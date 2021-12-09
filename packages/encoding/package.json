@@ -1,0 +1,18 @@
+{
+  "name": "@explorer/encoding",
+  "version": "0.1.0",
+  "private": true,
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "scripts": {
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint --ext .ts src test",
+    "lint:fix": "yarn lint --fix",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "mocha"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
