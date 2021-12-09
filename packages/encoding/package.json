@@ -14,5 +14,7 @@
     "test": "mocha"
   },
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "ethers": "^5.5.2"
+  }
 }
