@@ -2,26 +2,25 @@ import { providers, utils } from 'ethers'
 
 import { getCache, setCache } from './cache'
 
-const REGISTRY_ABI = new utils.Interface([
-  'event LogMemoryPageFactContinuous(bytes32 factHash, uint256 memoryHash, uint256 prod)',
+const GPS_VERIFIER_ABI = new utils.Interface([
+  'event LogMemoryPagesHashes(bytes32 factHash, bytes32[] pagesHashes)',
 ])
 
-const REGISTRY_ADDRESS = '0xEfbCcE4659db72eC6897F46783303708cf9ACef8'
-
-interface MemoryPageEvent {
-  memoryHash: string
-  transactionHash: string
+export interface MemoryHashEvent {
+  factHash: string
+  pagesHashes: string[]
 }
 
-export async function getMemoryPageEvents(
+export async function getMemoryHashEvents(
   provider: providers.Provider,
+  address: string,
   fromBlock: number,
   toBlock: number
 ) {
   const batches = getBatches(fromBlock, toBlock, 10 ** 5)
-  const events: MemoryPageEvent[] = []
+  const events: MemoryHashEvent[] = []
   for (const [from, to] of batches) {
-    events.push(...(await getEventBatch(provider, from, to)))
+    events.push(...(await getEventBatch(provider, address, from, to)))
   }
   return events
 }
@@ -36,26 +35,27 @@ function getBatches(from: number, to: number, batchSize: number) {
 
 async function getEventBatch(
   provider: providers.Provider,
+  address: string,
   fromBlock: number,
   toBlock: number
 ) {
-  const cacheKey = `memory-page-${fromBlock}-${toBlock}`
-  const cached = getCache<MemoryPageEvent[]>(cacheKey)
+  const cacheKey = `memory-hash-${address}-${fromBlock}-${toBlock}`
+  const cached = getCache<MemoryHashEvent[]>(cacheKey)
   if (cached) {
     return cached
   }
   const logs = await provider.getLogs({
-    address: REGISTRY_ADDRESS,
+    address,
     fromBlock,
     toBlock,
-    topics: [REGISTRY_ABI.getEventTopic('LogMemoryPageFactContinuous')],
+    topics: [GPS_VERIFIER_ABI.getEventTopic('LogMemoryPagesHashes')],
   })
   const events = logs
-    .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
+    .map((log) => ({ log, event: GPS_VERIFIER_ABI.parseLog(log) }))
     .map(
-      ({ log, event }): MemoryPageEvent => ({
-        memoryHash: event.args.memoryHash.toHexString(),
-        transactionHash: log.transactionHash,
+      ({ event }): MemoryHashEvent => ({
+        factHash: event.args.factHash,
+        pagesHashes: event.args.pagesHashes,
       })
     )
   setCache(cacheKey, events)
