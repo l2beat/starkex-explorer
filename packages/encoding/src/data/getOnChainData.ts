@@ -1,4 +1,4 @@
-import { providers, utils } from 'ethers'
+import { BigNumber, providers, utils } from 'ethers'
 
 import { getFacts } from './getFacts'
 import { getGpsVerifiers } from './getGpsVerifiers'
@@ -33,7 +33,7 @@ export async function getOnChainData(blockHash: string) {
         memoryHashEvents.find((x) => x.factHash === fact)?.pagesHashes ?? []
     )
     .map((x) => mpMap.get(x))
-  const pages: unknown[] = []
+  const pages: BigNumber[] = []
   for (const hash of transactionHashes) {
     if (!hash) {
       continue
@@ -47,5 +47,8 @@ export async function getOnChainData(blockHash: string) {
   }
   // TODO: why do we drop the first memory page?
   const onChainData = pages.slice(1).flat()
-  console.log(onChainData.length)
+  const result = onChainData.map((x) =>
+    x.toHexString().substring(2).padStart(64, '0')
+  )
+  return result
 }
