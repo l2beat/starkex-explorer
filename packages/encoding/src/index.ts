@@ -1,3 +1,1 @@
-export function decode(value: string) {
-  return parseInt(value)
-}
+export { decode } from './decode'
