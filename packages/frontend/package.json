@@ -1,0 +1,27 @@
+{
+  "name": "@explorer/frontend",
+  "version": "0.1.0",
+  "private": true,
+  "main": "build/src/pages/index.js",
+  "types": "build/src/pages/index.d.ts",
+  "scripts": {
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint --ext .ts src",
+    "lint:fix": "yarn lint --fix",
+    "typecheck": "tsc --noEmit",
+    "build": "NODE_ENV=production gulp build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "autoprefixer": "^10.4.0",
+    "cssnano": "^5.0.12",
+    "del": "^6.0.0",
+    "gulp": "^4.0.2",
+    "gulp-postcss": "^9.0.1",
+    "gulp-sass": "^5.0.0",
+    "path": "^0.12.7",
+    "postcss": "^8.4.5",
+    "sass": "^1.45.0"
+  }
+}
