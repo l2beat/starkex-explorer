@@ -1,30 +1,12 @@
-interface OnChainData {
-  funding: FundingEntry[]
-  positions: PositionUpdate[]
-}
-
-interface FundingEntry {
-  indices: FundingIndex[]
-  timestamp: bigint
-}
-
-interface FundingIndex {
-  assetId: bigint
-  fundingIndex: bigint
-}
-
-interface PositionUpdate {
-  positionId: bigint
-  publicKey: bigint
-  collateralBalance: bigint
-  fundingTimestamp: bigint
-  balances: AssetBalance[]
-}
-
-interface AssetBalance {
-  assetId: bigint
-  balance: bigint
-}
+import { decodeAssetId } from './assetId'
+import { DecodingError } from './DecodingError'
+import {
+  AssetBalance,
+  FundingEntry,
+  FundingIndex,
+  OnChainData,
+  PositionUpdate,
+} from './OnChainData'
 
 const MIN_INT = -(2n ** 63n)
 
@@ -40,7 +22,7 @@ export function decode(data: string[]): OnChainData {
     const end = position + fundingIndicesLength * 2
     for (; position < end; position += 2) {
       indices.push({
-        assetId: hexToBigInt(data[position]),
+        assetId: hexToAssetId(data[position]),
         fundingIndex: hexToBigInt(data[position + 1]) + MIN_INT,
       })
     }
@@ -60,7 +42,9 @@ export function decode(data: string[]): OnChainData {
     const balances: AssetBalance[] = []
     const end = position + stateValuesLength - 4
     for (; position < end; position++) {
-      const assetId = hexToBigInt(data[position]?.slice(72 / 4, (72 + 120) / 4))
+      const assetId = hexToAssetId(
+        data[position]?.slice(72 / 4, (72 + 120) / 4)
+      )
       const balance =
         hexToBigInt(data[position]?.slice((72 + 120) / 4)) + MIN_INT
       balances.push({ assetId, balance })
@@ -78,20 +62,28 @@ export function decode(data: string[]): OnChainData {
   return { funding, positions }
 }
 
+export function hexToAssetId(value: string | undefined) {
+  checkIntegrity(value)
+  const last15bytes = value.substring(value.length - 30)
+  return decodeAssetId(last15bytes)
+}
+
 function hexToBigInt(value: string | undefined) {
-  if (value === undefined) {
-    throw new TypeError('Data malformed')
-  }
+  checkIntegrity(value)
   return BigInt('0x' + value)
 }
 
 function hexToSafeInt(value: string | undefined) {
-  if (value === undefined) {
-    throw new TypeError('Data malformed')
-  }
+  checkIntegrity(value)
   const number = parseInt(value, 16)
   if (number > Number.MAX_SAFE_INTEGER) {
-    throw new TypeError('Data malformed')
+    throw new DecodingError('Number too large')
   }
   return number
+}
+
+function checkIntegrity<T>(value: T | undefined): asserts value is T {
+  if (value === undefined) {
+    throw new DecodingError('Went out of bounds')
+  }
 }

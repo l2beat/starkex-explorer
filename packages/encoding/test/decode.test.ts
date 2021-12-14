@@ -1,6 +1,8 @@
 import { expect } from 'chai'
 
+import { encodeAssetId } from '../src/assetId'
 import { decode } from '../src/decode'
+import { DecodingError } from '../src/DecodingError'
 
 describe('decode', () => {
   function encodeUint256(value: bigint | number) {
@@ -8,7 +10,7 @@ describe('decode', () => {
   }
 
   it('fails for empty data', () => {
-    expect(() => decode([])).to.throw('Data malformed')
+    expect(() => decode([])).to.throw(DecodingError, 'Went out of bounds')
   })
 
   it('decodes a single entry with a single index', () => {
@@ -16,14 +18,14 @@ describe('decode', () => {
       decode([
         encodeUint256(1), // single entry
         encodeUint256(1), // single index
-        encodeUint256(123), // asset id
+        encodeAssetId('ETH-9').padStart(64, '0'),
         encodeUint256(2n ** 63n + 1n), // funding index = 1
         encodeUint256(456), // timestamp
       ])
     ).to.deep.equal({
       funding: [
         {
-          indices: [{ assetId: 123n, fundingIndex: 1n }],
+          indices: [{ assetId: 'ETH-9', fundingIndex: 1n }],
           timestamp: 456n,
         },
       ],
@@ -36,11 +38,11 @@ describe('decode', () => {
       decode([
         encodeUint256(1), // single entry
         encodeUint256(3), // 3 indices
-        encodeUint256(100), // asset id
+        encodeAssetId('ETH-9').padStart(64, '0'),
         encodeUint256(2n ** 63n + 100n), // funding index = 100
-        encodeUint256(200), // asset id
+        encodeAssetId('BTC-10').padStart(64, '0'),
         encodeUint256(2n ** 63n - 200n), // funding index = -200
-        encodeUint256(300), // asset id
+        encodeAssetId('ABC-1').padStart(64, '0'),
         encodeUint256(2n ** 63n), // funding index = 0
         encodeUint256(456), // timestamp
       ])
@@ -48,9 +50,9 @@ describe('decode', () => {
       funding: [
         {
           indices: [
-            { assetId: 100n, fundingIndex: 100n },
-            { assetId: 200n, fundingIndex: -200n },
-            { assetId: 300n, fundingIndex: 0n },
+            { assetId: 'ETH-9', fundingIndex: 100n },
+            { assetId: 'BTC-10', fundingIndex: -200n },
+            { assetId: 'ABC-1', fundingIndex: 0n },
           ],
           timestamp: 456n,
         },
@@ -64,17 +66,17 @@ describe('decode', () => {
       decode([
         encodeUint256(2), // 2 entries
         encodeUint256(3), // 3 indices
-        encodeUint256(100), // asset id
+        encodeAssetId('ETH-9').padStart(64, '0'),
         encodeUint256(2n ** 63n + 100n), // funding index = 100
-        encodeUint256(200), // asset id
+        encodeAssetId('BTC-10').padStart(64, '0'),
         encodeUint256(2n ** 63n - 200n), // funding index = -200
-        encodeUint256(300), // asset id
+        encodeAssetId('ABC-1').padStart(64, '0'),
         encodeUint256(2n ** 63n), // funding index = 0
         encodeUint256(456), // timestamp
         encodeUint256(2), // 2 indices
-        encodeUint256(100), // asset id
+        encodeAssetId('ETH-9').padStart(64, '0'),
         encodeUint256(2n ** 63n + 1n), // funding index = 1
-        encodeUint256(200), // asset id
+        encodeAssetId('BTC-10').padStart(64, '0'),
         encodeUint256(2n ** 63n + 2n), // funding index = 2
         encodeUint256(789), // timestamp
       ])
@@ -82,16 +84,16 @@ describe('decode', () => {
       funding: [
         {
           indices: [
-            { assetId: 100n, fundingIndex: 100n },
-            { assetId: 200n, fundingIndex: -200n },
-            { assetId: 300n, fundingIndex: 0n },
+            { assetId: 'ETH-9', fundingIndex: 100n },
+            { assetId: 'BTC-10', fundingIndex: -200n },
+            { assetId: 'ABC-1', fundingIndex: 0n },
           ],
           timestamp: 456n,
         },
         {
           indices: [
-            { assetId: 100n, fundingIndex: 1n },
-            { assetId: 200n, fundingIndex: 2n },
+            { assetId: 'ETH-9', fundingIndex: 1n },
+            { assetId: 'BTC-10', fundingIndex: 2n },
           ],
           timestamp: 789n,
         },
