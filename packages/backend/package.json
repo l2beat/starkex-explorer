@@ -15,7 +15,9 @@
     "start": "node -r esbuild-register src"
   },
   "dependencies": {
-    "@explorer/encoding": "*"
+    "@explorer/encoding": "*",
+    "chalk": "^4.1.2",
+    "dotenv": "^10.0.0"
   },
   "devDependencies": {}
 }
