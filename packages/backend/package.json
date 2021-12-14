@@ -12,8 +12,8 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "test": "mocha",
-    "start": "node -r esbuild-register src",
-    "start:prod": "node -r source-map-support/register build/src"
+    "start": "node -r source-map-support/register build/src",
+    "dev": "node -r esbuild-register src"
   },
   "dependencies": {
     "@explorer/encoding": "*",
