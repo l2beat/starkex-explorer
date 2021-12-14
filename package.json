@@ -18,7 +18,8 @@
     "lint:fix": "wsrun -ecsm lint:fix",
     "typecheck": "wsrun -ecsm typecheck",
     "test": "wsrun -ecsm test",
-    "build": "wsrun -ecsm build"
+    "build": "wsrun -ecsm build",
+    "start": "cd packages/backend && yarn start"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",
