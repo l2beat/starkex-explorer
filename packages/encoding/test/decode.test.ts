@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import { encodeAssetId } from '../src/assetId'
 import { decode } from '../src/decode'
 import { DecodingError } from '../src/DecodingError'
+import REAL_DECODED from './data/onchain-decoded.json'
 import REAL_DATA from './data/onchain-example.json'
 
 const OFFSET = 2n ** 63n
@@ -38,7 +39,7 @@ describe('decode', () => {
     ).to.deep.equal({
       funding: [
         {
-          indices: [{ assetId: 'ETH-9', fundingIndex: 1n }],
+          indices: [{ assetId: 'ETH-9', value: 1n }],
           timestamp: 456n,
         },
       ],
@@ -63,9 +64,9 @@ describe('decode', () => {
       funding: [
         {
           indices: [
-            { assetId: 'ETH-9', fundingIndex: 100n },
-            { assetId: 'BTC-10', fundingIndex: -200n },
-            { assetId: 'ABC-1', fundingIndex: 0n },
+            { assetId: 'ETH-9', value: 100n },
+            { assetId: 'BTC-10', value: -200n },
+            { assetId: 'ABC-1', value: 0n },
           ],
           timestamp: 456n,
         },
@@ -97,16 +98,16 @@ describe('decode', () => {
       funding: [
         {
           indices: [
-            { assetId: 'ETH-9', fundingIndex: 100n },
-            { assetId: 'BTC-10', fundingIndex: -200n },
-            { assetId: 'ABC-1', fundingIndex: 0n },
+            { assetId: 'ETH-9', value: 100n },
+            { assetId: 'BTC-10', value: -200n },
+            { assetId: 'ABC-1', value: 0n },
           ],
           timestamp: 456n,
         },
         {
           indices: [
-            { assetId: 'ETH-9', fundingIndex: 1n },
-            { assetId: 'BTC-10', fundingIndex: 2n },
+            { assetId: 'ETH-9', value: 1n },
+            { assetId: 'BTC-10', value: 2n },
           ],
           timestamp: 789n,
         },
@@ -246,16 +247,16 @@ describe('decode', () => {
       funding: [
         {
           indices: [
-            { assetId: 'ETH-9', fundingIndex: 100n },
-            { assetId: 'BTC-10', fundingIndex: -200n },
-            { assetId: 'ABC-1', fundingIndex: 0n },
+            { assetId: 'ETH-9', value: 100n },
+            { assetId: 'BTC-10', value: -200n },
+            { assetId: 'ABC-1', value: 0n },
           ],
           timestamp: 456n,
         },
         {
           indices: [
-            { assetId: 'ETH-9', fundingIndex: 1n },
-            { assetId: 'BTC-10', fundingIndex: 2n },
+            { assetId: 'ETH-9', value: 1n },
+            { assetId: 'BTC-10', value: 2n },
           ],
           timestamp: 789n,
         },
@@ -283,6 +284,10 @@ describe('decode', () => {
   })
 
   it('decodes real onchain data', () => {
-    expect(() => decode(REAL_DATA)).not.to.throw()
+    const decoded = decode(REAL_DATA)
+    const noBigInt = JSON.parse(
+      JSON.stringify(decoded, (k, v) => (typeof v === 'bigint' ? Number(v) : v))
+    )
+    expect(noBigInt).to.deep.equal(REAL_DECODED)
   })
 })

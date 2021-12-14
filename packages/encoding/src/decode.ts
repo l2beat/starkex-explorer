@@ -23,7 +23,7 @@ export function decode(data: string[]): OnChainData {
     for (; position < end; position += 2) {
       indices.push({
         assetId: hexToAssetId(data[position]),
-        fundingIndex: hexToBigInt(data[position + 1]) + MIN_INT,
+        value: hexToBigInt(data[position + 1]) + MIN_INT,
       })
     }
 

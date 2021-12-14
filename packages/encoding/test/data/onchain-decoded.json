@@ -1,0 +1,2663 @@
+{
+  "funding": [
+    {
+      "timestamp": 1621933200,
+      "indices": [
+        {
+          "assetId": "1INCH-7",
+          "value": 31655836
+        },
+        {
+          "assetId": "AAVE-8",
+          "value": 795868592
+        },
+        {
+          "assetId": "AVAX-7",
+          "value": 502785329
+        },
+        {
+          "assetId": "BTC-10",
+          "value": 2875287252
+        },
+        {
+          "assetId": "CRV-6",
+          "value": 0
+        },
+        {
+          "assetId": "DOGE-5",
+          "value": 194006499
+        },
+        {
+          "assetId": "ETH-9",
+          "value": 1210809155
+        },
+        {
+          "assetId": "LINK-7",
+          "value": 1109061313
+        },
+        {
+          "assetId": "SNX-7",
+          "value": -24347293
+        },
+        {
+          "assetId": "SOL-7",
+          "value": 659281933
+        },
+        {
+          "assetId": "SUSHI-7",
+          "value": 222952353
+        },
+        {
+          "assetId": "UNI-7",
+          "value": 722512578
+        },
+        {
+          "assetId": "YFI-10",
+          "value": 745561075
+        }
+      ]
+    },
+    {
+      "timestamp": 1621936800,
+      "indices": [
+        {
+          "assetId": "1INCH-7",
+          "value": 31670892
+        },
+        {
+          "assetId": "AAVE-8",
+          "value": 796115801
+        },
+        {
+          "assetId": "AVAX-7",
+          "value": 502681905
+        },
+        {
+          "assetId": "BTC-10",
+          "value": 2875914625
+        },
+        {
+          "assetId": "CRV-6",
+          "value": 0
+        },
+        {
+          "assetId": "DOGE-5",
+          "value": 194156122
+        },
+        {
+          "assetId": "ETH-9",
+          "value": 1210862951
+        },
+        {
+          "assetId": "LINK-7",
+          "value": 1109192348
+        },
+        {
+          "assetId": "SNX-7",
+          "value": -24369948
+        },
+        {
+          "assetId": "SOL-7",
+          "value": 659420772
+        },
+        {
+          "assetId": "SUSHI-7",
+          "value": 223024130
+        },
+        {
+          "assetId": "UNI-7",
+          "value": 722697410
+        },
+        {
+          "assetId": "YFI-10",
+          "value": 745838478
+        }
+      ]
+    },
+    {
+      "timestamp": 1621940400,
+      "indices": [
+        {
+          "assetId": "1INCH-7",
+          "value": 31686014
+        },
+        {
+          "assetId": "AAVE-8",
+          "value": 796392874
+        },
+        {
+          "assetId": "AVAX-7",
+          "value": 502423015
+        },
+        {
+          "assetId": "BTC-10",
+          "value": 2876577184
+        },
+        {
+          "assetId": "CRV-6",
+          "value": 0
+        },
+        {
+          "assetId": "DOGE-5",
+          "value": 194449692
+        },
+        {
+          "assetId": "ETH-9",
+          "value": 1210860892
+        },
+        {
+          "assetId": "LINK-7",
+          "value": 1109324093
+        },
+        {
+          "assetId": "SNX-7",
+          "value": -24421794
+        },
+        {
+          "assetId": "SOL-7",
+          "value": 659488404
+        },
+        {
+          "assetId": "SUSHI-7",
+          "value": 223074547
+        },
+        {
+          "assetId": "UNI-7",
+          "value": 722828981
+        },
+        {
+          "assetId": "YFI-10",
+          "value": 746082045
+        }
+      ]
+    },
+    {
+      "timestamp": 1621944000,
+      "indices": [
+        {
+          "assetId": "1INCH-7",
+          "value": 31699834
+        },
+        {
+          "assetId": "AAVE-8",
+          "value": 796584425
+        },
+        {
+          "assetId": "AVAX-7",
+          "value": 502079111
+        },
+        {
+          "assetId": "BTC-10",
+          "value": 2877317866
+        },
+        {
+          "assetId": "CRV-6",
+          "value": 0
+        },
+        {
+          "assetId": "DOGE-5",
+          "value": 194637831
+        },
+        {
+          "assetId": "ETH-9",
+          "value": 1210941212
+        },
+        {
+          "assetId": "LINK-7",
+          "value": 1109447331
+        },
+        {
+          "assetId": "SNX-7",
+          "value": -24472835
+        },
+        {
+          "assetId": "SOL-7",
+          "value": 659626207
+        },
+        {
+          "assetId": "SUSHI-7",
+          "value": 223145283
+        },
+        {
+          "assetId": "UNI-7",
+          "value": 722951672
+        },
+        {
+          "assetId": "YFI-10",
+          "value": 746371460
+        }
+      ]
+    },
+    {
+      "timestamp": 1621947600,
+      "indices": [
+        {
+          "assetId": "1INCH-7",
+          "value": 31713810
+        },
+        {
+          "assetId": "AAVE-8",
+          "value": 796959212
+        },
+        {
+          "assetId": "AVAX-7",
+          "value": 501626631
+        },
+        {
+          "assetId": "BTC-10",
+          "value": 2877935047
+        },
+        {
+          "assetId": "CRV-6",
+          "value": 0
+        },
+        {
+          "assetId": "DOGE-5",
+          "value": 194776442
+        },
+        {
+          "assetId": "ETH-9",
+          "value": 1211018970
+        },
+        {
+          "assetId": "LINK-7",
+          "value": 1109589085
+        },
+        {
+          "assetId": "SNX-7",
+          "value": -24650267
+        },
+        {
+          "assetId": "SOL-7",
+          "value": 659782533
+        },
+        {
+          "assetId": "SUSHI-7",
+          "value": 223242756
+        },
+        {
+          "assetId": "UNI-7",
+          "value": 723093473
+        },
+        {
+          "assetId": "YFI-10",
+          "value": 746724329
+        }
+      ]
+    },
+    {
+      "timestamp": 1621951200,
+      "indices": [
+        {
+          "assetId": "1INCH-7",
+          "value": 31728399
+        },
+        {
+          "assetId": "AAVE-8",
+          "value": 797240003
+        },
+        {
+          "assetId": "AVAX-7",
+          "value": 501196013
+        },
+        {
+          "assetId": "BTC-10",
+          "value": 2878291104
+        },
+        {
+          "assetId": "CRV-6",
+          "value": 0
+        },
+        {
+          "assetId": "DOGE-5",
+          "value": 194963343
+        },
+        {
+          "assetId": "ETH-9",
+          "value": 1211122539
+        },
+        {
+          "assetId": "LINK-7",
+          "value": 1109712666
+        },
+        {
+          "assetId": "SNX-7",
+          "value": -24750661
+        },
+        {
+          "assetId": "SOL-7",
+          "value": 659933869
+        },
+        {
+          "assetId": "SUSHI-7",
+          "value": 223313130
+        },
+        {
+          "assetId": "UNI-7",
+          "value": 723216045
+        },
+        {
+          "assetId": "YFI-10",
+          "value": 746976580
+        }
+      ]
+    },
+    {
+      "timestamp": 1621954800,
+      "indices": [
+        {
+          "assetId": "1INCH-7",
+          "value": 31743240
+        },
+        {
+          "assetId": "AAVE-8",
+          "value": 797726601
+        },
+        {
+          "assetId": "AVAX-7",
+          "value": 500862644
+        },
+        {
+          "assetId": "BTC-10",
+          "value": 2878493441
+        },
+        {
+          "assetId": "CRV-6",
+          "value": 0
+        },
+        {
+          "assetId": "DOGE-5",
+          "value": 195188655
+        },
+        {
+          "assetId": "ETH-9",
+          "value": 1211249488
+        },
+        {
+          "assetId": "LINK-7",
+          "value": 1109851408
+        },
+        {
+          "assetId": "SNX-7",
+          "value": -24786991
+        },
+        {
+          "assetId": "SOL-7",
+          "value": 660085869
+        },
+        {
+          "assetId": "SUSHI-7",
+          "value": 223410873
+        },
+        {
+          "assetId": "UNI-7",
+          "value": 723445696
+        },
+        {
+          "assetId": "YFI-10",
+          "value": 747276878
+        }
+      ]
+    },
+    {
+      "timestamp": 1621958400,
+      "indices": [
+        {
+          "assetId": "1INCH-7",
+          "value": 31758182
+        },
+        {
+          "assetId": "AAVE-8",
+          "value": 798387563
+        },
+        {
+          "assetId": "AVAX-7",
+          "value": 500904843
+        },
+        {
+          "assetId": "BTC-10",
+          "value": 2878664608
+        },
+        {
+          "assetId": "CRV-6",
+          "value": -136658
+        },
+        {
+          "assetId": "DOGE-5",
+          "value": 195477837
+        },
+        {
+          "assetId": "ETH-9",
+          "value": 1211233561
+        },
+        {
+          "assetId": "LINK-7",
+          "value": 1109996933
+        },
+        {
+          "assetId": "SNX-7",
+          "value": -24773136
+        },
+        {
+          "assetId": "SOL-7",
+          "value": 660421200
+        },
+        {
+          "assetId": "SUSHI-7",
+          "value": 223492251
+        },
+        {
+          "assetId": "UNI-7",
+          "value": 723584956
+        },
+        {
+          "assetId": "YFI-10",
+          "value": 747530197
+        }
+      ]
+    }
+  ],
+  "positions": [
+    {
+      "positionId": 0,
+      "publicKey": "0x006b56aeb3ee3df0002dfa4e2c65e335fbacf0f7a8f399a9beffe7b04534f7cd",
+      "collateralBalance": 29234661877,
+      "fundingTimestamp": 1621958400,
+      "balances": []
+    },
+    {
+      "positionId": 1,
+      "publicKey": "0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358",
+      "collateralBalance": 408907817269,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 2,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 16,
+      "publicKey": "0x015e8410e93e5c90b1bf7a393874f68f4cc7f477c5d742daac5c5a112e672d61",
+      "collateralBalance": 12280156418787,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "1INCH-7",
+          "balance": 63030000000
+        },
+        {
+          "assetId": "AAVE-8",
+          "balance": -34197000000
+        },
+        {
+          "assetId": "AVAX-7",
+          "balance": 45153000000
+        },
+        {
+          "assetId": "BTC-10",
+          "balance": 34355000000
+        },
+        {
+          "assetId": "CRV-6",
+          "balance": -200000000
+        },
+        {
+          "assetId": "DOGE-5",
+          "balance": -1814000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -248406000000
+        },
+        {
+          "assetId": "LINK-7",
+          "balance": 109081000000
+        },
+        {
+          "assetId": "SNX-7",
+          "balance": -105494000000
+        },
+        {
+          "assetId": "SOL-7",
+          "balance": -105662000000
+        },
+        {
+          "assetId": "SUSHI-7",
+          "balance": -77798000000
+        },
+        {
+          "assetId": "UNI-7",
+          "balance": -23250000000
+        },
+        {
+          "assetId": "YFI-10",
+          "balance": -1579000000
+        }
+      ]
+    },
+    {
+      "positionId": 18,
+      "publicKey": "0x01b9832d21b9497a35d7ab8921ac25e91aadb50351e3b114739453d7e9d63071",
+      "collateralBalance": 1788751099036,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "AAVE-8",
+          "balance": -28517000000
+        },
+        {
+          "assetId": "AVAX-7",
+          "balance": -40841000000
+        },
+        {
+          "assetId": "BTC-10",
+          "balance": 112706000000
+        },
+        {
+          "assetId": "CRV-6",
+          "balance": -50000000
+        },
+        {
+          "assetId": "DOGE-5",
+          "balance": 3186000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 67758000000
+        },
+        {
+          "assetId": "LINK-7",
+          "balance": -69629000000
+        },
+        {
+          "assetId": "SNX-7",
+          "balance": -51108000000
+        },
+        {
+          "assetId": "SOL-7",
+          "balance": -28329000000
+        },
+        {
+          "assetId": "SUSHI-7",
+          "balance": -72007000000
+        },
+        {
+          "assetId": "UNI-7",
+          "balance": -36770000000
+        }
+      ]
+    },
+    {
+      "positionId": 21,
+      "publicKey": "0x00f3345d5667e97b443a221ab0e065e7849dc70822ba5ed1de1b8e88de63eedc",
+      "collateralBalance": 964329855670,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "AVAX-7",
+          "balance": 0
+        },
+        {
+          "assetId": "BTC-10",
+          "balance": 2908000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -51296000000
+        }
+      ]
+    },
+    {
+      "positionId": 22,
+      "publicKey": "0x050e0343dc2c0c00aa13f584a31db64524e98b7ff11cd2e07c2f074440821f99",
+      "collateralBalance": 371014398124,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -755000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 882000000
+        }
+      ]
+    },
+    {
+      "positionId": 23,
+      "publicKey": "0x03f68abc7e2fae7eee20bacceafc216f88d2c4fea68c501f2151e220c6481b9b",
+      "collateralBalance": 5391321495770,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -120851000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -247078000000
+        },
+        {
+          "assetId": "LINK-7",
+          "balance": -65195000000
+        },
+        {
+          "assetId": "SUSHI-7",
+          "balance": -83200000000
+        }
+      ]
+    },
+    {
+      "positionId": 24,
+      "publicKey": "0x02e53252057b5beebebb821e4e22e01a3bed65c1a7ab4c38b2796526202be461",
+      "collateralBalance": 151515789423,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "AAVE-8",
+          "balance": -9446000000
+        },
+        {
+          "assetId": "BTC-10",
+          "balance": -500000000
+        },
+        {
+          "assetId": "LINK-7",
+          "balance": -4558000000
+        },
+        {
+          "assetId": "UNI-7",
+          "balance": -4910000000
+        }
+      ]
+    },
+    {
+      "positionId": 29,
+      "publicKey": "0x075abeccba7008be890d26ec82ea2cc66e39161db368350bc597af1c49b1ac1a",
+      "collateralBalance": 2949766771691,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "AVAX-7",
+          "balance": 0
+        },
+        {
+          "assetId": "BTC-10",
+          "balance": -300000000000
+        }
+      ]
+    },
+    {
+      "positionId": 533,
+      "publicKey": "0x049ff4709778112e3504976f137a64af6577fc1498ad190917c5499689189d58",
+      "collateralBalance": -3749209860,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 2000000000
+        }
+      ]
+    },
+    {
+      "positionId": 633,
+      "publicKey": "0x0165d3476c8c01fa2b00a14654b81bc5e11337d721f954bdc5911285d9db0b86",
+      "collateralBalance": -133110340576,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 52500000000
+        }
+      ]
+    },
+    {
+      "positionId": 846,
+      "publicKey": "0x0031d4362985f55465fc7c3bf3f142cd4610434b7c1dd71b7a6fbcc0751e0ce5",
+      "collateralBalance": -2531839665,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "AAVE-8",
+          "balance": 182000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 368000000
+        },
+        {
+          "assetId": "UNI-7",
+          "balance": 306000000
+        }
+      ]
+    },
+    {
+      "positionId": 1348,
+      "publicKey": "0x034b85d5d9df2e0be929c741658682b8b8c1239a5bd159e6c8af28acb6115e40",
+      "collateralBalance": -6647828490,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "AAVE-8",
+          "balance": 0
+        },
+        {
+          "assetId": "BTC-10",
+          "balance": 0
+        },
+        {
+          "assetId": "LINK-7",
+          "balance": 2000000000
+        },
+        {
+          "assetId": "SOL-7",
+          "balance": 2000000000
+        },
+        {
+          "assetId": "UNI-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 1583,
+      "publicKey": "0x054331e76a8011134cac59e478978a5deefecf666e1072c97b620b3ad1e5977a",
+      "collateralBalance": 39775546764,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "YFI-10",
+          "balance": -100000000
+        }
+      ]
+    },
+    {
+      "positionId": 1884,
+      "publicKey": "0x0380447a3d98530e20656cfda5d9b467e902cafb727be4ef7e392243bee9a751",
+      "collateralBalance": 183343881,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "DOGE-5",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 1908,
+      "publicKey": "0x065097c4060f8f7f076df9c70138554b2e005762488d0127425ce6701be6b23e",
+      "collateralBalance": 91930000,
+      "fundingTimestamp": 1621944000,
+      "balances": []
+    },
+    {
+      "positionId": 1931,
+      "publicKey": "0x00aa6a457ebf1d741b7f07e5b3e2cf0e8c1930b90ccd2ae47f0742fa8c1c2b46",
+      "collateralBalance": -382736209,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 200000000
+        }
+      ]
+    },
+    {
+      "positionId": 2473,
+      "publicKey": "0x066c3302cd653f404267ca4a3d746ab52fc926b156d7351bda242b3e84e52013",
+      "collateralBalance": 223067859,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "SNX-7",
+          "balance": -90000000
+        }
+      ]
+    },
+    {
+      "positionId": 2481,
+      "publicKey": "0x04ff49ea3a9462fa3dc1915b838442b740a696e1a5f29fe84570cc692d8771e9",
+      "collateralBalance": 708892397,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 20000000
+        },
+        {
+          "assetId": "UNI-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 2717,
+      "publicKey": "0x07b16387bc9f0895159b76db525eb0ee976979dedadcfe64036174cabe57fa4f",
+      "collateralBalance": -1034045315,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 300000000
+        },
+        {
+          "assetId": "SNX-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 3071,
+      "publicKey": "0x02c2f34e7f5770bcac71df73db5f51dcf8d9d4fa15253fdb409a8b0d5c35f0f5",
+      "collateralBalance": 895959798,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -200000000
+        }
+      ]
+    },
+    {
+      "positionId": 3499,
+      "publicKey": "0x03ad35af5e588bf7478615d32eccca8a77bc78760739843e7002635ed209442d",
+      "collateralBalance": 3212495,
+      "fundingTimestamp": 1621933200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 3807,
+      "publicKey": "0x0542f8aa6a8b3c8fca5557ddd7b3e0f0e7685cb341cb73dd881341207311fd98",
+      "collateralBalance": 501233555,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 3876,
+      "publicKey": "0x05e2e43e6ccc74564bf48d52ff444943fc70ee129a5b810b85864f9a813d0178",
+      "collateralBalance": -1933738409,
+      "fundingTimestamp": 1621944000,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 800000000
+        }
+      ]
+    },
+    {
+      "positionId": 4304,
+      "publicKey": "0x010c2cd3b64f9a4815222c98e37ab594ec8acce9b9d07decb3ed5b9998f94b37",
+      "collateralBalance": -2707312176,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 2000000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 9000000000
+        }
+      ]
+    },
+    {
+      "positionId": 4405,
+      "publicKey": "0x050c9141a7ac65344f7e83ab177b2913a4ca34ff80f904cdc0d4a969c6b94719",
+      "collateralBalance": 1982389,
+      "fundingTimestamp": 1621929600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 4435,
+      "publicKey": "0x03f174b019aded946c91ef6497fe2fcab9251ca387e98e98330663aba6f47f1b",
+      "collateralBalance": 12127066,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "DOGE-5",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 4618,
+      "publicKey": "0x04c3d9275fca784c14096c34b407b4054d3f7bfa2a31d4a2d2b1c256e8537cf7",
+      "collateralBalance": 641314687,
+      "fundingTimestamp": 1621933200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -100000000
+        }
+      ]
+    },
+    {
+      "positionId": 4674,
+      "publicKey": "0x0134cf27990e5e44e10fd4edbd023bc98388ebac83998734cd259c49fa12d112",
+      "collateralBalance": 20534249971,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 4688,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 4718,
+      "publicKey": "0x0767d6db26e6fd7e641181c3d7d07e7d46515f076ef244aa3607843672da2ec6",
+      "collateralBalance": -2373124192,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 1026000000
+        }
+      ]
+    },
+    {
+      "positionId": 5164,
+      "publicKey": "0x058b5753127b899e4c99808cc950403855d40e761721a507bd8edb08be74f077",
+      "collateralBalance": 13335007,
+      "fundingTimestamp": 1621944000,
+      "balances": []
+    },
+    {
+      "positionId": 5289,
+      "publicKey": "0x06388f62453cd671a20b19db10b98cbe90a77d4abe45ffca07da48861850131e",
+      "collateralBalance": 19200309043,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -3000000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 5356,
+      "publicKey": "0x07c83ebfaf94f6771364223f69e40d8ee11cdc469b35195f2e34868ba54b4ee4",
+      "collateralBalance": -586678805,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "LINK-7",
+          "balance": 261000000
+        }
+      ]
+    },
+    {
+      "positionId": 5404,
+      "publicKey": "0x0003581090362183ee4f4a18f03feb8111df996a560addf0bd8ef3df12979625",
+      "collateralBalance": 1398845363,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "UNI-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 5640,
+      "publicKey": "0x00f220d87d71ec973c5cebd947cc489945f08cde9394106665939d2fc6e7f86a",
+      "collateralBalance": 35426944943,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -7407000000
+        }
+      ]
+    },
+    {
+      "positionId": 5715,
+      "publicKey": "0x06d7f8c958d9a4392f7dc9d42f59b1a752641409c20ba2bc9165bc3f68c76d7e",
+      "collateralBalance": 5542660519,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -2000000000
+        }
+      ]
+    },
+    {
+      "positionId": 5742,
+      "publicKey": "0x04a1e296d63b097af6dd08be241b388a7c75b555242269465f926bfbd0fa3f91",
+      "collateralBalance": -268814751,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 150000000
+        }
+      ]
+    },
+    {
+      "positionId": 6029,
+      "publicKey": "0x0294b77a86e89ca7e2e67538444af580f5012fc60622d26c629bc8ae77682f78",
+      "collateralBalance": -3868327841,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "AAVE-8",
+          "balance": 18000000000
+        },
+        {
+          "assetId": "SNX-7",
+          "balance": 90000000000
+        },
+        {
+          "assetId": "UNI-7",
+          "balance": 15000000000
+        }
+      ]
+    },
+    {
+      "positionId": 6224,
+      "publicKey": "0x0233b017f5bedcc36650b7751bcca7537b872c2268f83e29417faaa8eb74cfce",
+      "collateralBalance": 4258051490,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 6265,
+      "publicKey": "0x05cbc4a4abb5fcb0750ff143b389c54f2aff3a5987831a53a730141f200731fb",
+      "collateralBalance": 310048,
+      "fundingTimestamp": 1621933200,
+      "balances": []
+    },
+    {
+      "positionId": 6509,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": [
+        {
+          "assetId": "1INCH-7",
+          "balance": 0
+        },
+        {
+          "assetId": "AVAX-7",
+          "balance": 0
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        },
+        {
+          "assetId": "SOL-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 6792,
+      "publicKey": "0x07d86019a277a6cbd987947d51d24057cf21f038b05f32905ee5ba1ba5b9fcab",
+      "collateralBalance": -79243760495,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 34000000000
+        }
+      ]
+    },
+    {
+      "positionId": 6941,
+      "publicKey": "0x0334489b7a5980c7ee53fbc10299b3d7c4624b3b7ab1a7973d16a5cffdb3a212",
+      "collateralBalance": 2795855923,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 7416,
+      "publicKey": "0x0685e8e6dc4e3ef0caf4e7648ea7ac53fd6483e51bbb98207724ee6fce26d6c7",
+      "collateralBalance": 10018655631,
+      "fundingTimestamp": 1621933200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 7437,
+      "publicKey": "0x025405e327f491af15b96ea5131bc5fae1006a6ce4dc3dcc300c86fef580388e",
+      "collateralBalance": 118694046,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 7495,
+      "publicKey": "0x008a7f86b51a532fb36ee85b5928277c12ad5d526c6f10397fb98dc5f1f309e7",
+      "collateralBalance": 2169174933,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 7522,
+      "publicKey": "0x02aa75d5feb091180f1f6e7f44ff3c9d7f1be53654767f5385fe9c1b30092b3d",
+      "collateralBalance": 19235994358,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "SOL-7",
+          "balance": -3249000000
+        }
+      ]
+    },
+    {
+      "positionId": 8130,
+      "publicKey": "0x02a7940c6d9f394659cdced986007729f5f4fbcafffb73c6e6d7e30eac17acf1",
+      "collateralBalance": 1278630661,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 8225,
+      "publicKey": "0x01d3608004c8172130d61dece804c3194f77c13b3e168ea11eac4e89fabfab41",
+      "collateralBalance": -5271480043,
+      "fundingTimestamp": 1621944000,
+      "balances": [
+        {
+          "assetId": "SNX-7",
+          "balance": 1000000000
+        }
+      ]
+    },
+    {
+      "positionId": 8340,
+      "publicKey": "0x0747731b9abe310b5652d59f3b5cbdfe2b227c45cf27101ffd8657f7816b6b63",
+      "collateralBalance": -15262671997,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 14000000000
+        }
+      ]
+    },
+    {
+      "positionId": 8413,
+      "publicKey": "0x021f64e7c73153d082001a5b166667f186b20c673db33c614725864db40e7c94",
+      "collateralBalance": 234368352,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 8929,
+      "publicKey": "0x058a7b493a1061f6c706f5a8574ba6f6e662733e2605b25680a14c5c18eb7913",
+      "collateralBalance": -890792497,
+      "fundingTimestamp": 1621929600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 1500000000
+        }
+      ]
+    },
+    {
+      "positionId": 9024,
+      "publicKey": "0x05387699f4eae30f9d3634b3c6da5eaa8eb8e8643ed2c81976bc74c5c283ddc7",
+      "collateralBalance": 2166344767,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -500000000
+        }
+      ]
+    },
+    {
+      "positionId": 9235,
+      "publicKey": "0x00cc72d44175cfeb4cefcaaf91dd9bdd767e297c7b6ff6951b5f0a0b0d504738",
+      "collateralBalance": 2735841289,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 9411,
+      "publicKey": "0x0163b743f992ce93ebf3a9e134531f4607e3b5218161752ce457d68211f7a347",
+      "collateralBalance": 1004153376,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 9479,
+      "publicKey": "0x00a27ac8eed34108552d51a2065d58c4f27982e37b64cb004073847deb6d84bd",
+      "collateralBalance": 721299689,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 9515,
+      "publicKey": "0x005442efe2f12136092b94736615c07c27c1f30e16426ece8f3dfaace3841fdf",
+      "collateralBalance": 577929538,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 1500000000
+        }
+      ]
+    },
+    {
+      "positionId": 10101,
+      "publicKey": "0x041da9e488eaf9f329ae7fe6b1268c4339e4043417bfde16a4d3fa17a830c759",
+      "collateralBalance": 286840160,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 10165,
+      "publicKey": "0x05a2388304a933186890e7fde3cb751bbdd17412352487e8385de85bdc6b1a31",
+      "collateralBalance": 3065237209,
+      "fundingTimestamp": 1621929600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -1104000000
+        }
+      ]
+    },
+    {
+      "positionId": 10193,
+      "publicKey": "0x018ec3ccbb3ab671b3260343f7c10f86d8dab638740695f0d4417af948594944",
+      "collateralBalance": -2256407298,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 1250000000
+        }
+      ]
+    },
+    {
+      "positionId": 10274,
+      "publicKey": "0x00bab631faeb4dd1cada26d4ceb0210763ac2009b7d6f2d9338fa05c2efcc988",
+      "collateralBalance": 1303345422,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 10419,
+      "publicKey": "0x0177bdde5362101f9522257f16a14d0aadca92b8365e74d9e8e4696a8ac52755",
+      "collateralBalance": 1198709324,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -260000000
+        }
+      ]
+    },
+    {
+      "positionId": 10493,
+      "publicKey": "0x05a7722a7fd072369706934512e6b596d68b9d1c64eef573960d113a50ba0d56",
+      "collateralBalance": -12373881353,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 5000000000
+        }
+      ]
+    },
+    {
+      "positionId": 10659,
+      "publicKey": "0x04d0c2957679e7fcbe7b53a2bb83638ff29b8db5cac6763c22812ce0b2192711",
+      "collateralBalance": 100202912,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 10973,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 11157,
+      "publicKey": "0x02ac24bea9f5edad7ff499ff6fdf29767fa1485f0f7b23b5aac621cd252dffd9",
+      "collateralBalance": -270836337,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "CRV-6",
+          "balance": 200000000
+        },
+        {
+          "assetId": "YFI-10",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 11574,
+      "publicKey": "0x07f5fdfde81606df4fd71cd4ab958cfbedcdd02f30ad5fa0ae2194d98bfe9622",
+      "collateralBalance": 4532533705,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 11822,
+      "publicKey": "0x027a59fae35998c2ade77f1a4ae3be385e7e059f78c49c1ad29372cb8e9be4ca",
+      "collateralBalance": -6290704056,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 4530000000
+        },
+        {
+          "assetId": "SOL-7",
+          "balance": 40000000
+        }
+      ]
+    },
+    {
+      "positionId": 12100,
+      "publicKey": "0x073f76f08d4ad8f83f52f8c0071ccf766b84291641f0d114d478425121488877",
+      "collateralBalance": 3191887904,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 12113,
+      "publicKey": "0x06566e02daaf334040d3ac51e927361010d348cad73de8244f5a76db19b9a88b",
+      "collateralBalance": 3435158245,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 12597,
+      "publicKey": "0x02a1e698e1a71b0b212acca9bff7fc2dec5234f45933e5b1d41210d7e56c51a8",
+      "collateralBalance": -2747454595,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 1787000000
+        }
+      ]
+    },
+    {
+      "positionId": 12616,
+      "publicKey": "0x018e04abab3e3d7518504acba6ec4ddf6394529574fbf2f272d949e02d6c8303",
+      "collateralBalance": -162756134548,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 80000000000
+        }
+      ]
+    },
+    {
+      "positionId": 12644,
+      "publicKey": "0x028565a645821419e2f94a89675922424abb09cc19ba3e606e2379430fa6bea2",
+      "collateralBalance": -71842550160,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 24457000000
+        }
+      ]
+    },
+    {
+      "positionId": 12847,
+      "publicKey": "0x0495850911d12f340fbd5d308664bfea95e57bce8ced804aa43dc47ba7561526",
+      "collateralBalance": -56026759414,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 13012000000
+        }
+      ]
+    },
+    {
+      "positionId": 12929,
+      "publicKey": "0x0318dc4f7c0dc575089112b23b1a03e3ff62c5d967144c50803793abc9c70d48",
+      "collateralBalance": 3767211617,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 13257,
+      "publicKey": "0x01eeb29a0922fe2dea3e7cc078f111d3f57801ad370300cea96d224d0c209a5c",
+      "collateralBalance": -1892551189,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 13544,
+      "publicKey": "0x01bc56f6746a1734ddac3d63b0dd4704fc02068c5da621554ad673d7608694f4",
+      "collateralBalance": 6931900318,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "UNI-7",
+          "balance": -2098000000
+        }
+      ]
+    },
+    {
+      "positionId": 13645,
+      "publicKey": "0x06f527ef0cd3a0ee33dad6d78d89f4471c0dc8dce31d51c0e991333ad1b75bf7",
+      "collateralBalance": 63048919,
+      "fundingTimestamp": 1621936800,
+      "balances": []
+    },
+    {
+      "positionId": 13721,
+      "publicKey": "0x0774c6b4c85770b0d9a5d03b16df840fd17bfce7639cb9e3cc424d85df6fe3df",
+      "collateralBalance": 40995478816,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -15000000000
+        }
+      ]
+    },
+    {
+      "positionId": 13815,
+      "publicKey": "0x06f67e660ff6d0034762fc97fe25f99f2946c4bd51b2551a957736c3972fa61a",
+      "collateralBalance": 109609097,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 13952,
+      "publicKey": "0x023b481a839e6cdbba3b3c41645741507c73a779c72b221f1c62184231418ca0",
+      "collateralBalance": -58853940,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 200000000
+        }
+      ]
+    },
+    {
+      "positionId": 14189,
+      "publicKey": "0x0557517cb834a05ddeb7f373544d25b6f778849559bdf3075656df865f60f04e",
+      "collateralBalance": 83956450891,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 14414,
+      "publicKey": "0x04113eecc2cfd9420ad8ad4c4a592dfc6f72847642efd0a7cd5ce14bd6551129",
+      "collateralBalance": 1015998580,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 14533,
+      "publicKey": "0x01f1fd9ac1f10e18858a20fbcb88bd4b8d238a6a08e49b62e0f92cfa869195bc",
+      "collateralBalance": 2766339051,
+      "fundingTimestamp": 1621933200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 14651,
+      "publicKey": "0x041513ddb0a7cfb3f5dc68f83dc14413ddd34859b83ed28ee9178d0acc95a8a9",
+      "collateralBalance": -4341447203,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 680000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 1009000000
+        }
+      ]
+    },
+    {
+      "positionId": 15110,
+      "publicKey": "0x0320634bcaf3d21f4974ab7b9c70a4ad53eba27f18e233a36c6375028e41f4c2",
+      "collateralBalance": -16517117211,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 5000000000
+        }
+      ]
+    },
+    {
+      "positionId": 15201,
+      "publicKey": "0x07b7e3ba4d966466c0d2cd95d91ac0903729bea69fdd62e6d5151aa5ed996fbe",
+      "collateralBalance": 2323513017,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -500000000
+        }
+      ]
+    },
+    {
+      "positionId": 15372,
+      "publicKey": "0x0452dbd40cdd68c07bd4a52648a17c2ccd4136c6dc0bb6d23614e076978494bd",
+      "collateralBalance": -31908293540,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 14078000000
+        }
+      ]
+    },
+    {
+      "positionId": 15375,
+      "publicKey": "0x01a3604d3bd1f75a61501c15315f625bf13077c83bada04536cf8012175fbb5c",
+      "collateralBalance": -588296739,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "SUSHI-7",
+          "balance": 1041000000
+        }
+      ]
+    },
+    {
+      "positionId": 15376,
+      "publicKey": "0x00e44c13c6cd589c5014ee89f36e812dc5cd32ae30b080a7550e0530ec8c80a5",
+      "collateralBalance": 1588330200,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "UNI-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 15678,
+      "publicKey": "0x06d529e94619062c46591364294ac3f8c6b774b80ace48677ea83defe4aa2dd0",
+      "collateralBalance": 238829743,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 15759,
+      "publicKey": "0x07860c98a7c4bcb06b4b53d1daadc30c415907304f791d4d1d3428f865e2de31",
+      "collateralBalance": 87900697924,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 15770,
+      "publicKey": "0x0473593b2c3f57e60db6709421686761d4fe1d06d3508fb4c64f24ad47d3d9c2",
+      "collateralBalance": 17013799263,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 16052,
+      "publicKey": "0x06171d598310c8539f9210df6ea34d7d4aac2fc6fd30c1a6dc793b6fbf257aa8",
+      "collateralBalance": 143293928,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 16292,
+      "publicKey": "0x02bc91bb979f975ac8214a8efd668bb36e767a49748d65ef753325bc3b631ffe",
+      "collateralBalance": -4435555566,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "1INCH-7",
+          "balance": 90000000000
+        },
+        {
+          "assetId": "YFI-10",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 16393,
+      "publicKey": "0x02817db9abe88707fc8f2dfa5e349049554123bd1192cce17cbb3cd5773c2189",
+      "collateralBalance": 302058745,
+      "fundingTimestamp": 1621933200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -40000000
+        }
+      ]
+    },
+    {
+      "positionId": 16447,
+      "publicKey": "0x04100932e4338cea1e58cf96378c7a0763ab7e8fcb4e1a0420104dc96ae842fa",
+      "collateralBalance": -263982468,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "1INCH-7",
+          "balance": 1000000000
+        },
+        {
+          "assetId": "BTC-10",
+          "balance": 45000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 17263,
+      "publicKey": "0x06e320d3ae79921d2ceec1fed6dcfeb0722609efa6553c04671a765a9ee194b5",
+      "collateralBalance": -398174360,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 200000000
+        }
+      ]
+    },
+    {
+      "positionId": 17608,
+      "publicKey": "0x00565791fef196a4944c987e5016eba77edf83f6aa9d00b6a39224940f9b7f6b",
+      "collateralBalance": 179223623,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 17626,
+      "publicKey": "0x03b1d83eb001df6362fbe89ea1450cd0df9334861e3b4ac8b8885cb38395c82c",
+      "collateralBalance": 58485802,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 17634,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 17644,
+      "publicKey": "0x04fbc43c8d595588d18ec42517b57080d3010862e6473126bcb28fbee2e6a2fc",
+      "collateralBalance": 179052738,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 17726,
+      "publicKey": "0x015a265faf1ebc4de002f883b748354af3765d913f47a84ab8c4c93382ad48c3",
+      "collateralBalance": 57744233,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 17748,
+      "publicKey": "0x0752c77ef7b07f042997a5484bae8feac861b76b34277f5e1af7f4c8b323a6b0",
+      "collateralBalance": 180002255,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 18295,
+      "publicKey": "0x05e288787e104695bdc7f7f2e70e7cd6b52138957760c0e31bb59c7e2fe69414",
+      "collateralBalance": 169174780,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 18774,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 18782,
+      "publicKey": "0x001a57613a2002a0114cfcc8230ca7a435ba40267290041db80e4f8a0596146c",
+      "collateralBalance": 260159036,
+      "fundingTimestamp": 1621954800,
+      "balances": []
+    },
+    {
+      "positionId": 18858,
+      "publicKey": "0x06237b4328b737f954d9b18ef9df8260fdd101c24288a7923d79d2c0c762217e",
+      "collateralBalance": 81252833,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 19313,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 19581,
+      "publicKey": "0x011420cb23f08090ce9fff9f0e4f2efe2fdd119919b41816674211434a3fc31e",
+      "collateralBalance": 759928633,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -200000000
+        }
+      ]
+    },
+    {
+      "positionId": 19721,
+      "publicKey": "0x034c6bbeba3a21c5a41c845d3b35f3049069d8dc01b188b3236b05e2b72b8283",
+      "collateralBalance": -80990319,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "SUSHI-7",
+          "balance": 60000000
+        }
+      ]
+    },
+    {
+      "positionId": 19749,
+      "publicKey": "0x05b0f7be5b554b252b7cdc7c93fa39e60f614c9d19b107440a9fa801f8b2d548",
+      "collateralBalance": -108428809,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 30000000
+        },
+        {
+          "assetId": "LINK-7",
+          "balance": 30000000
+        },
+        {
+          "assetId": "SNX-7",
+          "balance": 30000000
+        }
+      ]
+    },
+    {
+      "positionId": 19818,
+      "publicKey": "0x04b408ea7d5736a6c2f1bee884ecedd9426ad9449468192684ce06193edceb40",
+      "collateralBalance": 800289053009,
+      "fundingTimestamp": 1621944000,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -100000000000
+        }
+      ]
+    },
+    {
+      "positionId": 19902,
+      "publicKey": "0x03150e237715bb72af9d8ddf8cd69b56f7cf00b0a73e6310570fecf3f53aa01a",
+      "collateralBalance": 21184305,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "SNX-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 19920,
+      "publicKey": "0x005c436e0e6c584a9ab43754a8f217df6920ad2521e8f852053f8f4965e268b2",
+      "collateralBalance": -16063836,
+      "fundingTimestamp": 1621933200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 10000000
+        },
+        {
+          "assetId": "SNX-7",
+          "balance": 20000000
+        }
+      ]
+    },
+    {
+      "positionId": 20363,
+      "publicKey": "0x0786a53fac138ee08be091ade50015ea870edbcba6e1de506e431c6b16c36469",
+      "collateralBalance": 377948617,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "SUSHI-7",
+          "balance": -200000000
+        }
+      ]
+    },
+    {
+      "positionId": 20568,
+      "publicKey": "0x007b3f6cd092c8ffd462e4232ce78ab9e5bdf75d701d827ffa71865b37d8c581",
+      "collateralBalance": 4882820591,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 20658,
+      "publicKey": "0x07c823648db7ea6558802504529abffd2d8845595e42d06ef41a71b188a5ddd0",
+      "collateralBalance": -18324990826,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -2500000000
+        },
+        {
+          "assetId": "LINK-7",
+          "balance": 6500000000
+        },
+        {
+          "assetId": "SNX-7",
+          "balance": 10000000000
+        }
+      ]
+    },
+    {
+      "positionId": 20782,
+      "publicKey": "0x0215c894e723e24ac37d7e212b4b8d602780b207bfe91597c6adac42c04dc7b4",
+      "collateralBalance": 6421509,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 21604,
+      "publicKey": "0x065f507024df936b5dfe36e6c16c717fc5a2b19fb7cda4fb6c0b9417b64182f4",
+      "collateralBalance": 47701601693,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 21653,
+      "publicKey": "0x04a4465d04e2a1853654fcd74c96331cf4ec87654bc511a4e5bf1cfdbd091c0c",
+      "collateralBalance": 132934300,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 21798,
+      "publicKey": "0x03ea709a063a8867da1c12220c0064a30f21634147cecc8ffd5c30fbbce0c2e9",
+      "collateralBalance": 29505999,
+      "fundingTimestamp": 1621944000,
+      "balances": [
+        {
+          "assetId": "LINK-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 21940,
+      "publicKey": "0x0369a79c10fef847bb8d11f0b6b57f8df7e019d2d35c09273c806ca7305e4e64",
+      "collateralBalance": 1670415375,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 22093,
+      "publicKey": "0x05ab51ea9fe72712729cf9b1b452c3f09fcd443c45f0202a5bf17a6c8dc4b3b3",
+      "collateralBalance": 26004227,
+      "fundingTimestamp": 1621944000,
+      "balances": [
+        {
+          "assetId": "UNI-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 22787,
+      "publicKey": "0x03803dc788fb675445493c5eb1cbca7f2f050363714c65ad565b6ea5dcf36142",
+      "collateralBalance": 257636240,
+      "fundingTimestamp": 1621944000,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 100000000
+        }
+      ]
+    },
+    {
+      "positionId": 22930,
+      "publicKey": "0x0527dea11afff4a9176a671ce2a381bab25e96932854693e6a136c6b4fb0e7f1",
+      "collateralBalance": 412617475,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -153000000
+        }
+      ]
+    },
+    {
+      "positionId": 23222,
+      "publicKey": "0x010b44e83cbc286242f39a5cd06cd5b9b0db10c82c5311e1b03415932cdafafd",
+      "collateralBalance": 2071783461,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "YFI-10",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 23390,
+      "publicKey": "0x0661de2de923ace53399959f700569f2662f8e5eac8ca49d5a8bc287e68935b4",
+      "collateralBalance": 1105467844537,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -80464000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -179416000000
+        }
+      ]
+    },
+    {
+      "positionId": 23450,
+      "publicKey": "0x0636255090b8ea647eb155b6411069eff7d8ab249556c7a8e0b597b5fcef095e",
+      "collateralBalance": 1459825875,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 23463,
+      "publicKey": "0x03d2b67621b800197672cad7ba3fe0599423505f1c1da7a014f276ef8ca77943",
+      "collateralBalance": 153505456,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "SUSHI-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 23466,
+      "publicKey": "0x00e2894f4d1e984e08d09170808325082e3dcdf72ac11e6d03a13c4ff48b3696",
+      "collateralBalance": 111086367,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -30000000
+        }
+      ]
+    },
+    {
+      "positionId": 23539,
+      "publicKey": "0x04579751d8537b3ceafd7800b01703e8c1ae5c1dc742e968fa2b9e70494ca608",
+      "collateralBalance": -29651548419,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 140000000000
+        }
+      ]
+    },
+    {
+      "positionId": 23586,
+      "publicKey": "0x0729e4edbb4d0e783f206d0f25fca440fb5ee62a04e113ad5b53a0b0cce6d9ed",
+      "collateralBalance": -29911544,
+      "fundingTimestamp": 1621933200,
+      "balances": [
+        {
+          "assetId": "SNX-7",
+          "balance": 10000000
+        }
+      ]
+    },
+    {
+      "positionId": 23731,
+      "publicKey": "0x05dd792e2bbf368cc5720e97931ceff93c235b9ef8ec6135a40096f5b246de77",
+      "collateralBalance": 385205000,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 19000000000
+        }
+      ]
+    },
+    {
+      "positionId": 24012,
+      "publicKey": "0x00892e8e25a81010de8af915cb5600cc34641fc397c7dc828363ce0217f29339",
+      "collateralBalance": 2431240606,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 24044,
+      "publicKey": "0x0668c7076100535e81d660a4b6fc0e6a7c5470df78a52189c7a45307ff149abe",
+      "collateralBalance": 7532029413,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -1000000000
+        }
+      ]
+    },
+    {
+      "positionId": 24073,
+      "publicKey": "0x0486342b2bd77f578ad252da9f70b9e1a46dc408be4746683ace8eb63b0ef4d4",
+      "collateralBalance": 6778634474,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": -1500000000
+        }
+      ]
+    },
+    {
+      "positionId": 24113,
+      "publicKey": "0x071fabc41ba244cf6c0b15faed72239486641d317d29c3a871591e65a5a94aa1",
+      "collateralBalance": 7772805202,
+      "fundingTimestamp": 1621944000,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -2500000000
+        }
+      ]
+    },
+    {
+      "positionId": 24233,
+      "publicKey": "0x042afc7114700067aa18e3eed7dfd7cb7a289913e0244abcc7e3b566249c6069",
+      "collateralBalance": 107014912,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -37000000
+        }
+      ]
+    },
+    {
+      "positionId": 24257,
+      "publicKey": "0x04d1723d053f316f4225ab4833ac756950a4b817f354d900904fedaca85a7b0f",
+      "collateralBalance": -50195219324,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 25000000000
+        }
+      ]
+    },
+    {
+      "positionId": 24306,
+      "publicKey": "0x0479698dd34ff7922426c527e0d6dfb0c5c02b5c5681da3e35a6ae5e0e0ae4a6",
+      "collateralBalance": -24299245843,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 22500000000
+        }
+      ]
+    },
+    {
+      "positionId": 24308,
+      "publicKey": "0x0501a31a174ef79c559e81f850daf42195a9c571fe493199e918d707f824d866",
+      "collateralBalance": -847334784,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 355000000
+        }
+      ]
+    },
+    {
+      "positionId": 24344,
+      "publicKey": "0x03301cea947e5ad8dec6f20233e6311ff336492b12860fe23e28d78858adff48",
+      "collateralBalance": 1821897,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 24353,
+      "publicKey": "0x06cf848b132064cbed17573fb8ddac00ec3c0642b2e1233378366be9876a1a89",
+      "collateralBalance": -40096822,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 30000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 10000000
+        }
+      ]
+    },
+    {
+      "positionId": 24380,
+      "publicKey": "0x0729c5ab4660be99c1cd33c61f633251e58a630b3d34065847068eb276f425ae",
+      "collateralBalance": -294127795044,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 200000000000
+        }
+      ]
+    },
+    {
+      "positionId": 24456,
+      "publicKey": "0x07779398bcb1b4cb7f1c2a05d83d47f416bf2dae2b3a55ac2fa25e180f06534d",
+      "collateralBalance": -186786904363,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        },
+        {
+          "assetId": "SOL-7",
+          "balance": 135491000000
+        }
+      ]
+    },
+    {
+      "positionId": 24462,
+      "publicKey": "0x01a7188ad287c95654cd00e72e266135bc764e5bb3c5fa57a1bb1f4577c2e82d",
+      "collateralBalance": 600000000,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 24465,
+      "publicKey": "0x03699563a5f01b10f78f69e8bb29e45b14a60da66c2302c651a5898e99e1cdc8",
+      "collateralBalance": -13458485736,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 5492000000
+        }
+      ]
+    },
+    {
+      "positionId": 24508,
+      "publicKey": "0x0408900d5f64028c87d052c60094bd2d9a22719e6ead497e226293b275c63d41",
+      "collateralBalance": -168015436285,
+      "fundingTimestamp": 1621936800,
+      "balances": []
+    },
+    {
+      "positionId": 24521,
+      "publicKey": "0x057aaaf947b4fa9acc68c724e1228a3ccf39cb59c28b28e251030cb71ac0d35e",
+      "collateralBalance": -39174956669,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 19703000000
+        }
+      ]
+    },
+    {
+      "positionId": 24527,
+      "publicKey": "0x0780239c666d05359d9facf999353f1c76a084b20d05a07971762f71dbf97306",
+      "collateralBalance": -20140163447,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 10000000000
+        }
+      ]
+    },
+    {
+      "positionId": 24640,
+      "publicKey": "0x062d822b4f4632ec40f5d1890218b5fe6a203033c62fa2c42b5226fb211e99a6",
+      "collateralBalance": 55261977,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 24703,
+      "publicKey": "0x058098684324f0d2ffd91a87c9458c78fd152a5d9d29a34fb5a301f98460bf9a",
+      "collateralBalance": 5359039,
+      "fundingTimestamp": 1621936800,
+      "balances": [
+        {
+          "assetId": "1INCH-7",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 24742,
+      "publicKey": "0x032d2f9d7b57213a1768798f196497f5eff7ddffcf685c41e2d0b96b8419dfe1",
+      "collateralBalance": 4108766378,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -1000000000
+        }
+      ]
+    },
+    {
+      "positionId": 24782,
+      "publicKey": "0x0700c67c877d2c6fc8105480d4ad84838cb5c611727e1497fa92b64aa8df1c6d",
+      "collateralBalance": 228925731,
+      "fundingTimestamp": 1621936800,
+      "balances": []
+    },
+    {
+      "positionId": 24792,
+      "publicKey": "0x001be7cdb251c55057eddc2b649df85213c2ffd2f7e43c8b69e79b3bf32b3411",
+      "collateralBalance": 965877626561,
+      "fundingTimestamp": 1621940400,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": -300000000000
+        }
+      ]
+    },
+    {
+      "positionId": 24823,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 24867,
+      "publicKey": "0x052a2c4d95330e177d3a155d61a5419c3fcd889a02396f607270a4ea6e4a3397",
+      "collateralBalance": 44,
+      "fundingTimestamp": 1621944000,
+      "balances": []
+    },
+    {
+      "positionId": 24872,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 24873,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 24919,
+      "publicKey": "0x0364eceaf2a5ded7b78d5e1ee9747a0cf98e630466d7faaa7dd991a64edf24ab",
+      "collateralBalance": -44484151980,
+      "fundingTimestamp": 1621954800,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 34291000000
+        }
+      ]
+    },
+    {
+      "positionId": 24932,
+      "publicKey": "0x0474b834470f2daed5633d9b254f0dfbf3ccc14e046823acdbacafc1c87448a9",
+      "collateralBalance": -20893802307,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 8757000000
+        }
+      ]
+    },
+    {
+      "positionId": 24981,
+      "publicKey": "0x01b45935b652f8048156a0dcb090d24f19a0d8e0cedb42bbcc7281825e1b39c8",
+      "collateralBalance": -3127380840,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 25013,
+      "publicKey": "0x0313f8860f3fd4eaceb211b4e5e4d06bd9c9c5d15e1c71aae7d44910b35b026a",
+      "collateralBalance": -8179799295,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 3000000000
+        }
+      ]
+    },
+    {
+      "positionId": 25038,
+      "publicKey": "0x02385ada67132f2fa0776e84b87dac6a1af0426d295760a0c22dba3e7b481d7f",
+      "collateralBalance": -28551068,
+      "fundingTimestamp": 1621929600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 22000000
+        }
+      ]
+    },
+    {
+      "positionId": 25053,
+      "publicKey": "0x0326893b4e5b3c085afaa8875cc4d336d47f3a7c470adf0c011c85a33fbdd33e",
+      "collateralBalance": -627464208,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 464000000
+        }
+      ]
+    },
+    {
+      "positionId": 25058,
+      "publicKey": "0x05af54fedebd2fd11d7f7cfd543925a02ad11f9c9b5bc45ac08e467e6a36c45f",
+      "collateralBalance": 2688216,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "CRV-6",
+          "balance": 50000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 25071,
+      "publicKey": "0x05c72c283ffa2e2f37fda9751cafe8d65ddce375b03816ed66ed4a533a589419",
+      "collateralBalance": 15054223238,
+      "fundingTimestamp": 1621933200,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 0
+        }
+      ]
+    },
+    {
+      "positionId": 25127,
+      "publicKey": "0x07d23fc8b99ad9f91cf4d7e94063d218f39429425a294fa10795941926a8423b",
+      "collateralBalance": 809141386,
+      "fundingTimestamp": 1621944000,
+      "balances": []
+    },
+    {
+      "positionId": 25139,
+      "publicKey": "0x02b46502fb224491c5f45015f1d9b9e4a1e347c5dec746028c72285623cb5ead",
+      "collateralBalance": -1244746,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 10000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -10000000
+        }
+      ]
+    },
+    {
+      "positionId": 25140,
+      "publicKey": "0x00c7b6c6b61f08468dcfe44f52d77c67b598334daa69887262d5eab4ad96f103",
+      "collateralBalance": 1000704890,
+      "fundingTimestamp": 1621947600,
+      "balances": []
+    },
+    {
+      "positionId": 25142,
+      "publicKey": "0x0140fff4c4e6686b6fb45038317dc3c418a5c42aa0473b1fdc30ac56a25eb845",
+      "collateralBalance": -769886796,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "LINK-7",
+          "balance": 520000000
+        }
+      ]
+    },
+    {
+      "positionId": 25145,
+      "publicKey": "0x03c74fb0ea4023e90deabb25306cc15800abfd9be1d320c3171b76d73a4ccc6f",
+      "collateralBalance": -693135732,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "SUSHI-7",
+          "balance": 1178000000
+        }
+      ]
+    },
+    {
+      "positionId": 25147,
+      "publicKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "collateralBalance": 0,
+      "fundingTimestamp": 0,
+      "balances": []
+    },
+    {
+      "positionId": 25148,
+      "publicKey": "0x065ee8d72fec609b3d6e8e06b42e84d556b8b8838d739d58d43297335a88c12a",
+      "collateralBalance": 11000000,
+      "fundingTimestamp": 1621951200,
+      "balances": []
+    },
+    {
+      "positionId": 25149,
+      "publicKey": "0x05fd3e5d0c6e04f2d04c002e8cca0266e8d4bc6c04ec8b40663c3cf81dee44fa",
+      "collateralBalance": -252806480,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "SOL-7",
+          "balance": 100000000
+        }
+      ]
+    },
+    {
+      "positionId": 25150,
+      "publicKey": "0x01f787cbd19add025f408f296a238b078daadd88e2c7fa893fe913c1eb381c44",
+      "collateralBalance": -463111280,
+      "fundingTimestamp": 1621947600,
+      "balances": [
+        {
+          "assetId": "ETH-9",
+          "balance": 409000000
+        }
+      ]
+    },
+    {
+      "positionId": 25152,
+      "publicKey": "0x07ab6ab2f57ff0ec7075c22edbf9372e34ecf0631b26d20592e4a255a7cda4cb",
+      "collateralBalance": -2269840,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 10000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -10000000
+        }
+      ]
+    },
+    {
+      "positionId": 25153,
+      "publicKey": "0x02f10df65c7a60ed7bf42a9cd3e752253467a0c53f65fab3f18c5f9798c3c1d4",
+      "collateralBalance": -1314124,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 10000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -10000000
+        }
+      ]
+    },
+    {
+      "positionId": 25154,
+      "publicKey": "0x034e16b7d7648aedee19c92c10986a66909076d288f25a69cb073c50ca0ad7a2",
+      "collateralBalance": -1316216,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 10000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -10000000
+        }
+      ]
+    },
+    {
+      "positionId": 25155,
+      "publicKey": "0x070c4c948f0503e10f9fda408205d559750900b9e3bde503db7936723d8f5b2a",
+      "collateralBalance": -1358460,
+      "fundingTimestamp": 1621951200,
+      "balances": [
+        {
+          "assetId": "BTC-10",
+          "balance": 10000000
+        },
+        {
+          "assetId": "ETH-9",
+          "balance": -10000000
+        }
+      ]
+    },
+    {
+      "positionId": 25181,
+      "publicKey": "0x02d328df9493287ba678ba9a798725cbcff719a0f36ae45072180f0545ebe670",
+      "collateralBalance": -190212952,
+      "fundingTimestamp": 1621958400,
+      "balances": [
+        {
+          "assetId": "1INCH-7",
+          "balance": 1120000000
+        }
+      ]
+    }
+  ]
+}

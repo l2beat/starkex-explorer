@@ -10,7 +10,7 @@ export interface FundingEntry {
 
 export interface FundingIndex {
   assetId: string
-  fundingIndex: bigint
+  value: bigint
 }
 
 export interface PositionUpdate {
