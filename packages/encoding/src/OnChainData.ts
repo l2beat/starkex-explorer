@@ -15,7 +15,7 @@ export interface FundingIndex {
 
 export interface PositionUpdate {
   positionId: bigint
-  publicKey: bigint
+  publicKey: string
   collateralBalance: bigint
   fundingTimestamp: bigint
   balances: AssetBalance[]
