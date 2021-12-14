@@ -25,5 +25,8 @@
     "koa": "^2.13.4",
     "source-map-support": "^0.5.21"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/supertest": "^2.0.11",
+    "supertest": "^6.1.6"
+  }
 }
