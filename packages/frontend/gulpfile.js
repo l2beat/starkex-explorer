@@ -9,8 +9,9 @@ const cssnano = require('cssnano')
 const fs = require('fs')
 const crypto = require('crypto')
 
-function clean() {
-  return del('build/static')
+async function clean() {
+  await del('build')
+  await fs.promises.mkdir('build')
 }
 
 function buildScripts() {
