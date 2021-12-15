@@ -1,6 +1,31 @@
 @import 'normalize';
+@import 'fonts';
 @import 'global';
 
 body {
-  background-color: cornflowerblue;
+  background-color: #fefefe;
+}
+
+.Home-Background {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.Home-Title {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 15px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 5vw;
+
+  @media (max-width: 800px) {
+    font-size: 40px;
+  }
 }

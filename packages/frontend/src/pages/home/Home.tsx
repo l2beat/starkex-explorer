@@ -11,7 +11,8 @@ export function Home() {
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
     >
-      <div>Home Page</div>
+      <canvas className="Home-Background" />
+      <h1 className="Home-Title">Under construction</h1>
     </Page>
   )
 }
