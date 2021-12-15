@@ -6,5 +6,8 @@ export function createFrontendMiddleware() {
     path.dirname(require.resolve('@explorer/frontend/package.json')),
     'build/static'
   )
-  return serve(staticPath)
+  return serve(staticPath, {
+    maxAge: 365 * 24 * 60 * 60 * 1000,
+    immutable: true,
+  })
 }
