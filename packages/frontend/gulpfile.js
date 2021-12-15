@@ -7,80 +7,48 @@ const postcss = require('gulp-postcss')
 const autoprefixer = require('autoprefixer')
 const cssnano = require('cssnano')
 
-const OUT_PATH = 'build/static'
-
-const SCRIPT_IN_PATH = 'src/scripts/**/*.ts'
-const SCRIPT_IN_FILE = 'src/scripts/index.ts'
-const SCRIPT_OUT_FILE = `${OUT_PATH}/scripts/main.js`
-
-const STYLE_IN_PATH = 'src/styles/**/*.scss'
-const STYLE_OUT_PATH = `${OUT_PATH}/styles`
-
-const STATIC_IN_PATH = 'src/static/**/*'
-
-const PAGES_IN_PATH = 'src/pages/**/*'
-
-function exec(command) {
-  const nodeModulesHere = path.join(__dirname, './node_modules/.bin')
-  const nodeModulesUp = path.join(__dirname, '../node_modules/.bin')
-  const PATH = `${nodeModulesHere}:${nodeModulesUp}:${process.env.PATH}`
-  return new Promise((resolve, reject) =>
-    child_process.exec(
-      command,
-      { env: { ...process.env, PATH } },
-      (err, stdout, stderr) => {
-        stdout && console.log(stdout)
-        if (err) {
-          stderr && console.error(stderr)
-          reject(err)
-        } else {
-          resolve()
-        }
-      }
-    )
-  )
-}
-
 function clean() {
-  return del(OUT_PATH)
+  return del('build/static')
 }
 
 function buildScripts() {
   return exec(
-    `esbuild --bundle ${SCRIPT_IN_FILE} --outfile=${SCRIPT_OUT_FILE} --minify`
+    `esbuild --bundle src/scripts/index.ts --outfile=build/static/scripts/main.js --minify`
   )
 }
 
 function watchScripts() {
-  return gulp.watch(SCRIPT_IN_PATH, buildScripts)
+  return gulp.watch('src/scripts/**/*.ts', buildScripts)
 }
 
 function buildStyles() {
   return gulp
-    .src(STYLE_IN_PATH)
+    .src('src/styles/**/*.scss')
     .pipe(sass.sync().on('error', sass.logError))
     .pipe(postcss([autoprefixer(), cssnano()]))
-    .pipe(gulp.dest(STYLE_OUT_PATH))
+    .pipe(gulp.dest('build/static/styles'))
 }
 
 function watchStyles() {
-  return gulp.watch(STYLE_IN_PATH, buildStyles)
+  return gulp.watch('src/styles/**/*.scss', buildStyles)
 }
 
 function copyStatic() {
-  return gulp.src(STATIC_IN_PATH).pipe(gulp.dest(OUT_PATH))
+  return gulp.src('src/static/**/*').pipe(gulp.dest('build/static'))
 }
 
 function watchStatic() {
-  return gulp.watch(STATIC_IN_PATH, copyStatic)
+  return gulp.watch('src/static/**/*', copyStatic)
 }
 
 function buildPages() {
   return exec(`tsc -p tsconfig.pages.json`)
 }
 
-function watchPages() {
-  return gulp.watch(PAGES_IN_PATH, buildPages)
+function startPreview() {
+  return exec(
+    `nodemon --watch src -e ts,tsx --exec "node -r esbuild-register" src/preview/index.ts`
+  )
 }
 
 const build = gulp.series(
@@ -89,12 +57,52 @@ const build = gulp.series(
 )
 
 const watch = gulp.series(
-  gulp.parallel(buildScripts, buildStyles, buildPages, copyStatic),
-  gulp.parallel(watchScripts, watchStyles, watchPages, watchStatic)
+  clean,
+  gulp.parallel(buildScripts, buildStyles, copyStatic),
+  gulp.parallel(watchScripts, watchStyles, watchStatic, startPreview)
 )
 
 module.exports = {
   clean,
   watch,
   build,
+}
+
+// Utilities
+
+function exec(command) {
+  const nodeModulesHere = path.join(__dirname, './node_modules/.bin')
+  const nodeModulesUp = path.join(__dirname, '../node_modules/.bin')
+  const PATH = `${nodeModulesHere}:${nodeModulesUp}:${process.env.PATH}`
+  const [name, ...args] = parseCommand(command)
+  const cp = child_process.spawn(name, args, {
+    env: { ...process.env, PATH },
+    stdio: 'inherit',
+  })
+  return new Promise((resolve, reject) => {
+    cp.on('error', reject)
+    cp.on('exit', (code) => (code !== 0 ? reject(code) : resolve()))
+  })
+}
+
+function parseCommand(text) {
+  const SURROUNDED = /^"[^"]*"$/
+  const NOT_SURROUNDED = /^([^"]|[^"].*?[^"])$/
+
+  let args = []
+  let argPart = ''
+
+  for (const arg of text.split(' ')) {
+    if ((SURROUNDED.test(arg) || NOT_SURROUNDED.test(arg)) && !argPart) {
+      args.push(arg)
+    } else {
+      argPart = argPart ? argPart + ' ' + arg : arg
+      if (argPart.endsWith('"')) {
+        args.push(argPart.slice(1, -1))
+        argPart = ''
+      }
+    }
+  }
+
+  return args
 }
