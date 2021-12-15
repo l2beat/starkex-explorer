@@ -1,1 +1,1 @@
-export { makePage } from './makePage'
+export * from './home'

@@ -2,13 +2,13 @@ import Router from '@koa/router'
 import Koa from 'koa'
 import serve from 'koa-static'
 
-import { makePage } from '../pages'
+import { renderHomePage } from '../pages'
 
 const app = new Koa()
 const router = new Router()
 
 router.get('/', (ctx) => {
-  ctx.body = makePage()
+  ctx.body = renderHomePage()
 })
 
 app.use(router.routes())
