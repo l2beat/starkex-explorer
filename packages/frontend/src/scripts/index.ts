@@ -1,3 +1,3 @@
 import { hello } from './hello'
 
-hello('World')
+console.log(hello('World'))

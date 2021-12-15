@@ -8,6 +8,8 @@ export function Home() {
       description="Site under construction"
       image="https://dydx.l2beat.com/images/under-construction.png"
       url="https://dydx.l2beat.com"
+      stylesheets={['/styles/main.css']}
+      scripts={['/scripts/main.js']}
     >
       <div>Home Page</div>
     </Page>

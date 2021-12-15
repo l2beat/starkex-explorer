@@ -8,6 +8,7 @@ export interface HeadProps {
   description: string
   image: string
   url: string
+  stylesheets: string[]
 }
 
 export function Head(props: HeadProps) {
@@ -15,7 +16,9 @@ export function Head(props: HeadProps) {
     <head>
       <meta charSet="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="stylesheet" href="/styles/main.css" />
+      {props.stylesheets.map((href, i) => (
+        <link key={i} rel="stylesheet" href={href} />
+      ))}
       <Favicons />
       <MetaTags
         title={props.title}
