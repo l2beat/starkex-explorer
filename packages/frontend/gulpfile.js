@@ -70,14 +70,15 @@ function startPreview() {
 
 const build = gulp.series(
   clean,
+  makeEmptyManifest,
   gulp.parallel(buildScripts, buildStyles, buildPages, copyStatic),
   hashStaticFiles
 )
 
 const watch = gulp.series(
   clean,
-  gulp.parallel(buildScripts, buildStyles, copyStatic),
   makeEmptyManifest,
+  gulp.parallel(buildScripts, buildStyles, copyStatic),
   gulp.parallel(watchScripts, watchStyles, watchStatic, startPreview)
 )
 
