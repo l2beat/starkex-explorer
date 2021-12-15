@@ -1,21 +1,30 @@
 import Router from '@koa/router'
-import Koa from 'koa'
+import Koa, { Middleware } from 'koa'
 
 import { Logger } from '../tools/Logger'
 import { createApiLogger } from './ApiLogger'
 
+interface Options {
+  routers?: Router[]
+  middleware?: Middleware[]
+}
+
 export class ApiServer {
   private app: Koa
 
-  constructor(private port: number, private logger: Logger, routers: Router[]) {
+  constructor(private port: number, private logger: Logger, options: Options) {
     this.logger = this.logger.for(this)
     this.app = new Koa()
 
     this.app.use(createApiLogger(this.logger))
 
+    for (const middleware of options.middleware ?? []) {
+      this.app.use(middleware)
+    }
+
     const router = new Router()
 
-    for (const childRouter of routers) {
+    for (const childRouter of options.routers ?? []) {
       router.use(childRouter.routes(), childRouter.allowedMethods())
     }
 

@@ -1,4 +1,6 @@
 import { ApiServer } from './api/ApiServer'
+import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
+import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { Logger } from './tools/Logger'
@@ -13,7 +15,10 @@ export class Application {
 
     /* - - - - - API - - - - - */
 
-    const apiServer = new ApiServer(config.port, logger, [createStatusRouter()])
+    const apiServer = new ApiServer(config.port, logger, {
+      routers: [createStatusRouter(), createFrontendRouter()],
+      middleware: [createFrontendMiddleware()],
+    })
 
     /* - - - - - START - - - - - */
 

@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["src/pages"],
+  "compilerOptions": {
+    "outDir": "build/pages"
+  }
+}
