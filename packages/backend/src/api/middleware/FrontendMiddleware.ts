@@ -8,6 +8,6 @@ export function createFrontendMiddleware() {
   )
   return serve(staticPath, {
     maxAge: 365 * 24 * 60 * 60 * 1000,
-    immutable: true
+    immutable: true,
   })
 }
