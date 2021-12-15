@@ -2,8 +2,8 @@
   "name": "@explorer/frontend",
   "version": "0.1.0",
   "private": true,
-  "main": "build/src/pages/index.js",
-  "types": "build/src/pages/index.d.ts",
+  "main": "build/pages/index.js",
+  "types": "build/pages/index.d.ts",
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
