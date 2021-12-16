@@ -1,0 +1,24 @@
+{
+  "name": "@explorer/crypto",
+  "version": "0.1.0",
+  "private": true,
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "scripts": {
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint --ext .ts src test",
+    "lint:fix": "yarn lint --fix",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "@types/bn.js": "^5.1.0",
+    "@types/elliptic": "^6.4.14",
+    "bn.js": "^5.2.0",
+    "elliptic": "^6.5.4",
+    "hash.js": "^1.1.7"
+  },
+  "devDependencies": {}
+}
