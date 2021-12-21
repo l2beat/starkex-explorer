@@ -1,1 +1,2 @@
-export { pedersen } from './pedersen'
+export { pedersen, terminateWorkerPool } from './pedersen'
+export { pedersenSync } from './pedersenSync'
