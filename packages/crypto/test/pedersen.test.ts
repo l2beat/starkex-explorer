@@ -1,10 +1,10 @@
 import { expect } from 'chai'
 
-import { pedersen } from '../src/pedersen'
+import { terminateWorkerPool, pedersen } from '../src/pedersen'
 
 describe('pedersen', () => {
-  it('hashes sample values', () => {
-    const result = pedersen(
+  it('hashes values asynchronously', async () => {
+    const result = await pedersen(
       'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
     )
@@ -13,33 +13,31 @@ describe('pedersen', () => {
     )
   })
 
-  it('hashes different sample values', () => {
-    const result = pedersen(
-      '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcde',
-      '11223344556677889900aabbccddeeff11223344556677889900aabbccddeef'
-    )
-    expect(result).to.equal(
-      '63920cff837c3b73b4607e66d5f78c8f7f50e187f02ee8646ae4be674baddc1'
-    )
+  async function getExecutionTime(fn: () => Promise<unknown>) {
+    const start = Date.now()
+    await fn()
+    return Date.now() - start
+  }
+
+  it('hashes values in parallel', async () => {
+    async function hash() {
+      return pedersen(
+        'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+        'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+      )
+    }
+
+    async function hashMany(n: number) {
+      return Promise.all(new Array(n).fill(0).map(hash))
+    }
+
+    // initialize
+    await hashMany(10)
+
+    const shortTime = await getExecutionTime(() => hashMany(1))
+    const longTime = await getExecutionTime(() => hashMany(10))
+    expect(longTime).to.be.lessThan(shortTime * 4)
   })
 
-  it('follows original example 1', () => {
-    const result = pedersen(
-      '3d937c035c878245caf64531a5756109c53068da139362728feb561405371cb',
-      '208a0a10250e382e1e4bbe2880906c2791bf6275695e02fbbc6aeff9cd8b31a'
-    )
-    expect(result).to.equal(
-      '30e480bed5fe53fa909cc0f8c4d99b8f9f2c016be4c41e13a4848797979c662'
-    )
-  })
-
-  it('follows original example 2', () => {
-    const result = pedersen(
-      '58f580910a6ca59b28927c08fe6c43e2e303ca384badc365795fc645d479d45',
-      '78734f65a067be9bdb39de18434d71e79f7b6466a4b66bbd979ab9e7515fe0b'
-    )
-    expect(result).to.equal(
-      '68cc0b76cddd1dd4ed2301ada9b7c872b23875d5ff837b3a87993e0d9996b87'
-    )
-  })
+  after(terminateWorkerPool)
 })
