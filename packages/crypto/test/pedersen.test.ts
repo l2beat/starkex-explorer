@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { terminateWorkerPool, pedersen } from '../src/pedersen'
+import { pedersen, terminateWorkerPool } from '../src/pedersen'
 
 describe('pedersen', () => {
   it('hashes values asynchronously', async () => {
