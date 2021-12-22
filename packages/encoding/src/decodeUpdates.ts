@@ -1,14 +1,13 @@
 import { decodeAssetId } from './assetId'
 import { ByteReader } from './ByteReader'
+import { MIN_INT } from './decodeFirstPage'
 import {
   AssetBalance,
   FundingEntry,
-  FundingIndex,
   OnChainData,
   PositionUpdate,
 } from './OnChainData'
-
-const MIN_INT = -(2n ** 63n)
+import { readFundingIndices } from './readFundingIndices'
 
 export function decodeUpdates(data: string): OnChainData {
   const reader = new ByteReader(data)
@@ -16,14 +15,7 @@ export function decodeUpdates(data: string): OnChainData {
   const fundingEntriesLength = reader.readNumber(32)
   const funding: FundingEntry[] = []
   for (let i = 0; i < fundingEntriesLength; i++) {
-    const fundingIndicesLength = reader.readNumber(32)
-    const indices: FundingIndex[] = []
-    for (let i = 0; i < fundingIndicesLength; i++) {
-      reader.skip(17)
-      const assetId = decodeAssetId(reader.read(15))
-      const value = reader.readBigInt(32) + MIN_INT
-      indices.push({ assetId, value })
-    }
+    const indices = readFundingIndices(reader)
     const timestamp = reader.readBigInt(32)
     funding.push({ indices, timestamp })
   }
