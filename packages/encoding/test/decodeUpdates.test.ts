@@ -1,14 +1,14 @@
 import { expect } from 'chai'
 
 import { encodeAssetId } from '../src/assetId'
-import { decode } from '../src/decode'
+import { decodeUpdates } from '../src/decodeUpdates'
 import { DecodingError } from '../src/DecodingError'
 import REAL_DECODED from './data/onchain-decoded.json'
 import REAL_DATA from './data/onchain-example.json'
 
 const OFFSET = 2n ** 63n
 
-describe('decode', () => {
+describe('decodeUpdates', () => {
   function encodeUint256(value: bigint | number) {
     return value.toString(16).padStart(64, '0')
   }
@@ -24,12 +24,12 @@ describe('decode', () => {
   }
 
   it('fails for empty data', () => {
-    expect(() => decode([])).to.throw(DecodingError, 'Went out of bounds')
+    expect(() => decodeUpdates([])).to.throw(DecodingError, 'Went out of bounds')
   })
 
   it('decodes a single entry with a single index', () => {
     expect(
-      decode([
+      decodeUpdates([
         encodeUint256(1), // single entry
         encodeUint256(1), // single index
         encodeAssetId('ETH-9').padStart(64, '0'),
@@ -49,7 +49,7 @@ describe('decode', () => {
 
   it('decodes a single entry with a multiple indices', () => {
     expect(
-      decode([
+      decodeUpdates([
         encodeUint256(1), // single entry
         encodeUint256(3), // 3 indices
         encodeAssetId('ETH-9').padStart(64, '0'),
@@ -77,7 +77,7 @@ describe('decode', () => {
 
   it('decodes multiple entries with multiple indices', () => {
     expect(
-      decode([
+      decodeUpdates([
         encodeUint256(2), // 2 entries
         encodeUint256(3), // 3 indices
         encodeAssetId('ETH-9').padStart(64, '0'),
@@ -118,7 +118,7 @@ describe('decode', () => {
 
   it('decodes a single position with no values', () => {
     expect(
-      decode([
+      decodeUpdates([
         encodeUint256(0), // 0 entries
         encodeUint256(4), // 0 values
         encodeUint256(123), // positionId
@@ -142,7 +142,7 @@ describe('decode', () => {
 
   it('decodes a single position with multiple values', () => {
     expect(
-      decode([
+      decodeUpdates([
         encodeUint256(0), // 0 entries
         encodeUint256(4 + 2), // 2 values
         encodeUint256(123), // positionId
@@ -171,7 +171,7 @@ describe('decode', () => {
 
   it('decodes multiple positions with multiple values', () => {
     expect(
-      decode([
+      decodeUpdates([
         encodeUint256(0), // 0 entries
         encodeUint256(4 + 2), // 2 values
         encodeUint256(123), // positionId
@@ -213,7 +213,7 @@ describe('decode', () => {
 
   it('decodes multiple entries and positions', () => {
     expect(
-      decode([
+      decodeUpdates([
         encodeUint256(2), // 2 entries
         encodeUint256(3), // 3 indices
         encodeAssetId('ETH-9').padStart(64, '0'),
@@ -285,7 +285,7 @@ describe('decode', () => {
 
   it('decodes real onchain data', () => {
     // TODO: don't skip first page
-    const decoded = decode(REAL_DATA.slice(1).flat())
+    const decoded = decodeUpdates(REAL_DATA.slice(1).flat())
     const noBigInt = JSON.parse(
       JSON.stringify(decoded, (k, v) => (typeof v === 'bigint' ? Number(v) : v))
     )

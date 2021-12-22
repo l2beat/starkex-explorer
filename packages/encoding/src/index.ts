@@ -1,1 +1,1 @@
-export { decode } from './decode'
+export { decodeUpdates } from './decodeUpdates'

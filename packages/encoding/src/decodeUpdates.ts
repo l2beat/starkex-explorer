@@ -10,7 +10,7 @@ import {
 
 const MIN_INT = -(2n ** 63n)
 
-export function decode(data: string[]): OnChainData {
+export function decodeUpdates(data: string[]): OnChainData {
   let position = 0
 
   const fundingEntriesLength = hexToSafeInt(data[position++])
