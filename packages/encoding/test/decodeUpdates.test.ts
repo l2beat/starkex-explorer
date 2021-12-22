@@ -24,7 +24,10 @@ describe('decodeUpdates', () => {
   }
 
   it('fails for empty data', () => {
-    expect(() => decodeUpdates([])).to.throw(DecodingError, 'Went out of bounds')
+    expect(() => decodeUpdates([])).to.throw(
+      DecodingError,
+      'Went out of bounds'
+    )
   })
 
   it('decodes a single entry with a single index', () => {
