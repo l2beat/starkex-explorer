@@ -92,4 +92,62 @@ describe('ByteReader', () => {
       expect(() => reader.read(4)).to.throw(DecodingError, 'Went out of bounds')
     })
   })
+
+  describe('readBigInt', () => {
+    it('reads the value and converts it to BigInt', () => {
+      const reader = new ByteReader('1234567890abcdef')
+      expect(reader.readBigInt(8)).to.equal(1311768467294899695n)
+    })
+  })
+
+  describe('readNumber', () => {
+    it('reads the value and converts it to number', () => {
+      const reader = new ByteReader('1234')
+      expect(reader.readNumber(2)).to.equal(4660)
+    })
+
+    it('checks that the number is small enough', () => {
+      const reader = new ByteReader('1234567890abcdef')
+      expect(() => reader.readNumber(8)).to.throw(
+        DecodingError,
+        'Number too large'
+      )
+    })
+  })
+
+  describe('isAtEnd', () => {
+    it('returns false at the start', () => {
+      const reader = new ByteReader('112233')
+      expect(reader.isAtEnd()).to.equal(false)
+    })
+
+    it('returns false in the middle', () => {
+      const reader = new ByteReader('112233')
+      reader.skip(2)
+      expect(reader.isAtEnd()).to.equal(false)
+    })
+
+    it('returns true at the end', () => {
+      const reader = new ByteReader('112233')
+      reader.skip(3)
+      expect(reader.isAtEnd()).to.equal(true)
+    })
+  })
+
+  describe('assertEnd', () => {
+    it('throws when not at end', () => {
+      const reader = new ByteReader('112233')
+      reader.skip(2)
+      expect(() => reader.assertEnd()).to.throw(
+        DecodingError,
+        'Unread data remaining'
+      )
+    })
+
+    it('does nothing at the end', () => {
+      const reader = new ByteReader('112233')
+      reader.skip(3)
+      reader.assertEnd()
+    })
+  })
 })
