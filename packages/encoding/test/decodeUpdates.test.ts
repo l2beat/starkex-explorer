@@ -3,43 +3,29 @@ import { expect } from 'chai'
 import { encodeAssetId } from '../src/assetId'
 import { decodeUpdates } from '../src/decodeUpdates'
 import { DecodingError } from '../src/DecodingError'
+import { ByteWriter } from './ByteWriter'
 import REAL_DECODED from './data/onchain-decoded.json'
 import REAL_DATA from './data/onchain-example.json'
 
 const OFFSET = 2n ** 63n
 
 describe('decodeUpdates', () => {
-  function encodeUint256(value: bigint | number) {
-    return value.toString(16).padStart(64, '0')
-  }
-
-  function encodeUint64(value: bigint | number) {
-    return value.toString(16).padStart(16, '0')
-  }
-
-  function encodePositionValue(assetId: string, value: bigint) {
-    return encodeAssetId(assetId)
-      .padStart(48, '0')
-      .concat(encodeUint64(OFFSET + value))
-  }
-
   it('fails for empty data', () => {
-    expect(() => decodeUpdates([])).to.throw(
+    expect(() => decodeUpdates('')).to.throw(
       DecodingError,
       'Went out of bounds'
     )
   })
 
   it('decodes a single entry with a single index', () => {
-    expect(
-      decodeUpdates([
-        encodeUint256(1), // single entry
-        encodeUint256(1), // single index
-        encodeAssetId('ETH-9').padStart(64, '0'),
-        encodeUint256(OFFSET + 1n), // funding index = 1
-        encodeUint256(456), // timestamp
-      ])
-    ).to.deep.equal({
+    const writer = new ByteWriter()
+      .writeNumber(1, 32) // single entry
+      .writeNumber(1, 32) // single index
+      .writePadding(17)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 1n, 32) // funding index = 1
+      .writeNumber(456, 32) // timestamp
+    expect(decodeUpdates(writer.getBytes())).to.deep.equal({
       funding: [
         {
           indices: [{ assetId: 'ETH-9', value: 1n }],
@@ -51,19 +37,20 @@ describe('decodeUpdates', () => {
   })
 
   it('decodes a single entry with a multiple indices', () => {
-    expect(
-      decodeUpdates([
-        encodeUint256(1), // single entry
-        encodeUint256(3), // 3 indices
-        encodeAssetId('ETH-9').padStart(64, '0'),
-        encodeUint256(OFFSET + 100n), // funding index = 100
-        encodeAssetId('BTC-10').padStart(64, '0'),
-        encodeUint256(OFFSET - 200n), // funding index = -200
-        encodeAssetId('ABC-1').padStart(64, '0'),
-        encodeUint256(OFFSET), // funding index = 0
-        encodeUint256(456), // timestamp
-      ])
-    ).to.deep.equal({
+    const writer = new ByteWriter()
+      .writeNumber(1, 32) // single entry
+      .writeNumber(3, 32) // 3 indices
+      .writePadding(17)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 100n, 32) // funding index = 100
+      .writePadding(17)
+      .write(encodeAssetId('BTC-10'))
+      .writeNumber(OFFSET - 200n, 32) // funding index = -200
+      .writePadding(17)
+      .write(encodeAssetId('ABC-1'))
+      .writeNumber(OFFSET, 32) // funding index = 0
+      .writeNumber(456, 32) // timestamp
+    expect(decodeUpdates(writer.getBytes())).to.deep.equal({
       funding: [
         {
           indices: [
@@ -79,25 +66,28 @@ describe('decodeUpdates', () => {
   })
 
   it('decodes multiple entries with multiple indices', () => {
-    expect(
-      decodeUpdates([
-        encodeUint256(2), // 2 entries
-        encodeUint256(3), // 3 indices
-        encodeAssetId('ETH-9').padStart(64, '0'),
-        encodeUint256(OFFSET + 100n), // funding index = 100
-        encodeAssetId('BTC-10').padStart(64, '0'),
-        encodeUint256(OFFSET - 200n), // funding index = -200
-        encodeAssetId('ABC-1').padStart(64, '0'),
-        encodeUint256(OFFSET), // funding index = 0
-        encodeUint256(456), // timestamp
-        encodeUint256(2), // 2 indices
-        encodeAssetId('ETH-9').padStart(64, '0'),
-        encodeUint256(OFFSET + 1n), // funding index = 1
-        encodeAssetId('BTC-10').padStart(64, '0'),
-        encodeUint256(OFFSET + 2n), // funding index = 2
-        encodeUint256(789), // timestamp
-      ])
-    ).to.deep.equal({
+    const writer = new ByteWriter()
+      .writeNumber(2, 32) // 2 entries
+      .writeNumber(3, 32) // 3 indices
+      .writePadding(17)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 100n, 32) // funding index = 100
+      .writePadding(17)
+      .write(encodeAssetId('BTC-10'))
+      .writeNumber(OFFSET - 200n, 32) // funding index = -200
+      .writePadding(17)
+      .write(encodeAssetId('ABC-1'))
+      .writeNumber(OFFSET, 32) // funding index = 0
+      .writeNumber(456, 32) // timestamp
+      .writeNumber(2, 32) // 2 indices
+      .writePadding(17)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 1n, 32) // funding index = 1
+      .writePadding(17)
+      .write(encodeAssetId('BTC-10'))
+      .writeNumber(OFFSET + 2n, 32) // funding index = 2
+      .writeNumber(789, 32) // timestamp
+    expect(decodeUpdates(writer.getBytes())).to.deep.equal({
       funding: [
         {
           indices: [
@@ -120,16 +110,14 @@ describe('decodeUpdates', () => {
   })
 
   it('decodes a single position with no values', () => {
-    expect(
-      decodeUpdates([
-        encodeUint256(0), // 0 entries
-        encodeUint256(4), // 0 values
-        encodeUint256(123), // positionId
-        '1234abcd'.repeat(8), // publicKey
-        encodeUint256(OFFSET + 10n), // collateralBalance
-        encodeUint256(456), // fundingTimestamp
-      ])
-    ).to.deep.equal({
+    const writer = new ByteWriter()
+      .writeNumber(0, 32) // 0 entries
+      .writeNumber(4, 32) // 0 values
+      .writeNumber(123, 32) // positionId
+      .write('1234abcd'.repeat(8)) // publicKey
+      .writeNumber(OFFSET + 10n, 32) // collateralBalance
+      .writeNumber(456, 32) // fundingTimestamp
+    expect(decodeUpdates(writer.getBytes())).to.deep.equal({
       funding: [],
       positions: [
         {
@@ -144,18 +132,20 @@ describe('decodeUpdates', () => {
   })
 
   it('decodes a single position with multiple values', () => {
-    expect(
-      decodeUpdates([
-        encodeUint256(0), // 0 entries
-        encodeUint256(4 + 2), // 2 values
-        encodeUint256(123), // positionId
-        '1234abcd'.repeat(8), // publicKey
-        encodeUint256(OFFSET + 10n), // collateralBalance
-        encodeUint256(456), // fundingTimestamp
-        encodePositionValue('ETH-9', 50n),
-        encodePositionValue('BTC-10', 20n),
-      ])
-    ).to.deep.equal({
+    const writer = new ByteWriter()
+      .writeNumber(0, 32) // 0 entries
+      .writeNumber(4 + 2, 32) // 2 values
+      .writeNumber(123, 32) // positionId
+      .write('1234abcd'.repeat(8)) // publicKey
+      .writeNumber(OFFSET + 10n, 32) // collateralBalance
+      .writeNumber(456, 32) // fundingTimestamp
+      .writePadding(9)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 50n, 8)
+      .writePadding(9)
+      .write(encodeAssetId('BTC-10'))
+      .writeNumber(OFFSET + 20n, 8)
+    expect(decodeUpdates(writer.getBytes())).to.deep.equal({
       funding: [],
       positions: [
         {
@@ -173,24 +163,28 @@ describe('decodeUpdates', () => {
   })
 
   it('decodes multiple positions with multiple values', () => {
-    expect(
-      decodeUpdates([
-        encodeUint256(0), // 0 entries
-        encodeUint256(4 + 2), // 2 values
-        encodeUint256(123), // positionId
-        '1234abcd'.repeat(8), // publicKey
-        encodeUint256(OFFSET + 10n), // collateralBalance
-        encodeUint256(456), // fundingTimestamp
-        encodePositionValue('ETH-9', 50n),
-        encodePositionValue('BTC-10', 20n),
-        encodeUint256(4 + 1), // 1 value
-        encodeUint256(124), // positionId
-        'deadbeef'.repeat(8), // publicKey
-        encodeUint256(OFFSET + 33n), // collateralBalance
-        encodeUint256(457), // fundingTimestamp
-        encodePositionValue('ETH-9', 66n),
-      ])
-    ).to.deep.equal({
+    const writer = new ByteWriter()
+      .writeNumber(0, 32) // 0 entries
+      .writeNumber(4 + 2, 32) // 2 values
+      .writeNumber(123, 32) // positionId
+      .write('1234abcd'.repeat(8)) // publicKey
+      .writeNumber(OFFSET + 10n, 32) // collateralBalance
+      .writeNumber(456, 32) // fundingTimestamp
+      .writePadding(9)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 50n, 8)
+      .writePadding(9)
+      .write(encodeAssetId('BTC-10'))
+      .writeNumber(OFFSET + 20n, 8)
+      .writeNumber(4 + 1, 32) // 1 value
+      .writeNumber(124, 32) // positionId
+      .write('deadbeef'.repeat(8)) // publicKey
+      .writeNumber(OFFSET + 33n, 32) // collateralBalance
+      .writeNumber(457, 32) // fundingTimestamp
+      .writePadding(9)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 66n, 8)
+    expect(decodeUpdates(writer.getBytes())).to.deep.equal({
       funding: [],
       positions: [
         {
@@ -215,38 +209,47 @@ describe('decodeUpdates', () => {
   })
 
   it('decodes multiple entries and positions', () => {
-    expect(
-      decodeUpdates([
-        encodeUint256(2), // 2 entries
-        encodeUint256(3), // 3 indices
-        encodeAssetId('ETH-9').padStart(64, '0'),
-        encodeUint256(OFFSET + 100n), // funding index = 100
-        encodeAssetId('BTC-10').padStart(64, '0'),
-        encodeUint256(OFFSET - 200n), // funding index = -200
-        encodeAssetId('ABC-1').padStart(64, '0'),
-        encodeUint256(OFFSET), // funding index = 0
-        encodeUint256(456), // timestamp
-        encodeUint256(2), // 2 indices
-        encodeAssetId('ETH-9').padStart(64, '0'),
-        encodeUint256(OFFSET + 1n), // funding index = 1
-        encodeAssetId('BTC-10').padStart(64, '0'),
-        encodeUint256(OFFSET + 2n), // funding index = 2
-        encodeUint256(789), // timestamp
-        encodeUint256(4 + 2), // 2 values
-        encodeUint256(123), // positionId
-        '1234abcd'.repeat(8), // publicKey
-        encodeUint256(OFFSET + 10n), // collateralBalance
-        encodeUint256(456), // fundingTimestamp
-        encodePositionValue('ETH-9', 50n),
-        encodePositionValue('BTC-10', 20n),
-        encodeUint256(4 + 1), // 1 value
-        encodeUint256(124), // positionId
-        'deadbeef'.repeat(8), // publicKey
-        encodeUint256(OFFSET + 33n), // collateralBalance
-        encodeUint256(457), // fundingTimestamp
-        encodePositionValue('ETH-9', 66n),
-      ])
-    ).to.deep.equal({
+    const writer = new ByteWriter()
+      .writeNumber(2, 32) // 2 entries
+      .writeNumber(3, 32) // 3 indices
+      .writePadding(17)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 100n, 32) // funding index = 100
+      .writePadding(17)
+      .write(encodeAssetId('BTC-10'))
+      .writeNumber(OFFSET - 200n, 32) // funding index = -200
+      .writePadding(17)
+      .write(encodeAssetId('ABC-1'))
+      .writeNumber(OFFSET, 32) // funding index = 0
+      .writeNumber(456, 32) // timestamp
+      .writeNumber(2, 32) // 2 indices
+      .writePadding(17)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 1n, 32) // funding index = 1
+      .writePadding(17)
+      .write(encodeAssetId('BTC-10'))
+      .writeNumber(OFFSET + 2n, 32) // funding index = 2
+      .writeNumber(789, 32) // timestamp
+      .writeNumber(4 + 2, 32) // 2 values
+      .writeNumber(123, 32) // positionId
+      .write('1234abcd'.repeat(8)) // publicKey
+      .writeNumber(OFFSET + 10n, 32) // collateralBalance
+      .writeNumber(456, 32) // fundingTimestamp
+      .writePadding(9)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 50n, 8)
+      .writePadding(9)
+      .write(encodeAssetId('BTC-10'))
+      .writeNumber(OFFSET + 20n, 8)
+      .writeNumber(4 + 1, 32) // 1 value
+      .writeNumber(124, 32) // positionId
+      .write('deadbeef'.repeat(8)) // publicKey
+      .writeNumber(OFFSET + 33n, 32) // collateralBalance
+      .writeNumber(457, 32) // fundingTimestamp
+      .writePadding(9)
+      .write(encodeAssetId('ETH-9'))
+      .writeNumber(OFFSET + 66n, 8)
+    expect(decodeUpdates(writer.getBytes())).to.deep.equal({
       funding: [
         {
           indices: [
@@ -288,7 +291,7 @@ describe('decodeUpdates', () => {
 
   it('decodes real onchain data', () => {
     // TODO: don't skip first page
-    const decoded = decodeUpdates(REAL_DATA.slice(1).flat())
+    const decoded = decodeUpdates(REAL_DATA.slice(1).flat().join(''))
     const noBigInt = JSON.parse(
       JSON.stringify(decoded, (k, v) => (typeof v === 'bigint' ? Number(v) : v))
     )

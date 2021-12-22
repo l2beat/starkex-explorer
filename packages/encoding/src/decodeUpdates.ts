@@ -10,8 +10,8 @@ import {
 
 const MIN_INT = -(2n ** 63n)
 
-export function decodeUpdates(data: string[]): OnChainData {
-  const reader = new ByteReader(data.join(''))
+export function decodeUpdates(data: string): OnChainData {
+  const reader = new ByteReader(data)
 
   const fundingEntriesLength = reader.readNumber(32)
   const funding: FundingEntry[] = []
