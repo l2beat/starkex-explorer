@@ -7,4 +7,5 @@ export interface Config {
     format: 'pretty' | 'json'
   }
   port: number
+  databaseUrl: string
 }
