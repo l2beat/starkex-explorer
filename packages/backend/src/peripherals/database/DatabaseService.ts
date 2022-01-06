@@ -18,6 +18,8 @@ export class DatabaseService {
       connection: databaseUrl,
       migrations: {
         directory: path.join(__dirname, 'migrations'),
+        extension: 'ts',
+        loadExtensions: ['.ts'],
       },
     })
   }
