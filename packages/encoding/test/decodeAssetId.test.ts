@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { decodeAssetId, encodeAssetId } from '../src/assetId'
+import { decodeAssetId, encodeAssetId } from '../src/decodeAssetId'
 import { DecodingError } from '../src/DecodingError'
 
 describe('encodeAssetId', () => {

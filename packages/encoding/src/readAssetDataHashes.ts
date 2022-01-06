@@ -1,5 +1,5 @@
-import { decodeAssetId } from './assetId'
 import { ByteReader } from './ByteReader'
+import { decodeAssetId } from './decodeAssetId'
 import { AssetDataHash } from './OnChainData'
 
 export function readAssetDataHashes(reader: ByteReader) {

@@ -1,5 +1,5 @@
-import { decodeAssetId } from './assetId'
 import { ByteReader } from './ByteReader'
+import { decodeAssetId } from './decodeAssetId'
 import { MIN_INT } from './decodeFirstPage'
 import { FundingIndex } from './OnChainData'
 

@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 
-import { encodeAssetId } from '../src/assetId'
+import { encodeAssetId } from '../src/decodeAssetId'
 import { decodeUpdates } from '../src/decodeUpdates'
 import { DecodingError } from '../src/DecodingError'
 import { ByteWriter } from './ByteWriter'
