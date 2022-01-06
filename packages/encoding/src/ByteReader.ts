@@ -37,9 +37,13 @@ export class ByteReader {
     return result
   }
 
+  readHex(n: number) {
+    return '0x' + this.read(n)
+  }
+
   readBigInt(n: number) {
-    const hex = this.read(n)
-    return BigInt('0x' + hex)
+    const hex = this.readHex(n)
+    return BigInt(hex)
   }
 
   readNumber(n: number) {

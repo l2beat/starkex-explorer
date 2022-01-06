@@ -1,1 +1,2 @@
-export { decodeUpdates } from './decodeUpdates'
+export { decodeOnChainData } from './decodeOnChainData'
+export * from './OnChainData'

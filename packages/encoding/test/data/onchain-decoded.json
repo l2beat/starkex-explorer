@@ -1,4 +1,299 @@
 {
+  "configurationHash": "0x00b763230e8b7409f7a22c099d0159583b77cf79805449042082598e0acd6d97",
+  "assetDataHashes": [
+    {
+      "assetId": "1INCH-7",
+      "hash": "0x06d50d2c9b4ba8477d0a6189efd223e0a7bc8903e5e5502c2596bfd037d5cf1a"
+    },
+    {
+      "assetId": "AAVE-8",
+      "hash": "0x05b754de68ac6ca37456b54e3d6740dfb10ad6c991c6ea8e63b4c207f12e657c"
+    },
+    {
+      "assetId": "AVAX-7",
+      "hash": "0x06f6133d524c663a9cb6bc55da515e2906c3e3648bb756b085b5d66065d0e41b"
+    },
+    {
+      "assetId": "BTC-10",
+      "hash": "0x06b17c0ea15e9924ea938b1405c6cdd1253861524369999aba9f5e9183757082"
+    },
+    {
+      "assetId": "CRV-6",
+      "hash": "0x065486a27ad7673fcd39e2087e09c5d93ad80e151e69323035460bc0a2b9afe5"
+    },
+    {
+      "assetId": "DOGE-5",
+      "hash": "0x038b40a3cc927314917883295666bd170d67b008e30361ebbb2a6ef6ff499d42"
+    },
+    {
+      "assetId": "DOT-7",
+      "hash": "0x03cc4f20f85dfd549c4d1e3f2ba7cd7f206a24a506b21e0a6e7bd23c40b61fc1"
+    },
+    {
+      "assetId": "ETH-9",
+      "hash": "0x0706a231efa8932e2cf71ee572dff6eeee3b1eb14ae44a035a60b896643e85db"
+    },
+    {
+      "assetId": "LINK-7",
+      "hash": "0x031bccd53de4ce5aa144cf96f832e4093e3e993f35f11cd4918bf92de996043d"
+    },
+    {
+      "assetId": "SNX-7",
+      "hash": "0x073233e2abb9d0b13c6e77c2dd815a3c89fdc6135ecec80ae963d415ae34a07e"
+    },
+    {
+      "assetId": "SOL-7",
+      "hash": "0x01772242cd4849b1883a5ce776942fbe69461e0074aae1dc610933d50fb1f412"
+    },
+    {
+      "assetId": "SUSHI-7",
+      "hash": "0x029b76f6d536776777d7153cc79151a4cad6bc3e2dc7802e50dee1090035ad5e"
+    },
+    {
+      "assetId": "UMA-7",
+      "hash": "0x0716d18347420ea748219ee4f2dff5a072f20726e10d6e30585d571eaf122ead"
+    },
+    {
+      "assetId": "UNI-7",
+      "hash": "0x014b8c123616fb4ee47ceb9d003e5e17be5b6baf90f0de24c2fbfa0236ceb258"
+    },
+    {
+      "assetId": "YFI-10",
+      "hash": "0x03cbc25167ffc91de5f57dc6595eb0b760007bde9f82cf84f0ce485c9cb335d1"
+    }
+  ],
+  "oldState": {
+    "positionRoot": "0x0407bd3f313f2e6c1138af58cd26162a959eafaa8ec2e41d129e5e7ac4630d1a",
+    "positionHeight": 64,
+    "orderRoot": "0x054f4644ab416329cfcc63d6e348a2c7dccad7208ccaed21dd54ce2753281ae7",
+    "orderHeight": 64,
+    "indices": [
+      {
+        "assetId": "1INCH-7",
+        "value": "31640531"
+      },
+      {
+        "assetId": "AAVE-8",
+        "value": "795624999"
+      },
+      {
+        "assetId": "AVAX-7",
+        "value": "503060909"
+      },
+      {
+        "assetId": "BTC-10",
+        "value": "2874805647"
+      },
+      {
+        "assetId": "CRV-6",
+        "value": "0"
+      },
+      {
+        "assetId": "DOGE-5",
+        "value": "193789175"
+      },
+      {
+        "assetId": "ETH-9",
+        "value": "1210839850"
+      },
+      {
+        "assetId": "LINK-7",
+        "value": "1108924205"
+      },
+      {
+        "assetId": "SNX-7",
+        "value": "-24089302"
+      },
+      {
+        "assetId": "SOL-7",
+        "value": "659106377"
+      },
+      {
+        "assetId": "SUSHI-7",
+        "value": "222894151"
+      },
+      {
+        "assetId": "UNI-7",
+        "value": "722360220"
+      },
+      {
+        "assetId": "YFI-10",
+        "value": "745276449"
+      }
+    ],
+    "timestamp": "1621929600",
+    "oraclePrices": [
+      {
+        "assetId": "1INCH-7",
+        "price": "1275605287"
+      },
+      {
+        "assetId": "AAVE-8",
+        "price": "15780998336"
+      },
+      {
+        "assetId": "AVAX-7",
+        "price": "8389426210"
+      },
+      {
+        "assetId": "BTC-10",
+        "price": "16622299667"
+      },
+      {
+        "assetId": "CRV-6",
+        "price": "6906781800"
+      },
+      {
+        "assetId": "DOGE-5",
+        "price": "15373990211"
+      },
+      {
+        "assetId": "ETH-9",
+        "price": "11401806731"
+      },
+      {
+        "assetId": "LINK-7",
+        "price": "11342322827"
+      },
+      {
+        "assetId": "SNX-7",
+        "price": "5834142268"
+      },
+      {
+        "assetId": "SOL-7",
+        "price": "12521042746"
+      },
+      {
+        "assetId": "SUSHI-7",
+        "price": "4801773437"
+      },
+      {
+        "assetId": "UNI-7",
+        "price": "10781233138"
+      },
+      {
+        "assetId": "YFI-10",
+        "price": "20994463639"
+      }
+    ],
+    "systemTime": "1621930024"
+  },
+  "newState": {
+    "positionRoot": "0x03df522756c24ce244c65ed7c33a9f96e25ce1e9bffd54cdbc6092a621cd4f64",
+    "positionHeight": 64,
+    "orderRoot": "0x0578f88f158a0c2501a18b9f7e693b1836804a4a72f5190ce81485623a17847f",
+    "orderHeight": 64,
+    "indices": [
+      {
+        "assetId": "1INCH-7",
+        "value": "31758182"
+      },
+      {
+        "assetId": "AAVE-8",
+        "value": "798387563"
+      },
+      {
+        "assetId": "AVAX-7",
+        "value": "500904843"
+      },
+      {
+        "assetId": "BTC-10",
+        "value": "2878664608"
+      },
+      {
+        "assetId": "CRV-6",
+        "value": "-136658"
+      },
+      {
+        "assetId": "DOGE-5",
+        "value": "195477837"
+      },
+      {
+        "assetId": "ETH-9",
+        "value": "1211233561"
+      },
+      {
+        "assetId": "LINK-7",
+        "value": "1109996933"
+      },
+      {
+        "assetId": "SNX-7",
+        "value": "-24773136"
+      },
+      {
+        "assetId": "SOL-7",
+        "value": "660421200"
+      },
+      {
+        "assetId": "SUSHI-7",
+        "value": "223492251"
+      },
+      {
+        "assetId": "UNI-7",
+        "value": "723584956"
+      },
+      {
+        "assetId": "YFI-10",
+        "value": "747530197"
+      }
+    ],
+    "timestamp": "1621958400",
+    "oraclePrices": [
+      {
+        "assetId": "1INCH-7",
+        "price": "1177274828"
+      },
+      {
+        "assetId": "AAVE-8",
+        "price": "15374092378"
+      },
+      {
+        "assetId": "AVAX-7",
+        "price": "8122681303"
+      },
+      {
+        "assetId": "BTC-10",
+        "price": "16323487243"
+      },
+      {
+        "assetId": "CRV-6",
+        "price": "6574281808"
+      },
+      {
+        "assetId": "DOGE-5",
+        "price": "14742126222"
+      },
+      {
+        "assetId": "ETH-9",
+        "price": "11129490028"
+      },
+      {
+        "assetId": "LINK-7",
+        "price": "11214159610"
+      },
+      {
+        "assetId": "SNX-7",
+        "price": "5562937773"
+      },
+      {
+        "assetId": "SOL-7",
+        "price": "12651077224"
+      },
+      {
+        "assetId": "SUSHI-7",
+        "price": "4735070171"
+      },
+      {
+        "assetId": "UNI-7",
+        "price": "10354006509"
+      },
+      {
+        "assetId": "YFI-10",
+        "price": "20224347659"
+      }
+    ],
+    "systemTime": "1621958831"
+  },
   "funding": [
     {
       "timestamp": 1621933200,

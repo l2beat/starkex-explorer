@@ -5,9 +5,9 @@ import { readFundingIndices } from './readFundingIndices'
 export function decodeState(data: string) {
   const reader = new ByteReader(data)
 
-  const positionRoot = '0x' + reader.read(32)
+  const positionRoot = reader.readHex(32)
   const positionHeight = reader.readNumber(32)
-  const orderRoot = '0x' + reader.read(32)
+  const orderRoot = reader.readHex(32)
   const orderHeight = reader.readNumber(32)
 
   const indices = readFundingIndices(reader)

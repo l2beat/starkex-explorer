@@ -3,7 +3,7 @@ import REAL_DATA from './data/onchain-example.json'
 
 describe('decodeFirstPage', () => {
   it('decodes real onchain data', () => {
-    decodeFirstPage(REAL_DATA[0].join(''))
+    const values = decodeFirstPage(REAL_DATA[0].join(''))
     // TODO: check against expected values
   })
 })

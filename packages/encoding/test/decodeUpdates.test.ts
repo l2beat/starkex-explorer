@@ -4,8 +4,6 @@ import { encodeAssetId } from '../src/assetId'
 import { decodeUpdates } from '../src/decodeUpdates'
 import { DecodingError } from '../src/DecodingError'
 import { ByteWriter } from './ByteWriter'
-import REAL_DECODED from './data/onchain-decoded.json'
-import REAL_DATA from './data/onchain-example.json'
 
 const OFFSET = 2n ** 63n
 
@@ -287,14 +285,5 @@ describe('decodeUpdates', () => {
         },
       ],
     })
-  })
-
-  it('decodes real onchain data', () => {
-    // TODO: don't skip first page
-    const decoded = decodeUpdates(REAL_DATA.slice(1).flat().join(''))
-    const noBigInt = JSON.parse(
-      JSON.stringify(decoded, (k, v) => (typeof v === 'bigint' ? Number(v) : v))
-    )
-    expect(noBigInt).to.deep.equal(REAL_DECODED)
   })
 })
