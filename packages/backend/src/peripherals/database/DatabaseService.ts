@@ -1,8 +1,10 @@
+import { readdirSync } from 'fs'
 import KnexConstructor, { Knex } from 'knex'
 import path from 'path'
 import { types as pgTypes } from 'pg'
 
 import { Logger } from '../../tools/Logger'
+import { PolyglotMigrationSource } from './PolyglotMigrationSource'
 
 export class DatabaseService {
   private migrated = false
@@ -17,9 +19,9 @@ export class DatabaseService {
       client: 'pg',
       connection: databaseUrl,
       migrations: {
-        directory: path.join(__dirname, 'migrations'),
-        extension: 'ts',
-        // loadExtensions: ['.ts'], @todo if there is .ts in migrations dir, use .ts, otherwise use .js
+        migrationSource: new PolyglotMigrationSource(
+          path.join(__dirname, 'migrations')
+        ),
       },
     })
   }
