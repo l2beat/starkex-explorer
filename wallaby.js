@@ -7,7 +7,7 @@ module.exports = function (_wallaby) {
     packageNames.length === 1 ? packageNames[0] : `{${packageNames.join(",")}}`;
   const directories = `./packages/${packages}/{src,test}/**/`;
   const sourceFiles = directories + "*.{ts,tsx,mjs,cjs,js,jsx,json,env}";
-  const testFiles = directories + "*.test.ts";
+  const testFiles = directories + "*.test.{ts,tsx}";
   const packageJsonFiles = `./packages/${packages}/package.json`;
 
   return {
