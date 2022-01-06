@@ -1,5 +1,3 @@
-import { AssetBalances } from '../../model/AssetBalances'
-
 export {}
 
 declare module 'knex/types/tables' {
@@ -8,7 +6,7 @@ declare module 'knex/types/tables' {
     public_key: string
     collateral_balance: bigint
     funding_timestamp: bigint
-    balances: AssetBalances.Json
+    balances: JsonB<AssetBalanceJson[]>
   }
 
   interface AssetBalanceJson {
@@ -26,3 +24,11 @@ export interface Repository<TRecord> {
   getAll(): Promise<TRecord[]>
   deleteAll(): Promise<void>
 }
+
+/**
+ * JSON object stored in a column of type `json` or `jsonb`.
+ *
+ * We need to pass arrays as stringified JSON to the database — https://knexjs.org/#Schema-jsonb.
+ * But, when we receive it from the database, we get the JSON object alraedy partially parsed with JSON.parse.
+ */
+export type JsonB<T> = T | string

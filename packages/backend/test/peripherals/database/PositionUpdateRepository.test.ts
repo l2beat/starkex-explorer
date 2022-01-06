@@ -1,6 +1,5 @@
 import { expect } from 'chai'
 
-import { AssetBalances } from '../../../src/model/AssetBalances'
 import {
   PositionUpdateRecord,
   PositionUpdateRepository,
@@ -21,7 +20,7 @@ describe(PositionUpdateRepository.name, () => {
         '0x006b56aeb3ee3df0002dfa4e2c65e335fbacf0f7a8f399a9beffe7b04534f7cd',
       collateralBalance: 1n,
       fundingTimestamp: 1n,
-      balances: AssetBalances.from([]),
+      balances: [],
     }
     await repository.addOrUpdate([record])
 
@@ -38,7 +37,7 @@ describe(PositionUpdateRepository.name, () => {
           '0x006b56aeb3ee3df0002dfa4e2c65e335fbacf0f7a8f399a9beffe7b04534f7cd',
         collateralBalance: BigInt(29234661877),
         fundingTimestamp: BigInt(1621958400),
-        balances: new AssetBalances(),
+        balances: [],
       },
       {
         positionId: BigInt(1),
@@ -46,7 +45,7 @@ describe(PositionUpdateRepository.name, () => {
           '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358',
         collateralBalance: BigInt(408907817269),
         fundingTimestamp: BigInt(1621947600),
-        balances: new AssetBalances(),
+        balances: [],
       },
       {
         positionId: BigInt(2),
@@ -54,62 +53,60 @@ describe(PositionUpdateRepository.name, () => {
           '0x015e8410e93e5c90b1bf7a393874f68f4cc7f477c5d742daac5c5a112e672d61',
         collateralBalance: BigInt(12280156418787),
         fundingTimestamp: BigInt(1621958400),
-        balances: AssetBalances.from(
-          [
-            {
-              assetId: '1INCH-7',
-              balance: 63030000000,
-            },
-            {
-              assetId: 'AAVE-8',
-              balance: -34197000000,
-            },
-            {
-              assetId: 'AVAX-7',
-              balance: 45153000000,
-            },
-            {
-              assetId: 'BTC-10',
-              balance: 34355000000,
-            },
-            {
-              assetId: 'CRV-6',
-              balance: -200000000,
-            },
-            {
-              assetId: 'DOGE-5',
-              balance: -1814000000,
-            },
-            {
-              assetId: 'ETH-9',
-              balance: -248406000000,
-            },
-            {
-              assetId: 'LINK-7',
-              balance: 109081000000,
-            },
-            {
-              assetId: 'SNX-7',
-              balance: -105494000000,
-            },
-            {
-              assetId: 'SOL-7',
-              balance: -105662000000,
-            },
-            {
-              assetId: 'SUSHI-7',
-              balance: -77798000000,
-            },
-            {
-              assetId: 'UNI-7',
-              balance: -23250000000,
-            },
-            {
-              assetId: 'YFI-10',
-              balance: -1579000000,
-            },
-          ].map((x) => ({ assetId: x.assetId, balance: BigInt(x.balance) }))
-        ),
+        balances: [
+          {
+            assetId: '1INCH-7',
+            balance: 63030000000,
+          },
+          {
+            assetId: 'AAVE-8',
+            balance: -34197000000,
+          },
+          {
+            assetId: 'AVAX-7',
+            balance: 45153000000,
+          },
+          {
+            assetId: 'BTC-10',
+            balance: 34355000000,
+          },
+          {
+            assetId: 'CRV-6',
+            balance: -200000000,
+          },
+          {
+            assetId: 'DOGE-5',
+            balance: -1814000000,
+          },
+          {
+            assetId: 'ETH-9',
+            balance: -248406000000,
+          },
+          {
+            assetId: 'LINK-7',
+            balance: 109081000000,
+          },
+          {
+            assetId: 'SNX-7',
+            balance: -105494000000,
+          },
+          {
+            assetId: 'SOL-7',
+            balance: -105662000000,
+          },
+          {
+            assetId: 'SUSHI-7',
+            balance: -77798000000,
+          },
+          {
+            assetId: 'UNI-7',
+            balance: -23250000000,
+          },
+          {
+            assetId: 'YFI-10',
+            balance: -1579000000,
+          },
+        ].map((x) => ({ assetId: x.assetId, balance: BigInt(x.balance) })),
       },
     ]
 
@@ -126,7 +123,7 @@ describe(PositionUpdateRepository.name, () => {
           '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358',
         collateralBalance: BigInt(408907817269),
         fundingTimestamp: BigInt(1621947600),
-        balances: new AssetBalances(),
+        balances: [],
       },
       {
         positionId: BigInt(4),
@@ -134,7 +131,7 @@ describe(PositionUpdateRepository.name, () => {
           '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358',
         collateralBalance: BigInt(408907817269),
         fundingTimestamp: BigInt(1621947600),
-        balances: new AssetBalances(),
+        balances: [],
       },
     ])
     await repository.deleteAll()
