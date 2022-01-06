@@ -1,7 +1,7 @@
 import { Config } from './Config'
 import { getLocalConfig } from './config.local'
 import { getProductionConfig } from './config.production'
-import { getTestConfig } from './config.test'
+import { getTestConfig } from './config.testing'
 
 export type { Config }
 
