@@ -33,7 +33,7 @@ export async function getOnChainData(blockHash: string) {
         memoryHashEvents.find((x) => x.factHash === fact)?.pagesHashes ?? []
     )
     .map((x) => mpMap.get(x))
-  const pages: BigNumber[] = []
+  const pages: BigNumber[][] = []
   for (const hash of transactionHashes) {
     if (!hash) {
       continue
@@ -45,10 +45,8 @@ export async function getOnChainData(blockHash: string) {
     )
     pages.push(decoded[1])
   }
-  // TODO: why do we drop the first memory page?
-  const onChainData = pages.slice(1).flat()
-  const result = onChainData.map((x) =>
-    x.toHexString().substring(2).padStart(64, '0')
+  const result = pages.map((page) =>
+    page.map((x) => x.toHexString().substring(2).padStart(64, '0'))
   )
   return result
 }

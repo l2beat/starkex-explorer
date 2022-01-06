@@ -1,7 +1,6 @@
 import { expect } from 'chai'
 
-import { decodeAssetId, encodeAssetId } from '../src/assetId'
-import { DecodingError } from '../src/DecodingError'
+import { encodeAssetId } from '../src/encodeAssetId'
 
 describe('encodeAssetId', () => {
   it('fails for too long strings', () => {
@@ -17,19 +16,5 @@ describe('encodeAssetId', () => {
   it('can encode BTC-10', () => {
     const result = encodeAssetId('BTC-10')
     expect(result).to.equal('4254432d3130000000000000000000')
-  })
-})
-
-describe('decodeAssetId', () => {
-  it('fails for non-15 byte strings', () => {
-    expect(() => decodeAssetId('112233')).to.throw(
-      DecodingError,
-      'Invalid AssetId length'
-    )
-  })
-
-  it('can decode BTC-10', () => {
-    const result = decodeAssetId('4254432d3130000000000000000000')
-    expect(result).to.equal('BTC-10')
   })
 })
