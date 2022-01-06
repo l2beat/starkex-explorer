@@ -1,5 +1,6 @@
 import KnexConstructor, { Knex } from 'knex'
 import path from 'path'
+import { types as pgTypes } from 'pg'
 
 import { Logger } from '../../tools/Logger'
 
@@ -44,3 +45,11 @@ export class DatabaseService {
     this.logger.debug('Connection closed')
   }
 }
+
+/**
+ * node-postgres returns bigints as strings since 2013.
+ * @see https://github.com/brianc/node-postgres/pull/353
+ * We set a parser here, to inform pg-types BigInt is supported in Node :)
+ * `20` is the id of 8-bytes {@link pgTypes.TypeId.INT8}
+ */
+pgTypes.setTypeParser(20, 'text', BigInt)
