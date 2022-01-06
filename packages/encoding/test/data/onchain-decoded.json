@@ -70,113 +70,113 @@
     "indices": [
       {
         "assetId": "1INCH-7",
-        "value": "31640531"
+        "value": 31640531
       },
       {
         "assetId": "AAVE-8",
-        "value": "795624999"
+        "value": 795624999
       },
       {
         "assetId": "AVAX-7",
-        "value": "503060909"
+        "value": 503060909
       },
       {
         "assetId": "BTC-10",
-        "value": "2874805647"
+        "value": 2874805647
       },
       {
         "assetId": "CRV-6",
-        "value": "0"
+        "value": 0
       },
       {
         "assetId": "DOGE-5",
-        "value": "193789175"
+        "value": 193789175
       },
       {
         "assetId": "ETH-9",
-        "value": "1210839850"
+        "value": 1210839850
       },
       {
         "assetId": "LINK-7",
-        "value": "1108924205"
+        "value": 1108924205
       },
       {
         "assetId": "SNX-7",
-        "value": "-24089302"
+        "value": -24089302
       },
       {
         "assetId": "SOL-7",
-        "value": "659106377"
+        "value": 659106377
       },
       {
         "assetId": "SUSHI-7",
-        "value": "222894151"
+        "value": 222894151
       },
       {
         "assetId": "UNI-7",
-        "value": "722360220"
+        "value": 722360220
       },
       {
         "assetId": "YFI-10",
-        "value": "745276449"
+        "value": 745276449
       }
     ],
-    "timestamp": "1621929600",
+    "timestamp": 1621929600,
     "oraclePrices": [
       {
         "assetId": "1INCH-7",
-        "price": "1275605287"
+        "price": 1275605287
       },
       {
         "assetId": "AAVE-8",
-        "price": "15780998336"
+        "price": 15780998336
       },
       {
         "assetId": "AVAX-7",
-        "price": "8389426210"
+        "price": 8389426210
       },
       {
         "assetId": "BTC-10",
-        "price": "16622299667"
+        "price": 16622299667
       },
       {
         "assetId": "CRV-6",
-        "price": "6906781800"
+        "price": 6906781800
       },
       {
         "assetId": "DOGE-5",
-        "price": "15373990211"
+        "price": 15373990211
       },
       {
         "assetId": "ETH-9",
-        "price": "11401806731"
+        "price": 11401806731
       },
       {
         "assetId": "LINK-7",
-        "price": "11342322827"
+        "price": 11342322827
       },
       {
         "assetId": "SNX-7",
-        "price": "5834142268"
+        "price": 5834142268
       },
       {
         "assetId": "SOL-7",
-        "price": "12521042746"
+        "price": 12521042746
       },
       {
         "assetId": "SUSHI-7",
-        "price": "4801773437"
+        "price": 4801773437
       },
       {
         "assetId": "UNI-7",
-        "price": "10781233138"
+        "price": 10781233138
       },
       {
         "assetId": "YFI-10",
-        "price": "20994463639"
+        "price": 20994463639
       }
     ],
-    "systemTime": "1621930024"
+    "systemTime": 1621930024
   },
   "newState": {
     "positionRoot": "0x03df522756c24ce244c65ed7c33a9f96e25ce1e9bffd54cdbc6092a621cd4f64",
@@ -186,113 +186,113 @@
     "indices": [
       {
         "assetId": "1INCH-7",
-        "value": "31758182"
+        "value": 31758182
       },
       {
         "assetId": "AAVE-8",
-        "value": "798387563"
+        "value": 798387563
       },
       {
         "assetId": "AVAX-7",
-        "value": "500904843"
+        "value": 500904843
       },
       {
         "assetId": "BTC-10",
-        "value": "2878664608"
+        "value": 2878664608
       },
       {
         "assetId": "CRV-6",
-        "value": "-136658"
+        "value": -136658
       },
       {
         "assetId": "DOGE-5",
-        "value": "195477837"
+        "value": 195477837
       },
       {
         "assetId": "ETH-9",
-        "value": "1211233561"
+        "value": 1211233561
       },
       {
         "assetId": "LINK-7",
-        "value": "1109996933"
+        "value": 1109996933
       },
       {
         "assetId": "SNX-7",
-        "value": "-24773136"
+        "value": -24773136
       },
       {
         "assetId": "SOL-7",
-        "value": "660421200"
+        "value": 660421200
       },
       {
         "assetId": "SUSHI-7",
-        "value": "223492251"
+        "value": 223492251
       },
       {
         "assetId": "UNI-7",
-        "value": "723584956"
+        "value": 723584956
       },
       {
         "assetId": "YFI-10",
-        "value": "747530197"
+        "value": 747530197
       }
     ],
-    "timestamp": "1621958400",
+    "timestamp": 1621958400,
     "oraclePrices": [
       {
         "assetId": "1INCH-7",
-        "price": "1177274828"
+        "price": 1177274828
       },
       {
         "assetId": "AAVE-8",
-        "price": "15374092378"
+        "price": 15374092378
       },
       {
         "assetId": "AVAX-7",
-        "price": "8122681303"
+        "price": 8122681303
       },
       {
         "assetId": "BTC-10",
-        "price": "16323487243"
+        "price": 16323487243
       },
       {
         "assetId": "CRV-6",
-        "price": "6574281808"
+        "price": 6574281808
       },
       {
         "assetId": "DOGE-5",
-        "price": "14742126222"
+        "price": 14742126222
       },
       {
         "assetId": "ETH-9",
-        "price": "11129490028"
+        "price": 11129490028
       },
       {
         "assetId": "LINK-7",
-        "price": "11214159610"
+        "price": 11214159610
       },
       {
         "assetId": "SNX-7",
-        "price": "5562937773"
+        "price": 5562937773
       },
       {
         "assetId": "SOL-7",
-        "price": "12651077224"
+        "price": 12651077224
       },
       {
         "assetId": "SUSHI-7",
-        "price": "4735070171"
+        "price": 4735070171
       },
       {
         "assetId": "UNI-7",
-        "price": "10354006509"
+        "price": 10354006509
       },
       {
         "assetId": "YFI-10",
-        "price": "20224347659"
+        "price": 20224347659
       }
     ],
-    "systemTime": "1621958831"
+    "systemTime": 1621958831
   },
   "funding": [
     {
