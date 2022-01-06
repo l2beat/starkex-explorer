@@ -19,7 +19,7 @@ export class DatabaseService {
       migrations: {
         directory: path.join(__dirname, 'migrations'),
         extension: 'ts',
-        loadExtensions: ['.ts'],
+        // loadExtensions: ['.ts'], @todo if there is .ts in migrations dir, use .ts, otherwise use .js
       },
     })
   }
