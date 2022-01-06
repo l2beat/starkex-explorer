@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 
 import { DecodingError } from '../src'
-import { encodeAssetId } from '../src/decodeAssetId'
+import { encodeAssetId } from '../src/encodeAssetId'
 import { readAssetDataHashes } from '../src/readAssetDataHashes'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'

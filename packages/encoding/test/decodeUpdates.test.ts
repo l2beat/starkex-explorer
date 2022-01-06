@@ -1,9 +1,9 @@
 import { expect } from 'chai'
 
 import { MIN_INT } from '../src/constants'
-import { encodeAssetId } from '../src/decodeAssetId'
 import { decodeUpdates } from '../src/decodeUpdates'
 import { DecodingError } from '../src/DecodingError'
+import { encodeAssetId } from '../src/encodeAssetId'
 import { ByteWriter } from './ByteWriter'
 
 describe('decodeUpdates', () => {

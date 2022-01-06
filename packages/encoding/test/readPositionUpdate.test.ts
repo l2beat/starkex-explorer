@@ -2,7 +2,7 @@ import { expect } from 'chai'
 
 import { DecodingError } from '../src'
 import { MIN_INT } from '../src/constants'
-import { encodeAssetId } from '../src/decodeAssetId'
+import { encodeAssetId } from '../src/encodeAssetId'
 import { readPositionUpdate } from '../src/readPositionUpdate'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'
