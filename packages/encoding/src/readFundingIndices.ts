@@ -1,6 +1,6 @@
 import { ByteReader } from './ByteReader'
+import { MIN_INT } from './constants'
 import { decodeAssetId } from './decodeAssetId'
-import { MIN_INT } from './decodeFirstPage'
 import { FundingIndex } from './OnChainData'
 
 export function readFundingIndices(reader: ByteReader) {

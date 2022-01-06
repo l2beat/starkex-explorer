@@ -1,6 +1,6 @@
 import { ByteReader } from './ByteReader'
+import { MIN_INT } from './constants'
 import { decodeAssetId } from './decodeAssetId'
-import { MIN_INT } from './decodeFirstPage'
 import { AssetBalance, PositionUpdate } from './OnChainData'
 
 export function readPositionUpdate(reader: ByteReader): PositionUpdate {

@@ -2,8 +2,6 @@ import { ByteReader } from './ByteReader'
 import { readAssetDataHashes } from './readAssetDataHashes'
 import { readState } from './readState'
 
-export const MIN_INT = -(2n ** 63n)
-
 export function decodeFirstPage(data: string) {
   const reader = new ByteReader(data)
 
