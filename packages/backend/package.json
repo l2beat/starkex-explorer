@@ -2,8 +2,8 @@
   "name": "@explorer/backend",
   "version": "0.1.0",
   "private": true,
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "build/src/lib.js",
+  "types": "build/src/lib.d.ts",
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
