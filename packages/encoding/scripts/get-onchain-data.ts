@@ -1,6 +1,5 @@
+import { getOnChainData } from '@explorer/backend'
 import { writeFileSync } from 'fs'
-
-import { getOnChainData } from './getOnChainData'
 
 run()
 async function run() {

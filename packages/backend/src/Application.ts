@@ -5,6 +5,7 @@ import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
+import { OnChainDataClient } from './peripherals/onchain/OnChainDataClient'
 import { Logger } from './tools/Logger'
 
 export class Application {
@@ -20,8 +21,13 @@ export class Application {
     const knex = DatabaseService.createKnexInstance(config.databaseUrl)
     const databaseService = new DatabaseService(knex, logger)
 
-    // @todo unused for now
-    new PositionUpdateRepository(knex, logger)
+    const positionUpdateRepository = new PositionUpdateRepository(knex, logger)
+
+    // @todo should this be moved to /core?
+    const onChainDataClient = new OnChainDataClient(
+      positionUpdateRepository,
+      logger
+    )
 
     /* - - - - - API - - - - - */
 
@@ -36,6 +42,7 @@ export class Application {
       logger.for(this).info('Starting')
 
       await databaseService.migrateToLatest()
+      await onChainDataClient.savePositionsToDatabase()
 
       await apiServer.listen()
 
