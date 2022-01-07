@@ -56,57 +56,17 @@ describe(PositionUpdateRepository.name, () => {
         balances: [
           {
             assetId: '1INCH-7',
-            balance: 63030000000,
+            balance: 63030000000n,
           },
           {
             assetId: 'AAVE-8',
-            balance: -34197000000,
+            balance: -34197000000n,
           },
           {
             assetId: 'AVAX-7',
-            balance: 45153000000,
+            balance: 0n,
           },
-          {
-            assetId: 'BTC-10',
-            balance: 34355000000,
-          },
-          {
-            assetId: 'CRV-6',
-            balance: -200000000,
-          },
-          {
-            assetId: 'DOGE-5',
-            balance: -1814000000,
-          },
-          {
-            assetId: 'ETH-9',
-            balance: -248406000000,
-          },
-          {
-            assetId: 'LINK-7',
-            balance: 109081000000,
-          },
-          {
-            assetId: 'SNX-7',
-            balance: -105494000000,
-          },
-          {
-            assetId: 'SOL-7',
-            balance: -105662000000,
-          },
-          {
-            assetId: 'SUSHI-7',
-            balance: -77798000000,
-          },
-          {
-            assetId: 'UNI-7',
-            balance: -23250000000,
-          },
-          {
-            assetId: 'YFI-10',
-            balance: -1579000000,
-          },
-        ].map((x) => ({ assetId: x.assetId, balance: BigInt(x.balance) })),
+        ],
       },
     ]
 
