@@ -39,7 +39,6 @@ export class PolyglotMigrationSource
 
   async getMigrations(_loadExtensions: string[]): Promise<unknown[]> {
     const xs = await this.fsSource.getMigrations(this.loadExtensions)
-    console.log(xs.length)
     return this.fsSource.getMigrations(this.loadExtensions)
   }
 
