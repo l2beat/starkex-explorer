@@ -1,4 +1,3 @@
-import { readdirSync } from 'fs'
 import KnexConstructor, { Knex } from 'knex'
 import path from 'path'
 import { types as pgTypes } from 'pg'
