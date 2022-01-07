@@ -10,5 +10,6 @@ export function getProductionConfig(): Config {
       format: 'json',
     },
     port: getEnv.integer('PORT'),
+    databaseUrl: getEnv('DATABASE_URL'),
   }
 }
