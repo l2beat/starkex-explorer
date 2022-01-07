@@ -15,6 +15,14 @@ export class DatabaseService {
   }
 
   static createKnexInstance(databaseUrl: string) {
+    /**
+     * node-postgres returns bigints as strings since 2013.
+     * @see https://github.com/brianc/node-postgres/pull/353
+     * We set a parser here, to inform pg-types BigInt is supported in Node :)
+     * `20` is the id of 8-bytes {@link pgTypes.TypeId.INT8}
+     */
+    pgTypes.setTypeParser(20, 'text', BigInt)
+
     return KnexConstructor({
       client: 'pg',
       connection: databaseUrl,
@@ -49,11 +57,3 @@ export class DatabaseService {
     this.logger.debug('Connection closed')
   }
 }
-
-/**
- * node-postgres returns bigints as strings since 2013.
- * @see https://github.com/brianc/node-postgres/pull/353
- * We set a parser here, to inform pg-types BigInt is supported in Node :)
- * `20` is the id of 8-bytes {@link pgTypes.TypeId.INT8}
- */
-pgTypes.setTypeParser(20, 'text', BigInt)
