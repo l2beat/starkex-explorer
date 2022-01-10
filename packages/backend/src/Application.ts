@@ -3,40 +3,59 @@ import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
+import { OnChainDataClient } from './core/OnChainDataClient'
+import { SafeBlockService } from './core/SafeBlockService'
+import { StatusService } from './core/StatusService'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
-import { OnChainDataClient } from './peripherals/onchain/OnChainDataClient'
+import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { Logger } from './tools/Logger'
 
 export class Application {
   start: () => Promise<void>
 
   constructor(config: Config) {
-    /* - - - - - TOOLS - - - - - */
+    // #region tools
 
     const logger = new Logger(config.logger)
 
-    /* - - - - - PERIPHERALS - - - - - */
+    // #endregion tools
+    // #region peripherals
 
     const knex = DatabaseService.createKnexInstance(config.databaseUrl)
     const databaseService = new DatabaseService(knex, logger)
 
     const positionUpdateRepository = new PositionUpdateRepository(knex, logger)
 
-    // @todo should this be moved to /core?
     const onChainDataClient = new OnChainDataClient(
       positionUpdateRepository,
       logger
     )
 
-    /* - - - - - API - - - - - */
+    const ethereumClient = new EthereumClient()
+
+    const safeBlockService = new SafeBlockService(
+      config.core.safeBlock.refreshIntervalMs,
+      config.core.safeBlock.blockOffset,
+      ethereumClient,
+      logger
+    )
+
+    const statusService = new StatusService({
+      databaseService,
+      safeBlockService,
+    })
+
+    // #endregion peripherals
+    // #region api
 
     const apiServer = new ApiServer(config.port, logger, {
-      routers: [createStatusRouter(), createFrontendRouter()],
+      routers: [createStatusRouter(statusService), createFrontendRouter()],
       middleware: [createFrontendMiddleware()],
     })
 
-    /* - - - - - START - - - - - */
+    // #endregion api
+    // #region start
 
     this.start = async () => {
       logger.for(this).info('Starting')
@@ -48,5 +67,7 @@ export class Application {
 
       logger.for(this).info('Started')
     }
+
+    // #endregion start
   }
 }

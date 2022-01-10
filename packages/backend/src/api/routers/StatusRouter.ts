@@ -1,11 +1,19 @@
 import Router from '@koa/router'
 
-export function createStatusRouter() {
+import type { StatusService } from '../../core/StatusService'
+
+export function createStatusRouter(statusService: StatusService) {
   const router = new Router()
 
   router.get('/status', async (ctx) => {
-    ctx.body = { ok: true }
+    ctx.body = statusService.getStatus()
   })
+
+  for (const reporter of statusService.getReporters()) {
+    router.get(`/status/${reporter}`, async (ctx) => {
+      ctx.body = statusService.getReporterStatus(reporter)
+    })
+  }
 
   return router
 }

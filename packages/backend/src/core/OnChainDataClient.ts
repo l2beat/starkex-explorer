@@ -1,8 +1,8 @@
 import { decodeOnChainData, OnChainData } from '@explorer/encoding'
 
-import type { Logger } from '../../tools/Logger'
-import type { PositionUpdateRepository } from '../database/PositionUpdateRepository'
-import { getOnChainData } from './data/getOnChainData'
+import type { PositionUpdateRepository } from '../peripherals/database/PositionUpdateRepository'
+import { getOnChainData } from '../peripherals/todo/getOnChainData'
+import type { Logger } from '../tools/Logger'
 
 const BLOCK_HASH =
   '0x46c212912be05a090a9300cf87fd9434b8e8bbca15878d070ba83375a5dbaebd'
@@ -32,4 +32,16 @@ export class OnChainDataClient {
 
     return (this._data = decoded)
   }
+
+  sync(from: BlockNumber, to: BlockNumber) {
+    // const oldVerifiers = db.getExistingVerifiers(to)
+    // const newVerifiers = blockchain.getVerifierChanges(from, to)
+    // db.saveVerifiers(from, to, newVerifiers)
+    // const verifiers = [...oldVerifiers, ...newVerifiers]
+    // const events = blockchain.getEvents(verifiers, from, to)
+    // const data = parseOnChainData(events)
+    // db.saveData(data)
+  }
 }
+
+type BlockNumber = number
