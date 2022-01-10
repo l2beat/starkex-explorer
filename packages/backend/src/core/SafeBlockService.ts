@@ -83,12 +83,15 @@ export class SafeBlockService {
 
   private async updateSafeBlock() {
     const lastBlock = await this.ethereumClient.getBlockNumber()
+
     // we use a block in the past to not have to worry about reorgs
     const blockNumber = lastBlock - this.blockOffset
     const { timestamp } = await this.ethereumClient.getBlock(blockNumber)
-    this.safeBlock = { timestamp, blockNumber }
+    const safeBlock = { timestamp, blockNumber }
+
+    this.safeBlock = safeBlock
     this.lastUpdatedAt = new Date().toISOString()
-    this.logger.info('safe block found', { timestamp })
-    this.events.emit('newBlock', this.safeBlock)
+    this.logger.info('safe block found', safeBlock)
+    this.events.emit('newBlock', safeBlock)
   }
 }

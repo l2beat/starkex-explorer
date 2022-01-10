@@ -1,11 +1,12 @@
 import { json } from '../model'
+import { Logger } from '../tools/Logger'
 
 interface StatusReporter {
   getStatus(): json
 }
 
 export class StatusService {
-  constructor(private reporters: Record<string, StatusReporter>) {}
+  constructor(private readonly reporters: Record<string, StatusReporter>) {}
 
   getStatus() {
     const result: Record<string, json> = {}

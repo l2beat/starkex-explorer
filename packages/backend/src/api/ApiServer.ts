@@ -30,6 +30,11 @@ export class ApiServer {
 
     this.app.use(router.routes())
     this.app.use(router.allowedMethods())
+
+    this.logger.info({
+      message: 'Created ApiServer',
+      routes: router.stack.map((x) => x.path),
+    })
   }
 
   listen() {

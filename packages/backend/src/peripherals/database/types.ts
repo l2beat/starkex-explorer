@@ -14,8 +14,14 @@ declare module 'knex/types/tables' {
     balance: string
   }
 
+  interface VerifierRow {
+    address: string
+    block_number: number
+  }
+
   interface Tables {
     position_updates: PositionUpdateRow
+    verifiers: VerifierRow
   }
 }
 

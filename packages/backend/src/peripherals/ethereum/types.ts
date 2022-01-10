@@ -1,3 +1,13 @@
+export type {
+  Block,
+  Filter,
+  FilterByBlockHash,
+  Log,
+} from '@ethersproject/abstract-provider'
+
 export type BlockNumber = number
 export type BlockTag = BlockNumber | 'earliest' | 'latest' | 'pending'
-export type { Block } from '@ethersproject/abstract-provider'
+export type BlockRange = {
+  readonly from: BlockNumber
+  readonly to: BlockNumber
+}
