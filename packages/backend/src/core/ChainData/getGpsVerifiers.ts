@@ -1,12 +1,8 @@
 import { utils } from 'ethers'
 import { AbiCoder } from 'ethers/lib/utils'
 
-import type {
-  BlockRange,
-  Filter,
-  FilterByBlockHash,
-  Log,
-} from '../../peripherals/ethereum/types'
+import type { BlockRange } from '../../peripherals/ethereum/types'
+import { GetLogs } from './types'
 
 const PROXY_ADDRESS = '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'
 
@@ -14,8 +10,6 @@ const PROXY_ABI = new utils.Interface([
   'event ImplementationAdded(address indexed implementation, bytes initializer, bool finalize)',
   'event Upgraded(address indexed implementation)',
 ])
-
-type GetLogs = (filter: Filter | FilterByBlockHash) => Promise<Log[]>
 
 export async function getGpsVerifiers(
   getLogs: GetLogs,

@@ -1,14 +1,21 @@
 import { decodeOnChainData, OnChainData } from '@explorer/encoding'
 
 import type { PositionUpdateRepository } from '../../peripherals/database/PositionUpdateRepository'
-import { VerifierRepository } from '../../peripherals/database/VerifierRepository'
+import {
+  VerifierRecord,
+  VerifierRepository,
+} from '../../peripherals/database/VerifierRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { BlockTag } from '../../peripherals/ethereum/types'
+import { BlockRange } from '../../peripherals/ethereum/types'
+import { Cache } from '../../peripherals/FileSystemCache'
 import { getOnChainData } from '../../peripherals/todo/getOnChainData'
 import { JobQueue } from '../../tools/JobQueue'
 import type { Logger } from '../../tools/Logger'
 import type { SafeBlockService } from '../SafeBlockService'
 import { getGpsVerifiers } from './getGpsVerifiers'
+import { getMemoryHashEvents, MemoryHashEvent } from './getMemoryHashEvents'
+import { getMemoryPageEvents } from './getMemoryPageEvents'
+import { GetLogs } from './types'
 
 const BLOCK_HASH =
   '0x46c212912be05a090a9300cf87fd9434b8e8bbca15878d070ba83375a5dbaebd'
@@ -23,11 +30,16 @@ export class ChainDataCollector {
     private readonly verifierRepository: VerifierRepository,
     private readonly safeBlockService: SafeBlockService,
     private readonly ethereumClient: EthereumClient,
-    private readonly jobQueue: JobQueue,
-    private readonly logger: Logger
+    private readonly logger: Logger,
+    private readonly cache: Cache
   ) {
     this.logger = logger.for(this)
   }
+
+  private readonly jobQueue: JobQueue = new JobQueue(
+    { maxConcurrentJobs: 1 },
+    this.logger
+  )
 
   // async savePositionsToDatabase() {
   //   const data = await this.getData()
@@ -41,7 +53,7 @@ export class ChainDataCollector {
         name: block.blockNumber.toString(),
         execute: async () => {
           const from = await this.getLastBlockNumberSynced()
-          return await this.sync(from, block.blockNumber)
+          return await this.sync({ from, to: block.blockNumber })
         },
       })
     })
@@ -83,8 +95,28 @@ export class ChainDataCollector {
     ]
   }
 
-  private async sync(from: BlockNumber, to: BlockNumber) {
-    const verifiers = await this.getVerifiers(to)
+  private async sync(blockRange: BlockRange) {
+    const verifiers = this.getVerifiers(blockRange.to)
+    const getLogs: GetLogs = (filter) => this.ethereumClient.getLogs(filter)
+
+    const memoryPageEvents = await getMemoryPageEvents(
+      getLogs,
+      blockRange,
+      this.cache
+    )
+
+    const memoryHashEvents: MemoryHashEvent[] = []
+    for (const verifier of await verifiers) {
+      const events = await getMemoryHashEvents(
+        getLogs,
+        verifier.address,
+        blockRange,
+        this.cache
+      )
+      memoryHashEvents.push(...events)
+    }
+
+    console.log({ memoryHashEvents, memoryPageEvents })
 
     // const oldVerifiers = db.getExistingVerifiers(to)
     // const newVerifiers = blockchain.getVerifierChanges(from, to)
@@ -94,7 +126,7 @@ export class ChainDataCollector {
     // const data = parseOnChainData(events)
     // db.saveData(data)
 
-    await this.setLastBlockNumberSynced(to)
+    await this.setLastBlockNumberSynced(blockRange.to)
   }
 
   private _lastBlockNumberSynced: BlockNumber | undefined // assuming long-running process, otherwise we should move it to redis or sth like that

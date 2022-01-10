@@ -10,6 +10,7 @@ import { DatabaseService } from './peripherals/database/DatabaseService'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
 import { VerifierRepository } from './peripherals/database/VerifierRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
+import { JobQueue } from './tools/JobQueue'
 import { Logger } from './tools/Logger'
 
 export class Application {

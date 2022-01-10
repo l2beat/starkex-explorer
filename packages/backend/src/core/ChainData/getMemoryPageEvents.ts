@@ -2,6 +2,7 @@ import { providers, utils } from 'ethers'
 
 import { BlockRange } from '../../peripherals/ethereum/types'
 import { Cache } from '../../peripherals/FileSystemCache'
+import { GetLogs } from './types'
 
 const REGISTRY_ABI = new utils.Interface([
   'event LogMemoryPageFactContinuous(bytes32 factHash, uint256 memoryHash, uint256 prod)',
@@ -15,14 +16,14 @@ interface MemoryPageEvent {
 }
 
 export async function getMemoryPageEvents(
-  provider: providers.Provider,
+  getLogs: GetLogs,
   blockRange: BlockRange,
   cache: Cache
 ) {
   const batches = getBatches(blockRange.from, blockRange.to, 10 ** 5)
   const events: MemoryPageEvent[] = []
-  for (const batch of batches) {
-    events.push(...(await getEventBatch(provider, batch, cache)))
+  for (const range of batches) {
+    events.push(...(await getEventBatch(getLogs, range, cache)))
   }
   return events
 }
@@ -36,7 +37,7 @@ function getBatches(from: number, to: number, batchSize: number) {
 }
 
 async function getEventBatch(
-  provider: providers.Provider,
+  getLogs: GetLogs,
   blockRange: BlockRange,
   cache: Cache
 ) {
@@ -46,7 +47,7 @@ async function getEventBatch(
     return cached
   }
 
-  const logs = await provider.getLogs({
+  const logs = await getLogs({
     address: REGISTRY_ADDRESS,
     fromBlock: blockRange.from,
     toBlock: blockRange.to,
