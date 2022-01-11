@@ -3,6 +3,7 @@ import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
+import { StatusService } from './core/StatusService'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
 import { Logger } from './tools/Logger'
@@ -11,11 +12,12 @@ export class Application {
   start: () => Promise<void>
 
   constructor(config: Config) {
-    /* - - - - - TOOLS - - - - - */
+    // #region tools
 
     const logger = new Logger(config.logger)
 
-    /* - - - - - PERIPHERALS - - - - - */
+    // #endregion tools
+    // #region peripherals
 
     const knex = DatabaseService.createKnexInstance(config.databaseUrl)
     const databaseService = new DatabaseService(knex, logger)
@@ -23,14 +25,23 @@ export class Application {
     // @todo unused for now
     new PositionUpdateRepository(knex, logger)
 
-    /* - - - - - API - - - - - */
+    // #endregion peripherals
+    // #region core
+
+    const statusService = new StatusService({
+      databaseService,
+    })
+
+    // #endregion core
+    // #region api
 
     const apiServer = new ApiServer(config.port, logger, {
-      routers: [createStatusRouter(), createFrontendRouter()],
+      routers: [createStatusRouter(statusService), createFrontendRouter()],
       middleware: [createFrontendMiddleware()],
     })
 
-    /* - - - - - START - - - - - */
+    // #endregion api
+    // #region start
 
     this.start = async () => {
       logger.for(this).info('Starting')
@@ -41,5 +52,7 @@ export class Application {
 
       logger.for(this).info('Started')
     }
+
+    // #endregion start
   }
 }
