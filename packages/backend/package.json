@@ -34,6 +34,7 @@
   "devDependencies": {
     "@types/supertest": "^2.0.11",
     "conditional-type-checks": "^1.0.5",
-    "supertest": "^6.1.6"
+    "supertest": "^6.1.6",
+    "wait-for-expect": "^3.0.2"
   }
 }
