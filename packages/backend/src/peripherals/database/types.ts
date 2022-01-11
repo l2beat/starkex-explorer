@@ -19,9 +19,15 @@ declare module 'knex/types/tables' {
     block_number: number
   }
 
+  interface KeyValueRow {
+    key: string
+    value: string
+  }
+
   interface Tables {
     position_updates: PositionUpdateRow
     verifiers: VerifierRow
+    key_values: KeyValueRow
   }
 }
 

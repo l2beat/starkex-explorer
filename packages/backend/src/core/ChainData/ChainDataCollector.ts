@@ -1,5 +1,6 @@
 import { decodeOnChainData, OnChainData } from '@explorer/encoding'
 
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import type { PositionUpdateRepository } from '../../peripherals/database/PositionUpdateRepository'
 import {
   VerifierRecord,
@@ -30,6 +31,7 @@ export class ChainDataCollector {
     private readonly verifierRepository: VerifierRepository,
     private readonly safeBlockService: SafeBlockService,
     private readonly ethereumClient: EthereumClient,
+    private readonly kvStore: KeyValueStore,
     private readonly logger: Logger,
     private readonly cache: Cache
   ) {
@@ -104,7 +106,6 @@ export class ChainDataCollector {
       blockRange,
       this.cache
     )
-
     const memoryHashEvents: MemoryHashEvent[] = []
     for (const verifier of await verifiers) {
       const events = await getMemoryHashEvents(
@@ -118,10 +119,7 @@ export class ChainDataCollector {
 
     console.log({ memoryHashEvents, memoryPageEvents })
 
-    // const oldVerifiers = db.getExistingVerifiers(to)
-    // const newVerifiers = blockchain.getVerifierChanges(from, to)
-    // db.saveVerifiers(from, to, newVerifiers)
-    // const verifiers = [...oldVerifiers, ...newVerifiers]
+    // @todo
     // const events = blockchain.getEvents(verifiers, from, to)
     // const data = parseOnChainData(events)
     // db.saveData(data)
@@ -134,12 +132,16 @@ export class ChainDataCollector {
     if (this._lastBlockNumberSynced !== undefined) {
       return this._lastBlockNumberSynced
     }
-    // @todo this._lastBlockNumberSynced = await this.db.getLastBlockNumberSynced()
-    return this._lastBlockNumberSynced || EARLIEST_BLOCK
+    const valueInDb = await this.kvStore.get('lastBlockNumberSynced')
+
+    this._lastBlockNumberSynced =
+      (valueInDb && parseInt(valueInDb)) || EARLIEST_BLOCK
+
+    return this._lastBlockNumberSynced
   }
   private async setLastBlockNumberSynced(blockNumber: BlockNumber) {
     this._lastBlockNumberSynced = blockNumber
-    // @todo await this.db.setLastBlockNumberSynced(blockNumber)
+    this.kvStore.set('lastBlockNumberSynced', String(blockNumber))
   }
 }
 
