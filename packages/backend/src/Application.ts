@@ -3,9 +3,12 @@ import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
+import { DataSyncService } from './core/DataSyncService'
 import { SafeBlockService } from './core/SafeBlockService'
 import { StatusService } from './core/StatusService'
+import { SyncScheduler } from './core/SyncScheduler'
 import { DatabaseService } from './peripherals/database/DatabaseService'
+import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { Logger } from './tools/Logger'
@@ -24,6 +27,7 @@ export class Application {
     const knex = DatabaseService.createKnexInstance(config.databaseUrl)
     const databaseService = new DatabaseService(knex, logger)
 
+    const kvStore = new KeyValueStore(knex, logger)
     // @todo unused for now
     new PositionUpdateRepository(knex, logger)
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
@@ -43,6 +47,14 @@ export class Application {
       safeBlockService,
     })
 
+    const dataSyncService = new DataSyncService()
+    const syncScheduler = new SyncScheduler(
+      kvStore,
+      safeBlockService,
+      dataSyncService,
+      logger
+    )
+
     // #endregion core
     // #region api
 
@@ -60,6 +72,7 @@ export class Application {
       await databaseService.migrateToLatest()
 
       await apiServer.listen()
+      await syncScheduler.start()
 
       logger.for(this).info('Started')
     }
