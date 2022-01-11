@@ -21,7 +21,7 @@ export class PositionUpdateRepository
   implements Repository<PositionUpdateRecord>
 {
   constructor(private knex: Knex, private logger: Logger) {
-    this.logger = this.logger.for(this)
+    this.logger = logger.for(this)
   }
 
   async addOrUpdate(records: PositionUpdateRecord[]) {

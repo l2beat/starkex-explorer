@@ -14,8 +14,14 @@ declare module 'knex/types/tables' {
     balance: string
   }
 
+  interface KeyValueRow {
+    key: string
+    value: string
+  }
+
   interface Tables {
     position_updates: PositionUpdateRow
+    key_values: KeyValueRow
   }
 }
 
