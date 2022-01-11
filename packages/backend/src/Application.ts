@@ -3,9 +3,11 @@ import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
+import { SafeBlockService } from './core/SafeBlockService'
 import { StatusService } from './core/StatusService'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
+import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { Logger } from './tools/Logger'
 
 export class Application {
@@ -24,12 +26,21 @@ export class Application {
 
     // @todo unused for now
     new PositionUpdateRepository(knex, logger)
+    const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
     // #endregion peripherals
     // #region core
 
+    const safeBlockService = new SafeBlockService(
+      config.core.safeBlock.refreshIntervalMs,
+      config.core.safeBlock.blockOffset,
+      ethereumClient,
+      logger
+    )
+
     const statusService = new StatusService({
       databaseService,
+      safeBlockService,
     })
 
     // #endregion core
