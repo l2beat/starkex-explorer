@@ -14,7 +14,8 @@
     "test": "mocha"
   },
   "dependencies": {
-    "@explorer/crypto": "*"
+    "@explorer/crypto": "*",
+    "@explorer/encoding": "*"
   },
   "devDependencies": {}
 }
