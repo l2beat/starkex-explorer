@@ -66,6 +66,7 @@ export class SyncScheduler {
   }
 
   private async sync(blockRange: BlockRange) {
+    this.logger.info({ method: 'sync', blockRange })
     await this.dataSyncService.sync(blockRange)
     await this.setLastBlockNumberSynced(blockRange.to)
   }
