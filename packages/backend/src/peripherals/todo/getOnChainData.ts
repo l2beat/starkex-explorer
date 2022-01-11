@@ -27,14 +27,16 @@ export async function getOnChainData(blockHash: string) {
     )
   }
 
-  const mpMap = new Map(mpEvents.map((x) => [x.memoryHash, x.transactionHash]))
   const facts = await getFacts(provider, blockHash)
+
+  const mpMap = new Map(mpEvents.map((x) => [x.memoryHash, x.transactionHash]))
   const transactionHashes = facts
     .flatMap(
       (fact) =>
         memoryHashEvents.find((x) => x.factHash === fact)?.pagesHashes ?? []
     )
     .map((x) => mpMap.get(x))
+
   const pages: BigNumber[][] = []
   for (const hash of transactionHashes) {
     if (!hash) {

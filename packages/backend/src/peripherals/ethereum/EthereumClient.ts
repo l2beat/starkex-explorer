@@ -22,4 +22,8 @@ export class EthereumClient {
   async getLogs(filter: Filter | FilterByBlockHash) {
     return await this.provider.getLogs(filter)
   }
+
+  async getTransaction(transactionHash: string) {
+    return await this.provider.getTransaction(transactionHash)
+  }
 }

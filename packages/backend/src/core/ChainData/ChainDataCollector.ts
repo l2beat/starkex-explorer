@@ -7,17 +7,19 @@ import {
   VerifierRepository,
 } from '../../peripherals/database/VerifierRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { BlockRange } from '../../peripherals/ethereum/types'
+import { BigNumber, BlockRange } from '../../peripherals/ethereum/types'
 import { Cache } from '../../peripherals/FileSystemCache'
-import { getOnChainData } from '../../peripherals/todo/getOnChainData'
+import { getOnChainData, PAGE_ABI } from '../../peripherals/todo/getOnChainData'
 import { JobQueue } from '../../tools/JobQueue'
 import type { Logger } from '../../tools/Logger'
 import type { SafeBlockService } from '../SafeBlockService'
+import { getFacts } from './getFacts'
 import { getGpsVerifiers } from './getGpsVerifiers'
 import { getMemoryHashEvents, MemoryHashEvent } from './getMemoryHashEvents'
 import { getMemoryPageEvents } from './getMemoryPageEvents'
 import { GetLogs } from './types'
 
+// @todo Question: Why is this block hash important?
 const BLOCK_HASH =
   '0x46c212912be05a090a9300cf87fd9434b8e8bbca15878d070ba83375a5dbaebd'
 
@@ -97,10 +99,11 @@ export class ChainDataCollector {
     ]
   }
 
-  private async sync(blockRange: BlockRange) {
+  private async sync(blockRange: BlockRange): Promise<void> {
     const verifiers = this.getVerifiers(blockRange.to)
     const getLogs: GetLogs = (filter) => this.ethereumClient.getLogs(filter)
 
+    // ?? await this.getEvents(verifiers, blockRange)
     const memoryPageEvents = await getMemoryPageEvents(
       getLogs,
       blockRange,
@@ -117,23 +120,54 @@ export class ChainDataCollector {
       memoryHashEvents.push(...events)
     }
 
-    console.log({ memoryHashEvents, memoryPageEvents })
+    const facts = await getFacts(getLogs, BLOCK_HASH)
+
+    const mpMap = new Map(
+      memoryPageEvents.map((x) => [x.memoryHash, x.transactionHash])
+    )
+    const transactionHashes = facts
+      .flatMap(
+        (fact) =>
+          memoryHashEvents.find((x) => x.factHash === fact)?.pagesHashes ?? []
+      )
+      .map((x) => mpMap.get(x))
+
+    console.log('>>', { memoryHashEvents, memoryPageEvents, transactionHashes })
+
+    // ?? await this.decodeTransactions(transactionHashes)
+    const pages: BigNumber[][] = []
+    for (const hash of transactionHashes) {
+      if (!hash) {
+        continue
+      }
+      const tx = await this.ethereumClient.getTransaction(hash)
+      const decoded = PAGE_ABI.decodeFunctionData(
+        'registerContinuousMemoryPage',
+        tx.data
+      )
+      pages.push(decoded[1])
+    }
+    const result = pages.map((page) =>
+      page.map((x) => x.toHexString().substring(2).padStart(64, '0'))
+    )
+
+    console.log({ result })
 
     // @todo
-    // const events = blockchain.getEvents(verifiers, from, to)
     // const data = parseOnChainData(events)
     // db.saveData(data)
 
     await this.setLastBlockNumberSynced(blockRange.to)
   }
 
-  private _lastBlockNumberSynced: BlockNumber | undefined // assuming long-running process, otherwise we should move it to redis or sth like that
+  // @todo discuss this with @sz-piotr -- how will this be deployed? one long-running process?
+  private _lastBlockNumberSynced: BlockNumber | undefined
   private async getLastBlockNumberSynced() {
     if (this._lastBlockNumberSynced !== undefined) {
       return this._lastBlockNumberSynced
     }
-    const valueInDb = await this.kvStore.get('lastBlockNumberSynced')
 
+    const valueInDb = await this.kvStore.get('lastBlockNumberSynced')
     this._lastBlockNumberSynced =
       (valueInDb && parseInt(valueInDb)) || EARLIEST_BLOCK
 
@@ -141,7 +175,7 @@ export class ChainDataCollector {
   }
   private async setLastBlockNumberSynced(blockNumber: BlockNumber) {
     this._lastBlockNumberSynced = blockNumber
-    this.kvStore.set('lastBlockNumberSynced', String(blockNumber))
+    await this.kvStore.set('lastBlockNumberSynced', String(blockNumber))
   }
 }
 
