@@ -8,6 +8,7 @@ import { SafeBlockService } from './SafeBlockService'
 
 // block of the first verifier deploy
 const EARLIEST_BLOCK = 11813207
+/** max synced blockRange length */
 const BATCH_SIZE = 500
 
 export class SyncScheduler {
