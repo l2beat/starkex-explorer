@@ -7,7 +7,7 @@ import { DataSyncService } from './DataSyncService'
 import { SafeBlockService } from './SafeBlockService'
 
 /** max synced blockRange length */
-const BATCH_SIZE = 500
+const BATCH_SIZE = 10000
 
 export class SyncScheduler {
   constructor(

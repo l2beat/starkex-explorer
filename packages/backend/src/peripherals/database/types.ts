@@ -19,9 +19,21 @@ declare module 'knex/types/tables' {
     value: string
   }
 
+  interface VerifierEventRow {
+    /**
+     * surrogate key
+     */
+    id?: number
+    implementation: string
+    block_number: number
+    name: 'ImplementationAdded' | 'Upgraded'
+    initializer?: string
+  }
+
   interface Tables {
     position_updates: PositionUpdateRow
     key_values: KeyValueRow
+    verifier_events: VerifierEventRow
   }
 }
 
