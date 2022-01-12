@@ -10,6 +10,7 @@ import { SyncScheduler } from './core/SyncScheduler'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
+import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { Logger } from './tools/Logger'
 
@@ -28,6 +29,7 @@ export class Application {
     const databaseService = new DatabaseService(knex, logger)
 
     const kvStore = new KeyValueStore(knex, logger)
+    const syncStatusRepository = new SyncStatusRepository(kvStore)
     // @todo unused for now
     new PositionUpdateRepository(knex, logger)
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
@@ -49,7 +51,7 @@ export class Application {
 
     const dataSyncService = new DataSyncService()
     const syncScheduler = new SyncScheduler(
-      kvStore,
+      syncStatusRepository,
       safeBlockService,
       dataSyncService,
       logger

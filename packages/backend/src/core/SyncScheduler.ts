@@ -1,23 +1,20 @@
-import { KeyValueStore } from '../peripherals/database/KeyValueStore'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
+import { BlockRange } from '../peripherals/ethereum/types'
 import { getBatches } from '../tools/getBatches'
 import { JobQueue } from '../tools/JobQueue'
 import { Logger } from '../tools/Logger'
 import { DataSyncService } from './DataSyncService'
 import { SafeBlockService } from './SafeBlockService'
 
-/** block of the first verifier deploy */
-const EARLIEST_BLOCK = 11813207
 /** max synced blockRange length */
 const BATCH_SIZE = 500
 
 export class SyncScheduler {
   constructor(
-    private readonly kvStore: KeyValueStore<'lastBlockNumberSynced'>,
+    private readonly statusRepository: SyncStatusRepository,
     private readonly safeBlockService: SafeBlockService,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
-    private readonly earliestBlock = EARLIEST_BLOCK,
     private readonly batchSize = BATCH_SIZE
   ) {
     this.logger = logger.for(this)
@@ -29,7 +26,7 @@ export class SyncScheduler {
   )
 
   async start() {
-    let last = await this.getLastBlockNumberSynced()
+    let last = await this.statusRepository.getLastBlockNumberSynced()
 
     this.logger.info('Last block number synced', { last })
 
@@ -69,16 +66,6 @@ export class SyncScheduler {
   private async sync(blockRange: BlockRange) {
     this.logger.info({ method: 'sync', blockRange })
     await this.dataSyncService.sync(blockRange)
-    await this.setLastBlockNumberSynced(blockRange.to)
-  }
-
-  private async getLastBlockNumberSynced(): Promise<BlockNumber> {
-    const valueInDb = await this.kvStore.get('lastBlockNumberSynced')
-
-    return (valueInDb && parseInt(valueInDb)) || this.earliestBlock
-  }
-
-  private async setLastBlockNumberSynced(blockNumber: BlockNumber) {
-    await this.kvStore.set('lastBlockNumberSynced', String(blockNumber))
+    await this.statusRepository.setLastBlockNumberSynced(blockRange.to)
   }
 }

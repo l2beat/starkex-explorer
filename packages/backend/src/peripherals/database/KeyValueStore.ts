@@ -9,7 +9,7 @@ type KeyValueRecord = KeyValueRow
 export class KeyValueStore<K extends string>
   implements Omit<Repository<KeyValueRecord>, 'addOrUpdate'>
 {
-  constructor(private knex: Knex, private logger: Logger) {
+  constructor(private readonly knex: Knex, private readonly logger: Logger) {
     this.logger = logger.for(this)
   }
 

@@ -4,29 +4,27 @@ import waitForExpect from 'wait-for-expect'
 import { DataSyncService } from '../../src/core/DataSyncService'
 import { SafeBlock, SafeBlockService } from '../../src/core/SafeBlockService'
 import { SyncScheduler } from '../../src/core/SyncScheduler'
-import { KeyValueStore } from '../../src/peripherals/database/KeyValueStore'
+import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
 import { BlockRange } from '../../src/peripherals/ethereum/types'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
-describe.only(SyncScheduler.name, () => {
+describe(SyncScheduler.name, () => {
   it('syncs in batches', async () => {
     const {
-      kvStore,
+      statusRepository,
       safeBlockService,
       dataSyncService,
       calls,
       safeBlockListener,
-    } = setupMocks({ lastBlockNumberSynced: '1' })
+    } = setupMocks({ lastBlockNumberSynced: 1 })
 
-    const earliestBlock = 0
     const batchSize = 3
     const syncScheduler = new SyncScheduler(
-      kvStore,
+      statusRepository,
       safeBlockService,
       dataSyncService,
       Logger.SILENT,
-      earliestBlock,
       batchSize
     )
 
@@ -46,52 +44,21 @@ describe.only(SyncScheduler.name, () => {
     })
   })
 
-  it('respects earliestBlock', async () => {
-    const {
-      kvStore,
-      safeBlockService,
-      dataSyncService,
-      calls,
-      safeBlockListener,
-    } = setupMocks({
-      lastBlockNumberSynced: undefined,
-    })
-
-    const earliestBlock = 1000
-    const syncScheduler = new SyncScheduler(
-      kvStore,
-      safeBlockService,
-      dataSyncService,
-      Logger.SILENT,
-      earliestBlock
-    )
-
-    await syncScheduler.start()
-
-    safeBlockListener({ blockNumber: 1010, timestamp: 0 })
-
-    await waitForExpect(() => {
-      expect(calls.sync).to.deep.eq([{ from: earliestBlock + 1, to: 1010 }])
-    })
-  })
-
   it('handles incoming new blocks', async () => {
     const {
-      kvStore,
+      statusRepository,
       safeBlockService,
       dataSyncService,
       calls,
       safeBlockListener,
     } = setupMocks()
 
-    const earliestBlock = 0
     const batchSize = 50
     const syncScheduler = new SyncScheduler(
-      kvStore,
+      statusRepository,
       safeBlockService,
       dataSyncService,
       Logger.SILENT,
-      earliestBlock,
       batchSize
     )
 
@@ -115,7 +82,7 @@ describe.only(SyncScheduler.name, () => {
   })
 
   it('reruns failing syncs', async () => {
-    const mocks = setupMocks()
+    const mocks = setupMocks({ lastBlockNumberSynced: 1 })
 
     let failed = false
     const _sync = mocks.dataSyncService.sync
@@ -128,11 +95,10 @@ describe.only(SyncScheduler.name, () => {
     }
 
     const syncScheduler = new SyncScheduler(
-      mocks.kvStore,
+      mocks.statusRepository,
       mocks.safeBlockService,
       mocks.dataSyncService,
-      Logger.SILENT,
-      1
+      Logger.SILENT
     )
 
     await syncScheduler.start()
@@ -151,18 +117,12 @@ describe.only(SyncScheduler.name, () => {
 function setupMocks({
   lastBlockNumberSynced = undefined,
 }: {
-  lastBlockNumberSynced?: string
+  lastBlockNumberSynced?: number
 } = {}) {
-  let kvStoreValue: string | undefined = lastBlockNumberSynced
-  const kvStore = mock<KeyValueStore<string>>({
-    async get(key) {
-      expect(key).to.equal('lastBlockNumberSynced')
-      return kvStoreValue
-    },
-    async set(key, value) {
-      expect(key).to.equal('lastBlockNumberSynced')
-      kvStoreValue = value
-    },
+  let storedValue: number = lastBlockNumberSynced || 0
+  const statusRepository = mock<SyncStatusRepository>({
+    getLastBlockNumberSynced: async () => storedValue,
+    setLastBlockNumberSynced: async (value) => void (storedValue = value),
   })
 
   let safeBlockListener: (block: SafeBlock) => void = () => {}
@@ -189,7 +149,7 @@ function setupMocks({
   })
 
   return {
-    kvStore,
+    statusRepository,
     safeBlockService,
     dataSyncService,
     calls,
