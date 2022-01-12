@@ -48,4 +48,14 @@ describe(SyncStatusRepository.name, () => {
 
     expect(actual).to.eq(30)
   })
+
+  it('fallbacks to options.earliestBlock when the store is corrupt', async () => {
+    const store = mock<Store>({ get: async () => '3 is my favorite number' })
+
+    const repository = new SyncStatusRepository(store, { earliestBlock: 40 })
+
+    const actual = await repository.getLastBlockNumberSynced()
+
+    expect(actual).to.eq(40)
+  })
 })

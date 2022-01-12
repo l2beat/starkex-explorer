@@ -18,7 +18,7 @@ export class SyncStatusRepository {
   async getLastBlockNumberSynced(): Promise<number> {
     const valueInDb = await this.store.get('lastBlockNumberSynced')
 
-    return (valueInDb && parseInt(valueInDb)) || this.earliestBlock
+    return (valueInDb && Number(valueInDb)) || this.earliestBlock
   }
 
   async setLastBlockNumberSynced(blockNumber: number): Promise<void> {
