@@ -72,7 +72,7 @@ describe(PositionUpdateRepository.name, () => {
 
     await repository.addOrUpdate(records)
     const actual = await repository.getAll()
-    expect(actual[0]).to.deep.eq(records[0])
+    expect(actual).to.deep.eq(records)
   })
 
   it('deletes all records', async () => {

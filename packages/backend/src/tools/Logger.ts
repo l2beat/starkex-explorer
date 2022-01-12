@@ -33,9 +33,9 @@ export class Logger {
     return this.configure({ service: object.constructor.name })
   }
 
-  error(error: unknown) {
+  error(error: unknown, annotation?: string) {
     if (this.options.logLevel >= LogLevel.ERROR) {
-      const message = getErrorMessage(error)
+      const message = [annotation, getErrorMessage(error)].join(' ')
       this.print('error', { message })
     }
   }

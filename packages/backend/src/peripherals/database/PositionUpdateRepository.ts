@@ -25,12 +25,16 @@ export class PositionUpdateRepository
   }
 
   async addOrUpdate(records: PositionUpdateRecord[]) {
+    if (records.length === 0)
+      return this.logger.debug({ method: 'addOrUpdate', rows: 0 })
+
     const rows: PositionUpdateRow[] = records.map(toRow)
     await this.knex('position_updates')
       .insert(rows)
       .onConflict(['position_id'])
       .merge()
-    this.logger.debug({ method: 'add', rows: rows.length })
+
+    this.logger.debug({ method: 'addOrUpdate', rows: rows.length })
   }
 
   async getAll() {
