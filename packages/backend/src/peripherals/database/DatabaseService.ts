@@ -38,17 +38,19 @@ export class DatabaseService {
   }
 
   async migrateToLatest() {
+    const oldVersion = await this.knex.migrate.currentVersion()
     await this.knex.migrate.latest()
     const version = await this.knex.migrate.currentVersion()
     this.migrated = true
     this.version = version
-    this.logger.info('Migrations completed', { version })
+    this.logger.info('Migrations completed', { oldVersion, version })
   }
 
   async rollbackAll() {
     this.migrated = false
     this.version = null
     await this.knex.migrate.rollback(undefined, true)
+    this.logger.info('Rollback completed')
   }
 
   async closeConnection() {
