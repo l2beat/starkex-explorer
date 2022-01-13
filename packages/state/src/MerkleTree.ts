@@ -6,13 +6,20 @@ import { MerkleUpdate } from './MerkleUpdate'
 import { MerkleValue } from './MerkleValue'
 
 export class MerkleTree {
-  constructor(
-    private storage: IMerkleStorage,
-    private height: number,
-    private rootHashOrValue: PedersenHash | MerkleValue
-  ) {}
+  private maxIndex = 0n
 
-  static create(storage: IMerkleStorage, height: number, leaf: MerkleValue) {
+  constructor(
+    private readonly storage: IMerkleStorage,
+    private readonly height: bigint,
+    private rootHashOrValue: PedersenHash | MerkleValue
+  ) {
+    if (height < 0) {
+      throw new TypeError('Height cannot be negative')
+    }
+    this.maxIndex = 2n ** height - 1n
+  }
+
+  static create(storage: IMerkleStorage, height: bigint, leaf: MerkleValue) {
     let root = leaf
     for (let i = 0; i < height; i++) {
       root = new MerkleNode(storage, root, root)
@@ -34,14 +41,34 @@ export class MerkleTree {
     return this.rootHashOrValue
   }
 
+  async get(index: bigint): Promise<MerkleValue> {
+    if (index < 0n || index > this.maxIndex) {
+      throw new TypeError('Index out of bounds')
+    }
+    const root = await this.root()
+    if (root instanceof MerkleNode) {
+      const center = 2n ** (this.height - 1n)
+      return root.get(index, center, this.height - 1n)
+    } else {
+      return root
+    }
+  }
+
   async update(updates: MerkleUpdate[]) {
     if (updates.length === 0) {
       return
     }
+    if (updates.some((x) => x.index < 0n || x.index > this.maxIndex)) {
+      throw new TypeError('Index out of bounds')
+    }
     const root = await this.root()
     if (root instanceof MerkleNode) {
-      const center = 2 ** (this.height - 2)
-      this.rootHashOrValue = await root.update(updates, center, this.height - 1)
+      const center = 2n ** (this.height - 1n)
+      this.rootHashOrValue = await root.update(
+        updates,
+        center,
+        this.height - 1n
+      )
     } else {
       if (updates.length !== 1) {
         throw new Error('Cannot replace leaf with multiple values')

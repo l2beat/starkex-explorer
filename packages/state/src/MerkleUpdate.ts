@@ -1,6 +1,6 @@
 import { MerkleValue } from './MerkleValue'
 
 export interface MerkleUpdate {
-  id: number
+  index: bigint
   value: MerkleValue
 }

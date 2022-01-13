@@ -41,25 +41,49 @@ export class MerkleNode extends MerkleValue {
     return this.rightHashOrValue
   }
 
+  async get(
+    index: bigint,
+    center: bigint,
+    height: bigint
+  ): Promise<MerkleValue> {
+    const child = index < center ? await this.left() : await this.right()
+    if (height === 0n) {
+      if (child instanceof MerkleNode) {
+        throw new Error('Tree structure corrupted')
+      }
+      return child
+    }
+    const offset = 2n ** (height - 1n)
+    if (child instanceof MerkleNode) {
+      return child.get(
+        index,
+        index < center ? center - offset : center + offset,
+        height - 1n
+      )
+    } else {
+      throw new Error('Tree structure corrupted')
+    }
+  }
+
   async update(
     updates: MerkleUpdate[],
-    center: number,
-    height: number
+    center: bigint,
+    height: bigint
   ): Promise<MerkleNode> {
-    const leftUpdates = updates.filter((x) => x.id < center)
-    const rightUpdates = updates.filter((x) => x.id >= center)
-    const offset = 2 ** (height - 2)
+    const leftUpdates = updates.filter((x) => x.index < center)
+    const rightUpdates = updates.filter((x) => x.index >= center)
+    const offset = 2n ** (height - 1n)
     const newLeft = await this.updateChild(
       this.leftHashOrValue,
       leftUpdates,
       center - offset,
-      height - 1
+      height - 1n
     )
     const newRight = await this.updateChild(
       this.rightHashOrValue,
       rightUpdates,
       center + offset,
-      height - 1
+      height - 1n
     )
     return new MerkleNode(this.storage, newLeft, newRight)
   }
@@ -67,13 +91,13 @@ export class MerkleNode extends MerkleValue {
   private async updateChild(
     child: PedersenHash | MerkleValue,
     updates: MerkleUpdate[],
-    center: number,
-    height: number
+    center: bigint,
+    height: bigint
   ) {
     if (updates.length === 0) {
       return child
     }
-    if (typeof child === 'string') {
+    if (!(child instanceof MerkleValue)) {
       child = await this.storage.recover(child)
     }
     if (child instanceof MerkleNode) {
