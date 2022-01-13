@@ -8,4 +8,11 @@ export interface Config {
   }
   port: number
   databaseUrl: string
+  jsonRpcUrl: string
+  core: {
+    safeBlock: {
+      refreshIntervalMs: number
+      blockOffset: number
+    }
+  }
 }
