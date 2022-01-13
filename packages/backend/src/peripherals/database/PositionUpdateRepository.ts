@@ -25,8 +25,10 @@ export class PositionUpdateRepository
   }
 
   async addOrUpdate(records: PositionUpdateRecord[]) {
-    if (records.length === 0)
-      return this.logger.debug({ method: 'addOrUpdate', rows: 0 })
+    if (records.length === 0) {
+      this.logger.debug({ method: 'addOrUpdate', rows: 0 })
+      return
+    }
 
     const rows: PositionUpdateRow[] = records.map(toRow)
     await this.knex('position_updates')
