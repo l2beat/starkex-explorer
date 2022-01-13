@@ -1,11 +1,16 @@
 import workerpool from 'workerpool'
 
+import { PedersenHash } from './model'
+
 const pool = workerpool.pool(
   require.resolve('@explorer/crypto/worker/worker.js')
 )
 
-export async function pedersen(a: string, b: string): Promise<string> {
-  return pool.exec('pedersenSync', [a, b])
+export async function pedersen(
+  a: PedersenHash,
+  b: PedersenHash
+): Promise<PedersenHash> {
+  return PedersenHash(await pool.exec('pedersenSync', [a, b]))
 }
 
 export function terminateWorkerPool() {
