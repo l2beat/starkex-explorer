@@ -6,16 +6,13 @@ import { Logger } from '../tools/Logger'
 import { DataSyncService } from './DataSyncService'
 import { SafeBlockService } from './SafeBlockService'
 
-/** max synced blockRange length */
-const BATCH_SIZE = 10000
-
 export class SyncScheduler {
   constructor(
     private readonly statusRepository: SyncStatusRepository,
     private readonly safeBlockService: SafeBlockService,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
-    private readonly batchSize = BATCH_SIZE
+    private readonly batchSize: number
   ) {
     this.logger = logger.for(this)
   }

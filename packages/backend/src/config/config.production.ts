@@ -17,6 +17,9 @@ export function getProductionConfig(): Config {
         refreshIntervalMs: 5 * 60 * 1000,
         blockOffset: 100,
       },
+      sync: {
+        batchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
+      },
     },
   }
 }

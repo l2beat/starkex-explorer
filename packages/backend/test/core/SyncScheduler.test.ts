@@ -98,7 +98,8 @@ describe(SyncScheduler.name, () => {
       mocks.statusRepository,
       mocks.safeBlockService,
       mocks.dataSyncService,
-      Logger.SILENT
+      Logger.SILENT,
+      6_000
     )
 
     await syncScheduler.start()
