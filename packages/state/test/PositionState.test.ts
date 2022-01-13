@@ -1,4 +1,4 @@
-import { PedersenHash, terminateWorkerPool } from '@explorer/crypto'
+import { PedersenHash } from '@explorer/crypto'
 import { expect } from 'chai'
 
 import { PositionState } from '../src/PositionState'
@@ -38,6 +38,4 @@ describe(PositionState.name, () => {
       )
     )
   })
-
-  after(terminateWorkerPool)
 })

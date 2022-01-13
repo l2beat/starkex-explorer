@@ -47,13 +47,13 @@ export class MerkleNode extends MerkleValue {
     height: bigint
   ): Promise<MerkleValue> {
     const child = index < center ? await this.left() : await this.right()
-    if (height === 0n) {
+    if (height === 1n) {
       if (child instanceof MerkleNode) {
         throw new Error('Tree structure corrupted')
       }
       return child
     }
-    const offset = 2n ** (height - 1n)
+    const offset = height > 1n ? 2n ** (height - 2n) : index < center ? 1n : 0n
     if (child instanceof MerkleNode) {
       return child.get(
         index,
@@ -72,11 +72,11 @@ export class MerkleNode extends MerkleValue {
   ): Promise<MerkleNode> {
     const leftUpdates = updates.filter((x) => x.index < center)
     const rightUpdates = updates.filter((x) => x.index >= center)
-    const offset = 2n ** (height - 1n)
+    const offset = height > 1n ? 2n ** (height - 2n) : 0n
     const newLeft = await this.updateChild(
       this.leftHashOrValue,
       leftUpdates,
-      center - offset,
+      height > 1n ? center - offset : center - 1n,
       height - 1n
     )
     const newRight = await this.updateChild(
@@ -100,14 +100,16 @@ export class MerkleNode extends MerkleValue {
     if (!(child instanceof MerkleValue)) {
       child = await this.storage.recover(child)
     }
+    if (height === 0n) {
+      if (child instanceof MerkleNode) {
+        throw new Error('Tree structure corrupted')
+      }
+      return updates[updates.length - 1].value
+    }
     if (child instanceof MerkleNode) {
       return child.update(updates, center, height)
     } else {
-      if (updates.length !== 1) {
-        throw new Error('Cannot replace leaf with multiple values')
-      } else {
-        return updates[0].value
-      }
+      throw new Error('Tree structure corrupted')
     }
   }
 

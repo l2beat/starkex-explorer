@@ -48,7 +48,7 @@ export class MerkleTree {
     const root = await this.root()
     if (root instanceof MerkleNode) {
       const center = 2n ** (this.height - 1n)
-      return root.get(index, center, this.height - 1n)
+      return root.get(index, center, this.height)
     } else {
       return root
     }
@@ -64,11 +64,7 @@ export class MerkleTree {
     const root = await this.root()
     if (root instanceof MerkleNode) {
       const center = 2n ** (this.height - 1n)
-      this.rootHashOrValue = await root.update(
-        updates,
-        center,
-        this.height - 1n
-      )
+      this.rootHashOrValue = await root.update(updates, center, this.height)
     } else {
       if (updates.length !== 1) {
         throw new Error('Cannot replace leaf with multiple values')
