@@ -35,7 +35,9 @@ export class Logger {
 
   error(error: unknown, annotation?: string) {
     if (this.options.logLevel >= LogLevel.ERROR) {
-      const message = [annotation, getErrorMessage(error)].join(' ')
+      const message = [annotation, getErrorMessage(error)]
+        .filter(Boolean)
+        .join(' ')
       this.print('error', { message })
     }
   }
