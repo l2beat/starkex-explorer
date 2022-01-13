@@ -63,7 +63,8 @@ export class Application {
       syncStatusRepository,
       safeBlockService,
       dataSyncService,
-      logger
+      logger,
+      config.core.sync.batchSize
     )
 
     // #endregion core
