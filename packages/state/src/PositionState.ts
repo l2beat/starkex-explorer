@@ -1,4 +1,4 @@
-import { pedersen } from '@explorer/crypto'
+import { pedersen, PedersenHash } from '@explorer/crypto'
 import { encodeAssetId } from '@explorer/encoding'
 
 import { MerkleValue } from './MerkleValue'
@@ -18,7 +18,7 @@ export class PositionState extends MerkleValue {
     public readonly publicKey: string,
     public readonly collateralBalance: bigint,
     public readonly assets: readonly PositionAssetState[],
-    protected knownHash?: string
+    protected knownHash?: PedersenHash
   ) {
     super()
   }
@@ -33,11 +33,11 @@ export class PositionState extends MerkleValue {
       this.publicKey.substring(2),
       packedPosition,
     ]
-    let hash = '0'.repeat(64)
+    let hash = PedersenHash.ZERO
     for (const item of items) {
-      hash = await pedersen(hash, item)
+      hash = await pedersen(hash, PedersenHash(item))
     }
-    return hash.padStart(64, '0')
+    return hash
   }
 }
 

@@ -1,8 +1,10 @@
-export abstract class MerkleValue {
-  protected abstract calculateHash(): Promise<string>
+import { PedersenHash } from '@explorer/crypto'
 
-  protected knownHash?: string
-  protected calculatedHash?: Promise<string>
+export abstract class MerkleValue {
+  protected abstract calculateHash(): Promise<PedersenHash>
+
+  protected knownHash?: PedersenHash
+  protected calculatedHash?: Promise<PedersenHash>
   async hash() {
     if (this.knownHash) {
       return this.knownHash

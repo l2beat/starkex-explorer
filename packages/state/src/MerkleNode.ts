@@ -1,51 +1,44 @@
-import { pedersen } from '@explorer/crypto'
+import { pedersen, PedersenHash } from '@explorer/crypto'
 
+import { IMerkleStorage } from './IMerkleStorage'
+import { MerkleUpdate } from './MerkleUpdate'
 import { MerkleValue } from './MerkleValue'
-
-interface MerkleUpdate {
-  id: number
-  value: MerkleValue
-}
-
-export interface IMerkleStorage {
-  get(hash: string): Promise<MerkleValue>
-}
 
 export class MerkleNode extends MerkleValue {
   constructor(
     private storage: IMerkleStorage,
-    private leftHashOrValue: string | MerkleValue,
-    private rightHashOrValue: string | MerkleValue
+    private leftHashOrValue: PedersenHash | MerkleValue,
+    private rightHashOrValue: PedersenHash | MerkleValue
   ) {
     super()
   }
 
   async left(): Promise<MerkleValue> {
-    if (typeof this.leftHashOrValue === 'string') {
-      this.leftHashOrValue = await this.storage.get(this.leftHashOrValue)
+    if (!(this.leftHashOrValue instanceof MerkleValue)) {
+      this.leftHashOrValue = await this.storage.recover(this.leftHashOrValue)
     }
     return this.leftHashOrValue
   }
 
-  async leftHash(): Promise<string> {
-    if (typeof this.leftHashOrValue === 'string') {
-      return this.leftHashOrValue
+  async leftHash(): Promise<PedersenHash> {
+    if (this.leftHashOrValue instanceof MerkleValue) {
+      return this.leftHashOrValue.hash()
     }
-    return this.leftHashOrValue.hash()
+    return this.leftHashOrValue
   }
 
   async right(): Promise<MerkleValue> {
-    if (typeof this.rightHashOrValue === 'string') {
-      this.rightHashOrValue = await this.storage.get(this.rightHashOrValue)
+    if (!(this.rightHashOrValue instanceof MerkleValue)) {
+      this.rightHashOrValue = await this.storage.recover(this.rightHashOrValue)
     }
     return this.rightHashOrValue
   }
 
-  async rightHash(): Promise<string> {
-    if (typeof this.rightHashOrValue === 'string') {
-      return this.rightHashOrValue
+  async rightHash(): Promise<PedersenHash> {
+    if (this.rightHashOrValue instanceof MerkleValue) {
+      return this.rightHashOrValue.hash()
     }
-    return this.rightHashOrValue.hash()
+    return this.rightHashOrValue
   }
 
   async update(
@@ -72,7 +65,7 @@ export class MerkleNode extends MerkleValue {
   }
 
   private async updateChild(
-    child: string | MerkleValue,
+    child: PedersenHash | MerkleValue,
     updates: MerkleUpdate[],
     center: number,
     height: number
@@ -81,7 +74,7 @@ export class MerkleNode extends MerkleValue {
       return child
     }
     if (typeof child === 'string') {
-      child = await this.storage.get(child)
+      child = await this.storage.recover(child)
     }
     if (child instanceof MerkleNode) {
       return child.update(updates, center, height)
@@ -94,7 +87,7 @@ export class MerkleNode extends MerkleValue {
     }
   }
 
-  protected async calculateHash(): Promise<string> {
+  protected async calculateHash(): Promise<PedersenHash> {
     const [leftHash, rightHash] = await Promise.all([
       this.leftHash(),
       this.rightHash(),
