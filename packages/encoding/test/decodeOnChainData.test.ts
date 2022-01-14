@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { decodeOnChainData } from '../src'
 import REAL_DECODED from './data/onchain-decoded.json'
@@ -10,6 +10,6 @@ describe('decodeOnChainData', () => {
     const noBigInt = JSON.parse(
       JSON.stringify(decoded, (k, v) => (typeof v === 'bigint' ? Number(v) : v))
     )
-    expect(noBigInt).to.deep.equal(REAL_DECODED)
+    expect(noBigInt).toEqual(REAL_DECODED)
   })
 })

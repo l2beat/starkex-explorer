@@ -1,18 +1,31 @@
-export function mock<T>(overrides: Partial<T> = {}): T {
-  const clone = { ...overrides }
+import { Mock as MockFunction, mockFn } from 'earljs'
+
+export type MockedObject<T> = {
+  [P in keyof T]: T[P] extends (...args: any[]) => any
+    ? MockFunction.Of<T[P]>
+    : T[P]
+} & T
+
+export function mock<T>(overrides: Partial<T> = {}): MockedObject<T> {
+  const clone = { ...overrides } as any as MockedObject<T>
   const proxy = new Proxy(clone, {
     get(target, property, receiver) {
       const value = Reflect.get(target, property, receiver)
-      if (value !== undefined) {
+      if (value && typeof value !== 'function') {
         return value
       }
-      const name = String(property)
-      return () => {
-        throw new Error(
-          `Cannot call .${name}() - no mock implementation provided.`
-        )
+      if (isMockFunction(value)) {
+        return value
       }
+      const m = mockFn(value || (() => {}))
+      Reflect.set(target, property, m, receiver)
+      return m
     },
   })
-  return proxy as T
+
+  return proxy
+}
+
+function isMockFunction(x: unknown): x is MockFunction<any[], unknown> {
+  return typeof x === 'function' && 'calls' in x
 }

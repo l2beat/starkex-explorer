@@ -1,11 +1,10 @@
-import { expect } from 'chai'
+import { expect, mockFn } from 'earljs'
 import waitForExpect from 'wait-for-expect'
 
 import { DataSyncService } from '../../src/core/DataSyncService'
 import { SafeBlock, SafeBlockService } from '../../src/core/SafeBlockService'
 import { SyncScheduler } from '../../src/core/SyncScheduler'
 import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
-import { BlockRange } from '../../src/peripherals/ethereum/types'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
@@ -15,7 +14,6 @@ describe(SyncScheduler.name, () => {
       statusRepository,
       safeBlockService,
       dataSyncService,
-      calls,
       safeBlockListener,
     } = setupMocks({ lastBlockNumberSynced: 1 })
 
@@ -29,18 +27,17 @@ describe(SyncScheduler.name, () => {
     )
 
     await syncScheduler.start()
-    expect(calls.revert).not.to.be.empty
+
+    expect(dataSyncService.revert).toHaveBeenCalledWith([])
 
     safeBlockListener({ blockNumber: 10, timestamp: 0 })
 
-    const expectedSyncCalls = [
-      { from: 2, to: 4 },
-      { from: 5, to: 7 },
-      { from: 8, to: 10 },
-    ]
-
     await waitForExpect(() => {
-      expect(calls.sync).to.deep.eq(expectedSyncCalls)
+      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
+        [{ from: 2, to: 4 }],
+        [{ from: 5, to: 7 }],
+        [{ from: 8, to: 10 }],
+      ])
     })
   })
 
@@ -49,7 +46,6 @@ describe(SyncScheduler.name, () => {
       statusRepository,
       safeBlockService,
       dataSyncService,
-      calls,
       safeBlockListener,
     } = setupMocks()
 
@@ -63,21 +59,19 @@ describe(SyncScheduler.name, () => {
     )
 
     await syncScheduler.start()
-    expect(calls.revert).not.to.be.empty
+    expect(dataSyncService.revert).toHaveBeenCalledWith([])
 
     safeBlockListener({ blockNumber: 8, timestamp: 0 })
     safeBlockListener({ blockNumber: 9, timestamp: 0 })
     safeBlockListener({ blockNumber: 100, timestamp: 0 })
 
-    const expectedSyncCalls = [
-      { from: 1, to: 8 },
-      { from: 9, to: 9 },
-      { from: 10, to: 59 },
-      { from: 60, to: 100 },
-    ]
-
     await waitForExpect(() => {
-      expect(calls.sync).to.deep.eq(expectedSyncCalls)
+      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
+        [{ from: 1, to: 8 }],
+        [{ from: 9, to: 9 }],
+        [{ from: 10, to: 59 }],
+        [{ from: 60, to: 100 }],
+      ])
     })
   })
 
@@ -86,13 +80,15 @@ describe(SyncScheduler.name, () => {
 
     let failed = false
     const _sync = mocks.dataSyncService.sync
-    mocks.dataSyncService.sync = async (...args) => {
-      _sync(...args)
-      if (!failed) {
-        failed = true
-        throw new Error('failed as expected')
+    mocks.dataSyncService.sync = mockFn<DataSyncService['sync']>(
+      async (...args) => {
+        _sync(...args)
+        if (!failed) {
+          failed = true
+          throw new Error('failed as expected')
+        }
       }
-    }
+    )
 
     const syncScheduler = new SyncScheduler(
       mocks.statusRepository,
@@ -106,9 +102,9 @@ describe(SyncScheduler.name, () => {
     mocks.safeBlockListener({ blockNumber: 2, timestamp: 0 })
 
     await waitForExpect(() => {
-      expect(mocks.calls.sync).to.deep.eq([
-        { from: 2, to: 2 },
-        { from: 2, to: 2 },
+      expect(mocks.dataSyncService.sync).toHaveBeenCalledExactlyWith([
+        [{ from: 2, to: 2 }],
+        [{ from: 2, to: 2 }],
       ])
     })
   })
@@ -133,26 +129,10 @@ function setupMocks({
     },
   })
 
-  // @todo earljs or sinon mocks?
-  const calls = {
-    revert: [] as unknown[],
-    sync: [] as BlockRange[],
-  }
-
-  const dataSyncService = mock<DataSyncService>({
-    async revert() {
-      calls.revert.push([])
-    },
-    async sync(blockRange) {
-      calls.sync.push(blockRange)
-    },
-  })
-
   return {
     statusRepository,
     safeBlockService,
-    dataSyncService,
-    calls,
+    dataSyncService: mock<DataSyncService>(),
     safeBlockListener: (block: SafeBlock) => safeBlockListener(block),
   }
 }

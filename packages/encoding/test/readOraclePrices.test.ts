@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
 import { encodeAssetId } from '../src/encodeAssetId'
@@ -10,12 +10,12 @@ describe('readOraclePrices', () => {
   const decode = readToDecode(readOraclePrices)
 
   it('fails for empty data', () => {
-    expect(() => decode('')).to.throw(DecodingError, 'Went out of bounds')
+    expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')
   })
 
   it('can read zero prices', () => {
     const writer = new ByteWriter().writeNumber(0, 32)
-    expect(decode(writer.getBytes())).to.deep.equal([])
+    expect(decode(writer.getBytes())).toEqual([])
   })
 
   it('can read a single price', () => {
@@ -24,9 +24,7 @@ describe('readOraclePrices', () => {
       .writePadding(17)
       .write(encodeAssetId('ETH-9'))
       .writeNumber(1n, 32)
-    expect(decode(writer.getBytes())).to.deep.equal([
-      { assetId: 'ETH-9', price: 1n },
-    ])
+    expect(decode(writer.getBytes())).toEqual([{ assetId: 'ETH-9', price: 1n }])
   })
 
   it('can read a multiple prices', () => {
@@ -42,7 +40,7 @@ describe('readOraclePrices', () => {
       .write(encodeAssetId('ABC-123'))
       .writeNumber(456n, 32)
 
-    expect(decode(writer.getBytes())).to.deep.equal([
+    expect(decode(writer.getBytes())).toEqual([
       { assetId: 'ETH-9', price: 1n },
       { assetId: 'BTC-10', price: 50n },
       { assetId: 'ABC-123', price: 456n },

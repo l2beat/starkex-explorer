@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
 import { MIN_INT } from '../src/constants'
@@ -11,12 +11,12 @@ describe('readFundingEntries', () => {
   const decode = readToDecode(readFundingEntries)
 
   it('fails for empty data', () => {
-    expect(() => decode('')).to.throw(DecodingError, 'Went out of bounds')
+    expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')
   })
 
   it('can read zero entries', () => {
     const writer = new ByteWriter().writeNumber(0, 32)
-    expect(decode(writer.getBytes())).to.deep.equal([])
+    expect(decode(writer.getBytes())).toEqual([])
   })
 
   it('can read an entry without indices', () => {
@@ -24,7 +24,7 @@ describe('readFundingEntries', () => {
       .writeNumber(1, 32)
       .writeNumber(0, 32)
       .writeNumber(1234, 32)
-    expect(decode(writer.getBytes())).to.deep.equal([
+    expect(decode(writer.getBytes())).toEqual([
       {
         indices: [],
         timestamp: 1234n,
@@ -43,7 +43,7 @@ describe('readFundingEntries', () => {
       .write(encodeAssetId('BTC-10'))
       .writeNumber(-50n - MIN_INT, 32)
       .writeNumber(5678, 32)
-    expect(decode(writer.getBytes())).to.deep.equal([
+    expect(decode(writer.getBytes())).toEqual([
       {
         indices: [
           { assetId: 'ETH-9', value: 1n },
@@ -67,7 +67,7 @@ describe('readFundingEntries', () => {
       .write(encodeAssetId('BTC-10'))
       .writeNumber(-50n - MIN_INT, 32)
       .writeNumber(5678, 32)
-    expect(decode(writer.getBytes())).to.deep.equal([
+    expect(decode(writer.getBytes())).toEqual([
       {
         indices: [],
         timestamp: 1234n,

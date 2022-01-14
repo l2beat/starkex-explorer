@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { StatusService } from '../../src/core/StatusService'
 
@@ -9,7 +9,7 @@ describe('StatusService', () => {
       barService: new BarService(),
     })
 
-    expect(statusService.getStatus()).to.deep.eq({
+    expect<object>(statusService.getStatus()).toEqual({
       fooService: { foo: 123 },
       barService: { bar: 'baz' },
     })
@@ -21,10 +21,7 @@ describe('StatusService', () => {
       barService: new BarService(),
     })
 
-    expect(statusService.getReporters()).to.deep.eq([
-      'fooService',
-      'barService',
-    ])
+    expect(statusService.getReporters()).toEqual(['fooService', 'barService'])
   })
 
   it('returns the status of a reporter', () => {
@@ -33,7 +30,7 @@ describe('StatusService', () => {
       barService: new BarService(),
     })
 
-    expect(statusService.getReporterStatus('fooService')).to.deep.eq({
+    expect<unknown>(statusService.getReporterStatus('fooService')).toEqual({
       foo: 123,
     })
   })
@@ -44,7 +41,7 @@ describe('StatusService', () => {
       barService: new BarService(),
     })
 
-    expect(() => statusService.getReporterStatus('bazService')).to.throw(
+    expect(() => statusService.getReporterStatus('bazService')).toThrow(
       'Unknown reporter bazService!'
     )
   })
