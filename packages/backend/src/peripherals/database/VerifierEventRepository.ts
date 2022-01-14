@@ -47,12 +47,29 @@ export class VerifierEventRepository
   async getAll() {
     const rows = await this.knex('verifier_events').select('*')
     this.logger.debug({ method: 'getAll', rows: rows.length })
+
+    return rows.map(toRecord)
+  }
+
+  async getAllAfter(blockNumber: number) {
+    const rows = await this.knex('verifier_events')
+      .where('blockNumber', '>', blockNumber)
+      .select('*')
+    this.logger.debug({ method: 'getAllAfter', rows: rows.length })
+
     return rows.map(toRecord)
   }
 
   async deleteAll() {
     await this.knex('verifier_events').delete()
     this.logger.debug({ method: 'deleteAll' })
+  }
+
+  async deleteAllAfter(blockNumber: number) {
+    const rowsCount = await this.knex('verifier_events')
+      .where('blockNumber', '>', blockNumber)
+      .delete()
+    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
   }
 }
 
