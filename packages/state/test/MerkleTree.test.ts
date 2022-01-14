@@ -215,4 +215,36 @@ describe(MerkleTree.name, () => {
       ])
     })
   })
+
+  describe('recovering nodes', () => {
+    const positionA = new PositionState('0xdead1234', 420n, [])
+    const positionB = new PositionState('0xbeef5678', 69n, [])
+
+    it('can recover a persisted state', async () => {
+      const storage = new InMemoryMerkleStorage()
+      const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
+      await tree.update([
+        { index: 2n, value: positionA },
+        { index: 7n, value: positionB },
+      ])
+
+      const recovered = new MerkleTree(storage, 3n, await tree.hash())
+      expect(await recovered.get(2n)).to.equal(positionA)
+    })
+
+    it('set hash changes the tree', async () => {
+      const storage = new InMemoryMerkleStorage()
+      const treeA = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
+      const treeB = new MerkleTree(storage, 3n, await treeA.hash())
+
+      await treeA.update([
+        { index: 2n, value: positionA },
+        { index: 7n, value: positionB },
+      ])
+
+      expect(await treeB.get(2n)).to.equal(PositionState.EMPTY)
+      treeB.setHash(await treeA.hash())
+      expect(await treeB.get(2n)).to.equal(positionA)
+    })
+  })
 })

@@ -48,6 +48,10 @@ export class MerkleTree {
     return this.rootHashOrValue
   }
 
+  setHash(hash: PedersenHash) {
+    this.rootHashOrValue = hash
+  }
+
   async getNode(path: (0 | 1)[]): Promise<MerkleValue> {
     if (path.length > this.height) {
       throw new TypeError('Path too long')
