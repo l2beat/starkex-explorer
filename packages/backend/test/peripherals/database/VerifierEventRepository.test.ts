@@ -21,7 +21,7 @@ describe(VerifierEventRepository.name, () => {
       blockNumber: 1,
     }
 
-    await repository.addOrUpdate([record])
+    await repository.add([record])
 
     const actual = await repository.getAll()
 
@@ -49,7 +49,7 @@ describe(VerifierEventRepository.name, () => {
       },
     ]
 
-    await repository.addOrUpdate(records)
+    await repository.add(records)
     const actual = await repository.getAll()
 
     // @todo earl's `id: expect.any(Number)`
@@ -59,7 +59,7 @@ describe(VerifierEventRepository.name, () => {
   })
 
   it('deletes all records', async () => {
-    await repository.addOrUpdate([
+    await repository.add([
       {
         name: 'ImplementationAdded',
         initializer: '0x0000000000000000000000000000000000000001',

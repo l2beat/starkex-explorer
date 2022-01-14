@@ -16,7 +16,7 @@ import { mock } from '../mock'
 
 describe(VerifierCollector.name, () => {
   it('saves events to repository and returns verifier addresses', async () => {
-    const addOrUpdate = mockFn(async (_records: VerifierEventRecord[]) => {})
+    const add = mockFn(async (_records: VerifierEventRecord[]) => {})
     const getLogs = mockFn(
       async (_filter: Filter | FilterByBlockHash) => testData().logs
     )
@@ -24,7 +24,7 @@ describe(VerifierCollector.name, () => {
     const collector = new VerifierCollector(
       mock<EthereumClient>({ getLogs }),
       mock<VerifierEventRepository>({
-        addOrUpdate,
+        add,
         async getAll() {
           return []
         },
@@ -49,7 +49,7 @@ describe(VerifierCollector.name, () => {
         ],
       },
     ])
-    expect(addOrUpdate).toHaveBeenCalledWith([
+    expect(add).toHaveBeenCalledWith([
       [
         expect.objectWith({
           name: 'ImplementationAdded',
