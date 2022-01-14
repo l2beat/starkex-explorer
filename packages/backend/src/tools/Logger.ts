@@ -36,12 +36,13 @@ export class Logger {
   error(error: unknown): void
   error(annotation: string, error: unknown): void
   error(...args: [unknown] | [string, unknown]): void {
-    const [annotation, error] = args.length === 1 ? ['', args[0]] : args
-
     if (this.options.logLevel >= LogLevel.ERROR) {
+      const [annotation, error] = args.length === 1 ? ['', args[0]] : args
+
       const message = [annotation, getErrorMessage(error)]
         .filter(Boolean)
         .join(' ')
+
       this.print('error', { message })
     }
   }
