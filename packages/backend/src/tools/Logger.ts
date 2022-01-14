@@ -33,7 +33,11 @@ export class Logger {
     return this.configure({ service: object.constructor.name })
   }
 
-  error(error: unknown, annotation?: string) {
+  error(error: unknown): void
+  error(annotation: string, error: unknown): void
+  error(...args: [unknown] | [string, unknown]): void {
+    const [annotation, error] = args.length === 1 ? ['', args[0]] : args
+
     if (this.options.logLevel >= LogLevel.ERROR) {
       const message = [annotation, getErrorMessage(error)]
         .filter(Boolean)
