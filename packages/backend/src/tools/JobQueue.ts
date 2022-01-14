@@ -59,7 +59,7 @@ export class JobQueue {
       await job.execute()
       this.inProgress.splice(this.inProgress.indexOf(job), 1)
     } catch (error) {
-      this.logger.error(error, `Job "${job.name}" failed with:`)
+      this.logger.error(`Job "${job.name}" failed with:`, error)
       this.inProgress.splice(this.inProgress.indexOf(job), 1)
       this.queue.unshift({ ...job, failureCount: job.failureCount + 1 })
     } finally {
