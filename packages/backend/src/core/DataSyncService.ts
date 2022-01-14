@@ -20,7 +20,8 @@ export class DataSyncService {
     })
   }
 
-  async revert(_blockNumber: BlockNumber) {
+  async revert(blockNumber: BlockNumber) {
+    await this.verifierCollector.discard({ from: blockNumber })
     this.logger.error(`Method .revert() not implemented`)
   }
 }

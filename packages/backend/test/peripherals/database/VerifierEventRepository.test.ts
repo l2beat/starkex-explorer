@@ -60,42 +60,6 @@ describe(VerifierEventRepository.name, () => {
     expect(actual).toEqual(records.map((r) => ({ ...r, id: expect.a(Number) })))
   })
 
-  it('gets all after block number', async () => {
-    await repository.add([
-      {
-        name: 'Upgraded',
-        implementation: '0x0000000000000000000000000000000000000001',
-        blockNumber: 1,
-      },
-      {
-        name: 'Upgraded',
-        implementation: '0x0000000000000000000000000000000000000002',
-        blockNumber: 2,
-      },
-      {
-        name: 'Upgraded',
-        implementation: '0x0000000000000000000000000000000000000003',
-        blockNumber: 3,
-      },
-    ])
-
-    const actual = await repository.getAllAfter(1)
-    expect(actual).toEqual([
-      {
-        name: 'Upgraded',
-        implementation: '0x0000000000000000000000000000000000000002',
-        blockNumber: 2,
-        id: expect.a(Number),
-      },
-      {
-        name: 'Upgraded',
-        implementation: '0x0000000000000000000000000000000000000003',
-        blockNumber: 3,
-        id: expect.a(Number),
-      },
-    ])
-  })
-
   it('deletes all records', async () => {
     await repository.add([
       {

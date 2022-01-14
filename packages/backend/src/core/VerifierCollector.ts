@@ -9,7 +9,7 @@ import {
   VerifierEventRepository,
 } from '../peripherals/database/VerifierEventRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
 import { partition } from '../tools/partition'
 
 const PROXY_ADDRESS = '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'
@@ -45,6 +45,10 @@ export class VerifierCollector {
     await savingNewEventsToDb
 
     return computeVerifiersFromEvents(added, upgraded)
+  }
+
+  async discard({ from }: { from: BlockNumber }) {
+    await this.verifierEventRepository.deleteAllAfter(from - 1)
   }
 
   private async getEvents(blockRange: BlockRange) {
