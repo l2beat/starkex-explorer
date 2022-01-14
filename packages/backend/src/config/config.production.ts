@@ -10,5 +10,13 @@ export function getProductionConfig(): Config {
       format: 'json',
     },
     port: getEnv.integer('PORT'),
+    databaseUrl: getEnv('DATABASE_URL'),
+    jsonRpcUrl: getEnv('JSON_RPC_URL'),
+    core: {
+      safeBlock: {
+        refreshIntervalMs: 5 * 60 * 1000,
+        blockOffset: 100,
+      },
+    },
   }
 }
