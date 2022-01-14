@@ -19,9 +19,7 @@ export function getTestConfig(): Config {
     jsonRpcUrl: getEnv('TEST_JSON_RPC_URL', 'http://localhost:8545'),
     core: throwsOnUnexpectedAccess({
       safeBlock: UNEXPECTED_ACCESS,
-      sync: {
-        batchSize: 6_000,
-      },
+      syncBatchSize: 6_000,
     }),
   }
 }

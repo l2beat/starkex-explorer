@@ -64,7 +64,7 @@ export class Application {
       safeBlockService,
       dataSyncService,
       logger,
-      config.core.sync.batchSize
+      config.core.syncBatchSize
     )
 
     // #endregion core
