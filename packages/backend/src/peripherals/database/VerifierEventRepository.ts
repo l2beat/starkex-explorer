@@ -53,7 +53,7 @@ export class VerifierEventRepository
 
   async getAllAfter(blockNumber: number) {
     const rows = await this.knex('verifier_events')
-      .where('blockNumber', '>', blockNumber)
+      .where('block_number', '>', blockNumber)
       .select('*')
     this.logger.debug({ method: 'getAllAfter', rows: rows.length })
 
@@ -67,7 +67,7 @@ export class VerifierEventRepository
 
   async deleteAllAfter(blockNumber: number) {
     const rowsCount = await this.knex('verifier_events')
-      .where('blockNumber', '>', blockNumber)
+      .where('block_number', '>', blockNumber)
       .delete()
     this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
   }

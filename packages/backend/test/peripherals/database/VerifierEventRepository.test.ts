@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import {
   VerifierEventRecord,
@@ -25,7 +25,12 @@ describe(VerifierEventRepository.name, () => {
 
     const actual = await repository.getAll()
 
-    expect(actual[0]).to.include(record)
+    expect(actual).toEqual([
+      {
+        ...record,
+        id: expect.a(Number),
+      },
+    ])
   })
 
   it('adds multiple records and queries them', async () => {
@@ -52,10 +57,43 @@ describe(VerifierEventRepository.name, () => {
     await repository.add(records)
     const actual = await repository.getAll()
 
-    // @todo earl's `id: expect.any(Number)`
-    expect(actual[0]).to.include(records[0])
-    expect(actual[1]).to.include(records[1])
-    expect(actual[2]).to.include(records[2])
+    expect(actual).toEqual(records.map((r) => ({ ...r, id: expect.a(Number) })))
+  })
+
+  it('gets all after block number', async () => {
+    await repository.add([
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000001',
+        blockNumber: 1,
+      },
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000002',
+        blockNumber: 2,
+      },
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000003',
+        blockNumber: 3,
+      },
+    ])
+
+    const actual = await repository.getAllAfter(1)
+    expect(actual).toEqual([
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000002',
+        blockNumber: 2,
+        id: expect.a(Number),
+      },
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000003',
+        blockNumber: 3,
+        id: expect.a(Number),
+      },
+    ])
   })
 
   it('deletes all records', async () => {
@@ -76,6 +114,44 @@ describe(VerifierEventRepository.name, () => {
     await repository.deleteAll()
 
     const actual = await repository.getAll()
-    expect(actual).to.deep.eq([])
+    expect(actual).toEqual([])
+  })
+
+  it('deletes all records after a block number', async () => {
+    await repository.add([
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000001',
+        blockNumber: 1,
+      },
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000002',
+        blockNumber: 2,
+      },
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000003',
+        blockNumber: 3,
+      },
+    ])
+
+    await repository.deleteAllAfter(2)
+
+    const actual = await repository.getAll()
+    expect(actual).toEqual([
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000001',
+        blockNumber: 1,
+        id: expect.a(Number),
+      },
+      {
+        name: 'Upgraded',
+        implementation: '0x0000000000000000000000000000000000000002',
+        blockNumber: 2,
+        id: expect.a(Number),
+      },
+    ])
   })
 })
