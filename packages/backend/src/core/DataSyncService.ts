@@ -1,4 +1,4 @@
-import { BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { VerifierCollector } from './VerifierCollector'
 
@@ -20,7 +20,7 @@ export class DataSyncService {
     })
   }
 
-  async revert() {
+  async revert(_blockNumber: BlockNumber) {
     this.logger.error(`Method .revert() not implemented`)
   }
 }
