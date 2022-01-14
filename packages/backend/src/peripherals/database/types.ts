@@ -38,7 +38,8 @@ declare module 'knex/types/tables' {
 }
 
 export interface Repository<TRecord> {
-  addOrUpdate(records: TRecord[]): Promise<void>
+  addOrUpdate?(records: TRecord[]): Promise<void>
+  add?(records: TRecord[]): Promise<void>
   getAll(): Promise<TRecord[]>
   deleteAll(): Promise<void>
 }

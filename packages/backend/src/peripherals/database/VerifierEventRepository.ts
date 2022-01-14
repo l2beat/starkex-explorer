@@ -31,21 +31,17 @@ export class VerifierEventRepository
     this.logger = this.logger.for(this)
   }
 
-  async addOrUpdate(records: VerifierEventRecord[]) {
+  async add(records: VerifierEventRecord[]) {
     if (records.length === 0) {
-      this.logger.debug({ method: 'addOrUpdate', rows: 0 })
+      this.logger.debug({ method: 'add', rows: 0 })
       return
     }
 
     const rows: VerifierEventRow[] = records.map(toRow)
-    const primaryKey: keyof VerifierEventRow = 'id'
 
-    await this.knex('verifier_events')
-      .insert(rows)
-      .onConflict([primaryKey])
-      .merge()
+    await this.knex('verifier_events').insert(rows)
 
-    this.logger.debug({ method: 'addOrUpdate', rows: rows.length })
+    this.logger.debug({ method: 'add', rows: rows.length })
   }
 
   async getAll() {

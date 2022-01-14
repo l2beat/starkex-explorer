@@ -35,8 +35,7 @@ export class VerifierCollector {
   async collect(blockRange: BlockRange): Promise<EthereumAddress[]> {
     const oldEvents = this.verifierEventRepository.getAll()
     const newEvents = await this.getEvents(blockRange)
-    const savingNewEventsToDb =
-      this.verifierEventRepository.addOrUpdate(newEvents)
+    const savingNewEventsToDb = this.verifierEventRepository.add(newEvents)
 
     const events = [...(await oldEvents), ...newEvents]
     const [upgraded, added] = partitionVerifierEvents(events)
