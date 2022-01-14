@@ -51,15 +51,6 @@ export class VerifierEventRepository
     return rows.map(toRecord)
   }
 
-  async getAllAfter(blockNumber: number) {
-    const rows = await this.knex('verifier_events')
-      .where('block_number', '>', blockNumber)
-      .select('*')
-    this.logger.debug({ method: 'getAllAfter', rows: rows.length })
-
-    return rows.map(toRecord)
-  }
-
   async deleteAll() {
     await this.knex('verifier_events').delete()
     this.logger.debug({ method: 'deleteAll' })
