@@ -69,23 +69,24 @@ export class MerkleNode extends MerkleValue {
     updates: MerkleUpdate[],
     center: bigint,
     height: bigint
-  ): Promise<MerkleNode> {
+  ): Promise<[MerkleNode, MerkleValue[]]> {
     const leftUpdates = updates.filter((x) => x.index < center)
     const rightUpdates = updates.filter((x) => x.index >= center)
     const offset = height > 1n ? 2n ** (height - 2n) : 0n
-    const newLeft = await this.updateChild(
+    const [newLeft, leftNodes] = await this.updateChild(
       this.leftHashOrValue,
       leftUpdates,
       height > 1n ? center - offset : center - 1n,
       height - 1n
     )
-    const newRight = await this.updateChild(
+    const [newRight, rightNodes] = await this.updateChild(
       this.rightHashOrValue,
       rightUpdates,
       center + offset,
       height - 1n
     )
-    return new MerkleNode(this.storage, newLeft, newRight)
+    const newNode = new MerkleNode(this.storage, newLeft, newRight)
+    return [newNode, [...leftNodes, ...rightNodes, newNode]]
   }
 
   private async updateChild(
@@ -93,9 +94,9 @@ export class MerkleNode extends MerkleValue {
     updates: MerkleUpdate[],
     center: bigint,
     height: bigint
-  ) {
+  ): Promise<[PedersenHash | MerkleValue, MerkleValue[]]> {
     if (updates.length === 0) {
-      return child
+      return [child, []]
     }
     if (!(child instanceof MerkleValue)) {
       child = await this.storage.recover(child)
@@ -104,7 +105,8 @@ export class MerkleNode extends MerkleValue {
       if (child instanceof MerkleNode) {
         throw new Error('Tree structure corrupted')
       }
-      return updates[updates.length - 1].value
+      const value = updates[updates.length - 1].value
+      return [value, [value]]
     }
     if (child instanceof MerkleNode) {
       return child.update(updates, center, height)

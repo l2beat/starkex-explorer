@@ -4,5 +4,5 @@ import { MerkleValue } from './MerkleValue'
 
 export interface IMerkleStorage {
   recover(hash: PedersenHash): Promise<MerkleValue>
-  persist(value: MerkleValue): Promise<void>
+  persist(values: MerkleValue[]): Promise<void>
 }

@@ -19,11 +19,18 @@ export class MerkleTree {
     this.maxIndex = 2n ** height - 1n
   }
 
-  static create(storage: IMerkleStorage, height: bigint, leaf: MerkleValue) {
+  static async create(
+    storage: IMerkleStorage,
+    height: bigint,
+    leaf: MerkleValue
+  ) {
     let root = leaf
+    const nodes = [leaf]
     for (let i = 0; i < height; i++) {
       root = new MerkleNode(storage, root, root)
+      nodes.push(root)
     }
+    await storage.persist(nodes)
     return new MerkleTree(storage, height, root)
   }
 
@@ -39,6 +46,20 @@ export class MerkleTree {
       return this.rootHashOrValue.hash()
     }
     return this.rootHashOrValue
+  }
+
+  async getNode(path: (0 | 1)[]): Promise<MerkleValue> {
+    if (path.length > this.height) {
+      throw new TypeError('Path too long')
+    }
+    let current = await this.root()
+    for (const turn of path) {
+      if (!(current instanceof MerkleNode)) {
+        throw new Error('Tree structure corrupted')
+      }
+      current = turn ? await current.right() : await current.left()
+    }
+    return current
   }
 
   async get(index: bigint): Promise<MerkleValue> {
@@ -64,12 +85,20 @@ export class MerkleTree {
     const root = await this.root()
     if (root instanceof MerkleNode) {
       const center = 2n ** (this.height - 1n)
-      this.rootHashOrValue = await root.update(updates, center, this.height)
+      const [newRoot, newNodes] = await root.update(
+        updates,
+        center,
+        this.height
+      )
+      await this.storage.persist(newNodes)
+      this.rootHashOrValue = newRoot
     } else {
       if (updates.length !== 1) {
         throw new Error('Cannot replace leaf with multiple values')
       } else {
-        this.rootHashOrValue = updates[0].value
+        const newRoot = updates[0].value
+        await this.storage.persist([newRoot])
+        this.rootHashOrValue = newRoot
       }
     }
   }

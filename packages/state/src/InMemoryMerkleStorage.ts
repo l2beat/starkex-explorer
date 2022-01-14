@@ -14,8 +14,12 @@ export class InMemoryMerkleStorage implements IMerkleStorage {
     return value
   }
 
-  async persist(value: MerkleValue): Promise<void> {
-    const hash = await value.hash()
-    this.store.set(hash, value)
+  async persist(values: MerkleValue[]): Promise<void> {
+    await Promise.all(
+      values.map(async (value) => {
+        const hash = await value.hash()
+        this.store.set(hash, value)
+      })
+    )
   }
 }
