@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { PedersenHash } from '../src'
 import { pedersen, terminateWorkerPool } from '../src/pedersen'
@@ -13,7 +13,7 @@ describe(pedersen.name, () => {
         'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
       )
     )
-    expect(result).to.equal(
+    expect(result).toEqual(
       PedersenHash(
         '1235ac944ab0709debd2756fc26deddd25741d0fca5c5acefdbd49b74c68af'
       )

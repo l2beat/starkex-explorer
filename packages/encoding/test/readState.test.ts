@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
 import { MIN_INT } from '../src/constants'
@@ -11,7 +11,7 @@ describe('readState', () => {
   const decode = readToDecode(readState)
 
   it('fails for empty data', () => {
-    expect(() => decode('')).to.throw(DecodingError, 'Went out of bounds')
+    expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')
   })
 
   it('decodes a simple state', () => {
@@ -25,7 +25,7 @@ describe('readState', () => {
       .writeNumber(1234, 32)
       .writeNumber(0, 32)
       .writeNumber(5678, 32)
-    expect(decode(writer.getBytes())).to.deep.equal({
+    expect(decode(writer.getBytes())).toEqual({
       positionRoot: '0x' + 'deadbeef'.repeat(8),
       positionHeight: 10,
       orderRoot: '0x' + 'abcd1234'.repeat(8),
@@ -60,7 +60,7 @@ describe('readState', () => {
       .write(encodeAssetId('BTC-10'))
       .writeNumber(420n, 32)
       .writeNumber(5678, 32)
-    expect(decode(writer.getBytes())).to.deep.equal({
+    expect(decode(writer.getBytes())).toEqual({
       positionRoot: '0x' + 'deadbeef'.repeat(8),
       positionHeight: 10,
       orderRoot: '0x' + 'abcd1234'.repeat(8),

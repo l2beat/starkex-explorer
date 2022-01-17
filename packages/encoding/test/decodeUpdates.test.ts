@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { MIN_INT } from '../src/constants'
 import { decodeUpdates } from '../src/decodeUpdates'
@@ -8,10 +8,7 @@ import { ByteWriter } from './ByteWriter'
 
 describe('decodeUpdates', () => {
   it('fails for empty data', () => {
-    expect(() => decodeUpdates('')).to.throw(
-      DecodingError,
-      'Went out of bounds'
-    )
+    expect(() => decodeUpdates('')).toThrow(DecodingError, 'Went out of bounds')
   })
 
   it('decodes multiple entries and positions', () => {
@@ -55,7 +52,7 @@ describe('decodeUpdates', () => {
       .writePadding(9)
       .write(encodeAssetId('ETH-9'))
       .writeNumber(66n - MIN_INT, 8)
-    expect(decodeUpdates(writer.getBytes())).to.deep.equal({
+    expect(decodeUpdates(writer.getBytes())).toEqual({
       funding: [
         {
           indices: [

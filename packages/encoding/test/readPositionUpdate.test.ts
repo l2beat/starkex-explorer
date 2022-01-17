@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
 import { MIN_INT } from '../src/constants'
@@ -11,7 +11,7 @@ describe('readPositionUpdate', () => {
   const decode = readToDecode(readPositionUpdate)
 
   it('fails for empty data', () => {
-    expect(() => decode('')).to.throw(DecodingError, 'Went out of bounds')
+    expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')
   })
 
   it('decodes a position with no values', () => {
@@ -21,7 +21,7 @@ describe('readPositionUpdate', () => {
       .write('1234abcd'.repeat(8)) // publicKey
       .writeNumber(10n - MIN_INT, 32) // collateralBalance
       .writeNumber(456, 32) // fundingTimestamp
-    expect(decode(writer.getBytes())).to.deep.equal({
+    expect(decode(writer.getBytes())).toEqual({
       positionId: 123n,
       publicKey: '0x' + '1234abcd'.repeat(8),
       collateralBalance: 10n,
@@ -43,7 +43,7 @@ describe('readPositionUpdate', () => {
       .writePadding(9)
       .write(encodeAssetId('BTC-10'))
       .writeNumber(20n - MIN_INT, 8)
-    expect(decode(writer.getBytes())).to.deep.equal({
+    expect(decode(writer.getBytes())).toEqual({
       positionId: 123n,
       publicKey: '0x' + '1234abcd'.repeat(8),
       collateralBalance: 10n,
