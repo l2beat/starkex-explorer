@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import {
   PositionUpdateRecord,
@@ -26,7 +26,7 @@ describe(PositionUpdateRepository.name, () => {
 
     const actual = await repository.getAll()
 
-    expect(actual).to.deep.eq([record])
+    expect(actual).toEqual([record])
   })
 
   it('adds multiple records and queries them', async () => {
@@ -72,7 +72,7 @@ describe(PositionUpdateRepository.name, () => {
 
     await repository.addOrUpdate(records)
     const actual = await repository.getAll()
-    expect(actual).to.deep.eq(records)
+    expect(actual).toEqual(records)
   })
 
   it('deletes all records', async () => {
@@ -96,6 +96,6 @@ describe(PositionUpdateRepository.name, () => {
     ])
     await repository.deleteAll()
     const actual = await repository.getAll()
-    expect(actual).to.deep.eq([])
+    expect(actual).toEqual([])
   })
 })

@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import {
   Store,
@@ -18,8 +18,8 @@ describe(SyncStatusRepository.name, () => {
 
     await repository.setLastBlockNumberSynced(10)
 
-    expect(key).to.eq('lastBlockNumberSynced')
-    expect(value).to.eq('10')
+    expect(key).toEqual('lastBlockNumberSynced')
+    expect(value).toEqual('10')
   })
 
   it('reads value from store', async () => {
@@ -35,8 +35,8 @@ describe(SyncStatusRepository.name, () => {
 
     const actual = await repository.getLastBlockNumberSynced()
 
-    expect(actual).to.eq(20)
-    expect(key).to.eq('lastBlockNumberSynced')
+    expect(actual).toEqual(20)
+    expect(key).toEqual('lastBlockNumberSynced')
   })
 
   it('returns options.earliestBlock when store is empty', async () => {
@@ -46,7 +46,7 @@ describe(SyncStatusRepository.name, () => {
 
     const actual = await repository.getLastBlockNumberSynced()
 
-    expect(actual).to.eq(30)
+    expect(actual).toEqual(30)
   })
 
   it('fallbacks to options.earliestBlock when the store is corrupt', async () => {
@@ -56,6 +56,6 @@ describe(SyncStatusRepository.name, () => {
 
     const actual = await repository.getLastBlockNumberSynced()
 
-    expect(actual).to.eq(40)
+    expect(actual).toEqual(40)
   })
 })

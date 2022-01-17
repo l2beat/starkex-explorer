@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
 import { encodeAssetId } from '../src/encodeAssetId'
@@ -10,12 +10,12 @@ describe('readAssetDataHashes', () => {
   const decode = readToDecode(readAssetDataHashes)
 
   it('fails for empty data', () => {
-    expect(() => decode('')).to.throw(DecodingError, 'Went out of bounds')
+    expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')
   })
 
   it('can read zero values', () => {
     const writer = new ByteWriter().writeNumber(0, 32)
-    expect(decode(writer.getBytes())).to.deep.equal([])
+    expect(decode(writer.getBytes())).toEqual([])
   })
 
   it('can read a single value', () => {
@@ -24,7 +24,7 @@ describe('readAssetDataHashes', () => {
       .writePadding(17)
       .write(encodeAssetId('ETH-9'))
       .write('abcd1234'.repeat(8))
-    expect(decode(writer.getBytes())).to.deep.equal([
+    expect(decode(writer.getBytes())).toEqual([
       { assetId: 'ETH-9', hash: '0x' + 'abcd1234'.repeat(8) },
     ])
   })
@@ -39,7 +39,7 @@ describe('readAssetDataHashes', () => {
       .write(encodeAssetId('BTC-10'))
       .write('deadbeef'.repeat(8))
 
-    expect(decode(writer.getBytes())).to.deep.equal([
+    expect(decode(writer.getBytes())).toEqual([
       { assetId: 'ETH-9', hash: '0x' + 'abcd1234'.repeat(8) },
       { assetId: 'BTC-10', hash: '0x' + 'deadbeef'.repeat(8) },
     ])

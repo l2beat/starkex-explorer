@@ -1,5 +1,5 @@
-import { expect } from 'chai'
 import { AssertTrue, IsExact } from 'conditional-type-checks'
+import { expect } from 'earljs'
 
 import { KeyValueStore } from '../../../src/peripherals/database/KeyValueStore'
 import { Logger } from '../../../src/tools/Logger'
@@ -15,7 +15,7 @@ describe(KeyValueStore.name, () => {
   it('sets and reads value', async () => {
     kvStore.set('key', 'value')
     const actual = await kvStore.get('key')
-    expect(actual).to.eq('value')
+    expect(actual).toEqual('value')
   })
 
   it('reads and removes all values', async () => {
@@ -26,7 +26,7 @@ describe(KeyValueStore.name, () => {
     ])
 
     let actual = await kvStore.getAll()
-    expect(actual).to.deep.eq([
+    expect(actual).toEqual([
       { key: '1', value: 'one' },
       { key: '2', value: 'two' },
       { key: '3', value: 'three' },
@@ -34,7 +34,7 @@ describe(KeyValueStore.name, () => {
 
     await kvStore.deleteAll()
     actual = await kvStore.getAll()
-    expect(actual).to.deep.eq([])
+    expect(actual).toEqual([])
   })
 
   // it constrains key type to generic parameter passed to constructor

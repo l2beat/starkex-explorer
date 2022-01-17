@@ -1,5 +1,5 @@
 import FakeTimers from '@sinonjs/fake-timers'
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { SafeBlock, SafeBlockService } from '../../src/core/SafeBlockService'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
@@ -14,7 +14,7 @@ describe('SafeBlockService', () => {
         return 556
       },
       async getBlock(blockNumber) {
-        expect(blockNumber).to.eq(456)
+        expect(blockNumber).toEqual(456)
         return {
           timestamp: 1234,
         } as Block
@@ -29,7 +29,7 @@ describe('SafeBlockService', () => {
     const stop = await service.start()
     stop()
     const block = service.getSafeBlock()
-    expect(block).to.deep.eq({
+    expect(block).toEqual({
       timestamp: 1234,
       blockNumber: 456,
     })
@@ -42,7 +42,7 @@ describe('SafeBlockService', () => {
       mock<EthereumClient>(),
       Logger.SILENT
     )
-    expect(() => service.getSafeBlock()).to.throw(Error, 'Not started')
+    expect(() => service.getSafeBlock()).toThrow(Error, 'Not started')
   })
 
   it('refreshes the block and emits events', async () => {
@@ -73,7 +73,7 @@ describe('SafeBlockService', () => {
     await clock.tickAsync(3000)
     clock.uninstall()
 
-    expect(blocks).to.deep.eq([
+    expect(blocks).toEqual([
       {
         blockNumber: 456,
         timestamp: 912,
