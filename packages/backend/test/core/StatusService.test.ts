@@ -9,7 +9,7 @@ describe('StatusService', () => {
       barService: new BarService(),
     })
 
-    expect<object>(statusService.getStatus()).toEqual({
+    expect<unknown>(statusService.getStatus()).toEqual({
       fooService: { foo: 123 },
       barService: { bar: 'baz' },
     })

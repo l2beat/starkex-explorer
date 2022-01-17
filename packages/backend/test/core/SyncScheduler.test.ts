@@ -132,7 +132,10 @@ function setupMocks({
   return {
     statusRepository,
     safeBlockService,
-    dataSyncService: mock<DataSyncService>(),
+    dataSyncService: mock<DataSyncService>({
+      sync: mockFn().resolvesTo(undefined),
+      revert: mockFn().resolvesTo(undefined),
+    }),
     safeBlockListener: (block: SafeBlock) => safeBlockListener(block),
   }
 }
