@@ -1,6 +1,7 @@
 import BN from 'bn.js'
 
 import { starkCurvePoint } from './curve'
+import { PedersenHash } from './model'
 
 function toPoint(a: string, b: string) {
   return starkCurvePoint(new BN(a, 16), new BN(b, 16))
@@ -34,9 +35,9 @@ const BN_248 = new BN(
   16
 )
 
-export function pedersenSync(a: string, b: string) {
-  const aBN = new BN(a, 16)
-  const bBN = new BN(b, 16)
+export function pedersenSync(a: PedersenHash, b: PedersenHash) {
+  const aBN = new BN(a.toString(), 16)
+  const bBN = new BN(b.toString(), 16)
   const aHigh = aBN.shrn(248)
   const aLow = aBN.sub(aHigh.mul(BN_248))
   const bHigh = bBN.shrn(248)
@@ -46,5 +47,5 @@ export function pedersenSync(a: string, b: string) {
     .add(points[2].mul(aHigh))
     .add(points[3].mul(bLow))
     .add(points[4].mul(bHigh))
-  return point.getX().toString(16)
+  return PedersenHash(point.getX().toString(16, 64))
 }

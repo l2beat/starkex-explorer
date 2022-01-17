@@ -23,11 +23,13 @@
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",
+    "@types/chai-as-promised": "^7.1.4",
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.11.12",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "@typescript-eslint/parser": "^5.6.0",
     "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
     "esbuild": "^0.14.2",
     "esbuild-register": "^3.2.0",
     "eslint": "^8.4.1",
