@@ -1,4 +1,5 @@
 import { randomUUID as uuid } from 'crypto'
+import type { Knex } from 'knex'
 
 import { getConfig } from '../../../src/config'
 import { __SKIP_DB_TESTS__ } from '../../../src/config/config.testing'
