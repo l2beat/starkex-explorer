@@ -24,8 +24,8 @@ export function setupDatabaseTestSuite() {
 
       // We drop before instead of after tests, so we can inspect the
       // contents of database when tests fail.
-      await knex.raw(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)
-      await knex.raw(`CREATE SCHEMA "${schemaName}"`)
+      await knex.raw(`DROP SCHEMA IF EXISTS ?? CASCADE`, schemaName)
+      await knex.raw(`CREATE SCHEMA ??`, schemaName)
       await knex.raw(`SET SCHEMA '${schemaName}'`)
 
       await knex.migrate.latest({ schemaName })
