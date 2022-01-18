@@ -1,4 +1,5 @@
 import { expect, mockFn } from 'earljs'
+import { providers } from 'ethers'
 
 import { VerifierCollector } from '../../src/core/VerifierCollector'
 import { EthereumAddress } from '../../src/model'
@@ -7,19 +8,13 @@ import {
   VerifierEventRepository,
 } from '../../src/peripherals/database/VerifierEventRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import {
-  BlockRange,
-  Filter,
-  FilterByBlockHash,
-} from '../../src/peripherals/ethereum/types'
+import { BlockRange } from '../../src/peripherals/ethereum/types'
 import { mock } from '../mock'
 
 describe(VerifierCollector.name, () => {
   it('saves events to repository and returns verifier addresses', async () => {
     const add = mockFn(async (_records: VerifierEventRecord[]) => {})
-    const getLogs = mockFn(
-      async (_filter: Filter | FilterByBlockHash) => testData().logs
-    )
+    const getLogs = mockFn(async (_filter: providers.Filter) => testData().logs)
 
     const collector = new VerifierCollector(
       mock<EthereumClient>({ getLogs }),
