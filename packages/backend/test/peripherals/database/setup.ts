@@ -20,7 +20,7 @@ export function setupDatabaseTestSuite() {
         // 'test_one_two' schema before running tests.
 
         const titlePath = this.test?.parent?.titlePath()
-        schemaName = `test_${titlePath?.join('_') || uuid()}`
+        schemaName = snakeCase(`test_${titlePath?.join('_') || uuid()}`)
 
         console.log('    > Creating test schema', schemaName)
 
@@ -51,4 +51,13 @@ async function printTables(knex: Knex) {
     'SELECT table_name, current_schema(), current_database() FROM information_schema.tables WHERE table_schema = current_schema()'
   )
   console.log('tables:', tables.rows)
+}
+
+function snakeCase(str: string) {
+  return str
+    .replace(/([A-Z])/g, ' $1')
+    .split(' ')
+    .join('_')
+    .toLowerCase()
+    .replace(/[^\w]/g, '')
 }
