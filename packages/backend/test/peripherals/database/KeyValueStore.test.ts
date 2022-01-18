@@ -5,7 +5,7 @@ import { KeyValueStore } from '../../../src/peripherals/database/KeyValueStore'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
-describe(KeyValueStore.name, () => {
+describe.only(KeyValueStore.name, () => {
   const { knex } = setupDatabaseTestSuite()
   type TestKey = '1' | '2' | '3' | 'key'
   const kvStore = new KeyValueStore<TestKey>(knex, Logger.SILENT)
@@ -16,13 +16,14 @@ describe(KeyValueStore.name, () => {
     kvStore.set('key', 'value')
     const actual = await kvStore.get('key')
     expect(actual).toEqual('value')
-    await kvStore.delete('key')
   })
 
   it('reads and removes all values', async () => {
-    await kvStore.set('1', 'one')
-    await kvStore.set('2', 'two')
-    await kvStore.set('3', 'three')
+    await Promise.all([
+      kvStore.set('1', 'one'),
+      kvStore.set('2', 'two'),
+      kvStore.set('3', 'three'),
+    ])
 
     let actual = await kvStore.getAll()
     expect(actual).toBeAnArrayOfLength(3)

@@ -37,7 +37,7 @@ export class DataSyncService {
   // Temporary
   async getOnChainData() {
     // blockRange?
-    const pages = await this.pageRepository.getAllForFacts()
+    const pages = await this.pageRepository.getAllForFacts([])
 
     return decodeOnChainData(pages.map((p) => p.page))
   }

@@ -1,19 +1,9 @@
-import { BigNumber, utils } from 'ethers'
+import { utils } from 'ethers'
 
 import { EthereumAddress } from '../model'
 import { FactToPageRepository } from '../peripherals/database/FactToPageRepository'
-import {
-  PageRecord,
-  PageRepository,
-} from '../peripherals/database/PageRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
-
-const REGISTRY_ABI = new utils.Interface([
-  'event LogMemoryPageFactContinuous(bytes32 factHash, uint256 memoryHash, uint256 prod)',
-])
-
-const REGISTRY_ADDRESS = '0xEfbCcE4659db72eC6897F46783303708cf9ACef8'
 
 const GPS_VERIFIER_ABI = new utils.Interface([
   'event LogMemoryPagesHashes(bytes32 factHash, bytes32[] pagesHashes)',

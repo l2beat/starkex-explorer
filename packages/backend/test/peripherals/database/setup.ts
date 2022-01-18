@@ -7,15 +7,17 @@ import { DatabaseService } from '../../../src/peripherals/database/DatabaseServi
 
 export function setupDatabaseTestSuite() {
   const config = getConfig('test')
-  const knex = DatabaseService.createKnexInstance(config.databaseUrl)
   const skip = config.databaseUrl === __SKIP_DB_TESTS__
   let schemaName = ''
+  let knex: Knex<any, unknown[]> = undefined as any;
 
   before(async function () {
     if (skip) {
       this.skip()
     } else {
       try {
+        knex = DatabaseService.createKnexInstance(config.databaseUrl)
+
         // For describe("one", () => describe("two") => {}) test suite we set up
         // 'test_one_two' schema before running tests.
 

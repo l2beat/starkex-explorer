@@ -34,10 +34,11 @@ export class PageRepository implements Repository<PageRecord> {
     return rows.map(toRecord)
   }
 
-  async getAllForFacts() {
+  async getAllForFacts(factHashes: string[]) {
     const rows = await this.knex('fact_to_pages')
       .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
       .select('fact_hash', 'pages.page_hash', 'page')
+      .whereIn('fact_hash', factHashes)
 
     this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
 
