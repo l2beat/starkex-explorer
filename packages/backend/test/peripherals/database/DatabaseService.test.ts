@@ -17,6 +17,8 @@ describe('DatabaseService', () => {
     )
     const tables = result.rows.map((x: { table_name: string }) => x.table_name)
 
-    expect(tables).toEqual(['knex_migrations', 'knex_migrations_lock'])
+    expect(tables).toEqual(
+      expect.arrayWith('knex_migrations', 'knex_migrations_lock')
+    )
   })
 })
