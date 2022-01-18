@@ -1,5 +1,4 @@
 import { providers, utils } from 'ethers'
-import { AbiCoder } from 'ethers/lib/utils'
 
 const PROXY_ADDRESS = '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'
 
@@ -34,7 +33,7 @@ export async function getGpsVerifiers(provider: providers.Provider) {
 }
 
 function decodeAddress(data: string): string {
-  return new AbiCoder().decode(['address'], data)[0]
+  return new utils.AbiCoder().decode(['address'], data)[0]
 }
 
 interface ImplementationAddedEvent {

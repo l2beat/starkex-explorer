@@ -7,7 +7,7 @@
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "lint": "eslint --ext .ts src test",
+    "lint": "eslint --ext .ts --max-warnings 0 src test",
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
@@ -25,6 +25,7 @@
     "@types/pg": "^8.6.3",
     "chalk": "^4.1.2",
     "dotenv": "^10.0.0",
+    "ethers": "^5.5.2",
     "knex": "^0.95.15",
     "koa": "^2.13.4",
     "koa-static": "^5.0.0",
