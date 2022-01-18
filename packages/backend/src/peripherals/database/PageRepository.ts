@@ -38,6 +38,14 @@ export class PageRepository implements Repository<PageRecord> {
     await this.knex('pages').delete()
     this.logger.debug({ method: 'deleteAll' })
   }
+
+  async deleteAllAfter(blockNumber: number) {
+    const rowsCount = await this.knex('pages')
+      .where('block_number', '>', blockNumber)
+      .delete()
+
+    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
+  }
 }
 
 function toRow(record: PageRecord): PageRow {
