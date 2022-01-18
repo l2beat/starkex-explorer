@@ -18,7 +18,7 @@ export async function up(knex: Knex) {
     table.increments('id').primary()
     table.integer('block_number').notNullable()
     table.string('page_hash').notNullable().index()
-    table.string('page').notNullable()
+    table.text('page').notNullable()
   })
 }
 

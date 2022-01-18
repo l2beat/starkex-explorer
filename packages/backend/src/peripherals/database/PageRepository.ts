@@ -34,6 +34,20 @@ export class PageRepository implements Repository<PageRecord> {
     return rows.map(toRecord)
   }
 
+  async getAllForFacts() {
+    const rows = await this.knex('fact_to_pages')
+      .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
+      .select('fact_hash', 'page_hash', 'page')
+
+    this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
+
+    return rows.map((row) => ({
+      factHash: row.fact_hash,
+      pageHash: row.page_hash,
+      page: row.page,
+    }))
+  }
+
   async deleteAll() {
     await this.knex('pages').delete()
     this.logger.debug({ method: 'deleteAll' })

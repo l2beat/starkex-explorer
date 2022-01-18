@@ -4,12 +4,16 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { DataSyncService } from './core/DataSyncService'
+import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
+import { PageCollector } from './core/PageCollector'
 import { SafeBlockService } from './core/SafeBlockService'
 import { StatusService } from './core/StatusService'
 import { SyncScheduler } from './core/SyncScheduler'
 import { VerifierCollector } from './core/VerifierCollector'
 import { DatabaseService } from './peripherals/database/DatabaseService'
+import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
+import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
@@ -35,6 +39,8 @@ export class Application {
     // @todo unused for now
     new PositionUpdateRepository(knex, logger)
     const verifierEventRepository = new VerifierEventRepository(knex, logger)
+    const factToPageRepository = new FactToPageRepository(knex, logger)
+    const pageRepository = new PageRepository(knex, logger)
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
@@ -57,8 +63,19 @@ export class Application {
       ethereumClient,
       verifierEventRepository
     )
+    const memoryHashEventCollector = new MemoryHashEventCollector(
+      ethereumClient,
+      factToPageRepository
+    )
+    const pageCollector = new PageCollector(ethereumClient, pageRepository)
 
-    const dataSyncService = new DataSyncService(verifierCollector, logger)
+    const dataSyncService = new DataSyncService(
+      verifierCollector,
+      memoryHashEventCollector,
+      pageCollector,
+      pageRepository,
+      logger
+    )
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
       safeBlockService,
