@@ -23,8 +23,7 @@ export class PageRepository implements Repository<PageRecord> {
     }
 
     const rows: PageRow[] = records.map(toRow)
-    const primaryKey: keyof PageRow = 'id'
-    await this.knex('pages').insert(rows).onConflict([primaryKey]).merge()
+    await this.knex('pages').insert(rows)
 
     this.logger.debug({ method: 'addOrUpdate', rows: rows.length })
   }
