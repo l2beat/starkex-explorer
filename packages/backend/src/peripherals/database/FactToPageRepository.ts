@@ -25,7 +25,7 @@ export class FactToPageRepository implements Repository<FactToPageRecord> {
     const rows: FactToPageRow[] = records.map(toRow)
     await this.knex('fact_to_pages').insert(rows)
 
-    this.logger.debug({ method: 'addOrUpdate', rows: rows.length })
+    this.logger.debug({ method: 'add', rows: rows.length })
   }
 
   async getAll() {
