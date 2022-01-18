@@ -28,8 +28,8 @@ jobs:
           node-version: 14.x
       - run: yarn --frozen-lockfile
       - run: yarn format
-      - run: yarn lint
       - run: yarn build
+      - run: yarn lint
       - run: yarn typecheck
       - run: yarn test
         env:

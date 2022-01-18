@@ -7,15 +7,15 @@
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "lint": "eslint --ext .ts src test",
+    "lint": "eslint --ext .ts --max-warnings 0 src test",
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "test": "mocha",
     "get-onchain-data": "node -r esbuild-register src/data"
   },
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
     "ethers": "^5.5.2"
-  }
+  },
+  "devDependencies": {}
 }

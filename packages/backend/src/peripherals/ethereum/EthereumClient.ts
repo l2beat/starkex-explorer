@@ -1,6 +1,6 @@
-import { ethers } from 'ethers'
+import { ethers, providers } from 'ethers'
 
-import { Block, BlockTag, Filter, FilterByBlockHash } from './types'
+import { BlockTag } from './types'
 
 export class EthereumClient {
   private provider = new ethers.providers.JsonRpcProvider(this.rpcUrl)
@@ -11,11 +11,11 @@ export class EthereumClient {
     return await this.provider.getBlockNumber()
   }
 
-  async getBlock(blockTagOrHash: BlockTag): Promise<Block> {
+  async getBlock(blockTagOrHash: BlockTag): Promise<providers.Block> {
     return await this.provider.getBlock(blockTagOrHash)
   }
 
-  async getLogs(filter: Filter | FilterByBlockHash) {
+  async getLogs(filter: providers.Filter) {
     return await this.provider.getLogs(filter)
   }
 
