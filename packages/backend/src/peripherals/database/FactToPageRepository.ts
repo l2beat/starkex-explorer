@@ -1,5 +1,5 @@
 import { Knex } from 'knex'
-import { AssetBalanceJson, FactToPageRow } from 'knex/types/tables'
+import { FactToPageRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'

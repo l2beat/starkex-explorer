@@ -63,7 +63,10 @@ describe(PageRepository.name, () => {
 
     const actual = await repository.getAll()
     expect(actual).toEqual(
-      Array.from({ length: 6 }).map((_, i) => dummyPageRecord(i))
+      Array.from({ length: 6 }).map((_, i) => ({
+        ...dummyPageRecord(i),
+        id: expect.a(Number),
+      }))
     )
   })
 })
