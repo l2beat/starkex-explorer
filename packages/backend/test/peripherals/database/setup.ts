@@ -49,3 +49,10 @@ export function setupDatabaseTestSuite() {
 function log(...args: unknown[]) {
   console.log('    >', ...args)
 }
+
+async function printTables(knex: Knex) {
+  const tables = await knex.raw(
+    'SELECT table_name, current_schema(), current_database() FROM information_schema.tables WHERE table_schema = current_schema()'
+  )
+  console.log('tables:', tables.rows)
+}
