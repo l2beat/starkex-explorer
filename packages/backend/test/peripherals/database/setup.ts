@@ -7,9 +7,11 @@ import { DatabaseService } from '../../../src/peripherals/database/DatabaseServi
 
 export function setupDatabaseTestSuite() {
   const config = getConfig('test')
-  const knex = DatabaseService.createKnexInstance(config.databaseUrl)
+  const searchPath = ['public']
+  const knex = DatabaseService.createKnexInstance(config.databaseUrl, {
+    searchPath,
+  })
   const skip = config.databaseUrl === __SKIP_DB_TESTS__
-  let schemaName = ''
 
   before(async function () {
     if (skip) {
@@ -18,17 +20,15 @@ export function setupDatabaseTestSuite() {
       try {
         // For describe("one", () => describe("two") => {}) test suite we set up
         // 'test_one_two' schema before running tests.
-
-        const titlePath = this.test?.parent?.titlePath()
-        schemaName = snakeCase(`test_${titlePath?.join('_') || uuid()}`)
-
-        console.log('    > Creating test schema', schemaName)
+        const titlePath = this.test?.parent?.titlePath()?.join('_')
+        const schemaName = snakeCase(`test_${titlePath || uuid()}`)
+        searchPath[0] = schemaName
 
         // We drop before instead of after tests, so we can inspect the
         // contents of database when tests fail.
-        await knex.raw(`DROP SCHEMA IF EXISTS ?? CASCADE`, schemaName)
-        await knex.raw(`CREATE SCHEMA ??`, schemaName)
-        await knex.raw(`SET SCHEMA '${schemaName}'`)
+        await knex.schema.dropSchemaIfExists(schemaName, true)
+        await knex.schema.createSchema(schemaName)
+        console.log('    > Creating test schema', schemaName)
 
         await knex.migrate.latest({ schemaName })
       } catch (err) {
@@ -55,9 +55,10 @@ async function printTables(knex: Knex) {
 
 function snakeCase(str: string) {
   return str
+    .replace(/[^\w\s]/g, '')
     .replace(/([A-Z])/g, ' $1')
-    .split(' ')
-    .join('_')
+    .trim()
+    .replace(/\s/g, '_')
+    .replace(/_+/g, '_')
     .toLowerCase()
-    .replace(/[^\w]/g, '')
 }
