@@ -38,6 +38,14 @@ export class FactToPageRepository implements Repository<FactToPageRecord> {
     await this.knex('fact_to_pages').delete()
     this.logger.debug({ method: 'deleteAll' })
   }
+
+  async deleteAllAfter(blockNumber: number) {
+    const rowsCount = await this.knex('fact_to_pages')
+      .where('block_number', '>', blockNumber)
+      .delete()
+
+    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
+  }
 }
 
 function toRow(record: FactToPageRecord): FactToPageRow {
