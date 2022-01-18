@@ -16,6 +16,7 @@ describe.only(KeyValueStore.name, () => {
     kvStore.set('key', 'value')
     const actual = await kvStore.get('key')
     expect(actual).toEqual('value')
+    await kvStore.delete('key')
   })
 
   it('reads and removes all values', async () => {

@@ -7,30 +7,28 @@ import { DatabaseService } from '../../../src/peripherals/database/DatabaseServi
 
 export function setupDatabaseTestSuite() {
   const config = getConfig('test')
+  const searchPath = ['public']
+  const knex = DatabaseService.createKnexInstance(config.databaseUrl, {
+    searchPath,
+  })
   const skip = config.databaseUrl === __SKIP_DB_TESTS__
-  let schemaName = ''
-  let knex: Knex<any, unknown[]> = undefined as any;
 
   before(async function () {
     if (skip) {
       this.skip()
     } else {
       try {
-        knex = DatabaseService.createKnexInstance(config.databaseUrl)
-
         // For describe("one", () => describe("two") => {}) test suite we set up
         // 'test_one_two' schema before running tests.
-
-        const titlePath = this.test?.parent?.titlePath()
-        schemaName = `test_${titlePath?.join('_') || uuid()}`
-
-        log('Creating test schema', schemaName)
+        const titlePath = this.test?.parent?.titlePath()?.join('_')
+        const schemaName = snakeCase(`test_${titlePath || uuid()}`)
+        searchPath[0] = schemaName
 
         // We drop before instead of after tests, so we can inspect the
         // contents of database when tests fail.
-        await knex.raw(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)
-        await knex.raw(`CREATE SCHEMA "${schemaName}"`)
-        await knex.raw(`SET SCHEMA '${schemaName}'`)
+        await knex.schema.dropSchemaIfExists(schemaName, true)
+        await knex.schema.createSchema(schemaName)
+        console.log('    > Creating test schema', schemaName)
 
         await knex.migrate.latest({ schemaName })
       } catch (err) {
@@ -48,13 +46,19 @@ export function setupDatabaseTestSuite() {
   return { knex }
 }
 
-function log(...args: unknown[]) {
-  console.log('    >', ...args)
-}
-
 async function printTables(knex: Knex) {
   const tables = await knex.raw(
     'SELECT table_name, current_schema(), current_database() FROM information_schema.tables WHERE table_schema = current_schema()'
   )
   console.log('tables:', tables.rows)
+}
+
+function snakeCase(str: string) {
+  return str
+    .replace(/[^\w\s]/g, '')
+    .replace(/([A-Z])/g, ' $1')
+    .trim()
+    .replace(/\s/g, '_')
+    .replace(/_+/g, '_')
+    .toLowerCase()
 }
