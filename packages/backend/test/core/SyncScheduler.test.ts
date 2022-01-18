@@ -10,12 +10,13 @@ import { mock } from '../mock'
 
 describe(SyncScheduler.name, () => {
   it('syncs in batches', async () => {
+    const lastBlockNumberSynced = 1
     const {
       statusRepository,
       safeBlockService,
       dataSyncService,
       safeBlockListener,
-    } = setupMocks({ lastBlockNumberSynced: 1 })
+    } = setupMocks({ lastBlockNumberSynced })
 
     const batchSize = 3
     const syncScheduler = new SyncScheduler(
@@ -28,7 +29,7 @@ describe(SyncScheduler.name, () => {
 
     await syncScheduler.start()
 
-    expect(dataSyncService.revert).toHaveBeenCalledWith([])
+    expect(dataSyncService.revert).toHaveBeenCalledWith([lastBlockNumberSynced])
 
     safeBlockListener({ blockNumber: 10, timestamp: 0 })
 
@@ -59,7 +60,7 @@ describe(SyncScheduler.name, () => {
     )
 
     await syncScheduler.start()
-    expect(dataSyncService.revert).toHaveBeenCalledWith([])
+    expect(dataSyncService.revert).toHaveBeenCalledWith([0])
 
     safeBlockListener({ blockNumber: 8, timestamp: 0 })
     safeBlockListener({ blockNumber: 9, timestamp: 0 })

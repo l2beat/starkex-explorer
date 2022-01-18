@@ -34,7 +34,7 @@ describe('EthereumAddress', () => {
     const address = EthereumAddress(
       '0xabcdabcd12345678abcdabcd12345678abcdabcd'
     )
-    expect(address).to.eq(
+    expect(address).toEqual(
       '0xAbCdABCd12345678abcDabCd12345678ABcdaBcd' as unknown as EthereumAddress
     )
   })

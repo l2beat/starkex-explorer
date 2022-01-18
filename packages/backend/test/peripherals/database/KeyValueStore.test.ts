@@ -25,12 +25,11 @@ describe(KeyValueStore.name, () => {
     await kvStore.set('3', 'three')
 
     let actual = await kvStore.getAll()
-    expect(actual).toEqual(
-      expect.arrayWith(
-        { key: '1', value: 'one' },
-        { key: '2', value: 'two' },
-        { key: '3', value: 'three' }
-      )
+    expect(actual).toBeAnArrayOfLength(3)
+    expect(actual).toBeAnArrayWith(
+      { key: '1', value: 'one' },
+      { key: '2', value: 'two' },
+      { key: '3', value: 'three' }
     )
 
     await kvStore.deleteAll()
