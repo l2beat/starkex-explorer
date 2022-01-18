@@ -5,21 +5,10 @@ import { getConfig } from '../../../src/config'
 import { __SKIP_DB_TESTS__ } from '../../../src/config/config.testing'
 import { DatabaseService } from '../../../src/peripherals/database/DatabaseService'
 import { Logger } from '../../../src/tools/Logger'
+import { setupDatabaseTestSuite } from './setup'
 
 describe('DatabaseService', () => {
-  const config = getConfig('test')
-  let knex: Knex
-  const skip = config.databaseUrl === __SKIP_DB_TESTS__
-
-  before(async function () {
-    if (skip) {
-      this.skip()
-    }
-
-    knex = DatabaseService.createKnexInstance(config.databaseUrl)
-    await knex.schema.createSchema('test_DatabaseService')
-    await knex.raw("SET SCHEMA 'test_DatabaseService'")
-  })
+  const { knex } = setupDatabaseTestSuite()
 
   it('can run and rollback all migrations', async () => {
     const databaseService = new DatabaseService(knex, Logger.SILENT)
@@ -34,10 +23,5 @@ describe('DatabaseService', () => {
     expect(tables).toEqual(
       expect.arrayWith('knex_migrations', 'knex_migrations_lock')
     )
-  })
-
-  after(async function () {
-    await knex.schema.dropSchema('test_DatabaseService', true)
-    await knex.destroy()
   })
 })
