@@ -8,7 +8,7 @@ export interface PageRecord {
   id?: number
   blockNumber: number
   pageHash: string
-  page: string[]
+  page: string
 }
 
 export class PageRepository implements Repository<PageRecord> {
