@@ -1,3 +1,5 @@
+import type { Knex } from 'knex'
+
 import { getConfig } from '../../../src/config'
 import { __SKIP_DB_TESTS__ } from '../../../src/config/config.testing'
 import { DatabaseService } from '../../../src/peripherals/database/DatabaseService'
@@ -11,7 +13,13 @@ export function setupDatabaseTestSuite() {
     if (skip) {
       this.skip()
     } else {
-      await knex.migrate.latest()
+      try {
+        await knex.migrate.latest()
+      } catch (err) {
+        console.error('database test suite setup failed')
+        await printTables(knex)
+        throw err
+      }
     }
   })
 
@@ -20,4 +28,11 @@ export function setupDatabaseTestSuite() {
   })
 
   return { knex }
+}
+
+async function printTables(knex: Knex) {
+  const tables = await knex.raw(
+    'SELECT table_name, current_schema(), current_database() FROM information_schema.tables WHERE table_schema = current_schema()'
+  )
+  console.log('tables:', tables.rows)
 }
