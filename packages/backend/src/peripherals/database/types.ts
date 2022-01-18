@@ -41,8 +41,7 @@ declare module 'knex/types/tables' {
     id?: number
     block_number: number
     page_hash: string
-    /** raw page data */
-    page: string[]
+    page: string
   }
 
   interface Tables {
