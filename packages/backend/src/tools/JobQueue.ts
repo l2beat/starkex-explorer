@@ -18,7 +18,9 @@ export class JobQueue {
   private inProgress: JobInQueue[] = []
   private lastUpdatedAt = new Date().toISOString()
 
-  constructor(private options: JobQueueOptions, private logger: Logger) {}
+  constructor(private options: JobQueueOptions, private logger: Logger) {
+    this.logger = logger.for(this)
+  }
 
   add(job: Job) {
     this.queue.push({ ...job, failureCount: 0 })
@@ -57,7 +59,7 @@ export class JobQueue {
       await job.execute()
       this.inProgress.splice(this.inProgress.indexOf(job), 1)
     } catch (error) {
-      this.logger.error(error)
+      this.logger.error(`Job "${job.name}" failed with:`, error)
       this.inProgress.splice(this.inProgress.indexOf(job), 1)
       this.queue.unshift({ ...job, failureCount: job.failureCount + 1 })
     } finally {

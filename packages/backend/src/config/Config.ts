@@ -14,5 +14,6 @@ export interface Config {
       refreshIntervalMs: number
       blockOffset: number
     }
+    syncBatchSize: number
   }
 }

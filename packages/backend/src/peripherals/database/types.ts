@@ -19,14 +19,27 @@ declare module 'knex/types/tables' {
     value: string
   }
 
+  interface VerifierEventRow {
+    /**
+     * surrogate key
+     */
+    id?: number
+    implementation: string
+    block_number: number
+    name: 'ImplementationAdded' | 'Upgraded'
+    initializer?: string
+  }
+
   interface Tables {
     position_updates: PositionUpdateRow
     key_values: KeyValueRow
+    verifier_events: VerifierEventRow
   }
 }
 
 export interface Repository<TRecord> {
-  addOrUpdate(records: TRecord[]): Promise<void>
+  addOrUpdate?(records: TRecord[]): Promise<void>
+  add?(records: TRecord[]): Promise<void>
   getAll(): Promise<TRecord[]>
   deleteAll(): Promise<void>
 }

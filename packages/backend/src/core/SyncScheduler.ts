@@ -6,16 +6,13 @@ import { Logger } from '../tools/Logger'
 import { DataSyncService } from './DataSyncService'
 import { SafeBlockService } from './SafeBlockService'
 
-/** max synced blockRange length */
-const BATCH_SIZE = 500
-
 export class SyncScheduler {
   constructor(
     private readonly statusRepository: SyncStatusRepository,
     private readonly safeBlockService: SafeBlockService,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
-    private readonly batchSize = BATCH_SIZE
+    private readonly batchSize: number
   ) {
     this.logger = logger.for(this)
   }
@@ -30,7 +27,7 @@ export class SyncScheduler {
 
     this.logger.info('Last block number synced', { last })
 
-    await this.dataSyncService.revert()
+    await this.dataSyncService.revert(last)
 
     this.safeBlockService.onNewSafeBlock(({ blockNumber }) => {
       if (blockNumber > last) {
@@ -64,8 +61,13 @@ export class SyncScheduler {
   }
 
   private async sync(blockRange: BlockRange) {
-    this.logger.info({ method: 'sync', blockRange })
-    await this.dataSyncService.sync(blockRange)
-    await this.statusRepository.setLastBlockNumberSynced(blockRange.to)
+    try {
+      this.logger.info({ method: 'sync', blockRange })
+      await this.dataSyncService.sync(blockRange)
+      await this.statusRepository.setLastBlockNumberSynced(blockRange.to)
+    } catch (err) {
+      this.dataSyncService.revert(blockRange.from)
+      throw err
+    }
   }
 }
