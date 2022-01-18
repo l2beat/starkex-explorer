@@ -15,21 +15,27 @@ export function setupDatabaseTestSuite() {
     if (skip) {
       this.skip()
     } else {
-      // For describe("one", () => describe("two") => {}) test suite we set up
-      // 'test_one_two' schema before running tests.
+      try {
+        // For describe("one", () => describe("two") => {}) test suite we set up
+        // 'test_one_two' schema before running tests.
 
-      const titlePath = this.test?.parent?.titlePath()
-      schemaName = `test_${titlePath?.join('_') || uuid()}`
+        const titlePath = this.test?.parent?.titlePath()
+        schemaName = `test_${titlePath?.join('_') || uuid()}`
 
-      log('Creating test schema', schemaName)
+        log('Creating test schema', schemaName)
 
-      // We drop before instead of after tests, so we can inspect the
-      // contents of database when tests fail.
-      await knex.raw(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)
-      await knex.raw(`CREATE SCHEMA "${schemaName}"`)
-      await knex.raw(`SET SCHEMA '${schemaName}'`)
+        // We drop before instead of after tests, so we can inspect the
+        // contents of database when tests fail.
+        await knex.raw(`DROP SCHEMA IF EXISTS "${schemaName}" CASCADE`)
+        await knex.raw(`CREATE SCHEMA "${schemaName}"`)
+        await knex.raw(`SET SCHEMA '${schemaName}'`)
 
-      await knex.migrate.latest({ schemaName })
+        await knex.migrate.latest({ schemaName })
+      } catch (err) {
+        console.error('database test suite setup failed')
+        await printTables(knex)
+        throw err
+      }
     }
   })
 
