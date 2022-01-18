@@ -23,11 +23,7 @@ export class FactToPageRepository implements Repository<FactToPageRecord> {
     }
 
     const rows: FactToPageRow[] = records.map(toRow)
-    const primaryKey: keyof FactToPageRow = 'id'
-    await this.knex('fact_to_pages')
-      .insert(rows)
-      .onConflict([primaryKey])
-      .merge()
+    await this.knex('fact_to_pages').insert(rows)
 
     this.logger.debug({ method: 'addOrUpdate', rows: rows.length })
   }
