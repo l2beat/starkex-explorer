@@ -25,7 +25,7 @@ export class PageRepository implements Repository<PageRecord> {
     const rows: PageRow[] = records.map(toRow)
     await this.knex('pages').insert(rows)
 
-    this.logger.debug({ method: 'addOrUpdate', rows: rows.length })
+    this.logger.debug({ method: 'add', rows: rows.length })
   }
 
   async getAll() {
