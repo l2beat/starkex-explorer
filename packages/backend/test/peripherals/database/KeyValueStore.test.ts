@@ -16,21 +16,22 @@ describe(KeyValueStore.name, () => {
     kvStore.set('key', 'value')
     const actual = await kvStore.get('key')
     expect(actual).toEqual('value')
+    await kvStore.delete('key')
   })
 
   it('reads and removes all values', async () => {
-    await Promise.all([
-      kvStore.set('1', 'one'),
-      kvStore.set('2', 'two'),
-      kvStore.set('3', 'three'),
-    ])
+    await kvStore.set('1', 'one')
+    await kvStore.set('2', 'two')
+    await kvStore.set('3', 'three')
 
     let actual = await kvStore.getAll()
-    expect(actual).toEqual([
-      { key: '1', value: 'one' },
-      { key: '2', value: 'two' },
-      { key: '3', value: 'three' },
-    ])
+    expect(actual).toEqual(
+      expect.arrayWith(
+        { key: '1', value: 'one' },
+        { key: '2', value: 'two' },
+        { key: '3', value: 'three' }
+      )
+    )
 
     await kvStore.deleteAll()
     actual = await kvStore.getAll()

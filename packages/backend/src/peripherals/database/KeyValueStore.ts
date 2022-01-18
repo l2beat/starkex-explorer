@@ -25,11 +25,17 @@ export class KeyValueStore<K extends string>
 
   async set(key: K, value: string): Promise<void> {
     const primaryKey: keyof KeyValueRow = 'key'
-    await this.knex('key_values')
+    const res: unknown = await this.knex('key_values')
       .insert({ key, value })
       .onConflict([primaryKey])
       .merge()
-    this.logger.debug({ method: 'set', key, value })
+
+    this.logger.debug({
+      method: 'set',
+      key,
+      value,
+      rowCount: (res as { rowCount: number }).rowCount,
+    })
   }
 
   async getAll(): Promise<KeyValueRow[]> {
@@ -41,5 +47,9 @@ export class KeyValueStore<K extends string>
   async deleteAll(): Promise<void> {
     await this.knex('key_values').delete()
     this.logger.debug({ method: 'deleteAll' })
+  }
+
+  async delete(key: string): Promise<void> {
+    await this.knex('key_values').where({ key }).delete()
   }
 }
