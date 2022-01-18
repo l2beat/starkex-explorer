@@ -15,7 +15,7 @@
     "project": "./tsconfig.json",
     "sourceType": "module"
   },
-  "plugins": ["simple-import-sort"],
+  "plugins": ["simple-import-sort", "no-only-tests"],
   "rules": {
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-extra-semi": "off",
@@ -31,6 +31,7 @@
       { "devDependencies": false }
     ],
     "import/no-unresolved": ["error", { "ignore": ["^knex/types/tables$"] }],
+    "no-only-tests/no-only-tests": "error",
     "no-restricted-imports": [
       "error",
       { "paths": [".", "..", "../..", "../../.."] }
