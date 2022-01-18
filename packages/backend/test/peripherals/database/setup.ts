@@ -29,10 +29,6 @@ export function setupDatabaseTestSuite() {
       await knex.raw(`SET SCHEMA '${schemaName}'`)
 
       await knex.migrate.latest({ schemaName })
-      log(
-        'Migrated to version:',
-        await knex.migrate.currentVersion({ schemaName })
-      )
     }
   })
 
