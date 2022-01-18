@@ -20,7 +20,7 @@ export function setupDatabaseTestSuite() {
       const titlePath = this.test?.parent?.titlePath()
       schemaName = `test_${titlePath?.join('_') || uuid()}`
 
-      console.log('Creating test schema', schemaName)
+      log('Creating test schema', schemaName)
 
       // We drop before instead of after tests, so we can inspect the
       // contents of database when tests fail.
@@ -29,6 +29,10 @@ export function setupDatabaseTestSuite() {
       await knex.raw(`SET SCHEMA '${schemaName}'`)
 
       await knex.migrate.latest({ schemaName })
+      log(
+        'Migrated to version:',
+        await knex.migrate.currentVersion({ schemaName })
+      )
     }
   })
 
@@ -37,4 +41,8 @@ export function setupDatabaseTestSuite() {
   })
 
   return { knex }
+}
+
+function log(...args: unknown[]) {
+  console.log('    >', ...args)
 }
