@@ -1,3 +1,4 @@
+import { decodeOnChainData } from '@explorer/encoding'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
@@ -34,9 +35,11 @@ export class DataSyncService {
   }
 
   // Temporary
-  async getDecodedPages() {
+  async getOnChainData() {
     // blockRange?
     const pages = await this.pageRepository.getAllForFacts()
+
+    return decodeOnChainData(pages.map((p) => p.page))
   }
 
   async revert(blockNumber: BlockNumber) {

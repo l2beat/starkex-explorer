@@ -37,7 +37,7 @@ export class PageRepository implements Repository<PageRecord> {
   async getAllForFacts() {
     const rows = await this.knex('fact_to_pages')
       .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
-      .select('fact_hash', 'page_hash', 'page')
+      .select('fact_hash', 'pages.page_hash', 'page')
 
     this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
 

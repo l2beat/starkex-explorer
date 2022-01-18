@@ -105,6 +105,8 @@ export class Application {
       await syncScheduler.start()
 
       logger.for(this).info('Started')
+
+      console.log('>>', await dataSyncService.getOnChainData())
     }
 
     // #endregion start
