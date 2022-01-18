@@ -1,4 +1,4 @@
-import { expect } from 'chai'
+import { expect } from 'earljs'
 
 import { partition } from '../../src/tools/partition'
 
@@ -9,8 +9,8 @@ describe(partition.name, () => {
       (x) => x % 2 === 0
     )
 
-    expect(evens).to.deep.eq([0, 2, 4, 6, 8])
-    expect(odds).to.deep.eq([1, 3, 5, 7, 9])
+    expect(evens).toEqual([0, 2, 4, 6, 8])
+    expect(odds).toEqual([1, 3, 5, 7, 9])
   })
 
   it('partitions an array of union types given type predicate', () => {
@@ -21,7 +21,7 @@ describe(partition.name, () => {
 
     const [as, bs] = partition(xs, (x): x is A => 'a' in x)
 
-    expect(as.map((a) => a.a)).to.deep.eq([1, 3])
-    expect(bs.map((b) => b.b)).to.deep.eq([2, 4])
+    expect(as.map((a) => a.a)).toEqual([1, 3])
+    expect(bs.map((b) => b.b)).toEqual([2, 4])
   })
 })
