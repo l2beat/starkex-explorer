@@ -2,7 +2,6 @@ import { utils } from 'ethers'
 
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockRange } from '../peripherals/ethereum/types'
-import { getBatches } from '../tools/getBatches'
 
 const REGISTRY_ABI = new utils.Interface([
   'event LogMemoryPageFactContinuous(bytes32 factHash, uint256 memoryHash, uint256 prod)',
@@ -17,7 +16,12 @@ const GPS_VERIFIER_ABI = new utils.Interface([
 export class MemoryEventCollector {
   constructor(private readonly ethereumClient: EthereumClient) {}
 
-  async collectMemoryPageEvents(
+  async collectMemoryHashEvents(blockRange: BlockRange, verifierAddress: string) {
+    const hashEvents = await this.getMemoryHashEvents(blockRange, verifierAddress)
+    // thsi.repo.saveMemoryHashEvents(hashEvents)
+  }
+
+  async getMemoryPageEvents(
     blockRange: BlockRange
   ): Promise<MemoryPageEvent[]> {
     const res: MemoryPageEvent[] = []
@@ -40,11 +44,10 @@ export class MemoryEventCollector {
 
     res.push(...events)
 
-    // await this.repo.saveToDb(res)
     return res
   }
 
-  private async collectMemoryHashEvents(
+  private async getMemoryHashEvents(
     blockRange: BlockRange,
     verifierAddress: string
   ): Promise<MemoryHashEvent[]> {
@@ -68,7 +71,6 @@ export class MemoryEventCollector {
 
     res.push(...events)
 
-    // await this.repo.saveToDb(res)
     return res
   }
 }
