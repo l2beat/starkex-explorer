@@ -16,7 +16,7 @@ export class PageRepository implements Repository<PageRecord> {
     this.logger = logger.for(this)
   }
 
-  async addOrUpdate(records: PageRecord[]) {
+  async add(records: PageRecord[]) {
     if (records.length === 0) {
       this.logger.debug({ method: 'addOrUpdate', rows: 0 })
       return
