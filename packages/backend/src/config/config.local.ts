@@ -20,6 +20,7 @@ export function getLocalConfig(): Config {
         refreshIntervalMs: 1 * 60 * 1000,
         blockOffset: 100,
       },
+      syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
     },
   }
 }

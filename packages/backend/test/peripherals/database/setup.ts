@@ -1,4 +1,5 @@
 import { randomUUID as uuid } from 'crypto'
+import type { Knex } from 'knex'
 
 import { getConfig } from '../../../src/config'
 import { __SKIP_DB_TESTS__ } from '../../../src/config/config.testing'
@@ -14,21 +15,27 @@ export function setupDatabaseTestSuite() {
     if (skip) {
       this.skip()
     } else {
-      // For describe("one", () => describe("two") => {}) test suite we set up
-      // 'test_one_two' schema before running tests.
+      try {
+        // For describe("one", () => describe("two") => {}) test suite we set up
+        // 'test_one_two' schema before running tests.
 
-      const titlePath = this.test?.parent?.titlePath()
-      schemaName = `test_${titlePath?.join('_') || uuid()}`
+        const titlePath = this.test?.parent?.titlePath()
+        schemaName = `test_${titlePath?.join('_') || uuid()}`
 
-      console.log('    > Creating test schema', schemaName)
+        console.log('    > Creating test schema', schemaName)
 
-      // We drop before instead of after tests, so we can inspect the
-      // contents of database when tests fail.
-      await knex.raw(`DROP SCHEMA IF EXISTS ?? CASCADE`, schemaName)
-      await knex.raw(`CREATE SCHEMA ??`, schemaName)
-      await knex.raw(`SET SCHEMA '${schemaName}'`)
+        // We drop before instead of after tests, so we can inspect the
+        // contents of database when tests fail.
+        await knex.raw(`DROP SCHEMA IF EXISTS ?? CASCADE`, schemaName)
+        await knex.raw(`CREATE SCHEMA ??`, schemaName)
+        await knex.raw(`SET SCHEMA '${schemaName}'`)
 
-      await knex.migrate.latest({ schemaName })
+        await knex.migrate.latest({ schemaName })
+      } catch (err) {
+        console.error('database test suite setup failed')
+        await printTables(knex)
+        throw err
+      }
     }
   })
 
@@ -37,4 +44,11 @@ export function setupDatabaseTestSuite() {
   })
 
   return { knex }
+}
+
+async function printTables(knex: Knex) {
+  const tables = await knex.raw(
+    'SELECT table_name, current_schema(), current_database() FROM information_schema.tables WHERE table_schema = current_schema()'
+  )
+  console.log('tables:', tables.rows)
 }

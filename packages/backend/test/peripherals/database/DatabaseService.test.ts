@@ -12,7 +12,6 @@ describe('DatabaseService', () => {
 
     await databaseService.migrateToLatest()
     await databaseService.rollbackAll()
-
     const result = await knex.raw(
       'SELECT table_name FROM information_schema.tables WHERE table_schema = current_schema()'
     )

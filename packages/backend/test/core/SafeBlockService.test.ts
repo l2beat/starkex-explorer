@@ -1,9 +1,9 @@
 import FakeTimers from '@sinonjs/fake-timers'
 import { expect } from 'earljs'
+import { providers } from 'ethers'
 
 import { SafeBlock, SafeBlockService } from '../../src/core/SafeBlockService'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { Block } from '../../src/peripherals/ethereum/types'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
@@ -17,7 +17,7 @@ describe('SafeBlockService', () => {
         expect(blockNumber).toEqual(456)
         return {
           timestamp: 1234,
-        } as Block
+        } as providers.Block
       },
     })
     const service = new SafeBlockService(
@@ -54,7 +54,7 @@ describe('SafeBlockService', () => {
       async getBlock(blockNumber) {
         return {
           timestamp: Number((blockNumber as number) * 2),
-        } as Block
+        } as providers.Block
       },
     })
     const service = new SafeBlockService(

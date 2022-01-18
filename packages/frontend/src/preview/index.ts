@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import Router from '@koa/router'
 import Koa from 'koa'
 import serve from 'koa-static'
