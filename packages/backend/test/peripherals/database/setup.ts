@@ -1,5 +1,6 @@
 import { randomUUID as uuid } from 'crypto'
 import type { Knex } from 'knex'
+import { snakeCase } from 'lodash'
 
 import { getConfig } from '../../../src/config'
 import { __SKIP_DB_TESTS__ } from '../../../src/config/config.testing'
@@ -51,14 +52,4 @@ async function printTables(knex: Knex) {
     'SELECT table_name, current_schema(), current_database() FROM information_schema.tables WHERE table_schema = current_schema()'
   )
   console.log('tables:', tables.rows)
-}
-
-function snakeCase(str: string) {
-  return str
-    .replace(/[^\w\s]/g, '')
-    .replace(/([A-Z])/g, ' $1')
-    .trim()
-    .replace(/\s/g, '_')
-    .replace(/_+/g, '_')
-    .toLowerCase()
 }
