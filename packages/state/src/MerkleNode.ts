@@ -76,18 +76,20 @@ export class MerkleNode extends MerkleValue {
       (x) => x.index < center
     )
     const offset = height > 1n ? 2n ** (height - 2n) : 0n
-    const [newLeft, leftNodes] = await this.updateChild(
-      this.leftHashOrValue,
-      leftUpdates,
-      height > 1n ? center - offset : center - 1n,
-      height - 1n
-    )
-    const [newRight, rightNodes] = await this.updateChild(
-      this.rightHashOrValue,
-      rightUpdates,
-      center + offset,
-      height - 1n
-    )
+    const [[newLeft, leftNodes], [newRight, rightNodes]] = await Promise.all([
+      this.updateChild(
+        this.leftHashOrValue,
+        leftUpdates,
+        height > 1n ? center - offset : center - 1n,
+        height - 1n
+      ),
+      this.updateChild(
+        this.rightHashOrValue,
+        rightUpdates,
+        center + offset,
+        height - 1n
+      ),
+    ])
     const newNode = new MerkleNode(this.storage, newLeft, newRight)
     return [newNode, [...leftNodes, ...rightNodes, newNode]]
   }
