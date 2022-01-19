@@ -24,3 +24,6 @@ pids
 *.pid
 *.seed
 *.pid.lock
+
+# Test coverage
+.nyc_output
