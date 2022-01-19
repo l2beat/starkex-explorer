@@ -1,4 +1,5 @@
 import { pedersen, PedersenHash } from '@explorer/crypto'
+import { partition } from 'lodash'
 
 import { IMerkleStorage } from './IMerkleStorage'
 import { MerkleUpdate } from './MerkleUpdate'
@@ -70,8 +71,10 @@ export class MerkleNode extends MerkleValue {
     center: bigint,
     height: bigint
   ): Promise<[MerkleNode, MerkleValue[]]> {
-    const leftUpdates = updates.filter((x) => x.index < center)
-    const rightUpdates = updates.filter((x) => x.index >= center)
+    const [leftUpdates, rightUpdates] = partition(
+      updates,
+      (x) => x.index < center
+    )
     const offset = height > 1n ? 2n ** (height - 2n) : 0n
     const [newLeft, leftNodes] = await this.updateChild(
       this.leftHashOrValue,
