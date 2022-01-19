@@ -27,7 +27,7 @@ export class Application {
     // #endregion tools
     // #region peripherals
 
-    const knex = DatabaseService.createKnexInstance(config.databaseUrl)
+    const knex = DatabaseService.createKnexInstance(config.databaseConnection)
     const databaseService = new DatabaseService(knex, logger)
 
     const kvStore = new KeyValueStore(knex, logger)
