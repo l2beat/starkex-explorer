@@ -36,12 +36,12 @@ export class PageCollector {
             tx.data
           )
 
-          const page = (decoded[1] as BigNumber[])
+          const data = (decoded[1] as BigNumber[])
             .map((x) => x.toHexString().substring(2).padStart(64, '0'))
             .join('')
 
           return {
-            page,
+            data,
             pageHash: memoryHash, // @todo is this correct?
             blockNumber: tx.blockNumber ?? blockRange.from,
           }

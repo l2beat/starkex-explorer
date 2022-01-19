@@ -14,14 +14,13 @@ should create a new migration file that fixes the issue.
 import { Knex } from 'knex'
 
 export async function up(knex: Knex) {
-  await knex.schema.createTable('pages', (table) => {
+  await knex.schema.createTable('state_transition_facts', (table) => {
     table.increments('id').primary()
     table.integer('block_number').notNullable()
-    table.string('page_hash').notNullable().index()
-    table.text('data').notNullable()
+    table.string('hash').notNullable().index()
   })
 }
 
 export async function down(knex: Knex) {
-  await knex.schema.dropTable('pages')
+  await knex.schema.dropTable('state_transition_facts')
 }

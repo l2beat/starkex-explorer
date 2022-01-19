@@ -19,6 +19,7 @@ export async function up(knex: Knex) {
     table.integer('block_number').notNullable()
     table.string('fact_hash').notNullable()
     table.string('page_hash').notNullable().index()
+    table.integer('index').notNullable()
   })
 }
 

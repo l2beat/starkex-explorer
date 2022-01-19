@@ -35,7 +35,7 @@ export class DataSyncService {
 
     // dla faktów w tym block range (LogStateTransitionFact)
     //
-    // const pageHashesInOrder = facts
+    // const pageHashesInOrder = factsInOrder
     // .flatMap(
     //   (fact) =>
     //     memoryHashEvents.find((x) => x.factHash === fact)?.pagesHashes ?? []

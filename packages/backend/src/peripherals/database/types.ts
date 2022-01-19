@@ -42,7 +42,14 @@ declare module 'knex/types/tables' {
     id?: number
     block_number: number
     page_hash: string
-    page: string
+    data: string
+  }
+
+  interface StateTransitionFactRow {
+    /** surrogate key */
+    id?: number
+    block_number: number
+    hash: string
   }
 
   interface Tables {
@@ -51,6 +58,7 @@ declare module 'knex/types/tables' {
     verifier_events: VerifierEventRow
     fact_to_pages: FactToPageRow
     pages: PageRow
+    state_transition_facts: StateTransitionFactRow
   }
 }
 

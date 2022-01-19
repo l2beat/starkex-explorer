@@ -8,7 +8,7 @@ export interface PageRecord {
   id?: number
   blockNumber: number
   pageHash: string
-  page: string
+  data: string
 }
 
 export class PageRepository implements Repository<PageRecord> {
@@ -35,18 +35,27 @@ export class PageRepository implements Repository<PageRecord> {
   }
 
   async getAllForFacts(factHashes: string[]) {
-    const rows = await this.knex('fact_to_pages')
+    type Row = { fact_hash: string; page_hash: string; data: string }
+
+    const rows = (await this.knex('fact_to_pages')
+      .select('fact_hash', 'data', 'index', 'pages.page_hash' as 'page_hash')
       .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
-      .select('fact_hash', 'pages.page_hash', 'page')
       .whereIn('fact_hash', factHashes)
-      .orderBy('fact_to_pages.index')
+      .join(
+        this.knex.raw(
+          'unnest(?::varchar[]) WITH ORDINALITY t(fact_hash, ord) USING (fact_hash)',
+          [factHashes]
+        )
+      )
+      .orderBy('t.ord')
+      .orderBy('index')) as Row[]
 
     this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
 
     return rows.map((row) => ({
       factHash: row.fact_hash,
       pageHash: row.page_hash,
-      page: row.page,
+      data: row.data,
     }))
   }
 
@@ -69,7 +78,7 @@ function toRow(record: PageRecord): PageRow {
     id: record.id,
     block_number: record.blockNumber,
     page_hash: record.pageHash,
-    page: record.page,
+    data: record.data,
   }
 }
 
@@ -78,6 +87,6 @@ function toRecord(row: PageRow): PageRecord {
     id: row.id,
     blockNumber: row.block_number,
     pageHash: row.page_hash,
-    page: row.page,
+    data: row.data,
   }
 }

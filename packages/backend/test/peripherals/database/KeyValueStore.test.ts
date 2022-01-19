@@ -5,7 +5,7 @@ import { KeyValueStore } from '../../../src/peripherals/database/KeyValueStore'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
-describe.only(KeyValueStore.name, () => {
+describe(KeyValueStore.name, () => {
   const { knex } = setupDatabaseTestSuite()
   type TestKey = '1' | '2' | '3' | 'key'
   const kvStore = new KeyValueStore<TestKey>(knex, Logger.SILENT)
