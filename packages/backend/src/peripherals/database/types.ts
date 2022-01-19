@@ -34,6 +34,7 @@ declare module 'knex/types/tables' {
     block_number: number
     fact_hash: string
     page_hash: string
+    index: number
   }
 
   interface PageRow {

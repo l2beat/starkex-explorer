@@ -33,7 +33,8 @@ export class MemoryHashEventCollector {
 
         await this.factToPageRepository.add(
           hashEvents.flatMap((event) =>
-            event.pagesHashes.map((pageHash) => ({
+            event.pagesHashes.map((pageHash, index) => ({
+              index,
               pageHash,
               factHash: event.factHash,
               blockNumber: event.blockNumber,
@@ -56,8 +57,6 @@ export class MemoryHashEventCollector {
     blockRange: BlockRange,
     verifierAddress: EthereumAddress
   ): Promise<MemoryHashEvent[]> {
-    const res: MemoryHashEvent[] = []
-
     const logs = await this.ethereumClient.getLogs({
       address: verifierAddress.toString(),
       fromBlock: blockRange.from,
@@ -65,7 +64,7 @@ export class MemoryHashEventCollector {
       topics: [GPS_VERIFIER_ABI.getEventTopic('LogMemoryPagesHashes')],
     })
 
-    const events = logs.map((log): MemoryHashEvent => {
+    return logs.map((log): MemoryHashEvent => {
       const event = GPS_VERIFIER_ABI.parseLog(log)
 
       return {
@@ -74,10 +73,6 @@ export class MemoryHashEventCollector {
         pagesHashes: event.args.pagesHashes,
       }
     })
-
-    res.push(...events)
-
-    return res
   }
 }
 

@@ -9,6 +9,7 @@ export interface FactToPageRecord {
   blockNumber: number
   factHash: string
   pageHash: string
+  index: number
 }
 
 export class FactToPageRepository implements Repository<FactToPageRecord> {
@@ -54,6 +55,7 @@ function toRow(record: FactToPageRecord): FactToPageRow {
     block_number: record.blockNumber,
     fact_hash: record.factHash,
     page_hash: record.pageHash,
+    index: record.index,
   }
 }
 
@@ -63,5 +65,6 @@ function toRecord(row: FactToPageRow): FactToPageRecord {
     blockNumber: row.block_number,
     factHash: row.fact_hash,
     pageHash: row.page_hash,
+    index: row.index,
   }
 }

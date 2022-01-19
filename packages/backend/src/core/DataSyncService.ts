@@ -32,6 +32,17 @@ export class DataSyncService {
       newHashEventsCount: hashEvents.length,
       newPageRecords: pageRecords.length,
     })
+
+    // dla faktów w tym block range (LogStateTransitionFact)
+    //
+    // const pageHashesInOrder = facts
+    // .flatMap(
+    //   (fact) =>
+    //     memoryHashEvents.find((x) => x.factHash === fact)?.pagesHashes ?? []
+    // )
+    //
+    // zapisz fakty
+    // docelowo wywołać funkcję zmiany stanu
   }
 
   // Temporary

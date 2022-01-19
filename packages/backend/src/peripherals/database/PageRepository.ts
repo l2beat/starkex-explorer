@@ -39,6 +39,7 @@ export class PageRepository implements Repository<PageRecord> {
       .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
       .select('fact_hash', 'pages.page_hash', 'page')
       .whereIn('fact_hash', factHashes)
+      .orderBy('fact_to_pages.index')
 
     this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
 
