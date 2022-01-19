@@ -15,7 +15,9 @@
   },
   "dependencies": {
     "@explorer/crypto": "*",
-    "@explorer/encoding": "*"
+    "@explorer/encoding": "*",
+    "@types/lodash": "^4.14.178",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {}
 }
