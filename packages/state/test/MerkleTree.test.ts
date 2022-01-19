@@ -39,23 +39,67 @@ describe(MerkleTree.name, () => {
     })
   })
 
-  describe(MerkleTree.prototype.get.name, () => {
-    it('returns the node at a specified index', async () => {
+  describe(MerkleTree.prototype.getLeaf.name, () => {
+    it('returns the leaf at a specified index', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
-      expect(await tree.get(2n)).toEqual(PositionState.EMPTY)
+      expect(await tree.getLeaf(2n)).toEqual(PositionState.EMPTY)
     })
 
     it('throws for negative indices', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
-      await expect(tree.get(-1n)).toBeRejected(TypeError, 'Index out of bounds')
+      await expect(tree.getLeaf(-1n)).toBeRejected(
+        TypeError,
+        'Index out of bounds'
+      )
     })
 
     it('throws for too large indices', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
-      await expect(tree.get(8n)).toBeRejected(TypeError, 'Index out of bounds')
+      await expect(tree.getLeaf(8n)).toBeRejected(
+        TypeError,
+        'Index out of bounds'
+      )
+    })
+  })
+
+  describe(MerkleTree.prototype.getLeaves.name, () => {
+    it('returns multiple leaves', async () => {
+      const positionA = new PositionState('0xdead1234', 420n, [])
+      const positionB = new PositionState('0xbeef5678', 69n, [])
+
+      const storage = new InMemoryMerkleStorage()
+      const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
+      await tree.update([
+        { index: 2n, value: positionA },
+        { index: 7n, value: positionB },
+      ])
+
+      expect(await tree.getLeaves([7n, 1n, 2n])).toEqual([
+        positionB,
+        PositionState.EMPTY,
+        positionA,
+      ])
+    })
+
+    it('throws for negative indices', async () => {
+      const storage = new InMemoryMerkleStorage()
+      const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
+      await expect(tree.getLeaf(-1n)).toBeRejected(
+        TypeError,
+        'Index out of bounds'
+      )
+    })
+
+    it('throws for too large indices', async () => {
+      const storage = new InMemoryMerkleStorage()
+      const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
+      await expect(tree.getLeaf(8n)).toBeRejected(
+        TypeError,
+        'Index out of bounds'
+      )
     })
   })
 
@@ -67,16 +111,17 @@ describe(MerkleTree.name, () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
 
-      expect(await tree.get(2n)).toEqual(PositionState.EMPTY)
-      expect(await tree.get(7n)).toEqual(PositionState.EMPTY)
+      expect(await tree.getLeaves([2n, 7n])).toEqual([
+        PositionState.EMPTY,
+        PositionState.EMPTY,
+      ])
 
       await tree.update([
         { index: 2n, value: positionA },
         { index: 7n, value: positionB },
       ])
 
-      expect(await tree.get(2n)).toEqual(positionA)
-      expect(await tree.get(7n)).toEqual(positionB)
+      expect(await tree.getLeaves([2n, 7n])).toEqual([positionA, positionB])
     })
 
     it('throws for negative indices', async () => {
@@ -119,12 +164,12 @@ describe(MerkleTree.name, () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionState.EMPTY)
 
-      expect(await tree.get(2n)).toEqual(PositionState.EMPTY)
+      expect(await tree.getLeaf(2n)).toEqual(PositionState.EMPTY)
       await tree.update([
         { index: 2n, value: positionA },
         { index: 2n, value: positionB },
       ])
-      expect(await tree.get(2n)).toEqual(positionB)
+      expect(await tree.getLeaf(2n)).toEqual(positionB)
     })
 
     it('empty update array leaves the hash unchanged', async () => {
@@ -223,7 +268,7 @@ describe(MerkleTree.name, () => {
       ])
 
       const recovered = new MerkleTree(storage, 3n, await tree.hash())
-      expect(await recovered.get(2n)).toEqual(positionA)
+      expect(await recovered.getLeaf(2n)).toEqual(positionA)
     })
 
     it('set hash changes the tree', async () => {
@@ -236,9 +281,9 @@ describe(MerkleTree.name, () => {
         { index: 7n, value: positionB },
       ])
 
-      expect(await treeB.get(2n)).toEqual(PositionState.EMPTY)
+      expect(await treeB.getLeaf(2n)).toEqual(PositionState.EMPTY)
       treeB.setHash(await treeA.hash())
-      expect(await treeB.get(2n)).toEqual(positionA)
+      expect(await treeB.getLeaf(2n)).toEqual(positionA)
     })
   })
 })

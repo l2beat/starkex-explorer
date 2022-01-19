@@ -42,25 +42,39 @@ export class MerkleNode extends MerkleValue {
     return this.rightHashOrValue
   }
 
-  async get(
-    index: bigint,
+  async getLeaves(
+    /** guaranteed to be sorted */
+    indices: bigint[],
     center: bigint,
     height: bigint
-  ): Promise<MerkleValue> {
-    const child = index < center ? await this.left() : await this.right()
-    if (height === 1n) {
+  ): Promise<MerkleValue[]> {
+    const [leftIndices, rightIndices] = partition(indices, (i) => i < center)
+    const [leftCenter, rightCenter] = this.getCenters(center, height)
+    const [leftLeaves, rightLeaves] = await Promise.all([
+      this.getChildLeaves('left', leftIndices, leftCenter, height - 1n),
+      this.getChildLeaves('right', rightIndices, rightCenter, height - 1n),
+    ])
+    return [...leftLeaves, ...rightLeaves]
+  }
+
+  async getChildLeaves(
+    direction: 'left' | 'right',
+    indices: bigint[],
+    center: bigint,
+    height: bigint
+  ): Promise<MerkleValue[]> {
+    if (indices.length === 0) {
+      return []
+    }
+    const child = direction === 'left' ? await this.left() : await this.right()
+    if (height === 0n) {
       if (child instanceof MerkleNode) {
         throw new Error('Tree structure corrupted')
       }
-      return child
+      return [child]
     }
-    const offset = height > 1n ? 2n ** (height - 2n) : index < center ? 1n : 0n
     if (child instanceof MerkleNode) {
-      return child.get(
-        index,
-        index < center ? center - offset : center + offset,
-        height - 1n
-      )
+      return child.getLeaves(indices, center, height)
     } else {
       throw new Error('Tree structure corrupted')
     }
@@ -75,18 +89,18 @@ export class MerkleNode extends MerkleValue {
       updates,
       (x) => x.index < center
     )
-    const offset = height > 1n ? 2n ** (height - 2n) : 0n
+    const [leftCenter, rightCenter] = this.getCenters(center, height)
     const [[newLeft, leftNodes], [newRight, rightNodes]] = await Promise.all([
       this.updateChild(
         this.leftHashOrValue,
         leftUpdates,
-        height > 1n ? center - offset : center - 1n,
+        leftCenter,
         height - 1n
       ),
       this.updateChild(
         this.rightHashOrValue,
         rightUpdates,
-        center + offset,
+        rightCenter,
         height - 1n
       ),
     ])
@@ -118,6 +132,12 @@ export class MerkleNode extends MerkleValue {
     } else {
       throw new Error('Tree structure corrupted')
     }
+  }
+
+  private getCenters(center: bigint, height: bigint): [bigint, bigint] {
+    const leftOffset = height > 1n ? 2n ** (height - 2n) : 1n
+    const rightOffset = height > 1n ? 2n ** (height - 2n) : 0n
+    return [center - leftOffset, center + rightOffset]
   }
 
   protected async calculateHash(): Promise<PedersenHash> {

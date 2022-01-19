@@ -66,16 +66,28 @@ export class MerkleTree {
     return current
   }
 
-  async get(index: bigint): Promise<MerkleValue> {
-    if (index < 0n || index > this.maxIndex) {
+  async getLeaf(index: bigint): Promise<MerkleValue> {
+    const leaves = await this.getLeaves([index])
+    return leaves[0]
+  }
+
+  async getLeaves(indices: bigint[]): Promise<MerkleValue[]> {
+    if (indices.some((i) => i < 0n || i > this.maxIndex)) {
       throw new TypeError('Index out of bounds')
     }
     const root = await this.root()
     if (root instanceof MerkleNode) {
       const center = 2n ** (this.height - 1n)
-      return root.get(index, center, this.height)
+      const sorted = [...indices].sort((a, b) => Number(a - b))
+      const leaves = await root.getLeaves(sorted, center, this.height)
+      const map = new Map<bigint, MerkleValue>()
+      for (let i = 0; i < sorted.length; i++) {
+        map.set(sorted[i], leaves[i])
+      }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return indices.map((x) => map.get(x)!)
     } else {
-      return root
+      return [root]
     }
   }
 
