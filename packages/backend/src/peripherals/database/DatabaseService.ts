@@ -13,7 +13,10 @@ export class DatabaseService {
     this.logger = this.logger.for(this)
   }
 
-  static createKnexInstance(databaseUrl: string, overrides?: Knex.Config) {
+  static createKnexInstance(
+    connection: string | Knex.StaticConnectionConfig,
+    overrides?: Knex.Config
+  ) {
     /**
      * node-postgres returns bigints as strings since 2013.
      * @see https://github.com/brianc/node-postgres/pull/353
@@ -24,7 +27,7 @@ export class DatabaseService {
 
     return KnexConstructor({
       client: 'pg',
-      connection: databaseUrl,
+      connection,
       migrations: {
         migrationSource: new PolyglotMigrationSource(
           path.join(__dirname, 'migrations')

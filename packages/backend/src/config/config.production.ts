@@ -10,7 +10,10 @@ export function getProductionConfig(): Config {
       format: 'json',
     },
     port: getEnv.integer('PORT'),
-    databaseUrl: getEnv('DATABASE_URL'),
+    databaseConnection: {
+      connectString: getEnv('DATABASE_URL'),
+      ssl: true,
+    },
     jsonRpcUrl: getEnv('JSON_RPC_URL'),
     core: {
       safeBlock: {
