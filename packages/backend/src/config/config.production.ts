@@ -11,7 +11,7 @@ export function getProductionConfig(): Config {
     },
     port: getEnv.integer('PORT'),
     databaseConnection: {
-      connectString: getEnv('DATABASE_URL'),
+      connectionString: getEnv('DATABASE_URL'),
       ssl: { rejectUnauthorized: false },
     },
     jsonRpcUrl: getEnv('JSON_RPC_URL'),
