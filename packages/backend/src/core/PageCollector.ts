@@ -23,7 +23,6 @@ export class PageCollector {
     private readonly pageRepository: PageRepository
   ) {}
 
-  // @todo Needs tests
   async collect(blockRange: BlockRange): Promise<PageRecord[]> {
     const memoryPageEvents = await this.getMemoryPageEvents(blockRange)
 
@@ -60,8 +59,6 @@ export class PageCollector {
   private async getMemoryPageEvents(
     blockRange: BlockRange
   ): Promise<MemoryPageEvent[]> {
-    const res: MemoryPageEvent[] = []
-
     const logs = await this.ethereumClient.getLogs({
       address: REGISTRY_ADDRESS,
       fromBlock: blockRange.from,
@@ -69,7 +66,7 @@ export class PageCollector {
       topics: [REGISTRY_ABI.getEventTopic('LogMemoryPageFactContinuous')],
     })
 
-    const events = logs
+    return logs
       .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
       .map(
         ({ log, event }): MemoryPageEvent => ({
@@ -77,10 +74,6 @@ export class PageCollector {
           transactionHash: log.transactionHash,
         })
       )
-
-    res.push(...events)
-
-    return res
   }
 }
 

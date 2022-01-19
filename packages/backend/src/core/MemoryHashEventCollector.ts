@@ -19,7 +19,6 @@ export class MemoryHashEventCollector {
     private readonly factToPageRepository: FactToPageRepository
   ) {}
 
-  // @todo needs tests
   async collect(
     blockRange: BlockRange,
     verifierAddresses: EthereumAddress[]

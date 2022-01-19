@@ -11,7 +11,6 @@ export class DataSyncService {
     private readonly verifierCollector: VerifierCollector,
     private readonly memoryHashEventCollector: MemoryHashEventCollector,
     private readonly pageCollector: PageCollector,
-    private readonly pageRepository: PageRepository,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -43,14 +42,6 @@ export class DataSyncService {
     //
     // zapisz fakty
     // docelowo wywołać funkcję zmiany stanu
-  }
-
-  // Temporary
-  async getOnChainData() {
-    // blockRange?
-    const pages = await this.pageRepository.getAllForFacts([])
-
-    return decodeOnChainData(pages.map((p) => p.page))
   }
 
   async revert(blockNumber: BlockNumber) {
