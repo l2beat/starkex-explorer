@@ -1,4 +1,6 @@
 import { BigNumber, utils } from 'ethers'
+import { writeFile } from 'fs/promises'
+import { resolve } from 'path'
 
 import {
   PageRecord,
@@ -13,9 +15,14 @@ const REGISTRY_ABI = new utils.Interface([
 
 const REGISTRY_ADDRESS = '0xEfbCcE4659db72eC6897F46783303708cf9ACef8'
 
-export const PAGE_ABI = new utils.Interface([
+const PAGE_ABI = new utils.Interface([
   'function registerContinuousMemoryPage(uint256 startAddr, uint256[] values, uint256 z, uint256 alpha, uint256 prime)',
 ])
+
+/** @internal exported only for tests */
+export const LOG_MEMORY_PAGE_FACT_CONTINUOUS = REGISTRY_ABI.getEventTopic(
+  'LogMemoryPageFactContinuous'
+)
 
 export class PageCollector {
   constructor(
@@ -30,6 +37,7 @@ export class PageCollector {
       memoryPageEvents.map(
         async ({ memoryHash, transactionHash }): Promise<PageRecord> => {
           const tx = await this.ethereumClient.getTransaction(transactionHash)
+
           const decoded = PAGE_ABI.decodeFunctionData(
             'registerContinuousMemoryPage',
             tx.data
@@ -53,7 +61,7 @@ export class PageCollector {
   }
 
   async discard({ from }: { from: BlockNumber }) {
-    await this.pageRepository.deleteAllAfter(from)
+    await this.pageRepository.deleteAllAfter(from - 1)
   }
 
   private async getMemoryPageEvents(
@@ -63,7 +71,7 @@ export class PageCollector {
       address: REGISTRY_ADDRESS,
       fromBlock: blockRange.from,
       toBlock: blockRange.to,
-      topics: [REGISTRY_ABI.getEventTopic('LogMemoryPageFactContinuous')],
+      topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
     })
 
     return logs
