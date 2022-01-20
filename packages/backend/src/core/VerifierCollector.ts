@@ -1,5 +1,6 @@
 import { utils } from 'ethers'
 import { AbiCoder } from 'ethers/lib/utils'
+import { partition } from 'lodash'
 
 import { EthereumAddress } from '../model'
 import {
@@ -10,7 +11,6 @@ import {
 } from '../peripherals/database/VerifierEventRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
-import { partition } from '../tools/partition'
 
 const PROXY_ADDRESS = '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'
 
