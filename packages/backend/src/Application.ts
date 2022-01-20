@@ -10,6 +10,7 @@ import { DataSyncService } from './core/DataSyncService'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
 import { PageCollector } from './core/PageCollector'
 import { SafeBlockService } from './core/SafeBlockService'
+import { StateTransitionFactCollector } from './core/StateTransitionFactCollector'
 import { StatusService } from './core/StatusService'
 import { SyncScheduler } from './core/SyncScheduler'
 import { VerifierCollector } from './core/VerifierCollector'
@@ -18,6 +19,7 @@ import { FactToPageRepository } from './peripherals/database/FactToPageRepositor
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
+import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
@@ -44,6 +46,10 @@ export class Application {
     const verifierEventRepository = new VerifierEventRepository(knex, logger)
     const factToPageRepository = new FactToPageRepository(knex, logger)
     const pageRepository = new PageRepository(knex, logger)
+    const stateTransitionFactRepository = new StateTransitionFactRepository(
+      knex,
+      logger
+    )
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
@@ -71,11 +77,17 @@ export class Application {
       factToPageRepository
     )
     const pageCollector = new PageCollector(ethereumClient, pageRepository)
+    const stateTransitionFactCollector = new StateTransitionFactCollector(
+      ethereumClient,
+      stateTransitionFactRepository
+    )
 
     const dataSyncService = new DataSyncService(
       verifierCollector,
       memoryHashEventCollector,
       pageCollector,
+      stateTransitionFactCollector,
+      pageRepository,
       logger
     )
     const syncScheduler = new SyncScheduler(
@@ -100,6 +112,7 @@ export class Application {
     this.start = async () => {
       logger.for(this).info('Starting')
 
+      await databaseService.rollbackAll() // @todo temporary for local development
       await databaseService.migrateToLatest()
 
       await apiServer.listen()

@@ -1,9 +1,11 @@
-import { decodeOnChainData } from '@explorer/encoding'
+import { decodeUpdates } from '@explorer/encoding/build/src/decodeUpdates'
+
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { MemoryHashEventCollector } from './MemoryHashEventCollector'
 import { PageCollector } from './PageCollector'
+import { StateTransitionFactCollector } from './StateTransitionFactCollector'
 import { VerifierCollector } from './VerifierCollector'
 
 export class DataSyncService {
@@ -11,6 +13,9 @@ export class DataSyncService {
     private readonly verifierCollector: VerifierCollector,
     private readonly memoryHashEventCollector: MemoryHashEventCollector,
     private readonly pageCollector: PageCollector,
+    private readonly stateTransitionFactCollector: StateTransitionFactCollector,
+    // @todo where to move this?
+    private readonly pageRepository: Pick<PageRepository, 'getAllForFacts'>,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -23,6 +28,8 @@ export class DataSyncService {
       verifiers
     )
     const pageRecords = await this.pageCollector.collect(blockRange)
+    const stateTransitionFacts =
+      await this.stateTransitionFactCollector.collect(blockRange)
 
     this.logger.info({
       method: 'sync',
@@ -30,18 +37,18 @@ export class DataSyncService {
       newVerifiers: verifiers.map(String),
       newHashEventsCount: hashEvents.length,
       newPageRecords: pageRecords.length,
+      newStateTransitionFacts: stateTransitionFacts.length,
     })
 
-    // dla faktów w tym block range (LogStateTransitionFact)
-    //
-    // const pageHashesInOrder = factsInOrder
-    // .flatMap(
-    //   (fact) =>
-    //     memoryHashEvents.find((x) => x.factHash === fact)?.pagesHashes ?? []
-    // )
-    //
-    // zapisz fakty
-    // docelowo wywołać funkcję zmiany stanu
+    const pages = await this.pageRepository.getAllForFacts(
+      stateTransitionFacts.map((f) => f.hash)
+    )
+
+    console.log('pages.length', pages.length)
+
+    // const decodedPages = decodeUpdates(pages.map((p) => p.data).join(''))
+
+    // console.log({ decodedPages })
   }
 
   async revert(blockNumber: BlockNumber) {
