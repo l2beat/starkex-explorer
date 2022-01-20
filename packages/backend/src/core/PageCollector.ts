@@ -1,6 +1,4 @@
 import { BigNumber, utils } from 'ethers'
-import { writeFile } from 'fs/promises'
-import { resolve } from 'path'
 
 import {
   PageRecord,

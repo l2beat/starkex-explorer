@@ -106,7 +106,7 @@ describe(PageRepository.name, () => {
       const actual = await repository.getAllForFacts(['fh2', 'fh1'])
 
       expect(format(actual)).toEqual([
-        'fh2 {{2-1}}{{2-2}}{{2-3}}{{2-5}}{{2-4}}',
+        'fh2 {{2-1}}{{2-2}}{{2-3}}{{2-4}}{{2-5}}',
         'fh1 {{1-1}}{{1-2}}{{1-3}}{{1-4}}{{1-5}}',
       ])
     })
