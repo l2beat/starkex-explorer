@@ -5,19 +5,19 @@ import { MerkleValue } from './MerkleValue'
 
 const MIN_INT_64 = -(2n ** 63n)
 
-export interface PositionAssetState {
+export interface PositionAsset {
   readonly assetId: string
   readonly balance: bigint
   readonly fundingIndex: bigint
 }
 
-export class PositionState extends MerkleValue {
-  static EMPTY = new PositionState('0x' + '0'.repeat(64), 0n, [])
+export class Position extends MerkleValue {
+  static EMPTY = new Position('0x' + '0'.repeat(64), 0n, [])
 
   constructor(
     public readonly publicKey: string,
     public readonly collateralBalance: bigint,
-    public readonly assets: readonly PositionAssetState[],
+    public readonly assets: readonly PositionAsset[],
     protected knownHash?: PedersenHash
   ) {
     super()
@@ -41,7 +41,7 @@ export class PositionState extends MerkleValue {
   }
 }
 
-function packAsset(asset: PositionAssetState) {
+function packAsset(asset: PositionAsset) {
   return packBytes([
     { bytes: 16, value: encodeAssetId(asset.assetId) },
     { bytes: 8, value: asset.fundingIndex - MIN_INT_64 },
