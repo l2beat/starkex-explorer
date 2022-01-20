@@ -1,4 +1,4 @@
-import { decodeUpdates } from '@explorer/encoding/build/src/decodeUpdates'
+import { decodeOnChainData } from '@explorer/encoding'
 
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
@@ -40,12 +40,17 @@ export class DataSyncService {
       newStateTransitionFacts: stateTransitionFacts.length,
     })
 
-    const pages = await this.pageRepository.getAllForFacts(
+    const states = await this.pageRepository.getAllForFacts(
       stateTransitionFacts.map((f) => f.hash)
     )
 
-    console.log('pages.length', pages.length)
-
+    for (const state of states) {
+      const decoded = decodeOnChainData(state.pages)
+      console.log({
+        hash: state.factHash,
+        decoded,
+      })
+    }
     // const decodedPages = decodeUpdates(pages.map((p) => p.data).join(''))
 
     // console.log({ decodedPages })

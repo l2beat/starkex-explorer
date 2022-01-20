@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
-import { FactToPageRepository } from '../../../src/peripherals/database/FactToPageRepository'
 
+import { FactToPageRepository } from '../../../src/peripherals/database/FactToPageRepository'
 import {
   PageRecord,
   PageRepository,
@@ -71,7 +71,7 @@ describe(PageRepository.name, () => {
     )
   })
 
-  describe(`with ${FactToPageRepository.name}`, () => {
+  describe.only(`with ${FactToPageRepository.name}`, () => {
     const factToPageRepository = new FactToPageRepository(knex, Logger.SILENT)
 
     afterEach(() => factToPageRepository.deleteAll())
@@ -91,31 +91,23 @@ describe(PageRepository.name, () => {
       ])
 
       await repository.add([
-        { blockNumber: 2, pageHash: 'ph10', data: '{{ data 1-1 }}' },
-        { blockNumber: 1, pageHash: 'ph11', data: '{{ data 1-2 }}' },
-        { blockNumber: 3, pageHash: 'ph12', data: '{{ data 1-3 }}' },
-        { blockNumber: 2, pageHash: 'ph13', data: '{{ data 1-4 }}' },
-        { blockNumber: 4, pageHash: 'ph14', data: '{{ data 1-5 }}' },
-        { blockNumber: 2, pageHash: 'ph20', data: '{{ data 2-1 }}' },
-        { blockNumber: 1, pageHash: 'ph21', data: '{{ data 2-2 }}' },
-        { blockNumber: 3, pageHash: 'ph22', data: '{{ data 2-3 }}' },
-        { blockNumber: 2, pageHash: 'ph24', data: '{{ data 2-5 }}' },
-        { blockNumber: 2, pageHash: 'ph23', data: '{{ data 2-4 }}' },
+        { blockNumber: 2, pageHash: 'ph10', data: '{{1-1}}' },
+        { blockNumber: 1, pageHash: 'ph11', data: '{{1-2}}' },
+        { blockNumber: 3, pageHash: 'ph12', data: '{{1-3}}' },
+        { blockNumber: 2, pageHash: 'ph13', data: '{{1-4}}' },
+        { blockNumber: 4, pageHash: 'ph14', data: '{{1-5}}' },
+        { blockNumber: 2, pageHash: 'ph20', data: '{{2-1}}' },
+        { blockNumber: 1, pageHash: 'ph21', data: '{{2-2}}' },
+        { blockNumber: 3, pageHash: 'ph22', data: '{{2-3}}' },
+        { blockNumber: 2, pageHash: 'ph24', data: '{{2-5}}' },
+        { blockNumber: 2, pageHash: 'ph23', data: '{{2-4}}' },
       ])
 
-      let actual = await repository.getAllForFacts(['fh2', 'fh1'])
+      const actual = await repository.getAllForFacts(['fh2', 'fh1'])
 
       expect(format(actual)).toEqual([
-        'fh2 ph20 {{ data 2-1 }}',
-        'fh2 ph21 {{ data 2-2 }}',
-        'fh2 ph22 {{ data 2-3 }}',
-        'fh2 ph23 {{ data 2-4 }}',
-        'fh2 ph24 {{ data 2-5 }}',
-        'fh1 ph10 {{ data 1-1 }}',
-        'fh1 ph11 {{ data 1-2 }}',
-        'fh1 ph12 {{ data 1-3 }}',
-        'fh1 ph13 {{ data 1-4 }}',
-        'fh1 ph14 {{ data 1-5 }}',
+        'fh2 {{2-1}}{{2-2}}{{2-3}}{{2-5}}{{2-4}}',
+        'fh1 {{1-1}}{{1-2}}{{1-3}}{{1-4}}{{1-5}}',
       ])
     })
 
@@ -130,34 +122,25 @@ describe(PageRepository.name, () => {
       ])
 
       await repository.add([
-        { blockNumber: 2, pageHash: 'ph10', data: '' },
-        { blockNumber: 1, pageHash: 'ph11', data: '' },
-        { blockNumber: 2, pageHash: 'ph20', data: '' },
-        { blockNumber: 1, pageHash: 'ph21', data: '' },
-        { blockNumber: 2, pageHash: 'ph30', data: '' },
-        { blockNumber: 2, pageHash: 'ph31', data: '' },
+        { blockNumber: 2, pageHash: 'ph10', data: '{{1-0}}' },
+        { blockNumber: 1, pageHash: 'ph11', data: '{{1-1}}' },
+        { blockNumber: 2, pageHash: 'ph20', data: '{{2-0}}' },
+        { blockNumber: 1, pageHash: 'ph21', data: '{{2-1}}' },
+        { blockNumber: 2, pageHash: 'ph30', data: '{{3-0}}' },
+        { blockNumber: 2, pageHash: 'ph31', data: '{{3-1}}' },
       ])
 
-      let actual = await repository.getAllForFacts(['fh1', 'fh2', 'fh3'])
+      const actual = await repository.getAllForFacts(['fh1', 'fh2', 'fh3'])
 
       expect(format(actual)).toEqual([
-        'fh1 ph10',
-        'fh1 ph11',
-        'fh2 ph20',
-        'fh2 ph21',
-        'fh3 ph30',
-        'fh3 ph31',
+        'fh1 {{1-0}}{{1-1}}',
+        'fh2 {{2-0}}{{2-1}}',
+        'fh3 {{3-0}}{{3-1}}',
       ])
     })
 
-    function format(
-      xs: {
-        factHash: string
-        pageHash: string
-        data: string
-      }[]
-    ) {
-      return xs.map((x) => `${x.factHash} ${x.pageHash} ${x.data}`.trim())
+    function format(xs: { factHash: string; pages: string[] }[]) {
+      return xs.map((x) => `${x.factHash} ${x.pages.join('')}`.trim())
     }
   })
 })

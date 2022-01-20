@@ -35,27 +35,31 @@ export class PageRepository implements Repository<PageRecord> {
   }
 
   async getAllForFacts(factHashes: string[]) {
-    type Row = { fact_hash: string; page_hash: string; data: string }
+    type Row = { fact_hash: string; pages: string[] }
 
     const rows = (await this.knex('fact_to_pages')
-      .select('fact_hash', 'data', 'index', 'pages.page_hash' as 'page_hash')
-      .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
-      .whereIn('fact_hash', factHashes)
-      .join(
-        this.knex.raw(
-          'unnest(?::varchar[]) WITH ORDINALITY t(fact_hash, ord) USING (fact_hash)',
-          [factHashes]
-        )
+      .select(
+        'fact_hash',
+        // @todo shouldn't we just add pages as string array to the database?
+        // https://www.postgresql.org/docs/9.1/arrays.html
+        // They're never changed, so we split them and join them without any need.
+        // >> Talk with @sz-piotr aboit this.
+        this.knex.raw('ARRAY_AGG(pages.data) as pages')
       )
-      .orderBy('t.ord')
-      .orderBy('index')) as Row[]
+      .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
+      .groupBy('fact_hash')
+      .whereIn('fact_hash', factHashes)) as unknown as Row[]
+
+    // TODO: Order pages by fact_to_pages.index
+    // TODO: Order results by index in `factHashes`
 
     this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
 
+    console.log({ rows })
+
     return rows.map((row) => ({
       factHash: row.fact_hash,
-      pageHash: row.page_hash,
-      data: row.data,
+      pages: row.pages,
     }))
   }
 
