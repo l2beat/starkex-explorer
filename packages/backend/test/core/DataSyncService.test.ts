@@ -7,6 +7,7 @@ import { StateTransitionFactCollector } from '../../src/core/StateTransitionFact
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
 import { EthereumAddress } from '../../src/model'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
+import { PositionUpdateRepository } from '../../src/peripherals/database/PositionUpdateRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
@@ -25,10 +26,13 @@ describe(DataSyncService.name, () => {
       collect: async (_blockRange) => [],
     })
     const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
-      collect: async (_blockRange) => [],
+      collect: async (_blockRange) => [{ hash: 'fact-hash-1', blockNumber: 1 }],
     })
     const pageRepository = mock<PageRepository>({
       getAllForFacts: async () => [],
+    })
+    const positionUpdateRepository = mock<PositionUpdateRepository>({
+      addOrUpdate: async () => {},
     })
 
     const service = new DataSyncService(
@@ -37,6 +41,7 @@ describe(DataSyncService.name, () => {
       pageCollector,
       stateTransitionFactCollector,
       pageRepository,
+      positionUpdateRepository,
       Logger.SILENT
     )
 
@@ -54,11 +59,48 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionFactCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
+
+      expect(pageRepository.getAllForFacts).toHaveBeenCalledWith([
+        ['fact-hash-1'],
+      ])
+      expect(positionUpdateRepository.addOrUpdate).toHaveBeenCalledExactlyWith(
+        []
+      )
     })
   })
 
   describe(DataSyncService.prototype.revert.name, () => {
-    it('discards data from block number', () => {})
-    // @todo
+    it('discards data from block number', async () => {
+      const noop = async () => {}
+      const verifierCollector = mock<VerifierCollector>({ discard: noop })
+      const memoryHashEventCollector = mock<MemoryHashEventCollector>({
+        discard: noop,
+      })
+      const pageCollector = mock<PageCollector>({ discard: noop })
+      const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
+        discard: noop,
+      })
+
+      const dataSyncService = new DataSyncService(
+        verifierCollector,
+        memoryHashEventCollector,
+        pageCollector,
+        stateTransitionFactCollector,
+        mock<PageRepository>({ getAllForFacts: async () => [] }),
+        mock<PositionUpdateRepository>({ addOrUpdate: async () => {} }),
+        Logger.SILENT
+      )
+
+      await dataSyncService.revert(10)
+
+      expect(verifierCollector.discard).toHaveBeenCalledWith([{ from: 10 }])
+      expect(memoryHashEventCollector.discard).toHaveBeenCalledWith([
+        { from: 10 },
+      ])
+      expect(pageCollector.discard).toHaveBeenCalledWith([{ from: 10 }])
+      expect(stateTransitionFactCollector.discard).toHaveBeenCalledWith([
+        { from: 10 },
+      ])
+    })
   })
 })

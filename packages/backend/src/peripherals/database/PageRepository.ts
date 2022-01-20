@@ -41,10 +41,6 @@ export class PageRepository implements Repository<PageRecord> {
     const rows = (await this.knex('fact_to_pages')
       .select(
         'fact_hash',
-        // @todo shouldn't we just add pages as string array to the database?
-        // https://www.postgresql.org/docs/9.1/arrays.html
-        // They're never changed, so we split them and join them without any need.
-        // >> Talk with @sz-piotr aboit this.
         this.knex.raw(
           'ARRAY_AGG(pages.data ORDER BY fact_to_pages.index) as pages'
         )

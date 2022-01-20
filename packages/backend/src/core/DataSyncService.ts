@@ -1,6 +1,7 @@
 import { decodeOnChainData } from '@explorer/encoding'
 
 import { PageRepository } from '../peripherals/database/PageRepository'
+import { PositionUpdateRepository } from '../peripherals/database/PositionUpdateRepository'
 import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { MemoryHashEventCollector } from './MemoryHashEventCollector'
@@ -16,6 +17,11 @@ export class DataSyncService {
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
     // @todo where to move this?
     private readonly pageRepository: Pick<PageRepository, 'getAllForFacts'>,
+    private readonly positionUpdateRepository: Pick<
+      PositionUpdateRepository,
+      'addOrUpdate'
+    >,
+    // @todo ^ and this, should it be here?
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -40,25 +46,27 @@ export class DataSyncService {
       newStateTransitionFacts: stateTransitionFacts.length,
     })
 
-    const states = await this.pageRepository.getAllForFacts(
+    const stateTransitions = await this.pageRepository.getAllForFacts(
       stateTransitionFacts.map((f) => f.hash)
     )
 
-    for (const state of states) {
-      const decoded = decodeOnChainData(state.pages)
+    for (const { pages, factHash } of stateTransitions) {
+      const decoded = decodeOnChainData(pages)
+
+      // @todo temporary — just for code review
       console.log({
-        hash: state.factHash,
+        hash: factHash,
         decoded,
       })
-    }
-    // const decodedPages = decodeUpdates(pages.map((p) => p.data).join(''))
 
-    // console.log({ decodedPages })
+      await this.positionUpdateRepository.addOrUpdate(decoded.positions)
+    }
   }
 
   async revert(blockNumber: BlockNumber) {
     await this.verifierCollector.discard({ from: blockNumber })
     await this.memoryHashEventCollector.discard({ from: blockNumber })
     await this.pageCollector.discard({ from: blockNumber })
+    await this.stateTransitionFactCollector.discard({ from: blockNumber })
   }
 }

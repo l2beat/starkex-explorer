@@ -71,7 +71,7 @@ describe(PageRepository.name, () => {
     )
   })
 
-  describe.only(`with ${FactToPageRepository.name}`, () => {
+  describe(`with ${FactToPageRepository.name}`, () => {
     const factToPageRepository = new FactToPageRepository(knex, Logger.SILENT)
 
     afterEach(() => factToPageRepository.deleteAll())
