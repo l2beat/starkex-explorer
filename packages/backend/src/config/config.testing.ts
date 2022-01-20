@@ -21,6 +21,7 @@ export function getTestConfig(): Config {
       safeBlock: UNEXPECTED_ACCESS,
       syncBatchSize: 6_000,
     }),
+    freshStart: true, // not relevant for tests
   }
 }
 

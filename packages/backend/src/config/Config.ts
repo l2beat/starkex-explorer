@@ -18,4 +18,5 @@ export interface Config {
     }
     syncBatchSize: number
   }
+  freshStart: boolean
 }

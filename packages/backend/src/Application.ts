@@ -1,6 +1,3 @@
-import { writeFile } from 'fs/promises'
-import { resolve } from 'path'
-
 import { ApiServer } from './api/ApiServer'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
@@ -41,8 +38,7 @@ export class Application {
 
     const kvStore = new KeyValueStore(knex, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore)
-    // @todo unused for now
-    new PositionUpdateRepository(knex, logger)
+    const positionUpdateRepository = new PositionUpdateRepository(knex, logger)
     const verifierEventRepository = new VerifierEventRepository(knex, logger)
     const factToPageRepository = new FactToPageRepository(knex, logger)
     const pageRepository = new PageRepository(knex, logger)
@@ -88,6 +84,7 @@ export class Application {
       pageCollector,
       stateTransitionFactCollector,
       pageRepository,
+      positionUpdateRepository,
       logger
     )
     const syncScheduler = new SyncScheduler(
@@ -112,7 +109,7 @@ export class Application {
     this.start = async () => {
       logger.for(this).info('Starting')
 
-      await databaseService.rollbackAll() // @todo temporary for local development
+      if (config.freshStart) await databaseService.rollbackAll()
       await databaseService.migrateToLatest()
 
       await apiServer.listen()
