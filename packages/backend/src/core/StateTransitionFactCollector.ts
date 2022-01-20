@@ -1,3 +1,4 @@
+import { expect } from 'earljs'
 import { utils } from 'ethers'
 
 import {
@@ -13,6 +14,11 @@ const PERPETUAL_ABI = new utils.Interface([
   'event LogStateTransitionFact(bytes32 stateTransitionFact)',
 ])
 
+/** @internal exported only for tests */
+export const LOG_STATE_TRANSITION_FACT = PERPETUAL_ABI.getEventTopic(
+  'LogStateTransitionFact'
+)
+
 export class StateTransitionFactCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
@@ -24,22 +30,22 @@ export class StateTransitionFactCollector {
       address: PERPETUAL_ADDRESS,
       fromBlock: blockRange.from,
       toBlock: blockRange.to,
-      topics: [PERPETUAL_ABI.getEventTopic('LogStateTransitionFact')],
+      topics: [LOG_STATE_TRANSITION_FACT],
     })
 
-    // @todo temp
-    console.log('>>', { logs })
-
-    return logs.map((log): StateTransitionFactRecord => {
+    const records = logs.map((log): StateTransitionFactRecord => {
       const event = PERPETUAL_ABI.parseLog(log)
       return {
         blockNumber: log.blockNumber,
         hash: event.args.stateTransitionFact,
       }
     })
+
+    await this.stateTransitionFactRepository.add(records)
+    return records
   }
 
   async discard({ from }: { from: BlockNumber }) {
-    await this.stateTransitionFactRepository.deleteAllAfter(from)
+    await this.stateTransitionFactRepository.deleteAllAfter(from - 1)
   }
 }
