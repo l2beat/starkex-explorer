@@ -1,3 +1,6 @@
+import { writeFile } from 'fs/promises'
+import { resolve } from 'path'
+
 import { ApiServer } from './api/ApiServer'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
@@ -73,7 +76,6 @@ export class Application {
       verifierCollector,
       memoryHashEventCollector,
       pageCollector,
-      pageRepository,
       logger
     )
     const syncScheduler = new SyncScheduler(
@@ -105,8 +107,6 @@ export class Application {
       await syncScheduler.start()
 
       logger.for(this).info('Started')
-
-      console.log('>>', await dataSyncService.getOnChainData())
     }
 
     // #endregion start
