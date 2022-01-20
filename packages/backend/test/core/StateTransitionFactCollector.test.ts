@@ -59,7 +59,7 @@ describe(StateTransitionFactCollector.name, () => {
     expect(transitionFactRepository.add).toHaveBeenCalledWith([expectedRecords])
   })
 
-  it('discards all records from factToPageRepostiory after given block', async () => {
+  it('discards all records from factToPageRepository after given block', async () => {
     const transitionFactRepository = mock<StateTransitionFactRepository>({
       deleteAllAfter: async () => {},
     })
