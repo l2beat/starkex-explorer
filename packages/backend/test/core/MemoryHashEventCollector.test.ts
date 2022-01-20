@@ -161,7 +161,6 @@ describe(MemoryHashEventCollector.name, () => {
 
 function testData() {
   return {
-    // @todo real logs
     logs: [
       // verifier 0x8
       {
