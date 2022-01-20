@@ -22,6 +22,6 @@ export function getProductionConfig(): Config {
       },
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
     },
-    freshStart: getEnv.boolean('FRESH_START', false),
+    freshStart: false,
   }
 }
