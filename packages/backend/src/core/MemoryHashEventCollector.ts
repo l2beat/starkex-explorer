@@ -9,9 +9,10 @@ const GPS_VERIFIER_ABI = new utils.Interface([
   'event LogMemoryPagesHashes(bytes32 factHash, bytes32[] pagesHashes)',
 ])
 
-export const PAGE_ABI = new utils.Interface([
-  'function registerContinuousMemoryPage(uint256 startAddr, uint256[] values, uint256 z, uint256 alpha, uint256 prime)',
-])
+/** @internal exported only for tests */
+export const LOG_MEMORY_PAGE_HASHES = GPS_VERIFIER_ABI.getEventTopic(
+  'LogMemoryPagesHashes'
+)
 
 export class MemoryHashEventCollector {
   constructor(
@@ -49,7 +50,7 @@ export class MemoryHashEventCollector {
   }
 
   async discard({ from }: { from: BlockNumber }) {
-    await this.factToPageRepository.deleteAllAfter(from)
+    await this.factToPageRepository.deleteAllAfter(from - 1)
   }
 
   private async getMemoryHashEvents(
@@ -60,7 +61,7 @@ export class MemoryHashEventCollector {
       address: verifierAddress.toString(),
       fromBlock: blockRange.from,
       toBlock: blockRange.to,
-      topics: [GPS_VERIFIER_ABI.getEventTopic('LogMemoryPagesHashes')],
+      topics: [LOG_MEMORY_PAGE_HASHES],
     })
 
     return logs.map((log): MemoryHashEvent => {
