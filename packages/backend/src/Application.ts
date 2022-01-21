@@ -81,6 +81,7 @@ export class Application {
     this.start = async () => {
       logger.for(this).info('Starting')
 
+      if (config.freshStart) await databaseService.rollbackAll()
       await databaseService.migrateToLatest()
 
       await apiServer.listen()
