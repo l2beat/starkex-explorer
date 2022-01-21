@@ -15,13 +15,8 @@ export class DataSyncService {
     private readonly memoryHashEventCollector: MemoryHashEventCollector,
     private readonly pageCollector: PageCollector,
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
-    // @todo where to move this?
-    private readonly pageRepository: Pick<PageRepository, 'getAllForFacts'>,
-    private readonly positionUpdateRepository: Pick<
-      PositionUpdateRepository,
-      'addOrUpdate'
-    >,
-    // @todo ^ and this, should it be here?
+    private readonly pageRepository: PageRepository,
+    private readonly positionUpdateRepository: PositionUpdateRepository,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
