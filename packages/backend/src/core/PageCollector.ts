@@ -47,7 +47,7 @@ export class PageCollector {
 
           return {
             data,
-            pageHash: memoryHash, // @todo is this correct?
+            pageHash: memoryHash,
             blockNumber: tx.blockNumber ?? blockRange.from,
           }
         }

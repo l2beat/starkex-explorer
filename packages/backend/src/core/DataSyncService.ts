@@ -50,14 +50,8 @@ export class DataSyncService {
       stateTransitionFacts.map((f) => f.hash)
     )
 
-    for (const { pages, factHash } of stateTransitions) {
+    for (const { pages } of stateTransitions) {
       const decoded = decodeOnChainData(pages)
-
-      // @todo temporary — just for code review
-      console.log({
-        hash: factHash,
-        decoded,
-      })
 
       await this.positionUpdateRepository.addOrUpdate(decoded.positions)
     }
