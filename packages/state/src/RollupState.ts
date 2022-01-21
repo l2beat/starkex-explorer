@@ -1,7 +1,7 @@
 import { PedersenHash } from '@explorer/crypto'
 import { OnChainData } from '@explorer/encoding'
 
-import { MerkleNode } from './MerkleNode'
+import { NodeOrLeaf } from './MerkleNode'
 import { MerkleTree } from './MerkleTree'
 import { Position } from './Position'
 
@@ -17,12 +17,12 @@ export interface IRollupStateStorage {
     values: RollupParameters
   ): Promise<RollupParameters>
 
-  recover(hash: PedersenHash): Promise<MerkleNode | Position>
-  persist(values: (MerkleNode | Position)[]): Promise<void>
+  recover(hash: PedersenHash): Promise<NodeOrLeaf<Position>>
+  persist(values: NodeOrLeaf<Position>[]): Promise<void>
 }
 
 export class RollupState {
-  private positions: MerkleTree
+  private positions: MerkleTree<Position>
   private timestamp?: bigint
   private funding?: ReadonlyMap<string, bigint>
 
@@ -35,11 +35,40 @@ export class RollupState {
 
   async update(onChainData: OnChainData) {
     const fundingByTimestamp = await this.getFundingByTimestamp(onChainData)
-    const updatedPositionIds = onChainData.positions.map(x => x.positionId)
+    const updatedPositionIds = onChainData.positions.map((x) => x.positionId)
     const oldPositions = await this.positions.getLeaves(updatedPositionIds)
     const newPositions = oldPositions.map((oldPosition, i) => {
       const update = onChainData.positions[i]
-      const newPosition = new Position(update.publicKey, update.fundingTimestamp, [])
+      const funding =
+        update.fundingTimestamp !== 0n
+          ? fundingByTimestamp.get(update.fundingTimestamp)
+          : new Map<string, bigint>()
+      if (!funding) {
+        throw new Error('Missing funding!')
+      }
+      const updatedAssets = new Set(update.balances.map((x) => x.assetId))
+      const assets = oldPosition.assets.filter(
+        (x) => !updatedAssets.has(x.assetId)
+      )
+      for (const updated of update.balances) {
+        if (updated.balance === 0n) {
+          continue
+        }
+        const fundingIndex = funding.get(updated.assetId)
+        if (fundingIndex === undefined) {
+          throw new Error('Missing funding!')
+        }
+        assets.push({
+          assetId: updated.assetId,
+          balance: updated.balance,
+          fundingIndex: fundingIndex,
+        })
+      }
+      const newPosition = new Position(
+        update.publicKey,
+        update.fundingTimestamp,
+        assets
+      )
       return { index: update.positionId, value: newPosition }
     })
     await this.positions.update(newPositions)
