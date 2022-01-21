@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "test": "mocha",
+    "coverage": "nyc --reporter=lcov --reporter=text mocha",
     "start": "node -r source-map-support/register build/src",
     "dev": "node -r esbuild-register src"
   },
