@@ -124,6 +124,20 @@ describe(MerkleTree.name, () => {
       expect(await tree.getLeaves([2n, 7n])).toEqual([positionA, positionB])
     })
 
+    it('does not change the original tree', async () => {
+      const storage = new InMemoryMerkleStorage()
+      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+
+      const hashBefore = await tree.hash()
+      await tree.update([
+        { index: 2n, value: positionA },
+        { index: 7n, value: positionB },
+      ])
+      const hashAfter = await tree.hash()
+
+      expect(hashBefore).toEqual(hashAfter)
+    })
+
     it('throws for negative indices', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
