@@ -19,7 +19,8 @@
     "typecheck": "wsrun -ecsm typecheck",
     "test": "wsrun -ecsm test",
     "build": "wsrun -ecsm build",
-    "start": "cd packages/backend && yarn start"
+    "start": "cd packages/backend && yarn start",
+    "coverage": "wsrun -ecsm coverage"
   },
   "devDependencies": {
     "@types/mocha": "^9.0.0",
