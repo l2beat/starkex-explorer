@@ -16,7 +16,7 @@ import { Knex } from 'knex'
 export async function up(knex: Knex) {
   await knex.schema.createTable('fact_to_pages', (table) => {
     table.increments('id').primary()
-    table.integer('block_number').notNullable()
+    table.integer('block_number').notNullable().index()
     table.string('fact_hash').notNullable()
     table.string('page_hash').notNullable().index()
     table.integer('index').notNullable()

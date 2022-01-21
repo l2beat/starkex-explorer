@@ -16,7 +16,7 @@ import { Knex } from 'knex'
 export async function up(knex: Knex) {
   await knex.schema.createTable('state_transition_facts', (table) => {
     table.increments('id').primary()
-    table.integer('block_number').notNullable()
+    table.integer('block_number').notNullable().index()
     table.string('hash').notNullable().index()
   })
 }
