@@ -19,3 +19,8 @@ flags:
   encoding: { paths: ["packages/encoding/coverage/lcov.info"] }
   crypto: { paths: ["packages/crypto/coverage/lcov.info"] }
   state: { paths: ["packages/state/coverage/lcov.info"] }
+fixes:
+  - "::packages/backend/"
+  - "::packages/encoding/"
+  - "::packages/crypto/"
+  - "::packages/state/"

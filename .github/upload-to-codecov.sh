@@ -14,7 +14,6 @@ for dir in */
       then
         file="$PWD/$package/coverage/lcov.info"
         if test -f "$file"; then
-          cd $package
           flag="${package/-/_}"
           $codecov_file -f $file -F $flag -v -t $CODECOV_TOKEN
         fi
