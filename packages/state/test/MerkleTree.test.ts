@@ -71,8 +71,8 @@ describe(MerkleTree.name, () => {
       const positionB = new Position('0xbeef5678', 69n, [])
 
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
-      await tree.update([
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      tree = await tree.update([
         { index: 2n, value: positionA },
         { index: 7n, value: positionB },
       ])
@@ -109,14 +109,14 @@ describe(MerkleTree.name, () => {
 
     it('updates nodes at specified indices', async () => {
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
       expect(await tree.getLeaves([2n, 7n])).toEqual([
         Position.EMPTY,
         Position.EMPTY,
       ])
 
-      await tree.update([
+      tree = await tree.update([
         { index: 2n, value: positionA },
         { index: 7n, value: positionB },
       ])
@@ -162,10 +162,10 @@ describe(MerkleTree.name, () => {
 
     it('uses last value for multiple updates at the same index', async () => {
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
       expect(await tree.getLeaf(2n)).toEqual(Position.EMPTY)
-      await tree.update([
+      tree = await tree.update([
         { index: 2n, value: positionA },
         { index: 2n, value: positionB },
       ])
@@ -174,20 +174,20 @@ describe(MerkleTree.name, () => {
 
     it('empty update array leaves the hash unchanged', async () => {
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
       const hashBefore = await tree.hash()
-      await tree.update([])
+      tree = await tree.update([])
       const hashAfter = await tree.hash()
       expect(hashBefore).toEqual(hashAfter)
     })
 
     it('non-empty update changes the hash', async () => {
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
       const hashBefore = await tree.hash()
-      await tree.update([
+      tree = await tree.update([
         { index: 2n, value: positionA },
         { index: 7n, value: positionB },
       ])
@@ -197,17 +197,17 @@ describe(MerkleTree.name, () => {
 
     it('updates that do not change values do not change the hash', async () => {
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
       const hashBefore = await tree.hash()
-      await tree.update([{ index: 2n, value: Position.EMPTY }])
+      tree = await tree.update([{ index: 2n, value: Position.EMPTY }])
       const hashAfter = await tree.hash()
       expect(hashBefore).toEqual(hashAfter)
     })
 
     it('has a correct hash after updates', async () => {
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
       const positionA = new Position(`0x${'0'.repeat(63)}1`, 2n, [
         { assetId: 'BTC-10', balance: 3n, fundingIndex: 4n },
@@ -217,7 +217,7 @@ describe(MerkleTree.name, () => {
         { assetId: 'BTC-10', balance: 5n, fundingIndex: 6n },
       ])
 
-      await tree.update([
+      tree = await tree.update([
         { index: 2n, value: positionA },
         { index: 7n, value: positionB },
       ])
@@ -231,14 +231,14 @@ describe(MerkleTree.name, () => {
 
     it('persists updated nodes to the database', async () => {
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
       let persisted: MerkleValue[] = []
       storage.persist = async (values) => {
         persisted = values
       }
 
-      await tree.update([
+      tree = await tree.update([
         { index: 2n, value: positionA },
         { index: 7n, value: positionB },
       ])
@@ -261,29 +261,14 @@ describe(MerkleTree.name, () => {
 
     it('can recover a persisted state', async () => {
       const storage = new InMemoryMerkleStorage()
-      const tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
-      await tree.update([
+      let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
+      tree = await tree.update([
         { index: 2n, value: positionA },
         { index: 7n, value: positionB },
       ])
 
       const recovered = new MerkleTree(storage, 3n, await tree.hash())
       expect(await recovered.getLeaf(2n)).toEqual(positionA)
-    })
-
-    it('set hash changes the tree', async () => {
-      const storage = new InMemoryMerkleStorage()
-      const treeA = await MerkleTree.create(storage, 3n, Position.EMPTY)
-      const treeB = new MerkleTree(storage, 3n, await treeA.hash())
-
-      await treeA.update([
-        { index: 2n, value: positionA },
-        { index: 7n, value: positionB },
-      ])
-
-      expect(await treeB.getLeaf(2n)).toEqual(Position.EMPTY)
-      treeB.setHash(await treeA.hash())
-      expect(await treeB.getLeaf(2n)).toEqual(positionA)
     })
   })
 })

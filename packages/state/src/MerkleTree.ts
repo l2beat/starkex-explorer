@@ -51,10 +51,6 @@ export class MerkleTree<T extends MerkleValue> {
     return this.rootHashOrValue
   }
 
-  setHash(hash: PedersenHash) {
-    this.rootHashOrValue = hash
-  }
-
   async getNode(path: (0 | 1)[]): Promise<NodeOrLeaf<T>> {
     if (path.length > this.height) {
       throw new TypeError('Path too long')
@@ -96,7 +92,7 @@ export class MerkleTree<T extends MerkleValue> {
 
   async update(updates: MerkleUpdate<T>[]) {
     if (updates.length === 0) {
-      return
+      return this
     }
     if (updates.some((x) => x.index < 0n || x.index > this.maxIndex)) {
       throw new TypeError('Index out of bounds')
@@ -110,14 +106,14 @@ export class MerkleTree<T extends MerkleValue> {
         this.height
       )
       await this.storage.persist(newNodes)
-      this.rootHashOrValue = newRoot
+      return new MerkleTree(this.storage, this.height, newRoot)
     } else {
       if (updates.length !== 1) {
         throw new Error('Cannot replace leaf with multiple values')
       } else {
         const newRoot = updates[0].value
         await this.storage.persist([newRoot])
-        this.rootHashOrValue = newRoot
+        return new MerkleTree(this.storage, this.height, newRoot)
       }
     }
   }
