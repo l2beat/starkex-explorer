@@ -1,20 +1,30 @@
 import { pedersen, PedersenHash } from '@explorer/crypto'
 import { partition } from 'lodash'
 
-import { IMerkleStorage } from './IMerkleStorage'
-import { MerkleUpdate } from './MerkleUpdate'
 import { MerkleValue } from './MerkleValue'
 
-export class MerkleNode extends MerkleValue {
+export interface IMerkleStorage<T extends MerkleValue> {
+  recover(hash: PedersenHash): Promise<NodeOrLeaf<T>>
+  persist(values: NodeOrLeaf<T>[]): Promise<void>
+}
+
+export interface MerkleUpdate<T extends MerkleValue> {
+  index: bigint
+  value: NodeOrLeaf<T>
+}
+
+export type NodeOrLeaf<T extends MerkleValue> = MerkleNode<T> | T
+
+export class MerkleNode<T extends MerkleValue> extends MerkleValue {
   constructor(
-    private storage: IMerkleStorage,
-    private leftHashOrValue: PedersenHash | MerkleValue,
-    private rightHashOrValue: PedersenHash | MerkleValue
+    private storage: IMerkleStorage<T>,
+    private leftHashOrValue: PedersenHash | NodeOrLeaf<T>,
+    private rightHashOrValue: PedersenHash | NodeOrLeaf<T>
   ) {
     super()
   }
 
-  async left(): Promise<MerkleValue> {
+  async left(): Promise<NodeOrLeaf<T>> {
     if (!(this.leftHashOrValue instanceof MerkleValue)) {
       this.leftHashOrValue = await this.storage.recover(this.leftHashOrValue)
     }
@@ -28,7 +38,7 @@ export class MerkleNode extends MerkleValue {
     return this.leftHashOrValue
   }
 
-  async right(): Promise<MerkleValue> {
+  async right(): Promise<NodeOrLeaf<T>> {
     if (!(this.rightHashOrValue instanceof MerkleValue)) {
       this.rightHashOrValue = await this.storage.recover(this.rightHashOrValue)
     }
@@ -47,7 +57,7 @@ export class MerkleNode extends MerkleValue {
     indices: bigint[],
     center: bigint,
     height: bigint
-  ): Promise<MerkleValue[]> {
+  ): Promise<T[]> {
     const [leftIndices, rightIndices] = partition(indices, (i) => i < center)
     const [leftCenter, rightCenter] = this.getCenters(center, height)
     const [leftLeaves, rightLeaves] = await Promise.all([
@@ -62,7 +72,7 @@ export class MerkleNode extends MerkleValue {
     indices: bigint[],
     center: bigint,
     height: bigint
-  ): Promise<MerkleValue[]> {
+  ): Promise<T[]> {
     if (indices.length === 0) {
       return []
     }
@@ -81,10 +91,10 @@ export class MerkleNode extends MerkleValue {
   }
 
   async update(
-    updates: MerkleUpdate[],
+    updates: MerkleUpdate<T>[],
     center: bigint,
     height: bigint
-  ): Promise<[MerkleNode, MerkleValue[]]> {
+  ): Promise<[MerkleNode<T>, NodeOrLeaf<T>[]]> {
     const [leftUpdates, rightUpdates] = partition(
       updates,
       (x) => x.index < center
@@ -104,16 +114,16 @@ export class MerkleNode extends MerkleValue {
         height - 1n
       ),
     ])
-    const newNode = new MerkleNode(this.storage, newLeft, newRight)
+    const newNode = new MerkleNode<T>(this.storage, newLeft, newRight)
     return [newNode, [...leftNodes, ...rightNodes, newNode]]
   }
 
   private async updateChild(
-    child: PedersenHash | MerkleValue,
-    updates: MerkleUpdate[],
+    child: PedersenHash | NodeOrLeaf<T>,
+    updates: MerkleUpdate<T>[],
     center: bigint,
     height: bigint
-  ): Promise<[PedersenHash | MerkleValue, MerkleValue[]]> {
+  ): Promise<[PedersenHash | NodeOrLeaf<T>, NodeOrLeaf<T>[]]> {
     if (updates.length === 0) {
       return [child, []]
     }

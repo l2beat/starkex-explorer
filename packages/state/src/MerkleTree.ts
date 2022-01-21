@@ -1,17 +1,20 @@
 import { PedersenHash } from '@explorer/crypto'
 
-import { IMerkleStorage } from './IMerkleStorage'
-import { MerkleNode } from './MerkleNode'
-import { MerkleUpdate } from './MerkleUpdate'
+import {
+  IMerkleStorage,
+  MerkleNode,
+  MerkleUpdate,
+  NodeOrLeaf,
+} from './MerkleNode'
 import { MerkleValue } from './MerkleValue'
 
-export class MerkleTree {
+export class MerkleTree<T extends MerkleValue> {
   private maxIndex = 0n
 
   constructor(
-    private readonly storage: IMerkleStorage,
+    private readonly storage: IMerkleStorage<T>,
     private readonly height: bigint,
-    private rootHashOrValue: PedersenHash | MerkleValue
+    private rootHashOrValue: PedersenHash | NodeOrLeaf<T>
   ) {
     if (height < 0) {
       throw new TypeError('Height cannot be negative')
@@ -19,10 +22,10 @@ export class MerkleTree {
     this.maxIndex = 2n ** height - 1n
   }
 
-  static async create(
-    storage: IMerkleStorage,
+  static async create<T extends MerkleValue>(
+    storage: IMerkleStorage<T>,
     height: bigint,
-    leaf: MerkleValue
+    leaf: NodeOrLeaf<T>
   ) {
     let root = leaf
     const nodes = [leaf]
@@ -34,7 +37,7 @@ export class MerkleTree {
     return new MerkleTree(storage, height, root)
   }
 
-  private async root(): Promise<MerkleValue> {
+  private async root(): Promise<NodeOrLeaf<T>> {
     if (!(this.rootHashOrValue instanceof MerkleValue)) {
       this.rootHashOrValue = await this.storage.recover(this.rootHashOrValue)
     }
@@ -52,7 +55,7 @@ export class MerkleTree {
     this.rootHashOrValue = hash
   }
 
-  async getNode(path: (0 | 1)[]): Promise<MerkleValue> {
+  async getNode(path: (0 | 1)[]): Promise<NodeOrLeaf<T>> {
     if (path.length > this.height) {
       throw new TypeError('Path too long')
     }
@@ -66,12 +69,12 @@ export class MerkleTree {
     return current
   }
 
-  async getLeaf(index: bigint): Promise<MerkleValue> {
+  async getLeaf(index: bigint): Promise<T> {
     const leaves = await this.getLeaves([index])
     return leaves[0]
   }
 
-  async getLeaves(indices: bigint[]): Promise<MerkleValue[]> {
+  async getLeaves(indices: bigint[]): Promise<T[]> {
     if (indices.some((i) => i < 0n || i > this.maxIndex)) {
       throw new TypeError('Index out of bounds')
     }
@@ -80,7 +83,7 @@ export class MerkleTree {
       const center = 2n ** (this.height - 1n)
       const sorted = [...indices].sort((a, b) => Number(a - b))
       const leaves = await root.getLeaves(sorted, center, this.height)
-      const map = new Map<bigint, MerkleValue>()
+      const map = new Map<bigint, T>()
       for (let i = 0; i < sorted.length; i++) {
         map.set(sorted[i], leaves[i])
       }
@@ -91,7 +94,7 @@ export class MerkleTree {
     }
   }
 
-  async update(updates: MerkleUpdate[]) {
+  async update(updates: MerkleUpdate<T>[]) {
     if (updates.length === 0) {
       return
     }
