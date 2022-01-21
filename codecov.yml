@@ -1,0 +1,21 @@
+codecov:
+  require_ci_to_pass: true
+  branch: master
+
+coverage:
+  precision: 2
+  round: down
+  status:
+    project:
+      default: { target: auto }
+      backend: { flags: ["backend"], target: auto }
+      # frontend: { flags: ["frontend"], target: 100% }
+      encoding: { flags: ["encoding"], target: 100% }
+      crypto: { flags: ["crypto"], target: 100% }
+      state: { flags: ["state"], target: 100% }
+flags:
+  backend: { paths: ["packages/backend/coverage/lcov.info"] }
+  # frontend: { paths: ["packages/frontend/"] }
+  encoding: { paths: ["packages/encoding/coverage/lcov.info"] }
+  crypto: { paths: ["packages/crypto/coverage/lcov.info"] }
+  state: { paths: ["packages/state/coverage/lcov.info"] }
