@@ -13,7 +13,8 @@ const REGISTRY_ABI = new utils.Interface([
 
 const REGISTRY_ADDRESS = '0xEfbCcE4659db72eC6897F46783303708cf9ACef8'
 
-const PAGE_ABI = new utils.Interface([
+/** @internal exported only for tests */
+export const PAGE_ABI = new utils.Interface([
   'function registerContinuousMemoryPage(uint256 startAddr, uint256[] values, uint256 z, uint256 alpha, uint256 prime)',
 ])
 
@@ -41,9 +42,8 @@ export class PageCollector {
             tx.data
           )
 
-          const data = (decoded[1] as BigNumber[])
-            .map((x) => x.toHexString().substring(2).padStart(64, '0'))
-            .join('')
+          const values = decoded[1] as BigNumber[]
+          const data = values.map(bignumToPaddedString).join('')
 
           return {
             data,
@@ -86,4 +86,9 @@ export class PageCollector {
 interface MemoryPageEvent {
   memoryHash: string
   transactionHash: string
+}
+
+/** @internal */
+export function bignumToPaddedString(x: BigNumber): string {
+  return x.toHexString().substring(2).padStart(64, '0')
 }
