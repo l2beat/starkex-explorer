@@ -16,11 +16,26 @@ export function mock<T>(overrides: Partial<T> = {}): MockedObject<T> {
         return value
       }
       const name = String(property)
-      return () => {
+
+      const res = () => {
         throw new Error(
           `Cannot call .${name}() - no mock implementation provided.`
         )
       }
+
+      // Handles `expect(f).toHaveBeenCalledWith([])` when the function wasn't
+      // called. We'd otherwise fail the test with the following error:
+      // > TypeError: control.actual.calls is not iterable
+      Object.defineProperty(res, 'calls', {
+        get: () => {
+          throw new Error(
+            'Cannot access .calls - no mock implementation provided' +
+              ' and the function was not called.'
+          )
+        },
+      })
+
+      return res
     },
   })
 

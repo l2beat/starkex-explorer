@@ -20,9 +20,7 @@ declare module 'knex/types/tables' {
   }
 
   interface VerifierEventRow {
-    /**
-     * surrogate key
-     */
+    /** surrogate key */
     id?: number
     implementation: string
     block_number: number
@@ -30,10 +28,37 @@ declare module 'knex/types/tables' {
     initializer?: string
   }
 
+  interface FactToPageRow {
+    /** surrogate key */
+    id?: number
+    block_number: number
+    fact_hash: string
+    page_hash: string
+    index: number
+  }
+
+  interface PageRow {
+    /** surrogate key */
+    id?: number
+    block_number: number
+    page_hash: string
+    data: string
+  }
+
+  interface StateTransitionFactRow {
+    /** surrogate key */
+    id?: number
+    block_number: number
+    hash: string
+  }
+
   interface Tables {
     position_updates: PositionUpdateRow
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
+    fact_to_pages: FactToPageRow
+    pages: PageRow
+    state_transition_facts: StateTransitionFactRow
   }
 }
 

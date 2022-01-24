@@ -115,7 +115,7 @@ export function getErrorMessage(error: unknown) {
   if (typeof error === 'string') {
     return error
   } else if (error instanceof Error) {
-    return error.message
+    return error.message + '\n' + error.stack
   } else {
     return '' + error
   }
