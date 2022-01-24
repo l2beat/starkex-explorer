@@ -27,11 +27,11 @@ jobs:
         with:
           node-version: 14.x
       - run: yarn --frozen-lockfile
-      # - run: yarn format
+      - run: yarn format
       - run: yarn build
-      # - run: yarn lint
-      # - run: yarn typecheck
-      # - run: yarn test
+      - run: yarn lint
+      - run: yarn typecheck
+      - run: yarn test
       - run: yarn coverage
       - uses: codecov/codecov-action@v2
         with:
