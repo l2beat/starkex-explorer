@@ -11,7 +11,8 @@
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "build": "tsc",
-    "test": "mocha"
+    "test": "mocha",
+    "coverage": "nyc --reporter=lcov --reporter=text mocha"
   },
   "dependencies": {
     "@explorer/crypto": "*",

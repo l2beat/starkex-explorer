@@ -34,3 +34,8 @@ jobs:
       - run: yarn test
         env:
           TEST_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      - run: yarn coverage
+      - uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
+          verbose: true

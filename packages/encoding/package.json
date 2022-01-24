@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "test": "mocha",
-    "get-onchain-data": "node -r esbuild-register src/data"
+    "get-onchain-data": "node -r esbuild-register src/data",
+    "coverage": "nyc --reporter=lcov --reporter=text mocha"
   },
   "dependencies": {
     "ethers": "^5.5.2"
