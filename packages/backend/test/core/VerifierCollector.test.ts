@@ -78,6 +78,20 @@ describe(VerifierCollector.name, () => {
       EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
     ])
   })
+
+  it('discards all records from repository after given block', async () => {
+    const verifierEventRepository = mock<VerifierEventRepository>({
+      deleteAllAfter: async (_blockNumber: number) => {},
+    })
+    const collector = new VerifierCollector(
+      mock<EthereumClient>(),
+      verifierEventRepository
+    )
+
+    await collector.discard({ from: 123 })
+
+    expect(verifierEventRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+  })
 })
 
 function testData() {

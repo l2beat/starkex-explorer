@@ -24,7 +24,7 @@ const ImplementationAdded = PROXY_ABI.getEventTopic('ImplementationAdded')
 
 export class VerifierCollector {
   constructor(
-    private readonly ethereumClient: Pick<EthereumClient, 'getLogs'>,
+    private readonly ethereumClient: EthereumClient,
     private readonly verifierEventRepository: VerifierEventRepository
   ) {}
 
