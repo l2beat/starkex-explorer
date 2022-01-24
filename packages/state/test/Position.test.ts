@@ -1,11 +1,11 @@
 import { PedersenHash } from '@explorer/crypto'
 import { expect } from 'earljs'
 
-import { PositionState } from '../src/PositionState'
+import { Position } from '../src/Position'
 
-describe(PositionState.name, () => {
+describe(Position.name, () => {
   it('has a correct empty hash', async () => {
-    const position = PositionState.EMPTY
+    const position = Position.EMPTY
     const hash = await position.hash()
     expect(hash).toEqual(
       PedersenHash(
@@ -15,7 +15,7 @@ describe(PositionState.name, () => {
   })
 
   it('has a correct hash with 1 asset', async () => {
-    const position = new PositionState(`0x${'0'.repeat(63)}1`, 2n, [
+    const position = new Position(`0x${'0'.repeat(63)}1`, 2n, [
       { assetId: 'BTC-10', balance: 3n, fundingIndex: 4n },
     ])
     const hash = await position.hash()
@@ -27,7 +27,7 @@ describe(PositionState.name, () => {
   })
 
   it('has a correct hash with 2 assets', async () => {
-    const position = new PositionState(`0x${'0'.repeat(63)}1`, 2n, [
+    const position = new Position(`0x${'0'.repeat(63)}1`, 2n, [
       { assetId: 'ETH-9', balance: 3n, fundingIndex: 4n },
       { assetId: 'BTC-10', balance: 5n, fundingIndex: 6n },
     ])

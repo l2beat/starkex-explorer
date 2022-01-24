@@ -1,9 +1,9 @@
 import { PedersenHash } from '@explorer/crypto'
 
-import { IMerkleStorage } from './IMerkleStorage'
+import { IMerkleStorage } from './MerkleNode'
 import { MerkleValue } from './MerkleValue'
 
-export class InMemoryMerkleStorage implements IMerkleStorage {
+export class InMemoryMerkleStorage implements IMerkleStorage<MerkleValue> {
   private store = new Map<PedersenHash, MerkleValue>()
 
   async recover(hash: PedersenHash): Promise<MerkleValue> {
