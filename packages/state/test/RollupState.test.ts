@@ -318,4 +318,57 @@ describe(RollupState.name, () => {
       ).toBeRejected(Error, 'Missing funding for asset: BTC-10!')
     })
   })
+
+  describe(RollupState.recover.name, () => {
+    it('recovers positions and indices', async () => {
+      const storage = new InMemoryRollupStorage()
+      let rollup = await RollupState.empty(storage, 3n)
+      rollup = await rollup.update({
+        funding: [
+          {
+            timestamp: 1001n,
+            indices: [
+              { assetId: 'BTC-10', value: 1n },
+              { assetId: 'ETH-9', value: -1n },
+            ],
+          },
+        ],
+        positions: [
+          {
+            positionId: 5n,
+            collateralBalance: 555n,
+            fundingTimestamp: 1001n,
+            publicKey: `0x${'0'.repeat(63)}5`,
+            balances: [
+              { assetId: 'BTC-10', balance: 5n },
+              { assetId: 'ETH-9', balance: 55n },
+            ],
+          },
+        ],
+      })
+
+      const recovered = RollupState.recover(
+        storage,
+        await rollup.positions.hash(),
+        3n
+      )
+
+      expect(await recovered.getParameters()).toEqual({
+        timestamp: 1001n,
+        funding: new Map([
+          ['BTC-10', 1n],
+          ['ETH-9', -1n],
+        ]),
+      })
+      const position = await recovered.positions.getLeaf(5n)
+      expect(position.getData()).toEqual({
+        publicKey: `0x${'0'.repeat(63)}5`,
+        collateralBalance: 555n,
+        assets: [
+          { assetId: 'BTC-10', balance: 5n, fundingIndex: 1n },
+          { assetId: 'ETH-9', balance: 55n, fundingIndex: -1n },
+        ],
+      })
+    })
+  })
 })
