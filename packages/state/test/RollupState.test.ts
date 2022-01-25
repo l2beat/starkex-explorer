@@ -147,5 +147,65 @@ describe(RollupState.name, () => {
         ],
       })
     })
+
+    it('can persist last known funding', async () => {
+      const storage = new InMemoryRollupStorage()
+      let rollup = await RollupState.empty(storage, 3n)
+
+      rollup = await rollup.update({
+        funding: [
+          {
+            timestamp: 1001n,
+            indices: [
+              { assetId: 'BTC-10', value: 1n },
+              { assetId: 'ETH-9', value: -1n },
+            ],
+          },
+          {
+            timestamp: 1002n,
+            indices: [
+              { assetId: 'BTC-10', value: 2n },
+              { assetId: 'ETH-9', value: -2n },
+            ],
+          },
+        ],
+        positions: [],
+      })
+
+      const params = await storage.getParameters(await rollup.positions.hash())
+      expect(params).toEqual({
+        timestamp: 1002n,
+        funding: new Map([
+          ['BTC-10', 2n],
+          ['ETH-9', -2n],
+        ]),
+      })
+
+      rollup = await rollup.update({
+        funding: [],
+        positions: [
+          {
+            positionId: 5n,
+            collateralBalance: 555n,
+            fundingTimestamp: 1002n,
+            publicKey: `0x${'0'.repeat(63)}5`,
+            balances: [
+              { assetId: 'BTC-10', balance: 5n },
+              { assetId: 'ETH-9', balance: 55n },
+            ],
+          },
+        ],
+      })
+
+      const position = await rollup.positions.getLeaf(5n)
+      expect(position.getData()).toEqual({
+        publicKey: `0x${'0'.repeat(63)}5`,
+        collateralBalance: 555n,
+        assets: [
+          { assetId: 'BTC-10', balance: 5n, fundingIndex: 2n },
+          { assetId: 'ETH-9', balance: 55n, fundingIndex: -2n },
+        ],
+      })
+    })
   })
 })

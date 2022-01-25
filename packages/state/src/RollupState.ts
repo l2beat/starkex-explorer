@@ -94,6 +94,12 @@ export class RollupState {
     const [timestamp, funding] = [...fundingByTimestamp.entries()].reduce(
       (a, b) => (a[0] > b[0] ? a : b)
     )
+
+    await this.storage.setParameters(await positions.hash(), {
+      timestamp,
+      funding,
+    })
+
     return new RollupState(this.storage, positions, timestamp, funding)
   }
 
