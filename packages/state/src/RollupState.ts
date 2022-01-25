@@ -61,7 +61,9 @@ export class RollupState {
             ? fundingByTimestamp.get(update.fundingTimestamp)
             : new Map<string, bigint>()
         if (!funding) {
-          throw new Error('Missing funding!')
+          throw new Error(
+            `Missing funding for timestamp: ${update.fundingTimestamp}!`
+          )
         }
         const updatedAssets = new Set(update.balances.map((x) => x.assetId))
         const assets = oldPosition.assets.filter(
@@ -73,7 +75,7 @@ export class RollupState {
           }
           const fundingIndex = funding.get(updated.assetId)
           if (fundingIndex === undefined) {
-            throw new Error('Missing funding!')
+            throw new Error(`Missing funding for asset: ${updated.assetId}!`)
           }
           assets.push({
             assetId: updated.assetId,
