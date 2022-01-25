@@ -1,5 +1,4 @@
 comment: # https://docs.codecov.io/docs/pull-request-comments
-  layout: "files"
   behavior: default
   require_changes: false
   require_base: false
