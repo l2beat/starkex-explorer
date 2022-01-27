@@ -76,7 +76,14 @@ export class BlockDownloader {
     return this.ethereumClient.onBlock((block) =>
       this.jobQueue.add({
         name: `handleNewBlock-${block.number}-${block.hash}`,
-        execute: async () => this.handleNewBlock(block),
+        execute: async () => {
+          // This job won't be retried by jobQueue
+          try {
+            await this.handleNewBlock(block)
+          } catch (error) {
+            this.logger.error(error)
+          }
+        },
       })
     )
   }
