@@ -3,10 +3,12 @@ import { PedersenHash } from '@explorer/crypto'
 import { IMerkleStorage } from './MerkleNode'
 import { MerkleValue } from './MerkleValue'
 
-export class InMemoryMerkleStorage implements IMerkleStorage<MerkleValue> {
-  private store = new Map<PedersenHash, MerkleValue>()
+export class InMemoryMerkleStorage<T extends MerkleValue = MerkleValue>
+  implements IMerkleStorage<T>
+{
+  private store = new Map<PedersenHash, T>()
 
-  async recover(hash: PedersenHash): Promise<MerkleValue> {
+  async recover(hash: PedersenHash): Promise<T> {
     const value = this.store.get(hash)
     if (!value) {
       throw new Error(`Cannot recover value for hash ${hash}`)
@@ -14,7 +16,7 @@ export class InMemoryMerkleStorage implements IMerkleStorage<MerkleValue> {
     return value
   }
 
-  async persist(values: MerkleValue[]): Promise<void> {
+  async persist(values: T[]): Promise<void> {
     await Promise.all(
       values.map(async (value) => {
         const hash = await value.hash()

@@ -39,6 +39,14 @@ export class Position extends MerkleValue {
     }
     return hash
   }
+
+  getData() {
+    return {
+      publicKey: this.publicKey,
+      collateralBalance: this.collateralBalance,
+      assets: this.assets,
+    }
+  }
 }
 
 function packAsset(asset: PositionAsset) {
