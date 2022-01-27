@@ -16,7 +16,7 @@ import { Knex } from 'knex'
 export async function up(knex: Knex) {
   await knex.schema.createTable('blocks', (table) => {
     table.string('hash').primary()
-    table.integer('number').notNullable().index()
+    table.integer('number').notNullable().index().unique()
   })
 }
 
