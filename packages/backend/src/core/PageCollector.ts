@@ -74,12 +74,13 @@ export class PageCollector {
 
     return logs
       .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
-      .map(
-        ({ log, event }): MemoryPageEvent => ({
-          memoryHash: event.args.memoryHash.toHexString(),
+      .map(({ log, event }): MemoryPageEvent => {
+        const hash: BigNumber = event.args.memoryHash
+        return {
+          memoryHash: '0x' + hash.toHexString().slice(2).padStart(64, '0'),
           transactionHash: log.transactionHash,
-        })
-      )
+        }
+      })
   }
 }
 
