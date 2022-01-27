@@ -13,17 +13,13 @@ import {
   BlockRepository,
 } from '../../src/peripherals/database/BlockRepository'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import {
-  BlockNumber,
-  BlockRange,
-  BlockTag,
-} from '../../src/peripherals/ethereum/types'
+import { BlockRange, BlockTag } from '../../src/peripherals/ethereum/types'
 import { Logger, LogLevel } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
 const INITIAL_BLOCK: BlockRecord = { number: 0, hash: 'h0' }
 
-describe(BlockDownloader.name, () => {
+describe.only(BlockDownloader.name, () => {
   const logger = new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
 
   it('saves obtained blocks to db', async () => {
@@ -250,7 +246,13 @@ describe(BlockDownloader.name, () => {
     await waitForExpect(async () => {
       const blocksInDb = await blockRepository.getAll()
       expect(blocksInDb).toBeAnArrayOfLength(3)
-    })
+    }, 2000)
+
+    expect(await blockRepository.getAll()).toEqual([
+      { hash: 'h1', number: 1 },
+      { hash: 'h2', number: 2 },
+      { hash: 'h3.a', number: 3 },
+    ])
 
     const blocks = reorganize(['h1', 'h2', 'h3.b', 'h4.b'])
 
@@ -258,17 +260,15 @@ describe(BlockDownloader.name, () => {
 
     await waitForExpect(() => {
       expect(reorgListener).toHaveBeenCalledExactlyWith([
-        // last known block is numer 22 and the first reorg point we consider
-        // is `(lastKnown - 10) + 1`
-        [{ firstChangedBlock: 2 }],
+        [{ firstChangedBlock: 1 }],
       ])
-    })
+    }, 2000)
 
     const expectedNewBlocksEventArgs = [
       { from: 1, to: 1 },
       { from: 2, to: 2 },
       { from: 3, to: 3 },
-      { from: 2, to: 4 },
+      { from: 1, to: 4 },
     ]
 
     await waitForExpect(() => {
@@ -379,6 +379,101 @@ describe(BlockDownloader.name, () => {
     ])
   })
 
+  it('handles reorgs between the last known block and the next one', async () => {
+    const blocks: BlocksDict = {
+      1: { hash: 'h1.b', number: 1, parentHash: 'h0', timestamp: 0 },
+      2: { hash: 'h2.b', number: 2, parentHash: 'h1.b', timestamp: 0 },
+    }
+
+    const { blockRepository, ethereumClient, emitBlock, reorganize } =
+      setupMocks({
+        blocks,
+      })
+
+    const blockDownloader = new BlockDownloader(
+      ethereumClient,
+      blockRepository,
+      logger
+    )
+
+    const reorgListener = mockFn((_: { firstChangedBlock: number }): void => {})
+    blockDownloader.onReorg(reorgListener)
+    const newBlocksListener = mockFn((_: BlockRange): void => {})
+    blockDownloader.onNewBlocks(newBlocksListener)
+
+    await blockDownloader.start()
+
+    emitBlock({ hash: 'h1.a', number: 1, parentHash: 'h0', timestamp: 0 })
+
+    await waitForExpect(() => {
+      expect(blockDownloader.getLastKnownBlock()).toEqual({
+        hash: 'h1.a',
+        number: 1,
+      })
+    })
+
+    emitBlock(blocks[2]!)
+
+    await waitForExpect(async () => {
+      expect(reorgListener).toHaveBeenCalledExactlyWith([
+        [{ firstChangedBlock: 1 }],
+      ])
+    })
+
+    const expectedNewBlocksEventArgs = [
+      { from: 1, to: 1 },
+      { from: 1, to: 2 },
+    ]
+
+    await waitForExpect(() => {
+      expect(newBlocksListener).toHaveBeenCalledExactlyWith(
+        expect.arrayOfLength(expectedNewBlocksEventArgs.length)
+      )
+    })
+    expect(newBlocksListener).toHaveBeenCalledExactlyWith(
+      expectedNewBlocksEventArgs.map((blockRange) => [
+        expect.objectWith(blockRange),
+      ])
+    )
+
+    await waitForExpect(async () => {
+      const blocksInDb = await blockRepository.getAll()
+      expect(blocksInDb).toEqual([
+        { hash: 'h1.b', number: 1 },
+        { hash: 'h2.b', number: 2 },
+      ])
+    })
+  })
+
+  it('returns last known block', async () => {
+    const { blockRepository, ethereumClient, emitBlock } = setupMocks({
+      blocks: ['h1'],
+    })
+    const blockDownloader = new BlockDownloader(
+      ethereumClient,
+      blockRepository,
+      logger
+    )
+
+    expect(() => blockDownloader.getLastKnownBlock()).toThrow('Not started')
+
+    await blockDownloader.start()
+
+    expect(blockDownloader.getLastKnownBlock()).toEqual({
+      number: 0,
+      hash: 'h0',
+    })
+
+    emitBlock({ number: 1, hash: 'h1', parentHash: 'h0', timestamp: 0 })
+
+    await waitForExpect(() => {
+      expect(blockDownloader.getLastKnownBlock()).toEqual({
+        number: 1,
+        hash: 'h1',
+      })
+    })
+  })
+
   it('shows status', async () => {
     const { blockRepository, ethereumClient, emitBlock } = setupMocks({
       blocks: ['test--show-status--hash'],
@@ -402,7 +497,7 @@ describe(BlockDownloader.name, () => {
 
     emitBlock({
       hash: 'test--show-status--hash',
-      parentHash: 'test--show-status--parentHash',
+      parentHash: 'h0',
       number: 1,
       timestamp: 0,
     })
@@ -490,7 +585,9 @@ function setupMocks(
       }
 
       let res = blocks[blockTagOrHash]
-      if (Array.isArray(res)) res = res.shift()
+      if (Array.isArray(res)) {
+        res = res.length > 1 ? res.shift() : res[0]
+      }
       if (!res) throw new Error(`unexpected blockTag ${blockTagOrHash}`)
       return res as providers.Block
     }
@@ -517,8 +614,7 @@ function setupMocks(
     deleteAllAfter: async (number) => {
       _blockRecords = _blockRecords.filter((x) => x.number <= number)
     },
-    getFirst: async () =>
-      orderBy(_blockRecords, (x) => x.number, 'asc')[0] || INITIAL_BLOCK,
+    getFirst: () => INITIAL_BLOCK,
   })
 
   return {
