@@ -4,6 +4,7 @@ import { uniqueId } from 'lodash'
 import {
   BlockRecord,
   BlockRepository,
+  EARLIEST_BLOCK,
 } from '../../../src/peripherals/database/BlockRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
@@ -63,7 +64,7 @@ describe(BlockRepository.name, () => {
   })
 
   it('gets by hash', async () => {
-    const record = { number: 1, hash: 'hash--test-get-by-hash' }
+    const record = { number: 1, hash: uniqueId('get-by-hash') }
 
     await repository.add([record])
 
@@ -73,7 +74,7 @@ describe(BlockRepository.name, () => {
   })
 
   it('gets by number', async () => {
-    const record = { number: 1, hash: 'hash--test-get-by-number' }
+    const record = { number: 1, hash: uniqueId('get-by-number') }
 
     await repository.add([record])
 
@@ -84,10 +85,7 @@ describe(BlockRepository.name, () => {
 
   it('gets last by number', async () => {
     // Empty repository will return hardcoded earliest block
-    expect(await repository.getLast()).toEqual({
-      number: 11813207,
-      hash: '0xe191f743db9d988ff2dbeda3ec800954445f61cf8e79cc458ba831965e628e8d',
-    })
+    expect(await repository.getLast()).toEqual(EARLIEST_BLOCK)
 
     const block = { number: 11813208, hash: uniqueId('get-last-') }
     await repository.add([block])
@@ -101,21 +99,8 @@ describe(BlockRepository.name, () => {
     expect(await repository.getLast()).toEqual(laterBlock)
   })
 
-  it('gets first by number', async () => {
-    expect(await repository.getFirst()).toEqual({
-      number: 11813207,
-      hash: '0xe191f743db9d988ff2dbeda3ec800954445f61cf8e79cc458ba831965e628e8d',
-    })
-
-    const record8 = { number: 11813208, hash: uniqueId('get-first-') }
-    await repository.add([record8])
-
-    expect(await repository.getFirst()).toEqual(record8)
-
-    const earlierBlock = { number: 11813206, hash: uniqueId('get-first-') }
-    const laterBlock = { number: 11813209, hash: uniqueId('get-first-') }
-    await repository.add([laterBlock, earlierBlock])
-
-    expect(await repository.getFirst()).toEqual(earlierBlock)
+  it('gets first block', async () => {
+    // We always return the same one, regardless of what's in the database.
+    expect(repository.getFirst()).toEqual(EARLIEST_BLOCK)
   })
 })

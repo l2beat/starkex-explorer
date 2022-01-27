@@ -4,8 +4,11 @@ import { BlockRow } from 'knex/types/tables'
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
-/** block of the first verifier deploy */
-const EARLIEST_BLOCK: BlockRecord = {
+/**
+ * block of the first verifier deploy
+ * @internal exported for tests
+ */
+export const EARLIEST_BLOCK: Readonly<BlockRecord> = {
   number: 11813207,
   hash: '0xe191f743db9d988ff2dbeda3ec800954445f61cf8e79cc458ba831965e628e8d',
 }
@@ -65,18 +68,8 @@ export class BlockRepository implements Repository<BlockRecord> {
     return row
   }
 
-  async getFirst(): Promise<BlockRecord> {
-    let row = await this.knex('blocks').orderBy('number', 'asc').first()
-
-    row ||= EARLIEST_BLOCK
-
-    this.logger.debug({
-      method: 'getFirst',
-      number: row.number,
-      hash: row.hash,
-    })
-
-    return row
+  getFirst(): BlockRecord {
+    return EARLIEST_BLOCK
   }
 
   async getByNumber(number: number): Promise<BlockRecord | undefined> {
