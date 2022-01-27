@@ -1,15 +1,15 @@
 import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
-import { BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
 import { getBatches } from '../tools/getBatches'
 import { JobQueue } from '../tools/JobQueue'
 import { Logger } from '../tools/Logger'
+import { BlockDownloader } from './BlockDownloader'
 import { DataSyncService } from './DataSyncService'
-import { SafeBlockService } from './SafeBlockService'
 
 export class SyncScheduler {
   constructor(
     private readonly statusRepository: SyncStatusRepository,
-    private readonly safeBlockService: SafeBlockService,
+    private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
     private readonly batchSize: number
@@ -23,31 +23,38 @@ export class SyncScheduler {
   )
 
   async start() {
-    let last = await this.statusRepository.getLastBlockNumberSynced()
+    let lastSynced = await this.statusRepository.getLastBlockNumberSynced()
+    const lastKnown = this.blockDownloader.getLastKnownBlock()
 
-    this.logger.info('Last block number synced', { last })
+    this.logger.info('start', { lastSynced, lastKnown: lastKnown.number })
 
-    await this.dataSyncService.revert(last)
+    await this.dataSyncService.discard({ from: lastSynced })
 
-    this.safeBlockService.onNewSafeBlock(({ blockNumber }) => {
-      if (blockNumber > last) {
-        this.schedule({ from: last + 1, to: blockNumber })
-        last = blockNumber
-      }
+    if (lastKnown.number > lastSynced) {
+      this.scheduleSync({ from: lastSynced, to: lastKnown.number })
+      lastSynced = lastKnown.number
+    }
+
+    this.blockDownloader.onNewBlocks((blockRange) => {
+      lastSynced = blockRange.to
+      this.scheduleSync(blockRange)
     })
 
-    // @todo handle reverts
-    // this.safeBlockNumber.onRevert(async (blockNumber) => {
-    //   await this.jobQueue.finishCurrentAndClear()
-    //   this.dataSyncService.revert()
-    //   last = await this.getLastBlockNumberSynced()
-    //   this.schedule({ from: last + 1, to: blockNumber })
-    //   last = blockNumber
-    // })
-    //
+    // @todo write tests for this
+    this.blockDownloader.onReorg(({ firstChangedBlock }) => {
+      lastSynced = firstChangedBlock - 1
+      this.scheduleDiscard(firstChangedBlock)
+    })
   }
 
-  private async schedule(blockRange: BlockRange) {
+  private async scheduleDiscard(from: BlockNumber) {
+    this.jobQueue.add({
+      name: `discard-${from}`,
+      execute: () => this.dataSyncService.discard({ from }),
+    })
+  }
+
+  private async scheduleSync(blockRange: BlockRange) {
     for (const [from, to] of getBatches(
       blockRange.from,
       blockRange.to,
@@ -66,7 +73,7 @@ export class SyncScheduler {
       await this.dataSyncService.sync(blockRange)
       await this.statusRepository.setLastBlockNumberSynced(blockRange.to)
     } catch (err) {
-      this.dataSyncService.revert(blockRange.from)
+      await this.dataSyncService.discard(blockRange)
       throw err
     }
   }

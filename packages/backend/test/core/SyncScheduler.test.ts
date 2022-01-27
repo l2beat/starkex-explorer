@@ -1,8 +1,8 @@
 import { expect, mockFn } from 'earljs'
 import waitForExpect from 'wait-for-expect'
 
+import { BlockDownloader } from '../../src/core/BlockDownloader'
 import { DataSyncService } from '../../src/core/DataSyncService'
-import { SafeBlock, SafeBlockService } from '../../src/core/SafeBlockService'
 import { SyncScheduler } from '../../src/core/SyncScheduler'
 import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
 import { Logger } from '../../src/tools/Logger'
@@ -13,9 +13,9 @@ describe(SyncScheduler.name, () => {
     const lastBlockNumberSynced = 1
     const {
       statusRepository,
-      safeBlockService,
+      blockDownloader: safeBlockService,
       dataSyncService,
-      safeBlockListener,
+      newBlocksListener,
     } = setupMocks({ lastBlockNumberSynced })
 
     const batchSize = 3
@@ -29,9 +29,9 @@ describe(SyncScheduler.name, () => {
 
     await syncScheduler.start()
 
-    expect(dataSyncService.revert).toHaveBeenCalledWith([lastBlockNumberSynced])
+    expect(dataSyncService.discard).toHaveBeenCalledWith([{ from: 0 }])
 
-    safeBlockListener({ blockNumber: 10, timestamp: 0 })
+    newBlocksListener({ from: 2, to: 10 })
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
@@ -45,9 +45,9 @@ describe(SyncScheduler.name, () => {
   it('handles incoming new blocks', async () => {
     const {
       statusRepository,
-      safeBlockService,
+      blockDownloader: safeBlockService,
       dataSyncService,
-      safeBlockListener,
+      newBlocksListener,
     } = setupMocks()
 
     const batchSize = 50
@@ -60,11 +60,11 @@ describe(SyncScheduler.name, () => {
     )
 
     await syncScheduler.start()
-    expect(dataSyncService.revert).toHaveBeenCalledWith([0])
+    expect(dataSyncService.discard).toHaveBeenCalledWith([{ from: 0 }])
 
-    safeBlockListener({ blockNumber: 8, timestamp: 0 })
-    safeBlockListener({ blockNumber: 9, timestamp: 0 })
-    safeBlockListener({ blockNumber: 100, timestamp: 0 })
+    newBlocksListener({ from: 8, to: 8 })
+    newBlocksListener({ from: 9, to: 9 })
+    newBlocksListener({ from: 10, to: 100 })
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
@@ -93,7 +93,7 @@ describe(SyncScheduler.name, () => {
 
     const syncScheduler = new SyncScheduler(
       mocks.statusRepository,
-      mocks.safeBlockService,
+      mocks.blockDownloader,
       mocks.dataSyncService,
       Logger.SILENT,
       6_000
@@ -101,7 +101,7 @@ describe(SyncScheduler.name, () => {
 
     await syncScheduler.start()
 
-    mocks.safeBlockListener({ blockNumber: 2, timestamp: 0 })
+    mocks.newBlocksListener({ from: 2, to: 2 })
 
     await waitForExpect(() => {
       expect(mocks.dataSyncService.sync).toHaveBeenCalledExactlyWith([
@@ -123,21 +123,24 @@ function setupMocks({
     setLastBlockNumberSynced: async (value) => void (storedValue = value),
   })
 
-  let safeBlockListener: (block: SafeBlock) => void = () => {}
-  const safeBlockService = mock<SafeBlockService>({
-    onNewSafeBlock: (listener) => {
-      safeBlockListener = listener
+  let newBlocksListener: Parameters<
+    BlockDownloader['onNewBlocks']
+  >[0] = () => {}
+  const blockDownloader = mock<BlockDownloader>({
+    onNewBlocks: (listener) => {
+      newBlocksListener = listener
       return () => {}
     },
   })
 
   return {
     statusRepository,
-    safeBlockService,
+    blockDownloader,
     dataSyncService: mock<DataSyncService>({
       sync: mockFn().resolvesTo(undefined),
-      revert: mockFn().resolvesTo(undefined),
+      discard: mockFn().resolvesTo(undefined),
     }),
-    safeBlockListener: (block: SafeBlock) => safeBlockListener(block),
+    newBlocksListener: (...args: Parameters<typeof newBlocksListener>) =>
+      newBlocksListener(...args),
   }
 }

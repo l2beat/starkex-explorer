@@ -52,10 +52,10 @@ export class DataSyncService {
     }
   }
 
-  async revert(blockNumber: BlockNumber) {
-    await this.verifierCollector.discard({ from: blockNumber })
-    await this.memoryHashEventCollector.discard({ from: blockNumber })
-    await this.pageCollector.discard({ from: blockNumber })
-    await this.stateTransitionFactCollector.discard({ from: blockNumber })
+  async discard(range: { from: BlockNumber }) {
+    await this.verifierCollector.discard(range)
+    await this.memoryHashEventCollector.discard(range)
+    await this.pageCollector.discard(range)
+    await this.stateTransitionFactCollector.discard(range)
   }
 }

@@ -71,7 +71,7 @@ describe(DataSyncService.name, () => {
     })
   })
 
-  describe(DataSyncService.prototype.revert.name, () => {
+  describe(DataSyncService.prototype.discard.name, () => {
     it('discards data from block number', async () => {
       const noop = async () => {}
       const verifierCollector = mock<VerifierCollector>({ discard: noop })
@@ -93,7 +93,7 @@ describe(DataSyncService.name, () => {
         Logger.SILENT
       )
 
-      await dataSyncService.revert(10)
+      await dataSyncService.discard({ from: 10 })
 
       expect(verifierCollector.discard).toHaveBeenCalledWith([{ from: 10 }])
       expect(memoryHashEventCollector.discard).toHaveBeenCalledWith([
