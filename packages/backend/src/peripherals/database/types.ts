@@ -53,7 +53,6 @@ declare module 'knex/types/tables' {
   }
 
   interface BlockRow {
-    /** surrogate key */
     number: number
     hash: string
   }
