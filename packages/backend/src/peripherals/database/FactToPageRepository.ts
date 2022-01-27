@@ -20,7 +20,7 @@ export class FactToPageRepository implements Repository<FactToPageRecord> {
 
   async add(records: FactToPageRecord[]) {
     if (records.length === 0) {
-      this.logger.debug({ method: 'addOrUpdate', rows: 0 })
+      this.logger.debug({ method: 'add', rows: 0 })
       return
     }
 
