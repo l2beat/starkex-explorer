@@ -4,6 +4,7 @@ import {
   LOG_MEMORY_PAGE_HASHES,
   MemoryHashEventCollector,
 } from '../../src/core/MemoryHashEventCollector'
+import { Hash256 } from '../../src/model'
 import { EthereumAddress } from '../../src/model/EthereumAddress'
 import { FactToPageRepository } from '../../src/peripherals/database/FactToPageRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
@@ -88,26 +89,26 @@ describe(MemoryHashEventCollector.name, () => {
       [
         {
           index: 0,
-          pageHash: expectedEvents[0].pagesHashes[0],
-          factHash: expectedEvents[0].factHash,
+          pageHash: Hash256(expectedEvents[0].pagesHashes[0]),
+          factHash: Hash256(expectedEvents[0].factHash),
           blockNumber: expectedEvents[0].blockNumber,
         },
         {
           index: 1,
-          pageHash: expectedEvents[0].pagesHashes[1],
-          factHash: expectedEvents[0].factHash,
+          pageHash: Hash256(expectedEvents[0].pagesHashes[1]),
+          factHash: Hash256(expectedEvents[0].factHash),
           blockNumber: expectedEvents[0].blockNumber,
         },
         {
           index: 0,
-          pageHash: expectedEvents[1].pagesHashes[0],
-          factHash: expectedEvents[1].factHash,
+          pageHash: Hash256(expectedEvents[1].pagesHashes[0]),
+          factHash: Hash256(expectedEvents[1].factHash),
           blockNumber: expectedEvents[1].blockNumber,
         },
         {
           index: 1,
-          pageHash: expectedEvents[1].pagesHashes[1],
-          factHash: expectedEvents[1].factHash,
+          pageHash: Hash256(expectedEvents[1].pagesHashes[1]),
+          factHash: Hash256(expectedEvents[1].factHash),
           blockNumber: expectedEvents[1].blockNumber,
         },
       ],
@@ -117,26 +118,26 @@ describe(MemoryHashEventCollector.name, () => {
       [
         {
           index: 0,
-          pageHash: expectedEvents[2].pagesHashes[0],
-          factHash: expectedEvents[2].factHash,
+          pageHash: Hash256(expectedEvents[2].pagesHashes[0]),
+          factHash: Hash256(expectedEvents[2].factHash),
           blockNumber: expectedEvents[2].blockNumber,
         },
         {
           index: 1,
-          pageHash: expectedEvents[2].pagesHashes[1],
-          factHash: expectedEvents[2].factHash,
+          pageHash: Hash256(expectedEvents[2].pagesHashes[1]),
+          factHash: Hash256(expectedEvents[2].factHash),
           blockNumber: expectedEvents[2].blockNumber,
         },
         {
           index: 0,
-          pageHash: expectedEvents[3].pagesHashes[0],
-          factHash: expectedEvents[3].factHash,
+          pageHash: Hash256(expectedEvents[3].pagesHashes[0]),
+          factHash: Hash256(expectedEvents[3].factHash),
           blockNumber: expectedEvents[3].blockNumber,
         },
         {
           index: 1,
-          pageHash: expectedEvents[3].pagesHashes[1],
-          factHash: expectedEvents[3].factHash,
+          pageHash: Hash256(expectedEvents[3].pagesHashes[1]),
+          factHash: Hash256(expectedEvents[3].factHash),
           blockNumber: expectedEvents[3].blockNumber,
         },
       ],

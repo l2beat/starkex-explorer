@@ -8,6 +8,7 @@ import {
   PAGE_ABI,
   PageCollector,
 } from '../../src/core/PageCollector'
+import { Hash256 } from '../../src/model'
 import {
   PageRecord,
   PageRepository,
@@ -35,8 +36,9 @@ describe(PageCollector.name, () => {
       {
         blockNumber: 9,
         data: [5, 6, 7].map(BigNumber.from).map(bignumToPaddedString).join(''),
-        pageHash:
-          '0x450c6bd64d9066a35eea0d4b9ec956d88dd2d3d8589321aa41d950f2f57a708f',
+        pageHash: Hash256(
+          '0x450c6bd64d9066a35eea0d4b9ec956d88dd2d3d8589321aa41d950f2f57a708f'
+        ),
       },
       {
         blockNumber: 12,
@@ -44,8 +46,9 @@ describe(PageCollector.name, () => {
           .map(BigNumber.from)
           .map(bignumToPaddedString)
           .join(''),
-        pageHash:
-          '0xa2485807235f3ee4984796b7a1e2275a84f3bf5ae364c3a4c0c2e5c5ebaa495a',
+        pageHash: Hash256(
+          '0xa2485807235f3ee4984796b7a1e2275a84f3bf5ae364c3a4c0c2e5c5ebaa495a'
+        ),
       },
     ]
 
@@ -152,7 +155,7 @@ function testData() {
   return {
     logs,
     transactions,
-    getTransaction: (transactionHash: string) =>
-      transactions.find((tx) => tx.hash === transactionHash)!,
+    getTransaction: (transactionHash: Hash256) =>
+      transactions.find((tx) => tx.hash === transactionHash.toString())!,
   }
 }

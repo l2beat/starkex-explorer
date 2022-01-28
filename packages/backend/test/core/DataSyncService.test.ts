@@ -5,7 +5,7 @@ import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCol
 import type { PageCollector } from '../../src/core/PageCollector'
 import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
-import { EthereumAddress } from '../../src/model'
+import { EthereumAddress, Hash256 } from '../../src/model'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
 import { PositionUpdateRepository } from '../../src/peripherals/database/PositionUpdateRepository'
 import { Logger } from '../../src/tools/Logger'
@@ -26,7 +26,9 @@ describe(DataSyncService.name, () => {
       collect: async (_blockRange) => [],
     })
     const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
-      collect: async (_blockRange) => [{ hash: 'fact-hash-1', blockNumber: 1 }],
+      collect: async (_blockRange) => [
+        { hash: Hash256.fake('abcd'), blockNumber: 1 },
+      ],
     })
     const pageRepository = mock<PageRepository>({
       getAllForFacts: async () => [],
@@ -61,7 +63,7 @@ describe(DataSyncService.name, () => {
       ])
 
       expect(pageRepository.getAllForFacts).toHaveBeenCalledWith([
-        ['fact-hash-1'],
+        [Hash256.fake('abcd')],
       ])
       expect(positionUpdateRepository.addOrUpdate).toHaveBeenCalledExactlyWith(
         []

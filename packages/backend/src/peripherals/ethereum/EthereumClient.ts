@@ -1,5 +1,6 @@
 import { ethers, providers } from 'ethers'
 
+import { Hash256 } from '../../model'
 import { BlockTag } from './types'
 
 export class EthereumClient {
@@ -19,7 +20,7 @@ export class EthereumClient {
     return await this.provider.getLogs(filter)
   }
 
-  async getTransaction(transactionHash: string) {
-    return await this.provider.getTransaction(transactionHash)
+  async getTransaction(transactionHash: Hash256) {
+    return await this.provider.getTransaction(transactionHash.toString())
   }
 }

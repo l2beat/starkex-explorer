@@ -21,3 +21,12 @@ Hash256.fromBigNumber = function fromBigNumber(value: BigNumber) {
 Hash256.fromBigInt = function fromBigInt(value: bigint) {
   return Hash256('0x' + value.toString(16).padStart(64, '0'))
 }
+
+Hash256.fake = function fake(start?: string) {
+  if (!start) {
+    const fakeDigit = () => '0123456789abcdef'[Math.floor(Math.random() * 16)]
+    return Hash256(new Array(64).fill(0).map(fakeDigit).join(''))
+  } else {
+    return Hash256(start.padEnd(64, '0'))
+  }
+}

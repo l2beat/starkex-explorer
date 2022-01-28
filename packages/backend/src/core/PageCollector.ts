@@ -1,5 +1,6 @@
 import { BigNumber, utils } from 'ethers'
 
+import { Hash256 } from '../model'
 import {
   PageRecord,
   PageRepository,
@@ -75,18 +76,17 @@ export class PageCollector {
     return logs
       .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
       .map(({ log, event }): MemoryPageEvent => {
-        const hash: BigNumber = event.args.memoryHash
         return {
-          memoryHash: '0x' + hash.toHexString().slice(2).padStart(64, '0'),
-          transactionHash: log.transactionHash,
+          memoryHash: Hash256.fromBigNumber(event.args.memoryHash),
+          transactionHash: Hash256(log.transactionHash),
         }
       })
   }
 }
 
 interface MemoryPageEvent {
-  memoryHash: string
-  transactionHash: string
+  memoryHash: Hash256
+  transactionHash: Hash256
 }
 
 /** @internal */

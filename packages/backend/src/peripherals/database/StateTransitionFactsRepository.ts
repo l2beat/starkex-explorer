@@ -1,13 +1,14 @@
 import { Knex } from 'knex'
 import { StateTransitionFactRow } from 'knex/types/tables'
 
+import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
 export interface StateTransitionFactRecord {
   id?: number
   blockNumber: number
-  hash: string
+  hash: Hash256
 }
 
 export class StateTransitionFactRepository
@@ -56,7 +57,7 @@ function toRow(record: StateTransitionFactRecord): StateTransitionFactRow {
   return {
     id: record.id,
     block_number: record.blockNumber,
-    hash: record.hash,
+    hash: record.hash.toString(),
   }
 }
 
@@ -64,6 +65,6 @@ function toRecord(row: StateTransitionFactRow): StateTransitionFactRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,
-    hash: row.hash,
+    hash: Hash256(row.hash),
   }
 }

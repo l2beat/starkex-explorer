@@ -1,6 +1,10 @@
 import { expect } from 'earljs'
 
-import { FactToPageRepository } from '../../../src/peripherals/database/FactToPageRepository'
+import { Hash256 } from '../../../src/model'
+import {
+  FactToPageRecord,
+  FactToPageRepository,
+} from '../../../src/peripherals/database/FactToPageRepository'
 import {
   PageRecord,
   PageRepository,
@@ -17,8 +21,8 @@ describe(PageRepository.name, () => {
   it('adds single record and queries it', async () => {
     const record: PageRecord = {
       blockNumber: 1,
-      pageHash: '{{ page hash }}',
-      data: '{{ data }}',
+      pageHash: Hash256.fake(),
+      data: '11223344',
     }
 
     await repository.add([record])
@@ -56,18 +60,14 @@ describe(PageRepository.name, () => {
   })
 
   it('deletes all records after a block number', async () => {
-    await repository.add(
-      Array.from({ length: 10 }).map((_, i) => dummyPageRecord(i))
-    )
+    const records = Array.from({ length: 10 }).map((_, i) => dummyPageRecord(i))
+    await repository.add(records)
 
     await repository.deleteAllAfter(5)
 
     const actual = await repository.getAll()
     expect(actual).toEqual(
-      Array.from({ length: 6 }).map((_, i) => ({
-        ...dummyPageRecord(i),
-        id: expect.a(Number),
-      }))
+      records.slice(0, 6).map((r) => ({ ...r, id: expect.a(Number) }))
     )
   })
 
@@ -78,77 +78,104 @@ describe(PageRepository.name, () => {
 
     it('gets pages for ordered by .index and fact hash position in array #1', async () => {
       await factToPageRepository.add([
-        { blockNumber: 2, factHash: 'fh2', pageHash: 'ph22', index: 2 },
-        { blockNumber: 1, factHash: 'fh1', pageHash: 'ph13', index: 3 },
-        { blockNumber: 3, factHash: 'fh2', pageHash: 'ph20', index: 0 },
-        { blockNumber: 1, factHash: 'fh1', pageHash: 'ph11', index: 1 },
-        { blockNumber: 1, factHash: 'fh2', pageHash: 'ph24', index: 4 },
-        { blockNumber: 5, factHash: 'fh2', pageHash: 'ph21', index: 1 },
-        { blockNumber: 1, factHash: 'fh1', pageHash: 'ph12', index: 2 },
-        { blockNumber: 4, factHash: 'fh1', pageHash: 'ph10', index: 0 },
-        { blockNumber: 3, factHash: 'fh2', pageHash: 'ph23', index: 3 },
-        { blockNumber: 5, factHash: 'fh1', pageHash: 'ph14', index: 4 },
+        dummyFactToPageRecord(2, Hash256.fake('ff02'), Hash256.fake('aa22'), 2),
+        dummyFactToPageRecord(1, Hash256.fake('ff01'), Hash256.fake('aa13'), 3),
+        dummyFactToPageRecord(3, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
+        dummyFactToPageRecord(1, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
+        dummyFactToPageRecord(1, Hash256.fake('ff02'), Hash256.fake('aa24'), 4),
+        dummyFactToPageRecord(5, Hash256.fake('ff02'), Hash256.fake('aa21'), 1),
+        dummyFactToPageRecord(1, Hash256.fake('ff01'), Hash256.fake('aa12'), 2),
+        dummyFactToPageRecord(4, Hash256.fake('ff01'), Hash256.fake('aa10'), 0),
+        dummyFactToPageRecord(3, Hash256.fake('ff02'), Hash256.fake('aa23'), 3),
+        dummyFactToPageRecord(5, Hash256.fake('ff01'), Hash256.fake('aa14'), 4),
       ])
 
       await repository.add([
-        { blockNumber: 2, pageHash: 'ph10', data: '{{1-1}}' },
-        { blockNumber: 1, pageHash: 'ph11', data: '{{1-2}}' },
-        { blockNumber: 3, pageHash: 'ph12', data: '{{1-3}}' },
-        { blockNumber: 2, pageHash: 'ph13', data: '{{1-4}}' },
-        { blockNumber: 4, pageHash: 'ph14', data: '{{1-5}}' },
-        { blockNumber: 2, pageHash: 'ph20', data: '{{2-1}}' },
-        { blockNumber: 1, pageHash: 'ph21', data: '{{2-2}}' },
-        { blockNumber: 3, pageHash: 'ph22', data: '{{2-3}}' },
-        { blockNumber: 2, pageHash: 'ph24', data: '{{2-5}}' },
-        { blockNumber: 2, pageHash: 'ph23', data: '{{2-4}}' },
+        dummyPageRecord(2, Hash256.fake('aa10'), '{{1-1}}'),
+        dummyPageRecord(1, Hash256.fake('aa11'), '{{1-2}}'),
+        dummyPageRecord(3, Hash256.fake('aa12'), '{{1-3}}'),
+        dummyPageRecord(2, Hash256.fake('aa13'), '{{1-4}}'),
+        dummyPageRecord(4, Hash256.fake('aa14'), '{{1-5}}'),
+        dummyPageRecord(2, Hash256.fake('aa20'), '{{2-1}}'),
+        dummyPageRecord(1, Hash256.fake('aa21'), '{{2-2}}'),
+        dummyPageRecord(3, Hash256.fake('aa22'), '{{2-3}}'),
+        dummyPageRecord(2, Hash256.fake('aa24'), '{{2-5}}'),
+        dummyPageRecord(2, Hash256.fake('aa23'), '{{2-4}}'),
       ])
 
-      const actual = await repository.getAllForFacts(['fh2', 'fh1'])
+      const actual = await repository.getAllForFacts([
+        Hash256.fake('ff02'),
+        Hash256.fake('ff01'),
+      ])
 
       expect(format(actual)).toEqual([
-        'fh2 {{2-1}}{{2-2}}{{2-3}}{{2-4}}{{2-5}}',
-        'fh1 {{1-1}}{{1-2}}{{1-3}}{{1-4}}{{1-5}}',
+        '0xff02 {{2-1}}{{2-2}}{{2-3}}{{2-4}}{{2-5}}',
+        '0xff01 {{1-1}}{{1-2}}{{1-3}}{{1-4}}{{1-5}}',
       ])
     })
 
     it('gets pages for ordered by .index and fact hash position in array #2', async () => {
       await factToPageRepository.add([
-        { blockNumber: 3, factHash: 'fh2', pageHash: 'ph20', index: 0 },
-        { blockNumber: 1, factHash: 'fh1', pageHash: 'ph11', index: 1 },
-        { blockNumber: 3, factHash: 'fh3', pageHash: 'ph30', index: 0 },
-        { blockNumber: 5, factHash: 'fh2', pageHash: 'ph21', index: 1 },
-        { blockNumber: 4, factHash: 'fh1', pageHash: 'ph10', index: 0 },
-        { blockNumber: 3, factHash: 'fh3', pageHash: 'ph31', index: 1 },
+        dummyFactToPageRecord(3, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
+        dummyFactToPageRecord(1, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
+        dummyFactToPageRecord(3, Hash256.fake('ff03'), Hash256.fake('aa30'), 0),
+        dummyFactToPageRecord(5, Hash256.fake('ff02'), Hash256.fake('aa21'), 1),
+        dummyFactToPageRecord(4, Hash256.fake('ff01'), Hash256.fake('aa10'), 0),
+        dummyFactToPageRecord(3, Hash256.fake('ff03'), Hash256.fake('aa31'), 1),
       ])
 
       await repository.add([
-        { blockNumber: 2, pageHash: 'ph10', data: '{{1-0}}' },
-        { blockNumber: 1, pageHash: 'ph11', data: '{{1-1}}' },
-        { blockNumber: 2, pageHash: 'ph20', data: '{{2-0}}' },
-        { blockNumber: 1, pageHash: 'ph21', data: '{{2-1}}' },
-        { blockNumber: 2, pageHash: 'ph30', data: '{{3-0}}' },
-        { blockNumber: 2, pageHash: 'ph31', data: '{{3-1}}' },
+        dummyPageRecord(2, Hash256.fake('aa10'), '{{1-0}}'),
+        dummyPageRecord(1, Hash256.fake('aa11'), '{{1-1}}'),
+        dummyPageRecord(2, Hash256.fake('aa20'), '{{2-0}}'),
+        dummyPageRecord(1, Hash256.fake('aa21'), '{{2-1}}'),
+        dummyPageRecord(2, Hash256.fake('aa30'), '{{3-0}}'),
+        dummyPageRecord(2, Hash256.fake('aa31'), '{{3-1}}'),
       ])
 
-      const actual = await repository.getAllForFacts(['fh1', 'fh2', 'fh3'])
+      const actual = await repository.getAllForFacts([
+        Hash256.fake('ff01'),
+        Hash256.fake('ff02'),
+        Hash256.fake('ff03'),
+      ])
 
       expect(format(actual)).toEqual([
-        'fh1 {{1-0}}{{1-1}}',
-        'fh2 {{2-0}}{{2-1}}',
-        'fh3 {{3-0}}{{3-1}}',
+        '0xff01 {{1-0}}{{1-1}}',
+        '0xff02 {{2-0}}{{2-1}}',
+        '0xff03 {{3-0}}{{3-1}}',
       ])
     })
 
-    function format(xs: { factHash: string; pages: string[] }[]) {
-      return xs.map((x) => `${x.factHash} ${x.pages.join('')}`.trim())
+    function format(xs: { factHash: Hash256; pages: string[] }[]) {
+      return xs.map((x) =>
+        `${x.factHash.slice(0, 6)} ${x.pages.join('')}`.trim()
+      )
     }
   })
 })
 
-function dummyPageRecord(blockNumber: number): PageRecord {
+function dummyPageRecord(
+  blockNumber: number,
+  pageHash = Hash256.fake(),
+  data = `{{ data ${blockNumber} }}`
+): PageRecord {
   return {
     blockNumber,
-    data: `{{ data ${blockNumber} }}`,
-    pageHash: `{{ page hash ${blockNumber} }}`,
+    pageHash,
+    data,
+  }
+}
+
+function dummyFactToPageRecord(
+  blockNumber: number,
+  factHash: Hash256,
+  pageHash: Hash256,
+  index: number
+): FactToPageRecord {
+  return {
+    blockNumber,
+    factHash,
+    pageHash,
+    index,
   }
 }
