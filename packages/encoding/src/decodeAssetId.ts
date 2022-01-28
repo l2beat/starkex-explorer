@@ -1,3 +1,4 @@
+import { AssetId } from './AssetId'
 import { DecodingError } from './DecodingError'
 
 export function decodeAssetId(value: string) {
@@ -11,5 +12,5 @@ export function decodeAssetId(value: string) {
     .join('')
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const zeroBytes = idString.match(/\0*$/)![0].length
-  return idString.substring(0, idString.length - zeroBytes)
+  return AssetId(idString.substring(0, idString.length - zeroBytes))
 }

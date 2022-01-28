@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { DecodingError } from '../src'
+import { AssetId, DecodingError } from '../src'
 import { MIN_INT } from '../src/constants'
 import { encodeAssetId } from '../src/encodeAssetId'
 import { readFundingIndices } from '../src/readFundingIndices'
@@ -23,28 +23,30 @@ describe('readFundingIndices', () => {
     const writer = new ByteWriter()
       .writeNumber(1, 32)
       .writePadding(17)
-      .write(encodeAssetId('ETH-9'))
+      .write(encodeAssetId(AssetId('ETH-9')))
       .writeNumber(1n - MIN_INT, 32)
-    expect(decode(writer.getBytes())).toEqual([{ assetId: 'ETH-9', value: 1n }])
+    expect(decode(writer.getBytes())).toEqual([
+      { assetId: AssetId('ETH-9'), value: 1n },
+    ])
   })
 
   it('can read a multiple indices', () => {
     const writer = new ByteWriter()
       .writeNumber(3, 32)
       .writePadding(17)
-      .write(encodeAssetId('ETH-9'))
+      .write(encodeAssetId(AssetId('ETH-9')))
       .writeNumber(1n - MIN_INT, 32)
       .writePadding(17)
-      .write(encodeAssetId('BTC-10'))
+      .write(encodeAssetId(AssetId('BTC-10')))
       .writeNumber(-50n - MIN_INT, 32)
       .writePadding(17)
-      .write(encodeAssetId('ABC-123'))
+      .write(encodeAssetId(AssetId('ABC-123')))
       .writeNumber(456n - MIN_INT, 32)
 
     expect(decode(writer.getBytes())).toEqual([
-      { assetId: 'ETH-9', value: 1n },
-      { assetId: 'BTC-10', value: -50n },
-      { assetId: 'ABC-123', value: 456n },
+      { assetId: AssetId('ETH-9'), value: 1n },
+      { assetId: AssetId('BTC-10'), value: -50n },
+      { assetId: AssetId('ABC-123'), value: 456n },
     ])
   })
 })

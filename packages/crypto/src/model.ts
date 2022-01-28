@@ -1,5 +1,5 @@
 export interface PedersenHash extends String {
-  _pedersenHashBrand: string
+  _PedersenHashBrand: string
 }
 
 export function PedersenHash(value: string) {

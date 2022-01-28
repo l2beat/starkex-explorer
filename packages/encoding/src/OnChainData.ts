@@ -1,3 +1,5 @@
+import { AssetId } from './AssetId'
+
 export interface OnChainData {
   configurationHash: string
   assetDataHashes: AssetDataHash[]
@@ -8,12 +10,12 @@ export interface OnChainData {
 }
 
 export interface AssetDataHash {
-  assetId: string
+  assetId: AssetId
   hash: string
 }
 
 export interface FundingIndex {
-  assetId: string
+  assetId: AssetId
   value: bigint
 }
 
@@ -29,7 +31,7 @@ export interface State {
 }
 
 export interface OraclePrice {
-  assetId: string
+  assetId: AssetId
   price: bigint
 }
 
@@ -47,6 +49,6 @@ export interface PositionUpdate {
 }
 
 export interface AssetBalance {
-  assetId: string
+  assetId: AssetId
   balance: bigint
 }

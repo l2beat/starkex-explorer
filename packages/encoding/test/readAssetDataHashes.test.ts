@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { DecodingError } from '../src'
+import { AssetId, DecodingError } from '../src'
 import { encodeAssetId } from '../src/encodeAssetId'
 import { readAssetDataHashes } from '../src/readAssetDataHashes'
 import { ByteWriter } from './ByteWriter'
@@ -22,10 +22,10 @@ describe('readAssetDataHashes', () => {
     const writer = new ByteWriter()
       .writeNumber(1, 32)
       .writePadding(17)
-      .write(encodeAssetId('ETH-9'))
+      .write(encodeAssetId(AssetId('ETH-9')))
       .write('abcd1234'.repeat(8))
     expect(decode(writer.getBytes())).toEqual([
-      { assetId: 'ETH-9', hash: '0x' + 'abcd1234'.repeat(8) },
+      { assetId: AssetId('ETH-9'), hash: '0x' + 'abcd1234'.repeat(8) },
     ])
   })
 
@@ -33,15 +33,15 @@ describe('readAssetDataHashes', () => {
     const writer = new ByteWriter()
       .writeNumber(2, 32)
       .writePadding(17)
-      .write(encodeAssetId('ETH-9'))
+      .write(encodeAssetId(AssetId('ETH-9')))
       .write('abcd1234'.repeat(8))
       .writePadding(17)
-      .write(encodeAssetId('BTC-10'))
+      .write(encodeAssetId(AssetId('BTC-10')))
       .write('deadbeef'.repeat(8))
 
     expect(decode(writer.getBytes())).toEqual([
-      { assetId: 'ETH-9', hash: '0x' + 'abcd1234'.repeat(8) },
-      { assetId: 'BTC-10', hash: '0x' + 'deadbeef'.repeat(8) },
+      { assetId: AssetId('ETH-9'), hash: '0x' + 'abcd1234'.repeat(8) },
+      { assetId: AssetId('BTC-10'), hash: '0x' + 'deadbeef'.repeat(8) },
     ])
   })
 })
