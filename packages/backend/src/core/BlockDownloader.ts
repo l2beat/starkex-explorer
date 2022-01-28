@@ -2,13 +2,13 @@ import assert from 'assert'
 import { providers } from 'ethers'
 import { last, range } from 'lodash'
 
-import { json } from '../model'
+import { BlockRange, json } from '../model'
 import {
   BlockRecord,
   BlockRepository,
 } from '../peripherals/database/BlockRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber } from '../peripherals/ethereum/types'
 import { createEventEmitter } from '../tools/EventEmitter'
 import { JobQueue } from '../tools/JobQueue'
 import { Logger } from '../tools/Logger'
@@ -141,10 +141,7 @@ export class BlockDownloader {
 
     this.state.lastKnownBlock = { hash: latest.hash, number: latest.number }
 
-    this.events.emit('newBlocks', {
-      from: lastKnown.number + 1,
-      to: latest.number,
-    })
+    this.events.emit('newBlocks', new BlockRange(newBlocks))
   }
 
   // We check if the last known block was reorged, if so, we find the reorg

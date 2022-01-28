@@ -8,18 +8,19 @@ import {
   IncomingBlock,
   isConsistentChain,
 } from '../../src/core/BlockDownloader'
+import { BlockRange } from '../../src/model'
 import {
   BlockRecord,
   BlockRepository,
 } from '../../src/peripherals/database/BlockRepository'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { BlockRange, BlockTag } from '../../src/peripherals/ethereum/types'
+import { BlockTag } from '../../src/peripherals/ethereum/types'
 import { Logger, LogLevel } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
 const INITIAL_BLOCK: BlockRecord = { number: 0, hash: 'h0' }
 
-describe.only(BlockDownloader.name, () => {
+describe(BlockDownloader.name, () => {
   const logger = new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
 
   it('saves obtained blocks to db', async () => {
@@ -116,7 +117,7 @@ describe.only(BlockDownloader.name, () => {
 
     await waitForExpect(() => {
       expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-        [{ from: 1, to: 1 }],
+        [new BlockRange([{ hash: 'h1', number: 1 }])],
       ])
     })
 
@@ -131,8 +132,8 @@ describe.only(BlockDownloader.name, () => {
 
     await waitForExpect(() => {
       expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-        [{ from: 1, to: 1 }],
-        [{ from: 2, to: 4 }],
+        [BlockRange.from({ 1: 'h1' })],
+        [BlockRange.from({ 2: 'h2', 3: 'h3', 4: 'h4' })],
       ])
     })
   })
@@ -246,7 +247,7 @@ describe.only(BlockDownloader.name, () => {
     await waitForExpect(async () => {
       const blocksInDb = await blockRepository.getAll()
       expect(blocksInDb).toBeAnArrayOfLength(3)
-    }, 2000)
+    })
 
     expect(await blockRepository.getAll()).toEqual([
       { hash: 'h1', number: 1 },
@@ -262,7 +263,7 @@ describe.only(BlockDownloader.name, () => {
       expect(reorgListener).toHaveBeenCalledExactlyWith([
         [{ firstChangedBlock: 1 }],
       ])
-    }, 2000)
+    })
 
     const expectedNewBlocksEventArgs = [
       { from: 1, to: 1 },
@@ -373,9 +374,14 @@ describe.only(BlockDownloader.name, () => {
     expect(reorgListener).toHaveBeenCalledExactlyWith([])
 
     expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-      [{ from: 1, to: 1 }],
-      [{ from: 2, to: 2 }],
-      [{ from: 3, to: 4 }],
+      [new BlockRange([{ number: 1, hash: 'h1' }])],
+      [new BlockRange([{ number: 2, hash: 'h2' }])],
+      [
+        new BlockRange([
+          { number: 3, hash: 'h3.b' },
+          { number: 4, hash: 'h4.b' },
+        ]),
+      ],
     ])
   })
 
@@ -385,10 +391,9 @@ describe.only(BlockDownloader.name, () => {
       2: { hash: 'h2.b', number: 2, parentHash: 'h1.b', timestamp: 0 },
     }
 
-    const { blockRepository, ethereumClient, emitBlock, reorganize } =
-      setupMocks({
-        blocks,
-      })
+    const { blockRepository, ethereumClient, emitBlock } = setupMocks({
+      blocks,
+    })
 
     const blockDownloader = new BlockDownloader(
       ethereumClient,

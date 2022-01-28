@@ -4,6 +4,7 @@ import waitForExpect from 'wait-for-expect'
 import { BlockDownloader } from '../../src/core/BlockDownloader'
 import { DataSyncService } from '../../src/core/DataSyncService'
 import { SyncScheduler } from '../../src/core/SyncScheduler'
+import { BlockRange } from '../../src/model'
 import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
@@ -31,7 +32,7 @@ describe(SyncScheduler.name, () => {
 
     expect(dataSyncService.discard).toHaveBeenCalledWith([{ from: 0 }])
 
-    newBlocksListener({ from: 2, to: 10 })
+    newBlocksListener({ from: 2, to: 10 } as BlockRange)
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
@@ -62,9 +63,9 @@ describe(SyncScheduler.name, () => {
     await syncScheduler.start()
     expect(dataSyncService.discard).toHaveBeenCalledWith([{ from: 0 }])
 
-    newBlocksListener({ from: 8, to: 8 })
-    newBlocksListener({ from: 9, to: 9 })
-    newBlocksListener({ from: 10, to: 100 })
+    newBlocksListener({ from: 8, to: 8 } as BlockRange)
+    newBlocksListener({ from: 9, to: 9 } as BlockRange)
+    newBlocksListener({ from: 10, to: 100 } as BlockRange)
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
@@ -101,12 +102,13 @@ describe(SyncScheduler.name, () => {
 
     await syncScheduler.start()
 
-    mocks.newBlocksListener({ from: 2, to: 2 })
+    const range = new BlockRange([{ number: 2, hash: '0x2' }])
+    mocks.newBlocksListener(range)
 
     await waitForExpect(() => {
       expect(mocks.dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [{ from: 2, to: 2 }],
-        [{ from: 2, to: 2 }],
+        [range],
+        [range],
       ])
     })
   })

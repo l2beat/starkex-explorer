@@ -2,13 +2,12 @@ import { expect, mockFn } from 'earljs'
 import { providers } from 'ethers'
 
 import { VerifierCollector } from '../../src/core/VerifierCollector'
-import { EthereumAddress } from '../../src/model'
+import { BlockRange, EthereumAddress } from '../../src/model'
 import {
   VerifierEventRecord,
   VerifierEventRepository,
 } from '../../src/peripherals/database/VerifierEventRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { BlockRange } from '../../src/peripherals/ethereum/types'
 import { mock } from '../mock'
 
 describe(VerifierCollector.name, () => {
@@ -26,7 +25,25 @@ describe(VerifierCollector.name, () => {
       })
     )
 
-    const blockRange: BlockRange = { from: 11813207, to: 13987296 }
+    const blockRange: BlockRange = new BlockRange([
+      {
+        number: 12004790,
+        hash: '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53',
+      },
+      {
+        number: 12004790,
+        hash: '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53',
+      },
+      {
+        number: 12016212,
+        hash: '0x867fdd66b6dee527e1f5f6c9d742ca6776a8fd72a1919e019bff85b0a2c1005d',
+      },
+      {
+        number: 12016212,
+        hash: '0x867fdd66b6dee527e1f5f6c9d742ca6776a8fd72a1919e019bff85b0a2c1005d',
+      },
+    ])
+
     const verifiers = await collector.collect(blockRange)
 
     expect(getLogs).toHaveBeenCalledWith([
@@ -91,6 +108,54 @@ describe(VerifierCollector.name, () => {
     await collector.discard({ from: 123 })
 
     expect(verifierEventRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+  })
+
+  it('filters out logs from reorged chain histories', async () => {
+    const verifierEventRepository = mock<VerifierEventRepository>({
+      add: async () => {},
+      getAll: async () => [],
+    })
+
+    const collector = new VerifierCollector(
+      mock<EthereumClient>({ getLogs: async () => testData().logs }),
+      verifierEventRepository
+    )
+
+    const blockRange: BlockRange = new BlockRange([
+      {
+        number: 12004790,
+        hash: '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53',
+      },
+      {
+        number: 12016212,
+        hash: '0xdeadbeef',
+      },
+    ])
+
+    const verifiers = await collector.collect(blockRange)
+
+    expect(verifierEventRepository.add).toHaveBeenCalledExactlyWith([
+      [
+        [
+          expect.objectWith({
+            name: 'ImplementationAdded',
+            blockNumber: 12004790,
+            implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
+            initializer:
+              '0x000000000000000000000000b1eda32c467569fbdc8c3e041c81825d76b32b84',
+          }),
+          expect.objectWith({
+            name: 'Upgraded',
+            blockNumber: 12004790,
+            implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
+          }),
+        ],
+      ],
+    ])
+
+    expect(verifiers).toEqual([
+      EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84'),
+    ])
   })
 })
 

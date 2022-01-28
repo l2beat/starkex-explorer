@@ -8,7 +8,7 @@ import {
   PAGE_ABI,
   PageCollector,
 } from '../../src/core/PageCollector'
-import { Hash256 } from '../../src/model'
+import { BlockRange, Hash256 } from '../../src/model'
 import {
   PageRecord,
   PageRepository,
@@ -28,7 +28,16 @@ describe(PageCollector.name, () => {
 
     const pageCollector = new PageCollector(ethereumClient, pageRepository)
 
-    const blockRange = { from: 8, to: 12 }
+    const blockRange = new BlockRange([
+      {
+        number: 9,
+        hash: '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c',
+      },
+      {
+        number: 10,
+        hash: '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c',
+      },
+    ])
 
     const actualRecords = await pageCollector.collect(blockRange)
 
@@ -76,6 +85,56 @@ describe(PageCollector.name, () => {
     await collector.discard({ from: 123 })
 
     expect(pageRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+  })
+
+  it('filters out logs from reorged chain histories', async () => {
+    const ethereumClient = mock<EthereumClient>({
+      getTransaction: async (txHash) => testData().getTransaction(txHash),
+      getLogs: async () => testData().logs,
+    })
+    const pageRepository = mock<PageRepository>({
+      add: async () => {},
+    })
+
+    const pageCollector = new PageCollector(ethereumClient, pageRepository)
+
+    const blockRange = new BlockRange([
+      {
+        number: 9,
+        hash: '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c',
+      },
+      {
+        number: 10,
+        hash: '0xdeadbeef',
+      },
+    ])
+
+    const actualRecords = await pageCollector.collect(blockRange)
+
+    const expectedRecords: PageRecord[] = [
+      {
+        blockNumber: 9,
+        data: [5, 6, 7].map(BigNumber.from).map(bignumToPaddedString).join(''),
+        pageHash: Hash256(
+          '0x450c6bd64d9066a35eea0d4b9ec956d88dd2d3d8589321aa41d950f2f57a708f'
+        ),
+      },
+    ]
+
+    expect(actualRecords).toEqual(expectedRecords)
+
+    expect(ethereumClient.getLogs).toHaveBeenCalledExactlyWith([
+      [
+        {
+          address: '0xEfbCcE4659db72eC6897F46783303708cf9ACef8',
+          topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
+          fromBlock: blockRange.from,
+          toBlock: blockRange.to,
+        },
+      ],
+    ])
+
+    expect(pageRepository.add).toHaveBeenCalledWith([expectedRecords])
   })
 
   describe(bignumToPaddedString.name, () => {

@@ -2,13 +2,13 @@ import { expect } from 'earljs'
 
 import {
   LOG_MEMORY_PAGE_HASHES,
+  MemoryHashEvent,
   MemoryHashEventCollector,
 } from '../../src/core/MemoryHashEventCollector'
-import { Hash256 } from '../../src/model'
+import { BlockRange, Hash256 } from '../../src/model'
 import { EthereumAddress } from '../../src/model/EthereumAddress'
 import { FactToPageRepository } from '../../src/peripherals/database/FactToPageRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { BlockRange } from '../../src/peripherals/ethereum/types'
 import { mock } from '../mock'
 
 describe(MemoryHashEventCollector.name, () => {
@@ -29,7 +29,24 @@ describe(MemoryHashEventCollector.name, () => {
       EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84'),
       EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
     ]
-    const blockRange: BlockRange = { from: 11813207, to: 13987296 }
+    const blockRange: BlockRange = new BlockRange([
+      {
+        number: 11905858,
+        hash: '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55',
+      },
+      {
+        number: 11905919,
+        hash: '0x51c1482ed70ef0cab9fb40b891ada76408c0272bd1fd9c48e3d28ca65a2fc54f',
+      },
+      {
+        number: 12050594,
+        hash: '0x34eba61af14fcce1f79268532b73cb39af2897a5d219288edef044f07a660a74',
+      },
+      {
+        number: 12052850,
+        hash: '0x8a74ff3eb9f3d439b2b52241b9f6035a7ff93887ca8a16424413c97d0d9adfd8',
+      },
+    ])
 
     const actual = await collector.collect(blockRange, verifierAddresses)
 
@@ -177,6 +194,72 @@ describe(MemoryHashEventCollector.name, () => {
     await collector.discard({ from: 123 })
 
     expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+  })
+
+  it('filters out logs from reorged history', async () => {
+    const ethereumClient = mock<EthereumClient>({
+      getLogs: async (filter) =>
+        testData().logs.filter((log) => filter.address === log.address),
+    })
+    const factToPageRepository = mock<FactToPageRepository>({
+      add: async () => {},
+    })
+    const collector = new MemoryHashEventCollector(
+      ethereumClient,
+      factToPageRepository
+    )
+
+    const actual = await collector.collect(
+      new BlockRange([
+        {
+          number: 11905858,
+          hash: '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55',
+        },
+        {
+          number: 11905919,
+          hash: '0xdeadbeef',
+        },
+      ]),
+      [EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84')]
+    )
+
+    const expectedEvents: MemoryHashEvent[] = [
+      {
+        blockNumber: 11905858,
+        factHash: Hash256(
+          '0x4ac3c5b87c46c673c67db046ffef90c618297b6ba445c7560f8122c33e9a37ff'
+        ),
+        pagesHashes: [
+          Hash256(
+            '0xce887f94b38c0efe1e788c845b5c4e496f6f65fb9340369af22c351868238c16'
+          ),
+          Hash256(
+            '0xfc7e3b571b22a96a4c234b194d55f2c833b3f3dd0e1d82a9be9a30eaf754cb19'
+          ),
+        ],
+      },
+    ]
+
+    expect(actual).toEqual(expectedEvents)
+
+    expect(factToPageRepository.add).toHaveBeenCalledExactlyWith([
+      [
+        [
+          {
+            index: 0,
+            pageHash: expectedEvents[0].pagesHashes[0],
+            factHash: expectedEvents[0].factHash,
+            blockNumber: expectedEvents[0].blockNumber,
+          },
+          {
+            index: 1,
+            pageHash: expectedEvents[0].pagesHashes[1],
+            factHash: expectedEvents[0].factHash,
+            blockNumber: expectedEvents[0].blockNumber,
+          },
+        ],
+      ],
+    ])
   })
 })
 

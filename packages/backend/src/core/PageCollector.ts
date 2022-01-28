@@ -1,12 +1,12 @@
 import { BigNumber, utils } from 'ethers'
 
-import { Hash256 } from '../model'
+import { BlockRange, Hash256 } from '../model'
 import {
   PageRecord,
   PageRepository,
 } from '../peripherals/database/PageRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber } from '../peripherals/ethereum/types'
 
 const REGISTRY_ABI = new utils.Interface([
   'event LogMemoryPageFactContinuous(bytes32 factHash, uint256 memoryHash, uint256 prod)',
@@ -74,6 +74,7 @@ export class PageCollector {
     })
 
     return logs
+      .filter((log) => blockRange.has(log))
       .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
       .map(({ log, event }): MemoryPageEvent => {
         return {

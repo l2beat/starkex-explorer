@@ -5,7 +5,7 @@ import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCol
 import type { PageCollector } from '../../src/core/PageCollector'
 import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
-import { EthereumAddress, Hash256 } from '../../src/model'
+import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
 import { PositionUpdateRepository } from '../../src/peripherals/database/PositionUpdateRepository'
 import { Logger } from '../../src/tools/Logger'
@@ -48,7 +48,7 @@ describe(DataSyncService.name, () => {
     )
 
     it('collects data', async () => {
-      const blockRange = { from: 10, to: 25 }
+      const blockRange = { from: 10, to: 25 } as BlockRange
       await service.sync(blockRange)
 
       expect(verifierCollector.collect).toHaveBeenCalledExactlyWith([

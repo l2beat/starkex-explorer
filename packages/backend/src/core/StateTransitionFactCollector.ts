@@ -1,11 +1,12 @@
 import { utils } from 'ethers'
 
+import { BlockRange } from '../model/BlockRange'
 import {
   StateTransitionFactRecord,
   StateTransitionFactRepository,
 } from '../peripherals/database/StateTransitionFactsRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber } from '../peripherals/ethereum/types'
 
 const PERPETUAL_ADDRESS = '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'
 
@@ -32,13 +33,15 @@ export class StateTransitionFactCollector {
       topics: [LOG_STATE_TRANSITION_FACT],
     })
 
-    const records = logs.map((log): StateTransitionFactRecord => {
-      const event = PERPETUAL_ABI.parseLog(log)
-      return {
-        blockNumber: log.blockNumber,
-        hash: event.args.stateTransitionFact,
-      }
-    })
+    const records = logs
+      .filter((log) => blockRange.has(log))
+      .map((log): StateTransitionFactRecord => {
+        const event = PERPETUAL_ABI.parseLog(log)
+        return {
+          blockNumber: log.blockNumber,
+          hash: event.args.stateTransitionFact,
+        }
+      })
 
     await this.stateTransitionFactRepository.add(records)
     return records

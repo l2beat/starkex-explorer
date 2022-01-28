@@ -3,6 +3,7 @@ import { AbiCoder } from 'ethers/lib/utils'
 import { partition } from 'lodash'
 
 import { EthereumAddress } from '../model'
+import { BlockRange } from '../model/BlockRange'
 import {
   ImplementationAddedEventRecord,
   UpgradedEventRecord,
@@ -10,7 +11,7 @@ import {
   VerifierEventRepository,
 } from '../peripherals/database/VerifierEventRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber } from '../peripherals/ethereum/types'
 
 const PROXY_ADDRESS = '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'
 
@@ -59,15 +60,17 @@ export class VerifierCollector {
       topics: [[ImplementationAdded, Upgraded]],
     })
 
-    const events = logs.map((log): VerifierEventRecord => {
-      const event = PROXY_ABI.parseLog(log)
-      return {
-        name: event.name as 'ImplementationAdded' | 'Upgraded',
-        blockNumber: log.blockNumber,
-        implementation: event.args.implementation,
-        initializer: event.args.initializer,
-      }
-    })
+    const events = logs
+      .filter((log) => blockRange.has(log))
+      .map((log): VerifierEventRecord => {
+        const event = PROXY_ABI.parseLog(log)
+        return {
+          name: event.name as 'ImplementationAdded' | 'Upgraded',
+          blockNumber: log.blockNumber,
+          implementation: event.args.implementation,
+          initializer: event.args.initializer,
+        }
+      })
 
     return events
   }

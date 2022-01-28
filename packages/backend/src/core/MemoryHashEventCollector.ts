@@ -1,9 +1,9 @@
 import { utils } from 'ethers'
 
-import { EthereumAddress, Hash256 } from '../model'
+import { BlockRange, EthereumAddress, Hash256 } from '../model'
 import { FactToPageRepository } from '../peripherals/database/FactToPageRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber } from '../peripherals/ethereum/types'
 
 const GPS_VERIFIER_ABI = new utils.Interface([
   'event LogMemoryPagesHashes(bytes32 factHash, bytes32[] pagesHashes)',
@@ -64,19 +64,21 @@ export class MemoryHashEventCollector {
       topics: [LOG_MEMORY_PAGE_HASHES],
     })
 
-    return logs.map((log): MemoryHashEvent => {
-      const event = GPS_VERIFIER_ABI.parseLog(log)
+    return logs
+      .filter((log) => blockRange.has(log))
+      .map((log): MemoryHashEvent => {
+        const event = GPS_VERIFIER_ABI.parseLog(log)
 
-      return {
-        blockNumber: log.blockNumber,
-        factHash: Hash256(event.args.factHash),
-        pagesHashes: event.args.pagesHashes.map(Hash256),
-      }
-    })
+        return {
+          blockNumber: log.blockNumber,
+          factHash: Hash256(event.args.factHash),
+          pagesHashes: event.args.pagesHashes.map(Hash256),
+        }
+      })
   }
 }
 
-interface MemoryHashEvent {
+export interface MemoryHashEvent {
   factHash: Hash256
   pagesHashes: Hash256[]
   blockNumber: BlockNumber
