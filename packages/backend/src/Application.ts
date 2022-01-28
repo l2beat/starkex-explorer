@@ -54,7 +54,7 @@ export class Application {
     // #endregion peripherals
     // #region core
 
-    const safeBlockService = new BlockDownloader(
+    const blockDownloader = new BlockDownloader(
       ethereumClient,
       blockRepository,
       logger
@@ -62,7 +62,7 @@ export class Application {
 
     const statusService = new StatusService({
       databaseService,
-      safeBlockService,
+      blockDownloader,
     })
 
     const verifierCollector = new VerifierCollector(
@@ -90,7 +90,7 @@ export class Application {
     )
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
-      safeBlockService,
+      blockDownloader,
       dataSyncService,
       logger,
       config.core.syncBatchSize
@@ -114,7 +114,7 @@ export class Application {
       await databaseService.migrateToLatest()
 
       await apiServer.listen()
-      await safeBlockService.start()
+      await blockDownloader.start()
       await syncScheduler.start()
 
       logger.for(this).info('Started')
