@@ -36,38 +36,58 @@ describe(MemoryHashEventCollector.name, () => {
     const expectedEvents = [
       {
         blockNumber: 11905858,
-        factHash:
-          '0x4ac3c5b87c46c673c67db046ffef90c618297b6ba445c7560f8122c33e9a37ff',
+        factHash: Hash256(
+          '0x4ac3c5b87c46c673c67db046ffef90c618297b6ba445c7560f8122c33e9a37ff'
+        ),
         pagesHashes: [
-          '0xce887f94b38c0efe1e788c845b5c4e496f6f65fb9340369af22c351868238c16',
-          '0xfc7e3b571b22a96a4c234b194d55f2c833b3f3dd0e1d82a9be9a30eaf754cb19',
+          Hash256(
+            '0xce887f94b38c0efe1e788c845b5c4e496f6f65fb9340369af22c351868238c16'
+          ),
+          Hash256(
+            '0xfc7e3b571b22a96a4c234b194d55f2c833b3f3dd0e1d82a9be9a30eaf754cb19'
+          ),
         ],
       },
       {
         blockNumber: 11905919,
-        factHash:
-          '0x66f9d068861a54123cd952988a6ac4e933f5d28c4d28a9559f111efa1897d653',
+        factHash: Hash256(
+          '0x66f9d068861a54123cd952988a6ac4e933f5d28c4d28a9559f111efa1897d653'
+        ),
         pagesHashes: [
-          '0x4e410edb11b8f075018b40a3904b0a2c4d41a689db2b389971a0ba09e018fcee',
-          '0xfdf816c39b1c2f73bd090812602da2fb2cbbae0edfc773d9b7db4c24f2502565',
+          Hash256(
+            '0x4e410edb11b8f075018b40a3904b0a2c4d41a689db2b389971a0ba09e018fcee'
+          ),
+          Hash256(
+            '0xfdf816c39b1c2f73bd090812602da2fb2cbbae0edfc773d9b7db4c24f2502565'
+          ),
         ],
       },
       {
         blockNumber: 12050594,
-        factHash:
-          '0x8921ae1e750e50195406973065a7064222ae8cb26761460e57e3091bedebbd89',
+        factHash: Hash256(
+          '0x8921ae1e750e50195406973065a7064222ae8cb26761460e57e3091bedebbd89'
+        ),
         pagesHashes: [
-          '0x41f81fd2bade6e91b3d4f1e49a90bc45ebd96cb0e5062de84001a70fcef7b59d',
-          '0xa1a19d0a1daf2bd8e83d9d6f676e6e4e4e91cc874d3f20b2e6ab0d2ed59ff62a',
+          Hash256(
+            '0x41f81fd2bade6e91b3d4f1e49a90bc45ebd96cb0e5062de84001a70fcef7b59d'
+          ),
+          Hash256(
+            '0xa1a19d0a1daf2bd8e83d9d6f676e6e4e4e91cc874d3f20b2e6ab0d2ed59ff62a'
+          ),
         ],
       },
       {
         blockNumber: 12052850,
-        factHash:
-          '0xedb0b161bb4b45d861dcb5bb57db15fbb92d581642b32a00d128e4893ac04dce',
+        factHash: Hash256(
+          '0xedb0b161bb4b45d861dcb5bb57db15fbb92d581642b32a00d128e4893ac04dce'
+        ),
         pagesHashes: [
-          '0x851b5d0de3a6cb3be977609e9675e8b680b1d7ffb9271bbdea65dd7865052a90',
-          '0x4a6131eb8a34b798b831633d66cb083c63a477fd95d0355c343bbfef41e61a6c',
+          Hash256(
+            '0x851b5d0de3a6cb3be977609e9675e8b680b1d7ffb9271bbdea65dd7865052a90'
+          ),
+          Hash256(
+            '0x4a6131eb8a34b798b831633d66cb083c63a477fd95d0355c343bbfef41e61a6c'
+          ),
         ],
       },
     ]
@@ -89,26 +109,26 @@ describe(MemoryHashEventCollector.name, () => {
       [
         {
           index: 0,
-          pageHash: Hash256(expectedEvents[0].pagesHashes[0]),
-          factHash: Hash256(expectedEvents[0].factHash),
+          pageHash: expectedEvents[0].pagesHashes[0],
+          factHash: expectedEvents[0].factHash,
           blockNumber: expectedEvents[0].blockNumber,
         },
         {
           index: 1,
-          pageHash: Hash256(expectedEvents[0].pagesHashes[1]),
-          factHash: Hash256(expectedEvents[0].factHash),
+          pageHash: expectedEvents[0].pagesHashes[1],
+          factHash: expectedEvents[0].factHash,
           blockNumber: expectedEvents[0].blockNumber,
         },
         {
           index: 0,
-          pageHash: Hash256(expectedEvents[1].pagesHashes[0]),
-          factHash: Hash256(expectedEvents[1].factHash),
+          pageHash: expectedEvents[1].pagesHashes[0],
+          factHash: expectedEvents[1].factHash,
           blockNumber: expectedEvents[1].blockNumber,
         },
         {
           index: 1,
-          pageHash: Hash256(expectedEvents[1].pagesHashes[1]),
-          factHash: Hash256(expectedEvents[1].factHash),
+          pageHash: expectedEvents[1].pagesHashes[1],
+          factHash: expectedEvents[1].factHash,
           blockNumber: expectedEvents[1].blockNumber,
         },
       ],
@@ -118,26 +138,26 @@ describe(MemoryHashEventCollector.name, () => {
       [
         {
           index: 0,
-          pageHash: Hash256(expectedEvents[2].pagesHashes[0]),
-          factHash: Hash256(expectedEvents[2].factHash),
+          pageHash: expectedEvents[2].pagesHashes[0],
+          factHash: expectedEvents[2].factHash,
           blockNumber: expectedEvents[2].blockNumber,
         },
         {
           index: 1,
-          pageHash: Hash256(expectedEvents[2].pagesHashes[1]),
-          factHash: Hash256(expectedEvents[2].factHash),
+          pageHash: expectedEvents[2].pagesHashes[1],
+          factHash: expectedEvents[2].factHash,
           blockNumber: expectedEvents[2].blockNumber,
         },
         {
           index: 0,
-          pageHash: Hash256(expectedEvents[3].pagesHashes[0]),
-          factHash: Hash256(expectedEvents[3].factHash),
+          pageHash: expectedEvents[3].pagesHashes[0],
+          factHash: expectedEvents[3].factHash,
           blockNumber: expectedEvents[3].blockNumber,
         },
         {
           index: 1,
-          pageHash: Hash256(expectedEvents[3].pagesHashes[1]),
-          factHash: Hash256(expectedEvents[3].factHash),
+          pageHash: expectedEvents[3].pagesHashes[1],
+          factHash: expectedEvents[3].factHash,
           blockNumber: expectedEvents[3].blockNumber,
         },
       ],

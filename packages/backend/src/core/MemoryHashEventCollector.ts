@@ -35,8 +35,8 @@ export class MemoryHashEventCollector {
           hashEvents.flatMap((event) =>
             event.pagesHashes.map((pageHash, index) => ({
               index,
-              pageHash: Hash256(pageHash),
-              factHash: Hash256(event.factHash),
+              pageHash: pageHash,
+              factHash: event.factHash,
               blockNumber: event.blockNumber,
             }))
           )
@@ -69,8 +69,8 @@ export class MemoryHashEventCollector {
 
       return {
         blockNumber: log.blockNumber,
-        factHash: event.args.factHash,
-        pagesHashes: event.args.pagesHashes,
+        factHash: Hash256(event.args.factHash),
+        pagesHashes: event.args.pagesHashes.map(Hash256),
       }
     })
   }
@@ -78,6 +78,6 @@ export class MemoryHashEventCollector {
 
 interface MemoryHashEvent {
   factHash: Hash256
-  pagesHashes: string[]
+  pagesHashes: Hash256[]
   blockNumber: BlockNumber
 }
