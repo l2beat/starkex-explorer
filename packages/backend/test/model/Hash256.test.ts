@@ -43,19 +43,17 @@ describe(Hash256.name, () => {
     expect(() => Hash256('0x' + '1'.repeat(65))).toThrow(TypeError)
   })
 
-  describe(Hash256.fromBigInt.name, () => {
-    it('returns a padded hexadecimal representation', () => {
-      expect(Hash256.fromBigInt(0x1234n)).toEqual(
+  describe(Hash256.from.name, () => {
+    it('returns a padded hexadecimal representation of bigint', () => {
+      expect(Hash256.from(0x1234n)).toEqual(
         Hash256(
           '0x0000000000000000000000000000000000000000000000000000000000001234'
         )
       )
     })
-  })
 
-  describe(Hash256.fromBigNumber.name, () => {
-    it('returns a padded hexadecimal representation', () => {
-      expect(Hash256.fromBigNumber(BigNumber.from(0x1234))).toEqual(
+    it('returns a padded hexadecimal representation of BigNumber', () => {
+      expect(Hash256.from(BigNumber.from(0x1234))).toEqual(
         Hash256(
           '0x0000000000000000000000000000000000000000000000000000000000001234'
         )

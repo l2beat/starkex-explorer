@@ -77,7 +77,7 @@ export class PageCollector {
       .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
       .map(({ log, event }): MemoryPageEvent => {
         return {
-          memoryHash: Hash256.fromBigNumber(event.args.memoryHash),
+          memoryHash: Hash256.from(event.args.memoryHash),
           transactionHash: Hash256(log.transactionHash),
         }
       })

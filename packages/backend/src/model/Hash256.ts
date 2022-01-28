@@ -14,11 +14,10 @@ export function Hash256(value: string) {
   return value.toLowerCase() as unknown as Hash256
 }
 
-Hash256.fromBigNumber = function fromBigNumber(value: BigNumber) {
-  return Hash256.fromBigInt(value.toBigInt())
-}
-
-Hash256.fromBigInt = function fromBigInt(value: bigint) {
+Hash256.from = function from(value: BigNumber | bigint) {
+  if (BigNumber.isBigNumber(value)) {
+    value = value.toBigInt()
+  }
   return Hash256('0x' + value.toString(16).padStart(64, '0'))
 }
 
