@@ -1,6 +1,6 @@
 {
   "spec": "test/**/*.test.ts",
-  "require": "esbuild-register",
+  "require": ["esbuild-register", "./test/global-setup.ts"],
   "watchExtensions": "ts",
   "extension": "ts"
 }
