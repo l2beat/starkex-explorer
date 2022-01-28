@@ -1,3 +1,4 @@
+import { AssetId } from '@explorer/encoding'
 import { expect } from 'earljs'
 
 import { InMemoryRollupStorage } from '../src/InMemoryRollupStorage'
@@ -37,8 +38,8 @@ describe(RollupState.name, () => {
           {
             timestamp: 1001n,
             indices: [
-              { assetId: 'BTC-10', value: 1n },
-              { assetId: 'ETH-9', value: -1n },
+              { assetId: AssetId('BTC-10'), value: 1n },
+              { assetId: AssetId('ETH-9'), value: -1n },
             ],
           },
         ],
@@ -49,8 +50,8 @@ describe(RollupState.name, () => {
             fundingTimestamp: 1001n,
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
-              { assetId: 'BTC-10', balance: 5n },
-              { assetId: 'ETH-9', balance: 55n },
+              { assetId: AssetId('BTC-10'), balance: 5n },
+              { assetId: AssetId('ETH-9'), balance: 55n },
             ],
           },
         ],
@@ -61,8 +62,8 @@ describe(RollupState.name, () => {
         publicKey: `0x${'0'.repeat(63)}5`,
         collateralBalance: 555n,
         assets: [
-          { assetId: 'BTC-10', balance: 5n, fundingIndex: 1n },
-          { assetId: 'ETH-9', balance: 55n, fundingIndex: -1n },
+          { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 1n },
+          { assetId: AssetId('ETH-9'), balance: 55n, fundingIndex: -1n },
         ],
       })
     })
@@ -75,15 +76,15 @@ describe(RollupState.name, () => {
           {
             timestamp: 1001n,
             indices: [
-              { assetId: 'BTC-10', value: 1n },
-              { assetId: 'ETH-9', value: -1n },
+              { assetId: AssetId('BTC-10'), value: 1n },
+              { assetId: AssetId('ETH-9'), value: -1n },
             ],
           },
           {
             timestamp: 1002n,
             indices: [
-              { assetId: 'BTC-10', value: 2n },
-              { assetId: 'ETH-9', value: -2n },
+              { assetId: AssetId('BTC-10'), value: 2n },
+              { assetId: AssetId('ETH-9'), value: -2n },
             ],
           },
         ],
@@ -94,8 +95,8 @@ describe(RollupState.name, () => {
             fundingTimestamp: 1001n,
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
-              { assetId: 'BTC-10', balance: 5n },
-              { assetId: 'ETH-9', balance: 55n },
+              { assetId: AssetId('BTC-10'), balance: 5n },
+              { assetId: AssetId('ETH-9'), balance: 55n },
             ],
           },
           {
@@ -104,8 +105,8 @@ describe(RollupState.name, () => {
             fundingTimestamp: 1002n,
             publicKey: `0x${'0'.repeat(63)}6`,
             balances: [
-              { assetId: 'BTC-10', balance: 6n },
-              { assetId: 'ETH-9', balance: 66n },
+              { assetId: AssetId('BTC-10'), balance: 6n },
+              { assetId: AssetId('ETH-9'), balance: 66n },
             ],
           },
           {
@@ -114,8 +115,8 @@ describe(RollupState.name, () => {
             fundingTimestamp: 1002n,
             publicKey: `0x${'0'.repeat(63)}7`,
             balances: [
-              { assetId: 'BTC-10', balance: 7n },
-              { assetId: 'ETH-9', balance: 77n },
+              { assetId: AssetId('BTC-10'), balance: 7n },
+              { assetId: AssetId('ETH-9'), balance: 77n },
             ],
           },
         ],
@@ -126,24 +127,24 @@ describe(RollupState.name, () => {
         publicKey: `0x${'0'.repeat(63)}5`,
         collateralBalance: 555n,
         assets: [
-          { assetId: 'BTC-10', balance: 5n, fundingIndex: 1n },
-          { assetId: 'ETH-9', balance: 55n, fundingIndex: -1n },
+          { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 1n },
+          { assetId: AssetId('ETH-9'), balance: 55n, fundingIndex: -1n },
         ],
       })
       expect(six.getData()).toEqual({
         publicKey: `0x${'0'.repeat(63)}6`,
         collateralBalance: 666n,
         assets: [
-          { assetId: 'BTC-10', balance: 6n, fundingIndex: 2n },
-          { assetId: 'ETH-9', balance: 66n, fundingIndex: -2n },
+          { assetId: AssetId('BTC-10'), balance: 6n, fundingIndex: 2n },
+          { assetId: AssetId('ETH-9'), balance: 66n, fundingIndex: -2n },
         ],
       })
       expect(seven.getData()).toEqual({
         publicKey: `0x${'0'.repeat(63)}7`,
         collateralBalance: 777n,
         assets: [
-          { assetId: 'BTC-10', balance: 7n, fundingIndex: 2n },
-          { assetId: 'ETH-9', balance: 77n, fundingIndex: -2n },
+          { assetId: AssetId('BTC-10'), balance: 7n, fundingIndex: 2n },
+          { assetId: AssetId('ETH-9'), balance: 77n, fundingIndex: -2n },
         ],
       })
     })
@@ -157,15 +158,15 @@ describe(RollupState.name, () => {
           {
             timestamp: 1001n,
             indices: [
-              { assetId: 'BTC-10', value: 1n },
-              { assetId: 'ETH-9', value: -1n },
+              { assetId: AssetId('BTC-10'), value: 1n },
+              { assetId: AssetId('ETH-9'), value: -1n },
             ],
           },
           {
             timestamp: 1002n,
             indices: [
-              { assetId: 'BTC-10', value: 2n },
-              { assetId: 'ETH-9', value: -2n },
+              { assetId: AssetId('BTC-10'), value: 2n },
+              { assetId: AssetId('ETH-9'), value: -2n },
             ],
           },
         ],
@@ -176,8 +177,8 @@ describe(RollupState.name, () => {
       expect(params).toEqual({
         timestamp: 1002n,
         funding: new Map([
-          ['BTC-10', 2n],
-          ['ETH-9', -2n],
+          [AssetId('BTC-10'), 2n],
+          [AssetId('ETH-9'), -2n],
         ]),
       })
 
@@ -190,8 +191,8 @@ describe(RollupState.name, () => {
             fundingTimestamp: 1002n,
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
-              { assetId: 'BTC-10', balance: 5n },
-              { assetId: 'ETH-9', balance: 55n },
+              { assetId: AssetId('BTC-10'), balance: 5n },
+              { assetId: AssetId('ETH-9'), balance: 55n },
             ],
           },
         ],
@@ -202,8 +203,8 @@ describe(RollupState.name, () => {
         publicKey: `0x${'0'.repeat(63)}5`,
         collateralBalance: 555n,
         assets: [
-          { assetId: 'BTC-10', balance: 5n, fundingIndex: 2n },
-          { assetId: 'ETH-9', balance: 55n, fundingIndex: -2n },
+          { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 2n },
+          { assetId: AssetId('ETH-9'), balance: 55n, fundingIndex: -2n },
         ],
       })
     })
@@ -217,10 +218,10 @@ describe(RollupState.name, () => {
           {
             timestamp: 1001n,
             indices: [
-              { assetId: 'BTC-10', value: 1n },
-              { assetId: 'ETH-9', value: -1n },
-              { assetId: 'UNI-9', value: 11n },
-              { assetId: 'MKR-9', value: -11n },
+              { assetId: AssetId('BTC-10'), value: 1n },
+              { assetId: AssetId('ETH-9'), value: -1n },
+              { assetId: AssetId('UNI-9'), value: 11n },
+              { assetId: AssetId('MKR-9'), value: -11n },
             ],
           },
         ],
@@ -231,9 +232,9 @@ describe(RollupState.name, () => {
             fundingTimestamp: 1001n,
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
-              { assetId: 'BTC-10', balance: 5n },
-              { assetId: 'ETH-9', balance: 55n },
-              { assetId: 'UNI-9', balance: 555n },
+              { assetId: AssetId('BTC-10'), balance: 5n },
+              { assetId: AssetId('ETH-9'), balance: 55n },
+              { assetId: AssetId('UNI-9'), balance: 555n },
             ],
           },
         ],
@@ -244,10 +245,10 @@ describe(RollupState.name, () => {
           {
             timestamp: 1002n,
             indices: [
-              { assetId: 'BTC-10', value: 2n },
-              { assetId: 'ETH-9', value: -2n },
-              { assetId: 'UNI-9', value: 22n },
-              { assetId: 'MKR-9', value: -22n },
+              { assetId: AssetId('BTC-10'), value: 2n },
+              { assetId: AssetId('ETH-9'), value: -2n },
+              { assetId: AssetId('UNI-9'), value: 22n },
+              { assetId: AssetId('MKR-9'), value: -22n },
             ],
           },
         ],
@@ -258,9 +259,9 @@ describe(RollupState.name, () => {
             fundingTimestamp: 1002n,
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
-              { assetId: 'ETH-9', balance: 0n },
-              { assetId: 'UNI-9', balance: 20n },
-              { assetId: 'MKR-9', balance: 30n },
+              { assetId: AssetId('ETH-9'), balance: 0n },
+              { assetId: AssetId('UNI-9'), balance: 20n },
+              { assetId: AssetId('MKR-9'), balance: 30n },
             ],
           },
         ],
@@ -271,9 +272,9 @@ describe(RollupState.name, () => {
         publicKey: `0x${'0'.repeat(63)}5`,
         collateralBalance: 555n,
         assets: [
-          { assetId: 'BTC-10', balance: 5n, fundingIndex: 1n },
-          { assetId: 'UNI-9', balance: 20n, fundingIndex: 22n },
-          { assetId: 'MKR-9', balance: 30n, fundingIndex: -22n },
+          { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 1n },
+          { assetId: AssetId('UNI-9'), balance: 20n, fundingIndex: 22n },
+          { assetId: AssetId('MKR-9'), balance: 30n, fundingIndex: -22n },
         ],
       })
     })
@@ -291,7 +292,7 @@ describe(RollupState.name, () => {
               collateralBalance: 555n,
               fundingTimestamp: 1001n,
               publicKey: `0x${'0'.repeat(63)}5`,
-              balances: [{ assetId: 'BTC-10', balance: 5n }],
+              balances: [{ assetId: AssetId('BTC-10'), balance: 5n }],
             },
           ],
         })
@@ -311,7 +312,7 @@ describe(RollupState.name, () => {
               collateralBalance: 555n,
               fundingTimestamp: 1001n,
               publicKey: `0x${'0'.repeat(63)}5`,
-              balances: [{ assetId: 'BTC-10', balance: 5n }],
+              balances: [{ assetId: AssetId('BTC-10'), balance: 5n }],
             },
           ],
         })
@@ -328,8 +329,8 @@ describe(RollupState.name, () => {
           {
             timestamp: 1001n,
             indices: [
-              { assetId: 'BTC-10', value: 1n },
-              { assetId: 'ETH-9', value: -1n },
+              { assetId: AssetId('BTC-10'), value: 1n },
+              { assetId: AssetId('ETH-9'), value: -1n },
             ],
           },
         ],
@@ -340,8 +341,8 @@ describe(RollupState.name, () => {
             fundingTimestamp: 1001n,
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
-              { assetId: 'BTC-10', balance: 5n },
-              { assetId: 'ETH-9', balance: 55n },
+              { assetId: AssetId('BTC-10'), balance: 5n },
+              { assetId: AssetId('ETH-9'), balance: 55n },
             ],
           },
         ],
@@ -356,8 +357,8 @@ describe(RollupState.name, () => {
       expect(await recovered.getParameters()).toEqual({
         timestamp: 1001n,
         funding: new Map([
-          ['BTC-10', 1n],
-          ['ETH-9', -1n],
+          [AssetId('BTC-10'), 1n],
+          [AssetId('ETH-9'), -1n],
         ]),
       })
       const position = await recovered.positions.getLeaf(5n)
@@ -365,8 +366,8 @@ describe(RollupState.name, () => {
         publicKey: `0x${'0'.repeat(63)}5`,
         collateralBalance: 555n,
         assets: [
-          { assetId: 'BTC-10', balance: 5n, fundingIndex: 1n },
-          { assetId: 'ETH-9', balance: 55n, fundingIndex: -1n },
+          { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 1n },
+          { assetId: AssetId('ETH-9'), balance: 55n, fundingIndex: -1n },
         ],
       })
     })
