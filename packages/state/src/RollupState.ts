@@ -1,5 +1,5 @@
 import { PedersenHash } from '@explorer/crypto'
-import { OnChainData } from '@explorer/encoding'
+import { AssetId, OnChainData } from '@explorer/encoding'
 import { zip } from 'lodash'
 
 import { NodeOrLeaf } from './MerkleNode'
@@ -8,7 +8,7 @@ import { Position } from './Position'
 
 export interface RollupParameters {
   readonly timestamp: bigint
-  readonly funding: ReadonlyMap<string, bigint>
+  readonly funding: ReadonlyMap<AssetId, bigint>
 }
 
 export interface IRollupStateStorage {
@@ -26,7 +26,7 @@ export class RollupState {
     private readonly storage: IRollupStateStorage,
     public readonly positions: MerkleTree<Position>,
     private timestamp?: bigint,
-    private funding?: ReadonlyMap<string, bigint>
+    private funding?: ReadonlyMap<AssetId, bigint>
   ) {}
 
   static recover(
@@ -59,7 +59,7 @@ export class RollupState {
         const funding =
           update.fundingTimestamp !== 0n
             ? fundingByTimestamp.get(update.fundingTimestamp)
-            : new Map<string, bigint>()
+            : new Map<AssetId, bigint>()
         if (!funding) {
           throw new Error(
             `Missing funding for timestamp: ${update.fundingTimestamp}!`
@@ -107,10 +107,10 @@ export class RollupState {
 
   private async getFundingByTimestamp(onChainData: OnChainUpdate) {
     const { timestamp, funding } = await this.getParameters()
-    const fundingByTimestamp = new Map<bigint, ReadonlyMap<string, bigint>>()
+    const fundingByTimestamp = new Map<bigint, ReadonlyMap<AssetId, bigint>>()
     fundingByTimestamp.set(timestamp, funding)
     for (const { timestamp, indices } of onChainData.funding) {
-      const funding = new Map<string, bigint>()
+      const funding = new Map<AssetId, bigint>()
       for (const { assetId, value } of indices) {
         funding.set(assetId, value)
       }

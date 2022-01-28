@@ -1,3 +1,4 @@
+import { AssetId } from '@explorer/encoding'
 import { expect } from 'earljs'
 
 import {
@@ -55,15 +56,15 @@ describe(PositionUpdateRepository.name, () => {
         fundingTimestamp: BigInt(1621958400),
         balances: [
           {
-            assetId: '1INCH-7',
+            assetId: AssetId('1INCH-7'),
             balance: 63030000000n,
           },
           {
-            assetId: 'AAVE-8',
+            assetId: AssetId('AAVE-8'),
             balance: -34197000000n,
           },
           {
-            assetId: 'AVAX-7',
+            assetId: AssetId('AVAX-7'),
             balance: 0n,
           },
         ],

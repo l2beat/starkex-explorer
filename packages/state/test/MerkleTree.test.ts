@@ -1,4 +1,5 @@
 import { PedersenHash } from '@explorer/crypto'
+import { AssetId } from '@explorer/encoding'
 import { expect } from 'earljs'
 
 import { InMemoryMerkleStorage } from '../src/InMemoryMerkleStorage'
@@ -224,11 +225,11 @@ describe(MerkleTree.name, () => {
       let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
       const positionA = new Position(`0x${'0'.repeat(63)}1`, 2n, [
-        { assetId: 'BTC-10', balance: 3n, fundingIndex: 4n },
+        { assetId: AssetId('BTC-10'), balance: 3n, fundingIndex: 4n },
       ])
       const positionB = new Position(`0x${'0'.repeat(63)}1`, 2n, [
-        { assetId: 'ETH-9', balance: 3n, fundingIndex: 4n },
-        { assetId: 'BTC-10', balance: 5n, fundingIndex: 6n },
+        { assetId: AssetId('ETH-9'), balance: 3n, fundingIndex: 4n },
+        { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 6n },
       ])
 
       tree = await tree.update([

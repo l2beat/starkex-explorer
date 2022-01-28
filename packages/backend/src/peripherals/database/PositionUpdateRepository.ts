@@ -1,3 +1,4 @@
+import { AssetId } from '@explorer/encoding'
 import { Knex } from 'knex'
 import { AssetBalanceJson, PositionUpdateRow } from 'knex/types/tables'
 
@@ -13,7 +14,7 @@ export interface PositionUpdateRecord {
 }
 
 export interface AssetBalance {
-  assetId: string
+  assetId: AssetId
   balance: bigint
 }
 
@@ -62,7 +63,7 @@ export class PositionUpdateRepository
 function toRow(record: PositionUpdateRecord): PositionUpdateRow {
   const balances = record.balances.map(
     (x): AssetBalanceJson => ({
-      asset_id: x.assetId,
+      asset_id: x.assetId.toString(),
       balance: x.balance.toString(),
     })
   )
@@ -86,7 +87,7 @@ function toRecord(row: PositionUpdateRow): PositionUpdateRecord {
       ? (JSON.parse(row.balances) as AssetBalanceJson[])
       : row.balances
     ).map((x) => ({
-      assetId: x.asset_id,
+      assetId: AssetId(x.asset_id),
       balance: BigInt(x.balance),
     })),
   }

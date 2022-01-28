@@ -1,12 +1,12 @@
 import { pedersen, PedersenHash } from '@explorer/crypto'
-import { encodeAssetId } from '@explorer/encoding'
+import { AssetId, encodeAssetId } from '@explorer/encoding'
 
 import { MerkleValue } from './MerkleValue'
 
 const MIN_INT_64 = -(2n ** 63n)
 
 export interface PositionAsset {
-  readonly assetId: string
+  readonly assetId: AssetId
   readonly balance: bigint
   readonly fundingIndex: bigint
 }

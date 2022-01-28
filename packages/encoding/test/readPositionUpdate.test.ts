@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { DecodingError } from '../src'
+import { AssetId, DecodingError } from '../src'
 import { MIN_INT } from '../src/constants'
 import { encodeAssetId } from '../src/encodeAssetId'
 import { readPositionUpdate } from '../src/readPositionUpdate'
@@ -38,10 +38,10 @@ describe('readPositionUpdate', () => {
       .writeNumber(10n - MIN_INT, 32) // collateralBalance
       .writeNumber(456, 32) // fundingTimestamp
       .writePadding(9)
-      .write(encodeAssetId('ETH-9'))
+      .write(encodeAssetId(AssetId('ETH-9')))
       .writeNumber(50n - MIN_INT, 8)
       .writePadding(9)
-      .write(encodeAssetId('BTC-10'))
+      .write(encodeAssetId(AssetId('BTC-10')))
       .writeNumber(20n - MIN_INT, 8)
     expect(decode(writer.getBytes())).toEqual({
       positionId: 123n,
@@ -49,8 +49,8 @@ describe('readPositionUpdate', () => {
       collateralBalance: 10n,
       fundingTimestamp: 456n,
       balances: [
-        { assetId: 'ETH-9', balance: 50n },
-        { assetId: 'BTC-10', balance: 20n },
+        { assetId: AssetId('ETH-9'), balance: 50n },
+        { assetId: AssetId('BTC-10'), balance: 20n },
       ],
     })
   })
