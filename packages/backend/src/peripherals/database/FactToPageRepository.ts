@@ -1,14 +1,15 @@
 import { Knex } from 'knex'
 import { FactToPageRow } from 'knex/types/tables'
 
+import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
 export interface FactToPageRecord {
   id?: number
   blockNumber: number
-  factHash: string
-  pageHash: string
+  factHash: Hash256
+  pageHash: Hash256
   index: number
 }
 
@@ -53,8 +54,8 @@ function toRow(record: FactToPageRecord): FactToPageRow {
   return {
     id: record.id,
     block_number: record.blockNumber,
-    fact_hash: record.factHash,
-    page_hash: record.pageHash,
+    fact_hash: record.factHash.toString(),
+    page_hash: record.pageHash.toString(),
     index: record.index,
   }
 }
@@ -63,8 +64,8 @@ function toRecord(row: FactToPageRow): FactToPageRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,
-    factHash: row.fact_hash,
-    pageHash: row.page_hash,
+    factHash: Hash256(row.fact_hash),
+    pageHash: Hash256(row.page_hash),
     index: row.index,
   }
 }

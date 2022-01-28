@@ -1,5 +1,6 @@
 import { expect } from 'earljs'
 
+import { Hash256 } from '../../../src/model'
 import {
   FactToPageRecord,
   FactToPageRepository,
@@ -17,8 +18,8 @@ describe(FactToPageRepository.name, () => {
     const record: FactToPageRecord = {
       blockNumber: 1,
       index: 0,
-      factHash: '{{ fact hash }}',
-      pageHash: '{{ page hash }}',
+      factHash: Hash256.fake(),
+      pageHash: Hash256.fake(),
     }
 
     await repository.add([record])
@@ -59,20 +60,16 @@ describe(FactToPageRepository.name, () => {
   })
 
   it('deletes all records after a block number', async () => {
-    await repository.add(
-      Array.from({ length: 10 }).map((_, i) =>
-        dummyFactToPageRecord({ blockNumber: i })
-      )
+    const records = Array.from({ length: 10 }).map((_, i) =>
+      dummyFactToPageRecord({ blockNumber: i })
     )
+    await repository.add(records)
 
     await repository.deleteAllAfter(5)
 
     const actual = await repository.getAll()
     expect(actual).toEqual(
-      Array.from({ length: 6 }).map((_, i) => ({
-        ...dummyFactToPageRecord({ blockNumber: i, index: 0 }),
-        id: expect.a(Number),
-      }))
+      records.slice(0, 6).map((r) => ({ ...r, id: expect.a(Number) }))
     )
   })
 })
@@ -81,8 +78,8 @@ function dummyFactToPageRecord({
   id,
   blockNumber = 0,
   index = 0,
-  pageHash = `{{ page hash ${blockNumber}-${index} }}`,
-  factHash = `{{ factHash hash ${blockNumber}-${index} }}`,
+  pageHash = Hash256.fake(),
+  factHash = Hash256.fake(),
 }: Partial<FactToPageRecord>): FactToPageRecord {
   return {
     id,

@@ -1,5 +1,6 @@
 import { expect } from 'earljs'
 
+import { Hash256 } from '../../../src/model'
 import {
   StateTransitionFactRecord,
   StateTransitionFactRepository,
@@ -14,10 +15,7 @@ describe(StateTransitionFactRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    const record: StateTransitionFactRecord = {
-      blockNumber: 1,
-      hash: '0x1234567890',
-    }
+    const record = dummyRecord({ blockNumber: 1 })
 
     await repository.add([record])
 
@@ -32,10 +30,10 @@ describe(StateTransitionFactRepository.name, () => {
   })
 
   it('adds multiple records and queries them', async () => {
-    const records: StateTransitionFactRecord[] = [
-      dummyStateTransitionFactRecord({ blockNumber: 1, hash: '0x123' }),
-      dummyStateTransitionFactRecord({ blockNumber: 2, hash: '0x456' }),
-      dummyStateTransitionFactRecord({ blockNumber: 3, hash: '0x789' }),
+    const records = [
+      dummyRecord({ blockNumber: 1 }),
+      dummyRecord({ blockNumber: 2 }),
+      dummyRecord({ blockNumber: 3 }),
     ]
 
     await repository.add(records)
@@ -46,9 +44,9 @@ describe(StateTransitionFactRepository.name, () => {
 
   it('deletes all records', async () => {
     await repository.add([
-      dummyStateTransitionFactRecord({ blockNumber: 1, hash: '0x123' }),
-      dummyStateTransitionFactRecord({ blockNumber: 2, hash: '0x456' }),
-      dummyStateTransitionFactRecord({ blockNumber: 3, hash: '0x789' }),
+      dummyRecord({ blockNumber: 1 }),
+      dummyRecord({ blockNumber: 2 }),
+      dummyRecord({ blockNumber: 3 }),
     ])
 
     await repository.deleteAll()
@@ -58,28 +56,28 @@ describe(StateTransitionFactRepository.name, () => {
   })
 
   it('deletes all records after a block number', async () => {
-    await repository.add([
-      dummyStateTransitionFactRecord({ blockNumber: 1 }),
-      dummyStateTransitionFactRecord({ blockNumber: 2 }),
-      dummyStateTransitionFactRecord({ blockNumber: 3 }),
-      dummyStateTransitionFactRecord({ blockNumber: 4 }),
-      dummyStateTransitionFactRecord({ blockNumber: 5 }),
-    ])
+    const records = [
+      dummyRecord({ blockNumber: 1 }),
+      dummyRecord({ blockNumber: 2 }),
+      dummyRecord({ blockNumber: 3 }),
+      dummyRecord({ blockNumber: 4 }),
+      dummyRecord({ blockNumber: 5 }),
+    ]
+    await repository.add(records)
 
     await repository.deleteAllAfter(2)
 
     const actual = await repository.getAll()
-    expect(actual).toEqual([
-      dummyStateTransitionFactRecord({ blockNumber: 1, id: expect.a(Number) }),
-      dummyStateTransitionFactRecord({ blockNumber: 2, id: expect.a(Number) }),
-    ])
+    expect(actual).toEqual(
+      records.slice(0, 2).map((r) => ({ ...r, id: expect.a(Number) }))
+    )
   })
 })
 
-function dummyStateTransitionFactRecord({
+function dummyRecord({
   id,
   blockNumber = 0,
-  hash = '0x',
+  hash = Hash256.fake(),
 }: Partial<StateTransitionFactRecord>): StateTransitionFactRecord {
   return { id, blockNumber, hash }
 }

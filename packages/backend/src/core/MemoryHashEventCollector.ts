@@ -1,6 +1,6 @@
 import { utils } from 'ethers'
 
-import { EthereumAddress } from '../model'
+import { EthereumAddress, Hash256 } from '../model'
 import { FactToPageRepository } from '../peripherals/database/FactToPageRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
@@ -35,7 +35,7 @@ export class MemoryHashEventCollector {
           hashEvents.flatMap((event) =>
             event.pagesHashes.map((pageHash, index) => ({
               index,
-              pageHash,
+              pageHash: pageHash,
               factHash: event.factHash,
               blockNumber: event.blockNumber,
             }))
@@ -69,15 +69,15 @@ export class MemoryHashEventCollector {
 
       return {
         blockNumber: log.blockNumber,
-        factHash: event.args.factHash,
-        pagesHashes: event.args.pagesHashes,
+        factHash: Hash256(event.args.factHash),
+        pagesHashes: event.args.pagesHashes.map(Hash256),
       }
     })
   }
 }
 
 interface MemoryHashEvent {
-  factHash: string
-  pagesHashes: string[]
+  factHash: Hash256
+  pagesHashes: Hash256[]
   blockNumber: BlockNumber
 }

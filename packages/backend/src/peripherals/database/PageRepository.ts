@@ -2,13 +2,14 @@ import { Knex } from 'knex'
 import { PageRow } from 'knex/types/tables'
 import { sortBy } from 'lodash'
 
+import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
 export interface PageRecord {
   id?: number
   blockNumber: number
-  pageHash: string
+  pageHash: Hash256
   data: string
 }
 
@@ -35,7 +36,7 @@ export class PageRepository implements Repository<PageRecord> {
     return rows.map(toRecord)
   }
 
-  async getAllForFacts(factHashes: string[]) {
+  async getAllForFacts(factHashes: Hash256[]) {
     type Row = { fact_hash: string; pages: string[] }
 
     const rows = (await this.knex('fact_to_pages')
@@ -47,13 +48,16 @@ export class PageRepository implements Repository<PageRecord> {
       )
       .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
       .groupBy('fact_hash')
-      .whereIn('fact_hash', factHashes)) as unknown as Row[]
+      .whereIn(
+        'fact_hash',
+        factHashes.map((x) => x.toString())
+      )) as unknown as Row[]
 
     this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
 
     return sortBy(
       rows.map((row) => ({
-        factHash: row.fact_hash,
+        factHash: Hash256(row.fact_hash),
         pages: row.pages,
       })),
       (x) => factHashes.indexOf(x.factHash)
@@ -78,7 +82,7 @@ function toRow(record: PageRecord): PageRow {
   return {
     id: record.id,
     block_number: record.blockNumber,
-    page_hash: record.pageHash,
+    page_hash: record.pageHash.toString(),
     data: record.data,
   }
 }
@@ -87,7 +91,7 @@ function toRecord(row: PageRow): PageRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,
-    pageHash: row.page_hash,
+    pageHash: Hash256(row.page_hash),
     data: row.data,
   }
 }
