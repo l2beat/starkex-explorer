@@ -1,5 +1,6 @@
+import { BlockRange } from '../model'
 import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber } from '../peripherals/ethereum/types'
 import { getBatches } from '../tools/getBatches'
 import { JobQueue } from '../tools/JobQueue'
 import { Logger } from '../tools/Logger'
@@ -24,14 +25,15 @@ export class SyncScheduler {
 
   async start() {
     let lastSynced = await this.statusRepository.getLastBlockNumberSynced()
+    await this.dataSyncService.discard({ from: lastSynced })
+
     const lastKnown = this.blockDownloader.getLastKnownBlock()
 
     this.logger.info('start', { lastSynced, lastKnown: lastKnown.number })
 
-    await this.dataSyncService.discard({ from: lastSynced })
-
     if (lastKnown.number > lastSynced) {
-      this.scheduleSync({ from: lastSynced, to: lastKnown.number })
+      const unsyncedRange = await lastKnown.rangeFrom(lastSynced)
+      await this.scheduleSync(unsyncedRange)
       lastSynced = lastKnown.number
     }
 
@@ -62,14 +64,18 @@ export class SyncScheduler {
     )) {
       this.jobQueue.add({
         name: `sync-${from}-${to}`,
-        execute: () => this.sync({ from, to }),
+        execute: () => this.sync(new BlockRange(blockRange, from, to)),
       })
     }
   }
 
   private async sync(blockRange: BlockRange) {
     try {
-      this.logger.info({ method: 'sync', blockRange })
+      this.logger.info({
+        method: 'sync',
+        from: blockRange.from,
+        to: blockRange.to,
+      })
       await this.dataSyncService.sync(blockRange)
       await this.statusRepository.setLastBlockNumberSynced(blockRange.to)
     } catch (err) {

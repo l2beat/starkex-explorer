@@ -55,7 +55,18 @@ export class BlockDownloader {
     if (this.state.t !== 'working') {
       throw new Error('Not started')
     }
-    return this.state.lastKnownBlock
+
+    const lastBlock = this.state.lastKnownBlock
+    // @todo I'm not sure if SyncScheduler should depend on BlockRepository
+    //       or if this is a better way.
+    return {
+      ...lastBlock,
+      rangeFrom: async (from: BlockNumber) => {
+        return new BlockRange(
+          await this.blockRepository.getAllInRange(from, lastBlock.number)
+        )
+      },
+    }
   }
 
   onNewBlocks(handler: (blockRange: BlockRange) => void) {

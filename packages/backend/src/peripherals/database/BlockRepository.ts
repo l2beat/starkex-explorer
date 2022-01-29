@@ -41,17 +41,13 @@ export class BlockRepository implements Repository<BlockRecord> {
     return rows
   }
 
-  async deleteAll() {
-    await this.knex('blocks').delete()
-    this.logger.debug({ method: 'deleteAll' })
-  }
-
-  async deleteAllAfter(blockNumber: number) {
-    const rowsCount = await this.knex('blocks')
-      .where('number', '>', blockNumber)
-      .delete()
-
-    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
+  async getAllInRange(from: number, to: number): Promise<BlockRecord[]> {
+    const rows = await this.knex('blocks')
+      .select('*')
+      .where('number', '>=', from)
+      .andWhere('number', '<=', to)
+    this.logger.debug({ method: 'getAllUntil', rows: rows.length })
+    return rows
   }
 
   async getLast(): Promise<BlockRecord> {
@@ -94,5 +90,18 @@ export class BlockRepository implements Repository<BlockRecord> {
     })
 
     return row
+  }
+
+  async deleteAll() {
+    await this.knex('blocks').delete()
+    this.logger.debug({ method: 'deleteAll' })
+  }
+
+  async deleteAllAfter(blockNumber: number) {
+    const rowsCount = await this.knex('blocks')
+      .where('number', '>', blockNumber)
+      .delete()
+
+    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
   }
 }

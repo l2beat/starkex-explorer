@@ -411,10 +411,9 @@ describe(BlockDownloader.name, () => {
     emitBlock({ hash: 'h1.a', number: 1, parentHash: 'h0', timestamp: 0 })
 
     await waitForExpect(() => {
-      expect(blockDownloader.getLastKnownBlock()).toEqual({
-        hash: 'h1.a',
-        number: 1,
-      })
+      expect(blockDownloader.getLastKnownBlock()).toEqual(
+        expect.objectWith({ hash: 'h1.a', number: 1 })
+      )
     })
 
     emitBlock(blocks[2]!)
@@ -464,18 +463,16 @@ describe(BlockDownloader.name, () => {
 
     await blockDownloader.start()
 
-    expect(blockDownloader.getLastKnownBlock()).toEqual({
-      number: 0,
-      hash: 'h0',
-    })
+    expect(blockDownloader.getLastKnownBlock()).toEqual(
+      expect.objectWith({ number: 0, hash: 'h0' })
+    )
 
     emitBlock({ number: 1, hash: 'h1', parentHash: 'h0', timestamp: 0 })
 
     await waitForExpect(() => {
-      expect(blockDownloader.getLastKnownBlock()).toEqual({
-        number: 1,
-        hash: 'h1',
-      })
+      expect(blockDownloader.getLastKnownBlock()).toEqual(
+        expect.objectWith({ number: 1, hash: 'h1' })
+      )
     })
   })
 

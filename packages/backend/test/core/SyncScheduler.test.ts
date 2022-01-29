@@ -4,12 +4,12 @@ import waitForExpect from 'wait-for-expect'
 import { BlockDownloader } from '../../src/core/BlockDownloader'
 import { DataSyncService } from '../../src/core/DataSyncService'
 import { SyncScheduler } from '../../src/core/SyncScheduler'
-import { BlockRange } from '../../src/model'
+import { BlockRange, Hash256 } from '../../src/model'
 import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
-describe(SyncScheduler.name, () => {
+describe.only(SyncScheduler.name, () => {
   it('syncs in batches', async () => {
     const lastBlockNumberSynced = 1
     const {
@@ -77,7 +77,7 @@ describe(SyncScheduler.name, () => {
     })
   })
 
-  it('reruns failing syncs', async () => {
+  it.only('reruns failing syncs', async () => {
     const mocks = setupMocks({ lastBlockNumberSynced: 1 })
 
     let failed = false
@@ -125,13 +125,24 @@ function setupMocks({
     setLastBlockNumberSynced: async (value) => void (storedValue = value),
   })
 
-  let newBlocksListener: Parameters<
-    BlockDownloader['onNewBlocks']
-  >[0] = () => {}
+  let newBlocksListener:
+    | Parameters<BlockDownloader['onNewBlocks']>[0]
+    | undefined
+  let reorgListener: Parameters<BlockDownloader['onReorg']>[0] | undefined
+
   const blockDownloader = mock<BlockDownloader>({
+    getLastKnownBlock: () => ({
+      number: 123,
+      hash: '0x123',
+      rangeFrom: mockFn<(_: number) => Promise<BlockRange>>(),
+    }),
     onNewBlocks: (listener) => {
       newBlocksListener = listener
-      return () => {}
+      return () => (newBlocksListener = undefined)
+    },
+    onReorg: (listener) => {
+      reorgListener = listener
+      return () => (reorgListener = undefined)
     },
   })
 
@@ -142,7 +153,8 @@ function setupMocks({
       sync: mockFn().resolvesTo(undefined),
       discard: mockFn().resolvesTo(undefined),
     }),
-    newBlocksListener: (...args: Parameters<typeof newBlocksListener>) =>
-      newBlocksListener(...args),
+    newBlocksListener: (
+      ...args: Parameters<Exclude<typeof newBlocksListener, undefined>>
+    ) => newBlocksListener!(...args),
   }
 }

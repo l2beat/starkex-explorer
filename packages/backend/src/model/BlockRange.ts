@@ -7,12 +7,37 @@ export class BlockRange {
   public readonly from: BlockNumber
   /** number of the latest block in range */
   public readonly to: BlockNumber
-  private readonly hashes: Map<BlockNumber, string>
+  private readonly hashes: ReadonlyMap<BlockNumber, string>
 
   constructor(
     /** a list of blocks in order from oldest to newest */
-    blocks: readonly { number: BlockNumber; hash: string }[]
-  ) {
+    blocks: readonly Block[]
+  )
+  constructor(
+    /** parent block range */
+    range: BlockRange,
+    /** new left boundary */
+    from: BlockNumber,
+    /** new right boundary */
+    to: BlockNumber
+  )
+
+  constructor(...args: BlockRangeConstructorArgs) {
+    if (args.length === 3) {
+      const [range, from, to] = args
+      this.to = to
+      this.from = from
+      this.hashes = range.hashes
+
+      console.log({
+        to,
+        from,
+        range,
+      })
+      return
+    }
+
+    const [blocks] = args
     assert(blocks.length > 0, 'BlockRange must have at least one block')
 
     this.from = blocks[0].number
@@ -44,3 +69,8 @@ export class BlockRange {
     )
   }
 }
+
+type Block = { number: BlockNumber; hash: string }
+type BlockRangeConstructorArgs =
+  | [blocks: readonly Block[]]
+  | [range: BlockRange, from: number, to: number]

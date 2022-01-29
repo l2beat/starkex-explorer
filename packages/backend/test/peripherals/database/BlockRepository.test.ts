@@ -1,5 +1,5 @@
 import { expect } from 'earljs'
-import { uniqueId } from 'lodash'
+import { range, uniqueId } from 'lodash'
 
 import {
   BlockRecord,
@@ -102,5 +102,21 @@ describe(BlockRepository.name, () => {
   it('gets first block', async () => {
     // We always return the same one, regardless of what's in the database.
     expect(repository.getFirst()).toEqual(EARLIEST_BLOCK)
+  })
+
+  it('gets all blocks in range between given numbers (inclusive)', async () => {
+    const blocks = range(10, 20).map((i) => ({
+      number: i,
+      hash: uniqueId('get-in-range-'),
+    }))
+    await repository.add(blocks)
+
+    expect(await repository.getAllInRange(13, 17)).toEqual([
+      blocks[3],
+      blocks[4],
+      blocks[5],
+      blocks[6],
+      blocks[7],
+    ])
   })
 })
