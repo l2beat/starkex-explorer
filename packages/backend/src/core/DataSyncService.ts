@@ -1,8 +1,9 @@
 import { decodeOnChainData } from '@explorer/encoding'
 
+import { BlockRange } from '../model'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { PositionUpdateRepository } from '../peripherals/database/PositionUpdateRepository'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { MemoryHashEventCollector } from './MemoryHashEventCollector'
 import { PageCollector } from './PageCollector'
@@ -34,7 +35,7 @@ export class DataSyncService {
 
     this.logger.info({
       method: 'sync',
-      blockRange,
+      blockRange: { from: blockRange.from, to: blockRange.to },
       newVerifiers: verifiers.map(String),
       newHashEventsCount: hashEvents.length,
       newPageRecords: pageRecords.length,

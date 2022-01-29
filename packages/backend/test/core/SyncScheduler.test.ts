@@ -1,28 +1,36 @@
 import { expect, mockFn } from 'earljs'
+import { range } from 'lodash'
 import waitForExpect from 'wait-for-expect'
 
-import { BlockDownloader } from '../../src/core/BlockDownloader'
+import {
+  BlockDownloader,
+  BlockDownloaderEvents,
+} from '../../src/core/BlockDownloader'
 import { DataSyncService } from '../../src/core/DataSyncService'
 import { SyncScheduler } from '../../src/core/SyncScheduler'
-import { BlockRange, Hash256 } from '../../src/model'
+import { BlockRange } from '../../src/model'
+import { BlockRepository } from '../../src/peripherals/database/BlockRepository'
 import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
+import { createEventEmitter } from '../../src/tools/EventEmitter'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
-describe.only(SyncScheduler.name, () => {
+describe(SyncScheduler.name, () => {
   it('syncs in batches', async () => {
     const lastBlockNumberSynced = 1
     const {
       statusRepository,
-      blockDownloader: safeBlockService,
+      blockRepository,
+      blockDownloader,
       dataSyncService,
-      newBlocksListener,
+      emitNewBlocks,
     } = setupMocks({ lastBlockNumberSynced })
 
     const batchSize = 3
     const syncScheduler = new SyncScheduler(
       statusRepository,
-      safeBlockService,
+      blockRepository,
+      blockDownloader,
       dataSyncService,
       Logger.SILENT,
       batchSize
@@ -30,15 +38,15 @@ describe.only(SyncScheduler.name, () => {
 
     await syncScheduler.start()
 
-    expect(dataSyncService.discard).toHaveBeenCalledWith([{ from: 0 }])
+    expect(dataSyncService.discard).toHaveBeenCalledWith([{ from: 1 }])
 
-    newBlocksListener({ from: 2, to: 10 } as BlockRange)
+    emitNewBlocks({ from: 2, to: 10 } as BlockRange)
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [{ from: 2, to: 4 }],
-        [{ from: 5, to: 7 }],
-        [{ from: 8, to: 10 }],
+        [expect.objectWith({ from: 2, to: 4 })],
+        [expect.objectWith({ from: 5, to: 7 })],
+        [expect.objectWith({ from: 8, to: 10 })],
       ])
     })
   })
@@ -46,15 +54,17 @@ describe.only(SyncScheduler.name, () => {
   it('handles incoming new blocks', async () => {
     const {
       statusRepository,
-      blockDownloader: safeBlockService,
+      blockRepository,
+      blockDownloader,
       dataSyncService,
-      newBlocksListener,
+      emitNewBlocks,
     } = setupMocks()
 
     const batchSize = 50
     const syncScheduler = new SyncScheduler(
       statusRepository,
-      safeBlockService,
+      blockRepository,
+      blockDownloader,
       dataSyncService,
       Logger.SILENT,
       batchSize
@@ -63,21 +73,21 @@ describe.only(SyncScheduler.name, () => {
     await syncScheduler.start()
     expect(dataSyncService.discard).toHaveBeenCalledWith([{ from: 0 }])
 
-    newBlocksListener({ from: 8, to: 8 } as BlockRange)
-    newBlocksListener({ from: 9, to: 9 } as BlockRange)
-    newBlocksListener({ from: 10, to: 100 } as BlockRange)
+    emitNewBlocks({ from: 1, to: 1 } as BlockRange)
+    emitNewBlocks({ from: 2, to: 2 } as BlockRange)
+    emitNewBlocks({ from: 3, to: 100 } as BlockRange)
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [{ from: 1, to: 8 }],
-        [{ from: 9, to: 9 }],
-        [{ from: 10, to: 59 }],
-        [{ from: 60, to: 100 }],
+        [expect.objectWith({ from: 1, to: 1 })],
+        [expect.objectWith({ from: 2, to: 2 })],
+        [expect.objectWith({ from: 3, to: 52 })],
+        [expect.objectWith({ from: 53, to: 100 })],
       ])
     })
   })
 
-  it.only('reruns failing syncs', async () => {
+  it('reruns failing syncs', async () => {
     const mocks = setupMocks({ lastBlockNumberSynced: 1 })
 
     let failed = false
@@ -94,6 +104,7 @@ describe.only(SyncScheduler.name, () => {
 
     const syncScheduler = new SyncScheduler(
       mocks.statusRepository,
+      mocks.blockRepository,
       mocks.blockDownloader,
       mocks.dataSyncService,
       Logger.SILENT,
@@ -103,7 +114,7 @@ describe.only(SyncScheduler.name, () => {
     await syncScheduler.start()
 
     const range = new BlockRange([{ number: 2, hash: '0x2' }])
-    mocks.newBlocksListener(range)
+    mocks.emitNewBlocks(range)
 
     await waitForExpect(() => {
       expect(mocks.dataSyncService.sync).toHaveBeenCalledExactlyWith([
@@ -119,42 +130,45 @@ function setupMocks({
 }: {
   lastBlockNumberSynced?: number
 } = {}) {
-  let storedValue: number = lastBlockNumberSynced || 0
+  let lastSynced = lastBlockNumberSynced || 0
+  const lastKnown = lastSynced
+
   const statusRepository = mock<SyncStatusRepository>({
-    getLastBlockNumberSynced: async () => storedValue,
-    setLastBlockNumberSynced: async (value) => void (storedValue = value),
+    getLastBlockNumberSynced: async () => lastSynced,
+    setLastBlockNumberSynced: async (value) => void (lastSynced = value),
   })
 
-  let newBlocksListener:
-    | Parameters<BlockDownloader['onNewBlocks']>[0]
-    | undefined
-  let reorgListener: Parameters<BlockDownloader['onReorg']>[0] | undefined
+  const blockDownloaderEvents = createEventEmitter<BlockDownloaderEvents>()
 
+  const _blockDownloaderProperties = { events: blockDownloaderEvents }
   const blockDownloader = mock<BlockDownloader>({
+    ...{ events: blockDownloaderEvents },
     getLastKnownBlock: () => ({
-      number: 123,
-      hash: '0x123',
-      rangeFrom: mockFn<(_: number) => Promise<BlockRange>>(),
+      number: lastKnown,
+      hash: '0x' + lastKnown,
     }),
-    onNewBlocks: (listener) => {
-      newBlocksListener = listener
-      return () => (newBlocksListener = undefined)
-    },
-    onReorg: (listener) => {
-      reorgListener = listener
-      return () => (reorgListener = undefined)
-    },
+    onNewBlocks: BlockDownloader.prototype.onNewBlocks.bind(
+      _blockDownloaderProperties
+    ),
+    onReorg: BlockDownloader.prototype.onReorg.bind(_blockDownloaderProperties),
+  })
+
+  const blockRepository = mock<BlockRepository>({
+    getAllInRange: async (from, to) =>
+      range(from, to + 1).map((i) => ({ hash: '0x' + i, number: i })),
   })
 
   return {
     statusRepository,
+    blockRepository,
     blockDownloader,
     dataSyncService: mock<DataSyncService>({
       sync: mockFn().resolvesTo(undefined),
       discard: mockFn().resolvesTo(undefined),
     }),
-    newBlocksListener: (
-      ...args: Parameters<Exclude<typeof newBlocksListener, undefined>>
-    ) => newBlocksListener!(...args),
+    emitNewBlocks: (event: BlockRange) =>
+      blockDownloaderEvents.emit('newBlocks', event),
+    emitReorg: (event: { firstChangedBlock: number }) =>
+      blockDownloaderEvents.emit('reorg', event),
   }
 }

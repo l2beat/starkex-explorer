@@ -14,8 +14,8 @@ import { JobQueue } from '../tools/JobQueue'
 import { Logger } from '../tools/Logger'
 
 export interface KnownBlock {
-  number: number
-  hash: string
+  readonly number: number
+  readonly hash: string
 }
 
 type State = { t: 'not-started' } | { t: 'working'; lastKnownBlock: KnownBlock }
@@ -56,17 +56,7 @@ export class BlockDownloader {
       throw new Error('Not started')
     }
 
-    const lastBlock = this.state.lastKnownBlock
-    // @todo I'm not sure if SyncScheduler should depend on BlockRepository
-    //       or if this is a better way.
-    return {
-      ...lastBlock,
-      rangeFrom: async (from: BlockNumber) => {
-        return new BlockRange(
-          await this.blockRepository.getAllInRange(from, lastBlock.number)
-        )
-      },
-    }
+    return this.state.lastKnownBlock
   }
 
   onNewBlocks(handler: (blockRange: BlockRange) => void) {
@@ -232,7 +222,7 @@ export type IncomingBlock = Pick<
   'hash' | 'number' | 'timestamp' | 'parentHash'
 >
 
-interface BlockDownloaderEvents {
+export interface BlockDownloaderEvents {
   newBlocks: BlockRange
   reorg: { firstChangedBlock: number }
 }

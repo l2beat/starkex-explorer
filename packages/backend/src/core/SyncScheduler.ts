@@ -1,4 +1,5 @@
 import { BlockRange } from '../model'
+import { BlockRepository } from '../peripherals/database/BlockRepository'
 import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { getBatches } from '../tools/getBatches'
@@ -10,6 +11,7 @@ import { DataSyncService } from './DataSyncService'
 export class SyncScheduler {
   constructor(
     private readonly statusRepository: SyncStatusRepository,
+    private readonly blockRepository: BlockRepository,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
@@ -32,14 +34,17 @@ export class SyncScheduler {
     this.logger.info('start', { lastSynced, lastKnown: lastKnown.number })
 
     if (lastKnown.number > lastSynced) {
-      const unsyncedRange = await lastKnown.rangeFrom(lastSynced)
-      await this.scheduleSync(unsyncedRange)
+      const blocks = await this.blockRepository.getAllInRange(
+        lastSynced + 1,
+        lastKnown.number
+      )
       lastSynced = lastKnown.number
+      this.scheduleSync(new BlockRange(blocks))
     }
 
-    this.blockDownloader.onNewBlocks((blockRange) => {
-      lastSynced = blockRange.to
-      this.scheduleSync(blockRange)
+    this.blockDownloader.onNewBlocks(async (newBlockRange) => {
+      lastSynced = newBlockRange.to
+      this.scheduleSync(newBlockRange)
     })
 
     // @todo write tests for this
@@ -56,7 +61,7 @@ export class SyncScheduler {
     })
   }
 
-  private async scheduleSync(blockRange: BlockRange) {
+  private scheduleSync(blockRange: BlockRange) {
     for (const [from, to] of getBatches(
       blockRange.from,
       blockRange.to,

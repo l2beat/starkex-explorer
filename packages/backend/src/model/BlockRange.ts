@@ -1,4 +1,5 @@
 import assert from 'assert'
+import { range } from 'lodash'
 
 import { BlockNumber } from '../peripherals/ethereum/types'
 
@@ -28,12 +29,6 @@ export class BlockRange {
       this.to = to
       this.from = from
       this.hashes = range.hashes
-
-      console.log({
-        to,
-        from,
-        range,
-      })
       return
     }
 
@@ -54,7 +49,6 @@ export class BlockRange {
     blockNumber: BlockNumber
     blockHash: string
   }) {
-    console.log(JSON.stringify({ number: blockNumber, hash: blockHash }) + ',')
     // @todo if blockNumber is far enough in the past, we want to assume
     //       every blockHash is valid
     return this.hashes.get(blockNumber) === blockHash
@@ -66,6 +60,12 @@ export class BlockRange {
         number: Number(number),
         hash,
       }))
+    )
+  }
+
+  static fake({ from, to }: { from: BlockNumber; to: BlockNumber }) {
+    return new BlockRange(
+      range(from, to + 1).map((i) => ({ number: i, hash: '0x' + i }))
     )
   }
 }
