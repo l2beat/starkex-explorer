@@ -1,6 +1,7 @@
 import { Knex } from 'knex'
 import { BlockRow } from 'knex/types/tables'
 
+import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
@@ -10,12 +11,14 @@ import { Repository } from './types'
  */
 export const EARLIEST_BLOCK: Readonly<BlockRecord> = {
   number: 11813207,
-  hash: '0xe191f743db9d988ff2dbeda3ec800954445f61cf8e79cc458ba831965e628e8d',
+  hash: Hash256(
+    '0xe191f743db9d988ff2dbeda3ec800954445f61cf8e79cc458ba831965e628e8d'
+  ),
 }
 
 export interface BlockRecord {
   number: number
-  hash: string
+  hash: Hash256
 }
 
 export class BlockRepository implements Repository<BlockRecord> {
@@ -29,7 +32,7 @@ export class BlockRepository implements Repository<BlockRecord> {
       return
     }
 
-    const rows: BlockRow[] = records
+    const rows: BlockRow[] = records.map(toRow)
     await this.knex('blocks').insert(rows)
 
     this.logger.debug({ method: 'add', rows: rows.length })
@@ -38,7 +41,7 @@ export class BlockRepository implements Repository<BlockRecord> {
   async getAll(): Promise<BlockRecord[]> {
     const rows = await this.knex('blocks').select('*')
     this.logger.debug({ method: 'getAll', rows: rows.length })
-    return rows
+    return rows.map(toRecord)
   }
 
   async getAllInRange(from: number, to: number): Promise<BlockRecord[]> {
@@ -47,21 +50,23 @@ export class BlockRepository implements Repository<BlockRecord> {
       .where('number', '>=', from)
       .andWhere('number', '<=', to)
     this.logger.debug({ method: 'getAllUntil', rows: rows.length })
-    return rows
+    return rows.map(toRecord)
   }
 
   async getLast(): Promise<BlockRecord> {
-    let row = await this.knex('blocks').orderBy('number', 'desc').first()
+    const row = await this.knex('blocks').orderBy('number', 'desc').first()
 
-    row ||= EARLIEST_BLOCK
+    let record = row && toRecord(row)
+
+    record ||= EARLIEST_BLOCK
 
     this.logger.debug({
       method: 'getLast',
-      number: row.number,
-      hash: row.hash,
+      number: record.number,
+      hash: record.hash.toString(),
     })
 
-    return row
+    return record
   }
 
   getFirst(): BlockRecord {
@@ -77,19 +82,19 @@ export class BlockRepository implements Repository<BlockRecord> {
       hash: row?.hash || null,
     })
 
-    return row
+    return row && toRecord(row)
   }
 
-  async getByHash(hash: string): Promise<BlockRecord | undefined> {
-    const row = await this.knex('blocks').where('hash', hash).first()
+  async getByHash(hash: Hash256): Promise<BlockRecord | undefined> {
+    const row = await this.knex('blocks').where('hash', hash.toString()).first()
 
     this.logger.debug({
       method: 'getByHash',
-      hash,
+      hash: hash.toString(),
       number: row?.number || null,
     })
 
-    return row
+    return row && toRecord(row)
   }
 
   async deleteAll() {
@@ -103,5 +108,19 @@ export class BlockRepository implements Repository<BlockRecord> {
       .delete()
 
     this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
+  }
+}
+
+function toRow(record: BlockRecord): BlockRow {
+  return {
+    hash: record.hash.toString(),
+    number: record.number,
+  }
+}
+
+function toRecord(row: BlockRow): BlockRecord {
+  return {
+    hash: Hash256(row.hash),
+    number: row.number,
   }
 }

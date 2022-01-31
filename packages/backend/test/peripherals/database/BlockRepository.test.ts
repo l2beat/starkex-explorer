@@ -1,6 +1,7 @@
 import { expect } from 'earljs'
 import { range, uniqueId } from 'lodash'
 
+import { Hash256 } from '../../../src/model'
 import {
   BlockRecord,
   BlockRepository,
@@ -16,7 +17,7 @@ describe(BlockRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    const record: BlockRecord = { number: 1, hash: 'h1' }
+    const record: BlockRecord = { number: 1, hash: Hash256.fake() }
 
     await repository.add([record])
 
@@ -32,9 +33,9 @@ describe(BlockRepository.name, () => {
 
   it('adds multiple records and queries them', async () => {
     const records: BlockRecord[] = [
-      { number: 1, hash: 'h1' },
-      { number: 2, hash: 'h2' },
-      { number: 3, hash: 'h3' },
+      { number: 1, hash: Hash256.fake() },
+      { number: 2, hash: Hash256.fake() },
+      { number: 3, hash: Hash256.fake() },
     ]
 
     await repository.add(records)
@@ -45,8 +46,8 @@ describe(BlockRepository.name, () => {
 
   it('deletes all records', async () => {
     await repository.add([
-      { number: 1, hash: 'h1' },
-      { number: 2, hash: 'h2' },
+      { number: 1, hash: Hash256.fake() },
+      { number: 2, hash: Hash256.fake() },
     ])
 
     await repository.deleteAll()
@@ -57,7 +58,7 @@ describe(BlockRepository.name, () => {
 
   it('deletes all records after a block number', async () => {
     const records: BlockRecord[] = Array.from({ length: 10 }).map((_, i) => ({
-      hash: 'h' + i,
+      hash: Hash256.fake(),
       number: i,
     }))
     await repository.add(records)
@@ -69,17 +70,17 @@ describe(BlockRepository.name, () => {
   })
 
   it('gets by hash', async () => {
-    const record = { number: 1, hash: uniqueId('get-by-hash') }
+    const record = { number: 1, hash: Hash256.fake() }
 
     await repository.add([record])
 
     expect(await repository.getByHash(record.hash)).toEqual(record)
 
-    expect(await repository.getByHash('hash--not-found')).toEqual(undefined)
+    expect(await repository.getByHash(Hash256.fake('000'))).toEqual(undefined)
   })
 
   it('gets by number', async () => {
-    const record = { number: 1, hash: uniqueId('get-by-number') }
+    const record = { number: 1, hash: Hash256.fake() }
 
     await repository.add([record])
 
@@ -92,13 +93,13 @@ describe(BlockRepository.name, () => {
     // Empty repository will return hardcoded earliest block
     expect(await repository.getLast()).toEqual(EARLIEST_BLOCK)
 
-    const block = { number: 11813208, hash: uniqueId('get-last-') }
+    const block = { number: 11813208, hash: Hash256.fake() }
     await repository.add([block])
 
     expect(await repository.getLast()).toEqual(block)
 
-    const earlierBlock = { number: 11813206, hash: uniqueId('get-last-') }
-    const laterBlock = { number: 11813209, hash: uniqueId('get-last-') }
+    const earlierBlock = { number: 11813206, hash: Hash256.fake() }
+    const laterBlock = { number: 11813209, hash: Hash256.fake() }
     await repository.add([laterBlock, earlierBlock])
 
     expect(await repository.getLast()).toEqual(laterBlock)
@@ -112,7 +113,7 @@ describe(BlockRepository.name, () => {
   it('gets all blocks in range between given numbers (inclusive)', async () => {
     const blocks = range(10, 20).map((i) => ({
       number: i,
-      hash: uniqueId('get-in-range-'),
+      hash: Hash256.fake(),
     }))
     await repository.add(blocks)
 
