@@ -77,22 +77,13 @@ export class BlockDownloader {
     return this.ethereumClient.onBlock((block) =>
       this.jobQueue.add({
         name: `handleNewBlock-${block.number}-${block.hash}`,
-        execute: async () => {
-          // This job won't be retried by jobQueue
-          try {
-            await this.handleNewBlock(block)
-          } catch (error) {
-            this.logger.error(error)
-          }
-        },
+        execute: async () => this.handleNewBlock(block),
+        maxRetries: 2,
       })
     )
   }
 
-  private async handleNewBlock(
-    latest: IncomingBlock,
-    retriesRemaining = 2
-  ): Promise<void> {
+  private async handleNewBlock(latest: IncomingBlock): Promise<void> {
     if (this.state.t !== 'working') return
 
     let lastKnown = this.state.lastKnownBlock
@@ -123,9 +114,6 @@ export class BlockDownloader {
     // parentHashes to ensure they form a valid chain, if they don't, we go back
     // to the beginning of the procedure.
     if (!isConsistentChain(newBlocks)) {
-      if (retriesRemaining > 0) {
-        return this.handleNewBlock(latest, retriesRemaining - 1)
-      }
       throw new Error(
         `Inconsistent chain from ${lastKnown.number} to ${latest.number}\n` +
           JSON.stringify(
