@@ -105,9 +105,9 @@ describe(VerifierCollector.name, () => {
       verifierEventRepository
     )
 
-    await collector.discardFrom(123)
+    await collector.discardAfter(123)
 
-    expect(verifierEventRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+    expect(verifierEventRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 
   it('filters out logs from reorged chain histories', async () => {

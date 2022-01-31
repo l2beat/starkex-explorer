@@ -48,8 +48,8 @@ export class VerifierCollector {
     return computeVerifiersFromEvents(added, upgraded)
   }
 
-  async discardFrom(from: BlockNumber) {
-    await this.verifierEventRepository.deleteAllAfter(from - 1)
+  async discardAfter(lastToKeep: BlockNumber) {
+    await this.verifierEventRepository.deleteAllAfter(lastToKeep)
   }
 
   private async getEvents(blockRange: BlockRange) {

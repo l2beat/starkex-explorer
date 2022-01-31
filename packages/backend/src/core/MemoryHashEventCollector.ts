@@ -49,8 +49,8 @@ export class MemoryHashEventCollector {
     return events.flat(1)
   }
 
-  async discardFrom(from: BlockNumber) {
-    await this.factToPageRepository.deleteAllAfter(from - 1)
+  async discardAfter(lastToKeep: BlockNumber) {
+    await this.factToPageRepository.deleteAllAfter(lastToKeep)
   }
 
   private async getMemoryHashEvents(

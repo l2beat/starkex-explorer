@@ -38,7 +38,7 @@ describe(SyncScheduler.name, () => {
 
     await syncScheduler.start()
 
-    expect(dataSyncService.discardFrom).toHaveBeenCalledWith([1])
+    expect(dataSyncService.discardAfter).toHaveBeenCalledWith([1])
 
     emitNewBlocks({ from: 2, to: 10 } as BlockRange)
 
@@ -71,7 +71,7 @@ describe(SyncScheduler.name, () => {
     )
 
     await syncScheduler.start()
-    expect(dataSyncService.discardFrom).toHaveBeenCalledWith([0])
+    expect(dataSyncService.discardAfter).toHaveBeenCalledWith([0])
 
     emitNewBlocks({ from: 1, to: 1 } as BlockRange)
     emitNewBlocks({ from: 2, to: 2 } as BlockRange)
@@ -149,7 +149,7 @@ describe(SyncScheduler.name, () => {
     emitReorg({ firstChangedBlock: 10 })
 
     waitForExpect(() => {
-      expect(dataSyncService.discardFrom).toHaveBeenCalledWith([10])
+      expect(dataSyncService.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 
@@ -235,7 +235,7 @@ function setupMocks({
     blockDownloader,
     dataSyncService: mock<DataSyncService>({
       sync: mockFn().resolvesTo(undefined),
-      discardFrom: mockFn().resolvesTo(undefined),
+      discardAfter: mockFn().resolvesTo(undefined),
     }),
     emitNewBlocks: (event: BlockRange) =>
       blockDownloaderEvents.emit('newBlocks', event),

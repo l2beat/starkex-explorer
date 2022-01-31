@@ -82,9 +82,9 @@ describe(PageCollector.name, () => {
 
     const collector = new PageCollector(mock<EthereumClient>(), pageRepository)
 
-    await collector.discardFrom(123)
+    await collector.discardAfter(123)
 
-    expect(pageRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+    expect(pageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 
   it('filters out logs from reorged chain histories', async () => {

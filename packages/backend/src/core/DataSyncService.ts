@@ -53,10 +53,10 @@ export class DataSyncService {
     }
   }
 
-  async discardFrom(blockNumber: BlockNumber) {
-    await this.verifierCollector.discardFrom(blockNumber)
-    await this.memoryHashEventCollector.discardFrom(blockNumber)
-    await this.pageCollector.discardFrom(blockNumber)
-    await this.stateTransitionFactCollector.discardFrom(blockNumber)
+  async discardAfter(blockNumber: BlockNumber) {
+    await this.verifierCollector.discardAfter(blockNumber)
+    await this.memoryHashEventCollector.discardAfter(blockNumber)
+    await this.pageCollector.discardAfter(blockNumber)
+    await this.stateTransitionFactCollector.discardAfter(blockNumber)
   }
 }

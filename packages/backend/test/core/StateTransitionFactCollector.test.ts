@@ -95,9 +95,9 @@ describe(StateTransitionFactCollector.name, () => {
       transitionFactRepository
     )
 
-    await collector.discardFrom(123)
+    await collector.discardAfter(123)
 
-    expect(transitionFactRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+    expect(transitionFactRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 
   it('filters out logs from reorged chain histories', async () => {

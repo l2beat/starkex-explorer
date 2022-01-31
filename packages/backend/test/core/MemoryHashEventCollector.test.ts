@@ -191,9 +191,9 @@ describe(MemoryHashEventCollector.name, () => {
       factToPageRepository
     )
 
-    await collector.discardFrom(123)
+    await collector.discardAfter(123)
 
-    expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+    expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 
   it('filters out logs from reorged history', async () => {

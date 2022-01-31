@@ -59,8 +59,8 @@ export class PageCollector {
     return records
   }
 
-  async discardFrom(from: BlockNumber) {
-    await this.pageRepository.deleteAllAfter(from - 1)
+  async discardAfter(lastToKeep: BlockNumber) {
+    await this.pageRepository.deleteAllAfter(lastToKeep)
   }
 
   private async getMemoryPageEvents(
