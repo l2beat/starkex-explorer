@@ -1,6 +1,6 @@
 import { expect, mockFn } from 'earljs'
 import { providers } from 'ethers'
-import { last, orderBy, range, sortBy } from 'lodash'
+import { orderBy, range } from 'lodash'
 import waitForExpect from 'wait-for-expect'
 
 import {

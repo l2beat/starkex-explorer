@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { providers } from 'ethers'
-import { last, range } from 'lodash'
+import { range } from 'lodash'
 
 import { BlockRange, json } from '../model'
 import {
