@@ -1,8 +1,9 @@
 import { Logger } from './Logger'
 
 export interface Job {
-  name: string
-  execute: () => Promise<void>
+  readonly name: string
+  readonly execute: () => Promise<void>
+  readonly maxRetries?: number
 }
 
 interface JobInQueue extends Job {
@@ -61,7 +62,11 @@ export class JobQueue {
     } catch (error) {
       this.logger.error(`Job "${job.name}" failed with:`, error)
       this.inProgress.splice(this.inProgress.indexOf(job), 1)
-      this.queue.unshift({ ...job, failureCount: job.failureCount + 1 })
+
+      const { maxRetries = Infinity } = job
+      if (job.failureCount < maxRetries) {
+        this.queue.unshift({ ...job, failureCount: job.failureCount + 1 })
+      }
     } finally {
       setTimeout(() => this.execute())
     }
