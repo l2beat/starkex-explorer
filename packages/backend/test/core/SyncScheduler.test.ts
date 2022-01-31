@@ -172,10 +172,10 @@ describe(SyncScheduler.name, () => {
       batchSize
     )
 
-    blockDownloader.getLastKnownBlock = mockFn(() => ({
+    blockDownloader.getLastKnownBlock.returnsOnce({
       number: lastBlockNumberSynced + batchSize,
       hash: '0x',
-    }))
+    })
 
     await syncScheduler.start()
 

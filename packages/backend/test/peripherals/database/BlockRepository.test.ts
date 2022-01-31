@@ -25,6 +25,11 @@ describe(BlockRepository.name, () => {
     expect(actual).toEqual([record])
   })
 
+  it('adds 0 records', async () => {
+    await repository.add([])
+    expect(await repository.getAll()).toEqual([])
+  })
+
   it('adds multiple records and queries them', async () => {
     const records: BlockRecord[] = [
       { number: 1, hash: 'h1' },
