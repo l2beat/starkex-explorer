@@ -47,7 +47,7 @@ export class StateTransitionFactCollector {
     return records
   }
 
-  async discard({ from }: { from: BlockNumber }) {
+  async discardFrom(from: BlockNumber) {
     await this.stateTransitionFactRepository.deleteAllAfter(from - 1)
   }
 }

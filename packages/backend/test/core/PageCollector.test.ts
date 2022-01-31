@@ -82,7 +82,7 @@ describe(PageCollector.name, () => {
 
     const collector = new PageCollector(mock<EthereumClient>(), pageRepository)
 
-    await collector.discard({ from: 123 })
+    await collector.discardFrom(123)
 
     expect(pageRepository.deleteAllAfter).toHaveBeenCalledWith([122])
   })

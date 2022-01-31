@@ -27,7 +27,7 @@ export class SyncScheduler {
 
   async start() {
     let lastSynced = await this.statusRepository.getLastBlockNumberSynced()
-    await this.dataSyncService.discard({ from: lastSynced })
+    await this.dataSyncService.discardFrom(lastSynced)
 
     const lastKnown = this.blockDownloader.getLastKnownBlock()
 
@@ -56,7 +56,7 @@ export class SyncScheduler {
   private async scheduleDiscard(from: BlockNumber) {
     this.jobQueue.add({
       name: `discard-${from}`,
-      execute: () => this.dataSyncService.discard({ from }),
+      execute: () => this.dataSyncService.discardFrom(from),
     })
   }
 
@@ -83,7 +83,7 @@ export class SyncScheduler {
       await this.dataSyncService.sync(blockRange)
       await this.statusRepository.setLastBlockNumberSynced(blockRange.to)
     } catch (err) {
-      await this.dataSyncService.discard(blockRange)
+      await this.dataSyncService.discardFrom(blockRange.from)
       throw err
     }
   }

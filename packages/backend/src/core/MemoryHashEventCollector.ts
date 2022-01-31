@@ -49,7 +49,7 @@ export class MemoryHashEventCollector {
     return events.flat(1)
   }
 
-  async discard({ from }: { from: BlockNumber }) {
+  async discardFrom(from: BlockNumber) {
     await this.factToPageRepository.deleteAllAfter(from - 1)
   }
 

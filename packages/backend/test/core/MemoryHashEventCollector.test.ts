@@ -191,7 +191,7 @@ describe(MemoryHashEventCollector.name, () => {
       factToPageRepository
     )
 
-    await collector.discard({ from: 123 })
+    await collector.discardFrom(123)
 
     expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([122])
   })

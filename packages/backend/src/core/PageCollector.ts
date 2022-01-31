@@ -59,7 +59,7 @@ export class PageCollector {
     return records
   }
 
-  async discard({ from }: { from: BlockNumber }) {
+  async discardFrom(from: BlockNumber) {
     await this.pageRepository.deleteAllAfter(from - 1)
   }
 

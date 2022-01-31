@@ -95,7 +95,7 @@ describe(StateTransitionFactCollector.name, () => {
       transitionFactRepository
     )
 
-    await collector.discard({ from: 123 })
+    await collector.discardFrom(123)
 
     expect(transitionFactRepository.deleteAllAfter).toHaveBeenCalledWith([122])
   })

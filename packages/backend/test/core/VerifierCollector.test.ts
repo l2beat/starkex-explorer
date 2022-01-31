@@ -105,7 +105,7 @@ describe(VerifierCollector.name, () => {
       verifierEventRepository
     )
 
-    await collector.discard({ from: 123 })
+    await collector.discardFrom(123)
 
     expect(verifierEventRepository.deleteAllAfter).toHaveBeenCalledWith([122])
   })

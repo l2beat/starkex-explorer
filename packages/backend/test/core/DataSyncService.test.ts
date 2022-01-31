@@ -71,16 +71,16 @@ describe(DataSyncService.name, () => {
     })
   })
 
-  describe(DataSyncService.prototype.discard.name, () => {
+  describe(DataSyncService.prototype.discardFrom.name, () => {
     it('discards data from block number', async () => {
       const noop = async () => {}
-      const verifierCollector = mock<VerifierCollector>({ discard: noop })
+      const verifierCollector = mock<VerifierCollector>({ discardFrom: noop })
       const memoryHashEventCollector = mock<MemoryHashEventCollector>({
-        discard: noop,
+        discardFrom: noop,
       })
-      const pageCollector = mock<PageCollector>({ discard: noop })
+      const pageCollector = mock<PageCollector>({ discardFrom: noop })
       const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
-        discard: noop,
+        discardFrom: noop,
       })
 
       const dataSyncService = new DataSyncService(
@@ -93,15 +93,13 @@ describe(DataSyncService.name, () => {
         Logger.SILENT
       )
 
-      await dataSyncService.discard({ from: 10 })
+      await dataSyncService.discardFrom(10)
 
-      expect(verifierCollector.discard).toHaveBeenCalledWith([{ from: 10 }])
-      expect(memoryHashEventCollector.discard).toHaveBeenCalledWith([
-        { from: 10 },
-      ])
-      expect(pageCollector.discard).toHaveBeenCalledWith([{ from: 10 }])
-      expect(stateTransitionFactCollector.discard).toHaveBeenCalledWith([
-        { from: 10 },
+      expect(verifierCollector.discardFrom).toHaveBeenCalledWith([10])
+      expect(memoryHashEventCollector.discardFrom).toHaveBeenCalledWith([10])
+      expect(pageCollector.discardFrom).toHaveBeenCalledWith([10])
+      expect(stateTransitionFactCollector.discardFrom).toHaveBeenCalledWith([
+        10,
       ])
     })
   })
