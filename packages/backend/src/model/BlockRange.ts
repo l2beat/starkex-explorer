@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { orderBy, range } from 'lodash'
+import { range } from 'lodash'
 
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Hash256 } from './Hash256'
@@ -36,9 +36,9 @@ export class BlockRange {
       this.hashes = new Map(
         blocksArray.map((block) => [block.number, block.hash])
       )
-      const sorted = orderBy(blocksArray, (x) => x.number)
-      this.from = sorted[0].number
-      this.to = sorted[sorted.length - 1].number
+      const blockNumbers = blocksArray.map((block) => block.number)
+      this.from = Math.min(...blockNumbers)
+      this.to = Math.max(...blockNumbers)
     }
 
     if (from !== undefined) this.from = from
