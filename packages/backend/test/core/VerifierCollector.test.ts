@@ -138,7 +138,7 @@ describe(VerifierCollector.name, () => {
       },
       {
         number: 12016212,
-        hash: Hash256('deadbeef'),
+        hash: Hash256.fake('deadbeef'),
       },
     ])
 

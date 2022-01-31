@@ -1,5 +1,5 @@
 import { expect } from 'earljs'
-import { range, uniqueId } from 'lodash'
+import { range } from 'lodash'
 
 import { Hash256 } from '../../../src/model'
 import {

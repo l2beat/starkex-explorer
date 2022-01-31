@@ -40,7 +40,7 @@ describe(SyncScheduler.name, () => {
 
     expect(dataSyncService.discardAfter).toHaveBeenCalledWith([1])
 
-    emitNewBlocks({ from: 2, to: 10 } as BlockRange)
+    emitNewBlocks(BlockRange.fake({ from: 2, to: 10 }))
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
@@ -73,9 +73,9 @@ describe(SyncScheduler.name, () => {
     await syncScheduler.start()
     expect(dataSyncService.discardAfter).toHaveBeenCalledWith([0])
 
-    emitNewBlocks({ from: 1, to: 1 } as BlockRange)
-    emitNewBlocks({ from: 2, to: 2 } as BlockRange)
-    emitNewBlocks({ from: 3, to: 100 } as BlockRange)
+    emitNewBlocks(BlockRange.fake({ from: 1, to: 1 }))
+    emitNewBlocks(BlockRange.fake({ from: 2, to: 2 }))
+    emitNewBlocks(BlockRange.fake({ from: 3, to: 100 }))
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
