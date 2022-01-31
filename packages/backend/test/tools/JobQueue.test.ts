@@ -99,4 +99,27 @@ describe(JobQueue.name, () => {
       expect(queue.getTotalJobs()).toEqual(0)
     })
   })
+
+  it('shows stats', async () => {
+    const queue = new JobQueue({ maxConcurrentJobs: 1 }, Logger.SILENT)
+    expect(queue.getStats()).toEqual({
+      jobsInProgress: 0,
+      jobsInQueue: 0,
+      lastUpdatedAt: expect.a(String),
+      recentFailureCount: 0,
+    })
+
+    let resolve!: () => void
+
+    queue.add({
+      name: 'job-in-progress',
+      execute: () => new Promise((r) => (resolve = r)),
+    })
+
+    await waitForExpect(() => {
+      expect(queue.getStats()).toEqual(expect.objectWith({ jobsInProgress: 1 }))
+    })
+
+    resolve()
+  })
 })
