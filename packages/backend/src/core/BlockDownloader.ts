@@ -148,9 +148,7 @@ export class BlockDownloader {
   // We check if the last known block was reorged, if so, we find the reorg
   // point and delete all blocks after it, rebuilding our block database
   private async handlePastReorganizations(): Promise<BlockRecord> {
-    if (this.state.t !== 'working') {
-      throw new Error('not started')
-    }
+    assert(this.state.t === 'working', 'block downloader not started')
 
     const lastKnown = this.state.lastKnownBlock
 
