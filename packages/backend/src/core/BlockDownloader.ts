@@ -2,7 +2,7 @@ import assert from 'assert'
 import { providers } from 'ethers'
 import { range } from 'lodash'
 
-import { BlockRange, json } from '../model'
+import { BlockRange, Hash256, json } from '../model'
 import {
   BlockRecord,
   BlockRepository,
@@ -15,7 +15,7 @@ import { Logger } from '../tools/Logger'
 
 export interface KnownBlock {
   readonly number: number
-  readonly hash: string
+  readonly hash: Hash256
 }
 
 type State = { t: 'not-started' } | { t: 'working'; lastKnownBlock: KnownBlock }
@@ -46,7 +46,10 @@ export class BlockDownloader {
     const status: json = { status: this.state.t }
 
     if (this.state.t === 'working')
-      status.lastKnownBlock = { ...this.state.lastKnownBlock }
+      status.lastKnownBlock = {
+        number: this.state.lastKnownBlock.number,
+        hash: this.state.lastKnownBlock.hash.toString(),
+      }
 
     return status
   }
@@ -92,7 +95,7 @@ export class BlockDownloader {
         ? latest
         : await this.ethereumClient.getBlock(lastKnown.number + 1)
 
-    if (next.parentHash !== lastKnown.hash) {
+    if (next.parentHash !== lastKnown.hash.toString()) {
       lastKnown = await this.handlePastReorganizations()
       next = await this.ethereumClient.getBlock(lastKnown.number + 1)
     }
@@ -124,13 +127,21 @@ export class BlockDownloader {
       )
     }
 
-    await this.blockRepository.add(
-      newBlocks.map((block) => ({ hash: block.hash, number: block.number }))
+    const newBlockRecords = newBlocks.map(
+      (block): BlockRecord => ({
+        hash: Hash256(block.hash),
+        number: block.number,
+      })
     )
 
-    this.state.lastKnownBlock = { hash: latest.hash, number: latest.number }
+    await this.blockRepository.add(newBlockRecords)
 
-    this.events.emit('newBlocks', new BlockRange(newBlocks))
+    this.state.lastKnownBlock = {
+      hash: Hash256(latest.hash),
+      number: latest.number,
+    }
+
+    this.events.emit('newBlocks', new BlockRange(newBlockRecords))
   }
 
   // We check if the last known block was reorged, if so, we find the reorg
@@ -147,11 +158,11 @@ export class BlockDownloader {
     this.logger.info({
       method: 'handlePastReorganizations',
       blockNumber: lastKnown.number,
-      hashInDb: lastKnown.hash,
+      hashInDb: lastKnown.hash.toString(),
       hashOnChain: lastKnownFromChain.hash,
     })
 
-    if (lastKnownFromChain.hash === lastKnown.hash) {
+    if (lastKnownFromChain.hash === lastKnown.hash.toString()) {
       // no reorg in the past, last known block is still valid
       return lastKnown
     }
@@ -183,7 +194,7 @@ export class BlockDownloader {
         lastKnown.number - offset
       )
 
-      if (fromDb.hash === fromChain.hash) {
+      if (fromDb.hash.toString() === fromChain.hash) {
         // This is a good block, the reorg happened after it.
         lastUnchangedBlock = fromDb
         break

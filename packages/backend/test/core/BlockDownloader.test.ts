@@ -8,7 +8,7 @@ import {
   IncomingBlock,
   isConsistentChain,
 } from '../../src/core/BlockDownloader'
-import { BlockRange } from '../../src/model'
+import { BlockRange, Hash256 } from '../../src/model'
 import {
   BlockRecord,
   BlockRepository,
@@ -18,14 +18,15 @@ import { BlockTag } from '../../src/peripherals/ethereum/types'
 import { Logger, LogLevel } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
-const INITIAL_BLOCK: BlockRecord = { number: 0, hash: 'h0' }
+const INITIAL_BLOCK: BlockRecord = { number: 0, hash: Hash256.from(0n) }
 
 describe(BlockDownloader.name, () => {
   const logger = new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
 
   it('saves obtained blocks to db', async () => {
+    const [h1, h2, h3] = range(3).map((i) => Hash256.fake(String(i)))
     const { blockRepository, ethereumClient, emitBlock } = setupMocks({
-      blocks: ['h1', 'h2', 'h3'],
+      blocks: [h1, h2, h3],
     })
     const blockDownloader = new BlockDownloader(
       ethereumClient,
@@ -35,25 +36,41 @@ describe(BlockDownloader.name, () => {
 
     await blockDownloader.start()
 
-    emitBlock({ timestamp: 0, hash: 'h1', number: 1, parentHash: 'h0' })
-    emitBlock({ timestamp: 0, hash: 'h2', number: 2, parentHash: 'h1' })
-    emitBlock({ timestamp: 0, hash: 'h3', number: 3, parentHash: 'h2' })
+    emitBlock({
+      timestamp: 0,
+      hash: h1.toString(),
+      number: 1,
+      parentHash: INITIAL_BLOCK.hash.toString(),
+    })
+    emitBlock({
+      timestamp: 0,
+      hash: h2.toString(),
+      number: 2,
+      parentHash: h1.toString(),
+    })
+    emitBlock({
+      timestamp: 0,
+      hash: h3.toString(),
+      number: 3,
+      parentHash: h2.toString(),
+    })
 
     await waitForExpect(async () => {
       const blocksInDb = await blockRepository.getAll()
 
       expect(blocksInDb).toBeAnArrayOfLength(3)
       expect(blocksInDb).toEqual([
-        { hash: 'h1', number: 1 },
-        { hash: 'h2', number: 2 },
-        { hash: 'h3', number: 3 },
+        { hash: h1, number: 1 },
+        { hash: h2, number: 2 },
+        { hash: h3, number: 3 },
       ])
     })
   })
 
   it('handles gaps between received blocks (in case of server restarts)', async () => {
+    const [h1, h2, h3, h4] = range(4).map((i) => Hash256.fake(String(i)))
     const { blockRepository, ethereumClient, emitBlock } = setupMocks({
-      blocks: ['h1', 'h2', 'h3', 'h4'],
+      blocks: [h1, h2, h3, h4],
     })
     const blockDownloader = new BlockDownloader(
       ethereumClient,
@@ -64,9 +81,9 @@ describe(BlockDownloader.name, () => {
     const stop = await blockDownloader.start()
 
     emitBlock({
-      hash: 'h1',
+      hash: h1.toString(),
       number: 1,
-      parentHash: 'h0',
+      parentHash: INITIAL_BLOCK.hash.toString(),
       timestamp: 0,
     })
 
@@ -75,9 +92,9 @@ describe(BlockDownloader.name, () => {
     await blockDownloader.start()
 
     emitBlock({
-      hash: 'h4',
+      hash: h4.toString(),
       number: 4,
-      parentHash: 'h3',
+      parentHash: h3.toString(),
       timestamp: 0,
     })
 
@@ -85,17 +102,18 @@ describe(BlockDownloader.name, () => {
       const blocksInDb = await blockRepository.getAll()
 
       expect(blocksInDb).toEqual([
-        { hash: 'h1', number: 1 },
-        { hash: 'h2', number: 2 },
-        { hash: 'h3', number: 3 },
-        { hash: 'h4', number: 4 },
+        { hash: h1, number: 1 },
+        { hash: h2, number: 2 },
+        { hash: h3, number: 3 },
+        { hash: h4, number: 4 },
       ])
     })
   })
 
   it('calls `onNewBlocks` listeners the range of new blocks obtained', async () => {
+    const [h1, h2, h3, h4] = range(4).map((i) => Hash256.fake(String(i)))
     const { blockRepository, ethereumClient, emitBlock } = setupMocks({
-      blocks: ['h1', 'h2', 'h3', 'h4'],
+      blocks: [h1, h2, h3, h4],
     })
     const blockDownloader = new BlockDownloader(
       ethereumClient,
@@ -109,39 +127,39 @@ describe(BlockDownloader.name, () => {
     await blockDownloader.start()
 
     emitBlock({
-      hash: 'h1',
+      hash: h1.toString(),
       number: 1,
-      parentHash: 'h0',
+      parentHash: INITIAL_BLOCK.hash.toString(),
       timestamp: 0,
     })
 
     await waitForExpect(() => {
       expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-        [new BlockRange([{ hash: 'h1', number: 1 }])],
+        [new BlockRange([{ hash: h1, number: 1 }])],
       ])
     })
 
     await blockDownloader.start()
 
     emitBlock({
-      hash: 'h4',
+      hash: h4.toString(),
       number: 4,
-      parentHash: 'h3',
+      parentHash: h3.toString(),
       timestamp: 0,
     })
 
     await waitForExpect(() => {
       expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-        [BlockRange.from({ 1: 'h1' })],
-        [BlockRange.from({ 2: 'h2', 3: 'h3', 4: 'h4' })],
+        [BlockRange.from({ 1: h1 })],
+        [BlockRange.from({ 2: h2, 3: h3, 4: h4 })],
       ])
     })
   })
 
   it('handles reorgs in the past (finding reorg point)', async () => {
-    const hashes = range(1, 21)
-      .map((i) => `h${i}`)
-      .concat(['h21.a', 'h22.a'])
+    const commonHistory = range(1, 21).map((i) => Hash256.fake(`${i}0`))
+    const reorgedHistory = [Hash256.fake('21a'), Hash256.fake('22a')]
+    const hashes = commonHistory.concat(reorgedHistory)
 
     const { blockRepository, ethereumClient, emitBlock, reorganize } =
       setupMocks({ blocks: hashes })
@@ -160,9 +178,9 @@ describe(BlockDownloader.name, () => {
 
     hashes.forEach((hash, i) => {
       emitBlock({
-        hash,
+        hash: hash.toString(),
         number: i + 1,
-        parentHash: hashes[i - 1] || 'h0',
+        parentHash: (hashes[i - 1] || INITIAL_BLOCK.hash).toString(),
         timestamp: 0,
       })
     })
@@ -172,11 +190,14 @@ describe(BlockDownloader.name, () => {
       expect(blocksInDb).toBeAnArrayOfLength(22)
     })
 
-    const blocks = reorganize(
-      range(1, 21)
-        .map((i) => `h${i}`)
-        .concat(['h21.b', 'h22.b', 'h23.b'])
-    )
+    const newHistory = [
+      Hash256.fake('21b'),
+      Hash256.fake('22b'),
+      Hash256.fake('23b'),
+    ]
+    const [h21b, h22b, h23b] = newHistory
+
+    const blocks = reorganize(commonHistory.concat(newHistory))
 
     emitBlock(blocks[23]!)
 
@@ -208,16 +229,20 @@ describe(BlockDownloader.name, () => {
       const blocksInDb = await blockRepository.getAll()
 
       expect(blocksInDb).toEqual([
-        ...range(1, 21).map((i): BlockRecord => ({ hash: `h${i}`, number: i })),
-        { hash: 'h21.b', number: 21 },
-        { hash: 'h22.b', number: 22 },
-        { hash: 'h23.b', number: 23 },
+        ...commonHistory.map(
+          (hash, i): BlockRecord => ({ hash, number: i + 1 })
+        ),
+        { hash: h21b, number: 21 },
+        { hash: h22b, number: 22 },
+        { hash: h23b, number: 23 },
       ])
     })
   })
 
   it('handles reorgs in the past (removing all)', async () => {
-    const hashes = ['h1', 'h2', 'h3.a']
+    // const hashes = ['h1', 'h2', 'h3.a']
+    const hashes = [Hash256.fake('1'), Hash256.fake('2'), Hash256.fake('3a')]
+    const [h1, h2, h3a] = hashes
 
     const { blockRepository, ethereumClient, emitBlock, reorganize } =
       setupMocks({ blocks: hashes })
@@ -237,9 +262,9 @@ describe(BlockDownloader.name, () => {
 
     hashes.forEach((hash, i) => {
       emitBlock({
-        hash,
+        hash: hash.toString(),
         number: i + 1,
-        parentHash: hashes[i - 1] || 'h0',
+        parentHash: (hashes[i - 1] || INITIAL_BLOCK.hash).toString(),
         timestamp: 0,
       })
     })
@@ -250,12 +275,14 @@ describe(BlockDownloader.name, () => {
     })
 
     expect(await blockRepository.getAll()).toEqual([
-      { hash: 'h1', number: 1 },
-      { hash: 'h2', number: 2 },
-      { hash: 'h3.a', number: 3 },
+      { hash: h1, number: 1 },
+      { hash: h2, number: 2 },
+      { hash: h3a, number: 3 },
     ])
 
-    const blocks = reorganize(['h1', 'h2', 'h3.b', 'h4.b'])
+    const h3b = Hash256.fake('3b')
+    const h4b = Hash256.fake('4b')
+    const blocks = reorganize([h1, h2, h3b, h4b])
 
     emitBlock(blocks[4]!)
 
@@ -287,25 +314,27 @@ describe(BlockDownloader.name, () => {
       const blocksInDb = await blockRepository.getAll()
 
       expect(blocksInDb).toEqual([
-        { hash: 'h1', number: 1 },
-        { hash: 'h2', number: 2 },
-        { hash: 'h3.b', number: 3 },
-        { hash: 'h4.b', number: 4 },
+        { hash: h1, number: 1 },
+        { hash: h2, number: 2 },
+        { hash: h3b, number: 3 },
+        { hash: h4b, number: 4 },
       ])
     })
   })
 
   it('handles reorgs in incoming data', async () => {
+    const h1 = Hash256.fake('1')
+    const h2 = Hash256.fake('2')
     const blocks: BlocksDict = {
       1: {
-        hash: 'h1',
-        parentHash: 'h0',
+        hash: h1.toString(),
+        parentHash: INITIAL_BLOCK.hash.toString(),
         number: 1,
         timestamp: 0,
       },
       2: {
-        hash: 'h2',
-        parentHash: 'h1',
+        hash: h2.toString(),
+        parentHash: h1.toString(),
         number: 2,
         timestamp: 0,
       },
@@ -329,10 +358,13 @@ describe(BlockDownloader.name, () => {
 
     Object.values(blocks).forEach((block) => block && emitBlock(block))
 
-    const h4b = {
-      hash: 'h4.b',
+    const h3a = Hash256.fake('3a')
+    const h3b = Hash256.fake('3b')
+    const h4b = Hash256.fake('4b')
+    const blockH4b = {
+      hash: h4b.toString(),
       // The first time we get h4.b, we won't know about h3.b.
-      parentHash: 'h3.b',
+      parentHash: h3b.toString(),
       number: 4,
       timestamp: 0,
     }
@@ -342,30 +374,30 @@ describe(BlockDownloader.name, () => {
       3: [
         // The first time we ask for block 3, we'll get h3.a, the second time, we'll get h3.b.
         {
-          hash: 'h3.a',
-          parentHash: 'h2',
+          hash: h3a.toString(),
+          parentHash: h2.toString(),
           number: 3,
           timestamp: 0,
         },
         {
-          hash: 'h3.b',
-          parentHash: 'h2',
+          hash: h3b.toString(),
+          parentHash: h2.toString(),
           number: 3,
           timestamp: 0,
         },
       ],
-      4: h4b,
+      4: blockH4b,
     })
 
-    emitBlock(h4b)
+    emitBlock(blockH4b)
 
     await waitForExpect(async () => {
       const blocksInDb = await blockRepository.getAll()
       expect(blocksInDb).toEqual([
-        { hash: 'h1', number: 1 },
-        { hash: 'h2', number: 2 },
-        { hash: 'h3.b', number: 3 },
-        { hash: 'h4.b', number: 4 },
+        { hash: h1, number: 1 },
+        { hash: h2, number: 2 },
+        { hash: h3b, number: 3 },
+        { hash: h4b, number: 4 },
       ])
     })
 
@@ -374,21 +406,34 @@ describe(BlockDownloader.name, () => {
     expect(reorgListener).toHaveBeenCalledExactlyWith([])
 
     expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-      [new BlockRange([{ number: 1, hash: 'h1' }])],
-      [new BlockRange([{ number: 2, hash: 'h2' }])],
+      [new BlockRange([{ number: 1, hash: h1 }])],
+      [new BlockRange([{ number: 2, hash: h2 }])],
       [
         new BlockRange([
-          { number: 3, hash: 'h3.b' },
-          { number: 4, hash: 'h4.b' },
+          { number: 3, hash: h3b },
+          { number: 4, hash: h4b },
         ]),
       ],
     ])
   })
 
   it('handles reorgs between the last known block and the next one', async () => {
+    const h1b = Hash256.fake('1b')
+    const h2b = Hash256.fake('2b')
+
     const blocks: BlocksDict = {
-      1: { hash: 'h1.b', number: 1, parentHash: 'h0', timestamp: 0 },
-      2: { hash: 'h2.b', number: 2, parentHash: 'h1.b', timestamp: 0 },
+      1: {
+        hash: h1b.toString(),
+        number: 1,
+        parentHash: INITIAL_BLOCK.hash.toString(),
+        timestamp: 0,
+      },
+      2: {
+        hash: h2b.toString(),
+        number: 2,
+        parentHash: h1b.toString(),
+        timestamp: 0,
+      },
     }
 
     const { blockRepository, ethereumClient, emitBlock } = setupMocks({
@@ -408,11 +453,18 @@ describe(BlockDownloader.name, () => {
 
     await blockDownloader.start()
 
-    emitBlock({ hash: 'h1.a', number: 1, parentHash: 'h0', timestamp: 0 })
+    const h1a = Hash256.fake('1a')
+
+    emitBlock({
+      hash: h1a.toString(),
+      number: 1,
+      parentHash: INITIAL_BLOCK.hash.toString(),
+      timestamp: 0,
+    })
 
     await waitForExpect(() => {
       expect(blockDownloader.getLastKnownBlock()).toEqual(
-        expect.objectWith({ hash: 'h1.a', number: 1 })
+        expect.objectWith({ hash: h1a, number: 1 })
       )
     })
 
@@ -443,15 +495,16 @@ describe(BlockDownloader.name, () => {
     await waitForExpect(async () => {
       const blocksInDb = await blockRepository.getAll()
       expect(blocksInDb).toEqual([
-        { hash: 'h1.b', number: 1 },
-        { hash: 'h2.b', number: 2 },
+        { hash: h1b, number: 1 },
+        { hash: h2b, number: 2 },
       ])
     })
   })
 
   it('returns last known block', async () => {
+    const h1 = Hash256.fake('1')
     const { blockRepository, ethereumClient, emitBlock } = setupMocks({
-      blocks: ['h1'],
+      blocks: [h1],
     })
     const blockDownloader = new BlockDownloader(
       ethereumClient,
@@ -464,21 +517,27 @@ describe(BlockDownloader.name, () => {
     await blockDownloader.start()
 
     expect(blockDownloader.getLastKnownBlock()).toEqual(
-      expect.objectWith({ number: 0, hash: 'h0' })
+      expect.objectWith({ number: 0, hash: INITIAL_BLOCK.hash })
     )
 
-    emitBlock({ number: 1, hash: 'h1', parentHash: 'h0', timestamp: 0 })
+    emitBlock({
+      number: 1,
+      hash: h1.toString(),
+      parentHash: INITIAL_BLOCK.hash.toString(),
+      timestamp: 0,
+    })
 
     await waitForExpect(() => {
       expect(blockDownloader.getLastKnownBlock()).toEqual(
-        expect.objectWith({ number: 1, hash: 'h1' })
+        expect.objectWith({ number: 1, hash: h1 })
       )
     })
   })
 
   it('shows status', async () => {
+    const h1 = Hash256.fake('1000')
     const { blockRepository, ethereumClient, emitBlock } = setupMocks({
-      blocks: ['test--show-status--hash'],
+      blocks: [h1],
     })
     const blockDownloader = new BlockDownloader(
       ethereumClient,
@@ -498,8 +557,8 @@ describe(BlockDownloader.name, () => {
     })
 
     emitBlock({
-      hash: 'test--show-status--hash',
-      parentHash: 'h0',
+      hash: h1.toString(),
+      parentHash: INITIAL_BLOCK.hash.toString(),
       number: 1,
       timestamp: 0,
     })
@@ -509,7 +568,7 @@ describe(BlockDownloader.name, () => {
         status: 'working',
         lastKnownBlock: {
           number: 1,
-          hash: 'test--show-status--hash',
+          hash: h1.toString(),
         },
       })
     })
@@ -554,16 +613,18 @@ describe(BlockDownloader.name, () => {
   })
 })
 
-type BlockHashes = string[]
+type BlockHashes = Array<Hash256 | string>
 type BlocksDict = Partial<Record<BlockTag, IncomingBlock | IncomingBlock[]>>
 const deserializeBlockHashes = (blockHashes: BlockHashes): BlocksDict => {
   return Object.fromEntries(
     blockHashes.map((hash, i): [number, IncomingBlock] => [
       i + 1,
       {
-        hash,
+        hash: hash.toString(),
         number: i + 1,
-        parentHash: blockHashes[i - 1] || 'h0',
+        parentHash: (
+          blockHashes[i - 1] || INITIAL_BLOCK.hash.toString()
+        ).toString(),
         timestamp: 0,
       },
     ])

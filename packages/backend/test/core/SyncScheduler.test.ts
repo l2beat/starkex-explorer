@@ -8,7 +8,7 @@ import {
 } from '../../src/core/BlockDownloader'
 import { DataSyncService } from '../../src/core/DataSyncService'
 import { SyncScheduler } from '../../src/core/SyncScheduler'
-import { BlockRange } from '../../src/model'
+import { BlockRange, Hash256 } from '../../src/model'
 import { BlockRepository } from '../../src/peripherals/database/BlockRepository'
 import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
 import { createEventEmitter } from '../../src/tools/EventEmitter'
@@ -113,7 +113,7 @@ describe(SyncScheduler.name, () => {
 
     await syncScheduler.start()
 
-    const range = new BlockRange([{ number: 2, hash: '0x2' }])
+    const range = new BlockRange([{ number: 2, hash: Hash256.from(2n) }])
     mocks.emitNewBlocks(range)
 
     await waitForExpect(() => {
@@ -172,9 +172,10 @@ describe(SyncScheduler.name, () => {
       batchSize
     )
 
+    const lastKnown = lastBlockNumberSynced + batchSize
     blockDownloader.getLastKnownBlock.returnsOnce({
-      number: lastBlockNumberSynced + batchSize,
-      hash: '0x',
+      number: lastKnown,
+      hash: Hash256.from(BigInt(lastKnown)),
     })
 
     await syncScheduler.start()
@@ -216,7 +217,7 @@ function setupMocks({
     ...{ events: blockDownloaderEvents },
     getLastKnownBlock: () => ({
       number: lastKnown,
-      hash: '0x' + lastKnown,
+      hash: Hash256.from(BigInt(lastKnown)),
     }),
     onNewBlocks: BlockDownloader.prototype.onNewBlocks.bind(
       _blockDownloaderProperties
@@ -226,7 +227,10 @@ function setupMocks({
 
   const blockRepository = mock<BlockRepository>({
     getAllInRange: async (from, to) =>
-      range(from, to + 1).map((i) => ({ hash: '0x' + i, number: i })),
+      range(from, to + 1).map((i) => ({
+        hash: Hash256.from(BigInt(i)),
+        number: i,
+      })),
   })
 
   return {

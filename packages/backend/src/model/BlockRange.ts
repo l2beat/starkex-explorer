@@ -1,45 +1,48 @@
 import assert from 'assert'
-import { range } from 'lodash'
+import { orderBy, range } from 'lodash'
 
 import { BlockNumber } from '../peripherals/ethereum/types'
+import { Hash256 } from './Hash256'
 
 export class BlockRange {
   /** number of the earliest block in range */
   public readonly from: BlockNumber
   /** number of the latest block in range */
   public readonly to: BlockNumber
-  private readonly hashes: ReadonlyMap<BlockNumber, string>
+  private readonly hashes: ReadonlyMap<BlockNumber, Hash256>
 
   constructor(
-    /** a list of blocks in order from oldest to newest */
-    blocks: readonly Block[]
-  )
-  constructor(
-    /** parent block range */
-    range: BlockRange,
-    /** new left boundary */
-    from: BlockNumber,
-    /** new right boundary */
-    to: BlockNumber
-  )
+    /** a unordered collection of blocks or parent block range */
+    blocks: BlockRange | Iterable<BlockInRange>,
+    /**
+     * left boundary
+     * @default max block number from `blocks`
+     */
+    from?: BlockNumber,
+    /**
+     * new right boundary
+     * @default min block number from `blocks`
+     */
+    to?: BlockNumber
+  ) {
+    if (blocks instanceof BlockRange) {
+      this.to = blocks.to
+      this.from = blocks.from
+      this.hashes = blocks.hashes
+    } else {
+      const blocksArray = Array.from(blocks)
+      assert(blocksArray.length > 0, 'BlockRange must have at least one block')
 
-  constructor(...args: BlockRangeConstructorArgs) {
-    if (args.length === 3) {
-      const [range, from, to] = args
-      this.to = to
-      this.from = from
-      this.hashes = range.hashes
-      return
+      this.hashes = new Map(
+        blocksArray.map((block) => [block.number, block.hash])
+      )
+      const sorted = orderBy(blocksArray, (x) => x.number)
+      this.from = sorted[0].number
+      this.to = sorted[sorted.length - 1].number
     }
 
-    const [blocks] = args
-    assert(blocks.length > 0, 'BlockRange must have at least one block')
-
-    this.from = blocks[0].number
-    this.to = blocks[blocks.length - 1].number
-    this.hashes = new Map(
-      blocks.map((block) => [block.number, block.hash] as const)
-    )
+    if (from !== undefined) this.from = from
+    if (to !== undefined) this.to = to
   }
 
   has({
@@ -47,14 +50,14 @@ export class BlockRange {
     blockHash,
   }: {
     blockNumber: BlockNumber
-    blockHash: string
+    blockHash: string | Hash256
   }) {
     // @todo if blockNumber is far enough in the past, we want to assume
     //       every blockHash is valid
     return this.hashes.get(blockNumber) === blockHash
   }
 
-  static from(dict: Record<BlockNumber, string>) {
+  static from(dict: Record<BlockNumber, Hash256>) {
     return new BlockRange(
       Object.entries(dict).map(([number, hash]) => ({
         number: Number(number),
@@ -65,12 +68,15 @@ export class BlockRange {
 
   static fake({ from, to }: { from: BlockNumber; to: BlockNumber }) {
     return new BlockRange(
-      range(from, to + 1).map((i) => ({ number: i, hash: '0x' + i }))
+      range(from, to + 1).map((i) => ({
+        number: i,
+        hash: Hash256.from(BigInt(i)),
+      }))
     )
   }
 }
 
-type Block = { number: BlockNumber; hash: string }
-type BlockRangeConstructorArgs =
-  | [blocks: readonly Block[]]
-  | [range: BlockRange, from: number, to: number]
+export interface BlockInRange {
+  number: BlockNumber
+  hash: Hash256
+}

@@ -31,11 +31,15 @@ describe(PageCollector.name, () => {
     const blockRange = new BlockRange([
       {
         number: 9,
-        hash: '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c',
+        hash: Hash256(
+          '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c'
+        ),
       },
       {
         number: 10,
-        hash: '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c',
+        hash: Hash256(
+          '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c'
+        ),
       },
     ])
 
@@ -101,11 +105,13 @@ describe(PageCollector.name, () => {
     const blockRange = new BlockRange([
       {
         number: 9,
-        hash: '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c',
+        hash: Hash256(
+          '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c'
+        ),
       },
       {
         number: 10,
-        hash: '0xdeadbeef',
+        hash: Hash256.fake('deadbeef'),
       },
     ])
 

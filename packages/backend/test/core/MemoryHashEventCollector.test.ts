@@ -32,19 +32,27 @@ describe(MemoryHashEventCollector.name, () => {
     const blockRange: BlockRange = new BlockRange([
       {
         number: 11905858,
-        hash: '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55',
+        hash: Hash256(
+          '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55'
+        ),
       },
       {
         number: 11905919,
-        hash: '0x51c1482ed70ef0cab9fb40b891ada76408c0272bd1fd9c48e3d28ca65a2fc54f',
+        hash: Hash256(
+          '0x51c1482ed70ef0cab9fb40b891ada76408c0272bd1fd9c48e3d28ca65a2fc54f'
+        ),
       },
       {
         number: 12050594,
-        hash: '0x34eba61af14fcce1f79268532b73cb39af2897a5d219288edef044f07a660a74',
+        hash: Hash256(
+          '0x34eba61af14fcce1f79268532b73cb39af2897a5d219288edef044f07a660a74'
+        ),
       },
       {
         number: 12052850,
-        hash: '0x8a74ff3eb9f3d439b2b52241b9f6035a7ff93887ca8a16424413c97d0d9adfd8',
+        hash: Hash256(
+          '0x8a74ff3eb9f3d439b2b52241b9f6035a7ff93887ca8a16424413c97d0d9adfd8'
+        ),
       },
     ])
 
@@ -213,11 +221,13 @@ describe(MemoryHashEventCollector.name, () => {
       new BlockRange([
         {
           number: 11905858,
-          hash: '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55',
+          hash: Hash256(
+            '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55'
+          ),
         },
         {
           number: 11905919,
-          hash: '0xdeadbeef',
+          hash: Hash256.fake('deadbeef'),
         },
       ]),
       [EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84')]

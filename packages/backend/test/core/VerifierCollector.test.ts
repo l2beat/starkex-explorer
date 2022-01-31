@@ -2,7 +2,7 @@ import { expect, mockFn } from 'earljs'
 import { providers } from 'ethers'
 
 import { VerifierCollector } from '../../src/core/VerifierCollector'
-import { BlockRange, EthereumAddress } from '../../src/model'
+import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
 import {
   VerifierEventRecord,
   VerifierEventRepository,
@@ -28,19 +28,27 @@ describe(VerifierCollector.name, () => {
     const blockRange: BlockRange = new BlockRange([
       {
         number: 12004790,
-        hash: '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53',
+        hash: Hash256(
+          '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53'
+        ),
       },
       {
         number: 12004790,
-        hash: '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53',
+        hash: Hash256(
+          '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53'
+        ),
       },
       {
         number: 12016212,
-        hash: '0x867fdd66b6dee527e1f5f6c9d742ca6776a8fd72a1919e019bff85b0a2c1005d',
+        hash: Hash256(
+          '0x867fdd66b6dee527e1f5f6c9d742ca6776a8fd72a1919e019bff85b0a2c1005d'
+        ),
       },
       {
         number: 12016212,
-        hash: '0x867fdd66b6dee527e1f5f6c9d742ca6776a8fd72a1919e019bff85b0a2c1005d',
+        hash: Hash256(
+          '0x867fdd66b6dee527e1f5f6c9d742ca6776a8fd72a1919e019bff85b0a2c1005d'
+        ),
       },
     ])
 
@@ -124,11 +132,13 @@ describe(VerifierCollector.name, () => {
     const blockRange: BlockRange = new BlockRange([
       {
         number: 12004790,
-        hash: '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53',
+        hash: Hash256(
+          '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53'
+        ),
       },
       {
         number: 12016212,
-        hash: '0xdeadbeef',
+        hash: Hash256('deadbeef'),
       },
     ])
 
