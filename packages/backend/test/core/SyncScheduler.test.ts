@@ -123,6 +123,77 @@ describe(SyncScheduler.name, () => {
       ])
     })
   })
+
+  it('schedules discard on reorg', async () => {
+    const lastBlockNumberSynced = 1
+    const {
+      statusRepository,
+      blockRepository,
+      blockDownloader,
+      dataSyncService,
+      emitReorg,
+    } = setupMocks({ lastBlockNumberSynced })
+
+    const batchSize = 100
+    const syncScheduler = new SyncScheduler(
+      statusRepository,
+      blockRepository,
+      blockDownloader,
+      dataSyncService,
+      Logger.SILENT,
+      batchSize
+    )
+
+    await syncScheduler.start()
+
+    emitReorg({ firstChangedBlock: 10 })
+
+    waitForExpect(() => {
+      expect(dataSyncService.discard).toHaveBeenCalledWith([{ from: 10 }])
+    })
+  })
+
+  it('syncs range between last synced and last known block on startup', async () => {
+    const lastBlockNumberSynced = 12345
+    const {
+      statusRepository,
+      blockRepository,
+      blockDownloader,
+      dataSyncService,
+    } = setupMocks({ lastBlockNumberSynced })
+
+    const batchSize = 10_000
+    const syncScheduler = new SyncScheduler(
+      statusRepository,
+      blockRepository,
+      blockDownloader,
+      dataSyncService,
+      Logger.SILENT,
+      batchSize
+    )
+
+    blockDownloader.getLastKnownBlock = mockFn(() => ({
+      number: lastBlockNumberSynced + batchSize,
+      hash: '0x',
+    }))
+
+    await syncScheduler.start()
+
+    await waitForExpect(() => {
+      expect(blockDownloader.getLastKnownBlock).toHaveBeenCalledExactlyWith([
+        [],
+      ])
+
+      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
+        [
+          BlockRange.fake({
+            from: lastBlockNumberSynced + 1,
+            to: lastBlockNumberSynced + batchSize,
+          }),
+        ],
+      ])
+    })
+  })
 })
 
 function setupMocks({

@@ -47,7 +47,6 @@ export class SyncScheduler {
       this.scheduleSync(newBlockRange)
     })
 
-    // @todo write tests for this
     this.blockDownloader.onReorg(({ firstChangedBlock }) => {
       lastSynced = firstChangedBlock - 1
       this.scheduleDiscard(firstChangedBlock)
