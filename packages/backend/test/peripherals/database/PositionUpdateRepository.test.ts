@@ -30,6 +30,11 @@ describe(PositionUpdateRepository.name, () => {
     expect(actual).toEqual([record])
   })
 
+  it('adds 0 records', async () => {
+    await repository.addOrUpdate([])
+    expect(await repository.getAll()).toEqual([])
+  })
+
   it('adds multiple records and queries them', async () => {
     const records: PositionUpdateRecord[] = [
       {
