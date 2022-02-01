@@ -34,6 +34,11 @@ describe(FactToPageRepository.name, () => {
     ])
   })
 
+  it('adds 0 records', async () => {
+    await repository.add([])
+    expect(await repository.getAll()).toEqual([])
+  })
+
   it('adds multiple records and queries them', async () => {
     const records: FactToPageRecord[] = [
       dummyFactToPageRecord({ index: 0 }),

@@ -42,6 +42,11 @@ describe(StateTransitionFactRepository.name, () => {
     expect(actual).toEqual(records.map((r) => ({ ...r, id: expect.a(Number) })))
   })
 
+  it('adds 0 records', async () => {
+    await repository.add([])
+    expect(await repository.getAll()).toEqual([])
+  })
+
   it('deletes all records', async () => {
     await repository.add([
       dummyRecord({ blockNumber: 1 }),
