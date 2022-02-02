@@ -29,20 +29,9 @@ export class SyncScheduler {
     let lastSynced = await this.statusRepository.getLastBlockNumberSynced()
     await this.dataSyncService.discardAfter(lastSynced)
 
-    const lastKnown = this.blockDownloader.getLastKnownBlock()
+    this.logger.info('start', { lastSynced })
 
-    this.logger.info('start', { lastSynced, lastKnown: lastKnown.number })
-
-    if (lastKnown.number > lastSynced) {
-      const blocks = await this.blockRepository.getAllInRange(
-        lastSynced + 1,
-        lastKnown.number
-      )
-      lastSynced = lastKnown.number
-      this.scheduleSync(new BlockRange(blocks))
-    }
-
-    this.blockDownloader.onNewBlocks(async (newBlockRange) => {
+    this.blockDownloader.onNewBlocks(lastSynced + 1, async (newBlockRange) => {
       lastSynced = newBlockRange.to
       this.scheduleSync(newBlockRange)
     })
@@ -53,7 +42,7 @@ export class SyncScheduler {
     })
   }
 
-  private async scheduleDiscard(from: BlockNumber) {
+  private scheduleDiscard(from: BlockNumber) {
     this.jobQueue.add({
       name: `discard-${from}`,
       execute: () => this.dataSyncService.discardAfter(from),
