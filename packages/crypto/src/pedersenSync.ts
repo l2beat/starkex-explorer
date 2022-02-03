@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 
 import { starkCurvePoint } from './curve'
-import { PedersenHash } from './model'
+import { PedersenHash } from './PedersenHash'
 
 function toPoint(a: string, b: string) {
   return starkCurvePoint(new BN(a, 16), new BN(b, 16))
