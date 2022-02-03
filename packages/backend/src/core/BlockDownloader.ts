@@ -18,11 +18,13 @@ export interface KnownBlock {
   readonly hash: Hash256
 }
 
-type State = { t: 'not-started' } | { t: 'working'; lastKnownBlock: KnownBlock }
+type State =
+  | { type: 'not-started' }
+  | { type: 'working'; lastKnownBlock: KnownBlock }
 
 export class BlockDownloader {
   private events = createEventEmitter<BlockDownloaderEvents>()
-  private state: State = { t: 'not-started' }
+  private state: State = { type: 'not-started' }
   private jobQueue: JobQueue
 
   constructor(
@@ -37,15 +39,15 @@ export class BlockDownloader {
   async start() {
     const lastKnownBlock = await this.blockRepository.getLast()
 
-    this.state = { t: 'working', lastKnownBlock }
+    this.state = { type: 'working', lastKnownBlock }
 
     return this.startBackgroundWork()
   }
 
   getStatus() {
-    const status: json = { status: this.state.t }
+    const status: json = { status: this.state.type }
 
-    if (this.state.t === 'working')
+    if (this.state.type === 'working')
       status.lastKnownBlock = {
         number: this.state.lastKnownBlock.number,
         hash: this.state.lastKnownBlock.hash.toString(),
@@ -55,17 +57,44 @@ export class BlockDownloader {
   }
 
   getLastKnownBlock() {
-    if (this.state.t !== 'working') {
+    if (this.state.type !== 'working') {
       throw new Error('Not started')
     }
 
     return this.state.lastKnownBlock
   }
 
-  onNewBlocks(handler: (blockRange: BlockRange) => void) {
-    this.events.on('newBlocks', handler)
+  onNewBlocks(from: number, handler: (blockRange: BlockRange) => void) {
+    const lastKnown = this.getLastKnownBlock().number
+    if (from > lastKnown) {
+      throw new TypeError('From cannot be in the future')
+    }
+
+    let synced = from === lastKnown
+    let cancelled = false
+    let range = BlockRange.EMPTY
+    if (!synced) {
+      this.blockRepository.getAllInRange(from, lastKnown).then((blocks) => {
+        range = range.merge(new BlockRange(blocks))
+        if (!cancelled) {
+          handler(range)
+          synced = true
+        }
+      })
+    }
+
+    function onBlocks(blockRange: BlockRange) {
+      if (!synced) {
+        range = range.merge(blockRange)
+      } else {
+        handler(blockRange)
+      }
+    }
+
+    this.events.on('newBlocks', onBlocks)
     return () => {
-      this.events.off('newBlocks', handler)
+      cancelled = true
+      this.events.off('newBlocks', onBlocks)
     }
   }
 
@@ -87,7 +116,7 @@ export class BlockDownloader {
   }
 
   private async handleNewBlock(latest: IncomingBlock): Promise<void> {
-    if (this.state.t !== 'working') return
+    if (this.state.type !== 'working') return
 
     let lastKnown = this.state.lastKnownBlock
     let next =
@@ -147,7 +176,7 @@ export class BlockDownloader {
   // We check if the last known block was reorged, if so, we find the reorg
   // point and delete all blocks after it, rebuilding our block database
   private async handlePastReorganizations(): Promise<BlockRecord> {
-    assert(this.state.t === 'working', 'block downloader not started')
+    assert(this.state.type === 'working', 'block downloader not started')
 
     const lastKnown = this.state.lastKnownBlock
 

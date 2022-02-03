@@ -11,7 +11,6 @@ import { DataSyncService } from './DataSyncService'
 export class SyncScheduler {
   constructor(
     private readonly statusRepository: SyncStatusRepository,
-    private readonly blockRepository: BlockRepository,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
