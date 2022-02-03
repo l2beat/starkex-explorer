@@ -1,96 +1,125 @@
 import assert from 'assert'
 
-import { Hash256 } from '../model'
+import { BlockRange, Hash256 } from '../model'
 import { Logger } from '../tools/Logger'
+import { BlockDownloader } from './BlockDownloader'
+import { DataSyncService } from './DataSyncService'
 
-interface SyncState {
+export interface SyncState {
   /** Have we read the initial blocks from db already? */
   readonly isInitialized: boolean
   /** Is sync or discard being executed? */
   readonly isProcessing: boolean
-  readonly reorgRequired: boolean
-  readonly blocks: ContinuousBlocks
+  readonly discardRequired: boolean
+  readonly blocksToProcess: ContinuousBlocks
   readonly blocksProcessing: Block[]
-  readonly latestBlock: number
+  readonly latestBlockProcessed: number
 }
 
-type SyncSchedulerEffect = 'sync' | 'discardAfter'
-type StateAndEffects = [SyncState, SyncSchedulerEffect[]]
-
-const SYNC_BATCH_SIZE = 6000
+export type SyncSchedulerEffect = 'sync' | 'discardAfter'
+export type StateAndEffects = [SyncState, SyncSchedulerEffect[]]
 
 /** @internal */
-export function onInit(
-  state: SyncState,
-  blocks: Block[],
-  latestBlock: number
-): StateAndEffects {
-  assert(!state.isInitialized)
+export const SYNC_BATCH_SIZE = 6000
 
-  return process({
-    ...state,
-    isInitialized: true,
-    latestBlock,
-    blocks: state.blocks.prependEarlier(blocks),
-  })
-}
+export type SyncSchedulerAction =
+  | { type: 'init'; blocks: Block[] }
+  | { type: 'newBlocks'; blocks: Block[] }
+  | { type: 'reorg'; blocks: Block[] }
+  | { type: 'syncFinished'; success: boolean }
+  | { type: 'discardFinished'; success: boolean }
 
 /** @internal */
-export function onNewBlocks(
+export function syncSchedulerReducer(
   state: SyncState,
-  blocks: Block[]
+  action: SyncSchedulerAction
 ): StateAndEffects {
-  const newState = {
-    ...state,
-    blocks: state.blocks.concat(blocks),
+  // console.log('>> action', action.type)
+  switch (action.type) {
+    case 'init': {
+      assert(!state.isInitialized)
+
+      return process({
+        ...state,
+        isInitialized: true,
+        blocksToProcess: state.blocksToProcess.prependEarlier(action.blocks),
+      })
+    }
+
+    case 'newBlocks': {
+      return process({
+        ...state,
+        blocksToProcess: state.blocksToProcess.concat(action.blocks),
+      })
+    }
+
+    case 'reorg': {
+      if (state.latestBlockProcessed >= action.blocks[0].number) {
+        return process({
+          ...state,
+          discardRequired: true,
+          blocksToProcess: new ContinuousBlocks(action.blocks),
+        })
+      } else {
+        return process({
+          ...state,
+          blocksToProcess: state.blocksToProcess.replaceTail(action.blocks),
+        })
+      }
+    }
+
+    case 'discardFinished': {
+      return process({
+        ...state,
+        isProcessing: false,
+        discardRequired: action.success ? false : state.discardRequired,
+      })
+    }
+
+    case 'syncFinished': {
+      return process({
+        ...state,
+        isProcessing: false,
+        blocksToProcess: action.success
+          ? state.blocksToProcess
+          : state.blocksToProcess.prependEarlier(state.blocksProcessing),
+        blocksProcessing: [],
+      })
+    }
   }
-
-  return state.isInitialized && !state.isProcessing
-    ? process(newState)
-    : [newState, []]
 }
 
-/** @internal */
-export function onSyncFinished(state: SyncState, success: boolean) {
-  return process({
-    ...state,
-    isProcessing: false,
-    blocks: success
-      ? state.blocks
-      : state.blocks.prependEarlier(state.blocksProcessing),
-    blocksProcessing: [],
-  })
-}
+function process(state: SyncState): StateAndEffects {
+  // console.log('>> process() received state', state)
+  // console.log(
+  //   '>> process will proceed',
+  //   state.isInitialized && !state.isProcessing
+  // )
+  if (!state.isInitialized || state.isProcessing) return [state, []]
 
-/** @internal */
-export function onDiscardFinished(
-  state: SyncState,
-  success: boolean
-): StateAndEffects {
-  return process({
-    ...state,
-    isProcessing: false,
-    reorgRequired: success ? state.reorgRequired : false,
-  })
-}
+  if (state.discardRequired) {
+    return [{ ...state, isProcessing: true }, ['discardAfter']]
+  } else {
+    const [blocksProcessing, blocksToProcess] =
+      state.blocksToProcess.take(SYNC_BATCH_SIZE)
 
-/** @internal */
-export function process(state: SyncState): StateAndEffects {
-  assert(!state.isProcessing)
-  if (!state.reorgRequired) {
-    const [blocksProcessing, blocks] = state.blocks.takeFirst(SYNC_BATCH_SIZE)
     if (blocksProcessing.length > 0) {
-      const latestBlock = blocksProcessing[blocksProcessing.length - 1].number
+      const latestBlockProcessed =
+        blocksProcessing[blocksProcessing.length - 1].number
 
       return [
-        { ...state, blocksProcessing, blocks, isProcessing: true, latestBlock },
+        {
+          ...state,
+          blocksProcessing,
+          blocksToProcess,
+          isProcessing: true,
+          latestBlockProcessed,
+        },
         ['sync'],
       ]
     } else {
       return [{ ...state, blocksProcessing }, []]
     }
-  } else {
-    return [{ ...state, isProcessing: true }, ['discardAfter']]
   }
 }
 
@@ -109,11 +138,17 @@ export class ContinuousBlocks {
    *
    * - we use this to handle deep reorganizations
    */
-  prependEarlier(blocks: readonly Block[]) {
+  prependEarlier(newStart: readonly Block[]) {
     return new ContinuousBlocks(
-      blocks
+      newStart
         .filter((x) => x.number < (this.first?.number ?? Infinity))
         .concat(this.blocks)
+    )
+  }
+
+  replaceTail(newTail: readonly Block[]) {
+    return new ContinuousBlocks(
+      this.blocks.filter((x) => x.number < newTail[0].number).concat(newTail)
     )
   }
 
@@ -121,7 +156,7 @@ export class ContinuousBlocks {
     return new ContinuousBlocks(this.blocks.concat(newBlocks))
   }
 
-  takeFirst(end: number) {
+  take(end: number) {
     return [
       this.blocks.slice(0, end),
       new ContinuousBlocks(this.blocks.slice(end)),
@@ -129,32 +164,15 @@ export class ContinuousBlocks {
   }
 }
 
-const INITIAL_SYNC_STATE = {
+/** @internal */
+export const INITIAL_SYNC_STATE: SyncState = {
   isInitialized: false,
-  blocks: new ContinuousBlocks(),
+  blocksToProcess: new ContinuousBlocks(),
   blocksProcessing: [],
   isProcessing: false,
-  reorgRequired: false,
-  latestBlock: 0,
+  discardRequired: false,
+  latestBlockProcessed: 0,
 }
-
-const actionHandlers = {
-  init: onInit,
-  newBlocks: onNewBlocks,
-  syncFinished: onSyncFinished,
-  discardFinished: onDiscardFinished,
-}
-
-type Tail<T extends readonly unknown[]> = T extends [unknown, ...infer R]
-  ? R
-  : never
-
-export type SyncSchedulerAction = {
-  [A in keyof typeof actionHandlers]: [
-    type: A,
-    ...rest: Tail<Parameters<typeof actionHandlers[A]>>
-  ]
-}[keyof typeof actionHandlers]
 
 export type SyncSchedulerEffectHandlers = {
   [P in SyncSchedulerEffect]: (state: SyncState) => void
@@ -162,45 +180,45 @@ export type SyncSchedulerEffectHandlers = {
 
 export class SyncScheduler {
   private state: SyncState = INITIAL_SYNC_STATE
+  private readonly effects: SyncSchedulerEffectHandlers
 
   constructor(
-    /**
-     * @example
-     * {
-     *   sync: ({ blocksProcessing }) => sync(new BlockRange(blocksProcessing))
-     *   discardAfter: ({ blocks }) => discardAfter(blocks.first!.number - 1)
-     * }
-     */
-    private readonly effects: SyncSchedulerEffectHandlers,
+    private readonly blockDownloader: BlockDownloader,
+    private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
+    this.effects = {
+      sync: ({ blocksProcessing }) =>
+        this.dataSyncService.sync(new BlockRange(blocksProcessing)),
+      discardAfter: ({ blocksToProcess }) =>
+        this.dataSyncService.discardAfter(blocksToProcess.first!.number - 1),
+    }
   }
 
-  dispatch(...action: SyncSchedulerAction) {
-    const [actionType, ...args] = action
-    const actionHandler = actionHandlers[actionType]
-
-    // Uhh, TypeScript would want us to write a trivial switchcase here 🤷‍♂️
-    const _actionHandler = actionHandler as UnionToIntersection<
-      typeof actionHandler
-    >
-    const _args = args as Tail<Parameters<typeof _actionHandler>>
-
-    const [newState, effects] = _actionHandler(this.state, ..._args)
-
-    console.log('[]SyncScheduler]', this.state, action, newState)
+  dispatch(action: SyncSchedulerAction) {
+    const [newState, effects] = syncSchedulerReducer(this.state, action)
 
     effects.forEach((effect) => this.effects[effect](newState))
+
+    this.logger.debug({
+      method: 'dispatch',
+      action: action.type,
+      ...('success' in action && { success: action.success }),
+      ...('blocks' in action &&
+        action.blocks.length && {
+          blocksRange: [
+            action.blocks[0]!.number,
+            action.blocks[action.blocks.length - 1]!.number,
+          ].join(' - '),
+        }),
+    })
+
     this.state = newState
   }
-}
 
-type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (
-  x: infer R
-) => any
-  ? R
-  : never
+  async start() {}
+}
 
 function assertContinuous(blocks: readonly Block[]): void {
   for (let i = 1; i < blocks.length; ++i) {
@@ -213,7 +231,7 @@ function assertContinuous(blocks: readonly Block[]): void {
   }
 }
 
-interface Block {
+export interface Block {
   readonly number: number
   readonly hash: Hash256
 }
