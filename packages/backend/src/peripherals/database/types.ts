@@ -3,19 +3,6 @@ import { Position } from '@explorer/state'
 export {}
 
 declare module 'knex/types/tables' {
-  interface PositionUpdateRow {
-    position_id: bigint
-    public_key: string
-    collateral_balance: bigint
-    funding_timestamp: bigint
-    balances: JsonB<AssetBalanceJson[]>
-  }
-
-  interface AssetBalanceJson {
-    asset_id: string
-    balance: string
-  }
-
   interface KeyValueRow {
     key: string
     value: string
@@ -76,8 +63,43 @@ declare module 'knex/types/tables' {
     funding: Record<string, string>
   }
 
+  interface StateUpdateRow {
+    id: number
+    fact_hash: string
+    root_hash: string
+    fact_timestamp: number
+    data_timestamp: number
+  }
+
+  interface PositionUpdateRow {
+    state_update_id: number
+    position_id: bigint
+    public_key: string
+    collateral_balance: bigint
+    funding_timestamp: bigint
+    balances: JsonB<AssetBalanceJson[]>
+  }
+
+  interface PositionRow {
+    state_update_id: number
+    position_id: number
+    public_key: string
+    collateral_balance: bigint
+    balances: JsonB<AssetBalanceJson[]>
+  }
+
+  interface AssetBalanceJson {
+    asset_id: string
+    balance: string
+  }
+
+  interface PriceRow {
+    state_update_id: number
+    asset_id: string
+    price: bigint
+  }
+
   interface Tables {
-    position_updates: PositionUpdateRow
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
     fact_to_pages: FactToPageRow
@@ -87,6 +109,10 @@ declare module 'knex/types/tables' {
     merkle_nodes: MerkleNodeRow
     merkle_positions: MerklePositionsRow
     rollup_parameters: RollupParametersRow
+    position_updates: PositionUpdateRow
+    state_updates: StateUpdateRow
+    positions: PositionRow
+    prices: PriceRow
   }
 }
 

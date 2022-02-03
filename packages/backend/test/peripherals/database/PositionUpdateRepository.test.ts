@@ -5,17 +5,35 @@ import {
   PositionUpdateRecord,
   PositionUpdateRepository,
 } from '../../../src/peripherals/database/PositionUpdateRepository'
+import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
 describe(PositionUpdateRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()
+  const stateUpdateRepository = new StateUpdateRepository(knex, Logger.SILENT)
   const repository = new PositionUpdateRepository(knex, Logger.SILENT)
 
-  afterEach(() => repository.deleteAll())
+  const stateUpdateId = 1000
+  beforeEach(() =>
+    stateUpdateRepository.add([
+      {
+        id: stateUpdateId,
+        factHash: '',
+        rootHash: '',
+        dataTimestamp: Math.floor(Date.now() / 1000),
+        factTimestamp: Math.floor(Date.now() / 1000),
+      },
+    ])
+  )
+  afterEach(async () => {
+    await repository.deleteAll()
+    await stateUpdateRepository.delete(stateUpdateId)
+  })
 
   it('adds single record and queries it', async () => {
-    const record = {
+    const record: PositionUpdateRecord = {
+      stateUpdateId,
       positionId: 1n,
       publicKey:
         '0x006b56aeb3ee3df0002dfa4e2c65e335fbacf0f7a8f399a9beffe7b04534f7cd',
@@ -38,6 +56,7 @@ describe(PositionUpdateRepository.name, () => {
   it('adds multiple records and queries them', async () => {
     const records: PositionUpdateRecord[] = [
       {
+        stateUpdateId,
         positionId: BigInt(0),
         publicKey:
           '0x006b56aeb3ee3df0002dfa4e2c65e335fbacf0f7a8f399a9beffe7b04534f7cd',
@@ -46,6 +65,7 @@ describe(PositionUpdateRepository.name, () => {
         balances: [],
       },
       {
+        stateUpdateId,
         positionId: BigInt(1),
         publicKey:
           '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358',
@@ -54,6 +74,7 @@ describe(PositionUpdateRepository.name, () => {
         balances: [],
       },
       {
+        stateUpdateId,
         positionId: BigInt(2),
         publicKey:
           '0x015e8410e93e5c90b1bf7a393874f68f4cc7f477c5d742daac5c5a112e672d61',
@@ -84,6 +105,7 @@ describe(PositionUpdateRepository.name, () => {
   it('deletes all records', async () => {
     await repository.addOrUpdate([
       {
+        stateUpdateId,
         positionId: BigInt(3),
         publicKey:
           '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358',
@@ -92,6 +114,7 @@ describe(PositionUpdateRepository.name, () => {
         balances: [],
       },
       {
+        stateUpdateId,
         positionId: BigInt(4),
         publicKey:
           '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358',

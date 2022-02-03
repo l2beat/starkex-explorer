@@ -49,7 +49,14 @@ export class DataSyncService {
     for (const { pages } of stateTransitions) {
       const decoded = decodeOnChainData(pages)
 
-      await this.positionUpdateRepository.addOrUpdate(decoded.positions)
+      await this.positionUpdateRepository.addOrUpdate(
+        decoded.positions.map((positionUpdate) => {
+          return {
+            stateUpdateId: Number(decoded.newState.systemTime), // @todo
+            ...positionUpdate,
+          }
+        })
+      )
     }
   }
 

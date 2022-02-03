@@ -6,6 +6,7 @@ import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
 export interface PositionUpdateRecord {
+  stateUpdateId: number
   positionId: bigint
   publicKey: string
   collateralBalance: bigint
@@ -34,7 +35,7 @@ export class PositionUpdateRepository
     const rows: PositionUpdateRow[] = records.map(toRow)
     await this.knex('position_updates')
       .insert(rows)
-      .onConflict(['position_id'])
+      .onConflict(['position_id', 'state_update_id'])
       .merge()
 
     this.logger.debug({ method: 'addOrUpdate', rows: rows.length })
@@ -69,6 +70,7 @@ function toRow(record: PositionUpdateRecord): PositionUpdateRow {
   )
 
   return {
+    state_update_id: record.stateUpdateId,
     position_id: record.positionId,
     public_key: record.publicKey,
     collateral_balance: record.collateralBalance,
@@ -79,6 +81,7 @@ function toRow(record: PositionUpdateRecord): PositionUpdateRow {
 
 function toRecord(row: PositionUpdateRow): PositionUpdateRecord {
   return {
+    stateUpdateId: row.state_update_id,
     positionId: row.position_id,
     publicKey: row.public_key,
     collateralBalance: row.collateral_balance,
