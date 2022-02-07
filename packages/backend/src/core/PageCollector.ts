@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { BigNumber, utils } from 'ethers'
 
 import { BlockRange, Hash256 } from '../model'
@@ -73,8 +74,9 @@ export class PageCollector {
       topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
     })
 
+    assert(blockRange.includes(logs), 'all logs must be from the block range')
+
     return logs
-      .filter((log) => blockRange.has(log))
       .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
       .map(({ log, event }): MemoryPageEvent => {
         return {

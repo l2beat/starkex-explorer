@@ -2,7 +2,6 @@ import { expect } from 'earljs'
 
 import {
   LOG_MEMORY_PAGE_HASHES,
-  MemoryHashEvent,
   MemoryHashEventCollector,
 } from '../../src/core/MemoryHashEventCollector'
 import { BlockRange, Hash256 } from '../../src/model'
@@ -204,7 +203,7 @@ describe(MemoryHashEventCollector.name, () => {
     expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 
-  it('filters out logs from reorged history', async () => {
+  it('crashes on logs from reorged history', async () => {
     const ethereumClient = mock<EthereumClient>({
       getLogs: async (filter) =>
         testData().logs.filter((log) => filter.address === log.address),
@@ -217,59 +216,23 @@ describe(MemoryHashEventCollector.name, () => {
       factToPageRepository
     )
 
-    const actual = await collector.collect(
-      new BlockRange([
-        {
-          number: 11905858,
-          hash: Hash256(
-            '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55'
-          ),
-        },
-        {
-          number: 11905919,
-          hash: Hash256.fake('deadbeef'),
-        },
-      ]),
-      [EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84')]
-    )
-
-    const expectedEvents: MemoryHashEvent[] = [
-      {
-        blockNumber: 11905858,
-        factHash: Hash256(
-          '0x4ac3c5b87c46c673c67db046ffef90c618297b6ba445c7560f8122c33e9a37ff'
-        ),
-        pagesHashes: [
-          Hash256(
-            '0xce887f94b38c0efe1e788c845b5c4e496f6f65fb9340369af22c351868238c16'
-          ),
-          Hash256(
-            '0xfc7e3b571b22a96a4c234b194d55f2c833b3f3dd0e1d82a9be9a30eaf754cb19'
-          ),
-        ],
-      },
-    ]
-
-    expect(actual).toEqual(expectedEvents)
-
-    expect(factToPageRepository.add).toHaveBeenCalledExactlyWith([
-      [
-        [
+    expect(
+      collector.collect(
+        new BlockRange([
           {
-            index: 0,
-            pageHash: expectedEvents[0].pagesHashes[0],
-            factHash: expectedEvents[0].factHash,
-            blockNumber: expectedEvents[0].blockNumber,
+            number: 11905858,
+            hash: Hash256(
+              '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55'
+            ),
           },
           {
-            index: 1,
-            pageHash: expectedEvents[0].pagesHashes[1],
-            factHash: expectedEvents[0].factHash,
-            blockNumber: expectedEvents[0].blockNumber,
+            number: 11905919,
+            hash: Hash256.fake('deadbeef'),
           },
-        ],
-      ],
-    ])
+        ]),
+        [EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84')]
+      )
+    ).toBeRejected('all logs must be from the block range')
   })
 })
 

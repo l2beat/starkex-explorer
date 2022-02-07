@@ -118,7 +118,7 @@ describe(VerifierCollector.name, () => {
     expect(verifierEventRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 
-  it('filters out logs from reorged chain histories', async () => {
+  it('crashes on logs from reorged chain histories', async () => {
     const verifierEventRepository = mock<VerifierEventRepository>({
       add: async () => {},
       getAll: async () => [],
@@ -142,30 +142,9 @@ describe(VerifierCollector.name, () => {
       },
     ])
 
-    const verifiers = await collector.collect(blockRange)
-
-    expect(verifierEventRepository.add).toHaveBeenCalledExactlyWith([
-      [
-        [
-          expect.objectWith({
-            name: 'ImplementationAdded',
-            blockNumber: 12004790,
-            implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
-            initializer:
-              '0x000000000000000000000000b1eda32c467569fbdc8c3e041c81825d76b32b84',
-          }),
-          expect.objectWith({
-            name: 'Upgraded',
-            blockNumber: 12004790,
-            implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
-          }),
-        ],
-      ],
-    ])
-
-    expect(verifiers).toEqual([
-      EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84'),
-    ])
+    expect(collector.collect(blockRange)).toBeRejected(
+      'all logs must be from the block range'
+    )
   })
 })
 

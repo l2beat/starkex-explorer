@@ -91,7 +91,7 @@ describe(PageCollector.name, () => {
     expect(pageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 
-  it('filters out logs from reorged chain histories', async () => {
+  it('crashes on logs from reorged chain histories', async () => {
     const ethereumClient = mock<EthereumClient>({
       getTransaction: async (txHash) => testData().getTransaction(txHash),
       getLogs: async () => testData().logs,
@@ -115,32 +115,9 @@ describe(PageCollector.name, () => {
       },
     ])
 
-    const actualRecords = await pageCollector.collect(blockRange)
-
-    const expectedRecords: PageRecord[] = [
-      {
-        blockNumber: 9,
-        data: [5, 6, 7].map(BigNumber.from).map(bignumToPaddedString).join(''),
-        pageHash: Hash256(
-          '0x450c6bd64d9066a35eea0d4b9ec956d88dd2d3d8589321aa41d950f2f57a708f'
-        ),
-      },
-    ]
-
-    expect(actualRecords).toEqual(expectedRecords)
-
-    expect(ethereumClient.getLogs).toHaveBeenCalledExactlyWith([
-      [
-        {
-          address: '0xEfbCcE4659db72eC6897F46783303708cf9ACef8',
-          topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
-          fromBlock: blockRange.from,
-          toBlock: blockRange.to,
-        },
-      ],
-    ])
-
-    expect(pageRepository.add).toHaveBeenCalledWith([expectedRecords])
+    expect(pageCollector.collect(blockRange)).toBeRejected(
+      'all logs must be from the block range'
+    )
   })
 
   describe(bignumToPaddedString.name, () => {

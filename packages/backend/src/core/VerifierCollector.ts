@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { utils } from 'ethers'
 import { AbiCoder } from 'ethers/lib/utils'
 import { partition } from 'lodash'
@@ -60,19 +61,17 @@ export class VerifierCollector {
       topics: [[ImplementationAdded, Upgraded]],
     })
 
-    const events = logs
-      .filter((log) => blockRange.has(log))
-      .map((log): VerifierEventRecord => {
-        const event = PROXY_ABI.parseLog(log)
-        return {
-          name: event.name as 'ImplementationAdded' | 'Upgraded',
-          blockNumber: log.blockNumber,
-          implementation: event.args.implementation,
-          initializer: event.args.initializer,
-        }
-      })
+    assert(blockRange.includes(logs), 'all logs must be from the block range')
 
-    return events
+    return logs.map((log): VerifierEventRecord => {
+      const event = PROXY_ABI.parseLog(log)
+      return {
+        name: event.name as 'ImplementationAdded' | 'Upgraded',
+        blockNumber: log.blockNumber,
+        implementation: event.args.implementation,
+        initializer: event.args.initializer,
+      }
+    })
   }
 }
 

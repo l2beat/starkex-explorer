@@ -108,7 +108,7 @@ describe(StateTransitionFactCollector.name, () => {
     expect(transitionFactRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 
-  it('filters out logs from reorged chain histories', async () => {
+  it('crashes on logs from reorged chain histories', async () => {
     const ethereumClient = mock<EthereumClient>({
       getLogs: async () => testData().logs,
     })
@@ -133,21 +133,9 @@ describe(StateTransitionFactCollector.name, () => {
       },
     ])
 
-    const records = await stateTransitionFactCollector.collect(blockRange)
-
-    const expectedRecords: StateTransitionFactRecord[] = [
-      {
-        blockNumber: 13986068,
-        hash: Hash256(
-          '0xf7a4d368103ca720efb0ba4873ca2e0b9dee88e385d14de8ac743cec81a048f2'
-        ),
-      },
-    ]
-
-    expect(records).toEqual(expectedRecords)
-    expect(transitionFactRepository.add).toHaveBeenCalledExactlyWith([
-      [expectedRecords],
-    ])
+    expect(stateTransitionFactCollector.collect(blockRange)).toBeRejected(
+      'all logs must be from the block range'
+    )
   })
 })
 

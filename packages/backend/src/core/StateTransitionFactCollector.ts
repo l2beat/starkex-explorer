@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
@@ -33,15 +34,15 @@ export class StateTransitionFactCollector {
       topics: [LOG_STATE_TRANSITION_FACT],
     })
 
-    const records = logs
-      .filter((log) => blockRange.has(log))
-      .map((log): StateTransitionFactRecord => {
-        const event = PERPETUAL_ABI.parseLog(log)
-        return {
-          blockNumber: log.blockNumber,
-          hash: event.args.stateTransitionFact,
-        }
-      })
+    assert(blockRange.includes(logs), 'all logs must be from the block range')
+
+    const records = logs.map((log): StateTransitionFactRecord => {
+      const event = PERPETUAL_ABI.parseLog(log)
+      return {
+        blockNumber: log.blockNumber,
+        hash: event.args.stateTransitionFact,
+      }
+    })
 
     await this.stateTransitionFactRepository.add(records)
     return records

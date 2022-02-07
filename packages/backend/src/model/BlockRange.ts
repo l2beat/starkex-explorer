@@ -57,6 +57,13 @@ export class BlockRange {
     return this.hashes.get(blockNumber) === blockHash
   }
 
+  includes(
+    subset: Iterable<{ blockNumber: BlockNumber; blockHash: string | Hash256 }>
+  ) {
+    for (const x of subset) if (!this.has(x)) return false
+    return true
+  }
+
   static from(dict: Record<BlockNumber, Hash256>) {
     return new BlockRange(
       Object.entries(dict).map(([number, hash]) => ({
