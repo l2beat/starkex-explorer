@@ -202,9 +202,12 @@ export class SyncScheduler {
         void this.syncStatusRepository.setLastBlockNumberSynced(
           latestBlockProcessed
         )
+
+        assert(blocksToProcess.first, 'blocksToProcess.first must be defined')
+
         try {
           await this.dataSyncService.discardAfter(
-            blocksToProcess.first!.number - 1
+            blocksToProcess.first.number - 1
           )
           this.dispatch({ type: 'discardFinished', success: true })
         } catch (err) {
@@ -227,7 +230,10 @@ export class SyncScheduler {
       ...('blocks' in action &&
         action.blocks.length && {
           blocksRange: [
+            // We checked action.blocks.length already.
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             action.blocks[0]!.number,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             action.blocks[action.blocks.length - 1]!.number,
           ].join(' - '),
         }),

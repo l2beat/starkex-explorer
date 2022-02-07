@@ -8,7 +8,7 @@ import {
   IncomingBlock,
   isConsistentChain,
 } from '../../src/core/BlockDownloader'
-import { BlockRange, Hash256 } from '../../src/model'
+import { Hash256 } from '../../src/model'
 import {
   BlockRecord,
   BlockRepository,

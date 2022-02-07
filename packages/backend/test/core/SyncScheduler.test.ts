@@ -1,4 +1,4 @@
-import { expect, Mock, mockFn } from 'earljs'
+import { expect, mockFn } from 'earljs'
 import { range } from 'lodash'
 import waitForExpect from 'wait-for-expect'
 
@@ -397,7 +397,6 @@ describe(SyncScheduler.name, () => {
     })
     let init!: (blocks: BlockRecord[]) => void
     let emitNewBlocks!: (blocks: BlockRecord[]) => void
-    let emitReorg!: (blocks: BlockRecord[]) => void
     const blockDownloader = mock<BlockDownloader>({
       onInit: async (_from, handler) => {
         init = handler
