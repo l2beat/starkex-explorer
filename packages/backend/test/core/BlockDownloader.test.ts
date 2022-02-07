@@ -121,7 +121,7 @@ describe(BlockDownloader.name, () => {
       logger
     )
 
-    const newBlocksListener = mockFn((_: BlockRange): void => {})
+    const newBlocksListener = mockFn((_: BlockRecord[]): void => {})
     blockDownloader.onNewBlocks(newBlocksListener)
 
     await blockDownloader.start()
@@ -135,7 +135,7 @@ describe(BlockDownloader.name, () => {
 
     await waitForExpect(() => {
       expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-        [new BlockRange([{ hash: h1, number: 1 }])],
+        [[{ hash: h1, number: 1 }]],
       ])
     })
 
@@ -150,13 +150,19 @@ describe(BlockDownloader.name, () => {
 
     await waitForExpect(() => {
       expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-        [BlockRange.from({ 1: h1 })],
-        [BlockRange.from({ 2: h2, 3: h3, 4: h4 })],
+        [[{ number: 1, hash: h1 }]],
+        [
+          [
+            { number: 2, hash: h2 },
+            { number: 3, hash: h3 },
+            { number: 4, hash: h4 },
+          ],
+        ],
       ])
     })
   })
 
-  it('handles reorgs in the past (finding reorg point)', async () => {
+  it('handles reorgs in the past #1s', async () => {
     const commonHistory = range(1, 21).map((i) => Hash256.fake(`${i}0`))
     const reorgedHistory = [Hash256.fake('21a'), Hash256.fake('22a')]
     const hashes = commonHistory.concat(reorgedHistory)
@@ -169,9 +175,9 @@ describe(BlockDownloader.name, () => {
       logger
     )
 
-    const reorgListener = mockFn((_: { firstChangedBlock: number }): void => {})
+    const reorgListener = mockFn((_: BlockRecord[]): void => {})
     blockDownloader.onReorg(reorgListener)
-    const newBlocksListener = mockFn((_: BlockRange): void => {})
+    const newBlocksListener = mockFn((_: BlockRecord[]): void => {})
     blockDownloader.onNewBlocks(newBlocksListener)
 
     await blockDownloader.start()
@@ -203,27 +209,9 @@ describe(BlockDownloader.name, () => {
 
     await waitForExpect(() => {
       expect(reorgListener).toHaveBeenCalledExactlyWith([
-        // last known block is number 22 and the first reorg point we consider
-        // is `(lastKnown - 10) + 1`
-        [{ firstChangedBlock: hashes.length - 10 + 1 }],
+        [newHistory.map((h) => expect.objectWith({ hash: h.toString() }))],
       ])
     })
-
-    const expectedNewBlocksEventArgs = [
-      ...range(1, 23).map((i) => ({ from: i, to: i })),
-      { from: 13, to: 23 },
-    ]
-
-    await waitForExpect(() => {
-      expect(newBlocksListener).toHaveBeenCalledExactlyWith(
-        expect.arrayOfLength(expectedNewBlocksEventArgs.length)
-      )
-    })
-    expect(newBlocksListener).toHaveBeenCalledExactlyWith(
-      expectedNewBlocksEventArgs.map((blockRange) => [
-        expect.objectWith(blockRange),
-      ])
-    )
 
     await waitForExpect(async () => {
       const blocksInDb = await blockRepository.getAll()
@@ -239,8 +227,7 @@ describe(BlockDownloader.name, () => {
     })
   })
 
-  it('handles reorgs in the past (removing all)', async () => {
-    // const hashes = ['h1', 'h2', 'h3.a']
+  it('handles reorgs in the past #2', async () => {
     const hashes = [Hash256.fake('1'), Hash256.fake('2'), Hash256.fake('3a')]
     const [h1, h2, h3a] = hashes
 
@@ -253,9 +240,9 @@ describe(BlockDownloader.name, () => {
       logger
     )
 
-    const reorgListener = mockFn((_: { firstChangedBlock: number }): void => {})
+    const reorgListener = mockFn((_: BlockRecord[]): void => {})
     blockDownloader.onReorg(reorgListener)
-    const newBlocksListener = mockFn((_: BlockRange): void => {})
+    const newBlocksListener = mockFn((_: BlockRecord[]): void => {})
     blockDownloader.onNewBlocks(newBlocksListener)
 
     await blockDownloader.start()
@@ -288,27 +275,25 @@ describe(BlockDownloader.name, () => {
 
     await waitForExpect(() => {
       expect(reorgListener).toHaveBeenCalledExactlyWith([
-        [{ firstChangedBlock: 1 }],
+        [
+          [
+            { hash: h3b, number: 3 },
+            { hash: h4b, number: 4 },
+          ],
+        ],
       ])
     })
-
-    const expectedNewBlocksEventArgs = [
-      { from: 1, to: 1 },
-      { from: 2, to: 2 },
-      { from: 3, to: 3 },
-      { from: 1, to: 4 },
-    ]
 
     await waitForExpect(() => {
-      expect(newBlocksListener).toHaveBeenCalledExactlyWith(
-        expect.arrayOfLength(expectedNewBlocksEventArgs.length)
-      )
-    })
-    expect(newBlocksListener).toHaveBeenCalledExactlyWith(
-      expectedNewBlocksEventArgs.map((blockRange) => [
-        expect.objectWith(blockRange),
+      expect(reorgListener).toHaveBeenCalledExactlyWith([
+        [
+          [
+            { number: 3, hash: h3b },
+            { number: 4, hash: h4b },
+          ],
+        ],
       ])
-    )
+    })
 
     await waitForExpect(async () => {
       const blocksInDb = await blockRepository.getAll()
@@ -349,9 +334,9 @@ describe(BlockDownloader.name, () => {
       logger
     )
 
-    const reorgListener = mockFn((_: { firstChangedBlock: number }): void => {})
+    const reorgListener = mockFn((_: BlockRecord[]): void => {})
     blockDownloader.onReorg(reorgListener)
-    const newBlocksListener = mockFn((_: BlockRange): void => {})
+    const newBlocksListener = mockFn((_: BlockRecord[]): void => {})
     blockDownloader.onNewBlocks(newBlocksListener)
 
     await blockDownloader.start()
@@ -406,13 +391,13 @@ describe(BlockDownloader.name, () => {
     expect(reorgListener).toHaveBeenCalledExactlyWith([])
 
     expect(newBlocksListener).toHaveBeenCalledExactlyWith([
-      [new BlockRange([{ number: 1, hash: h1 }])],
-      [new BlockRange([{ number: 2, hash: h2 }])],
+      [[{ number: 1, hash: h1 }]],
+      [[{ number: 2, hash: h2 }]],
       [
-        new BlockRange([
+        [
           { number: 3, hash: h3b },
           { number: 4, hash: h4b },
-        ]),
+        ],
       ],
     ])
   })
@@ -446,10 +431,8 @@ describe(BlockDownloader.name, () => {
       logger
     )
 
-    const reorgListener = mockFn((_: { firstChangedBlock: number }): void => {})
+    const reorgListener = mockFn((_: BlockRecord[]): void => {})
     blockDownloader.onReorg(reorgListener)
-    const newBlocksListener = mockFn((_: BlockRange): void => {})
-    blockDownloader.onNewBlocks(newBlocksListener)
 
     await blockDownloader.start()
 
@@ -472,25 +455,14 @@ describe(BlockDownloader.name, () => {
 
     await waitForExpect(async () => {
       expect(reorgListener).toHaveBeenCalledExactlyWith([
-        [{ firstChangedBlock: 1 }],
+        [
+          [
+            { number: 1, hash: h1b },
+            { number: 2, hash: h2b },
+          ],
+        ],
       ])
     })
-
-    const expectedNewBlocksEventArgs = [
-      { from: 1, to: 1 },
-      { from: 1, to: 2 },
-    ]
-
-    await waitForExpect(() => {
-      expect(newBlocksListener).toHaveBeenCalledExactlyWith(
-        expect.arrayOfLength(expectedNewBlocksEventArgs.length)
-      )
-    })
-    expect(newBlocksListener).toHaveBeenCalledExactlyWith(
-      expectedNewBlocksEventArgs.map((blockRange) => [
-        expect.objectWith(blockRange),
-      ])
-    )
 
     await waitForExpect(async () => {
       const blocksInDb = await blockRepository.getAll()

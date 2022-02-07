@@ -214,7 +214,30 @@ export class BlockDownloader {
 
     if (!lastUnchangedBlock) throw new Error('Unreasonable reorganization')
 
-    // @todo binary search to right — lastUnchangedBlock + 1 is the reorg point OR block earlier than reorg point
+    // binary search to right
+    // lastUnchangedBlock + 1 is the reorg point OR block earlier than reorg point
+    // and we want to find an actual
+    let rightBound = lastKnown.number
+    let leftBound = 0
+    while (leftBound <= rightBound) {
+      leftBound = lastUnchangedBlock.number + 1
+
+      const middle = Math.floor((leftBound + rightBound) / 2)
+      const currentFromDb = await this.blockRepository.getByNumber(middle)
+
+      if (!currentFromDb) {
+        this.logger.error(`Block ${middle} not found in database`)
+        break
+      }
+
+      const currentFromChain = await this.ethereumClient.getBlock(middle)
+
+      if (currentFromDb.hash.toString() === currentFromChain.hash) {
+        lastUnchangedBlock = currentFromDb
+      } else {
+        rightBound = middle - 1
+      }
+    }
 
     this.blockRepository.deleteAllAfter(lastUnchangedBlock.number)
     return (this.state.lastKnownBlock = lastUnchangedBlock)
