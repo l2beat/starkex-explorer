@@ -64,41 +64,21 @@ export class BlockDownloader {
     return this.state.lastKnownBlock
   }
 
-  onNewBlocks(from: number, handler: (blockRange: BlockRange) => void) {
+  onInit(from: number, handler: (block: BlockRecord[]) => void) {
     const lastKnown = this.getLastKnownBlock().number
-    if (from > lastKnown) {
-      throw new TypeError('From cannot be in the future')
-    }
+    this.blockRepository
+      .getAllInRange(from, lastKnown)
+      .then((blocks) => handler(blocks))
+  }
 
-    let synced = from === lastKnown
-    let cancelled = false
-    let range = BlockRange.EMPTY
-    if (!synced) {
-      this.blockRepository.getAllInRange(from, lastKnown).then((blocks) => {
-        range = range.merge(new BlockRange(blocks))
-        if (!cancelled) {
-          handler(range)
-          synced = true
-        }
-      })
-    }
-
-    function onBlocks(blockRange: BlockRange) {
-      if (!synced) {
-        range = range.merge(blockRange)
-      } else {
-        handler(blockRange)
-      }
-    }
-
-    this.events.on('newBlocks', onBlocks)
+  onNewBlocks(handler: (blocks: BlockRecord[]) => void) {
+    this.events.on('newBlocks', handler)
     return () => {
-      cancelled = true
-      this.events.off('newBlocks', onBlocks)
+      this.events.off('newBlocks', handler)
     }
   }
 
-  onReorg(handler: (point: { firstChangedBlock: BlockNumber }) => void) {
+  onReorg(handler: (newBlocks: BlockRecord[]) => void) {
     this.events.on('reorg', handler)
     return () => {
       this.events.off('reorg', handler)
@@ -118,6 +98,7 @@ export class BlockDownloader {
   private async handleNewBlock(latest: IncomingBlock): Promise<void> {
     if (this.state.type !== 'working') return
 
+    let eventType: keyof BlockDownloaderEvents = 'newBlocks'
     let lastKnown = this.state.lastKnownBlock
     let next =
       latest.number === lastKnown.number + 1
@@ -125,6 +106,7 @@ export class BlockDownloader {
         : await this.ethereumClient.getBlock(lastKnown.number + 1)
 
     if (next.parentHash !== lastKnown.hash.toString()) {
+      eventType = 'reorg'
       lastKnown = await this.handlePastReorganizations()
       next = await this.ethereumClient.getBlock(lastKnown.number + 1)
     }
@@ -170,7 +152,7 @@ export class BlockDownloader {
       number: latest.number,
     }
 
-    this.events.emit('newBlocks', new BlockRange(newBlockRecords))
+    this.events.emit(eventType, newBlockRecords)
   }
 
   // We check if the last known block was reorged, if so, we find the reorg
@@ -232,12 +214,9 @@ export class BlockDownloader {
 
     if (!lastUnchangedBlock) throw new Error('Unreasonable reorganization')
 
+    // @todo binary search to right — lastUnchangedBlock + 1 is the reorg point OR block earlier than reorg point
+
     this.blockRepository.deleteAllAfter(lastUnchangedBlock.number)
-    // The reaorg happened at `lastUnchangedBlock.number + 1` or later.
-    // @todo I kinda feel we should always binary search for the correct reorg point. There would be more code, but less corner cases to remember about.
-    this.events.emit('reorg', {
-      firstChangedBlock: lastUnchangedBlock.number + 1,
-    })
     return (this.state.lastKnownBlock = lastUnchangedBlock)
   }
 }
@@ -249,8 +228,8 @@ export type IncomingBlock = Pick<
 >
 
 export interface BlockDownloaderEvents {
-  newBlocks: BlockRange
-  reorg: { firstChangedBlock: number }
+  newBlocks: BlockRecord[]
+  reorg: BlockRecord[]
 }
 
 /** @internal */

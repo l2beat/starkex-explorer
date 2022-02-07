@@ -1,249 +1,418 @@
-import { expect, mockFn } from 'earljs'
+import { expect } from 'earljs'
 import { range } from 'lodash'
-import waitForExpect from 'wait-for-expect'
 
 import {
-  BlockDownloader,
-  BlockDownloaderEvents,
-} from '../../src/core/BlockDownloader'
-import { DataSyncService } from '../../src/core/DataSyncService'
-import { SyncScheduler } from '../../src/core/SyncScheduler'
-import { BlockRange, Hash256 } from '../../src/model'
-import { BlockRepository } from '../../src/peripherals/database/BlockRepository'
-import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
-import { createEventEmitter } from '../../src/tools/EventEmitter'
-import { Logger } from '../../src/tools/Logger'
-import { mock } from '../mock'
+  Block,
+  ContinuousBlocks,
+  INITIAL_SYNC_STATE,
+  SYNC_BATCH_SIZE,
+  SyncScheduler,
+  SyncSchedulerAction,
+  SyncSchedulerEffect,
+  syncSchedulerReducer,
+  SyncState,
+} from '../../src/core/SyncScheduler'
+import { Hash256 } from '../../src/model'
 
 describe(SyncScheduler.name, () => {
-  it('syncs in batches', async () => {
-    const lastBlockNumberSynced = 1
-    const {
-      statusRepository,
-      blockRepository,
-      blockDownloader,
-      dataSyncService,
-      emitNewBlocks,
-    } = setupMocks({ lastBlockNumberSynced })
+  describe(syncSchedulerReducer.name, () => {
+    describe('init', () => {
+      it('accepts latestBlock and starts processing and sync', () => {
+        const blocks = [fakeBlock(1), fakeBlock(2), fakeBlock(3)]
+        const [state, effects] = syncSchedulerReducer(INITIAL_SYNC_STATE, {
+          type: 'init',
+          blocks,
+        })
 
-    const batchSize = 3
-    const syncScheduler = new SyncScheduler(
-      statusRepository,
-      blockRepository,
-      blockDownloader,
-      dataSyncService,
-      Logger.SILENT,
-      batchSize
-    )
+        expect(state).toEqual({
+          isInitialized: true,
+          isProcessing: true,
+          discardRequired: false,
+          latestBlockProcessed: 3,
+          blocksToProcess: new ContinuousBlocks(),
+          blocksProcessing: blocks,
+        })
+        expect(effects).toEqual(['sync'])
+      })
 
-    await syncScheduler.start()
+      it(`triggers processing of up to ${SYNC_BATCH_SIZE} blocks at once`, () => {
+        const blocksCount = SYNC_BATCH_SIZE + 500
+        const blocks = range(blocksCount).map(fakeBlock)
 
-    expect(dataSyncService.discardAfter).toHaveBeenCalledWith([1])
+        const [state, effects] = syncSchedulerReducer(INITIAL_SYNC_STATE, {
+          type: 'init',
+          blocks,
+        })
 
-    emitNewBlocks(BlockRange.fake({ from: 2, to: 10 }))
-
-    await waitForExpect(() => {
-      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [expect.objectWith({ from: 2, to: 4 })],
-        [expect.objectWith({ from: 5, to: 7 })],
-        [expect.objectWith({ from: 8, to: 10 })],
-      ])
+        expect(state.blocksProcessing).toEqual(blocks.slice(0, SYNC_BATCH_SIZE))
+        expect(effects).toEqual(['sync'])
+      })
     })
-  })
 
-  it('handles incoming new blocks', async () => {
-    const {
-      statusRepository,
-      blockRepository,
-      blockDownloader,
-      dataSyncService,
-      emitNewBlocks,
-    } = setupMocks()
-
-    const batchSize = 50
-    const syncScheduler = new SyncScheduler(
-      statusRepository,
-      blockRepository,
-      blockDownloader,
-      dataSyncService,
-      Logger.SILENT,
-      batchSize
-    )
-
-    await syncScheduler.start()
-    expect(dataSyncService.discardAfter).toHaveBeenCalledWith([0])
-
-    emitNewBlocks(BlockRange.fake({ from: 1, to: 1 }))
-    emitNewBlocks(BlockRange.fake({ from: 2, to: 2 }))
-    emitNewBlocks(BlockRange.fake({ from: 3, to: 100 }))
-
-    await waitForExpect(() => {
-      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [expect.objectWith({ from: 1, to: 1 })],
-        [expect.objectWith({ from: 2, to: 2 })],
-        [expect.objectWith({ from: 3, to: 52 })],
-        [expect.objectWith({ from: 53, to: 100 })],
-      ])
-    })
-  })
-
-  it('reruns failing syncs', async () => {
-    const mocks = setupMocks({ lastBlockNumberSynced: 1 })
-
-    let failed = false
-    const _sync = mocks.dataSyncService.sync
-    mocks.dataSyncService.sync = mockFn<DataSyncService['sync']>(
-      async (...args) => {
-        _sync(...args)
-        if (!failed) {
-          failed = true
-          throw new Error('failed as expected')
+    describe('syncFinished', () => {
+      it('clears .blocksProcessing and .isProcessing flag on success', () => {
+        const initialState: SyncState = {
+          isInitialized: true,
+          isProcessing: true,
+          discardRequired: false,
+          latestBlockProcessed: 3,
+          blocksToProcess: new ContinuousBlocks(),
+          blocksProcessing: [fakeBlock(1), fakeBlock(2), fakeBlock(3)],
         }
+
+        const [newState, effects] = syncSchedulerReducer(initialState, {
+          type: 'syncFinished',
+          success: true,
+        })
+
+        expect(newState).toEqual({
+          ...initialState,
+          isProcessing: false,
+          blocksProcessing: [],
+        })
+        expect(effects).toEqual([])
+      })
+
+      it('moves blocks processing back to the queue and orders sync on failure', () => {
+        const blocks = {
+          a1: fakeBlock(1),
+          a2: fakeBlock(2),
+          a3: fakeBlock(3),
+          b3: fakeBlock(3),
+          b4: fakeBlock(4),
+        }
+
+        const initialState: SyncState = {
+          isInitialized: true,
+          isProcessing: true,
+          discardRequired: false,
+          latestBlockProcessed: 3,
+          blocksToProcess: new ContinuousBlocks([blocks.b3, blocks.b4]),
+          blocksProcessing: [blocks.a1, blocks.a2, blocks.a3],
+        }
+
+        const [newState, effects] = syncSchedulerReducer(initialState, {
+          type: 'syncFinished',
+          success: false,
+        })
+
+        expect(effects).toEqual(['sync'])
+        expect(newState).toEqual({
+          ...initialState,
+          blocksToProcess: new ContinuousBlocks(),
+          latestBlockProcessed: 4,
+          blocksProcessing: [blocks.a1, blocks.a2, blocks.b3, blocks.b4],
+        })
+      })
+    })
+
+    describe('reorg', () => {
+      it("doesn't cause discard given blocks not processed yet", () => {
+        const oldBlocks = [fakeBlock(4), fakeBlock(5)]
+        const initialState: SyncState = {
+          isInitialized: true,
+          isProcessing: true,
+          discardRequired: false,
+          latestBlockProcessed: 3,
+          blocksToProcess: new ContinuousBlocks(oldBlocks),
+          blocksProcessing: [fakeBlock(1), fakeBlock(2), fakeBlock(3)],
+        }
+
+        const newBlocks = [fakeBlock(4), fakeBlock(5)]
+        const [newState, effects] = syncSchedulerReducer(initialState, {
+          type: 'reorg',
+          blocks: newBlocks,
+        })
+
+        expect(newState).toEqual({
+          ...initialState,
+          isProcessing: true,
+          discardRequired: false,
+          blocksToProcess: new ContinuousBlocks(newBlocks),
+        })
+        expect(effects).toEqual([])
+      })
+
+      it('causes discard given blocks processed already', () => {
+        const initialState: SyncState = {
+          isInitialized: true,
+          isProcessing: true,
+          discardRequired: false,
+          latestBlockProcessed: 3,
+          blocksToProcess: new ContinuousBlocks([fakeBlock(5)]),
+          blocksProcessing: [fakeBlock(4)],
+        }
+
+        const newBlocks = [fakeBlock(2), fakeBlock(3), fakeBlock(4)]
+
+        let [newState, effects] = syncSchedulerReducer(initialState, {
+          type: 'reorg',
+          blocks: newBlocks,
+        })
+
+        expect(newState).toEqual({
+          ...initialState,
+          discardRequired: true,
+          blocksToProcess: new ContinuousBlocks(newBlocks),
+          latestBlockProcessed: 3,
+        })
+
+        // There is no `discard` yet, because we need to process old block 4 still.
+        expect(effects).toEqual([])
+        ;[newState, effects] = syncSchedulerReducer(newState, {
+          type: 'syncFinished',
+          success: true,
+        })
+
+        expect(newState).toEqual({
+          isInitialized: true,
+          isProcessing: true,
+          discardRequired: true,
+          blocksToProcess: new ContinuousBlocks(newBlocks),
+          latestBlockProcessed: 3,
+          blocksProcessing: [],
+        })
+        expect(effects).toEqual(['discardAfter'])
+      })
+    })
+
+    describe('newBlocks', () => {
+      it('adds new blocks to process', () => {
+        const blocks = {
+          a9: fakeBlock(9),
+          a10: fakeBlock(10),
+          a11: fakeBlock(11),
+          a12: fakeBlock(12),
+        }
+
+        const initialState: SyncState = {
+          isInitialized: true,
+          isProcessing: true,
+          discardRequired: false,
+          latestBlockProcessed: 8,
+          blocksToProcess: new ContinuousBlocks([blocks.a10]),
+          blocksProcessing: [blocks.a9],
+        }
+
+        const [newState, effects] = syncSchedulerReducer(initialState, {
+          type: 'newBlocks',
+          blocks: [blocks.a11, blocks.a12],
+        })
+
+        expect(effects).toEqual([])
+        expect(newState).toEqual({
+          ...initialState,
+          blocksToProcess: new ContinuousBlocks([
+            blocks.a10,
+            blocks.a11,
+            blocks.a12,
+          ]),
+        })
+      })
+
+      it('throws error on gaps in block range', () => {
+        const blocks = {
+          a10: fakeBlock(10),
+          a12: fakeBlock(12),
+        }
+
+        const initialState: SyncState = {
+          isInitialized: true,
+          isProcessing: false,
+          discardRequired: false,
+          latestBlockProcessed: 8,
+          blocksToProcess: new ContinuousBlocks([blocks.a10]),
+          blocksProcessing: [],
+        }
+
+        expect(() =>
+          syncSchedulerReducer(initialState, {
+            type: 'newBlocks',
+            blocks: [blocks.a12],
+          })
+        ).toThrow('Blocks are not continuous. Gap found at index: 1')
+      })
+    })
+
+    describe('discardFinished', () => {
+      it('clears .discardRequired on success', () => {
+        const initialState: SyncState = {
+          isInitialized: true,
+          blocksProcessing: [],
+          blocksToProcess: new ContinuousBlocks(),
+          latestBlockProcessed: 0,
+          isProcessing: true,
+          discardRequired: true,
+        }
+
+        const [newState, effects] = syncSchedulerReducer(initialState, {
+          type: 'discardFinished',
+          success: true,
+        })
+
+        expect(effects).toEqual([])
+        expect(newState).toEqual({
+          ...initialState,
+          isProcessing: false,
+          discardRequired: false,
+        })
+      })
+
+      it("doesn't clear .discardRequire on failure", () => {
+        const initialState: SyncState = {
+          ...INITIAL_SYNC_STATE,
+          isProcessing: true,
+          discardRequired: true,
+        }
+
+        const [newState, effects] = syncSchedulerReducer(initialState, {
+          type: 'discardFinished',
+          success: false,
+        })
+
+        expect(effects).toEqual([])
+        expect(newState).toEqual({
+          ...initialState,
+          isProcessing: false,
+          discardRequired: true,
+        })
+      })
+    })
+
+    it('while blocks are being read from db new blocks are found', () => {
+      // `init` happens after `newBlocks`
+      const blocks = [
+        fakeBlock(1),
+        fakeBlock(2),
+        fakeBlock(3),
+        fakeBlock(4),
+        fakeBlock(5),
+        fakeBlock(6),
+      ]
+
+      let [state, effects] = syncSchedulerReducer(INITIAL_SYNC_STATE, {
+        type: 'newBlocks',
+        blocks: blocks.slice(2),
+      })
+
+      expect(state).toEqual({
+        isInitialized: false,
+        blocksToProcess: new ContinuousBlocks(blocks.slice(2)),
+        blocksProcessing: [],
+        isProcessing: false,
+        discardRequired: false,
+        latestBlockProcessed: 0,
+      })
+      expect(effects).toEqual([])
+      ;[state, effects] = syncSchedulerReducer(state, {
+        type: 'init',
+        blocks: blocks.slice(0, 4),
+      })
+
+      expect(state).toEqual({
+        isInitialized: true,
+        blocksToProcess: new ContinuousBlocks(),
+        blocksProcessing: blocks,
+        isProcessing: true,
+        latestBlockProcessed: 6,
+        discardRequired: false,
+      })
+      expect(effects).toEqual(['sync'])
+    })
+
+    it('handles reorg in blocks known from before the server start', () => {
+      const blocks = {
+        a1: fakeBlock(1),
+        a2: fakeBlock(2),
+        a3: fakeBlock(3),
+        b2: fakeBlock(2),
+        b3: fakeBlock(3),
       }
-    )
 
-    const syncScheduler = new SyncScheduler(
-      mocks.statusRepository,
-      mocks.blockRepository,
-      mocks.blockDownloader,
-      mocks.dataSyncService,
-      Logger.SILENT,
-      6_000
-    )
+      const actions: SyncSchedulerAction[] = [
+        { type: 'init', blocks: [blocks.a1, blocks.a2, blocks.a3] },
+        { type: 'reorg', blocks: [blocks.b2, blocks.b3] },
+        { type: 'syncFinished', success: true },
+        { type: 'discardFinished', success: true },
+        { type: 'syncFinished', success: true },
+      ]
 
-    await syncScheduler.start()
+      const results = reduceAndConcat(actions)
 
-    const range = new BlockRange([{ number: 2, hash: Hash256.from(2n) }])
-    mocks.emitNewBlocks(range)
-
-    await waitForExpect(() => {
-      expect(mocks.dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [range],
-        [range],
-      ])
-    })
-  })
-
-  it('schedules discard on reorg', async () => {
-    const lastBlockNumberSynced = 1
-    const {
-      statusRepository,
-      blockRepository,
-      blockDownloader,
-      dataSyncService,
-      emitReorg,
-    } = setupMocks({ lastBlockNumberSynced })
-
-    const batchSize = 100
-    const syncScheduler = new SyncScheduler(
-      statusRepository,
-      blockRepository,
-      blockDownloader,
-      dataSyncService,
-      Logger.SILENT,
-      batchSize
-    )
-
-    await syncScheduler.start()
-
-    emitReorg({ firstChangedBlock: 10 })
-
-    waitForExpect(() => {
-      expect(dataSyncService.discardAfter).toHaveBeenCalledWith([10])
-    })
-  })
-
-  it('syncs range between last synced and last known block on startup', async () => {
-    const lastBlockNumberSynced = 12345
-    const {
-      statusRepository,
-      blockRepository,
-      blockDownloader,
-      dataSyncService,
-    } = setupMocks({ lastBlockNumberSynced })
-
-    const batchSize = 10_000
-    const syncScheduler = new SyncScheduler(
-      statusRepository,
-      blockRepository,
-      blockDownloader,
-      dataSyncService,
-      Logger.SILENT,
-      batchSize
-    )
-
-    const lastKnown = lastBlockNumberSynced + batchSize
-    blockDownloader.getLastKnownBlock.returnsOnce({
-      number: lastKnown,
-      hash: Hash256.from(BigInt(lastKnown)),
-    })
-
-    await syncScheduler.start()
-
-    await waitForExpect(() => {
-      expect(blockDownloader.getLastKnownBlock).toHaveBeenCalledExactlyWith([
-        [],
-      ])
-
-      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
+      expect(results).toEqual([
         [
-          BlockRange.fake({
-            from: lastBlockNumberSynced + 1,
-            to: lastBlockNumberSynced + batchSize,
-          }),
+          {
+            isInitialized: true,
+            isProcessing: true,
+            latestBlockProcessed: 3,
+            blocksProcessing: [blocks.a1, blocks.a2, blocks.a3],
+            blocksToProcess: new ContinuousBlocks(),
+          },
+          ['sync'],
+        ],
+        [
+          {
+            discardRequired: true,
+            blocksToProcess: new ContinuousBlocks([blocks.b2, blocks.b3]),
+          },
+          [],
+        ],
+        [
+          {
+            blocksProcessing: [],
+          },
+          ['discardAfter'],
+        ],
+        [
+          {
+            discardRequired: false,
+            blocksProcessing: [blocks.b2, blocks.b3],
+            blocksToProcess: new ContinuousBlocks(),
+          },
+          ['sync'],
+        ],
+        [
+          {
+            blocksProcessing: [],
+            isProcessing: false,
+          },
+          [],
         ],
       ])
     })
   })
 })
 
-function setupMocks({
-  lastBlockNumberSynced = undefined,
-}: {
-  lastBlockNumberSynced?: number
-} = {}) {
-  let lastSynced = lastBlockNumberSynced || 0
-  const lastKnown = lastSynced
+function reduceAndConcat(
+  actions: SyncSchedulerAction[],
+  initialState = INITIAL_SYNC_STATE
+) {
+  const results = actions.reduce<
+    Array<[state: SyncState, effects: SyncSchedulerEffect[]]>
+  >(
+    (acc, action) => {
+      const prevState = acc[acc.length - 1][0]
+      return [...acc, syncSchedulerReducer(prevState, action)]
+    },
+    [[initialState, []]]
+  )
 
-  const statusRepository = mock<SyncStatusRepository>({
-    getLastBlockNumberSynced: async () => lastSynced,
-    setLastBlockNumberSynced: async (value) => void (lastSynced = value),
+  return results.slice(1).map((result, i) => {
+    const [state, effects] = result
+    const [prevState] = results[i]
+    const stateDelta = Object.fromEntries(
+      Object.entries(state).filter(
+        ([k, v]) => v !== prevState[k as keyof SyncState]
+      )
+    ) as Partial<SyncState>
+
+    return [stateDelta, effects] as const
   })
+}
 
-  const blockDownloaderEvents = createEventEmitter<BlockDownloaderEvents>()
-
-  const _blockDownloaderProperties = { events: blockDownloaderEvents }
-  const blockDownloader = mock<BlockDownloader>({
-    ...{ events: blockDownloaderEvents },
-    getLastKnownBlock: () => ({
-      number: lastKnown,
-      hash: Hash256.from(BigInt(lastKnown)),
-    }),
-    onNewBlocks: BlockDownloader.prototype.onNewBlocks.bind(
-      _blockDownloaderProperties
-    ),
-    onReorg: BlockDownloader.prototype.onReorg.bind(_blockDownloaderProperties),
-  })
-
-  const blockRepository = mock<BlockRepository>({
-    getAllInRange: async (from, to) =>
-      range(from, to + 1).map((i) => ({
-        hash: Hash256.from(BigInt(i)),
-        number: i,
-      })),
-  })
-
+function fakeBlock(number: number): Block {
   return {
-    statusRepository,
-    blockRepository,
-    blockDownloader,
-    dataSyncService: mock<DataSyncService>({
-      sync: mockFn().resolvesTo(undefined),
-      discardAfter: mockFn().resolvesTo(undefined),
-    }),
-    emitNewBlocks: (event: BlockRange) =>
-      blockDownloaderEvents.emit('newBlocks', event),
-    emitReorg: (event: { firstChangedBlock: number }) =>
-      blockDownloaderEvents.emit('reorg', event),
+    number,
+    hash: Hash256.fake(),
   }
 }

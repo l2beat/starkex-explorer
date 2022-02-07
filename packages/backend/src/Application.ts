@@ -90,11 +90,9 @@ export class Application {
     )
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
-      blockRepository,
       blockDownloader,
       dataSyncService,
-      logger,
-      config.core.syncBatchSize
+      logger
     )
 
     // #endregion core

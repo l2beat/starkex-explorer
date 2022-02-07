@@ -49,6 +49,7 @@ export class BlockRepository implements Repository<BlockRecord> {
       .select('*')
       .where('number', '>=', from)
       .andWhere('number', '<=', to)
+      .orderBy('number')
     this.logger.debug({ method: 'getAllUntil', rows: rows.length })
     return rows.map(toRecord)
   }
