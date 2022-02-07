@@ -13,6 +13,7 @@
     "build": "tsc",
     "test": "mocha",
     "coverage": "nyc --reporter=lcov --reporter=text mocha",
+    "coverage:serve": "nyc --reporter=html mocha && npx serve coverage",
     "start": "node -r source-map-support/register build/src",
     "dev": "node -r esbuild-register src"
   },
