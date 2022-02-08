@@ -593,7 +593,6 @@ describe(SyncScheduler.name, () => {
     })
 
     await waitForExpect(() => {
-      console.log(dataSyncService.discardAfter.calls.map((c) => c.args))
       expect(dataSyncService.discardAfter).toHaveBeenCalledExactlyWith([
         [lastBlockNumberSynced],
         [blocks.b3.number - 1], // <- failed
