@@ -1,4 +1,5 @@
 import { PedersenHash } from '@explorer/crypto'
+import { AssetId } from '@explorer/encoding'
 import {
   IRollupStateStorage,
   MerkleNode,
@@ -17,14 +18,27 @@ export class RollupStateRepository implements IRollupStateStorage {
   }
 
   async getParameters(rootHash: PedersenHash): Promise<RollupParameters> {
-    throw new Error('Method not implemented.')
+    const result = await this.knex('rollup_parameters')
+      .first('parameters')
+      .where('root_hash', rootHash.toString())
+    if (!result) {
+      throw new Error(`Cannot find parameters for ${rootHash}`)
+    }
+    return parametersFromJson(result.parameters)
   }
 
   async setParameters(
     rootHash: PedersenHash,
     values: RollupParameters
   ): Promise<void> {
-    throw new Error('Method not implemented.')
+    await this.knex('rollup_parameters')
+      .insert({
+        root_hash: rootHash.toString(),
+        parameters: parametersToJson(values),
+      })
+      .onConflict('hash')
+      .merge()
+    this.logger.debug({ method: 'setParameters' })
   }
 
   async persist(values: NodeOrLeaf<Position>[]): Promise<void> {
@@ -103,5 +117,28 @@ export class RollupStateRepository implements IRollupStateStorage {
       this.knex('rollup_parameters').delete(),
     ])
     this.logger.debug({ method: 'deleteAll' })
+  }
+}
+
+function parametersToJson(parameters: RollupParameters) {
+  return {
+    timestamp: parameters.timestamp.toString(),
+    funding: Object.fromEntries(
+      [...parameters.funding.entries()].map(([k, v]) => [
+        k.toString(),
+        v.toString(),
+      ])
+    ),
+  }
+}
+
+function parametersFromJson(
+  json: ReturnType<typeof parametersToJson>
+): RollupParameters {
+  return {
+    timestamp: BigInt(json.timestamp),
+    funding: new Map(
+      Object.entries(json.funding).map(([k, v]) => [AssetId(k), BigInt(v)])
+    ),
   }
 }

@@ -72,8 +72,10 @@ declare module 'knex/types/tables' {
 
   interface RollupParametersRow {
     root_hash: string
-    timestamp: number
-    funding: any // TODO: better type
+    parameters: {
+      timestamp: string
+      funding: Record<string, string>
+    }
   }
 
   interface Tables {
