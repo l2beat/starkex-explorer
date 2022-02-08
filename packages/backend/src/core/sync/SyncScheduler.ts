@@ -8,18 +8,12 @@ import { BlockDownloader } from './BlockDownloader'
 import {
   INITIAL_SYNC_STATE,
   SyncSchedulerAction,
-  SyncSchedulerEffect,
   syncSchedulerReducer,
   SyncState,
 } from './syncSchedulerReducer'
 
-export type SyncSchedulerEffectHandlers = {
-  [P in SyncSchedulerEffect]: (state: SyncState) => void
-}
-
 export class SyncScheduler {
   private state: SyncState = INITIAL_SYNC_STATE
-  private readonly effects: SyncSchedulerEffectHandlers
 
   constructor(
     private readonly syncStatusRepository: SyncStatusRepository,
@@ -28,59 +22,6 @@ export class SyncScheduler {
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
-
-    this.effects = {
-      sync: async ({ blocksProcessing, latestBlockProcessed }) => {
-        void this.syncStatusRepository.setLastBlockNumberSynced(
-          latestBlockProcessed
-        )
-        try {
-          await this.dataSyncService.sync(new BlockRange(blocksProcessing))
-          this.dispatch({ type: 'syncFinished', success: true })
-        } catch (err) {
-          this.dispatch({ type: 'syncFinished', success: false })
-          this.logger.error(err)
-        }
-      },
-      discardAfter: async ({ blocksToProcess, latestBlockProcessed }) => {
-        void this.syncStatusRepository.setLastBlockNumberSynced(
-          latestBlockProcessed
-        )
-
-        assert(blocksToProcess.first, 'blocksToProcess.first must be defined')
-
-        try {
-          await this.dataSyncService.discardAfter(
-            blocksToProcess.first.number - 1
-          )
-          this.dispatch({ type: 'discardFinished', success: true })
-        } catch (err) {
-          this.dispatch({ type: 'discardFinished', success: false })
-          this.logger.error(err)
-        }
-      },
-    }
-  }
-
-  private dispatch(action: SyncSchedulerAction) {
-    const [newState, effects] = syncSchedulerReducer(this.state, action)
-
-    effects.forEach((effect) => this.effects[effect](newState))
-
-    this.logger.debug({
-      method: 'dispatch',
-      action: action.type,
-      ...('success' in action && { success: action.success }),
-      ...('blocks' in action &&
-        action.blocks.length && {
-          blocksRange: [
-            action.blocks[0].number,
-            action.blocks[action.blocks.length - 1].number,
-          ].join(' - '),
-        }),
-    })
-
-    this.state = newState
   }
 
   async start() {
@@ -102,5 +43,68 @@ export class SyncScheduler {
     this.blockDownloader.onReorg((blocks) =>
       this.dispatch({ type: 'reorg', blocks })
     )
+  }
+
+  private dispatch(action: SyncSchedulerAction) {
+    const [newState, effects] = syncSchedulerReducer(this.state, action)
+
+    effects.forEach((effect) => {
+      switch (effect) {
+        case 'sync':
+          return this.handleSync(newState)
+        case 'discardAfter':
+          return this.handleDiscardAfter(newState)
+      }
+    })
+
+    this.logger.debug({
+      method: 'dispatch',
+      action: action.type,
+      ...('success' in action && { success: action.success }),
+      ...('blocks' in action &&
+        action.blocks.length && {
+          blocksRange: [
+            action.blocks[0].number,
+            action.blocks[action.blocks.length - 1].number,
+          ].join(' - '),
+        }),
+    })
+
+    this.state = newState
+  }
+
+  private async handleSync({
+    blocksProcessing,
+    latestBlockProcessed,
+  }: SyncState) {
+    void this.syncStatusRepository.setLastBlockNumberSynced(
+      latestBlockProcessed
+    )
+    try {
+      await this.dataSyncService.sync(new BlockRange(blocksProcessing))
+      this.dispatch({ type: 'syncFinished', success: true })
+    } catch (err) {
+      this.dispatch({ type: 'syncFinished', success: false })
+      this.logger.error(err)
+    }
+  }
+
+  private async handleDiscardAfter({
+    blocksToProcess,
+    latestBlockProcessed,
+  }: SyncState) {
+    void this.syncStatusRepository.setLastBlockNumberSynced(
+      latestBlockProcessed
+    )
+
+    assert(blocksToProcess.first, 'blocksToProcess.first must be defined')
+
+    try {
+      await this.dataSyncService.discardAfter(blocksToProcess.first.number - 1)
+      this.dispatch({ type: 'discardFinished', success: true })
+    } catch (err) {
+      this.dispatch({ type: 'discardFinished', success: false })
+      this.logger.error(err)
+    }
   }
 }

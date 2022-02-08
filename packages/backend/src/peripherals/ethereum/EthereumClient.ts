@@ -12,8 +12,12 @@ export class EthereumClient {
     return await this.provider.getBlockNumber()
   }
 
-  async getBlock(blockTagOrHash: BlockTag): Promise<providers.Block> {
-    return await this.provider.getBlock(blockTagOrHash)
+  async getBlock(blockTagOrHash: BlockTag | Hash256): Promise<providers.Block> {
+    return await this.provider.getBlock(
+      typeof blockTagOrHash === 'number'
+        ? blockTagOrHash
+        : blockTagOrHash.toString()
+    )
   }
 
   async getLogs(filter: providers.Filter) {
