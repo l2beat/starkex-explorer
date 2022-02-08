@@ -102,7 +102,10 @@ export class RollupState {
       funding,
     })
 
-    return new RollupState(this.storage, positions, timestamp, funding)
+    return [
+      new RollupState(this.storage, positions, timestamp, funding),
+      newPositions,
+    ] as const
   }
 
   private async getFundingByTimestamp(onChainData: OnChainUpdate) {
