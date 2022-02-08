@@ -9,7 +9,8 @@ describe(RollupState.name, () => {
     it('can update a single position', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
-      rollup = await rollup.update({
+
+      ;[rollup] = await rollup.update({
         funding: [],
         positions: [
           {
@@ -33,7 +34,7 @@ describe(RollupState.name, () => {
     it('can update a single position with assets', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
-      rollup = await rollup.update({
+      ;[rollup] = await rollup.update({
         funding: [
           {
             timestamp: 1001n,
@@ -71,7 +72,7 @@ describe(RollupState.name, () => {
     it('can update a multiple positions with assets', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
-      rollup = await rollup.update({
+      ;[rollup] = await rollup.update({
         funding: [
           {
             timestamp: 1001n,
@@ -153,7 +154,7 @@ describe(RollupState.name, () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
 
-      rollup = await rollup.update({
+      ;[rollup] = await rollup.update({
         funding: [
           {
             timestamp: 1001n,
@@ -181,8 +182,7 @@ describe(RollupState.name, () => {
           [AssetId('ETH-9'), -2n],
         ]),
       })
-
-      rollup = await rollup.update({
+      ;[rollup] = await rollup.update({
         funding: [],
         positions: [
           {
@@ -213,7 +213,7 @@ describe(RollupState.name, () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
 
-      rollup = await rollup.update({
+      ;[rollup] = await rollup.update({
         funding: [
           {
             timestamp: 1001n,
@@ -239,8 +239,7 @@ describe(RollupState.name, () => {
           },
         ],
       })
-
-      rollup = await rollup.update({
+      ;[rollup] = await rollup.update({
         funding: [
           {
             timestamp: 1002n,
@@ -324,7 +323,7 @@ describe(RollupState.name, () => {
     it('recovers positions and indices', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
-      rollup = await rollup.update({
+      ;[rollup] = await rollup.update({
         funding: [
           {
             timestamp: 1001n,
