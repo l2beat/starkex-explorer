@@ -2,8 +2,8 @@ import { expect, mockFn } from 'earljs'
 import { range } from 'lodash'
 import waitForExpect from 'wait-for-expect'
 
-import { BlockDownloader } from '../../src/core/BlockDownloader'
-import { DataSyncService } from '../../src/core/DataSyncService'
+import { DataSyncService } from '../../../src/core/DataSyncService'
+import { BlockDownloader } from '../../../src/core/sync/BlockDownloader'
 import {
   Block,
   ContinuousBlocks,
@@ -14,12 +14,12 @@ import {
   SyncSchedulerEffect,
   syncSchedulerReducer,
   SyncState,
-} from '../../src/core/SyncScheduler'
-import { BlockRange, Hash256 } from '../../src/model'
-import { BlockRecord } from '../../src/peripherals/database/BlockRepository'
-import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
-import { Logger, LogLevel } from '../../src/tools/Logger'
-import { mock } from '../mock'
+} from '../../../src/core/sync/SyncScheduler'
+import { BlockRange, Hash256 } from '../../../src/model'
+import { BlockRecord } from '../../../src/peripherals/database/BlockRepository'
+import { SyncStatusRepository } from '../../../src/peripherals/database/SyncStatusRepository'
+import { Logger, LogLevel } from '../../../src/tools/Logger'
+import { mock } from '../../mock'
 
 describe(SyncScheduler.name, () => {
   describe(syncSchedulerReducer.name, () => {

@@ -1,10 +1,10 @@
 import assert from 'assert'
 
-import { BlockRange, Hash256 } from '../model'
-import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
-import { Logger } from '../tools/Logger'
+import { BlockRange, Hash256 } from '../../model'
+import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
+import { Logger } from '../../tools/Logger'
+import { DataSyncService } from '../DataSyncService'
 import { BlockDownloader } from './BlockDownloader'
-import { DataSyncService } from './DataSyncService'
 
 export interface SyncState {
   /** Have we read the initial blocks from db already? */
@@ -230,11 +230,8 @@ export class SyncScheduler {
       ...('blocks' in action &&
         action.blocks.length && {
           blocksRange: [
-            // We checked action.blocks.length already.
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            action.blocks[0]!.number,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            action.blocks[action.blocks.length - 1]!.number,
+            action.blocks[0].number,
+            action.blocks[action.blocks.length - 1].number,
           ].join(' - '),
         }),
     })
