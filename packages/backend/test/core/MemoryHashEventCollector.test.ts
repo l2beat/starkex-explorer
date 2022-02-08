@@ -4,11 +4,10 @@ import {
   LOG_MEMORY_PAGE_HASHES,
   MemoryHashEventCollector,
 } from '../../src/core/MemoryHashEventCollector'
-import { Hash256 } from '../../src/model'
+import { BlockRange, Hash256 } from '../../src/model'
 import { EthereumAddress } from '../../src/model/EthereumAddress'
 import { FactToPageRepository } from '../../src/peripherals/database/FactToPageRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { BlockRange } from '../../src/peripherals/ethereum/types'
 import { mock } from '../mock'
 
 describe(MemoryHashEventCollector.name, () => {
@@ -29,7 +28,32 @@ describe(MemoryHashEventCollector.name, () => {
       EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84'),
       EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
     ]
-    const blockRange: BlockRange = { from: 11813207, to: 13987296 }
+    const blockRange: BlockRange = new BlockRange([
+      {
+        number: 11905858,
+        hash: Hash256(
+          '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55'
+        ),
+      },
+      {
+        number: 11905919,
+        hash: Hash256(
+          '0x51c1482ed70ef0cab9fb40b891ada76408c0272bd1fd9c48e3d28ca65a2fc54f'
+        ),
+      },
+      {
+        number: 12050594,
+        hash: Hash256(
+          '0x34eba61af14fcce1f79268532b73cb39af2897a5d219288edef044f07a660a74'
+        ),
+      },
+      {
+        number: 12052850,
+        hash: Hash256(
+          '0x8a74ff3eb9f3d439b2b52241b9f6035a7ff93887ca8a16424413c97d0d9adfd8'
+        ),
+      },
+    ])
 
     const actual = await collector.collect(blockRange, verifierAddresses)
 
@@ -174,9 +198,41 @@ describe(MemoryHashEventCollector.name, () => {
       factToPageRepository
     )
 
-    await collector.discard({ from: 123 })
+    await collector.discardAfter(123)
 
-    expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+    expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
+  })
+
+  it('crashes on logs from reorged history', async () => {
+    const ethereumClient = mock<EthereumClient>({
+      getLogs: async (filter) =>
+        testData().logs.filter((log) => filter.address === log.address),
+    })
+    const factToPageRepository = mock<FactToPageRepository>({
+      add: async () => {},
+    })
+    const collector = new MemoryHashEventCollector(
+      ethereumClient,
+      factToPageRepository
+    )
+
+    expect(
+      collector.collect(
+        new BlockRange([
+          {
+            number: 11905858,
+            hash: Hash256(
+              '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55'
+            ),
+          },
+          {
+            number: 11905919,
+            hash: Hash256.fake('deadbeef'),
+          },
+        ]),
+        [EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84')]
+      )
+    ).toBeRejected('all logs must be from the block range')
   })
 })
 

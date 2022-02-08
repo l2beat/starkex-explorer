@@ -8,7 +8,7 @@ import {
   PAGE_ABI,
   PageCollector,
 } from '../../src/core/PageCollector'
-import { Hash256 } from '../../src/model'
+import { BlockRange, Hash256 } from '../../src/model'
 import {
   PageRecord,
   PageRepository,
@@ -28,7 +28,20 @@ describe(PageCollector.name, () => {
 
     const pageCollector = new PageCollector(ethereumClient, pageRepository)
 
-    const blockRange = { from: 8, to: 12 }
+    const blockRange = new BlockRange([
+      {
+        number: 9,
+        hash: Hash256(
+          '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c'
+        ),
+      },
+      {
+        number: 10,
+        hash: Hash256(
+          '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c'
+        ),
+      },
+    ])
 
     const actualRecords = await pageCollector.collect(blockRange)
 
@@ -73,9 +86,38 @@ describe(PageCollector.name, () => {
 
     const collector = new PageCollector(mock<EthereumClient>(), pageRepository)
 
-    await collector.discard({ from: 123 })
+    await collector.discardAfter(123)
 
-    expect(pageRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+    expect(pageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
+  })
+
+  it('crashes on logs from reorged chain histories', async () => {
+    const ethereumClient = mock<EthereumClient>({
+      getTransaction: async (txHash) => testData().getTransaction(txHash),
+      getLogs: async () => testData().logs,
+    })
+    const pageRepository = mock<PageRepository>({
+      add: async () => {},
+    })
+
+    const pageCollector = new PageCollector(ethereumClient, pageRepository)
+
+    const blockRange = new BlockRange([
+      {
+        number: 9,
+        hash: Hash256(
+          '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c'
+        ),
+      },
+      {
+        number: 10,
+        hash: Hash256.fake('deadbeef'),
+      },
+    ])
+
+    expect(pageCollector.collect(blockRange)).toBeRejected(
+      'all logs must be from the block range'
+    )
   })
 
   describe(bignumToPaddedString.name, () => {

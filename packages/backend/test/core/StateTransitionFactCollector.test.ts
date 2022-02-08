@@ -4,7 +4,7 @@ import {
   LOG_STATE_TRANSITION_FACT,
   StateTransitionFactCollector,
 } from '../../src/core/StateTransitionFactCollector'
-import { Hash256 } from '../../src/model'
+import { BlockRange, Hash256 } from '../../src/model'
 import type {
   StateTransitionFactRecord,
   StateTransitionFactRepository,
@@ -25,7 +25,32 @@ describe(StateTransitionFactCollector.name, () => {
       transitionFactRepository
     )
 
-    const blockRange = { from: 11813207, to: 13987296 }
+    const blockRange = new BlockRange([
+      {
+        number: 13986068,
+        hash: Hash256(
+          '0x60b59393cb31785e21f40fc3004496069e8fb69b0117af27ac40f4a949e705ac'
+        ),
+      },
+      {
+        number: 13986473,
+        hash: Hash256(
+          '0x0a4c7eb5e4c57f31a84d57df23c038e6c439d9e3feae9420898269b748853cae'
+        ),
+      },
+      {
+        number: 13986918,
+        hash: Hash256(
+          '0x3e9938b5f3233be2ada3b0928b8ddd57e6b630fe3c3a372fd0aceab7e3f5accd'
+        ),
+      },
+      {
+        number: 13987182,
+        hash: Hash256(
+          '0xb801060a71983b17e37d1307306c7dbd7f79ab12feba8020cae00bdf8c0bd911'
+        ),
+      },
+    ])
 
     const records = await stateTransitionFactCollector.collect(blockRange)
 
@@ -78,9 +103,39 @@ describe(StateTransitionFactCollector.name, () => {
       transitionFactRepository
     )
 
-    await collector.discard({ from: 123 })
+    await collector.discardAfter(123)
 
-    expect(transitionFactRepository.deleteAllAfter).toHaveBeenCalledWith([122])
+    expect(transitionFactRepository.deleteAllAfter).toHaveBeenCalledWith([123])
+  })
+
+  it('crashes on logs from reorged chain histories', async () => {
+    const ethereumClient = mock<EthereumClient>({
+      getLogs: async () => testData().logs,
+    })
+    const transitionFactRepository = mock<StateTransitionFactRepository>({
+      add: async () => {},
+    })
+    const stateTransitionFactCollector = new StateTransitionFactCollector(
+      ethereumClient,
+      transitionFactRepository
+    )
+
+    const blockRange = new BlockRange([
+      {
+        number: 13986068,
+        hash: Hash256(
+          '0x60b59393cb31785e21f40fc3004496069e8fb69b0117af27ac40f4a949e705ac'
+        ),
+      },
+      {
+        number: 13986473,
+        hash: Hash256.fake('deadbeef'),
+      },
+    ])
+
+    expect(stateTransitionFactCollector.collect(blockRange)).toBeRejected(
+      'all logs must be from the block range'
+    )
   })
 })
 

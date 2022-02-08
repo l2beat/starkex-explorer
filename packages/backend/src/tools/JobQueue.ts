@@ -60,15 +60,30 @@ export class JobQueue {
       await job.execute()
       this.inProgress.splice(this.inProgress.indexOf(job), 1)
     } catch (error) {
-      this.logger.error(`Job "${job.name}" failed with:`, error)
       this.inProgress.splice(this.inProgress.indexOf(job), 1)
 
-      const { maxRetries = Infinity } = job
-      if (job.failureCount < maxRetries) {
+      const shouldRetry = job.failureCount < (job.maxRetries ?? Infinity)
+
+      if (shouldRetry) {
         this.queue.unshift({ ...job, failureCount: job.failureCount + 1 })
+      }
+
+      if (shouldRetry && job.maxRetries != null) {
+        const { message, stack = '' } = makeError(error)
+        this.logger.debug(
+          `Retrying job "${job.name}" due to ${message}${
+            stack ? ' ' + stack : ''
+          }`
+        )
+      } else {
+        this.logger.error(`Job "${job.name}" failed with:`, error)
       }
     } finally {
       setTimeout(() => this.execute())
     }
   }
+}
+
+function makeError(error: unknown) {
+  return error instanceof Error ? error : new Error(JSON.stringify(error))
 }

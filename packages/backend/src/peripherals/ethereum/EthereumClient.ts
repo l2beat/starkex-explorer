@@ -23,4 +23,11 @@ export class EthereumClient {
   async getTransaction(transactionHash: Hash256) {
     return await this.provider.getTransaction(transactionHash.toString())
   }
+
+  onBlock(handler: (block: providers.Block) => void) {
+    this.provider.on('block', handler)
+    return () => {
+      this.provider.off('block', handler)
+    }
+  }
 }

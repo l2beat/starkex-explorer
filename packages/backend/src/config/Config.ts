@@ -12,10 +12,6 @@ export interface Config {
   databaseConnection: string | Knex.StaticConnectionConfig
   jsonRpcUrl: string
   core: {
-    safeBlock: {
-      refreshIntervalMs: number
-      blockOffset: number
-    }
     syncBatchSize: number
   }
   freshStart: boolean

@@ -52,6 +52,11 @@ declare module 'knex/types/tables' {
     hash: string
   }
 
+  interface BlockRow {
+    number: number
+    hash: string
+  }
+
   interface Tables {
     position_updates: PositionUpdateRow
     key_values: KeyValueRow
@@ -59,6 +64,7 @@ declare module 'knex/types/tables' {
     fact_to_pages: FactToPageRow
     pages: PageRow
     state_transition_facts: StateTransitionFactRow
+    blocks: BlockRow
   }
 }
 

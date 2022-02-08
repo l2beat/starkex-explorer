@@ -1,8 +1,10 @@
+import assert from 'assert'
 import { utils } from 'ethers'
 import { AbiCoder } from 'ethers/lib/utils'
 import { partition } from 'lodash'
 
 import { EthereumAddress } from '../model'
+import { BlockRange } from '../model/BlockRange'
 import {
   ImplementationAddedEventRecord,
   UpgradedEventRecord,
@@ -10,7 +12,7 @@ import {
   VerifierEventRepository,
 } from '../peripherals/database/VerifierEventRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber, BlockRange } from '../peripherals/ethereum/types'
+import { BlockNumber } from '../peripherals/ethereum/types'
 
 const PROXY_ADDRESS = '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'
 
@@ -47,8 +49,8 @@ export class VerifierCollector {
     return computeVerifiersFromEvents(added, upgraded)
   }
 
-  async discard({ from }: { from: BlockNumber }) {
-    await this.verifierEventRepository.deleteAllAfter(from - 1)
+  async discardAfter(lastToKeep: BlockNumber) {
+    await this.verifierEventRepository.deleteAllAfter(lastToKeep)
   }
 
   private async getEvents(blockRange: BlockRange) {
@@ -59,7 +61,9 @@ export class VerifierCollector {
       topics: [[ImplementationAdded, Upgraded]],
     })
 
-    const events = logs.map((log): VerifierEventRecord => {
+    assert(blockRange.includes(logs), 'all logs must be from the block range')
+
+    return logs.map((log): VerifierEventRecord => {
       const event = PROXY_ABI.parseLog(log)
       return {
         name: event.name as 'ImplementationAdded' | 'Upgraded',
@@ -68,8 +72,6 @@ export class VerifierCollector {
         initializer: event.args.initializer,
       }
     })
-
-    return events
   }
 }
 

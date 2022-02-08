@@ -3,14 +3,15 @@ import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
+import { BlockDownloader } from './core/BlockDownloader'
 import { DataSyncService } from './core/DataSyncService'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
 import { PageCollector } from './core/PageCollector'
-import { SafeBlockService } from './core/SafeBlockService'
 import { StateTransitionFactCollector } from './core/StateTransitionFactCollector'
 import { StatusService } from './core/StatusService'
 import { SyncScheduler } from './core/SyncScheduler'
 import { VerifierCollector } from './core/VerifierCollector'
+import { BlockRepository } from './peripherals/database/BlockRepository'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
@@ -46,22 +47,22 @@ export class Application {
       knex,
       logger
     )
+    const blockRepository = new BlockRepository(knex, logger)
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
     // #endregion peripherals
     // #region core
 
-    const safeBlockService = new SafeBlockService(
-      config.core.safeBlock.refreshIntervalMs,
-      config.core.safeBlock.blockOffset,
+    const blockDownloader = new BlockDownloader(
       ethereumClient,
+      blockRepository,
       logger
     )
 
     const statusService = new StatusService({
       databaseService,
-      safeBlockService,
+      blockDownloader,
     })
 
     const verifierCollector = new VerifierCollector(
@@ -89,10 +90,9 @@ export class Application {
     )
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
-      safeBlockService,
+      blockDownloader,
       dataSyncService,
-      logger,
-      config.core.syncBatchSize
+      logger
     )
 
     // #endregion core
@@ -113,7 +113,7 @@ export class Application {
       await databaseService.migrateToLatest()
 
       await apiServer.listen()
-      await safeBlockService.start()
+      await blockDownloader.start()
       await syncScheduler.start()
 
       logger.for(this).info('Started')

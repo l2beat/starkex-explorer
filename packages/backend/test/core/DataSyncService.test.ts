@@ -5,7 +5,7 @@ import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCol
 import type { PageCollector } from '../../src/core/PageCollector'
 import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
-import { EthereumAddress, Hash256 } from '../../src/model'
+import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
 import { PositionUpdateRepository } from '../../src/peripherals/database/PositionUpdateRepository'
 import { Logger } from '../../src/tools/Logger'
@@ -48,7 +48,7 @@ describe(DataSyncService.name, () => {
     )
 
     it('collects data', async () => {
-      const blockRange = { from: 10, to: 25 }
+      const blockRange = { from: 10, to: 25 } as BlockRange
       await service.sync(blockRange)
 
       expect(verifierCollector.collect).toHaveBeenCalledExactlyWith([
@@ -71,16 +71,16 @@ describe(DataSyncService.name, () => {
     })
   })
 
-  describe(DataSyncService.prototype.revert.name, () => {
+  describe(DataSyncService.prototype.discardAfter.name, () => {
     it('discards data from block number', async () => {
       const noop = async () => {}
-      const verifierCollector = mock<VerifierCollector>({ discard: noop })
+      const verifierCollector = mock<VerifierCollector>({ discardAfter: noop })
       const memoryHashEventCollector = mock<MemoryHashEventCollector>({
-        discard: noop,
+        discardAfter: noop,
       })
-      const pageCollector = mock<PageCollector>({ discard: noop })
+      const pageCollector = mock<PageCollector>({ discardAfter: noop })
       const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
-        discard: noop,
+        discardAfter: noop,
       })
 
       const dataSyncService = new DataSyncService(
@@ -93,15 +93,13 @@ describe(DataSyncService.name, () => {
         Logger.SILENT
       )
 
-      await dataSyncService.revert(10)
+      await dataSyncService.discardAfter(10)
 
-      expect(verifierCollector.discard).toHaveBeenCalledWith([{ from: 10 }])
-      expect(memoryHashEventCollector.discard).toHaveBeenCalledWith([
-        { from: 10 },
-      ])
-      expect(pageCollector.discard).toHaveBeenCalledWith([{ from: 10 }])
-      expect(stateTransitionFactCollector.discard).toHaveBeenCalledWith([
-        { from: 10 },
+      expect(verifierCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(memoryHashEventCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(pageCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(stateTransitionFactCollector.discardAfter).toHaveBeenCalledWith([
+        10,
       ])
     })
   })
