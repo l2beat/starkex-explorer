@@ -2,15 +2,15 @@ import assert from 'assert'
 import { providers } from 'ethers'
 import { range } from 'lodash'
 
-import { Hash256, json } from '../model'
+import { Hash256, json } from '../../model'
 import {
   BlockRecord,
   BlockRepository,
-} from '../peripherals/database/BlockRepository'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { createEventEmitter } from '../tools/EventEmitter'
-import { JobQueue } from '../tools/JobQueue'
-import { Logger } from '../tools/Logger'
+} from '../../peripherals/database/BlockRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { createEventEmitter } from '../../tools/EventEmitter'
+import { JobQueue } from '../../tools/JobQueue'
+import { Logger } from '../../tools/Logger'
 
 export interface KnownBlock {
   readonly number: number
