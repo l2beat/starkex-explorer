@@ -39,4 +39,15 @@ describe(Position.name, () => {
       )
     )
   })
+
+  it('can be stringified to json and back', async () => {
+    const position = new Position(`0x${'0'.repeat(63)}1`, 2n, [
+      { assetId: AssetId('ETH-9'), balance: 3n, fundingIndex: 4n },
+      { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 6n },
+    ])
+    const json = position.toJSON()
+    const transformed = JSON.parse(JSON.stringify(json))
+    const recovered = Position.fromJSON(transformed)
+    expect(recovered).toEqual(position)
+  })
 })

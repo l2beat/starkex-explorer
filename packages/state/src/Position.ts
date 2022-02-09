@@ -47,6 +47,34 @@ export class Position extends MerkleValue {
       assets: this.assets,
     }
   }
+
+  static fromJSON(
+    data: ReturnType<typeof Position.prototype.toJSON>,
+    knownHash?: PedersenHash
+  ) {
+    return new Position(
+      data.publicKey,
+      BigInt(data.collateralBalance),
+      data.assets.map((x) => ({
+        assetId: AssetId(x.assetId),
+        balance: BigInt(x.balance),
+        fundingIndex: BigInt(x.fundingIndex),
+      })),
+      knownHash
+    )
+  }
+
+  toJSON() {
+    return {
+      publicKey: this.publicKey,
+      collateralBalance: this.collateralBalance.toString(),
+      assets: this.assets.map((x) => ({
+        assetId: x.assetId.toString(),
+        balance: x.balance.toString(),
+        fundingIndex: x.fundingIndex.toString(),
+      })),
+    }
+  }
 }
 
 function packAsset(asset: PositionAsset) {
