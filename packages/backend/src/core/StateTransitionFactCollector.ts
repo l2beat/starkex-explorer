@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
@@ -27,15 +26,10 @@ export class StateTransitionFactCollector {
   ) {}
 
   async collect(blockRange: BlockRange): Promise<StateTransitionFactRecord[]> {
-    const logs = await this.ethereumClient.getLogs({
+    const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: PERPETUAL_ADDRESS,
-      fromBlock: blockRange.from,
-      toBlock: blockRange.to,
       topics: [LOG_STATE_TRANSITION_FACT],
     })
-
-    assert(blockRange.includes(logs), 'all logs must be from the block range')
-
     const records = logs.map((log): StateTransitionFactRecord => {
       const event = PERPETUAL_ABI.parseLog(log)
       return {

@@ -13,7 +13,7 @@ import { mock } from '../mock'
 describe(MemoryHashEventCollector.name, () => {
   it('fetches memory hash events and saves them to repository', async () => {
     const ethereumClient = mock<EthereumClient>({
-      getLogs: async (filter) =>
+      getLogsInRange: async (blockRange, filter) =>
         testData().logs.filter((log) => filter.address === log.address),
     })
     const factToPageRepository = mock<FactToPageRepository>({
@@ -119,12 +119,11 @@ describe(MemoryHashEventCollector.name, () => {
     expect(actual).toEqual(expectedEvents)
 
     for (const address of verifierAddresses) {
-      expect(ethereumClient.getLogs).toHaveBeenCalledWith([
+      expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
+        blockRange,
         {
           address: String(address),
           topics: [LOG_MEMORY_PAGE_HASHES],
-          fromBlock: blockRange.from,
-          toBlock: blockRange.to,
         },
       ])
     }

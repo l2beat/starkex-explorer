@@ -7,16 +7,16 @@ import {
   BlockDownloader,
   IncomingBlock,
   isConsistentChain,
-} from '../../src/core/BlockDownloader'
-import { Hash256 } from '../../src/model'
+} from '../../../src/core/sync/BlockDownloader'
+import { Hash256 } from '../../../src/model'
 import {
   BlockRecord,
   BlockRepository,
-} from '../../src/peripherals/database/BlockRepository'
-import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { BlockTag } from '../../src/peripherals/ethereum/types'
-import { Logger, LogLevel } from '../../src/tools/Logger'
-import { mock } from '../mock'
+} from '../../../src/peripherals/database/BlockRepository'
+import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
+import { BlockTag } from '../../../src/peripherals/ethereum/types'
+import { Logger, LogLevel } from '../../../src/tools/Logger'
+import { mock } from '../../mock'
 
 const INITIAL_BLOCK: BlockRecord = { number: 0, hash: Hash256.from(0n) }
 
