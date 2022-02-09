@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { BigNumber, utils } from 'ethers'
 
 import { BlockRange, Hash256 } from '../model'
@@ -50,7 +49,7 @@ export class PageCollector {
           return {
             data,
             pageHash: memoryHash,
-            blockNumber: tx.blockNumber ?? blockRange.from,
+            blockNumber: tx.blockNumber ?? blockRange.start,
           }
         }
       )
@@ -67,23 +66,17 @@ export class PageCollector {
   private async getMemoryPageEvents(
     blockRange: BlockRange
   ): Promise<MemoryPageEvent[]> {
-    const logs = await this.ethereumClient.getLogs({
+    const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: REGISTRY_ADDRESS,
-      fromBlock: blockRange.from,
-      toBlock: blockRange.to,
       topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
     })
-
-    assert(blockRange.includes(logs), 'all logs must be from the block range')
-
-    return logs
-      .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
-      .map(({ log, event }): MemoryPageEvent => {
-        return {
-          memoryHash: Hash256.from(event.args.memoryHash),
-          transactionHash: Hash256(log.transactionHash),
-        }
-      })
+    return logs.map((log): MemoryPageEvent => {
+      const event = REGISTRY_ABI.parseLog(log)
+      return {
+        memoryHash: Hash256.from(event.args.memoryHash),
+        transactionHash: Hash256(log.transactionHash),
+      }
+    })
   }
 }
 

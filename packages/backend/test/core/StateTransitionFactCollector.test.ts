@@ -15,7 +15,7 @@ import { mock } from '../mock'
 describe(StateTransitionFactCollector.name, () => {
   it('parses logs, saves and returns records', async () => {
     const ethereumClient = mock<EthereumClient>({
-      getLogs: async () => testData().logs,
+      getLogsInRange: async () => testData().logs,
     })
     const transitionFactRepository = mock<StateTransitionFactRepository>({
       add: async () => {},
@@ -82,11 +82,10 @@ describe(StateTransitionFactCollector.name, () => {
     ]
 
     expect(records).toEqual(expectedRecords)
-    expect(ethereumClient.getLogs).toHaveBeenCalledWith([
+    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
+      blockRange,
       {
         address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
-        fromBlock: blockRange.from,
-        toBlock: blockRange.to,
         topics: [LOG_STATE_TRANSITION_FACT],
       },
     ])

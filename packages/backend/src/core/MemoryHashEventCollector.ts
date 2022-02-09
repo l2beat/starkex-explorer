@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { utils } from 'ethers'
 
 import { BlockRange, EthereumAddress, Hash256 } from '../model'
@@ -58,18 +57,12 @@ export class MemoryHashEventCollector {
     blockRange: BlockRange,
     verifierAddress: EthereumAddress
   ): Promise<MemoryHashEvent[]> {
-    const logs = await this.ethereumClient.getLogs({
+    const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: verifierAddress.toString(),
-      fromBlock: blockRange.from,
-      toBlock: blockRange.to,
       topics: [LOG_MEMORY_PAGE_HASHES],
     })
-
-    assert(blockRange.includes(logs), 'all logs must be from the block range')
-
     return logs.map((log): MemoryHashEvent => {
       const event = GPS_VERIFIER_ABI.parseLog(log)
-
       return {
         blockNumber: log.blockNumber,
         factHash: Hash256(event.args.factHash),

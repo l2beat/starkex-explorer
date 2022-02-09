@@ -35,7 +35,7 @@ export class DataSyncService {
 
     this.logger.info({
       method: 'sync',
-      blockRange: { from: blockRange.from, to: blockRange.to },
+      blockRange: { from: blockRange.start, to: blockRange.end },
       newVerifiers: verifiers.map(String),
       newHashEventsCount: hashEvents.length,
       newPageRecords: pageRecords.length,
