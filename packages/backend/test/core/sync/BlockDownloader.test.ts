@@ -128,4 +128,44 @@ describe(BlockDownloader.name, () => {
       ])
     })
   })
+
+  describe(BlockDownloader.prototype.getStatus.name, () => {
+    it('returns started=false when not started', () => {
+      const ethereumClient = mock<EthereumClient>()
+      const blockRepository = mock<BlockRepository>()
+      const blockDownloader = new BlockDownloader(
+        ethereumClient,
+        blockRepository,
+        Logger.SILENT
+      )
+      expect<unknown>(blockDownloader.getStatus()).toEqual({
+        started: false,
+        lastKnown: 0,
+        queueTip: 0,
+      })
+    })
+
+    it('returns full info when started', async () => {
+      const ethereumClient = mock<EthereumClient>({
+        getBlockNumber: async () => 13_000_000,
+        onBlock: () => () => {},
+      })
+      const blockRepository = mock<BlockRepository>({
+        getLast: async () => ({ hash: Hash256.fake(), number: 10_000_000 }),
+      })
+      const blockDownloader = new BlockDownloader(
+        ethereumClient,
+        blockRepository,
+        Logger.SILENT
+      )
+      blockDownloader['advanceChain'] = mockFn().returns(undefined)
+
+      await blockDownloader.start()
+      expect<unknown>(blockDownloader.getStatus()).toEqual({
+        started: true,
+        lastKnown: 10_000_000,
+        queueTip: 13_000_000,
+      })
+    })
+  })
 })
