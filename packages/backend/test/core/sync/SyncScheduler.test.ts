@@ -14,18 +14,21 @@ import { mock } from '../../mock'
 describe(SyncScheduler.name, () => {
   it('syncs blocks', async () => {
     const lastBlockNumberSynced = 10000
+    const blocks = [
+      fakeBlock(lastBlockNumberSynced + 1),
+      fakeBlock(lastBlockNumberSynced + 2),
+      fakeBlock(lastBlockNumberSynced + 3),
+      fakeBlock(lastBlockNumberSynced + 4),
+    ]
     const syncStatusRepository = mock<SyncStatusRepository>({
       getLastBlockNumberSynced: async () => lastBlockNumberSynced,
       setLastBlockNumberSynced: async () => {},
     })
-    let init!: (blocks: BlockRecord[]) => void
-    let emitNewBlocks!: (blocks: BlockRecord[]) => void
+    let emitNewBlock!: (blocks: BlockRecord) => void
     const blockDownloader = mock<BlockDownloader>({
-      onInit: async (_from, handler) => {
-        init = handler
-      },
+      getKnownBlocks: async () => [blocks[0], blocks[1]],
       onNewBlock: (handler) => {
-        emitNewBlocks = handler
+        emitNewBlock = handler
         return () => {}
       },
       onReorg: () => () => {},
@@ -50,10 +53,10 @@ describe(SyncScheduler.name, () => {
       syncStatusRepository.getLastBlockNumberSynced
     ).toHaveBeenCalledExactlyWith([[]])
 
-    expect(blockDownloader.onInit).toHaveBeenCalledExactlyWith([
-      [lastBlockNumberSynced, expect.a<any>(Function)],
+    expect(blockDownloader.getKnownBlocks).toHaveBeenCalledExactlyWith([
+      [lastBlockNumberSynced],
     ])
-    expect(blockDownloader.onNewBlocks).toHaveBeenCalledExactlyWith([
+    expect(blockDownloader.onNewBlock).toHaveBeenCalledExactlyWith([
       [expect.a<any>(Function)],
     ])
     expect(blockDownloader.onReorg).toHaveBeenCalledExactlyWith([
@@ -65,15 +68,8 @@ describe(SyncScheduler.name, () => {
     ])
     expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([])
 
-    const blocks = [
-      fakeBlock(lastBlockNumberSynced + 1),
-      fakeBlock(lastBlockNumberSynced + 2),
-      fakeBlock(lastBlockNumberSynced + 3),
-      fakeBlock(lastBlockNumberSynced + 4),
-    ]
-
-    init!([blocks[0], blocks[1]])
-    emitNewBlocks([blocks[2], blocks[3]])
+    emitNewBlock(blocks[2])
+    emitNewBlock(blocks[3])
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
@@ -96,19 +92,24 @@ describe(SyncScheduler.name, () => {
 
   it('handles sync failure and discards', async () => {
     const lastBlockNumberSynced = 10000
+    const blocks = {
+      a1: fakeBlock(lastBlockNumberSynced + 1),
+      a2: fakeBlock(lastBlockNumberSynced + 2),
+      a3: fakeBlock(lastBlockNumberSynced + 3),
+      a4: fakeBlock(lastBlockNumberSynced + 4),
+      b3: fakeBlock(lastBlockNumberSynced + 3),
+      b4: fakeBlock(lastBlockNumberSynced + 4),
+    }
     const syncStatusRepository = mock<SyncStatusRepository>({
       getLastBlockNumberSynced: async () => lastBlockNumberSynced,
       setLastBlockNumberSynced: async () => {},
     })
-    let init!: (blocks: BlockRecord[]) => void
-    let emitNewBlocks!: (blocks: BlockRecord[]) => void
+    let emitNewBlock!: (blocks: BlockRecord) => void
     let emitReorg!: (blocks: BlockRecord[]) => void
     const blockDownloader = mock<BlockDownloader>({
-      onInit: async (_from, handler) => {
-        init = handler
-      },
-      onNewBlocks: (handler) => {
-        emitNewBlocks = handler
+      getKnownBlocks: async () => [blocks.a1, blocks.a2],
+      onNewBlock: (handler) => {
+        emitNewBlock = handler
         return () => {}
       },
       onReorg: (handler) => {
@@ -153,10 +154,10 @@ describe(SyncScheduler.name, () => {
       syncStatusRepository.getLastBlockNumberSynced
     ).toHaveBeenCalledExactlyWith([[]])
 
-    expect(blockDownloader.onInit).toHaveBeenCalledExactlyWith([
-      [lastBlockNumberSynced, expect.a<any>(Function)],
+    expect(blockDownloader.getKnownBlocks).toHaveBeenCalledExactlyWith([
+      [lastBlockNumberSynced],
     ])
-    expect(blockDownloader.onNewBlocks).toHaveBeenCalledExactlyWith([
+    expect(blockDownloader.onNewBlock).toHaveBeenCalledExactlyWith([
       [expect.a<any>(Function)],
     ])
     expect(blockDownloader.onReorg).toHaveBeenCalledExactlyWith([
@@ -168,17 +169,8 @@ describe(SyncScheduler.name, () => {
     ])
     expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([])
 
-    const blocks = {
-      a1: fakeBlock(lastBlockNumberSynced + 1),
-      a2: fakeBlock(lastBlockNumberSynced + 2),
-      a3: fakeBlock(lastBlockNumberSynced + 3),
-      a4: fakeBlock(lastBlockNumberSynced + 4),
-      b3: fakeBlock(lastBlockNumberSynced + 3),
-      b4: fakeBlock(lastBlockNumberSynced + 4),
-    }
-
-    init!([blocks.a1, blocks.a2])
-    emitNewBlocks([blocks.a3, blocks.a4])
+    emitNewBlock(blocks.a3)
+    emitNewBlock(blocks.a4)
 
     await waitForExpect(() => {
       expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
