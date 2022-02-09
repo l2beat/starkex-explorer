@@ -125,4 +125,43 @@ describe(BlockRange.name, () => {
       ]).toEqual([true, false, true, false])
     })
   })
+
+  describe(BlockRange.prototype.take.name, () => {
+    const range = new BlockRange([
+      { number: 10, hash: Hash256.fake('10') },
+      { number: 11, hash: Hash256.fake('11') },
+      { number: 12, hash: Hash256.fake('12') },
+    ])
+
+    it('can take zero items', () => {
+      const [taken, remaining] = range.take(0)
+      expect(taken).toEqual(new BlockRange([]))
+      expect(remaining).toEqual(range)
+    })
+
+    it('can take all items', () => {
+      const [taken, remaining] = range.take(3)
+      expect(taken).toEqual(range)
+      expect(remaining).toEqual(new BlockRange([]))
+    })
+
+    it('cannot take more than all items', () => {
+      const [taken, remaining] = range.take(1000)
+      expect(taken).toEqual(range)
+      expect(remaining).toEqual(new BlockRange([]))
+    })
+
+    it('can take some items', () => {
+      const [taken, remaining] = range.take(2)
+      expect(taken).toEqual(
+        new BlockRange([
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 11, hash: Hash256.fake('11') },
+        ])
+      )
+      expect(remaining).toEqual(
+        new BlockRange([{ number: 12, hash: Hash256.fake('12') }])
+      )
+    })
+  })
 })

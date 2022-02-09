@@ -1,4 +1,5 @@
 import assert from 'assert'
+import { partition } from 'lodash'
 
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Hash256 } from './Hash256'
@@ -63,6 +64,10 @@ export class BlockRange {
     return this.start === this.end
   }
 
+  get length() {
+    return this.end - this.start
+  }
+
   has({ blockNumber, blockHash }: BlockReference) {
     if (blockNumber < this.start || blockNumber >= this.end) {
       return false
@@ -84,5 +89,27 @@ export class BlockRange {
       Math.min(this.start, other.start),
       Math.max(this.end, other.end)
     )
+  }
+
+  take(count: number): [taken: BlockRange, remaining: BlockRange] {
+    if (count <= 0) {
+      return [new BlockRange([]), this]
+    } else if (count >= this.length) {
+      return [this, new BlockRange([])]
+    }
+    const [left, right] = partition(
+      [...this.hashes.keys()],
+      (x) => x < this.start + count
+    )
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const leftBlocks = new Map(left.map((k) => [k, this.hashes.get(k)!]))
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const rightBlocks = new Map(right.map((k) => [k, this.hashes.get(k)!]))
+
+    return [
+      new BlockRange(leftBlocks, this.start, this.start + count),
+      new BlockRange(rightBlocks, this.start + count, this.end),
+    ]
   }
 }
