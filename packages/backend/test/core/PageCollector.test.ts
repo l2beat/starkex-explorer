@@ -20,7 +20,7 @@ describe(PageCollector.name, () => {
   it('fetches memory page logs and transactions and then saves records to repository', async () => {
     const ethereumClient = mock<EthereumClient>({
       getTransaction: async (txHash) => testData().getTransaction(txHash),
-      getLogs: async () => testData().logs,
+      getLogsInRange: async () => testData().logs,
     })
     const pageRepository = mock<PageRepository>({
       add: async () => {},
@@ -67,12 +67,11 @@ describe(PageCollector.name, () => {
 
     expect(actualRecords).toEqual(expectedRecords)
 
-    expect(ethereumClient.getLogs).toHaveBeenCalledWith([
+    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
+      blockRange,
       {
         address: '0xEfbCcE4659db72eC6897F46783303708cf9ACef8',
         topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
-        fromBlock: blockRange.from,
-        toBlock: blockRange.to,
       },
     ])
 

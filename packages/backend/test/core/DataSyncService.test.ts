@@ -48,7 +48,7 @@ describe(DataSyncService.name, () => {
     )
 
     it('collects data', async () => {
-      const blockRange = { from: 10, to: 25 } as BlockRange
+      const blockRange = { start: 10, end: 25 } as BlockRange
       await service.sync(blockRange)
 
       expect(verifierCollector.collect).toHaveBeenCalledExactlyWith([
