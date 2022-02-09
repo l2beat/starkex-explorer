@@ -28,7 +28,8 @@ export class BlockDownloader {
   constructor(
     private ethereumClient: EthereumClient,
     private blockRepository: BlockRepository,
-    private logger: Logger
+    private logger: Logger,
+    private safeBlockDistance = SAFE_BLOCK_DISTANCE
   ) {
     this.logger = this.logger.for(this)
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
@@ -36,13 +37,16 @@ export class BlockDownloader {
 
   async start() {
     this.started = true
-    this.lastKnown = (await this.blockRepository.getLast()).number 
+    this.lastKnown = (await this.blockRepository.getLast())?.number ?? 0
     this.queueTip = await this.ethereumClient.getBlockNumber()
 
-    const queueStart = Math.max(this.lastKnown, this.queueTip - SAFE_BLOCK_DISTANCE)
+    const queueStart = Math.max(
+      this.lastKnown + 1,
+      this.queueTip - this.safeBlockDistance + 1
+    )
 
-    if (this.lastKnown + 1 < queueStart) {
-      this.advanceChain(this.queueTip + 1)
+    if (this.lastKnown !== 0 && this.lastKnown + 1 < queueStart) {
+      this.advanceChain(this.lastKnown + 1)
     }
 
     for (let i = queueStart; i <= this.queueTip; i++) {
@@ -50,10 +54,10 @@ export class BlockDownloader {
     }
 
     return this.ethereumClient.onBlock((block) => {
-      for (let i = this.queueTip; i <= block.number; i++) {
+      for (let i = this.queueTip + 1; i <= block.number; i++) {
         this.advanceChain(i)
+        this.queueTip = i
       }
-      this.queueTip = block.number
     })
   }
 
@@ -68,12 +72,15 @@ export class BlockDownloader {
     return {
       started: this.started,
       lastKnown: this.lastKnown,
-      queueTip: this.queueTip
+      queueTip: this.queueTip,
     }
   }
 
   async getKnownBlocks(from: number) {
     const lastKnown = await this.blockRepository.getLast()
+    if (!lastKnown) {
+      return []
+    }
     return this.blockRepository.getAllInRange(from, lastKnown.number)
   }
 
