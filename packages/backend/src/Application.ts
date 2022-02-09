@@ -113,8 +113,8 @@ export class Application {
       await databaseService.migrateToLatest()
 
       await apiServer.listen()
-      await blockDownloader.start()
       await syncScheduler.start()
+      await blockDownloader.start()
 
       logger.for(this).info('Started')
     }

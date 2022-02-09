@@ -32,7 +32,7 @@ describe(syncSchedulerReducer.name, () => {
         blocksToProcess: new ContinuousBlocks(),
         blocksProcessing: blocks,
       })
-      expect(effects).toEqual(['sync'])
+      expect(effects).toEqual('sync')
     })
 
     it(`triggers processing of up to ${SYNC_BATCH_SIZE} blocks at once`, () => {
@@ -45,7 +45,7 @@ describe(syncSchedulerReducer.name, () => {
       })
 
       expect(state.blocksProcessing).toEqual(blocks.slice(0, SYNC_BATCH_SIZE))
-      expect(effects).toEqual(['sync'])
+      expect(effects).toEqual('sync')
     })
   })
 
@@ -70,7 +70,7 @@ describe(syncSchedulerReducer.name, () => {
         isProcessing: false,
         blocksProcessing: [],
       })
-      expect(effects).toEqual([])
+      expect(effects).toEqual(undefined)
     })
 
     it('moves blocks processing back to the queue and orders sync on failure', () => {
@@ -96,7 +96,7 @@ describe(syncSchedulerReducer.name, () => {
         success: false,
       })
 
-      expect(effects).toEqual(['sync'])
+      expect(effects).toEqual('sync')
       expect(newState).toEqual({
         ...initialState,
         blocksToProcess: new ContinuousBlocks(),
@@ -130,7 +130,7 @@ describe(syncSchedulerReducer.name, () => {
         discardRequired: false,
         blocksToProcess: new ContinuousBlocks(newBlocks),
       })
-      expect(effects).toEqual([])
+      expect(effects).toEqual(undefined)
     })
 
     it('causes discard given blocks processed already', () => {
@@ -158,7 +158,7 @@ describe(syncSchedulerReducer.name, () => {
       })
 
       // There is no `discard` yet, because we need to process old block 4 still.
-      expect(effects).toEqual([])
+      expect(effects).toEqual(undefined)
       ;[newState, effects] = syncSchedulerReducer(newState, {
         type: 'syncFinished',
         success: true,
@@ -172,7 +172,7 @@ describe(syncSchedulerReducer.name, () => {
         latestBlockProcessed: 3,
         blocksProcessing: [],
       })
-      expect(effects).toEqual(['discardAfter'])
+      expect(effects).toEqual('discardAfter')
     })
   })
 
@@ -199,7 +199,7 @@ describe(syncSchedulerReducer.name, () => {
         blocks: [blocks.a11, blocks.a12],
       })
 
-      expect(effects).toEqual([])
+      expect(effects).toEqual(undefined)
       expect(newState).toEqual({
         ...initialState,
         blocksToProcess: new ContinuousBlocks([
@@ -250,7 +250,7 @@ describe(syncSchedulerReducer.name, () => {
         success: true,
       })
 
-      expect(effects).toEqual([])
+      expect(effects).toEqual(undefined)
       expect(newState).toEqual({
         ...initialState,
         isProcessing: false,
@@ -270,7 +270,7 @@ describe(syncSchedulerReducer.name, () => {
         success: false,
       })
 
-      expect(effects).toEqual([])
+      expect(effects).toEqual(undefined)
       expect(newState).toEqual({
         ...initialState,
         isProcessing: false,
@@ -303,7 +303,7 @@ describe(syncSchedulerReducer.name, () => {
       discardRequired: false,
       latestBlockProcessed: 0,
     })
-    expect(effects).toEqual([])
+    expect(effects).toEqual(undefined)
     ;[state, effects] = syncSchedulerReducer(state, {
       type: 'init',
       blocks: blocks.slice(0, 4),
@@ -317,7 +317,7 @@ describe(syncSchedulerReducer.name, () => {
       latestBlockProcessed: 6,
       discardRequired: false,
     })
-    expect(effects).toEqual(['sync'])
+    expect(effects).toEqual('sync')
   })
 
   it('handles reorg in blocks known from before the server start', () => {
@@ -348,20 +348,20 @@ describe(syncSchedulerReducer.name, () => {
           blocksProcessing: [blocks.a1, blocks.a2, blocks.a3],
           blocksToProcess: new ContinuousBlocks(),
         },
-        ['sync'],
+        'sync',
       ],
       [
         {
           discardRequired: true,
           blocksToProcess: new ContinuousBlocks([blocks.b2, blocks.b3]),
         },
-        [],
+        undefined,
       ],
       [
         {
           blocksProcessing: [],
         },
-        ['discardAfter'],
+        'discardAfter',
       ],
       [
         {
@@ -369,14 +369,14 @@ describe(syncSchedulerReducer.name, () => {
           blocksProcessing: [blocks.b2, blocks.b3],
           blocksToProcess: new ContinuousBlocks(),
         },
-        ['sync'],
+        'sync',
       ],
       [
         {
           blocksProcessing: [],
           isProcessing: false,
         },
-        [],
+        undefined,
       ],
     ])
   })
@@ -386,14 +386,12 @@ function reduceAndConcat(
   actions: SyncSchedulerAction[],
   initialState = INITIAL_SYNC_STATE
 ) {
-  const results = actions.reduce<
-    Array<[state: SyncState, effects: SyncSchedulerEffect[]]>
-  >(
+  const results = actions.reduce<Array<[SyncState, SyncSchedulerEffect?]>>(
     (acc, action) => {
       const prevState = acc[acc.length - 1][0]
       return [...acc, syncSchedulerReducer(prevState, action)]
     },
-    [[initialState, []]]
+    [[initialState]]
   )
 
   return results.slice(1).map((result, i) => {

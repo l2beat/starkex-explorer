@@ -24,7 +24,7 @@ describe(SyncScheduler.name, () => {
       onInit: async (_from, handler) => {
         init = handler
       },
-      onNewBlocks: (handler) => {
+      onNewBlock: (handler) => {
         emitNewBlocks = handler
         return () => {}
       },

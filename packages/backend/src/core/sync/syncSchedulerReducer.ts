@@ -25,7 +25,7 @@ export interface SyncState {
 }
 
 export type SyncSchedulerEffect = 'sync' | 'discardAfter'
-export type StateAndEffects = [SyncState, SyncSchedulerEffect[]]
+export type StateAndEffects = [SyncState, SyncSchedulerEffect?]
 
 export type SyncSchedulerAction =
   | { type: 'init'; blocks: Block[] }
@@ -93,10 +93,10 @@ export function syncSchedulerReducer(
 }
 
 function process(state: SyncState): StateAndEffects {
-  if (!state.isInitialized || state.isProcessing) return [state, []]
+  if (!state.isInitialized || state.isProcessing) return [state]
 
   if (state.discardRequired) {
-    return [{ ...state, isProcessing: true }, ['discardAfter']]
+    return [{ ...state, isProcessing: true }, 'discardAfter']
   } else {
     const [blocksProcessing, blocksToProcess] =
       state.blocksToProcess.take(SYNC_BATCH_SIZE)
@@ -113,10 +113,10 @@ function process(state: SyncState): StateAndEffects {
           isProcessing: true,
           latestBlockProcessed,
         },
-        ['sync'],
+        'sync',
       ]
     } else {
-      return [{ ...state, blocksProcessing }, []]
+      return [{ ...state, blocksProcessing }]
     }
   }
 }
