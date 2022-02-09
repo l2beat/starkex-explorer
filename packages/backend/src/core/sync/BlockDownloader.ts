@@ -46,16 +46,16 @@ export class BlockDownloader {
     )
 
     if (this.lastKnown !== 0 && this.lastKnown + 1 < queueStart) {
-      this.advanceChain(this.lastKnown + 1)
+      this.addJob(this.lastKnown + 1)
     }
 
     for (let i = queueStart; i <= this.queueTip; i++) {
-      this.advanceChain(i)
+      this.addJob(i)
     }
 
     return this.ethereumClient.onBlock((block) => {
       for (let i = this.queueTip + 1; i <= block.number; i++) {
-        this.advanceChain(i)
+        this.addJob(i)
         this.queueTip = i
       }
     })
@@ -91,14 +91,17 @@ export class BlockDownloader {
     }
   }
 
-  private advanceChain(blockNumber: number) {
+  private addJob(blockNumber: number) {
     this.jobQueue.add({
       name: `advanceChain-${blockNumber}`,
-      execute: () => this.executeAdvanceChain(blockNumber),
+      execute: async () => {
+        const event = await this.advanceChain(blockNumber)
+        this.events.emit(event[0], event[1])
+      },
     })
   }
 
-  private async executeAdvanceChain(blockNumber: number): Promise<void> {
+  private async advanceChain(blockNumber: number) {
     let [block, parent] = await Promise.all([
       this.ethereumClient.getBlock(blockNumber),
       this.getKnownBlock(blockNumber - 1),
@@ -110,7 +113,7 @@ export class BlockDownloader {
       }
       await this.blockRepository.add([record])
       this.lastKnown = blockNumber
-      this.events.emit('newBlock', record)
+      return ['newBlock', record] as const
     } else {
       const changed: providers.Block[] = [block]
       let current = blockNumber
@@ -129,7 +132,7 @@ export class BlockDownloader {
       await this.blockRepository.deleteAllAfter(records[0].number - 1)
       await this.blockRepository.add(records)
       this.lastKnown = blockNumber
-      this.events.emit('reorg', records)
+      return ['reorg', records] as const
     }
   }
 
