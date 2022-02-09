@@ -65,6 +65,7 @@ declare module 'knex/types/tables' {
 
   interface StateUpdateRow {
     id: number
+    block_number: number
     fact_hash: string
     root_hash: string
     fact_timestamp: number
