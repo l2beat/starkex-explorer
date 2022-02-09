@@ -2324,10 +2324,10 @@ each-props@^1.3.2:
     is-plain-object "^2.0.1"
     object.defaults "^1.1.0"
 
-earljs@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/earljs/-/earljs-0.2.0.tgz#bb36d1088e9bbd637a05b137e83260773ea1516a"
-  integrity sha512-gxrcEDpCQYay/E6iEnVUbsQm7EpnijDd6r/d889ScaVadm/SGeSF/JntL2PfZpBYC+7BXci06i5m4ADv7cTG2Q==
+earljs@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/earljs/-/earljs-0.2.1.tgz#155ba338fb00aeca9bd22317fa26f480f166c088"
+  integrity sha512-hbmWdvgB6Bc0L2m0fmbR3okQLm+sdnoN+vqaPijtqlIX9nBmNRQLbS6HsKG+Q91/FNmgul+OcUEBCyuD7N97Xw==
   dependencies:
     debug "^4.1.1"
     jest-snapshot "^26.6.2"
