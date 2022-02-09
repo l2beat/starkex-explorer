@@ -172,6 +172,55 @@ describe(BlockDownloader.name, () => {
     })
   })
 
+  describe(BlockDownloader.prototype.getKnownBlocks.name, () => {
+    it('returns no blocks if the repository is empty', async () => {
+      const ethereumClient = mock<EthereumClient>()
+      const blockRepository = mock<BlockRepository>({
+        getLast: async () => undefined,
+      })
+      const blockDownloader = new BlockDownloader(
+        ethereumClient,
+        blockRepository,
+        Logger.SILENT
+      )
+      expect(await blockDownloader.getKnownBlocks(1_000_000)).toEqual([])
+    })
+
+    it('returns no blocks if there are no blocks in range', async () => {
+      const ethereumClient = mock<EthereumClient>()
+      const blockRepository = mock<BlockRepository>({
+        getLast: async () => ({ number: 2_000_000, hash: Hash256.fake() }),
+        getAllInRange: async () => [],
+      })
+      const blockDownloader = new BlockDownloader(
+        ethereumClient,
+        blockRepository,
+        Logger.SILENT
+      )
+      expect(await blockDownloader.getKnownBlocks(1_000_000)).toEqual([])
+    })
+
+    it('returns the blocks in range', async () => {
+      const ethereumClient = mock<EthereumClient>()
+      const blockRepository = mock<BlockRepository>({
+        getLast: async () => ({ number: 2_000_000, hash: Hash256.fake() }),
+        getAllInRange: async () => [
+          { number: 1_500_000, hash: Hash256.fake('abc') },
+          { number: 1_700_000, hash: Hash256.fake('def') },
+        ],
+      })
+      const blockDownloader = new BlockDownloader(
+        ethereumClient,
+        blockRepository,
+        Logger.SILENT
+      )
+      expect(await blockDownloader.getKnownBlocks(1_000_000)).toEqual([
+        { number: 1_500_000, hash: Hash256.fake('abc') },
+        { number: 1_700_000, hash: Hash256.fake('def') },
+      ])
+    })
+  })
+
   describe('handling block reorganizations', () => {
     class TestBlockDownloader extends BlockDownloader {
       getLastKnown() {
