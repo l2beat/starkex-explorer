@@ -71,4 +71,27 @@ describe(RollupStateRepository.name, () => {
       expect(recovered).toEqual(node)
     })
   })
+
+  describe(repository.getParameters.name, () => {
+    it('throws when parameters for rootHash are missing from db', async () => {
+      expect(repository.getParameters(PedersenHash.fake('111'))).toBeRejected(
+        'Cannot find parameters for'
+      )
+    })
+
+    it('gets parameters', async () => {
+      const rootHash = PedersenHash.fake('111')
+
+      const parameters = {
+        funding: new Map([[AssetId('ETH-9'), 123n]]),
+        timestamp: 123n,
+      }
+
+      await repository.setParameters(rootHash, parameters)
+
+      const actual = await repository.getParameters(rootHash)
+
+      expect(actual).toEqual(parameters)
+    })
+  })
 })

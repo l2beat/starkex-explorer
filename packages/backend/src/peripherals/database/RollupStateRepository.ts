@@ -19,12 +19,12 @@ export class RollupStateRepository implements IRollupStateStorage {
 
   async getParameters(rootHash: PedersenHash): Promise<RollupParameters> {
     const result = await this.knex('rollup_parameters')
-      .first('parameters')
+      .first('funding', 'timestamp')
       .where('root_hash', rootHash.toString())
     if (!result) {
       throw new Error(`Cannot find parameters for ${rootHash}`)
     }
-    return parametersFromJson(result.parameters)
+    return parametersFromJson(result)
   }
 
   async setParameters(
@@ -34,9 +34,9 @@ export class RollupStateRepository implements IRollupStateStorage {
     await this.knex('rollup_parameters')
       .insert({
         root_hash: rootHash.toString(),
-        parameters: parametersToJson(values),
+        ...parametersToJson(values),
       })
-      .onConflict('hash')
+      .onConflict('root_hash')
       .merge()
     this.logger.debug({ method: 'setParameters' })
   }
