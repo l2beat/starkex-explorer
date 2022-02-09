@@ -1,5 +1,4 @@
 import { expect } from 'earljs'
-import { range } from 'lodash'
 
 import { Hash256 } from '../../src/model'
 import { BlockRange } from '../../src/model/BlockRange'
@@ -17,35 +16,90 @@ describe(BlockRange.name, () => {
   })
 
   describe(BlockRange.prototype.has.name, () => {
-    it('returns true if range has the hash under block number', () => {
-      const [h1, h2, h3] = range(3).map((i) => Hash256.fake(String(i)))
+    const blockRange = new BlockRange(
+      [
+        { number: 10, hash: Hash256.fake('10') },
+        { number: 11, hash: Hash256.fake('11') },
+        { number: 13, hash: Hash256.fake('13') },
+      ],
+      5,
+      15
+    )
 
-      const blockRange = new BlockRange([
-        { number: 1, hash: h1 },
-        { number: 2, hash: h2 },
-        { number: 3, hash: h3 },
-      ])
-
-      expect(blockRange.has({ blockNumber: 1, blockHash: h1 })).toEqual(true)
-      expect(blockRange.has({ blockNumber: 2, blockHash: h2 })).toEqual(true)
-      expect(blockRange.has({ blockNumber: 3, blockHash: h3 })).toEqual(true)
+    it('returns true for a matching number and hash', () => {
+      expect(
+        blockRange.has({ blockNumber: 11, blockHash: Hash256.fake('11') })
+      ).toEqual(true)
     })
 
-    it('returns false if range does not have the hash under block number', () => {
-      const hash = Hash256.fake('0')
-      const blockRange = new BlockRange([{ hash, number: 10 }])
-
+    it('returns false for a matching number but a different hash', () => {
       expect(
-        blockRange.has({ blockNumber: 10, blockHash: Hash256.fake('1') })
+        blockRange.has({ blockNumber: 11, blockHash: Hash256.fake('22') })
       ).toEqual(false)
+    })
 
+    it('returns true for a block inside range of unknown hash', () => {
       expect(
-        blockRange.has({ blockNumber: 13987297, blockHash: Hash256.fake('1') })
-      ).toEqual(false)
+        blockRange.has({ blockNumber: 9, blockHash: Hash256.fake('abc') })
+      ).toEqual(true)
+    })
 
+    it('returns true for a block outside range', () => {
       expect(
-        blockRange.has({ blockNumber: 13987297, blockHash: hash })
+        blockRange.has({ blockNumber: 100, blockHash: Hash256.fake('abc') })
       ).toEqual(false)
+    })
+  })
+
+  describe(BlockRange.prototype.hasAll.name, () => {
+    const blockRange = new BlockRange(
+      [
+        { number: 10, hash: Hash256.fake('10') },
+        { number: 11, hash: Hash256.fake('11') },
+        { number: 13, hash: Hash256.fake('13') },
+      ],
+      5,
+      15
+    )
+
+    it('returns true when all items match', () => {
+      expect(
+        blockRange.hasAll([
+          { blockNumber: 9, blockHash: Hash256.fake('abc') },
+          { blockNumber: 11, blockHash: Hash256.fake('11') },
+        ])
+      ).toEqual(true)
+    })
+
+    it('returns false when some items do not match', () => {
+      expect(
+        blockRange.hasAll([
+          { blockNumber: 9, blockHash: Hash256.fake('abc') },
+          { blockNumber: 10, blockHash: Hash256.fake('22') },
+          { blockNumber: 11, blockHash: Hash256.fake('11') },
+        ])
+      ).toEqual(false)
+    })
+  })
+
+  describe(BlockRange.prototype.isEmpty.name, () => {
+    it('returns false when some blocks are known', () => {
+      const blockRange = new BlockRange([
+        { number: 10, hash: Hash256.fake('10') },
+        { number: 11, hash: Hash256.fake('11') },
+        { number: 13, hash: Hash256.fake('13') },
+      ])
+      expect(blockRange.isEmpty()).toEqual(false)
+    })
+
+    it('returns false when the range covers some blocks', () => {
+      const blockRange = new BlockRange([], 5, 10)
+      expect(blockRange.isEmpty()).toEqual(false)
+    })
+
+    it('returns true when the range covers no blocks', () => {
+      const blockRange = new BlockRange([])
+      expect(blockRange.isEmpty()).toEqual(true)
     })
   })
 })

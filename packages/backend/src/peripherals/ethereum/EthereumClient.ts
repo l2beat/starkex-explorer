@@ -30,7 +30,7 @@ export class EthereumClient {
       fromBlock: blockRange.start,
       toBlock: blockRange.end - 1,
     })
-    assert(blockRange.includes(logs), 'all logs must be from the block range')
+    assert(blockRange.hasAll(logs), 'all logs must be from the block range')
     return logs
   }
 

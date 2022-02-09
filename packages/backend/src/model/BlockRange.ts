@@ -21,7 +21,7 @@ export class BlockRange {
   private readonly hashes: ReadonlyMap<BlockNumber, Hash256>
 
   constructor(
-    blocks: BlockRange | Iterable<BlockInRange>,
+    blocks: BlockRange | BlockInRange[],
     start?: BlockNumber,
     end?: BlockNumber
   ) {
@@ -29,12 +29,13 @@ export class BlockRange {
       this.end = blocks.end
       this.start = blocks.start
       this.hashes = blocks.hashes
+    } else if (blocks.length === 0) {
+      this.hashes = new Map()
+      this.start = 0
+      this.end = 0
     } else {
-      const blocksArray = Array.from(blocks)
-      this.hashes = new Map(
-        blocksArray.map((block) => [block.number, block.hash])
-      )
-      const blockNumbers = blocksArray.map((block) => block.number)
+      this.hashes = new Map(blocks.map((block) => [block.number, block.hash]))
+      const blockNumbers = blocks.map((block) => block.number)
       this.start = Math.min(...blockNumbers)
       this.end = Math.max(...blockNumbers) + 1
     }
@@ -50,13 +51,14 @@ export class BlockRange {
   }
 
   has({ blockNumber, blockHash }: BlockReference) {
-    // @todo if blockNumber is far enough in the past, we want to assume
-    //       every blockHash is valid
-    return this.hashes.get(blockNumber) === blockHash
+    if (blockNumber < this.start || blockNumber >= this.end) {
+      return false
+    }
+    const expectedHash = this.hashes.get(blockNumber)
+    return !expectedHash || expectedHash === blockHash
   }
 
-  includes(subset: Iterable<BlockReference>) {
-    for (const x of subset) if (!this.has(x)) return false
-    return true
+  hasAll(references: BlockReference[]) {
+    return references.every((x) => this.has(x))
   }
 }
