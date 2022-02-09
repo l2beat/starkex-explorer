@@ -11,7 +11,7 @@ import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
 
 export interface BlockDownloaderEvents {
-  newBlocks: BlockRecord[]
+  newBlock: BlockRecord
   reorg: BlockRecord[]
 }
 
@@ -61,13 +61,6 @@ export class BlockDownloader {
     })
   }
 
-  private advanceChain(blockNumber: number) {
-    this.jobQueue.add({
-      name: `advanceChain-${blockNumber}`,
-      execute: () => this.executeAdvanceChain(blockNumber),
-    })
-  }
-
   getStatus(): json {
     return {
       started: this.started,
@@ -84,10 +77,10 @@ export class BlockDownloader {
     return this.blockRepository.getAllInRange(from, lastKnown.number)
   }
 
-  onNewBlocks(handler: (blocks: BlockRecord[]) => void) {
-    this.events.on('newBlocks', handler)
+  onNewBlock(handler: (blocks: BlockRecord) => void) {
+    this.events.on('newBlock', handler)
     return () => {
-      this.events.off('newBlocks', handler)
+      this.events.off('newBlock', handler)
     }
   }
 
@@ -96,6 +89,13 @@ export class BlockDownloader {
     return () => {
       this.events.off('reorg', handler)
     }
+  }
+
+  private advanceChain(blockNumber: number) {
+    this.jobQueue.add({
+      name: `advanceChain-${blockNumber}`,
+      execute: () => this.executeAdvanceChain(blockNumber),
+    })
   }
 
   private async executeAdvanceChain(blockNumber: number): Promise<void> {
@@ -109,14 +109,16 @@ export class BlockDownloader {
         hash: Hash256(block.hash),
       }
       await this.blockRepository.add([record])
-      this.events.emit('newBlocks', [record])
+      this.lastKnown = blockNumber
+      this.events.emit('newBlock', record)
     } else {
       const changed: providers.Block[] = [block]
+      let current = blockNumber
       while (Hash256(block.parentHash) !== parent.hash) {
-        blockNumber--
+        current--
         ;[block, parent] = await Promise.all([
           this.ethereumClient.getBlock(Hash256(block.parentHash)),
-          this.getKnownBlock(blockNumber - 1),
+          this.getKnownBlock(current - 1),
         ])
         changed.push(block)
       }
@@ -126,6 +128,7 @@ export class BlockDownloader {
       }))
       await this.blockRepository.deleteAllAfter(records[0].number - 1)
       await this.blockRepository.add(records)
+      this.lastKnown = blockNumber
       this.events.emit('reorg', records)
     }
   }
