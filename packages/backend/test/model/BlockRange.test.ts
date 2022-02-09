@@ -102,4 +102,27 @@ describe(BlockRange.name, () => {
       expect(blockRange.isEmpty()).toEqual(true)
     })
   })
+
+  describe(BlockRange.prototype.merge.name, () => {
+    it('merges two block ranges', () => {
+      const first = new BlockRange([
+        { number: 10, hash: Hash256.fake('10') },
+        { number: 11, hash: Hash256.fake('11') },
+      ])
+      const second = new BlockRange([
+        { number: 11, hash: Hash256.fake('11') },
+        { number: 12, hash: Hash256.fake('12') },
+        { number: 13, hash: Hash256.fake('13') },
+      ])
+      const result = first.merge(second)
+      expect(result.start).toEqual(10)
+      expect(result.end).toEqual(14)
+      expect([
+        result.has({ blockNumber: 10, blockHash: Hash256.fake('10') }),
+        result.has({ blockNumber: 10, blockHash: Hash256.fake('abc') }),
+        result.has({ blockNumber: 13, blockHash: Hash256.fake('13') }),
+        result.has({ blockNumber: 13, blockHash: Hash256.fake('abc') }),
+      ]).toEqual([true, false, true, false])
+    })
+  })
 })

@@ -21,7 +21,7 @@ export class BlockRange {
   private readonly hashes: ReadonlyMap<BlockNumber, Hash256>
 
   constructor(
-    blocks: BlockRange | BlockInRange[],
+    blocks: BlockRange | BlockInRange[] | ReadonlyMap<BlockNumber, Hash256>,
     start?: BlockNumber,
     end?: BlockNumber
   ) {
@@ -29,15 +29,28 @@ export class BlockRange {
       this.end = blocks.end
       this.start = blocks.start
       this.hashes = blocks.hashes
-    } else if (blocks.length === 0) {
-      this.hashes = new Map()
-      this.start = 0
-      this.end = 0
+    } else if (Array.isArray(blocks)) {
+      if (blocks.length === 0) {
+        this.hashes = new Map()
+        this.start = 0
+        this.end = 0
+      } else {
+        this.hashes = new Map(blocks.map((block) => [block.number, block.hash]))
+        const blockNumbers = blocks.map((block) => block.number)
+        this.start = Math.min(...blockNumbers)
+        this.end = Math.max(...blockNumbers) + 1
+      }
     } else {
-      this.hashes = new Map(blocks.map((block) => [block.number, block.hash]))
-      const blockNumbers = blocks.map((block) => block.number)
-      this.start = Math.min(...blockNumbers)
-      this.end = Math.max(...blockNumbers) + 1
+      if (blocks.size === 0) {
+        this.hashes = new Map()
+        this.start = 0
+        this.end = 0
+      } else {
+        this.hashes = blocks
+        const blockNumbers = [...blocks.keys()]
+        this.start = Math.min(...blockNumbers)
+        this.end = Math.max(...blockNumbers) + 1
+      }
     }
 
     if (start !== undefined) this.start = start
@@ -60,5 +73,16 @@ export class BlockRange {
 
   hasAll(references: BlockReference[]) {
     return references.every((x) => this.has(x))
+  }
+
+  merge(other: BlockRange | BlockInRange[]): BlockRange {
+    if (!(other instanceof BlockRange)) {
+      return this.merge(new BlockRange(other))
+    }
+    return new BlockRange(
+      new Map([...this.hashes.entries(), ...other.hashes.entries()]),
+      Math.min(this.start, other.start),
+      Math.max(this.end, other.end)
+    )
   }
 }
