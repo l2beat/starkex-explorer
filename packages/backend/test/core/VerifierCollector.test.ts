@@ -13,10 +13,10 @@ import { mock } from '../mock'
 describe(VerifierCollector.name, () => {
   it('saves events to repository and returns verifier addresses', async () => {
     const add = mockFn(async (_records: VerifierEventRecord[]) => {})
-    const getLogs = mockFn(async (_filter: providers.Filter) => testData().logs)
 
+    const ethereumClient = mock<EthereumClient>({ getLogsInRange: async () => testData().logs })
     const collector = new VerifierCollector(
-      mock<EthereumClient>({ getLogs }),
+      ethereumClient,
       mock<VerifierEventRepository>({
         add,
         async getAll() {
@@ -54,11 +54,10 @@ describe(VerifierCollector.name, () => {
 
     const verifiers = await collector.collect(blockRange)
 
-    expect(getLogs).toHaveBeenCalledWith([
+    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
+      blockRange,
       {
         address: expect.stringMatching('0x'),
-        fromBlock: blockRange.from,
-        toBlock: blockRange.to,
         topics: [
           [
             // ImplementationAdded

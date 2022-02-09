@@ -5,15 +5,15 @@ import { Hash256 } from '../../src/model'
 import { BlockRange } from '../../src/model/BlockRange'
 
 describe(BlockRange.name, () => {
-  it('has .from and .to properties', () => {
+  it('has .start and .end properties', () => {
     const blockRange = new BlockRange([
       { number: 1, hash: Hash256.fake() },
       { number: 2, hash: Hash256.fake() },
       { number: 3, hash: Hash256.fake() },
     ])
 
-    expect(blockRange.from).toEqual(1)
-    expect(blockRange.to).toEqual(3)
+    expect(blockRange.start).toEqual(1)
+    expect(blockRange.end).toEqual(4)
   })
 
   describe(BlockRange.prototype.has.name, () => {
@@ -46,19 +46,6 @@ describe(BlockRange.name, () => {
       expect(
         blockRange.has({ blockNumber: 13987297, blockHash: hash })
       ).toEqual(false)
-    })
-  })
-
-  describe(BlockRange.from.name, () => {
-    it('creates a new BlockRange with given hashes and numbers', () => {
-      const [h1, h2] = range(2).map((i) => Hash256.fake(String(i)))
-
-      expect(BlockRange.from({ 1: h1, 2: h2 })).toEqual(
-        new BlockRange([
-          { number: 1, hash: h1 },
-          { number: 2, hash: h2 },
-        ])
-      )
     })
   })
 })

@@ -1,6 +1,7 @@
+import { assert } from 'console'
 import { ethers, providers } from 'ethers'
 
-import { Hash256 } from '../../model'
+import { BlockRange, Hash256 } from '../../model'
 import { BlockTag } from './types'
 
 export class EthereumClient {
@@ -18,6 +19,19 @@ export class EthereumClient {
 
   async getLogs(filter: providers.Filter) {
     return await this.provider.getLogs(filter)
+  }
+
+  async getLogsInRange(blockRange: BlockRange, filter: providers.Filter) {
+    if (blockRange.isEmpty()) {
+      return []
+    }
+    const logs = await this.provider.getLogs({
+      ...filter,
+      fromBlock: blockRange.start,
+      toBlock: blockRange.end - 1,
+    })
+    assert(blockRange.includes(logs), 'all logs must be from the block range')
+    return logs
   }
 
   async getTransaction(transactionHash: Hash256) {

@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { utils } from 'ethers'
 import { AbiCoder } from 'ethers/lib/utils'
 import { partition } from 'lodash'
@@ -54,15 +53,10 @@ export class VerifierCollector {
   }
 
   private async getEvents(blockRange: BlockRange) {
-    const logs = await this.ethereumClient.getLogs({
+    const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: PROXY_ADDRESS,
-      fromBlock: blockRange.from,
-      toBlock: blockRange.to,
       topics: [[ImplementationAdded, Upgraded]],
     })
-
-    assert(blockRange.includes(logs), 'all logs must be from the block range')
-
     return logs.map((log): VerifierEventRecord => {
       const event = PROXY_ABI.parseLog(log)
       return {
