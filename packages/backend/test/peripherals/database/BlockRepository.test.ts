@@ -5,7 +5,6 @@ import { Hash256 } from '../../../src/model'
 import {
   BlockRecord,
   BlockRepository,
-  EARLIEST_BLOCK,
 } from '../../../src/peripherals/database/BlockRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
@@ -90,8 +89,7 @@ describe(BlockRepository.name, () => {
   })
 
   it('gets last by number', async () => {
-    // Empty repository will return hardcoded earliest block
-    expect(await repository.getLast()).toEqual(EARLIEST_BLOCK)
+    expect(await repository.getLast()).toEqual(undefined)
 
     const block = { number: 11813208, hash: Hash256.fake() }
     await repository.add([block])
@@ -103,11 +101,6 @@ describe(BlockRepository.name, () => {
     await repository.add([laterBlock, earlierBlock])
 
     expect(await repository.getLast()).toEqual(laterBlock)
-  })
-
-  it('gets first block', async () => {
-    // We always return the same one, regardless of what's in the database.
-    expect(repository.getFirst()).toEqual(EARLIEST_BLOCK)
   })
 
   it('gets all blocks in range between given numbers (inclusive)', async () => {

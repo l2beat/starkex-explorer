@@ -5,17 +5,6 @@ import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
-/**
- * block of the first verifier deploy
- * @internal exported for tests
- */
-export const EARLIEST_BLOCK: Readonly<BlockRecord> = {
-  number: 11813207,
-  hash: Hash256(
-    '0xe191f743db9d988ff2dbeda3ec800954445f61cf8e79cc458ba831965e628e8d'
-  ),
-}
-
 export interface BlockRecord {
   number: number
   hash: Hash256
@@ -54,24 +43,16 @@ export class BlockRepository implements Repository<BlockRecord> {
     return rows.map(toRecord)
   }
 
-  async getLast(): Promise<BlockRecord> {
+  async getLast(): Promise<BlockRecord | undefined> {
     const row = await this.knex('blocks').orderBy('number', 'desc').first()
-
-    let record = row && toRecord(row)
-
-    record ||= EARLIEST_BLOCK
 
     this.logger.debug({
       method: 'getLast',
-      number: record.number,
-      hash: record.hash.toString(),
+      number: row?.number ?? null,
+      hash: row?.hash ?? null,
     })
 
-    return record
-  }
-
-  getFirst(): BlockRecord {
-    return EARLIEST_BLOCK
+    return row && toRecord(row)
   }
 
   async getByNumber(number: number): Promise<BlockRecord | undefined> {
@@ -80,7 +61,7 @@ export class BlockRepository implements Repository<BlockRecord> {
     this.logger.debug({
       method: 'getByNumber',
       number,
-      hash: row?.hash || null,
+      hash: row?.hash ?? null,
     })
 
     return row && toRecord(row)
@@ -92,7 +73,7 @@ export class BlockRepository implements Repository<BlockRecord> {
     this.logger.debug({
       method: 'getByHash',
       hash: hash.toString(),
-      number: row?.number || null,
+      number: row?.number ?? null,
     })
 
     return row && toRecord(row)
