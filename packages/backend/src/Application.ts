@@ -16,7 +16,6 @@ import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
-import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
 import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
@@ -39,7 +38,6 @@ export class Application {
 
     const kvStore = new KeyValueStore(knex, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore)
-    const positionUpdateRepository = new PositionUpdateRepository(knex, logger)
     const verifierEventRepository = new VerifierEventRepository(knex, logger)
     const factToPageRepository = new FactToPageRepository(knex, logger)
     const pageRepository = new PageRepository(knex, logger)
@@ -85,7 +83,6 @@ export class Application {
       pageCollector,
       stateTransitionFactCollector,
       pageRepository,
-      positionUpdateRepository,
       logger
     )
     const syncScheduler = new SyncScheduler(

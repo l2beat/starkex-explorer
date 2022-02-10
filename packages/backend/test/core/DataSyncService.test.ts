@@ -7,7 +7,6 @@ import { StateTransitionFactCollector } from '../../src/core/StateTransitionFact
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
 import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
-import { PositionUpdateRepository } from '../../src/peripherals/database/PositionUpdateRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
@@ -33,9 +32,6 @@ describe(DataSyncService.name, () => {
     const pageRepository = mock<PageRepository>({
       getAllForFacts: async () => [],
     })
-    const positionUpdateRepository = mock<PositionUpdateRepository>({
-      addOrUpdate: async () => {},
-    })
 
     const service = new DataSyncService(
       verifierCollector,
@@ -43,7 +39,6 @@ describe(DataSyncService.name, () => {
       pageCollector,
       stateTransitionFactCollector,
       pageRepository,
-      positionUpdateRepository,
       Logger.SILENT
     )
 
@@ -65,9 +60,6 @@ describe(DataSyncService.name, () => {
       expect(pageRepository.getAllForFacts).toHaveBeenCalledWith([
         [Hash256.fake('abcd')],
       ])
-      expect(positionUpdateRepository.addOrUpdate).toHaveBeenCalledExactlyWith(
-        []
-      )
     })
   })
 
@@ -89,7 +81,6 @@ describe(DataSyncService.name, () => {
         pageCollector,
         stateTransitionFactCollector,
         mock<PageRepository>({ getAllForFacts: async () => [] }),
-        mock<PositionUpdateRepository>({ addOrUpdate: async () => {} }),
         Logger.SILENT
       )
 

@@ -2,7 +2,6 @@ import { decodeOnChainData } from '@explorer/encoding'
 
 import { BlockRange } from '../model'
 import { PageRepository } from '../peripherals/database/PageRepository'
-import { PositionUpdateRepository } from '../peripherals/database/PositionUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { MemoryHashEventCollector } from './MemoryHashEventCollector'
@@ -17,7 +16,6 @@ export class DataSyncService {
     private readonly pageCollector: PageCollector,
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
     private readonly pageRepository: PageRepository,
-    private readonly positionUpdateRepository: PositionUpdateRepository,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -47,16 +45,9 @@ export class DataSyncService {
     )
 
     for (const { pages } of stateTransitions) {
-      const decoded = decodeOnChainData(pages)
+      const _decoded = decodeOnChainData(pages)
 
-      await this.positionUpdateRepository.addOrUpdate(
-        decoded.positions.map((positionUpdate) => {
-          return {
-            stateUpdateId: Number(decoded.newState.systemTime), // @todo
-            ...positionUpdate,
-          }
-        })
-      )
+      // @todo construct rollup state and save decoded data to database
     }
   }
 
