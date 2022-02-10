@@ -26,36 +26,35 @@ export class BlockRange {
     start?: BlockNumber,
     end?: BlockNumber
   ) {
+    let blocksStart: number | undefined
+    let blocksEnd: number | undefined
+
     if (blocks instanceof BlockRange) {
-      this.end = blocks.end
-      this.start = blocks.start
       this.hashes = blocks.hashes
+      blocksStart = blocks.start
+      blocksEnd = blocks.end
     } else if (Array.isArray(blocks)) {
       if (blocks.length === 0) {
         this.hashes = new Map()
-        this.start = 0
-        this.end = 0
       } else {
         this.hashes = new Map(blocks.map((block) => [block.number, block.hash]))
         const blockNumbers = blocks.map((block) => block.number)
-        this.start = Math.min(...blockNumbers)
-        this.end = Math.max(...blockNumbers) + 1
+        blocksStart = Math.min(...blockNumbers)
+        blocksEnd = Math.max(...blockNumbers) + 1
       }
     } else {
       if (blocks.size === 0) {
         this.hashes = new Map()
-        this.start = 0
-        this.end = 0
       } else {
         this.hashes = blocks
         const blockNumbers = [...blocks.keys()]
-        this.start = Math.min(...blockNumbers)
-        this.end = Math.max(...blockNumbers) + 1
+        blocksStart = Math.min(...blockNumbers)
+        blocksEnd = Math.max(...blockNumbers) + 1
       }
     }
 
-    if (start !== undefined) this.start = start
-    if (end !== undefined) this.end = end
+    this.start = start ?? blocksStart ?? 0
+    this.end = end ?? blocksEnd ?? start ?? 0
 
     assert(this.end >= this.start, 'Block range cannot end before it starts')
   }
@@ -93,9 +92,9 @@ export class BlockRange {
 
   take(count: number): [taken: BlockRange, remaining: BlockRange] {
     if (count <= 0) {
-      return [new BlockRange([]), this]
+      return [new BlockRange([], this.start), this]
     } else if (count >= this.length) {
-      return [this, new BlockRange([])]
+      return [this, new BlockRange([], this.end)]
     }
     const [left, right] = partition(
       [...this.hashes.keys()],
