@@ -1,3 +1,5 @@
+import { Position } from '@explorer/state'
+
 export {}
 
 declare module 'knex/types/tables' {
@@ -57,6 +59,23 @@ declare module 'knex/types/tables' {
     hash: string
   }
 
+  interface MerkleNodeRow {
+    hash: string
+    left_hash: string
+    right_hash: string
+  }
+
+  interface MerklePositionsRow {
+    hash: string
+    data: ReturnType<typeof Position.prototype.toJSON>
+  }
+
+  interface RollupParametersRow {
+    root_hash: string
+    timestamp: string
+    funding: Record<string, string>
+  }
+
   interface Tables {
     position_updates: PositionUpdateRow
     key_values: KeyValueRow
@@ -65,6 +84,9 @@ declare module 'knex/types/tables' {
     pages: PageRow
     state_transition_facts: StateTransitionFactRow
     blocks: BlockRow
+    merkle_nodes: MerkleNodeRow
+    merkle_positions: MerklePositionsRow
+    rollup_parameters: RollupParametersRow
   }
 }
 

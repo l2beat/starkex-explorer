@@ -19,7 +19,8 @@ export class MerkleNode<T extends MerkleValue> extends MerkleValue {
   constructor(
     private storage: IMerkleStorage<T>,
     private leftHashOrValue: PedersenHash | NodeOrLeaf<T>,
-    private rightHashOrValue: PedersenHash | NodeOrLeaf<T>
+    private rightHashOrValue: PedersenHash | NodeOrLeaf<T>,
+    protected knownHash?: PedersenHash
   ) {
     super()
   }

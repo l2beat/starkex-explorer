@@ -53,58 +53,58 @@ describe(PedersenHash.name, () => {
     expect(hash).toEqual(('0' + 'f'.repeat(63)) as unknown as PedersenHash)
   })
 
-  describe(PedersenHash.fromNumber.name, () => {
+  describe(PedersenHash.from.name, () => {
     it('throws for floating points', () => {
-      expect(() => PedersenHash.fromNumber(1.5)).toThrow(
+      expect(() => PedersenHash.from(1.5)).toThrow(
         TypeError,
         'Value cannot be floating point'
       )
     })
 
     it('throws for too large numbers', () => {
-      expect(() =>
-        PedersenHash.fromNumber(2 * Number.MAX_SAFE_INTEGER)
-      ).toThrow(TypeError, 'Value too large')
+      expect(() => PedersenHash.from(2 * Number.MAX_SAFE_INTEGER)).toThrow(
+        TypeError,
+        'Value too large'
+      )
     })
 
     it('throws for negative numbers', () => {
-      expect(() => PedersenHash.fromNumber(-2)).toThrow(
+      expect(() => PedersenHash.from(-2)).toThrow(
         TypeError,
         'Value cannot be negative'
       )
     })
 
     it('throws for negative bigints', () => {
-      expect(() => PedersenHash.fromNumber(-2n)).toThrow(
+      expect(() => PedersenHash.from(-2n)).toThrow(
         TypeError,
         'Value cannot be negative'
       )
     })
 
     it('throws for too large bigints', () => {
-      expect(() =>
-        PedersenHash.fromNumber(BigInt('0x1' + '0'.repeat(63)))
-      ).toThrow(TypeError, 'Value too large')
+      expect(() => PedersenHash.from(BigInt('0x1' + '0'.repeat(63)))).toThrow(
+        TypeError,
+        'Value too large'
+      )
     })
 
     it('converts zero', () => {
-      expect(PedersenHash.fromNumber(0)).toEqual(PedersenHash.ZERO)
-      expect(PedersenHash.fromNumber(0n)).toEqual(PedersenHash.ZERO)
+      expect(PedersenHash.from(0)).toEqual(PedersenHash.ZERO)
+      expect(PedersenHash.from(0n)).toEqual(PedersenHash.ZERO)
     })
 
     it('converts 0x1a2b3c', () => {
       const hash = PedersenHash('1a2b3c')
 
-      expect(PedersenHash.fromNumber(0x1a2b3c)).toEqual(hash)
-      expect(PedersenHash.fromNumber(0x1a2b3cn)).toEqual(hash)
+      expect(PedersenHash.from(0x1a2b3c)).toEqual(hash)
+      expect(PedersenHash.from(0x1a2b3cn)).toEqual(hash)
     })
 
     it('converts maximum value', () => {
       const hash = PedersenHash('f'.repeat(63))
 
-      expect(PedersenHash.fromNumber(BigInt('0x' + 'f'.repeat(63)))).toEqual(
-        hash
-      )
+      expect(PedersenHash.from(BigInt('0x' + 'f'.repeat(63)))).toEqual(hash)
     })
   })
 })

@@ -1,3 +1,3 @@
-export { PedersenHash } from './model'
 export { pedersen, terminateWorkerPool } from './pedersen'
+export { PedersenHash } from './PedersenHash'
 export { pedersenSync } from './pedersenSync'

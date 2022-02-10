@@ -1,6 +1,6 @@
 import workerpool from 'workerpool'
 
-import { PedersenHash } from './model'
+import { PedersenHash } from './PedersenHash'
 
 const pool = workerpool.pool(
   require.resolve('@explorer/crypto/worker/worker.js')

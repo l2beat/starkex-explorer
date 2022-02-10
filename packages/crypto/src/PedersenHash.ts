@@ -23,7 +23,7 @@ const MAX_PEDERSEN_HASH = BigInt('0x' + 'f'.repeat(63))
 
 PedersenHash.ZERO = PedersenHash('0'.repeat(64))
 
-PedersenHash.fromNumber = function fromNumber(value: number | bigint) {
+PedersenHash.from = function from(value: number | bigint) {
   if (typeof value === 'number') {
     if (!Number.isInteger(value)) {
       throw new TypeError('Value cannot be floating point')
@@ -39,4 +39,13 @@ PedersenHash.fromNumber = function fromNumber(value: number | bigint) {
     throw new TypeError('Value too large')
   }
   return value.toString(16).padStart(64, '0') as unknown as PedersenHash
+}
+
+PedersenHash.fake = function fake(start?: string) {
+  if (!start) {
+    const fakeDigit = () => '0123456789abcdef'[Math.floor(Math.random() * 16)]
+    return PedersenHash('0' + new Array(63).fill(0).map(fakeDigit).join(''))
+  } else {
+    return PedersenHash('0' + start.padEnd(63, '0'))
+  }
 }
