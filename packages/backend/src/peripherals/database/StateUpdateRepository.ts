@@ -40,7 +40,9 @@ export class StateUpdateRepository {
     prices: OraclePrice[]
   }) {
     await this.knex.transaction(async (trx) => {
-      await this.knex('state_updates').insert([stateUpdate]).transacting(trx)
+      await this.knex('state_updates')
+        .insert([toStateUpdateRow(stateUpdate)])
+        .transacting(trx)
 
       if (positions.length > 0)
         await this.knex('positions')
@@ -62,6 +64,15 @@ export class StateUpdateRepository {
 
   async delete(stateUpdateId: number) {
     await this.knex('state_updates').where('id', stateUpdateId).first().delete()
+  }
+
+  async getPositionById(positionId: number) {
+    const rows = await this.knex('positions')
+      .select('*')
+      .where('position_id', positionId)
+      .orderBy('state_update_id', 'desc')
+
+    return rows.map(toPositionRecord)
   }
 
   async getAll() {
@@ -98,7 +109,9 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
   }
 }
 
-function toPositionRecord(row: PositionRow) {
+function toPositionRecord(
+  row: PositionRow
+): PositionRecord & { stateUpdateId: number } {
   return {
     stateUpdateId: row.state_update_id,
     positionId: row.position_id,

@@ -3,22 +3,10 @@ import { Knex } from 'knex'
 export async function up(knex: Knex) {
   await knex.schema.createTable('state_updates', (table) => {
     table.integer('id').primary()
+    table.integer('block_number').notNullable().index()
     table.string('fact_hash').notNullable().index()
     table.string('root_hash').notNullable().index()
     table.integer('timestamp').notNullable()
-  })
-
-  // @todo this table can be removed when we save positions with the state update
-  await knex.schema.alterTable('position_updates', (table) => {
-    table
-      .integer('state_update_id')
-      .notNullable()
-      .index()
-      .references('id')
-      .inTable('state_updates')
-      .onDelete('CASCADE')
-    table.dropPrimary()
-    table.primary(['state_update_id', 'position_id'])
   })
 
   await knex.schema.createTable('positions', (table) => {

@@ -1,6 +1,10 @@
+import { AssetId } from '@explorer/encoding'
 import { expect } from 'earljs'
 
-import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
+import {
+  StateUpdateRecord,
+  StateUpdateRepository,
+} from '../../../src/peripherals/database/StateUpdateRepository'
 import { Logger, LogLevel } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
@@ -14,34 +18,161 @@ describe(StateUpdateRepository.name, () => {
 
   afterEach(() => repository.deleteAll())
 
-  describe(repository.add.name, () => {})
-
-  describe(repository.delete.name, () => {
-    it('removes prices and positions from database', async () => {
-      await repository.add({
-        stateUpdate: {
-          id: 10_000,
-          blockNumber: 10_000,
-          rootHash: 'rootHash',
-          factHash: 'factHash',
-          factTimestamp: 0,
-          dataTimestamp: 0,
+  it('adds state update', async () => {
+    await repository.add({
+      stateUpdate: {
+        id: 10_000,
+        blockNumber: 10_000,
+        rootHash: 'root-hash-0',
+        factHash: 'fact-hash-0',
+        factTimestamp: 0,
+        dataTimestamp: 0,
+      },
+      positions: [
+        {
+          publicKey: 'public-key-0',
+          positionId: 0,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
         },
-        positions: [
-          // @todo
-        ],
-        prices: [
-          // @todo
-        ],
-      })
-
-      await repository.delete(10_000)
-
-      const remainingPrices = await knex('prices').select('*')
-      const remainingPositions = await knex('positions').select('*')
-
-      expect(remainingPrices.length).toEqual(0)
-      expect(remainingPositions.length).toEqual(0)
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
     })
+  })
+
+  it('removes prices and positions connected to state update from database', async () => {
+    const updateToRemove = {
+      stateUpdate: {
+        id: 10_001,
+        blockNumber: 10_001,
+        rootHash: 'root-hash-1',
+        factHash: 'fact-hash-1',
+        factTimestamp: 0,
+        dataTimestamp: 0,
+      },
+      positions: [
+        {
+          publicKey: 'public-key-1',
+          positionId: 0,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
+    }
+
+    await repository.add(updateToRemove)
+
+    const updateThatWontBeRemoved = {
+      stateUpdate: {
+        id: 10_002,
+        blockNumber: 10_002,
+        rootHash: 'root-hash-2',
+        factHash: 'fact-hash-2',
+        factTimestamp: 0,
+        dataTimestamp: 0,
+      },
+      positions: [
+        {
+          publicKey: 'public-key-1',
+          positionId: 0,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
+    }
+
+    await repository.add(updateThatWontBeRemoved)
+
+    await repository.delete(updateToRemove.stateUpdate.id)
+
+    const remainingPrices = await knex('prices').select('*')
+    const remainingPositions = await knex('positions').select('*')
+
+    expect(remainingPrices.length).toEqual(
+      updateThatWontBeRemoved.positions.length
+    )
+    expect(remainingPositions.length).toEqual(
+      updateThatWontBeRemoved.prices.length
+    )
+  })
+
+  it('gets position by id', async () => {
+    const positionId = 12345
+
+    await repository.add({
+      stateUpdate: {
+        id: 1,
+        blockNumber: 1,
+        rootHash: 'root-hash-1',
+        factHash: 'fact-hash-1',
+        factTimestamp: 0,
+        dataTimestamp: 0,
+      },
+      positions: [
+        {
+          publicKey: 'public-key-0',
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [],
+    })
+
+    await repository.add({
+      stateUpdate: {
+        id: 2,
+        blockNumber: 2,
+        rootHash: 'root-hash-2',
+        factHash: 'fact-hash-2',
+        factTimestamp: 0,
+        dataTimestamp: 0,
+      },
+      positions: [
+        {
+          publicKey: 'public-key-0',
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        },
+      ],
+      prices: [],
+    })
+
+    const position = await repository.getPositionById(positionId)
+
+    expect(position).toEqual([
+      {
+        stateUpdateId: 2,
+        publicKey: 'public-key-0',
+        positionId,
+        collateralBalance: 0n,
+        balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+      },
+      {
+        stateUpdateId: 1,
+        publicKey: 'public-key-0',
+        positionId,
+        collateralBalance: 0n,
+        balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+      },
+    ])
+  })
+
+  it('gets all state updates', async () => {
+    const stateUpdate: StateUpdateRecord = {
+      id: 10_002,
+      blockNumber: 10_002,
+      rootHash: 'root-hash-2',
+      factHash: 'fact-hash-2',
+      factTimestamp: 0,
+      dataTimestamp: 0,
+    }
+
+    await repository.add({ stateUpdate, positions: [], prices: [] })
+
+    expect(await repository.getAll()).toEqual([stateUpdate])
   })
 })
