@@ -26,35 +26,43 @@ export class BlockRange {
     start?: BlockNumber,
     end?: BlockNumber
   ) {
-    let blocksStart: number | undefined
-    let blocksEnd: number | undefined
-
-    if (blocks instanceof BlockRange) {
-      this.hashes = blocks.hashes
-      blocksStart = blocks.start
-      blocksEnd = blocks.end
-    } else if (Array.isArray(blocks)) {
-      if (blocks.length === 0) {
-        this.hashes = new Map()
-      } else {
-        this.hashes = new Map(blocks.map((block) => [block.number, block.hash]))
-        const blockNumbers = blocks.map((block) => block.number)
-        blocksStart = Math.min(...blockNumbers)
-        blocksEnd = Math.max(...blockNumbers) + 1
-      }
+    if (start !== undefined || end !== undefined) {
+      let entries =
+        blocks instanceof BlockRange
+          ? [...blocks.hashes.entries()]
+          : Array.isArray(blocks)
+          ? blocks.map((block) => [block.number, block.hash] as const)
+          : [...blocks.entries()]
+      entries = entries.filter(
+        ([number]) =>
+          (start === undefined || number >= start) &&
+          (end === undefined || number < end)
+      )
+      this.hashes = new Map(entries)
     } else {
-      if (blocks.size === 0) {
-        this.hashes = new Map()
+      this.hashes =
+        blocks instanceof BlockRange
+          ? new Map(blocks.hashes)
+          : Array.isArray(blocks)
+          ? new Map(blocks.map((block) => [block.number, block.hash]))
+          : new Map(blocks)
+    }
+
+    if (start === undefined || end === undefined) {
+      if (blocks instanceof BlockRange) {
+        start ??= blocks.start
+        end ??= blocks.end
       } else {
-        this.hashes = blocks
-        const blockNumbers = [...blocks.keys()]
-        blocksStart = Math.min(...blockNumbers)
-        blocksEnd = Math.max(...blockNumbers) + 1
+        const blockNumbers = [...this.hashes.keys()]
+        if (blockNumbers.length !== 0) {
+          start ??= Math.min(...blockNumbers)
+          end ??= Math.max(...blockNumbers) + 1
+        }
       }
     }
 
-    this.start = start ?? blocksStart ?? 0
-    this.end = end ?? blocksEnd ?? start ?? 0
+    this.start = start ?? 0
+    this.end = end ?? start ?? 0
 
     assert(this.end >= this.start, 'Block range cannot end before it starts')
   }

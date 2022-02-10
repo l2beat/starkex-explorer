@@ -29,11 +29,13 @@ describe(BlockRange.name, () => {
         { number: 11, hash: Hash256.fake('11') },
         { number: 13, hash: Hash256.fake('13') },
       ])
-      const rangeB = new BlockRange(new Map([
-        [10, Hash256.fake('10')],
-        [11, Hash256.fake('11')],
-        [13, Hash256.fake('13')],
-      ]))
+      const rangeB = new BlockRange(
+        new Map([
+          [10, Hash256.fake('10')],
+          [11, Hash256.fake('11')],
+          [13, Hash256.fake('13')],
+        ])
+      )
       expect(rangeA).toEqual(rangeB)
     })
 
@@ -58,23 +60,51 @@ describe(BlockRange.name, () => {
     })
 
     it('can override start', () => {
-      const blockRange = new BlockRange([
-        { number: 10, hash: Hash256.fake('10') },
-        { number: 11, hash: Hash256.fake('11') },
-        { number: 13, hash: Hash256.fake('13') },
-      ], 5)
+      const blockRange = new BlockRange(
+        [
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 11, hash: Hash256.fake('11') },
+          { number: 13, hash: Hash256.fake('13') },
+        ],
+        5
+      )
       expect(blockRange.start).toEqual(5)
       expect(blockRange.end).toEqual(14)
     })
 
     it('can override start and end', () => {
-      const blockRange = new BlockRange([
-        { number: 10, hash: Hash256.fake('10') },
-        { number: 11, hash: Hash256.fake('11') },
-        { number: 13, hash: Hash256.fake('13') },
-      ], 5, 20)
+      const blockRange = new BlockRange(
+        [
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 11, hash: Hash256.fake('11') },
+          { number: 13, hash: Hash256.fake('13') },
+        ],
+        5,
+        20
+      )
       expect(blockRange.start).toEqual(5)
       expect(blockRange.end).toEqual(20)
+    })
+
+    it('discards given blocks outside of start and end', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 11, hash: Hash256.fake('11') },
+          { number: 12, hash: Hash256.fake('12') },
+          { number: 13, hash: Hash256.fake('13') },
+        ],
+        11,
+        13
+      )
+      expect(blockRange.start).toEqual(11)
+      expect(blockRange.end).toEqual(13)
+      expect(blockRange['hashes']).toEqual(
+        new Map([
+          [11, Hash256.fake('11')],
+          [12, Hash256.fake('12')],
+        ])
+      )
     })
   })
 
