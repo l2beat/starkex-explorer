@@ -11,6 +11,9 @@ import {
   SyncState,
 } from './syncSchedulerReducer'
 
+/** block of the first verifier deploy */
+const EARLIEST_BLOCK = 11813207
+
 export class SyncScheduler {
   private state: SyncState = INITIAL_SYNC_STATE
   private jobQueue: JobQueue
@@ -19,7 +22,8 @@ export class SyncScheduler {
     private readonly syncStatusRepository: SyncStatusRepository,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
-    private readonly logger: Logger
+    private readonly logger: Logger,
+    private readonly earliestBlock = EARLIEST_BLOCK
   ) {
     this.logger = logger.for(this)
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
@@ -27,7 +31,7 @@ export class SyncScheduler {
 
   async start() {
     const lastSynced =
-      await this.syncStatusRepository.getLastBlockNumberSynced()
+      (await this.syncStatusRepository.getLastSynced()) ?? this.earliestBlock
 
     await this.dataSyncService.discardAfter(lastSynced)
 
@@ -70,7 +74,7 @@ export class SyncScheduler {
   private async handleSync(blocks: BlockRange) {
     try {
       await this.dataSyncService.sync(blocks)
-      await this.syncStatusRepository.setLastBlockNumberSynced(blocks.end - 1)
+      await this.syncStatusRepository.setLastSynced(blocks.end - 1)
       this.dispatch({ type: 'syncSucceeded' })
     } catch (err) {
       this.dispatch({ type: 'syncFailed', blocks })
@@ -80,7 +84,7 @@ export class SyncScheduler {
 
   private async handleDiscardAfter(blockNumber: number) {
     try {
-      await this.syncStatusRepository.setLastBlockNumberSynced(blockNumber)
+      await this.syncStatusRepository.setLastSynced(blockNumber)
       await this.dataSyncService.discardAfter(blockNumber)
       this.dispatch({ type: 'discardAfterSucceeded', blockNumber })
     } catch (err) {

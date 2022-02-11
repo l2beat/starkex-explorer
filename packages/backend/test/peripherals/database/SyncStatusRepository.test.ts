@@ -1,61 +1,48 @@
 import { expect } from 'earljs'
 
-import {
-  Store,
-  SyncStatusRepository,
-} from '../../../src/peripherals/database/SyncStatusRepository'
+import { KeyValueStore } from '../../../src/peripherals/database/KeyValueStore'
+import { SyncStatusRepository } from '../../../src/peripherals/database/SyncStatusRepository'
 import { mock } from '../../mock'
 
 describe(SyncStatusRepository.name, () => {
   it('writes value to store', async () => {
-    let key = ''
-    let value = ''
-    const repository = new SyncStatusRepository(
-      mock<Store>({
-        set: async (...args) => void ([key, value] = args),
-      })
-    )
+    const store = mock<KeyValueStore<'lastBlockNumberSynced'>>({
+      set: async () => {},
+    })
+    const repository = new SyncStatusRepository(store)
 
-    await repository.setLastBlockNumberSynced(10)
-
-    expect(key).toEqual('lastBlockNumberSynced')
-    expect(value).toEqual('10')
+    await repository.setLastSynced(20)
+    expect(store.set).toHaveBeenCalledWith(['lastBlockNumberSynced', '20'])
   })
 
   it('reads value from store', async () => {
-    let key = ''
-    const repository = new SyncStatusRepository(
-      mock<Store>({
-        async get(k) {
-          key = k
-          return '20'
-        },
-      })
-    )
+    const store = mock<KeyValueStore<'lastBlockNumberSynced'>>({
+      get: async () => '20',
+    })
+    const repository = new SyncStatusRepository(store)
 
-    const actual = await repository.getLastBlockNumberSynced()
-
+    const actual = await repository.getLastSynced()
     expect(actual).toEqual(20)
-    expect(key).toEqual('lastBlockNumberSynced')
+    expect(store.get).toHaveBeenCalledWith(['lastBlockNumberSynced'])
   })
 
-  it('returns options.earliestBlock when store is empty', async () => {
-    const store = mock<Store>({ get: async () => undefined })
+  it('returns undefined when store is empty', async () => {
+    const store = mock<KeyValueStore<'lastBlockNumberSynced'>>({
+      get: async () => undefined,
+    })
+    const repository = new SyncStatusRepository(store)
 
-    const repository = new SyncStatusRepository(store, { earliestBlock: 30 })
-
-    const actual = await repository.getLastBlockNumberSynced()
-
-    expect(actual).toEqual(30)
+    const actual = await repository.getLastSynced()
+    expect(actual).toEqual(undefined)
   })
 
-  it('fallbacks to options.earliestBlock when the store is corrupt', async () => {
-    const store = mock<Store>({ get: async () => '3 is my favorite number' })
+  it('returns undefined when the store is corrupt', async () => {
+    const store = mock<KeyValueStore<'lastBlockNumberSynced'>>({
+      get: async () => '3 is my favorite number',
+    })
+    const repository = new SyncStatusRepository(store)
 
-    const repository = new SyncStatusRepository(store, { earliestBlock: 40 })
-
-    const actual = await repository.getLastBlockNumberSynced()
-
-    expect(actual).toEqual(40)
+    const actual = await repository.getLastSynced()
+    expect(actual).toEqual(undefined)
   })
 })
