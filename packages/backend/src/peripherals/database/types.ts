@@ -68,8 +68,7 @@ declare module 'knex/types/tables' {
     block_number: number
     fact_hash: string
     root_hash: string
-    fact_timestamp: number
-    data_timestamp: number
+    timestamp: number
   }
 
   interface PositionUpdateRow {

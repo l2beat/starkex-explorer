@@ -1,7 +1,10 @@
+import { PedersenHash } from '@explorer/crypto'
 import { AssetId } from '@explorer/encoding'
 import { expect } from 'earljs'
 
+import { Hash256 } from '../../../src/model'
 import {
+  StateUpdateBundle,
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../../src/peripherals/database/StateUpdateRepository'
@@ -23,10 +26,9 @@ describe(StateUpdateRepository.name, () => {
       stateUpdate: {
         id: 10_000,
         blockNumber: 10_000,
-        rootHash: 'root-hash-0',
-        factHash: 'fact-hash-0',
-        factTimestamp: 0,
-        dataTimestamp: 0,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: 0,
       },
       positions: [
         {
@@ -41,14 +43,13 @@ describe(StateUpdateRepository.name, () => {
   })
 
   it('removes prices and positions connected to state update from database', async () => {
-    const updateToRemove = {
+    const updateToRemove: StateUpdateBundle = {
       stateUpdate: {
         id: 10_001,
         blockNumber: 10_001,
-        rootHash: 'root-hash-1',
-        factHash: 'fact-hash-1',
-        factTimestamp: 0,
-        dataTimestamp: 0,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: 0,
       },
       positions: [
         {
@@ -63,14 +64,13 @@ describe(StateUpdateRepository.name, () => {
 
     await repository.add(updateToRemove)
 
-    const updateThatWontBeRemoved = {
+    const updateThatWontBeRemoved: StateUpdateBundle = {
       stateUpdate: {
         id: 10_002,
         blockNumber: 10_002,
-        rootHash: 'root-hash-2',
-        factHash: 'fact-hash-2',
-        factTimestamp: 0,
-        dataTimestamp: 0,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: 0,
       },
       positions: [
         {
@@ -105,10 +105,9 @@ describe(StateUpdateRepository.name, () => {
       stateUpdate: {
         id: 1,
         blockNumber: 1,
-        rootHash: 'root-hash-1',
-        factHash: 'fact-hash-1',
-        factTimestamp: 0,
-        dataTimestamp: 0,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: 0,
       },
       positions: [
         {
@@ -125,10 +124,9 @@ describe(StateUpdateRepository.name, () => {
       stateUpdate: {
         id: 2,
         blockNumber: 2,
-        rootHash: 'root-hash-2',
-        factHash: 'fact-hash-2',
-        factTimestamp: 0,
-        dataTimestamp: 0,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: 0,
       },
       positions: [
         {
@@ -165,10 +163,9 @@ describe(StateUpdateRepository.name, () => {
     const stateUpdate: StateUpdateRecord = {
       id: 10_002,
       blockNumber: 10_002,
-      rootHash: 'root-hash-2',
-      factHash: 'fact-hash-2',
-      factTimestamp: 0,
-      dataTimestamp: 0,
+      rootHash: PedersenHash.fake(),
+      factHash: Hash256.fake(),
+      timestamp: 0,
     }
 
     await repository.add({ stateUpdate, positions: [], prices: [] })

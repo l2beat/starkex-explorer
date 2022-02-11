@@ -1,3 +1,4 @@
+import { PedersenHash } from '@explorer/crypto'
 import { AssetBalance, AssetId, OraclePrice } from '@explorer/encoding'
 import { Knex } from 'knex'
 import {
@@ -7,22 +8,22 @@ import {
   StateUpdateRow,
 } from 'knex/types/tables'
 
+import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 
 export interface StateUpdateRecord {
   id: number
   blockNumber: number
-  factHash: string
-  rootHash: string
-  factTimestamp: number
-  dataTimestamp: number
+  factHash: Hash256
+  rootHash: PedersenHash
+  timestamp: number
 }
 
 export interface PositionRecord {
   positionId: number
   publicKey: string
   collateralBalance: bigint
-  balances: AssetBalance[]
+  balances: readonly AssetBalance[]
 }
 
 export class StateUpdateRepository {
@@ -30,15 +31,11 @@ export class StateUpdateRepository {
     this.logger = logger.for(this)
   }
 
-  async add({
-    stateUpdate,
-    positions,
-    prices,
-  }: {
-    stateUpdate: StateUpdateRecord
-    positions: PositionRecord[]
-    prices: OraclePrice[]
-  }) {
+  async getLast(): Promise<StateUpdateRecord> {
+    throw new Error('Not Implemented')
+  }
+
+  async add({ stateUpdate, positions, prices }: StateUpdateBundle) {
     await this.knex.transaction(async (trx) => {
       await this.knex('state_updates')
         .insert([toStateUpdateRow(stateUpdate)])
@@ -87,14 +84,19 @@ export class StateUpdateRepository {
   }
 }
 
+export interface StateUpdateBundle {
+  stateUpdate: StateUpdateRecord
+  positions: PositionRecord[]
+  prices: OraclePrice[]
+}
+
 function toStateUpdateRecord(row: StateUpdateRow): StateUpdateRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,
-    factHash: row.fact_hash,
-    rootHash: row.root_hash,
-    factTimestamp: row.fact_timestamp,
-    dataTimestamp: row.data_timestamp,
+    factHash: Hash256(row.fact_hash),
+    rootHash: PedersenHash(row.root_hash),
+    timestamp: row.timestamp,
   }
 }
 
@@ -102,10 +104,9 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
   return {
     id: record.id,
     block_number: record.blockNumber,
-    fact_hash: record.factHash,
-    root_hash: record.rootHash,
-    fact_timestamp: record.factTimestamp,
-    data_timestamp: record.dataTimestamp,
+    fact_hash: record.factHash.toString(),
+    root_hash: record.rootHash.toString(),
+    timestamp: record.timestamp,
   }
 }
 
