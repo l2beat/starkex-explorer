@@ -19,7 +19,7 @@ export async function up(knex: Knex) {
     table.string('public_key').notNullable()
     table.bigInteger('collateral_balance').notNullable()
     table.bigInteger('funding_timestamp').notNullable()
-    table.jsonb('balances').notNullable() // @todo this might go to a separate table — would we query by asset_id?
+    table.jsonb('balances').notNullable()
   })
 }
 

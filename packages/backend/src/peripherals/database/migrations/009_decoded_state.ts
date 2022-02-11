@@ -1,6 +1,10 @@
 import { Knex } from 'knex'
 
+import * as positions_001 from './001_positions'
+
 export async function up(knex: Knex) {
+  await positions_001.down(knex)
+
   await knex.schema.createTable('state_updates', (table) => {
     table.integer('id').primary()
     table.integer('block_number').notNullable().index()
