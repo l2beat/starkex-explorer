@@ -1,7 +1,7 @@
 export {}
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-const canvas: HTMLCanvasElement = document.querySelector('.Home-Background')!
+const canvas = document.querySelector('canvas')!
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const ctx = canvas.getContext('2d')!
 

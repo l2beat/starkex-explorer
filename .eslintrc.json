@@ -24,6 +24,7 @@
       "warn",
       { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }
     ],
+
     "import/no-cycle": "error",
     "import/no-default-export": "error",
     "import/no-extraneous-dependencies": [
@@ -31,11 +32,14 @@
       { "devDependencies": false }
     ],
     "import/no-unresolved": ["error", { "ignore": ["^knex/types/tables$"] }],
+
     "no-only-tests/no-only-tests": "error",
     "no-restricted-imports": [
       "error",
       { "paths": [".", "..", "../..", "../../.."] }
     ],
+    "prefer-const": ["warn", { "destructuring": "all" }],
+
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error"
   },

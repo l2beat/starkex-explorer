@@ -8,7 +8,7 @@ interface Props extends HeadProps {
 
 export function Page({ children, scripts, ...head }: Props) {
   return (
-    <html lang="en">
+    <html lang="en" className="text-[16px] font-sans font-regular bg-zinc-50">
       <Head {...head} />
       <body>
         <div className="Page">{children}</div>
