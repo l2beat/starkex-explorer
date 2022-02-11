@@ -82,6 +82,13 @@ export class StateUpdateRepository {
     await this.knex('state_updates').delete()
     this.logger.debug({ method: 'deleteAll' })
   }
+
+  async deleteAllAfter(blockNumber: number) {
+    const rowsCount = await this.knex('state_updates')
+      .where('block_number', '>', blockNumber)
+      .delete()
+    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
+  }
 }
 
 export interface StateUpdateBundle {
