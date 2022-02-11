@@ -3,3 +3,6 @@ comment: # https://docs.codecov.io/docs/pull-request-comments
   require_changes: false
   require_base: false
   require_head: true
+coverage:
+  status:
+    patch: false
