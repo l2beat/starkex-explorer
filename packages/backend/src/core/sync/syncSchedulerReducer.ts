@@ -1,122 +1,115 @@
-import assert from 'assert'
+import { BlockRange, Hash256 } from '../../model'
 
-import { Block, ContinuousBlocks } from './ContinuousBlocks'
+export interface Block {
+  readonly number: number
+  readonly hash: Hash256
+}
 
 export const INITIAL_SYNC_STATE: SyncState = {
-  isInitialized: false,
-  blocksToProcess: new ContinuousBlocks(),
-  blocksProcessing: [],
   isProcessing: false,
-  discardRequired: false,
-  latestBlockProcessed: 0,
+  remaining: new BlockRange([]),
+  discardAfter: undefined,
 }
 
 export const SYNC_BATCH_SIZE = 6000
 
 export interface SyncState {
-  /** Have we read the initial blocks from db already? */
-  readonly isInitialized: boolean
-  /** Is sync or discard being executed? */
   readonly isProcessing: boolean
-  readonly discardRequired: boolean
-  readonly blocksToProcess: ContinuousBlocks
-  readonly blocksProcessing: Block[]
-  readonly latestBlockProcessed: number
+  readonly remaining: BlockRange
+  readonly discardAfter: number | undefined
 }
 
-export type SyncSchedulerEffect = 'sync' | 'discardAfter'
+export type SyncSchedulerEffect =
+  | { type: 'sync'; blocks: BlockRange }
+  | { type: 'discardAfter'; blockNumber: number }
+
 export type StateAndEffects = [SyncState, SyncSchedulerEffect?]
 
 export type SyncSchedulerAction =
-  | { type: 'init'; blocks: Block[] }
-  | { type: 'newBlocks'; blocks: Block[] }
-  | { type: 'reorg'; blocks: Block[] }
-  | { type: 'syncFinished'; success: boolean }
-  | { type: 'discardFinished'; success: boolean }
+  | { type: 'initialized'; lastSynced: number; knownBlocks: Block[] }
+  | { type: 'newBlockFound'; block: Block }
+  | { type: 'reorgOccurred'; blocks: Block[] }
+  | { type: 'syncSucceeded' }
+  | { type: 'syncFailed'; blocks: BlockRange }
+  | { type: 'discardAfterSucceeded'; blockNumber: number }
+  | { type: 'discardAfterFailed' }
 
 export function syncSchedulerReducer(
   state: SyncState,
   action: SyncSchedulerAction
 ): StateAndEffects {
   switch (action.type) {
-    case 'init': {
-      assert(!state.isInitialized)
-
+    case 'initialized': {
       return process({
-        ...state,
-        isInitialized: true,
-        blocksToProcess: state.blocksToProcess.prependEarlier(action.blocks),
+        isProcessing: false,
+        remaining: new BlockRange(action.knownBlocks, action.lastSynced + 1),
+        discardAfter: undefined,
       })
     }
-
-    case 'newBlocks': {
+    case 'newBlockFound': {
       return process({
         ...state,
-        blocksToProcess: state.blocksToProcess.concat(action.blocks),
+        remaining: state.remaining.merge([action.block]),
       })
     }
-
-    case 'reorg': {
-      if (state.latestBlockProcessed >= action.blocks[0].number) {
-        return process({
-          ...state,
-          discardRequired: true,
-          blocksToProcess: new ContinuousBlocks(action.blocks),
-        })
-      } else {
-        return process({
-          ...state,
-          blocksToProcess: state.blocksToProcess.replaceTail(action.blocks),
-        })
-      }
+    case 'reorgOccurred': {
+      const reorgStart = Math.min(...action.blocks.map((x) => x.number))
+      return process({
+        ...state,
+        remaining: state.remaining.merge(action.blocks),
+        discardAfter:
+          state.discardAfter !== undefined
+            ? Math.min(reorgStart - 1, state.discardAfter)
+            : reorgStart < state.remaining.start
+            ? reorgStart - 1
+            : undefined,
+      })
     }
-
-    case 'discardFinished': {
+    case 'syncSucceeded': {
       return process({
         ...state,
         isProcessing: false,
-        discardRequired: action.success ? false : state.discardRequired,
       })
     }
-
-    case 'syncFinished': {
+    case 'syncFailed': {
       return process({
         ...state,
         isProcessing: false,
-        blocksToProcess: action.success
-          ? state.blocksToProcess
-          : state.blocksToProcess.prependEarlier(state.blocksProcessing),
-        blocksProcessing: [],
+        remaining: action.blocks.merge(state.remaining),
+      })
+    }
+    case 'discardAfterSucceeded': {
+      return process({
+        ...state,
+        isProcessing: false,
+        discardAfter:
+          state.discardAfter === action.blockNumber
+            ? undefined
+            : state.discardAfter,
+      })
+    }
+    case 'discardAfterFailed': {
+      return process({
+        ...state,
+        isProcessing: false,
       })
     }
   }
 }
 
 function process(state: SyncState): StateAndEffects {
-  if (!state.isInitialized || state.isProcessing) return [state]
-
-  if (state.discardRequired) {
-    return [{ ...state, isProcessing: true }, 'discardAfter']
+  if (state.isProcessing || state.remaining.isEmpty()) {
+    return [state]
+  } else if (!state.discardAfter) {
+    const [toProcess, remaining] = state.remaining.take(SYNC_BATCH_SIZE)
+    return [
+      { isProcessing: true, remaining, discardAfter: undefined },
+      { type: 'sync', blocks: toProcess },
+    ]
   } else {
-    const [blocksProcessing, blocksToProcess] =
-      state.blocksToProcess.take(SYNC_BATCH_SIZE)
-
-    if (blocksProcessing.length > 0) {
-      const latestBlockProcessed =
-        blocksProcessing[blocksProcessing.length - 1].number
-
-      return [
-        {
-          ...state,
-          blocksProcessing,
-          blocksToProcess,
-          isProcessing: true,
-          latestBlockProcessed,
-        },
-        'sync',
-      ]
-    } else {
-      return [{ ...state, blocksProcessing }]
-    }
+    return [
+      { ...state, isProcessing: true },
+      { type: 'discardAfter', blockNumber: state.discardAfter },
+    ]
   }
 }

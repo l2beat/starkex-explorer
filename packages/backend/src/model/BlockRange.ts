@@ -26,36 +26,43 @@ export class BlockRange {
     start?: BlockNumber,
     end?: BlockNumber
   ) {
-    if (blocks instanceof BlockRange) {
-      this.end = blocks.end
-      this.start = blocks.start
-      this.hashes = blocks.hashes
-    } else if (Array.isArray(blocks)) {
-      if (blocks.length === 0) {
-        this.hashes = new Map()
-        this.start = 0
-        this.end = 0
-      } else {
-        this.hashes = new Map(blocks.map((block) => [block.number, block.hash]))
-        const blockNumbers = blocks.map((block) => block.number)
-        this.start = Math.min(...blockNumbers)
-        this.end = Math.max(...blockNumbers) + 1
-      }
+    if (start !== undefined || end !== undefined) {
+      let entries =
+        blocks instanceof BlockRange
+          ? [...blocks.hashes.entries()]
+          : Array.isArray(blocks)
+          ? blocks.map((block) => [block.number, block.hash] as const)
+          : [...blocks.entries()]
+      entries = entries.filter(
+        ([number]) =>
+          (start === undefined || number >= start) &&
+          (end === undefined || number < end)
+      )
+      this.hashes = new Map(entries)
     } else {
-      if (blocks.size === 0) {
-        this.hashes = new Map()
-        this.start = 0
-        this.end = 0
+      this.hashes =
+        blocks instanceof BlockRange
+          ? new Map(blocks.hashes)
+          : Array.isArray(blocks)
+          ? new Map(blocks.map((block) => [block.number, block.hash]))
+          : new Map(blocks)
+    }
+
+    if (start === undefined || end === undefined) {
+      if (blocks instanceof BlockRange) {
+        start ??= blocks.start
+        end ??= blocks.end
       } else {
-        this.hashes = blocks
-        const blockNumbers = [...blocks.keys()]
-        this.start = Math.min(...blockNumbers)
-        this.end = Math.max(...blockNumbers) + 1
+        const blockNumbers = [...this.hashes.keys()]
+        if (blockNumbers.length !== 0) {
+          start ??= Math.min(...blockNumbers)
+          end ??= Math.max(...blockNumbers) + 1
+        }
       }
     }
 
-    if (start !== undefined) this.start = start
-    if (end !== undefined) this.end = end
+    this.start = start ?? 0
+    this.end = end ?? start ?? 0
 
     assert(this.end >= this.start, 'Block range cannot end before it starts')
   }
@@ -93,9 +100,9 @@ export class BlockRange {
 
   take(count: number): [taken: BlockRange, remaining: BlockRange] {
     if (count <= 0) {
-      return [new BlockRange([]), this]
+      return [new BlockRange([], this.start), this]
     } else if (count >= this.length) {
-      return [this, new BlockRange([])]
+      return [this, new BlockRange([], this.end)]
     }
     const [left, right] = partition(
       [...this.hashes.keys()],

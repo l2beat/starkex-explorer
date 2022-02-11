@@ -4,15 +4,108 @@ import { Hash256 } from '../../src/model'
 import { BlockRange } from '../../src/model/BlockRange'
 
 describe(BlockRange.name, () => {
-  it('has .start and .end properties', () => {
-    const blockRange = new BlockRange([
-      { number: 1, hash: Hash256.fake() },
-      { number: 2, hash: Hash256.fake() },
-      { number: 3, hash: Hash256.fake() },
-    ])
+  describe('constructor', () => {
+    it('can crate a zero blocks block range', () => {
+      const blockRange = new BlockRange([])
+      expect(blockRange.start).toEqual(0)
+      expect(blockRange.end).toEqual(0)
+    })
 
-    expect(blockRange.start).toEqual(1)
-    expect(blockRange.end).toEqual(4)
+    it('can crate a zero blocks block range with a given start', () => {
+      const blockRange = new BlockRange([], 1000)
+      expect(blockRange.start).toEqual(1000)
+      expect(blockRange.end).toEqual(1000)
+    })
+
+    it('can crate a block range with a given span', () => {
+      const blockRange = new BlockRange([], 1000, 1500)
+      expect(blockRange.start).toEqual(1000)
+      expect(blockRange.end).toEqual(1500)
+    })
+
+    it('can crate a block range from a map', () => {
+      const rangeA = new BlockRange([
+        { number: 10, hash: Hash256.fake('10') },
+        { number: 11, hash: Hash256.fake('11') },
+        { number: 13, hash: Hash256.fake('13') },
+      ])
+      const rangeB = new BlockRange(
+        new Map([
+          [10, Hash256.fake('10')],
+          [11, Hash256.fake('11')],
+          [13, Hash256.fake('13')],
+        ])
+      )
+      expect(rangeA).toEqual(rangeB)
+    })
+
+    it('can crate a block range from a block range', () => {
+      const rangeA = new BlockRange([
+        { number: 10, hash: Hash256.fake('10') },
+        { number: 11, hash: Hash256.fake('11') },
+        { number: 13, hash: Hash256.fake('13') },
+      ])
+      const rangeB = new BlockRange(rangeA)
+      expect(rangeA).toEqual(rangeB)
+    })
+
+    it('correctly sets start and end', () => {
+      const blockRange = new BlockRange([
+        { number: 10, hash: Hash256.fake('10') },
+        { number: 11, hash: Hash256.fake('11') },
+        { number: 13, hash: Hash256.fake('13') },
+      ])
+      expect(blockRange.start).toEqual(10)
+      expect(blockRange.end).toEqual(14)
+    })
+
+    it('can override start', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 11, hash: Hash256.fake('11') },
+          { number: 13, hash: Hash256.fake('13') },
+        ],
+        5
+      )
+      expect(blockRange.start).toEqual(5)
+      expect(blockRange.end).toEqual(14)
+    })
+
+    it('can override start and end', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 11, hash: Hash256.fake('11') },
+          { number: 13, hash: Hash256.fake('13') },
+        ],
+        5,
+        20
+      )
+      expect(blockRange.start).toEqual(5)
+      expect(blockRange.end).toEqual(20)
+    })
+
+    it('discards given blocks outside of start and end', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 11, hash: Hash256.fake('11') },
+          { number: 12, hash: Hash256.fake('12') },
+          { number: 13, hash: Hash256.fake('13') },
+        ],
+        11,
+        13
+      )
+      expect(blockRange.start).toEqual(11)
+      expect(blockRange.end).toEqual(13)
+      expect(blockRange['hashes']).toEqual(
+        new Map([
+          [11, Hash256.fake('11')],
+          [12, Hash256.fake('12')],
+        ])
+      )
+    })
   })
 
   describe(BlockRange.prototype.has.name, () => {
@@ -135,20 +228,20 @@ describe(BlockRange.name, () => {
 
     it('can take zero items', () => {
       const [taken, remaining] = range.take(0)
-      expect(taken).toEqual(new BlockRange([]))
+      expect(taken).toEqual(new BlockRange([], 10, 10))
       expect(remaining).toEqual(range)
     })
 
     it('can take all items', () => {
       const [taken, remaining] = range.take(3)
       expect(taken).toEqual(range)
-      expect(remaining).toEqual(new BlockRange([]))
+      expect(remaining).toEqual(new BlockRange([], 13, 13))
     })
 
     it('cannot take more than all items', () => {
       const [taken, remaining] = range.take(1000)
       expect(taken).toEqual(range)
-      expect(remaining).toEqual(new BlockRange([]))
+      expect(remaining).toEqual(new BlockRange([], 13, 13))
     })
 
     it('can take some items', () => {
