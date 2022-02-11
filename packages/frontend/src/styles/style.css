@@ -15,3 +15,7 @@
     url('/fonts/Roboto/roboto-v27-latin-700.woff2') format('woff2');
   font-display: block;
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
