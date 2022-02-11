@@ -1,6 +1,7 @@
 import { AssetId } from '@explorer/encoding'
 import { expect } from 'earljs'
 
+import { Position } from '../src'
 import { InMemoryRollupStorage } from '../src/InMemoryRollupStorage'
 import { RollupState } from '../src/RollupState'
 
@@ -9,8 +10,9 @@ describe(RollupState.name, () => {
     it('can update a single position', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
+      let newPositions: { index: bigint; value: Position }[] = []
 
-      ;[rollup] = await rollup.update({
+      ;[rollup, newPositions] = await rollup.update({
         funding: [],
         positions: [
           {
@@ -24,11 +26,23 @@ describe(RollupState.name, () => {
       })
 
       const updated = await rollup.positions.getLeaf(5n)
-      expect(updated.getData()).toEqual({
+      const data = updated.getData()
+      expect(data).toEqual({
         publicKey: `0x${'0'.repeat(63)}5`,
         collateralBalance: 555n,
         assets: [],
       })
+
+      expect(newPositions).toEqual([
+        {
+          index: 5n,
+          value: expect.objectWith({
+            assets: [],
+            collateralBalance: data.collateralBalance,
+            publicKey: data.publicKey,
+          }),
+        },
+      ])
     })
 
     it('can update a single position with assets', async () => {
