@@ -80,10 +80,6 @@ export class StateUpdateRepository {
     return rows.map(toStateUpdateRecord)
   }
 
-  async delete(stateUpdateId: number) {
-    await this.knex('state_updates').where('id', stateUpdateId).first().delete()
-  }
-
   async deleteAll() {
     await this.knex('state_updates').delete()
     this.logger.debug({ method: 'deleteAll' })

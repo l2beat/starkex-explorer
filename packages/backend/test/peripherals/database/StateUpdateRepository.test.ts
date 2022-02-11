@@ -42,62 +42,6 @@ describe(StateUpdateRepository.name, () => {
     })
   })
 
-  it('removes prices and positions connected to state update from database', async () => {
-    const updateToRemove: StateUpdateBundle = {
-      stateUpdate: {
-        id: 10_001,
-        blockNumber: 10_001,
-        rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
-        timestamp: 0,
-      },
-      positions: [
-        {
-          publicKey: 'public-key-1',
-          positionId: 0,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
-    }
-
-    await repository.add(updateToRemove)
-
-    const updateThatWontBeRemoved: StateUpdateBundle = {
-      stateUpdate: {
-        id: 10_002,
-        blockNumber: 10_002,
-        rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
-        timestamp: 0,
-      },
-      positions: [
-        {
-          publicKey: 'public-key-1',
-          positionId: 0,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
-    }
-
-    await repository.add(updateThatWontBeRemoved)
-
-    await repository.delete(updateToRemove.stateUpdate.id)
-
-    const remainingPrices = await knex('prices').select('*')
-    const remainingPositions = await knex('positions').select('*')
-
-    expect(remainingPrices.length).toEqual(
-      updateThatWontBeRemoved.positions.length
-    )
-    expect(remainingPositions.length).toEqual(
-      updateThatWontBeRemoved.prices.length
-    )
-  })
-
   it('gets position by id', async () => {
     const positionId = 12345
 
@@ -215,8 +159,15 @@ describe(StateUpdateRepository.name, () => {
           factHash: Hash256.fake(),
           timestamp: 0,
         },
-        positions: [],
-        prices: [],
+        positions: [
+          {
+            publicKey: `public-key-${blockNumber}`,
+            positionId: blockNumber,
+            collateralBalance: 0n,
+            balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+          },
+        ],
+        prices: [{ assetId: AssetId('ETH-9'), price: BigInt(blockNumber) }],
       })
     }
 
@@ -224,5 +175,14 @@ describe(StateUpdateRepository.name, () => {
 
     const records = await repository.getAll()
     expect(records.map((x) => x.blockNumber)).toEqual([20_001, 20_002])
+
+    expect(await knex('positions').select('public_key')).toEqual([
+      { public_key: 'public-key-20001' },
+      { public_key: 'public-key-20002' },
+    ])
+    expect(await knex('prices').select('asset_id', 'price')).toEqual([
+      { asset_id: 'ETH-9', price: 20001n },
+      { asset_id: 'ETH-9', price: 20002n },
+    ])
   })
 })
