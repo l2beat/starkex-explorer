@@ -148,5 +148,82 @@ describe(SyncScheduler.name, () => {
       // allow the jobQueue to finish
       dataSyncService.sync.resolvesTo(undefined)
     })
+
+    it('handles a successful discardAfter', async () => {
+      const syncStatusRepository = mock<SyncStatusRepository>({
+        setLastSynced: async () => {},
+      })
+      const blockDownloader = mock<BlockDownloader>()
+      const dataSyncService = mock<DataSyncService>({
+        sync: async () => {},
+        discardAfter: async () => {},
+      })
+      const syncScheduler = new SyncScheduler(
+        syncStatusRepository,
+        blockDownloader,
+        dataSyncService,
+        Logger.SILENT
+      )
+
+      syncScheduler['dispatch']({
+        type: 'initialized',
+        lastSynced: 1_000_000,
+        knownBlocks: [],
+      })
+      syncScheduler['dispatch']({
+        type: 'reorgOccurred',
+        blocks: [block(1_000_000), block(1_000_001)],
+      })
+
+      await waitForExpect(() => {
+        expect(dataSyncService.discardAfter).toHaveBeenCalledExactlyWith([
+          [999_999],
+        ])
+        expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
+          [new BlockRange([block(1_000_000), block(1_000_001)])],
+        ])
+        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledExactlyWith([
+          [999_999],
+          [1_000_001],
+        ])
+      })
+    })
+
+    it('handles a failing discardAfter', async () => {
+      const syncStatusRepository = mock<SyncStatusRepository>({
+        setLastSynced: async () => {},
+      })
+      const blockDownloader = mock<BlockDownloader>()
+      const dataSyncService = mock<DataSyncService>({
+        sync: async () => {},
+        discardAfter: mockFn().rejectsWith(new Error('oops')),
+      })
+      const syncScheduler = new SyncScheduler(
+        syncStatusRepository,
+        blockDownloader,
+        dataSyncService,
+        Logger.SILENT
+      )
+
+      syncScheduler['dispatch']({
+        type: 'initialized',
+        lastSynced: 1_000_000,
+        knownBlocks: [],
+      })
+      syncScheduler['dispatch']({
+        type: 'reorgOccurred',
+        blocks: [block(1_000_000), block(1_000_001)],
+      })
+
+      await waitForExpect(() => {
+        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledWith([
+          999_999,
+        ])
+        expect(dataSyncService.discardAfter).toHaveBeenCalledWith([999_999])
+      })
+
+      // allow the jobQueue to finish
+      dataSyncService.discardAfter.resolvesTo(undefined)
+    })
   })
 })
