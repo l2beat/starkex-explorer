@@ -173,6 +173,38 @@ describe(StateUpdateRepository.name, () => {
     expect(await repository.getAll()).toEqual([stateUpdate])
   })
 
+  it('gets last state update by block number', async () => {
+    let last = await repository.getLast()
+
+    expect(last).toEqual(undefined)
+
+    for (const blockNumber of [30_001, 30_002, 30_003]) {
+      await repository.add({
+        stateUpdate: {
+          id: blockNumber,
+          blockNumber,
+          rootHash: PedersenHash.fake(),
+          factHash: Hash256.fake(),
+          timestamp: 0,
+        },
+        positions: [],
+        prices: [],
+      })
+    }
+    const stateUpdate = {
+      id: 30_004,
+      blockNumber: 30_004,
+      rootHash: PedersenHash.fake(),
+      factHash: Hash256.fake(),
+      timestamp: 0,
+    }
+    await repository.add({ stateUpdate, positions: [], prices: [] })
+
+    last = await repository.getLast()
+
+    expect(last).toEqual(stateUpdate)
+  })
+
   it('deletes all state updates after block number', async () => {
     for (const blockNumber of [20_001, 20_002, 20_003, 20_004]) {
       await repository.add({

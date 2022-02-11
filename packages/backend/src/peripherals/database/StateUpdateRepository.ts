@@ -31,10 +31,6 @@ export class StateUpdateRepository {
     this.logger = logger.for(this)
   }
 
-  async getLast(): Promise<StateUpdateRecord> {
-    throw new Error('Not Implemented')
-  }
-
   async add({ stateUpdate, positions, prices }: StateUpdateBundle) {
     await this.knex.transaction(async (trx) => {
       await this.knex('state_updates')
@@ -59,8 +55,14 @@ export class StateUpdateRepository {
     })
   }
 
-  async delete(stateUpdateId: number) {
-    await this.knex('state_updates').where('id', stateUpdateId).first().delete()
+  async getLast(): Promise<StateUpdateRecord | undefined> {
+    const row = await this.knex('state_updates')
+      .orderBy('block_number', 'desc')
+      .first()
+
+    this.logger.debug({ method: 'getLast', id: row?.id || null })
+
+    return row && toStateUpdateRecord(row)
   }
 
   async getPositionById(positionId: number) {
@@ -76,6 +78,10 @@ export class StateUpdateRepository {
     const rows = await this.knex('state_updates').select('*')
     this.logger.debug({ method: 'getAll', rows: rows.length })
     return rows.map(toStateUpdateRecord)
+  }
+
+  async delete(stateUpdateId: number) {
+    await this.knex('state_updates').where('id', stateUpdateId).first().delete()
   }
 
   async deleteAll() {
