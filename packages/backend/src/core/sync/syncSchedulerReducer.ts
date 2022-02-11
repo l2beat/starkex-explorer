@@ -1,5 +1,9 @@
-import { BlockRange } from '../../model'
-import { Block } from './ContinuousBlocks'
+import { BlockRange, Hash256 } from '../../model'
+
+export interface Block {
+  readonly number: number
+  readonly hash: Hash256
+}
 
 export const INITIAL_SYNC_STATE: SyncState = {
   isProcessing: false,

@@ -3,223 +3,150 @@ import waitForExpect from 'wait-for-expect'
 
 import { DataSyncService } from '../../../src/core/DataSyncService'
 import { BlockDownloader } from '../../../src/core/sync/BlockDownloader'
-import { Block } from '../../../src/core/sync/ContinuousBlocks'
 import { SyncScheduler } from '../../../src/core/sync/SyncScheduler'
+import { Block } from '../../../src/core/sync/syncSchedulerReducer'
 import { BlockRange, Hash256 } from '../../../src/model'
-import { BlockRecord } from '../../../src/peripherals/database/BlockRepository'
 import { SyncStatusRepository } from '../../../src/peripherals/database/SyncStatusRepository'
-import { Logger, LogLevel } from '../../../src/tools/Logger'
+import { Logger } from '../../../src/tools/Logger'
 import { mock } from '../../mock'
 
 describe(SyncScheduler.name, () => {
-  it('syncs blocks', async () => {
-    const lastBlockNumberSynced = 10000
-    const blocks = [
-      fakeBlock(lastBlockNumberSynced + 1),
-      fakeBlock(lastBlockNumberSynced + 2),
-      fakeBlock(lastBlockNumberSynced + 3),
-      fakeBlock(lastBlockNumberSynced + 4),
-    ]
-    const syncStatusRepository = mock<SyncStatusRepository>({
-      getLastBlockNumberSynced: async () => lastBlockNumberSynced,
-      setLastBlockNumberSynced: async () => {},
-    })
-    let emitNewBlock!: (blocks: BlockRecord) => void
-    const blockDownloader = mock<BlockDownloader>({
-      getKnownBlocks: async () => [blocks[0], blocks[1]],
-      onNewBlock: (handler) => {
-        emitNewBlock = handler
-        return () => {}
-      },
-      onReorg: () => () => {},
-    })
+  const block = (number: number): Block => ({
+    number,
+    hash: Hash256.fake(number.toString()),
+  })
 
-    let emitSyncFinished!: () => void
-    const dataSyncService = mock<DataSyncService>({
-      sync: () => new Promise((resolve) => (emitSyncFinished = resolve)),
-      discardAfter: async () => {},
-    })
+  describe(SyncScheduler.prototype.start.name, () => {
+    it('starts from scratch', async () => {
+      const syncStatusRepository = mock<SyncStatusRepository>({
+        getLastSynced: async () => undefined,
+      })
+      const blockDownloader = mock<BlockDownloader>({
+        getKnownBlocks: async () => [],
+        onNewBlock: () => () => {},
+        onReorg: () => () => {},
+      })
+      const dataSyncService = mock<DataSyncService>({
+        discardAfter: async () => {},
+      })
+      const syncScheduler = new SyncScheduler(
+        syncStatusRepository,
+        blockDownloader,
+        dataSyncService,
+        Logger.SILENT,
+        1_000_000
+      )
 
-    const syncScheduler = new SyncScheduler(
-      syncStatusRepository,
-      blockDownloader,
-      dataSyncService,
-      new Logger({ logLevel: LogLevel.ERROR, format: 'pretty' })
-    )
+      await syncScheduler.start()
 
-    await syncScheduler.start()
-
-    expect(
-      syncStatusRepository.getLastBlockNumberSynced
-    ).toHaveBeenCalledExactlyWith([[]])
-
-    expect(blockDownloader.getKnownBlocks).toHaveBeenCalledExactlyWith([
-      [lastBlockNumberSynced],
-    ])
-    expect(blockDownloader.onNewBlock).toHaveBeenCalledExactlyWith([
-      [expect.a<any>(Function)],
-    ])
-    expect(blockDownloader.onReorg).toHaveBeenCalledExactlyWith([
-      [expect.a<any>(Function)],
-    ])
-
-    expect(dataSyncService.discardAfter).toHaveBeenCalledExactlyWith([
-      [lastBlockNumberSynced],
-    ])
-    expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([])
-
-    emitNewBlock(blocks[2])
-    emitNewBlock(blocks[3])
-
-    await waitForExpect(() => {
-      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [new BlockRange([blocks[0], blocks[1]])],
-      ])
-      expect(
-        syncStatusRepository.setLastBlockNumberSynced
-      ).toHaveBeenCalledExactlyWith([[blocks[1].number]])
+      expect(dataSyncService.discardAfter).toHaveBeenCalledWith([1_000_000])
+      expect(blockDownloader.getKnownBlocks).toHaveBeenCalledWith([1_000_000])
+      expect(blockDownloader.onNewBlock.calls.length).toEqual(1)
+      expect(blockDownloader.onReorg.calls.length).toEqual(1)
     })
 
-    emitSyncFinished()
+    it('starts from the middle', async () => {
+      const syncStatusRepository = mock<SyncStatusRepository>({
+        getLastSynced: async () => 2_000_000,
+      })
+      const blockDownloader = mock<BlockDownloader>({
+        getKnownBlocks: async () => [block(2_000_100), block(2_000_101)],
+        onNewBlock: () => () => {},
+        onReorg: () => () => {},
+      })
+      const dataSyncService = mock<DataSyncService>({
+        discardAfter: async () => {},
+      })
+      const syncScheduler = new SyncScheduler(
+        syncStatusRepository,
+        blockDownloader,
+        dataSyncService,
+        Logger.SILENT,
+        1_000_000
+      )
 
-    await waitForExpect(() => {
-      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [new BlockRange([blocks[0], blocks[1]])],
-        [new BlockRange([blocks[2], blocks[3]])],
+      const dispatch = mockFn().returns(undefined)
+      syncScheduler['dispatch'] = dispatch
+      await syncScheduler.start()
+
+      expect(dataSyncService.discardAfter).toHaveBeenCalledWith([2_000_000])
+      expect(blockDownloader.getKnownBlocks).toHaveBeenCalledWith([2_000_000])
+      expect(blockDownloader.onNewBlock.calls.length).toEqual(1)
+      expect(blockDownloader.onReorg.calls.length).toEqual(1)
+      expect(dispatch).toHaveBeenCalledWith([
+        {
+          type: 'initialized',
+          lastSynced: 2_000_000,
+          knownBlocks: [block(2_000_100), block(2_000_101)],
+        },
       ])
     })
   })
 
-  it('handles sync failure and discards', async () => {
-    const lastBlockNumberSynced = 10000
-    const blocks = {
-      a1: fakeBlock(lastBlockNumberSynced + 1),
-      a2: fakeBlock(lastBlockNumberSynced + 2),
-      a3: fakeBlock(lastBlockNumberSynced + 3),
-      a4: fakeBlock(lastBlockNumberSynced + 4),
-      b3: fakeBlock(lastBlockNumberSynced + 3),
-      b4: fakeBlock(lastBlockNumberSynced + 4),
-    }
-    const syncStatusRepository = mock<SyncStatusRepository>({
-      getLastBlockNumberSynced: async () => lastBlockNumberSynced,
-      setLastBlockNumberSynced: async () => {},
-    })
-    let emitNewBlock!: (blocks: BlockRecord) => void
-    let emitReorg!: (blocks: BlockRecord[]) => void
-    const blockDownloader = mock<BlockDownloader>({
-      getKnownBlocks: async () => [blocks.a1, blocks.a2],
-      onNewBlock: (handler) => {
-        emitNewBlock = handler
-        return () => {}
-      },
-      onReorg: (handler) => {
-        emitReorg = handler
-        return () => {}
-      },
-    })
-
-    let emitSyncFinished!: () => void
-    let emitSyncFailed!: () => void
-
-    const dataSyncService = mock<DataSyncService>({
-      sync: () =>
-        new Promise((resolve, reject) => {
-          emitSyncFinished = resolve
-          emitSyncFailed = () => reject(new Error('expected sync failure'))
-        }),
-      discardAfter: async () => {},
-    })
-
-    function prepareDiscardSpy() {
-      let _discardFailed = false
-      dataSyncService.discardAfter.executes(async () => {
-        if (_discardFailed) return
-        else {
-          _discardFailed = true
-          throw new Error('expected discard failure')
-        }
+  describe(SyncScheduler.prototype['dispatch'].name, () => {
+    it('handles a successful sync', async () => {
+      const syncStatusRepository = mock<SyncStatusRepository>({
+        setLastSynced: async () => {},
       })
-    }
+      const blockDownloader = mock<BlockDownloader>()
+      const dataSyncService = mock<DataSyncService>({
+        sync: async () => {},
+      })
+      const syncScheduler = new SyncScheduler(
+        syncStatusRepository,
+        blockDownloader,
+        dataSyncService,
+        Logger.SILENT
+      )
 
-    const syncScheduler = new SyncScheduler(
-      syncStatusRepository,
-      blockDownloader,
-      dataSyncService,
-      Logger.SILENT
-    )
+      syncScheduler['dispatch']({
+        type: 'initialized',
+        lastSynced: 1_000_000,
+        knownBlocks: [block(1_000_001), block(1_000_002)],
+      })
 
-    await syncScheduler.start()
-
-    expect(
-      syncStatusRepository.getLastBlockNumberSynced
-    ).toHaveBeenCalledExactlyWith([[]])
-
-    expect(blockDownloader.getKnownBlocks).toHaveBeenCalledExactlyWith([
-      [lastBlockNumberSynced],
-    ])
-    expect(blockDownloader.onNewBlock).toHaveBeenCalledExactlyWith([
-      [expect.a<any>(Function)],
-    ])
-    expect(blockDownloader.onReorg).toHaveBeenCalledExactlyWith([
-      [expect.a<any>(Function)],
-    ])
-
-    expect(dataSyncService.discardAfter).toHaveBeenCalledExactlyWith([
-      [lastBlockNumberSynced],
-    ])
-    expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([])
-
-    emitNewBlock(blocks.a3)
-    emitNewBlock(blocks.a4)
-
-    await waitForExpect(() => {
-      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [new BlockRange([blocks.a1, blocks.a2])],
-      ])
-      expect(
-        syncStatusRepository.setLastBlockNumberSynced
-      ).toHaveBeenCalledExactlyWith([[blocks.a2.number]])
+      await waitForExpect(() => {
+        expect(dataSyncService.sync).toHaveBeenCalledWith([
+          new BlockRange([block(1_000_001), block(1_000_002)]),
+        ])
+        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledWith([
+          1_000_002,
+        ])
+      })
     })
 
-    const logError = mockFn<{ (error: unknown): void }>(() => {})
-    ;(syncScheduler as any).logger.error = logError
+    it('handles a failing sync', async () => {
+      const syncStatusRepository = mock<SyncStatusRepository>({
+        setLastSynced: async () => {},
+      })
+      const blockDownloader = mock<BlockDownloader>()
+      const dataSyncService = mock<DataSyncService>({
+        sync: mockFn().rejectsWith(new Error('oops')),
+      })
+      const syncScheduler = new SyncScheduler(
+        syncStatusRepository,
+        blockDownloader,
+        dataSyncService,
+        Logger.SILENT
+      )
 
-    emitSyncFailed()
+      syncScheduler['dispatch']({
+        type: 'initialized',
+        lastSynced: 1_000_000,
+        knownBlocks: [block(1_000_001), block(1_000_002)],
+      })
 
-    await waitForExpect(() => {
-      expect(logError).toHaveBeenCalledExactlyWith([
-        [new Error('expected sync failure')],
-      ])
-      expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-        [new BlockRange([blocks.a1, blocks.a2])], // <- failed
-        [new BlockRange([blocks.a1, blocks.a2, blocks.a3, blocks.a4])],
-      ])
-    })
+      await waitForExpect(() => {
+        expect(dataSyncService.sync).toHaveBeenCalledWith([
+          new BlockRange([block(1_000_001), block(1_000_002)]),
+        ])
+        expect(syncStatusRepository.setLastSynced).not.toHaveBeenCalledWith([
+          1_000_002,
+        ])
+      })
 
-    emitSyncFinished()
-
-    prepareDiscardSpy()
-    emitReorg([blocks.b3, blocks.b4])
-
-    await waitForExpect(() => {
-      expect(dataSyncService.discardAfter).toHaveBeenCalledWith([
-        blocks.b3.number - 1,
-      ])
-    })
-
-    await waitForExpect(() => {
-      expect(dataSyncService.discardAfter).toHaveBeenCalledExactlyWith([
-        [lastBlockNumberSynced],
-        [blocks.b3.number - 1], // <- failed
-        [blocks.b3.number - 1],
-      ])
+      // allow the jobQueue to finish
+      dataSyncService.sync.resolvesTo(undefined)
     })
   })
 })
-
-function fakeBlock(number: number): Block {
-  return {
-    number,
-    hash: Hash256.fake(),
-  }
-}

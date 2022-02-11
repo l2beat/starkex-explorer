@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 
-import { Block } from '../../../src/core/sync/ContinuousBlocks'
 import {
+  Block,
   INITIAL_SYNC_STATE,
   StateAndEffects,
   SyncSchedulerAction,
