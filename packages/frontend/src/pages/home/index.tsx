@@ -1,5 +1,5 @@
 import React from 'react'
-import { reactToHtml } from '../util'
+import { reactToHtml } from '../reactToHtml'
 import { Home } from './Home'
 
 export function renderHomePage() {
