@@ -1,11 +1,7 @@
 const gulp = require('gulp')
-const sass = require('gulp-sass')(require('sass'))
 const del = require('del')
 const child_process = require('child_process')
 const path = require('path')
-const postcss = require('gulp-postcss')
-const autoprefixer = require('autoprefixer')
-const cssnano = require('cssnano')
 const fs = require('fs')
 const { addHashes } = require('./scripts/hashStaticFiles')
 
@@ -25,15 +21,13 @@ function watchScripts() {
 }
 
 function buildStyles() {
-  return gulp
-    .src('src/styles/**/*.scss')
-    .pipe(sass.sync().on('error', sass.logError))
-    .pipe(postcss([autoprefixer(), cssnano()]))
-    .pipe(gulp.dest('build/static/styles'))
+  return exec(
+    `tailwindcss -i ./src/styles/style.css -o ./build/static/styles/main.css`
+  )
 }
 
 function watchStyles() {
-  return gulp.watch('src/styles/**/*.scss', buildStyles)
+  return gulp.watch('src/**/*.{css,ts,tsx}', buildStyles)
 }
 
 function copyStatic() {
