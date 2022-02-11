@@ -7,6 +7,9 @@ import { StateTransitionFactCollector } from '../../src/core/StateTransitionFact
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
 import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
+import { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
+import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
+import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
@@ -32,6 +35,11 @@ describe(DataSyncService.name, () => {
     const pageRepository = mock<PageRepository>({
       getAllForFacts: async () => [],
     })
+    const rollupStateRepository = mock<RollupStateRepository>({})
+    const stateUpdateRepository = mock<StateUpdateRepository>({
+      getLast: async () => undefined,
+    })
+    const ethereumClient = mock<EthereumClient>({})
 
     const service = new DataSyncService(
       verifierCollector,
@@ -39,6 +47,9 @@ describe(DataSyncService.name, () => {
       pageCollector,
       stateTransitionFactCollector,
       pageRepository,
+      rollupStateRepository,
+      stateUpdateRepository,
+      ethereumClient,
       Logger.SILENT
     )
 
@@ -74,13 +85,22 @@ describe(DataSyncService.name, () => {
       const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
         discardAfter: noop,
       })
+      const pageRepository = mock<PageRepository>({})
+      const rollupStateRepository = mock<RollupStateRepository>({})
+      const stateUpdateRepository = mock<StateUpdateRepository>({
+        deleteAllAfter: noop,
+      })
+      const ethereumClient = mock<EthereumClient>({})
 
       const dataSyncService = new DataSyncService(
         verifierCollector,
         memoryHashEventCollector,
         pageCollector,
         stateTransitionFactCollector,
-        mock<PageRepository>({ getAllForFacts: async () => [] }),
+        pageRepository,
+        rollupStateRepository,
+        stateUpdateRepository,
+        ethereumClient,
         Logger.SILENT
       )
 
@@ -92,6 +112,7 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionFactCollector.discardAfter).toHaveBeenCalledWith([
         10,
       ])
+      expect(stateUpdateRepository.deleteAllAfter).toHaveBeenCalledWith([10])
     })
   })
 })

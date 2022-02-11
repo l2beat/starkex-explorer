@@ -16,7 +16,9 @@ import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
+import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
 import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
+import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
@@ -46,6 +48,8 @@ export class Application {
       logger
     )
     const blockRepository = new BlockRepository(knex, logger)
+    const rollupStateRepository = new RollupStateRepository(knex, logger)
+    const stateUpdateRepository = new StateUpdateRepository(knex, logger)
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
@@ -83,6 +87,9 @@ export class Application {
       pageCollector,
       stateTransitionFactCollector,
       pageRepository,
+      rollupStateRepository,
+      stateUpdateRepository,
+      ethereumClient,
       logger
     )
     const syncScheduler = new SyncScheduler(
