@@ -1,5 +1,3 @@
-import assert from 'assert'
-
 import { BlockRange } from '../../model'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { JobQueue } from '../../tools/JobQueue'
@@ -13,6 +11,9 @@ import {
   SyncState,
 } from './syncSchedulerReducer'
 
+/** block of the first verifier deploy */
+const EARLIEST_BLOCK = 11813207
+
 export class SyncScheduler {
   private state: SyncState = INITIAL_SYNC_STATE
   private jobQueue: JobQueue
@@ -21,7 +22,8 @@ export class SyncScheduler {
     private readonly syncStatusRepository: SyncStatusRepository,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
-    private readonly logger: Logger
+    private readonly logger: Logger,
+    private readonly earliestBlock = EARLIEST_BLOCK
   ) {
     this.logger = logger.for(this)
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
@@ -29,85 +31,64 @@ export class SyncScheduler {
 
   async start() {
     const lastSynced =
-      await this.syncStatusRepository.getLastBlockNumberSynced()
+      (await this.syncStatusRepository.getLastSynced()) ?? this.earliestBlock
 
     await this.dataSyncService.discardAfter(lastSynced)
 
-    this.logger.info('start', { lastSynced })
-
-    this.blockDownloader
-      .getKnownBlocks(lastSynced)
-      .then((blocks) => this.dispatch({ type: 'init', blocks }))
+    const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)
+    this.dispatch({ type: 'initialized', lastSynced, knownBlocks })
 
     this.blockDownloader.onNewBlock((block) =>
-      this.dispatch({ type: 'newBlocks', blocks: [block] })
+      this.dispatch({ type: 'newBlockFound', block })
     )
 
     this.blockDownloader.onReorg((blocks) =>
-      this.dispatch({ type: 'reorg', blocks })
+      this.dispatch({ type: 'reorgOccurred', blocks })
     )
+
+    this.logger.info('start', { lastSynced })
   }
 
   private dispatch(action: SyncSchedulerAction) {
-    this.jobQueue.add({
-      name: 'action',
-      execute: async () => {
-        const [newState, effect] = syncSchedulerReducer(this.state, action)
-        if (effect === 'sync') {
-          await this.handleSync(newState)
-        } else if (effect === 'discardAfter') {
-          await this.handleDiscardAfter(newState)
-        }
+    const [newState, effect] = syncSchedulerReducer(this.state, action)
+    this.state = newState
 
-        this.state = newState
+    this.logger.debug({ method: 'dispatch', action: action.type })
 
-        this.logger.debug({
-          method: 'dispatch',
-          action: action.type,
-          ...('success' in action && { success: action.success }),
-          ...('blocks' in action &&
-            action.blocks.length && {
-              blocksRange: [
-                action.blocks[0].number,
-                action.blocks[action.blocks.length - 1].number,
-              ].join(' - '),
-            }),
-        })
-      },
-    })
+    if (effect) {
+      this.jobQueue.add({
+        name: 'action',
+        execute: async () => {
+          this.logger.debug({ method: 'effect', effect: effect.type })
+
+          if (effect.type === 'sync') {
+            await this.handleSync(effect.blocks)
+          } else if (effect.type === 'discardAfter') {
+            await this.handleDiscardAfter(effect.blockNumber)
+          }
+        },
+      })
+    }
   }
 
-  private async handleSync({
-    blocksProcessing,
-    latestBlockProcessed,
-  }: SyncState) {
-    await this.syncStatusRepository.setLastBlockNumberSynced(
-      latestBlockProcessed
-    )
+  private async handleSync(blocks: BlockRange) {
     try {
-      await this.dataSyncService.sync(new BlockRange(blocksProcessing))
-      this.dispatch({ type: 'syncFinished', success: true })
+      await this.dataSyncService.sync(blocks)
+      await this.syncStatusRepository.setLastSynced(blocks.end - 1)
+      this.dispatch({ type: 'syncSucceeded' })
     } catch (err) {
-      this.dispatch({ type: 'syncFinished', success: false })
+      this.dispatch({ type: 'syncFailed', blocks })
       this.logger.error(err)
     }
   }
 
-  private async handleDiscardAfter({
-    blocksToProcess,
-    latestBlockProcessed,
-  }: SyncState) {
-    await this.syncStatusRepository.setLastBlockNumberSynced(
-      latestBlockProcessed
-    )
-
-    assert(blocksToProcess.first, 'blocksToProcess.first must be defined')
-
+  private async handleDiscardAfter(blockNumber: number) {
     try {
-      await this.dataSyncService.discardAfter(blocksToProcess.first.number - 1)
-      this.dispatch({ type: 'discardFinished', success: true })
+      await this.syncStatusRepository.setLastSynced(blockNumber)
+      await this.dataSyncService.discardAfter(blockNumber)
+      this.dispatch({ type: 'discardAfterSucceeded', blockNumber })
     } catch (err) {
-      this.dispatch({ type: 'discardFinished', success: false })
+      this.dispatch({ type: 'discardAfterFailed' })
       this.logger.error(err)
     }
   }
