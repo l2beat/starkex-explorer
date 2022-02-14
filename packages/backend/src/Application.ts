@@ -7,6 +7,7 @@ import { DataSyncService } from './core/DataSyncService'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
 import { PageCollector } from './core/PageCollector'
 import { StateTransitionFactCollector } from './core/StateTransitionFactCollector'
+import { StateUpdateCollector } from './core/StateUpdateCollector'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
@@ -80,16 +81,19 @@ export class Application {
       ethereumClient,
       stateTransitionFactRepository
     )
+    const stateUpdateCollector = new StateUpdateCollector(
+      pageRepository,
+      stateUpdateRepository,
+      rollupStateRepository,
+      ethereumClient
+    )
 
     const dataSyncService = new DataSyncService(
       verifierCollector,
       memoryHashEventCollector,
       pageCollector,
       stateTransitionFactCollector,
-      pageRepository,
-      rollupStateRepository,
-      stateUpdateRepository,
-      ethereumClient,
+      stateUpdateCollector,
       logger
     )
     const syncScheduler = new SyncScheduler(

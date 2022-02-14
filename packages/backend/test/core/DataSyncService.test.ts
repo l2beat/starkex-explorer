@@ -4,14 +4,14 @@ import { DataSyncService } from '../../src/core/DataSyncService'
 import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCollector'
 import type { PageCollector } from '../../src/core/PageCollector'
 import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
+import { StateUpdateCollector } from '../../src/core/StateUpdateCollector'
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
 import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
-import { PageRepository } from '../../src/peripherals/database/PageRepository'
-import { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
-import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
-import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
+
+const noop = async () => {}
 
 describe(DataSyncService.name, () => {
   describe(DataSyncService.prototype.sync.name, () => {
@@ -27,29 +27,24 @@ describe(DataSyncService.name, () => {
     const pageCollector = mock<PageCollector>({
       collect: async (_blockRange) => [],
     })
+
+    const transitionFacts: StateTransitionFactRecord[] = [
+      { hash: Hash256.fake('abcd'), blockNumber: 1 },
+    ]
+
     const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
-      collect: async (_blockRange) => [
-        { hash: Hash256.fake('abcd'), blockNumber: 1 },
-      ],
+      collect: async (_blockRange) => transitionFacts,
     })
-    const pageRepository = mock<PageRepository>({
-      getAllForFacts: async () => [],
+    const stateUpdateCollector = mock<StateUpdateCollector>({
+      save: noop,
     })
-    const rollupStateRepository = mock<RollupStateRepository>({})
-    const stateUpdateRepository = mock<StateUpdateRepository>({
-      getLast: async () => undefined,
-    })
-    const ethereumClient = mock<EthereumClient>({})
 
     const service = new DataSyncService(
       verifierCollector,
       memoryHashEventCollector,
       pageCollector,
       stateTransitionFactCollector,
-      pageRepository,
-      rollupStateRepository,
-      stateUpdateRepository,
-      ethereumClient,
+      stateUpdateCollector,
       Logger.SILENT
     )
 
@@ -67,16 +62,14 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionFactCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
-
-      expect(pageRepository.getAllForFacts).toHaveBeenCalledWith([
-        [Hash256.fake('abcd')],
+      expect(stateUpdateCollector.save).toHaveBeenCalledExactlyWith([
+        [transitionFacts],
       ])
     })
   })
 
   describe(DataSyncService.prototype.discardAfter.name, () => {
     it('discards data from block number', async () => {
-      const noop = async () => {}
       const verifierCollector = mock<VerifierCollector>({ discardAfter: noop })
       const memoryHashEventCollector = mock<MemoryHashEventCollector>({
         discardAfter: noop,
@@ -85,22 +78,16 @@ describe(DataSyncService.name, () => {
       const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
         discardAfter: noop,
       })
-      const pageRepository = mock<PageRepository>({})
-      const rollupStateRepository = mock<RollupStateRepository>({})
-      const stateUpdateRepository = mock<StateUpdateRepository>({
-        deleteAllAfter: noop,
+      const stateUpdateCollector = mock<StateUpdateCollector>({
+        discardAfter: noop,
       })
-      const ethereumClient = mock<EthereumClient>({})
 
       const dataSyncService = new DataSyncService(
         verifierCollector,
         memoryHashEventCollector,
         pageCollector,
         stateTransitionFactCollector,
-        pageRepository,
-        rollupStateRepository,
-        stateUpdateRepository,
-        ethereumClient,
+        stateUpdateCollector,
         Logger.SILENT
       )
 
@@ -112,7 +99,7 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionFactCollector.discardAfter).toHaveBeenCalledWith([
         10,
       ])
-      expect(stateUpdateRepository.deleteAllAfter).toHaveBeenCalledWith([10])
+      expect(stateUpdateCollector.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })

@@ -4,7 +4,6 @@ import { expect } from 'earljs'
 
 import { Hash256 } from '../../../src/model'
 import {
-  StateUpdateBundle,
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../../src/peripherals/database/StateUpdateRepository'
