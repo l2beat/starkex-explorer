@@ -3,7 +3,6 @@ import { AssetId, OnChainData } from '@explorer/encoding'
 import { Position } from '@explorer/state'
 import { expect } from 'earljs'
 import type { providers } from 'ethers'
-import { MessagePort } from 'worker_threads'
 
 import {
   ROLLUP_STATE_EMPTY_HASH,
