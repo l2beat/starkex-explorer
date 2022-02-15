@@ -32,7 +32,7 @@ describe(StateUpdateRepository.name, () => {
       positions: [
         {
           publicKey: 'public-key-0',
-          positionId: 0,
+          positionId: 0n,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
         },
@@ -42,7 +42,7 @@ describe(StateUpdateRepository.name, () => {
   })
 
   it('gets position by id', async () => {
-    const positionId = 12345
+    const positionId = 12345n
 
     await repository.add({
       stateUpdate: {
@@ -161,7 +161,7 @@ describe(StateUpdateRepository.name, () => {
         positions: [
           {
             publicKey: `public-key-${blockNumber}`,
-            positionId: blockNumber,
+            positionId: BigInt(blockNumber),
             collateralBalance: 0n,
             balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
           },

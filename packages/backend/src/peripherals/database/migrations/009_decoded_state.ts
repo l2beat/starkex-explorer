@@ -21,7 +21,7 @@ export async function up(knex: Knex) {
       .references('id')
       .inTable('state_updates')
       .onDelete('CASCADE')
-    table.integer('position_id').notNullable()
+    table.bigInteger('position_id').notNullable()
     table.string('public_key').notNullable()
     table.bigInteger('collateral_balance').notNullable()
     table.jsonb('balances').notNullable()

@@ -63,7 +63,7 @@ export class StateUpdateRepository {
     return row && toStateUpdateRecord(row)
   }
 
-  async getPositionById(positionId: number) {
+  async getPositionById(positionId: bigint) {
     const rows = await this.knex('positions')
       .select('*')
       .where('position_id', positionId)
@@ -122,7 +122,7 @@ function toPositionRecord(
 ): PositionRecord & { stateUpdateId: number } {
   return {
     stateUpdateId: row.state_update_id,
-    positionId: row.position_id,
+    positionId: BigInt(row.position_id),
     publicKey: row.public_key,
     collateralBalance: row.collateral_balance,
     balances: (typeof row.balances === 'string'

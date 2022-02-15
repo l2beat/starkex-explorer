@@ -2,28 +2,29 @@ import { PedersenHash } from '@explorer/crypto'
 import { AssetId, OnChainData } from '@explorer/encoding'
 import { Position } from '@explorer/state'
 import { expect } from 'earljs'
-import { providers } from 'ethers'
+import type { providers } from 'ethers'
+import { MessagePort } from 'worker_threads'
 
 import {
   ROLLUP_STATE_EMPTY_HASH,
   StateUpdateCollector,
 } from '../../src/core/StateUpdateCollector'
 import { Hash256 } from '../../src/model'
-import { PageRepository } from '../../src/peripherals/database/PageRepository'
-import { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
-import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
-import {
+import type { PageRepository } from '../../src/peripherals/database/PageRepository'
+import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
+import type { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
+import type {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../src/peripherals/database/StateUpdateRepository'
-import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../mock'
 
 describe(StateUpdateCollector.name, () => {
   describe(StateUpdateCollector.prototype.save.name, () => {
     it('saves updates', async () => {
       const pageRepository = mock<PageRepository>({
-        getAllForFacts: async () => [
+        getAllForFacts: async (_factHashes) => [
           {
             factHash: Hash256.fake('f1'),
             pages: [''],
@@ -101,6 +102,9 @@ describe(StateUpdateCollector.name, () => {
 
       await stateUpdateCollector.save(stateTransitionFacts)
 
+      expect(pageRepository.getAllForFacts).toHaveBeenCalledExactlyWith([
+        [stateTransitionFacts.map((f) => f.hash)],
+      ])
       expect(stateUpdateRepository.add).toHaveBeenCalledExactlyWith([
         [
           {
@@ -113,7 +117,7 @@ describe(StateUpdateCollector.name, () => {
                   }),
                 ],
                 collateralBalance: 555n,
-                positionId: 5,
+                positionId: 5n,
                 publicKey: `0x${'0'.repeat(63)}5`,
               },
             ],
