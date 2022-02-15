@@ -82,7 +82,7 @@ declare module 'knex/types/tables' {
 
   interface PositionRow {
     state_update_id: number
-    position_id: number
+    position_id: bigint
     public_key: string
     collateral_balance: bigint
     balances: JsonB<AssetBalanceJson[]>

@@ -20,7 +20,7 @@ export interface StateUpdateRecord {
 }
 
 export interface PositionRecord {
-  positionId: number
+  positionId: bigint
   publicKey: string
   collateralBalance: bigint
   balances: readonly AssetBalance[]

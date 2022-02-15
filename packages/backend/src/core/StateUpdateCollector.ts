@@ -62,7 +62,7 @@ export class StateUpdateCollector {
         },
         positions: newPositions.map(
           ({ value, index }): PositionRecord => ({
-            positionId: Number(index), // @todo This isn't correct, right? How do I get `positionId`?
+            positionId: index,
             publicKey: value.publicKey,
             balances: value.assets,
             collateralBalance: value.collateralBalance,
