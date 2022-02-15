@@ -5,7 +5,7 @@ export function createFrontendRouter() {
   const router = new Router()
 
   router.get('/', async (ctx) => {
-    ctx.body = renderHomePage()
+    ctx.body = renderHomePage({ forcedTransaction: [], stateUpdates: [] })
   })
 
   return router
