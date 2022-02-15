@@ -33,19 +33,17 @@ export class StateUpdateRepository {
 
   async add({ stateUpdate, positions, prices }: StateUpdateBundle) {
     await this.knex.transaction(async (trx) => {
-      await this.knex('state_updates')
-        .insert([toStateUpdateRow(stateUpdate)])
-        .transacting(trx)
+      await trx('state_updates').insert([toStateUpdateRow(stateUpdate)])
 
       if (positions.length > 0)
-        await this.knex('positions')
-          .insert(positions.map((pos) => toPositionRow(pos, stateUpdate.id)))
-          .transacting(trx)
+        await trx('positions').insert(
+          positions.map((pos) => toPositionRow(pos, stateUpdate.id))
+        )
 
       if (prices.length > 0)
-        await this.knex('prices')
-          .insert(prices.map((price) => toPriceRow(price, stateUpdate.id)))
-          .transacting(trx)
+        await trx('prices').insert(
+          prices.map((price) => toPriceRow(price, stateUpdate.id))
+        )
 
       this.logger.debug({
         method: 'add',
