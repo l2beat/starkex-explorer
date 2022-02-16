@@ -4,12 +4,14 @@ import { DataSyncService } from '../../src/core/DataSyncService'
 import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCollector'
 import type { PageCollector } from '../../src/core/PageCollector'
 import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
+import { StateUpdateCollector } from '../../src/core/StateUpdateCollector'
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
 import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
-import { PageRepository } from '../../src/peripherals/database/PageRepository'
-import { PositionUpdateRepository } from '../../src/peripherals/database/PositionUpdateRepository'
+import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
+
+const noop = async () => {}
 
 describe(DataSyncService.name, () => {
   describe(DataSyncService.prototype.sync.name, () => {
@@ -25,16 +27,16 @@ describe(DataSyncService.name, () => {
     const pageCollector = mock<PageCollector>({
       collect: async (_blockRange) => [],
     })
+
+    const transitionFacts: StateTransitionFactRecord[] = [
+      { hash: Hash256.fake('abcd'), blockNumber: 1 },
+    ]
+
     const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
-      collect: async (_blockRange) => [
-        { hash: Hash256.fake('abcd'), blockNumber: 1 },
-      ],
+      collect: async (_blockRange) => transitionFacts,
     })
-    const pageRepository = mock<PageRepository>({
-      getAllForFacts: async () => [],
-    })
-    const positionUpdateRepository = mock<PositionUpdateRepository>({
-      addOrUpdate: async () => {},
+    const stateUpdateCollector = mock<StateUpdateCollector>({
+      save: noop,
     })
 
     const service = new DataSyncService(
@@ -42,8 +44,7 @@ describe(DataSyncService.name, () => {
       memoryHashEventCollector,
       pageCollector,
       stateTransitionFactCollector,
-      pageRepository,
-      positionUpdateRepository,
+      stateUpdateCollector,
       Logger.SILENT
     )
 
@@ -61,19 +62,14 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionFactCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
-
-      expect(pageRepository.getAllForFacts).toHaveBeenCalledWith([
-        [Hash256.fake('abcd')],
+      expect(stateUpdateCollector.save).toHaveBeenCalledExactlyWith([
+        [transitionFacts],
       ])
-      expect(positionUpdateRepository.addOrUpdate).toHaveBeenCalledExactlyWith(
-        []
-      )
     })
   })
 
   describe(DataSyncService.prototype.discardAfter.name, () => {
     it('discards data from block number', async () => {
-      const noop = async () => {}
       const verifierCollector = mock<VerifierCollector>({ discardAfter: noop })
       const memoryHashEventCollector = mock<MemoryHashEventCollector>({
         discardAfter: noop,
@@ -82,14 +78,16 @@ describe(DataSyncService.name, () => {
       const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
         discardAfter: noop,
       })
+      const stateUpdateCollector = mock<StateUpdateCollector>({
+        discardAfter: noop,
+      })
 
       const dataSyncService = new DataSyncService(
         verifierCollector,
         memoryHashEventCollector,
         pageCollector,
         stateTransitionFactCollector,
-        mock<PageRepository>({ getAllForFacts: async () => [] }),
-        mock<PositionUpdateRepository>({ addOrUpdate: async () => {} }),
+        stateUpdateCollector,
         Logger.SILENT
       )
 
@@ -101,6 +99,7 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionFactCollector.discardAfter).toHaveBeenCalledWith([
         10,
       ])
+      expect(stateUpdateCollector.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })

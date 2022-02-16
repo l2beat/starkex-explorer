@@ -7,6 +7,7 @@ import { DataSyncService } from './core/DataSyncService'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
 import { PageCollector } from './core/PageCollector'
 import { StateTransitionFactCollector } from './core/StateTransitionFactCollector'
+import { StateUpdateCollector } from './core/StateUpdateCollector'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
@@ -16,8 +17,9 @@ import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
-import { PositionUpdateRepository } from './peripherals/database/PositionUpdateRepository'
+import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
 import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
+import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
@@ -39,7 +41,6 @@ export class Application {
 
     const kvStore = new KeyValueStore(knex, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore)
-    const positionUpdateRepository = new PositionUpdateRepository(knex, logger)
     const verifierEventRepository = new VerifierEventRepository(knex, logger)
     const factToPageRepository = new FactToPageRepository(knex, logger)
     const pageRepository = new PageRepository(knex, logger)
@@ -48,6 +49,8 @@ export class Application {
       logger
     )
     const blockRepository = new BlockRepository(knex, logger)
+    const rollupStateRepository = new RollupStateRepository(knex, logger)
+    const stateUpdateRepository = new StateUpdateRepository(knex, logger)
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
@@ -78,14 +81,19 @@ export class Application {
       ethereumClient,
       stateTransitionFactRepository
     )
+    const stateUpdateCollector = new StateUpdateCollector(
+      pageRepository,
+      stateUpdateRepository,
+      rollupStateRepository,
+      ethereumClient
+    )
 
     const dataSyncService = new DataSyncService(
       verifierCollector,
       memoryHashEventCollector,
       pageCollector,
       stateTransitionFactCollector,
-      pageRepository,
-      positionUpdateRepository,
+      stateUpdateCollector,
       logger
     )
     const syncScheduler = new SyncScheduler(

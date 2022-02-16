@@ -1,13 +1,10 @@
-import { decodeOnChainData } from '@explorer/encoding'
-
 import { BlockRange } from '../model'
-import { PageRepository } from '../peripherals/database/PageRepository'
-import { PositionUpdateRepository } from '../peripherals/database/PositionUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { MemoryHashEventCollector } from './MemoryHashEventCollector'
 import { PageCollector } from './PageCollector'
 import { StateTransitionFactCollector } from './StateTransitionFactCollector'
+import { StateUpdateCollector } from './StateUpdateCollector'
 import { VerifierCollector } from './VerifierCollector'
 
 export class DataSyncService {
@@ -16,8 +13,7 @@ export class DataSyncService {
     private readonly memoryHashEventCollector: MemoryHashEventCollector,
     private readonly pageCollector: PageCollector,
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
-    private readonly pageRepository: PageRepository,
-    private readonly positionUpdateRepository: PositionUpdateRepository,
+    private readonly stateUpdateCollector: StateUpdateCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -42,15 +38,7 @@ export class DataSyncService {
       newStateTransitionFacts: stateTransitionFacts.length,
     })
 
-    const stateTransitions = await this.pageRepository.getAllForFacts(
-      stateTransitionFacts.map((f) => f.hash)
-    )
-
-    for (const { pages } of stateTransitions) {
-      const decoded = decodeOnChainData(pages)
-
-      await this.positionUpdateRepository.addOrUpdate(decoded.positions)
-    }
+    await this.stateUpdateCollector.save(stateTransitionFacts)
   }
 
   async discardAfter(blockNumber: BlockNumber) {
@@ -58,5 +46,6 @@ export class DataSyncService {
     await this.memoryHashEventCollector.discardAfter(blockNumber)
     await this.pageCollector.discardAfter(blockNumber)
     await this.stateTransitionFactCollector.discardAfter(blockNumber)
+    await this.stateUpdateCollector.discardAfter(blockNumber)
   }
 }
