@@ -78,6 +78,30 @@ export class StateUpdateRepository {
     return rows.map(toStateUpdateRecord)
   }
 
+  async getStateChangeList() {
+    const rows = (await this.knex('state_updates')
+      .join('positions', 'state_updates.id', 'positions.state_update_id')
+      .groupBy('root_hash', 'timestamp')
+      .select(
+        'root_hash',
+        'timestamp',
+        this.knex.raw('count(position_id) as position_count')
+      )
+      .orderBy('timestamp')) as unknown as Array<{
+      root_hash: string
+      timestamp: number
+      position_count: bigint
+    }>
+
+    this.logger.debug({ method: 'getAll', rows: rows.length })
+
+    return rows.map((row) => ({
+      rootHash: row.root_hash,
+      timestamp: row.timestamp,
+      positionCount: row.position_count,
+    }))
+  }
+
   async deleteAll() {
     await this.knex('state_updates').delete()
     this.logger.debug({ method: 'deleteAll' })

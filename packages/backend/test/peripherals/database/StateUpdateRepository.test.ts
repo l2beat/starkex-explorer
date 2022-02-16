@@ -184,4 +184,54 @@ describe(StateUpdateRepository.name, () => {
       { asset_id: 'ETH-9', price: 20002n },
     ])
   })
+
+  it('gets a list of state changes', async () => {
+    for (const blockNumber of [20_001, 20_002, 20_003, 20_004]) {
+      await repository.add({
+        stateUpdate: {
+          id: blockNumber,
+          blockNumber,
+          rootHash: PedersenHash.fake(blockNumber.toString()),
+          factHash: Hash256.fake(),
+          timestamp: blockNumber,
+        },
+        positions: Array.from({ length: blockNumber - 20_000 }).map((_, i) => ({
+          publicKey: `public-key-${blockNumber}-${i}`,
+          positionId: BigInt(blockNumber * 10 + i),
+          collateralBalance: 0n,
+          balances: [],
+        })),
+        prices: [],
+      })
+    }
+
+    const actual = await repository.getStateChangeList()
+
+    expect(actual).toEqual([
+      {
+        positionCount: 1n,
+        rootHash:
+          '0200010000000000000000000000000000000000000000000000000000000000',
+        timestamp: 20001,
+      },
+      {
+        positionCount: 2n,
+        rootHash:
+          '0200020000000000000000000000000000000000000000000000000000000000',
+        timestamp: 20002,
+      },
+      {
+        positionCount: 3n,
+        rootHash:
+          '0200030000000000000000000000000000000000000000000000000000000000',
+        timestamp: 20003,
+      },
+      {
+        positionCount: 4n,
+        rootHash:
+          '0200040000000000000000000000000000000000000000000000000000000000',
+        timestamp: 20004,
+      },
+    ])
+  })
 })
