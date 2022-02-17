@@ -4,6 +4,7 @@ import { expect } from 'earljs'
 
 import { Hash256 } from '../../../src/model'
 import {
+  PositionRecord,
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../../src/peripherals/database/StateUpdateRepository'
@@ -185,7 +186,7 @@ describe(StateUpdateRepository.name, () => {
     ])
   })
 
-  it('gets a list of state changes', async () => {
+  it('gets a list of state changes descending by timestamp', async () => {
     for (const blockNumber of [20_001, 20_002, 20_003, 20_004]) {
       await repository.add({
         stateUpdate: {
@@ -205,33 +206,60 @@ describe(StateUpdateRepository.name, () => {
       })
     }
 
-    const actual = await repository.getStateChangeList()
+    const actual = await repository.getStateChangeList({ offset: 1, limit: 2 })
 
     expect(actual).toEqual([
       {
-        positionCount: 1n,
-        rootHash:
-          '0200010000000000000000000000000000000000000000000000000000000000',
-        timestamp: 20001,
-      },
-      {
-        positionCount: 2n,
-        rootHash:
-          '0200020000000000000000000000000000000000000000000000000000000000',
-        timestamp: 20002,
-      },
-      {
-        positionCount: 3n,
-        rootHash:
-          '0200030000000000000000000000000000000000000000000000000000000000',
+        positionCount: 3,
+        rootHash: PedersenHash(
+          '0200030000000000000000000000000000000000000000000000000000000000'
+        ),
         timestamp: 20003,
       },
       {
-        positionCount: 4n,
-        rootHash:
-          '0200040000000000000000000000000000000000000000000000000000000000',
-        timestamp: 20004,
+        positionCount: 2,
+        rootHash: PedersenHash(
+          '0200020000000000000000000000000000000000000000000000000000000000'
+        ),
+        timestamp: 20002,
       },
     ])
+  })
+
+  it('gets state by its root hash', async () => {
+    const collateralBalance = 100_000_000_000_000n
+    const blockNumber = 30_000
+    const timestamp = Math.floor(Date.now() / 1000)
+    const rootHash = PedersenHash.fake()
+    await repository.add({
+      stateUpdate: {
+        id: blockNumber,
+        blockNumber,
+        rootHash,
+        factHash: Hash256.fake(),
+        timestamp,
+      },
+      positions: Array.from({ length: 4 }).map((_, i) => ({
+        publicKey: `public-key-${blockNumber}-${i}`,
+        positionId: BigInt(blockNumber * 10 + i),
+        collateralBalance: collateralBalance,
+        balances: [],
+      })),
+      prices: [],
+    })
+
+    const actual = await repository.getStateChangeByRootHash(rootHash)
+
+    expect(actual).toEqual({
+      timestamp,
+      positions: Array.from({ length: 4 }).map((_, i) =>
+        expect.objectWith({
+          publicKey: `public-key-${blockNumber}-${i}`,
+          positionId: BigInt(blockNumber * 10 + i),
+          collateralBalance: collateralBalance,
+          balances: [],
+        })
+      ),
+    })
   })
 })
