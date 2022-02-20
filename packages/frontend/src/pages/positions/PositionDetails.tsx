@@ -44,7 +44,7 @@ export function PositionDetails({ positionId, history }: PositionDetailsProps) {
                       </div>
                       <dl>
                         {balances.map(({ assetId, balance }) => (
-                          <div key={`${assetId}`}>
+                          <div key={assetId}>
                             <dt className="inline text-zinc-600">
                               {assetId}:{' '}
                             </dt>

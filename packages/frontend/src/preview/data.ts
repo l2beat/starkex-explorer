@@ -1,8 +1,11 @@
 import { PedersenHash } from '@explorer/crypto'
 
-import { PositionDetailsProps } from '../pages'
-import { HomeProps } from '../pages/home/HomeProps'
-import { StateChangeDetailsProps } from '../pages/state-updates'
+import {
+  HomeProps,
+  PositionDetailsProps,
+  StateChangeDetailsProps,
+  StateChangesIndexProps,
+} from '../pages'
 
 const ONE_HOUR = 60 * 60 * 1000
 
@@ -71,4 +74,18 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       ],
     },
   ],
+}
+
+export const STATE_CHANGES_INDEX_PROPS: StateChangesIndexProps = {
+  stateUpdates: Array.from({ length: 10 }).map((_, i) => ({
+    hash: PedersenHash.fake(),
+    positionCount: Math.floor(Math.random() * 30 + 4),
+    timestamp:
+      Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR),
+  })),
+  fullCount: 121,
+  params: {
+    perPage: 10,
+    page: 5,
+  },
 }

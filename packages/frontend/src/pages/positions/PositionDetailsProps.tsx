@@ -5,7 +5,7 @@ export interface PositionDetailsProps {
     readonly publicKey: string
     readonly collateralBalance: bigint
     readonly balances: ReadonlyArray<{
-      readonly assetId: String
+      readonly assetId: string
       readonly balance: bigint
     }>
   }>

@@ -7,6 +7,7 @@ import {
   renderHomePage,
   renderPositionDetailsPage,
   renderStateChangeDetailsPage,
+  renderStateChangesIndexPage,
 } from '../pages'
 import * as DATA from './data'
 
@@ -15,6 +16,9 @@ const router = new Router()
 
 router.get('/', (ctx) => {
   ctx.body = renderHomePage(DATA.HOME_PROPS)
+})
+router.get('/state-updates', (ctx) => {
+  ctx.body = renderStateChangesIndexPage(DATA.STATE_CHANGES_INDEX_PROPS)
 })
 router.get('/state-updates/:hash', (ctx) => {
   ctx.body = renderStateChangeDetailsPage(DATA.STATE_CHANGE_DETAILS_PROPS)

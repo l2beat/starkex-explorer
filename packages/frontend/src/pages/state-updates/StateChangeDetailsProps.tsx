@@ -8,7 +8,7 @@ export interface StateChangeDetailsProps {
     readonly positionId: bigint
     readonly collateralBalance: bigint
     readonly balances: ReadonlyArray<{
-      readonly assetId: String
+      readonly assetId: string
       readonly balance: bigint
     }>
   }>

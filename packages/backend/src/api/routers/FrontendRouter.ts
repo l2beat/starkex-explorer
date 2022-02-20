@@ -2,8 +2,9 @@ import { PedersenHash } from '@explorer/crypto'
 import {
   HomeProps,
   renderHomePage,
-  renderStateChangeDetailsPage,
   renderPositionDetailsPage,
+  renderStateChangeDetailsPage,
+  renderStateChangesIndexPage,
 } from '@explorer/frontend'
 import Router from '@koa/router'
 
@@ -29,6 +30,20 @@ export function createFrontendRouter(
           positionCount: x.positionCount,
         })
       ),
+    })
+  })
+
+  router.get('/state-updates', async (ctx) => {
+    const page = parseInt(String(ctx.query.page ?? '1'))
+    const perPage = parseInt(String(ctx.query.perPage ?? '10'))
+
+    const stateUpdates = await stateUpdateRepository.getStateChangeList({
+      offset: (page - 1) * perPage,
+      limit: perPage,
+    })
+
+    ctx.body = renderStateChangesIndexPage({
+      stateUpdates,
     })
   })
 
