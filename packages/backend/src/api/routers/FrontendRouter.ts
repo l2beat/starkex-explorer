@@ -31,5 +31,18 @@ export function createFrontendRouter(
     })
   })
 
+  router.get('/state-updates/:hash', async (ctx) => {
+    const hash = PedersenHash(ctx.params.hash)
+    const stateChange = await stateUpdateRepository.getStateChangeByRootHash(
+      hash
+    )
+
+    ctx.body = renderStateChangeDetailsPage({
+      hash,
+      timestamp: stateChange.timestamp,
+      positions: stateChange.positions,
+    })
+  })
+
   return router
 }
