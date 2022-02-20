@@ -41,9 +41,19 @@ export function createFrontendRouter(
       offset: (page - 1) * perPage,
       limit: perPage,
     })
+    const fullCount = await stateUpdateRepository.getStateChangeCount()
 
     ctx.body = renderStateChangesIndexPage({
-      stateUpdates,
+      stateUpdates: stateUpdates.map((update) => ({
+        hash: update.rootHash,
+        timestamp: update.timestamp,
+        positionCount: update.positionCount,
+      })),
+      fullCount: Number(fullCount),
+      params: {
+        page,
+        perPage,
+      },
     })
   })
 
@@ -56,7 +66,13 @@ export function createFrontendRouter(
     ctx.body = renderStateChangeDetailsPage({
       hash,
       timestamp: stateChange.timestamp,
-      positions: stateChange.positions,
+      positions: stateChange.positions.map((pos) => ({
+        ...pos,
+        balances: pos.balances.map((balance) => ({
+          assetId: balance.assetId.toString(), // <- this is less than ideal
+          balance: balance.balance,
+        })),
+      })),
     })
   })
 
@@ -66,7 +82,13 @@ export function createFrontendRouter(
 
     ctx.body = renderPositionDetailsPage({
       positionId,
-      history,
+      history: history.map((pos) => ({
+        ...pos,
+        balances: pos.balances.map((balance) => ({
+          assetId: balance.assetId.toString(),
+          balance: balance.balance,
+        })),
+      })),
     })
   })
 
