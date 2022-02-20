@@ -110,6 +110,11 @@ export class StateUpdateRepository {
     }))
   }
 
+  async getStateChangeCount() {
+    const row = await this.knex('state_updates').count()
+    return row[0].count as unknown as bigint
+  }
+
   async getStateChangeByRootHash(rootHash: PedersenHash) {
     const hash = rootHash.toString()
     const row = (await this.knex('state_updates')

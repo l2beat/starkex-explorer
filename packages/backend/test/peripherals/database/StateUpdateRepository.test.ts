@@ -262,4 +262,29 @@ describe(StateUpdateRepository.name, () => {
       ),
     })
   })
+
+  it('gets a count of all state changes', async () => {
+    for (const blockNumber of [40_001, 40_002, 40_003, 40_004]) {
+      await repository.add({
+        stateUpdate: {
+          id: blockNumber,
+          blockNumber,
+          rootHash: PedersenHash.fake(blockNumber.toString()),
+          factHash: Hash256.fake(),
+          timestamp: blockNumber,
+        },
+        positions: Array.from({ length: blockNumber - 40_000 }).map((_, i) => ({
+          publicKey: `public-key-${blockNumber}-${i}`,
+          positionId: BigInt(blockNumber * 10 + i),
+          collateralBalance: 0n,
+          balances: [],
+        })),
+        prices: [],
+      })
+    }
+
+    const fullCount = await repository.getStateChangeCount()
+
+    expect(fullCount).toEqual(4n)
+  })
 })
