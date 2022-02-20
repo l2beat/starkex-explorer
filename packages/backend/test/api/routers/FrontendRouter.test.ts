@@ -5,9 +5,11 @@ import { createTestApiServer } from '../TestApiServer'
 
 describe('FrontendRouter', () => {
   it('/ returns html', async () => {
-    const frontendRouter = createFrontendRouter(mock<StateUpdateRepository>({
-      getStateChangeList: async () => []
-    }))
+    const frontendRouter = createFrontendRouter(
+      mock<StateUpdateRepository>({
+        getStateChangeList: async () => [],
+      })
+    )
     const server = createTestApiServer([frontendRouter])
 
     await server
