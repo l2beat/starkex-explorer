@@ -3,8 +3,11 @@ import Router from '@koa/router'
 import Koa from 'koa'
 import serve from 'koa-static'
 
-import { renderHomePage } from '../pages'
-import { renderStateChangeDetailsPage } from '../pages/state-updates'
+import {
+  renderHomePage,
+  renderPositionDetailsPage,
+  renderStateChangeDetailsPage,
+} from '../pages'
 import * as DATA from './data'
 
 const app = new Koa()
@@ -15,6 +18,9 @@ router.get('/', (ctx) => {
 })
 router.get('/state-updates/:hash', (ctx) => {
   ctx.body = renderStateChangeDetailsPage(DATA.STATE_CHANGE_DETAILS_PROPS)
+})
+router.get('/positions/:positionId', (ctx) => {
+  ctx.body = renderPositionDetailsPage(DATA.POSITION_DETAILS_PROPS)
 })
 
 app.use(router.routes())

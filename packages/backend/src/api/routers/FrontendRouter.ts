@@ -3,6 +3,7 @@ import {
   HomeProps,
   renderHomePage,
   renderStateChangeDetailsPage,
+  renderPositionDetailsPage,
 } from '@explorer/frontend'
 import Router from '@koa/router'
 
@@ -41,6 +42,16 @@ export function createFrontendRouter(
       hash,
       timestamp: stateChange.timestamp,
       positions: stateChange.positions,
+    })
+  })
+
+  router.get('/positions/:positionId', async (ctx) => {
+    const positionId = BigInt(ctx.params.positionId)
+    const history = await stateUpdateRepository.getPositionById(positionId)
+
+    ctx.body = renderPositionDetailsPage({
+      positionId,
+      history,
     })
   })
 

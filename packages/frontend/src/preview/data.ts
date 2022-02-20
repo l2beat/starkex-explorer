@@ -1,5 +1,6 @@
 import { PedersenHash } from '@explorer/crypto'
 
+import { PositionDetailsProps } from '../pages'
 import { HomeProps } from '../pages/home/HomeProps'
 import { StateChangeDetailsProps } from '../pages/state-updates'
 
@@ -38,6 +39,31 @@ export const STATE_CHANGE_DETAILS_PROPS: StateChangeDetailsProps = {
     {
       publicKey: `0x${'0'.repeat(63)}2`,
       positionId: 2n,
+      collateralBalance: 222n,
+      balances: [
+        { assetId: 'BTC-10', balance: 5n },
+        { assetId: 'UNI-9', balance: 20n },
+      ],
+    },
+  ],
+}
+
+export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
+  positionId: 1234n,
+  history: [
+    {
+      stateUpdateId: 11,
+      publicKey: `0x${'0'.repeat(63)}1`,
+      collateralBalance: 100n,
+      balances: [
+        { assetId: 'ETH-9', balance: 0n },
+        { assetId: 'UNI-9', balance: 20n },
+        { assetId: 'MKR-9', balance: 30n },
+      ],
+    },
+    {
+      stateUpdateId: 12,
+      publicKey: `0x${'0'.repeat(63)}1`,
       collateralBalance: 222n,
       balances: [
         { assetId: 'BTC-10', balance: 5n },
