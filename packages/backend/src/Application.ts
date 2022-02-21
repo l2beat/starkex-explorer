@@ -107,7 +107,10 @@ export class Application {
     // #region api
 
     const apiServer = new ApiServer(config.port, logger, {
-      routers: [createStatusRouter(statusService), createFrontendRouter()],
+      routers: [
+        createStatusRouter(statusService),
+        createFrontendRouter(stateUpdateRepository),
+      ],
       middleware: [createFrontendMiddleware()],
     })
 

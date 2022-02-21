@@ -95,7 +95,7 @@ function parseCommand(text) {
   const SURROUNDED = /^"[^"]*"$/
   const NOT_SURROUNDED = /^([^"]|[^"].*?[^"])$/
 
-  let args = []
+  const args = []
   let argPart = ''
 
   for (const arg of text.split(' ')) {

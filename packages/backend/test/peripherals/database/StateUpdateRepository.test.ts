@@ -184,4 +184,106 @@ describe(StateUpdateRepository.name, () => {
       { asset_id: 'ETH-9', price: 20002n },
     ])
   })
+
+  it('gets a list of state changes descending by timestamp', async () => {
+    for (const blockNumber of [20_001, 20_002, 20_003, 20_004]) {
+      await repository.add({
+        stateUpdate: {
+          id: blockNumber,
+          blockNumber,
+          rootHash: PedersenHash.fake(blockNumber.toString()),
+          factHash: Hash256.fake(),
+          timestamp: blockNumber,
+        },
+        positions: Array.from({ length: blockNumber - 20_000 }).map((_, i) => ({
+          publicKey: `public-key-${blockNumber}-${i}`,
+          positionId: BigInt(blockNumber * 10 + i),
+          collateralBalance: 0n,
+          balances: [],
+        })),
+        prices: [],
+      })
+    }
+
+    const actual = await repository.getStateChangeList({ offset: 1, limit: 2 })
+
+    expect(actual).toEqual([
+      {
+        positionCount: 3,
+        rootHash: PedersenHash(
+          '0200030000000000000000000000000000000000000000000000000000000000'
+        ),
+        timestamp: 20003,
+      },
+      {
+        positionCount: 2,
+        rootHash: PedersenHash(
+          '0200020000000000000000000000000000000000000000000000000000000000'
+        ),
+        timestamp: 20002,
+      },
+    ])
+  })
+
+  it('gets state by its root hash', async () => {
+    const collateralBalance = 100_000_000_000_000n
+    const blockNumber = 30_000
+    const timestamp = Math.floor(Date.now() / 1000)
+    const rootHash = PedersenHash.fake()
+    await repository.add({
+      stateUpdate: {
+        id: blockNumber,
+        blockNumber,
+        rootHash,
+        factHash: Hash256.fake(),
+        timestamp,
+      },
+      positions: Array.from({ length: 4 }).map((_, i) => ({
+        publicKey: `public-key-${blockNumber}-${i}`,
+        positionId: BigInt(blockNumber * 10 + i),
+        collateralBalance: collateralBalance,
+        balances: [],
+      })),
+      prices: [],
+    })
+
+    const actual = await repository.getStateChangeByRootHash(rootHash)
+
+    expect(actual).toEqual({
+      timestamp,
+      positions: Array.from({ length: 4 }).map((_, i) =>
+        expect.objectWith({
+          publicKey: `public-key-${blockNumber}-${i}`,
+          positionId: BigInt(blockNumber * 10 + i),
+          collateralBalance: collateralBalance,
+          balances: [],
+        })
+      ),
+    })
+  })
+
+  it('gets a count of all state changes', async () => {
+    for (const blockNumber of [40_001, 40_002, 40_003, 40_004]) {
+      await repository.add({
+        stateUpdate: {
+          id: blockNumber,
+          blockNumber,
+          rootHash: PedersenHash.fake(blockNumber.toString()),
+          factHash: Hash256.fake(),
+          timestamp: blockNumber,
+        },
+        positions: Array.from({ length: blockNumber - 40_000 }).map((_, i) => ({
+          publicKey: `public-key-${blockNumber}-${i}`,
+          positionId: BigInt(blockNumber * 10 + i),
+          collateralBalance: 0n,
+          balances: [],
+        })),
+        prices: [],
+      })
+    }
+
+    const fullCount = await repository.getStateChangeCount()
+
+    expect(fullCount).toEqual(4n)
+  })
 })

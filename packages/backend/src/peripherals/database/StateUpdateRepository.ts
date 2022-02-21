@@ -78,8 +78,67 @@ export class StateUpdateRepository {
     return rows.map(toStateUpdateRecord)
   }
 
+  async getStateChangeList({
+    offset,
+    limit,
+  }: {
+    offset: number
+    limit: number
+  }) {
+    const rows = (await this.knex('state_updates')
+      .orderBy('timestamp', 'desc')
+      .offset(offset)
+      .limit(limit)
+      .join('positions', 'state_updates.id', 'positions.state_update_id')
+      .groupBy('root_hash', 'timestamp')
+      .select(
+        'root_hash',
+        'timestamp',
+        this.knex.raw('count(position_id) as position_count')
+      )) as unknown as Array<{
+      root_hash: string
+      timestamp: number
+      position_count: bigint
+    }>
+
+    this.logger.debug({ method: 'getStateChangeList', rows: rows.length })
+
+    return rows.map((row) => ({
+      rootHash: PedersenHash(row.root_hash),
+      timestamp: row.timestamp,
+      positionCount: Number(row.position_count),
+    }))
+  }
+
+  async getStateChangeCount() {
+    const row = await this.knex('state_updates').count()
+    return row[0].count as unknown as bigint
+  }
+
+  async getStateChangeByRootHash(rootHash: PedersenHash) {
+    const hash = rootHash.toString()
+    const row = (await this.knex('state_updates')
+      .first()
+      .where('root_hash', '=', hash)
+      .orderBy('timestamp', 'desc')
+      .join('positions', 'state_updates.id', 'positions.state_update_id')
+      .groupBy('root_hash', 'timestamp')
+      .select(
+        'timestamp',
+        this.knex.raw('ARRAY_AGG(row_to_json(positions)) as positions')
+      )) as unknown as { timestamp: number; positions: PositionRow[] }
+
+    this.logger.debug({ method: 'getStateChangeByRootHash', hash })
+
+    return {
+      timestamp: row.timestamp,
+      positions: row.positions.map(toPositionRecord),
+    }
+  }
+
   async deleteAll() {
     await this.knex('state_updates').delete()
+
     this.logger.debug({ method: 'deleteAll' })
   }
 
@@ -124,7 +183,7 @@ function toPositionRecord(
     stateUpdateId: row.state_update_id,
     positionId: BigInt(row.position_id),
     publicKey: row.public_key,
-    collateralBalance: row.collateral_balance,
+    collateralBalance: BigInt(row.collateral_balance),
     balances: (typeof row.balances === 'string'
       ? (JSON.parse(row.balances) as AssetBalanceJson[])
       : row.balances
