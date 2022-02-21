@@ -15,6 +15,10 @@ export function createFrontendRouter(
   router.get('/state-updates', async (ctx) => {
     const page = parseInt(String(ctx.query.page ?? '1'))
     const perPage = parseInt(String(ctx.query.perPage ?? '10'))
+    if ([page, perPage].some(Number.isNaN)) {
+      ctx.status = 500;
+      return;
+    }
     ctx.body = await frontendController.getStateChangesPage(page, perPage)
   })
 
