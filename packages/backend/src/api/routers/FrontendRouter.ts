@@ -1,16 +1,9 @@
 import { PedersenHash } from '@explorer/crypto'
-import {
-  renderPositionDetailsPage,
-  renderStateChangeDetailsPage,
-  renderStateChangesIndexPage,
-} from '@explorer/frontend'
 import Router from '@koa/router'
 
-import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { FrontendController } from '../controllers/FrontendController'
 
 export function createFrontendRouter(
-  stateUpdateRepository: StateUpdateRepository,
   frontendController: FrontendController,
 ) {
   const router = new Router()
@@ -22,60 +15,17 @@ export function createFrontendRouter(
   router.get('/state-updates', async (ctx) => {
     const page = parseInt(String(ctx.query.page ?? '1'))
     const perPage = parseInt(String(ctx.query.perPage ?? '10'))
-
-    const stateUpdates = await stateUpdateRepository.getStateChangeList({
-      offset: (page - 1) * perPage,
-      limit: perPage,
-    })
-    const fullCount = await stateUpdateRepository.getStateChangeCount()
-
-    ctx.body = renderStateChangesIndexPage({
-      stateUpdates: stateUpdates.map((update) => ({
-        hash: update.rootHash,
-        timestamp: update.timestamp,
-        positionCount: update.positionCount,
-      })),
-      fullCount: Number(fullCount),
-      params: {
-        page,
-        perPage,
-      },
-    })
+    ctx.body = await frontendController.getStateChangesPage(page, perPage)
   })
 
   router.get('/state-updates/:hash', async (ctx) => {
     const hash = PedersenHash(ctx.params.hash)
-    const stateChange = await stateUpdateRepository.getStateChangeByRootHash(
-      hash
-    )
-
-    ctx.body = renderStateChangeDetailsPage({
-      hash,
-      timestamp: stateChange.timestamp,
-      positions: stateChange.positions.map((pos) => ({
-        ...pos,
-        balances: pos.balances.map((balance) => ({
-          assetId: balance.assetId.toString(), // <- this is less than ideal
-          balance: balance.balance,
-        })),
-      })),
-    })
+    ctx.body = await frontendController.getStateChangeDetailsPage(hash)
   })
 
   router.get('/positions/:positionId', async (ctx) => {
     const positionId = BigInt(ctx.params.positionId)
-    const history = await stateUpdateRepository.getPositionById(positionId)
-
-    ctx.body = renderPositionDetailsPage({
-      positionId,
-      history: history.map((pos) => ({
-        ...pos,
-        balances: pos.balances.map((balance) => ({
-          assetId: balance.assetId.toString(),
-          balance: balance.balance,
-        })),
-      })),
-    })
+    ctx.body = await frontendController.getPositionDetailsPage(positionId)
   })
 
   return router

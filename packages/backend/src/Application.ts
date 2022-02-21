@@ -111,7 +111,7 @@ export class Application {
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
-        createFrontendRouter(stateUpdateRepository, frontendController),
+        createFrontendRouter(frontendController),
       ],
       middleware: [createFrontendMiddleware()],
     })

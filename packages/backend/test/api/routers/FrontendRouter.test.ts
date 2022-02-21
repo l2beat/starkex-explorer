@@ -11,7 +11,6 @@ describe('FrontendRouter', () => {
     })
     const frontendController = new FrontendController(stateUpdateRepository)
     const frontendRouter = createFrontendRouter(
-      stateUpdateRepository,
       frontendController,
     )
     const server = createTestApiServer([frontendRouter])
