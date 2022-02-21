@@ -1,7 +1,5 @@
 import { PedersenHash } from '@explorer/crypto'
 import {
-  HomeProps,
-  renderHomePage,
   renderPositionDetailsPage,
   renderStateChangeDetailsPage,
   renderStateChangesIndexPage,
@@ -9,28 +7,16 @@ import {
 import Router from '@koa/router'
 
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { FrontendController } from '../controllers/FrontendController'
 
 export function createFrontendRouter(
-  stateUpdateRepository: StateUpdateRepository
+  stateUpdateRepository: StateUpdateRepository,
+  frontendController: FrontendController,
 ) {
   const router = new Router()
 
   router.get('/', async (ctx) => {
-    const stateUpdates = await stateUpdateRepository.getStateChangeList({
-      offset: 0,
-      limit: 20,
-    })
-
-    ctx.body = renderHomePage({
-      forcedTransaction: [],
-      stateUpdates: stateUpdates.map(
-        (x): HomeProps['stateUpdates'][number] => ({
-          hash: x.rootHash,
-          timestamp: x.timestamp,
-          positionCount: x.positionCount,
-        })
-      ),
-    })
+    ctx.body = await frontendController.getHomePage()
   })
 
   router.get('/state-updates', async (ctx) => {
