@@ -29,6 +29,7 @@ export class FrontendController {
       ),
     })
   }
+
   async getStateChangesPage(page: number, perPage: number): Promise<string> {
     const stateUpdates = await this.stateUpdateRepository.getStateChangeList({
       offset: (page - 1) * perPage,
@@ -49,6 +50,7 @@ export class FrontendController {
       },
     })
   }
+
   async getStateChangeDetailsPage(hash: PedersenHash): Promise<string> {
     const stateChange =
       await this.stateUpdateRepository.getStateChangeByRootHash(hash)
@@ -65,6 +67,7 @@ export class FrontendController {
       })),
     })
   }
+
   async getPositionDetailsPage(positionId: bigint): Promise<string> {
     const history = await this.stateUpdateRepository.getPositionById(positionId)
 
