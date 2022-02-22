@@ -1,4 +1,5 @@
 import { ApiServer } from './api/ApiServer'
+import { FrontendController } from './api/controllers/FrontendController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
@@ -106,10 +107,11 @@ export class Application {
     // #endregion core
     // #region api
 
+    const frontendController = new FrontendController(stateUpdateRepository)
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
-        createFrontendRouter(stateUpdateRepository),
+        createFrontendRouter(frontendController),
       ],
       middleware: [createFrontendMiddleware()],
     })
