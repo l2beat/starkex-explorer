@@ -10,9 +10,8 @@ import {
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 
 export class FrontendController {
-  constructor(private stateUpdateRepository: StateUpdateRepository) {
-    this.stateUpdateRepository = stateUpdateRepository
-  }
+  constructor(private stateUpdateRepository: StateUpdateRepository) {}
+
   async getHomePage(): Promise<string> {
     const stateUpdates = await this.stateUpdateRepository.getStateChangeList({
       offset: 0,
