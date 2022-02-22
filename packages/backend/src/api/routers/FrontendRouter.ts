@@ -3,9 +3,7 @@ import Router from '@koa/router'
 
 import { FrontendController } from '../controllers/FrontendController'
 
-export function createFrontendRouter(
-  frontendController: FrontendController,
-) {
+export function createFrontendRouter(frontendController: FrontendController) {
   const router = new Router()
 
   router.get('/', async (ctx) => {
@@ -16,8 +14,8 @@ export function createFrontendRouter(
     const page = parseInt(String(ctx.query.page ?? '1'))
     const perPage = parseInt(String(ctx.query.perPage ?? '10'))
     if ([page, perPage].some(Number.isNaN)) {
-      ctx.status = 500;
-      return;
+      ctx.status = 500
+      return
     }
     ctx.body = await frontendController.getStateChangesPage(page, perPage)
   })

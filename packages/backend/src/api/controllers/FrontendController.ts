@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/crypto';
+import { PedersenHash } from '@explorer/crypto'
 import {
   HomeProps,
   renderHomePage,
@@ -7,7 +7,7 @@ import {
   renderStateChangesIndexPage,
 } from '@explorer/frontend'
 
-import { StateUpdateRepository } from "../../peripherals/database/StateUpdateRepository";
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 
 export class FrontendController {
   constructor(private stateUpdateRepository: StateUpdateRepository) {
@@ -51,9 +51,8 @@ export class FrontendController {
     })
   }
   async getStateChangeDetailsPage(hash: PedersenHash): Promise<string> {
-    const stateChange = await this.stateUpdateRepository.getStateChangeByRootHash(
-      hash
-    )
+    const stateChange =
+      await this.stateUpdateRepository.getStateChangeByRootHash(hash)
 
     return renderStateChangeDetailsPage({
       hash,
