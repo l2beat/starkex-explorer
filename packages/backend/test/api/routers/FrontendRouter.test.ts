@@ -20,40 +20,26 @@ describe('FrontendRouter', () => {
     }) 
   })
   describe('/state-updates', () => {
+    const frontendRouter = createFrontendRouter(
+      mock<FrontendController>({
+        getStateChangesPage: async () => '<!DOCTYPE html>',
+      }),
+    )
+    const server = createTestApiServer([frontendRouter])
+
     it('returns html', async () => {
-      const frontendRouter = createFrontendRouter(
-        mock<FrontendController>({
-          getStateChangesPage: async () => '<!DOCTYPE html>',
-        }),
-      )
-      const server = createTestApiServer([frontendRouter])
-  
       await server
         .get('/state-updates')
         .expect(200)
         .expect(/^<!DOCTYPE html>/)
     })
-    it('accepts pagination params', async () => {
-      const frontendRouter = createFrontendRouter(
-        mock<FrontendController>({
-          getStateChangesPage: async () => '<!DOCTYPE html>',
-        }),
-      )
-      const server = createTestApiServer([frontendRouter])
-  
+    it('accepts pagination params', async () => {  
       await server
         .get('/state-updates?page=123&perPage=100')
         .expect(200)
         .expect(/^<!DOCTYPE html>/)
     })
-    it('does not allow invalid input', async () => {
-      const frontendRouter = createFrontendRouter(
-        mock<FrontendController>({
-          getStateChangesPage: async () => '<!DOCTYPE html>',
-        }),
-      )
-      const server = createTestApiServer([frontendRouter])
-  
+    it('does not allow invalid input', async () => {  
       await server
         .get('/state-updates?page=foo&perPage=bar')
         .expect(500)
