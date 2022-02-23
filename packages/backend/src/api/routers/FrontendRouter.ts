@@ -2,31 +2,8 @@ import { PedersenHash } from '@explorer/crypto'
 import Router from '@koa/router'
 import { z } from 'zod'
 
-import {
-  brandedString,
-  stringToPositiveInt,
-  withRequestDataParsing,
-} from '../../tools/RequestDataParsing'
 import { FrontendController } from '../controllers/FrontendController'
-
-const GetStateChangesParser = z.object({
-  query: z.object({
-    page: stringToPositiveInt('1'),
-    perPage: stringToPositiveInt('10'),
-  }),
-})
-
-const GetStateChangeDetailsParser = z.object({
-  params: z.object({
-    hash: brandedString(PedersenHash),
-  }),
-})
-
-const GetPositionDetailsParser = z.object({
-  params: z.object({
-    positionId: brandedString(BigInt),
-  }),
-})
+import { brandedString, stringToPositiveInt, withTypedContext } from './types'
 
 export function createFrontendRouter(frontendController: FrontendController) {
   const router = new Router()
@@ -37,9 +14,15 @@ export function createFrontendRouter(frontendController: FrontendController) {
 
   router.get(
     '/state-updates',
-    withRequestDataParsing(
-      GetStateChangesParser,
-      async (ctx, { query: { page, perPage } }) => {
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: stringToPositiveInt('1'),
+          perPage: stringToPositiveInt('10'),
+        }),
+      }),
+      async (ctx) => {
+        const { page, perPage } = ctx.query
         ctx.body = await frontendController.getStateChangesPage(page, perPage)
       }
     )
@@ -47,9 +30,14 @@ export function createFrontendRouter(frontendController: FrontendController) {
 
   router.get(
     '/state-updates/:hash',
-    withRequestDataParsing(
-      GetStateChangeDetailsParser,
-      async (ctx, { params: { hash } }) => {
+    withTypedContext(
+      z.object({
+        params: z.object({
+          hash: brandedString(PedersenHash),
+        }),
+      }),
+      async (ctx) => {
+        const { hash } = ctx.params
         ctx.body = await frontendController.getStateChangeDetailsPage(hash)
       }
     )
@@ -57,9 +45,14 @@ export function createFrontendRouter(frontendController: FrontendController) {
 
   router.get(
     '/positions/:positionId',
-    withRequestDataParsing(
-      GetPositionDetailsParser,
-      async (ctx, { params: { positionId } }) => {
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionId: brandedString(BigInt),
+        }),
+      }),
+      async (ctx) => {
+        const { positionId } = ctx.params
         ctx.body = await frontendController.getPositionDetailsPage(positionId)
       }
     )

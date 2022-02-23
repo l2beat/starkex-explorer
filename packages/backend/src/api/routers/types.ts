@@ -22,24 +22,30 @@ export function brandedString<T>(brandedType: (value: string) => T) {
     .transform(brandedType)
 }
 
-export function withRequestDataParsing<T extends z.AnyZodObject>(
+export type TypedContext<T> = Omit<
+  Application.ParameterizedContext,
+  'body' | 'params' | 'query'
+> &
+  T
+
+export function withTypedContext<T extends z.AnyZodObject>(
   parser: T,
-  handler: (
-    ctx: Application.ParameterizedContext,
-    data: z.infer<T>
-  ) => Promise<void>
+  handler: (ctx: TypedContext<z.infer<T>>) => Promise<void>
 ) {
-  return async (_ctx: Application.ParameterizedContext) => {
+  return async (ctx: Application.ParameterizedContext) => {
     const parseResult = parser.safeParse({
-      body: _ctx.body,
-      params: _ctx.params,
-      query: _ctx.query,
+      body: ctx.body,
+      params: ctx.params,
+      query: ctx.query,
     })
     if (!parseResult.success) {
-      _ctx.status = 400
-      _ctx.body = { issues: parseResult.error.issues }
+      ctx.status = 400
+      ctx.body = { issues: parseResult.error.issues }
       return
     }
-    await handler(_ctx, parseResult.data)
+    ctx.body = parseResult.data.body
+    ctx.params = parseResult.data.params
+    ctx.query = parseResult.data.query
+    await handler(ctx)
   }
 }
