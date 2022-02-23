@@ -24,7 +24,7 @@ export function brandedString<T>(brandedType: (value: string) => T) {
 
 export type TypedContext<T> = Omit<
   Application.ParameterizedContext,
-  'body' | 'params' | 'query'
+  'params' | 'query'
 > &
   T
 
@@ -34,7 +34,6 @@ export function withTypedContext<T extends z.AnyZodObject>(
 ) {
   return async (ctx: Application.ParameterizedContext) => {
     const parseResult = parser.safeParse({
-      body: ctx.body,
       params: ctx.params,
       query: ctx.query,
     })
@@ -43,7 +42,6 @@ export function withTypedContext<T extends z.AnyZodObject>(
       ctx.body = { issues: parseResult.error.issues }
       return
     }
-    ctx.body = parseResult.data.body
     ctx.params = parseResult.data.params
     ctx.query = parseResult.data.query
     await handler(ctx)
