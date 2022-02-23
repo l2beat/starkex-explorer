@@ -39,7 +39,7 @@ describe('FrontendRouter', () => {
     })
 
     it('does not allow invalid input', async () => {
-      await server.get('/state-updates?page=foo&perPage=bar').expect(500)
+      await server.get('/state-updates?page=foo&perPage=bar').expect(400)
     })
   })
 
@@ -61,7 +61,7 @@ describe('FrontendRouter', () => {
     })
 
     it('does not allow invalid input', async () => {
-      await server.get('/state-updates/foo').expect(500)
+      await server.get('/state-updates/foo').expect(400)
     })
   })
 
@@ -78,7 +78,7 @@ describe('FrontendRouter', () => {
     })
 
     it('does not allow invalid input', async () => {
-      await server.get('/positions/foo').expect(500)
+      await server.get('/positions/foo').expect(400)
     })
   })
 })
