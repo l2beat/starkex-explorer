@@ -63,16 +63,26 @@ export class RollupStateRepository implements IRollupStateStorage {
       ),
     ])
 
+    const filteredNodeRows = nodeRows.filter(
+      (x, i, a) => a.findIndex((y) => x.hash === y.hash) === i
+    )
+    const filteredPositionRows = positionRows.filter(
+      (x, i, a) => a.findIndex((y) => x.hash === y.hash) === i
+    )
+
     const queries = []
-    if (nodeRows.length > 0) {
+    if (filteredNodeRows.length > 0) {
       queries.push(
-        this.knex('merkle_nodes').insert(nodeRows).onConflict('hash').merge()
+        this.knex('merkle_nodes')
+          .insert(filteredNodeRows)
+          .onConflict('hash')
+          .merge()
       )
     }
-    if (positionRows.length > 0) {
+    if (filteredPositionRows.length > 0) {
       queries.push(
         this.knex('merkle_positions')
-          .insert(positionRows)
+          .insert(filteredPositionRows)
           .onConflict('hash')
           .merge()
       )

@@ -14,7 +14,7 @@ describe(RollupStateRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   describe(RollupStateRepository.prototype.persist.name, () => {
-    it('can persist and recover a merkle node', async () => {
+    it('persists and recover a merkle node', async () => {
       const node = new MerkleNode(
         repository,
         PedersenHash.fake('111'),
@@ -26,7 +26,7 @@ describe(RollupStateRepository.name, () => {
       expect(recovered).toEqual(node)
     })
 
-    it('can persist and recover a Position', async () => {
+    it('persists and recover a Position', async () => {
       const position = new Position(
         'deadbeef',
         123n,
@@ -38,7 +38,7 @@ describe(RollupStateRepository.name, () => {
       expect(recovered).toEqual(position)
     })
 
-    it('can persist and recover multiple merkle nodes', async () => {
+    it('persists and recover multiple merkle nodes', async () => {
       const nodeA = new MerkleNode(
         repository,
         PedersenHash.fake('A1A'),
@@ -58,7 +58,7 @@ describe(RollupStateRepository.name, () => {
       expect(recoveredB).toEqual(nodeB)
     })
 
-    it('can persist the same node multiple times', async () => {
+    it('persists the same node multiple times', async () => {
       const node = new MerkleNode(
         repository,
         PedersenHash.fake('111'),
@@ -69,6 +69,26 @@ describe(RollupStateRepository.name, () => {
       await repository.persist([node])
       const recovered = await repository.recover(PedersenHash.fake('333'))
       expect(recovered).toEqual(node)
+    })
+
+    it('persists the same node multiple times in one update', async () => {
+      const node = new MerkleNode(
+        repository,
+        PedersenHash.fake('111'),
+        PedersenHash.fake('222'),
+        PedersenHash.fake('333')
+      )
+      await repository.persist([node, node])
+    })
+
+    it('persists the same position multiple times in one update', async () => {
+      const position = new Position(
+        'deadbeef',
+        123n,
+        [{ assetId: AssetId('ETH-9'), balance: 456n, fundingIndex: 789n }],
+        PedersenHash.fake('abc')
+      )
+      await repository.persist([position, position])
     })
   })
 
