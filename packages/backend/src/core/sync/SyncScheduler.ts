@@ -73,6 +73,7 @@ export class SyncScheduler {
 
   private async handleSync(blocks: BlockRange) {
     try {
+      await this.dataSyncService.discardAfter(blocks.start - 1)
       await this.dataSyncService.sync(blocks)
       await this.syncStatusRepository.setLastSynced(blocks.end - 1)
       this.dispatch({ type: 'syncSucceeded' })

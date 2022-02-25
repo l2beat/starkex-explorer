@@ -91,6 +91,7 @@ describe(SyncScheduler.name, () => {
       const blockDownloader = mock<BlockDownloader>()
       const dataSyncService = mock<DataSyncService>({
         sync: async () => {},
+        discardAfter: async () => {},
       })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
@@ -106,6 +107,7 @@ describe(SyncScheduler.name, () => {
       })
 
       await waitForExpect(() => {
+        expect(dataSyncService.discardAfter).toHaveBeenCalledWith([1_000_000])
         expect(dataSyncService.sync).toHaveBeenCalledWith([
           new BlockRange([block(1_000_001), block(1_000_002)]),
         ])
@@ -122,6 +124,7 @@ describe(SyncScheduler.name, () => {
       const blockDownloader = mock<BlockDownloader>()
       const dataSyncService = mock<DataSyncService>({
         sync: mockFn().rejectsWith(new Error('oops')),
+        discardAfter: async () => {},
       })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
@@ -177,7 +180,8 @@ describe(SyncScheduler.name, () => {
 
       await waitForExpect(() => {
         expect(dataSyncService.discardAfter).toHaveBeenCalledExactlyWith([
-          [999_999],
+          [999_999], // this from handleDiscard
+          [999_999], // this from later handleSync
         ])
         expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
           [new BlockRange([block(1_000_000), block(1_000_001)])],
