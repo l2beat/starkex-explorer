@@ -32,6 +32,10 @@ export class StateUpdateCollector {
   ) {}
 
   async save(stateTransitionFacts: StateTransitionFactRecord[]) {
+    if (stateTransitionFacts.length === 0) {
+      return
+    }
+
     const stateTransitions = await this.pageRepository.getAllForFacts(
       stateTransitionFacts.map((f) => f.hash)
     )
@@ -95,12 +99,16 @@ export class StateUpdateCollector {
     return { oldHash, id }
   }
 
-  private async ensureRollupState(oldHash: PedersenHash) {
+  async ensureRollupState(oldHash: PedersenHash) {
     if (!this.rollupState) {
-      this.rollupState = RollupState.recover(
-        this.rollupStateRepository,
-        oldHash
-      )
+      if (oldHash === ROLLUP_STATE_EMPTY_HASH) {
+        this.rollupState = await RollupState.empty(this.rollupStateRepository)
+      } else {
+        this.rollupState = RollupState.recover(
+          this.rollupStateRepository,
+          oldHash
+        )
+      }
     } else if ((await this.rollupState.positions.hash()) !== oldHash) {
       this.rollupState = RollupState.recover(
         this.rollupStateRepository,
