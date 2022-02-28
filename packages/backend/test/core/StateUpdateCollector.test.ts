@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/crypto'
+import { PedersenHash } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import {

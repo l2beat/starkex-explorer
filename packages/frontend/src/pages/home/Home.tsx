@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/crypto'
+import { PedersenHash } from '@explorer/types'
 import React from 'react'
 import { Page } from '../common'
 import { Footer } from '../common/Footer'

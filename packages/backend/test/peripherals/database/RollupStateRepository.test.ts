@@ -1,6 +1,5 @@
-import { PedersenHash } from '@explorer/crypto'
 import { MerkleNode, Position } from '@explorer/state'
-import { AssetId } from '@explorer/types'
+import { AssetId, PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { RollupStateRepository } from '../../../src/peripherals/database/RollupStateRepository'

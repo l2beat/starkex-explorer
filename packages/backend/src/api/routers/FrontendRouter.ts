@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/crypto'
+import { PedersenHash } from '@explorer/types'
 import Router from '@koa/router'
 import { z } from 'zod'
 

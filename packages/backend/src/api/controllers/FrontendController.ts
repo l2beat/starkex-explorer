@@ -1,4 +1,3 @@
-import { PedersenHash } from '@explorer/crypto'
 import {
   HomeProps,
   renderHomePage,
@@ -6,6 +5,7 @@ import {
   renderStateChangeDetailsPage,
   renderStateChangesIndexPage,
 } from '@explorer/frontend'
+import { PedersenHash } from '@explorer/types'
 
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 

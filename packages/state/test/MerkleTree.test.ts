@@ -1,5 +1,4 @@
-import { PedersenHash } from '@explorer/crypto'
-import { AssetId } from '@explorer/types'
+import { AssetId, PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { InMemoryMerkleStorage } from '../src/InMemoryMerkleStorage'

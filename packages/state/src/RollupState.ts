@@ -1,6 +1,5 @@
-import { PedersenHash } from '@explorer/crypto'
 import { OnChainData } from '@explorer/encoding'
-import { AssetId } from '@explorer/types'
+import { AssetId, PedersenHash } from '@explorer/types'
 import { zip } from 'lodash'
 
 import { NodeOrLeaf } from './MerkleNode'

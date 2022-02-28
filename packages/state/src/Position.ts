@@ -1,6 +1,6 @@
-import { pedersen, PedersenHash } from '@explorer/crypto'
+import { pedersen } from '@explorer/crypto'
 import { encodeAssetId } from '@explorer/encoding'
-import { AssetId } from '@explorer/types'
+import { AssetId, PedersenHash } from '@explorer/types'
 
 import { MerkleValue } from './MerkleValue'
 

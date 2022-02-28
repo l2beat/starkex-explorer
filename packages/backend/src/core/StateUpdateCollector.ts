@@ -1,6 +1,6 @@
-import { PedersenHash } from '@explorer/crypto'
 import { decodeOnChainData as _decodeOnChainData } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
+import { PedersenHash } from '@explorer/types'
 
 import { Hash256 } from '../model'
 import { PageRepository } from '../peripherals/database/PageRepository'
