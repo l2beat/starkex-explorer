@@ -1,4 +1,3 @@
-export * from './AssetId'
 export { decodeOnChainData } from './decodeOnChainData'
 export { DecodingError } from './DecodingError'
 export * from './encodeAssetId'

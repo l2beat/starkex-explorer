@@ -1,5 +1,4 @@
 import { PedersenHash } from '@explorer/crypto'
-import { AssetId } from '@explorer/encoding'
 import {
   IRollupStateStorage,
   MerkleNode,
@@ -7,6 +6,7 @@ import {
   Position,
   RollupParameters,
 } from '@explorer/state'
+import { AssetId } from '@explorer/types'
 import { Knex } from 'knex'
 import { partition } from 'lodash'
 

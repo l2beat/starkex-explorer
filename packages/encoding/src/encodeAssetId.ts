@@ -1,4 +1,4 @@
-import { AssetId } from './AssetId'
+import { AssetId } from '@explorer/types'
 
 export function encodeAssetId(assetId: AssetId) {
   return assetId

@@ -1,6 +1,6 @@
+import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { AssetId } from '../src'
 import { decodeAssetId } from '../src/decodeAssetId'
 import { DecodingError } from '../src/DecodingError'
 

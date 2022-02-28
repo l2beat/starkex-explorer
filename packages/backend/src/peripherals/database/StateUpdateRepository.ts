@@ -1,5 +1,6 @@
 import { PedersenHash } from '@explorer/crypto'
-import { AssetBalance, AssetId, OraclePrice } from '@explorer/encoding'
+import { AssetBalance, OraclePrice } from '@explorer/encoding'
+import { AssetId } from '@explorer/types'
 import { Knex } from 'knex'
 import {
   AssetBalanceJson,

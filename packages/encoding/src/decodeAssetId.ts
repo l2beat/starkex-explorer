@@ -1,4 +1,5 @@
-import { AssetId } from './AssetId'
+import { AssetId } from '@explorer/types'
+
 import { DecodingError } from './DecodingError'
 
 export function decodeAssetId(value: string) {

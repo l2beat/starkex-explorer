@@ -1,5 +1,5 @@
 import { PedersenHash } from '@explorer/crypto'
-import { AssetId } from '@explorer/encoding'
+import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { Hash256 } from '../../../src/model'

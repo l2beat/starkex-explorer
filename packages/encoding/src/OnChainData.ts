@@ -1,4 +1,4 @@
-import { AssetId } from './AssetId'
+import { AssetId } from '@explorer/types'
 
 export interface OnChainData {
   configurationHash: string
