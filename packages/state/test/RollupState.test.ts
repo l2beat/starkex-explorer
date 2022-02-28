@@ -12,7 +12,9 @@ describe(RollupState.name, () => {
       const storage = new InMemoryRollupStorage()
       const empty = await RollupState.empty(storage)
       expect(await empty.positions.hash()).toEqual(
-        PedersenHash('052ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626')
+        PedersenHash(
+          '052ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
+        )
       )
     })
   })
