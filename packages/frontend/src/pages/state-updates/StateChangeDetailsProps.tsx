@@ -3,6 +3,7 @@ import { PedersenHash } from '@explorer/crypto'
 export interface StateChangeDetailsProps {
   readonly hash: PedersenHash
   readonly timestamp: number
+  readonly id: number
   positions: ReadonlyArray<{
     readonly publicKey: string
     readonly positionId: bigint

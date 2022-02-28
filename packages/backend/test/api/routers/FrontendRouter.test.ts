@@ -43,7 +43,7 @@ describe('FrontendRouter', () => {
     })
   })
 
-  describe('/state-updates/:hash', () => {
+  describe('/state-updates/:id', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
         getStateChangeDetailsPage: async () => TEST_PAGE,
@@ -52,12 +52,7 @@ describe('FrontendRouter', () => {
     const server = createTestApiServer([frontendRouter])
 
     it('returns html', async () => {
-      await server
-        .get(
-          '/state-updates/52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
-        )
-        .expect(200)
-        .expect(TEST_PAGE)
+      await server.get('/state-updates/1').expect(200).expect(TEST_PAGE)
     })
 
     it('does not allow invalid input', async () => {

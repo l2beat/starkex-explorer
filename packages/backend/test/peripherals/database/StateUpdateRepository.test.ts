@@ -214,6 +214,7 @@ describe(StateUpdateRepository.name, () => {
           '0200030000000000000000000000000000000000000000000000000000000000'
         ),
         timestamp: 20003,
+        id: 20003,
       },
       {
         positionCount: 2,
@@ -221,11 +222,12 @@ describe(StateUpdateRepository.name, () => {
           '0200020000000000000000000000000000000000000000000000000000000000'
         ),
         timestamp: 20002,
+        id: 20002,
       },
     ])
   })
 
-  it('gets state by its root hash', async () => {
+  it('gets state by its id', async () => {
     const collateralBalance = 100_000_000_000_000n
     const blockNumber = 30_000
     const timestamp = Math.floor(Date.now() / 1000)
@@ -247,9 +249,11 @@ describe(StateUpdateRepository.name, () => {
       prices: [],
     })
 
-    const actual = await repository.getStateChangeByRootHash(rootHash)
+    const actual = await repository.getStateChangeById(blockNumber)
 
     expect(actual).toEqual({
+      id: blockNumber,
+      hash: rootHash,
       timestamp,
       positions: Array.from({ length: 4 }).map((_, i) =>
         expect.objectWith({

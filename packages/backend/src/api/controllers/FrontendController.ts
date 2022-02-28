@@ -1,4 +1,3 @@
-import { PedersenHash } from '@explorer/crypto'
 import {
   HomeProps,
   renderHomePage,
@@ -22,6 +21,7 @@ export class FrontendController {
       forcedTransaction: [],
       stateUpdates: stateUpdates.map(
         (x): HomeProps['stateUpdates'][number] => ({
+          id: x.id,
           hash: x.rootHash,
           timestamp: x.timestamp,
           positionCount: x.positionCount,
@@ -51,12 +51,12 @@ export class FrontendController {
     })
   }
 
-  async getStateChangeDetailsPage(hash: PedersenHash): Promise<string> {
-    const stateChange =
-      await this.stateUpdateRepository.getStateChangeByRootHash(hash)
+  async getStateChangeDetailsPage(id: number): Promise<string> {
+    const stateChange = await this.stateUpdateRepository.getStateChangeById(id)
 
     return renderStateChangeDetailsPage({
-      hash,
+      id: stateChange.id,
+      hash: stateChange.hash,
       timestamp: stateChange.timestamp,
       positions: stateChange.positions.map((pos) => ({
         ...pos,

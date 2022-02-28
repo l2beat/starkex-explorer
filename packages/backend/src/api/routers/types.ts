@@ -1,7 +1,7 @@
 import Application from 'koa'
 import { z } from 'zod'
 
-export function stringToPositiveInt(def: string) {
+export function stringToPositiveInt(def?: string) {
   return z.preprocess(
     (s) => Number(z.string().parse(s ?? def)),
     z.number().int().positive()

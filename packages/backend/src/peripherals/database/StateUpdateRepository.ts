@@ -90,12 +90,14 @@ export class StateUpdateRepository {
       .offset(offset)
       .limit(limit)
       .join('positions', 'state_updates.id', 'positions.state_update_id')
-      .groupBy('root_hash', 'timestamp')
+      .groupBy('root_hash', 'id', 'timestamp')
       .select(
+        'id',
         'root_hash',
         'timestamp',
         this.knex.raw('count(position_id) as position_count')
       )) as unknown as Array<{
+      id: number
       root_hash: string
       timestamp: number
       position_count: bigint
@@ -104,6 +106,7 @@ export class StateUpdateRepository {
     this.logger.debug({ method: 'getStateChangeList', rows: rows.length })
 
     return rows.map((row) => ({
+      id: row.id,
       rootHash: PedersenHash(row.root_hash),
       timestamp: row.timestamp,
       positionCount: Number(row.position_count),
@@ -115,22 +118,28 @@ export class StateUpdateRepository {
     return row[0].count as unknown as bigint
   }
 
-  async getStateChangeByRootHash(rootHash: PedersenHash) {
-    const hash = rootHash.toString()
+  async getStateChangeById(id: number) {
     const row = (await this.knex('state_updates')
       .first()
-      .where('root_hash', '=', hash)
+      .where('id', '=', id)
       .orderBy('timestamp', 'desc')
       .join('positions', 'state_updates.id', 'positions.state_update_id')
       .groupBy('root_hash', 'timestamp')
       .select(
         'timestamp',
+        'root_hash',
         this.knex.raw('ARRAY_AGG(row_to_json(positions)) as positions')
-      )) as unknown as { timestamp: number; positions: PositionRow[] }
+      )) as unknown as {
+      timestamp: number
+      root_hash: string
+      positions: PositionRow[]
+    }
 
-    this.logger.debug({ method: 'getStateChangeByRootHash', hash })
+    this.logger.debug({ method: 'getStateChangeById', id })
 
     return {
+      id,
+      hash: PedersenHash(row.root_hash),
       timestamp: row.timestamp,
       positions: row.positions.map(toPositionRecord),
     }

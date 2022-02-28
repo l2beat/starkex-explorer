@@ -6,6 +6,7 @@ export interface HomeProps {
 }
 
 export interface HomeStateUpdate {
+  id: number
   hash: PedersenHash
   timestamp: number
   positionCount: number

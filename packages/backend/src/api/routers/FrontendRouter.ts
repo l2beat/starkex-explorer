@@ -1,4 +1,3 @@
-import { PedersenHash } from '@explorer/crypto'
 import Router from '@koa/router'
 import { z } from 'zod'
 
@@ -29,16 +28,16 @@ export function createFrontendRouter(frontendController: FrontendController) {
   )
 
   router.get(
-    '/state-updates/:hash',
+    '/state-updates/:id',
     withTypedContext(
       z.object({
         params: z.object({
-          hash: brandedString(PedersenHash),
+          id: stringToPositiveInt(),
         }),
       }),
       async (ctx) => {
-        const { hash } = ctx.params
-        ctx.body = await frontendController.getStateChangeDetailsPage(hash)
+        const { id } = ctx.params
+        ctx.body = await frontendController.getStateChangeDetailsPage(id)
       }
     )
   )
