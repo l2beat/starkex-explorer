@@ -1,3 +1,4 @@
+import { PedersenHash } from '@explorer/crypto'
 import { AssetId } from '@explorer/encoding'
 import { expect } from 'earljs'
 
@@ -6,6 +7,18 @@ import { InMemoryRollupStorage } from '../src/InMemoryRollupStorage'
 import { RollupState } from '../src/RollupState'
 
 describe(RollupState.name, () => {
+  describe(RollupState.empty.name, () => {
+    it('has a specific root hash', async () => {
+      const storage = new InMemoryRollupStorage()
+      const empty = await RollupState.empty(storage)
+      expect(await empty.positions.hash()).toEqual(
+        PedersenHash(
+          '052ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
+        )
+      )
+    })
+  })
+
   describe(RollupState.prototype.update.name, () => {
     it('can update a single position', async () => {
       const storage = new InMemoryRollupStorage()

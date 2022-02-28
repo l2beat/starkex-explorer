@@ -32,7 +32,7 @@ export class DataSyncService {
     this.logger.info({
       method: 'sync',
       blockRange: { from: blockRange.start, to: blockRange.end },
-      newVerifiers: verifiers.map(String),
+      verifiers: verifiers.length,
       newHashEventsCount: hashEvents.length,
       newPageRecords: pageRecords.length,
       newStateTransitionFacts: stateTransitionFacts.length,
