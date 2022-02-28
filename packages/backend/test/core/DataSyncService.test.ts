@@ -1,3 +1,4 @@
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DataSyncService } from '../../src/core/DataSyncService'
@@ -6,7 +7,7 @@ import type { PageCollector } from '../../src/core/PageCollector'
 import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
 import { StateUpdateCollector } from '../../src/core/StateUpdateCollector'
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
-import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
+import { BlockRange } from '../../src/model'
 import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'

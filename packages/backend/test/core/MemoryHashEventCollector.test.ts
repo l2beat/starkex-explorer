@@ -1,11 +1,12 @@
+import { Hash256 } from '@explorer/types'
+import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
 import { expect } from 'earljs'
 
 import {
   LOG_MEMORY_PAGE_HASHES,
   MemoryHashEventCollector,
 } from '../../src/core/MemoryHashEventCollector'
-import { BlockRange, Hash256 } from '../../src/model'
-import { EthereumAddress } from '../../src/model/EthereumAddress'
+import { BlockRange } from '../../src/model'
 import { FactToPageRepository } from '../../src/peripherals/database/FactToPageRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../mock'

@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 import { BigNumber } from 'ethers'
 
-import { Hash256 } from '../../src/model'
+import { Hash256 } from '../src'
 
 describe(Hash256.name, () => {
   it('accepts a valid hash', () => {

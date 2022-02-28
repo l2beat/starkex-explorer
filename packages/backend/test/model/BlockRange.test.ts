@@ -1,6 +1,6 @@
+import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { Hash256 } from '../../src/model'
 import { BlockRange } from '../../src/model/BlockRange'
 
 describe(BlockRange.name, () => {
