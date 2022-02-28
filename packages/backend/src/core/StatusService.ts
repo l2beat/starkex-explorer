@@ -1,4 +1,4 @@
-import { json } from '../model'
+import { json } from '@explorer/types'
 
 interface StatusReporter {
   getStatus(): json

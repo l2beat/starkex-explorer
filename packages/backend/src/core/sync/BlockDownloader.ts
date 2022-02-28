@@ -1,6 +1,7 @@
+import { json } from '@explorer/types'
 import { providers } from 'ethers'
 
-import { Hash256, json } from '../../model'
+import { Hash256 } from '../../model'
 import {
   BlockRecord,
   BlockRepository,

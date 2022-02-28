@@ -1,7 +1,6 @@
+import { json } from '@explorer/types'
 import chalk from 'chalk'
 import { inspect } from 'util'
-
-import { json } from '../model'
 
 export enum LogLevel {
   NONE = 0,
