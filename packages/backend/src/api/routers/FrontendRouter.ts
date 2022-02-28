@@ -1,7 +1,9 @@
 import { PedersenHash } from '@explorer/crypto'
 import Router from '@koa/router'
+import { z } from 'zod'
 
 import { FrontendController } from '../controllers/FrontendController'
+import { brandedString, stringToPositiveInt, withTypedContext } from './types'
 
 export function createFrontendRouter(frontendController: FrontendController) {
   const router = new Router()
@@ -10,25 +12,51 @@ export function createFrontendRouter(frontendController: FrontendController) {
     ctx.body = await frontendController.getHomePage()
   })
 
-  router.get('/state-updates', async (ctx) => {
-    const page = parseInt(String(ctx.query.page ?? '1'))
-    const perPage = parseInt(String(ctx.query.perPage ?? '10'))
-    if ([page, perPage].some(Number.isNaN)) {
-      ctx.status = 500
-      return
-    }
-    ctx.body = await frontendController.getStateChangesPage(page, perPage)
-  })
+  router.get(
+    '/state-updates',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: stringToPositiveInt('1'),
+          perPage: stringToPositiveInt('10'),
+        }),
+      }),
+      async (ctx) => {
+        const { page, perPage } = ctx.query
+        ctx.body = await frontendController.getStateChangesPage(page, perPage)
+      }
+    )
+  )
 
-  router.get('/state-updates/:hash', async (ctx) => {
-    const hash = PedersenHash(ctx.params.hash)
-    ctx.body = await frontendController.getStateChangeDetailsPage(hash)
-  })
+  router.get(
+    '/state-updates/:hash',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          hash: brandedString(PedersenHash),
+        }),
+      }),
+      async (ctx) => {
+        const { hash } = ctx.params
+        ctx.body = await frontendController.getStateChangeDetailsPage(hash)
+      }
+    )
+  )
 
-  router.get('/positions/:positionId', async (ctx) => {
-    const positionId = BigInt(ctx.params.positionId)
-    ctx.body = await frontendController.getPositionDetailsPage(positionId)
-  })
+  router.get(
+    '/positions/:positionId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionId: brandedString(BigInt),
+        }),
+      }),
+      async (ctx) => {
+        const { positionId } = ctx.params
+        ctx.body = await frontendController.getPositionDetailsPage(positionId)
+      }
+    )
+  )
 
   return router
 }
