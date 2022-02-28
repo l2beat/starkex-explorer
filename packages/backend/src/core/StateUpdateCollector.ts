@@ -106,10 +106,13 @@ export class StateUpdateCollector {
     return { oldHash: ROLLUP_STATE_EMPTY_HASH, id: 0 }
   }
 
-  async ensureRollupState(oldHash: PedersenHash) {
+  async ensureRollupState(oldHash: PedersenHash, height?: bigint) {
     if (!this.rollupState) {
       if (oldHash === ROLLUP_STATE_EMPTY_HASH) {
-        this.rollupState = await RollupState.empty(this.rollupStateRepository)
+        this.rollupState = await RollupState.empty(
+          this.rollupStateRepository,
+          height
+        )
       } else {
         this.rollupState = RollupState.recover(
           this.rollupStateRepository,

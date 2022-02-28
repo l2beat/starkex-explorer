@@ -24,11 +24,17 @@ describe(StateUpdateCollector.name, () => {
         rollupStateRepository,
         mock<EthereumClient>()
       )
+      // ROLLUP_STATE_EMPTY_HASH is for tree of height 64 and  recalculating this hash
+      // in tests on slower machines (e.g. CI) makes test flakey async-wise.
       const rollupState = await stateUpdateCollector.ensureRollupState(
-        ROLLUP_STATE_EMPTY_HASH
+        ROLLUP_STATE_EMPTY_HASH,
+        3n
+      )
+      const rollupStateEmptyHashForHeight3 = PedersenHash(
+        '048c477cdb37576ddff3c3fe5c1c7559778d6cbade51e5a6c1fe71e6bdb1d4db'
       )
       expect(await rollupState.positions.hash()).toEqual(
-        ROLLUP_STATE_EMPTY_HASH
+        rollupStateEmptyHashForHeight3
       )
       expect(rollupStateRepository.persist.calls.length).toEqual(1)
     })
