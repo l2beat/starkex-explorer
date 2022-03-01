@@ -5,7 +5,18 @@ import { Navbar } from '../common/Navbar'
 import { Page } from '../common/Page'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
-export function PositionDetails({ positionId, history }: PositionDetailsProps) {
+const centsToFixedDollars = (cents: bigint) => {
+  const centsString = cents.toString().padEnd(3, '0')
+  return centsString.slice(0, -2) + '.' + centsString.slice(-2)
+}
+
+export function PositionDetails({
+  positionId,
+  assets,
+  publicKey,
+  totalUSDCents,
+  history,
+}: PositionDetailsProps) {
   const sorted = [...history].sort((a, b) =>
     a.stateUpdateId < b.stateUpdateId ? -1 : 1
   )
@@ -22,6 +33,18 @@ export function PositionDetails({ positionId, history }: PositionDetailsProps) {
       <main className="px-4 max-w-5xl mx-auto">
         <Navbar />
         <div className="bg-white border-2 border-black p-2">
+          <p>Public key: {publicKey}</p>
+          <p>Total USD: {centsToFixedDollars(totalUSDCents)}</p>
+          <div>Assets</div>
+          <ul>
+            {assets.map(({ assetId, balance, totalUSDCents }) => (
+              <li key={assetId}>
+                <p>Asset id: {assetId}</p>
+                <p>Balance: {balance.toString()}</p>
+                <p>Total USD: {centsToFixedDollars(totalUSDCents)}</p>
+              </li>
+            ))}
+          </ul>
           <div className="bg-zinc-100 text-center p-2 border border-black mt-2">
             Position History
           </div>

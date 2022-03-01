@@ -1,3 +1,4 @@
+import { AssetId } from '@explorer/encoding'
 import {
   HomeProps,
   renderHomePage,
@@ -70,9 +71,48 @@ export class FrontendController {
 
   async getPositionDetailsPage(positionId: bigint): Promise<string> {
     const history = await this.stateUpdateRepository.getPositionById(positionId)
+    const current = history[0]
+    const prices = await this.stateUpdateRepository.getStateChangePrices(
+      current.stateUpdateId
+    )
+    const assets: {
+      assetId: string
+      balance: bigint
+      totalUSDCents: bigint
+    }[] = current.balances.map(({ balance, assetId }) => {
+      const price = prices.find((p) => p.assetId === assetId)?.price
+      if (!price) {
+        return {
+          assetId: assetId.toString(),
+          balance,
+          totalUSDCents: 0n,
+        }
+      }
+      const totalUSDCents =
+        (balance * price * BigInt(10 ** AssetId.decimals(assetId))) /
+        BigInt(2 ** 32) /
+        1000n
+      return {
+        assetId: assetId.toString(),
+        balance,
+        totalUSDCents,
+      }
+    })
+    assets.push({
+      assetId: 'USDC',
+      balance: current.collateralBalance,
+      totalUSDCents: current.collateralBalance / 1000n,
+    })
+    const totalUSDCents = assets.reduce(
+      (total, { totalUSDCents }) => totalUSDCents + total,
+      0n
+    )
 
     return renderPositionDetailsPage({
       positionId,
+      publicKey: current.publicKey,
+      totalUSDCents,
+      assets,
       history: history.map((pos) => ({
         ...pos,
         balances: pos.balances.map((balance) => ({

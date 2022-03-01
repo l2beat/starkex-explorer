@@ -26,6 +26,12 @@ export interface PositionRecord {
   balances: readonly AssetBalance[]
 }
 
+export interface StateUpdatePriceRecord {
+  stateUpdateId: number
+  assetId: AssetId
+  price: bigint
+}
+
 export class StateUpdateRepository {
   constructor(private knex: Knex, private logger: Logger) {
     this.logger = logger.for(this)
@@ -111,6 +117,13 @@ export class StateUpdateRepository {
       timestamp: row.timestamp,
       positionCount: Number(row.position_count),
     }))
+  }
+
+  async getStateChangePrices(stateChangeId: number) {
+    const rows = await this.knex('prices')
+      .select('*')
+      .where('state_update_id', '=', stateChangeId)
+    return rows.map(toStateUpdatePriceRecord)
   }
 
   async getStateChangeCount() {
@@ -200,6 +213,14 @@ function toPositionRecord(
       assetId: AssetId(x.asset_id),
       balance: BigInt(x.balance),
     })),
+  }
+}
+
+function toStateUpdatePriceRecord(row: PriceRow): StateUpdatePriceRecord {
+  return {
+    stateUpdateId: row.state_update_id,
+    assetId: AssetId(row.asset_id),
+    price: row.price,
   }
 }
 
