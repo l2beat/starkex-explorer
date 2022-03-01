@@ -57,5 +57,24 @@ export function createFrontendRouter(frontendController: FrontendController) {
     )
   )
 
+  router.get(
+    '/positions/:positionId/updates/:updateId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionId: brandedString(BigInt),
+          updateId: brandedString(Number),
+        }),
+      }),
+      async (ctx) => {
+        const { positionId, updateId } = ctx.params
+        ctx.body = await frontendController.getPositionUpdatePage(
+          positionId,
+          updateId
+        )
+      }
+    )
+  )
+
   return router
 }

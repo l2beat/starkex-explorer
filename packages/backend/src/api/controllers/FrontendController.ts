@@ -122,4 +122,44 @@ export class FrontendController {
       })),
     })
   }
+
+  async getPositionUpdatePage(
+    positionId: bigint,
+    stateUpdateId: number
+  ): Promise<string> {
+    const [history, update] = await Promise.all([
+      this.stateUpdateRepository.getPositionById(positionId),
+      this.stateUpdateRepository.getStateChangeById(stateUpdateId),
+    ])
+    console.log(history)
+    const updateIndex = history.findIndex(
+      (p) => p.stateUpdateId === stateUpdateId
+    )
+    if (!updateIndex) {
+      throw new Error('Cannot find update for position with id ' + positionId)
+    }
+    const position = history[updateIndex]
+    const previousPosition = history[updateIndex + 1]
+    const assetChanges = position.balances.map((balance) => {
+      const previous = previousPosition?.balances.find(
+        (b) => b.assetId === balance.assetId
+      )
+      return {
+        assetId: balance.assetId,
+        previous: previous?.balance || 0n,
+        current: balance.balance,
+      }
+    })
+
+    const toReturn = {
+      stateUpdateId,
+      hash: update.hash,
+      timestamp: update.timestamp,
+      positionId,
+      publicKey: position.publicKey,
+      assetChanges,
+    }
+
+    return toReturn.toString()
+  }
 }
