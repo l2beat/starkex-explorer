@@ -131,7 +131,6 @@ export class FrontendController {
       this.stateUpdateRepository.getPositionById(positionId),
       this.stateUpdateRepository.getStateChangeById(stateUpdateId),
     ])
-    console.log(history)
     const updateIndex = history.findIndex(
       (p) => p.stateUpdateId === stateUpdateId
     )
