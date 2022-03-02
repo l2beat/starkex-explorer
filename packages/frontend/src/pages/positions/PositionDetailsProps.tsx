@@ -6,6 +6,7 @@ export interface PositionDetailsProps {
     readonly assetId: string
     readonly balance: bigint
     readonly totalUSDCents: bigint
+    readonly price?: bigint
   }>
   readonly history: ReadonlyArray<{
     readonly stateUpdateId: number

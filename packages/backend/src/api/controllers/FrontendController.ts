@@ -79,22 +79,18 @@ export class FrontendController {
       assetId: string
       balance: bigint
       totalUSDCents: bigint
+      price: bigint
     }[] = current.balances.map(({ balance, assetId }) => {
       const price = prices.find((p) => p.assetId === assetId)?.price
-      if (!price) {
-        return {
-          assetId: assetId.toString(),
-          balance,
-          totalUSDCents: 0n,
-        }
-      }
-      const totalUSDCents =
-        (balance * price * BigInt(10 ** AssetId.decimals(assetId))) /
-        BigInt(2 ** 32) /
-        1000n
+      const totalUSDCents = price
+        ? (balance * price * BigInt(10 ** AssetId.decimals(assetId))) /
+          BigInt(2 ** 32) /
+          1000n
+        : 0n
       return {
         assetId: assetId.toString(),
         balance,
+        price,
         totalUSDCents,
       }
     })
@@ -102,6 +98,7 @@ export class FrontendController {
       assetId: 'USDC',
       balance: current.collateralBalance,
       totalUSDCents: current.collateralBalance / 1000n,
+      price: 1n,
     })
     const totalUSDCents = assets.reduce(
       (total, { totalUSDCents }) => totalUSDCents + total,
