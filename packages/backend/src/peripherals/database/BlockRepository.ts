@@ -1,7 +1,7 @@
+import { Hash256 } from '@explorer/types'
 import { Knex } from 'knex'
 import { BlockRow } from 'knex/types/tables'
 
-import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 

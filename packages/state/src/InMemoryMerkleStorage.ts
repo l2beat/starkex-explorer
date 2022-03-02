@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/crypto'
+import { PedersenHash } from '@explorer/types'
 
 import { IMerkleStorage } from './MerkleNode'
 import { MerkleValue } from './MerkleValue'

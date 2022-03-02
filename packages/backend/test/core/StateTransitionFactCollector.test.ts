@@ -1,10 +1,11 @@
+import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
   LOG_STATE_TRANSITION_FACT,
   StateTransitionFactCollector,
 } from '../../src/core/StateTransitionFactCollector'
-import { BlockRange, Hash256 } from '../../src/model'
+import { BlockRange } from '../../src/model'
 import type {
   StateTransitionFactRecord,
   StateTransitionFactRepository,

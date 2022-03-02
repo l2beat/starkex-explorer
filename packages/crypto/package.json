@@ -15,6 +15,7 @@
     "coverage": "nyc --reporter=lcov --reporter=text mocha"
   },
   "dependencies": {
+    "@explorer/types": "*",
     "@types/bn.js": "^5.1.0",
     "@types/elliptic": "^6.4.14",
     "@types/workerpool": "^6.1.0",

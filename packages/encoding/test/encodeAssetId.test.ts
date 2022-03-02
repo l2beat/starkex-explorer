@@ -1,6 +1,6 @@
+import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { AssetId } from '../src'
 import { encodeAssetId } from '../src/encodeAssetId'
 
 describe('encodeAssetId', () => {

@@ -1,6 +1,7 @@
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { utils } from 'ethers'
 
-import { BlockRange, EthereumAddress, Hash256 } from '../model'
+import { BlockRange } from '../model'
 import { FactToPageRepository } from '../peripherals/database/FactToPageRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'

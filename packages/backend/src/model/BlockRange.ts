@@ -1,8 +1,8 @@
+import { Hash256 } from '@explorer/types'
 import assert from 'assert'
 import { partition } from 'lodash'
 
 import { BlockNumber } from '../peripherals/ethereum/types'
-import { Hash256 } from './Hash256'
 
 export interface BlockInRange {
   number: BlockNumber

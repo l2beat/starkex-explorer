@@ -1,6 +1,7 @@
+import { Hash256 } from '@explorer/types'
 import { BigNumber, utils } from 'ethers'
 
-import { BlockRange, Hash256 } from '../model'
+import { BlockRange } from '../model'
 import {
   PageRecord,
   PageRepository,
