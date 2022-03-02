@@ -290,4 +290,32 @@ describe(StateUpdateRepository.name, () => {
 
     expect(fullCount).toEqual(4n)
   })
+
+  it('gets prices for state update', async () => {
+    const stateUpdateId = 10_000
+
+    await repository.add({
+      stateUpdate: {
+        id: stateUpdateId,
+        blockNumber: 10_000,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: 0,
+      },
+      positions: [
+        {
+          publicKey: 'public-key-0',
+          positionId: 0n,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
+    })
+
+    const prices = await repository.getStateChangePrices(stateUpdateId)
+    expect(prices).toEqual([
+      { stateUpdateId, assetId: AssetId('ETH-9'), price: 40n },
+    ])
+  })
 })
