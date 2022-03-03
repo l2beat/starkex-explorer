@@ -26,7 +26,7 @@ describe('FrontendRouter', () => {
   describe('/state-updates', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
-        getStateChangesPage: async () => TEST_PAGE,
+        getStateUpdatesPage: async () => TEST_PAGE,
       })
     )
     const server = createTestApiServer([frontendRouter])
@@ -50,7 +50,7 @@ describe('FrontendRouter', () => {
   describe('/state-updates/:id', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
-        getStateChangeDetailsPage: async () => SUCCESFUL_RESPONE,
+        getStateUpdateDetailsPage: async () => SUCCESFUL_RESPONE,
       })
     )
     const server = createTestApiServer([frontendRouter])

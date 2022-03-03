@@ -3,8 +3,8 @@ import { PedersenHash } from '@explorer/types'
 import {
   HomeProps,
   PositionDetailsProps,
-  StateChangeDetailsProps,
-  StateChangesIndexProps,
+  StateUpdateDetailsProps,
+  StateUpdatesIndexProps,
 } from '../pages'
 
 const ONE_HOUR = 60 * 60 * 1000
@@ -26,7 +26,7 @@ export const HOME_PROPS: HomeProps = {
   })),
 }
 
-export const STATE_CHANGE_DETAILS_PROPS: StateChangeDetailsProps = {
+export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   id: 1,
   hash: PedersenHash.fake(),
   timestamp: Date.now() / 1000,
@@ -87,7 +87,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   ],
 }
 
-export const STATE_CHANGES_INDEX_PROPS: StateChangesIndexProps = {
+export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
   stateUpdates: Array.from({ length: 10 }).map((_, i) => ({
     hash: PedersenHash.fake(),
     positionCount: Math.floor(Math.random() * 30 + 4),

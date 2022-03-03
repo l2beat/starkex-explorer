@@ -3,13 +3,13 @@ import React, { ComponentPropsWithoutRef } from 'react'
 import { Page } from '../common'
 import { Footer } from '../common/Footer'
 import { Navbar } from '../common/Navbar'
-import { StateChangesIndexProps } from './StateChangesIndexProps'
+import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 
-export function StateChangesIndex({
+export function StateUpdatesIndex({
   stateUpdates,
   params,
   fullCount,
-}: StateChangesIndexProps) {
+}: StateUpdatesIndexProps) {
   return (
     <Page
       title="L2BEAT dYdX Explorer"

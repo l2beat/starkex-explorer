@@ -1,17 +1,17 @@
 import React from 'react'
 
 import { reactToHtml } from '../reactToHtml'
-import { StateChangeDetails } from './StateChangeDetails'
-import { StateChangeDetailsProps } from './StateChangeDetailsProps'
-import { StateChangesIndex } from './StateChangesIndex'
-import { StateChangesIndexProps } from './StateChangesIndexProps'
+import { StateUpdateDetails } from './StateUpdateDetails'
+import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
+import { StateUpdatesIndex } from './StateUpdatesIndex'
+import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 
-export function renderStateChangeDetailsPage(props: StateChangeDetailsProps) {
-  return reactToHtml(<StateChangeDetails {...props} />)
+export function renderStateUpdateDetailsPage(props: StateUpdateDetailsProps) {
+  return reactToHtml(<StateUpdateDetails {...props} />)
 }
 
-export function renderStateChangesIndexPage(props: StateChangesIndexProps) {
-  return reactToHtml(<StateChangesIndex {...props} />)
+export function renderStateUpdatesIndexPage(props: StateUpdatesIndexProps) {
+  return reactToHtml(<StateUpdatesIndex {...props} />)
 }
 
-export type { StateChangeDetailsProps, StateChangesIndexProps }
+export type { StateUpdateDetailsProps, StateUpdatesIndexProps }

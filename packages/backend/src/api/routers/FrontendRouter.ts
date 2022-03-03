@@ -22,7 +22,7 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { page, perPage } = ctx.query
-        ctx.body = await frontendController.getStateChangesPage(page, perPage)
+        ctx.body = await frontendController.getStateUpdatesPage(page, perPage)
       }
     )
   )
@@ -38,7 +38,7 @@ export function createFrontendRouter(frontendController: FrontendController) {
       async (ctx) => {
         const { id } = ctx.params
         const { status, html } =
-          await frontendController.getStateChangeDetailsPage(id)
+          await frontendController.getStateUpdateDetailsPage(id)
         ctx.body = html
         ctx.status = status
       }

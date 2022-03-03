@@ -2,8 +2,8 @@ import {
   HomeProps,
   renderHomePage,
   renderPositionDetailsPage,
-  renderStateChangeDetailsPage,
-  renderStateChangesIndexPage,
+  renderStateUpdateDetailsPage,
+  renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
 
 import { assetTotalUSDCents } from '../../core/AssetTotalCalculator'
@@ -13,7 +13,7 @@ export class FrontendController {
   constructor(private stateUpdateRepository: StateUpdateRepository) {}
 
   async getHomePage(): Promise<string> {
-    const stateUpdates = await this.stateUpdateRepository.getStateChangeList({
+    const stateUpdates = await this.stateUpdateRepository.getStateUpdateList({
       offset: 0,
       limit: 20,
     })
@@ -31,14 +31,14 @@ export class FrontendController {
     })
   }
 
-  async getStateChangesPage(page: number, perPage: number): Promise<string> {
-    const stateUpdates = await this.stateUpdateRepository.getStateChangeList({
+  async getStateUpdatesPage(page: number, perPage: number): Promise<string> {
+    const stateUpdates = await this.stateUpdateRepository.getStateUpdateList({
       offset: (page - 1) * perPage,
       limit: perPage,
     })
-    const fullCount = await this.stateUpdateRepository.getStateChangeCount()
+    const fullCount = await this.stateUpdateRepository.getStateUpdateCount()
 
-    return renderStateChangesIndexPage({
+    return renderStateUpdatesIndexPage({
       stateUpdates: stateUpdates.map((update) => ({
         hash: update.rootHash,
         timestamp: update.timestamp,
@@ -52,13 +52,13 @@ export class FrontendController {
     })
   }
 
-  async getStateChangeDetailsPage(id: number): Promise<{
+  async getStateUpdateDetailsPage(id: number): Promise<{
     status: 200 | 404
     html: string
   }> {
-    const stateChange = await this.stateUpdateRepository.getStateChangeById(id)
+    const stateUpdate = await this.stateUpdateRepository.getStateUpdateById(id)
 
-    if (!stateChange) {
+    if (!stateUpdate) {
       return {
         status: 404,
         html: 'State update not found',
@@ -66,11 +66,11 @@ export class FrontendController {
     }
 
     return {
-      html: renderStateChangeDetailsPage({
-        id: stateChange.id,
-        hash: stateChange.hash,
-        timestamp: stateChange.timestamp,
-        positions: stateChange.positions.map((pos) => ({
+      html: renderStateUpdateDetailsPage({
+        id: stateUpdate.id,
+        hash: stateUpdate.hash,
+        timestamp: stateUpdate.timestamp,
+        positions: stateUpdate.positions.map((pos) => ({
           ...pos,
           balances: pos.balances.map((balance) => ({
             assetId: balance.assetId.toString(), // <- this is less than ideal
@@ -149,7 +149,7 @@ export class FrontendController {
   ): Promise<{ html: string; status: 200 | 404 }> {
     const [history, update] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
-      this.stateUpdateRepository.getStateChangeById(stateUpdateId),
+      this.stateUpdateRepository.getStateUpdateById(stateUpdateId),
     ])
     const updateIndex = history.findIndex(
       (p) => p.stateUpdateId === stateUpdateId

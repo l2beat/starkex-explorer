@@ -83,7 +83,7 @@ export class StateUpdateRepository {
     return rows.map(toStateUpdateRecord)
   }
 
-  async getStateChangeList({
+  async getStateUpdateList({
     offset,
     limit,
   }: {
@@ -108,7 +108,7 @@ export class StateUpdateRepository {
       position_count: bigint
     }>
 
-    this.logger.debug({ method: 'getStateChangeList', rows: rows.length })
+    this.logger.debug({ method: 'getStateUpdateList', rows: rows.length })
 
     return rows.map((row) => ({
       id: row.id,
@@ -138,12 +138,12 @@ export class StateUpdateRepository {
     return rows.map(toStateUpdatePriceRecord)
   }
 
-  async getStateChangeCount() {
+  async getStateUpdateCount() {
     const row = await this.knex('state_updates').count()
     return row[0].count as unknown as bigint
   }
 
-  async getStateChangeById(id: number) {
+  async getStateUpdateById(id: number) {
     const row = (await this.knex('state_updates')
       .first()
       .where('id', '=', id)
@@ -162,7 +162,7 @@ export class StateUpdateRepository {
         }
       | undefined
 
-    this.logger.debug({ method: 'getStateChangeById', id })
+    this.logger.debug({ method: 'getStateUpdateById', id })
 
     return (
       row && {

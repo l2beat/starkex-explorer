@@ -203,7 +203,7 @@ describe(StateUpdateRepository.name, () => {
       })
     }
 
-    const actual = await repository.getStateChangeList({ offset: 1, limit: 2 })
+    const actual = await repository.getStateUpdateList({ offset: 1, limit: 2 })
 
     expect(actual).toEqual([
       {
@@ -247,7 +247,7 @@ describe(StateUpdateRepository.name, () => {
       prices: [],
     })
 
-    const actual = await repository.getStateChangeById(blockNumber)
+    const actual = await repository.getStateUpdateById(blockNumber)
 
     expect(actual).toEqual({
       id: blockNumber,
@@ -284,7 +284,7 @@ describe(StateUpdateRepository.name, () => {
       })
     }
 
-    const fullCount = await repository.getStateChangeCount()
+    const fullCount = await repository.getStateUpdateCount()
 
     expect(fullCount).toEqual(4n)
   })
@@ -330,7 +330,7 @@ describe(StateUpdateRepository.name, () => {
   })
 
   it('returns undefined if update is missing', async () => {
-    const update = await repository.getStateChangeById(1)
+    const update = await repository.getStateUpdateById(1)
     expect(update).not.toBeDefined()
   })
 })
