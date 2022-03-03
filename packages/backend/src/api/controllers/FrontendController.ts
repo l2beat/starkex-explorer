@@ -83,8 +83,8 @@ export class FrontendController {
     }[] = current.balances.map(({ balance, assetId }) => {
       const price = prices.find((p) => p.assetId === assetId)?.price
       const totalUSDCents = price
-        ? (balance * price * BigInt(10 ** AssetId.decimals(assetId))) /
-          BigInt(2 ** 32) /
+        ? (balance * price * 10n ** BigInt(AssetId.decimals(assetId))) /
+          2n ** 32n /
           1000n
         : 0n
       return {
