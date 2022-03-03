@@ -1,9 +1,9 @@
 import { Context } from 'koa'
 import { z } from 'zod'
 
-export function stringToPositiveInt(def?: string) {
+export function stringToPositiveInt(fallback?: string) {
   return z.preprocess(
-    (s) => Number(z.string().parse(s ?? def)),
+    (s) => Number(z.string().parse(s ?? fallback)),
     z.number().int().positive()
   )
 }
