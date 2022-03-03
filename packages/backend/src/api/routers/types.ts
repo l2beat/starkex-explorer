@@ -28,11 +28,9 @@ export function stringAs<T>(brandedType: (value: string) => T, fallback?: T) {
     .transform(brandedType)
 }
 
-export type TypedContext<T> = Omit<Context, 'params' | 'query'> & T
-
 export function withTypedContext<T extends z.AnyZodObject>(
   parser: T,
-  handler: (ctx: TypedContext<z.infer<T>>) => Promise<void>
+  handler: (ctx: Context & z.infer<T>) => Promise<void>
 ) {
   return async (ctx: Context) => {
     const parseResult = parser.safeParse({
