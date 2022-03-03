@@ -4,6 +4,10 @@ import { mock } from '../../mock'
 import { createTestApiServer } from '../TestApiServer'
 
 const TEST_PAGE = '<!DOCTYPE html><p>test page</p>'
+const SUCCESFUL_RESPONE = {
+  status: 200 as const,
+  html: TEST_PAGE,
+}
 
 describe('FrontendRouter', () => {
   describe('/', () => {
@@ -46,7 +50,7 @@ describe('FrontendRouter', () => {
   describe('/state-updates/:id', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
-        getStateChangeDetailsPage: async () => TEST_PAGE,
+        getStateChangeDetailsPage: async () => SUCCESFUL_RESPONE,
       })
     )
     const server = createTestApiServer([frontendRouter])
@@ -63,7 +67,7 @@ describe('FrontendRouter', () => {
   describe('/positions/:positionId', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
-        getPositionDetailsPage: async () => TEST_PAGE,
+        getPositionDetailsPage: async () => SUCCESFUL_RESPONE,
       })
     )
     const server = createTestApiServer([frontendRouter])
@@ -74,6 +78,23 @@ describe('FrontendRouter', () => {
 
     it('does not allow invalid input', async () => {
       await server.get('/positions/foo').expect(400)
+    })
+  })
+
+  describe('/positions/:positionId/updates/:updateId', () => {
+    const frontendRouter = createFrontendRouter(
+      mock<FrontendController>({
+        getPositionUpdatePage: async () => SUCCESFUL_RESPONE,
+      })
+    )
+    const server = createTestApiServer([frontendRouter])
+
+    it('returns html', async () => {
+      await server.get('/positions/1/updates/1').expect(200).expect(TEST_PAGE)
+    })
+
+    it('does not allow invalid input', async () => {
+      await server.get('/positions/foo/updates/bar').expect(400)
     })
   })
 })

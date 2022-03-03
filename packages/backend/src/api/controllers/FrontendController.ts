@@ -52,29 +52,51 @@ export class FrontendController {
     })
   }
 
-  async getStateChangeDetailsPage(id: number): Promise<string> {
+  async getStateChangeDetailsPage(id: number): Promise<{
+    status: 200 | 404
+    html: string
+  }> {
     const stateChange = await this.stateUpdateRepository.getStateChangeById(id)
 
-    return renderStateChangeDetailsPage({
-      id: stateChange.id,
-      hash: stateChange.hash,
-      timestamp: stateChange.timestamp,
-      positions: stateChange.positions.map((pos) => ({
-        ...pos,
-        balances: pos.balances.map((balance) => ({
-          assetId: balance.assetId.toString(), // <- this is less than ideal
-          balance: balance.balance,
+    if (!stateChange) {
+      return {
+        status: 404,
+        html: 'State update not found',
+      }
+    }
+
+    return {
+      html: renderStateChangeDetailsPage({
+        id: stateChange.id,
+        hash: stateChange.hash,
+        timestamp: stateChange.timestamp,
+        positions: stateChange.positions.map((pos) => ({
+          ...pos,
+          balances: pos.balances.map((balance) => ({
+            assetId: balance.assetId.toString(), // <- this is less than ideal
+            balance: balance.balance,
+          })),
         })),
-      })),
-    })
+      }),
+      status: 200,
+    }
   }
 
-  async getPositionDetailsPage(positionId: bigint): Promise<string> {
+  async getPositionDetailsPage(positionId: bigint): Promise<{
+    html: string
+    status: 404 | 200
+  }> {
     const [history, prices] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
       this.stateUpdateRepository.getLatestAssetPrices(),
     ])
     const current = history[0]
+    if (!current) {
+      return {
+        status: 404,
+        html: 'Position not found',
+      }
+    }
     const assets: {
       assetId: string
       balance: bigint
@@ -105,25 +127,28 @@ export class FrontendController {
       0n
     )
 
-    return renderPositionDetailsPage({
-      positionId,
-      publicKey: current.publicKey,
-      totalUSDCents,
-      assets,
-      history: history.map((pos) => ({
-        ...pos,
-        balances: pos.balances.map((balance) => ({
-          assetId: balance.assetId.toString(),
-          balance: balance.balance,
+    return {
+      status: 200,
+      html: renderPositionDetailsPage({
+        positionId,
+        publicKey: current.publicKey,
+        totalUSDCents,
+        assets,
+        history: history.map((pos) => ({
+          ...pos,
+          balances: pos.balances.map((balance) => ({
+            assetId: balance.assetId.toString(),
+            balance: balance.balance,
+          })),
         })),
-      })),
-    })
+      }),
+    }
   }
 
   async getPositionUpdatePage(
     positionId: bigint,
     stateUpdateId: number
-  ): Promise<string> {
+  ): Promise<{ html: string; status: 200 | 404 }> {
     const [history, update] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
       this.stateUpdateRepository.getStateChangeById(stateUpdateId),
@@ -132,7 +157,10 @@ export class FrontendController {
       (p) => p.stateUpdateId === stateUpdateId
     )
     if (!updateIndex) {
-      throw new Error('Cannot find update for position with id ' + positionId)
+      return {
+        html: 'Update not found',
+        status: 404,
+      }
     }
     const position = history[updateIndex]
     const previousPosition = history[updateIndex + 1]
@@ -156,6 +184,9 @@ export class FrontendController {
       assetChanges,
     }
 
-    return toReturn.toString()
+    return {
+      html: toReturn.toString(),
+      status: 200,
+    }
   }
 }

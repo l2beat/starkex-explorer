@@ -37,7 +37,10 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { id } = ctx.params
-        ctx.body = await frontendController.getStateChangeDetailsPage(id)
+        const { status, html } =
+          await frontendController.getStateChangeDetailsPage(id)
+        ctx.body = html
+        ctx.status = status
       }
     )
   )
@@ -52,7 +55,10 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { positionId } = ctx.params
-        ctx.body = await frontendController.getPositionDetailsPage(positionId)
+        const { status, html } =
+          await frontendController.getPositionDetailsPage(positionId)
+        ctx.body = html
+        ctx.status = status
       }
     )
   )
@@ -68,10 +74,12 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { positionId, updateId } = ctx.params
-        ctx.body = await frontendController.getPositionUpdatePage(
+        const { status, html } = await frontendController.getPositionUpdatePage(
           positionId,
           updateId
         )
+        ctx.body = html
+        ctx.status = status
       }
     )
   )

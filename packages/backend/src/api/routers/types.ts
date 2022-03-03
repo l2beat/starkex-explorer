@@ -1,4 +1,4 @@
-import Application from 'koa'
+import { Context } from 'koa'
 import { z } from 'zod'
 
 export function stringToPositiveInt(def?: string) {
@@ -22,17 +22,13 @@ export function brandedString<T>(brandedType: (value: string) => T) {
     .transform(brandedType)
 }
 
-export type TypedContext<T> = Omit<
-  Application.ParameterizedContext,
-  'params' | 'query'
-> &
-  T
+export type TypedContext<T> = Omit<Context, 'params' | 'query'> & T
 
 export function withTypedContext<T extends z.AnyZodObject>(
   parser: T,
   handler: (ctx: TypedContext<z.infer<T>>) => Promise<void>
 ) {
-  return async (ctx: Application.ParameterizedContext) => {
+  return async (ctx: Context) => {
     const parseResult = parser.safeParse({
       params: ctx.params,
       query: ctx.query,
