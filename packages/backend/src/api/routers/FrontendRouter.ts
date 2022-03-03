@@ -2,7 +2,7 @@ import Router from '@koa/router'
 import { z } from 'zod'
 
 import { FrontendController } from '../controllers/FrontendController'
-import { brandedString, stringToPositiveInt, withTypedContext } from './types'
+import { stringAsBigInt, stringAsInt, withTypedContext } from './types'
 
 export function createFrontendRouter(frontendController: FrontendController) {
   const router = new Router()
@@ -16,8 +16,8 @@ export function createFrontendRouter(frontendController: FrontendController) {
     withTypedContext(
       z.object({
         query: z.object({
-          page: stringToPositiveInt('1'),
-          perPage: stringToPositiveInt('10'),
+          page: stringAsInt(1),
+          perPage: stringAsInt(10),
         }),
       }),
       async (ctx) => {
@@ -32,7 +32,7 @@ export function createFrontendRouter(frontendController: FrontendController) {
     withTypedContext(
       z.object({
         params: z.object({
-          id: stringToPositiveInt(),
+          id: stringAsInt(),
         }),
       }),
       async (ctx) => {
@@ -50,7 +50,7 @@ export function createFrontendRouter(frontendController: FrontendController) {
     withTypedContext(
       z.object({
         params: z.object({
-          positionId: brandedString(BigInt),
+          positionId: stringAsBigInt(),
         }),
       }),
       async (ctx) => {
@@ -68,8 +68,8 @@ export function createFrontendRouter(frontendController: FrontendController) {
     withTypedContext(
       z.object({
         params: z.object({
-          positionId: brandedString(BigInt),
-          updateId: brandedString(Number),
+          positionId: stringAsBigInt(),
+          updateId: stringAsInt(),
         }),
       }),
       async (ctx) => {

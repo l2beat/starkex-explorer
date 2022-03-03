@@ -1,14 +1,17 @@
 import { Context } from 'koa'
 import { z } from 'zod'
 
-export function stringToPositiveInt(fallback?: string) {
-  return z.preprocess(
-    (s) => Number(z.string().parse(s ?? fallback)),
-    z.number().int().positive()
-  )
+export function stringAsInt(fallback?: number) {
+  return z.preprocess((s) => {
+    const res = z.string().safeParse(s)
+    return res.success && res.data ? Number(res.data) : fallback
+  }, z.number().int())
+}
+export function stringAsBigInt(fallback?: bigint) {
+  return stringAs(BigInt, fallback)
 }
 
-export function brandedString<T>(brandedType: (value: string) => T) {
+export function stringAs<T>(brandedType: (value: string) => T, fallback?: T) {
   return z
     .string()
     .refine((v) => {
@@ -16,7 +19,10 @@ export function brandedString<T>(brandedType: (value: string) => T) {
         brandedType(v)
         return true
       } catch {
-        return false
+        if (!fallback) {
+          return false
+        }
+        return fallback
       }
     })
     .transform(brandedType)
