@@ -1,4 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
+import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 import { BigNumber, BigNumberish } from 'ethers'
 
@@ -8,7 +9,7 @@ import {
   PAGE_ABI,
   PageCollector,
 } from '../../src/core/PageCollector'
-import { BlockRange, Hash256 } from '../../src/model'
+import { BlockRange } from '../../src/model'
 import {
   PageRecord,
   PageRepository,

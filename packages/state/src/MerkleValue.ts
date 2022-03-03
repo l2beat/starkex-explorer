@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/crypto'
+import { PedersenHash } from '@explorer/types'
 
 export abstract class MerkleValue {
   protected abstract calculateHash(): Promise<PedersenHash>

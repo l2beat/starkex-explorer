@@ -1,8 +1,8 @@
+import { Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 import { providers } from 'ethers'
 
 import { BlockDownloader } from '../../../src/core/sync/BlockDownloader'
-import { Hash256 } from '../../../src/model'
 import {
   BlockRecord,
   BlockRepository,

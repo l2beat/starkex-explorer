@@ -1,7 +1,7 @@
+import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 import { range } from 'lodash'
 
-import { Hash256 } from '../../../src/model'
 import {
   BlockRecord,
   BlockRepository,

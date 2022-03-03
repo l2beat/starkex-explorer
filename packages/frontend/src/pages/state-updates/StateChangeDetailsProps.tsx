@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/crypto'
+import { PedersenHash } from '@explorer/types'
 
 export interface StateChangeDetailsProps {
   readonly hash: PedersenHash

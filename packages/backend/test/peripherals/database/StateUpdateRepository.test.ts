@@ -1,8 +1,6 @@
-import { PedersenHash } from '@explorer/crypto'
-import { AssetId } from '@explorer/encoding'
+import { AssetId, Hash256, PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { Hash256 } from '../../../src/model'
 import {
   StateUpdateRecord,
   StateUpdateRepository,

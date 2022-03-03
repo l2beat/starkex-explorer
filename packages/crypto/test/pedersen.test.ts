@@ -1,6 +1,6 @@
+import { PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { PedersenHash } from '../src'
 import { pedersen, terminateWorkerPool } from '../src/pedersen'
 
 describe(pedersen.name, () => {

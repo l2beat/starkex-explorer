@@ -1,6 +1,7 @@
+import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { AssetId, DecodingError } from '../src'
+import { DecodingError } from '../src'
 import { MIN_INT } from '../src/constants'
 import { encodeAssetId } from '../src/encodeAssetId'
 import { readState } from '../src/readState'

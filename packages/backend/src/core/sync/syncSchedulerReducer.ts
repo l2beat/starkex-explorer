@@ -1,4 +1,6 @@
-import { BlockRange, Hash256 } from '../../model'
+import { Hash256 } from '@explorer/types'
+
+import { BlockRange } from '../../model'
 
 export interface Block {
   readonly number: number

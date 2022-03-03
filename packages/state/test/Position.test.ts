@@ -1,5 +1,4 @@
-import { PedersenHash } from '@explorer/crypto'
-import { AssetId } from '@explorer/encoding'
+import { AssetId, PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { Position } from '../src/Position'

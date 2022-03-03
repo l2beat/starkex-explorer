@@ -1,3 +1,4 @@
+import { Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 import waitForExpect from 'wait-for-expect'
 
@@ -5,7 +6,7 @@ import { DataSyncService } from '../../../src/core/DataSyncService'
 import { BlockDownloader } from '../../../src/core/sync/BlockDownloader'
 import { SyncScheduler } from '../../../src/core/sync/SyncScheduler'
 import { Block } from '../../../src/core/sync/syncSchedulerReducer'
-import { BlockRange, Hash256 } from '../../../src/model'
+import { BlockRange } from '../../../src/model'
 import { SyncStatusRepository } from '../../../src/peripherals/database/SyncStatusRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { mock } from '../../mock'

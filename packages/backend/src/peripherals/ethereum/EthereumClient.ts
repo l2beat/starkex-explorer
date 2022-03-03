@@ -1,7 +1,8 @@
+import { Hash256 } from '@explorer/types'
 import { assert } from 'console'
 import { ethers, providers } from 'ethers'
 
-import { BlockRange, Hash256 } from '../../model'
+import { BlockRange } from '../../model'
 import { BlockTag } from './types'
 
 export class EthereumClient {

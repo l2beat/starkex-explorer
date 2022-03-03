@@ -1,8 +1,8 @@
+import { Hash256 } from '@explorer/types'
 import { Knex } from 'knex'
 import { PageRow } from 'knex/types/tables'
 import { sortBy } from 'lodash'
 
-import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 

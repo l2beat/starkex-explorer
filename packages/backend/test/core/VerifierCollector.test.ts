@@ -1,7 +1,8 @@
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import { VerifierCollector } from '../../src/core/VerifierCollector'
-import { BlockRange, EthereumAddress, Hash256 } from '../../src/model'
+import { BlockRange } from '../../src/model'
 import {
   VerifierEventRecord,
   VerifierEventRepository,
@@ -26,7 +27,7 @@ describe(VerifierCollector.name, () => {
       })
     )
 
-    const blockRange: BlockRange = new BlockRange([
+    const blockRange = new BlockRange([
       {
         number: 12004790,
         hash: Hash256(

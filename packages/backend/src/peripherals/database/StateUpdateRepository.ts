@@ -1,5 +1,5 @@
-import { PedersenHash } from '@explorer/crypto'
-import { AssetBalance, AssetId, OraclePrice } from '@explorer/encoding'
+import { AssetBalance, OraclePrice } from '@explorer/encoding'
+import { AssetId, Hash256, PedersenHash } from '@explorer/types'
 import { Knex } from 'knex'
 import {
   AssetBalanceJson,
@@ -8,7 +8,6 @@ import {
   StateUpdateRow,
 } from 'knex/types/tables'
 
-import { Hash256 } from '../../model'
 import { Logger } from '../../tools/Logger'
 
 export interface StateUpdateRecord {

@@ -1,11 +1,10 @@
-import { PedersenHash } from '@explorer/crypto'
+import { Hash256, PedersenHash } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import {
   ROLLUP_STATE_EMPTY_HASH,
   StateUpdateCollector,
 } from '../../src/core/StateUpdateCollector'
-import { Hash256 } from '../../src/model'
 import type { PageRepository } from '../../src/peripherals/database/PageRepository'
 import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
 import type { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'

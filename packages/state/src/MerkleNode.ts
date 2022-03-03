@@ -1,4 +1,5 @@
-import { pedersen, PedersenHash } from '@explorer/crypto'
+import { pedersen } from '@explorer/crypto'
+import { PedersenHash } from '@explorer/types'
 import { partition } from 'lodash'
 
 import { MerkleValue } from './MerkleValue'

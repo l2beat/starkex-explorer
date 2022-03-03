@@ -1,3 +1,4 @@
+import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -8,7 +9,7 @@ import {
   syncSchedulerReducer,
   SyncState,
 } from '../../../src/core/sync/syncSchedulerReducer'
-import { BlockRange, Hash256 } from '../../../src/model'
+import { BlockRange } from '../../../src/model'
 
 describe(syncSchedulerReducer.name, () => {
   const block = (number: number, version?: 'a' | 'b'): Block => ({

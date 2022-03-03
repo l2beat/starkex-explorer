@@ -1,5 +1,5 @@
 {
-  "name": "@explorer/encoding",
+  "name": "@explorer/types",
   "version": "0.1.0",
   "private": true,
   "main": "build/src/index.js",
@@ -12,11 +12,9 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "test": "mocha",
-    "get-onchain-data": "node -r esbuild-register src/data",
     "coverage": "nyc --reporter=lcov --reporter=text mocha"
   },
   "dependencies": {
-    "@explorer/types": "*",
     "ethers": "^5.5.2"
   },
   "devDependencies": {}
