@@ -4,7 +4,7 @@ import { z } from 'zod'
 export function stringAsInt(fallback?: number) {
   return z.preprocess((s) => {
     const res = z.string().safeParse(s)
-    return res.success && res.data ? Number(res.data) : fallback
+    return res.success && s !== '' ? Number(res.data) : fallback
   }, z.number().int())
 }
 export function stringAsBigInt(fallback?: bigint) {
