@@ -1,4 +1,3 @@
-import { AssetId } from '@explorer/encoding'
 import {
   HomeProps,
   renderHomePage,
@@ -6,6 +5,7 @@ import {
   renderStateChangeDetailsPage,
   renderStateChangesIndexPage,
 } from '@explorer/frontend'
+import { AssetId } from '@explorer/types'
 
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 
