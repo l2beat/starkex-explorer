@@ -5,8 +5,8 @@ import {
   renderStateChangeDetailsPage,
   renderStateChangesIndexPage,
 } from '@explorer/frontend'
-import { AssetId } from '@explorer/types'
 
+import { assetTotalUSDCents } from '../../core/AssetTotalCalculator'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 
 export class FrontendController {
@@ -105,9 +105,7 @@ export class FrontendController {
     }[] = current.balances.map(({ balance, assetId }) => {
       const price = prices.find((p) => p.assetId === assetId)?.price
       const totalUSDCents = price
-        ? (balance * price * 10n ** BigInt(AssetId.decimals(assetId))) /
-          2n ** 32n /
-          1000n
+        ? assetTotalUSDCents(balance, price, assetId)
         : 0n
       return {
         assetId: assetId.toString(),
