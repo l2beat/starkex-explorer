@@ -291,12 +291,10 @@ describe(StateUpdateRepository.name, () => {
     expect(fullCount).toEqual(4n)
   })
 
-  it('gets prices for state update', async () => {
-    const stateUpdateId = 10_000
-
-    await repository.add({
+  it('gets latest asset prices', async () => {
+    const update = {
       stateUpdate: {
-        id: stateUpdateId,
+        id: 1,
         blockNumber: 10_000,
         rootHash: PedersenHash.fake(),
         factHash: Hash256.fake(),
@@ -311,11 +309,25 @@ describe(StateUpdateRepository.name, () => {
         },
       ],
       prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
-    })
+    }
 
-    const prices = await repository.getStateChangePrices(stateUpdateId)
-    expect(prices).toEqual([
-      { stateUpdateId, assetId: AssetId('ETH-9'), price: 40n },
+    await repository.add(update)
+
+    expect(await repository.getLatestAssetPrices()).toEqual([
+      { stateUpdateId: 1, assetId: AssetId('ETH-9'), price: 40n },
+    ])
+
+    update.stateUpdate.id = 2
+    update.prices = [
+      { assetId: AssetId('ETH-9'), price: 80n },
+      { assetId: AssetId('BTC-10'), price: 100n },
+    ]
+
+    await repository.add(update)
+
+    expect(await repository.getLatestAssetPrices()).toEqual([
+      { stateUpdateId: 2, assetId: AssetId('ETH-9'), price: 80n },
+      { stateUpdateId: 2, assetId: AssetId('BTC-10'), price: 100n },
     ])
   })
 })

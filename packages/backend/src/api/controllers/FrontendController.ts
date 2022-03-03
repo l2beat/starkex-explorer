@@ -70,16 +70,16 @@ export class FrontendController {
   }
 
   async getPositionDetailsPage(positionId: bigint): Promise<string> {
-    const history = await this.stateUpdateRepository.getPositionHistoryById(positionId)
+    const [history, prices] = await Promise.all([
+      this.stateUpdateRepository.getPositionHistoryById(positionId),
+      this.stateUpdateRepository.getLatestAssetPrices(),
+    ])
     const current = history[0]
-    const prices = await this.stateUpdateRepository.getStateChangePrices(
-      current.stateUpdateId
-    )
     const assets: {
       assetId: string
       balance: bigint
       totalUSDCents: bigint
-      price: bigint
+      price?: bigint
     }[] = current.balances.map(({ balance, assetId }) => {
       const price = prices.find((p) => p.assetId === assetId)?.price
       const totalUSDCents = price
