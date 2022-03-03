@@ -70,7 +70,7 @@ export class FrontendController {
   }
 
   async getPositionDetailsPage(positionId: bigint): Promise<string> {
-    const history = await this.stateUpdateRepository.getPositionById(positionId)
+    const history = await this.stateUpdateRepository.getPositionHistoryById(positionId)
     const current = history[0]
     const prices = await this.stateUpdateRepository.getStateChangePrices(
       current.stateUpdateId
@@ -125,7 +125,7 @@ export class FrontendController {
     stateUpdateId: number
   ): Promise<string> {
     const [history, update] = await Promise.all([
-      this.stateUpdateRepository.getPositionById(positionId),
+      this.stateUpdateRepository.getPositionHistoryById(positionId),
       this.stateUpdateRepository.getStateChangeById(stateUpdateId),
     ])
     const updateIndex = history.findIndex(

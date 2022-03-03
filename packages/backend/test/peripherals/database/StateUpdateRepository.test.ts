@@ -82,7 +82,7 @@ describe(StateUpdateRepository.name, () => {
       prices: [],
     })
 
-    const position = await repository.getPositionById(positionId)
+    const position = await repository.getPositionHistoryById(positionId)
 
     expect(position).toEqual([
       {

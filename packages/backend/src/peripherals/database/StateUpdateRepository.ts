@@ -69,7 +69,7 @@ export class StateUpdateRepository {
     return row && toStateUpdateRecord(row)
   }
 
-  async getPositionById(positionId: bigint) {
+  async getPositionHistoryById(positionId: bigint) {
     const rows = await this.knex('positions')
       .select('*')
       .where('position_id', positionId)
