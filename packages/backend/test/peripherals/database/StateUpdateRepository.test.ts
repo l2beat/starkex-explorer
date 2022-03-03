@@ -330,4 +330,9 @@ describe(StateUpdateRepository.name, () => {
       { stateUpdateId: 2, assetId: AssetId('BTC-10'), price: 100n },
     ])
   })
+
+  it('returns undefined if update is missing', async () => {
+    const update = await repository.getStateChangeById(1)
+    expect(update).not.toBeDefined()
+  })
 })

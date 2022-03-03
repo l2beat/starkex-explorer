@@ -155,20 +155,24 @@ export class StateUpdateRepository {
         'timestamp',
         'root_hash',
         this.knex.raw('ARRAY_AGG(row_to_json(positions)) as positions')
-      )) as unknown as {
-      timestamp: number
-      root_hash: string
-      positions: PositionRow[]
-    }
+      )) as unknown as
+      | {
+          timestamp: number
+          root_hash: string
+          positions: PositionRow[]
+        }
+      | undefined
 
     this.logger.debug({ method: 'getStateChangeById', id })
 
-    return {
-      id,
-      hash: PedersenHash(row.root_hash),
-      timestamp: row.timestamp,
-      positions: row.positions.map(toPositionRecord),
-    }
+    return (
+      row && {
+        id,
+        hash: PedersenHash(row.root_hash),
+        timestamp: row.timestamp,
+        positions: row.positions.map(toPositionRecord),
+      }
+    )
   }
 
   async deleteAll() {

@@ -156,7 +156,7 @@ export class FrontendController {
     const updateIndex = history.findIndex(
       (p) => p.stateUpdateId === stateUpdateId
     )
-    if (!updateIndex) {
+    if (!updateIndex || !update) {
       return {
         html: 'Update not found',
         status: 404,
