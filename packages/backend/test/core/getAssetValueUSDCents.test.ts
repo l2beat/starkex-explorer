@@ -1,9 +1,9 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { assetTotalUSDCents } from '../../src/core/AssetTotalCalculator'
+import { getAssetValueUSDCents } from '../../src/core/getAssetValueUSDCents'
 
-describe(assetTotalUSDCents.name, () => {
+describe(getAssetValueUSDCents.name, () => {
   const cases = [
     {
       balance: 1000n,
@@ -21,7 +21,7 @@ describe(assetTotalUSDCents.name, () => {
 
   cases.forEach(({ balance, price, assetId, total }) => {
     it('caculates value properly', () => {
-      expect(assetTotalUSDCents(balance, price, AssetId(assetId))).toEqual(
+      expect(getAssetValueUSDCents(balance, price, AssetId(assetId))).toEqual(
         total
       )
     })

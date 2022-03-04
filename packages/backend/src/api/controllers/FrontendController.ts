@@ -6,7 +6,7 @@ import {
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
 
-import { assetTotalUSDCents } from '../../core/AssetTotalCalculator'
+import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 
 type ControllerResult = {
@@ -104,7 +104,7 @@ export class FrontendController {
     }[] = current.balances.map(({ balance, assetId }) => {
       const price = prices.find((p) => p.assetId === assetId)?.price
       const totalUSDCents = price
-        ? assetTotalUSDCents(balance, price, assetId)
+        ? getAssetValueUSDCents(balance, price, assetId)
         : 0n
       return {
         assetId: assetId.toString(),

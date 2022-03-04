@@ -1,6 +1,6 @@
 import { AssetId } from '@explorer/types'
 
-export function assetTotalUSDCents(
+export function getAssetValueUSDCents(
   balance: bigint,
   price: bigint,
   assetId: AssetId
