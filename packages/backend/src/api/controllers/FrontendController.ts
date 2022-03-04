@@ -9,6 +9,11 @@ import {
 import { assetTotalUSDCents } from '../../core/AssetTotalCalculator'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 
+type ControllerResult = {
+  html: string
+  status: 200 | 404
+}
+
 export class FrontendController {
   constructor(private stateUpdateRepository: StateUpdateRepository) {}
 
@@ -52,10 +57,7 @@ export class FrontendController {
     })
   }
 
-  async getStateUpdateDetailsPage(id: number): Promise<{
-    status: 200 | 404
-    html: string
-  }> {
+  async getStateUpdateDetailsPage(id: number): Promise<ControllerResult> {
     const stateUpdate = await this.stateUpdateRepository.getStateUpdateById(id)
 
     if (!stateUpdate) {
@@ -82,10 +84,7 @@ export class FrontendController {
     }
   }
 
-  async getPositionDetailsPage(positionId: bigint): Promise<{
-    html: string
-    status: 404 | 200
-  }> {
+  async getPositionDetailsPage(positionId: bigint): Promise<ControllerResult> {
     const [history, prices] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
       this.stateUpdateRepository.getLatestAssetPrices(),
@@ -146,7 +145,7 @@ export class FrontendController {
   async getPositionUpdatePage(
     positionId: bigint,
     stateUpdateId: number
-  ): Promise<{ html: string; status: 200 | 404 }> {
+  ): Promise<ControllerResult> {
     const [history, update] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
       this.stateUpdateRepository.getStateUpdateById(stateUpdateId),
