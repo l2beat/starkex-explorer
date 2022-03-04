@@ -324,8 +324,8 @@ describe(StateUpdateRepository.name, () => {
     await repository.add(update)
 
     expect(await repository.getLatestAssetPrices()).toEqual([
-      { stateUpdateId: 2, assetId: AssetId('ETH-9'), price: 80n },
       { stateUpdateId: 2, assetId: AssetId('BTC-10'), price: 100n },
+      { stateUpdateId: 2, assetId: AssetId('ETH-9'), price: 80n },
     ])
   })
 

@@ -119,22 +119,13 @@ export class StateUpdateRepository {
   }
 
   async getLatestAssetPrices() {
-    const rows = await this.knex('prices as p1').innerJoin(
-      this.knex('prices')
-        .select(
-          'asset_id',
-          this.knex.raw('max(state_update_id) as state_update_id')
-        )
-        .groupBy('asset_id')
-        .as('p2'),
-      function () {
-        this.on('p1.asset_id', '=', 'p2.asset_id').andOn(
-          'p1.state_update_id',
-          '=',
-          'p2.state_update_id'
-        )
-      }
-    )
+    const rows = await this.knex('prices')
+      .where(
+        'state_update_id',
+        '=',
+        this.knex.raw('(select max(state_update_id) from prices)')
+      )
+      .orderBy('asset_id')
     return rows.map(toStateUpdatePriceRecord)
   }
 
