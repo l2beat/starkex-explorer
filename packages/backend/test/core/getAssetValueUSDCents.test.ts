@@ -20,7 +20,7 @@ describe(getAssetValueUSDCents.name, () => {
   ]
 
   cases.forEach(({ balance, price, assetId, total }) => {
-    it('caculates value properly', () => {
+    it('calculates value properly', () => {
       expect(getAssetValueUSDCents(balance, price, AssetId(assetId))).toEqual(
         total
       )
