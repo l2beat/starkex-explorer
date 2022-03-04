@@ -19,7 +19,7 @@ export function stringAs<T>(brandedType: (value: string) => T, fallback?: T) {
         brandedType(v)
         return true
       } catch {
-        if (!fallback) {
+        if (fallback !== undefined) {
           return false
         }
         return fallback
