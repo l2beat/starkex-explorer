@@ -1,11 +1,10 @@
 import { expect } from 'earljs'
 
-import { stringToPositiveInt } from '../../../src/api/routers/types'
+import { stringAsInt } from '../../../src/api/routers/types'
 
-describe(stringToPositiveInt.name, () => {
-  const parser = stringToPositiveInt('10')
-
+describe(stringAsInt.name, () => {
   describe('parses correct input', () => {
+    const parser = stringAsInt(10)
     const inputs = [undefined, null, '1']
 
     inputs.forEach((input) => {
@@ -15,6 +14,7 @@ describe(stringToPositiveInt.name, () => {
   })
 
   describe('parses incorrect input', () => {
+    const parser = stringAsInt()
     const inputs = ['foo', '123foo', '', '1.2']
 
     inputs.forEach((input) => {

@@ -32,13 +32,12 @@ export function Home(props: HomeProps) {
                 <li key={i} className="my-4">
                   <a
                     className="w-full grid gap-2 grid-cols-[auto_1fr_auto]"
-                    href={`/state-updates/${update.hash}`}
+                    href={`/state-updates/${update.id}`}
                   >
                     <div className="w-12 h-12 bg-zinc-200 rounded-full" />
                     <div>
-                      <div className="text-blue-700">
-                        {formatHash(update.hash)}
-                      </div>
+                      <div className="text-blue-700">{update.id}</div>
+                      <div>Hash: {formatHash(update.hash)}</div>
                       <div>{update.positionCount} positions</div>
                     </div>
                     <div>{new Date(update.timestamp).toUTCString()}</div>

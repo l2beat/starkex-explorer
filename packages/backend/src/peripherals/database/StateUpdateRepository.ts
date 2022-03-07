@@ -25,6 +25,12 @@ export interface PositionRecord {
   balances: readonly AssetBalance[]
 }
 
+export interface StateUpdatePriceRecord {
+  stateUpdateId: number
+  assetId: AssetId
+  price: bigint
+}
+
 export class StateUpdateRepository {
   constructor(private knex: Knex, private logger: Logger) {
     this.logger = logger.for(this)
@@ -62,7 +68,7 @@ export class StateUpdateRepository {
     return row && toStateUpdateRecord(row)
   }
 
-  async getPositionById(positionId: bigint) {
+  async getPositionHistoryById(positionId: bigint) {
     const rows = await this.knex('positions')
       .select('*')
       .where('position_id', positionId)
@@ -77,7 +83,7 @@ export class StateUpdateRepository {
     return rows.map(toStateUpdateRecord)
   }
 
-  async getStateChangeList({
+  async getStateUpdateList({
     offset,
     limit,
   }: {
@@ -89,50 +95,74 @@ export class StateUpdateRepository {
       .offset(offset)
       .limit(limit)
       .join('positions', 'state_updates.id', 'positions.state_update_id')
-      .groupBy('root_hash', 'timestamp')
+      .groupBy('root_hash', 'id', 'timestamp')
       .select(
+        'id',
         'root_hash',
         'timestamp',
         this.knex.raw('count(position_id) as position_count')
       )) as unknown as Array<{
+      id: number
       root_hash: string
       timestamp: number
       position_count: bigint
     }>
 
-    this.logger.debug({ method: 'getStateChangeList', rows: rows.length })
+    this.logger.debug({ method: 'getStateUpdateList', rows: rows.length })
 
     return rows.map((row) => ({
+      id: row.id,
       rootHash: PedersenHash(row.root_hash),
       timestamp: row.timestamp,
       positionCount: Number(row.position_count),
     }))
   }
 
-  async getStateChangeCount() {
+  async getLatestAssetPrices() {
+    const rows = await this.knex('prices')
+      .where(
+        'state_update_id',
+        '=',
+        this.knex.raw('(select max(state_update_id) from prices)')
+      )
+      .orderBy('asset_id')
+    return rows.map(toStateUpdatePriceRecord)
+  }
+
+  async getStateUpdateCount() {
     const row = await this.knex('state_updates').count()
     return row[0].count as unknown as bigint
   }
 
-  async getStateChangeByRootHash(rootHash: PedersenHash) {
-    const hash = rootHash.toString()
+  async getStateUpdateById(id: number) {
     const row = (await this.knex('state_updates')
       .first()
-      .where('root_hash', '=', hash)
+      .where('id', '=', id)
       .orderBy('timestamp', 'desc')
       .join('positions', 'state_updates.id', 'positions.state_update_id')
       .groupBy('root_hash', 'timestamp')
       .select(
         'timestamp',
+        'root_hash',
         this.knex.raw('ARRAY_AGG(row_to_json(positions)) as positions')
-      )) as unknown as { timestamp: number; positions: PositionRow[] }
+      )) as unknown as
+      | {
+          timestamp: number
+          root_hash: string
+          positions: PositionRow[]
+        }
+      | undefined
 
-    this.logger.debug({ method: 'getStateChangeByRootHash', hash })
+    this.logger.debug({ method: 'getStateUpdateById', id })
 
-    return {
-      timestamp: row.timestamp,
-      positions: row.positions.map(toPositionRecord),
-    }
+    return (
+      row && {
+        id,
+        hash: PedersenHash(row.root_hash),
+        timestamp: row.timestamp,
+        positions: row.positions.map(toPositionRecord),
+      }
+    )
   }
 
   async deleteAll() {
@@ -190,6 +220,14 @@ function toPositionRecord(
       assetId: AssetId(x.asset_id),
       balance: BigInt(x.balance),
     })),
+  }
+}
+
+function toStateUpdatePriceRecord(row: PriceRow): StateUpdatePriceRecord {
+  return {
+    stateUpdateId: row.state_update_id,
+    assetId: AssetId(row.asset_id),
+    price: row.price,
   }
 }
 

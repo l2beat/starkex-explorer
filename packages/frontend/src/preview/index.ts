@@ -6,8 +6,8 @@ import serve from 'koa-static'
 import {
   renderHomePage,
   renderPositionDetailsPage,
-  renderStateChangeDetailsPage,
-  renderStateChangesIndexPage,
+  renderStateUpdateDetailsPage,
+  renderStateUpdatesIndexPage,
 } from '../pages'
 import * as DATA from './data'
 
@@ -18,10 +18,10 @@ router.get('/', (ctx) => {
   ctx.body = renderHomePage(DATA.HOME_PROPS)
 })
 router.get('/state-updates', (ctx) => {
-  ctx.body = renderStateChangesIndexPage(DATA.STATE_CHANGES_INDEX_PROPS)
+  ctx.body = renderStateUpdatesIndexPage(DATA.STATE_CHANGES_INDEX_PROPS)
 })
 router.get('/state-updates/:hash', (ctx) => {
-  ctx.body = renderStateChangeDetailsPage(DATA.STATE_CHANGE_DETAILS_PROPS)
+  ctx.body = renderStateUpdateDetailsPage(DATA.STATE_CHANGE_DETAILS_PROPS)
 })
 router.get('/positions/:positionId', (ctx) => {
   ctx.body = renderPositionDetailsPage(DATA.POSITION_DETAILS_PROPS)

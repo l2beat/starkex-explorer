@@ -80,7 +80,7 @@ describe(StateUpdateRepository.name, () => {
       prices: [],
     })
 
-    const position = await repository.getPositionById(positionId)
+    const position = await repository.getPositionHistoryById(positionId)
 
     expect(position).toEqual([
       {
@@ -203,7 +203,7 @@ describe(StateUpdateRepository.name, () => {
       })
     }
 
-    const actual = await repository.getStateChangeList({ offset: 1, limit: 2 })
+    const actual = await repository.getStateUpdateList({ offset: 1, limit: 2 })
 
     expect(actual).toEqual([
       {
@@ -212,6 +212,7 @@ describe(StateUpdateRepository.name, () => {
           '0200030000000000000000000000000000000000000000000000000000000000'
         ),
         timestamp: 20003,
+        id: 20003,
       },
       {
         positionCount: 2,
@@ -219,11 +220,12 @@ describe(StateUpdateRepository.name, () => {
           '0200020000000000000000000000000000000000000000000000000000000000'
         ),
         timestamp: 20002,
+        id: 20002,
       },
     ])
   })
 
-  it('gets state by its root hash', async () => {
+  it('gets state by its id', async () => {
     const collateralBalance = 100_000_000_000_000n
     const blockNumber = 30_000
     const timestamp = Math.floor(Date.now() / 1000)
@@ -245,9 +247,11 @@ describe(StateUpdateRepository.name, () => {
       prices: [],
     })
 
-    const actual = await repository.getStateChangeByRootHash(rootHash)
+    const actual = await repository.getStateUpdateById(blockNumber)
 
     expect(actual).toEqual({
+      id: blockNumber,
+      hash: rootHash,
       timestamp,
       positions: Array.from({ length: 4 }).map((_, i) =>
         expect.objectWith({
@@ -280,8 +284,53 @@ describe(StateUpdateRepository.name, () => {
       })
     }
 
-    const fullCount = await repository.getStateChangeCount()
+    const fullCount = await repository.getStateUpdateCount()
 
     expect(fullCount).toEqual(4n)
+  })
+
+  it('gets latest asset prices', async () => {
+    const update = {
+      stateUpdate: {
+        id: 1,
+        blockNumber: 10_000,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: 0,
+      },
+      positions: [
+        {
+          publicKey: 'public-key-0',
+          positionId: 0n,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
+    }
+
+    await repository.add(update)
+
+    expect(await repository.getLatestAssetPrices()).toEqual([
+      { stateUpdateId: 1, assetId: AssetId('ETH-9'), price: 40n },
+    ])
+
+    update.stateUpdate.id = 2
+    update.prices = [
+      { assetId: AssetId('ETH-9'), price: 80n },
+      { assetId: AssetId('BTC-10'), price: 100n },
+    ]
+
+    await repository.add(update)
+
+    expect(await repository.getLatestAssetPrices()).toEqual([
+      { stateUpdateId: 2, assetId: AssetId('BTC-10'), price: 100n },
+      { stateUpdateId: 2, assetId: AssetId('ETH-9'), price: 80n },
+    ])
+  })
+
+  it('returns undefined if update is missing', async () => {
+    const update = await repository.getStateUpdateById(1)
+    expect(update).not.toBeDefined()
   })
 })

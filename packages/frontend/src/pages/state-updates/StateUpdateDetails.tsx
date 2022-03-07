@@ -2,13 +2,14 @@ import React from 'react'
 import { Page } from '../common/Page'
 import { Footer } from '../common/Footer'
 import { Navbar } from '../common/Navbar'
-import { StateChangeDetailsProps } from './StateChangeDetailsProps'
+import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 
-export function StateChangeDetails({
+export function StateUpdateDetails({
+  id,
   hash,
   positions,
   timestamp: _timestamp,
-}: StateChangeDetailsProps) {
+}: StateUpdateDetailsProps) {
   return (
     <Page
       title={`L2BEAT dYdX Explorer | ${hash.toString()}`}
@@ -21,6 +22,10 @@ export function StateChangeDetails({
       <main className="px-4 max-w-5xl mx-auto">
         <Navbar />
         <div className="bg-white border-2 border-black p-2">
+          <h1 className="bg-zinc-100 text-lg p-2 w-full flex justify-between">
+            <span>Id</span>
+            <span>{id}</span>
+          </h1>
           <h1 className="bg-zinc-100 text-lg p-2 w-full flex justify-between">
             <span>Hash</span>
             <span>{hash}</span>

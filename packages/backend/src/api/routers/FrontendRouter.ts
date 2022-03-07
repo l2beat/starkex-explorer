@@ -1,9 +1,8 @@
-import { PedersenHash } from '@explorer/types'
 import Router from '@koa/router'
 import { z } from 'zod'
 
 import { FrontendController } from '../controllers/FrontendController'
-import { brandedString, stringToPositiveInt, withTypedContext } from './types'
+import { stringAsBigInt, stringAsInt, withTypedContext } from './types'
 
 export function createFrontendRouter(frontendController: FrontendController) {
   const router = new Router()
@@ -17,28 +16,31 @@ export function createFrontendRouter(frontendController: FrontendController) {
     withTypedContext(
       z.object({
         query: z.object({
-          page: stringToPositiveInt('1'),
-          perPage: stringToPositiveInt('10'),
+          page: stringAsInt(1),
+          perPage: stringAsInt(10),
         }),
       }),
       async (ctx) => {
         const { page, perPage } = ctx.query
-        ctx.body = await frontendController.getStateChangesPage(page, perPage)
+        ctx.body = await frontendController.getStateUpdatesPage(page, perPage)
       }
     )
   )
 
   router.get(
-    '/state-updates/:hash',
+    '/state-updates/:id',
     withTypedContext(
       z.object({
         params: z.object({
-          hash: brandedString(PedersenHash),
+          id: stringAsInt(),
         }),
       }),
       async (ctx) => {
-        const { hash } = ctx.params
-        ctx.body = await frontendController.getStateChangeDetailsPage(hash)
+        const { id } = ctx.params
+        const { status, html } =
+          await frontendController.getStateUpdateDetailsPage(id)
+        ctx.body = html
+        ctx.status = status
       }
     )
   )
@@ -48,12 +50,36 @@ export function createFrontendRouter(frontendController: FrontendController) {
     withTypedContext(
       z.object({
         params: z.object({
-          positionId: brandedString(BigInt),
+          positionId: stringAsBigInt(),
         }),
       }),
       async (ctx) => {
         const { positionId } = ctx.params
-        ctx.body = await frontendController.getPositionDetailsPage(positionId)
+        const { status, html } =
+          await frontendController.getPositionDetailsPage(positionId)
+        ctx.body = html
+        ctx.status = status
+      }
+    )
+  )
+
+  router.get(
+    '/positions/:positionId/updates/:updateId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionId: stringAsBigInt(),
+          updateId: stringAsInt(),
+        }),
+      }),
+      async (ctx) => {
+        const { positionId, updateId } = ctx.params
+        const { status, html } = await frontendController.getPositionUpdatePage(
+          positionId,
+          updateId
+        )
+        ctx.body = html
+        ctx.status = status
       }
     )
   )

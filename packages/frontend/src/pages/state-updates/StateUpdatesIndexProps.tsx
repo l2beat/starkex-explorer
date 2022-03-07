@@ -1,6 +1,6 @@
 import { PedersenHash } from '@explorer/types'
 
-export interface StateChangesIndexProps {
+export interface StateUpdatesIndexProps {
   stateUpdates: StateUpdate[]
   params: {
     perPage: number

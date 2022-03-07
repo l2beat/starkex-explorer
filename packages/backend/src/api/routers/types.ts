@@ -1,14 +1,17 @@
-import Application from 'koa'
+import { Context } from 'koa'
 import { z } from 'zod'
 
-export function stringToPositiveInt(def: string) {
-  return z.preprocess(
-    (s) => Number(z.string().parse(s ?? def)),
-    z.number().int().positive()
-  )
+export function stringAsInt(fallback?: number) {
+  return z.preprocess((s) => {
+    const res = z.string().safeParse(s)
+    return res.success && s !== '' ? Number(res.data) : fallback
+  }, z.number().int())
+}
+export function stringAsBigInt(fallback?: bigint) {
+  return stringAs(BigInt, fallback)
 }
 
-export function brandedString<T>(brandedType: (value: string) => T) {
+export function stringAs<T>(brandedType: (value: string) => T, fallback?: T) {
   return z
     .string()
     .refine((v) => {
@@ -16,23 +19,20 @@ export function brandedString<T>(brandedType: (value: string) => T) {
         brandedType(v)
         return true
       } catch {
-        return false
+        if (fallback !== undefined) {
+          return false
+        }
+        return fallback
       }
     })
     .transform(brandedType)
 }
 
-export type TypedContext<T> = Omit<
-  Application.ParameterizedContext,
-  'params' | 'query'
-> &
-  T
-
 export function withTypedContext<T extends z.AnyZodObject>(
   parser: T,
-  handler: (ctx: TypedContext<z.infer<T>>) => Promise<void>
+  handler: (ctx: Context & z.infer<T>) => Promise<void>
 ) {
-  return async (ctx: Application.ParameterizedContext) => {
+  return async (ctx: Context) => {
     const parseResult = parser.safeParse({
       params: ctx.params,
       query: ctx.query,
