@@ -8,24 +8,15 @@ export function stringAsInt(fallback?: number) {
   }, z.number().int())
 }
 export function stringAsBigInt(fallback?: bigint) {
-  return stringAs(BigInt, fallback)
-}
-
-export function stringAs<T>(brandedType: (value: string) => T, fallback?: T) {
-  return z
-    .string()
-    .refine((v) => {
-      try {
-        brandedType(v)
-        return true
-      } catch {
-        if (fallback !== undefined) {
-          return false
-        }
-        return fallback
-      }
-    })
-    .transform(brandedType)
+  return z.preprocess((v) => {
+    try {
+      const s = z.string().parse(v)
+      if (s === '') return fallback
+      return BigInt(s)
+    } catch {
+      return fallback
+    }
+  }, z.bigint())
 }
 
 export function withTypedContext<T extends z.AnyZodObject>(
