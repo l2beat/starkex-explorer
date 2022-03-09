@@ -1,8 +1,6 @@
 import React, { ComponentPropsWithoutRef } from 'react'
 
 import { Page } from '../common'
-import { Footer } from '../common/Footer'
-import { Navbar } from '../common/Navbar'
 import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 
 export function StateUpdatesIndex({
@@ -19,39 +17,35 @@ export function StateUpdatesIndex({
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
     >
-      <main className="px-4 max-w-5xl mx-auto">
-        <Navbar />
-        <input
-          className="w-full p-4 mt-8 border-2 border-black placeholder:text-zinc-600"
-          type="text"
-          placeholder="Search by hash, Stark key or Ethereum address…"
+      <input
+        className="w-full p-4 mt-8 border-2 border-black placeholder:text-zinc-600"
+        type="text"
+        placeholder="Search by hash, Stark key or Ethereum address…"
+      />
+      <div className="bg-white border-2 border-black p-2">
+        <ul>
+          {stateUpdates.map((update, i) => (
+            <li key={i} className="my-4">
+              <a
+                className="w-full grid gap-2 grid-cols-[auto_1fr_auto]"
+                href={`/state-updates/${update.hash}`}
+              >
+                <div className="w-12 h-12 bg-zinc-200 rounded-full" />
+                <div>
+                  <div className="text-blue-700">{update.hash}</div>
+                  <div>{update.positionCount} positions</div>
+                </div>
+                <div>{new Date(update.timestamp).toUTCString()}</div>
+              </a>
+            </li>
+          ))}
+        </ul>
+        <Pagination
+          perPage={params.perPage}
+          page={params.page}
+          pageCount={Math.ceil(fullCount / params.perPage)}
         />
-        <div className="bg-white border-2 border-black p-2">
-          <ul>
-            {stateUpdates.map((update, i) => (
-              <li key={i} className="my-4">
-                <a
-                  className="w-full grid gap-2 grid-cols-[auto_1fr_auto]"
-                  href={`/state-updates/${update.hash}`}
-                >
-                  <div className="w-12 h-12 bg-zinc-200 rounded-full" />
-                  <div>
-                    <div className="text-blue-700">{update.hash}</div>
-                    <div>{update.positionCount} positions</div>
-                  </div>
-                  <div>{new Date(update.timestamp).toUTCString()}</div>
-                </a>
-              </li>
-            ))}
-          </ul>
-          <Pagination
-            perPage={params.perPage}
-            page={params.page}
-            pageCount={Math.ceil(fullCount / params.perPage)}
-          />
-        </div>
-        <Footer />
-      </main>
+      </div>
     </Page>
   )
 }
