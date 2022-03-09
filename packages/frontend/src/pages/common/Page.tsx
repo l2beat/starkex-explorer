@@ -21,7 +21,7 @@ export function Page({ children, scripts, ...head }: Props) {
         </div>
         <div className="Page">
           <Navbar />
-          <main className="px-4 max-w-5xl mx-auto">
+          <main className="px-4 max-w-[600px] mx-auto">
             {children}
             <Footer />
           </main>
