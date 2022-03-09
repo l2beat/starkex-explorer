@@ -8,7 +8,7 @@ interface Props extends HeadProps {
 
 export function Page({ children, scripts, ...head }: Props) {
   return (
-    <html lang="en" className="text-[16px] font-sans font-regular bg-zinc-50">
+    <html lang="en" className="text-[16px] font-sans font-regular bg-grey-100 text-white">
       <Head {...head} />
       <body>
         <div className="flex justify-center items-center top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 absolute pointer-events-none text-[10vw] font-bold opacity-5 -rotate-45 select-none">
