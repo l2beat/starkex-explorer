@@ -1,17 +1,20 @@
 import React from 'react'
 
+import { L2beatLogo } from './L2beatLogo'
+import { DydxLogo } from './DydxLogo'
+
 export function Navbar() {
   return (
-    <div className="flex justify-between items-center h-12">
-      <div>
-        <span className="mr-4">L2BEAT</span>
-        <span>dYdX</span>
+    <div className="flex justify-between items-center h-16 px-4 border-b-[1px] border-grey-300">
+      <div className="flex">
+        <span className="pr-4"><L2beatLogo /></span>
+        <DydxLogo />
       </div>
       <button
         id="connect-with-metamask"
-        className="hover:bg-zinc-100 p-2 -m-2 rounded-md"
+        className="bg-grey-300 px-4 rounded-md h-[44px]"
       >
-        Connect with Metamask
+        Connect
       </button>
       <script
         dangerouslySetInnerHTML={{
