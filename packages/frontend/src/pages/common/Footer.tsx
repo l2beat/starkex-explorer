@@ -1,9 +1,35 @@
 import React from 'react'
+import { DiscordLogo } from './DiscordLogo'
+import { DydxLogo } from './DydxLogo'
+import { GithubLogo } from './GithubLogo'
+import { L2beatLogo } from './L2beatLogo'
+import { StarkwareLogo } from './StarkwareLogo'
+import { TwitterLogo } from './TwitterLogo'
 
 export function Footer() {
   return (
-    <footer className="text-center mt-10">
-      Made with &lt;3 by the L2BEAT team
+    <footer className="mt-24 mb-12">
+      <div className="flex justify-between pb-3 mb-3 border-b-[1px] border-grey-300">
+        <div>
+          <a href="/" className="mr-3 text-blue-200 underline">
+            API documentation
+          </a>
+          <a href="/" className="text-blue-200 underline">Donate</a>
+        </div>
+        <div className="flex">
+          <TwitterLogo height={24} className="mr-3" />
+          <DiscordLogo height={24} className="mr-3" />
+          <GithubLogo height={24} />
+        </div>
+      </div>
+      <div className="flex justify-between">
+        <div className="flex items-center">
+          Built by <L2beatLogo height={18} className="mx-1" /> team and funded
+          by <DydxLogo height={14} className="mx-1" /> and{' '}
+          <StarkwareLogo height={18} className="ml-1" />
+        </div>
+        <span>Copyright 2022 L2BEAT</span>
+      </div>
     </footer>
   )
 }
