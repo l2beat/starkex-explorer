@@ -17,13 +17,6 @@ export const HOME_PROPS: HomeProps = {
     timestamp:
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR),
   })),
-  forcedTransaction: Array.from({ length: 6 }).map((_, i) => ({
-    hash: PedersenHash.fake().toString(),
-    valueUSDCents: Math.floor(Math.random() * 20000_00 + 5000_00),
-    type: Math.random() > 0.3 ? 'exit' : 'trade',
-    timestamp:
-      Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR),
-  })),
 }
 
 export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {

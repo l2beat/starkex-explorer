@@ -2,7 +2,6 @@ import { PedersenHash } from '@explorer/types'
 
 export interface HomeProps {
   stateUpdates: HomeStateUpdate[]
-  forcedTransaction: HomeForcedTransaction[]
 }
 
 export interface HomeStateUpdate {

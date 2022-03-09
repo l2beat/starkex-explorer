@@ -24,7 +24,6 @@ export class FrontendController {
     })
 
     return renderHomePage({
-      forcedTransaction: [],
       stateUpdates: stateUpdates.map(
         (x): HomeProps['stateUpdates'][number] => ({
           id: x.id,
