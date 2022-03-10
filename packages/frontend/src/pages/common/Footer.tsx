@@ -14,12 +14,20 @@ export function Footer() {
           <a href="/" className="mr-3 text-blue-200 underline">
             API documentation
           </a>
-          <a href="/" className="text-blue-200 underline">Donate</a>
+          <a href="/" className="text-blue-200 underline">
+            Donate
+          </a>
         </div>
         <div className="flex">
-          <a href="/"><TwitterLogo height={24} className="mr-3" /></a>
-          <a href="/"><DiscordLogo height={24} className="mr-3" /></a>
-          <a href="/"><GithubLogo height={24} /></a>
+          <a href="/">
+            <TwitterLogo height={24} className="mr-3" />
+          </a>
+          <a href="/">
+            <DiscordLogo height={24} className="mr-3" />
+          </a>
+          <a href="/">
+            <GithubLogo height={24} />
+          </a>
         </div>
       </div>
       <div className="flex justify-between">

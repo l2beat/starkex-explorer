@@ -1,6 +1,7 @@
 import { PedersenHash } from '@explorer/types'
 import React from 'react'
 import { Page } from '../common'
+import { SearchIcon } from '../common/SearchIcon'
 import { HomeProps } from './HomeProps'
 
 export function Home(props: HomeProps) {
@@ -13,11 +14,20 @@ export function Home(props: HomeProps) {
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
     >
-      <input
-        className="w-full p-4 mt-8 border-2 border-black placeholder:text-zinc-600"
-        type="text"
-        placeholder="Search by hash, Stark key or Ethereum address…"
-      />
+      <form
+        method="GET"
+        action="/"
+        className="rounded-md w-full mt-8 bg-grey-200 flex h-11"
+      >
+        <input
+          className="w-full placeholder:text-grey-400 bg-grey-200 p-4"
+          type="text"
+          placeholder="Search by hash, Stark key or Ethereum address…"
+        />
+        <button className="bg-grey-300 w-12 flex items-center justify-center">
+          <SearchIcon width={16} height={16} />
+        </button>
+      </form>
       <div className="grid grid-cols-2 gap-4 mt-8">
         <div className="bg-white border-2 border-black p-2">
           <div className="bg-zinc-100 text-center p-2 border border-black">
