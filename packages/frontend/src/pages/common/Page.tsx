@@ -6,7 +6,7 @@ import { Navbar } from './Navbar'
 interface Props extends HeadProps {
   scripts: string[]
   children: ReactNode
-  navbarSearch: boolean
+  navbarSearch?: boolean
 }
 
 export function Page({
