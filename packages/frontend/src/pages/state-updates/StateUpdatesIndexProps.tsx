@@ -10,6 +10,7 @@ export interface StateUpdatesIndexProps {
 }
 
 export interface StateUpdate {
+  id: number
   hash: PedersenHash
   timestamp: number
   positionCount: number

@@ -44,6 +44,7 @@ export class FrontendController {
 
     return renderStateUpdatesIndexPage({
       stateUpdates: stateUpdates.map((update) => ({
+        id: update.id,
         hash: update.rootHash,
         timestamp: update.timestamp,
         positionCount: update.positionCount,

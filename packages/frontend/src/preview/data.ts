@@ -82,6 +82,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
 
 export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
   stateUpdates: Array.from({ length: 10 }).map((_, i) => ({
+    id: i,
     hash: PedersenHash.fake(),
     positionCount: Math.floor(Math.random() * 30 + 4),
     timestamp:
