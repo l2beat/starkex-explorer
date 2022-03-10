@@ -31,12 +31,12 @@ export function Footer() {
         </div>
       </div>
       <div className="flex justify-between">
-        <div className="flex items-center">
+        <div className="flex items-center text-sm">
           Built by <L2beatLogo height={18} className="mx-1" /> team and funded
           by <DydxLogo height={14} className="mx-1" /> and{' '}
           <StarkwareLogo height={18} className="ml-1" />
         </div>
-        <span>Copyright 2022 L2BEAT</span>
+        <span className="text-xs">Copyright 2022 L2BEAT</span>
       </div>
     </footer>
   )

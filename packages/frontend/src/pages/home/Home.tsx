@@ -34,7 +34,9 @@ export function Home(props: HomeProps) {
       <div className="overflow-x-auto">
         <table className="w-full whitespace-nowrap">
           <caption className="mb-1.5">
-            <span className="float-left">Latest state updates</span>
+            <span className="float-left font-medium text-lg">
+              Latest state updates
+            </span>
             <a
               className="text-blue-200 underline float-right"
               href="/state-updates"
@@ -43,7 +45,7 @@ export function Home(props: HomeProps) {
             </a>
           </caption>
           <thead>
-            <tr className="bg-grey-300">
+            <tr className="bg-grey-300 font-medium">
               <th
                 scope="col"
                 className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
@@ -78,10 +80,10 @@ export function Home(props: HomeProps) {
                   i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
                 }`}
               >
-                <td className="px-2 py-0.5">
+                <td className="px-2 py-0.5 font-mono">
                   <StateUpdateLink id={update.id}>{update.id}</StateUpdateLink>
                 </td>
-                <td className="max-w-[320px] px-2 py-0.5">
+                <td className="max-w-[320px] px-2 py-0.5 font-mono">
                   <a
                     href={`/state-updates/${update.id}`}
                     className="block text-ellipsis overflow-hidden"
@@ -94,7 +96,7 @@ export function Home(props: HomeProps) {
                     {timeAgo(update.timestamp)}
                   </StateUpdateLink>
                 </td>
-                <td className="text-right px-2 py-0.5">
+                <td className="text-right px-2 py-0.5 font-mono">
                   <StateUpdateLink id={update.id}>
                     {update.positionCount}
                   </StateUpdateLink>

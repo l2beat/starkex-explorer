@@ -4,7 +4,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Roboto', 'sans-serif'],
+        sans: ['Fira Sans', 'sans-serif'],
+        mono: ['Fira Mono', 'mono'],
       },
     },
     colors: {
