@@ -1,9 +1,9 @@
-import { PedersenHash } from '@explorer/types'
 import React, { ReactNode } from 'react'
 import { Page } from '../common'
 import { SearchBar } from '../common/SearchBar'
 import { HomeProps } from './HomeProps'
 import { format as timeAgo } from 'timeago.js'
+import { formatHash } from '../formatHash'
 
 const StateUpdateLink = ({
   id,
@@ -30,7 +30,7 @@ export function Home(props: HomeProps) {
       scripts={['/scripts/main.js']}
       navbarSearch={false}
     >
-      <SearchBar className="drop-shadow-lg my-12" />
+      <SearchBar className="drop-shadow-lg mb-12" />
       <div className="overflow-x-auto">
         <table className="w-full whitespace-nowrap">
           <caption className="mb-1.5">
@@ -108,12 +108,4 @@ export function Home(props: HomeProps) {
       </div>
     </Page>
   )
-}
-
-function formatHash(hash: PedersenHash | string) {
-  let formatted = hash.toString()
-  if (!formatted.startsWith('0x')) {
-    formatted = '0x' + formatted
-  }
-  return formatted
 }

@@ -1,11 +1,27 @@
-import React, { ComponentPropsWithoutRef } from 'react'
+import React, { ReactNode } from 'react'
+import { formatHash } from '../formatHash'
+import { format as timeAgo } from 'timeago.js'
 
 import { Page } from '../common'
 import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 
+const StateUpdateLink = ({
+  id,
+  children,
+  className,
+}: {
+  id: number
+  children: ReactNode
+  className?: string
+}) => (
+  <a href={`/state-updates/${id}`} className={`block ${className}`}>
+    {children}
+  </a>
+)
+
 export function StateUpdatesIndex({
   stateUpdates,
-  params,
+  params: { perPage, page },
   fullCount,
 }: StateUpdatesIndexProps) {
   return (
@@ -17,164 +33,123 @@ export function StateUpdatesIndex({
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
     >
-      <input
-        className="w-full p-4 mt-8 border-2 border-black placeholder:text-zinc-600"
-        type="text"
-        placeholder="Search by hash, Stark key or Ethereum address…"
-      />
-      <div className="bg-white border-2 border-black p-2">
-        <ul>
-          {stateUpdates.map((update, i) => (
-            <li key={i} className="my-4">
-              <a
-                className="w-full grid gap-2 grid-cols-[auto_1fr_auto]"
-                href={`/state-updates/${update.hash}`}
+      <h1 className="font-sans font-bold text-2xl mb-12">
+        Latest state updates
+      </h1>
+      <Pagination perPage={perPage} page={page} fullCount={fullCount} />
+      <div className="overflow-x-auto">
+        <table className="w-full whitespace-nowrap">
+          <thead>
+            <tr className="bg-grey-300 font-medium">
+              <th
+                scope="col"
+                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
               >
-                <div className="w-12 h-12 bg-zinc-200 rounded-full" />
-                <div>
-                  <div className="text-blue-700">{update.hash}</div>
-                  <div>{update.positionCount} positions</div>
-                </div>
-                <div>{new Date(update.timestamp).toUTCString()}</div>
-              </a>
-            </li>
-          ))}
-        </ul>
-        <Pagination
-          perPage={params.perPage}
-          page={params.page}
-          pageCount={Math.ceil(fullCount / params.perPage)}
-        />
+                No.
+              </th>
+              <th
+                scope="col"
+                className="max-w-[320px] text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Hash
+              </th>
+              <th
+                scope="col"
+                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Time
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Position updates
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {stateUpdates.map((update, i) => (
+              <tr
+                key={i}
+                className={`my-4 hover:bg-blue-100 ${
+                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
+                }`}
+              >
+                <td className="px-2 py-0.5 font-mono">
+                  <StateUpdateLink id={update.id}>{update.id}</StateUpdateLink>
+                </td>
+                <td className="max-w-[320px] px-2 py-0.5 font-mono">
+                  <a
+                    href={`/state-updates/${update.id}`}
+                    className="block text-ellipsis overflow-hidden"
+                  >
+                    {formatHash(update.hash)}
+                  </a>
+                </td>
+                <td className="px-2 py-0.5">
+                  <StateUpdateLink id={update.id}>
+                    {timeAgo(update.timestamp)}
+                  </StateUpdateLink>
+                </td>
+                <td className="text-right px-2 py-0.5 font-mono">
+                  <StateUpdateLink id={update.id}>
+                    {update.positionCount}
+                  </StateUpdateLink>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </Page>
   )
 }
 
-interface PaginationProps {
-  perPage: number
+const stateUpdatesLink = (page: number, perPage: number) =>
+  `/state-updates?page=${page}&perPage=${perPage}`
+
+type PaginationProps = {
   page: number
-  pageCount: number
+  perPage: number
+  fullCount: number
 }
 
-function Pagination({ page, pageCount, perPage: _perPage }: PaginationProps) {
-  const aroundCurrentPage = [
-    page - 2,
-    page - 1,
-    page,
-    page + 1,
-    page + 2,
-  ].filter((x) => x > 2 && x < pageCount - 1)
+function Pagination({ page, perPage, fullCount }: PaginationProps) {
+  const first = 1
+  const prev = page - 1
+  const next = page + 1
+  const last = Math.floor(fullCount / perPage) || 1
 
   return (
-    <nav className="border-t border-zinc-200 px-4 flex items-center justify-between sm:px-0 pb-2">
-      <div className="-mt-px w-0 flex-1 flex">
-        <a
-          href="#"
-          className="border-t-2 border-transparent pt-4 pr-1 inline-flex items-center font-medium text-zinc-500 hover:text-zinc-700 hover:border-zinc-300"
-        >
-          <ArrowLeftIcon
-            className="mr-3 h-5 w-5 text-zinc-400"
-            aria-hidden="true"
-          />
-          Previous
-        </a>
-      </div>
-      <div className="hidden md:-mt-px md:flex">
-        <PageLink page={1} isCurrent={page === 1} />
-        <PageLink page={2} isCurrent={page === 2} />
-        {page > 5 && <PaginationEllipsis />}
-        {aroundCurrentPage.map((num) => (
-          <PageLink key={num} page={num} isCurrent={page === num} />
-        ))}
-        {page < pageCount - 4 && <PaginationEllipsis />}
-        {pageCount > 4 && (
-          <PageLink page={pageCount - 1} isCurrent={page === pageCount - 1} />
-        )}
-        {pageCount > 5 && (
-          <PageLink page={pageCount} isCurrent={page === pageCount} />
-        )}
-      </div>
-      <div className="-mt-px w-0 flex-1 flex justify-end">
-        <a
-          href="#"
-          className="border-t-2 border-transparent pt-4 pl-1 inline-flex items-center font-medium text-zinc-500 hover:text-zinc-700 hover:border-zinc-300"
-        >
-          Next
-          <ArrowNarrowRightIcon
-            className="ml-3 h-5 w-5 text-zinc-400"
-            aria-hidden="true"
-          />
-        </a>
-      </div>
-    </nav>
-  )
-}
-
-function PaginationEllipsis() {
-  return (
-    <span className="border-transparent text-zinc-500 border-t-2 pt-4 px-4 inline-flex items-center font-medium">
-      ...
-    </span>
-  )
-}
-
-function PageLink({ isCurrent, page }: { isCurrent: boolean; page: number }) {
-  return (
-    <a
-      href="#"
-      className={`
-        border-t-2 pt-4 px-4 inline-flex items-center font-medium
-        ${
-          isCurrent
-            ? 'border-blue-500 text-blue-600'
-            : 'border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300'
-        }
-      `}
-      aria-current={isCurrent ? 'page' : undefined}
-    >
-      {page}
-    </a>
-  )
-}
-
-type IconProps = Omit<ComponentPropsWithoutRef<'svg'>, 'children'>
-
-function ArrowLeftIcon(props: IconProps) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      {...props}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M7 16l-4-4m0 0l4-4m-4 4h18"
-      />
-    </svg>
-  )
-}
-
-export function ArrowNarrowRightIcon(props: IconProps) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-6 w-6"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      {...props}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M17 8l4 4m0 0l-4 4m4-4H3"
-      />
-    </svg>
+    <div>
+      <a href={stateUpdatesLink(first, perPage)}>First</a>
+      {prev >= 1 && <a href={stateUpdatesLink(prev, perPage)}>Prev</a>}
+      <span>
+        Page {page} out of {last}
+      </span>
+      {next <= last && <a href={stateUpdatesLink(next, perPage)}>Next</a>}
+      <a href={stateUpdatesLink(last, perPage)}>Last</a>
+      <form
+        action={stateUpdatesLink(1, perPage)}
+        method="get"
+        className="pagination"
+      >
+        <label htmlFor="perPage">Per page</label>
+        <select name="perPage" className="bg-grey-100">
+          {[10, 25, 50, 100].map((n) => (
+            <option key={n} value={n} selected={n == perPage}>
+              {n}
+            </option>
+          ))}
+        </select>
+      </form>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+      document.querySelector('form.pagination select[name="perPage"]').onchange = function () { this.form.submit() }
+      `,
+        }}
+      ></script>
+    </div>
   )
 }
