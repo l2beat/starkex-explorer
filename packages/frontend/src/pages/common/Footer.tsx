@@ -9,7 +9,7 @@ import { TwitterLogo } from './TwitterLogo'
 export function Footer() {
   return (
     <footer className="mt-24 mb-12">
-      <div className="flex justify-between pb-3 mb-3 border-b-[1px] border-grey-300">
+      <div className="flex justify-between pb-3 mb-3 border-b-[1px] border-grey-300 flex-wrap gap-y-3">
         <div>
           <a href="/" className="mr-3 text-blue-200 underline">
             API documentation
@@ -30,11 +30,11 @@ export function Footer() {
           </a>
         </div>
       </div>
-      <div className="flex justify-between">
-        <div className="flex items-center text-sm">
-          Built by <L2beatLogo height={18} className="mx-1" /> team and funded
-          by <DydxLogo height={14} className="mx-1" /> and{' '}
-          <StarkwareLogo height={18} className="ml-1" />
+      <div className="flex justify-between flex-wrap gap-y-3">
+        <div className="flex items-center text-sm flex-wrap">
+          Built by <L2beatLogo height={18} width={44} className="mx-1" /> team
+          and funded by <DydxLogo height={14} width={45} className="mx-1" /> and{' '}
+          <StarkwareLogo height={18} width={98} className="ml-1" />
         </div>
         <span className="text-xs">Copyright 2022 L2BEAT</span>
       </div>
