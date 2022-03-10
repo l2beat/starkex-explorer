@@ -1,8 +1,23 @@
 import { PedersenHash } from '@explorer/types'
-import React from 'react'
+import React, { ReactNode } from 'react'
 import { Page } from '../common'
 import { SearchBar } from '../common/SearchBar'
 import { HomeProps } from './HomeProps'
+import { format as timeAgo } from 'timeago.js'
+
+const StateUpdateLink = ({
+  id,
+  children,
+  className,
+}: {
+  id: number
+  children: ReactNode
+  className?: string
+}) => (
+  <a href={`/state-updates/${id}`} className={`block ${className}`}>
+    {children}
+  </a>
+)
 
 export function Home(props: HomeProps) {
   return (
@@ -15,37 +30,79 @@ export function Home(props: HomeProps) {
       scripts={['/scripts/main.js']}
       navbarSearch={false}
     >
-      <SearchBar className="drop-shadow-lg mt-8" />
-      <div className="grid grid-cols-2 gap-4 mt-8">
-        <div className="bg-white border-2 border-black p-2">
-          <div className="bg-zinc-100 text-center p-2 border border-black">
-            Latest state updates
-          </div>
-          <ul>
+      <SearchBar className="drop-shadow-lg my-12" />
+      <div className="overflow-x-auto">
+        <table className="w-full whitespace-nowrap">
+          <caption className="mb-1.5">
+            <span className="float-left">Latest state updates</span>
+            <a
+              className="text-blue-200 underline float-right"
+              href="/state-updates"
+            >
+              view all
+            </a>
+          </caption>
+          <thead>
+            <tr className="bg-grey-300">
+              <th
+                scope="col"
+                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                No.
+              </th>
+              <th
+                scope="col"
+                className="max-w-[320px] text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Hash
+              </th>
+              <th
+                scope="col"
+                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Time
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Position updates
+              </th>
+            </tr>
+          </thead>
+          <tbody>
             {props.stateUpdates.map((update, i) => (
-              <li key={i} className="my-4">
-                <a
-                  className="w-full grid gap-2 grid-cols-[auto_1fr_auto]"
-                  href={`/state-updates/${update.id}`}
-                >
-                  <div className="w-12 h-12 bg-zinc-200 rounded-full" />
-                  <div>
-                    <div className="text-blue-700">{update.id}</div>
-                    <div>Hash: {formatHash(update.hash)}</div>
-                    <div>{update.positionCount} positions</div>
-                  </div>
-                  <div>{new Date(update.timestamp).toUTCString()}</div>
-                </a>
-              </li>
+              <tr
+                key={i}
+                className={`my-4 hover:bg-blue-100 ${
+                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
+                }`}
+              >
+                <td className="px-2 py-0.5">
+                  <StateUpdateLink id={update.id}>{update.id}</StateUpdateLink>
+                </td>
+                <td className="max-w-[320px] px-2 py-0.5">
+                  <a
+                    href={`/state-updates/${update.id}`}
+                    className="block text-ellipsis overflow-hidden"
+                  >
+                    {formatHash(update.hash)}
+                  </a>
+                </td>
+                <td className="px-2 py-0.5">
+                  <StateUpdateLink id={update.id}>
+                    {timeAgo(update.timestamp)}
+                  </StateUpdateLink>
+                </td>
+                <td className="text-right px-2 py-0.5">
+                  <StateUpdateLink id={update.id}>
+                    {update.positionCount}
+                  </StateUpdateLink>
+                </td>
+              </tr>
             ))}
-          </ul>
-          <a
-            className="block p-2 text-center text-blue-700 bg-zinc-100 border border-black"
-            href="/state-updates"
-          >
-            View all
-          </a>
-        </div>
+          </tbody>
+        </table>
       </div>
     </Page>
   )
@@ -56,5 +113,5 @@ function formatHash(hash: PedersenHash | string) {
   if (!formatted.startsWith('0x')) {
     formatted = '0x' + formatted
   }
-  return `${formatted.slice(0, 10)}…${formatted.slice(-8)}`
+  return formatted
 }
