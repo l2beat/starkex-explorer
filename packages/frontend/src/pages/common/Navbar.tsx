@@ -10,7 +10,7 @@ type NavbarProps = {
 
 export function Navbar({ searchBar = true }: NavbarProps) {
   return (
-    <div className="flex justify-between items-center h-16 px-4 border-b-[1px] border-grey-300">
+    <div className="flex justify-between items-center px-4 py-2.5 border-b-[1px] border-grey-300 flex-wrap gap-y-2">
       <a className="flex" href="/">
         <span className="pr-4">
           <L2beatExplorerLogo height={36} />
