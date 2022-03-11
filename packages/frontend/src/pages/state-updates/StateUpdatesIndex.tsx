@@ -155,38 +155,40 @@ const NextIcon = (
 
 function Pagination({ page, perPage, fullCount }: PaginationProps) {
   const first = 1
-  const prev = page - 1
-  const next = page + 1
+  const prev = Number(page) - 1
+  const next = Number(page) + 1
   const last = Math.floor(fullCount / perPage) || 1
 
   return (
     <div className="w-full flex justify-between mb-2 leading-5 flex-wrap gap-y-2">
-      <div className="gap-x-2 flex items-center">
+      <div className="gap-x-2 flex items-center flex-wrap gap-y-2">
         <a
           href={stateUpdatesLink(first, perPage)}
           className="bg-grey-300 px-3 py-1 rounded-md"
         >
           First
         </a>
-        {prev >= 1 && (
-          <a
-            href={stateUpdatesLink(prev, perPage)}
-            className="bg-grey-300 px-3 py-2 rounded-md"
-          >
-            <PrevIcon width={8} height={12} />
-          </a>
-        )}
+        <a
+          href={stateUpdatesLink(prev, perPage)}
+          className={
+            'bg-grey-300 px-3 py-2 rounded-md' +
+            (prev < 1 ? ' pointer-events-none bg-grey-400 cursor-not-allowed' : '')
+          }
+        >
+          <PrevIcon width={8} height={12} />
+        </a>
         <span className="bg-grey-200 px-3 py-1 rounded-md">
           Page {page} out of {last}
         </span>
-        {next <= last && (
-          <a
-            href={stateUpdatesLink(next, perPage)}
-            className="bg-grey-300 px-3 py-2 rounded-md"
-          >
-            <NextIcon width={8} height={12} />
-          </a>
-        )}
+        <a
+          href={stateUpdatesLink(next, perPage)}
+          className={
+            'bg-grey-300 px-3 py-2 rounded-md' +
+            (next > last ? ' pointer-events-none bg-grey-400 cursor-not-allowed' : '')
+          }
+        >
+          <NextIcon width={8} height={12} />
+        </a>
         <a
           href={stateUpdatesLink(last, perPage)}
           className="bg-grey-300 px-3 py-1 rounded-md"

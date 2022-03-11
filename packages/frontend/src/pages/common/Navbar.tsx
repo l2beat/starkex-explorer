@@ -17,11 +17,11 @@ export function Navbar({ searchBar = true }: NavbarProps) {
         </span>
         <DydxLogo height={32} />
       </a>
-      <div className="flex">
-        {searchBar && <SearchBar className="mr-4" />}
+      <div className="flex flex-wrap gap-y-2 gap-x-4 w-full lg:w-auto">
+        {searchBar && <SearchBar className='lg:w-auto lg:min-w-[600px]'/>}
         <button
           id="connect-with-metamask"
-          className="bg-grey-300 px-4 rounded-md h-[44px]"
+          className="bg-grey-300 px-4 rounded-md h-[44px] w-full lg:w-auto"
         >
           Connect
         </button>
