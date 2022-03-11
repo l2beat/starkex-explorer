@@ -153,7 +153,7 @@ const NextIcon = (
   </svg>
 )
 
-function Pagination({ page, perPage, fullCount }: PaginationProps) {
+export function Pagination({ page, perPage, fullCount }: PaginationProps) {
   const first = 1
   const prev = Number(page) - 1
   const next = Number(page) + 1
@@ -172,7 +172,9 @@ function Pagination({ page, perPage, fullCount }: PaginationProps) {
           href={stateUpdatesLink(prev, perPage)}
           className={
             'bg-grey-300 px-3 py-2 rounded-md' +
-            (prev < 1 ? ' pointer-events-none bg-grey-400 cursor-not-allowed' : '')
+            (prev < 1
+              ? ' pointer-events-none bg-grey-400 cursor-not-allowed'
+              : '')
           }
         >
           <PrevIcon width={8} height={12} />
@@ -184,7 +186,9 @@ function Pagination({ page, perPage, fullCount }: PaginationProps) {
           href={stateUpdatesLink(next, perPage)}
           className={
             'bg-grey-300 px-3 py-2 rounded-md' +
-            (next > last ? ' pointer-events-none bg-grey-400 cursor-not-allowed' : '')
+            (next > last
+              ? ' pointer-events-none bg-grey-400 cursor-not-allowed'
+              : '')
           }
         >
           <NextIcon width={8} height={12} />

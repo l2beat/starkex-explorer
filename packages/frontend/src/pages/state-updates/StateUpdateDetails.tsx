@@ -17,6 +17,7 @@ export function StateUpdateDetails({
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
     >
+      <h1 className="font-sans font-bold text-2xl mb-12">State update #{id}</h1>
       <div className="bg-white border-2 border-black p-2">
         <h1 className="bg-zinc-100 text-lg p-2 w-full flex justify-between">
           <span>Id</span>

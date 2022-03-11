@@ -47,35 +47,26 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
 }
 
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
+  positionId: 123n,
   publicKey: `0x${'0'.repeat(63)}1`,
   totalUSDCents: 123n,
   assets: [
-    { assetId: 'ETH-9', balance: 0n, totalUSDCents: 0n },
-    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n },
-    { assetId: 'MKR-9', balance: 30n, totalUSDCents: 30n },
-    { assetId: 'BTC-10', balance: 5n, totalUSDCents: 5n },
-    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n },
+    { assetId: 'ETH-9', balance: 0n, totalUSDCents: 0n, price: 1000n },
+    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
+    { assetId: 'MKR-9', balance: 30n, totalUSDCents: 30n, price: 1000n },
+    { assetId: 'BTC-10', balance: 5n, totalUSDCents: 5n, price: 1000n },
+    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
   ],
-  positionId: 1234n,
   history: [
     {
-      stateUpdateId: 11,
-      publicKey: `0x${'0'.repeat(63)}1`,
-      collateralBalance: 100n,
-      balances: [
-        { assetId: 'ETH-9', balance: 0n },
-        { assetId: 'UNI-9', balance: 20n },
-        { assetId: 'MKR-9', balance: 30n },
-      ],
+      stateUpdateId: 12,
+      totalUSDCents: 100n,
+      assetsUpdated: 10,
     },
     {
-      stateUpdateId: 12,
-      publicKey: `0x${'0'.repeat(63)}1`,
-      collateralBalance: 222n,
-      balances: [
-        { assetId: 'BTC-10', balance: 5n },
-        { assetId: 'UNI-9', balance: 20n },
-      ],
+      stateUpdateId: 11,
+      totalUSDCents: 222n,
+      assetsUpdated: 20,
     },
   ],
 }

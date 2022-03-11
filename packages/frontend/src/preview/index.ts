@@ -31,6 +31,7 @@ app.use(router.routes())
 app.use(router.allowedMethods())
 app.use(serve('build/static'))
 
-app.listen(8080, () => {
-  console.log('Listening at http://localhost:8080')
+const port = process.env.PORT || 8080
+app.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}`)
 })

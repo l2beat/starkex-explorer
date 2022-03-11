@@ -15,10 +15,6 @@ export function PositionDetails({
   totalUSDCents,
   history,
 }: PositionDetailsProps) {
-  const sorted = [...history].sort((a, b) =>
-    a.stateUpdateId < b.stateUpdateId ? -1 : 1
-  )
-
   return (
     <Page
       title={`L2BEAT dYdX Explorer | ${positionId.toString()}`}
@@ -28,50 +24,132 @@ export function PositionDetails({
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
     >
-      <div className="bg-white border-2 border-black p-2">
-        <p>Public key: {publicKey}</p>
-        <p>Total USD: {centsToFixedDollars(totalUSDCents)}</p>
-        <div>Assets</div>
-        <ul>
-          {assets.map(({ assetId, balance, totalUSDCents }) => (
-            <li key={assetId}>
-              <p>Asset id: {assetId}</p>
-              <p>Balance: {balance.toString()}</p>
-              <p>Total USD: {centsToFixedDollars(totalUSDCents)}</p>
-            </li>
-          ))}
-        </ul>
-        <div className="bg-zinc-100 text-center p-2 border border-black mt-2">
-          Position History
-        </div>
-        <ul>
-          {sorted.map(
-            ({ balances, collateralBalance, publicKey, stateUpdateId }, i) => (
-              <li key={i} className="my-4">
-                <div className="w-full grid gap-2 grid-cols-[auto_1fr_auto]">
-                  <div className="w-12 h-12 bg-zinc-200 rounded-full" />
-                  <div>
-                    <div className="text-zinc-500 font-bold">{publicKey}</div>
-                    <div className="text-zinc-800">
-                      State Update {stateUpdateId.toString()}
-                    </div>
-                    <div className="font-semibold">
-                      Collateral balance: {collateralBalance.toString()}
-                    </div>
-                    <dl>
-                      {balances.map(({ assetId, balance }) => (
-                        <div key={assetId}>
-                          <dt className="inline text-zinc-600">{assetId}: </dt>
-                          <dd className="inline ml-1">{balance.toString()}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
-                </div>
-              </li>
-            )
-          )}
-        </ul>
+      <h1 className="font-sans font-bold text-2xl mb-12">
+        Position #{positionId.toString()}
+      </h1>
+      <h2 className="mb-2">
+        <span className="font-bold font-sans text-xl">Total: </span>
+        <span className="font-mono text-lg">
+          ${centsToFixedDollars(totalUSDCents)}
+        </span>
+      </h2>
+      <h2 className="mb-12">
+        <span className="font-bold font-sans text-xl">Key: </span>
+        <span className="font-mono text-lg">{publicKey}</span>
+      </h2>
+      <div className="overflow-x-auto mb-8">
+        <table className="w-full whitespace-nowrap">
+          <caption className="mb-1.5 font-medium text-lg text-left">
+            Assets
+          </caption>
+          <thead>
+            <tr className="bg-grey-300 font-medium">
+              <th
+                scope="col"
+                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Asset id
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Balance
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Value
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Price
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {assets.map((asset, i) => (
+              <tr
+                key={i}
+                className={`my-4 hover:bg-blue-100 ${
+                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
+                }`}
+              >
+                <td className="px-2 py-0.5">{asset.assetId}</td>
+                <td className="px-2 py-0.5 font-mono text-right">
+                  {asset.balance.toString()}
+                </td>
+                <td className="px-2 py-0.5 font-mono text-right">
+                  ${centsToFixedDollars(asset.totalUSDCents)}
+                </td>
+                <td className="px-2 py-0.5 font-mono text-right">
+                  {asset.price ? `$${asset.price}` : '-'}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="overflow-x-auto mb-8">
+        <table className="w-full whitespace-nowrap">
+          <caption className="mb-1.5 font-medium text-lg text-left">
+            Update history
+          </caption>
+          <thead>
+            <tr className="bg-grey-300 font-medium">
+              <th
+                scope="col"
+                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                State update
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Value before
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Value after
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Asset updates
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {history.map((update, i) => (
+              <tr
+                key={i}
+                className={`my-4 hover:bg-blue-100 ${
+                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
+                }`}
+              >
+                <td className="px-2 py-0.5">{update.stateUpdateId}</td>
+                <td className="px-2 py-0.5 font-mono text-right">
+                  {history[i + 1]?.totalUSDCents
+                    ? `$${centsToFixedDollars(history[i + 1].totalUSDCents)}`
+                    : '-'}
+                </td>
+                <td className="px-2 py-0.5 font-mono text-right">
+                  ${centsToFixedDollars(update.totalUSDCents)}
+                </td>
+                <td className="px-2 py-0.5 font-mono text-right">
+                  {update.assetsUpdated}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </Page>
   )
