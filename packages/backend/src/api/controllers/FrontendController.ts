@@ -103,7 +103,10 @@ export class FrontendController {
   }
 
   async getStateUpdateDetailsPage(id: number): Promise<ControllerResult> {
-    const stateUpdate = await this.stateUpdateRepository.getStateUpdateById(id)
+    const [stateUpdate, prices] = await Promise.all([
+      this.stateUpdateRepository.getStateUpdateById(id),
+      this.stateUpdateRepository.getLatestAssetPrices(),
+    ])
 
     if (!stateUpdate) {
       return {
@@ -117,13 +120,23 @@ export class FrontendController {
         id: stateUpdate.id,
         hash: stateUpdate.hash,
         timestamp: stateUpdate.timestamp,
-        positions: stateUpdate.positions.map((pos) => ({
-          ...pos,
-          balances: pos.balances.map((balance) => ({
-            assetId: balance.assetId.toString(), // <- this is less than ideal
-            balance: balance.balance,
-          })),
-        })),
+        positions: stateUpdate.positions.map((pos) => {
+          const assets = buildViewAssets(
+            pos.balances,
+            pos.collateralBalance,
+            prices
+          )
+          const totalUSDCents = assets.reduce(
+            (total, { totalUSDCents }) => totalUSDCents + total,
+            0n
+          )
+
+          return {
+            publicKey: pos.publicKey,
+            positionId: pos.positionId,
+            totalUSDCents,
+          }
+        }),
       }),
       status: 200,
     }

@@ -49,12 +49,6 @@ export function StateUpdateDetails({
                 scope="col"
                 className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
               >
-                Assets updated
-              </th>
-              <th
-                scope="col"
-                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
                 Value after
               </th>
             </tr>
@@ -72,9 +66,6 @@ export function StateUpdateDetails({
                 </td>
                 <td className="max-w-[320px] px-2 py-0.5 font-mono text-right text-ellipsis overflow-hidden">
                   {position.publicKey}
-                </td>
-                <td className="px-2 py-0.5 font-mono text-right">
-                  {position.assetsUpdated}
                 </td>
                 <td className="px-2 py-0.5 font-mono text-right">
                   ${centsToFixedDollars(position.totalUSDCents)}
