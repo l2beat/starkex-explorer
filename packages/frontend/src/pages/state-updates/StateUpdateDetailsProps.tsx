@@ -7,10 +7,7 @@ export interface StateUpdateDetailsProps {
   positions: ReadonlyArray<{
     readonly publicKey: string
     readonly positionId: bigint
-    readonly collateralBalance: bigint
-    readonly balances: ReadonlyArray<{
-      readonly assetId: string
-      readonly balance: bigint
-    }>
+    readonly totalUSDCents: bigint
+    readonly assetsUpdated: number
   }>
 }

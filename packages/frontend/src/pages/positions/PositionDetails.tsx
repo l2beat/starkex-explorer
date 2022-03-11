@@ -1,12 +1,8 @@
 import React from 'react'
+import { centsToFixedDollars } from '../centsToFixedDollars'
 
 import { Page } from '../common/Page'
 import { PositionDetailsProps } from './PositionDetailsProps'
-
-const centsToFixedDollars = (cents: bigint) => {
-  const centsString = cents.toString().padEnd(3, '0')
-  return centsString.slice(0, -2) + '.' + centsString.slice(-2)
-}
 
 export function PositionDetails({
   positionId,

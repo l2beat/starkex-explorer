@@ -1,12 +1,14 @@
 import React from 'react'
 import { Page } from '../common/Page'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
+import { format as timeAgo } from 'timeago.js'
+import { centsToFixedDollars } from '../centsToFixedDollars'
 
 export function StateUpdateDetails({
   id,
   hash,
   positions,
-  timestamp: _timestamp,
+  timestamp,
 }: StateUpdateDetailsProps) {
   return (
     <Page
@@ -17,47 +19,70 @@ export function StateUpdateDetails({
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
     >
-      <h1 className="font-sans font-bold text-2xl mb-12">State update #{id}</h1>
-      <div className="bg-white border-2 border-black p-2">
-        <h1 className="bg-zinc-100 text-lg p-2 w-full flex justify-between">
-          <span>Id</span>
-          <span>{id}</span>
-        </h1>
-        <h1 className="bg-zinc-100 text-lg p-2 w-full flex justify-between">
-          <span>Hash</span>
-          <span>{hash}</span>
-        </h1>
-        <div className="bg-zinc-100 text-center p-2 border border-black mt-2">
-          Positions
-        </div>
-        <ul>
-          {positions.map(
-            ({ balances, collateralBalance, positionId, publicKey }, i) => (
-              <li key={i} className="my-4">
-                <a
-                  className="w-full grid gap-2 grid-cols-[auto_1fr_auto]"
-                  href={`/positions/${positionId}`}
-                >
-                  <div className="w-12 h-12 bg-zinc-200 rounded-full" />
-                  <div>
-                    <div className="text-blue-700">{publicKey}</div>
-                    <div className="font-semibold">
-                      Collateral balance: {collateralBalance.toString()}
-                    </div>
-                    <dl>
-                      {balances.map(({ assetId, balance }) => (
-                        <div key={`${assetId}`}>
-                          <dt className="inline text-zinc-600">{assetId}: </dt>
-                          <dd className="inline ml-1">{balance.toString()}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
-                </a>
-              </li>
-            )
-          )}
-        </ul>
+      <h1 className="font-sans font-bold text-2xl mb-12">
+        State update #{id.toString()} ({timeAgo(timestamp)})
+      </h1>
+      <h2 className="mb-2">
+        <span className="font-bold font-sans text-xl">Hash: </span>
+        <span className="font-mono text-lg">{hash}</span>
+      </h2>
+      <div className="overflow-x-auto mb-8">
+        <table className="w-full whitespace-nowrap">
+          <caption className="mb-1.5 font-medium text-lg text-left">
+            Updated positions
+          </caption>
+          <thead>
+            <tr className="bg-grey-300 font-medium">
+              <th
+                scope="col"
+                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Position id
+              </th>
+              <th
+                scope="col"
+                className="max-w-[320px] text-left px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Owner
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Assets updated
+              </th>
+              <th
+                scope="col"
+                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
+              >
+                Value after
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {positions.map((position, i) => (
+              <tr
+                key={i}
+                className={`my-4 hover:bg-blue-100 ${
+                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
+                }`}
+              >
+                <td className="px-2 py-0.5">
+                  {position.positionId.toString()}
+                </td>
+                <td className="max-w-[320px] px-2 py-0.5 font-mono text-right text-ellipsis overflow-hidden">
+                  {position.publicKey}
+                </td>
+                <td className="px-2 py-0.5 font-mono text-right">
+                  {position.assetsUpdated}
+                </td>
+                <td className="px-2 py-0.5 font-mono text-right">
+                  ${centsToFixedDollars(position.totalUSDCents)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </Page>
   )

@@ -27,21 +27,14 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
     {
       publicKey: `0x${'0'.repeat(63)}1`,
       positionId: 1n,
-      collateralBalance: 100n,
-      balances: [
-        { assetId: 'ETH-9', balance: 0n },
-        { assetId: 'UNI-9', balance: 20n },
-        { assetId: 'MKR-9', balance: 30n },
-      ],
+      totalUSDCents: 100n,
+      assetsUpdated: 10,
     },
     {
       publicKey: `0x${'0'.repeat(63)}2`,
       positionId: 2n,
-      collateralBalance: 222n,
-      balances: [
-        { assetId: 'BTC-10', balance: 5n },
-        { assetId: 'UNI-9', balance: 20n },
-      ],
+      totalUSDCents: 100n,
+      assetsUpdated: 20,
     },
   ],
 }
