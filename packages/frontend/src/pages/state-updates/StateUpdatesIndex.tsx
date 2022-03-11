@@ -114,6 +114,45 @@ type PaginationProps = {
   fullCount: number
 }
 
+const PrevIcon = (
+  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
+) => (
+  <svg
+    viewBox="0 0 8 13"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <g clipPath="url(#a)">
+      <path
+        d="M7.41 1.91 6 .5l-6 6 6 6 1.41-1.41L2.83 6.5l4.58-4.59Z"
+        fill="#FAFAFA"
+      />
+    </g>
+    <defs>
+      <clipPath id="a">
+        <path fill="#fff" transform="translate(0 .5)" d="M0 0h8v12H0z" />
+      </clipPath>
+    </defs>
+  </svg>
+)
+
+const NextIcon = (
+  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
+) => (
+  <svg
+    viewBox="0 0 8 13"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M.59 11.09 2 12.5l6-6-6-6L.59 1.91 5.17 6.5.59 11.09Z"
+      fill="#FAFAFA"
+    />
+  </svg>
+)
+
 function Pagination({ page, perPage, fullCount }: PaginationProps) {
   const first = 1
   const prev = page - 1
@@ -121,21 +160,47 @@ function Pagination({ page, perPage, fullCount }: PaginationProps) {
   const last = Math.floor(fullCount / perPage) || 1
 
   return (
-    <div>
-      <a href={stateUpdatesLink(first, perPage)}>First</a>
-      {prev >= 1 && <a href={stateUpdatesLink(prev, perPage)}>Prev</a>}
-      <span>
-        Page {page} out of {last}
-      </span>
-      {next <= last && <a href={stateUpdatesLink(next, perPage)}>Next</a>}
-      <a href={stateUpdatesLink(last, perPage)}>Last</a>
+    <div className="w-full flex justify-between mb-2 leading-5 flex-wrap gap-y-2">
+      <div className="gap-x-2 flex items-center">
+        <a
+          href={stateUpdatesLink(first, perPage)}
+          className="bg-grey-300 px-3 py-1 rounded-md"
+        >
+          First
+        </a>
+        {prev >= 1 && (
+          <a
+            href={stateUpdatesLink(prev, perPage)}
+            className="bg-grey-300 px-3 py-2 rounded-md"
+          >
+            <PrevIcon width={8} height={12} />
+          </a>
+        )}
+        <span className="bg-grey-200 px-3 py-1 rounded-md">
+          Page {page} out of {last}
+        </span>
+        {next <= last && (
+          <a
+            href={stateUpdatesLink(next, perPage)}
+            className="bg-grey-300 px-3 py-2 rounded-md"
+          >
+            <NextIcon width={8} height={12} />
+          </a>
+        )}
+        <a
+          href={stateUpdatesLink(last, perPage)}
+          className="bg-grey-300 px-3 py-1 rounded-md"
+        >
+          Last
+        </a>
+      </div>
       <form
         action={stateUpdatesLink(1, perPage)}
         method="get"
-        className="pagination"
+        className="pagination flex gap-x-2 items-center"
       >
         <label htmlFor="perPage">Per page</label>
-        <select name="perPage" className="bg-grey-100">
+        <select name="perPage" className="bg-grey-300 rounded-md px-3 py-0.5">
           {[10, 25, 50, 100].map((n) => (
             <option key={n} value={n} selected={n == perPage}>
               {n}
