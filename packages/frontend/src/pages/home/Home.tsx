@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react'
 import { Page } from '../common'
 import { SearchBar } from '../common/SearchBar'
 import { HomeProps } from './HomeProps'
-import { format as timeAgo } from 'timeago.js'
+import { formatTime } from '../formatTime'
 import { formatHash } from '../formatHash'
 
 const StateUpdateLink = ({
@@ -93,7 +93,7 @@ export function Home(props: HomeProps) {
                 </td>
                 <td className="px-2 py-0.5">
                   <StateUpdateLink id={update.id}>
-                    {timeAgo(update.timestamp)}
+                    {formatTime(update.timestamp)}
                   </StateUpdateLink>
                 </td>
                 <td className="text-right px-2 py-0.5 font-mono">

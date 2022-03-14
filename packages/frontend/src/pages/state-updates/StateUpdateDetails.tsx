@@ -1,7 +1,7 @@
 import React from 'react'
 import { Page } from '../common/Page'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
-import { format as timeAgo } from 'timeago.js'
+import { formatTime } from '../formatTime'
 import { centsToFixedDollars } from '../centsToFixedDollars'
 
 export function StateUpdateDetails({
@@ -20,7 +20,7 @@ export function StateUpdateDetails({
       scripts={['/scripts/main.js']}
     >
       <h1 className="font-sans font-bold text-2xl mb-12">
-        State update #{id.toString()} ({timeAgo(timestamp)})
+        State update #{id.toString()} ({formatTime(timestamp)})
       </h1>
       <h2 className="mb-2">
         <span className="font-bold font-sans text-xl">Hash: </span>
