@@ -68,7 +68,7 @@ export function StateUpdateDetails({
                   {position.publicKey}
                 </td>
                 <td className="px-2 py-0.5 font-mono text-right">
-                  ${centsToFixedDollars(position.totalUSDCents)}
+                  {centsToFixedDollars(position.totalUSDCents)}
                 </td>
               </tr>
             ))}

@@ -1,4 +1,5 @@
 import { AssetBalance } from '@explorer/encoding'
+import { AssetId } from '@explorer/types'
 import {
   HomeProps,
   renderHomePage,
@@ -8,6 +9,7 @@ import {
 } from '@explorer/frontend'
 
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
+import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import {
   StateUpdatePriceRecord,
   StateUpdateRepository,
@@ -26,10 +28,11 @@ const buildViewAssets = (
   }[] = balances.map(({ balance, assetId }) => {
     const price = prices.find((p) => p.assetId === assetId)?.price
     const totalUSDCents = price ? getAssetValueUSDCents(balance, price) : 0n
+    const priceUSDCents = price ? getAssetPriceUSDCents(price, assetId) : 0n
     return {
       assetId: assetId.toString(),
       balance,
-      price,
+      price: priceUSDCents,
       totalUSDCents,
     }
   })
@@ -181,9 +184,6 @@ export class FrontendController {
         assets: current.assets,
         history: historyWithAssets.map((update, i) => {
           const previousUpdate = historyWithAssets[i + 1]
-          if (i === 0) {
-            console.log(update, previousUpdate)
-          }
           const assetsUpdated = previousUpdate
             ? countDifferentAssets(previousUpdate.balances, update.balances)
             : 0

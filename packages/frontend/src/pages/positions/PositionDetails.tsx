@@ -26,7 +26,7 @@ export function PositionDetails({
       <h2 className="mb-2">
         <span className="font-bold font-sans text-xl">Total: </span>
         <span className="font-mono text-lg">
-          ${centsToFixedDollars(totalUSDCents)}
+          {centsToFixedDollars(totalUSDCents)}
         </span>
       </h2>
       <h2 className="mb-12">
@@ -79,10 +79,10 @@ export function PositionDetails({
                   {asset.balance.toString()}
                 </td>
                 <td className="px-2 py-0.5 font-mono text-right">
-                  ${centsToFixedDollars(asset.totalUSDCents)}
+                  {centsToFixedDollars(asset.totalUSDCents)}
                 </td>
                 <td className="px-2 py-0.5 font-mono text-right">
-                  {asset.price ? `$${asset.price}` : '-'}
+                  {asset.price ? `${centsToFixedDollars(asset.price)}` : '-'}
                 </td>
               </tr>
             ))}
@@ -133,11 +133,11 @@ export function PositionDetails({
                 <td className="px-2 py-0.5">{update.stateUpdateId}</td>
                 <td className="px-2 py-0.5 font-mono text-right">
                   {history[i + 1]?.totalUSDCents
-                    ? `$${centsToFixedDollars(history[i + 1].totalUSDCents)}`
+                    ? `${centsToFixedDollars(history[i + 1].totalUSDCents)}`
                     : '-'}
                 </td>
                 <td className="px-2 py-0.5 font-mono text-right">
-                  ${centsToFixedDollars(update.totalUSDCents)}
+                  {centsToFixedDollars(update.totalUSDCents)}
                 </td>
                 <td className="px-2 py-0.5 font-mono text-right">
                   {update.assetsUpdated}
