@@ -1,8 +1,6 @@
 import React from 'react'
 
-export function GithubLogo(
-  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) {
+export function GithubLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 24 24"

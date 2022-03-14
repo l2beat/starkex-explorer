@@ -1,8 +1,6 @@
 import React from 'react'
 
-export function DiscordLogo(
-  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) {
+export function DiscordLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 24 24"

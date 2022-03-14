@@ -114,9 +114,7 @@ type PaginationProps = {
   fullCount: number
 }
 
-const PrevIcon = (
-  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) => (
+const PrevIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 8 13"
     fill="none"
@@ -137,9 +135,7 @@ const PrevIcon = (
   </svg>
 )
 
-const NextIcon = (
-  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) => (
+const NextIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 8 13"
     fill="none"

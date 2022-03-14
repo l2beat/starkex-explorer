@@ -1,8 +1,6 @@
 import React from 'react'
 
-export function StarkwareLogo(
-  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) {
+export function StarkwareLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 100 18"

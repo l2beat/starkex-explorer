@@ -1,8 +1,6 @@
 import * as React from 'react'
 
-export function SearchIcon(
-  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) {
+export function SearchIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 16 16"

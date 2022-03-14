@@ -1,5 +1,4 @@
 import { AssetBalance } from '@explorer/encoding'
-import { AssetId } from '@explorer/types'
 import {
   HomeProps,
   renderHomePage,
@@ -8,8 +7,8 @@ import {
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
 
-import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
+import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import {
   StateUpdatePriceRecord,
   StateUpdateRepository,

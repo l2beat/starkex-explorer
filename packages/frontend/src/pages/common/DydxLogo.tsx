@@ -1,8 +1,6 @@
 import React from 'react'
 
-export function DydxLogo(
-  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) {
+export function DydxLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 103 32"

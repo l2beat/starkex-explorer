@@ -1,8 +1,6 @@
 import React from 'react'
 
-export function L2beatExplorerLogo(
-  props: JSX.IntrinsicAttributes & React.SVGProps<SVGSVGElement>
-) {
+export function L2beatExplorerLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       viewBox="0 0 88 36"
