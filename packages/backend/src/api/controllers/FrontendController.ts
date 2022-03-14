@@ -25,9 +25,7 @@ const buildViewAssets = (
     price?: bigint
   }[] = balances.map(({ balance, assetId }) => {
     const price = prices.find((p) => p.assetId === assetId)?.price
-    const totalUSDCents = price
-      ? getAssetValueUSDCents(balance, price)
-      : 0n
+    const totalUSDCents = price ? getAssetValueUSDCents(balance, price) : 0n
     return {
       assetId: assetId.toString(),
       balance,
