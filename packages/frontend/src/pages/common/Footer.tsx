@@ -3,6 +3,7 @@ import { DiscordLogo } from './DiscordLogo'
 import { DydxLogo } from './DydxLogo'
 import { GithubLogo } from './GithubLogo'
 import { L2beatLogo } from './L2beatLogo'
+import { SimpleLink } from './SimpleLink'
 import { StarkwareLogo } from './StarkwareLogo'
 import { TwitterLogo } from './TwitterLogo'
 
@@ -11,12 +12,10 @@ export function Footer() {
     <footer className="mt-24 mb-12">
       <div className="flex justify-between pb-3 mb-3 border-b-[1px] border-grey-300 flex-wrap gap-y-3">
         <div>
-          <a href="/" className="mr-3 text-blue-200 underline">
+          <SimpleLink href="/" className="mr-3">
             API documentation
-          </a>
-          <a href="/" className="text-blue-200 underline">
-            Donate
-          </a>
+          </SimpleLink>
+          <SimpleLink href="/">Donate</SimpleLink>
         </div>
         <div className="flex">
           <a href="/">

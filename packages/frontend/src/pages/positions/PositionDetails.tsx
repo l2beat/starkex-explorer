@@ -1,8 +1,58 @@
 import React from 'react'
 import { centsToFixedDollars } from '../centsToFixedDollars'
-
 import { Page } from '../common/Page'
+import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
+
+const assetTableColumns = [
+  { header: 'Asset id' },
+  { header: 'Balance', numeric: true },
+  { header: 'Value', numeric: true },
+  { header: 'Price', numeric: true },
+]
+const buildAssetTableRow = ({
+  assetId,
+  balance,
+  totalUSDCents,
+  price,
+}: PositionDetailsProps['assets'][number]) => ({
+  cells: [
+    assetId.toString(),
+    balance.toString(),
+    centsToFixedDollars(totalUSDCents),
+    price ? `${centsToFixedDollars(price)}` : '-',
+  ],
+})
+
+const updateHistoryTableColumns = [
+  { header: 'State update' },
+  { header: 'Value before', numeric: true },
+  { header: 'Value after', numeric: true },
+  { header: 'Asset updates', numeric: true },
+]
+const buildUpdateHistoryTableRow = (
+  {
+    stateUpdateId,
+    totalUSDCents,
+    assetsUpdated,
+  }: PositionDetailsProps['history'][number],
+  i: number,
+  history: PositionDetailsProps['history']
+) => {
+  const previousTotal = history[i + 1]?.totalUSDCents
+  const valueBefore = previousTotal
+    ? `${centsToFixedDollars(previousTotal)}`
+    : '-'
+
+  return {
+    cells: [
+      stateUpdateId.toString(),
+      valueBefore,
+      centsToFixedDollars(totalUSDCents),
+      assetsUpdated.toString(),
+    ],
+  }
+}
 
 export function PositionDetails({
   positionId,
@@ -33,120 +83,17 @@ export function PositionDetails({
         <span className="font-bold font-sans text-xl">Key: </span>
         <span className="font-mono text-lg">{publicKey}</span>
       </h2>
-      <div className="overflow-x-auto mb-8">
-        <table className="w-full whitespace-nowrap">
-          <caption className="mb-1.5 font-medium text-lg text-left">
-            Assets
-          </caption>
-          <thead>
-            <tr className="bg-grey-300 font-medium">
-              <th
-                scope="col"
-                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Asset id
-              </th>
-              <th
-                scope="col"
-                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Balance
-              </th>
-              <th
-                scope="col"
-                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Value
-              </th>
-              <th
-                scope="col"
-                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Price
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {assets.map((asset, i) => (
-              <tr
-                key={i}
-                className={`my-4 hover:bg-blue-100 ${
-                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
-                }`}
-              >
-                <td className="px-2 py-0.5">{asset.assetId}</td>
-                <td className="px-2 py-0.5 font-mono text-right">
-                  {asset.balance.toString()}
-                </td>
-                <td className="px-2 py-0.5 font-mono text-right">
-                  {centsToFixedDollars(asset.totalUSDCents)}
-                </td>
-                <td className="px-2 py-0.5 font-mono text-right">
-                  {asset.price ? `${centsToFixedDollars(asset.price)}` : '-'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="overflow-x-auto mb-8">
-        <table className="w-full whitespace-nowrap">
-          <caption className="mb-1.5 font-medium text-lg text-left">
-            Update history
-          </caption>
-          <thead>
-            <tr className="bg-grey-300 font-medium">
-              <th
-                scope="col"
-                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                State update
-              </th>
-              <th
-                scope="col"
-                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Value before
-              </th>
-              <th
-                scope="col"
-                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Value after
-              </th>
-              <th
-                scope="col"
-                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Asset updates
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {history.map((update, i) => (
-              <tr
-                key={i}
-                className={`my-4 hover:bg-blue-100 ${
-                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
-                }`}
-              >
-                <td className="px-2 py-0.5">{update.stateUpdateId}</td>
-                <td className="px-2 py-0.5 font-mono text-right">
-                  {history[i + 1]?.totalUSDCents
-                    ? `${centsToFixedDollars(history[i + 1].totalUSDCents)}`
-                    : '-'}
-                </td>
-                <td className="px-2 py-0.5 font-mono text-right">
-                  {centsToFixedDollars(update.totalUSDCents)}
-                </td>
-                <td className="px-2 py-0.5 font-mono text-right">
-                  {update.assetsUpdated}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <div className="mb-1.5 font-medium text-lg text-left">Assets</div>
+      <Table
+        className="mb-8"
+        columns={assetTableColumns}
+        rows={assets.map(buildAssetTableRow)}
+      />
+      <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
+      <Table
+        columns={updateHistoryTableColumns}
+        rows={history.map(buildUpdateHistoryTableRow)}
+      />
     </Page>
   )
 }

@@ -3,6 +3,7 @@ import { Page } from '../common/Page'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 import { formatTime } from '../formatTime'
 import { centsToFixedDollars } from '../centsToFixedDollars'
+import { Table } from '../common/Table'
 
 export function StateUpdateDetails({
   id,
@@ -26,55 +27,23 @@ export function StateUpdateDetails({
         <span className="font-bold font-sans text-xl">Hash: </span>
         <span className="font-mono text-lg">{hash}</span>
       </h2>
-      <div className="overflow-x-auto mb-8">
-        <table className="w-full whitespace-nowrap">
-          <caption className="mb-1.5 font-medium text-lg text-left">
-            Updated positions
-          </caption>
-          <thead>
-            <tr className="bg-grey-300 font-medium">
-              <th
-                scope="col"
-                className="text-left px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Position id
-              </th>
-              <th
-                scope="col"
-                className="max-w-[320px] text-left px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Owner
-              </th>
-              <th
-                scope="col"
-                className="text-right px-2 py-1 border-2 border-grey-100 rounded-md"
-              >
-                Value after
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {positions.map((position, i) => (
-              <tr
-                key={i}
-                className={`my-4 hover:bg-blue-100 ${
-                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
-                }`}
-              >
-                <td className="px-2 py-0.5">
-                  {position.positionId.toString()}
-                </td>
-                <td className="max-w-[320px] px-2 py-0.5 font-mono text-right text-ellipsis overflow-hidden">
-                  {position.publicKey}
-                </td>
-                <td className="px-2 py-0.5 font-mono text-right">
-                  {centsToFixedDollars(position.totalUSDCents)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="mb-1.5 font-medium text-lg text-left">
+        Updated positions
       </div>
+      <Table
+        columns={[
+          { header: 'Position id' },
+          { header: 'Owner', maxWidth: true, cellFontMono: true },
+          { header: 'Value after', numeric: true },
+        ]}
+        rows={positions.map(({ positionId, publicKey, totalUSDCents }) => ({
+          cells: [
+            positionId.toString(),
+            publicKey,
+            centsToFixedDollars(totalUSDCents),
+          ],
+        }))}
+      />
     </Page>
   )
 }

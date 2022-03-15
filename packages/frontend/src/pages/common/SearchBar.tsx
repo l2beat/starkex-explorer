@@ -1,12 +1,16 @@
 import React from 'react'
 import { SearchIcon } from './SearchIcon'
+import cx from 'classnames'
 
 export function SearchBar({ className = '' }) {
   return (
     <form
       method="GET"
       action="/"
-      className={`w-full bg-grey-200 flex h-11 rounded-md drop-shadow-lg ${className}`}
+      className={cx(
+        'w-full bg-grey-200 flex h-11 rounded-md drop-shadow-lg',
+        className
+      )}
     >
       <input
         className="w-full placeholder:text-grey-400 bg-grey-200 p-4 rounded-l-md outline-0"
