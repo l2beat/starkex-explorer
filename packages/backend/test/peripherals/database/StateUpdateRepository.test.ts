@@ -58,7 +58,7 @@ describe(StateUpdateRepository.name, () => {
           balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
         },
       ],
-      prices: [],
+      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
     })
 
     await repository.add({
@@ -77,7 +77,7 @@ describe(StateUpdateRepository.name, () => {
           balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
         },
       ],
-      prices: [],
+      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
     })
 
     const position = await repository.getPositionHistoryById(positionId)
@@ -89,6 +89,7 @@ describe(StateUpdateRepository.name, () => {
         positionId,
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
       },
       {
         stateUpdateId: 1,
@@ -96,6 +97,7 @@ describe(StateUpdateRepository.name, () => {
         positionId,
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
       },
     ])
   })

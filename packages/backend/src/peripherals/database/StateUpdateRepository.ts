@@ -70,11 +70,16 @@ export class StateUpdateRepository {
 
   async getPositionHistoryById(positionId: bigint) {
     const rows = await this.knex('positions')
-      .select('*')
       .where('position_id', positionId)
-      .orderBy('state_update_id', 'desc')
+      .orderBy('positions.state_update_id', 'desc')
+      .join('prices', 'prices.state_update_id', 'positions.state_update_id')
+      .groupBy('positions.position_id', 'positions.state_update_id')
+      .select(
+        'positions.*',
+        this.knex.raw('array_agg(row_to_json(prices)) as prices')
+      )
 
-    return rows.map(toPositionRecord)
+    return rows.map(toPositionWithPricesRecord)
   }
 
   async getAll() {
@@ -219,6 +224,21 @@ function toPositionRecord(
     ).map((x) => ({
       assetId: AssetId(x.asset_id),
       balance: BigInt(x.balance),
+    })),
+  }
+}
+
+function toPositionWithPricesRecord(
+  row: PositionRow & { prices: PriceRow[] }
+): PositionRecord & {
+  stateUpdateId: number
+  prices: { assetId: AssetId; price: bigint }[]
+} {
+  return {
+    ...toPositionRecord(row),
+    prices: row.prices.map((p) => ({
+      assetId: AssetId(p.asset_id),
+      price: BigInt(p.price),
     })),
   }
 }

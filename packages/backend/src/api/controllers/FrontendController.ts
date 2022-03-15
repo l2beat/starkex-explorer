@@ -6,18 +6,16 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
+import { AssetId } from '@explorer/types'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
-import {
-  StateUpdatePriceRecord,
-  StateUpdateRepository,
-} from '../../peripherals/database/StateUpdateRepository'
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 
 const buildViewAssets = (
   balances: readonly AssetBalance[],
   collateralBalance: bigint,
-  prices: StateUpdatePriceRecord[]
+  prices: { price: bigint; assetId: AssetId }[]
 ) => {
   const assets: {
     assetId: string
@@ -143,10 +141,9 @@ export class FrontendController {
   }
 
   async getPositionDetailsPage(positionId: bigint): Promise<ControllerResult> {
-    const [history, prices] = await Promise.all([
-      this.stateUpdateRepository.getPositionHistoryById(positionId),
-      this.stateUpdateRepository.getLatestAssetPrices(),
-    ])
+    const history = await this.stateUpdateRepository.getPositionHistoryById(
+      positionId
+    )
 
     if (!history[0]) {
       return {
@@ -159,7 +156,7 @@ export class FrontendController {
       const assets = buildViewAssets(
         update.balances,
         update.collateralBalance,
-        prices
+        update.prices
       )
       const totalUSDCents = assets.reduce(
         (total, { totalUSDCents }) => totalUSDCents + total,
