@@ -140,34 +140,60 @@ export class StateUpdateRepository {
   }
 
   async getStateUpdateById(id: number) {
-    const row = (await this.knex('state_updates')
-      .first()
-      .where('id', '=', id)
-      .orderBy('timestamp', 'desc')
-      .join('positions', 'state_updates.id', 'positions.state_update_id')
-      .groupBy('root_hash', 'timestamp')
-      .select(
-        'timestamp',
-        'root_hash',
-        this.knex.raw('ARRAY_AGG(row_to_json(positions)) as positions')
-      )) as unknown as
-      | {
-          timestamp: number
-          root_hash: string
-          positions: PositionRow[]
+    const [update, positions] = await Promise.all([
+      this.knex('state_updates').where('id', '=', id).first(),
+      this.knex('positions')
+        .where('prices.state_update_id', '=', id)
+        .join('prices', 'prices.state_update_id', 'positions.state_update_id')
+        .groupBy('positions.position_id', 'positions.state_update_id')
+        .select(
+          'positions.*',
+          this.knex.raw('array_agg(row_to_json(prices)) as prices')
+        ),
+    ])
+
+    if (!update) {
+      return undefined
+    }
+
+    return {
+      id,
+      hash: PedersenHash(update.root_hash),
+      timestamp: update.timestamp,
+      positions: positions.map(toPositionWithPricesRecord),
+    }
+  }
+
+  async getPositionsPreviousState(
+    positionIds: bigint[],
+    stateUpdateId: number
+  ) {
+    const rows = await this.knex
+      .select('p1.*', this.knex.raw('array_agg(row_to_json(prices)) as prices'))
+      .from('positions as p1')
+      .innerJoin(
+        this.knex
+          .select(
+            'position_id',
+            this.knex.raw('max(state_update_id) as prev_state_update_id')
+          )
+          .from('positions')
+          .as('p2')
+          .whereIn('position_id', positionIds)
+          .andWhere('state_update_id', '<', stateUpdateId)
+          .groupBy('position_id'),
+        function () {
+          return this.on('p1.position_id', '=', 'p2.position_id').andOn(
+            'p1.state_update_id',
+            '=',
+            'p2.prev_state_update_id'
+          )
         }
-      | undefined
+      )
+      .innerJoin('prices', 'prices.state_update_id', 'p1.state_update_id')
+      .groupBy('p1.state_update_id', 'p1.position_id')
 
-    this.logger.debug({ method: 'getStateUpdateById', id })
-
-    return (
-      row && {
-        id,
-        hash: PedersenHash(row.root_hash),
-        timestamp: row.timestamp,
-        positions: row.positions.map(toPositionRecord),
-      }
-    )
+    return rows.map(toPositionWithPricesRecord)
   }
 
   async deleteAll() {
