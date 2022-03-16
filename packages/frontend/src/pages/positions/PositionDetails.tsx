@@ -1,5 +1,5 @@
 import React from 'react'
-import { centsToFixedDollars } from '../centsToFixedDollars'
+import { formatUSDCents } from '../formatUSDCents'
 import { Page } from '../common/Page'
 import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
@@ -19,8 +19,8 @@ const buildAssetTableRow = ({
   cells: [
     assetId.toString(),
     balance.toString(),
-    centsToFixedDollars(totalUSDCents),
-    price ? `${centsToFixedDollars(price)}` : '-',
+    formatUSDCents(totalUSDCents),
+    price ? `${formatUSDCents(price)}` : '-',
   ],
 })
 
@@ -40,15 +40,13 @@ const buildUpdateHistoryTableRow = (
   history: PositionDetailsProps['history']
 ) => {
   const previousTotal = history[i + 1]?.totalUSDCents
-  const valueBefore = previousTotal
-    ? `${centsToFixedDollars(previousTotal)}`
-    : '-'
+  const valueBefore = previousTotal ? `${formatUSDCents(previousTotal)}` : '-'
 
   return {
     cells: [
       stateUpdateId.toString(),
       valueBefore,
-      centsToFixedDollars(totalUSDCents),
+      formatUSDCents(totalUSDCents),
       assetsUpdated.toString(),
     ],
   }
@@ -76,7 +74,7 @@ export function PositionDetails({
       <h2 className="mb-2">
         <span className="font-bold font-sans text-xl">Total: </span>
         <span className="font-mono text-lg">
-          {centsToFixedDollars(totalUSDCents)}
+          {formatUSDCents(totalUSDCents)}
         </span>
       </h2>
       <h2 className="mb-12">

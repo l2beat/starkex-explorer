@@ -1,4 +1,4 @@
-export function centsToFixedDollars(cents: bigint) {
+export function formatUSDCents(cents: bigint) {
   const centsString = cents.toString().padEnd(3, '0')
   const sign = cents < 0 ? '-' : ''
   return (

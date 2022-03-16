@@ -2,7 +2,7 @@ import React from 'react'
 import { Page } from '../common/Page'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 import { formatTime } from '../formatTime'
-import { centsToFixedDollars } from '../centsToFixedDollars'
+import { formatUSDCents } from '../formatUSDCents'
 import { Table } from '../common/Table'
 
 export function StateUpdateDetails({
@@ -40,7 +40,7 @@ export function StateUpdateDetails({
           cells: [
             positionId.toString(),
             publicKey,
-            centsToFixedDollars(totalUSDCents),
+            formatUSDCents(totalUSDCents),
           ],
         }))}
       />
