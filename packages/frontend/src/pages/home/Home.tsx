@@ -16,7 +16,7 @@ export function Home(props: HomeProps) {
       image="/images/under-construction.png"
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
-      navbarSearch={false}
+      withoutSearch
     >
       <SearchBar className="drop-shadow-lg mb-12" />
       <div className="mb-1.5">

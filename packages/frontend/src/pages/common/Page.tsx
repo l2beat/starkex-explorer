@@ -6,15 +6,10 @@ import { Navbar } from './Navbar'
 interface Props extends HeadProps {
   scripts: string[]
   children: ReactNode
-  navbarSearch?: boolean
+  withoutSearch?: boolean
 }
 
-export function Page({
-  children,
-  scripts,
-  navbarSearch = true,
-  ...head
-}: Props) {
+export function Page({ children, scripts, withoutSearch, ...head }: Props) {
   return (
     <html
       lang="en"
@@ -26,7 +21,7 @@ export function Page({
           PREVIEW
         </div>
         <div className="Page">
-          <Navbar searchBar={navbarSearch} />
+          <Navbar searchBar={!withoutSearch} />
           <main className="px-4 max-w-[800px] mx-auto pt-20">
             {children}
             <Footer />
