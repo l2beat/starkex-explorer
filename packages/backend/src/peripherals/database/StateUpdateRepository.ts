@@ -123,17 +123,6 @@ export class StateUpdateRepository {
     }))
   }
 
-  async getLatestAssetPrices() {
-    const rows = await this.knex('prices')
-      .where(
-        'state_update_id',
-        '=',
-        this.knex.raw('(select max(state_update_id) from prices)')
-      )
-      .orderBy('asset_id')
-    return rows.map(toStateUpdatePriceRecord)
-  }
-
   async getStateUpdateCount() {
     const row = await this.knex('state_updates').count()
     return row[0].count as unknown as bigint
@@ -143,8 +132,8 @@ export class StateUpdateRepository {
     const [update, positions] = await Promise.all([
       this.knex('state_updates').where('id', '=', id).first(),
       this.knex('positions')
-        .where('prices.state_update_id', '=', id)
-        .join('prices', 'prices.state_update_id', 'positions.state_update_id')
+        .where('positions.state_update_id', '=', id)
+        .leftJoin('prices', 'prices.state_update_id', 'positions.state_update_id')
         .groupBy('positions.position_id', 'positions.state_update_id')
         .select(
           'positions.*',
@@ -262,18 +251,10 @@ function toPositionWithPricesRecord(
 } {
   return {
     ...toPositionRecord(row),
-    prices: row.prices.map((p) => ({
+    prices: row.prices.filter(Boolean).map((p) => ({
       assetId: AssetId(p.asset_id),
       price: BigInt(p.price),
     })),
-  }
-}
-
-function toStateUpdatePriceRecord(row: PriceRow): StateUpdatePriceRecord {
-  return {
-    stateUpdateId: row.state_update_id,
-    assetId: AssetId(row.asset_id),
-    price: row.price,
   }
 }
 
