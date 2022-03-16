@@ -55,6 +55,7 @@ export function StateUpdateDetails({
               formatUSDCents(totalUSDCents),
               assetsUpdated ? assetsUpdated.toString() : '0',
             ],
+            link: `/positions/${positionId}`,
           })
         )}
       />
