@@ -4,7 +4,24 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Roboto', 'sans-serif'],
+        sans: ['Fira Sans', 'sans-serif'],
+        mono: ['Fira Mono', 'mono'],
+      },
+    },
+    colors: {
+      grey: {
+        100: '#20252F',
+        200: '#2D2D3A',
+        300: '#374354',
+        400: '#838F9F',
+      },
+      white: '#FAFAFA',
+      blue: {
+        100: '#3067BB',
+        200: '#5196FF',
+      },
+      orange: {
+        100: '#9C4D03',
       },
     },
   },

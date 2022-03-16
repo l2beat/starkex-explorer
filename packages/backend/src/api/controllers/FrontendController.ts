@@ -1,3 +1,4 @@
+import { AssetBalance } from '@explorer/encoding'
 import {
   HomeProps,
   renderHomePage,
@@ -5,9 +6,51 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
+import { AssetId } from '@explorer/types'
 
+import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+
+const buildViewAssets = (
+  balances: readonly AssetBalance[],
+  collateralBalance: bigint,
+  prices: { price: bigint; assetId: AssetId }[]
+) => {
+  const assets: {
+    assetId: string
+    balance: bigint
+    totalUSDCents: bigint
+    price?: bigint
+  }[] = balances.map(({ balance, assetId }) => {
+    const price = prices.find((p) => p.assetId === assetId)?.price
+    const totalUSDCents = price ? getAssetValueUSDCents(balance, price) : 0n
+    const priceUSDCents = price ? getAssetPriceUSDCents(price, assetId) : 0n
+    return {
+      assetId: assetId.toString(),
+      balance,
+      price: priceUSDCents,
+      totalUSDCents,
+    }
+  })
+  assets.push({
+    assetId: 'USDC',
+    balance: collateralBalance,
+    totalUSDCents: collateralBalance / 1000n,
+    price: 1n,
+  })
+  return assets
+}
+const countDifferentAssets = (
+  prev: readonly AssetBalance[],
+  current: readonly AssetBalance[]
+) => {
+  return current.reduce((updates, balance) => {
+    const prevBalance = prev.find((b) => b.assetId === balance.assetId)
+    const updated = !prevBalance || prevBalance.balance !== balance.balance
+    return updated ? updates + 1 : updates
+  }, 0)
+}
 
 type ControllerResult = {
   html: string
@@ -24,7 +67,6 @@ export class FrontendController {
     })
 
     return renderHomePage({
-      forcedTransaction: [],
       stateUpdates: stateUpdates.map(
         (x): HomeProps['stateUpdates'][number] => ({
           id: x.id,
@@ -45,6 +87,7 @@ export class FrontendController {
 
     return renderStateUpdatesIndexPage({
       stateUpdates: stateUpdates.map((update) => ({
+        id: update.id,
         hash: update.rootHash,
         timestamp: update.timestamp,
         positionCount: update.positionCount,
@@ -58,7 +101,10 @@ export class FrontendController {
   }
 
   async getStateUpdateDetailsPage(id: number): Promise<ControllerResult> {
-    const stateUpdate = await this.stateUpdateRepository.getStateUpdateById(id)
+    const [stateUpdate, prices] = await Promise.all([
+      this.stateUpdateRepository.getStateUpdateById(id),
+      this.stateUpdateRepository.getLatestAssetPrices(),
+    ])
 
     if (!stateUpdate) {
       return {
@@ -72,72 +118,77 @@ export class FrontendController {
         id: stateUpdate.id,
         hash: stateUpdate.hash,
         timestamp: stateUpdate.timestamp,
-        positions: stateUpdate.positions.map((pos) => ({
-          ...pos,
-          balances: pos.balances.map((balance) => ({
-            assetId: balance.assetId.toString(), // <- this is less than ideal
-            balance: balance.balance,
-          })),
-        })),
+        positions: stateUpdate.positions.map((pos) => {
+          const assets = buildViewAssets(
+            pos.balances,
+            pos.collateralBalance,
+            prices
+          )
+          const totalUSDCents = assets.reduce(
+            (total, { totalUSDCents }) => totalUSDCents + total,
+            0n
+          )
+
+          return {
+            publicKey: pos.publicKey,
+            positionId: pos.positionId,
+            totalUSDCents,
+          }
+        }),
       }),
       status: 200,
     }
   }
 
   async getPositionDetailsPage(positionId: bigint): Promise<ControllerResult> {
-    const [history, prices] = await Promise.all([
-      this.stateUpdateRepository.getPositionHistoryById(positionId),
-      this.stateUpdateRepository.getLatestAssetPrices(),
-    ])
-    const current = history[0]
-    if (!current) {
+    const history = await this.stateUpdateRepository.getPositionHistoryById(
+      positionId
+    )
+
+    if (!history[0]) {
       return {
         status: 404,
         html: 'Position not found',
       }
     }
-    const assets: {
-      assetId: string
-      balance: bigint
-      totalUSDCents: bigint
-      price?: bigint
-    }[] = current.balances.map(({ balance, assetId }) => {
-      const price = prices.find((p) => p.assetId === assetId)?.price
-      const totalUSDCents = price
-        ? getAssetValueUSDCents(balance, price, assetId)
-        : 0n
+
+    const historyWithAssets = history.map((update) => {
+      const assets = buildViewAssets(
+        update.balances,
+        update.collateralBalance,
+        update.prices
+      )
+      const totalUSDCents = assets.reduce(
+        (total, { totalUSDCents }) => totalUSDCents + total,
+        0n
+      )
       return {
-        assetId: assetId.toString(),
-        balance,
-        price,
+        ...update,
+        assets,
         totalUSDCents,
       }
     })
-    assets.push({
-      assetId: 'USDC',
-      balance: current.collateralBalance,
-      totalUSDCents: current.collateralBalance / 1000n,
-      price: 1n,
-    })
-    const totalUSDCents = assets.reduce(
-      (total, { totalUSDCents }) => totalUSDCents + total,
-      0n
-    )
+
+    const current = historyWithAssets[0]
 
     return {
       status: 200,
       html: renderPositionDetailsPage({
         positionId,
         publicKey: current.publicKey,
-        totalUSDCents,
-        assets,
-        history: history.map((pos) => ({
-          ...pos,
-          balances: pos.balances.map((balance) => ({
-            assetId: balance.assetId.toString(),
-            balance: balance.balance,
-          })),
-        })),
+        totalUSDCents: current.totalUSDCents,
+        assets: current.assets,
+        history: historyWithAssets.map((update, i) => {
+          const previousUpdate = historyWithAssets[i + 1]
+          const assetsUpdated = previousUpdate
+            ? countDifferentAssets(previousUpdate.balances, update.balances)
+            : 0
+          return {
+            stateUpdateId: update.stateUpdateId,
+            totalUSDCents: update.totalUSDCents,
+            assetsUpdated,
+          }
+        }),
       }),
     }
   }

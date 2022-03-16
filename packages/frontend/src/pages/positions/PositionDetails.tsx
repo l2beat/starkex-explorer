@@ -1,13 +1,55 @@
 import React from 'react'
-
-import { Footer } from '../common/Footer'
-import { Navbar } from '../common/Navbar'
+import { formatUSDCents } from '../formatUSDCents'
 import { Page } from '../common/Page'
+import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
-const centsToFixedDollars = (cents: bigint) => {
-  const centsString = cents.toString().padEnd(3, '0')
-  return centsString.slice(0, -2) + '.' + centsString.slice(-2)
+const assetTableColumns = [
+  { header: 'Asset id' },
+  { header: 'Balance', numeric: true },
+  { header: 'Value', numeric: true },
+  { header: 'Price', numeric: true },
+]
+const buildAssetTableRow = ({
+  assetId,
+  balance,
+  totalUSDCents,
+  price,
+}: PositionDetailsProps['assets'][number]) => ({
+  cells: [
+    assetId.toString(),
+    balance.toString(),
+    formatUSDCents(totalUSDCents),
+    price ? `${formatUSDCents(price)}` : '-',
+  ],
+})
+
+const updateHistoryTableColumns = [
+  { header: 'State update' },
+  { header: 'Value before', numeric: true },
+  { header: 'Value after', numeric: true },
+  { header: 'Asset updates', numeric: true },
+]
+const buildUpdateHistoryTableRow = (
+  {
+    stateUpdateId,
+    totalUSDCents,
+    assetsUpdated,
+  }: PositionDetailsProps['history'][number],
+  i: number,
+  history: PositionDetailsProps['history']
+) => {
+  const previousTotal = history[i + 1]?.totalUSDCents
+  const valueBefore = previousTotal ? `${formatUSDCents(previousTotal)}` : '-'
+
+  return {
+    cells: [
+      stateUpdateId.toString(),
+      valueBefore,
+      formatUSDCents(totalUSDCents),
+      assetsUpdated.toString(),
+    ],
+  }
 }
 
 export function PositionDetails({
@@ -17,10 +59,6 @@ export function PositionDetails({
   totalUSDCents,
   history,
 }: PositionDetailsProps) {
-  const sorted = [...history].sort((a, b) =>
-    a.stateUpdateId < b.stateUpdateId ? -1 : 1
-  )
-
   return (
     <Page
       title={`L2BEAT dYdX Explorer | ${positionId.toString()}`}
@@ -30,62 +68,30 @@ export function PositionDetails({
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
     >
-      <main className="px-4 max-w-5xl mx-auto">
-        <Navbar />
-        <div className="bg-white border-2 border-black p-2">
-          <p>Public key: {publicKey}</p>
-          <p>Total USD: {centsToFixedDollars(totalUSDCents)}</p>
-          <div>Assets</div>
-          <ul>
-            {assets.map(({ assetId, balance, totalUSDCents }) => (
-              <li key={assetId}>
-                <p>Asset id: {assetId}</p>
-                <p>Balance: {balance.toString()}</p>
-                <p>Total USD: {centsToFixedDollars(totalUSDCents)}</p>
-              </li>
-            ))}
-          </ul>
-          <div className="bg-zinc-100 text-center p-2 border border-black mt-2">
-            Position History
-          </div>
-          <ul>
-            {sorted.map(
-              (
-                { balances, collateralBalance, publicKey, stateUpdateId },
-                i
-              ) => (
-                <li key={i} className="my-4">
-                  <div className="w-full grid gap-2 grid-cols-[auto_1fr_auto]">
-                    <div className="w-12 h-12 bg-zinc-200 rounded-full" />
-                    <div>
-                      <div className="text-zinc-500 font-bold">{publicKey}</div>
-                      <div className="text-zinc-800">
-                        State Update {stateUpdateId.toString()}
-                      </div>
-                      <div className="font-semibold">
-                        Collateral balance: {collateralBalance.toString()}
-                      </div>
-                      <dl>
-                        {balances.map(({ assetId, balance }) => (
-                          <div key={assetId}>
-                            <dt className="inline text-zinc-600">
-                              {assetId}:{' '}
-                            </dt>
-                            <dd className="inline ml-1">
-                              {balance.toString()}
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
-                    </div>
-                  </div>
-                </li>
-              )
-            )}
-          </ul>
-        </div>
-        <Footer />
-      </main>
+      <h1 className="font-sans font-bold text-2xl mb-12">
+        Position #{positionId.toString()}
+      </h1>
+      <h2 className="mb-2">
+        <span className="font-bold font-sans text-xl">Total: </span>
+        <span className="font-mono text-lg">
+          {formatUSDCents(totalUSDCents)}
+        </span>
+      </h2>
+      <h2 className="mb-12">
+        <span className="font-bold font-sans text-xl">Key: </span>
+        <span className="font-mono text-lg">{publicKey}</span>
+      </h2>
+      <div className="mb-1.5 font-medium text-lg text-left">Assets</div>
+      <Table
+        className="mb-8"
+        columns={assetTableColumns}
+        rows={assets.map(buildAssetTableRow)}
+      />
+      <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
+      <Table
+        columns={updateHistoryTableColumns}
+        rows={history.map(buildUpdateHistoryTableRow)}
+      />
     </Page>
   )
 }
