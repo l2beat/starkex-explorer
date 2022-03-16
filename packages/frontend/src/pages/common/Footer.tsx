@@ -1,11 +1,11 @@
 import React from 'react'
-import { DiscordLogo } from './DiscordLogo'
-import { DydxLogo } from './DydxLogo'
-import { GithubLogo } from './GithubLogo'
-import { L2beatLogo } from './L2beatLogo'
+import { DiscordLogo } from './logos/DiscordLogo'
+import { DydxLogo } from './logos/DydxLogo'
+import { GithubLogo } from './logos/GithubLogo'
+import { L2beatLogo } from './logos/L2beatLogo'
 import { SimpleLink } from './SimpleLink'
-import { StarkwareLogo } from './StarkwareLogo'
-import { TwitterLogo } from './TwitterLogo'
+import { StarkWareLogo } from './logos/StarkWareLogo'
+import { TwitterLogo } from './logos/TwitterLogo'
 
 export function Footer() {
   return (
@@ -33,7 +33,7 @@ export function Footer() {
         <div className="flex items-center text-sm flex-wrap">
           Built by <L2beatLogo height={18} width={44} className="mx-1" /> team
           and funded by <DydxLogo height={14} width={45} className="mx-1" /> and{' '}
-          <StarkwareLogo height={18} width={98} className="ml-1" />
+          <StarkWareLogo height={18} width={98} className="ml-1" />
         </div>
         <span className="text-xs">Copyright 2022 L2BEAT</span>
       </div>

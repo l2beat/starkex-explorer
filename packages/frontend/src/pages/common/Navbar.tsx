@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { L2beatExplorerLogo } from './L2beatExplorerLogo'
-import { DydxLogo } from './DydxLogo'
+import { L2beatExplorerLogo } from './logos/L2beatExplorerLogo'
+import { DydxLogo } from './logos/DydxLogo'
 import { SearchBar } from './SearchBar'
 
 type NavbarProps = {
