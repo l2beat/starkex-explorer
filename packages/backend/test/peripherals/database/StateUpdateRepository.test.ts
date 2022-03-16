@@ -261,7 +261,7 @@ describe(StateUpdateRepository.name, () => {
           positionId: BigInt(blockNumber * 10 + i),
           collateralBalance: collateralBalance,
           balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
-          prices: [{ assetId: AssetId('ETH-9'), price: 10n }]
+          prices: [{ assetId: AssetId('ETH-9'), price: 10n }],
         })
       ),
     })
@@ -338,12 +338,15 @@ describe(StateUpdateRepository.name, () => {
       ],
       prices: [{ assetId: AssetId('ETH-9'), price: BigInt(nextStateUpdateId) }],
     })
-    const positions = await repository.getPositionsPreviousState([positionId], nextStateUpdateId)
+    const positions = await repository.getPositionsPreviousState(
+      [positionId],
+      nextStateUpdateId
+    )
     expect(positions.length).toEqual(1)
     expect(positions[0]).toBeAnObjectWith({
       stateUpdateId,
-      prices:[{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
-      balances: [{ assetId: AssetId('ETH-9'), balance: 10n }]
+      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
+      balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
     })
   })
 

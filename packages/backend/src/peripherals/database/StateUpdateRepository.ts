@@ -133,7 +133,11 @@ export class StateUpdateRepository {
       this.knex('state_updates').where('id', '=', id).first(),
       this.knex('positions')
         .where('positions.state_update_id', '=', id)
-        .leftJoin('prices', 'prices.state_update_id', 'positions.state_update_id')
+        .leftJoin(
+          'prices',
+          'prices.state_update_id',
+          'positions.state_update_id'
+        )
         .groupBy('positions.position_id', 'positions.state_update_id')
         .select(
           'positions.*',
