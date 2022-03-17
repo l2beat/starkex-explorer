@@ -4,13 +4,13 @@ import { Page } from '../common/Page'
 import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
-const assetTableColumns = [
-  { header: 'Asset id' },
+const balanceTableColumns = [
+  { header: 'Name' },
   { header: 'Balance', numeric: true },
+  { header: 'Unit price', numeric: true },
   { header: 'Value', numeric: true },
-  { header: 'Price', numeric: true },
 ]
-const buildAssetTableRow = ({
+const buildBalanceTableRow = ({
   assetId,
   balance,
   totalUSDCents,
@@ -19,8 +19,8 @@ const buildAssetTableRow = ({
   cells: [
     assetId.toString(),
     balance.toString(),
-    formatUSDCents(totalUSDCents),
     price ? `${formatUSDCents(price)}` : '-',
+    formatUSDCents(totalUSDCents),
   ],
 })
 
@@ -81,11 +81,11 @@ export function PositionDetails({
         <span className="font-bold font-sans text-xl">Key: </span>
         <span className="font-mono text-lg">{publicKey}</span>
       </h2>
-      <div className="mb-1.5 font-medium text-lg text-left">Assets</div>
+      <div className="mb-1.5 font-medium text-lg text-left">Balances</div>
       <Table
         className="mb-8"
-        columns={assetTableColumns}
-        rows={assets.map(buildAssetTableRow)}
+        columns={balanceTableColumns}
+        rows={assets.map(buildBalanceTableRow)}
       />
       <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
       <Table
