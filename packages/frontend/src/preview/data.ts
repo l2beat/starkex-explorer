@@ -43,10 +43,10 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   totalUSDCents: 123n,
   assets: [
     { assetId: 'ETH-9', balance: 0n, totalUSDCents: 0n, price: 1000n },
-    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
+    { assetId: 'USDC-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
+    { assetId: 'LINK-7', balance: 20n, totalUSDCents: 20n, price: 1000n },
     { assetId: 'MKR-9', balance: 30n, totalUSDCents: 30n, price: 1000n },
     { assetId: 'BTC-10', balance: 5n, totalUSDCents: 5n, price: 1000n },
-    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
   ],
   history: [
     {

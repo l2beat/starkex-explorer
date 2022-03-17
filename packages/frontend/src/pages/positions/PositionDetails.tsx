@@ -3,6 +3,24 @@ import { formatUSDCents } from '../formatUSDCents'
 import { Page } from '../common/Page'
 import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
+import { assetIcons } from '../common/icons/assets/assetIcons'
+
+type AssetCellProps = {
+  assetId: string
+}
+
+function AssetCell({ assetId }: AssetCellProps) {
+  const name = assetId.replace(/-\d+$/, '')
+  const Icon = assetIcons[name]
+  if (!Icon) {
+    return <>{name}</>
+  }
+  return (
+    <div className="flex gap-x-1 items-center">
+      <Icon width={16} height={16} /> {name}
+    </div>
+  )
+}
 
 const balanceTableColumns = [
   { header: 'Name' },
@@ -17,7 +35,7 @@ const buildBalanceTableRow = ({
   price,
 }: PositionDetailsProps['assets'][number]) => ({
   cells: [
-    assetId.toString(),
+    <AssetCell assetId={assetId} />,
     balance.toString(),
     price ? `${formatUSDCents(price)}` : '-',
     formatUSDCents(totalUSDCents),
