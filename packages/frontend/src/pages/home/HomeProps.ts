@@ -2,6 +2,8 @@ import { PedersenHash } from '@explorer/types'
 
 export interface HomeProps {
   stateUpdates: HomeStateUpdate[]
+  totalUpdates: bigint
+  totalPositions: bigint
 }
 
 export interface HomeStateUpdate {

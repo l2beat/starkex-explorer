@@ -8,17 +8,22 @@ import { Table } from '../common/Table'
 import { SimpleLink } from '../common/SimpleLink'
 import { FreezeButton } from '../common/FreezeButton'
 
-const stats = [
-  { title: 'Total Value Locked', value: '$5.24B' },
-  { title: 'State updates', value: '5143' },
-  { title: 'Tracked positions', value: '45,762' },
-]
-
-const Stat = ({ title, value }: { title: string; value: string }) => {
+const Stat = ({
+  title,
+  value,
+  valueId,
+}: {
+  title: string
+  value: string
+  valueId?: string
+}) => {
   return (
     <div className="py-2 px-4 bg-grey-300 rounded-md w-[25%]">
       <div className="w-full mb-2">{title}</div>
-      <div className="font-sans font-bold text-2xl w-full text-right">
+      <div
+        className="font-sans font-bold text-2xl w-full text-right"
+        id={valueId}
+      >
         {value}
       </div>
     </div>
@@ -37,9 +42,12 @@ export function Home(props: HomeProps) {
       withoutSearch
     >
       <div className="mb-12 flex gap-x-4 items-center">
-        {stats.map(({ title, value }) => (
-          <Stat key={title} title={title} value={value} />
-        ))}
+        <Stat title="Total Value Locked" value="-" valueId="dydx-tvl" />
+        <Stat title="State updates" value={props.totalUpdates.toString()} />
+        <Stat
+          title="Tracked positions"
+          value={props.totalPositions.toString()}
+        />
         <FreezeButton />
       </div>
       <SearchBar className="drop-shadow-lg mb-12" />
