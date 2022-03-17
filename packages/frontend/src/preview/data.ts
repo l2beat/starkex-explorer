@@ -22,7 +22,9 @@ export const HOME_PROPS: HomeProps = {
 export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   id: 1,
   hash: PedersenHash.fake(),
-  timestamp: Date.now() / 1000,
+  rootHash: PedersenHash.fake(),
+  blockNumber: BigInt(Math.floor(Math.random() * 100)),
+  timestamp: Date.now(),
   positions: [
     {
       publicKey: `0x${'0'.repeat(63)}1`,

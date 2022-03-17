@@ -1,9 +1,11 @@
 import { PedersenHash } from '@explorer/types'
 
 export interface StateUpdateDetailsProps {
-  readonly hash: PedersenHash
-  readonly timestamp: number
   readonly id: number
+  readonly hash: PedersenHash
+  readonly rootHash: PedersenHash
+  readonly blockNumber: bigint
+  readonly timestamp: number
   positions: ReadonlyArray<{
     readonly publicKey: string
     readonly positionId: bigint

@@ -6,7 +6,7 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
-import { AssetId } from '@explorer/types'
+import { AssetId, PedersenHash } from '@explorer/types'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
@@ -117,6 +117,8 @@ export class FrontendController {
       html: renderStateUpdateDetailsPage({
         id: stateUpdate.id,
         hash: stateUpdate.hash,
+        rootHash: PedersenHash.fake(), // TODO: use real value
+        blockNumber: 1000n, // TODO: use real value
         timestamp: stateUpdate.timestamp,
         positions: stateUpdate.positions.map((pos) => {
           const assets = buildViewAssets(
