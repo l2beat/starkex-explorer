@@ -6,29 +6,8 @@ import { formatTime } from '../formatTime'
 import { formatHash } from '../formatHash'
 import { Table } from '../common/Table'
 import { SimpleLink } from '../common/SimpleLink'
-import { FreezeButton } from '../common/FreezeButton'
-
-const Stat = ({
-  title,
-  value,
-  valueId,
-}: {
-  title: string
-  value: string
-  valueId?: string
-}) => {
-  return (
-    <div className="py-2 px-4 bg-grey-300 rounded-md w-[25%]">
-      <div className="w-full mb-2">{title}</div>
-      <div
-        className="font-sans font-bold text-2xl w-full text-right"
-        id={valueId}
-      >
-        {value}
-      </div>
-    </div>
-  )
-}
+import { FreezeButton } from './FreezeButton'
+import { Stat } from './Stat'
 
 export function Home(props: HomeProps) {
   return (
