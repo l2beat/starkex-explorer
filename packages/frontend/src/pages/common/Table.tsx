@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 import cx from 'classnames'
 
-type Cell = string
+type Cell = ReactNode
 
 type Row = {
   cells: Cell[]
@@ -57,7 +57,7 @@ export function Table({ columns, rows, className }: TableProps) {
                   i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
                 )}
               >
-                {cells.map((text, col) => {
+                {cells.map((cell, col) => {
                   const { maxWidth, numeric, cellFontMono } = columns[col] || {}
                   const content = link ? (
                     <a
@@ -68,10 +68,10 @@ export function Table({ columns, rows, className }: TableProps) {
                         maxWidth && cellOverflowStyles
                       )}
                     >
-                      {text}
+                      {cell}
                     </a>
                   ) : (
-                    text
+                    cell
                   )
                   return (
                     <td

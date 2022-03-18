@@ -18,7 +18,7 @@ const buildViewAssets = (
   prices: { price: bigint; assetId: AssetId }[]
 ) => {
   const assets: {
-    assetId: string
+    assetId: AssetId
     balance: bigint
     totalUSDCents: bigint
     price?: bigint
@@ -27,14 +27,14 @@ const buildViewAssets = (
     const totalUSDCents = price ? getAssetValueUSDCents(balance, price) : 0n
     const priceUSDCents = price ? getAssetPriceUSDCents(price, assetId) : 0n
     return {
-      assetId: assetId.toString(),
+      assetId,
       balance,
       price: priceUSDCents,
       totalUSDCents,
     }
   })
   assets.push({
-    assetId: 'USDC',
+    assetId: AssetId('USDC'),
     balance: collateralBalance,
     totalUSDCents: collateralBalance / 1000n,
     price: 1n,

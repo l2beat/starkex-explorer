@@ -3,24 +3,40 @@ import { formatUSDCents } from '../formatUSDCents'
 import { Page } from '../common/Page'
 import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
+import { AssetId } from '@explorer/types'
+import { AssetIcon } from '../common/icons/AssetIcon'
 
-const assetTableColumns = [
-  { header: 'Asset id' },
+type AssetCellProps = {
+  assetId: AssetId
+}
+
+function AssetCell({ assetId }: AssetCellProps) {
+  const symbol = AssetId.symbol(assetId)
+  return (
+    <div className="flex gap-x-1 items-center">
+      <AssetIcon assetId={assetId} width="16" height="16" />
+      {symbol}
+    </div>
+  )
+}
+
+const balanceTableColumns = [
+  { header: 'Name' },
   { header: 'Balance', numeric: true },
+  { header: 'Unit price', numeric: true },
   { header: 'Value', numeric: true },
-  { header: 'Price', numeric: true },
 ]
-const buildAssetTableRow = ({
+const buildBalanceTableRow = ({
   assetId,
   balance,
   totalUSDCents,
   price,
 }: PositionDetailsProps['assets'][number]) => ({
   cells: [
-    assetId.toString(),
+    <AssetCell assetId={assetId} />,
     balance.toString(),
-    formatUSDCents(totalUSDCents),
     price ? `${formatUSDCents(price)}` : '-',
+    formatUSDCents(totalUSDCents),
   ],
 })
 
@@ -81,11 +97,11 @@ export function PositionDetails({
         <span className="font-bold font-sans text-xl">Key: </span>
         <span className="font-mono text-lg">{publicKey}</span>
       </h2>
-      <div className="mb-1.5 font-medium text-lg text-left">Assets</div>
+      <div className="mb-1.5 font-medium text-lg text-left">Balances</div>
       <Table
         className="mb-8"
-        columns={assetTableColumns}
-        rows={assets.map(buildAssetTableRow)}
+        columns={balanceTableColumns}
+        rows={assets.map(buildBalanceTableRow)}
       />
       <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
       <Table
