@@ -1,4 +1,4 @@
-import { AssetId } from "@explorer/types"
+import { AssetId } from '@explorer/types'
 
 export interface PositionDetailsProps {
   readonly positionId: bigint
