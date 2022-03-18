@@ -9,6 +9,8 @@ import { SimpleLink } from '../common/SimpleLink'
 import { FreezeButton } from './FreezeButton'
 import { Stat } from './Stat'
 
+export const tvlElId = 'dydx-tvl'
+
 export function Home(props: HomeProps) {
   return (
     <Page
@@ -21,7 +23,7 @@ export function Home(props: HomeProps) {
       withoutSearch
     >
       <div className="mb-12 flex gap-x-4 items-center">
-        <Stat title="Total Value Locked" value="-" valueId="dydx-tvl" />
+        <Stat title="Total Value Locked" value="-" valueId={tvlElId} />
         <Stat title="State updates" value={props.totalUpdates.toString()} />
         <Stat
           title="Tracked positions"

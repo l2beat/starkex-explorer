@@ -1,6 +1,7 @@
 import { formatLargeNumber } from '../pages/formatLargeNumber'
+import { tvlElId } from '../pages/home/Home'
 
-const tvlEl = document.querySelector('#dydx-tvl')
+const tvlEl = document.querySelector('#' + tvlElId)
 if (tvlEl) {
   fetch('https://l2beat.com/api/dydx.json')
     .then((res) => res.json())
