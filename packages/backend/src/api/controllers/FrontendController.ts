@@ -120,6 +120,8 @@ export class FrontendController {
       html: renderStateUpdateDetailsPage({
         id: stateUpdate.id,
         hash: stateUpdate.hash,
+        rootHash: stateUpdate.rootHash,
+        blockNumber: stateUpdate.blockNumber,
         timestamp: stateUpdate.timestamp,
         positions: stateUpdate.positions.map((pos) => {
           const assets = buildViewAssets(

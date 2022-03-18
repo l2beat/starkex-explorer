@@ -1,14 +1,16 @@
 import React from 'react'
 import { Page } from '../common/Page'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
-import { formatTime } from '../formatTime'
 import { formatUSDCents } from '../formatUSDCents'
 import { Table } from '../common/Table'
+import { StateUpdateStats } from './StateUpdatesStats'
 
 export function StateUpdateDetails({
   id,
   hash,
+  rootHash,
   positions,
+  blockNumber,
   timestamp,
 }: StateUpdateDetailsProps) {
   return (
@@ -21,12 +23,14 @@ export function StateUpdateDetails({
       scripts={['/scripts/main.js']}
     >
       <h1 className="font-sans font-bold text-2xl mb-12">
-        State update #{id.toString()} ({formatTime(timestamp)})
+        State update #{id.toString()}
       </h1>
-      <h2 className="mb-2">
-        <span className="font-bold font-sans text-xl">Hash: </span>
-        <span className="font-mono text-lg">{hash}</span>
-      </h2>
+      <StateUpdateStats
+        stateHash={hash}
+        rootHash={rootHash}
+        blockNumber={blockNumber}
+        timestamp={timestamp}
+      />
       <div className="mb-1.5 font-medium text-lg text-left">
         Updated positions
       </div>
