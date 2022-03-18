@@ -1,4 +1,4 @@
-import { Hash256, PedersenHash } from '@explorer/types'
+import { Hash256, AssetId, PedersenHash } from '@explorer/types'
 
 import {
   HomeProps,
@@ -46,11 +46,31 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   publicKey: `0x${'0'.repeat(63)}1`,
   totalUSDCents: 123n,
   assets: [
-    { assetId: 'ETH-9', balance: 0n, totalUSDCents: 0n, price: 1000n },
-    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
-    { assetId: 'MKR-9', balance: 30n, totalUSDCents: 30n, price: 1000n },
-    { assetId: 'BTC-10', balance: 5n, totalUSDCents: 5n, price: 1000n },
-    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
+    { assetId: AssetId('ETH-9'), balance: 0n, totalUSDCents: 0n, price: 1000n },
+    {
+      assetId: AssetId('USDC-9'),
+      balance: 20n,
+      totalUSDCents: 20n,
+      price: 1000n,
+    },
+    {
+      assetId: AssetId('LINK-7'),
+      balance: 20n,
+      totalUSDCents: 20n,
+      price: 1000n,
+    },
+    {
+      assetId: AssetId('MKR-9'),
+      balance: 30n,
+      totalUSDCents: 30n,
+      price: 1000n,
+    },
+    {
+      assetId: AssetId('BTC-10'),
+      balance: 5n,
+      totalUSDCents: 5n,
+      price: 1000n,
+    },
   ],
   history: [
     {

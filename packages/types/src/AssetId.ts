@@ -12,3 +12,7 @@ export function AssetId(value: string) {
 AssetId.decimals = function decimals(assetId: AssetId) {
   return parseInt(assetId.split('-')[1])
 }
+
+AssetId.symbol = function symbol(assetId: AssetId) {
+  return assetId.replace(/-\d+$/, '')
+}
