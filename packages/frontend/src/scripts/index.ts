@@ -1,5 +1,5 @@
 import { formatLargeNumber } from '../pages/formatLargeNumber'
-import { tvlElId } from '../pages/home/Home'
+import { tvlElId } from '../pages/home/tvlElId'
 
 const tvlEl = document.querySelector('#' + tvlElId)
 if (tvlEl) {

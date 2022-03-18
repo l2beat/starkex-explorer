@@ -8,8 +8,7 @@ import { Table } from '../common/Table'
 import { SimpleLink } from '../common/SimpleLink'
 import { FreezeButton } from './FreezeButton'
 import { Stat } from './Stat'
-
-export const tvlElId = 'dydx-tvl'
+import { tvlElId } from './tvlElId'
 
 export function Home(props: HomeProps) {
   return (
