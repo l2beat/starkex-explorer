@@ -232,12 +232,13 @@ describe(StateUpdateRepository.name, () => {
     const blockNumber = 30_000
     const timestamp = Math.floor(Date.now() / 1000)
     const rootHash = PedersenHash.fake()
+    const factHash = Hash256.fake()
     await repository.add({
       stateUpdate: {
         id: blockNumber,
         blockNumber,
         rootHash,
-        factHash: Hash256.fake(),
+        factHash,
         timestamp,
       },
       positions: Array.from({ length: 4 }).map((_, i) => ({
@@ -253,7 +254,9 @@ describe(StateUpdateRepository.name, () => {
 
     expect(actual).toEqual({
       id: blockNumber,
-      hash: rootHash,
+      hash: factHash,
+      blockNumber,
+      rootHash,
       timestamp,
       positions: Array.from({ length: 4 }).map((_, i) =>
         expect.objectWith({

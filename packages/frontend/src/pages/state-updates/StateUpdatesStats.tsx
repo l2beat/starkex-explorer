@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/types'
+import { Hash256, PedersenHash } from '@explorer/types'
 import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 import { SimpleLink } from '../common/SimpleLink'
@@ -42,9 +42,9 @@ function StatRow({ even, title, content, fontRegular }: StatRowProps) {
 }
 
 type StateUpdateStatsProps = {
-  stateHash: PedersenHash
+  stateHash: Hash256
   rootHash: PedersenHash
-  blockNumber: bigint
+  blockNumber: number
   timestamp: number
 }
 
@@ -61,7 +61,7 @@ export function StateUpdateStats({
           {[
             {
               title: 'State update hash',
-              content: formatHash(stateHash),
+              content: stateHash.toString(),
             },
             {
               title: 'State tree root',

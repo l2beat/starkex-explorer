@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/types'
+import { Hash256, PedersenHash } from '@explorer/types'
 
 import {
   HomeProps,
@@ -21,9 +21,9 @@ export const HOME_PROPS: HomeProps = {
 
 export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   id: 1,
-  hash: PedersenHash.fake(),
+  hash: Hash256.fake(),
   rootHash: PedersenHash.fake(),
-  blockNumber: BigInt(Math.floor(Math.random() * 100)),
+  blockNumber: Math.floor(Math.random() * 100),
   timestamp: Date.now(),
   positions: [
     {

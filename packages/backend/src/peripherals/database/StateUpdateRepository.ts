@@ -151,7 +151,9 @@ export class StateUpdateRepository {
 
     return {
       id,
-      hash: PedersenHash(update.root_hash),
+      hash: Hash256(update.fact_hash),
+      rootHash: PedersenHash(update.root_hash),
+      blockNumber: update.block_number,
       timestamp: update.timestamp,
       positions: positions.map(toPositionWithPricesRecord),
     }
