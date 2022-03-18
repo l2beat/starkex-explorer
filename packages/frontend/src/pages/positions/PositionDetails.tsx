@@ -3,21 +3,19 @@ import { formatUSDCents } from '../formatUSDCents'
 import { Page } from '../common/Page'
 import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
-import { assetIcons } from '../common/icons/assets/assetIcons'
+import { AssetId } from '@explorer/types'
+import { AssetIcon } from '../common/icons/AssetIcon'
 
 type AssetCellProps = {
-  assetId: string
+  assetId: AssetId
 }
 
 function AssetCell({ assetId }: AssetCellProps) {
-  const name = assetId.replace(/-\d+$/, '')
-  const Icon = assetIcons[name]
-  if (!Icon) {
-    return <>{name}</>
-  }
+  const symbol = AssetId.symbol(assetId)
   return (
     <div className="flex gap-x-1 items-center">
-      <Icon width={16} height={16} /> {name}
+      <AssetIcon assetId={assetId} width="16" height="16" />
+      {symbol}
     </div>
   )
 }
