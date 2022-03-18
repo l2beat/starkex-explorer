@@ -189,7 +189,9 @@ export class StateUpdateRepository {
   }
 
   async countPositions() {
-    const [{ count }] = await this.knex('positions').countDistinct({ count: 'position_id' })
+    const [{ count }] = await this.knex('positions').countDistinct({
+      count: 'position_id',
+    })
     return count ? BigInt(count) : 0n
   }
 }
