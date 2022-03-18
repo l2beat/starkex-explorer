@@ -8,5 +8,7 @@ export interface StateUpdateDetailsProps {
     readonly publicKey: string
     readonly positionId: bigint
     readonly totalUSDCents: bigint
+    readonly previousTotalUSDCents?: bigint
+    readonly assetsUpdated?: number
   }>
 }

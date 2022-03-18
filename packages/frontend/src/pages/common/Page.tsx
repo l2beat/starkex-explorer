@@ -22,7 +22,7 @@ export function Page({ children, scripts, withoutSearch, ...head }: Props) {
         </div>
         <div className="Page">
           <Navbar searchBar={!withoutSearch} />
-          <main className="px-4 max-w-[800px] mx-auto pt-20">
+          <main className="px-4 max-w-[900px] mx-auto pt-20">
             {children}
             <Footer />
           </main>
