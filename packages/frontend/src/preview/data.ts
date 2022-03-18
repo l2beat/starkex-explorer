@@ -28,11 +28,13 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
       publicKey: `0x${'0'.repeat(63)}1`,
       positionId: 1n,
       totalUSDCents: 100n,
+      previousTotalUSDCents: 90n,
     },
     {
       publicKey: `0x${'0'.repeat(63)}2`,
       positionId: 2n,
       totalUSDCents: 100n,
+      previousTotalUSDCents: 90n,
     },
   ],
 }
