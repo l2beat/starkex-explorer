@@ -38,15 +38,30 @@ export function StateUpdateDetails({
         columns={[
           { header: 'Position id' },
           { header: 'Owner', maxWidth: true, cellFontMono: true },
+          { header: 'Value before', numeric: true },
           { header: 'Value after', numeric: true },
+          { header: 'Assets updated', numeric: true },
         ]}
-        rows={positions.map(({ positionId, publicKey, totalUSDCents }) => ({
-          cells: [
-            positionId.toString(),
+        rows={positions.map(
+          ({
+            positionId,
             publicKey,
-            formatUSDCents(totalUSDCents),
-          ],
-        }))}
+            totalUSDCents,
+            previousTotalUSDCents,
+            assetsUpdated,
+          }) => ({
+            cells: [
+              positionId.toString(),
+              publicKey,
+              previousTotalUSDCents
+                ? formatUSDCents(previousTotalUSDCents)
+                : '-',
+              formatUSDCents(totalUSDCents),
+              assetsUpdated ? assetsUpdated.toString() : '0',
+            ],
+            link: `/positions/${positionId}`,
+          })
+        )}
       />
     </Page>
   )

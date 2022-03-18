@@ -101,10 +101,7 @@ export class FrontendController {
   }
 
   async getStateUpdateDetailsPage(id: number): Promise<ControllerResult> {
-    const [stateUpdate, prices] = await Promise.all([
-      this.stateUpdateRepository.getStateUpdateById(id),
-      this.stateUpdateRepository.getLatestAssetPrices(),
-    ])
+    const stateUpdate = await this.stateUpdateRepository.getStateUpdateById(id)
 
     if (!stateUpdate) {
       return {
@@ -112,6 +109,12 @@ export class FrontendController {
         html: 'State update not found',
       }
     }
+
+    const previousPositions =
+      await this.stateUpdateRepository.getPositionsPreviousState(
+        stateUpdate.positions.map((p) => p.positionId),
+        id
+      )
 
     return {
       html: renderStateUpdateDetailsPage({
@@ -124,17 +127,36 @@ export class FrontendController {
           const assets = buildViewAssets(
             pos.balances,
             pos.collateralBalance,
-            prices
+            pos.prices
           )
           const totalUSDCents = assets.reduce(
             (total, { totalUSDCents }) => totalUSDCents + total,
             0n
           )
+          const previousPos = previousPositions.find(
+            (p) => p.positionId === pos.positionId
+          )
+          const previousAssets =
+            previousPos &&
+            buildViewAssets(
+              previousPos.balances,
+              previousPos.collateralBalance,
+              previousPos.prices
+            )
+          const previousTotalUSDCents = previousAssets?.reduce(
+            (total, { totalUSDCents }) => totalUSDCents + total,
+            0n
+          )
+          const assetsUpdated = previousPos
+            ? countDifferentAssets(previousPos.balances, pos.balances)
+            : 0
 
           return {
             publicKey: pos.publicKey,
             positionId: pos.positionId,
             totalUSDCents,
+            previousTotalUSDCents,
+            assetsUpdated,
           }
         }),
       }),
