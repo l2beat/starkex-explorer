@@ -61,10 +61,14 @@ export class FrontendController {
   constructor(private stateUpdateRepository: StateUpdateRepository) {}
 
   async getHomePage(): Promise<string> {
-    const stateUpdates = await this.stateUpdateRepository.getStateUpdateList({
-      offset: 0,
-      limit: 20,
-    })
+    const [stateUpdates, totalUpdates, totalPositions] = await Promise.all([
+      this.stateUpdateRepository.getStateUpdateList({
+        offset: 0,
+        limit: 20,
+      }),
+      this.stateUpdateRepository.countStateUpdates(),
+      this.stateUpdateRepository.countPositions(),
+    ])
 
     return renderHomePage({
       stateUpdates: stateUpdates.map(
@@ -75,6 +79,8 @@ export class FrontendController {
           positionCount: x.positionCount,
         })
       ),
+      totalUpdates,
+      totalPositions,
     })
   }
 

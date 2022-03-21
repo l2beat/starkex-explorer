@@ -203,6 +203,18 @@ export class StateUpdateRepository {
       .delete()
     this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
   }
+
+  async countStateUpdates() {
+    const [{ count }] = await this.knex('state_updates').count({ count: '*' })
+    return count ? BigInt(count) : 0n
+  }
+
+  async countPositions() {
+    const [{ count }] = await this.knex('positions').countDistinct({
+      count: 'position_id',
+    })
+    return count ? BigInt(count) : 0n
+  }
 }
 
 export interface StateUpdateBundle {

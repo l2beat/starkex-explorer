@@ -6,6 +6,9 @@ import { formatTime } from '../formatTime'
 import { formatHash } from '../formatHash'
 import { Table } from '../common/Table'
 import { SimpleLink } from '../common/SimpleLink'
+import { FreezeButton } from './FreezeButton'
+import { Stat } from './Stat'
+import { tvlElId } from './tvlElId'
 
 export function Home(props: HomeProps) {
   return (
@@ -18,6 +21,15 @@ export function Home(props: HomeProps) {
       scripts={['/scripts/main.js']}
       withoutSearch
     >
+      <div className="mb-12 flex gap-x-4 items-center">
+        <Stat title="Total Value Locked" value="-" valueId={tvlElId} />
+        <Stat title="State updates" value={props.totalUpdates.toString()} />
+        <Stat
+          title="Tracked positions"
+          value={props.totalPositions.toString()}
+        />
+        <FreezeButton />
+      </div>
       <SearchBar className="drop-shadow-lg mb-12" />
       <div className="mb-1.5">
         <span className="float-left font-medium text-lg">

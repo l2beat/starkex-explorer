@@ -17,6 +17,8 @@ export const HOME_PROPS: HomeProps = {
     timestamp:
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR),
   })),
+  totalPositions: 45762n,
+  totalUpdates: 5143n,
 }
 
 export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
