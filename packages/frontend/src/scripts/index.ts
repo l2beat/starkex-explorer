@@ -14,5 +14,3 @@ if (tvlEl) {
     })
     .catch(console.error)
 }
-
-export {}
