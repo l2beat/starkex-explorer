@@ -5,6 +5,7 @@ import serve from 'koa-static'
 
 import {
   renderHomePage,
+  renderPositionAtUpdatePage,
   renderPositionDetailsPage,
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
@@ -25,6 +26,9 @@ router.get('/state-updates/:hash', (ctx) => {
 })
 router.get('/positions/:positionId', (ctx) => {
   ctx.body = renderPositionDetailsPage(DATA.POSITION_DETAILS_PROPS)
+})
+router.get('/positions/:positionId/updates/:updateId', (ctx) => {
+  ctx.body = renderPositionAtUpdatePage(DATA.POSITION_AT_UPDATE_PROPS)
 })
 
 app.use(router.routes())
