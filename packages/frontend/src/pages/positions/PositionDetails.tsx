@@ -5,6 +5,7 @@ import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
 import { AssetId } from '@explorer/types'
 import { AssetIcon } from '../common/icons/AssetIcon'
+import { PositionStats } from './PositionStats'
 
 type AssetCellProps = {
   assetId: AssetId
@@ -72,7 +73,8 @@ export function PositionDetails({
   positionId,
   assets,
   publicKey,
-  totalUSDCents,
+  stateUpdateId,
+  lastUpdateTimestamp,
   history,
 }: PositionDetailsProps) {
   return (
@@ -87,16 +89,12 @@ export function PositionDetails({
       <h1 className="font-sans font-bold text-2xl mb-12">
         Position #{positionId.toString()}
       </h1>
-      <h2 className="mb-2">
-        <span className="font-bold font-sans text-xl">Total: </span>
-        <span className="font-mono text-lg">
-          {formatUSDCents(totalUSDCents)}
-        </span>
-      </h2>
-      <h2 className="mb-12">
-        <span className="font-bold font-sans text-xl">Key: </span>
-        <span className="font-mono text-lg">{publicKey}</span>
-      </h2>
+      <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
+      <PositionStats
+        publicKey={publicKey}
+        stateUpdateId={stateUpdateId}
+        lastUpdateTimestamp={lastUpdateTimestamp}
+      />
       <div className="mb-1.5 font-medium text-lg text-left">Balances</div>
       <Table
         className="mb-8"

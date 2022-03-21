@@ -46,7 +46,8 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   positionId: 123n,
   publicKey: `0x${'0'.repeat(63)}1`,
-  totalUSDCents: 123n,
+  lastUpdateTimestamp: Date.now(),
+  stateUpdateId: 1,
   assets: [
     { assetId: AssetId('ETH-9'), balance: 0n, totalUSDCents: 0n, price: 1000n },
     {

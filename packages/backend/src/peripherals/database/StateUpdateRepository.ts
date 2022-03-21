@@ -73,13 +73,24 @@ export class StateUpdateRepository {
       .where('position_id', positionId)
       .orderBy('positions.state_update_id', 'desc')
       .join('prices', 'prices.state_update_id', 'positions.state_update_id')
-      .groupBy('positions.position_id', 'positions.state_update_id')
+      .join('state_updates', 'state_updates.id', 'positions.state_update_id')
+      .groupBy(
+        'positions.position_id',
+        'positions.state_update_id',
+        'state_updates.timestamp'
+      )
       .select(
         'positions.*',
+        'state_updates.timestamp as timestamp',
         this.knex.raw('array_agg(row_to_json(prices)) as prices')
       )
 
-    return rows.map(toPositionWithPricesRecord)
+    return rows.map((r) => {
+      return {
+        ...toPositionWithPricesRecord(r),
+        timestamp: r.timestamp,
+      }
+    })
   }
 
   async getAll() {

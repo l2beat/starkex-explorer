@@ -34,7 +34,7 @@ const buildViewAssets = (
     }
   })
   assets.push({
-    assetId: AssetId('USDC'),
+    assetId: AssetId('USDC-1'),
     balance: collateralBalance,
     totalUSDCents: collateralBalance / 1000n,
     price: 1n,
@@ -206,7 +206,8 @@ export class FrontendController {
       html: renderPositionDetailsPage({
         positionId,
         publicKey: current.publicKey,
-        totalUSDCents: current.totalUSDCents,
+        stateUpdateId: current.stateUpdateId,
+        lastUpdateTimestamp: current.timestamp,
         assets: current.assets,
         history: historyWithAssets.map((update, i) => {
           const previousUpdate = historyWithAssets[i + 1]
