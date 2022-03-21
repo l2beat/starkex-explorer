@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/types'
+import { AssetId, Hash256, PedersenHash } from '@explorer/types'
 
 import {
   HomeProps,
@@ -23,18 +23,22 @@ export const HOME_PROPS: HomeProps = {
 
 export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   id: 1,
-  hash: PedersenHash.fake(),
-  timestamp: Date.now() / 1000,
+  hash: Hash256.fake(),
+  rootHash: PedersenHash.fake(),
+  blockNumber: Math.floor(Math.random() * 100),
+  timestamp: Date.now(),
   positions: [
     {
       publicKey: `0x${'0'.repeat(63)}1`,
       positionId: 1n,
       totalUSDCents: 100n,
+      previousTotalUSDCents: 90n,
     },
     {
       publicKey: `0x${'0'.repeat(63)}2`,
       positionId: 2n,
       totalUSDCents: 100n,
+      previousTotalUSDCents: 90n,
     },
   ],
 }
@@ -44,11 +48,31 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   publicKey: `0x${'0'.repeat(63)}1`,
   totalUSDCents: 123n,
   assets: [
-    { assetId: 'ETH-9', balance: 0n, totalUSDCents: 0n, price: 1000n },
-    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
-    { assetId: 'MKR-9', balance: 30n, totalUSDCents: 30n, price: 1000n },
-    { assetId: 'BTC-10', balance: 5n, totalUSDCents: 5n, price: 1000n },
-    { assetId: 'UNI-9', balance: 20n, totalUSDCents: 20n, price: 1000n },
+    { assetId: AssetId('ETH-9'), balance: 0n, totalUSDCents: 0n, price: 1000n },
+    {
+      assetId: AssetId('USDC-9'),
+      balance: 20n,
+      totalUSDCents: 20n,
+      price: 1000n,
+    },
+    {
+      assetId: AssetId('LINK-7'),
+      balance: 20n,
+      totalUSDCents: 20n,
+      price: 1000n,
+    },
+    {
+      assetId: AssetId('MKR-9'),
+      balance: 30n,
+      totalUSDCents: 30n,
+      price: 1000n,
+    },
+    {
+      assetId: AssetId('BTC-10'),
+      balance: 5n,
+      totalUSDCents: 5n,
+      price: 1000n,
+    },
   ],
   history: [
     {

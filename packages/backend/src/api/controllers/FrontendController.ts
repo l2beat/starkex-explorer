@@ -18,7 +18,7 @@ const buildViewAssets = (
   prices: { price: bigint; assetId: AssetId }[]
 ) => {
   const assets: {
-    assetId: string
+    assetId: AssetId
     balance: bigint
     totalUSDCents: bigint
     price?: bigint
@@ -27,14 +27,14 @@ const buildViewAssets = (
     const totalUSDCents = price ? getAssetValueUSDCents(balance, price) : 0n
     const priceUSDCents = price ? getAssetPriceUSDCents(price, assetId) : 0n
     return {
-      assetId: assetId.toString(),
+      assetId,
       balance,
       price: priceUSDCents,
       totalUSDCents,
     }
   })
   assets.push({
-    assetId: 'USDC',
+    assetId: AssetId('USDC'),
     balance: collateralBalance,
     totalUSDCents: collateralBalance / 1000n,
     price: 1n,
@@ -107,10 +107,7 @@ export class FrontendController {
   }
 
   async getStateUpdateDetailsPage(id: number): Promise<ControllerResult> {
-    const [stateUpdate, prices] = await Promise.all([
-      this.stateUpdateRepository.getStateUpdateById(id),
-      this.stateUpdateRepository.getLatestAssetPrices(),
-    ])
+    const stateUpdate = await this.stateUpdateRepository.getStateUpdateById(id)
 
     if (!stateUpdate) {
       return {
@@ -119,26 +116,53 @@ export class FrontendController {
       }
     }
 
+    const previousPositions =
+      await this.stateUpdateRepository.getPositionsPreviousState(
+        stateUpdate.positions.map((p) => p.positionId),
+        id
+      )
+
     return {
       html: renderStateUpdateDetailsPage({
         id: stateUpdate.id,
         hash: stateUpdate.hash,
+        rootHash: stateUpdate.rootHash,
+        blockNumber: stateUpdate.blockNumber,
         timestamp: stateUpdate.timestamp,
         positions: stateUpdate.positions.map((pos) => {
           const assets = buildViewAssets(
             pos.balances,
             pos.collateralBalance,
-            prices
+            pos.prices
           )
           const totalUSDCents = assets.reduce(
             (total, { totalUSDCents }) => totalUSDCents + total,
             0n
           )
+          const previousPos = previousPositions.find(
+            (p) => p.positionId === pos.positionId
+          )
+          const previousAssets =
+            previousPos &&
+            buildViewAssets(
+              previousPos.balances,
+              previousPos.collateralBalance,
+              previousPos.prices
+            )
+          const previousTotalUSDCents = previousAssets?.reduce(
+            (total, { totalUSDCents }) => totalUSDCents + total,
+            0n
+          )
+          const assetsUpdated = previousPos
+            ? countDifferentAssets(previousPos.balances, pos.balances)
+            : 0
 
           return {
             publicKey: pos.publicKey,
             positionId: pos.positionId,
             totalUSDCents,
+            previousTotalUSDCents,
+            assetsUpdated,
           }
         }),
       }),

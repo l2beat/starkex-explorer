@@ -232,35 +232,39 @@ describe(StateUpdateRepository.name, () => {
     const blockNumber = 30_000
     const timestamp = Math.floor(Date.now() / 1000)
     const rootHash = PedersenHash.fake()
+    const factHash = Hash256.fake()
     await repository.add({
       stateUpdate: {
         id: blockNumber,
         blockNumber,
         rootHash,
-        factHash: Hash256.fake(),
+        factHash,
         timestamp,
       },
       positions: Array.from({ length: 4 }).map((_, i) => ({
         publicKey: `public-key-${blockNumber}-${i}`,
         positionId: BigInt(blockNumber * 10 + i),
         collateralBalance: collateralBalance,
-        balances: [],
+        balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
       })),
-      prices: [],
+      prices: [{ assetId: AssetId('ETH-9'), price: 10n }],
     })
 
     const actual = await repository.getStateUpdateById(blockNumber)
 
     expect(actual).toEqual({
       id: blockNumber,
-      hash: rootHash,
+      hash: factHash,
+      blockNumber,
+      rootHash,
       timestamp,
       positions: Array.from({ length: 4 }).map((_, i) =>
         expect.objectWith({
           publicKey: `public-key-${blockNumber}-${i}`,
           positionId: BigInt(blockNumber * 10 + i),
           collateralBalance: collateralBalance,
-          balances: [],
+          balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
+          prices: [{ assetId: AssetId('ETH-9'), price: 10n }],
         })
       ),
     })
@@ -291,44 +295,62 @@ describe(StateUpdateRepository.name, () => {
     expect(fullCount).toEqual(4n)
   })
 
-  it('gets latest asset prices', async () => {
-    const update = {
+  it('gets positions state from previous update', async () => {
+    const stateUpdateId = 10
+    const nextStateUpdateId = 11
+    const positionId = 1n
+    await repository.add({
       stateUpdate: {
-        id: 1,
-        blockNumber: 10_000,
+        id: stateUpdateId,
+        blockNumber: stateUpdateId,
         rootHash: PedersenHash.fake(),
         factHash: Hash256.fake(),
         timestamp: 0,
       },
       positions: [
         {
-          publicKey: 'public-key-0',
-          positionId: 0n,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+          publicKey: `public-key-${stateUpdateId}`,
+          positionId,
+          collateralBalance: 10n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
         },
       ],
-      prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
-    }
-
-    await repository.add(update)
-
-    expect(await repository.getLatestAssetPrices()).toEqual([
-      { stateUpdateId: 1, assetId: AssetId('ETH-9'), price: 40n },
-    ])
-
-    update.stateUpdate.id = 2
-    update.prices = [
-      { assetId: AssetId('ETH-9'), price: 80n },
-      { assetId: AssetId('BTC-10'), price: 100n },
-    ]
-
-    await repository.add(update)
-
-    expect(await repository.getLatestAssetPrices()).toEqual([
-      { stateUpdateId: 2, assetId: AssetId('BTC-10'), price: 100n },
-      { stateUpdateId: 2, assetId: AssetId('ETH-9'), price: 80n },
-    ])
+      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
+    })
+    await repository.add({
+      stateUpdate: {
+        id: nextStateUpdateId,
+        blockNumber: nextStateUpdateId,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: 0,
+      },
+      positions: [
+        {
+          publicKey: `public-key-0`,
+          positionId,
+          collateralBalance: 20n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+        {
+          publicKey: `public-key-1`,
+          positionId: 2n,
+          collateralBalance: 30n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 30n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(nextStateUpdateId) }],
+    })
+    const positions = await repository.getPositionsPreviousState(
+      [positionId],
+      nextStateUpdateId
+    )
+    expect(positions.length).toEqual(1)
+    expect(positions[0]).toBeAnObjectWith({
+      stateUpdateId,
+      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
+      balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
+    })
   })
 
   it('returns undefined if update is missing', async () => {
