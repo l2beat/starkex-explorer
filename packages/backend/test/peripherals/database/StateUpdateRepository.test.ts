@@ -90,6 +90,7 @@ describe(StateUpdateRepository.name, () => {
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
         prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+        timestamp: 0,
       },
       {
         stateUpdateId: 1,
@@ -98,6 +99,7 @@ describe(StateUpdateRepository.name, () => {
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
         prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+        timestamp: 0,
       },
     ])
   })
