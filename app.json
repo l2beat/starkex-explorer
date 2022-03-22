@@ -1,0 +1,18 @@
+{
+  "name": "dydx-state-explorer",
+  "description": "",
+  "scripts": {},
+  "env": {},
+  "formation": {},
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ],
+  "environments": {
+    "review": {
+      "addons": ["heroku-postgresql:hobby-dev", "papertrail:choklad"]
+    }
+  }
+}
