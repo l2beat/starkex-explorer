@@ -1,11 +1,8 @@
-import { Hash256, PedersenHash } from '@explorer/types'
-import classNames from 'classnames'
 import React, { ReactNode } from 'react'
-import { SimpleLink } from '../common/SimpleLink'
-import { formatHash } from '../formatHash'
+import classNames from 'classnames'
 import { formatTime } from '../formatTime'
 
-const formatTimestamp = (timestamp: number) => {
+export function formatTimestamp(timestamp: number) {
   const date = new Date(timestamp)
   const day = date.getUTCDate()
   const month = date.getUTCMonth()
@@ -41,44 +38,16 @@ function StatRow({ even, title, content, fontRegular }: StatRowProps) {
   )
 }
 
-type StateUpdateStatsProps = {
-  stateHash: Hash256
-  rootHash: PedersenHash
-  blockNumber: number
-  timestamp: number
+export type PageHeaderStatsProps = {
+  rows: Omit<StatRowProps, 'even'>[]
 }
 
-export function StateUpdateStats({
-  stateHash,
-  rootHash,
-  blockNumber,
-  timestamp,
-}: StateUpdateStatsProps) {
+export function PageHeaderStats({ rows }: PageHeaderStatsProps) {
   return (
     <div className="w-full overflow-x-auto mb-12 ">
       <table className="whitespace-nowrap w-full">
         <tbody>
-          {[
-            {
-              title: 'State update hash',
-              content: stateHash.toString(),
-            },
-            {
-              title: 'State tree root',
-              content: formatHash(rootHash),
-            },
-            {
-              title: 'Ethereum block number',
-              content: (
-                <SimpleLink href="/">{blockNumber.toString()}</SimpleLink>
-              ),
-            },
-            {
-              title: 'Timestamp',
-              content: formatTimestamp(timestamp),
-              fontRegular: true,
-            },
-          ].map((stat, i) => (
+          {rows.map((stat, i) => (
             <StatRow key={i} {...stat} even={i % 2 === 0} />
           ))}
         </tbody>

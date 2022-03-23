@@ -3,7 +3,9 @@ import { Page } from '../common/Page'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 import { formatUSDCents } from '../formatUSDCents'
 import { Table } from '../common/Table'
-import { StateUpdateStats } from './StateUpdatesStats'
+import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { formatHash } from '../formatHash'
+import { SimpleLink } from '../common/SimpleLink'
 
 export function StateUpdateDetails({
   id,
@@ -25,11 +27,26 @@ export function StateUpdateDetails({
       <h1 className="font-sans font-bold text-2xl mb-12">
         State update #{id.toString()}
       </h1>
-      <StateUpdateStats
-        stateHash={hash}
-        rootHash={rootHash}
-        blockNumber={blockNumber}
-        timestamp={timestamp}
+      <PageHeaderStats
+        rows={[
+          {
+            title: 'State update hash',
+            content: hash.toString(),
+          },
+          {
+            title: 'State tree root',
+            content: formatHash(rootHash),
+          },
+          {
+            title: 'Ethereum block number',
+            content: <SimpleLink href="/">{blockNumber.toString()}</SimpleLink>,
+          },
+          {
+            title: 'Timestamp',
+            content: formatTimestamp(timestamp),
+            fontRegular: true,
+          },
+        ]}
       />
       <div className="mb-1.5 font-medium text-lg text-left">
         Updated positions

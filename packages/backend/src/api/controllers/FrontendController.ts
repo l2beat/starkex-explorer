@@ -2,6 +2,7 @@ import { AssetBalance } from '@explorer/encoding'
 import {
   HomeProps,
   renderHomePage,
+  renderPositionAtUpdatePage,
   renderPositionDetailsPage,
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
@@ -34,7 +35,7 @@ const buildViewAssets = (
     }
   })
   assets.push({
-    assetId: AssetId('USDC'),
+    assetId: AssetId('USDC-1'),
     balance: collateralBalance,
     totalUSDCents: collateralBalance / 1000n,
     price: 1n,
@@ -206,7 +207,8 @@ export class FrontendController {
       html: renderPositionDetailsPage({
         positionId,
         publicKey: current.publicKey,
-        totalUSDCents: current.totalUSDCents,
+        stateUpdateId: current.stateUpdateId,
+        lastUpdateTimestamp: current.timestamp,
         assets: current.assets,
         history: historyWithAssets.map((update, i) => {
           const previousUpdate = historyWithAssets[i + 1]
@@ -234,7 +236,7 @@ export class FrontendController {
     const updateIndex = history.findIndex(
       (p) => p.stateUpdateId === stateUpdateId
     )
-    if (!updateIndex || !update) {
+    if (updateIndex === -1 || !update) {
       return {
         html: 'Update not found',
         status: 404,
@@ -243,27 +245,27 @@ export class FrontendController {
     const position = history[updateIndex]
     const previousPosition = history[updateIndex + 1]
     const assetChanges = position.balances.map((balance) => {
-      const previous = previousPosition?.balances.find(
-        (b) => b.assetId === balance.assetId
-      )
+      const previousBalance =
+        previousPosition?.balances.find((b) => b.assetId === balance.assetId)
+          ?.balance || 0n
+      const currentBalance = balance.balance
       return {
         assetId: balance.assetId,
-        previous: previous?.balance || 0n,
-        current: balance.balance,
+        previousBalance,
+        currentBalance,
+        balanceDiff: currentBalance - previousBalance,
       }
     })
 
-    const toReturn = {
-      stateUpdateId,
-      hash: update.hash,
-      timestamp: update.timestamp,
-      positionId,
-      publicKey: position.publicKey,
-      assetChanges,
-    }
-
     return {
-      html: toReturn.toString(),
+      html: renderPositionAtUpdatePage({
+        stateUpdateId,
+        positionId,
+        lastUpdateTimestamp: update.timestamp,
+        previousPublicKey: previousPosition?.publicKey,
+        publicKey: position.publicKey,
+        assetChanges,
+      }),
       status: 200,
     }
   }

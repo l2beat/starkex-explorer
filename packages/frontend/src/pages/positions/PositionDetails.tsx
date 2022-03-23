@@ -3,22 +3,10 @@ import { formatUSDCents } from '../formatUSDCents'
 import { Page } from '../common/Page'
 import { Table } from '../common/Table'
 import { PositionDetailsProps } from './PositionDetailsProps'
-import { AssetId } from '@explorer/types'
-import { AssetIcon } from '../common/icons/AssetIcon'
-
-type AssetCellProps = {
-  assetId: AssetId
-}
-
-function AssetCell({ assetId }: AssetCellProps) {
-  const symbol = AssetId.symbol(assetId)
-  return (
-    <div className="flex gap-x-1 items-center">
-      <AssetIcon assetId={assetId} width="16" height="16" />
-      {symbol}
-    </div>
-  )
-}
+import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { formatHash } from '../formatHash'
+import { SimpleLink } from '../common/SimpleLink'
+import { AssetNameCell } from '../common/AssetNameCell'
 
 const balanceTableColumns = [
   { header: 'Name' },
@@ -33,7 +21,7 @@ const buildBalanceTableRow = ({
   price,
 }: PositionDetailsProps['assets'][number]) => ({
   cells: [
-    <AssetCell assetId={assetId} />,
+    <AssetNameCell assetId={assetId} />,
     balance.toString(),
     price ? `${formatUSDCents(price)}` : '-',
     formatUSDCents(totalUSDCents),
@@ -46,33 +34,37 @@ const updateHistoryTableColumns = [
   { header: 'Value after', numeric: true },
   { header: 'Asset updates', numeric: true },
 ]
-const buildUpdateHistoryTableRow = (
-  {
-    stateUpdateId,
-    totalUSDCents,
-    assetsUpdated,
-  }: PositionDetailsProps['history'][number],
-  i: number,
-  history: PositionDetailsProps['history']
-) => {
-  const previousTotal = history[i + 1]?.totalUSDCents
-  const valueBefore = previousTotal ? `${formatUSDCents(previousTotal)}` : '-'
+const buildUpdateHistoryTableRow =
+  (positionId: bigint) =>
+  (
+    {
+      stateUpdateId,
+      totalUSDCents,
+      assetsUpdated,
+    }: PositionDetailsProps['history'][number],
+    i: number,
+    history: PositionDetailsProps['history']
+  ) => {
+    const previousTotal = history[i + 1]?.totalUSDCents
+    const valueBefore = previousTotal ? `${formatUSDCents(previousTotal)}` : '-'
 
-  return {
-    cells: [
-      stateUpdateId.toString(),
-      valueBefore,
-      formatUSDCents(totalUSDCents),
-      assetsUpdated.toString(),
-    ],
+    return {
+      link: `/positions/${positionId}/updates/${stateUpdateId}`,
+      cells: [
+        stateUpdateId.toString(),
+        valueBefore,
+        formatUSDCents(totalUSDCents),
+        assetsUpdated.toString(),
+      ],
+    }
   }
-}
 
 export function PositionDetails({
   positionId,
   assets,
   publicKey,
-  totalUSDCents,
+  stateUpdateId,
+  lastUpdateTimestamp,
   history,
 }: PositionDetailsProps) {
   return (
@@ -87,16 +79,28 @@ export function PositionDetails({
       <h1 className="font-sans font-bold text-2xl mb-12">
         Position #{positionId.toString()}
       </h1>
-      <h2 className="mb-2">
-        <span className="font-bold font-sans text-xl">Total: </span>
-        <span className="font-mono text-lg">
-          {formatUSDCents(totalUSDCents)}
-        </span>
-      </h2>
-      <h2 className="mb-12">
-        <span className="font-bold font-sans text-xl">Key: </span>
-        <span className="font-mono text-lg">{publicKey}</span>
-      </h2>
+      <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
+      <PageHeaderStats
+        rows={[
+          {
+            title: 'Owner stark key',
+            content: formatHash(publicKey),
+          },
+          {
+            title: 'Last state update',
+            content: (
+              <SimpleLink href={`/state-updates/${stateUpdateId}`}>
+                #{stateUpdateId.toString()}
+              </SimpleLink>
+            ),
+          },
+          {
+            title: 'Last update timestamp',
+            content: formatTimestamp(lastUpdateTimestamp),
+            fontRegular: true,
+          },
+        ]}
+      />
       <div className="mb-1.5 font-medium text-lg text-left">Balances</div>
       <Table
         className="mb-8"
@@ -106,7 +110,7 @@ export function PositionDetails({
       <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
       <Table
         columns={updateHistoryTableColumns}
-        rows={history.map(buildUpdateHistoryTableRow)}
+        rows={history.map(buildUpdateHistoryTableRow(positionId))}
       />
     </Page>
   )

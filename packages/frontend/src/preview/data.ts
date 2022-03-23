@@ -2,6 +2,7 @@ import { AssetId, Hash256, PedersenHash } from '@explorer/types'
 
 import {
   HomeProps,
+  PositionAtUpdateProps,
   PositionDetailsProps,
   StateUpdateDetailsProps,
   StateUpdatesIndexProps,
@@ -46,7 +47,8 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   positionId: 123n,
   publicKey: `0x${'0'.repeat(63)}1`,
-  totalUSDCents: 123n,
+  lastUpdateTimestamp: Date.now(),
+  stateUpdateId: 1,
   assets: [
     { assetId: AssetId('ETH-9'), balance: 0n, totalUSDCents: 0n, price: 1000n },
     {
@@ -84,6 +86,34 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       stateUpdateId: 11,
       totalUSDCents: 222n,
       assetsUpdated: 20,
+    },
+  ],
+}
+
+export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
+  stateUpdateId: 1,
+  positionId: 123n,
+  publicKey: `0x${'0'.repeat(63)}1`,
+  previousPublicKey: `0x${'0'.repeat(63)}2`,
+  lastUpdateTimestamp: Date.now(),
+  assetChanges: [
+    {
+      assetId: AssetId('ETH-9'),
+      previousBalance: 0n,
+      currentBalance: 1234567n,
+      balanceDiff: 1234567n,
+    },
+    {
+      assetId: AssetId('BTC-10'),
+      previousBalance: 12345678n,
+      currentBalance: 1234567n,
+      balanceDiff: -11111111n,
+    },
+    {
+      assetId: AssetId('LINK-7'),
+      previousBalance: 12345678n,
+      currentBalance: 12345678n,
+      balanceDiff: 0n,
     },
   ],
 }
