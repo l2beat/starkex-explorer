@@ -101,7 +101,9 @@ export class Application {
       syncStatusRepository,
       blockDownloader,
       dataSyncService,
-      logger
+      logger,
+      undefined,
+      config.blocksLimit
     )
 
     // #endregion core
