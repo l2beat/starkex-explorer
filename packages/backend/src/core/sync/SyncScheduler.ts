@@ -35,7 +35,7 @@ export class SyncScheduler {
     return blockNumber - this.earliestBlock + 1 <= this.blocksLimit
   }
 
-  private onNewBlock(block: BlockRecord) {
+  private handleNewBlock(block: BlockRecord) {
     const blockNumber = block.number
     if (!this.isBlockBeforeLimit(blockNumber)) {
       this.logger.info(
@@ -51,7 +51,7 @@ export class SyncScheduler {
     this.dispatch({ type: 'newBlockFound', block })
   }
 
-  private onReorg(blocks: BlockRecord[]) {
+  private handleReorg(blocks: BlockRecord[]) {
     const blockNumber = blocks[blocks.length - 1].number
     if (!this.isBlockBeforeLimit(blockNumber)) {
       this.logger.info(
@@ -76,9 +76,9 @@ export class SyncScheduler {
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)
     this.dispatch({ type: 'initialized', lastSynced, knownBlocks })
 
-    this.blockDownloader.onNewBlock(this.onNewBlock)
+    this.blockDownloader.onNewBlock(this.handleNewBlock)
 
-    this.blockDownloader.onReorg(this.onReorg)
+    this.blockDownloader.onReorg(this.handleReorg)
 
     this.logger.info('start', { lastSynced })
   }

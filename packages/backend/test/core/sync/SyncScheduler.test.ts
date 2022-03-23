@@ -245,13 +245,13 @@ describe(SyncScheduler.name, () => {
       const dispatch = mockFn().returns(undefined)
       syncScheduler['dispatch'] = dispatch
 
-      syncScheduler['onNewBlock'](block(earliestBlockNumber + 1))
-      syncScheduler['onReorg']([block(earliestBlockNumber + 1)])
+      syncScheduler['handleNewBlock'](block(earliestBlockNumber + 1))
+      syncScheduler['handleReorg']([block(earliestBlockNumber + 1)])
 
       expect(dispatch.calls.length).toEqual(2)
 
-      syncScheduler['onNewBlock'](block(earliestBlockNumber + 2))
-      syncScheduler['onReorg']([block(earliestBlockNumber + 2)])
+      syncScheduler['handleNewBlock'](block(earliestBlockNumber + 2))
+      syncScheduler['handleReorg']([block(earliestBlockNumber + 2)])
 
       expect(dispatch.calls.length).toEqual(2)
     })
