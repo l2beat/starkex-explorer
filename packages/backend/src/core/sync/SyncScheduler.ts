@@ -76,9 +76,9 @@ export class SyncScheduler {
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)
     this.dispatch({ type: 'initialized', lastSynced, knownBlocks })
 
-    this.blockDownloader.onNewBlock(this.handleNewBlock)
+    this.blockDownloader.onNewBlock(block => this.handleNewBlock(block))
 
-    this.blockDownloader.onReorg(this.handleReorg)
+    this.blockDownloader.onReorg(blocks => this.handleReorg(blocks))
 
     this.logger.info('start', { lastSynced })
   }
