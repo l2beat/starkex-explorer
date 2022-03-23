@@ -1,4 +1,5 @@
 import { BlockRange } from '../../model'
+import { BlockRecord } from '../../peripherals/database/BlockRepository'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
@@ -23,10 +24,47 @@ export class SyncScheduler {
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
-    private readonly earliestBlock = EARLIEST_BLOCK
+    private readonly earliestBlock = EARLIEST_BLOCK,
+    private readonly blocksLimit = Infinity
   ) {
     this.logger = logger.for(this)
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
+  }
+
+  private isBlockBeforeLimit(blockNumber: number) {
+    return blockNumber - this.earliestBlock + 1 <= this.blocksLimit
+  }
+
+  private onNewBlock(block: BlockRecord) {
+    const blockNumber = block.number
+    if (!this.isBlockBeforeLimit(blockNumber)) {
+      this.logger.info(
+        'Skipping new block - it is outside of the acceptable limit',
+        {
+          blockNumber,
+          earliestBlock: this.earliestBlock,
+          blocksLimit: this.blocksLimit,
+        }
+      )
+      return
+    }
+    this.dispatch({ type: 'newBlockFound', block })
+  }
+
+  private onReorg(blocks: BlockRecord[]) {
+    const blockNumber = blocks[blocks.length - 1].number
+    if (!this.isBlockBeforeLimit(blockNumber)) {
+      this.logger.info(
+        'Skipping reorg - last block is outside of the acceptable limit',
+        {
+          blockNumber,
+          earliestBlock: this.earliestBlock,
+          blocksLimit: this.blocksLimit,
+        }
+      )
+      return
+    }
+    this.dispatch({ type: 'reorgOccurred', blocks })
   }
 
   async start() {
@@ -38,13 +76,9 @@ export class SyncScheduler {
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)
     this.dispatch({ type: 'initialized', lastSynced, knownBlocks })
 
-    this.blockDownloader.onNewBlock((block) =>
-      this.dispatch({ type: 'newBlockFound', block })
-    )
+    this.blockDownloader.onNewBlock(this.onNewBlock)
 
-    this.blockDownloader.onReorg((blocks) =>
-      this.dispatch({ type: 'reorgOccurred', blocks })
-    )
+    this.blockDownloader.onReorg(this.onReorg)
 
     this.logger.info('start', { lastSynced })
   }

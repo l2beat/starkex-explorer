@@ -55,3 +55,4 @@ You can configure the behavior of the app with the following environment variabl
 - `TEST_DB_URL` - Database url used in `yarn test`
 - `LOG_LEVEL` - Integer specifying the log level (`0 | 1 | 2 | 3`). See `src/tools/Logger.ts`
 - `PORT` - The port on which the application exposes the api
+- `BLOCKS_LIMIT` - Integer specifying the number of blocks acceptable to store (used in environments with limited database space e.g. heroku review apps)

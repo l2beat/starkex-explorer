@@ -15,4 +15,5 @@ export interface Config {
     syncBatchSize: number
   }
   freshStart: boolean
+  blocksLimit?: number
 }
