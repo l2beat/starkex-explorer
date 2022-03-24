@@ -14,19 +14,27 @@ import {
 /** block of the first verifier deploy */
 const EARLIEST_BLOCK = 11813207
 
+type SyncSchedulerOptions = {
+  earliestBlock?: number
+  maxBlockNumber?: number
+}
+
 export class SyncScheduler {
   private state: SyncState = INITIAL_SYNC_STATE
   private jobQueue: JobQueue
+  private earliestBlock: number
+  private maxBlockNumber: number
 
   constructor(
     private readonly syncStatusRepository: SyncStatusRepository,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
-    private readonly earliestBlock = EARLIEST_BLOCK,
-    private readonly maxBlockNumber = Infinity
+    opts: SyncSchedulerOptions = {},
   ) {
     this.logger = logger.for(this)
+    this.earliestBlock = opts.earliestBlock || EARLIEST_BLOCK
+    this.maxBlockNumber = opts.maxBlockNumber || Infinity
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
   }
 

@@ -35,7 +35,7 @@ describe(SyncScheduler.name, () => {
         blockDownloader,
         dataSyncService,
         Logger.SILENT,
-        1_000_000
+        { earliestBlock: 1_000_000 }
       )
 
       await syncScheduler.start()
@@ -63,7 +63,7 @@ describe(SyncScheduler.name, () => {
         blockDownloader,
         dataSyncService,
         Logger.SILENT,
-        1_000_000
+        { earliestBlock: 1_000_000 }
       )
 
       const dispatch = mockFn().returns(undefined)
@@ -249,8 +249,7 @@ describe(SyncScheduler.name, () => {
         mock<BlockDownloader>(),
         dataSyncService,
         Logger.SILENT,
-        1,
-        maxBlockNumber
+        { maxBlockNumber }
       )
 
       syncScheduler['handleSync'](
