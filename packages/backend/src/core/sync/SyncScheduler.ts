@@ -30,7 +30,7 @@ export class SyncScheduler {
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
-    opts: SyncSchedulerOptions = {},
+    opts: SyncSchedulerOptions = {}
   ) {
     this.logger = logger.for(this)
     this.earliestBlock = opts.earliestBlock || EARLIEST_BLOCK

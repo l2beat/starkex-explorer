@@ -237,9 +237,7 @@ describe(SyncScheduler.name, () => {
       const maxBlockNumber = 10
       const dataSyncService = mock<DataSyncService>({
         discardAfter: async () => {},
-        sync: async () => {
-          console.log('called!')
-        },
+        sync: async () => {},
       })
       const syncStatusRepository = mock<SyncStatusRepository>({
         setLastSynced: async () => {},
