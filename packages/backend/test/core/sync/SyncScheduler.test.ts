@@ -230,30 +230,48 @@ describe(SyncScheduler.name, () => {
       // allow the jobQueue to finish
       dataSyncService.discardAfter.resolvesTo(undefined)
     })
+  })
 
-    it('gets triggered only for block inside the acceptable limit', async () => {
-      const maxBlockNumber = 2
+  describe(SyncScheduler.prototype['handleSync'].name, () => {
+    it('triggers data sync only if block range is inside the limit', async () => {
+      const maxBlockNumber = 10
+      const dataSyncService = mock<DataSyncService>({
+        discardAfter: async () => {},
+        sync: async () => {
+          console.log('called!')
+        },
+      })
+      const syncStatusRepository = mock<SyncStatusRepository>({
+        setLastSynced: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
-        mock<SyncStatusRepository>(),
+        syncStatusRepository,
         mock<BlockDownloader>(),
-        mock<DataSyncService>(),
+        dataSyncService,
         Logger.SILENT,
         1,
         maxBlockNumber
       )
 
-      const dispatch = mockFn().returns(undefined)
-      syncScheduler['dispatch'] = dispatch
+      syncScheduler['handleSync'](
+        new BlockRange([block(maxBlockNumber - 2), block(maxBlockNumber - 1)])
+      )
 
-      syncScheduler['handleNewBlock'](block(maxBlockNumber))
-      syncScheduler['handleReorg']([block(maxBlockNumber)])
+      await waitForExpect(() => {
+        expect(dataSyncService.discardAfter.calls.length).toEqual(1)
+        expect(dataSyncService.sync.calls.length).toEqual(1)
+        expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
+      })
 
-      expect(dispatch.calls.length).toEqual(2)
+      syncScheduler['handleSync'](
+        new BlockRange([block(maxBlockNumber), block(maxBlockNumber + 1)])
+      )
 
-      syncScheduler['handleNewBlock'](block(maxBlockNumber + 1))
-      syncScheduler['handleReorg']([block(maxBlockNumber + 1)])
-
-      expect(dispatch.calls.length).toEqual(2)
+      await waitForExpect(() => {
+        expect(dataSyncService.discardAfter.calls.length).toEqual(1)
+        expect(dataSyncService.sync.calls.length).toEqual(1)
+        expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
+      })
     })
   })
 })

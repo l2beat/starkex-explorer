@@ -1,5 +1,4 @@
 import { BlockRange } from '../../model'
-import { BlockRecord } from '../../peripherals/database/BlockRepository'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
@@ -31,42 +30,6 @@ export class SyncScheduler {
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
   }
 
-  private isBlockBeforeLimit(blockNumber: number) {
-    return blockNumber <= this.maxBlockNumber
-  }
-
-  private handleNewBlock(block: BlockRecord) {
-    const blockNumber = block.number
-    if (!this.isBlockBeforeLimit(blockNumber)) {
-      this.logger.info(
-        'Skipping new block - it is outside of the acceptable limit',
-        {
-          blockNumber,
-          earliestBlock: this.earliestBlock,
-          blocksLimit: this.maxBlockNumber,
-        }
-      )
-      return
-    }
-    this.dispatch({ type: 'newBlockFound', block })
-  }
-
-  private handleReorg(blocks: BlockRecord[]) {
-    const blockNumber = blocks[blocks.length - 1].number
-    if (!this.isBlockBeforeLimit(blockNumber)) {
-      this.logger.info(
-        'Skipping reorg - last block is outside of the acceptable limit',
-        {
-          blockNumber,
-          earliestBlock: this.earliestBlock,
-          blocksLimit: this.maxBlockNumber,
-        }
-      )
-      return
-    }
-    this.dispatch({ type: 'reorgOccurred', blocks })
-  }
-
   async start() {
     const lastSynced =
       (await this.syncStatusRepository.getLastSynced()) ?? this.earliestBlock
@@ -76,9 +39,13 @@ export class SyncScheduler {
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)
     this.dispatch({ type: 'initialized', lastSynced, knownBlocks })
 
-    this.blockDownloader.onNewBlock((block) => this.handleNewBlock(block))
+    this.blockDownloader.onNewBlock((block) =>
+      this.dispatch({ type: 'newBlockFound', block })
+    )
 
-    this.blockDownloader.onReorg((blocks) => this.handleReorg(blocks))
+    this.blockDownloader.onReorg((blocks) =>
+      this.dispatch({ type: 'reorgOccurred', blocks })
+    )
 
     this.logger.info('start', { lastSynced })
   }
@@ -106,6 +73,20 @@ export class SyncScheduler {
   }
 
   private async handleSync(blocks: BlockRange) {
+    if (blocks.end > this.maxBlockNumber) {
+      this.logger.info(
+        'Skipping data sync - the end of block range is after the max acceptable block number',
+        {
+          blockStart: blocks.start,
+          blockEnd: blocks.end,
+          maxBlockNumber: this.maxBlockNumber,
+        }
+      )
+      // Returning here means no 'syncSucceeded' event will get dispatched
+      // This means that syncSchedulerReducer will never return blocks to sync anymore
+      // Used to limit the amount of data getting stored in the database if required (e.g. Heroku Review Apps)
+      return
+    }
     try {
       await this.dataSyncService.discardAfter(blocks.start - 1)
       await this.dataSyncService.sync(blocks)
