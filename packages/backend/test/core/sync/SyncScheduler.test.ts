@@ -232,26 +232,26 @@ describe(SyncScheduler.name, () => {
     })
 
     it('gets triggered only for block inside the acceptable limit', async () => {
-      const earliestBlockNumber = 1_000_000
+      const maxBlockNumber = 2
       const syncScheduler = new SyncScheduler(
         mock<SyncStatusRepository>(),
         mock<BlockDownloader>(),
         mock<DataSyncService>(),
         Logger.SILENT,
-        earliestBlockNumber,
-        2
+        1,
+        maxBlockNumber
       )
 
       const dispatch = mockFn().returns(undefined)
       syncScheduler['dispatch'] = dispatch
 
-      syncScheduler['handleNewBlock'](block(earliestBlockNumber + 1))
-      syncScheduler['handleReorg']([block(earliestBlockNumber + 1)])
+      syncScheduler['handleNewBlock'](block(maxBlockNumber))
+      syncScheduler['handleReorg']([block(maxBlockNumber)])
 
       expect(dispatch.calls.length).toEqual(2)
 
-      syncScheduler['handleNewBlock'](block(earliestBlockNumber + 2))
-      syncScheduler['handleReorg']([block(earliestBlockNumber + 2)])
+      syncScheduler['handleNewBlock'](block(maxBlockNumber + 1))
+      syncScheduler['handleReorg']([block(maxBlockNumber + 1)])
 
       expect(dispatch.calls.length).toEqual(2)
     })

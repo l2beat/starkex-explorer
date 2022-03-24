@@ -103,7 +103,7 @@ export class Application {
       dataSyncService,
       logger,
       undefined,
-      config.blocksLimit
+      config.maxBlockNumber
     )
 
     // #endregion core

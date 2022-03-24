@@ -25,14 +25,14 @@ export class SyncScheduler {
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
     private readonly earliestBlock = EARLIEST_BLOCK,
-    private readonly blocksLimit = Infinity
+    private readonly maxBlockNumber = Infinity
   ) {
     this.logger = logger.for(this)
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
   }
 
   private isBlockBeforeLimit(blockNumber: number) {
-    return blockNumber - this.earliestBlock + 1 <= this.blocksLimit
+    return blockNumber <= this.maxBlockNumber
   }
 
   private handleNewBlock(block: BlockRecord) {
@@ -43,7 +43,7 @@ export class SyncScheduler {
         {
           blockNumber,
           earliestBlock: this.earliestBlock,
-          blocksLimit: this.blocksLimit,
+          blocksLimit: this.maxBlockNumber,
         }
       )
       return
@@ -59,7 +59,7 @@ export class SyncScheduler {
         {
           blockNumber,
           earliestBlock: this.earliestBlock,
-          blocksLimit: this.blocksLimit,
+          blocksLimit: this.maxBlockNumber,
         }
       )
       return

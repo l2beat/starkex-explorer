@@ -19,6 +19,6 @@ export function getLocalConfig(): Config {
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
     },
     freshStart: getEnv.boolean('FRESH_START', false),
-    blocksLimit: getEnv.integer('BLOCKS_LIMIT', Infinity),
+    maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
   }
 }
