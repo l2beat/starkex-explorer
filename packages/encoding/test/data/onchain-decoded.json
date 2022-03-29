@@ -1,6 +1,6 @@
 {
   "configurationHash": "0x00b763230e8b7409f7a22c099d0159583b77cf79805449042082598e0acd6d97",
-  "assetDataHashes": [
+  "assetConfigHashes": [
     {
       "assetId": "1INCH-7",
       "hash": "0x06d50d2c9b4ba8477d0a6189efd223e0a7bc8903e5e5502c2596bfd037d5cf1a"
@@ -138,6 +138,287 @@
     ],
     "systemTime": 1621958831000
   },
+  "minimumExpirationTimestamp": 450705,
+  "modifications": [
+    {
+      "publicKey": "0x07d23fc8b99ad9f91cf4d7e94063d218f39429425a294fa10795941926a8423b",
+      "positionId": 25127,
+      "difference": 5000000000
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -342840200
+    },
+    {
+      "publicKey": "0x0163b743f992ce93ebf3a9e134531f4607e3b5218161752ce457d68211f7a347",
+      "positionId": 9411,
+      "difference": 1000000000
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -3009850000
+    },
+    {
+      "publicKey": "0x04113eecc2cfd9420ad8ad4c4a592dfc6f72847642efd0a7cd5ce14bd6551129",
+      "positionId": 14414,
+      "difference": 688794810
+    },
+    {
+      "publicKey": "0x04a1e296d63b097af6dd08be241b388a7c75b555242269465f926bfbd0fa3f91",
+      "positionId": 5742,
+      "difference": 107861560
+    },
+    {
+      "publicKey": "0x0408900d5f64028c87d052c60094bd2d9a22719e6ead497e226293b275c63d41",
+      "positionId": 24508,
+      "difference": 51021800000
+    },
+    {
+      "publicKey": "0x06cf848b132064cbed17573fb8ddac00ec3c0642b2e1233378366be9876a1a89",
+      "positionId": 24353,
+      "difference": 99000000
+    },
+    {
+      "publicKey": "0x00bab631faeb4dd1cada26d4ceb0210763ac2009b7d6f2d9338fa05c2efcc988",
+      "positionId": 10274,
+      "difference": 500000000
+    },
+    {
+      "publicKey": "0x0152c03a36b4ef9d254ee8a26458ea664866675e0f8b7235f77ef4e9596c3e25",
+      "positionId": 19313,
+      "difference": -69203901
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -15598297752
+    },
+    {
+      "publicKey": "0x05e2e43e6ccc74564bf48d52ff444943fc70ee129a5b810b85864f9a813d0178",
+      "positionId": 3876,
+      "difference": 1000000001
+    },
+    {
+      "publicKey": "0x03803dc788fb675445493c5eb1cbca7f2f050363714c65ad565b6ea5dcf36142",
+      "positionId": 22787,
+      "difference": 500000000
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -101000000
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -528665100
+    },
+    {
+      "publicKey": "0x02b46502fb224491c5f45015f1d9b9e4a1e347c5dec746028c72285623cb5ead",
+      "positionId": 25139,
+      "difference": 11000000
+    },
+    {
+      "publicKey": "0x065097c4060f8f7f076df9c70138554b2e005762488d0127425ce6701be6b23e",
+      "positionId": 1908,
+      "difference": 91930000
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -550858608
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -591651492
+    },
+    {
+      "publicKey": "0x018e04abab3e3d7518504acba6ec4ddf6394529574fbf2f272d949e02d6c8303",
+      "positionId": 12616,
+      "difference": 9851776572
+    },
+    {
+      "publicKey": "0x0326893b4e5b3c085afaa8875cc4d336d47f3a7c470adf0c011c85a33fbdd33e",
+      "positionId": 25053,
+      "difference": 532484659
+    },
+    {
+      "publicKey": "0x027a59fae35998c2ade77f1a4ae3be385e7e059f78c49c1ad29372cb8e9be4ca",
+      "positionId": 11822,
+      "difference": 934277693
+    },
+    {
+      "publicKey": "0x02b49a5240bcefee78534240592113f9e2992b2aaae825105d68f7db79bc0399",
+      "positionId": 10973,
+      "difference": -99829916
+    },
+    {
+      "publicKey": "0x0140fff4c4e6686b6fb45038317dc3c418a5c42aa0473b1fdc30ac56a25eb845",
+      "positionId": 25142,
+      "difference": 519635100
+    },
+    {
+      "publicKey": "0x014c094510b82e3c5cb970a087b8bfd5249a8b369bf5fb6449dd371722463d78",
+      "positionId": 18774,
+      "difference": -50000000
+    },
+    {
+      "publicKey": "0x03c74fb0ea4023e90deabb25306cc15800abfd9be1d320c3171b76d73a4ccc6f",
+      "positionId": 25145,
+      "difference": 541398608
+    },
+    {
+      "publicKey": "0x0313f8860f3fd4eaceb211b4e5e4d06bd9c9c5d15e1c71aae7d44910b35b026a",
+      "positionId": 25013,
+      "difference": 1000000000
+    },
+    {
+      "publicKey": "0x07b7e3ba4d966466c0d2cd95d91ac0903729bea69fdd62e6d5151aa5ed996fbe",
+      "positionId": 15201,
+      "difference": 1039199543
+    },
+    {
+      "publicKey": "0x01f787cbd19add025f408f296a238b078daadd88e2c7fa893fe913c1eb381c44",
+      "positionId": 25150,
+      "difference": 582211492
+    },
+    {
+      "publicKey": "0x00c7b6c6b61f08468dcfe44f52d77c67b598334daa69887262d5eab4ad96f103",
+      "positionId": 25140,
+      "difference": 1000704890
+    },
+    {
+      "publicKey": "0x05fd3e5d0c6e04f2d04c002e8cca0266e8d4bc6c04ec8b40663c3cf81dee44fa",
+      "positionId": 25149,
+      "difference": 31000000
+    },
+    {
+      "publicKey": "0x010c41e98d3f5435bc115d20dc66d1a56fecec0a906c341b5f2646ebe7d8b028",
+      "positionId": 25147,
+      "difference": 1007368803
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -1407681345
+    },
+    {
+      "publicKey": "0x041513ddb0a7cfb3f5dc68f83dc14413ddd34859b83ed28ee9178d0acc95a8a9",
+      "positionId": 14651,
+      "difference": 760643077
+    },
+    {
+      "publicKey": "0x07ab6ab2f57ff0ec7075c22edbf9372e34ecf0631b26d20592e4a255a7cda4cb",
+      "positionId": 25152,
+      "difference": 10100000
+    },
+    {
+      "publicKey": "0x02f10df65c7a60ed7bf42a9cd3e752253467a0c53f65fab3f18c5f9798c3c1d4",
+      "positionId": 25153,
+      "difference": 11000000
+    },
+    {
+      "publicKey": "0x034e16b7d7648aedee19c92c10986a66909076d288f25a69cb073c50ca0ad7a2",
+      "positionId": 25154,
+      "difference": 11000000
+    },
+    {
+      "publicKey": "0x070c4c948f0503e10f9fda408205d559750900b9e3bde503db7936723d8f5b2a",
+      "positionId": 25155,
+      "difference": 11000000
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -983783553
+    },
+    {
+      "publicKey": "0x027a59fae35998c2ade77f1a4ae3be385e7e059f78c49c1ad29372cb8e9be4ca",
+      "positionId": 11822,
+      "difference": 2507471896
+    },
+    {
+      "publicKey": "0x01a7188ad287c95654cd00e72e266135bc764e5bb3c5fa57a1bb1f4577c2e82d",
+      "positionId": 24462,
+      "difference": 600000000
+    },
+    {
+      "publicKey": "0x065ee8d72fec609b3d6e8e06b42e84d556b8b8838d739d58d43297335a88c12a",
+      "positionId": 25148,
+      "difference": 11000000
+    },
+    {
+      "publicKey": "0x057aaaf947b4fa9acc68c724e1228a3ccf39cb59c28b28e251030cb71ac0d35e",
+      "positionId": 24521,
+      "difference": 18686227796
+    },
+    {
+      "publicKey": "0x00a27ac8eed34108552d51a2065d58c4f27982e37b64cb004073847deb6d84bd",
+      "positionId": 9479,
+      "difference": 823406424
+    },
+    {
+      "publicKey": "0x020ce2e0a138d6ba48b7d4a22ee0b0913501de38795c187408372e54ec86199a",
+      "positionId": 2,
+      "difference": -5515170000
+    },
+    {
+      "publicKey": "0x0233b017f5bedcc36650b7751bcca7537b872c2268f83e29417faaa8eb74cfce",
+      "positionId": 6224,
+      "difference": 4000000000
+    },
+    {
+      "publicKey": "0x04feba6d2929599cd88e8c3572f5bc0f16beaa378d8906f0676004a0e3ab09f2",
+      "positionId": 24823,
+      "difference": -419083795512
+    },
+    {
+      "publicKey": "0x06e320d3ae79921d2ceec1fed6dcfeb0722609efa6553c04671a765a9ee194b5",
+      "positionId": 17263,
+      "difference": 128296480
+    },
+    {
+      "publicKey": "0x01bc56f6746a1734ddac3d63b0dd4704fc02068c5da621554ad673d7608694f4",
+      "positionId": 13544,
+      "difference": 1161691273
+    },
+    {
+      "publicKey": "0x04d0c2957679e7fcbe7b53a2bb83638ff29b8db5cac6763c22812ce0b2192711",
+      "positionId": 10659,
+      "difference": 100000000
+    },
+    {
+      "publicKey": "0x05dd792e2bbf368cc5720e97931ceff93c235b9ef8ec6135a40096f5b246de77",
+      "positionId": 23731,
+      "difference": 50000000000
+    },
+    {
+      "publicKey": "0x02d328df9493287ba678ba9a798725cbcff719a0f36ae45072180f0545ebe670",
+      "positionId": 25181,
+      "difference": 116270792
+    },
+    {
+      "publicKey": "0x03c9719daad2a617b6aa772f74c6f863f23767d90cdc7e99715d0bc2911150e7",
+      "positionId": 17634,
+      "difference": -93991219
+    }
+  ],
+  "forcedActions": [],
+  "conditions": [
+    "0x00e93195fcad133eb7e2adcac515e5c0d9d8adb41e6ab8bc1a77c5868c73924b",
+    "0x0119b47f77b549a1ddd4f9c1afec2deda5f1f7893a77599235457f6f3b05f903",
+    "0x01395922721f5fd40de0e1bdcfc70864c424fcf15704f6e9c7c1fe70dba0624f",
+    "0x03e6c29c633c8067f9d6d1f3d758c3f4fa224486f26ddbe2c1b5ab58ab06d439",
+    "0x037b530fce7c4d363275e73af7aba2f513e144cdc206185144cbc13e5751d355",
+    "0x030c7e83e213f7c4eee348b6cad8be18b55184c874c83d6c3ebf18f0ceeaf9ed",
+    "0x011cc41741402b1ace74e6486c411bfe64aca0ac146f88ac42988e9ff836541e",
+    "0x01c08ee6cd3eabc111a2f12a9c1a65a563ab58f52a640ce8e7d94cba3d8685b8",
+    "0x010ab7d2a831609be8d2e5d79a6550316bff3d226f59fc13d299f199078c0cb9",
+    "0x0004a26d2b5c05145dc64d58a1aebf3076000af644545647618d6003e8df510c"
+  ],
   "funding": [
     {
       "indices": [
