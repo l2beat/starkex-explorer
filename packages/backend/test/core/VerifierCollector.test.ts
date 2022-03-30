@@ -159,16 +159,18 @@ describe(VerifierCollector.name, () => {
       hardcodedAddresses
     )
 
-    const addresses = await collector.collect(new BlockRange([
-      {
-        number: 1,
-        hash: Hash256.fake('123'),
-      },
-      {
-        number: 2,
-        hash: Hash256.fake('456'),
-      },
-    ]))
+    const addresses = await collector.collect(
+      new BlockRange([
+        {
+          number: 1,
+          hash: Hash256.fake('123'),
+        },
+        {
+          number: 2,
+          hash: Hash256.fake('456'),
+        },
+      ])
+    )
 
     expect(addresses).toEqual(hardcodedAddresses)
   })
