@@ -66,27 +66,34 @@ export class RollupState {
           )
         }
         const updatedAssets = new Set(update.balances.map((x) => x.assetId))
+
         const assets = oldPosition.assets.filter(
           (x) => !updatedAssets.has(x.assetId)
         )
+
         for (const updated of update.balances) {
           if (updated.balance === 0n) {
             continue
           }
-          const fundingIndex = funding.get(updated.assetId)
-          if (fundingIndex === undefined) {
-            throw new Error(`Missing funding for asset: ${updated.assetId}!`)
-          }
           assets.push({
             assetId: updated.assetId,
             balance: updated.balance,
-            fundingIndex: fundingIndex,
+            fundingIndex: 0n,
           })
         }
+
+        const newPositionAssets = assets.map((x) => {
+          const fundingIndex = funding.get(x.assetId)
+          if (fundingIndex === undefined) {
+            throw new Error(`Missing funding for asset: ${x.assetId}!`)
+          }
+          return { ...x, fundingIndex }
+        })
+
         const newPosition = new Position(
           update.publicKey,
           update.collateralBalance,
-          assets
+          newPositionAssets
         )
         return { index: update.positionId, value: newPosition }
       }
