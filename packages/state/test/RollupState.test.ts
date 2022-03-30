@@ -297,7 +297,7 @@ describe(RollupState.name, () => {
         publicKey: `0x${'0'.repeat(63)}5`,
         collateralBalance: 555n,
         assets: [
-          { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 1n },
+          { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 2n },
           { assetId: AssetId('UNI-9'), balance: 20n, fundingIndex: 22n },
           { assetId: AssetId('MKR-9'), balance: 30n, fundingIndex: -22n },
         ],
