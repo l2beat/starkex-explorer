@@ -80,6 +80,19 @@ describe(StateUpdateCollector.name, () => {
   })
 
   describe(StateUpdateCollector.prototype.save.name, () => {
+    it('throws if state transition facts are missing in database', async () => {
+      const pageRepository = mock<PageRepository>({
+        getAllForFacts: async () => [],
+      })
+      const stateUpdateCollector = new StateUpdateCollector(
+        pageRepository,
+        mock<StateUpdateRepository>(),
+        mock<RollupStateRepository>(),
+        mock<EthereumClient>()
+      )
+      expect(stateUpdateCollector.save([{ id: 1, hash: Hash256.fake('a'), blockNumber: 1 }])).toBeRejected('Missing state transition facts in database')
+    })
+
     it('calls processStateTransition for every update', async () => {
       const pageRepository = mock<PageRepository>({
         getAllForFacts: async () => [
