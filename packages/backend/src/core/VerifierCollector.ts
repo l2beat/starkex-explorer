@@ -32,7 +32,7 @@ export class VerifierCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly verifierEventRepository: VerifierEventRepository,
-    private readonly hardcodedAddresses: EthereumAddress[] = []
+    private readonly hardcodedAddresses: EthereumAddress[] = HARDCODED_VERIFIERS
   ) {}
 
   /**

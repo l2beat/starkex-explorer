@@ -12,10 +12,7 @@ import { StateUpdateCollector } from './core/StateUpdateCollector'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
-import {
-  HARDCODED_VERIFIERS,
-  VerifierCollector,
-} from './core/VerifierCollector'
+import { VerifierCollector } from './core/VerifierCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
@@ -74,8 +71,7 @@ export class Application {
 
     const verifierCollector = new VerifierCollector(
       ethereumClient,
-      verifierEventRepository,
-      HARDCODED_VERIFIERS
+      verifierEventRepository
     )
     const memoryHashEventCollector = new MemoryHashEventCollector(
       ethereumClient,
