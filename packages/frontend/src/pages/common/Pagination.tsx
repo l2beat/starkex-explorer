@@ -19,7 +19,7 @@ export function Pagination({
   const first = 1
   const prev = Number(page) - 1
   const next = Number(page) + 1
-  const last = Math.floor(fullCount / perPage) || 1
+  const last = Math.ceil(fullCount / perPage)
 
   const link = (page: number, perPage: number) => {
     const hasQuestionMark = baseUrl.indexOf('?') !== -1
@@ -41,7 +41,7 @@ export function Pagination({
           href={link(prev, perPage)}
           className={cx(
             'bg-grey-300 px-3 py-2 rounded-md',
-            prev < 1 && 'pointer-events-none bg-grey-400 cursor-not-allowed'
+            prev < first && 'pointer-events-none bg-grey-400 cursor-not-allowed'
           )}
         >
           <PrevIcon width={8} height={12} />
