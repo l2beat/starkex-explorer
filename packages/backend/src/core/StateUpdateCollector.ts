@@ -77,8 +77,6 @@ export class StateUpdateCollector {
 
     const rootHash = await rollupState.positions.hash()
     if (rootHash !== PedersenHash(decoded.newState.positionRoot)) {
-      // this means we are doing calculations incorrectly
-      // it should never happen, but if it does we bette know about it
       throw new Error('State transition calculated incorrectly')
     }
     await this.stateUpdateRepository.add({
