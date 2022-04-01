@@ -5,6 +5,7 @@ import { MemoryHashEventCollector } from './MemoryHashEventCollector'
 import { PageCollector } from './PageCollector'
 import { StateTransitionFactCollector } from './StateTransitionFactCollector'
 import { StateUpdateCollector } from './StateUpdateCollector'
+import { UserRegistrationCollector } from './UserRegistrationCollector'
 import { VerifierCollector } from './VerifierCollector'
 
 export class DataSyncService {
@@ -14,6 +15,7 @@ export class DataSyncService {
     private readonly pageCollector: PageCollector,
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
     private readonly stateUpdateCollector: StateUpdateCollector,
+    private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -28,6 +30,9 @@ export class DataSyncService {
     const pageRecords = await this.pageCollector.collect(blockRange)
     const stateTransitionFacts =
       await this.stateTransitionFactCollector.collect(blockRange)
+    const userRegistrationEvents = await this.userRegistrationCollector.collect(
+      blockRange
+    )
 
     this.logger.info({
       method: 'sync',
@@ -36,6 +41,7 @@ export class DataSyncService {
       newHashEventsCount: hashEvents.length,
       newPageRecords: pageRecords.length,
       newStateTransitionFacts: stateTransitionFacts.length,
+      userRegistrationEvents: userRegistrationEvents.length,
     })
 
     await this.stateUpdateCollector.save(stateTransitionFacts)
@@ -47,5 +53,6 @@ export class DataSyncService {
     await this.pageCollector.discardAfter(blockNumber)
     await this.stateTransitionFactCollector.discardAfter(blockNumber)
     await this.stateUpdateCollector.discardAfter(blockNumber)
+    await this.userRegistrationCollector.discardAfter(blockNumber)
   }
 }

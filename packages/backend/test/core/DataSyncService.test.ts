@@ -6,6 +6,7 @@ import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCol
 import type { PageCollector } from '../../src/core/PageCollector'
 import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
 import { StateUpdateCollector } from '../../src/core/StateUpdateCollector'
+import { UserRegistrationCollector } from '../../src/core/UserRegistrationCollector'
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
 import { BlockRange } from '../../src/model'
 import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
@@ -36,6 +37,10 @@ describe(DataSyncService.name, () => {
     const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
       collect: async (_blockRange) => transitionFacts,
     })
+
+    const userRegistrationCollector = mock<UserRegistrationCollector>({
+      collect: async () => [],
+    })
     const stateUpdateCollector = mock<StateUpdateCollector>({
       save: noop,
     })
@@ -46,6 +51,7 @@ describe(DataSyncService.name, () => {
       pageCollector,
       stateTransitionFactCollector,
       stateUpdateCollector,
+      userRegistrationCollector,
       Logger.SILENT
     )
 
@@ -79,6 +85,9 @@ describe(DataSyncService.name, () => {
       const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
         discardAfter: noop,
       })
+      const userRegistrationCollector = mock<UserRegistrationCollector>({
+        discardAfter: noop,
+      })
       const stateUpdateCollector = mock<StateUpdateCollector>({
         discardAfter: noop,
       })
@@ -89,6 +98,7 @@ describe(DataSyncService.name, () => {
         pageCollector,
         stateTransitionFactCollector,
         stateUpdateCollector,
+        userRegistrationCollector,
         Logger.SILENT
       )
 

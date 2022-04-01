@@ -12,6 +12,7 @@ import { StateUpdateCollector } from './core/StateUpdateCollector'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
+import { UserRegistrationCollector } from './core/UserRegistrationCollector'
 import { VerifierCollector } from './core/VerifierCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { DatabaseService } from './peripherals/database/DatabaseService'
@@ -22,6 +23,7 @@ import { RollupStateRepository } from './peripherals/database/RollupStateReposit
 import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
+import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { Logger } from './tools/Logger'
@@ -52,6 +54,10 @@ export class Application {
     const blockRepository = new BlockRepository(knex, logger)
     const rollupStateRepository = new RollupStateRepository(knex, logger)
     const stateUpdateRepository = new StateUpdateRepository(knex, logger)
+    const userRegistrationEventRepository = new UserRegistrationEventRepository(
+      knex,
+      logger
+    )
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
@@ -88,6 +94,10 @@ export class Application {
       rollupStateRepository,
       ethereumClient
     )
+    const userRegistrationCollector = new UserRegistrationCollector(
+      ethereumClient,
+      userRegistrationEventRepository
+    )
 
     const dataSyncService = new DataSyncService(
       verifierCollector,
@@ -95,6 +105,7 @@ export class Application {
       pageCollector,
       stateTransitionFactCollector,
       stateUpdateCollector,
+      userRegistrationCollector,
       logger
     )
     const syncScheduler = new SyncScheduler(
