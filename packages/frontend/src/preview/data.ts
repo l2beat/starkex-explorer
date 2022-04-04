@@ -47,6 +47,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   positionId: 123n,
   publicKey: `0x${'0'.repeat(63)}1`,
+  ethAddress: '0x1234567890ABCDEF1234567890ABCDEF12345678',
   lastUpdateTimestamp: Date.now(),
   stateUpdateId: 1,
   assets: [
