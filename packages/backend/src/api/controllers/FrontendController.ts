@@ -12,6 +12,7 @@ import { AssetId } from '@explorer/types'
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 
 const buildViewAssets = (
   balances: readonly AssetBalance[],
@@ -59,7 +60,10 @@ type ControllerResult = {
 }
 
 export class FrontendController {
-  constructor(private stateUpdateRepository: StateUpdateRepository) {}
+  constructor(
+    private stateUpdateRepository: StateUpdateRepository,
+    private userRegistrationEventRepository: UserRegistrationEventRepository
+  ) {}
 
   async getHomePage(): Promise<string> {
     const [stateUpdates, totalUpdates, totalPositions] = await Promise.all([
@@ -202,11 +206,17 @@ export class FrontendController {
 
     const current = historyWithAssets[0]
 
+    const lastUserRegistrationEvent =
+      await this.userRegistrationEventRepository.findByStarkKey(
+        current.publicKey
+      )
+
     return {
       status: 200,
       html: renderPositionDetailsPage({
         positionId,
         publicKey: current.publicKey,
+        ethAddress: lastUserRegistrationEvent?.ethAddress,
         stateUpdateId: current.stateUpdateId,
         lastUpdateTimestamp: current.timestamp,
         assets: current.assets,

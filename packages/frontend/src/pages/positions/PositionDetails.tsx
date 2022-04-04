@@ -85,7 +85,7 @@ export function PositionDetails({
         rows={[
           {
             title: 'Owner ETH address',
-            content: ethAddress,
+            content: ethAddress || '-',
           },
           {
             title: 'Owner stark key',
