@@ -26,28 +26,24 @@ export class MemoryHashEventCollector {
     verifierAddresses: EthereumAddress[]
   ): Promise<MemoryHashEvent[]> {
     const events = await Promise.all(
-      verifierAddresses.map(async (verifierAddress) => {
-        const hashEvents = await this.getMemoryHashEvents(
-          blockRange,
-          verifierAddress
-        )
+      verifierAddresses.map((verifierAddress) =>
+        this.getMemoryHashEvents(blockRange, verifierAddress)
+      )
+    )
+    const hashEvents = events.flat()
 
-        await this.factToPageRepository.add(
-          hashEvents.flatMap((event) =>
-            event.pagesHashes.map((pageHash, index) => ({
-              index,
-              pageHash: pageHash,
-              factHash: event.factHash,
-              blockNumber: event.blockNumber,
-            }))
-          )
-        )
-
-        return hashEvents
-      })
+    await this.factToPageRepository.add(
+      hashEvents.flatMap((event) =>
+        event.pagesHashes.map((pageHash, index) => ({
+          index,
+          pageHash: pageHash,
+          factHash: event.factHash,
+          blockNumber: event.blockNumber,
+        }))
+      )
     )
 
-    return events.flat(1)
+    return hashEvents
   }
 
   async discardAfter(lastToKeep: BlockNumber) {

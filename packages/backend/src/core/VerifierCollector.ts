@@ -23,10 +23,16 @@ const PROXY_ABI = new utils.Interface([
 const Upgraded = PROXY_ABI.getEventTopic('Upgraded')
 const ImplementationAdded = PROXY_ABI.getEventTopic('ImplementationAdded')
 
+const HARDCODED_VERIFIERS = [
+  EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84'),
+  EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
+]
+
 export class VerifierCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly verifierEventRepository: VerifierEventRepository
+    private readonly verifierEventRepository: VerifierEventRepository,
+    private readonly hardcodedAddresses: EthereumAddress[] = HARDCODED_VERIFIERS
   ) {}
 
   /**
@@ -45,7 +51,11 @@ export class VerifierCollector {
 
     await savingNewEventsToDb
 
-    return computeVerifiersFromEvents(added, upgraded)
+    const computed = computeVerifiersFromEvents(added, upgraded)
+
+    return computed
+      .concat(this.hardcodedAddresses)
+      .filter((x, i, a) => a.indexOf(x) === i)
   }
 
   async discardAfter(lastToKeep: BlockNumber) {

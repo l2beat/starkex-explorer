@@ -1,4 +1,4 @@
-import { decodeOnChainData as _decodeOnChainData } from '@explorer/encoding'
+import { decodeOnChainData } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
@@ -27,14 +27,12 @@ interface StateTransition {
 }
 
 export class StateUpdateCollector {
-  private rollupState?: RollupState
-
   constructor(
     private readonly pageRepository: PageRepository,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly rollupStateRepository: RollupStateRepository,
     private readonly ethereumClient: EthereumClient,
-    private readonly decodeOnChainData = _decodeOnChainData
+    private rollupState?: RollupState
   ) {}
 
   async save(stateTransitionFacts: StateTransitionFactRecord[]) {
@@ -49,6 +47,9 @@ export class StateUpdateCollector {
       ...x,
       blockNumber: stateTransitionFacts[i].blockNumber,
     }))
+    if (dbTransitions.length !== stateTransitionFacts.length) {
+      throw new Error('Missing state transition facts in database')
+    }
 
     const { oldHash, id } = await this.readLastUpdate()
     await this.ensureRollupState(oldHash)
@@ -67,12 +68,15 @@ export class StateUpdateCollector {
     }
     const { timestamp } = await this.ethereumClient.getBlock(blockNumber)
 
-    const decoded = this.decodeOnChainData(pages)
+    const decoded = decodeOnChainData(pages)
 
     const [rollupState, newPositions] = await this.rollupState.update(decoded)
     this.rollupState = rollupState
 
     const rootHash = await rollupState.positions.hash()
+    if (rootHash !== PedersenHash(decoded.newState.positionRoot)) {
+      throw new Error('State transition calculated incorrectly')
+    }
     await this.stateUpdateRepository.add({
       stateUpdate: {
         id,
