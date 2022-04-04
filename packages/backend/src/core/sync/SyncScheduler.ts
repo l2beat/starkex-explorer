@@ -14,18 +14,27 @@ import {
 /** block of the first verifier deploy */
 const EARLIEST_BLOCK = 11813207
 
+interface SyncSchedulerOptions {
+  earliestBlock?: number
+  maxBlockNumber?: number
+}
+
 export class SyncScheduler {
   private state: SyncState = INITIAL_SYNC_STATE
   private jobQueue: JobQueue
+  private earliestBlock: number
+  private maxBlockNumber: number
 
   constructor(
     private readonly syncStatusRepository: SyncStatusRepository,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
-    private readonly earliestBlock = EARLIEST_BLOCK
+    opts: SyncSchedulerOptions = {}
   ) {
     this.logger = logger.for(this)
+    this.earliestBlock = opts.earliestBlock || EARLIEST_BLOCK
+    this.maxBlockNumber = opts.maxBlockNumber || Infinity
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
   }
 
@@ -72,6 +81,20 @@ export class SyncScheduler {
   }
 
   private async handleSync(blocks: BlockRange) {
+    if (blocks.end > this.maxBlockNumber) {
+      this.logger.info(
+        'Skipping data sync - the end of block range is after the max acceptable block number',
+        {
+          blockStart: blocks.start,
+          blockEnd: blocks.end,
+          maxBlockNumber: this.maxBlockNumber,
+        }
+      )
+      // Returning here means no 'syncSucceeded' event will get dispatched
+      // This means that syncSchedulerReducer will never return blocks to sync anymore
+      // Used to limit the amount of data getting stored in the database if required (e.g. Heroku Review Apps)
+      return
+    }
     try {
       await this.dataSyncService.discardAfter(blocks.start - 1)
       await this.dataSyncService.sync(blocks)

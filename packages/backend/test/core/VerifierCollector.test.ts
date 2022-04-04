@@ -147,6 +147,33 @@ describe(VerifierCollector.name, () => {
       'all logs must be from the block range'
     )
   })
+
+  it('includes hardcoded addresses in collected', async () => {
+    const hardcodedAddresses = [EthereumAddress.ZERO]
+    const collector = new VerifierCollector(
+      mock<EthereumClient>({ getLogsInRange: async () => [] }),
+      mock<VerifierEventRepository>({
+        add: async () => {},
+        getAll: async () => [],
+      }),
+      hardcodedAddresses
+    )
+
+    const addresses = await collector.collect(
+      new BlockRange([
+        {
+          number: 1,
+          hash: Hash256.fake('123'),
+        },
+        {
+          number: 2,
+          hash: Hash256.fake('456'),
+        },
+      ])
+    )
+
+    expect(addresses).toEqual(hardcodedAddresses)
+  })
 })
 
 function testData() {

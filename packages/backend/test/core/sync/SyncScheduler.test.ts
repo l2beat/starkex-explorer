@@ -35,7 +35,7 @@ describe(SyncScheduler.name, () => {
         blockDownloader,
         dataSyncService,
         Logger.SILENT,
-        1_000_000
+        { earliestBlock: 1_000_000 }
       )
 
       await syncScheduler.start()
@@ -63,7 +63,7 @@ describe(SyncScheduler.name, () => {
         blockDownloader,
         dataSyncService,
         Logger.SILENT,
-        1_000_000
+        { earliestBlock: 1_000_000 }
       )
 
       const dispatch = mockFn().returns(undefined)
@@ -229,6 +229,46 @@ describe(SyncScheduler.name, () => {
 
       // allow the jobQueue to finish
       dataSyncService.discardAfter.resolvesTo(undefined)
+    })
+  })
+
+  describe(SyncScheduler.prototype['handleSync'].name, () => {
+    it('triggers data sync only if block range is inside the limit', async () => {
+      const maxBlockNumber = 10
+      const dataSyncService = mock<DataSyncService>({
+        discardAfter: async () => {},
+        sync: async () => {},
+      })
+      const syncStatusRepository = mock<SyncStatusRepository>({
+        setLastSynced: async () => {},
+      })
+      const syncScheduler = new SyncScheduler(
+        syncStatusRepository,
+        mock<BlockDownloader>(),
+        dataSyncService,
+        Logger.SILENT,
+        { maxBlockNumber }
+      )
+
+      syncScheduler['handleSync'](
+        new BlockRange([block(maxBlockNumber - 2), block(maxBlockNumber - 1)])
+      )
+
+      await waitForExpect(() => {
+        expect(dataSyncService.discardAfter.calls.length).toEqual(1)
+        expect(dataSyncService.sync.calls.length).toEqual(1)
+        expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
+      })
+
+      syncScheduler['handleSync'](
+        new BlockRange([block(maxBlockNumber), block(maxBlockNumber + 1)])
+      )
+
+      await waitForExpect(() => {
+        expect(dataSyncService.discardAfter.calls.length).toEqual(1)
+        expect(dataSyncService.sync.calls.length).toEqual(1)
+        expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
+      })
     })
   })
 })

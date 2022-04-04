@@ -1,3 +1,4 @@
+export * from './InMemoryRollupStorage'
 export * from './MerkleNode'
 export * from './MerkleTree'
 export * from './MerkleValue'
