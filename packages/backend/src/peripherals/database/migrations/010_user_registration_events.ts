@@ -15,8 +15,8 @@ import { Knex } from 'knex'
 
 export async function up(knex: Knex) {
   await knex.schema.createTable('user_registration_events', (table) => {
-    table.increments('id').primary(),
-      table.integer('block_number').notNullable().index()
+    table.increments('id').primary()
+    table.integer('block_number').notNullable().index()
     table.string('eth_address').notNullable().index()
     table.string('stark_key').notNullable().index()
   })
