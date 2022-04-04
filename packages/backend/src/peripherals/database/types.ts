@@ -99,6 +99,13 @@ declare module 'knex/types/tables' {
     price: bigint
   }
 
+  interface UserRegistrationEventRow {
+    id: number
+    block_number: number
+    stark_key: string
+    eth_address: string
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
