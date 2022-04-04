@@ -216,7 +216,7 @@ export class FrontendController {
       html: renderPositionDetailsPage({
         positionId,
         publicKey: current.publicKey,
-        ethAddress: lastUserRegistrationEvent?.ethAddress,
+        ethAddress: lastUserRegistrationEvent?.ethAddress.toString(),
         stateUpdateId: current.stateUpdateId,
         lastUpdateTimestamp: current.timestamp,
         assets: current.assets,
