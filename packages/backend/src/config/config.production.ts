@@ -17,8 +17,8 @@ export function getProductionConfig(): Config {
     jsonRpcUrl: getEnv('JSON_RPC_URL'),
     core: {
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
+      maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', undefined),
     },
     freshStart: false,
-    maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
   }
 }

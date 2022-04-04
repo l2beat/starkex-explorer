@@ -102,7 +102,7 @@ export class Application {
       blockDownloader,
       dataSyncService,
       logger,
-      { maxBlockNumber: config.maxBlockNumber }
+      { maxBlockNumber: config.core.maxBlockNumber }
     )
 
     // #endregion core

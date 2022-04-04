@@ -14,7 +14,7 @@ import {
 /** block of the first verifier deploy */
 const EARLIEST_BLOCK = 11813207
 
-type SyncSchedulerOptions = {
+interface SyncSchedulerOptions {
   earliestBlock?: number
   maxBlockNumber?: number
 }
