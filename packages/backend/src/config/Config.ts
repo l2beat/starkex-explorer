@@ -13,6 +13,7 @@ export interface Config {
   jsonRpcUrl: string
   core: {
     syncBatchSize: number
+    maxBlockNumber?: number
   }
   freshStart: boolean
 }
