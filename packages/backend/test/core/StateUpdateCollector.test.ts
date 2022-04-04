@@ -1,3 +1,5 @@
+import { Block } from '@ethersproject/providers'
+import { InMemoryRollupStorage, RollupState } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
@@ -80,6 +82,23 @@ describe(StateUpdateCollector.name, () => {
   })
 
   describe(StateUpdateCollector.prototype.save.name, () => {
+    it('throws if state transition facts are missing in database', async () => {
+      const pageRepository = mock<PageRepository>({
+        getAllForFacts: async () => [],
+      })
+      const stateUpdateCollector = new StateUpdateCollector(
+        pageRepository,
+        mock<StateUpdateRepository>(),
+        mock<RollupStateRepository>(),
+        mock<EthereumClient>()
+      )
+      expect(
+        stateUpdateCollector.save([
+          { id: 1, hash: Hash256.fake('a'), blockNumber: 1 },
+        ])
+      ).toBeRejected('Missing state transition facts in database')
+    })
+
     it('calls processStateTransition for every update', async () => {
       const pageRepository = mock<PageRepository>({
         getAllForFacts: async () => [
@@ -131,7 +150,28 @@ describe(StateUpdateCollector.name, () => {
   })
 
   describe(StateUpdateCollector.prototype.processStateTransition.name, () => {
-    it('saves the state update to the database')
+    it('throws if calculated root hash does not match the one from verifier', async () => {
+      const rollupState = await RollupState.empty(new InMemoryRollupStorage())
+      const collector = new StateUpdateCollector(
+        mock<PageRepository>(),
+        mock<StateUpdateRepository>(),
+        mock<RollupStateRepository>(),
+        mock<EthereumClient>({
+          getBlock: async () => {
+            return { timestamp: 1 } as unknown as Block
+          },
+        }),
+        rollupState
+      )
+      rollupState.positions.hash = mock(async () => '1234')
+
+      expect(
+        collector.processStateTransition(
+          { pages: [], factHash: Hash256.fake('123'), blockNumber: 1 },
+          1
+        )
+      ).toBeRejected('State transition calculated incorrectly')
+    })
   })
 
   describe(StateUpdateCollector.prototype.discardAfter.name, () => {

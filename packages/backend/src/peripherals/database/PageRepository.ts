@@ -1,7 +1,6 @@
 import { Hash256 } from '@explorer/types'
 import { Knex } from 'knex'
 import { PageRow } from 'knex/types/tables'
-import { sortBy } from 'lodash'
 
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
@@ -37,31 +36,65 @@ export class PageRepository implements Repository<PageRecord> {
   }
 
   async getAllForFacts(factHashes: Hash256[]) {
-    type Row = { fact_hash: string; pages: string[] }
+    type Row = {
+      fact_hash: string
+      page_block: number
+      fact_block: number
+      data: string
+      index: number
+    }
 
     const rows = (await this.knex('fact_to_pages')
       .select(
         'fact_hash',
-        this.knex.raw(
-          'ARRAY_AGG(pages.data ORDER BY fact_to_pages.index) as pages'
-        )
+        'fact_to_pages.block_number as fact_block',
+        'pages.block_number as page_block',
+        'pages.data',
+        'index'
       )
       .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
-      .groupBy('fact_hash')
       .whereIn(
         'fact_hash',
         factHashes.map((x) => x.toString())
-      )) as unknown as Row[]
+      )) as Row[]
 
     this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
 
-    return sortBy(
-      rows.map((row) => ({
-        factHash: Hash256(row.fact_hash),
-        pages: row.pages,
-      })),
-      (x) => factHashes.indexOf(x.factHash)
-    )
+    const records = rows.map((row) => ({
+      factBlockNumber: row.fact_block,
+      pageBlockNumber: row.page_block,
+      factHash: Hash256(row.fact_hash),
+      data: row.data,
+      index: row.index,
+    }))
+
+    return factHashes.map((factHash) => {
+      const relevant = records.filter((x) => x.factHash === factHash)
+      if (relevant.length === 0) {
+        throw new Error(`Missing pages for fact: ${factHash}`)
+      }
+      const maxFactBlockNumber = Math.max(
+        ...relevant.map((x) => x.factBlockNumber)
+      )
+      const allPages = relevant
+        .filter((x) => x.factBlockNumber === maxFactBlockNumber)
+        .sort((a, b) => {
+          const indexDiff = a.index - b.index
+          if (indexDiff === 0) {
+            return b.pageBlockNumber - a.pageBlockNumber
+          }
+          return indexDiff
+        })
+      const pages: string[] = []
+      let lastIndex = -1
+      for (const row of allPages) {
+        if (row.index !== lastIndex) {
+          lastIndex = row.index
+          pages.push(row.data)
+        }
+      }
+      return { factHash, pages }
+    })
   }
 
   async deleteAll() {

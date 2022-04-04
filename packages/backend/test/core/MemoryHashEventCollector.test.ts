@@ -155,11 +155,6 @@ describe(MemoryHashEventCollector.name, () => {
           factHash: expectedEvents[1].factHash,
           blockNumber: expectedEvents[1].blockNumber,
         },
-      ],
-    ])
-
-    expect(factToPageRepository.add).toHaveBeenCalledWith([
-      [
         {
           index: 0,
           pageHash: expectedEvents[2].pagesHashes[0],
