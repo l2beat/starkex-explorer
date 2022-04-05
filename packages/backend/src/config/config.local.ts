@@ -17,7 +17,7 @@ export function getLocalConfig(): Config {
     jsonRpcUrl: getEnv('LOCAL_JSON_RPC_URL'),
     core: {
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
-      maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', undefined),
+      maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     freshStart: getEnv.boolean('FRESH_START', false),
   }
