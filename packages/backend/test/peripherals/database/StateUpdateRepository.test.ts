@@ -187,7 +187,7 @@ describe(StateUpdateRepository.name, () => {
     ])
   })
 
-  it('gets a list of state changes descending by timestamp', async () => {
+  it('gets a list of state updates descending by timestamp', async () => {
     for (const blockNumber of [20_001, 20_002, 20_003, 20_004]) {
       await repository.add({
         stateUpdate: {
@@ -206,25 +206,36 @@ describe(StateUpdateRepository.name, () => {
         prices: [],
       })
     }
+    await repository.add({
+      stateUpdate: {
+        id: 20_005,
+        blockNumber: 20_005,
+        rootHash: PedersenHash.fake('20005'),
+        factHash: Hash256.fake(),
+        timestamp: 20_005,
+      },
+      positions: [],
+      prices: [],
+    })
 
-    const actual = await repository.getStateUpdateList({ offset: 1, limit: 2 })
+    const actual = await repository.getStateUpdateList({ offset: 0, limit: 2 })
 
     expect(actual).toEqual([
       {
-        positionCount: 3,
+        positionCount: 0,
         rootHash: PedersenHash(
-          '0200030000000000000000000000000000000000000000000000000000000000'
+          '0200050000000000000000000000000000000000000000000000000000000000'
         ),
-        timestamp: 20003,
-        id: 20003,
+        timestamp: 20005,
+        id: 20005,
       },
       {
-        positionCount: 2,
+        id: 20004,
+        positionCount: 4,
         rootHash: PedersenHash(
-          '0200020000000000000000000000000000000000000000000000000000000000'
+          '0200040000000000000000000000000000000000000000000000000000000000'
         ),
-        timestamp: 20002,
-        id: 20002,
+        timestamp: 20004,
       },
     ])
   })

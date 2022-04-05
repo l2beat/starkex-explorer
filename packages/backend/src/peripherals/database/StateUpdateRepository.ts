@@ -110,7 +110,7 @@ export class StateUpdateRepository {
       .orderBy('timestamp', 'desc')
       .offset(offset)
       .limit(limit)
-      .join('positions', 'state_updates.id', 'positions.state_update_id')
+      .leftJoin('positions', 'state_updates.id', 'positions.state_update_id')
       .groupBy('root_hash', 'id', 'timestamp')
       .select(
         'id',
