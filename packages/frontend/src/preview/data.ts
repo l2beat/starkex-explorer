@@ -1,4 +1,4 @@
-import { AssetId, Hash256, PedersenHash } from '@explorer/types'
+import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import {
   HomeProps,
@@ -15,8 +15,9 @@ export const HOME_PROPS: HomeProps = {
     id: i,
     hash: PedersenHash.fake(),
     positionCount: Math.floor(Math.random() * 30 + 4),
-    timestamp:
-      Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR),
+    timestamp: Timestamp(
+      Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)
+    ),
   })),
   totalPositions: 45762n,
   totalUpdates: 5143n,
@@ -27,7 +28,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   hash: Hash256.fake(),
   rootHash: PedersenHash.fake(),
   blockNumber: Math.floor(Math.random() * 100),
-  timestamp: Date.now(),
+  timestamp: Timestamp(Date.now()),
   positions: [
     {
       publicKey: `0x${'0'.repeat(63)}1`,
@@ -48,7 +49,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   positionId: 123n,
   publicKey: `0x${'0'.repeat(63)}1`,
   ethAddress: '0x1234567890ABCDEF1234567890ABCDEF12345678',
-  lastUpdateTimestamp: Date.now(),
+  lastUpdateTimestamp: Timestamp(Date.now()),
   stateUpdateId: 1,
   assets: [
     { assetId: AssetId('ETH-9'), balance: 0n, totalUSDCents: 0n, price: 1000n },
@@ -96,7 +97,7 @@ export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
   positionId: 123n,
   publicKey: `0x${'0'.repeat(63)}1`,
   previousPublicKey: `0x${'0'.repeat(63)}2`,
-  lastUpdateTimestamp: Date.now(),
+  lastUpdateTimestamp: Timestamp(Date.now()),
   assetChanges: [
     {
       assetId: AssetId('ETH-9'),
@@ -124,8 +125,9 @@ export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
     id: i,
     hash: PedersenHash.fake(),
     positionCount: Math.floor(Math.random() * 30 + 4),
-    timestamp:
-      Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR),
+    timestamp: Timestamp(
+      Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)
+    ),
   })),
   fullCount: 121,
   params: {

@@ -1,6 +1,6 @@
 import { Block } from '@ethersproject/providers'
 import { InMemoryRollupStorage, RollupState } from '@explorer/state'
-import { Hash256, PedersenHash } from '@explorer/types'
+import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import {
@@ -110,7 +110,7 @@ describe(StateUpdateCollector.name, () => {
         getLast: async () => ({
           rootHash: PedersenHash.fake('1234'),
           id: 567,
-          timestamp: Math.random(),
+          timestamp: Timestamp(1),
           blockNumber: Math.random(),
           factHash: Hash256.fake(),
         }),

@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/types'
+import { PedersenHash, Timestamp } from '@explorer/types'
 
 export interface StateUpdatesIndexProps {
   stateUpdates: StateUpdate[]
@@ -12,6 +12,6 @@ export interface StateUpdatesIndexProps {
 export interface StateUpdate {
   id: number
   hash: PedersenHash
-  timestamp: number
+  timestamp: Timestamp
   positionCount: number
 }
