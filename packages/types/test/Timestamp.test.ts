@@ -7,11 +7,21 @@ describe(Timestamp.name, () => {
     expect(() => Timestamp(3.14)).toThrow(TypeError, 'Value must be an integer')
   })
 
-  it('can represent timestamp in seconds', () => {
-    expect(+Timestamp(10_000_000_000)).toEqual(10_000_000_000_000)
+  it('can be created from bigint', () => {
+    expect(+Timestamp(10_000_000_000n)).toEqual(10_000_000_000)
   })
 
-  it('can represent timestamp in milliseconds', () => {
-    expect(+Timestamp(10_000_000_001)).toEqual(10_000_000_001)
+  it('can be created from integer', () => {
+    expect(+Timestamp(10_000_000_000)).toEqual(10_000_000_000)
+  })
+
+  describe(Timestamp.fromSeconds.name, () => {
+    it('can be created from bigint', () => {
+      expect(+Timestamp.fromSeconds(10_000_000n)).toEqual(10_000_000_000)
+    })
+
+    it('can be created from integer', () => {
+      expect(+Timestamp.fromSeconds(10_000_000)).toEqual(10_000_000_000)
+    })
   })
 })

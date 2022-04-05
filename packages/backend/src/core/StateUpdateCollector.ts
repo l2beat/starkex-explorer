@@ -83,7 +83,7 @@ export class StateUpdateCollector {
         blockNumber,
         factHash,
         rootHash,
-        timestamp: Timestamp(timestamp),
+        timestamp: Timestamp.fromSeconds(timestamp),
       },
       positions: newPositions.map(
         ({ value, index }): PositionRecord => ({

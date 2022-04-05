@@ -250,7 +250,7 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
     block_number: record.blockNumber,
     fact_hash: record.factHash.toString(),
     root_hash: record.rootHash.toString(),
-    timestamp: Number(record.timestamp) / 1000,
+    timestamp: BigInt(Number(record.timestamp)),
   }
 }
 

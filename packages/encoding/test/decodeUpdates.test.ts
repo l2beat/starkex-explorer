@@ -61,14 +61,14 @@ describe('decodeUpdates', () => {
             { assetId: AssetId('BTC-10'), value: -200n },
             { assetId: AssetId('ABC-1'), value: 0n },
           ],
-          timestamp: Timestamp(456),
+          timestamp: Timestamp.fromSeconds(456),
         },
         {
           indices: [
             { assetId: AssetId('ETH-9'), value: 1n },
             { assetId: AssetId('BTC-10'), value: 2n },
           ],
-          timestamp: Timestamp(789),
+          timestamp: Timestamp.fromSeconds(789),
         },
       ],
       positions: [
@@ -76,7 +76,7 @@ describe('decodeUpdates', () => {
           positionId: 123n,
           publicKey: '0x' + '1234abcd'.repeat(8),
           collateralBalance: 10n,
-          fundingTimestamp: Timestamp(456),
+          fundingTimestamp: Timestamp.fromSeconds(456),
           balances: [
             { assetId: AssetId('ETH-9'), balance: 50n },
             { assetId: AssetId('BTC-10'), balance: 20n },
@@ -86,7 +86,7 @@ describe('decodeUpdates', () => {
           positionId: 124n,
           publicKey: '0x' + 'deadbeef'.repeat(8),
           collateralBalance: 33n,
-          fundingTimestamp: Timestamp(457),
+          fundingTimestamp: Timestamp.fromSeconds(457),
           balances: [{ assetId: AssetId('ETH-9'), balance: 66n }],
         },
       ],

@@ -12,9 +12,9 @@ export function decodeState(data: string) {
   const orderRoot = reader.readHex(32)
   const orderHeight = reader.readNumber(32)
   const indices = readFundingIndices(reader)
-  const timestamp = Timestamp(reader.readNumber(32))
+  const timestamp = Timestamp.fromSeconds(reader.readNumber(32))
   const oraclePrices = readOraclePrices(reader)
-  const systemTime = Timestamp(reader.readNumber(32))
+  const systemTime = Timestamp.fromSeconds(reader.readNumber(32))
 
   reader.assertEnd()
 

@@ -28,7 +28,7 @@ describe('readFundingEntries', () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         indices: [],
-        timestamp: Timestamp(1234),
+        timestamp: Timestamp.fromSeconds(1234),
       },
     ])
   })
@@ -50,7 +50,7 @@ describe('readFundingEntries', () => {
           { assetId: AssetId('ETH-9'), value: 1n },
           { assetId: AssetId('BTC-10'), value: -50n },
         ],
-        timestamp: Timestamp(5678),
+        timestamp: Timestamp.fromSeconds(5678),
       },
     ])
   })
@@ -71,14 +71,14 @@ describe('readFundingEntries', () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         indices: [],
-        timestamp: Timestamp(1234),
+        timestamp: Timestamp.fromSeconds(1234),
       },
       {
         indices: [
           { assetId: AssetId('ETH-9'), value: 1n },
           { assetId: AssetId('BTC-10'), value: -50n },
         ],
-        timestamp: Timestamp(5678),
+        timestamp: Timestamp.fromSeconds(5678),
       },
     ])
   })

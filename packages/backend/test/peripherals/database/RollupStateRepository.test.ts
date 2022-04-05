@@ -103,7 +103,7 @@ describe(RollupStateRepository.name, () => {
 
       const parameters = {
         funding: new Map([[AssetId('ETH-9'), 123n]]),
-        timestamp: Timestamp(123),
+        timestamp: Timestamp.fromSeconds(123),
       }
 
       await repository.setParameters(rootHash, parameters)

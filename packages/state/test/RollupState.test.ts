@@ -315,7 +315,7 @@ describe(RollupState.name, () => {
             {
               positionId: 5n,
               collateralBalance: 555n,
-              fundingTimestamp: Timestamp(1001),
+              fundingTimestamp: Timestamp.fromSeconds(1001),
               publicKey: `0x${'0'.repeat(63)}5`,
               balances: [{ assetId: AssetId('BTC-10'), balance: 5n }],
             },
@@ -327,7 +327,7 @@ describe(RollupState.name, () => {
         rollup.update({
           funding: [
             {
-              timestamp: Timestamp(1001),
+              timestamp: Timestamp.fromSeconds(1001),
               indices: [],
             },
           ],
@@ -335,7 +335,7 @@ describe(RollupState.name, () => {
             {
               positionId: 5n,
               collateralBalance: 555n,
-              fundingTimestamp: Timestamp(1001),
+              fundingTimestamp: Timestamp.fromSeconds(1001),
               publicKey: `0x${'0'.repeat(63)}5`,
               balances: [{ assetId: AssetId('BTC-10'), balance: 5n }],
             },

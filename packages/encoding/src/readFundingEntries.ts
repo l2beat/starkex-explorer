@@ -9,7 +9,7 @@ export function readFundingEntries(reader: ByteReader) {
   const funding: FundingEntry[] = []
   for (let i = 0; i < fundingEntriesLength; i++) {
     const indices = readFundingIndices(reader)
-    const timestamp = Timestamp(reader.readNumber(32))
+    const timestamp = Timestamp.fromSeconds(reader.readNumber(32))
     funding.push({ indices, timestamp })
   }
   return funding

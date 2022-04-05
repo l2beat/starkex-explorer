@@ -26,7 +26,7 @@ describe('readPositionUpdate', () => {
       positionId: 123n,
       publicKey: '0x' + '1234abcd'.repeat(8),
       collateralBalance: 10n,
-      fundingTimestamp: Timestamp(456),
+      fundingTimestamp: Timestamp.fromSeconds(456),
       balances: [],
     })
   })
@@ -48,7 +48,7 @@ describe('readPositionUpdate', () => {
       positionId: 123n,
       publicKey: '0x' + '1234abcd'.repeat(8),
       collateralBalance: 10n,
-      fundingTimestamp: Timestamp(456),
+      fundingTimestamp: Timestamp.fromSeconds(456),
       balances: [
         { assetId: AssetId('ETH-9'), balance: 50n },
         { assetId: AssetId('BTC-10'), balance: 20n },

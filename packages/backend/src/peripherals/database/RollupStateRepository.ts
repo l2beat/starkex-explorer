@@ -131,7 +131,7 @@ export class RollupStateRepository implements IRollupStateStorage {
 
 function parametersToJson(parameters: RollupParameters) {
   return {
-    timestamp: (Number(parameters.timestamp) / 1000).toString(),
+    timestamp: BigInt(Number(parameters.timestamp)),
     funding: Object.fromEntries(
       [...parameters.funding.entries()].map(([k, v]) => [
         k.toString(),
@@ -145,7 +145,7 @@ function parametersFromJson(
   json: ReturnType<typeof parametersToJson>
 ): RollupParameters {
   return {
-    timestamp: Timestamp(Number(json.timestamp)),
+    timestamp: Timestamp(json.timestamp),
     funding: new Map(
       Object.entries(json.funding).map(([k, v]) => [AssetId(k), BigInt(v)])
     ),

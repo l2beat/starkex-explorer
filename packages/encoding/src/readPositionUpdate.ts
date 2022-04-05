@@ -10,7 +10,7 @@ export function readPositionUpdate(reader: ByteReader): PositionUpdate {
   const positionId = reader.readBigInt(32)
   const publicKey = reader.readHex(32)
   const collateralBalance = reader.readBigInt(32) + MIN_INT
-  const fundingTimestamp = Timestamp(reader.readNumber(32))
+  const fundingTimestamp = Timestamp.fromSeconds(reader.readNumber(32))
 
   const balances: AssetBalance[] = []
   for (let i = 0; i < stateValuesLength - 4; i++) {

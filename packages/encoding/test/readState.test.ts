@@ -32,9 +32,9 @@ describe('readState', () => {
       orderRoot: '0x' + 'abcd1234'.repeat(8),
       orderHeight: 12,
       indices: [],
-      timestamp: Timestamp(1234),
+      timestamp: Timestamp.fromSeconds(1234),
       oraclePrices: [],
-      systemTime: Timestamp(5678),
+      systemTime: Timestamp.fromSeconds(5678),
     })
   })
 
@@ -76,7 +76,7 @@ describe('readState', () => {
           value: -50n,
         },
       ],
-      timestamp: Timestamp(1234),
+      timestamp: Timestamp.fromSeconds(1234),
       oraclePrices: [
         {
           assetId: AssetId('ETH-9'),
@@ -87,7 +87,7 @@ describe('readState', () => {
           price: 420n,
         },
       ],
-      systemTime: Timestamp(5678),
+      systemTime: Timestamp.fromSeconds(5678),
     })
   })
 })
