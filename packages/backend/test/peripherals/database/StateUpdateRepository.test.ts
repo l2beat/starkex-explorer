@@ -218,9 +218,17 @@ describe(StateUpdateRepository.name, () => {
       prices: [],
     })
 
-    const actual = await repository.getStateUpdateList({ offset: 1, limit: 2 })
+    const actual = await repository.getStateUpdateList({ offset: 0, limit: 2 })
 
     expect(actual).toEqual([
+      {
+        positionCount: 0,
+        rootHash: PedersenHash(
+          '0200050000000000000000000000000000000000000000000000000000000000'
+        ),
+        timestamp: 20005,
+        id: 20005,
+      },
       {
         id: 20004,
         positionCount: 4,
@@ -228,14 +236,6 @@ describe(StateUpdateRepository.name, () => {
           '0200040000000000000000000000000000000000000000000000000000000000'
         ),
         timestamp: 20004,
-      },
-      {
-        positionCount: 3,
-        rootHash: PedersenHash(
-          '0200030000000000000000000000000000000000000000000000000000000000'
-        ),
-        timestamp: 20003,
-        id: 20003,
       },
     ])
   })
