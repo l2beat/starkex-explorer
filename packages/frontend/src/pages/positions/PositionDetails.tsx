@@ -65,6 +65,7 @@ export function PositionDetails({
   publicKey,
   stateUpdateId,
   lastUpdateTimestamp,
+  ethAddress,
   history,
 }: PositionDetailsProps) {
   return (
@@ -82,6 +83,10 @@ export function PositionDetails({
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
         rows={[
+          {
+            title: 'Owner ETH address',
+            content: ethAddress || '-',
+          },
           {
             title: 'Owner stark key',
             content: formatHash(publicKey),

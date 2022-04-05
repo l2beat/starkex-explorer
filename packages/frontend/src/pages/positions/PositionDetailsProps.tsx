@@ -3,6 +3,7 @@ import { AssetId } from '@explorer/types'
 export interface PositionDetailsProps {
   readonly positionId: bigint
   readonly publicKey: string
+  readonly ethAddress?: string
   readonly stateUpdateId: number
   readonly lastUpdateTimestamp: number
   readonly assets: ReadonlyArray<{

@@ -119,7 +119,10 @@ export class Application {
     // #endregion core
     // #region api
 
-    const frontendController = new FrontendController(stateUpdateRepository)
+    const frontendController = new FrontendController(
+      stateUpdateRepository,
+      userRegistrationEventRepository
+    )
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
