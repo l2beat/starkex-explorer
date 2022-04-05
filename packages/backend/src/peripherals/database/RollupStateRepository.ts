@@ -5,7 +5,7 @@ import {
   Position,
   RollupParameters,
 } from '@explorer/state'
-import { AssetId, PedersenHash } from '@explorer/types'
+import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { partition } from 'lodash'
 
@@ -131,7 +131,7 @@ export class RollupStateRepository implements IRollupStateStorage {
 
 function parametersToJson(parameters: RollupParameters) {
   return {
-    timestamp: parameters.timestamp.toString(),
+    timestamp: (Number(parameters.timestamp) / 1000).toString(),
     funding: Object.fromEntries(
       [...parameters.funding.entries()].map(([k, v]) => [
         k.toString(),
@@ -145,7 +145,7 @@ function parametersFromJson(
   json: ReturnType<typeof parametersToJson>
 ): RollupParameters {
   return {
-    timestamp: BigInt(json.timestamp),
+    timestamp: Timestamp(Number(json.timestamp)),
     funding: new Map(
       Object.entries(json.funding).map(([k, v]) => [AssetId(k), BigInt(v)])
     ),

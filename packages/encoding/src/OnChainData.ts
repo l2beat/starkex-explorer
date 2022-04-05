@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
 
 export interface OnChainData {
   configurationHash: string
@@ -25,9 +25,9 @@ export interface State {
   orderRoot: string
   orderHeight: number
   indices: FundingIndex[]
-  timestamp: bigint
+  timestamp: Timestamp
   oraclePrices: OraclePrice[]
-  systemTime: bigint
+  systemTime: Timestamp
 }
 
 export interface OraclePrice {
@@ -37,14 +37,14 @@ export interface OraclePrice {
 
 export interface FundingEntry {
   indices: FundingIndex[]
-  timestamp: bigint
+  timestamp: Timestamp
 }
 
 export interface PositionUpdate {
   positionId: bigint
   publicKey: string
   collateralBalance: bigint
-  fundingTimestamp: bigint
+  fundingTimestamp: Timestamp
   balances: AssetBalance[]
 }
 

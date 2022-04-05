@@ -1,3 +1,5 @@
+import { Timestamp } from '@explorer/types'
+
 import { ByteReader } from './ByteReader'
 import { readFundingIndices } from './readFundingIndices'
 import { readOraclePrices } from './readOraclePrices'
@@ -10,9 +12,9 @@ export function decodeState(data: string) {
   const orderRoot = reader.readHex(32)
   const orderHeight = reader.readNumber(32)
   const indices = readFundingIndices(reader)
-  const timestamp = reader.readBigInt(32)
+  const timestamp = Timestamp(reader.readNumber(32))
   const oraclePrices = readOraclePrices(reader)
-  const systemTime = reader.readBigInt(32)
+  const systemTime = Timestamp(reader.readNumber(32))
 
   reader.assertEnd()
 

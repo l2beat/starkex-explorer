@@ -1,4 +1,4 @@
-import { AssetId, PedersenHash } from '@explorer/types'
+import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { Position } from '../src'
@@ -30,7 +30,7 @@ describe(RollupState.name, () => {
           {
             positionId: 5n,
             collateralBalance: 555n,
-            fundingTimestamp: 0n,
+            fundingTimestamp: Timestamp(0),
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [],
           },
@@ -63,7 +63,7 @@ describe(RollupState.name, () => {
       ;[rollup] = await rollup.update({
         funding: [
           {
-            timestamp: 1001n,
+            timestamp: Timestamp(1001),
             indices: [
               { assetId: AssetId('BTC-10'), value: 1n },
               { assetId: AssetId('ETH-9'), value: -1n },
@@ -74,7 +74,7 @@ describe(RollupState.name, () => {
           {
             positionId: 5n,
             collateralBalance: 555n,
-            fundingTimestamp: 1001n,
+            fundingTimestamp: Timestamp(1001),
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
@@ -101,14 +101,14 @@ describe(RollupState.name, () => {
       ;[rollup] = await rollup.update({
         funding: [
           {
-            timestamp: 1001n,
+            timestamp: Timestamp(1001),
             indices: [
               { assetId: AssetId('BTC-10'), value: 1n },
               { assetId: AssetId('ETH-9'), value: -1n },
             ],
           },
           {
-            timestamp: 1002n,
+            timestamp: Timestamp(1002),
             indices: [
               { assetId: AssetId('BTC-10'), value: 2n },
               { assetId: AssetId('ETH-9'), value: -2n },
@@ -119,7 +119,7 @@ describe(RollupState.name, () => {
           {
             positionId: 5n,
             collateralBalance: 555n,
-            fundingTimestamp: 1001n,
+            fundingTimestamp: Timestamp(1001),
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
@@ -129,7 +129,7 @@ describe(RollupState.name, () => {
           {
             positionId: 6n,
             collateralBalance: 666n,
-            fundingTimestamp: 1002n,
+            fundingTimestamp: Timestamp(1002),
             publicKey: `0x${'0'.repeat(63)}6`,
             balances: [
               { assetId: AssetId('BTC-10'), balance: 6n },
@@ -139,7 +139,7 @@ describe(RollupState.name, () => {
           {
             positionId: 7n,
             collateralBalance: 777n,
-            fundingTimestamp: 1002n,
+            fundingTimestamp: Timestamp(1002),
             publicKey: `0x${'0'.repeat(63)}7`,
             balances: [
               { assetId: AssetId('BTC-10'), balance: 7n },
@@ -183,14 +183,14 @@ describe(RollupState.name, () => {
       ;[rollup] = await rollup.update({
         funding: [
           {
-            timestamp: 1001n,
+            timestamp: Timestamp(1001),
             indices: [
               { assetId: AssetId('BTC-10'), value: 1n },
               { assetId: AssetId('ETH-9'), value: -1n },
             ],
           },
           {
-            timestamp: 1002n,
+            timestamp: Timestamp(1002),
             indices: [
               { assetId: AssetId('BTC-10'), value: 2n },
               { assetId: AssetId('ETH-9'), value: -2n },
@@ -202,7 +202,7 @@ describe(RollupState.name, () => {
 
       const params = await storage.getParameters(await rollup.positions.hash())
       expect(params).toEqual({
-        timestamp: 1002n,
+        timestamp: Timestamp(1002),
         funding: new Map([
           [AssetId('BTC-10'), 2n],
           [AssetId('ETH-9'), -2n],
@@ -214,7 +214,7 @@ describe(RollupState.name, () => {
           {
             positionId: 5n,
             collateralBalance: 555n,
-            fundingTimestamp: 1002n,
+            fundingTimestamp: Timestamp(1002),
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
@@ -242,7 +242,7 @@ describe(RollupState.name, () => {
       ;[rollup] = await rollup.update({
         funding: [
           {
-            timestamp: 1001n,
+            timestamp: Timestamp(1001),
             indices: [
               { assetId: AssetId('BTC-10'), value: 1n },
               { assetId: AssetId('ETH-9'), value: -1n },
@@ -255,7 +255,7 @@ describe(RollupState.name, () => {
           {
             positionId: 5n,
             collateralBalance: 555n,
-            fundingTimestamp: 1001n,
+            fundingTimestamp: Timestamp(1001),
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
@@ -268,7 +268,7 @@ describe(RollupState.name, () => {
       ;[rollup] = await rollup.update({
         funding: [
           {
-            timestamp: 1002n,
+            timestamp: Timestamp(1002),
             indices: [
               { assetId: AssetId('BTC-10'), value: 2n },
               { assetId: AssetId('ETH-9'), value: -2n },
@@ -281,7 +281,7 @@ describe(RollupState.name, () => {
           {
             positionId: 5n,
             collateralBalance: 555n,
-            fundingTimestamp: 1002n,
+            fundingTimestamp: Timestamp(1002),
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
               { assetId: AssetId('ETH-9'), balance: 0n },
@@ -315,19 +315,19 @@ describe(RollupState.name, () => {
             {
               positionId: 5n,
               collateralBalance: 555n,
-              fundingTimestamp: 1001n,
+              fundingTimestamp: Timestamp(1001),
               publicKey: `0x${'0'.repeat(63)}5`,
               balances: [{ assetId: AssetId('BTC-10'), balance: 5n }],
             },
           ],
         })
-      ).toBeRejected(Error, 'Missing funding for timestamp: 1001!')
+      ).toBeRejected(Error, 'Missing funding for timestamp: 1001000!')
 
       await expect(
         rollup.update({
           funding: [
             {
-              timestamp: 1001n,
+              timestamp: Timestamp(1001),
               indices: [],
             },
           ],
@@ -335,7 +335,7 @@ describe(RollupState.name, () => {
             {
               positionId: 5n,
               collateralBalance: 555n,
-              fundingTimestamp: 1001n,
+              fundingTimestamp: Timestamp(1001),
               publicKey: `0x${'0'.repeat(63)}5`,
               balances: [{ assetId: AssetId('BTC-10'), balance: 5n }],
             },
@@ -352,7 +352,7 @@ describe(RollupState.name, () => {
       ;[rollup] = await rollup.update({
         funding: [
           {
-            timestamp: 1001n,
+            timestamp: Timestamp(1001),
             indices: [
               { assetId: AssetId('BTC-10'), value: 1n },
               { assetId: AssetId('ETH-9'), value: -1n },
@@ -363,7 +363,7 @@ describe(RollupState.name, () => {
           {
             positionId: 5n,
             collateralBalance: 555n,
-            fundingTimestamp: 1001n,
+            fundingTimestamp: Timestamp(1001),
             publicKey: `0x${'0'.repeat(63)}5`,
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
@@ -380,7 +380,7 @@ describe(RollupState.name, () => {
       )
 
       expect(await recovered.getParameters()).toEqual({
-        timestamp: 1001n,
+        timestamp: Timestamp(1001),
         funding: new Map([
           [AssetId('BTC-10'), 1n],
           [AssetId('ETH-9'), -1n],
