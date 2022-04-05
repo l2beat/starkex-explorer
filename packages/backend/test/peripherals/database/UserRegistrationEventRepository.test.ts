@@ -107,4 +107,36 @@ describe(UserRegistrationEventRepository.name, () => {
       },
     ])
   })
+
+  it('finds last event for stark key', async () => {
+    const starkKey = '0x123'
+    const ethAddress = EthereumAddress(
+      '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'
+    )
+    await repository.add([
+      {
+        blockNumber: 1,
+        ethAddress: EthereumAddress.ZERO,
+        starkKey,
+      },
+      {
+        blockNumber: 2,
+        ethAddress,
+        starkKey,
+      },
+    ])
+
+    const expectedEvent = await repository.findByStarkKey(starkKey)
+    expect(expectedEvent).toEqual({
+      id: expect.a(Number),
+      blockNumber: 2,
+      ethAddress,
+      starkKey,
+    })
+  })
+
+  it('returns undefined if no event exists for stark key', async () => {
+    const event = await repository.findByStarkKey('0x123')
+    expect(event).not.toBeDefined()
+  })
 })
