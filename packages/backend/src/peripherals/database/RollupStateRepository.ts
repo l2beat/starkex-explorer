@@ -5,7 +5,7 @@ import {
   Position,
   RollupParameters,
 } from '@explorer/state'
-import { AssetId, PedersenHash } from '@explorer/types'
+import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { partition } from 'lodash'
 
@@ -23,7 +23,7 @@ export class RollupStateRepository implements IRollupStateStorage {
     if (!result) {
       throw new Error(`Cannot find parameters for ${rootHash}`)
     }
-    return parametersFromJson(result)
+    return parametersFromRow(result)
   }
 
   async setParameters(
@@ -33,7 +33,7 @@ export class RollupStateRepository implements IRollupStateStorage {
     await this.knex('rollup_parameters')
       .insert({
         root_hash: rootHash.toString(),
-        ...parametersToJson(values),
+        ...parametersToRow(values),
       })
       .onConflict('root_hash')
       .merge()
@@ -129,9 +129,9 @@ export class RollupStateRepository implements IRollupStateStorage {
   }
 }
 
-function parametersToJson(parameters: RollupParameters) {
+function parametersToRow(parameters: RollupParameters) {
   return {
-    timestamp: parameters.timestamp.toString(),
+    timestamp: BigInt(Number(parameters.timestamp)),
     funding: Object.fromEntries(
       [...parameters.funding.entries()].map(([k, v]) => [
         k.toString(),
@@ -141,13 +141,13 @@ function parametersToJson(parameters: RollupParameters) {
   }
 }
 
-function parametersFromJson(
-  json: ReturnType<typeof parametersToJson>
+function parametersFromRow(
+  row: ReturnType<typeof parametersToRow>
 ): RollupParameters {
   return {
-    timestamp: BigInt(json.timestamp),
+    timestamp: Timestamp(row.timestamp),
     funding: new Map(
-      Object.entries(json.funding).map(([k, v]) => [AssetId(k), BigInt(v)])
+      Object.entries(row.funding).map(([k, v]) => [AssetId(k), BigInt(v)])
     ),
   }
 }

@@ -1,4 +1,4 @@
-import { AssetId, Hash256, PedersenHash } from '@explorer/types'
+import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -25,7 +25,7 @@ describe(StateUpdateRepository.name, () => {
         blockNumber: 10_000,
         rootHash: PedersenHash.fake(),
         factHash: Hash256.fake(),
-        timestamp: 0,
+        timestamp: Timestamp(0),
       },
       positions: [
         {
@@ -48,7 +48,7 @@ describe(StateUpdateRepository.name, () => {
         blockNumber: 1,
         rootHash: PedersenHash.fake(),
         factHash: Hash256.fake(),
-        timestamp: 0,
+        timestamp: Timestamp(0),
       },
       positions: [
         {
@@ -67,7 +67,7 @@ describe(StateUpdateRepository.name, () => {
         blockNumber: 2,
         rootHash: PedersenHash.fake(),
         factHash: Hash256.fake(),
-        timestamp: 0,
+        timestamp: Timestamp(0),
       },
       positions: [
         {
@@ -90,7 +90,7 @@ describe(StateUpdateRepository.name, () => {
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
         prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
-        timestamp: 0,
+        timestamp: Timestamp(0),
       },
       {
         stateUpdateId: 1,
@@ -99,7 +99,7 @@ describe(StateUpdateRepository.name, () => {
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
         prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
-        timestamp: 0,
+        timestamp: Timestamp(0),
       },
     ])
   })
@@ -110,7 +110,7 @@ describe(StateUpdateRepository.name, () => {
       blockNumber: 10_002,
       rootHash: PedersenHash.fake(),
       factHash: Hash256.fake(),
-      timestamp: 0,
+      timestamp: Timestamp(0),
     }
 
     await repository.add({ stateUpdate, positions: [], prices: [] })
@@ -130,7 +130,7 @@ describe(StateUpdateRepository.name, () => {
           blockNumber,
           rootHash: PedersenHash.fake(),
           factHash: Hash256.fake(),
-          timestamp: 0,
+          timestamp: Timestamp(0),
         },
         positions: [],
         prices: [],
@@ -141,7 +141,7 @@ describe(StateUpdateRepository.name, () => {
       blockNumber: 30_004,
       rootHash: PedersenHash.fake(),
       factHash: Hash256.fake(),
-      timestamp: 0,
+      timestamp: Timestamp(0),
     }
     await repository.add({ stateUpdate, positions: [], prices: [] })
 
@@ -158,7 +158,7 @@ describe(StateUpdateRepository.name, () => {
           blockNumber,
           rootHash: PedersenHash.fake(),
           factHash: Hash256.fake(),
-          timestamp: 0,
+          timestamp: Timestamp(0),
         },
         positions: [
           {
@@ -195,7 +195,7 @@ describe(StateUpdateRepository.name, () => {
           blockNumber,
           rootHash: PedersenHash.fake(blockNumber.toString()),
           factHash: Hash256.fake(),
-          timestamp: blockNumber,
+          timestamp: Timestamp(blockNumber),
         },
         positions: Array.from({ length: blockNumber - 20_000 }).map((_, i) => ({
           publicKey: `public-key-${blockNumber}-${i}`,
@@ -212,7 +212,7 @@ describe(StateUpdateRepository.name, () => {
         blockNumber: 20_005,
         rootHash: PedersenHash.fake('20005'),
         factHash: Hash256.fake(),
-        timestamp: 20_005,
+        timestamp: Timestamp(20_005),
       },
       positions: [],
       prices: [],
@@ -226,16 +226,16 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash(
           '0200050000000000000000000000000000000000000000000000000000000000'
         ),
-        timestamp: 20005,
-        id: 20005,
+        timestamp: Timestamp(20_005),
+        id: 20_005,
       },
       {
-        id: 20004,
+        id: 20_004,
         positionCount: 4,
         rootHash: PedersenHash(
           '0200040000000000000000000000000000000000000000000000000000000000'
         ),
-        timestamp: 20004,
+        timestamp: Timestamp(20_004),
       },
     ])
   })
@@ -243,7 +243,7 @@ describe(StateUpdateRepository.name, () => {
   it('gets state by its id', async () => {
     const collateralBalance = 100_000_000_000_000n
     const blockNumber = 30_000
-    const timestamp = Math.floor(Date.now() / 1000)
+    const timestamp = Timestamp(Math.floor(Date.now() / 1000))
     const rootHash = PedersenHash.fake()
     const factHash = Hash256.fake()
     await repository.add({
@@ -291,7 +291,7 @@ describe(StateUpdateRepository.name, () => {
           blockNumber,
           rootHash: PedersenHash.fake(blockNumber.toString()),
           factHash: Hash256.fake(),
-          timestamp: blockNumber,
+          timestamp: Timestamp(blockNumber),
         },
         positions: Array.from({ length: blockNumber - 40_000 }).map((_, i) => ({
           publicKey: `public-key-${blockNumber}-${i}`,
@@ -318,7 +318,7 @@ describe(StateUpdateRepository.name, () => {
         blockNumber: stateUpdateId,
         rootHash: PedersenHash.fake(),
         factHash: Hash256.fake(),
-        timestamp: 0,
+        timestamp: Timestamp(0),
       },
       positions: [
         {
@@ -336,7 +336,7 @@ describe(StateUpdateRepository.name, () => {
         blockNumber: nextStateUpdateId,
         rootHash: PedersenHash.fake(),
         factHash: Hash256.fake(),
-        timestamp: 0,
+        timestamp: Timestamp(0),
       },
       positions: [
         {

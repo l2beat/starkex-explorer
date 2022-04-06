@@ -59,7 +59,7 @@ declare module 'knex/types/tables' {
 
   interface RollupParametersRow {
     root_hash: string
-    timestamp: string
+    timestamp: bigint
     funding: Record<string, string>
   }
 
@@ -68,7 +68,7 @@ declare module 'knex/types/tables' {
     block_number: number
     fact_hash: string
     root_hash: string
-    timestamp: number
+    timestamp: bigint
   }
 
   interface PositionUpdateRow {

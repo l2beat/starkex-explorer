@@ -1,9 +1,9 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
 
 export interface PositionAtUpdateProps {
   readonly stateUpdateId: number
   readonly positionId: bigint
-  readonly lastUpdateTimestamp: number
+  readonly lastUpdateTimestamp: Timestamp
   readonly previousPublicKey?: string
   readonly publicKey: string
   readonly assetChanges: ReadonlyArray<{

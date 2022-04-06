@@ -1,5 +1,5 @@
 import { MerkleNode, Position } from '@explorer/state'
-import { AssetId, PedersenHash } from '@explorer/types'
+import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { RollupStateRepository } from '../../../src/peripherals/database/RollupStateRepository'
@@ -103,7 +103,7 @@ describe(RollupStateRepository.name, () => {
 
       const parameters = {
         funding: new Map([[AssetId('ETH-9'), 123n]]),
-        timestamp: 123n,
+        timestamp: Timestamp.fromSeconds(123),
       }
 
       await repository.setParameters(rootHash, parameters)

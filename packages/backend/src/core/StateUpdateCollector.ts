@@ -1,6 +1,6 @@
 import { decodeOnChainData } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
-import { Hash256, PedersenHash } from '@explorer/types'
+import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
@@ -83,7 +83,7 @@ export class StateUpdateCollector {
         blockNumber,
         factHash,
         rootHash,
-        timestamp,
+        timestamp: Timestamp.fromSeconds(timestamp),
       },
       positions: newPositions.map(
         ({ value, index }): PositionRecord => ({

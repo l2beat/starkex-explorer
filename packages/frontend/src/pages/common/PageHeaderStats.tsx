@@ -1,9 +1,10 @@
 import React, { ReactNode } from 'react'
 import classNames from 'classnames'
 import { formatTime } from '../formatTime'
+import { Timestamp } from '@explorer/types'
 
-export function formatTimestamp(timestamp: number) {
-  const date = new Date(timestamp)
+export function formatTimestamp(timestamp: Timestamp) {
+  const date = new Date(Number(timestamp))
   const day = date.getUTCDate()
   const month = date.getUTCMonth()
   const year = date.getUTCFullYear()

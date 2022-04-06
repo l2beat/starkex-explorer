@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
@@ -28,7 +28,7 @@ describe('readFundingEntries', () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         indices: [],
-        timestamp: 1234n,
+        timestamp: Timestamp.fromSeconds(1234),
       },
     ])
   })
@@ -50,7 +50,7 @@ describe('readFundingEntries', () => {
           { assetId: AssetId('ETH-9'), value: 1n },
           { assetId: AssetId('BTC-10'), value: -50n },
         ],
-        timestamp: 5678n,
+        timestamp: Timestamp.fromSeconds(5678),
       },
     ])
   })
@@ -71,14 +71,14 @@ describe('readFundingEntries', () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         indices: [],
-        timestamp: 1234n,
+        timestamp: Timestamp.fromSeconds(1234),
       },
       {
         indices: [
           { assetId: AssetId('ETH-9'), value: 1n },
           { assetId: AssetId('BTC-10'), value: -50n },
         ],
-        timestamp: 5678n,
+        timestamp: Timestamp.fromSeconds(5678),
       },
     ])
   })

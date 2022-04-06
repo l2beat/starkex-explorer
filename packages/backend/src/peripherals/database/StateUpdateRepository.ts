@@ -1,5 +1,5 @@
 import { AssetBalance, OraclePrice } from '@explorer/encoding'
-import { AssetId, Hash256, PedersenHash } from '@explorer/types'
+import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import {
   AssetBalanceJson,
@@ -15,7 +15,7 @@ export interface StateUpdateRecord {
   blockNumber: number
   factHash: Hash256
   rootHash: PedersenHash
-  timestamp: number
+  timestamp: Timestamp
 }
 
 export interface PositionRecord {
@@ -88,7 +88,7 @@ export class StateUpdateRepository {
     return rows.map((r) => {
       return {
         ...toPositionWithPricesRecord(r),
-        timestamp: r.timestamp,
+        timestamp: Timestamp(r.timestamp),
       }
     })
   }
@@ -129,7 +129,7 @@ export class StateUpdateRepository {
     return rows.map((row) => ({
       id: row.id,
       rootHash: PedersenHash(row.root_hash),
-      timestamp: row.timestamp,
+      timestamp: Timestamp(row.timestamp),
       positionCount: Number(row.position_count),
     }))
   }
@@ -165,7 +165,7 @@ export class StateUpdateRepository {
       hash: Hash256(update.fact_hash),
       rootHash: PedersenHash(update.root_hash),
       blockNumber: update.block_number,
-      timestamp: update.timestamp,
+      timestamp: Timestamp(update.timestamp),
       positions: positions.map(toPositionWithPricesRecord),
     }
   }
@@ -240,7 +240,7 @@ function toStateUpdateRecord(row: StateUpdateRow): StateUpdateRecord {
     blockNumber: row.block_number,
     factHash: Hash256(row.fact_hash),
     rootHash: PedersenHash(row.root_hash),
-    timestamp: row.timestamp,
+    timestamp: Timestamp(row.timestamp),
   }
 }
 
@@ -250,7 +250,7 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
     block_number: record.blockNumber,
     fact_hash: record.factHash.toString(),
     root_hash: record.rootHash.toString(),
-    timestamp: record.timestamp,
+    timestamp: BigInt(Number(record.timestamp)),
   }
 }
 

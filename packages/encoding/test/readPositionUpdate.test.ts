@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
@@ -26,7 +26,7 @@ describe('readPositionUpdate', () => {
       positionId: 123n,
       publicKey: '0x' + '1234abcd'.repeat(8),
       collateralBalance: 10n,
-      fundingTimestamp: 456n,
+      fundingTimestamp: Timestamp.fromSeconds(456),
       balances: [],
     })
   })
@@ -48,7 +48,7 @@ describe('readPositionUpdate', () => {
       positionId: 123n,
       publicKey: '0x' + '1234abcd'.repeat(8),
       collateralBalance: 10n,
-      fundingTimestamp: 456n,
+      fundingTimestamp: Timestamp.fromSeconds(456),
       balances: [
         { assetId: AssetId('ETH-9'), balance: 50n },
         { assetId: AssetId('BTC-10'), balance: 20n },

@@ -1,11 +1,11 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
 
 export interface PositionDetailsProps {
   readonly positionId: bigint
   readonly publicKey: string
   readonly ethAddress?: string
   readonly stateUpdateId: number
-  readonly lastUpdateTimestamp: number
+  readonly lastUpdateTimestamp: Timestamp
   readonly assets: ReadonlyArray<{
     readonly assetId: AssetId
     readonly balance: bigint

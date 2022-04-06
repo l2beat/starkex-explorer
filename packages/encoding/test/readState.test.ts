@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
@@ -32,9 +32,9 @@ describe('readState', () => {
       orderRoot: '0x' + 'abcd1234'.repeat(8),
       orderHeight: 12,
       indices: [],
-      timestamp: 1234n,
+      timestamp: Timestamp.fromSeconds(1234),
       oraclePrices: [],
-      systemTime: 5678n,
+      systemTime: Timestamp.fromSeconds(5678),
     })
   })
 
@@ -76,7 +76,7 @@ describe('readState', () => {
           value: -50n,
         },
       ],
-      timestamp: 1234n,
+      timestamp: Timestamp.fromSeconds(1234),
       oraclePrices: [
         {
           assetId: AssetId('ETH-9'),
@@ -87,7 +87,7 @@ describe('readState', () => {
           price: 420n,
         },
       ],
-      systemTime: 5678n,
+      systemTime: Timestamp.fromSeconds(5678),
     })
   })
 })

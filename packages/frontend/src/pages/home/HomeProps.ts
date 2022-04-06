@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/types'
+import { PedersenHash, Timestamp } from '@explorer/types'
 
 export interface HomeProps {
   stateUpdates: HomeStateUpdate[]
@@ -9,13 +9,13 @@ export interface HomeProps {
 export interface HomeStateUpdate {
   id: number
   hash: PedersenHash
-  timestamp: number
+  timestamp: Timestamp
   positionCount: number
 }
 
 export interface HomeForcedTransaction {
   hash: string // TODO: Hash256
   type: 'exit' | 'trade'
-  timestamp: number
+  timestamp: Timestamp
   valueUSDCents: number
 }

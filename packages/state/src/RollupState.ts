@@ -1,5 +1,5 @@
 import { OnChainData } from '@explorer/encoding'
-import { AssetId, PedersenHash } from '@explorer/types'
+import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
 import { zip } from 'lodash'
 
 import { NodeOrLeaf } from './MerkleNode'
@@ -7,7 +7,7 @@ import { MerkleTree } from './MerkleTree'
 import { Position } from './Position'
 
 export interface RollupParameters {
-  readonly timestamp: bigint
+  readonly timestamp: Timestamp
   readonly funding: ReadonlyMap<AssetId, bigint>
 }
 
@@ -25,7 +25,7 @@ export class RollupState {
   constructor(
     private readonly storage: IRollupStateStorage,
     public readonly positions: MerkleTree<Position>,
-    private timestamp?: bigint,
+    private timestamp?: Timestamp,
     private funding?: ReadonlyMap<AssetId, bigint>
   ) {}
 
@@ -41,7 +41,7 @@ export class RollupState {
     return new RollupState(
       storage,
       await MerkleTree.create(storage, height, Position.EMPTY),
-      0n,
+      Timestamp(0),
       new Map()
     )
   }
@@ -57,7 +57,7 @@ export class RollupState {
           throw new Error('Invalid update count')
         }
         const funding =
-          update.fundingTimestamp !== 0n
+          update.fundingTimestamp !== Timestamp(0)
             ? fundingByTimestamp.get(update.fundingTimestamp)
             : new Map<AssetId, bigint>()
         if (!funding) {
@@ -117,7 +117,10 @@ export class RollupState {
 
   private async getFundingByTimestamp(onChainData: OnChainUpdate) {
     const { timestamp, funding } = await this.getParameters()
-    const fundingByTimestamp = new Map<bigint, ReadonlyMap<AssetId, bigint>>()
+    const fundingByTimestamp = new Map<
+      Timestamp,
+      ReadonlyMap<AssetId, bigint>
+    >()
     fundingByTimestamp.set(timestamp, funding)
     for (const { timestamp, indices } of onChainData.funding) {
       const funding = new Map<AssetId, bigint>()
