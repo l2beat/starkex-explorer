@@ -23,7 +23,7 @@ export class RollupStateRepository implements IRollupStateStorage {
     if (!result) {
       throw new Error(`Cannot find parameters for ${rootHash}`)
     }
-    return parametersFromJson(result)
+    return parametersFromRow(result)
   }
 
   async setParameters(
@@ -33,7 +33,7 @@ export class RollupStateRepository implements IRollupStateStorage {
     await this.knex('rollup_parameters')
       .insert({
         root_hash: rootHash.toString(),
-        ...parametersToJson(values),
+        ...parametersToRow(values),
       })
       .onConflict('root_hash')
       .merge()
@@ -129,7 +129,7 @@ export class RollupStateRepository implements IRollupStateStorage {
   }
 }
 
-function parametersToJson(parameters: RollupParameters) {
+function parametersToRow(parameters: RollupParameters) {
   return {
     timestamp: BigInt(Number(parameters.timestamp)),
     funding: Object.fromEntries(
@@ -141,13 +141,13 @@ function parametersToJson(parameters: RollupParameters) {
   }
 }
 
-function parametersFromJson(
-  json: ReturnType<typeof parametersToJson>
+function parametersFromRow(
+  row: ReturnType<typeof parametersToRow>
 ): RollupParameters {
   return {
-    timestamp: Timestamp(json.timestamp),
+    timestamp: Timestamp(row.timestamp),
     funding: new Map(
-      Object.entries(json.funding).map(([k, v]) => [AssetId(k), BigInt(v)])
+      Object.entries(row.funding).map(([k, v]) => [AssetId(k), BigInt(v)])
     ),
   }
 }
