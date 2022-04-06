@@ -57,7 +57,7 @@ export class RollupState {
           throw new Error('Invalid update count')
         }
         const funding =
-          Number(update.fundingTimestamp) !== 0
+          update.fundingTimestamp !== Timestamp(0)
             ? fundingByTimestamp.get(update.fundingTimestamp)
             : new Map<AssetId, bigint>()
         if (!funding) {
