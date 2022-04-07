@@ -1,17 +1,34 @@
 import { ByteReader } from './ByteReader'
-import { readAssetDataHashes } from './readAssetDataHashes'
+import { readAssetConfigHashes } from './readAssetConfigHashes'
+import { readConditions } from './readConditions'
+import { readForcedActions } from './readForcedActions'
+import { readModifications } from './readModifications'
 import { readState } from './readState'
 
 export function decodeFirstPage(data: string) {
   const reader = new ByteReader(data)
 
   const configurationHash = reader.readHex(32)
-  // We don't know what those values are
-  const assetDataHashes = readAssetDataHashes(reader)
+  const assetConfigHashes = readAssetConfigHashes(reader)
   const oldState = readState(reader)
   const newState = readState(reader)
 
-  // There is more data in the first page, but we don't know the schema
+  const minimumExpirationTimestamp = reader.readBigInt(32)
+  const modifications = readModifications(reader)
+  reader.skip(32) // Total size of forced actions data. Not needed
+  const forcedActions = readForcedActions(reader)
+  const conditions = readConditions(reader)
 
-  return { configurationHash, assetDataHashes, oldState, newState }
+  reader.assertEnd()
+
+  return {
+    configurationHash,
+    assetConfigHashes,
+    oldState,
+    newState,
+    minimumExpirationTimestamp,
+    modifications,
+    forcedActions,
+    conditions,
+  }
 }

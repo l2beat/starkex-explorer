@@ -1,11 +1,11 @@
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
-import { AssetDataHash } from './OnChainData'
+import { AssetConfigHash } from './OnChainData'
 
-export function readAssetDataHashes(reader: ByteReader) {
-  const fundingIndicesLength = reader.readNumber(32)
-  const assetDataHashes: AssetDataHash[] = []
-  for (let i = 0; i < fundingIndicesLength; i++) {
+export function readAssetConfigHashes(reader: ByteReader) {
+  const count = reader.readNumber(32)
+  const assetDataHashes: AssetConfigHash[] = []
+  for (let i = 0; i < count; i++) {
     reader.skip(17)
     const assetId = decodeAssetId(reader.read(15))
     const hash = reader.readHex(32)

@@ -3,12 +3,12 @@ import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
 import { encodeAssetId } from '../src/encodeAssetId'
-import { readAssetDataHashes } from '../src/readAssetDataHashes'
+import { readAssetConfigHashes } from '../src/readAssetConfigHashes'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'
 
-describe('readAssetDataHashes', () => {
-  const decode = readToDecode(readAssetDataHashes)
+describe(readAssetConfigHashes.name, () => {
+  const decode = readToDecode(readAssetConfigHashes)
 
   it('fails for empty data', () => {
     expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')

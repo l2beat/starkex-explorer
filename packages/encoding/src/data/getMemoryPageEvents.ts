@@ -54,7 +54,9 @@ async function getEventBatch(
     .map((log) => ({ log, event: REGISTRY_ABI.parseLog(log) }))
     .map(
       ({ log, event }): MemoryPageEvent => ({
-        memoryHash: event.args.memoryHash.toHexString(),
+        memoryHash:
+          '0x' +
+          event.args.memoryHash.toHexString().substring(2).padStart(64, '0'),
         transactionHash: log.transactionHash,
       })
     )

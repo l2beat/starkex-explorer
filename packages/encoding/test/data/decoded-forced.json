@@ -1,0 +1,112 @@
+{
+  "forcedActions": [
+    {
+      "type": "withdrawal",
+      "publicKey": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "positionId": 517,
+      "amount": 10000000
+    },
+    {
+      "type": "withdrawal",
+      "publicKey": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "positionId": 517,
+      "amount": 0
+    },
+    {
+      "type": "withdrawal",
+      "publicKey": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "positionId": 517,
+      "amount": 11000000
+    },
+    {
+      "type": "withdrawal",
+      "publicKey": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "positionId": 1116,
+      "amount": 0
+    },
+    {
+      "type": "withdrawal",
+      "publicKey": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "positionId": 1224,
+      "amount": 0
+    },
+    {
+      "type": "withdrawal",
+      "publicKey": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "positionId": 4000,
+      "amount": 0
+    },
+    {
+      "type": "withdrawal",
+      "publicKey": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "positionId": 517,
+      "amount": 2360000
+    },
+    {
+      "type": "withdrawal",
+      "publicKey": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "positionId": 517,
+      "amount": 18446744073709552000
+    },
+    {
+      "type": "trade",
+      "publicKeyA": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "publicKeyB": "0x069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41",
+      "positionIdA": 517,
+      "positionIdB": 718,
+      "syntheticAssetId": "LINK-7",
+      "collateralAmount": 0,
+      "syntheticAmount": 100000000,
+      "isABuyingSynthetic": true,
+      "nonce": 1000
+    },
+    {
+      "type": "trade",
+      "publicKeyA": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "publicKeyB": "0x069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41",
+      "positionIdA": 517,
+      "positionIdB": 718,
+      "syntheticAssetId": "LINK-7",
+      "collateralAmount": 28000000,
+      "syntheticAmount": 0,
+      "isABuyingSynthetic": true,
+      "nonce": 1001
+    },
+    {
+      "type": "trade",
+      "publicKeyA": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "publicKeyB": "0x069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41",
+      "positionIdA": 517,
+      "positionIdB": 718,
+      "syntheticAssetId": "LINK-7",
+      "collateralAmount": 28000000,
+      "syntheticAmount": 1000000,
+      "isABuyingSynthetic": false,
+      "nonce": 1002
+    },
+    {
+      "type": "trade",
+      "publicKeyA": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "publicKeyB": "0x069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41",
+      "positionIdA": 517,
+      "positionIdB": 718,
+      "syntheticAssetId": "LINK-7",
+      "collateralAmount": 28000000000,
+      "syntheticAmount": 1000000,
+      "isABuyingSynthetic": false,
+      "nonce": 1003
+    },
+    {
+      "type": "trade",
+      "publicKeyA": "0x05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e",
+      "publicKeyB": "0x069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41",
+      "positionIdA": 1116,
+      "positionIdB": 718,
+      "syntheticAssetId": "LINK-7",
+      "collateralAmount": 28000000000,
+      "syntheticAmount": 1000000,
+      "isABuyingSynthetic": false,
+      "nonce": 1004
+    }
+  ]
+}
