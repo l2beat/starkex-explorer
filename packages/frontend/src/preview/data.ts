@@ -11,6 +11,7 @@ import {
 const ONE_HOUR = 60 * 60 * 1000
 
 export const HOME_PROPS: HomeProps = {
+  account: undefined,
   stateUpdates: Array.from({ length: 6 }).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),

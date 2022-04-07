@@ -16,7 +16,9 @@ const app = new Koa()
 const router = new Router()
 
 router.get('/', (ctx) => {
-  ctx.body = renderHomePage(DATA.HOME_PROPS)
+  const data = { ...DATA.HOME_PROPS }
+  data.account = ctx.cookies.get('account')
+  ctx.body = renderHomePage(data)
 })
 router.get('/state-updates', (ctx) => {
   ctx.body = renderStateUpdatesIndexPage(DATA.STATE_CHANGES_INDEX_PROPS)

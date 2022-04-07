@@ -4,12 +4,13 @@ import { Head, HeadProps } from './Head'
 import { Navbar } from './Navbar'
 
 interface Props extends HeadProps {
+  account?: string
   scripts: string[]
   children: ReactNode
   withoutSearch?: boolean
 }
 
-export function Page({ children, scripts, withoutSearch, ...head }: Props) {
+export function Page({ account, children, scripts, withoutSearch, ...head }: Props) {
   return (
     <html
       lang="en"
@@ -21,7 +22,7 @@ export function Page({ children, scripts, withoutSearch, ...head }: Props) {
           PREVIEW
         </div>
         <div className="Page">
-          <Navbar searchBar={!withoutSearch} />
+          <Navbar searchBar={!withoutSearch} account={account} />
           <main className="px-4 max-w-[900px] mx-auto pt-20">
             {children}
             <Footer />

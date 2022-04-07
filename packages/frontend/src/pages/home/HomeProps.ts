@@ -1,6 +1,7 @@
 import { PedersenHash, Timestamp } from '@explorer/types'
 
 export interface HomeProps {
+  account: string | undefined
   stateUpdates: HomeStateUpdate[]
   totalUpdates: bigint
   totalPositions: bigint

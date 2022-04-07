@@ -19,6 +19,7 @@ export function Home(props: HomeProps) {
       image="/images/under-construction.png"
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
+      account={props.account}
       withoutSearch
     >
       <div className="mb-12 flex gap-x-4 items-center">
