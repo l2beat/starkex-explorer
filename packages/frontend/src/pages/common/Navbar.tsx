@@ -26,20 +26,6 @@ export function Navbar({ searchBar = true }: NavbarProps) {
           Connect
         </button>
       </div>
-
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            document.getElementById("connect-with-metamask").onclick = () => {
-              if (typeof window.ethereum === 'undefined') {
-                window.alert('MetaMask is not installed!');
-                return
-              }
-              window.ethereum.request({ method: 'eth_requestAccounts' });
-            }
-          `,
-        }}
-      />
     </div>
   )
 }

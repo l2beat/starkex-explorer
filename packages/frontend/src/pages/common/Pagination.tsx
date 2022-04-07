@@ -79,13 +79,6 @@ export function Pagination({
           ))}
         </select>
       </form>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-        document.querySelector('form.pagination select[name="perPage"]').onchange = function () { this.form.submit() }
-        `,
-        }}
-      ></script>
     </div>
   )
 }
