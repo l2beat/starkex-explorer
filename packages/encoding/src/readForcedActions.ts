@@ -40,6 +40,5 @@ export function readForcedActions(reader: ByteReader) {
       throw new DecodingError(`Invalid forced action type: ${type}`)
     }
   }
-  reader.skip(32) // data size, not sure what this is
   return forcedActions
 }

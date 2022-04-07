@@ -15,6 +15,7 @@ export function decodeFirstPage(data: string) {
 
   const minimumExpirationTimestamp = reader.readBigInt(32)
   const modifications = readModifications(reader)
+  reader.skip(32) // Total size of forced actions data. Not needed
   const forcedActions = readForcedActions(reader)
   const conditions = readConditions(reader)
 
