@@ -5,6 +5,7 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { DataSyncService } from './core/DataSyncService'
+import { ForcedEventsCollector } from './core/ForcedEventsCollector'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
 import { PageCollector } from './core/PageCollector'
 import { StateTransitionFactCollector } from './core/StateTransitionFactCollector'
@@ -17,6 +18,7 @@ import { VerifierCollector } from './core/VerifierCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
+import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
@@ -58,6 +60,7 @@ export class Application {
       knex,
       logger
     )
+    const forcedTransactionsRepository = new ForcedTransactionsRepository()
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
@@ -92,11 +95,16 @@ export class Application {
       pageRepository,
       stateUpdateRepository,
       rollupStateRepository,
-      ethereumClient
+      ethereumClient,
+      forcedTransactionsRepository
     )
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
       userRegistrationEventRepository
+    )
+    const forcedEventsCollector = new ForcedEventsCollector(
+      ethereumClient,
+      forcedTransactionsRepository
     )
 
     const dataSyncService = new DataSyncService(
@@ -106,6 +114,7 @@ export class Application {
       stateTransitionFactCollector,
       stateUpdateCollector,
       userRegistrationCollector,
+      forcedEventsCollector,
       logger
     )
     const syncScheduler = new SyncScheduler(

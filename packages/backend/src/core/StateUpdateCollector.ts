@@ -2,6 +2,7 @@ import { decodeOnChainData } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
+import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionFactRecord } from '../peripherals/database/StateTransitionFactsRepository'
@@ -32,6 +33,7 @@ export class StateUpdateCollector {
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly rollupStateRepository: RollupStateRepository,
     private readonly ethereumClient: EthereumClient,
+    private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     private rollupState?: RollupState
   ) {}
 
@@ -95,10 +97,45 @@ export class StateUpdateCollector {
       ),
       prices: decoded.newState.oraclePrices,
     })
+    const datas =
+      await this.forcedTransactionsRepository.getTransactionHashesByMinedEventsData(
+        decoded.forcedActions.map((action) => {
+          if (action.type === 'trade') {
+            return {
+              publicKeyA: action.publicKeyA,
+              publicKeyB: action.publicKeyB,
+              positionIdA: action.positionIdA,
+              positionIdB: action.positionIdB,
+              syntheticAssetId: action.syntheticAssetId,
+              syntheticAmount: action.syntheticAmount,
+              collateralAmount: action.collateralAmount,
+              isABuyingSynthetic: action.isABuyingSynthetic,
+            }
+          }
+          return {
+            amount: action.amount,
+            positionId: action.positionId,
+            publicKey: action.publicKey,
+          }
+        })
+      )
+    await this.forcedTransactionsRepository.addEvents(
+      datas.map((data, i) => {
+        return {
+          eventType: 'verified',
+          transactionType: decoded.forcedActions[i].type,
+          transactionHash: data.transactionHash,
+          timestamp: Timestamp.fromSeconds(timestamp),
+          blockNumber,
+          stateUpdateId: id,
+        }
+      })
+    )
   }
 
   async discardAfter(blockNumber: BlockNumber) {
     await this.stateUpdateRepository.deleteAllAfter(blockNumber)
+    await this.forcedTransactionsRepository.discardAfter(blockNumber)
   }
 
   private async readLastUpdate() {
