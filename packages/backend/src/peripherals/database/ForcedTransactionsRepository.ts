@@ -10,7 +10,6 @@ type TransactionEventRow = {
   timestamp: bigint
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: Record<string, any>
-  data_hash?: string
 }
 
 type EventRecord = {
@@ -111,8 +110,14 @@ export class ForcedTransactionsRepository {
           eventType: event_type,
           blockNumber: block_number,
           timestamp,
-          ...data
+          ...rest
         } = event
+
+        const data: TransactionEventRow['data'] = rest
+
+        if (event_type === 'mined') {
+          data.hash = hashData(data as TradeData | WithdrawalData)
+        }
 
         return {
           id: this.id++,
@@ -122,10 +127,6 @@ export class ForcedTransactionsRepository {
           block_number,
           timestamp: BigInt(Number(timestamp)),
           data,
-          data_hash:
-            event_type === 'mined'
-              ? hashData(data as TradeData | WithdrawalData)
-              : undefined, // TODO: make nicer
         }
       })
       .forEach((e) => this.events.push(e))
@@ -140,11 +141,11 @@ export class ForcedTransactionsRepository {
       .filter(
         (e) =>
           e.event_type === 'mined' &&
-          e.data_hash &&
-          hashes.includes(e.data_hash)
+          e.data.hash &&
+          hashes.includes(e.data.hash)
       )
       .map((e) => ({
-        dataHash: String(e.data_hash),
+        dataHash: String(e.data.hash),
         transactionHash: e.transaction_hash,
       }))
   }
