@@ -60,7 +60,10 @@ export class Application {
       knex,
       logger
     )
-    const forcedTransactionsRepository = new ForcedTransactionsRepository()
+    const forcedTransactionsRepository = new ForcedTransactionsRepository(
+      knex,
+      logger
+    )
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
