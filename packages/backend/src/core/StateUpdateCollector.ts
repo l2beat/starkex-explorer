@@ -1,6 +1,7 @@
 import { decodeOnChainData } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { omit } from 'lodash'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
@@ -97,30 +98,16 @@ export class StateUpdateCollector {
       ),
       prices: decoded.newState.oraclePrices,
     })
-    const datas =
+    const hashes =
       await this.forcedTransactionsRepository.getTransactionHashesByMinedEventsData(
-        decoded.forcedActions.map((action) => {
-          if (action.type === 'trade') {
-            return {
-              publicKeyA: action.publicKeyA,
-              publicKeyB: action.publicKeyB,
-              positionIdA: action.positionIdA,
-              positionIdB: action.positionIdB,
-              syntheticAssetId: action.syntheticAssetId,
-              syntheticAmount: action.syntheticAmount,
-              collateralAmount: action.collateralAmount,
-              isABuyingSynthetic: action.isABuyingSynthetic,
-            }
-          }
-          return {
-            amount: action.amount,
-            positionId: action.positionId,
-            publicKey: action.publicKey,
-          }
-        })
+        decoded.forcedActions.map((action) =>
+          action.type === 'trade'
+            ? omit(action, 'type', 'nonce')
+            : omit(action, 'type')
+        )
       )
     await this.forcedTransactionsRepository.addEvents(
-      datas.map((data, i) => {
+      hashes.map((data, i) => {
         return {
           eventType: 'verified',
           transactionType: decoded.forcedActions[i].type,

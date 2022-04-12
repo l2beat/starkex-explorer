@@ -1,15 +1,20 @@
 import { AssetId, Timestamp } from '@explorer/types'
 import { createHash } from 'crypto'
 
+import { JsonB } from './types'
+
+type TransactionType = 'withdrawal' | 'trade'
+
+type EventType = 'mined' | 'verified'
+
 type TransactionEventRow = {
   id: number
   transaction_hash: string
-  transaction_type: 'withdrawal' | 'trade'
-  event_type: 'mined' | 'verified'
+  transaction_type: TransactionType
+  event_type: EventType
   block_number?: number
   timestamp: bigint
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: Record<string, any>
+  data: JsonB<string>
 }
 
 type EventRecord = {
@@ -23,14 +28,18 @@ type VerifiedEvent = {
   stateUpdateId: number
 }
 
-type MinedWithdrawalEvent = EventRecord & {
-  transactionType: 'withdrawal'
-  eventType: 'mined'
-  blockNumber: number
+type MinedWithdrawalEventData = {
   publicKey: string
   positionId: bigint
   amount: bigint
 }
+
+type MinedWithdrawalEvent = EventRecord &
+  MinedWithdrawalEventData & {
+    transactionType: 'withdrawal'
+    eventType: 'mined'
+    blockNumber: number
+  }
 
 type VerifiedWithdrawalEvent = EventRecord &
   VerifiedEvent & {
@@ -40,10 +49,7 @@ type VerifiedWithdrawalEvent = EventRecord &
 
 type WithdrawalEvent = MinedWithdrawalEvent | VerifiedWithdrawalEvent
 
-type MinedTradeEvent = EventRecord & {
-  transactionType: 'trade'
-  eventType: 'mined'
-  blockNumber: number
+type MinedTradeEventData = {
   publicKeyA: string
   publicKeyB: string
   positionIdA: bigint
@@ -53,6 +59,13 @@ type MinedTradeEvent = EventRecord & {
   collateralAmount: bigint
   syntheticAmount: bigint
 }
+
+type MinedTradeEvent = EventRecord &
+  MinedTradeEventData & {
+    transactionType: 'trade'
+    eventType: 'mined'
+    blockNumber: number
+  }
 
 type VerifiedTradeEvent = EventRecord &
   VerifiedEvent & {
@@ -66,30 +79,22 @@ type TransactionEventRecord = WithdrawalEvent | TradeEvent
 
 export type TransactionEventRecordCandidate = Omit<TransactionEventRecord, 'id'>
 
-type TradeData = Pick<
-  MinedTradeEvent,
-  | 'publicKeyA'
-  | 'publicKeyB'
-  | 'positionIdA'
-  | 'positionIdB'
-  | 'syntheticAssetId'
-  | 'syntheticAmount'
-  | 'collateralAmount'
-  | 'isABuyingSynthetic'
->
-type WithdrawalData = Pick<
-  MinedWithdrawalEvent,
-  'amount' | 'publicKey' | 'positionId'
->
-
-function hashData(data: TradeData | WithdrawalData): string {
+function toJsonString(data: object) {
   const serializable = Object.entries(data).reduce((acc, [key, val]) => {
     return {
       ...acc,
       [key]: typeof val === 'bigint' ? val.toString() : val,
     }
   }, {})
-  return createHash('md5').update(JSON.stringify(serializable)).digest('base64')
+  return JSON.stringify(serializable)
+}
+
+function fromJsonString(data: string) {
+  return JSON.parse(data)
+}
+
+function hashData(data: string): string {
+  return createHash('md5').update(data).digest('base64')
 }
 
 export class ForcedTransactionsRepository {
@@ -113,10 +118,13 @@ export class ForcedTransactionsRepository {
           ...rest
         } = event
 
-        const data: TransactionEventRow['data'] = rest
+        let data: string
 
         if (event_type === 'mined') {
-          data.hash = hashData(data as TradeData | WithdrawalData)
+          const hash = hashData(toJsonString(rest))
+          data = toJsonString({ ...rest, hash })
+        } else {
+          data = toJsonString(rest)
         }
 
         return {
@@ -133,11 +141,17 @@ export class ForcedTransactionsRepository {
   }
 
   async getTransactionHashesByMinedEventsData(
-    datas: (TradeData | WithdrawalData)[]
+    datas: (MinedTradeEventData | MinedWithdrawalEventData)[]
   ): Promise<{ dataHash: string; transactionHash: string }[]> {
-    const hashes = datas.map(hashData)
+    const hashes = datas.map(toJsonString).map(hashData)
 
     return this.events
+      .map((e) => {
+        return {
+          ...e,
+          data: fromJsonString(e.data),
+        }
+      })
       .filter(
         (e) =>
           e.event_type === 'mined' &&
