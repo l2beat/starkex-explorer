@@ -106,17 +106,20 @@ export class StateUpdateCollector {
             : omit(action, 'type')
         )
       )
+
     await this.forcedTransactionsRepository.addEvents(
-      hashes.map((data, i) => {
-        return {
-          eventType: 'verified',
-          transactionType: decoded.forcedActions[i].type,
-          transactionHash: data.transactionHash,
-          timestamp: Timestamp.fromSeconds(timestamp),
-          blockNumber,
-          stateUpdateId: id,
-        }
-      })
+      hashes
+        .filter((h): h is string => h !== undefined)
+        .map((transactionHash, i) => {
+          return {
+            eventType: 'verified',
+            transactionType: decoded.forcedActions[i].type,
+            transactionHash,
+            timestamp: Timestamp.fromSeconds(timestamp),
+            blockNumber,
+            stateUpdateId: id,
+          }
+        })
     )
   }
 

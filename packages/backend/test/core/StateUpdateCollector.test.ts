@@ -7,6 +7,7 @@ import {
   ROLLUP_STATE_EMPTY_HASH,
   StateUpdateCollector,
 } from '../../src/core/StateUpdateCollector'
+import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
 import type { PageRepository } from '../../src/peripherals/database/PageRepository'
 import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
 import type { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
@@ -161,6 +162,7 @@ describe(StateUpdateCollector.name, () => {
             return { timestamp: 1 } as unknown as Block
           },
         }),
+        mock<ForcedTransactionsRepository>(),
         rollupState
       )
       rollupState.positions.hash = mock(async () => '1234')
@@ -184,7 +186,10 @@ describe(StateUpdateCollector.name, () => {
         mock<PageRepository>(),
         stateUpdateRepository,
         mock<RollupStateRepository>(),
-        mock<EthereumClient>()
+        mock<EthereumClient>(),
+        mock<ForcedTransactionsRepository>({
+          discardAfter: async () => {},
+        })
       )
 
       await stateUpdateCollector.discardAfter(20)
