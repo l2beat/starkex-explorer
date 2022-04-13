@@ -2,6 +2,7 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DataSyncService } from '../../src/core/DataSyncService'
+import { ForcedEventsCollector } from '../../src/core/ForcedEventsCollector'
 import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCollector'
 import type { PageCollector } from '../../src/core/PageCollector'
 import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
@@ -41,6 +42,9 @@ describe(DataSyncService.name, () => {
     const userRegistrationCollector = mock<UserRegistrationCollector>({
       collect: async () => [],
     })
+    const forcedEventsCollector = mock<ForcedEventsCollector>({
+      collect: async () => [],
+    })
     const stateUpdateCollector = mock<StateUpdateCollector>({
       save: noop,
     })
@@ -52,6 +56,7 @@ describe(DataSyncService.name, () => {
       stateTransitionFactCollector,
       stateUpdateCollector,
       userRegistrationCollector,
+      forcedEventsCollector,
       Logger.SILENT
     )
 
@@ -72,6 +77,9 @@ describe(DataSyncService.name, () => {
       expect(stateUpdateCollector.save).toHaveBeenCalledExactlyWith([
         [transitionFacts],
       ])
+      expect(forcedEventsCollector.collect).toHaveBeenCalledExactlyWith([
+        [blockRange],
+      ])
     })
   })
 
@@ -91,6 +99,9 @@ describe(DataSyncService.name, () => {
       const stateUpdateCollector = mock<StateUpdateCollector>({
         discardAfter: noop,
       })
+      const forcedEventsCollector = mock<ForcedEventsCollector>({
+        discardAfter: noop,
+      })
 
       const dataSyncService = new DataSyncService(
         verifierCollector,
@@ -99,6 +110,7 @@ describe(DataSyncService.name, () => {
         stateTransitionFactCollector,
         stateUpdateCollector,
         userRegistrationCollector,
+        forcedEventsCollector,
         Logger.SILENT
       )
 
@@ -111,6 +123,7 @@ describe(DataSyncService.name, () => {
         10,
       ])
       expect(stateUpdateCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(forcedEventsCollector.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })

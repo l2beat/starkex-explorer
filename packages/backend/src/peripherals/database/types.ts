@@ -113,8 +113,7 @@ declare module 'knex/types/tables' {
     event_type: string
     block_number?: number
     timestamp: bigint
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: Record<string, any>
+    data: ReturnType<typeof JSON.parse>
   }
 
   interface Tables {

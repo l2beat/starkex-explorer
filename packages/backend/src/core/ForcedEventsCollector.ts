@@ -76,7 +76,7 @@ export class ForcedEventsCollector {
               isABuyingSynthetic: event.args.aIsBuyingSynthetic,
               collateralAmount: BigInt(event.args.amountCollateral),
               syntheticAmount: BigInt(event.args.amountSynthetic),
-              timestamp: Timestamp(block.timestamp),
+              timestamp: Timestamp.fromSeconds(block.timestamp),
             }
           case 'LogForcedWithdrawalRequest':
             return {
@@ -87,7 +87,7 @@ export class ForcedEventsCollector {
               publicKey: event.args.starkKey.toHexString(),
               positionId: BigInt(event.args.vaultId),
               amount: BigInt(event.args.quantizedAmount),
-              timestamp: Timestamp(block.timestamp),
+              timestamp: Timestamp.fromSeconds(block.timestamp),
             }
           default:
             throw new Error('Unknown event!')
