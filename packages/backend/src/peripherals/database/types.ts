@@ -1,4 +1,5 @@
 import { Position } from '@explorer/state'
+import { json } from '@explorer/types'
 
 export {}
 
@@ -113,7 +114,7 @@ declare module 'knex/types/tables' {
     event_type: string
     block_number?: number
     timestamp: bigint
-    data: ReturnType<typeof JSON.parse>
+    data: json
   }
 
   interface Tables {

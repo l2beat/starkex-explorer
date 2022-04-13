@@ -129,10 +129,10 @@ function toRecord(row: ForcedTransactionEventRow): TransactionEventRecord {
   const {
     id,
     transaction_hash: transactionHash,
-    data,
     transaction_type: transactionType,
     event_type: eventType,
   } = row
+  const data = Object(row.data)
   const timestamp = Timestamp(row.timestamp)
 
   if (transactionType === 'withdrawal' && eventType === 'mined') {
@@ -163,7 +163,7 @@ function toRecord(row: ForcedTransactionEventRow): TransactionEventRecord {
       collateralAmount: BigInt(data.collateralAmount),
       syntheticAmount: BigInt(data.syntheticAmount),
       isABuyingSynthetic: Boolean(data.isABuyingSynthetic),
-      syntheticAssetId: AssetId(row.data.syntheticAssetId),
+      syntheticAssetId: AssetId(data.syntheticAssetId),
     }
   }
   if (transactionType === 'withdrawal' && eventType === 'verified') {
@@ -336,7 +336,9 @@ export class ForcedTransactionsRepository {
       [hashes]
     )
     return hashes.map((hash) => {
-      const event = events.find((event) => String(event.data.hash) === hash)
+      const event = events.find(
+        (event) => String(Object(event.data).hash) === hash
+      )
       return event?.transaction_hash
     })
   }
