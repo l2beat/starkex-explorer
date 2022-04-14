@@ -30,7 +30,7 @@ type Verified = {
   stateUpdateId: number
 }
 
-type VerifiedWithdrawalCandidate = RecordCandidate &
+export type VerifiedWithdrawalCandidate = RecordCandidate &
   Verified & {
     transactionType: 'withdrawal'
     blockNumber: number
@@ -58,7 +58,7 @@ type MinedTradeCandidate = RecordCandidate &
     blockNumber: number
   }
 
-type VerifiedTradeCandidate = RecordCandidate &
+export type VerifiedTradeCandidate = RecordCandidate &
   Verified & {
     transactionType: 'trade'
     blockNumber: number

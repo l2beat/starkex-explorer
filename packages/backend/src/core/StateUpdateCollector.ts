@@ -1,9 +1,13 @@
-import { decodeOnChainData } from '@explorer/encoding'
+import { decodeOnChainData, ForcedAction } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { omit } from 'lodash'
 
-import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
+import {
+  ForcedTransactionsRepository,
+  VerifiedTradeCandidate,
+  VerifiedWithdrawalCandidate,
+} from '../peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionFactRecord } from '../peripherals/database/StateTransitionFactsRepository'
@@ -69,7 +73,8 @@ export class StateUpdateCollector {
     if (!this.rollupState) {
       return
     }
-    const { timestamp } = await this.ethereumClient.getBlock(blockNumber)
+    const block = await this.ethereumClient.getBlock(blockNumber)
+    const timestamp = Timestamp.fromSeconds(block.timestamp)
 
     const decoded = decodeOnChainData(pages)
 
@@ -80,47 +85,67 @@ export class StateUpdateCollector {
     if (rootHash !== PedersenHash(decoded.newState.positionRoot)) {
       throw new Error('State transition calculated incorrectly')
     }
-    await this.stateUpdateRepository.add({
-      stateUpdate: {
-        id,
+    await Promise.all([
+      this.stateUpdateRepository.add({
+        stateUpdate: {
+          id,
+          blockNumber,
+          factHash,
+          rootHash,
+          timestamp,
+        },
+        positions: newPositions.map(
+          ({ value, index }): PositionRecord => ({
+            positionId: index,
+            publicKey: value.publicKey,
+            balances: value.assets,
+            collateralBalance: value.collateralBalance,
+          })
+        ),
+        prices: decoded.newState.oraclePrices,
+      }),
+      this.processForcedActions(
+        decoded.forcedActions,
+        timestamp,
         blockNumber,
-        factHash,
-        rootHash,
-        timestamp: Timestamp.fromSeconds(timestamp),
-      },
-      positions: newPositions.map(
-        ({ value, index }): PositionRecord => ({
-          positionId: index,
-          publicKey: value.publicKey,
-          balances: value.assets,
-          collateralBalance: value.collateralBalance,
-        })
+        id
       ),
-      prices: decoded.newState.oraclePrices,
-    })
+    ])
+  }
+
+  async processForcedActions(
+    forcedActions: ForcedAction[],
+    timestamp: Timestamp,
+    blockNumber: number,
+    stateUpdateId: number
+  ): Promise<void> {
+    const datas = forcedActions.map((action) =>
+      action.type === 'trade'
+        ? omit(action, 'type', 'nonce')
+        : omit(action, 'type')
+    )
     const hashes =
       await this.forcedTransactionsRepository.getTransactionHashesByMinedEventsData(
-        decoded.forcedActions.map((action) =>
-          action.type === 'trade'
-            ? omit(action, 'type', 'nonce')
-            : omit(action, 'type')
-        )
+        datas
       )
-
-    await this.forcedTransactionsRepository.addEvents(
-      hashes
-        .filter((h): h is string => h !== undefined)
-        .map((transactionHash, i) => {
-          return {
-            eventType: 'verified',
-            transactionType: decoded.forcedActions[i].type,
-            transactionHash,
-            timestamp: Timestamp.fromSeconds(timestamp),
-            blockNumber,
-            stateUpdateId: id,
-          }
-        })
-    )
+    const events = hashes
+      .map((transactionHash, i) => {
+        return transactionHash
+          ? {
+              eventType: 'verified',
+              transactionType: forcedActions[i].type,
+              transactionHash,
+              timestamp,
+              blockNumber,
+              stateUpdateId,
+            }
+          : undefined
+      })
+      .filter(
+        (e): e is VerifiedTradeCandidate | VerifiedWithdrawalCandidate =>
+          e !== undefined
+      )
+    await this.forcedTransactionsRepository.addEvents(events)
   }
 
   async discardAfter(blockNumber: BlockNumber) {
