@@ -24,7 +24,7 @@ describe(ForcedTransactionsRepository.name, () => {
     }
     await repository.addEvents([record])
 
-    const actual = await repository.getAll()
+    const actual = await repository.getAllEvents()
 
     expect(actual).toEqual([
       {
@@ -60,7 +60,7 @@ describe(ForcedTransactionsRepository.name, () => {
 
     await repository.addEvents(events)
 
-    const actual = await repository.getAll()
+    const actual = await repository.getAllEvents()
 
     expect(actual).toEqual(events)
   })

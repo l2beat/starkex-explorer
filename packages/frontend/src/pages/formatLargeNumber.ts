@@ -2,13 +2,16 @@ const units = ['', 'K', 'M', 'B', 'T']
 
 const HAIR_SPACE = '\u200a'
 
-export function formatLargeNumber(value: number): string {
+export function formatLargeNumber(value: number | bigint): string {
   if (value === 0) {
     return '0.00'
   } else if (value < 0) {
     return `-${formatLargeNumber(-value)}`
   }
-  const str = Math.floor(value * 100).toString()
+  const str =
+    typeof value === 'number'
+      ? Math.floor(value * 100).toString()
+      : value.toString()
   for (const [i, unit] of units.entries()) {
     if (str.length <= 4 + i * 3) {
       const offset = str.length - 2 - i * 3

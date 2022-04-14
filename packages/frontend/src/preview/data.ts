@@ -26,7 +26,7 @@ export const HOME_PROPS: HomeProps = {
     lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
     hash: Hash256.fake().toString(),
     positionId: BigInt(i),
-    valueUSDCents: 10000n * (BigInt(i) + 1n),
+    amount: 10000n * (BigInt(i) + 1n),
   })),
   totalPositions: 45762n,
   totalUpdates: 5143n,

@@ -11,6 +11,7 @@ import { Stat } from './Stat'
 import { tvlElId } from './tvlElId'
 import { AssetNameCell } from '../common/AssetNameCell'
 import { formatUSDCents } from '../formatUSDCents'
+import { formatLargeNumber } from '../formatLargeNumber'
 
 export function Home(props: HomeProps) {
   return (
@@ -89,9 +90,9 @@ export function Home(props: HomeProps) {
               formatTime(transaction.lastUpdate),
               transaction.status,
               formatHash(transaction.hash),
-              formatUSDCents(transaction.valueUSDCents),
+              formatLargeNumber(transaction.amount),
               <AssetNameCell assetId={transaction.assetId} />,
-              transaction.positionId.toString()
+              transaction.positionId.toString(),
             ],
           }
         })}

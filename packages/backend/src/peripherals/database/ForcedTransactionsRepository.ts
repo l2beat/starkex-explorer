@@ -355,7 +355,7 @@ export class ForcedTransactionsRepository {
     await this.knex('forced_transaction_events').delete()
   }
 
-  async getAll(): Promise<TransactionEventRecord[]> {
+  async getAllEvents(): Promise<TransactionEventRecord[]> {
     const rows = await this.knex('forced_transaction_events').select()
     return rows.map(toRecord)
   }

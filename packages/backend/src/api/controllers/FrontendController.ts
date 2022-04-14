@@ -11,6 +11,7 @@ import { AssetId } from '@explorer/types'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
+import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 
@@ -62,18 +63,21 @@ type ControllerResult = {
 export class FrontendController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
-    private userRegistrationEventRepository: UserRegistrationEventRepository
+    private userRegistrationEventRepository: UserRegistrationEventRepository,
+    private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
 
   async getHomePage(): Promise<string> {
-    const [stateUpdates, totalUpdates, totalPositions] = await Promise.all([
-      this.stateUpdateRepository.getStateUpdateList({
-        offset: 0,
-        limit: 20,
-      }),
-      this.stateUpdateRepository.countStateUpdates(),
-      this.stateUpdateRepository.countPositions(),
-    ])
+    const [stateUpdates, totalUpdates, totalPositions, transactions] =
+      await Promise.all([
+        this.stateUpdateRepository.getStateUpdateList({
+          offset: 0,
+          limit: 20,
+        }),
+        this.stateUpdateRepository.countStateUpdates(),
+        this.stateUpdateRepository.countPositions(),
+        this.forcedTransactionsRepository.getLatest(10),
+      ])
 
     return renderHomePage({
       stateUpdates: stateUpdates.map(
@@ -84,6 +88,20 @@ export class FrontendController {
           positionCount: x.positionCount,
         })
       ),
+      forcedTransactions: transactions.map((t) => ({
+        type:
+          t.type === 'withdrawal'
+            ? 'exit'
+            : t.isABuyingSynthetic
+            ? 'buy'
+            : 'sell',
+        status: t.status === 'mined' ? 'waiting to be included' : 'completed',
+        hash: t.hash,
+        lastUpdate: t.lastUpdate,
+        amount: t.type === 'trade' ? t.syntheticAmount : t.amount,
+        assetId: t.type === 'trade' ? t.syntheticAssetId : AssetId('USDC-1'),
+        positionId: t.type === 'trade' ? t.positionIdA : t.positionId,
+      })),
       totalUpdates,
       totalPositions,
     })

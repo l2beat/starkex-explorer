@@ -15,11 +15,11 @@ export interface HomeStateUpdate {
 }
 
 export interface HomeForcedTransaction {
-  type: 'exit' | 'trade'
+  type: 'exit' | 'buy' | 'sell'
   status: 'waiting to be included' | 'completed'
   hash: string
   lastUpdate: Timestamp
-  valueUSDCents: bigint
+  amount: bigint
   assetId: AssetId
   positionId: bigint
 }

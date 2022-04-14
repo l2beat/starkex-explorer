@@ -133,7 +133,8 @@ export class Application {
 
     const frontendController = new FrontendController(
       stateUpdateRepository,
-      userRegistrationEventRepository
+      userRegistrationEventRepository,
+      forcedTransactionsRepository
     )
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
