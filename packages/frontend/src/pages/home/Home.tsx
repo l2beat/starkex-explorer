@@ -9,6 +9,8 @@ import { SimpleLink } from '../common/SimpleLink'
 import { FreezeButton } from './FreezeButton'
 import { Stat } from './Stat'
 import { tvlElId } from './tvlElId'
+import { AssetNameCell } from '../common/AssetNameCell'
+import { formatUSDCents } from '../formatUSDCents'
 
 export function Home(props: HomeProps) {
   return (
@@ -40,9 +42,10 @@ export function Home(props: HomeProps) {
         </SimpleLink>
       </div>
       <Table
+        className="mb-8"
         columns={[
           { header: 'No.' },
-          { header: 'Hash', cellFontMono: true, maxWidth: true },
+          { header: 'Hash', cellFontMono: true, maxWidth: 320 },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
         ]}
@@ -55,6 +58,40 @@ export function Home(props: HomeProps) {
               formatHash(update.hash),
               formatTime(update.timestamp),
               update.positionCount.toString(),
+            ],
+          }
+        })}
+      />
+      <div className="mb-1.5">
+        <span className="float-left font-medium text-lg">
+          Latest forced transactions
+        </span>
+        <SimpleLink className="float-right" href="/forced-transactions">
+          view all
+        </SimpleLink>
+      </div>
+      <Table
+        columns={[
+          { header: 'Type' },
+          { header: 'Time' },
+          { header: 'Status' },
+          { header: 'Hash', cellFontMono: true, maxWidth: 250 },
+          { header: 'Amount', numeric: true },
+          { header: 'Asset' },
+          { header: 'Position ID', numeric: true },
+        ]}
+        rows={props.forcedTransactions.map((transaction) => {
+          const link = `/forced-transactions/${transaction.hash}`
+          return {
+            link,
+            cells: [
+              transaction.type,
+              formatTime(transaction.lastUpdate),
+              transaction.status,
+              formatHash(transaction.hash),
+              formatUSDCents(transaction.valueUSDCents),
+              <AssetNameCell assetId={transaction.assetId} />,
+              transaction.positionId.toString()
             ],
           }
         })}

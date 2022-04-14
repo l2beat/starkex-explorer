@@ -54,7 +54,7 @@ export function StateUpdateDetails({
       <Table
         columns={[
           { header: 'Position id' },
-          { header: 'Owner', maxWidth: true, cellFontMono: true },
+          { header: 'Owner', maxWidth: 320, cellFontMono: true },
           { header: 'Value before', numeric: true },
           { header: 'Value after', numeric: true },
           { header: 'Assets updated', numeric: true },

@@ -11,7 +11,7 @@ type Row = {
 type Column = {
   header: string
   numeric?: boolean
-  maxWidth?: boolean
+  maxWidth?: 250 | 320
   cellFontMono?: boolean
 }
 
@@ -24,7 +24,8 @@ type TableProps = {
 const textAlign = (numeric?: boolean) => (numeric ? 'text-right' : 'text-left')
 const cellPaddings = 'px-2 py-0.5'
 const cellOverflowStyles = 'text-ellipsis overflow-hidden'
-const maxWidthStyles = (maxWidth?: boolean) => maxWidth && 'max-w-[320px]'
+const maxWidthStyles = (maxWidth?: Column['maxWidth']) =>
+  maxWidth && maxWidth === 320 ? 'max-w-[320px]' : 'max-w-[250px]'
 
 export function Table({ columns, rows, className }: TableProps) {
   return (
@@ -64,6 +65,7 @@ export function Table({ columns, rows, className }: TableProps) {
                       href={link}
                       className={cx(
                         'block',
+                        'first-letter:capitalize',
                         cellPaddings,
                         maxWidth && cellOverflowStyles
                       )}
@@ -78,6 +80,7 @@ export function Table({ columns, rows, className }: TableProps) {
                       key={col}
                       className={cx(
                         !link && cellPaddings,
+                        !link && 'first-letter:capitalize',
                         (numeric || cellFontMono) && 'font-mono',
                         textAlign(numeric),
                         maxWidthStyles(maxWidth),

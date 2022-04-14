@@ -19,6 +19,15 @@ export const HOME_PROPS: HomeProps = {
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)
     ),
   })),
+  forcedTransactions: Array.from({ length: 5 }).map((_, i) => ({
+    type: i % 2 === 0 ? 'exit' : 'trade',
+    status: i % 3 === 0 ? 'waiting to be included' : 'completed',
+    assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-7'),
+    lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
+    hash: Hash256.fake().toString(),
+    positionId: BigInt(i),
+    valueUSDCents: 10000n * (BigInt(i) + 1n),
+  })),
   totalPositions: 45762n,
   totalUpdates: 5143n,
 }

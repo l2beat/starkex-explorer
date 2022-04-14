@@ -33,7 +33,7 @@ export function StateUpdatesIndex({
       <Table
         columns={[
           { header: 'No.' },
-          { header: 'Hash', cellFontMono: true, maxWidth: true },
+          { header: 'Hash', cellFontMono: true, maxWidth: 320 },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
         ]}

@@ -1,7 +1,8 @@
-import { PedersenHash, Timestamp } from '@explorer/types'
+import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
 
 export interface HomeProps {
   stateUpdates: HomeStateUpdate[]
+  forcedTransactions: HomeForcedTransaction[]
   totalUpdates: bigint
   totalPositions: bigint
 }
@@ -14,8 +15,11 @@ export interface HomeStateUpdate {
 }
 
 export interface HomeForcedTransaction {
-  hash: string // TODO: Hash256
   type: 'exit' | 'trade'
-  timestamp: Timestamp
-  valueUSDCents: number
+  status: 'waiting to be included' | 'completed'
+  hash: string
+  lastUpdate: Timestamp
+  valueUSDCents: bigint
+  assetId: AssetId
+  positionId: bigint
 }
