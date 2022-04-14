@@ -1,4 +1,4 @@
-import { AssetId, json, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, json, Timestamp } from '@explorer/types'
 import { createHash } from 'crypto'
 import { Knex } from 'knex'
 import { ForcedTransactionEventRow } from 'knex/types/tables'
@@ -8,7 +8,7 @@ import { Logger } from '../../tools/Logger'
 
 type RecordCandidate = {
   id?: number
-  transactionHash: string
+  transactionHash: Hash256
   timestamp: Timestamp
 }
 
@@ -100,7 +100,7 @@ function recordCandidateToRow(
 ): TransactionEventRowCandidate {
   const {
     id,
-    transactionHash: transaction_hash,
+    transactionHash,
     transactionType: transaction_type,
     eventType: event_type,
     blockNumber: block_number,
@@ -118,7 +118,7 @@ function recordCandidateToRow(
 
   return {
     id,
-    transaction_hash,
+    transaction_hash: transactionHash.toString(),
     transaction_type,
     event_type,
     block_number,
@@ -130,12 +130,13 @@ function recordCandidateToRow(
 function toRecord(row: ForcedTransactionEventRow): TransactionEventRecord {
   const {
     id,
-    transaction_hash: transactionHash,
+    transaction_hash,
     transaction_type: transactionType,
     event_type: eventType,
   } = row
   const data = Object(row.data)
   const timestamp = Timestamp(row.timestamp)
+  const transactionHash = Hash256(transaction_hash)
 
   if (transactionType === 'withdrawal' && eventType === 'mined') {
     return {
@@ -194,7 +195,7 @@ function toRecord(row: ForcedTransactionEventRow): TransactionEventRecord {
 }
 
 type MinedWithdrawal = {
-  hash: string
+  hash: Hash256
   type: 'withdrawal'
   status: 'mined'
   lastUpdate: Timestamp
@@ -208,7 +209,7 @@ type VerifiedWithdrawal = Omit<MinedWithdrawal, 'status'> & {
 type Withdrawal = MinedWithdrawal | VerifiedWithdrawal
 
 type MinedTrade = {
-  hash: string
+  hash: Hash256
   type: 'trade'
   status: 'mined'
   lastUpdate: Timestamp
@@ -328,7 +329,7 @@ export class ForcedTransactionsRepository {
 
   async getTransactionHashesByMinedEventsData(
     datas: (MinedTradeData | MinedWithdrawalData)[]
-  ): Promise<(string | undefined)[]> {
+  ): Promise<(Hash256 | undefined)[]> {
     if (datas.length === 0) {
       return []
     }
@@ -341,7 +342,7 @@ export class ForcedTransactionsRepository {
       const event = events.find(
         (event) => String(Object(event.data).hash) === hash
       )
-      return event?.transaction_hash
+      return event ? Hash256(event.transaction_hash) : undefined
     })
   }
 

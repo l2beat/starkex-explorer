@@ -1,5 +1,5 @@
 import { decodeAssetId } from '@explorer/encoding'
-import { Timestamp } from '@explorer/types'
+import { Hash256, Timestamp } from '@explorer/types'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
@@ -58,14 +58,18 @@ export class ForcedEventsCollector {
       logs.map(async (log) => {
         const event = PERPETUAL_ABI.parseLog(log)
         const block = await this.ethereumClient.getBlock(log.blockNumber)
+        const blockNumber = log.blockNumber
+        const transactionHash = Hash256(log.transactionHash)
+        const timestamp = Timestamp.fromSeconds(block.timestamp)
 
         switch (event.name) {
           case 'LogForcedTradeRequest':
             return {
               transactionType: 'trade' as const,
               eventType: 'mined' as const,
-              blockNumber: log.blockNumber,
-              transactionHash: log.transactionHash,
+              blockNumber,
+              transactionHash,
+              timestamp,
               publicKeyA: event.args.starkKeyA.toHexString(),
               publicKeyB: event.args.starkKeyB.toHexString(),
               positionIdA: BigInt(event.args.vaultIdA),
@@ -76,18 +80,17 @@ export class ForcedEventsCollector {
               isABuyingSynthetic: event.args.aIsBuyingSynthetic,
               collateralAmount: BigInt(event.args.amountCollateral),
               syntheticAmount: BigInt(event.args.amountSynthetic),
-              timestamp: Timestamp.fromSeconds(block.timestamp),
             }
           case 'LogForcedWithdrawalRequest':
             return {
               transactionType: 'withdrawal' as const,
               eventType: 'mined' as const,
-              blockNumber: log.blockNumber,
-              transactionHash: log.transactionHash,
+              blockNumber,
+              transactionHash,
+              timestamp,
               publicKey: event.args.starkKey.toHexString(),
               positionId: BigInt(event.args.vaultId),
               amount: BigInt(event.args.quantizedAmount),
-              timestamp: Timestamp.fromSeconds(block.timestamp),
             }
           default:
             throw new Error('Unknown event!')

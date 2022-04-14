@@ -1,4 +1,4 @@
-import { AssetId, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
@@ -20,7 +20,7 @@ describe(ForcedTransactionsRepository.name, () => {
       positionId: 123n,
       publicKey: '123',
       timestamp: Timestamp(0),
-      transactionHash: '123',
+      transactionHash: Hash256.fake(),
     }
     await repository.addEvents([record])
 
@@ -35,6 +35,7 @@ describe(ForcedTransactionsRepository.name, () => {
   })
 
   it('adds events with ids', async () => {
+    const transactionHash = Hash256.fake()
     const events = [
       {
         id: 1,
@@ -45,14 +46,14 @@ describe(ForcedTransactionsRepository.name, () => {
         positionId: 123n,
         publicKey: '123',
         timestamp: Timestamp(0),
-        transactionHash: '123',
+        transactionHash,
       },
       {
         id: 2,
         transactionType: 'withdrawal' as const,
         eventType: 'verified' as const,
         timestamp: Timestamp(0),
-        transactionHash: '123',
+        transactionHash,
         blockNumber: 1,
         stateUpdateId: 2,
       },
@@ -71,14 +72,14 @@ describe(ForcedTransactionsRepository.name, () => {
   })
 
   it('returns transaction hashes', async () => {
-    const hash1 = '123'
+    const hash1 = Hash256.fake()
     const data1 = {
       amount: 123n,
       positionId: 123n,
       publicKey: '123',
     }
 
-    const hash2 = '456'
+    const hash2 = Hash256.fake()
     const data2 = {
       publicKeyA: '123a',
       publicKeyB: '123b',
@@ -123,14 +124,14 @@ describe(ForcedTransactionsRepository.name, () => {
   })
 
   it('returns latest transactions', async () => {
-    const hash1 = '123'
+    const hash1 = Hash256.fake()
     const data1 = {
       amount: 123n,
       positionId: 123n,
       publicKey: '123',
     }
 
-    const hash2 = '456'
+    const hash2 = Hash256.fake()
     const data2 = {
       publicKeyA: '123a',
       publicKeyB: '123b',
@@ -175,7 +176,7 @@ describe(ForcedTransactionsRepository.name, () => {
 
     expect(latest).toEqual([
       {
-        hash: '456',
+        hash: hash2,
         type: 'trade',
         status: 'mined',
         lastUpdate: Timestamp(2),
@@ -189,7 +190,7 @@ describe(ForcedTransactionsRepository.name, () => {
         syntheticAssetId: AssetId('ETH-7'),
       },
       {
-        hash: '123',
+        hash: hash1,
         type: 'withdrawal',
         status: 'verified',
         lastUpdate: Timestamp(1),
@@ -204,14 +205,14 @@ describe(ForcedTransactionsRepository.name, () => {
   })
 
   it('returns transactions included in a state update', async () => {
-    const hash1 = '123'
+    const hash1 = Hash256.fake()
     const data1 = {
       amount: 123n,
       positionId: 123n,
       publicKey: '123',
     }
 
-    const hash2 = '456'
+    const hash2 = Hash256.fake()
     const data2 = {
       publicKeyA: '123a',
       publicKeyB: '123b',
@@ -256,7 +257,7 @@ describe(ForcedTransactionsRepository.name, () => {
     expect(transactions).toEqual([
       {
         amount: 123n,
-        hash: '123',
+        hash: hash1,
         lastUpdate: Timestamp(1),
         positionId: 123n,
         publicKey: '123',
@@ -268,14 +269,14 @@ describe(ForcedTransactionsRepository.name, () => {
   })
 
   it('returns transactions affecting position', async () => {
-    const hash1 = '123'
+    const hash1 = Hash256.fake()
     const data1 = {
       amount: 123n,
       positionId: 123n,
       publicKey: '123',
     }
 
-    const hash2 = '456'
+    const hash2 = Hash256.fake()
     const data2 = {
       publicKeyA: '123a',
       publicKeyB: '123b',
@@ -320,7 +321,7 @@ describe(ForcedTransactionsRepository.name, () => {
     expect(transactions).toEqual([
       {
         amount: 123n,
-        hash: '123',
+        hash: hash1,
         lastUpdate: Timestamp(1),
         positionId: 123n,
         publicKey: '123',

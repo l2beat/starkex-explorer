@@ -10,7 +10,6 @@ import { FreezeButton } from './FreezeButton'
 import { Stat } from './Stat'
 import { tvlElId } from './tvlElId'
 import { AssetNameCell } from '../common/AssetNameCell'
-import { formatUSDCents } from '../formatUSDCents'
 import { formatLargeNumber } from '../formatLargeNumber'
 
 export function Home(props: HomeProps) {
@@ -89,7 +88,7 @@ export function Home(props: HomeProps) {
               transaction.type,
               formatTime(transaction.lastUpdate),
               transaction.status,
-              formatHash(transaction.hash),
+              formatHash(transaction.hash.toString()),
               formatLargeNumber(transaction.amount),
               <AssetNameCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),

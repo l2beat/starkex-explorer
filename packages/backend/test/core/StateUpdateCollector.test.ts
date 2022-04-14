@@ -231,7 +231,7 @@ describe(StateUpdateCollector.name, () => {
           syntheticAssetId: AssetId('ETH-7'),
         },
       ]
-      const transactionHash = '0x123'
+      const transactionHash = Hash256.fake()
       const forcedTransactionsRepository = mock<ForcedTransactionsRepository>({
         getTransactionHashesByMinedEventsData: async () => [
           transactionHash,
