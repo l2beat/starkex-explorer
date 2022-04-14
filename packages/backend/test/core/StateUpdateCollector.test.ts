@@ -25,7 +25,8 @@ describe(StateUpdateCollector.name, () => {
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         rollupStateRepository,
-        mock<EthereumClient>()
+        mock<EthereumClient>(),
+        mock<ForcedTransactionsRepository>()
       )
       // ROLLUP_STATE_EMPTY_HASH is for tree of height 64 and  recalculating this hash
       // in tests on slower machines (e.g. CI) makes test flakey async-wise.
@@ -47,7 +48,8 @@ describe(StateUpdateCollector.name, () => {
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
-        mock<EthereumClient>()
+        mock<EthereumClient>(),
+        mock<ForcedTransactionsRepository>()
       )
       const hash = PedersenHash.fake()
       const rollupState = await stateUpdateCollector.ensureRollupState(hash)
@@ -59,7 +61,8 @@ describe(StateUpdateCollector.name, () => {
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
-        mock<EthereumClient>()
+        mock<EthereumClient>(),
+        mock<ForcedTransactionsRepository>()
       )
       const hashA = PedersenHash.fake('a')
       const hashB = PedersenHash.fake('b')
@@ -74,7 +77,8 @@ describe(StateUpdateCollector.name, () => {
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
-        mock<EthereumClient>()
+        mock<EthereumClient>(),
+        mock<ForcedTransactionsRepository>()
       )
       const hash = PedersenHash.fake()
       const rollupStateA = await stateUpdateCollector.ensureRollupState(hash)
@@ -92,7 +96,8 @@ describe(StateUpdateCollector.name, () => {
         pageRepository,
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
-        mock<EthereumClient>()
+        mock<EthereumClient>(),
+        mock<ForcedTransactionsRepository>()
       )
       expect(
         stateUpdateCollector.save([
@@ -121,7 +126,8 @@ describe(StateUpdateCollector.name, () => {
         pageRepository,
         stateUpdateRepository,
         mock<RollupStateRepository>(),
-        mock<EthereumClient>()
+        mock<EthereumClient>(),
+        mock<ForcedTransactionsRepository>()
       )
       const processStateTransition = mockFn().resolvesTo(undefined)
       stateUpdateCollector.processStateTransition = processStateTransition

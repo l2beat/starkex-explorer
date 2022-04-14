@@ -66,7 +66,9 @@ export type VerifiedTradeCandidate = RecordCandidate &
 
 type TradeCandidate = MinedTradeCandidate | VerifiedTradeCandidate
 
-type TransactionEventRecordCandidate = TradeCandidate | WithdrawalCandidate
+export type TransactionEventRecordCandidate =
+  | TradeCandidate
+  | WithdrawalCandidate
 
 type TransactionEventRecord = TransactionEventRecordCandidate & {
   id: ForcedTransactionEventRow['id']
