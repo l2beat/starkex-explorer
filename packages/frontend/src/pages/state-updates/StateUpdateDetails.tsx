@@ -56,6 +56,7 @@ export function StateUpdateDetails({
         Updated positions
       </div>
       <Table
+        noRowsText="this update did not affect any position"
         className="mb-8"
         columns={[
           { header: 'Position id' },
@@ -89,6 +90,7 @@ export function StateUpdateDetails({
         Included forced transactions
       </div>
       <Table
+        noRowsText="this update does not include any forced transactions"
         columns={[
           { header: 'Type' },
           { header: 'Time' },

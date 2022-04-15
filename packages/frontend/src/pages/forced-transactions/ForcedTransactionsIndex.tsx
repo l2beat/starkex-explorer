@@ -32,6 +32,7 @@ export function ForcedTransactionsIndex({
         baseUrl="/forced-transactions"
       />
       <Table
+        noRowsText="no forced transactions have been issued so far"
         columns={[
           { header: 'Type' },
           { header: 'Time' },

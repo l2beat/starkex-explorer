@@ -89,6 +89,7 @@ export function PositionAtUpdate({
         Balance changes
       </div>
       <Table
+        noRowsText="no balance changes happened in this update"
         className="mb-8"
         columns={balanceChangesTableColumns}
         rows={assetChanges.map(buildBalanceChangesTableRow)}
@@ -97,6 +98,7 @@ export function PositionAtUpdate({
         Included forced transactions
       </div>
       <Table
+        noRowsText="no forced transactions were included in this update"
         columns={[
           { header: 'Type' },
           { header: 'Time' },

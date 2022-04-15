@@ -31,6 +31,7 @@ export function StateUpdatesIndex({
         baseUrl="/state-updates"
       />
       <Table
+        noRowsText="no state updates have occurred so far"
         columns={[
           { header: 'No.' },
           { header: 'Hash', cellFontMono: true, maxWidth: 320 },

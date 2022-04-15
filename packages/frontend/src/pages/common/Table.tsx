@@ -19,6 +19,7 @@ type TableProps = {
   columns: Column[]
   rows: Row[]
   className?: string
+  noRowsText: string
 }
 
 const textAlign = (numeric?: boolean) => (numeric ? 'text-right' : 'text-left')
@@ -27,7 +28,72 @@ const cellOverflowStyles = 'text-ellipsis overflow-hidden'
 const maxWidthStyles = (maxWidth?: Column['maxWidth']) =>
   maxWidth && maxWidth === 320 ? 'max-w-[320px]' : 'max-w-[250px]'
 
-export function Table({ columns, rows, className }: TableProps) {
+const RowEl = ({
+  cells,
+  link,
+  i,
+  columns,
+}: Row & { i: number; columns: Column[] }) => (
+  <tr
+    className={cx(
+      'my-4 hover:bg-blue-100',
+      i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
+    )}
+  >
+    {cells.map((cell, col) => {
+      const { maxWidth, numeric, cellFontMono } = columns[col] || {}
+      const content = link ? (
+        <a
+          href={link}
+          className={cx(
+            'block',
+            'first-letter:capitalize',
+            cellPaddings,
+            maxWidth && cellOverflowStyles
+          )}
+        >
+          {cell}
+        </a>
+      ) : (
+        cell
+      )
+      return (
+        <td
+          key={col}
+          className={cx(
+            !link && cellPaddings,
+            !link && 'first-letter:capitalize',
+            (numeric || cellFontMono) && 'font-mono',
+            textAlign(numeric),
+            maxWidthStyles(maxWidth),
+            maxWidth && !link && cellOverflowStyles
+          )}
+        >
+          {content}
+        </td>
+      )
+    })}
+  </tr>
+)
+
+const NoRowsMessage = ({
+  text,
+  colSpan,
+}: {
+  text: string
+  colSpan: number
+}) => (
+  <tr>
+    <td
+      colSpan={colSpan}
+      className="first-letter:capitalize bg-grey-200 pt-4 pb-4 text-center"
+    >
+      {text}
+    </td>
+  </tr>
+)
+
+export function Table({ columns, rows, className, noRowsText }: TableProps) {
   return (
     <div className={cx('overflow-x-auto w-full', className)}>
       <table className="w-full whitespace-nowrap">
@@ -49,51 +115,19 @@ export function Table({ columns, rows, className }: TableProps) {
           </tr>
         </thead>
         <tbody>
-          {rows.map(({ cells, link }, i) => {
-            return (
-              <tr
+          {rows.length > 0 ? (
+            rows.map(({ cells, link }, i) => (
+              <RowEl
+                cells={cells}
+                link={link}
+                columns={columns}
+                i={i}
                 key={i}
-                className={cx(
-                  'my-4 hover:bg-blue-100',
-                  i % 2 === 0 ? 'bg-grey-100' : 'bg-grey-200'
-                )}
-              >
-                {cells.map((cell, col) => {
-                  const { maxWidth, numeric, cellFontMono } = columns[col] || {}
-                  const content = link ? (
-                    <a
-                      href={link}
-                      className={cx(
-                        'block',
-                        'first-letter:capitalize',
-                        cellPaddings,
-                        maxWidth && cellOverflowStyles
-                      )}
-                    >
-                      {cell}
-                    </a>
-                  ) : (
-                    cell
-                  )
-                  return (
-                    <td
-                      key={col}
-                      className={cx(
-                        !link && cellPaddings,
-                        !link && 'first-letter:capitalize',
-                        (numeric || cellFontMono) && 'font-mono',
-                        textAlign(numeric),
-                        maxWidthStyles(maxWidth),
-                        maxWidth && !link && cellOverflowStyles
-                      )}
-                    >
-                      {content}
-                    </td>
-                  )
-                })}
-              </tr>
-            )
-          })}
+              />
+            ))
+          ) : (
+            <NoRowsMessage text={noRowsText} colSpan={columns.length} />
+          )}
         </tbody>
       </table>
     </div>

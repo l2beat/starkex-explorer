@@ -42,6 +42,7 @@ export function Home(props: HomeProps) {
         </SimpleLink>
       </div>
       <Table
+        noRowsText="no state updates have occurred so far"
         className="mb-8"
         columns={[
           { header: 'No.' },
@@ -71,6 +72,7 @@ export function Home(props: HomeProps) {
         </SimpleLink>
       </div>
       <Table
+        noRowsText="no forced transactions have been issued so far"
         columns={[
           { header: 'Type' },
           { header: 'Time' },

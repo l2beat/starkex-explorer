@@ -137,12 +137,14 @@ export function PositionDetails({
       />
       <div className="mb-1.5 font-medium text-lg text-left">Balances</div>
       <Table
+        noRowsText="this position has no balances"
         className="mb-8"
         columns={balanceTableColumns}
         rows={assets.map(buildBalanceTableRow)}
       />
       <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
       <Table
+        noRowsText="this position has no update history"
         className="mb-8"
         columns={updateHistoryTableColumns}
         rows={history.map(buildUpdateHistoryTableRow(positionId))}
@@ -151,6 +153,7 @@ export function PositionDetails({
         Force transaction history
       </div>
       <Table
+        noRowsText="there are no forced transactions associated with this position"
         columns={transactionHistoryTableColumns}
         rows={transactions.map(buildTransactionHistoryTableRow)}
       />
