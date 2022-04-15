@@ -421,9 +421,9 @@ export class ForcedTransactionsRepository {
   }
 
   async countAll(): Promise<bigint> {
-    const result = await this.knex('forced_transaction_events')
-      .count()
-      .groupBy('transaction_hash')
+    const result = await this.knex('forced_transaction_events').countDistinct(
+      'transaction_hash'
+    )
     return BigInt(result[0].count)
   }
 }

@@ -97,4 +97,28 @@ describe('FrontendRouter', () => {
       await server.get('/positions/foo/updates/bar').expect(400)
     })
   })
+
+  describe('/forced-transactions', () => {
+    const frontendRouter = createFrontendRouter(
+      mock<FrontendController>({
+        getForcedTransactionsPage: async () => TEST_PAGE,
+      })
+    )
+    const server = createTestApiServer([frontendRouter])
+
+    it('returns html', async () => {
+      await server.get('/forced-transactions').expect(200).expect(TEST_PAGE)
+    })
+
+    it('accepts pagination params', async () => {
+      await server
+        .get('/forced-transactions?page=123&perPage=100')
+        .expect(200)
+        .expect(TEST_PAGE)
+    })
+
+    it('does not allow invalid input', async () => {
+      await server.get('/forced-transactions?page=foo&perPage=bar').expect(400)
+    })
+  })
 })

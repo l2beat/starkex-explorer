@@ -336,4 +336,58 @@ describe(ForcedTransactionsRepository.name, () => {
     )
     expect(unknownPositionTransactions).toEqual([])
   })
+
+  it('counts all transactions', async () => {
+    const hash1 = Hash256.fake()
+    const data1 = {
+      amount: 123n,
+      positionId: 123n,
+      publicKey: '123',
+    }
+
+    const hash2 = Hash256.fake()
+    const data2 = {
+      publicKeyA: '123a',
+      publicKeyB: '123b',
+      positionIdA: 456n,
+      positionIdB: 789n,
+      syntheticAssetId: AssetId('ETH-7'),
+      isABuyingSynthetic: true,
+      syntheticAmount: 456n,
+      collateralAmount: 789n,
+    }
+
+    const events = [
+      {
+        transactionType: 'withdrawal' as const,
+        eventType: 'mined' as const,
+        blockNumber: 1,
+        timestamp: Timestamp(0),
+        transactionHash: hash1,
+        ...data1,
+      },
+      {
+        transactionType: 'withdrawal' as const,
+        eventType: 'verified' as const,
+        blockNumber: 1,
+        timestamp: Timestamp(1),
+        transactionHash: hash1,
+        stateUpdateId: 1,
+      },
+      {
+        transactionType: 'trade' as const,
+        eventType: 'mined' as const,
+        timestamp: Timestamp(2),
+        transactionHash: hash2,
+        blockNumber: 1,
+        ...data2,
+      },
+    ]
+
+    await repository.addEvents(events)
+
+    const count = await repository.countAll()
+
+    expect(count).toEqual(2n)
+  })
 })
