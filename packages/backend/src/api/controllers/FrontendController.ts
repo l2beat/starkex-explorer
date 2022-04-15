@@ -1,6 +1,8 @@
 import { AssetBalance } from '@explorer/encoding'
 import {
+  ForcedTransactionsIndexProps,
   HomeProps,
+  renderForcedTransactionsIndexPage,
   renderHomePage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
@@ -11,7 +13,10 @@ import { AssetId } from '@explorer/types'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
-import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
+import {
+  ForcedTransactionsRepository,
+  Transaction,
+} from '../../peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 
@@ -44,6 +49,7 @@ const buildViewAssets = (
   })
   return assets
 }
+
 const countDifferentAssets = (
   prev: readonly AssetBalance[],
   current: readonly AssetBalance[]
@@ -54,6 +60,19 @@ const countDifferentAssets = (
     return updated ? updates + 1 : updates
   }, 0)
 }
+
+const buildViewTransaction = (
+  t: Transaction
+): ForcedTransactionsIndexProps['transactions'][number] => ({
+  type:
+    t.type === 'withdrawal' ? 'exit' : t.isABuyingSynthetic ? 'buy' : 'sell',
+  status: t.status === 'mined' ? 'waiting to be included' : 'completed',
+  hash: t.hash,
+  lastUpdate: t.lastUpdate,
+  amount: t.type === 'trade' ? t.syntheticAmount : t.amount,
+  assetId: t.type === 'trade' ? t.syntheticAssetId : AssetId('USDC-1'),
+  positionId: t.type === 'trade' ? t.positionIdA : t.positionId,
+})
 
 type ControllerResult = {
   html: string
@@ -66,7 +85,6 @@ export class FrontendController {
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
-
   async getHomePage(): Promise<string> {
     const [stateUpdates, totalUpdates, totalPositions, transactions] =
       await Promise.all([
@@ -88,22 +106,27 @@ export class FrontendController {
           positionCount: x.positionCount,
         })
       ),
-      forcedTransactions: transactions.map((t) => ({
-        type:
-          t.type === 'withdrawal'
-            ? 'exit'
-            : t.isABuyingSynthetic
-            ? 'buy'
-            : 'sell',
-        status: t.status === 'mined' ? 'waiting to be included' : 'completed',
-        hash: t.hash,
-        lastUpdate: t.lastUpdate,
-        amount: t.type === 'trade' ? t.syntheticAmount : t.amount,
-        assetId: t.type === 'trade' ? t.syntheticAssetId : AssetId('USDC-1'),
-        positionId: t.type === 'trade' ? t.positionIdA : t.positionId,
-      })),
+      forcedTransactions: transactions.map(buildViewTransaction),
       totalUpdates,
       totalPositions,
+    })
+  }
+
+  async getForcedTransactionsPage(
+    page: number,
+    perPage: number
+  ): Promise<string> {
+    const limit = perPage
+    const offset = (page - 1) * perPage
+    const [transactions, fullCount] = await Promise.all([
+      this.forcedTransactionsRepository.getLatest({ limit, offset }),
+      this.forcedTransactionsRepository.countAll(),
+    ])
+
+    return renderForcedTransactionsIndexPage({
+      transactions: transactions.map(buildViewTransaction),
+      fullCount,
+      params: { page, perPage },
     })
   }
 

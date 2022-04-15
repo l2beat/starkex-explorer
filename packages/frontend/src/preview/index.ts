@@ -4,6 +4,7 @@ import Koa from 'koa'
 import serve from 'koa-static'
 
 import {
+  renderForcedTransactionsIndexPage,
   renderHomePage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
@@ -29,6 +30,11 @@ router.get('/positions/:positionId', (ctx) => {
 })
 router.get('/positions/:positionId/updates/:updateId', (ctx) => {
   ctx.body = renderPositionAtUpdatePage(DATA.POSITION_AT_UPDATE_PROPS)
+})
+router.get('/forced-transactions', (ctx) => {
+  ctx.body = renderForcedTransactionsIndexPage(
+    DATA.FORCED_TRANSACTIONS_INDEX_PROPS
+  )
 })
 
 app.use(router.routes())

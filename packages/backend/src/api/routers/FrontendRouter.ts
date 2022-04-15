@@ -12,6 +12,25 @@ export function createFrontendRouter(frontendController: FrontendController) {
   })
 
   router.get(
+    '/forced-transactions',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: stringAsInt(1),
+          perPage: stringAsInt(10),
+        }),
+      }),
+      async (ctx) => {
+        const { page, perPage } = ctx.query
+        ctx.body = await frontendController.getForcedTransactionsPage(
+          page,
+          perPage
+        )
+      }
+    )
+  )
+
+  router.get(
     '/state-updates',
     withTypedContext(
       z.object({

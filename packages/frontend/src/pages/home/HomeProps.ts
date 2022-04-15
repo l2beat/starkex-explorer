@@ -1,8 +1,10 @@
-import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { PedersenHash, Timestamp } from '@explorer/types'
+
+import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface HomeProps {
   stateUpdates: HomeStateUpdate[]
-  forcedTransactions: HomeForcedTransaction[]
+  forcedTransactions: ForcedTransaction[]
   totalUpdates: bigint
   totalPositions: bigint
 }
@@ -12,14 +14,4 @@ export interface HomeStateUpdate {
   hash: PedersenHash
   timestamp: Timestamp
   positionCount: number
-}
-
-export interface HomeForcedTransaction {
-  type: 'exit' | 'buy' | 'sell'
-  status: 'waiting to be included' | 'completed'
-  hash: Hash256
-  lastUpdate: Timestamp
-  amount: bigint
-  assetId: AssetId
-  positionId: bigint
 }

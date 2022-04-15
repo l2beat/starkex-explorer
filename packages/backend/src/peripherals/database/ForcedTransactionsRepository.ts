@@ -222,7 +222,7 @@ type VerifiedTrade = Omit<MinedTrade, 'status'> & {
 
 type Trade = MinedTrade | VerifiedTrade
 
-type Transaction = Withdrawal | Trade
+export type Transaction = Withdrawal | Trade
 
 function applyEvent(
   transaction: Transaction,
@@ -418,5 +418,12 @@ export class ForcedTransactionsRepository {
       )
 
     return eventRowsToTransactions(rows)
+  }
+
+  async countAll(): Promise<bigint> {
+    const result = await this.knex('forced_transaction_events')
+      .count()
+      .groupBy('transaction_hash')
+    return BigInt(result[0].count)
   }
 }

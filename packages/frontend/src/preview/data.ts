@@ -1,6 +1,7 @@
 import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import {
+  ForcedTransactionsIndexProps,
   HomeProps,
   PositionAtUpdateProps,
   PositionDetailsProps,
@@ -143,4 +144,21 @@ export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
     perPage: 10,
     page: 5,
   },
+}
+
+export const FORCED_TRANSACTIONS_INDEX_PROPS: ForcedTransactionsIndexProps = {
+  transactions: Array.from({ length: 50 }).map((_, i) => ({
+    type: i % 2 === 0 ? 'exit' : i % 3 === 0 ? 'buy' : 'sell',
+    status: i % 3 === 0 ? 'waiting to be included' : 'completed',
+    assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-7'),
+    lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
+    hash: Hash256.fake(),
+    positionId: BigInt(i),
+    amount: 10000n * (BigInt(i) + 1n),
+  })),
+  params: {
+    page: 1,
+    perPage: 50,
+  },
+  fullCount: 100n,
 }
