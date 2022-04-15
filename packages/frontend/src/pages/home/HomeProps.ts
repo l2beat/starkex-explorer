@@ -3,15 +3,13 @@ import { PedersenHash, Timestamp } from '@explorer/types'
 import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface HomeProps {
-  stateUpdates: HomeStateUpdate[]
-  forcedTransactions: ForcedTransaction[]
-  totalUpdates: bigint
-  totalPositions: bigint
-}
-
-export interface HomeStateUpdate {
-  id: number
-  hash: PedersenHash
-  timestamp: Timestamp
-  positionCount: number
+  readonly stateUpdates: ReadonlyArray<{
+    readonly id: number
+    readonly hash: PedersenHash
+    readonly timestamp: Timestamp
+    readonly positionCount: number
+  }>
+  readonly forcedTransactions: ReadonlyArray<ForcedTransaction>
+  readonly totalUpdates: bigint
+  readonly totalPositions: bigint
 }

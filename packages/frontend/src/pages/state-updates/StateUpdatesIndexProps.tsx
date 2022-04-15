@@ -1,17 +1,15 @@
 import { PedersenHash, Timestamp } from '@explorer/types'
 
 export interface StateUpdatesIndexProps {
-  stateUpdates: StateUpdate[]
-  params: {
-    perPage: number
-    page: number
+  readonly stateUpdates: ReadonlyArray<{
+    readonly id: number
+    readonly hash: PedersenHash
+    readonly timestamp: Timestamp
+    readonly positionCount: number
+  }>
+  readonly params: {
+    readonly perPage: number
+    readonly page: number
   }
-  fullCount: number
-}
-
-export interface StateUpdate {
-  id: number
-  hash: PedersenHash
-  timestamp: Timestamp
-  positionCount: number
+  readonly fullCount: number
 }

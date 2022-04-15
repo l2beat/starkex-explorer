@@ -1,20 +1,20 @@
 import { AssetId, Hash256, Timestamp } from '@explorer/types'
 
 export interface ForcedTransactionsIndexProps {
-  transactions: ForcedTransaction[]
-  params: {
-    perPage: number
-    page: number
+  readonly transactions: ReadonlyArray<ForcedTransaction>
+  readonly params: {
+    readonly perPage: number
+    readonly page: number
   }
-  fullCount: bigint
+  readonly fullCount: bigint
 }
 
 export interface ForcedTransaction {
-  type: 'exit' | 'buy' | 'sell'
-  status: 'waiting to be included' | 'completed'
-  hash: Hash256
-  lastUpdate: Timestamp
-  amount: bigint
-  assetId: AssetId
-  positionId: bigint
+  readonly type: 'exit' | 'buy' | 'sell'
+  readonly status: 'waiting to be included' | 'completed'
+  readonly hash: Hash256
+  readonly lastUpdate: Timestamp
+  readonly amount: bigint
+  readonly assetId: AssetId
+  readonly positionId: bigint
 }

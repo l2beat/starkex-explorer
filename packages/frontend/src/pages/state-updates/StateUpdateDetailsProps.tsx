@@ -7,12 +7,12 @@ export interface StateUpdateDetailsProps {
   readonly rootHash: PedersenHash
   readonly blockNumber: number
   readonly timestamp: Timestamp
-  positions: ReadonlyArray<{
+  readonly positions: ReadonlyArray<{
     readonly publicKey: string
     readonly positionId: bigint
     readonly totalUSDCents: bigint
     readonly previousTotalUSDCents?: bigint
     readonly assetsUpdated?: number
   }>
-  transactions: Omit<ForcedTransaction, 'status'>[]
+  readonly transactions: Omit<ForcedTransaction, 'status'>[]
 }
