@@ -4,8 +4,8 @@ import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
 import {
+  EventRecordCandidate,
   ForcedTransactionsRepository,
-  TransactionEventRecordCandidate,
 } from '../peripherals/database/ForcedTransactionsRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 
@@ -39,9 +39,7 @@ export class ForcedEventsCollector {
     private readonly forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
 
-  async collect(
-    blockRange: BlockRange
-  ): Promise<TransactionEventRecordCandidate[]> {
+  async collect(blockRange: BlockRange): Promise<EventRecordCandidate[]> {
     const events = await this.getEvents(blockRange)
     await this.forcedTransactionsRepository.addEvents(events)
     return events
@@ -49,7 +47,7 @@ export class ForcedEventsCollector {
 
   private async getEvents(
     blockRange: BlockRange
-  ): Promise<TransactionEventRecordCandidate[]> {
+  ): Promise<EventRecordCandidate[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: PERPETUAL_ADDRESS,
       topics: [[LogForcedTradeRequest, LogForcedWithdrawalRequest]],

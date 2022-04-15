@@ -14,8 +14,8 @@ import { omit } from 'lodash'
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import {
+  ForcedTransaction,
   ForcedTransactionsRepository,
-  Transaction,
 } from '../../peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
@@ -62,7 +62,7 @@ const countDifferentAssets = (
 }
 
 const buildViewTransaction = (
-  t: Transaction
+  t: ForcedTransaction
 ): ForcedTransactionsIndexProps['transactions'][number] => ({
   type:
     t.type === 'withdrawal' ? 'exit' : t.isABuyingSynthetic ? 'buy' : 'sell',

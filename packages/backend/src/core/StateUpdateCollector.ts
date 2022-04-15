@@ -5,8 +5,8 @@ import { omit } from 'lodash'
 
 import {
   ForcedTransactionsRepository,
-  VerifiedTradeCandidate,
-  VerifiedWithdrawalCandidate,
+  TradeVerifiedEventRecordCandidate,
+  WithdrawalVerifiedEventRecordCandidate,
 } from '../peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
@@ -142,8 +142,11 @@ export class StateUpdateCollector {
           : undefined
       })
       .filter(
-        (e): e is VerifiedTradeCandidate | VerifiedWithdrawalCandidate =>
-          e !== undefined
+        (
+          e
+        ): e is
+          | TradeVerifiedEventRecordCandidate
+          | WithdrawalVerifiedEventRecordCandidate => e !== undefined
       )
     await this.forcedTransactionsRepository.addEvents(events)
   }

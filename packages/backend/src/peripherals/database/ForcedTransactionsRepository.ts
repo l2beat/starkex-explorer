@@ -1,46 +1,42 @@
 import { AssetId, Hash256, json, Timestamp } from '@explorer/types'
 import { createHash } from 'crypto'
 import { Knex } from 'knex'
-import { ForcedTransactionEventRow } from 'knex/types/tables'
+import { ForcedTransactionEventRow as EventRow } from 'knex/types/tables'
 import { groupBy, pick } from 'lodash'
 
 import { Logger } from '../../tools/Logger'
 
-type RecordCandidate = {
+type EventRecordCandidateBase = {
   id?: number
   transactionHash: Hash256
   timestamp: Timestamp
 }
 
-type MinedWithdrawalData = {
+type WithdrawalMinedEventData = {
   publicKey: string
   positionId: bigint
   amount: bigint
 }
 
-type MinedWithdrawalCandidate = RecordCandidate &
-  MinedWithdrawalData & {
+type WithdrawalMinedEventRecordCandidate = EventRecordCandidateBase &
+  WithdrawalMinedEventData & {
     transactionType: 'withdrawal'
     eventType: 'mined'
     blockNumber: number
   }
 
-type Verified = {
+type VerifiedEventBase = {
   eventType: 'verified'
   stateUpdateId: number
 }
 
-export type VerifiedWithdrawalCandidate = RecordCandidate &
-  Verified & {
+export type WithdrawalVerifiedEventRecordCandidate = EventRecordCandidateBase &
+  VerifiedEventBase & {
     transactionType: 'withdrawal'
     blockNumber: number
   }
 
-type WithdrawalCandidate =
-  | MinedWithdrawalCandidate
-  | VerifiedWithdrawalCandidate
-
-type MinedTradeData = {
+type TradeMinedEventData = {
   publicKeyA: string
   publicKeyB: string
   positionIdA: bigint
@@ -51,31 +47,31 @@ type MinedTradeData = {
   syntheticAmount: bigint
 }
 
-type MinedTradeCandidate = RecordCandidate &
-  MinedTradeData & {
+type TradeMinedEventRecordCandidate = EventRecordCandidateBase &
+  TradeMinedEventData & {
     transactionType: 'trade'
     eventType: 'mined'
     blockNumber: number
   }
 
-export type VerifiedTradeCandidate = RecordCandidate &
-  Verified & {
+export type TradeVerifiedEventRecordCandidate = EventRecordCandidateBase &
+  VerifiedEventBase & {
     transactionType: 'trade'
     blockNumber: number
   }
 
-type TradeCandidate = MinedTradeCandidate | VerifiedTradeCandidate
+export type EventRecordCandidate =
+  | TradeMinedEventRecordCandidate
+  | TradeVerifiedEventRecordCandidate
+  | WithdrawalMinedEventRecordCandidate
+  | WithdrawalVerifiedEventRecordCandidate
 
-export type TransactionEventRecordCandidate =
-  | TradeCandidate
-  | WithdrawalCandidate
-
-type TransactionEventRecord = TransactionEventRecordCandidate & {
-  id: ForcedTransactionEventRow['id']
+type EventRecord = EventRecordCandidate & {
+  id: EventRow['id']
 }
 
-type TransactionEventRowCandidate = Omit<ForcedTransactionEventRow, 'id'> & {
-  id?: ForcedTransactionEventRow['id']
+type EventRowCandidate = Omit<EventRow, 'id'> & {
+  id?: EventRow['id']
 }
 
 function toSerializableJson(data: object): json {
@@ -96,8 +92,8 @@ function hashData(data: string): string {
 }
 
 function recordCandidateToRow(
-  candidate: TransactionEventRecordCandidate
-): TransactionEventRowCandidate {
+  candidate: EventRecordCandidate
+): EventRowCandidate {
   const {
     id,
     transactionHash,
@@ -127,7 +123,7 @@ function recordCandidateToRow(
   }
 }
 
-function toRecord(row: ForcedTransactionEventRow): TransactionEventRecord {
+function toRecord(row: EventRow): EventRecord {
   const {
     id,
     transaction_hash,
@@ -199,7 +195,7 @@ type MinedWithdrawal = {
   type: 'withdrawal'
   status: 'mined'
   lastUpdate: Timestamp
-} & MinedWithdrawalData
+} & WithdrawalMinedEventData
 
 type VerifiedWithdrawal = Omit<MinedWithdrawal, 'status'> & {
   status: 'verified'
@@ -213,7 +209,7 @@ type MinedTrade = {
   type: 'trade'
   status: 'mined'
   lastUpdate: Timestamp
-} & MinedTradeData
+} & TradeMinedEventData
 
 type VerifiedTrade = Omit<MinedTrade, 'status'> & {
   status: 'verified'
@@ -222,12 +218,12 @@ type VerifiedTrade = Omit<MinedTrade, 'status'> & {
 
 type Trade = MinedTrade | VerifiedTrade
 
-export type Transaction = Withdrawal | Trade
+export type ForcedTransaction = Withdrawal | Trade
 
 function applyEvent(
-  transaction: Transaction,
-  event: TransactionEventRecord
-): Transaction {
+  transaction: ForcedTransaction,
+  event: EventRecord
+): ForcedTransaction {
   if (event.transactionType === 'withdrawal' && event.eventType === 'mined') {
     return {
       type: 'withdrawal',
@@ -288,18 +284,14 @@ function applyEvent(
   )
 }
 
-function reduceEventsToTransaction(
-  events: TransactionEventRecord[]
-): Transaction {
+function reduceEventsToTransaction(events: EventRecord[]): ForcedTransaction {
   const sorted = events.sort(
     (a, b) => Number(a.timestamp) - Number(b.timestamp)
   )
-  return sorted.reduce(applyEvent, {} as Transaction)
+  return sorted.reduce(applyEvent, {} as ForcedTransaction)
 }
 
-function eventRowsToTransactions(
-  rows: ForcedTransactionEventRow[]
-): Transaction[] {
+function eventRowsToTransactions(rows: EventRow[]): ForcedTransaction[] {
   const events = rows.map(toRecord)
   const eventsGroupedByTransactionHash = Object.values(
     groupBy(events, (e) => e.transactionHash)
@@ -313,9 +305,7 @@ export class ForcedTransactionsRepository {
     this.logger = logger.for(this)
   }
 
-  async addEvents(
-    candidates: TransactionEventRecordCandidate[]
-  ): Promise<void> {
+  async addEvents(candidates: EventRecordCandidate[]): Promise<void> {
     if (candidates.length === 0) {
       return
     }
@@ -328,7 +318,7 @@ export class ForcedTransactionsRepository {
   }
 
   async getTransactionHashesByMinedEventsData(
-    datas: (MinedTradeData | MinedWithdrawalData)[]
+    datas: (TradeMinedEventData | WithdrawalMinedEventData)[]
   ): Promise<(Hash256 | undefined)[]> {
     if (datas.length === 0) {
       return []
@@ -356,7 +346,7 @@ export class ForcedTransactionsRepository {
     await this.knex('forced_transaction_events').delete()
   }
 
-  async getAllEvents(): Promise<TransactionEventRecord[]> {
+  async getAllEvents(): Promise<EventRecord[]> {
     const rows = await this.knex('forced_transaction_events').select()
     return rows.map(toRecord)
   }
@@ -367,7 +357,7 @@ export class ForcedTransactionsRepository {
   }: {
     limit: number
     offset: number
-  }): Promise<Transaction[]> {
+  }): Promise<ForcedTransaction[]> {
     const latestTable = this.knex
       .select(
         this.knex.raw('max(timestamp) as max_timestamp'),
@@ -392,7 +382,7 @@ export class ForcedTransactionsRepository {
 
   async getIncludedInStateUpdate(
     stateUpdateId: number
-  ): Promise<Transaction[]> {
+  ): Promise<ForcedTransaction[]> {
     const rows = await this.knex
       .from('forced_transaction_events')
       .whereIn(
@@ -405,7 +395,7 @@ export class ForcedTransactionsRepository {
     return eventRowsToTransactions(rows)
   }
 
-  async getAffectingPosition(positionId: bigint): Promise<Transaction[]> {
+  async getAffectingPosition(positionId: bigint): Promise<ForcedTransaction[]> {
     const rows = await this.knex
       .from('forced_transaction_events')
       .whereIn(
