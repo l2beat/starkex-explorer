@@ -10,6 +10,7 @@ import {
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
 import { AssetId } from '@explorer/types'
+import { omit } from 'lodash'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
@@ -153,7 +154,10 @@ export class FrontendController {
   }
 
   async getStateUpdateDetailsPage(id: number): Promise<ControllerResult> {
-    const stateUpdate = await this.stateUpdateRepository.getStateUpdateById(id)
+    const [stateUpdate, transactions] = await Promise.all([
+      this.stateUpdateRepository.getStateUpdateById(id),
+      this.forcedTransactionsRepository.getIncludedInStateUpdate(id),
+    ])
 
     if (!stateUpdate) {
       return {
@@ -211,6 +215,9 @@ export class FrontendController {
             assetsUpdated,
           }
         }),
+        transactions: transactions
+          .map(buildViewTransaction)
+          .map((t) => omit(t, 'status')),
       }),
       status: 200,
     }

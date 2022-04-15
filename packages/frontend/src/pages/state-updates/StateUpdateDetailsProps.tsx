@@ -1,4 +1,5 @@
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface StateUpdateDetailsProps {
   readonly id: number
@@ -13,4 +14,5 @@ export interface StateUpdateDetailsProps {
     readonly previousTotalUSDCents?: bigint
     readonly assetsUpdated?: number
   }>
+  transactions: Omit<ForcedTransaction, 'status'>[]
 }

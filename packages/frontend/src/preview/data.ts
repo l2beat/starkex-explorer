@@ -53,6 +53,14 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
       previousTotalUSDCents: 90n,
     },
   ],
+  transactions: Array.from({ length: 5 }).map((_, i) => ({
+    type: i % 2 === 0 ? 'exit' : i % 3 === 0 ? 'buy' : 'sell',
+    assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-7'),
+    lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
+    hash: Hash256.fake(),
+    positionId: BigInt(i),
+    amount: 10000n * (BigInt(i) + 1n),
+  })),
 }
 
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {

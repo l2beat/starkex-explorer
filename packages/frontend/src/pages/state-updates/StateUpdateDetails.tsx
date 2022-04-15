@@ -6,6 +6,9 @@ import { Table } from '../common/Table'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { formatHash } from '../formatHash'
 import { SimpleLink } from '../common/SimpleLink'
+import { AssetNameCell } from '../common/AssetNameCell'
+import { formatLargeNumber } from '../formatLargeNumber'
+import { formatTime } from '../formatTime'
 
 export function StateUpdateDetails({
   id,
@@ -14,6 +17,7 @@ export function StateUpdateDetails({
   positions,
   blockNumber,
   timestamp,
+  transactions,
 }: StateUpdateDetailsProps) {
   return (
     <Page
@@ -52,6 +56,7 @@ export function StateUpdateDetails({
         Updated positions
       </div>
       <Table
+        className="mb-8"
         columns={[
           { header: 'Position id' },
           { header: 'Owner', maxWidth: 320, cellFontMono: true },
@@ -79,6 +84,33 @@ export function StateUpdateDetails({
             link: `/positions/${positionId}`,
           })
         )}
+      />
+      <div className="mb-1.5 font-medium text-lg text-left">
+        Included forced transactions
+      </div>
+      <Table
+        columns={[
+          { header: 'Type' },
+          { header: 'Time' },
+          { header: 'Hash', cellFontMono: true, maxWidth: 250 },
+          { header: 'Amount', numeric: true },
+          { header: 'Asset' },
+          { header: 'Position ID', numeric: true },
+        ]}
+        rows={transactions.map((transaction) => {
+          const link = `/forced-transactions/${transaction.hash}`
+          return {
+            link,
+            cells: [
+              transaction.type,
+              formatTime(transaction.lastUpdate),
+              formatHash(transaction.hash.toString()),
+              formatLargeNumber(transaction.amount),
+              <AssetNameCell assetId={transaction.assetId} />,
+              transaction.positionId.toString(),
+            ],
+          }
+        })}
       />
     </Page>
   )
