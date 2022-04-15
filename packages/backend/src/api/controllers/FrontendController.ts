@@ -291,9 +291,10 @@ export class FrontendController {
     positionId: bigint,
     stateUpdateId: number
   ): Promise<ControllerResult> {
-    const [history, update] = await Promise.all([
+    const [history, update, transactions] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
       this.stateUpdateRepository.getStateUpdateById(stateUpdateId),
+      this.forcedTransactionsRepository.getIncludedInStateUpdate(stateUpdateId),
     ])
     const updateIndex = history.findIndex(
       (p) => p.stateUpdateId === stateUpdateId
@@ -327,6 +328,14 @@ export class FrontendController {
         previousPublicKey: previousPosition?.publicKey,
         publicKey: position.publicKey,
         assetChanges,
+        transactions: transactions
+          .filter((t) => {
+            return t.type === 'trade'
+              ? [t.positionIdA, t.positionIdB].includes(positionId)
+              : t.positionId === positionId
+          })
+          .map(buildViewTransaction)
+          .map((t) => omit(t, 'positionId', 'status', '')),
       }),
       status: 200,
     }

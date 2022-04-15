@@ -1,4 +1,5 @@
 import { AssetId, Timestamp } from '@explorer/types'
+import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface PositionAtUpdateProps {
   readonly stateUpdateId: number
@@ -12,4 +13,7 @@ export interface PositionAtUpdateProps {
     readonly currentBalance: bigint
     readonly balanceDiff: bigint
   }>
+  readonly transactions: ReadonlyArray<
+    Omit<ForcedTransaction, 'positionId' | 'status'>
+  >
 }
