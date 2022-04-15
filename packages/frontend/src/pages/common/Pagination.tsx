@@ -10,7 +10,7 @@ type PaginationProps = {
   baseUrl?: string
 }
 
-function divisionCeil(numeral: bigint, denominator: bigint) {
+function bigintDivisionCeil(numeral: bigint, denominator: bigint) {
   return numeral % denominator === 0n
     ? numeral / denominator
     : numeral / denominator + 1n
@@ -25,7 +25,7 @@ export function Pagination({
   const first = 1
   const prev = Number(page) - 1
   const next = Number(page) + 1
-  const last = divisionCeil(BigInt(fullCount), BigInt(perPage))
+  const last = bigintDivisionCeil(BigInt(fullCount), BigInt(perPage))
 
   const link = (page: number | bigint, perPage: number) => {
     const hasQuestionMark = baseUrl.indexOf('?') !== -1
