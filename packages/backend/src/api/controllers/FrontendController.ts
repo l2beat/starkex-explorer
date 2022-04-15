@@ -1,7 +1,6 @@
 import { AssetBalance } from '@explorer/encoding'
 import {
   ForcedTransactionsIndexProps,
-  HomeProps,
   renderForcedTransactionsIndexPage,
   renderHomePage,
   renderPositionAtUpdatePage,
@@ -87,26 +86,26 @@ export class FrontendController {
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
   async getHomePage(): Promise<string> {
+    const offset = 0
+    const limit = 5
     const [stateUpdates, totalUpdates, totalPositions, transactions] =
       await Promise.all([
         this.stateUpdateRepository.getStateUpdateList({
-          offset: 0,
-          limit: 20,
+          offset,
+          limit,
         }),
         this.stateUpdateRepository.countStateUpdates(),
         this.stateUpdateRepository.countPositions(),
-        this.forcedTransactionsRepository.getLatest({ limit: 5, offset: 0 }),
+        this.forcedTransactionsRepository.getLatest({ limit, offset }),
       ])
 
     return renderHomePage({
-      stateUpdates: stateUpdates.map(
-        (x): HomeProps['stateUpdates'][number] => ({
-          id: x.id,
-          hash: x.rootHash,
-          timestamp: x.timestamp,
-          positionCount: x.positionCount,
-        })
-      ),
+      stateUpdates: stateUpdates.map((x) => ({
+        id: x.id,
+        hash: x.rootHash,
+        timestamp: x.timestamp,
+        positionCount: x.positionCount,
+      })),
       forcedTransactions: transactions.map(buildViewTransaction),
       totalUpdates,
       totalPositions,
