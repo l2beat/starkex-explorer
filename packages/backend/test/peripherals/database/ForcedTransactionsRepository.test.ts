@@ -172,7 +172,7 @@ describe(ForcedTransactionsRepository.name, () => {
 
     await repository.addEvents(events)
 
-    const latest = await repository.getLatest(10)
+    const latest = await repository.getLatest({ limit: 10, offset: 0 })
 
     expect(latest).toEqual([
       {
@@ -200,7 +200,7 @@ describe(ForcedTransactionsRepository.name, () => {
         stateUpdateId: 1,
       },
     ])
-    const offset = await repository.getLatest(10, 2)
+    const offset = await repository.getLatest({ limit: 10, offset: 2 })
     expect(offset).toEqual([])
   })
 

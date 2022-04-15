@@ -361,7 +361,13 @@ export class ForcedTransactionsRepository {
     return rows.map(toRecord)
   }
 
-  async getLatest(limit: number, offset = 0): Promise<Transaction[]> {
+  async getLatest({
+    limit,
+    offset,
+  }: {
+    limit: number
+    offset: number
+  }): Promise<Transaction[]> {
     const latestTable = this.knex
       .select(
         this.knex.raw('max(timestamp) as max_timestamp'),

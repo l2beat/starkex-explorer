@@ -76,7 +76,7 @@ export class FrontendController {
         }),
         this.stateUpdateRepository.countStateUpdates(),
         this.stateUpdateRepository.countPositions(),
-        this.forcedTransactionsRepository.getLatest(10),
+        this.forcedTransactionsRepository.getLatest({ limit: 5, offset: 0 }),
       ])
 
     return renderHomePage({
