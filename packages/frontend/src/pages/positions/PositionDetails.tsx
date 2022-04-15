@@ -61,7 +61,7 @@ const buildUpdateHistoryTableRow =
     }
   }
 
-const transactionsHistoryTableColumns = [
+const transactionHistoryTableColumns = [
   { header: 'Type' },
   { header: 'Time' },
   { header: 'Status' },
@@ -70,7 +70,7 @@ const transactionsHistoryTableColumns = [
   { header: 'Asset' },
 ]
 
-const buildTransactionsHistoryTableRow = (
+const buildTransactionHistoryTableRow = (
   transaction: PositionDetailsProps['transactions'][number]
 ) => {
   const link = `/forced-transactions/${transaction.hash}`
@@ -148,11 +148,11 @@ export function PositionDetails({
         rows={history.map(buildUpdateHistoryTableRow(positionId))}
       />
       <div className="mb-1.5 font-medium text-lg text-left">
-        Force transactions history
+        Force transaction history
       </div>
       <Table
-        columns={transactionsHistoryTableColumns}
-        rows={transactions.map(buildTransactionsHistoryTableRow)}
+        columns={transactionHistoryTableColumns}
+        rows={transactions.map(buildTransactionHistoryTableRow)}
       />
     </Page>
   )
