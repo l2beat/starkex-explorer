@@ -7,6 +7,8 @@ import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { formatHash } from '../formatHash'
 import { SimpleLink } from '../common/SimpleLink'
 import { AssetNameCell } from '../common/AssetNameCell'
+import { formatLargeNumber } from '../formatLargeNumber'
+import { formatTime } from '../formatTime'
 
 const balanceTableColumns = [
   { header: 'Name' },
@@ -59,6 +61,32 @@ const buildUpdateHistoryTableRow =
     }
   }
 
+const transactionsHistoryTableColumns = [
+  { header: 'Type' },
+  { header: 'Time' },
+  { header: 'Status' },
+  { header: 'Hash', cellFontMono: true, maxWidth: 250 as const },
+  { header: 'Amount', numeric: true },
+  { header: 'Asset' },
+]
+
+const buildTransactionsHistoryTableRow = (
+  transaction: PositionDetailsProps['transactions'][number]
+) => {
+  const link = `/forced-transactions/${transaction.hash}`
+  return {
+    link,
+    cells: [
+      transaction.type,
+      formatTime(transaction.lastUpdate),
+      transaction.status,
+      formatHash(transaction.hash.toString()),
+      formatLargeNumber(transaction.amount),
+      <AssetNameCell assetId={transaction.assetId} />,
+    ],
+  }
+}
+
 export function PositionDetails({
   positionId,
   assets,
@@ -67,6 +95,7 @@ export function PositionDetails({
   lastUpdateTimestamp,
   ethAddress,
   history,
+  transactions,
 }: PositionDetailsProps) {
   return (
     <Page
@@ -114,8 +143,16 @@ export function PositionDetails({
       />
       <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
       <Table
+        className="mb-8"
         columns={updateHistoryTableColumns}
         rows={history.map(buildUpdateHistoryTableRow(positionId))}
+      />
+      <div className="mb-1.5 font-medium text-lg text-left">
+        Force transactions history
+      </div>
+      <Table
+        columns={transactionsHistoryTableColumns}
+        rows={transactions.map(buildTransactionsHistoryTableRow)}
       />
     </Page>
   )

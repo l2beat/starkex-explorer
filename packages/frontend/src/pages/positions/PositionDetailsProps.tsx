@@ -1,4 +1,5 @@
 import { AssetId, Timestamp } from '@explorer/types'
+import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface PositionDetailsProps {
   readonly positionId: bigint
@@ -17,4 +18,5 @@ export interface PositionDetailsProps {
     readonly totalUSDCents: bigint
     readonly assetsUpdated: number
   }>
+  readonly transactions: ReadonlyArray<Omit<ForcedTransaction, 'positionId'>>
 }

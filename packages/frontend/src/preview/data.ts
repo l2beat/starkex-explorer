@@ -108,6 +108,14 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       assetsUpdated: 20,
     },
   ],
+  transactions: Array.from({ length: 5 }).map((_, i) => ({
+    type: i % 2 === 0 ? 'exit' : i % 3 === 0 ? 'buy' : 'sell',
+    status: i % 3 === 0 ? 'waiting to be included' : 'completed',
+    assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-7'),
+    lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
+    hash: Hash256.fake(),
+    amount: 10000n * (BigInt(i) + 1n),
+  })),
 }
 
 export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {

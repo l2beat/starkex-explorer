@@ -224,9 +224,10 @@ export class FrontendController {
   }
 
   async getPositionDetailsPage(positionId: bigint): Promise<ControllerResult> {
-    const history = await this.stateUpdateRepository.getPositionHistoryById(
-      positionId
-    )
+    const [history, transactions] = await Promise.all([
+      this.stateUpdateRepository.getPositionHistoryById(positionId),
+      this.forcedTransactionsRepository.getAffectingPosition(positionId),
+    ])
 
     if (!history[0]) {
       return {
@@ -279,6 +280,9 @@ export class FrontendController {
             assetsUpdated,
           }
         }),
+        transactions: transactions
+          .map(buildViewTransaction)
+          .map((t) => omit(t, 'positionId')),
       }),
     }
   }
