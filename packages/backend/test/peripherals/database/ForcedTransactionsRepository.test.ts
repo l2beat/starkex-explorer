@@ -89,6 +89,7 @@ describe(ForcedTransactionsRepository.name, () => {
       isABuyingSynthetic: true,
       syntheticAmount: 456n,
       collateralAmount: 789n,
+      nonce: 1n,
     }
 
     const events = [
@@ -141,6 +142,7 @@ describe(ForcedTransactionsRepository.name, () => {
       isABuyingSynthetic: true,
       syntheticAmount: 456n,
       collateralAmount: 789n,
+      nonce: 1n,
     }
 
     const events = [
@@ -222,6 +224,7 @@ describe(ForcedTransactionsRepository.name, () => {
       isABuyingSynthetic: true,
       syntheticAmount: 456n,
       collateralAmount: 789n,
+      nonce: 1n,
     }
 
     const events = [
@@ -286,6 +289,7 @@ describe(ForcedTransactionsRepository.name, () => {
       isABuyingSynthetic: true,
       syntheticAmount: 456n,
       collateralAmount: 789n,
+      nonce: 1n,
     }
 
     const events = [
@@ -355,6 +359,7 @@ describe(ForcedTransactionsRepository.name, () => {
       isABuyingSynthetic: true,
       syntheticAmount: 456n,
       collateralAmount: 789n,
+      nonce: 1n,
     }
 
     const events = [

@@ -22,6 +22,7 @@ export async function up(knex: Knex) {
     table.integer('block_number').index()
     table.bigInteger('timestamp').notNullable()
     table.jsonb('data').notNullable()
+    table.string('data_hash').notNullable().index()
   })
 }
 

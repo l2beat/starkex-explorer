@@ -115,6 +115,7 @@ declare module 'knex/types/tables' {
     block_number?: number
     timestamp: bigint
     data: json
+    data_hash: string
   }
 
   interface Tables {

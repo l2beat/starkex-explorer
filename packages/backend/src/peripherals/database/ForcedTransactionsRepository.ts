@@ -102,16 +102,10 @@ function recordCandidateToRow(
     eventType: event_type,
     blockNumber: block_number,
     timestamp,
-    ...rest
+    ...data
   } = candidate
 
-  const data =
-    event_type === 'mined'
-      ? {
-          ...rest,
-          hash: hashData(toJsonString(rest)),
-        }
-      : rest
+  const data_hash = hashData(toJsonString(data))
 
   return {
     id,
@@ -121,6 +115,7 @@ function recordCandidateToRow(
     block_number,
     timestamp: BigInt(Number(timestamp)),
     data: toSerializableJson(data),
+    data_hash,
   }
 }
 
@@ -326,14 +321,11 @@ export class ForcedTransactionsRepository {
       return []
     }
     const hashes = datas.map(toJsonString).map(hashData)
-    const events = await this.knex('forced_transaction_events').whereRaw(
-      "data->>'hash' = any(?)",
-      [hashes]
-    )
+    const events = await this.knex('forced_transaction_events')
+      .whereIn('data_hash', hashes)
+      .andWhere('event_type', '=', 'mined')
     return hashes.map((hash) => {
-      const event = events.find(
-        (event) => String(Object(event.data).hash) === hash
-      )
+      const event = events.find((event) => event.data_hash === hash)
       return event ? Hash256(event.transaction_hash) : undefined
     })
   }
