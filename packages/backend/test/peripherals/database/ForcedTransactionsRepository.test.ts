@@ -116,7 +116,7 @@ describe(ForcedTransactionsRepository.name, () => {
     await repository.addEvents(events)
 
     const hashes = await repository.getTransactionHashesByMinedEventsData([
-      data1,
+      { positionId: 123n, amount: 123n, publicKey: '123' },
       data2,
       { ...data2, publicKeyA: 'something' },
     ])

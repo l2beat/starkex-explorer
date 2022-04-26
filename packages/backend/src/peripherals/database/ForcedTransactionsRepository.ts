@@ -1,8 +1,8 @@
 import { AssetId, Hash256, json, Timestamp } from '@explorer/types'
-import { createHash } from 'crypto'
 import { Knex } from 'knex'
 import { ForcedTransactionEventRow as EventRow } from 'knex/types/tables'
 import { groupBy, pick } from 'lodash'
+import { MD5 } from 'object-hash'
 
 import { Logger } from '../../tools/Logger'
 
@@ -84,12 +84,8 @@ function toSerializableJson(data: object): json {
   }, {})
 }
 
-function toJsonString(data: object) {
-  return JSON.stringify(toSerializableJson(data))
-}
-
-function hashData(data: string): string {
-  return createHash('md5').update(data).digest('base64')
+function hashData(data: object): string {
+  return MD5(data)
 }
 
 function recordCandidateToRow(
@@ -105,7 +101,7 @@ function recordCandidateToRow(
     ...data
   } = candidate
 
-  const data_hash = hashData(toJsonString(data))
+  const data_hash = hashData(data)
 
   return {
     id,
@@ -320,7 +316,7 @@ export class ForcedTransactionsRepository {
     if (datas.length === 0) {
       return []
     }
-    const hashes = datas.map(toJsonString).map(hashData)
+    const hashes = datas.map(hashData)
     const events = await this.knex('forced_transaction_events')
       .whereIn('data_hash', hashes)
       .andWhere('event_type', '=', 'mined')
