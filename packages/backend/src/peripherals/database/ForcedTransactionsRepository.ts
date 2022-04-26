@@ -45,6 +45,7 @@ type TradeMinedEventData = {
   isABuyingSynthetic: boolean
   collateralAmount: bigint
   syntheticAmount: bigint
+  nonce: bigint
 }
 
 type TradeMinedEventRecordCandidate = EventRecordCandidateBase &
@@ -163,6 +164,7 @@ function toRecord(row: EventRow): EventRecord {
       syntheticAmount: BigInt(data.syntheticAmount),
       isABuyingSynthetic: Boolean(data.isABuyingSynthetic),
       syntheticAssetId: AssetId(data.syntheticAssetId),
+      nonce: BigInt(data.nonce),
     }
   }
   if (transactionType === 'withdrawal' && eventType === 'verified') {
@@ -209,7 +211,7 @@ type MinedTrade = {
   type: 'trade'
   status: 'mined'
   lastUpdate: Timestamp
-} & TradeMinedEventData
+} & Omit<TradeMinedEventData, 'nonce'>
 
 type VerifiedTrade = Omit<MinedTrade, 'status'> & {
   status: 'verified'

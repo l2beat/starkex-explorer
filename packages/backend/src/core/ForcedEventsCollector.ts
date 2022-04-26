@@ -78,6 +78,7 @@ export class ForcedEventsCollector {
               isABuyingSynthetic: event.args.aIsBuyingSynthetic,
               collateralAmount: BigInt(event.args.amountCollateral),
               syntheticAmount: BigInt(event.args.amountSynthetic),
+              nonce: BigInt(event.args.nonce),
             }
           case 'LogForcedWithdrawalRequest':
             return {

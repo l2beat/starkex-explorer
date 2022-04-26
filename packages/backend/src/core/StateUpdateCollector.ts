@@ -1,7 +1,6 @@
 import { decodeOnChainData, ForcedAction } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { omit } from 'lodash'
 
 import {
   ForcedTransactionsRepository,
@@ -119,11 +118,7 @@ export class StateUpdateCollector {
     blockNumber: number,
     stateUpdateId: number
   ): Promise<void> {
-    const datas = forcedActions.map((action) =>
-      action.type === 'trade'
-        ? omit(action, 'type', 'nonce')
-        : omit(action, 'type')
-    )
+    const datas = forcedActions.map(({ type: _type, ...data }) => data)
     const hashes =
       await this.forcedTransactionsRepository.getTransactionHashesByMinedEventsData(
         datas
