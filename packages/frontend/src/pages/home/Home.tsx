@@ -9,6 +9,8 @@ import { SimpleLink } from '../common/SimpleLink'
 import { FreezeButton } from './FreezeButton'
 import { Stat } from './Stat'
 import { tvlElId } from './tvlElId'
+import { AssetNameCell } from '../common/AssetNameCell'
+import { formatLargeNumber } from '../formatLargeNumber'
 
 export function Home(props: HomeProps) {
   return (
@@ -41,9 +43,15 @@ export function Home(props: HomeProps) {
         </SimpleLink>
       </div>
       <Table
+        noRowsText="no state updates have occurred so far"
+        className="mb-8"
         columns={[
           { header: 'No.' },
-          { header: 'Hash', cellFontMono: true, maxWidth: true },
+          {
+            header: 'Hash',
+            cellFontMono: true,
+            maxWidthClass: 'max-w-[320px]',
+          },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
         ]}
@@ -56,6 +64,45 @@ export function Home(props: HomeProps) {
               formatHash(update.hash),
               formatTime(update.timestamp),
               update.positionCount.toString(),
+            ],
+          }
+        })}
+      />
+      <div className="mb-1.5">
+        <span className="float-left font-medium text-lg">
+          Latest forced transactions
+        </span>
+        <SimpleLink className="float-right" href="/forced-transactions">
+          view all
+        </SimpleLink>
+      </div>
+      <Table
+        noRowsText="no forced transactions have been issued so far"
+        columns={[
+          { header: 'Type' },
+          { header: 'Time' },
+          { header: 'Status' },
+          {
+            header: 'Hash',
+            cellFontMono: true,
+            maxWidthClass: 'max-w-[250px]',
+          },
+          { header: 'Amount', numeric: true },
+          { header: 'Asset' },
+          { header: 'Position ID', numeric: true },
+        ]}
+        rows={props.forcedTransactions.map((transaction) => {
+          const link = `/forced-transactions/${transaction.hash}`
+          return {
+            link,
+            cells: [
+              transaction.type,
+              formatTime(transaction.lastUpdate),
+              transaction.status,
+              formatHash(transaction.hash.toString()),
+              formatLargeNumber(transaction.amount),
+              <AssetNameCell assetId={transaction.assetId} />,
+              transaction.positionId.toString(),
             ],
           }
         })}

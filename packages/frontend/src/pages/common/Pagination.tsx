@@ -6,8 +6,14 @@ import { PrevIcon } from './icons/PrevIcon'
 type PaginationProps = {
   page: number
   perPage: number
-  fullCount: number
+  fullCount: number | bigint
   baseUrl?: string
+}
+
+function bigintDivisionCeil(numeral: bigint, denominator: bigint) {
+  return numeral % denominator === 0n
+    ? numeral / denominator
+    : numeral / denominator + 1n
 }
 
 export function Pagination({
@@ -19,9 +25,9 @@ export function Pagination({
   const first = 1
   const prev = Number(page) - 1
   const next = Number(page) + 1
-  const last = Math.ceil(fullCount / perPage)
+  const last = bigintDivisionCeil(BigInt(fullCount), BigInt(perPage))
 
-  const link = (page: number, perPage: number) => {
+  const link = (page: number | bigint, perPage: number) => {
     const hasQuestionMark = baseUrl.indexOf('?') !== -1
     return (
       baseUrl + (hasQuestionMark ? '' : '?') + `page=${page}&perPage=${perPage}`
@@ -47,7 +53,7 @@ export function Pagination({
           <PrevIcon width={8} height={12} />
         </a>
         <span className="bg-grey-200 px-3 py-1 rounded-md">
-          Page {page} out of {last}
+          Page {page} out of {last.toString()}
         </span>
         <a
           href={link(next, perPage)}

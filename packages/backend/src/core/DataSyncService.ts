@@ -1,6 +1,7 @@
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
+import { ForcedEventsCollector } from './ForcedEventsCollector'
 import { MemoryHashEventCollector } from './MemoryHashEventCollector'
 import { PageCollector } from './PageCollector'
 import { StateTransitionFactCollector } from './StateTransitionFactCollector'
@@ -16,6 +17,7 @@ export class DataSyncService {
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
     private readonly stateUpdateCollector: StateUpdateCollector,
     private readonly userRegistrationCollector: UserRegistrationCollector,
+    private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -33,6 +35,7 @@ export class DataSyncService {
     const userRegistrationEvents = await this.userRegistrationCollector.collect(
       blockRange
     )
+    const forcedEvents = await this.forcedEventsCollector.collect(blockRange)
 
     this.logger.info({
       method: 'sync',
@@ -42,6 +45,7 @@ export class DataSyncService {
       newPageRecords: pageRecords.length,
       newStateTransitionFacts: stateTransitionFacts.length,
       userRegistrationEvents: userRegistrationEvents.length,
+      forcedEvents: forcedEvents.length,
     })
 
     await this.stateUpdateCollector.save(stateTransitionFacts)
@@ -54,5 +58,6 @@ export class DataSyncService {
     await this.stateTransitionFactCollector.discardAfter(blockNumber)
     await this.stateUpdateCollector.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
+    await this.forcedEventsCollector.discardAfter(blockNumber)
   }
 }

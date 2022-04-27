@@ -1,6 +1,7 @@
 import { AssetBalance } from '@explorer/encoding'
 import {
-  HomeProps,
+  ForcedTransactionsIndexProps,
+  renderForcedTransactionsIndexPage,
   renderHomePage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
@@ -8,9 +9,14 @@ import {
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress } from '@explorer/types'
+import { omit } from 'lodash'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
+import {
+  ForcedTransaction,
+  ForcedTransactionsRepository,
+} from '../../peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 
@@ -43,6 +49,7 @@ const buildViewAssets = (
   })
   return assets
 }
+
 const countDifferentAssets = (
   prev: readonly AssetBalance[],
   current: readonly AssetBalance[]
@@ -54,6 +61,19 @@ const countDifferentAssets = (
   }, 0)
 }
 
+const buildViewTransaction = (
+  t: ForcedTransaction
+): ForcedTransactionsIndexProps['transactions'][number] => ({
+  type:
+    t.type === 'withdrawal' ? 'exit' : t.isABuyingSynthetic ? 'buy' : 'sell',
+  status: t.status === 'mined' ? 'waiting to be included' : 'completed',
+  hash: t.hash,
+  lastUpdate: t.lastUpdate,
+  amount: t.type === 'trade' ? t.syntheticAmount : t.amount,
+  assetId: t.type === 'trade' ? t.syntheticAssetId : AssetId('USDC-1'),
+  positionId: t.type === 'trade' ? t.positionIdA : t.positionId,
+})
+
 type ControllerResult = {
   html: string
   status: 200 | 404
@@ -62,31 +82,52 @@ type ControllerResult = {
 export class FrontendController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
-    private userRegistrationEventRepository: UserRegistrationEventRepository
+    private userRegistrationEventRepository: UserRegistrationEventRepository,
+    private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
-
   async getHomePage(account: EthereumAddress | undefined): Promise<string> {
-    const [stateUpdates, totalUpdates, totalPositions] = await Promise.all([
-      this.stateUpdateRepository.getStateUpdateList({
-        offset: 0,
-        limit: 20,
-      }),
-      this.stateUpdateRepository.countStateUpdates(),
-      this.stateUpdateRepository.countPositions(),
-    ])
+    const offset = 0
+    const limit = 5
+    const [stateUpdates, totalUpdates, totalPositions, transactions] =
+      await Promise.all([
+        this.stateUpdateRepository.getStateUpdateList({
+          offset,
+          limit,
+        }),
+        this.stateUpdateRepository.countStateUpdates(),
+        this.stateUpdateRepository.countPositions(),
+        this.forcedTransactionsRepository.getLatest({ limit, offset }),
+      ])
 
     return renderHomePage({
       account,
-      stateUpdates: stateUpdates.map(
-        (x): HomeProps['stateUpdates'][number] => ({
-          id: x.id,
-          hash: x.rootHash,
-          timestamp: x.timestamp,
-          positionCount: x.positionCount,
-        })
-      ),
+      stateUpdates: stateUpdates.map((x) => ({
+        id: x.id,
+        hash: x.rootHash,
+        timestamp: x.timestamp,
+        positionCount: x.positionCount,
+      })),
+      forcedTransactions: transactions.map(buildViewTransaction),
       totalUpdates,
       totalPositions,
+    })
+  }
+
+  async getForcedTransactionsPage(
+    page: number,
+    perPage: number
+  ): Promise<string> {
+    const limit = perPage
+    const offset = (page - 1) * perPage
+    const [transactions, fullCount] = await Promise.all([
+      this.forcedTransactionsRepository.getLatest({ limit, offset }),
+      this.forcedTransactionsRepository.countAll(),
+    ])
+
+    return renderForcedTransactionsIndexPage({
+      transactions: transactions.map(buildViewTransaction),
+      fullCount,
+      params: { page, perPage },
     })
   }
 
@@ -121,7 +162,10 @@ export class FrontendController {
     id: number,
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const stateUpdate = await this.stateUpdateRepository.getStateUpdateById(id)
+    const [stateUpdate, transactions] = await Promise.all([
+      this.stateUpdateRepository.getStateUpdateById(id),
+      this.forcedTransactionsRepository.getIncludedInStateUpdate(id),
+    ])
 
     if (!stateUpdate) {
       return {
@@ -180,6 +224,9 @@ export class FrontendController {
             assetsUpdated,
           }
         }),
+        transactions: transactions
+          .map(buildViewTransaction)
+          .map((t) => omit(t, 'status')),
       }),
       status: 200,
     }
@@ -189,9 +236,10 @@ export class FrontendController {
     positionId: bigint,
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const history = await this.stateUpdateRepository.getPositionHistoryById(
-      positionId
-    )
+    const [history, transactions] = await Promise.all([
+      this.stateUpdateRepository.getPositionHistoryById(positionId),
+      this.forcedTransactionsRepository.getAffectingPosition(positionId),
+    ])
 
     if (!history[0]) {
       return {
@@ -245,6 +293,9 @@ export class FrontendController {
             assetsUpdated,
           }
         }),
+        transactions: transactions
+          .map(buildViewTransaction)
+          .map((t) => omit(t, 'positionId')),
       }),
     }
   }
@@ -254,9 +305,10 @@ export class FrontendController {
     stateUpdateId: number,
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [history, update] = await Promise.all([
+    const [history, update, transactions] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
       this.stateUpdateRepository.getStateUpdateById(stateUpdateId),
+      this.forcedTransactionsRepository.getIncludedInStateUpdate(stateUpdateId),
     ])
     const updateIndex = history.findIndex(
       (p) => p.stateUpdateId === stateUpdateId
@@ -291,6 +343,14 @@ export class FrontendController {
         previousPublicKey: previousPosition?.publicKey,
         publicKey: position.publicKey,
         assetChanges,
+        transactions: transactions
+          .filter((t) => {
+            return t.type === 'trade'
+              ? [t.positionIdA, t.positionIdB].includes(positionId)
+              : t.positionId === positionId
+          })
+          .map(buildViewTransaction)
+          .map((t) => omit(t, 'positionId', 'status', '')),
       }),
       status: 200,
     }

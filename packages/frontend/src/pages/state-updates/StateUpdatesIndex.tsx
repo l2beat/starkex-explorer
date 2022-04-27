@@ -33,9 +33,14 @@ export function StateUpdatesIndex({
         baseUrl="/state-updates"
       />
       <Table
+        noRowsText="no state updates have occurred so far"
         columns={[
           { header: 'No.' },
-          { header: 'Hash', cellFontMono: true, maxWidth: true },
+          {
+            header: 'Hash',
+            cellFontMono: true,
+            maxWidthClass: 'max-w-[320px]',
+          },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
         ]}

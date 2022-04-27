@@ -1,14 +1,27 @@
 import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import {
+  ForcedTransactionsIndexProps,
   HomeProps,
   PositionAtUpdateProps,
   PositionDetailsProps,
   StateUpdateDetailsProps,
   StateUpdatesIndexProps,
 } from '../pages'
+import { ForcedTransaction } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
 
 const ONE_HOUR = 60 * 60 * 1000
+
+const createFakeTransactions = (count: number): ForcedTransaction[] =>
+  Array.from({ length: count }).map((_, i) => ({
+    type: i % 2 === 0 ? 'exit' : i % 3 === 0 ? 'buy' : 'sell',
+    status: i % 3 === 0 ? 'waiting to be included' : 'completed',
+    assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-7'),
+    lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
+    hash: Hash256.fake(),
+    amount: 10000n * (BigInt(i) + 1n),
+    positionId: 100n * BigInt(i),
+  }))
 
 export const HOME_PROPS: HomeProps = {
   account: undefined,
@@ -20,6 +33,7 @@ export const HOME_PROPS: HomeProps = {
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)
     ),
   })),
+  forcedTransactions: createFakeTransactions(10),
   totalPositions: 45762n,
   totalUpdates: 5143n,
 }
@@ -45,6 +59,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
       previousTotalUSDCents: 90n,
     },
   ],
+  transactions: createFakeTransactions(5),
 }
 
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
@@ -93,6 +108,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       assetsUpdated: 20,
     },
   ],
+  transactions: createFakeTransactions(5),
 }
 
 export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
@@ -122,6 +138,7 @@ export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
       balanceDiff: 0n,
     },
   ],
+  transactions: createFakeTransactions(5),
 }
 
 export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
@@ -139,4 +156,13 @@ export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
     perPage: 10,
     page: 5,
   },
+}
+
+export const FORCED_TRANSACTIONS_INDEX_PROPS: ForcedTransactionsIndexProps = {
+  transactions: createFakeTransactions(50),
+  params: {
+    page: 1,
+    perPage: 50,
+  },
+  fullCount: 100n,
 }

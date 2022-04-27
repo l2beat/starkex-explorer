@@ -1,4 +1,5 @@
 import { Position } from '@explorer/state'
+import { json } from '@explorer/types'
 
 export {}
 
@@ -106,6 +107,17 @@ declare module 'knex/types/tables' {
     eth_address: string
   }
 
+  interface ForcedTransactionEventRow {
+    id: number
+    transaction_hash: string
+    transaction_type: string
+    event_type: string
+    block_number?: number
+    timestamp: bigint
+    data: json
+    data_hash: string
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -120,6 +132,8 @@ declare module 'knex/types/tables' {
     state_updates: StateUpdateRow
     positions: PositionRow
     prices: PriceRow
+    user_registration_evens: UserRegistrationEventRow
+    forced_transaction_events: ForcedTransactionEventRow
   }
 }
 

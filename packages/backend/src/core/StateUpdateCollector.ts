@@ -1,7 +1,8 @@
-import { decodeOnChainData } from '@explorer/encoding'
+import { decodeOnChainData, ForcedAction } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
+import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionFactRecord } from '../peripherals/database/StateTransitionFactsRepository'
@@ -32,6 +33,7 @@ export class StateUpdateCollector {
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly rollupStateRepository: RollupStateRepository,
     private readonly ethereumClient: EthereumClient,
+    private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     private rollupState?: RollupState
   ) {}
 
@@ -66,7 +68,8 @@ export class StateUpdateCollector {
     if (!this.rollupState) {
       return
     }
-    const { timestamp } = await this.ethereumClient.getBlock(blockNumber)
+    const block = await this.ethereumClient.getBlock(blockNumber)
+    const timestamp = Timestamp.fromSeconds(block.timestamp)
 
     const decoded = decodeOnChainData(pages)
 
@@ -77,28 +80,72 @@ export class StateUpdateCollector {
     if (rootHash !== PedersenHash(decoded.newState.positionRoot)) {
       throw new Error('State transition calculated incorrectly')
     }
-    await this.stateUpdateRepository.add({
-      stateUpdate: {
-        id,
+    await Promise.all([
+      this.stateUpdateRepository.add({
+        stateUpdate: {
+          id,
+          blockNumber,
+          factHash,
+          rootHash,
+          timestamp,
+        },
+        positions: newPositions.map(
+          ({ value, index }): PositionRecord => ({
+            positionId: index,
+            publicKey: value.publicKey,
+            balances: value.assets,
+            collateralBalance: value.collateralBalance,
+          })
+        ),
+        prices: decoded.newState.oraclePrices,
+      }),
+      this.processForcedActions(
+        decoded.forcedActions,
+        timestamp,
         blockNumber,
-        factHash,
-        rootHash,
-        timestamp: Timestamp.fromSeconds(timestamp),
-      },
-      positions: newPositions.map(
-        ({ value, index }): PositionRecord => ({
-          positionId: index,
-          publicKey: value.publicKey,
-          balances: value.assets,
-          collateralBalance: value.collateralBalance,
-        })
+        id
       ),
-      prices: decoded.newState.oraclePrices,
+    ])
+  }
+
+  async processForcedActions(
+    forcedActions: ForcedAction[],
+    timestamp: Timestamp,
+    blockNumber: number,
+    stateUpdateId: number
+  ): Promise<void> {
+    const datas = forcedActions.map(({ type: _type, ...data }) => data)
+    const hashes =
+      await this.forcedTransactionsRepository.getTransactionHashesByMinedEventsData(
+        datas
+      )
+    const filteredHashes = hashes.filter(
+      (h): h is Exclude<typeof h, undefined> => h !== undefined
+    )
+
+    if (filteredHashes.length !== datas.length) {
+      throw new Error(
+        'Forced action included in state update does not have a matching mined transaction'
+      )
+    }
+
+    const events = filteredHashes.map((transactionHash, i) => {
+      return {
+        eventType: 'verified' as const,
+        transactionType: forcedActions[i].type,
+        transactionHash,
+        timestamp,
+        blockNumber,
+        stateUpdateId,
+      }
     })
+
+    await this.forcedTransactionsRepository.addEvents(events)
   }
 
   async discardAfter(blockNumber: BlockNumber) {
     await this.stateUpdateRepository.deleteAllAfter(blockNumber)
+    await this.forcedTransactionsRepository.discardAfter(blockNumber)
   }
 
   private async readLastUpdate() {

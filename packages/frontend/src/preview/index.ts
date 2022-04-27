@@ -5,6 +5,7 @@ import Koa from 'koa'
 import serve from 'koa-static'
 
 import {
+  renderForcedTransactionsIndexPage,
   renderHomePage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
@@ -40,6 +41,11 @@ router.get('/positions/:positionId/updates/:updateId', (ctx) => {
   const data = { ...DATA.POSITION_AT_UPDATE_PROPS }
   data.account = getAccount(ctx)
   ctx.body = renderPositionAtUpdatePage(data)
+})
+router.get('/forced-transactions', (ctx) => {
+  ctx.body = renderForcedTransactionsIndexPage(
+    DATA.FORCED_TRANSACTIONS_INDEX_PROPS
+  )
 })
 
 function getAccount(ctx: Koa.Context) {

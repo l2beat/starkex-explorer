@@ -1,22 +1,16 @@
 import { EthereumAddress, PedersenHash, Timestamp } from '@explorer/types'
 
+import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
+
 export interface HomeProps {
   readonly account: EthereumAddress | undefined
-  readonly stateUpdates: readonly HomeStateUpdate[]
+  readonly stateUpdates: ReadonlyArray<{
+    readonly id: number
+    readonly hash: PedersenHash
+    readonly timestamp: Timestamp
+    readonly positionCount: number
+  }>
+  readonly forcedTransactions: ReadonlyArray<ForcedTransaction>
   readonly totalUpdates: bigint
   readonly totalPositions: bigint
-}
-
-export interface HomeStateUpdate {
-  readonly id: number
-  readonly hash: PedersenHash
-  readonly timestamp: Timestamp
-  readonly positionCount: number
-}
-
-export interface HomeForcedTransaction {
-  readonly hash: string // TODO: Hash256
-  readonly type: 'exit' | 'trade'
-  readonly timestamp: Timestamp
-  readonly valueUSDCents: number
 }
