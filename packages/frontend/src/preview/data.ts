@@ -11,6 +11,7 @@ import {
 const ONE_HOUR = 60 * 60 * 1000
 
 export const HOME_PROPS: HomeProps = {
+  account: undefined,
   stateUpdates: Array.from({ length: 6 }).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),
@@ -24,6 +25,7 @@ export const HOME_PROPS: HomeProps = {
 }
 
 export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
+  account: undefined,
   id: 1,
   hash: Hash256.fake(),
   rootHash: PedersenHash.fake(),
@@ -46,6 +48,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
 }
 
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
+  account: undefined,
   positionId: 123n,
   publicKey: `0x${'0'.repeat(63)}1`,
   ethAddress: '0x1234567890ABCDEF1234567890ABCDEF12345678',
@@ -93,6 +96,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
 }
 
 export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
+  account: undefined,
   stateUpdateId: 1,
   positionId: 123n,
   publicKey: `0x${'0'.repeat(63)}1`,
@@ -121,6 +125,7 @@ export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
 }
 
 export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
+  account: undefined,
   stateUpdates: Array.from({ length: 10 }).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),

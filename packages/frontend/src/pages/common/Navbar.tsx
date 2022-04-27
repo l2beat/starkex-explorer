@@ -3,12 +3,14 @@ import React from 'react'
 import { L2beatExplorerLogo } from './logos/L2beatExplorerLogo'
 import { DydxLogo } from './logos/DydxLogo'
 import { SearchBar } from './SearchBar'
+import { EthereumAddress } from '@explorer/types'
 
-type NavbarProps = {
-  searchBar: boolean
+export interface NavbarProps {
+  readonly account: EthereumAddress | undefined
+  readonly searchBar: boolean
 }
 
-export function Navbar({ searchBar = true }: NavbarProps) {
+export function Navbar({ account, searchBar = true }: NavbarProps) {
   return (
     <div className="flex justify-between items-center px-4 py-2.5 border-b-[1px] border-grey-300 flex-wrap gap-y-2">
       <a className="flex" href="/">
@@ -19,27 +21,20 @@ export function Navbar({ searchBar = true }: NavbarProps) {
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4 w-full lg:w-auto">
         {searchBar && <SearchBar className="lg:w-auto lg:min-w-[600px]" />}
-        <button
-          id="connect-with-metamask"
-          className="bg-grey-300 px-4 rounded-md h-[44px] w-full lg:w-auto"
-        >
-          Connect
-        </button>
+        {!account && (
+          <button
+            id="connect-with-metamask"
+            className="bg-grey-300 px-4 rounded-md h-[44px] w-full lg:w-auto"
+          >
+            Connect
+          </button>
+        )}
+        {account && (
+          <div className="bg-grey-300 px-4 rounded-md h-[44px] w-full lg:w-auto leading-[44px] align-middle">
+            {account.toLowerCase().slice(0, 6)}
+          </div>
+        )}
       </div>
-
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            document.getElementById("connect-with-metamask").onclick = () => {
-              if (typeof window.ethereum === 'undefined') {
-                window.alert('MetaMask is not installed!');
-                return
-              }
-              window.ethereum.request({ method: 'eth_requestAccounts' });
-            }
-          `,
-        }}
-      />
     </div>
   )
 }
