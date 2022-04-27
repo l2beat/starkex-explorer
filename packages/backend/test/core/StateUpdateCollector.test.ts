@@ -1,5 +1,4 @@
 import { Block } from '@ethersproject/providers'
-import { ForcedAction } from '@explorer/encoding'
 import { InMemoryRollupStorage, RollupState } from '@explorer/state'
 import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
@@ -211,30 +210,9 @@ describe(StateUpdateCollector.name, () => {
 
   describe(StateUpdateCollector.prototype.processForcedActions.name, () => {
     it('adds verified events only for existing mined events', async () => {
-      const forcedActions: ForcedAction[] = [
-        {
-          type: 'withdrawal',
-          amount: 1n,
-          positionId: 12n,
-          publicKey: '123',
-        },
-        {
-          type: 'trade',
-          positionIdA: 12n,
-          positionIdB: 34n,
-          publicKeyA: '123',
-          publicKeyB: '456',
-          collateralAmount: 123n,
-          syntheticAmount: 456n,
-          isABuyingSynthetic: true,
-          nonce: 123n,
-          syntheticAssetId: AssetId('ETH-7'),
-        },
-      ]
-      const transactionHash = Hash256.fake()
       const forcedTransactionsRepository = mock<ForcedTransactionsRepository>({
         getTransactionHashesByMinedEventsData: async () => [
-          transactionHash,
+          Hash256.fake(),
           undefined,
         ],
         addEvents: async () => {},
@@ -248,32 +226,33 @@ describe(StateUpdateCollector.name, () => {
         forcedTransactionsRepository
       )
 
-      const timestamp = Timestamp(0)
-      const blockNumber = 1
-      const stateUpdateId = 1
-      await stateUpdateCollector.processForcedActions(
-        forcedActions,
-        timestamp,
-        blockNumber,
-        stateUpdateId
-      )
-
       expect(
-        forcedTransactionsRepository.addEvents
-      ).toHaveBeenCalledExactlyWith([
-        [
+        stateUpdateCollector.processForcedActions(
           [
             {
-              eventType: 'verified',
-              transactionType: 'withdrawal',
-              transactionHash,
-              timestamp,
-              blockNumber,
-              stateUpdateId,
+              type: 'withdrawal',
+              amount: 1n,
+              positionId: 12n,
+              publicKey: '123',
+            },
+            {
+              type: 'trade',
+              positionIdA: 12n,
+              positionIdB: 34n,
+              publicKeyA: '123',
+              publicKeyB: '456',
+              collateralAmount: 123n,
+              syntheticAmount: 456n,
+              isABuyingSynthetic: true,
+              nonce: 123n,
+              syntheticAssetId: AssetId('ETH-7'),
             },
           ],
-        ],
-      ])
+          Timestamp(0),
+          1,
+          1
+        )
+      ).toBeRejected()
     })
   })
 })

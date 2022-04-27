@@ -2,11 +2,7 @@ import { decodeOnChainData, ForcedAction } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
-import {
-  ForcedTransactionsRepository,
-  TradeVerifiedEventRecordCandidate,
-  WithdrawalVerifiedEventRecordCandidate,
-} from '../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionFactRecord } from '../peripherals/database/StateTransitionFactsRepository'
@@ -123,26 +119,27 @@ export class StateUpdateCollector {
       await this.forcedTransactionsRepository.getTransactionHashesByMinedEventsData(
         datas
       )
-    const events = hashes
-      .map((transactionHash, i) => {
-        return transactionHash
-          ? {
-              eventType: 'verified',
-              transactionType: forcedActions[i].type,
-              transactionHash,
-              timestamp,
-              blockNumber,
-              stateUpdateId,
-            }
-          : undefined
-      })
-      .filter(
-        (
-          e
-        ): e is
-          | TradeVerifiedEventRecordCandidate
-          | WithdrawalVerifiedEventRecordCandidate => e !== undefined
+    const filteredHashes = hashes.filter(
+      (h): h is Exclude<typeof h, undefined> => h !== undefined
+    )
+
+    if (filteredHashes.length !== datas.length) {
+      throw new Error(
+        'Forced action included in state update does not have a matching mined transaction'
       )
+    }
+
+    const events = filteredHashes.map((transactionHash, i) => {
+      return {
+        eventType: 'verified' as const,
+        transactionType: forcedActions[i].type,
+        transactionHash,
+        timestamp,
+        blockNumber,
+        stateUpdateId,
+      }
+    })
+
     await this.forcedTransactionsRepository.addEvents(events)
   }
 
