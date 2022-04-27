@@ -4,6 +4,7 @@ import {
   PedersenHash,
   Timestamp,
 } from '@explorer/types'
+
 import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface StateUpdateDetailsProps {
@@ -14,7 +15,7 @@ export interface StateUpdateDetailsProps {
   readonly blockNumber: number
   readonly timestamp: Timestamp
   readonly positions: readonly StateUpdatePosition[]
-  readonly transactions: readonly  Omit<ForcedTransaction, 'status'>[]
+  readonly transactions: readonly Omit<ForcedTransaction, 'status'>[]
 }
 
 export interface StateUpdatePosition {

@@ -8,8 +8,9 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
-import { omit } from 'lodash'
 import { AssetId, EthereumAddress } from '@explorer/types'
+import { omit } from 'lodash'
+
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import {

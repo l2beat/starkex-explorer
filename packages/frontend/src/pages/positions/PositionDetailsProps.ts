@@ -1,4 +1,5 @@
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
+
 import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface PositionDetailsProps {
