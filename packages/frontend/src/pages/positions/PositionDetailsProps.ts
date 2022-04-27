@@ -1,7 +1,7 @@
-import { AssetId, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
 export interface PositionDetailsProps {
-  readonly account: string | undefined
+  readonly account: EthereumAddress | undefined
   readonly positionId: bigint
   readonly publicKey: string
   readonly ethAddress?: string

@@ -1,7 +1,12 @@
-import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import {
+  EthereumAddress,
+  Hash256,
+  PedersenHash,
+  Timestamp,
+} from '@explorer/types'
 
 export interface StateUpdateDetailsProps {
-  readonly account: string | undefined
+  readonly account: EthereumAddress | undefined
   readonly id: number
   readonly hash: Hash256
   readonly rootHash: PedersenHash

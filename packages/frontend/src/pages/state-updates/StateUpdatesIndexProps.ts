@@ -1,7 +1,7 @@
-import { PedersenHash, Timestamp } from '@explorer/types'
+import { EthereumAddress, PedersenHash, Timestamp } from '@explorer/types'
 
 export interface StateUpdatesIndexProps {
-  readonly account: string | undefined
+  readonly account: EthereumAddress | undefined
   readonly stateUpdates: readonly StateUpdate[]
   readonly params: {
     readonly perPage: number

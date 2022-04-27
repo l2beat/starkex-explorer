@@ -1,7 +1,7 @@
-import { PedersenHash, Timestamp } from '@explorer/types'
+import { EthereumAddress, PedersenHash, Timestamp } from '@explorer/types'
 
 export interface HomeProps {
-  readonly account: string | undefined
+  readonly account: EthereumAddress | undefined
   readonly stateUpdates: readonly HomeStateUpdate[]
   readonly totalUpdates: bigint
   readonly totalPositions: bigint

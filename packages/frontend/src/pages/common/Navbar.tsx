@@ -3,10 +3,11 @@ import React from 'react'
 import { L2beatExplorerLogo } from './logos/L2beatExplorerLogo'
 import { DydxLogo } from './logos/DydxLogo'
 import { SearchBar } from './SearchBar'
+import { EthereumAddress } from '@explorer/types'
 
-type NavbarProps = {
-  account: string | undefined
-  searchBar: boolean
+export interface NavbarProps {
+  readonly account: EthereumAddress | undefined
+  readonly searchBar: boolean
 }
 
 export function Navbar({ account, searchBar = true }: NavbarProps) {
