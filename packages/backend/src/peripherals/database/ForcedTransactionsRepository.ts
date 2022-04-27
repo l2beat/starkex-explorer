@@ -320,6 +320,9 @@ export class ForcedTransactionsRepository {
     const events = await this.knex('forced_transaction_events')
       .whereIn('data_hash', hashes)
       .andWhere('event_type', '=', 'mined')
+      .whereNotIn('transaction_hash', this.knex('forced_transaction_events').select('transaction_hash').where('event_type', '=', 'verified'))
+      .orderBy('id')
+
     return hashes.map((hash) => {
       const event = events.find((event) => event.data_hash === hash)
       return event ? Hash256(event.transaction_hash) : undefined

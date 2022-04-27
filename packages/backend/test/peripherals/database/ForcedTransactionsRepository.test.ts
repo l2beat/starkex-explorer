@@ -71,6 +71,69 @@ describe(ForcedTransactionsRepository.name, () => {
     expect(hashes).toEqual([])
   })
 
+  it('returns transaction hashes only for unverified transactions', async () => {
+    const hash1 = Hash256.fake()
+    const data = {
+      publicKeyA: '123a',
+      publicKeyB: '123b',
+      positionIdA: 456n,
+      positionIdB: 789n,
+      syntheticAssetId: AssetId('ETH-7'),
+      isABuyingSynthetic: true,
+      syntheticAmount: 456n,
+      collateralAmount: 789n,
+      nonce: 1n,
+    }
+    const hash2 = Hash256.fake()
+
+    const events = [
+      {
+        id: 1,
+        transactionType: 'trade' as const,
+        eventType: 'mined' as const,
+        timestamp: Timestamp(1),
+        transactionHash: hash1,
+        blockNumber: 1,
+        ...data,
+      },
+      {
+        id: 2,
+        transactionType: 'trade' as const,
+        eventType: 'mined' as const,
+        timestamp: Timestamp(2),
+        transactionHash: hash2,
+        blockNumber: 1,
+        ...data,
+      },
+    ]
+
+    await repository.addEvents(events)
+
+    const hashes1 = await repository.getTransactionHashesByMinedEventsData([
+      data,
+    ])
+
+    expect(hashes1).toEqual([hash1])
+
+    await repository.addEvents([
+      {
+        id: 3,
+        transactionType: 'trade',
+        eventType: 'verified',
+        timestamp: Timestamp(3),
+        transactionHash: hash1,
+        blockNumber: 1,
+        stateUpdateId: 1,
+      },
+    ])
+
+    const hashes2 = await repository.getTransactionHashesByMinedEventsData([
+      data,
+    ])
+
+    expect(hashes2).toEqual([hash2])
+  })
+
   it('returns transaction hashes', async () => {
     const hash1 = Hash256.fake()
     const data1 = {
