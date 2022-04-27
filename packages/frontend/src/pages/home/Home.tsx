@@ -46,7 +46,11 @@ export function Home(props: HomeProps) {
         className="mb-8"
         columns={[
           { header: 'No.' },
-          { header: 'Hash', cellFontMono: true, maxWidth: 320 },
+          {
+            header: 'Hash',
+            cellFontMono: true,
+            maxWidthClass: 'max-w-[320px]',
+          },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
         ]}
@@ -77,7 +81,11 @@ export function Home(props: HomeProps) {
           { header: 'Type' },
           { header: 'Time' },
           { header: 'Status' },
-          { header: 'Hash', cellFontMono: true, maxWidth: 250 },
+          {
+            header: 'Hash',
+            cellFontMono: true,
+            maxWidthClass: 'max-w-[250px]',
+          },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
           { header: 'Position ID', numeric: true },

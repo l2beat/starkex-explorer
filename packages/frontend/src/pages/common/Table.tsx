@@ -11,7 +11,7 @@ type Row = {
 type Column = {
   header: string
   numeric?: boolean
-  maxWidth?: 250 | 320
+  maxWidthClass?: string
   cellFontMono?: boolean
 }
 
@@ -25,8 +25,6 @@ type TableProps = {
 const textAlign = (numeric?: boolean) => (numeric ? 'text-right' : 'text-left')
 const cellPaddings = 'px-2 py-0.5'
 const cellOverflowStyles = 'text-ellipsis overflow-hidden'
-const maxWidthStyles = (maxWidth?: Column['maxWidth']) =>
-  maxWidth && maxWidth === 320 ? 'max-w-[320px]' : 'max-w-[250px]'
 
 const RowEl = ({
   cells,
@@ -41,7 +39,7 @@ const RowEl = ({
     )}
   >
     {cells.map((cell, col) => {
-      const { maxWidth, numeric, cellFontMono } = columns[col] || {}
+      const { maxWidthClass, numeric, cellFontMono } = columns[col] || {}
       const content = link ? (
         <a
           href={link}
@@ -49,7 +47,7 @@ const RowEl = ({
             'block',
             'first-letter:capitalize',
             cellPaddings,
-            maxWidth && cellOverflowStyles
+            maxWidthClass
           )}
         >
           {cell}
@@ -65,8 +63,8 @@ const RowEl = ({
             !link && 'first-letter:capitalize',
             (numeric || cellFontMono) && 'font-mono',
             textAlign(numeric),
-            maxWidthStyles(maxWidth),
-            maxWidth && !link && cellOverflowStyles
+            maxWidthClass,
+            maxWidthClass && !link && cellOverflowStyles
           )}
         >
           {content}
@@ -99,14 +97,14 @@ export function Table({ columns, rows, className, noRowsText }: TableProps) {
       <table className="w-full whitespace-nowrap">
         <thead>
           <tr className="bg-grey-300 font-medium">
-            {columns.map(({ header, numeric, maxWidth }, i) => (
+            {columns.map(({ header, numeric, maxWidthClass }, i) => (
               <th
                 scope="col"
                 key={i}
                 className={cx(
                   'px-2 py-1 border-2 border-grey-100 rounded-md',
                   textAlign(numeric),
-                  maxWidthStyles(maxWidth)
+                  maxWidthClass
                 )}
               >
                 {header}

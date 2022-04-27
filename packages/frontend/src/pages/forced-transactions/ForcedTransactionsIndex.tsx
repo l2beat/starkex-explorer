@@ -37,7 +37,11 @@ export function ForcedTransactionsIndex({
           { header: 'Type' },
           { header: 'Time' },
           { header: 'Status' },
-          { header: 'Hash', cellFontMono: true, maxWidth: 250 },
+          {
+            header: 'Hash',
+            cellFontMono: true,
+            maxWidthClass: 'max-w-[250px]',
+          },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
           { header: 'Position ID', numeric: true },

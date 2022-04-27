@@ -34,7 +34,11 @@ export function StateUpdatesIndex({
         noRowsText="no state updates have occurred so far"
         columns={[
           { header: 'No.' },
-          { header: 'Hash', cellFontMono: true, maxWidth: 320 },
+          {
+            header: 'Hash',
+            cellFontMono: true,
+            maxWidthClass: 'max-w-[320px]',
+          },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
         ]}

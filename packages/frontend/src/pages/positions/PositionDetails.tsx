@@ -65,7 +65,7 @@ const transactionHistoryTableColumns = [
   { header: 'Type' },
   { header: 'Time' },
   { header: 'Status' },
-  { header: 'Hash', cellFontMono: true, maxWidth: 250 as const },
+  { header: 'Hash', cellFontMono: true, maxWidthClass: 'max-w-[250px]' },
   { header: 'Amount', numeric: true },
   { header: 'Asset' },
 ]

@@ -60,7 +60,11 @@ export function StateUpdateDetails({
         className="mb-8"
         columns={[
           { header: 'Position id' },
-          { header: 'Owner', maxWidth: 320, cellFontMono: true },
+          {
+            header: 'Owner',
+            maxWidthClass: 'max-w-[320px]',
+            cellFontMono: true,
+          },
           { header: 'Value before', numeric: true },
           { header: 'Value after', numeric: true },
           { header: 'Assets updated', numeric: true },
@@ -94,7 +98,11 @@ export function StateUpdateDetails({
         columns={[
           { header: 'Type' },
           { header: 'Time' },
-          { header: 'Hash', cellFontMono: true, maxWidth: 250 },
+          {
+            header: 'Hash',
+            cellFontMono: true,
+            maxWidthClass: 'max-w-[250px]',
+          },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
           { header: 'Position ID', numeric: true },
