@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { EthereumAddress } from '@explorer/types'
 import Router from '@koa/router'
 import Koa from 'koa'
 import serve from 'koa-static'
@@ -17,25 +18,46 @@ const app = new Koa()
 const router = new Router()
 
 router.get('/', (ctx) => {
-  ctx.body = renderHomePage(DATA.HOME_PROPS)
+  const data = { ...DATA.HOME_PROPS }
+  data.account = getAccount(ctx)
+  ctx.body = renderHomePage(data)
 })
 router.get('/state-updates', (ctx) => {
-  ctx.body = renderStateUpdatesIndexPage(DATA.STATE_CHANGES_INDEX_PROPS)
+  const data = { ...DATA.STATE_CHANGES_INDEX_PROPS }
+  data.account = getAccount(ctx)
+  ctx.body = renderStateUpdatesIndexPage(data)
 })
 router.get('/state-updates/:hash', (ctx) => {
-  ctx.body = renderStateUpdateDetailsPage(DATA.STATE_CHANGE_DETAILS_PROPS)
+  const data = { ...DATA.STATE_CHANGE_DETAILS_PROPS }
+  data.account = getAccount(ctx)
+  ctx.body = renderStateUpdateDetailsPage(data)
 })
 router.get('/positions/:positionId', (ctx) => {
-  ctx.body = renderPositionDetailsPage(DATA.POSITION_DETAILS_PROPS)
+  const data = { ...DATA.POSITION_DETAILS_PROPS }
+  data.account = getAccount(ctx)
+  ctx.body = renderPositionDetailsPage(data)
 })
 router.get('/positions/:positionId/updates/:updateId', (ctx) => {
-  ctx.body = renderPositionAtUpdatePage(DATA.POSITION_AT_UPDATE_PROPS)
+  const data = { ...DATA.POSITION_AT_UPDATE_PROPS }
+  data.account = getAccount(ctx)
+  ctx.body = renderPositionAtUpdatePage(data)
 })
 router.get('/forced-transactions', (ctx) => {
   ctx.body = renderForcedTransactionsIndexPage(
     DATA.FORCED_TRANSACTIONS_INDEX_PROPS
   )
 })
+
+function getAccount(ctx: Koa.Context) {
+  const cookie = ctx.cookies.get('account')
+  if (cookie) {
+    try {
+      return EthereumAddress(cookie)
+    } catch {
+      return
+    }
+  }
+}
 
 app.use(router.routes())
 app.use(router.allowedMethods())

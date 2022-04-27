@@ -8,9 +8,8 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
-import { AssetId } from '@explorer/types'
 import { omit } from 'lodash'
-
+import { AssetId, EthereumAddress } from '@explorer/types'
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import {
@@ -85,7 +84,7 @@ export class FrontendController {
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
-  async getHomePage(): Promise<string> {
+  async getHomePage(account: EthereumAddress | undefined): Promise<string> {
     const offset = 0
     const limit = 5
     const [stateUpdates, totalUpdates, totalPositions, transactions] =
@@ -100,6 +99,7 @@ export class FrontendController {
       ])
 
     return renderHomePage({
+      account,
       stateUpdates: stateUpdates.map((x) => ({
         id: x.id,
         hash: x.rootHash,
@@ -130,7 +130,11 @@ export class FrontendController {
     })
   }
 
-  async getStateUpdatesPage(page: number, perPage: number): Promise<string> {
+  async getStateUpdatesPage(
+    page: number,
+    perPage: number,
+    account: EthereumAddress | undefined
+  ): Promise<string> {
     const stateUpdates = await this.stateUpdateRepository.getStateUpdateList({
       offset: (page - 1) * perPage,
       limit: perPage,
@@ -138,6 +142,7 @@ export class FrontendController {
     const fullCount = await this.stateUpdateRepository.getStateUpdateCount()
 
     return renderStateUpdatesIndexPage({
+      account,
       stateUpdates: stateUpdates.map((update) => ({
         id: update.id,
         hash: update.rootHash,
@@ -152,7 +157,10 @@ export class FrontendController {
     })
   }
 
-  async getStateUpdateDetailsPage(id: number): Promise<ControllerResult> {
+  async getStateUpdateDetailsPage(
+    id: number,
+    account: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
     const [stateUpdate, transactions] = await Promise.all([
       this.stateUpdateRepository.getStateUpdateById(id),
       this.forcedTransactionsRepository.getIncludedInStateUpdate(id),
@@ -173,6 +181,7 @@ export class FrontendController {
 
     return {
       html: renderStateUpdateDetailsPage({
+        account,
         id: stateUpdate.id,
         hash: stateUpdate.hash,
         rootHash: stateUpdate.rootHash,
@@ -222,7 +231,10 @@ export class FrontendController {
     }
   }
 
-  async getPositionDetailsPage(positionId: bigint): Promise<ControllerResult> {
+  async getPositionDetailsPage(
+    positionId: bigint,
+    account: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
     const [history, transactions] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
       this.forcedTransactionsRepository.getAffectingPosition(positionId),
@@ -262,6 +274,7 @@ export class FrontendController {
     return {
       status: 200,
       html: renderPositionDetailsPage({
+        account,
         positionId,
         publicKey: current.publicKey,
         ethAddress: lastUserRegistrationEvent?.ethAddress.toString(),
@@ -288,7 +301,8 @@ export class FrontendController {
 
   async getPositionUpdatePage(
     positionId: bigint,
-    stateUpdateId: number
+    stateUpdateId: number,
+    account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
     const [history, update, transactions] = await Promise.all([
       this.stateUpdateRepository.getPositionHistoryById(positionId),
@@ -321,6 +335,7 @@ export class FrontendController {
 
     return {
       html: renderPositionAtUpdatePage({
+        account,
         stateUpdateId,
         positionId,
         lastUpdateTimestamp: update.timestamp,

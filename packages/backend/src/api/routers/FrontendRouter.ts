@@ -1,4 +1,6 @@
+import { EthereumAddress } from '@explorer/types'
 import Router from '@koa/router'
+import { Context } from 'koa'
 import { z } from 'zod'
 
 import { FrontendController } from '../controllers/FrontendController'
@@ -8,7 +10,8 @@ export function createFrontendRouter(frontendController: FrontendController) {
   const router = new Router()
 
   router.get('/', async (ctx) => {
-    ctx.body = await frontendController.getHomePage()
+    const account = getAccount(ctx)
+    ctx.body = await frontendController.getHomePage(account)
   })
 
   router.get(
@@ -41,7 +44,12 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { page, perPage } = ctx.query
-        ctx.body = await frontendController.getStateUpdatesPage(page, perPage)
+        const account = getAccount(ctx)
+        ctx.body = await frontendController.getStateUpdatesPage(
+          page,
+          perPage,
+          account
+        )
       }
     )
   )
@@ -56,8 +64,9 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { id } = ctx.params
+        const account = getAccount(ctx)
         const { status, html } =
-          await frontendController.getStateUpdateDetailsPage(id)
+          await frontendController.getStateUpdateDetailsPage(id, account)
         ctx.body = html
         ctx.status = status
       }
@@ -74,8 +83,9 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { positionId } = ctx.params
+        const account = getAccount(ctx)
         const { status, html } =
-          await frontendController.getPositionDetailsPage(positionId)
+          await frontendController.getPositionDetailsPage(positionId, account)
         ctx.body = html
         ctx.status = status
       }
@@ -93,9 +103,11 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { positionId, updateId } = ctx.params
+        const account = getAccount(ctx)
         const { status, html } = await frontendController.getPositionUpdatePage(
           positionId,
-          updateId
+          updateId,
+          account
         )
         ctx.body = html
         ctx.status = status
@@ -104,4 +116,15 @@ export function createFrontendRouter(frontendController: FrontendController) {
   )
 
   return router
+}
+
+export function getAccount(ctx: Context) {
+  const cookie = ctx.cookies.get('account')
+  if (cookie) {
+    try {
+      return EthereumAddress(cookie)
+    } catch {
+      return
+    }
+  }
 }

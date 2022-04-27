@@ -11,6 +11,7 @@ export function StateUpdatesIndex({
   stateUpdates,
   params: { perPage, page },
   fullCount,
+  account,
 }: StateUpdatesIndexProps) {
   return (
     <Page
@@ -20,6 +21,7 @@ export function StateUpdatesIndex({
       image="/images/under-construction.png"
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
+      account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-12">
         Latest state updates
