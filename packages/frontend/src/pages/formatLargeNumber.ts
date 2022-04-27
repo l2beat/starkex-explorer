@@ -11,7 +11,7 @@ export function formatLargeNumber(value: number | bigint): string {
   const str =
     typeof value === 'number'
       ? Math.floor(value * 100).toString()
-      : value.toString()
+      : (value * 100n).toString()
   for (const [i, unit] of units.entries()) {
     if (str.length <= 4 + i * 3) {
       const offset = str.length - 2 - i * 3
