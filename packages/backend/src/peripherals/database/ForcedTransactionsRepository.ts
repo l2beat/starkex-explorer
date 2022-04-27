@@ -6,37 +6,39 @@ import { MD5 as hashData } from 'object-hash'
 
 import { Logger } from '../../tools/Logger'
 
-type EventRecordCandidateBase = {
+interface EventRecordCandidateBase {
   id?: number
   transactionHash: Hash256
   timestamp: Timestamp
 }
 
-type WithdrawalMinedEventData = {
+interface WithdrawalMinedEventData {
   publicKey: string
   positionId: bigint
   amount: bigint
 }
 
-type WithdrawalMinedEventRecordCandidate = EventRecordCandidateBase &
-  WithdrawalMinedEventData & {
-    transactionType: 'withdrawal'
-    eventType: 'mined'
-    blockNumber: number
-  }
+interface WithdrawalMinedEventRecordCandidate
+  extends EventRecordCandidateBase,
+    WithdrawalMinedEventData {
+  transactionType: 'withdrawal'
+  eventType: 'mined'
+  blockNumber: number
+}
 
-type VerifiedEventBase = {
+interface VerifiedEventBase {
   eventType: 'verified'
   stateUpdateId: number
 }
 
-export type WithdrawalVerifiedEventRecordCandidate = EventRecordCandidateBase &
-  VerifiedEventBase & {
-    transactionType: 'withdrawal'
-    blockNumber: number
-  }
+export interface WithdrawalVerifiedEventRecordCandidate
+  extends EventRecordCandidateBase,
+    VerifiedEventBase {
+  transactionType: 'withdrawal'
+  blockNumber: number
+}
 
-type TradeMinedEventData = {
+interface TradeMinedEventData {
   publicKeyA: string
   publicKeyB: string
   positionIdA: bigint
@@ -48,18 +50,20 @@ type TradeMinedEventData = {
   nonce: bigint
 }
 
-type TradeMinedEventRecordCandidate = EventRecordCandidateBase &
-  TradeMinedEventData & {
-    transactionType: 'trade'
-    eventType: 'mined'
-    blockNumber: number
-  }
+interface TradeMinedEventRecordCandidate
+  extends EventRecordCandidateBase,
+    TradeMinedEventData {
+  transactionType: 'trade'
+  eventType: 'mined'
+  blockNumber: number
+}
 
-export type TradeVerifiedEventRecordCandidate = EventRecordCandidateBase &
-  VerifiedEventBase & {
-    transactionType: 'trade'
-    blockNumber: number
-  }
+export interface TradeVerifiedEventRecordCandidate
+  extends EventRecordCandidateBase,
+    VerifiedEventBase {
+  transactionType: 'trade'
+  blockNumber: number
+}
 
 export type EventRecordCandidate =
   | TradeMinedEventRecordCandidate
@@ -179,28 +183,28 @@ function toRecord(row: EventRow): EventRecord {
   throw new Error('Unknown event type')
 }
 
-type MinedWithdrawal = {
+interface MinedWithdrawal extends WithdrawalMinedEventData {
   hash: Hash256
   type: 'withdrawal'
   status: 'mined'
   lastUpdate: Timestamp
-} & WithdrawalMinedEventData
+}
 
-type VerifiedWithdrawal = Omit<MinedWithdrawal, 'status'> & {
+interface VerifiedWithdrawal extends Omit<MinedWithdrawal, 'status'> {
   status: 'verified'
   stateUpdateId: number
 }
 
 type Withdrawal = MinedWithdrawal | VerifiedWithdrawal
 
-type MinedTrade = {
+interface MinedTrade extends Omit<TradeMinedEventData, 'nonce'> {
   hash: Hash256
   type: 'trade'
   status: 'mined'
   lastUpdate: Timestamp
-} & Omit<TradeMinedEventData, 'nonce'>
+}
 
-type VerifiedTrade = Omit<MinedTrade, 'status'> & {
+interface VerifiedTrade extends Omit<MinedTrade, 'status'> {
   status: 'verified'
   stateUpdateId: number
 }

@@ -107,7 +107,7 @@ declare module 'knex/types/tables' {
     eth_address: string
   }
 
-  type ForcedTransactionEventRow = {
+  interface ForcedTransactionEventRow {
     id: number
     transaction_hash: string
     transaction_type: string
