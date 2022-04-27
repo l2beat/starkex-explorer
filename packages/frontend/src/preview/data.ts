@@ -159,6 +159,7 @@ export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
 }
 
 export const FORCED_TRANSACTIONS_INDEX_PROPS: ForcedTransactionsIndexProps = {
+  account: undefined,
   transactions: createFakeTransactions(50),
   params: {
     page: 1,

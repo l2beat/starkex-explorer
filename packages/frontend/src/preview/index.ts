@@ -43,9 +43,9 @@ router.get('/positions/:positionId/updates/:updateId', (ctx) => {
   ctx.body = renderPositionAtUpdatePage(data)
 })
 router.get('/forced-transactions', (ctx) => {
-  ctx.body = renderForcedTransactionsIndexPage(
-    DATA.FORCED_TRANSACTIONS_INDEX_PROPS
-  )
+  const data = { ...DATA.FORCED_TRANSACTIONS_INDEX_PROPS }
+  data.account = getAccount(ctx)
+  ctx.body = renderForcedTransactionsIndexPage(data)
 })
 
 function getAccount(ctx: Koa.Context) {
