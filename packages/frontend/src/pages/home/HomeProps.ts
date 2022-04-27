@@ -1,22 +1,22 @@
 import { PedersenHash, Timestamp } from '@explorer/types'
 
 export interface HomeProps {
-  account: string | undefined
-  stateUpdates: HomeStateUpdate[]
-  totalUpdates: bigint
-  totalPositions: bigint
+  readonly account: string | undefined
+  readonly stateUpdates: readonly HomeStateUpdate[]
+  readonly totalUpdates: bigint
+  readonly totalPositions: bigint
 }
 
 export interface HomeStateUpdate {
-  id: number
-  hash: PedersenHash
-  timestamp: Timestamp
-  positionCount: number
+  readonly id: number
+  readonly hash: PedersenHash
+  readonly timestamp: Timestamp
+  readonly positionCount: number
 }
 
 export interface HomeForcedTransaction {
-  hash: string // TODO: Hash256
-  type: 'exit' | 'trade'
-  timestamp: Timestamp
-  valueUSDCents: number
+  readonly hash: string // TODO: Hash256
+  readonly type: 'exit' | 'trade'
+  readonly timestamp: Timestamp
+  readonly valueUSDCents: number
 }

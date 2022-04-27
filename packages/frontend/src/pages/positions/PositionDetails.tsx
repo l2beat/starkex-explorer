@@ -67,6 +67,7 @@ export function PositionDetails({
   lastUpdateTimestamp,
   ethAddress,
   history,
+  account,
 }: PositionDetailsProps) {
   return (
     <Page
@@ -76,6 +77,7 @@ export function PositionDetails({
       image="/images/under-construction.png"
       stylesheets={['/styles/main.css']}
       scripts={['/scripts/main.js']}
+      account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-12">
         Position #{positionId.toString()}

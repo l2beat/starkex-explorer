@@ -21,16 +21,24 @@ router.get('/', (ctx) => {
   ctx.body = renderHomePage(data)
 })
 router.get('/state-updates', (ctx) => {
-  ctx.body = renderStateUpdatesIndexPage(DATA.STATE_CHANGES_INDEX_PROPS)
+  const data = { ...DATA.STATE_CHANGES_INDEX_PROPS }
+  data.account = ctx.cookies.get('account')
+  ctx.body = renderStateUpdatesIndexPage(data)
 })
 router.get('/state-updates/:hash', (ctx) => {
-  ctx.body = renderStateUpdateDetailsPage(DATA.STATE_CHANGE_DETAILS_PROPS)
+  const data = { ...DATA.STATE_CHANGE_DETAILS_PROPS }
+  data.account = ctx.cookies.get('account')
+  ctx.body = renderStateUpdateDetailsPage(data)
 })
 router.get('/positions/:positionId', (ctx) => {
-  ctx.body = renderPositionDetailsPage(DATA.POSITION_DETAILS_PROPS)
+  const data = { ...DATA.POSITION_DETAILS_PROPS }
+  data.account = ctx.cookies.get('account')
+  ctx.body = renderPositionDetailsPage(data)
 })
 router.get('/positions/:positionId/updates/:updateId', (ctx) => {
-  ctx.body = renderPositionAtUpdatePage(DATA.POSITION_AT_UPDATE_PROPS)
+  const data = { ...DATA.POSITION_AT_UPDATE_PROPS }
+  data.account = ctx.cookies.get('account')
+  ctx.body = renderPositionAtUpdatePage(data)
 })
 
 app.use(router.routes())

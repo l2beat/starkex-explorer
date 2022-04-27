@@ -10,7 +10,13 @@ interface Props extends HeadProps {
   withoutSearch?: boolean
 }
 
-export function Page({ account, children, scripts, withoutSearch, ...head }: Props) {
+export function Page({
+  account,
+  children,
+  scripts,
+  withoutSearch,
+  ...head
+}: Props) {
   return (
     <html
       lang="en"
