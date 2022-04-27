@@ -74,10 +74,15 @@ const buildViewTransaction = (
   positionId: t.type === 'trade' ? t.positionIdA : t.positionId,
 })
 
-type ControllerResult = {
-  html: string
-  status: 200 | 404
-}
+export type ControllerResult =
+  | {
+      status: 200 | 404
+      html: string
+    }
+  | {
+      status: 302
+      url: string
+    }
 
 export class FrontendController {
   constructor(
@@ -135,27 +140,30 @@ export class FrontendController {
     page: number,
     perPage: number,
     account: EthereumAddress | undefined
-  ): Promise<string> {
+  ): Promise<ControllerResult> {
     const stateUpdates = await this.stateUpdateRepository.getStateUpdateList({
       offset: (page - 1) * perPage,
       limit: perPage,
     })
     const fullCount = await this.stateUpdateRepository.getStateUpdateCount()
 
-    return renderStateUpdatesIndexPage({
-      account,
-      stateUpdates: stateUpdates.map((update) => ({
-        id: update.id,
-        hash: update.rootHash,
-        timestamp: update.timestamp,
-        positionCount: update.positionCount,
-      })),
-      fullCount: Number(fullCount),
-      params: {
-        page,
-        perPage,
-      },
-    })
+    return {
+      status: 200,
+      html: renderStateUpdatesIndexPage({
+        account,
+        stateUpdates: stateUpdates.map((update) => ({
+          id: update.id,
+          hash: update.rootHash,
+          timestamp: update.timestamp,
+          positionCount: update.positionCount,
+        })),
+        fullCount: Number(fullCount),
+        params: {
+          page,
+          perPage,
+        },
+      }),
+    }
   }
 
   async getStateUpdateDetailsPage(
@@ -355,4 +363,99 @@ export class FrontendController {
       status: 200,
     }
   }
+
+  async getSearchRedirect(query: string): Promise<ControllerResult> {
+    const queryType = categorizeSearchQuery(query)
+
+    switch (queryType) {
+      case 'state_root_hash_or_stark_key': {
+        return this.searchForRootHashOrStarkKey(query)
+      }
+
+      case 'ethereum_address':
+        return this.searchForEthereumAddress(query)
+
+      default:
+        return {
+          status: 404,
+          html: "Search query param couldn't be found",
+        }
+    }
+  }
+
+  private async searchForEthereumAddress(
+    ethereumAddr: string
+  ): Promise<ControllerResult> {
+    const userRegistrationEvent =
+      await this.userRegistrationEventRepository.findByEthereumAddr(
+        ethereumAddr
+      )
+    if (userRegistrationEvent === undefined) {
+      return {
+        status: 404,
+        html: 'Ethereum address not found!',
+      }
+    }
+
+    const positionId =
+      await this.stateUpdateRepository.getPositionIdByPublicKey(
+        userRegistrationEvent.starkKey
+      )
+
+    return {
+      status: 302,
+      url: `/positions/${positionId}`,
+    }
+  }
+
+  private async searchForRootHashOrStarkKey(
+    rootHashOrStarkKey: string
+  ): Promise<ControllerResult> {
+    const positionId = await this.stateUpdateRepository.getPositionIdByRootHash(
+      rootHashOrStarkKey.slice(2)
+    )
+    if (positionId) {
+      return {
+        status: 302,
+        url: `/state-updates/${positionId}`,
+      }
+    }
+
+    return await this.searchForStarkKey(rootHashOrStarkKey)
+  }
+
+  private async searchForStarkKey(starkKey: string): Promise<ControllerResult> {
+    const userRegistrationEvent =
+      await this.userRegistrationEventRepository.findByStarkKey(starkKey)
+
+    if (userRegistrationEvent === undefined) {
+      return {
+        status: 404,
+        html: 'State root hash not found!',
+      }
+    }
+
+    const positionId =
+      await this.stateUpdateRepository.getPositionIdByPublicKey(
+        userRegistrationEvent.starkKey
+      )
+
+    return {
+      status: 302,
+      url: `/positions/${positionId}`,
+    }
+  }
+}
+
+type Type = 'state_root_hash_or_stark_key' | 'ethereum_address' | 'unknown'
+
+function categorizeSearchQuery(query: string): Type {
+  if (query.startsWith('0x') && query.length === 66) {
+    return 'state_root_hash_or_stark_key'
+  }
+  if (query.startsWith('0x') && query.length === 42) {
+    return 'ethereum_address'
+  }
+
+  return 'unknown'
 }

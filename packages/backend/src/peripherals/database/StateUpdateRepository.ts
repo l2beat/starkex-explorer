@@ -93,6 +93,24 @@ export class StateUpdateRepository {
     })
   }
 
+  async getPositionIdByRootHash(hash: string): Promise<bigint | undefined> {
+    const rows = await this.knex('state_updates')
+      .where('root_hash', hash)
+      .select('state_updates.id as id')
+
+    return rows[0]?.id
+  }
+
+  async getPositionIdByPublicKey(
+    publicKey: string
+  ): Promise<bigint | undefined> {
+    const rows = await this.knex('positions')
+      .where('public_key', publicKey)
+      .select('positions.position_id as id')
+
+    return rows[0]?.id
+  }
+
   async getAll() {
     const rows = await this.knex('state_updates').select('*')
     this.logger.debug({ method: 'getAll', rows: rows.length })
