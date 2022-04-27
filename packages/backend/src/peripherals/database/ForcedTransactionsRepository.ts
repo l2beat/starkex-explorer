@@ -2,7 +2,7 @@ import { AssetId, Hash256, json, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { ForcedTransactionEventRow as EventRow } from 'knex/types/tables'
 import { groupBy, pick } from 'lodash'
-import { MD5 } from 'object-hash'
+import { MD5 as hashData } from 'object-hash'
 
 import { Logger } from '../../tools/Logger'
 
@@ -82,10 +82,6 @@ function toSerializableJson(data: object): json {
       [key]: typeof val === 'bigint' ? val.toString() : val,
     }
   }, {})
-}
-
-function hashData(data: object): string {
-  return MD5(data)
 }
 
 function recordCandidateToRow(
