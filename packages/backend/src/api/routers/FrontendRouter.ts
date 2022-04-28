@@ -1,10 +1,15 @@
-import { EthereumAddress } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
 import { z } from 'zod'
 
 import { FrontendController } from '../controllers/FrontendController'
-import { stringAsBigInt, stringAsInt, withTypedContext } from './types'
+import {
+  stringAs,
+  stringAsBigInt,
+  stringAsInt,
+  withTypedContext,
+} from './types'
 
 export function createFrontendRouter(frontendController: FrontendController) {
   const router = new Router()
@@ -25,10 +30,34 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { page, perPage } = ctx.query
+        const account = getAccount(ctx)
         ctx.body = await frontendController.getForcedTransactionsPage(
           page,
-          perPage
+          perPage,
+          account
         )
+      }
+    )
+  )
+
+  router.get(
+    '/forced-transactions/:hash',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          hash: stringAs(Hash256),
+        }),
+      }),
+      async (ctx) => {
+        const { hash } = ctx.params
+        const account = getAccount(ctx)
+        const { html, status } =
+          await frontendController.getForcedTransactionDetailsPage(
+            hash,
+            account
+          )
+        ctx.body = html
+        ctx.status = status
       }
     )
   )

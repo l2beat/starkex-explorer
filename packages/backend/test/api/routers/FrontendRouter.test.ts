@@ -1,10 +1,12 @@
+import { Hash256 } from '@explorer/types'
+
 import { FrontendController } from '../../../src/api/controllers/FrontendController'
 import { createFrontendRouter } from '../../../src/api/routers/FrontendRouter'
 import { mock } from '../../mock'
 import { createTestApiServer } from '../TestApiServer'
 
 const TEST_PAGE = '<!DOCTYPE html><p>test page</p>'
-const SUCCESFUL_RESPONE = {
+const SUCCESSFUL_RESPONSE = {
   status: 200 as const,
   html: TEST_PAGE,
 }
@@ -50,7 +52,7 @@ describe('FrontendRouter', () => {
   describe('/state-updates/:id', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
-        getStateUpdateDetailsPage: async () => SUCCESFUL_RESPONE,
+        getStateUpdateDetailsPage: async () => SUCCESSFUL_RESPONSE,
       })
     )
     const server = createTestApiServer([frontendRouter])
@@ -67,7 +69,7 @@ describe('FrontendRouter', () => {
   describe('/positions/:positionId', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
-        getPositionDetailsPage: async () => SUCCESFUL_RESPONE,
+        getPositionDetailsPage: async () => SUCCESSFUL_RESPONSE,
       })
     )
     const server = createTestApiServer([frontendRouter])
@@ -84,7 +86,7 @@ describe('FrontendRouter', () => {
   describe('/positions/:positionId/updates/:updateId', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
-        getPositionUpdatePage: async () => SUCCESFUL_RESPONE,
+        getPositionUpdatePage: async () => SUCCESSFUL_RESPONSE,
       })
     )
     const server = createTestApiServer([frontendRouter])
@@ -119,6 +121,26 @@ describe('FrontendRouter', () => {
 
     it('does not allow invalid input', async () => {
       await server.get('/forced-transactions?page=foo&perPage=bar').expect(400)
+    })
+  })
+
+  describe('/forced-transactions/:hash', () => {
+    const frontendRouter = createFrontendRouter(
+      mock<FrontendController>({
+        getForcedTransactionDetailsPage: async () => SUCCESSFUL_RESPONSE,
+      })
+    )
+    const server = createTestApiServer([frontendRouter])
+
+    it('returns html', async () => {
+      await server
+        .get(`/forced-transactions/${Hash256.fake()}`)
+        .expect(200)
+        .expect(TEST_PAGE)
+    })
+
+    it('does not allow invalid input', async () => {
+      await server.get('/forced-transactions/not-a-hash').expect(400)
     })
   })
 })

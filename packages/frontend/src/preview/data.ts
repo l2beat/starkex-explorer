@@ -1,6 +1,13 @@
-import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  PedersenHash,
+  Timestamp,
+} from '@explorer/types'
 
 import {
+  ForcedTransactionDetailsProps,
   ForcedTransactionsIndexProps,
   HomeProps,
   PositionAtUpdateProps,
@@ -166,4 +173,30 @@ export const FORCED_TRANSACTIONS_INDEX_PROPS: ForcedTransactionsIndexProps = {
     perPage: 50,
   },
   fullCount: 100n,
+}
+
+export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
+  account: undefined,
+  ethereumAddress: EthereumAddress(
+    '0x1234567890ABCDEF1234567890ABCDEF12345678'
+  ),
+  positionId: 1n,
+  transactionHash: Hash256.fake(),
+  value: 12345n,
+  stateUpdateId: 1,
+  history: [
+    {
+      timestamp: Timestamp(Date.now() - 100000),
+      type: 'sent',
+    },
+    {
+      timestamp: Timestamp(Date.now() - 10000),
+      type: 'mined',
+    },
+    {
+      timestamp: Timestamp(Date.now() - 1000),
+      type: 'verified',
+      stateUpdateId: 1,
+    },
+  ],
 }

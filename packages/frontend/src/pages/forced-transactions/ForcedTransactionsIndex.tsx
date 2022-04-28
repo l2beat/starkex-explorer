@@ -12,7 +12,7 @@ export function ForcedTransactionsIndex({
   transactions,
   params: { perPage, page },
   fullCount,
-  account
+  account,
 }: ForcedTransactionsIndexProps) {
   return (
     <Page
