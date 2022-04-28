@@ -1,4 +1,4 @@
-import { EthereumAddress, Hash256, PedersenHash } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { parseSearchQuery } from '../../../src/api/controllers/FrontendController'
