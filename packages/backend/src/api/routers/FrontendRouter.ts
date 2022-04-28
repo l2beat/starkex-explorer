@@ -1,7 +1,6 @@
 import { EthereumAddress } from '@explorer/types'
 import Router from '@koa/router'
-import { Context } from 'koa'
-import Application from 'koa'
+import Application, { Context } from 'koa'
 import { z } from 'zod'
 
 import {
@@ -134,10 +133,7 @@ export function createFrontendRouter(frontendController: FrontendController) {
       async (ctx) => {
         const { query } = ctx.query
 
-        applyResult(
-          await frontendController.getSearchRedirect(query as any),
-          ctx
-        )
+        applyResult(await frontendController.getSearchRedirect(query), ctx)
       }
     )
   )

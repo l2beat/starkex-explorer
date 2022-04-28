@@ -8,7 +8,12 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
-import { AssetId, EthereumAddress } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  PedersenHash,
+} from '@explorer/types'
 import { omit } from 'lodash'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
@@ -365,42 +370,50 @@ export class FrontendController {
   }
 
   async getSearchRedirect(query: string): Promise<ControllerResult> {
-    const queryType = categorizeSearchQuery(query)
+    const parsed = parseSearchQuery(query)
 
-    switch (queryType) {
-      case 'state_root_hash_or_stark_key': {
-        return this.searchForRootHashOrStarkKey(query)
-      }
+    let response: ControllerResult | undefined
 
-      case 'ethereum_address':
-        return this.searchForEthereumAddress(query)
-
-      default:
-        return {
-          status: 404,
-          html: "Search query param couldn't be found",
-        }
+    if (!response && parsed.ethereumAddress) {
+      response = await this.searchForEthereumAddress(parsed.ethereumAddress)
     }
+
+    if (!response && parsed.stateTreeHash) {
+      response = await this.searchForRootHash(parsed.stateTreeHash)
+    }
+
+    if (!response && parsed.starkKey) {
+      response = await this.searchForStarkKey(parsed.starkKey)
+    }
+
+    if (!response) {
+      return {
+        status: 404,
+        html: "Search query couldn't be found",
+      }
+    }
+
+    return response
   }
 
   private async searchForEthereumAddress(
-    ethereumAddr: string
-  ): Promise<ControllerResult> {
+    ethereumAddr: EthereumAddress
+  ): Promise<ControllerResult | undefined> {
     const userRegistrationEvent =
-      await this.userRegistrationEventRepository.findByEthereumAddr(
+      await this.userRegistrationEventRepository.findByEthereumAddress(
         ethereumAddr
       )
     if (userRegistrationEvent === undefined) {
-      return {
-        status: 404,
-        html: 'Ethereum address not found!',
-      }
+      return
     }
 
     const positionId =
       await this.stateUpdateRepository.getPositionIdByPublicKey(
         userRegistrationEvent.starkKey
       )
+    if (positionId === undefined) {
+      return
+    }
 
     return {
       status: 302,
@@ -408,37 +421,38 @@ export class FrontendController {
     }
   }
 
-  private async searchForRootHashOrStarkKey(
-    rootHashOrStarkKey: string
-  ): Promise<ControllerResult> {
+  private async searchForRootHash(
+    hash: Hash256
+  ): Promise<ControllerResult | undefined> {
     const positionId = await this.stateUpdateRepository.getPositionIdByRootHash(
-      rootHashOrStarkKey.slice(2)
+      hash
     )
-    if (positionId) {
-      return {
-        status: 302,
-        url: `/state-updates/${positionId}`,
-      }
+    if (positionId === undefined) {
+      return
     }
 
-    return await this.searchForStarkKey(rootHashOrStarkKey)
+    return {
+      status: 302,
+      url: `/state-updates/${positionId}`,
+    }
   }
 
-  private async searchForStarkKey(starkKey: string): Promise<ControllerResult> {
+  private async searchForStarkKey(
+    starkKey: string
+  ): Promise<ControllerResult | undefined> {
     const userRegistrationEvent =
       await this.userRegistrationEventRepository.findByStarkKey(starkKey)
-
     if (userRegistrationEvent === undefined) {
-      return {
-        status: 404,
-        html: 'State root hash not found!',
-      }
+      return
     }
 
     const positionId =
       await this.stateUpdateRepository.getPositionIdByPublicKey(
         userRegistrationEvent.starkKey
       )
+    if (positionId === undefined) {
+      return
+    }
 
     return {
       status: 302,
@@ -447,15 +461,24 @@ export class FrontendController {
   }
 }
 
-type Type = 'state_root_hash_or_stark_key' | 'ethereum_address' | 'unknown'
+interface ParsedQuery {
+  ethereumAddress?: EthereumAddress
+  stateTreeHash?: Hash256
+  starkKey?: string
+}
 
-function categorizeSearchQuery(query: string): Type {
+export function parseSearchQuery(query: string): ParsedQuery {
   if (query.startsWith('0x') && query.length === 66) {
-    return 'state_root_hash_or_stark_key'
+    return {
+      stateTreeHash: Hash256(query),
+      starkKey: query,
+    }
   }
   if (query.startsWith('0x') && query.length === 42) {
-    return 'ethereum_address'
+    return {
+      ethereumAddress: EthereumAddress(query),
+    }
   }
 
-  return 'unknown'
+  return {}
 }

@@ -93,9 +93,9 @@ export class StateUpdateRepository {
     })
   }
 
-  async getPositionIdByRootHash(hash: string): Promise<bigint | undefined> {
+  async getPositionIdByRootHash(hash: Hash256): Promise<bigint | undefined> {
     const rows = await this.knex('state_updates')
-      .where('root_hash', hash)
+      .where('root_hash', hash.slice(2))
       .select('state_updates.id as id')
 
     return rows[0]?.id
