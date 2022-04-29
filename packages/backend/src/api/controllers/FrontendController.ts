@@ -8,7 +8,12 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
-import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  PedersenHash,
+} from '@explorer/types'
 import { omit } from 'lodash'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
@@ -417,7 +422,7 @@ export class FrontendController {
   }
 
   private async searchForRootHash(
-    hash: Hash256
+    hash: PedersenHash
   ): Promise<ControllerResult | undefined> {
     const positionId = await this.stateUpdateRepository.getPositionIdByRootHash(
       hash
@@ -458,14 +463,14 @@ export class FrontendController {
 
 interface ParsedQuery {
   ethereumAddress?: EthereumAddress
-  stateTreeHash?: Hash256
+  stateTreeHash?: PedersenHash
   starkKey?: string
 }
 
 export function parseSearchQuery(query: string): ParsedQuery {
   if (query.startsWith('0x') && query.length === 66) {
     return {
-      stateTreeHash: Hash256(query),
+      stateTreeHash: PedersenHash(query),
       starkKey: query,
     }
   }
