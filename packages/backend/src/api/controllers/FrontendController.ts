@@ -90,6 +90,7 @@ export class FrontendController {
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
+
   async getHomePage(account: EthereumAddress | undefined): Promise<string> {
     const offset = 0
     const limit = 5
