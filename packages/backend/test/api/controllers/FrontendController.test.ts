@@ -1,4 +1,4 @@
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { EthereumAddress, PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { parseSearchQuery } from '../../../src/api/controllers/FrontendController'
@@ -19,7 +19,7 @@ describe(parseSearchQuery.name, () => {
     const result = parseSearchQuery(starkKeyLike)
 
     expect(result).toEqual({
-      stateTreeHash: Hash256(starkKeyLike),
+      stateTreeHash: PedersenHash(starkKeyLike),
       starkKey: starkKeyLike,
     })
   })
