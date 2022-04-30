@@ -6,7 +6,7 @@ import { SimpleLink } from '../common/SimpleLink'
 import { formatLargeNumber } from '../formatLargeNumber'
 import {
   ForcedTransactionDetailsProps,
-  HistoryEvent,
+  TransactionStatusEntry,
 } from './ForcedTransactionDetailsProps'
 
 export function ForcedTransactionDetails({
@@ -75,7 +75,7 @@ export function ForcedTransactionDetails({
                 {formatTimestamp(event.timestamp)}
               </th>
               <td className="font-normal first-letter:capitalize py-2 px-1.5">
-                {getHistoryEventText(event)}
+                {getStatusText(event)}
               </td>
             </tr>
           ))}
@@ -84,13 +84,14 @@ export function ForcedTransactionDetails({
     </Page>
   )
 }
-function getHistoryEventText(event: HistoryEvent): string {
-  switch (event.type) {
+
+function getStatusText(entry: TransactionStatusEntry): string {
+  switch (entry.type) {
     case 'sent':
       return 'transaction sent'
     case 'mined':
       return 'transaction mined (waiting for inclusion in state update)'
     case 'verified':
-      return `exit included in state update #${event.stateUpdateId}`
+      return `exit included in state update #${entry.stateUpdateId}`
   }
 }
