@@ -1,25 +1,20 @@
 import { AssetBalance } from '@explorer/encoding'
 import {
-  ForcedTransactionsIndexProps,
   renderForcedTransactionDetailsPage,
   renderForcedTransactionsIndexPage,
-  renderHomePage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
-import { omit } from 'lodash'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
-import {
-  ForcedTransaction,
-  ForcedTransactionsRepository,
-} from '../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { toForcedTransactionEntry } from './toForcedTransactionEntry'
 
 const buildViewAssets = (
   balances: readonly AssetBalance[],
@@ -62,19 +57,6 @@ const countDifferentAssets = (
   }, 0)
 }
 
-const buildViewTransaction = (
-  t: ForcedTransaction
-): ForcedTransactionsIndexProps['transactions'][number] => ({
-  type:
-    t.type === 'withdrawal' ? 'exit' : t.isABuyingSynthetic ? 'buy' : 'sell',
-  status: t.status === 'mined' ? 'waiting to be included' : 'completed',
-  hash: t.hash,
-  lastUpdate: t.lastUpdate,
-  amount: t.type === 'trade' ? t.syntheticAmount : t.amount,
-  assetId: t.type === 'trade' ? t.syntheticAssetId : AssetId('USDC-1'),
-  positionId: t.type === 'trade' ? t.positionIdA : t.positionId,
-})
-
 type ControllerResult = {
   html: string
   status: 200 | 404
@@ -86,33 +68,6 @@ export class FrontendController {
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
-  async getHomePage(account: EthereumAddress | undefined): Promise<string> {
-    const offset = 0
-    const limit = 5
-    const [stateUpdates, totalUpdates, totalPositions, transactions] =
-      await Promise.all([
-        this.stateUpdateRepository.getStateUpdateList({
-          offset,
-          limit,
-        }),
-        this.stateUpdateRepository.countStateUpdates(),
-        this.stateUpdateRepository.countPositions(),
-        this.forcedTransactionsRepository.getLatest({ limit, offset }),
-      ])
-
-    return renderHomePage({
-      account,
-      stateUpdates: stateUpdates.map((x) => ({
-        id: x.id,
-        hash: x.rootHash,
-        timestamp: x.timestamp,
-        positionCount: x.positionCount,
-      })),
-      forcedTransactions: transactions.map(buildViewTransaction),
-      totalUpdates,
-      totalPositions,
-    })
-  }
 
   async getForcedTransactionsPage(
     page: number,
@@ -128,7 +83,7 @@ export class FrontendController {
 
     return renderForcedTransactionsIndexPage({
       account,
-      transactions: transactions.map(buildViewTransaction),
+      transactions: transactions.map(toForcedTransactionEntry),
       fullCount,
       params: { page, perPage },
     })
@@ -280,9 +235,7 @@ export class FrontendController {
             assetsUpdated,
           }
         }),
-        transactions: transactions
-          .map(buildViewTransaction)
-          .map((t) => omit(t, 'status')),
+        transactions: transactions.map(toForcedTransactionEntry),
       }),
       status: 200,
     }
@@ -349,9 +302,7 @@ export class FrontendController {
             assetsUpdated,
           }
         }),
-        transactions: transactions
-          .map(buildViewTransaction)
-          .map((t) => omit(t, 'positionId')),
+        transactions: transactions.map(toForcedTransactionEntry),
       }),
     }
   }
@@ -405,8 +356,7 @@ export class FrontendController {
               ? [t.positionIdA, t.positionIdB].includes(positionId)
               : t.positionId === positionId
           })
-          .map(buildViewTransaction)
-          .map((t) => omit(t, 'positionId', 'status', '')),
+          .map(toForcedTransactionEntry),
       }),
       status: 200,
     }

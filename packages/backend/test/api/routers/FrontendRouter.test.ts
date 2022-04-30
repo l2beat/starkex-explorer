@@ -1,6 +1,7 @@
 import { Hash256 } from '@explorer/types'
 
 import { FrontendController } from '../../../src/api/controllers/FrontendController'
+import { HomeController } from '../../../src/api/controllers/HomeController'
 import { createFrontendRouter } from '../../../src/api/routers/FrontendRouter'
 import { mock } from '../../mock'
 import { createTestApiServer } from '../TestApiServer'
@@ -15,7 +16,8 @@ describe('FrontendRouter', () => {
   describe('/', () => {
     it('returns html', async () => {
       const frontendRouter = createFrontendRouter(
-        mock<FrontendController>({
+        mock<FrontendController>(),
+        mock<HomeController>({
           getHomePage: async () => TEST_PAGE,
         })
       )
@@ -29,7 +31,8 @@ describe('FrontendRouter', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
         getStateUpdatesPage: async () => TEST_PAGE,
-      })
+      }),
+      mock<HomeController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -53,7 +56,8 @@ describe('FrontendRouter', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
         getStateUpdateDetailsPage: async () => SUCCESSFUL_RESPONSE,
-      })
+      }),
+      mock<HomeController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -70,7 +74,8 @@ describe('FrontendRouter', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
         getPositionDetailsPage: async () => SUCCESSFUL_RESPONSE,
-      })
+      }),
+      mock<HomeController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -87,7 +92,8 @@ describe('FrontendRouter', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
         getPositionUpdatePage: async () => SUCCESSFUL_RESPONSE,
-      })
+      }),
+      mock<HomeController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -104,7 +110,8 @@ describe('FrontendRouter', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
         getForcedTransactionsPage: async () => TEST_PAGE,
-      })
+      }),
+      mock<HomeController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -128,7 +135,8 @@ describe('FrontendRouter', () => {
     const frontendRouter = createFrontendRouter(
       mock<FrontendController>({
         getForcedTransactionDetailsPage: async () => SUCCESSFUL_RESPONSE,
-      })
+      }),
+      mock<HomeController>()
     )
     const server = createTestApiServer([frontendRouter])
 

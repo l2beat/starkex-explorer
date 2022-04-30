@@ -4,6 +4,7 @@ import { Context } from 'koa'
 import { z } from 'zod'
 
 import { FrontendController } from '../controllers/FrontendController'
+import { HomeController } from '../controllers/HomeController'
 import {
   stringAs,
   stringAsBigInt,
@@ -11,12 +12,15 @@ import {
   withTypedContext,
 } from './types'
 
-export function createFrontendRouter(frontendController: FrontendController) {
+export function createFrontendRouter(
+  frontendController: FrontendController,
+  homeController: HomeController
+) {
   const router = new Router()
 
   router.get('/', async (ctx) => {
     const account = getAccount(ctx)
-    ctx.body = await frontendController.getHomePage(account)
+    ctx.body = await homeController.getHomePage(account)
   })
 
   router.get(
