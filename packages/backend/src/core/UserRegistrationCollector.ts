@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
@@ -50,7 +50,7 @@ export class UserRegistrationCollector {
       return {
         blockNumber: log.blockNumber,
         ethAddress: EthereumAddress(event.args.ethKey),
-        starkKey: event.args.starkKey.toHexString(),
+        starkKey: StarkKey.from(event.args.starkKey),
       }
     })
   }

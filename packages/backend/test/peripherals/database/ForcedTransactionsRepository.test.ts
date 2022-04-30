@@ -1,4 +1,4 @@
-import { AssetId, Hash256, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
@@ -18,7 +18,7 @@ describe(ForcedTransactionsRepository.name, () => {
       amount: 123n,
       blockNumber: 1,
       positionId: 123n,
-      publicKey: '123',
+      publicKey: StarkKey.fake('123'),
       timestamp: Timestamp(0),
       transactionHash: Hash256.fake(),
     }
@@ -44,7 +44,7 @@ describe(ForcedTransactionsRepository.name, () => {
         amount: 123n,
         blockNumber: 1,
         positionId: 123n,
-        publicKey: '123',
+        publicKey: StarkKey.fake('123'),
         timestamp: Timestamp(0),
         transactionHash,
       },
@@ -74,8 +74,8 @@ describe(ForcedTransactionsRepository.name, () => {
   it('returns transaction hashes only for unverified transactions', async () => {
     const hash1 = Hash256.fake()
     const data = {
-      publicKeyA: '123a',
-      publicKeyB: '123b',
+      publicKeyA: StarkKey.fake('123a'),
+      publicKeyB: StarkKey.fake('123b'),
       positionIdA: 456n,
       positionIdB: 789n,
       syntheticAssetId: AssetId('ETH-7'),
@@ -139,13 +139,13 @@ describe(ForcedTransactionsRepository.name, () => {
     const data1 = {
       amount: 123n,
       positionId: 123n,
-      publicKey: '123',
+      publicKey: StarkKey.fake('123'),
     }
 
     const hash2 = Hash256.fake()
     const data2 = {
-      publicKeyA: '123a',
-      publicKeyB: '123b',
+      publicKeyA: StarkKey.fake('123a'),
+      publicKeyB: StarkKey.fake('123b'),
       positionIdA: 456n,
       positionIdB: 789n,
       syntheticAssetId: AssetId('ETH-7'),
@@ -179,9 +179,9 @@ describe(ForcedTransactionsRepository.name, () => {
     await repository.addEvents(events)
 
     const hashes = await repository.getTransactionHashesByMinedEventsData([
-      { positionId: 123n, amount: 123n, publicKey: '123' },
+      { positionId: 123n, amount: 123n, publicKey: StarkKey.fake('123') },
       data2,
-      { ...data2, publicKeyA: 'something' },
+      { ...data2, publicKeyA: StarkKey.fake() },
     ])
 
     expect(hashes).toEqual([hash1, hash2, undefined])
@@ -192,13 +192,13 @@ describe(ForcedTransactionsRepository.name, () => {
     const data1 = {
       amount: 123n,
       positionId: 123n,
-      publicKey: '123',
+      publicKey: StarkKey.fake('123'),
     }
 
     const hash2 = Hash256.fake()
     const data2 = {
-      publicKeyA: '123a',
-      publicKeyB: '123b',
+      publicKeyA: StarkKey.fake('123a'),
+      publicKeyB: StarkKey.fake('123b'),
       positionIdA: 456n,
       positionIdB: 789n,
       syntheticAssetId: AssetId('ETH-7'),
@@ -249,8 +249,8 @@ describe(ForcedTransactionsRepository.name, () => {
         isABuyingSynthetic: true,
         positionIdA: 456n,
         positionIdB: 789n,
-        publicKeyA: '123a',
-        publicKeyB: '123b',
+        publicKeyA: StarkKey.fake('123a'),
+        publicKeyB: StarkKey.fake('123b'),
         syntheticAmount: 456n,
         syntheticAssetId: AssetId('ETH-7'),
       },
@@ -261,7 +261,7 @@ describe(ForcedTransactionsRepository.name, () => {
         lastUpdate: Timestamp(1),
         amount: 123n,
         positionId: 123n,
-        publicKey: '123',
+        publicKey: StarkKey.fake('123'),
         stateUpdateId: 1,
       },
     ])
@@ -274,13 +274,13 @@ describe(ForcedTransactionsRepository.name, () => {
     const data1 = {
       amount: 123n,
       positionId: 123n,
-      publicKey: '123',
+      publicKey: StarkKey.fake('123'),
     }
 
     const hash2 = Hash256.fake()
     const data2 = {
-      publicKeyA: '123a',
-      publicKeyB: '123b',
+      publicKeyA: StarkKey.fake('123a'),
+      publicKeyB: StarkKey.fake('123b'),
       positionIdA: 456n,
       positionIdB: 789n,
       syntheticAssetId: AssetId('ETH-7'),
@@ -326,7 +326,7 @@ describe(ForcedTransactionsRepository.name, () => {
         hash: hash1,
         lastUpdate: Timestamp(1),
         positionId: 123n,
-        publicKey: '123',
+        publicKey: StarkKey.fake('123'),
         stateUpdateId: 1,
         status: 'verified',
         type: 'withdrawal',
@@ -339,13 +339,13 @@ describe(ForcedTransactionsRepository.name, () => {
     const data1 = {
       amount: 123n,
       positionId: 123n,
-      publicKey: '123',
+      publicKey: StarkKey.fake('123'),
     }
 
     const hash2 = Hash256.fake()
     const data2 = {
-      publicKeyA: '123a',
-      publicKeyB: '123b',
+      publicKeyA: StarkKey.fake('123a'),
+      publicKeyB: StarkKey.fake('123b'),
       positionIdA: 456n,
       positionIdB: 789n,
       syntheticAssetId: AssetId('ETH-7'),
@@ -391,7 +391,7 @@ describe(ForcedTransactionsRepository.name, () => {
         hash: hash1,
         lastUpdate: Timestamp(1),
         positionId: 123n,
-        publicKey: '123',
+        publicKey: StarkKey.fake('123'),
         stateUpdateId: 1,
         status: 'verified',
         type: 'withdrawal',
@@ -409,13 +409,13 @@ describe(ForcedTransactionsRepository.name, () => {
     const data1 = {
       amount: 123n,
       positionId: 123n,
-      publicKey: '123',
+      publicKey: StarkKey.fake('123'),
     }
 
     const hash2 = Hash256.fake()
     const data2 = {
-      publicKeyA: '123a',
-      publicKeyB: '123b',
+      publicKeyA: StarkKey.fake('123a'),
+      publicKeyB: StarkKey.fake('123b'),
       positionIdA: 456n,
       positionIdB: 789n,
       syntheticAssetId: AssetId('ETH-7'),
@@ -469,13 +469,13 @@ describe(ForcedTransactionsRepository.name, () => {
     const data1 = {
       amount: 123n,
       positionId: 123n,
-      publicKey: '123',
+      publicKey: StarkKey.fake('123'),
     }
 
     const hash2 = Hash256.fake()
     const data2 = {
-      publicKeyA: '123a',
-      publicKeyB: '123b',
+      publicKeyA: StarkKey.fake('123a'),
+      publicKeyB: StarkKey.fake('123b'),
       positionIdA: 456n,
       positionIdB: 789n,
       syntheticAssetId: AssetId('ETH-7'),
