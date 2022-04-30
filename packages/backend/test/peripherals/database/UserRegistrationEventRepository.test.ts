@@ -141,15 +141,15 @@ describe(UserRegistrationEventRepository.name, () => {
   it('finds event by ethereum address', async () => {
     const event = {
       blockNumber: 2,
-      ethAddress: EthereumAddress.random(),
-      starkKey: '0x1235',
+      ethAddress: EthereumAddress.fake(),
+      starkKey: StarkKey.fake(),
     }
 
     const records = [
       {
         blockNumber: 1,
         ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x1234',
+        starkKey: StarkKey.fake(),
       },
       event,
     ]
@@ -162,7 +162,7 @@ describe(UserRegistrationEventRepository.name, () => {
 
   it('returns undefined when not found by ethereum address', async () => {
     const actual = await repository.findByEthereumAddress(
-      EthereumAddress.random()
+      EthereumAddress.fake()
     )
 
     expect(actual).toEqual(undefined)

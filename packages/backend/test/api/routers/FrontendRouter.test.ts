@@ -3,6 +3,7 @@ import {
   EthereumAddress,
   Hash256,
   PedersenHash,
+  StarkKey,
   Timestamp,
 } from '@explorer/types'
 import { SuperAgentTest } from 'supertest'
@@ -190,9 +191,10 @@ describe('FrontendRouter', () => {
 
   describe('/search', async () => {
     const { knex } = setupDatabaseTestSuite()
-    const ethAddress = EthereumAddress.random()
-    const starkKey =
+    const ethAddress = EthereumAddress.fake()
+    const starkKey = StarkKey(
       '0x0054f7db92d7826f24c4db2c9326d31d3f981952e388e770586cc081a41f7f33'
+    )
     const rootHash = PedersenHash.fake()
 
     let server: SuperAgentTest

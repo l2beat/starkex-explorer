@@ -115,10 +115,10 @@ export class StateUpdateRepository {
   }
 
   async getPositionIdByPublicKey(
-    publicKey: string
+    publicKey: StarkKey
   ): Promise<bigint | undefined> {
     const rows = await this.knex('positions')
-      .where('public_key', publicKey)
+      .where('public_key', publicKey.toString())
       .select('positions.position_id as id')
 
     return rows[0]?.id

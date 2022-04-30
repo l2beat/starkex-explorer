@@ -1,4 +1,4 @@
-import { EthereumAddress, PedersenHash } from '@explorer/types'
+import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
 
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
@@ -70,7 +70,7 @@ export class SearchController {
   }
 
   private async searchForStarkKey(
-    starkKey: string
+    starkKey: StarkKey
   ): Promise<ControllerResult | undefined> {
     const userRegistrationEvent =
       await this.userRegistrationEventRepository.findByStarkKey(starkKey)
@@ -93,14 +93,14 @@ export class SearchController {
 interface ParsedQuery {
   ethereumAddress?: EthereumAddress
   stateTreeHash?: PedersenHash
-  starkKey?: string
+  starkKey?: StarkKey
 }
 
 export function parseSearchQuery(query: string): ParsedQuery {
   if (query.startsWith('0x') && query.length === 66) {
     return {
       stateTreeHash: PedersenHash(query),
-      starkKey: query,
+      starkKey: StarkKey(query),
     }
   }
   if (query.startsWith('0x') && query.length === 42) {

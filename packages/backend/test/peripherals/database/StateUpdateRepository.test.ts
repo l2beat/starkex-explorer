@@ -125,7 +125,7 @@ describe(StateUpdateRepository.name, () => {
       },
       positions: [
         {
-          publicKey: 'public-key-0',
+          publicKey: StarkKey.fake(),
           positionId,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
@@ -144,7 +144,7 @@ describe(StateUpdateRepository.name, () => {
       },
       positions: [
         {
-          publicKey: 'public-key-0',
+          publicKey: StarkKey.fake(),
           positionId,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
@@ -168,7 +168,7 @@ describe(StateUpdateRepository.name, () => {
 
   it('gets position by public key', async () => {
     const positionId = 12345n
-    const publicKey = 'public-key-0'
+    const publicKey = StarkKey.fake()
 
     await repository.add({
       stateUpdate: {
@@ -199,7 +199,7 @@ describe(StateUpdateRepository.name, () => {
       },
       positions: [
         {
-          publicKey: 'public-key-0',
+          publicKey: StarkKey.fake(),
           positionId,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
@@ -214,7 +214,7 @@ describe(StateUpdateRepository.name, () => {
   })
 
   it('gets undefined when root hash not found', async () => {
-    const publicKey = 'public-key-0'
+    const publicKey = StarkKey.fake()
 
     const position = await repository.getPositionIdByPublicKey(publicKey)
 

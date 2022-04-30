@@ -1,4 +1,4 @@
-import { constants, utils, Wallet } from 'ethers'
+import { constants, utils } from 'ethers'
 
 import { fakeHexString } from './fake'
 
@@ -15,10 +15,6 @@ export function EthereumAddress(value: string) {
 }
 
 EthereumAddress.ZERO = EthereumAddress(constants.AddressZero)
-
-EthereumAddress.random = function (): EthereumAddress {
-  return EthereumAddress(Wallet.createRandom().address)
-}
 
 EthereumAddress.isBefore = function (a: EthereumAddress, b: EthereumAddress) {
   return a.toLowerCase() < b.toLowerCase()
