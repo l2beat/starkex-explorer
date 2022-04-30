@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError, encodeAssetId } from '../src'
@@ -28,7 +28,7 @@ describe(readForcedActions.name, () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'withdrawal',
-        publicKey: '0x' + '1234abcd'.repeat(8),
+        publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
         positionId: 123n,
         amount: 1500100900n,
       },
@@ -52,8 +52,8 @@ describe(readForcedActions.name, () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'trade',
-        publicKeyA: '0x' + '1234abcd'.repeat(8),
-        publicKeyB: '0x' + 'deadbeef'.repeat(8),
+        publicKeyA: StarkKey('0x' + '1234abcd'.repeat(8)),
+        publicKeyB: StarkKey('0x' + 'deadbeef'.repeat(8)),
         positionIdA: 123n,
         positionIdB: 456n,
         syntheticAssetId: AssetId('ETH-9'),
@@ -87,14 +87,14 @@ describe(readForcedActions.name, () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'withdrawal',
-        publicKey: '0x' + '1234abcd'.repeat(8),
+        publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
         positionId: 123n,
         amount: 1500100900n,
       },
       {
         type: 'trade',
-        publicKeyA: '0x' + '1234abcd'.repeat(8),
-        publicKeyB: '0x' + 'deadbeef'.repeat(8),
+        publicKeyA: StarkKey('0x' + '1234abcd'.repeat(8)),
+        publicKeyB: StarkKey('0x' + 'deadbeef'.repeat(8)),
         positionIdA: 123n,
         positionIdB: 456n,
         syntheticAssetId: AssetId('ETH-9'),

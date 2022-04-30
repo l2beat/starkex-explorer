@@ -1,4 +1,4 @@
-import { AssetId, Timestamp } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/program_output.cairo#L34-L49
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
@@ -23,7 +23,7 @@ export interface AssetConfigHash {
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/program_output.cairo#L11-L19
 export interface Modification {
-  publicKey: string
+  publicKey: StarkKey
   positionId: bigint
   difference: bigint
 }
@@ -34,7 +34,7 @@ export type ForcedAction = ForcedWithdrawal | ForcedTrade
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/forced.cairo#L17-L22
 export interface ForcedWithdrawal {
   type: 'withdrawal'
-  publicKey: string
+  publicKey: StarkKey
   positionId: bigint
   amount: bigint
 }
@@ -42,8 +42,8 @@ export interface ForcedWithdrawal {
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/forced.cairo#L41-L52
 export interface ForcedTrade {
   type: 'trade'
-  publicKeyA: string
-  publicKeyB: string
+  publicKeyA: StarkKey
+  publicKeyB: StarkKey
   positionIdA: bigint
   positionIdB: bigint
   syntheticAssetId: AssetId
@@ -86,7 +86,7 @@ export interface FundingEntry {
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/position/serialize_change.cairo
 export interface PositionUpdate {
   positionId: bigint
-  publicKey: string
+  publicKey: StarkKey
   collateralBalance: bigint
   fundingTimestamp: Timestamp
   balances: AssetBalance[]

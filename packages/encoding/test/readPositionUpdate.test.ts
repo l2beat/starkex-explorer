@@ -1,4 +1,4 @@
-import { AssetId, Timestamp } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
@@ -24,7 +24,7 @@ describe('readPositionUpdate', () => {
       .writeNumber(456, 32) // fundingTimestamp
     expect(decode(writer.getBytes())).toEqual({
       positionId: 123n,
-      publicKey: '0x' + '1234abcd'.repeat(8),
+      publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
       collateralBalance: 10n,
       fundingTimestamp: Timestamp.fromSeconds(456),
       balances: [],
@@ -46,7 +46,7 @@ describe('readPositionUpdate', () => {
       .writeNumber(20n - MIN_INT, 8)
     expect(decode(writer.getBytes())).toEqual({
       positionId: 123n,
-      publicKey: '0x' + '1234abcd'.repeat(8),
+      publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
       collateralBalance: 10n,
       fundingTimestamp: Timestamp.fromSeconds(456),
       balances: [

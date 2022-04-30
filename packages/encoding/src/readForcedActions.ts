@@ -1,3 +1,5 @@
+import { StarkKey } from '@explorer/types'
+
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
 import { DecodingError } from './DecodingError'
@@ -9,13 +11,13 @@ export function readForcedActions(reader: ByteReader) {
   for (let i = 0; i < count; i++) {
     const type = reader.readNumber(32)
     if (type === 0) {
-      const publicKey = reader.readHex(32)
+      const publicKey = StarkKey(reader.readHex(32))
       const positionId = reader.readBigInt(32)
       const amount = reader.readBigInt(32)
       forcedActions.push({ type: 'withdrawal', publicKey, positionId, amount })
     } else if (type === 1) {
-      const publicKeyA = reader.readHex(32)
-      const publicKeyB = reader.readHex(32)
+      const publicKeyA = StarkKey(reader.readHex(32))
+      const publicKeyB = StarkKey(reader.readHex(32))
       const positionIdA = reader.readBigInt(32)
       const positionIdB = reader.readBigInt(32)
       reader.skip(17)

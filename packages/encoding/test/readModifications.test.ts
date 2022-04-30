@@ -1,3 +1,4 @@
+import { StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
@@ -25,7 +26,7 @@ describe(readModifications.name, () => {
       .writeNumber(32n + 2n ** 64n, 32)
     expect(decode(writer.getBytes())).toEqual([
       {
-        publicKey: '0x' + '1234abcd'.repeat(8),
+        publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
         positionId: 123n,
         difference: 32n,
       },
@@ -44,12 +45,12 @@ describe(readModifications.name, () => {
 
     expect(decode(writer.getBytes())).toEqual([
       {
-        publicKey: '0x' + '1234abcd'.repeat(8),
+        publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
         positionId: 123n,
         difference: 32n,
       },
       {
-        publicKey: '0x' + 'deadbeef'.repeat(8),
+        publicKey: StarkKey('0x' + 'deadbeef'.repeat(8)),
         positionId: 456n,
         difference: -32n,
       },

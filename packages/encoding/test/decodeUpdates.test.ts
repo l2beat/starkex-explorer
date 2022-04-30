@@ -1,4 +1,4 @@
-import { AssetId, Timestamp } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { MIN_INT } from '../src/constants'
@@ -74,7 +74,7 @@ describe('decodeUpdates', () => {
       positions: [
         {
           positionId: 123n,
-          publicKey: '0x' + '1234abcd'.repeat(8),
+          publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
           collateralBalance: 10n,
           fundingTimestamp: Timestamp.fromSeconds(456),
           balances: [
@@ -84,7 +84,7 @@ describe('decodeUpdates', () => {
         },
         {
           positionId: 124n,
-          publicKey: '0x' + 'deadbeef'.repeat(8),
+          publicKey: StarkKey('0x' + 'deadbeef'.repeat(8)),
           collateralBalance: 33n,
           fundingTimestamp: Timestamp.fromSeconds(457),
           balances: [{ assetId: AssetId('ETH-9'), balance: 66n }],
