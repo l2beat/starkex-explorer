@@ -1,6 +1,6 @@
-import { PedersenHash } from '@explorer/types'
+import { Hash256, PedersenHash, StarkKey } from '@explorer/types'
 
-export function formatHash(hash: PedersenHash | string) {
+export function formatHash(hash: PedersenHash | StarkKey | Hash256 | string) {
   const stringifiedHash = hash.toString()
   return stringifiedHash.startsWith('0x')
     ? stringifiedHash

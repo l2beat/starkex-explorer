@@ -2,6 +2,7 @@ import {
   EthereumAddress,
   Hash256,
   PedersenHash,
+  StarkKey,
   Timestamp,
 } from '@explorer/types'
 
@@ -19,7 +20,7 @@ export interface StateUpdateDetailsProps {
 }
 
 export interface StateUpdatePosition {
-  readonly publicKey: string
+  readonly publicKey: StarkKey
   readonly positionId: bigint
   readonly totalUSDCents: bigint
   readonly previousTotalUSDCents?: bigint

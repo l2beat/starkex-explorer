@@ -3,6 +3,7 @@ import {
   EthereumAddress,
   Hash256,
   PedersenHash,
+  StarkKey,
   Timestamp,
 } from '@explorer/types'
 
@@ -54,13 +55,13 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   timestamp: Timestamp(Date.now()),
   positions: [
     {
-      publicKey: `0x${'0'.repeat(63)}1`,
+      publicKey: StarkKey.fake(),
       positionId: 1n,
       totalUSDCents: 100n,
       previousTotalUSDCents: 90n,
     },
     {
-      publicKey: `0x${'0'.repeat(63)}2`,
+      publicKey: StarkKey.fake(),
       positionId: 2n,
       totalUSDCents: 100n,
       previousTotalUSDCents: 90n,
@@ -72,7 +73,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   account: undefined,
   positionId: 123n,
-  publicKey: `0x${'0'.repeat(63)}1`,
+  publicKey: StarkKey.fake(),
   ethAddress: '0x1234567890ABCDEF1234567890ABCDEF12345678',
   lastUpdateTimestamp: Timestamp(Date.now()),
   stateUpdateId: 1,
@@ -122,8 +123,8 @@ export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
   account: undefined,
   stateUpdateId: 1,
   positionId: 123n,
-  publicKey: `0x${'0'.repeat(63)}1`,
-  previousPublicKey: `0x${'0'.repeat(63)}2`,
+  publicKey: StarkKey.fake(),
+  previousPublicKey: StarkKey.fake(),
   lastUpdateTimestamp: Timestamp(Date.now()),
   assetChanges: [
     {
