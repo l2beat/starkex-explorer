@@ -1,14 +1,15 @@
 import React from 'react'
-import { formatUSDCents } from '../formatUSDCents'
-import { Page } from '../common/Page'
-import { Table } from '../common/Table'
-import { PositionDetailsProps } from './PositionDetailsProps'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
-import { formatHash } from '../formatHash'
-import { SimpleLink } from '../common/SimpleLink'
+
 import { AssetNameCell } from '../common/AssetNameCell'
+import { Page } from '../common/Page'
+import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { SimpleLink } from '../common/SimpleLink'
+import { Table } from '../common/Table'
+import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { formatUSDCents } from '../formatUSDCents'
+import { PositionDetailsProps } from './PositionDetailsProps'
 
 const balanceTableColumns = [
   { header: 'Name' },

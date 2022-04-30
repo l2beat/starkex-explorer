@@ -1,17 +1,13 @@
 import React from 'react'
-import { formatHash } from '../formatHash'
-import { formatTime } from '../formatTime'
+
 import { Page } from '../common'
-import { Table } from '../common/Table'
-import { Pagination } from '../common/Pagination'
+import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { SimpleLink } from '../common/SimpleLink'
+import { formatLargeNumber } from '../formatLargeNumber'
 import {
   ForcedTransactionDetailsProps,
   HistoryEvent,
 } from './ForcedTransactionDetailsProps'
-import { AssetNameCell } from '../common/AssetNameCell'
-import { formatLargeNumber } from '../formatLargeNumber'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
-import { SimpleLink } from '../common/SimpleLink'
 
 export function ForcedTransactionDetails({
   account,

@@ -1,16 +1,17 @@
 import React from 'react'
+
 import { Page } from '../common'
+import { AssetNameCell } from '../common/AssetNameCell'
 import { SearchBar } from '../common/SearchBar'
-import { HomeProps } from './HomeProps'
-import { formatTime } from '../formatTime'
-import { formatHash } from '../formatHash'
-import { Table } from '../common/Table'
 import { SimpleLink } from '../common/SimpleLink'
+import { Table } from '../common/Table'
+import { formatHash } from '../formatHash'
+import { formatLargeNumber } from '../formatLargeNumber'
+import { formatTime } from '../formatTime'
 import { FreezeButton } from './FreezeButton'
+import { HomeProps } from './HomeProps'
 import { Stat } from './Stat'
 import { tvlElId } from './tvlElId'
-import { AssetNameCell } from '../common/AssetNameCell'
-import { formatLargeNumber } from '../formatLargeNumber'
 
 export function Home(props: HomeProps) {
   return (

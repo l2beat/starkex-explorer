@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react'
-import classNames from 'classnames'
-import { formatTime } from '../formatTime'
 import { Timestamp } from '@explorer/types'
+import classNames from 'classnames'
+import React, { ReactNode } from 'react'
+
+import { formatTime } from '../formatTime'
 
 export function formatTimestamp(timestamp: Timestamp) {
   const date = new Date(Number(timestamp))

@@ -1,9 +1,9 @@
+import { EthereumAddress } from '@explorer/types'
 import React from 'react'
 
-import { L2beatExplorerLogo } from './logos/L2beatExplorerLogo'
 import { DydxLogo } from './logos/DydxLogo'
+import { L2beatExplorerLogo } from './logos/L2beatExplorerLogo'
 import { SearchBar } from './SearchBar'
-import { EthereumAddress } from '@explorer/types'
 
 export interface NavbarProps {
   readonly account: EthereumAddress | undefined

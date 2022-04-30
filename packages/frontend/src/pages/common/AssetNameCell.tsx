@@ -1,5 +1,6 @@
-import React from 'react'
 import { AssetId } from '@explorer/types'
+import React from 'react'
+
 import { AssetIcon } from './icons/AssetIcon'
 
 export type AssetNameCellProps = {
