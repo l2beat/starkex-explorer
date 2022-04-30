@@ -2,6 +2,7 @@ import { ApiServer } from './api/ApiServer'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { FrontendController } from './api/controllers/FrontendController'
 import { HomeController } from './api/controllers/HomeController'
+import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
@@ -146,13 +147,18 @@ export class Application {
       userRegistrationEventRepository,
       forcedTransactionsRepository
     )
+    const stateUpdateController = new StateUpdateController(
+      stateUpdateRepository,
+      forcedTransactionsRepository
+    )
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
         createFrontendRouter(
           frontendController,
           homeController,
-          forcedTransactionController
+          forcedTransactionController,
+          stateUpdateController
         ),
       ],
       middleware: [createFrontendMiddleware()],

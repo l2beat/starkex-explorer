@@ -1,7 +1,7 @@
 import { ForcedTransactionEntry } from '@explorer/frontend'
 import { AssetId } from '@explorer/types'
 
-import { ForcedTransaction } from '../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransaction } from '../../../peripherals/database/ForcedTransactionsRepository'
 
 export function toForcedTransactionEntry(
   transaction: ForcedTransaction

@@ -11,7 +11,7 @@ import {
 } from '../../peripherals/database/ForcedTransactionsRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
-import { toForcedTransactionEntry } from './toForcedTransactionEntry'
+import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 
 export class ForcedTransactionController {
   constructor(

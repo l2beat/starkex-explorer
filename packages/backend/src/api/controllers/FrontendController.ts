@@ -1,59 +1,15 @@
-import { AssetBalance } from '@explorer/encoding'
 import {
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
-  renderStateUpdateDetailsPage,
-  renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
-import { AssetId, EthereumAddress } from '@explorer/types'
+import { EthereumAddress } from '@explorer/types'
 
-import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
-import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
-import { toForcedTransactionEntry } from './toForcedTransactionEntry'
-
-const buildViewAssets = (
-  balances: readonly AssetBalance[],
-  collateralBalance: bigint,
-  prices: { price: bigint; assetId: AssetId }[]
-) => {
-  const assets: {
-    assetId: AssetId
-    balance: bigint
-    totalUSDCents: bigint
-    price?: bigint
-  }[] = balances.map(({ balance, assetId }) => {
-    const price = prices.find((p) => p.assetId === assetId)?.price
-    const totalUSDCents = price ? getAssetValueUSDCents(balance, price) : 0n
-    const priceUSDCents = price ? getAssetPriceUSDCents(price, assetId) : 0n
-    return {
-      assetId,
-      balance,
-      price: priceUSDCents,
-      totalUSDCents,
-    }
-  })
-  assets.push({
-    assetId: AssetId('USDC-1'),
-    balance: collateralBalance,
-    totalUSDCents: collateralBalance / 1000n,
-    price: 1n,
-  })
-  return assets
-}
-
-const countDifferentAssets = (
-  prev: readonly AssetBalance[],
-  current: readonly AssetBalance[]
-) => {
-  return current.reduce((updates, balance) => {
-    const prevBalance = prev.find((b) => b.assetId === balance.assetId)
-    const updated = !prevBalance || prevBalance.balance !== balance.balance
-    return updated ? updates + 1 : updates
-  }, 0)
-}
+import { applyAssetPrices } from './utils/applyAssetPrices'
+import { countUpdatedAssets } from './utils/countUpdatedAssets'
+import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 
 type ControllerResult = {
   html: string
@@ -66,105 +22,6 @@ export class FrontendController {
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
-
-  async getStateUpdatesPage(
-    page: number,
-    perPage: number,
-    account: EthereumAddress | undefined
-  ): Promise<string> {
-    const stateUpdates = await this.stateUpdateRepository.getStateUpdateList({
-      offset: (page - 1) * perPage,
-      limit: perPage,
-    })
-    const fullCount = await this.stateUpdateRepository.getStateUpdateCount()
-
-    return renderStateUpdatesIndexPage({
-      account,
-      stateUpdates: stateUpdates.map((update) => ({
-        id: update.id,
-        hash: update.rootHash,
-        timestamp: update.timestamp,
-        positionCount: update.positionCount,
-      })),
-      fullCount: Number(fullCount),
-      params: {
-        page,
-        perPage,
-      },
-    })
-  }
-
-  async getStateUpdateDetailsPage(
-    id: number,
-    account: EthereumAddress | undefined
-  ): Promise<ControllerResult> {
-    const [stateUpdate, transactions] = await Promise.all([
-      this.stateUpdateRepository.getStateUpdateById(id),
-      this.forcedTransactionsRepository.getIncludedInStateUpdate(id),
-    ])
-
-    if (!stateUpdate) {
-      return {
-        status: 404,
-        html: 'State update not found',
-      }
-    }
-
-    const previousPositions =
-      await this.stateUpdateRepository.getPositionsPreviousState(
-        stateUpdate.positions.map((p) => p.positionId),
-        id
-      )
-
-    return {
-      html: renderStateUpdateDetailsPage({
-        account,
-        id: stateUpdate.id,
-        hash: stateUpdate.hash,
-        rootHash: stateUpdate.rootHash,
-        blockNumber: stateUpdate.blockNumber,
-        timestamp: stateUpdate.timestamp,
-        positions: stateUpdate.positions.map((pos) => {
-          const assets = buildViewAssets(
-            pos.balances,
-            pos.collateralBalance,
-            pos.prices
-          )
-          const totalUSDCents = assets.reduce(
-            (total, { totalUSDCents }) => totalUSDCents + total,
-            0n
-          )
-          const previousPos = previousPositions.find(
-            (p) => p.positionId === pos.positionId
-          )
-          const previousAssets =
-            previousPos &&
-            buildViewAssets(
-              previousPos.balances,
-              previousPos.collateralBalance,
-              previousPos.prices
-            )
-          const previousTotalUSDCents = previousAssets?.reduce(
-            (total, { totalUSDCents }) => totalUSDCents + total,
-            0n
-          )
-          const assetsUpdated = previousPos
-            ? countDifferentAssets(previousPos.balances, pos.balances)
-            : 0
-
-          return {
-            publicKey: pos.publicKey,
-            positionId: pos.positionId,
-            totalUSDCents,
-            previousTotalUSDCents,
-            assetsUpdated,
-          }
-        }),
-        transactions: transactions.map(toForcedTransactionEntry),
-      }),
-      status: 200,
-    }
-  }
 
   async getPositionDetailsPage(
     positionId: bigint,
@@ -183,7 +40,7 @@ export class FrontendController {
     }
 
     const historyWithAssets = history.map((update) => {
-      const assets = buildViewAssets(
+      const assets = applyAssetPrices(
         update.balances,
         update.collateralBalance,
         update.prices
@@ -219,7 +76,7 @@ export class FrontendController {
         history: historyWithAssets.map((update, i) => {
           const previousUpdate = historyWithAssets[i + 1]
           const assetsUpdated = previousUpdate
-            ? countDifferentAssets(previousUpdate.balances, update.balances)
+            ? countUpdatedAssets(previousUpdate.balances, update.balances)
             : 0
           return {
             stateUpdateId: update.stateUpdateId,

@@ -7,6 +7,7 @@ import { ControllerResult } from '../controllers/ControllerResult'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
 import { FrontendController } from '../controllers/FrontendController'
 import { HomeController } from '../controllers/HomeController'
+import { StateUpdateController } from '../controllers/StateUpdateController'
 import {
   stringAs,
   stringAsBigInt,
@@ -17,7 +18,8 @@ import {
 export function createFrontendRouter(
   frontendController: FrontendController,
   homeController: HomeController,
-  forcedTransactionController: ForcedTransactionController
+  forcedTransactionController: ForcedTransactionController,
+  stateUpdateController: StateUpdateController
 ) {
   const router = new Router()
 
@@ -83,11 +85,12 @@ export function createFrontendRouter(
       async (ctx) => {
         const { page, perPage } = ctx.query
         const account = getAccount(ctx)
-        ctx.body = await frontendController.getStateUpdatesPage(
+        const result = await stateUpdateController.getStateUpdatesPage(
           page,
           perPage,
           account
         )
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -103,10 +106,11 @@ export function createFrontendRouter(
       async (ctx) => {
         const { id } = ctx.params
         const account = getAccount(ctx)
-        const { status, html } =
-          await frontendController.getStateUpdateDetailsPage(id, account)
-        ctx.body = html
-        ctx.status = status
+        const result = await stateUpdateController.getStateUpdateDetailsPage(
+          id,
+          account
+        )
+        applyControllerResult(ctx, result)
       }
     )
   )
