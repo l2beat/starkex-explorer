@@ -1,23 +1,30 @@
 import { Hash256 } from '@explorer/types'
 
-import { FrontendController } from '../../../src/api/controllers/FrontendController'
+import { ControllerSuccessResult } from '../../../src/api/controllers/ControllerResult'
+import { ForcedTransactionController } from '../../../src/api/controllers/ForcedTransactionController'
+import { HomeController } from '../../../src/api/controllers/HomeController'
+import { PositionController } from '../../../src/api/controllers/PositionController'
+import { StateUpdateController } from '../../../src/api/controllers/StateUpdateController'
 import { createFrontendRouter } from '../../../src/api/routers/FrontendRouter'
 import { mock } from '../../mock'
 import { createTestApiServer } from '../TestApiServer'
 
 const TEST_PAGE = '<!DOCTYPE html><p>test page</p>'
-const SUCCESSFUL_RESPONSE = {
-  status: 200 as const,
-  html: TEST_PAGE,
+const SUCCESS_RESULT: ControllerSuccessResult = {
+  type: 'success',
+  content: TEST_PAGE,
 }
 
 describe('FrontendRouter', () => {
   describe('/', () => {
     it('returns html', async () => {
       const frontendRouter = createFrontendRouter(
-        mock<FrontendController>({
-          getHomePage: async () => TEST_PAGE,
-        })
+        mock<PositionController>(),
+        mock<HomeController>({
+          getHomePage: async () => SUCCESS_RESULT,
+        }),
+        mock<ForcedTransactionController>(),
+        mock<StateUpdateController>()
       )
       const server = createTestApiServer([frontendRouter])
 
@@ -27,8 +34,11 @@ describe('FrontendRouter', () => {
 
   describe('/state-updates', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getStateUpdatesPage: async () => TEST_PAGE,
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>({
+        getStateUpdatesPage: async () => SUCCESS_RESULT,
       })
     )
     const server = createTestApiServer([frontendRouter])
@@ -51,8 +61,11 @@ describe('FrontendRouter', () => {
 
   describe('/state-updates/:id', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getStateUpdateDetailsPage: async () => SUCCESSFUL_RESPONSE,
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>({
+        getStateUpdateDetailsPage: async () => SUCCESS_RESULT,
       })
     )
     const server = createTestApiServer([frontendRouter])
@@ -68,9 +81,12 @@ describe('FrontendRouter', () => {
 
   describe('/positions/:positionId', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getPositionDetailsPage: async () => SUCCESSFUL_RESPONSE,
-      })
+      mock<PositionController>({
+        getPositionDetailsPage: async () => SUCCESS_RESULT,
+      }),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -85,9 +101,12 @@ describe('FrontendRouter', () => {
 
   describe('/positions/:positionId/updates/:updateId', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getPositionUpdatePage: async () => SUCCESSFUL_RESPONSE,
-      })
+      mock<PositionController>({
+        getPositionUpdatePage: async () => SUCCESS_RESULT,
+      }),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -102,9 +121,12 @@ describe('FrontendRouter', () => {
 
   describe('/forced-transactions', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getForcedTransactionsPage: async () => TEST_PAGE,
-      })
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>({
+        getForcedTransactionsPage: async () => SUCCESS_RESULT,
+      }),
+      mock<StateUpdateController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -126,9 +148,12 @@ describe('FrontendRouter', () => {
 
   describe('/forced-transactions/:hash', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getForcedTransactionDetailsPage: async () => SUCCESSFUL_RESPONSE,
-      })
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>({
+        getForcedTransactionDetailsPage: async () => SUCCESS_RESULT,
+      }),
+      mock<StateUpdateController>()
     )
     const server = createTestApiServer([frontendRouter])
 

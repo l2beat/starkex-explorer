@@ -16,11 +16,11 @@ import {
   StateUpdateDetailsProps,
   StateUpdatesIndexProps,
 } from '../pages'
-import { ForcedTransaction } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
+import { ForcedTransactionEntry } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
 
 const ONE_HOUR = 60 * 60 * 1000
 
-const createFakeTransactions = (count: number): ForcedTransaction[] =>
+const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
   Array.from({ length: count }).map((_, i) => ({
     type: i % 2 === 0 ? 'exit' : i % 3 === 0 ? 'buy' : 'sell',
     status: i % 3 === 0 ? 'waiting to be included' : 'completed',

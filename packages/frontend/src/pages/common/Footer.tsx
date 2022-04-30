@@ -1,11 +1,12 @@
 import React from 'react'
+
 import { DiscordLogo } from './logos/DiscordLogo'
 import { DydxLogo } from './logos/DydxLogo'
 import { GithubLogo } from './logos/GithubLogo'
 import { L2beatLogo } from './logos/L2beatLogo'
-import { SimpleLink } from './SimpleLink'
 import { StarkWareLogo } from './logos/StarkWareLogo'
 import { TwitterLogo } from './logos/TwitterLogo'
+import { SimpleLink } from './SimpleLink'
 
 export function Footer() {
   return (

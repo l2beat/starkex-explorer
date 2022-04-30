@@ -1,12 +1,13 @@
 import React from 'react'
-import { formatHash } from '../formatHash'
-import { formatTime } from '../formatTime'
+
 import { Page } from '../common'
-import { Table } from '../common/Table'
-import { Pagination } from '../common/Pagination'
-import { ForcedTransactionsIndexProps } from './ForcedTransactionsIndexProps'
 import { AssetNameCell } from '../common/AssetNameCell'
+import { Pagination } from '../common/Pagination'
+import { Table } from '../common/Table'
+import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
+import { formatTime } from '../formatTime'
+import { ForcedTransactionsIndexProps } from './ForcedTransactionsIndexProps'
 
 export function ForcedTransactionsIndex({
   transactions,

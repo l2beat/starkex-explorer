@@ -71,7 +71,7 @@ export type EventRecordCandidate =
   | WithdrawalMinedEventRecordCandidate
   | WithdrawalVerifiedEventRecordCandidate
 
-type EventRecord = EventRecordCandidate & {
+export type EventRecord = EventRecordCandidate & {
   id: EventRow['id']
 }
 

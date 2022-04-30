@@ -1,14 +1,15 @@
 import React from 'react'
-import { Page } from '../common/Page'
-import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
-import { formatUSDCents } from '../formatUSDCents'
-import { Table } from '../common/Table'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
-import { formatHash } from '../formatHash'
-import { SimpleLink } from '../common/SimpleLink'
+
 import { AssetNameCell } from '../common/AssetNameCell'
+import { Page } from '../common/Page'
+import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { SimpleLink } from '../common/SimpleLink'
+import { Table } from '../common/Table'
+import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { formatUSDCents } from '../formatUSDCents'
+import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 
 export function StateUpdateDetails({
   id,

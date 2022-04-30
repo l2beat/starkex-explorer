@@ -1,11 +1,11 @@
 import React from 'react'
-import { formatHash } from '../formatHash'
-import { formatTime } from '../formatTime'
 
 import { Page } from '../common'
-import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
-import { Table } from '../common/Table'
 import { Pagination } from '../common/Pagination'
+import { Table } from '../common/Table'
+import { formatHash } from '../formatHash'
+import { formatTime } from '../formatTime'
+import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 
 export function StateUpdatesIndex({
   stateUpdates,
