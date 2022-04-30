@@ -7,16 +7,12 @@ import { EthereumAddress } from '@explorer/types'
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { ControllerResult } from './ControllerResult'
 import { applyAssetPrices } from './utils/applyAssetPrices'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 
-type ControllerResult = {
-  html: string
-  status: 200 | 404
-}
-
-export class FrontendController {
+export class PositionController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
@@ -33,10 +29,8 @@ export class FrontendController {
     ])
 
     if (!history[0]) {
-      return {
-        status: 404,
-        html: 'Position not found',
-      }
+      const content = 'Position not found'
+      return { type: 'not found', content }
     }
 
     const historyWithAssets = history.map((update) => {
@@ -63,30 +57,28 @@ export class FrontendController {
         current.publicKey
       )
 
-    return {
-      status: 200,
-      html: renderPositionDetailsPage({
-        account,
-        positionId,
-        publicKey: current.publicKey,
-        ethAddress: lastUserRegistrationEvent?.ethAddress.toString(),
-        stateUpdateId: current.stateUpdateId,
-        lastUpdateTimestamp: current.timestamp,
-        assets: current.assets,
-        history: historyWithAssets.map((update, i) => {
-          const previousUpdate = historyWithAssets[i + 1]
-          const assetsUpdated = previousUpdate
-            ? countUpdatedAssets(previousUpdate.balances, update.balances)
-            : 0
-          return {
-            stateUpdateId: update.stateUpdateId,
-            totalUSDCents: update.totalUSDCents,
-            assetsUpdated,
-          }
-        }),
-        transactions: transactions.map(toForcedTransactionEntry),
+    const content = renderPositionDetailsPage({
+      account,
+      positionId,
+      publicKey: current.publicKey,
+      ethAddress: lastUserRegistrationEvent?.ethAddress.toString(),
+      stateUpdateId: current.stateUpdateId,
+      lastUpdateTimestamp: current.timestamp,
+      assets: current.assets,
+      history: historyWithAssets.map((update, i) => {
+        const previousUpdate = historyWithAssets[i + 1]
+        const assetsUpdated = previousUpdate
+          ? countUpdatedAssets(previousUpdate.balances, update.balances)
+          : 0
+        return {
+          stateUpdateId: update.stateUpdateId,
+          totalUSDCents: update.totalUSDCents,
+          assetsUpdated,
+        }
       }),
-    }
+      transactions: transactions.map(toForcedTransactionEntry),
+    })
+    return { type: 'success', content }
   }
 
   async getPositionUpdatePage(
@@ -103,10 +95,8 @@ export class FrontendController {
       (p) => p.stateUpdateId === stateUpdateId
     )
     if (updateIndex === -1 || !update) {
-      return {
-        html: 'Update not found',
-        status: 404,
-      }
+      const content = 'Update not found'
+      return { type: 'not found', content }
     }
     const position = history[updateIndex]
     const previousPosition = history[updateIndex + 1]
@@ -123,24 +113,22 @@ export class FrontendController {
       }
     })
 
-    return {
-      html: renderPositionAtUpdatePage({
-        account,
-        stateUpdateId,
-        positionId,
-        lastUpdateTimestamp: update.timestamp,
-        previousPublicKey: previousPosition?.publicKey,
-        publicKey: position.publicKey,
-        assetChanges,
-        transactions: transactions
-          .filter((t) => {
-            return t.type === 'trade'
-              ? [t.positionIdA, t.positionIdB].includes(positionId)
-              : t.positionId === positionId
-          })
-          .map(toForcedTransactionEntry),
-      }),
-      status: 200,
-    }
+    const content = renderPositionAtUpdatePage({
+      account,
+      stateUpdateId,
+      positionId,
+      lastUpdateTimestamp: update.timestamp,
+      previousPublicKey: previousPosition?.publicKey,
+      publicKey: position.publicKey,
+      assetChanges,
+      transactions: transactions
+        .filter((t) => {
+          return t.type === 'trade'
+            ? [t.positionIdA, t.positionIdB].includes(positionId)
+            : t.positionId === positionId
+        })
+        .map(toForcedTransactionEntry),
+    })
+    return { type: 'success', content }
   }
 }

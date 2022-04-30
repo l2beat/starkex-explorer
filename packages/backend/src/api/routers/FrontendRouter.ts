@@ -5,8 +5,8 @@ import { z } from 'zod'
 
 import { ControllerResult } from '../controllers/ControllerResult'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
-import { FrontendController } from '../controllers/FrontendController'
 import { HomeController } from '../controllers/HomeController'
+import { PositionController } from '../controllers/PositionController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import {
   stringAs,
@@ -16,7 +16,7 @@ import {
 } from './types'
 
 export function createFrontendRouter(
-  frontendController: FrontendController,
+  positionController: PositionController,
   homeController: HomeController,
   forcedTransactionController: ForcedTransactionController,
   stateUpdateController: StateUpdateController
@@ -126,10 +126,11 @@ export function createFrontendRouter(
       async (ctx) => {
         const { positionId } = ctx.params
         const account = getAccount(ctx)
-        const { status, html } =
-          await frontendController.getPositionDetailsPage(positionId, account)
-        ctx.body = html
-        ctx.status = status
+        const result = await positionController.getPositionDetailsPage(
+          positionId,
+          account
+        )
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -146,13 +147,12 @@ export function createFrontendRouter(
       async (ctx) => {
         const { positionId, updateId } = ctx.params
         const account = getAccount(ctx)
-        const { status, html } = await frontendController.getPositionUpdatePage(
+        const result = await positionController.getPositionUpdatePage(
           positionId,
           updateId,
           account
         )
-        ctx.body = html
-        ctx.status = status
+        applyControllerResult(ctx, result)
       }
     )
   )

@@ -1,7 +1,7 @@
 import { ApiServer } from './api/ApiServer'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
-import { FrontendController } from './api/controllers/FrontendController'
 import { HomeController } from './api/controllers/HomeController'
+import { PositionController } from './api/controllers/PositionController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
@@ -134,7 +134,7 @@ export class Application {
     // #endregion core
     // #region api
 
-    const frontendController = new FrontendController(
+    const positionController = new PositionController(
       stateUpdateRepository,
       userRegistrationEventRepository,
       forcedTransactionsRepository
@@ -155,7 +155,7 @@ export class Application {
       routers: [
         createStatusRouter(statusService),
         createFrontendRouter(
-          frontendController,
+          positionController,
           homeController,
           forcedTransactionController,
           stateUpdateController
