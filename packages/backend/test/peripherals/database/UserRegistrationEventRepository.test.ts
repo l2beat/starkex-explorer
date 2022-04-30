@@ -159,7 +159,7 @@ describe(UserRegistrationEventRepository.name, () => {
     await repository.add(records)
     const actual = await repository.findByEthereumAddress(event.ethAddress)
 
-    expect(actual).toEqual({ id: 2, ...event })
+    expect(actual).toEqual({ id: expect.a(Number), ...event })
   })
 
   it('returns undefined when not found by ethereum address', async () => {
