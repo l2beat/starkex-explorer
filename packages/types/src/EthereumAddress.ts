@@ -1,5 +1,7 @@
 import { constants, utils, Wallet } from 'ethers'
 
+import { fakeHexString } from './fake'
+
 export interface EthereumAddress extends String {
   _EthereumAddressBrand: string
 }
@@ -27,4 +29,12 @@ EthereumAddress.inOrder = function (
   b: EthereumAddress
 ): [EthereumAddress, EthereumAddress] {
   return EthereumAddress.isBefore(a, b) ? [a, b] : [b, a]
+}
+
+EthereumAddress.fake = function fake(start?: string) {
+  if (!start) {
+    return EthereumAddress('0x' + fakeHexString(40))
+  } else {
+    return EthereumAddress('0x' + start.padEnd(40, '0'))
+  }
 }

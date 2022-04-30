@@ -1,4 +1,4 @@
-import { Timestamp } from '@explorer/types'
+import { StarkKey, Timestamp } from '@explorer/types'
 
 import { ByteReader } from './ByteReader'
 import { MIN_INT } from './constants'
@@ -8,7 +8,7 @@ import { AssetBalance, PositionUpdate } from './OnChainData'
 export function readPositionUpdate(reader: ByteReader): PositionUpdate {
   const count = reader.readNumber(32)
   const positionId = reader.readBigInt(32)
-  const publicKey = reader.readHex(32)
+  const publicKey = StarkKey(reader.readHex(32))
   const collateralBalance = reader.readBigInt(32) + MIN_INT
   const fundingTimestamp = Timestamp.fromSeconds(reader.readNumber(32))
 

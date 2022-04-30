@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError, encodeAssetId } from '../src'
@@ -22,13 +22,13 @@ describe(readForcedActions.name, () => {
     const writer = new ByteWriter()
       .writeNumber(1, 32)
       .writeNumber(0, 32)
-      .write('1234abcd'.repeat(8))
+      .write(StarkKey.fake('1234abcd').toString())
       .writeNumber(123, 32)
       .writeNumber(1500100900n, 32)
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'withdrawal',
-        publicKey: '0x' + '1234abcd'.repeat(8),
+        publicKey: StarkKey.fake('1234abcd'),
         positionId: 123n,
         amount: 1500100900n,
       },
@@ -39,8 +39,8 @@ describe(readForcedActions.name, () => {
     const writer = new ByteWriter()
       .writeNumber(1, 32)
       .writeNumber(1, 32)
-      .write('1234abcd'.repeat(8))
-      .write('deadbeef'.repeat(8))
+      .write(StarkKey.fake('1234abcd').toString())
+      .write(StarkKey.fake('deadbeef').toString())
       .writeNumber(123, 32)
       .writeNumber(456, 32)
       .writePadding(17)
@@ -52,8 +52,8 @@ describe(readForcedActions.name, () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'trade',
-        publicKeyA: '0x' + '1234abcd'.repeat(8),
-        publicKeyB: '0x' + 'deadbeef'.repeat(8),
+        publicKeyA: StarkKey.fake('1234abcd'),
+        publicKeyB: StarkKey.fake('deadbeef'),
         positionIdA: 123n,
         positionIdB: 456n,
         syntheticAssetId: AssetId('ETH-9'),
@@ -69,12 +69,12 @@ describe(readForcedActions.name, () => {
     const writer = new ByteWriter()
       .writeNumber(2, 32)
       .writeNumber(0, 32)
-      .write('1234abcd'.repeat(8))
+      .write(StarkKey.fake('1234abcd').toString())
       .writeNumber(123, 32)
       .writeNumber(1500100900n, 32)
       .writeNumber(1, 32)
-      .write('1234abcd'.repeat(8))
-      .write('deadbeef'.repeat(8))
+      .write(StarkKey.fake('1234abcd').toString())
+      .write(StarkKey.fake('deadbeef').toString())
       .writeNumber(123, 32)
       .writeNumber(456, 32)
       .writePadding(17)
@@ -87,14 +87,14 @@ describe(readForcedActions.name, () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'withdrawal',
-        publicKey: '0x' + '1234abcd'.repeat(8),
+        publicKey: StarkKey.fake('1234abcd'),
         positionId: 123n,
         amount: 1500100900n,
       },
       {
         type: 'trade',
-        publicKeyA: '0x' + '1234abcd'.repeat(8),
-        publicKeyB: '0x' + 'deadbeef'.repeat(8),
+        publicKeyA: StarkKey.fake('1234abcd'),
+        publicKeyB: StarkKey.fake('deadbeef'),
         positionIdA: 123n,
         positionIdB: 456n,
         syntheticAssetId: AssetId('ETH-9'),

@@ -1,4 +1,4 @@
-import { AssetId, PedersenHash } from '@explorer/types'
+import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { InMemoryMerkleStorage } from '../src/InMemoryMerkleStorage'
@@ -67,8 +67,8 @@ describe(MerkleTree.name, () => {
 
   describe(MerkleTree.prototype.getLeaves.name, () => {
     it('returns multiple leaves', async () => {
-      const positionA = new Position('0xdead1234', 420n, [])
-      const positionB = new Position('0xbeef5678', 69n, [])
+      const positionA = new Position(StarkKey.fake('dead'), 420n, [])
+      const positionB = new Position(StarkKey.fake('beef'), 69n, [])
 
       const storage = new InMemoryMerkleStorage()
       let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
@@ -104,8 +104,8 @@ describe(MerkleTree.name, () => {
   })
 
   describe(MerkleTree.prototype.update.name, () => {
-    const positionA = new Position('0xdead1234', 420n, [])
-    const positionB = new Position('0xbeef5678', 69n, [])
+    const positionA = new Position(StarkKey.fake('dead'), 420n, [])
+    const positionB = new Position(StarkKey.fake('beef'), 69n, [])
 
     it('updates nodes at specified indices', async () => {
       const storage = new InMemoryMerkleStorage()
@@ -223,10 +223,10 @@ describe(MerkleTree.name, () => {
       const storage = new InMemoryMerkleStorage()
       let tree = await MerkleTree.create(storage, 3n, Position.EMPTY)
 
-      const positionA = new Position(`0x${'0'.repeat(63)}1`, 2n, [
+      const positionA = new Position(StarkKey('1'.padStart(64, '0')), 2n, [
         { assetId: AssetId('BTC-10'), balance: 3n, fundingIndex: 4n },
       ])
-      const positionB = new Position(`0x${'0'.repeat(63)}1`, 2n, [
+      const positionB = new Position(StarkKey('1'.padStart(64, '0')), 2n, [
         { assetId: AssetId('ETH-9'), balance: 3n, fundingIndex: 4n },
         { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 6n },
       ])
@@ -270,8 +270,8 @@ describe(MerkleTree.name, () => {
   })
 
   describe('recovering nodes', () => {
-    const positionA = new Position('0xdead1234', 420n, [])
-    const positionB = new Position('0xbeef5678', 69n, [])
+    const positionA = new Position(StarkKey.fake('dead'), 420n, [])
+    const positionB = new Position(StarkKey.fake('beef'), 69n, [])
 
     it('can recover a persisted state', async () => {
       const storage = new InMemoryMerkleStorage()

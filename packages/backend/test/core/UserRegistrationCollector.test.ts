@@ -1,4 +1,4 @@
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { UserRegistrationCollector } from '../../src/core/UserRegistrationCollector'
@@ -80,24 +80,27 @@ describe(UserRegistrationCollector.name, () => {
         ethAddress: EthereumAddress(
           '0xB30E6ECDb51FE9A5Edf84c58B2C0F20ad3b62C3d'
         ),
-        starkKey:
-          '0x0138b0aff25a4effbc4c12c17dc27ce64a210d5837cbb32757ccd43e715a5f37',
+        starkKey: StarkKey(
+          '0x0138b0aff25a4effbc4c12c17dc27ce64a210d5837cbb32757ccd43e715a5f37'
+        ),
       },
       {
         blockNumber: 11912458,
         ethAddress: EthereumAddress(
           '0x0D012Ea1A2eE7308106B4618bDf8B83219918118'
         ),
-        starkKey:
-          '0x0421d25472e1f2dff8e5a31ab231b1bec8f9037ab0cae36eaf46a62842b4a218',
+        starkKey: StarkKey(
+          '0x0421d25472e1f2dff8e5a31ab231b1bec8f9037ab0cae36eaf46a62842b4a218'
+        ),
       },
       {
         blockNumber: 11915106,
         ethAddress: EthereumAddress(
           '0xF3ad7bE69629D05D1Df1D4BacF0FAB33A3cdF50c'
         ),
-        starkKey:
-          '0x035086df5c48598c68b4a36828e49cac61832b148a898e963f04493b29341cd1',
+        starkKey: StarkKey(
+          '0x035086df5c48598c68b4a36828e49cac61832b148a898e963f04493b29341cd1'
+        ),
       },
     ]
 

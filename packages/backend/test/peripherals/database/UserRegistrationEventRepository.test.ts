@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
@@ -14,8 +14,8 @@ describe(UserRegistrationEventRepository.name, () => {
   it('adds single record and queries it', async () => {
     const record = {
       blockNumber: 1,
-      ethAddress: EthereumAddress.ZERO,
-      starkKey: '0x1234',
+      ethAddress: EthereumAddress.fake(),
+      starkKey: StarkKey.fake(),
     }
 
     await repository.add([record])
@@ -39,13 +39,13 @@ describe(UserRegistrationEventRepository.name, () => {
     const records = [
       {
         blockNumber: 1,
-        ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x1234',
+        ethAddress: EthereumAddress.fake(),
+        starkKey: StarkKey.fake(),
       },
       {
         blockNumber: 2,
-        ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x1235',
+        ethAddress: EthereumAddress.fake(),
+        starkKey: StarkKey.fake(),
       },
     ]
 
@@ -59,8 +59,8 @@ describe(UserRegistrationEventRepository.name, () => {
     await repository.add([
       {
         blockNumber: 1,
-        ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x1234',
+        ethAddress: EthereumAddress.fake(),
+        starkKey: StarkKey.fake(),
       },
     ])
 
@@ -74,18 +74,18 @@ describe(UserRegistrationEventRepository.name, () => {
     await repository.add([
       {
         blockNumber: 1,
-        ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x123',
+        ethAddress: EthereumAddress.fake('1'),
+        starkKey: StarkKey.fake('1'),
       },
       {
         blockNumber: 2,
-        ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x234',
+        ethAddress: EthereumAddress.fake('2'),
+        starkKey: StarkKey.fake('2'),
       },
       {
         blockNumber: 3,
-        ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x345',
+        ethAddress: EthereumAddress.fake('2'),
+        starkKey: StarkKey.fake('2'),
       },
     ])
 
@@ -96,23 +96,21 @@ describe(UserRegistrationEventRepository.name, () => {
       {
         id: expect.a(Number),
         blockNumber: 1,
-        ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x123',
+        ethAddress: EthereumAddress.fake('1'),
+        starkKey: StarkKey.fake('1'),
       },
       {
         id: expect.a(Number),
         blockNumber: 2,
-        ethAddress: EthereumAddress.ZERO,
-        starkKey: '0x234',
+        ethAddress: EthereumAddress.fake('2'),
+        starkKey: StarkKey.fake('2'),
       },
     ])
   })
 
   it('finds last event for stark key', async () => {
-    const starkKey = '0x123'
-    const ethAddress = EthereumAddress(
-      '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'
-    )
+    const starkKey = StarkKey.fake()
+    const ethAddress = EthereumAddress.fake()
     await repository.add([
       {
         blockNumber: 1,
@@ -136,7 +134,7 @@ describe(UserRegistrationEventRepository.name, () => {
   })
 
   it('returns undefined if no event exists for stark key', async () => {
-    const event = await repository.findByStarkKey('0x123')
+    const event = await repository.findByStarkKey(StarkKey.fake('123'))
     expect(event).not.toBeDefined()
   })
 

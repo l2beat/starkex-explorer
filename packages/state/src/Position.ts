@@ -1,6 +1,6 @@
 import { pedersen } from '@explorer/crypto'
 import { encodeAssetId } from '@explorer/encoding'
-import { AssetId, PedersenHash } from '@explorer/types'
+import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 
 import { MerkleValue } from './MerkleValue'
 
@@ -13,10 +13,10 @@ export interface PositionAsset {
 }
 
 export class Position extends MerkleValue {
-  static EMPTY = new Position('0x' + '0'.repeat(64), 0n, [])
+  static EMPTY = new Position(StarkKey.ZERO, 0n, [])
 
   constructor(
-    public readonly publicKey: string,
+    public readonly publicKey: StarkKey,
     public readonly collateralBalance: bigint,
     public readonly assets: readonly PositionAsset[],
     protected knownHash?: PedersenHash

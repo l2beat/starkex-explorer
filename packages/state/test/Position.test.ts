@@ -1,4 +1,4 @@
-import { AssetId, PedersenHash } from '@explorer/types'
+import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { Position } from '../src/Position'
@@ -15,7 +15,7 @@ describe(Position.name, () => {
   })
 
   it('has a correct hash with 1 asset', async () => {
-    const position = new Position(`0x${'0'.repeat(63)}1`, 2n, [
+    const position = new Position(StarkKey('1'.padStart(64, '0')), 2n, [
       { assetId: AssetId('BTC-10'), balance: 3n, fundingIndex: 4n },
     ])
     const hash = await position.hash()
@@ -27,7 +27,7 @@ describe(Position.name, () => {
   })
 
   it('has a correct hash with 2 assets', async () => {
-    const position = new Position(`0x${'0'.repeat(63)}1`, 2n, [
+    const position = new Position(StarkKey('1'.padStart(64, '0')), 2n, [
       { assetId: AssetId('ETH-9'), balance: 3n, fundingIndex: 4n },
       { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 6n },
     ])
@@ -40,7 +40,7 @@ describe(Position.name, () => {
   })
 
   it('can be stringified to json and back', async () => {
-    const position = new Position(`0x${'0'.repeat(63)}1`, 2n, [
+    const position = new Position(StarkKey('1'.padStart(64, '0')), 2n, [
       { assetId: AssetId('ETH-9'), balance: 3n, fundingIndex: 4n },
       { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 6n },
     ])
