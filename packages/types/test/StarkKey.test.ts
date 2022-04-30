@@ -6,28 +6,28 @@ import { StarkKey } from '../src'
 describe(StarkKey.name, () => {
   it('accepts a valid key', () => {
     const hash = StarkKey(
-      '0xabcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0x0abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd123'
     )
     expect(hash.toString()).toEqual(
-      '0xabcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0x0abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd123'
     )
   })
 
   it('prepends 0x', () => {
     const hash = StarkKey(
-      'abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd123'
     )
     expect(hash.toString()).toEqual(
-      '0xabcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0x0abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd123'
     )
   })
 
   it('transforms to lowercase', () => {
     const hash = StarkKey(
-      '0xABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234'
+      '0x0ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD123'
     )
     expect(hash.toString()).toEqual(
-      '0xabcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0x0abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd123'
     )
   })
 
@@ -41,6 +41,14 @@ describe(StarkKey.name, () => {
 
   it('throws for long hex strings', () => {
     expect(() => StarkKey('0x' + '1'.repeat(65))).toThrow(TypeError)
+  })
+
+  it('throws for hex string starting with non-zero', () => {
+    expect(() =>
+      StarkKey(
+        'abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      )
+    ).toThrow(TypeError)
   })
 
   describe(StarkKey.from.name, () => {

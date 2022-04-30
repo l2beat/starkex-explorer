@@ -10,7 +10,7 @@ export function StarkKey(value: string) {
   if (!value.startsWith('0x')) {
     value = '0x' + value
   }
-  if (!/^0x[a-f\d]{64}$/i.test(value)) {
+  if (!/^0x0[a-f\d]{63}$/i.test(value)) {
     throw new TypeError('Invalid StarkKey')
   }
   return value.toLowerCase() as unknown as StarkKey
@@ -27,8 +27,8 @@ StarkKey.from = function from(value: BigNumber | bigint) {
 
 StarkKey.fake = function fake(start?: string) {
   if (!start) {
-    return StarkKey(fakeHexString(64))
+    return StarkKey('0' + fakeHexString(63))
   } else {
-    return StarkKey(start.padEnd(64, '0'))
+    return StarkKey('0' + start.padEnd(63, '0'))
   }
 }
