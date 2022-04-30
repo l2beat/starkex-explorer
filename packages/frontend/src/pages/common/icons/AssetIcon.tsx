@@ -1,5 +1,5 @@
-import React from 'react'
 import { AssetId } from '@explorer/types'
+import React from 'react'
 
 type AssetIconProps = {
   assetId: AssetId

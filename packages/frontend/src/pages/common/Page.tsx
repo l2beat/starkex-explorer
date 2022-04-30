@@ -1,5 +1,6 @@
 import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
+
 import { Footer } from './Footer'
 import { Head, HeadProps } from './Head'
 import { Navbar } from './Navbar'

@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
 import cx from 'classnames'
+import React, { ReactNode } from 'react'
 
 export function SimpleLink({
   className,
