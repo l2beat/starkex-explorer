@@ -3,6 +3,8 @@ import Router from '@koa/router'
 import { Context } from 'koa'
 import { z } from 'zod'
 
+import { ControllerResult } from '../controllers/ControllerResult'
+import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
 import { FrontendController } from '../controllers/FrontendController'
 import { HomeController } from '../controllers/HomeController'
 import {
@@ -14,13 +16,15 @@ import {
 
 export function createFrontendRouter(
   frontendController: FrontendController,
-  homeController: HomeController
+  homeController: HomeController,
+  forcedTransactionController: ForcedTransactionController
 ) {
   const router = new Router()
 
   router.get('/', async (ctx) => {
     const account = getAccount(ctx)
-    ctx.body = await homeController.getHomePage(account)
+    const result = await homeController.getHomePage(account)
+    applyControllerResult(ctx, result)
   })
 
   router.get(
@@ -35,11 +39,13 @@ export function createFrontendRouter(
       async (ctx) => {
         const { page, perPage } = ctx.query
         const account = getAccount(ctx)
-        ctx.body = await frontendController.getForcedTransactionsPage(
-          page,
-          perPage,
-          account
-        )
+        const result =
+          await forcedTransactionController.getForcedTransactionsPage(
+            page,
+            perPage,
+            account
+          )
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -55,13 +61,12 @@ export function createFrontendRouter(
       async (ctx) => {
         const { hash } = ctx.params
         const account = getAccount(ctx)
-        const { html, status } =
-          await frontendController.getForcedTransactionDetailsPage(
+        const result =
+          await forcedTransactionController.getForcedTransactionDetailsPage(
             hash,
             account
           )
-        ctx.body = html
-        ctx.status = status
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -159,5 +164,18 @@ export function getAccount(ctx: Context) {
     } catch {
       return
     }
+  }
+}
+
+function applyControllerResult(ctx: Context, result: ControllerResult) {
+  if (result.type === 'redirect') {
+    ctx.redirect(result.url)
+  } else {
+    if (result.type === 'success') {
+      ctx.status = 200
+    } else if (result.type === 'not found') {
+      ctx.status = 404
+    }
+    ctx.body = result.content
   }
 }

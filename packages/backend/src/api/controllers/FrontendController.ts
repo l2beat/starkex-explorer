@@ -1,13 +1,11 @@
 import { AssetBalance } from '@explorer/encoding'
 import {
-  renderForcedTransactionDetailsPage,
-  renderForcedTransactionsIndexPage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
-import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
 import { getAssetValueUSDCents } from '../../core/getAssetValueUSDCents'
@@ -68,79 +66,6 @@ export class FrontendController {
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
-
-  async getForcedTransactionsPage(
-    page: number,
-    perPage: number,
-    account: EthereumAddress | undefined
-  ): Promise<string> {
-    const limit = perPage
-    const offset = (page - 1) * perPage
-    const [transactions, fullCount] = await Promise.all([
-      this.forcedTransactionsRepository.getLatest({ limit, offset }),
-      this.forcedTransactionsRepository.countAll(),
-    ])
-
-    return renderForcedTransactionsIndexPage({
-      account,
-      transactions: transactions.map(toForcedTransactionEntry),
-      fullCount,
-      params: { page, perPage },
-    })
-  }
-
-  async getForcedTransactionDetailsPage(
-    transactionHash: Hash256,
-    account: EthereumAddress | undefined
-  ): Promise<ControllerResult> {
-    const result = await this.forcedTransactionsRepository.getByHashWithEvents(
-      transactionHash
-    )
-    if (!result) {
-      return {
-        status: 404,
-        html: 'Could not find transaction for that hash',
-      }
-    }
-
-    const { transaction, events } = result
-
-    if (transaction.type === 'trade') {
-      throw new Error('Rendering trades not implemented yet')
-    }
-
-    const registrationEvent =
-      await this.userRegistrationEventRepository.findByStarkKey(
-        transaction.publicKey
-      )
-
-    return {
-      status: 200,
-      html: renderForcedTransactionDetailsPage({
-        account,
-        history: events.map((event) => {
-          switch (event.eventType) {
-            case 'mined':
-              return { type: 'mined', timestamp: event.timestamp }
-            case 'verified':
-              return {
-                type: 'verified',
-                stateUpdateId: event.stateUpdateId,
-                timestamp: event.timestamp,
-              }
-          }
-        }),
-        ethereumAddress: registrationEvent?.ethAddress,
-        positionId: transaction.positionId,
-        transactionHash,
-        value: transaction.amount,
-        stateUpdateId:
-          transaction.status === 'verified'
-            ? transaction.stateUpdateId
-            : undefined,
-      }),
-    }
-  }
 
   async getStateUpdatesPage(
     page: number,

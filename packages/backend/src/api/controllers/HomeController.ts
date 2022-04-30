@@ -3,6 +3,7 @@ import { EthereumAddress, PedersenHash, Timestamp } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { ControllerResult } from './ControllerResult'
 import { toForcedTransactionEntry } from './toForcedTransactionEntry'
 
 export class HomeController {
@@ -11,7 +12,9 @@ export class HomeController {
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
 
-  async getHomePage(account: EthereumAddress | undefined): Promise<string> {
+  async getHomePage(
+    account: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
     const offset = 0
     const limit = 5
 
@@ -23,13 +26,14 @@ export class HomeController {
         this.stateUpdateRepository.countPositions(),
       ])
 
-    return renderHomePage({
+    const content = renderHomePage({
       account,
       stateUpdates: stateUpdates.map(toStateUpdateEntry),
       forcedTransactions: transactions.map(toForcedTransactionEntry),
       totalUpdates,
       totalPositions,
     })
+    return { type: 'success', content }
   }
 }
 
