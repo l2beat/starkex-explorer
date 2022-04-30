@@ -1,7 +1,8 @@
-import { AssetId, Hash256, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 
 export interface ForcedTransactionsIndexProps {
-  readonly transactions: ReadonlyArray<ForcedTransaction>
+  readonly account: EthereumAddress | undefined
+  readonly transactions: readonly ForcedTransactionEntry[]
   readonly params: {
     readonly perPage: number
     readonly page: number
@@ -9,7 +10,7 @@ export interface ForcedTransactionsIndexProps {
   readonly fullCount: bigint
 }
 
-export interface ForcedTransaction {
+export interface ForcedTransactionEntry {
   readonly type: 'exit' | 'buy' | 'sell'
   readonly status: 'waiting to be included' | 'completed'
   readonly hash: Hash256

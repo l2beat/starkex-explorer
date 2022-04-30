@@ -7,7 +7,7 @@
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "lint": "eslint --ext .ts --max-warnings 0 src",
+    "lint": "eslint --ext .ts,.tsx --max-warnings 0 src",
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "build": "NODE_ENV=production gulp build",

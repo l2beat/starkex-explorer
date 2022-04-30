@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
 import cx from 'classnames'
+import React, { ReactNode } from 'react'
 
 type Cell = ReactNode
 
@@ -47,7 +47,7 @@ const RowEl = ({
             'block',
             'first-letter:capitalize',
             cellPaddings,
-            maxWidthClass
+            maxWidthClass && cellOverflowStyles
           )}
         >
           {cell}

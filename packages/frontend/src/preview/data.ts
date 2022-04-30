@@ -1,6 +1,13 @@
-import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  PedersenHash,
+  Timestamp,
+} from '@explorer/types'
 
 import {
+  ForcedTransactionDetailsProps,
   ForcedTransactionsIndexProps,
   HomeProps,
   PositionAtUpdateProps,
@@ -8,11 +15,11 @@ import {
   StateUpdateDetailsProps,
   StateUpdatesIndexProps,
 } from '../pages'
-import { ForcedTransaction } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
+import { ForcedTransactionEntry } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
 
 const ONE_HOUR = 60 * 60 * 1000
 
-const createFakeTransactions = (count: number): ForcedTransaction[] =>
+const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
   Array.from({ length: count }).map((_, i) => ({
     type: i % 2 === 0 ? 'exit' : i % 3 === 0 ? 'buy' : 'sell',
     status: i % 3 === 0 ? 'waiting to be included' : 'completed',
@@ -159,10 +166,37 @@ export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
 }
 
 export const FORCED_TRANSACTIONS_INDEX_PROPS: ForcedTransactionsIndexProps = {
+  account: undefined,
   transactions: createFakeTransactions(50),
   params: {
     page: 1,
     perPage: 50,
   },
   fullCount: 100n,
+}
+
+export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
+  account: undefined,
+  ethereumAddress: EthereumAddress(
+    '0x1234567890ABCDEF1234567890ABCDEF12345678'
+  ),
+  positionId: 1n,
+  transactionHash: Hash256.fake(),
+  value: 12345n,
+  stateUpdateId: 1,
+  history: [
+    {
+      timestamp: Timestamp(Date.now() - 100000),
+      type: 'sent',
+    },
+    {
+      timestamp: Timestamp(Date.now() - 10000),
+      type: 'mined',
+    },
+    {
+      timestamp: Timestamp(Date.now() - 1000),
+      type: 'verified',
+      stateUpdateId: 1,
+    },
+  ],
 }

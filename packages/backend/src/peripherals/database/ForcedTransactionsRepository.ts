@@ -71,7 +71,7 @@ export type EventRecordCandidate =
   | WithdrawalMinedEventRecordCandidate
   | WithdrawalVerifiedEventRecordCandidate
 
-type EventRecord = EventRecordCandidate & {
+export type EventRecord = EventRecordCandidate & {
   id: EventRow['id']
 }
 
@@ -406,6 +406,25 @@ export class ForcedTransactionsRepository {
       )
 
     return eventRowsToTransactions(rows)
+  }
+
+  async getByHashWithEvents(
+    transactionHash: Hash256
+  ): Promise<
+    { transaction: ForcedTransaction; events: EventRecord[] } | undefined
+  > {
+    const rows = await this.knex('forced_transaction_events')
+      .where('transaction_hash', '=', transactionHash.toString())
+      .orderBy('timestamp')
+    if (rows.length === 0) {
+      return undefined
+    }
+    const events = rows.map(toRecord)
+    const transaction = reduceEventsToTransaction(events)
+    return {
+      transaction,
+      events,
+    }
   }
 
   async countAll(): Promise<bigint> {

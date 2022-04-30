@@ -458,4 +458,76 @@ describe(ForcedTransactionsRepository.name, () => {
 
     expect(count).toEqual(2n)
   })
+
+  it('returns undefined if transaction not found by hash', async () => {
+    const result = await repository.getByHashWithEvents(Hash256.fake())
+    expect(result).not.toBeDefined()
+  })
+
+  it('returns transaction with events by hash', async () => {
+    const hash1 = Hash256.fake()
+    const data1 = {
+      amount: 123n,
+      positionId: 123n,
+      publicKey: '123',
+    }
+
+    const hash2 = Hash256.fake()
+    const data2 = {
+      publicKeyA: '123a',
+      publicKeyB: '123b',
+      positionIdA: 456n,
+      positionIdB: 789n,
+      syntheticAssetId: AssetId('ETH-7'),
+      isABuyingSynthetic: true,
+      syntheticAmount: 456n,
+      collateralAmount: 789n,
+      nonce: 1n,
+    }
+    const stateUpdateId = 1
+
+    const events = [
+      {
+        id: 1,
+        transactionType: 'withdrawal' as const,
+        eventType: 'mined' as const,
+        blockNumber: 1,
+        timestamp: Timestamp(0),
+        transactionHash: hash1,
+        ...data1,
+      },
+      {
+        id: 2,
+        transactionType: 'withdrawal' as const,
+        eventType: 'verified' as const,
+        blockNumber: 1,
+        timestamp: Timestamp(1),
+        transactionHash: hash1,
+        stateUpdateId,
+      },
+      {
+        id: 3,
+        transactionType: 'trade' as const,
+        eventType: 'mined' as const,
+        timestamp: Timestamp(2),
+        transactionHash: hash2,
+        blockNumber: 1,
+        ...data2,
+      },
+    ]
+
+    await repository.addEvents(events)
+
+    const result = await repository.getByHashWithEvents(hash1)
+
+    expect(result?.events).toEqual(events.slice(0, 2))
+    expect(result?.transaction).toEqual({
+      type: 'withdrawal',
+      status: 'verified',
+      ...data1,
+      hash: hash1,
+      stateUpdateId,
+      lastUpdate: events[1].timestamp,
+    })
+  })
 })

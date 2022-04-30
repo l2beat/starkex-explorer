@@ -1,5 +1,6 @@
-import React from 'react'
 import cx from 'classnames'
+import React from 'react'
+
 import { NextIcon } from './icons/NextIcon'
 import { PrevIcon } from './icons/PrevIcon'
 

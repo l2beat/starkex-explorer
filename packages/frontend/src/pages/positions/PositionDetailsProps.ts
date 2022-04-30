@@ -1,6 +1,6 @@
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
-import { ForcedTransaction } from '../forced-transactions/ForcedTransactionsIndexProps'
+import { ForcedTransactionEntry } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface PositionDetailsProps {
   readonly account: EthereumAddress | undefined
@@ -9,12 +9,12 @@ export interface PositionDetailsProps {
   readonly ethAddress?: string
   readonly stateUpdateId: number
   readonly lastUpdateTimestamp: Timestamp
-  readonly assets: readonly PositionAsset[]
+  readonly assets: readonly PositionAssetEntry[]
   readonly history: readonly PositionHistoryEntry[]
-  readonly transactions: Omit<ForcedTransaction, 'positionId'>[]
+  readonly transactions: readonly ForcedTransactionEntry[]
 }
 
-export interface PositionAsset {
+export interface PositionAssetEntry {
   readonly assetId: AssetId
   readonly balance: bigint
   readonly totalUSDCents: bigint

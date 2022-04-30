@@ -1,13 +1,14 @@
 import React from 'react'
-import { Page } from '../common/Page'
-import { Table } from '../common/Table'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
-import { PositionAtUpdateProps } from './PositionAtUpdateProps'
-import { SimpleLink } from '../common/SimpleLink'
-import { formatHash } from '../formatHash'
+
 import { AssetNameCell } from '../common/AssetNameCell'
+import { Page } from '../common/Page'
+import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { SimpleLink } from '../common/SimpleLink'
+import { Table } from '../common/Table'
+import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { PositionAtUpdateProps } from './PositionAtUpdateProps'
 
 const balanceChangesTableColumns = [
   { header: 'Name' },

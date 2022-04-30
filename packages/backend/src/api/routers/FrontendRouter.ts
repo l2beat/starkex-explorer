@@ -1,20 +1,34 @@
-import { EthereumAddress } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import Router from '@koa/router'
-import Application, { Context } from 'koa'
+import { Context } from 'koa'
 import { z } from 'zod'
 
+import { ControllerResult } from '../controllers/ControllerResult'
+import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
+import { HomeController } from '../controllers/HomeController'
+import { PositionController } from '../controllers/PositionController'
+import { SearchController } from '../controllers/SearchController'
+import { StateUpdateController } from '../controllers/StateUpdateController'
 import {
-  ControllerResult,
-  FrontendController,
-} from '../controllers/FrontendController'
-import { stringAsBigInt, stringAsInt, withTypedContext } from './types'
+  stringAs,
+  stringAsBigInt,
+  stringAsInt,
+  withTypedContext,
+} from './types'
 
-export function createFrontendRouter(frontendController: FrontendController) {
+export function createFrontendRouter(
+  positionController: PositionController,
+  homeController: HomeController,
+  forcedTransactionController: ForcedTransactionController,
+  stateUpdateController: StateUpdateController,
+  searchController: SearchController
+) {
   const router = new Router()
 
   router.get('/', async (ctx) => {
     const account = getAccount(ctx)
-    ctx.body = await frontendController.getHomePage(account)
+    const result = await homeController.getHomePage(account)
+    applyControllerResult(ctx, result)
   })
 
   router.get(
@@ -28,10 +42,35 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { page, perPage } = ctx.query
-        ctx.body = await frontendController.getForcedTransactionsPage(
-          page,
-          perPage
-        )
+        const account = getAccount(ctx)
+        const result =
+          await forcedTransactionController.getForcedTransactionsPage(
+            page,
+            perPage,
+            account
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/forced-transactions/:hash',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          hash: stringAs(Hash256),
+        }),
+      }),
+      async (ctx) => {
+        const { hash } = ctx.params
+        const account = getAccount(ctx)
+        const result =
+          await forcedTransactionController.getForcedTransactionDetailsPage(
+            hash,
+            account
+          )
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -48,11 +87,12 @@ export function createFrontendRouter(frontendController: FrontendController) {
       async (ctx) => {
         const { page, perPage } = ctx.query
         const account = getAccount(ctx)
-
-        applyResult(
-          await frontendController.getStateUpdatesPage(page, perPage, account),
-          ctx
+        const result = await stateUpdateController.getStateUpdatesPage(
+          page,
+          perPage,
+          account
         )
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -68,11 +108,11 @@ export function createFrontendRouter(frontendController: FrontendController) {
       async (ctx) => {
         const { id } = ctx.params
         const account = getAccount(ctx)
-
-        applyResult(
-          await frontendController.getStateUpdateDetailsPage(id, account),
-          ctx
+        const result = await stateUpdateController.getStateUpdateDetailsPage(
+          id,
+          account
         )
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -88,11 +128,11 @@ export function createFrontendRouter(frontendController: FrontendController) {
       async (ctx) => {
         const { positionId } = ctx.params
         const account = getAccount(ctx)
-
-        applyResult(
-          await frontendController.getPositionDetailsPage(positionId, account),
-          ctx
+        const result = await positionController.getPositionDetailsPage(
+          positionId,
+          account
         )
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -109,15 +149,12 @@ export function createFrontendRouter(frontendController: FrontendController) {
       async (ctx) => {
         const { positionId, updateId } = ctx.params
         const account = getAccount(ctx)
-
-        applyResult(
-          await frontendController.getPositionUpdatePage(
-            positionId,
-            updateId,
-            account
-          ),
-          ctx
+        const result = await positionController.getPositionUpdatePage(
+          positionId,
+          updateId,
+          account
         )
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -132,8 +169,8 @@ export function createFrontendRouter(frontendController: FrontendController) {
       }),
       async (ctx) => {
         const { query } = ctx.query
-
-        applyResult(await frontendController.getSearchRedirect(query), ctx)
+        const result = await searchController.getSearchRedirect(query)
+        applyControllerResult(ctx, result)
       }
     )
   )
@@ -152,14 +189,15 @@ export function getAccount(ctx: Context) {
   }
 }
 
-function applyResult(
-  controllerResult: ControllerResult,
-  ctx: Application.Context
-) {
-  if (controllerResult.status === 302) {
-    ctx.redirect(controllerResult.url)
+function applyControllerResult(ctx: Context, result: ControllerResult) {
+  if (result.type === 'redirect') {
+    ctx.redirect(result.url)
   } else {
-    ctx.status = controllerResult.status
-    ctx.body = controllerResult.html
+    if (result.type === 'success') {
+      ctx.status = 200
+    } else if (result.type === 'not found') {
+      ctx.status = 404
+    }
+    ctx.body = result.content
   }
 }

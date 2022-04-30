@@ -1,7 +1,7 @@
 import { EthereumAddress, PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { parseSearchQuery } from '../../../src/api/controllers/FrontendController'
+import { parseSearchQuery } from '../../../src/api/controllers/SearchController'
 
 describe(parseSearchQuery.name, () => {
   it('parses ethereum address', () => {

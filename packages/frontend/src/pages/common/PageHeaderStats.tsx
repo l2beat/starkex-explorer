@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react'
-import classNames from 'classnames'
-import { formatTime } from '../formatTime'
 import { Timestamp } from '@explorer/types'
+import classNames from 'classnames'
+import React, { ReactNode } from 'react'
+
+import { formatTime } from '../formatTime'
 
 export function formatTimestamp(timestamp: Timestamp) {
   const date = new Date(Number(timestamp))
@@ -24,7 +25,10 @@ type StatRowProps = {
 function StatRow({ even, title, content, fontRegular }: StatRowProps) {
   return (
     <tr className={classNames(even ? ' bg-grey-200' : ' bg-grey-100')}>
-      <th className="p-1.5 text-right font-bold" scope="row">
+      <th
+        className="p-1.5 text-right font-bold first-letter:capitalize"
+        scope="row"
+      >
         {title}
       </th>
       <td

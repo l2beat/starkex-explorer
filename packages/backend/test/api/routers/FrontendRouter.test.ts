@@ -7,29 +7,37 @@ import {
 } from '@explorer/types'
 import { SuperAgentTest } from 'supertest'
 
-import { FrontendController } from '../../../src/api/controllers/FrontendController'
+import { ControllerSuccessResult } from '../../../src/api/controllers/ControllerResult'
+import { ForcedTransactionController } from '../../../src/api/controllers/ForcedTransactionController'
+import { HomeController } from '../../../src/api/controllers/HomeController'
+import { PositionController } from '../../../src/api/controllers/PositionController'
+import { SearchController } from '../../../src/api/controllers/SearchController'
+import { StateUpdateController } from '../../../src/api/controllers/StateUpdateController'
 import { createFrontendRouter } from '../../../src/api/routers/FrontendRouter'
-import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
 import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
-import { Logger, LogLevel } from '../../../src/tools/Logger'
+import { Logger } from '../../../src/tools/Logger'
 import { mock } from '../../mock'
 import { setupDatabaseTestSuite } from '../../peripherals/database/setup'
 import { createTestApiServer } from '../TestApiServer'
 
 const TEST_PAGE = '<!DOCTYPE html><p>test page</p>'
-const SUCCESSFUL_RESPONSE = {
-  status: 200 as const,
-  html: TEST_PAGE,
+const SUCCESS_RESULT: ControllerSuccessResult = {
+  type: 'success',
+  content: TEST_PAGE,
 }
 
 describe('FrontendRouter', () => {
   describe('/', () => {
     it('returns html', async () => {
       const frontendRouter = createFrontendRouter(
-        mock<FrontendController>({
-          getHomePage: async () => TEST_PAGE,
-        })
+        mock<PositionController>(),
+        mock<HomeController>({
+          getHomePage: async () => SUCCESS_RESULT,
+        }),
+        mock<ForcedTransactionController>(),
+        mock<StateUpdateController>(),
+        mock<SearchController>()
       )
       const server = createTestApiServer([frontendRouter])
 
@@ -39,9 +47,13 @@ describe('FrontendRouter', () => {
 
   describe('/state-updates', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getStateUpdatesPage: async () => ({ status: 200, html: TEST_PAGE }),
-      })
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>({
+        getStateUpdatesPage: async () => SUCCESS_RESULT,
+      }),
+      mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -63,9 +75,13 @@ describe('FrontendRouter', () => {
 
   describe('/state-updates/:id', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getStateUpdateDetailsPage: async () => SUCCESSFUL_RESPONSE,
-      })
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>({
+        getStateUpdateDetailsPage: async () => SUCCESS_RESULT,
+      }),
+      mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -80,9 +96,13 @@ describe('FrontendRouter', () => {
 
   describe('/positions/:positionId', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getPositionDetailsPage: async () => SUCCESSFUL_RESPONSE,
-      })
+      mock<PositionController>({
+        getPositionDetailsPage: async () => SUCCESS_RESULT,
+      }),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>(),
+      mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -97,9 +117,13 @@ describe('FrontendRouter', () => {
 
   describe('/positions/:positionId/updates/:updateId', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getPositionUpdatePage: async () => SUCCESSFUL_RESPONSE,
-      })
+      mock<PositionController>({
+        getPositionUpdatePage: async () => SUCCESS_RESULT,
+      }),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>(),
+      mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -114,9 +138,13 @@ describe('FrontendRouter', () => {
 
   describe('/forced-transactions', () => {
     const frontendRouter = createFrontendRouter(
-      mock<FrontendController>({
-        getForcedTransactionsPage: async () => TEST_PAGE,
-      })
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>({
+        getForcedTransactionsPage: async () => SUCCESS_RESULT,
+      }),
+      mock<StateUpdateController>(),
+      mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
 
@@ -133,6 +161,30 @@ describe('FrontendRouter', () => {
 
     it('does not allow invalid input', async () => {
       await server.get('/forced-transactions?page=foo&perPage=bar').expect(400)
+    })
+  })
+
+  describe('/forced-transactions/:hash', () => {
+    const frontendRouter = createFrontendRouter(
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTransactionController>({
+        getForcedTransactionDetailsPage: async () => SUCCESS_RESULT,
+      }),
+      mock<StateUpdateController>(),
+      mock<SearchController>()
+    )
+    const server = createTestApiServer([frontendRouter])
+
+    it('returns html', async () => {
+      await server
+        .get(`/forced-transactions/${Hash256.fake()}`)
+        .expect(200)
+        .expect(TEST_PAGE)
+    })
+
+    it('does not allow invalid input', async () => {
+      await server.get('/forced-transactions/not-a-hash').expect(400)
     })
   })
 
@@ -153,8 +205,6 @@ describe('FrontendRouter', () => {
 
       const userRegistrationEventRepository =
         new UserRegistrationEventRepository(knex, Logger.SILENT)
-
-      const forcedTxRepo = new ForcedTransactionsRepository(knex, Logger.SILENT)
 
       await stateUpdateRepository.add({
         stateUpdate: {
@@ -183,25 +233,17 @@ describe('FrontendRouter', () => {
         },
       ])
 
-      await forcedTxRepo.addEvents([
-        {
-          transactionType: 'withdrawal' as const,
-          eventType: 'mined' as const,
-          amount: 123n,
-          blockNumber: 1,
-          positionId: 123n,
-          publicKey: '123',
-          timestamp: Timestamp(0),
-          transactionHash: Hash256.fake(),
-        },
-      ])
-
-      const controller = new FrontendController(
+      const searchController = new SearchController(
         stateUpdateRepository,
-        userRegistrationEventRepository,
-        forcedTxRepo
+        userRegistrationEventRepository
       )
-      const frontendRouter = createFrontendRouter(controller)
+      const frontendRouter = createFrontendRouter(
+        mock<PositionController>(),
+        mock<HomeController>(),
+        mock<ForcedTransactionController>(),
+        mock<StateUpdateController>(),
+        searchController
+      )
       server = createTestApiServer([frontendRouter])
     })
 
