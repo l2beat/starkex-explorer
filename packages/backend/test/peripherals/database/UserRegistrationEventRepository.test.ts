@@ -110,9 +110,7 @@ describe(UserRegistrationEventRepository.name, () => {
 
   it('finds last event for stark key', async () => {
     const starkKey = '0x123'
-    const ethAddress = EthereumAddress(
-      '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'
-    )
+    const ethAddress = EthereumAddress.fake()
     await repository.add([
       {
         blockNumber: 1,

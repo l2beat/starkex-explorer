@@ -1,5 +1,7 @@
 import { BigNumber } from 'ethers'
 
+import { fakeHexString } from './fake'
+
 export interface Hash256 extends String {
   _Hash256Brand: string
 }
@@ -23,8 +25,7 @@ Hash256.from = function from(value: BigNumber | bigint) {
 
 Hash256.fake = function fake(start?: string) {
   if (!start) {
-    const fakeDigit = () => '0123456789abcdef'[Math.floor(Math.random() * 16)]
-    return Hash256(new Array(64).fill(0).map(fakeDigit).join(''))
+    return Hash256(fakeHexString(64))
   } else {
     return Hash256(start.padEnd(64, '0'))
   }

@@ -223,18 +223,14 @@ describe(StateUpdateRepository.name, () => {
     expect(actual).toEqual([
       {
         positionCount: 0,
-        rootHash: PedersenHash(
-          '0200050000000000000000000000000000000000000000000000000000000000'
-        ),
+        rootHash: PedersenHash.fake('20005'),
         timestamp: Timestamp(20_005),
         id: 20_005,
       },
       {
         id: 20_004,
         positionCount: 4,
-        rootHash: PedersenHash(
-          '0200040000000000000000000000000000000000000000000000000000000000'
-        ),
+        rootHash: PedersenHash.fake('20004'),
         timestamp: Timestamp(20_004),
       },
     ])
