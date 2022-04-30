@@ -8,7 +8,7 @@ export interface PositionAtUpdateProps {
   readonly positionId: bigint
   readonly lastUpdateTimestamp: Timestamp
   readonly previousPublicKey?: StarkKey
-  readonly publicKey: string
+  readonly publicKey: StarkKey
   readonly assetChanges: readonly AssetChangeEntry[]
   readonly transactions: readonly ForcedTransactionEntry[]
 }
