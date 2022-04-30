@@ -6,6 +6,9 @@ import { PositionAtUpdateProps } from './PositionAtUpdateProps'
 import { PositionDetails } from './PositionDetails'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
+export * from './PositionAtUpdateProps'
+export * from './PositionDetailsProps'
+
 export function renderPositionDetailsPage(props: PositionDetailsProps) {
   return reactToHtml(<PositionDetails {...props} />)
 }
@@ -13,5 +16,3 @@ export function renderPositionDetailsPage(props: PositionDetailsProps) {
 export function renderPositionAtUpdatePage(props: PositionAtUpdateProps) {
   return reactToHtml(<PositionAtUpdate {...props} />)
 }
-
-export type { PositionAtUpdateProps, PositionDetailsProps }

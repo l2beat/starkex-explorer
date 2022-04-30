@@ -25,6 +25,11 @@ export interface PositionRecord {
   balances: readonly AssetBalance[]
 }
 
+export interface PositionWithPricesRecord extends PositionRecord {
+  stateUpdateId: number
+  prices: { assetId: AssetId; price: bigint }[]
+}
+
 export interface StateUpdatePriceRecord {
   stateUpdateId: number
   assetId: AssetId
@@ -274,10 +279,7 @@ function toPositionRecord(
 
 function toPositionWithPricesRecord(
   row: PositionRow & { prices: PriceRow[] }
-): PositionRecord & {
-  stateUpdateId: number
-  prices: { assetId: AssetId; price: bigint }[]
-} {
+): PositionWithPricesRecord {
   return {
     ...toPositionRecord(row),
     prices: row.prices.filter(Boolean).map((p) => ({

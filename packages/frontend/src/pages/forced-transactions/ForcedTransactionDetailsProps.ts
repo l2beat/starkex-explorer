@@ -1,6 +1,8 @@
 import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 
-interface Exit {
+export type ForcedTransaction = ForcedExitTransaction // TODO: | Buy | Sell
+
+export interface ForcedExitTransaction {
   readonly transactionHash: Hash256
   readonly positionId: bigint
   readonly ethereumAddress?: EthereumAddress
@@ -8,22 +10,28 @@ interface Exit {
   readonly stateUpdateId?: number
 }
 
-type ForcedTransaction = Exit // TODO: | Buy | Sell
+export type TransactionStatusEntry =
+  | TransactionSentEntry
+  | TransactionMinedEntry
+  | TransactionVerifiedEntry
 
-export type HistoryEvent = (
-  | {
-      type: 'sent'
-    }
-  | {
-      type: 'mined'
-    }
-  | {
-      type: 'verified'
-      stateUpdateId: number
-    }
-) & { timestamp: Timestamp }
+export interface TransactionSentEntry {
+  readonly type: 'sent'
+  readonly timestamp: Timestamp
+}
 
-export type ForcedTransactionDetailsProps = ForcedTransaction & {
+export interface TransactionMinedEntry {
+  readonly type: 'mined'
+  readonly timestamp: Timestamp
+}
+
+export interface TransactionVerifiedEntry {
+  readonly type: 'verified'
+  readonly stateUpdateId: number
+  readonly timestamp: Timestamp
+}
+
+export interface ForcedTransactionDetailsProps extends ForcedTransaction {
   readonly account: EthereumAddress | undefined
-  readonly history: ReadonlyArray<HistoryEvent>
+  readonly history: readonly TransactionStatusEntry[]
 }
