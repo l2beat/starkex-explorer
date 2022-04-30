@@ -24,7 +24,10 @@ type StatRowProps = {
 function StatRow({ even, title, content, fontRegular }: StatRowProps) {
   return (
     <tr className={classNames(even ? ' bg-grey-200' : ' bg-grey-100')}>
-      <th className="p-1.5 text-right font-bold" scope="row">
+      <th
+        className="p-1.5 text-right font-bold first-letter:capitalize"
+        scope="row"
+      >
         {title}
       </th>
       <td

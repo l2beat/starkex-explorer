@@ -1,6 +1,7 @@
 import { AssetBalance } from '@explorer/encoding'
 import {
   ForcedTransactionsIndexProps,
+  renderForcedTransactionDetailsPage,
   renderForcedTransactionsIndexPage,
   renderHomePage,
   renderPositionAtUpdatePage,
@@ -8,7 +9,7 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
-import { AssetId, EthereumAddress } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 import { omit } from 'lodash'
 
 import { getAssetPriceUSDCents } from '../../core/getAssetPriceUSDCents'
@@ -115,7 +116,8 @@ export class FrontendController {
 
   async getForcedTransactionsPage(
     page: number,
-    perPage: number
+    perPage: number,
+    account: EthereumAddress | undefined
   ): Promise<string> {
     const limit = perPage
     const offset = (page - 1) * perPage
@@ -125,10 +127,64 @@ export class FrontendController {
     ])
 
     return renderForcedTransactionsIndexPage({
+      account,
       transactions: transactions.map(buildViewTransaction),
       fullCount,
       params: { page, perPage },
     })
+  }
+
+  async getForcedTransactionDetailsPage(
+    transactionHash: Hash256,
+    account: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
+    const result = await this.forcedTransactionsRepository.getByHashWithEvents(
+      transactionHash
+    )
+    if (!result) {
+      return {
+        status: 404,
+        html: 'Could not find transaction for that hash',
+      }
+    }
+
+    const { transaction, events } = result
+
+    if (transaction.type === 'trade') {
+      throw new Error('Rendering trades not implemented yet')
+    }
+
+    const registrationEvent =
+      await this.userRegistrationEventRepository.findByStarkKey(
+        transaction.publicKey
+      )
+
+    return {
+      status: 200,
+      html: renderForcedTransactionDetailsPage({
+        account,
+        history: events.map((event) => {
+          switch (event.eventType) {
+            case 'mined':
+              return { type: 'mined', timestamp: event.timestamp }
+            case 'verified':
+              return {
+                type: 'verified',
+                stateUpdateId: event.stateUpdateId,
+                timestamp: event.timestamp,
+              }
+          }
+        }),
+        ethereumAddress: registrationEvent?.ethAddress,
+        positionId: transaction.positionId,
+        transactionHash,
+        value: transaction.amount,
+        stateUpdateId:
+          transaction.status === 'verified'
+            ? transaction.stateUpdateId
+            : undefined,
+      }),
+    }
   }
 
   async getStateUpdatesPage(

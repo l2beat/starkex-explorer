@@ -47,7 +47,7 @@ const RowEl = ({
             'block',
             'first-letter:capitalize',
             cellPaddings,
-            maxWidthClass
+            maxWidthClass && cellOverflowStyles
           )}
         >
           {cell}

@@ -18,6 +18,19 @@ export function stringAsBigInt(fallback?: bigint) {
     }
   }, z.bigint())
 }
+export function stringAs<T>(Brand: (s: string) => T) {
+  return z
+    .string()
+    .refine((s) => {
+      try {
+        Brand(s)
+        return true
+      } catch {
+        return false
+      }
+    })
+    .transform(Brand)
+}
 
 export function withTypedContext<T extends z.AnyZodObject>(
   parser: T,
