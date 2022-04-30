@@ -1,5 +1,5 @@
 import { MerkleNode, Position } from '@explorer/state'
-import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
+import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { RollupStateRepository } from '../../../src/peripherals/database/RollupStateRepository'
@@ -27,7 +27,7 @@ describe(RollupStateRepository.name, () => {
 
     it('persists and recover a Position', async () => {
       const position = new Position(
-        'deadbeef',
+        StarkKey.fake('deadbeef'),
         123n,
         [{ assetId: AssetId('ETH-9'), balance: 456n, fundingIndex: 789n }],
         PedersenHash.fake('abc')
@@ -82,7 +82,7 @@ describe(RollupStateRepository.name, () => {
 
     it('persists the same position multiple times in one update', async () => {
       const position = new Position(
-        'deadbeef',
+        StarkKey.fake('deadbeef'),
         123n,
         [{ assetId: AssetId('ETH-9'), balance: 456n, fundingIndex: 789n }],
         PedersenHash.fake('abc')

@@ -1,5 +1,11 @@
 import { AssetBalance, OraclePrice } from '@explorer/encoding'
-import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { Knex } from 'knex'
 import {
   AssetBalanceJson,
@@ -20,7 +26,7 @@ export interface StateUpdateRecord {
 
 export interface PositionRecord {
   positionId: bigint
-  publicKey: string
+  publicKey: StarkKey
   collateralBalance: bigint
   balances: readonly AssetBalance[]
 }
@@ -265,7 +271,7 @@ function toPositionRecord(
   return {
     stateUpdateId: row.state_update_id,
     positionId: BigInt(row.position_id),
-    publicKey: row.public_key,
+    publicKey: StarkKey(row.public_key),
     collateralBalance: BigInt(row.collateral_balance),
     balances: (typeof row.balances === 'string'
       ? (JSON.parse(row.balances) as AssetBalanceJson[])
@@ -303,7 +309,7 @@ function toPositionRow(
   return {
     state_update_id: stateUpdateId,
     position_id: record.positionId,
-    public_key: record.publicKey,
+    public_key: record.publicKey.toString(),
     collateral_balance: record.collateralBalance,
     balances: JSON.stringify(balances),
   }

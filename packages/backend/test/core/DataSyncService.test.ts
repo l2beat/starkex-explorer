@@ -18,9 +18,7 @@ const noop = async () => {}
 
 describe(DataSyncService.name, () => {
   describe(DataSyncService.prototype.sync.name, () => {
-    const verifierAddresses = [
-      EthereumAddress('0x0000000000000000000000000000000000000123'),
-    ]
+    const verifierAddresses = [EthereumAddress.fake('123')]
     const verifierCollector = mock<VerifierCollector>({
       collect: async (_blockRange) => verifierAddresses,
     })

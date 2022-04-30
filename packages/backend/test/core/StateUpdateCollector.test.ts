@@ -1,6 +1,12 @@
 import { Block } from '@ethersproject/providers'
 import { InMemoryRollupStorage, RollupState } from '@explorer/state'
-import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import {
@@ -55,7 +61,7 @@ describe(StateUpdateCollector.name, () => {
       expect(await rollupState.positions.hash()).toEqual(hash)
     })
 
-    it('resests state after reorg', async () => {
+    it('resets state after reorg', async () => {
       const stateUpdateCollector = new StateUpdateCollector(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
@@ -233,14 +239,14 @@ describe(StateUpdateCollector.name, () => {
               type: 'withdrawal',
               amount: 1n,
               positionId: 12n,
-              publicKey: '123',
+              publicKey: StarkKey.fake(),
             },
             {
               type: 'trade',
               positionIdA: 12n,
               positionIdB: 34n,
-              publicKeyA: '123',
-              publicKeyB: '456',
+              publicKeyA: StarkKey.fake(),
+              publicKeyB: StarkKey.fake(),
               collateralAmount: 123n,
               syntheticAmount: 456n,
               isABuyingSynthetic: true,

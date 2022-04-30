@@ -1,3 +1,5 @@
+import { fakeHexString } from './fake'
+
 export interface PedersenHash extends String {
   _PedersenHashBrand: string
 }
@@ -43,8 +45,7 @@ PedersenHash.from = function from(value: number | bigint) {
 
 PedersenHash.fake = function fake(start?: string) {
   if (!start) {
-    const fakeDigit = () => '0123456789abcdef'[Math.floor(Math.random() * 16)]
-    return PedersenHash('0' + new Array(63).fill(0).map(fakeDigit).join(''))
+    return PedersenHash('0' + fakeHexString(63))
   } else {
     return PedersenHash('0' + start.padEnd(63, '0'))
   }

@@ -1,4 +1,4 @@
-import { AssetId, Timestamp } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError } from '../src'
@@ -19,12 +19,12 @@ describe('readPositionUpdate', () => {
     const writer = new ByteWriter()
       .writeNumber(4, 32) // 0 values
       .writeNumber(123, 32) // positionId
-      .write('1234abcd'.repeat(8)) // publicKey
+      .write(StarkKey.fake('1234abcd').toString()) // publicKey
       .writeNumber(10n - MIN_INT, 32) // collateralBalance
       .writeNumber(456, 32) // fundingTimestamp
     expect(decode(writer.getBytes())).toEqual({
       positionId: 123n,
-      publicKey: '0x' + '1234abcd'.repeat(8),
+      publicKey: StarkKey.fake('1234abcd'),
       collateralBalance: 10n,
       fundingTimestamp: Timestamp.fromSeconds(456),
       balances: [],
@@ -35,7 +35,7 @@ describe('readPositionUpdate', () => {
     const writer = new ByteWriter()
       .writeNumber(4 + 2, 32) // 2 values
       .writeNumber(123, 32) // positionId
-      .write('1234abcd'.repeat(8)) // publicKey
+      .write(StarkKey.fake('1234abcd').toString()) // publicKey
       .writeNumber(10n - MIN_INT, 32) // collateralBalance
       .writeNumber(456, 32) // fundingTimestamp
       .writePadding(9)
@@ -46,7 +46,7 @@ describe('readPositionUpdate', () => {
       .writeNumber(20n - MIN_INT, 8)
     expect(decode(writer.getBytes())).toEqual({
       positionId: 123n,
-      publicKey: '0x' + '1234abcd'.repeat(8),
+      publicKey: StarkKey.fake('1234abcd'),
       collateralBalance: 10n,
       fundingTimestamp: Timestamp.fromSeconds(456),
       balances: [

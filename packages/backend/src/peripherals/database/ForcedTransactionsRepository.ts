@@ -1,4 +1,4 @@
-import { AssetId, Hash256, json, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, json, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { ForcedTransactionEventRow as EventRow } from 'knex/types/tables'
 import { groupBy, pick } from 'lodash'
@@ -13,7 +13,7 @@ interface EventRecordCandidateBase {
 }
 
 interface WithdrawalMinedEventData {
-  publicKey: string
+  publicKey: StarkKey
   positionId: bigint
   amount: bigint
 }
@@ -39,8 +39,8 @@ export interface WithdrawalVerifiedEventRecordCandidate
 }
 
 interface TradeMinedEventData {
-  publicKeyA: string
-  publicKeyB: string
+  publicKeyA: StarkKey
+  publicKeyB: StarkKey
   positionIdA: bigint
   positionIdB: bigint
   syntheticAssetId: AssetId
@@ -134,7 +134,7 @@ function toRecord(row: EventRow): EventRecord {
       eventType: 'mined',
       timestamp,
       blockNumber: Number(row.block_number),
-      publicKey: String(data.publicKey),
+      publicKey: StarkKey(data.publicKey),
       positionId: BigInt(data.positionId),
       amount: BigInt(data.amount),
     }
@@ -147,8 +147,8 @@ function toRecord(row: EventRow): EventRecord {
       eventType: 'mined',
       timestamp,
       blockNumber: Number(row.block_number),
-      publicKeyA: String(data.publicKeyA),
-      publicKeyB: String(data.publicKeyB),
+      publicKeyA: StarkKey(data.publicKeyA),
+      publicKeyB: StarkKey(data.publicKeyB),
       positionIdA: BigInt(data.positionIdA),
       positionIdB: BigInt(data.positionIdB),
       collateralAmount: BigInt(data.collateralAmount),

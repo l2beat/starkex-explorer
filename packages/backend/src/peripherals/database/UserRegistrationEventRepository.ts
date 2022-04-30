@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 import { UserRegistrationEventRow } from 'knex/types/tables'
 
@@ -8,7 +8,7 @@ export type UserRegistrationEventRecord = {
   id: number
   blockNumber: number
   ethAddress: EthereumAddress
-  starkKey: string
+  starkKey: StarkKey
 }
 
 export type UserRegistrationEventRecordCandidate = Omit<
@@ -22,7 +22,7 @@ function toRowCandidate(
   return {
     block_number: record.blockNumber,
     eth_address: record.ethAddress.toString(),
-    stark_key: record.starkKey,
+    stark_key: record.starkKey.toString(),
   }
 }
 
@@ -31,7 +31,7 @@ function toRecord(row: UserRegistrationEventRow): UserRegistrationEventRecord {
     id: row.id,
     blockNumber: row.block_number,
     ethAddress: EthereumAddress(row.eth_address),
-    starkKey: row.stark_key,
+    starkKey: StarkKey(row.stark_key),
   }
 }
 
@@ -71,7 +71,7 @@ export class UserRegistrationEventRepository {
   }
 
   async findByStarkKey(
-    starkKey: string
+    starkKey: StarkKey
   ): Promise<UserRegistrationEventRecord | undefined> {
     const rows = await this.knex('user_registration_events')
       .select('*')
