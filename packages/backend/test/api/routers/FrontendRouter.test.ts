@@ -138,9 +138,7 @@ describe('FrontendRouter', () => {
 
   describe('/search', async () => {
     const { knex } = setupDatabaseTestSuite()
-    const ethAddress = EthereumAddress(
-      '0x8B4de256180CFEC54c436A470AF50F9EE2813dbB'
-    )
+    const ethAddress = EthereumAddress.random()
     const starkKey =
       '0x0054f7db92d7826f24c4db2c9326d31d3f981952e388e770586cc081a41f7f33'
     const rootHash = PedersenHash.fake()
@@ -150,7 +148,7 @@ describe('FrontendRouter', () => {
     before(async () => {
       const stateUpdateRepository = new StateUpdateRepository(
         knex,
-        new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+        Logger.SILENT
       )
 
       const userRegistrationEventRepository =

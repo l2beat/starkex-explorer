@@ -5,7 +5,7 @@ import { parseSearchQuery } from '../../../src/api/controllers/FrontendControlle
 
 describe(parseSearchQuery.name, () => {
   it('parses ethereum address', () => {
-    const ethAddress = '0xc730B028dA66EBB14f20e67c68DD809FBC49890D'
+    const ethAddress = EthereumAddress.random().toString()
 
     const result = parseSearchQuery(ethAddress)
 

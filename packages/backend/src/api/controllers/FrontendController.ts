@@ -420,9 +420,8 @@ export class FrontendController {
   private async searchForRootHash(
     hash: PedersenHash
   ): Promise<ControllerResult | undefined> {
-    const positionId = await this.stateUpdateRepository.getPositionIdByRootHash(
-      hash
-    )
+    const positionId =
+      await this.stateUpdateRepository.getStateUpdateIdByRootHash(hash)
     if (positionId === undefined) {
       return
     }

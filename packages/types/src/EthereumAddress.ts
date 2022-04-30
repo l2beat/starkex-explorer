@@ -1,4 +1,4 @@
-import { constants, utils } from 'ethers'
+import { constants, utils, Wallet } from 'ethers'
 
 export interface EthereumAddress extends String {
   _EthereumAddressBrand: string
@@ -13,6 +13,10 @@ export function EthereumAddress(value: string) {
 }
 
 EthereumAddress.ZERO = EthereumAddress(constants.AddressZero)
+
+EthereumAddress.random = function (): EthereumAddress {
+  return EthereumAddress(Wallet.createRandom().address)
+}
 
 EthereumAddress.isBefore = function (a: EthereumAddress, b: EthereumAddress) {
   return a.toLowerCase() < b.toLowerCase()
