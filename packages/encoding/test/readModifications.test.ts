@@ -21,12 +21,12 @@ describe(readModifications.name, () => {
   it('can read a single modification', () => {
     const writer = new ByteWriter()
       .writeNumber(1, 32)
-      .write('1234abcd'.repeat(8))
+      .write(StarkKey.fake('1234abcd').toString())
       .writeNumber(123, 32)
       .writeNumber(32n + 2n ** 64n, 32)
     expect(decode(writer.getBytes())).toEqual([
       {
-        publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
+        publicKey: StarkKey.fake('1234abcd'),
         positionId: 123n,
         difference: 32n,
       },
@@ -36,21 +36,21 @@ describe(readModifications.name, () => {
   it('can read multiple modifications', () => {
     const writer = new ByteWriter()
       .writeNumber(2, 32)
-      .write('1234abcd'.repeat(8))
+      .write(StarkKey.fake('1234abcd').toString())
       .writeNumber(123, 32)
       .writeNumber(32n + 2n ** 64n, 32)
-      .write('deadbeef'.repeat(8))
+      .write(StarkKey.fake('deadbeef').toString())
       .writeNumber(456, 32)
       .writeNumber(-32n + 2n ** 64n, 32)
 
     expect(decode(writer.getBytes())).toEqual([
       {
-        publicKey: StarkKey('0x' + '1234abcd'.repeat(8)),
+        publicKey: StarkKey.fake('1234abcd'),
         positionId: 123n,
         difference: 32n,
       },
       {
-        publicKey: StarkKey('0x' + 'deadbeef'.repeat(8)),
+        publicKey: StarkKey.fake('deadbeef'),
         positionId: 456n,
         difference: -32n,
       },
