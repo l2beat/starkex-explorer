@@ -17,6 +17,7 @@ import {
   StateUpdatesIndexProps,
 } from '../pages'
 import { ForcedTransactionEntry } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
+import { TransactionFormProps } from '../pages/transaction-form'
 
 const ONE_HOUR = 60 * 60 * 1000
 
@@ -203,6 +204,45 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
       timestamp: Timestamp(Date.now() - 1000),
       type: 'verified',
       stateUpdateId: 1,
+    },
+  ],
+}
+
+export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
+  account: EthereumAddress.fake(),
+  selectedAsset: AssetId('USDC-6'),
+  positionId: 1234n,
+  publicKey: StarkKey.fake(),
+  assets: [
+    {
+      assetId: AssetId('USDC-6'),
+      balance: 69420_654321n,
+      priceUSDCents: 100n,
+      totalUSDCents: 69420_65n,
+    },
+    {
+      assetId: AssetId('ETH-9'),
+      balance: 21_377654321n,
+      priceUSDCents: 2839_39n,
+      totalUSDCents: 60678_04n,
+    },
+    {
+      assetId: AssetId('BTC-10'),
+      balance: -5287654321n,
+      priceUSDCents: 38504_34n,
+      totalUSDCents: -20359_76n,
+    },
+    {
+      assetId: AssetId('DOGE-5'),
+      balance: 100_00000n,
+      priceUSDCents: 13n,
+      totalUSDCents: 13_12n,
+    },
+    {
+      assetId: AssetId('SUSHI-7'),
+      balance: -2_7654321n,
+      priceUSDCents: 2_44n,
+      totalUSDCents: 6_75n,
     },
   ],
 }
