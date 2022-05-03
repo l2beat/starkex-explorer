@@ -97,17 +97,18 @@ interface ParsedQuery {
 }
 
 export function parseSearchQuery(query: string): ParsedQuery {
-  if (query.startsWith('0x') && query.length === 66) {
-    return {
-      stateTreeHash: PedersenHash(query),
-      starkKey: StarkKey(query),
-    }
-  }
-  if (query.startsWith('0x') && query.length === 42) {
-    return {
-      ethereumAddress: EthereumAddress(query),
-    }
-  }
+  const parsed: ParsedQuery = {}
+  parsed.stateTreeHash = tryOrUndefined(() => PedersenHash(query))
+  parsed.starkKey = tryOrUndefined(() => StarkKey(query))
+  parsed.ethereumAddress = tryOrUndefined(() => EthereumAddress(query))
 
-  return {}
+  return parsed
+}
+
+function tryOrUndefined<T>(fn: () => T): T | undefined {
+  try {
+    return fn()
+  } catch {
+    return undefined
+  }
 }
