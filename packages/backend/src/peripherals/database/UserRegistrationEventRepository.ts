@@ -80,4 +80,15 @@ export class UserRegistrationEventRepository {
       .limit(1)
     return rows.length > 0 ? toRecord(rows[0]) : undefined
   }
+
+  async findByEthereumAddress(
+    ethereumAddress: EthereumAddress
+  ): Promise<UserRegistrationEventRecord | undefined> {
+    const rows = await this.knex('user_registration_events')
+      .select('*')
+      .orderBy('block_number', 'desc')
+      .where('eth_address', ethereumAddress)
+      .limit(1)
+    return rows.length > 0 ? toRecord(rows[0]) : undefined
+  }
 }

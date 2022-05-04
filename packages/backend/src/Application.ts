@@ -2,6 +2,7 @@ import { ApiServer } from './api/ApiServer'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { PositionController } from './api/controllers/PositionController'
+import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
@@ -151,6 +152,10 @@ export class Application {
       stateUpdateRepository,
       forcedTransactionsRepository
     )
+    const searchController = new SearchController(
+      stateUpdateRepository,
+      userRegistrationEventRepository
+    )
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
@@ -158,7 +163,8 @@ export class Application {
           positionController,
           homeController,
           forcedTransactionController,
-          stateUpdateController
+          stateUpdateController,
+          searchController
         ),
       ],
       middleware: [createFrontendMiddleware()],

@@ -7,6 +7,7 @@ import { ControllerResult } from '../controllers/ControllerResult'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
 import { HomeController } from '../controllers/HomeController'
 import { PositionController } from '../controllers/PositionController'
+import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import {
   stringAs,
@@ -19,7 +20,8 @@ export function createFrontendRouter(
   positionController: PositionController,
   homeController: HomeController,
   forcedTransactionController: ForcedTransactionController,
-  stateUpdateController: StateUpdateController
+  stateUpdateController: StateUpdateController,
+  searchController: SearchController
 ) {
   const router = new Router()
 
@@ -152,6 +154,22 @@ export function createFrontendRouter(
           updateId,
           account
         )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/search',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          query: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const { query } = ctx.query
+        const result = await searchController.getSearchRedirect(query)
         applyControllerResult(ctx, result)
       }
     )

@@ -110,6 +110,117 @@ describe(StateUpdateRepository.name, () => {
     ])
   })
 
+  it('gets state update id by root hash', async () => {
+    const stateRootId = 1
+    const positionId = 12345n
+    const rootHash = PedersenHash.fake()
+
+    await repository.add({
+      stateUpdate: {
+        id: stateRootId,
+        blockNumber: 1,
+        rootHash,
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake(),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+    })
+
+    await repository.add({
+      stateUpdate: {
+        id: 2,
+        blockNumber: 2,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake(),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+    })
+
+    const position = await repository.getStateUpdateIdByRootHash(rootHash)
+
+    expect(position).toEqual(stateRootId)
+  })
+
+  it('gets undefined when root hash not found', async () => {
+    const rootHash = PedersenHash.fake()
+
+    const position = await repository.getStateUpdateIdByRootHash(rootHash)
+
+    expect(position).toEqual(undefined)
+  })
+
+  it('gets position by public key', async () => {
+    const positionId = 12345n
+    const publicKey = StarkKey.fake()
+
+    await repository.add({
+      stateUpdate: {
+        id: 1,
+        blockNumber: 1,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey,
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+    })
+
+    await repository.add({
+      stateUpdate: {
+        id: 2,
+        blockNumber: 2,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake(),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+    })
+
+    const position = await repository.getPositionIdByPublicKey(publicKey)
+
+    expect(position).toEqual(positionId)
+  })
+
+  it('gets undefined when root hash not found', async () => {
+    const publicKey = StarkKey.fake()
+
+    const position = await repository.getPositionIdByPublicKey(publicKey)
+
+    expect(position).toEqual(undefined)
+  })
+
   it('gets all state updates', async () => {
     const stateUpdate: StateUpdateRecord = {
       id: 10_002,

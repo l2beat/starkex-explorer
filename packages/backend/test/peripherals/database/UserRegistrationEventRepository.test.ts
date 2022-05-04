@@ -137,4 +137,34 @@ describe(UserRegistrationEventRepository.name, () => {
     const event = await repository.findByStarkKey(StarkKey.fake('123'))
     expect(event).not.toBeDefined()
   })
+
+  it('finds event by ethereum address', async () => {
+    const event = {
+      blockNumber: 2,
+      ethAddress: EthereumAddress.fake(),
+      starkKey: StarkKey.fake(),
+    }
+
+    const records = [
+      {
+        blockNumber: 1,
+        ethAddress: EthereumAddress.ZERO,
+        starkKey: StarkKey.fake(),
+      },
+      event,
+    ]
+
+    await repository.add(records)
+    const actual = await repository.findByEthereumAddress(event.ethAddress)
+
+    expect(actual).toEqual({ id: expect.a(Number), ...event })
+  })
+
+  it('returns undefined when not found by ethereum address', async () => {
+    const actual = await repository.findByEthereumAddress(
+      EthereumAddress.fake()
+    )
+
+    expect(actual).toEqual(undefined)
+  })
 })
