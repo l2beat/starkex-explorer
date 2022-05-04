@@ -9,7 +9,11 @@ describe(parseSearchQuery.name, () => {
 
     const result = parseSearchQuery(ethAddress)
 
-    expect(result).toEqual({ ethereumAddress: EthereumAddress(ethAddress) })
+    expect(result).toEqual({
+      ethereumAddress: EthereumAddress(ethAddress),
+      starkKey: undefined,
+      stateTreeHash: PedersenHash(ethAddress),
+    })
   })
 
   it('parses stark key look alike', () => {
@@ -21,6 +25,7 @@ describe(parseSearchQuery.name, () => {
     expect(result).toEqual({
       stateTreeHash: PedersenHash(starkKeyLike),
       starkKey: StarkKey(starkKeyLike),
+      ethereumAddress: undefined,
     })
   })
 })
