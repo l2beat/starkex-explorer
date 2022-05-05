@@ -1,35 +1,69 @@
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { Table } from '../common/Table'
+import { Column, Table } from '../common/Table'
 import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
 import { formatUSDCents } from '../formatUSDCents'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
-const balanceTableColumns = [
-  { header: 'Name' },
-  { header: 'Balance', numeric: true },
-  { header: 'Unit price', numeric: true },
-  { header: 'Value', numeric: true },
-]
-const buildBalanceTableRow = ({
+const balanceTableColumns = (ownedByYou: boolean) => {
+  const columns: Column[] = [
+    { header: 'Name' },
+    { header: 'Balance', numeric: true },
+    { header: 'Unit price', numeric: true },
+    { header: 'Value', numeric: true },
+  ]
+
+  if (ownedByYou) {
+    columns.push({ header: 'Forced', maxWidthClass: 'w-0' })
+  }
+
+  return columns
+}
+
+const ActionButton = ({ text }: { text?: string }) => (
+  <>{text && <button className="px-3 rounded bg-blue-100">{text}</button>}</>
+)
+
+const actionButtonText = ({
   assetId,
   balance,
-  totalUSDCents,
-  price,
-}: PositionDetailsProps['assets'][number]) => ({
-  cells: [
-    <AssetNameCell assetId={assetId} />,
-    balance.toString(),
-    price ? `${formatUSDCents(price)}` : '-',
-    formatUSDCents(totalUSDCents),
-  ],
-})
+}: Pick<PositionDetailsProps['assets'][number], 'assetId' | 'balance'>) => {
+  if (AssetId.symbol(assetId) === 'USDC' && balance !== 0n) {
+    return 'Exit'
+  }
+  if (balance > 0) {
+    return 'Sell'
+  } else if (balance < 0) {
+    return 'Buy'
+  }
+}
+
+const buildBalanceTableRow =
+  (ownedByYou: boolean) =>
+  ({
+    assetId,
+    balance,
+    totalUSDCents,
+    price,
+  }: PositionDetailsProps['assets'][number]) => {
+    const cells = [
+      <AssetNameCell assetId={assetId} />,
+      balance.toString(),
+      price ? `${formatUSDCents(price)}` : '-',
+      formatUSDCents(totalUSDCents),
+    ]
+    if (ownedByYou) {
+      cells.push(<ActionButton text={actionButtonText({ assetId, balance })} />)
+    }
+    return { cells }
+  }
 
 const updateHistoryTableColumns = [
   { header: 'State update' },
@@ -99,6 +133,7 @@ export function PositionDetails({
   transactions,
   account,
 }: PositionDetailsProps) {
+  const ownedByYou = true
   return (
     <Page
       title={`L2BEAT dYdX Explorer | ${positionId.toString()}`}
@@ -109,9 +144,16 @@ export function PositionDetails({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-12">
-        Position #{positionId.toString()}
-      </h1>
+      <div className="mb-12 flex items-center">
+        <h1 className="font-sans font-bold text-2xl">
+          Position #{positionId.toString()}
+        </h1>
+        {ownedByYou && (
+          <span className="ml-4 px-2 bg-blue-100 rounded-full">
+            Owned by you
+          </span>
+        )}
+      </div>
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
         rows={[
@@ -142,8 +184,8 @@ export function PositionDetails({
       <Table
         noRowsText="this position has no balances"
         className="mb-8"
-        columns={balanceTableColumns}
-        rows={assets.map(buildBalanceTableRow)}
+        columns={balanceTableColumns(ownedByYou)}
+        rows={assets.map(buildBalanceTableRow(ownedByYou))}
       />
       <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
       <Table

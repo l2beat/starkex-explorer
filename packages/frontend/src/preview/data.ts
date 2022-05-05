@@ -87,7 +87,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
     },
     {
       assetId: AssetId('LINK-7'),
-      balance: 20n,
+      balance: -20n,
       totalUSDCents: 20n,
       price: 1000n,
     },

@@ -8,7 +8,7 @@ type Row = {
   link?: string
 }
 
-type Column = {
+export type Column = {
   header: string
   numeric?: boolean
   maxWidthClass?: string
