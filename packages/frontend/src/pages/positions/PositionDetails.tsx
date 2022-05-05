@@ -34,7 +34,10 @@ const ActionButton = ({ text }: { text?: string }) => (
 const actionButtonText = ({
   assetId,
   balance,
-}: Pick<PositionDetailsProps['assets'][number], 'assetId' | 'balance'>) => {
+}: {
+  assetId: AssetId
+  balance: bigint
+}) => {
   if (AssetId.symbol(assetId) === 'USDC' && balance !== 0n) {
     return 'Exit'
   }
@@ -133,7 +136,7 @@ export function PositionDetails({
   transactions,
   account,
 }: PositionDetailsProps) {
-  const ownedByYou = true
+  const ownedByYou = ethAddress === account
   return (
     <Page
       title={`L2BEAT dYdX Explorer | ${positionId.toString()}`}
