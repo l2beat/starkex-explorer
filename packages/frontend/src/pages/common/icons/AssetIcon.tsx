@@ -10,11 +10,10 @@ const usdcLogoUrl = 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg'
 const buildDydxUrl = (symbol: string) =>
   `https://dydx.exchange/currencies/${symbol.toLowerCase()}.svg`
 const buildUrl = (assetId: AssetId) => {
-  const symbol = AssetId.symbol(assetId)
-  if (symbol === 'USDC') {
+  if (assetId === AssetId.USDC) {
     return usdcLogoUrl
   }
-  return buildDydxUrl(symbol)
+  return buildDydxUrl(AssetId.symbol(assetId))
 }
 
 export function AssetIcon({ assetId, ...rest }: AssetIconProps) {

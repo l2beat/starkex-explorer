@@ -38,7 +38,7 @@ const actionButtonText = ({
   assetId: AssetId
   balance: bigint
 }) => {
-  if (AssetId.symbol(assetId) === 'USDC' && balance !== 0n) {
+  if (assetId === AssetId.USDC && balance !== 0n) {
     return 'Exit'
   }
   if (balance > 0) {
