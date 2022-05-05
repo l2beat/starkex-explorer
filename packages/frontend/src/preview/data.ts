@@ -80,14 +80,14 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   assets: [
     { assetId: AssetId('ETH-9'), balance: 0n, totalUSDCents: 0n, price: 1000n },
     {
-      assetId: AssetId('USDC-9'),
+      assetId: AssetId.USDC,
       balance: 20n,
       totalUSDCents: 20n,
       price: 1000n,
     },
     {
       assetId: AssetId('LINK-7'),
-      balance: 20n,
+      balance: -20n,
       totalUSDCents: 20n,
       price: 1000n,
     },

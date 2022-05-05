@@ -108,7 +108,7 @@ export function PositionAtUpdate({
           {
             header: 'Hash',
             cellFontMono: true,
-            maxWidthClass: 'max-w-[250px]',
+            className: 'max-w-[250px]',
           },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },

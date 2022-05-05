@@ -28,7 +28,7 @@ export function applyAssetPrices(
     }
   })
   assets.push({
-    assetId: AssetId('USDC-1'),
+    assetId: AssetId.USDC,
     balance: collateralBalance,
     totalUSDCents: collateralBalance / 1000n,
     priceUSDCents: 1n,

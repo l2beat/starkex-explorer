@@ -21,3 +21,12 @@ This repository is a monorepo consisting of four projects:
 - `packages/frontend`
 - `packages/crypto`
 - `packages/encoding`
+
+## Setup
+
+To run or develop, you need to install and build the dependencies. You can do it by running the following commands in the repository root:
+
+```
+yarn
+yarn build
+```

@@ -51,7 +51,7 @@ export function Home(props: HomeProps) {
           {
             header: 'Hash',
             cellFontMono: true,
-            maxWidthClass: 'max-w-[320px]',
+            className: 'max-w-[320px]',
           },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
@@ -86,7 +86,7 @@ export function Home(props: HomeProps) {
           {
             header: 'Hash',
             cellFontMono: true,
-            maxWidthClass: 'max-w-[250px]',
+            className: 'max-w-[250px]',
           },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
