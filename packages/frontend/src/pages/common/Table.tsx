@@ -11,7 +11,7 @@ type Row = {
 export type Column = {
   header: string
   numeric?: boolean
-  maxWidthClass?: string
+  className?: string
   cellFontMono?: boolean
 }
 
@@ -39,7 +39,7 @@ const RowEl = ({
     )}
   >
     {cells.map((cell, col) => {
-      const { maxWidthClass, numeric, cellFontMono } = columns[col] || {}
+      const { className, numeric, cellFontMono } = columns[col] || {}
       const content = link ? (
         <a
           href={link}
@@ -47,7 +47,7 @@ const RowEl = ({
             'block',
             'first-letter:capitalize',
             cellPaddings,
-            maxWidthClass && cellOverflowStyles
+            className && cellOverflowStyles
           )}
         >
           {cell}
@@ -63,8 +63,8 @@ const RowEl = ({
             !link && 'first-letter:capitalize',
             (numeric || cellFontMono) && 'font-mono',
             textAlign(numeric),
-            maxWidthClass,
-            maxWidthClass && !link && cellOverflowStyles
+            className,
+            className && !link && cellOverflowStyles
           )}
         >
           {content}
@@ -97,14 +97,14 @@ export function Table({ columns, rows, className, noRowsText }: TableProps) {
       <table className="w-full whitespace-nowrap">
         <thead>
           <tr className="bg-grey-300 font-medium">
-            {columns.map(({ header, numeric, maxWidthClass }, i) => (
+            {columns.map(({ header, numeric, className }, i) => (
               <th
                 scope="col"
                 key={i}
                 className={cx(
                   'px-2 py-1 border-2 border-grey-100 rounded-md',
                   textAlign(numeric),
-                  maxWidthClass
+                  className
                 )}
               >
                 {header}

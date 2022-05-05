@@ -21,7 +21,7 @@ const balanceTableColumns = (ownedByYou: boolean) => {
   ]
 
   if (ownedByYou) {
-    columns.push({ header: 'Forced', maxWidthClass: 'w-0' })
+    columns.push({ header: 'Forced', className: 'w-0' })
   }
 
   return columns

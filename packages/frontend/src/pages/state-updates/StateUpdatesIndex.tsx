@@ -39,7 +39,7 @@ export function StateUpdatesIndex({
           {
             header: 'Hash',
             cellFontMono: true,
-            maxWidthClass: 'max-w-[320px]',
+            className: 'max-w-[320px]',
           },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },

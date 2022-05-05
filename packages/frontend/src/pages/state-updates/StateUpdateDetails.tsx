@@ -65,7 +65,7 @@ export function StateUpdateDetails({
           { header: 'Position id' },
           {
             header: 'Owner',
-            maxWidthClass: 'max-w-[320px]',
+            className: 'max-w-[320px]',
             cellFontMono: true,
           },
           { header: 'Value before', numeric: true },
@@ -104,7 +104,7 @@ export function StateUpdateDetails({
           {
             header: 'Hash',
             cellFontMono: true,
-            maxWidthClass: 'max-w-[250px]',
+            className: 'max-w-[250px]',
           },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
