@@ -24,7 +24,7 @@ export function toForcedTransactionEntry(
     assetId:
       transaction.type === 'trade'
         ? transaction.syntheticAssetId
-        : AssetId('USDC-1'),
+        : AssetId('USDC-6'),
     positionId:
       transaction.type === 'trade'
         ? transaction.positionIdA
