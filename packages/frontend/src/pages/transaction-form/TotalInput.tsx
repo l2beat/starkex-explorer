@@ -5,7 +5,7 @@ import { AssetIcon } from '../common/icons/AssetIcon'
 
 export function TotalInput() {
   return (
-    <div className="flex flex-col gap-1">
+    <div id="total-section" className="flex flex-col gap-1">
       <label htmlFor="total">Total</label>
       <div className="relative">
         <input

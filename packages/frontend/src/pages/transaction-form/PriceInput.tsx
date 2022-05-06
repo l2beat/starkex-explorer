@@ -6,7 +6,7 @@ import { TransactionFormProps } from './TransactionFormProps'
 
 export function PriceInput(props: TransactionFormProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div id="price-section" className="flex flex-col gap-1">
       <label htmlFor="price">Price</label>
       <div className="relative">
         <input
@@ -25,6 +25,7 @@ export function PriceInput(props: TransactionFormProps) {
             Suggested: {props.assets[0].priceUSDCents.toString()}
           </span>
           <button
+            id="suggested-price"
             type="button"
             className="uppercase bg-grey-300 px-2 py-0.5 text-xs rounded-md"
           >

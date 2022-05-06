@@ -22,10 +22,10 @@ export function TransactionForm(props: TransactionFormProps) {
       scripts={['/scripts/main.js']}
       account={props.account}
     >
-      <div className="w-[273px] mx-auto flex bg-grey-200 drop-shadow-lg rounded-md mb-4">
-        <button className="w-[91px] py-1.5 rounded-md bg-grey-300">Exit</button>
-        <button className="w-[91px] py-1.5 rounded-md">Buy</button>
-        <button className="w-[91px] py-1.5 rounded-md">Sell</button>
+      <div className="w-min mx-auto flex bg-grey-200 drop-shadow-lg rounded-md mb-4">
+        <button id="exit-button" className="w-[91px] py-1.5 rounded-md bg-grey-300">Exit</button>
+        <button id="buy-button" className="w-[91px] py-1.5 rounded-md">Buy</button>
+        <button id="sell-button" className="w-[91px] py-1.5 rounded-md">Sell</button>
       </div>
       <form
         id="transaction-form"
@@ -39,6 +39,7 @@ export function TransactionForm(props: TransactionFormProps) {
         <TotalInput />
         <InfoText />
         <button
+          id="submit"
           type="button"
           className="bg-blue-100 w-full block text-lg font-bold py-2 rounded-md"
         >
