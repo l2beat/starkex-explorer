@@ -1,10 +1,11 @@
-import { AssetId, StarkKey } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 
 import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
 export interface OfferRecord {
+  createdAt: Timestamp
   starkKeyA: StarkKey
   positionIdA: bigint
   syntheticAssetId: AssetId
@@ -14,6 +15,7 @@ export interface OfferRecord {
 }
 
 interface OfferRow {
+  created_at: number
   stark_key_a: string
   position_id_a: bigint
   synthetic_asset_id: string
@@ -53,6 +55,7 @@ export class OfferRepository implements Repository<OfferRecord> {
 
 function toRow(offer: OfferRecord): OfferRow {
   return {
+    created_at: offer.createdAt as unknown as number,
     stark_key_a: offer.starkKeyA.toString(),
     position_id_a: offer.positionIdA,
     synthetic_asset_id: offer.syntheticAssetId.toString(),
@@ -64,6 +67,7 @@ function toRow(offer: OfferRecord): OfferRow {
 
 function toRecord(row: OfferRow): OfferRecord {
   return {
+    createdAt: Timestamp(row.created_at),
     starkKeyA: StarkKey(row.stark_key_a),
     positionIdA: BigInt(row.position_id_a),
     syntheticAssetId: AssetId(row.synthetic_asset_id),

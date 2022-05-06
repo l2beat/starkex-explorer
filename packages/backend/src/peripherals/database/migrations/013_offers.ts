@@ -15,7 +15,7 @@ import { Knex } from 'knex'
 
 export async function up(knex: Knex) {
   await knex.schema.createTable('offers', (table) => {
-    table.increments('id').primary()
+    table.integer('created_at').notNullable()
     table.string('stark_key_a').notNullable()
     table.bigInteger('position_id_a').notNullable()
     table.string('synthetic_asset_id').notNullable()

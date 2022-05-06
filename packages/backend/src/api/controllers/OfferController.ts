@@ -1,3 +1,5 @@
+import { Timestamp } from '@explorer/types'
+
 import {
   OfferRecord,
   OfferRepository,
@@ -6,8 +8,10 @@ import {
 export class OfferController {
   constructor(private offerRepository: OfferRepository) {}
 
-  async postOffer(offer: OfferRecord) {
-    await this.offerRepository.add([offer])
+  async postOffer(offer: Omit<OfferRecord, 'createdAt'>) {
+    const createdAt = Timestamp(Date.now())
+
+    await this.offerRepository.add([{ createdAt, ...offer }])
     return { type: 'created' }
   }
 }

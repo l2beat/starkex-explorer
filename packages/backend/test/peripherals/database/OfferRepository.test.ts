@@ -1,4 +1,4 @@
-import { AssetId, StarkKey } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -9,6 +9,7 @@ import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
 const record1: OfferRecord = {
+  createdAt: Timestamp(1),
   starkKeyA: StarkKey.fake(),
   positionIdA: 1n,
   syntheticAssetId: AssetId('ETH-18'),
@@ -18,6 +19,7 @@ const record1: OfferRecord = {
 }
 
 const record2: OfferRecord = {
+  createdAt: Timestamp(100),
   starkKeyA: StarkKey.fake(),
   positionIdA: 2n,
   syntheticAssetId: AssetId('LINK-18'),
@@ -27,6 +29,7 @@ const record2: OfferRecord = {
 }
 
 const record3: OfferRecord = {
+  createdAt: Timestamp(1000),
   starkKeyA: StarkKey.fake(),
   positionIdA: 3n,
   syntheticAssetId: AssetId('DAI-18'),
