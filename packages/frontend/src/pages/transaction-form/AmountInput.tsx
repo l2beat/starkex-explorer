@@ -12,8 +12,9 @@ export function AmountInput(props: TransactionFormProps) {
         <input
           id="amount"
           type="text"
+          autoComplete="off"
           placeholder="0.00"
-          className="font-mono text-2xl leading-none bg-grey-100 rounded-md pl-2 pt-2 pr-[100px] pb-10 w-full"
+          className="font-mono text-2xl leading-none bg-grey-100 rounded-md pl-2 pt-2 pr-[120px] pb-10 w-full"
         />
         <div className="absolute top-2 right-2 px-3 py-0.5 bg-grey-300 flex gap-2 items-center rounded-md">
           <AssetIcon className="w-4 h-4" assetId={AssetId.USDC} />

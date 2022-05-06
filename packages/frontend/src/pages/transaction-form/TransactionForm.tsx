@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Page } from '../common'
 import { AmountInput } from './AmountInput'
+import { InfoText } from './InfoText'
 import { PositionIdView } from './PositionIdView'
 import { PriceInput } from './PriceInput'
 import { TotalInput } from './TotalInput'
@@ -29,6 +30,13 @@ export function TransactionForm(props: TransactionFormProps) {
         <AmountInput {...props} />
         <PriceInput {...props} />
         <TotalInput />
+        <InfoText />
+        <button
+          type="button"
+          className="bg-blue-100 w-full block text-lg font-bold py-2 rounded-md"
+        >
+          Force exit
+        </button>
       </form>
     </Page>
   )

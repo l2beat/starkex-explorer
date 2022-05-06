@@ -26,7 +26,7 @@ export function Page({
     >
       <Head {...head} />
       <body>
-        <div className="flex justify-center items-center top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 absolute pointer-events-none text-[10vw] font-bold opacity-5 -rotate-45 select-none">
+        <div className="flex justify-center items-center top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 absolute pointer-events-none text-[10vw] font-bold opacity-5 -rotate-45 select-none z-50">
           PREVIEW
         </div>
         <div className="Page">
