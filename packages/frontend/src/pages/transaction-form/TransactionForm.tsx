@@ -48,7 +48,7 @@ export function TransactionForm(props: TransactionFormProps) {
             >
               <path d="M0 0L10 0L5 5D" />
             </svg>
-            <select className="absolute top-0 left-0 w-full h-full opacity-0">
+            <select className="absolute top-0 left-0 w-full h-full opacity-0 bg-white appearance-none cursor-pointer">
               {props.assets.map((asset) => (
                 <option
                   key={asset.assetId.toString()}
@@ -58,6 +58,10 @@ export function TransactionForm(props: TransactionFormProps) {
                 </option>
               ))}
             </select>
+          </div>
+          <div className='absolute bottom-2 right-2 w-full flex items-center justify-end'>
+            <span>Balance: {props.assets[0].balance.toString()}</span>
+            <button className='uppercase bg-grey-300'>Max</button>
           </div>
         </div>
       </form>
