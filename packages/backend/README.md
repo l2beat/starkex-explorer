@@ -36,7 +36,7 @@ Once you have everything, create a `.env` file with the following contents:
 ```
 LOCAL_DB_URL=postgresql://postgres:password@localhost:5432/local
 TEST_DB_URL=postgresql://postgres:password@localhost:5432/test
-LOCAL_JSON_RPC_URL=https://eth-mainnet.alchemyapi.io/v2/zR5UQGm__S5p1pVRUG3vCsK5elOgJL6v
+LOCAL_JSON_RPC_URL=<PASTE_YOUR_ALCHEMY_URL_HERE>
 ```
 
 ## Environment variables
