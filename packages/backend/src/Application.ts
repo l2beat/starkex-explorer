@@ -1,11 +1,13 @@
 import { ApiServer } from './api/ApiServer'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
+import { OfferController } from './api/controllers/OfferController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
+import { createOffersRouter } from './api/routers/OffersRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { DataSyncService } from './core/DataSyncService'
@@ -24,6 +26,7 @@ import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
+import { OfferRepository } from './peripherals/database/OfferRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
 import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
@@ -68,6 +71,7 @@ export class Application {
       knex,
       logger
     )
+    const offerRepository = new OfferRepository(knex, logger)
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
@@ -156,6 +160,8 @@ export class Application {
       stateUpdateRepository,
       userRegistrationEventRepository
     )
+    const offerController = new OfferController(offerRepository)
+
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
@@ -166,6 +172,7 @@ export class Application {
           stateUpdateController,
           searchController
         ),
+        createOffersRouter(offerController),
       ],
       middleware: [createFrontendMiddleware()],
     })

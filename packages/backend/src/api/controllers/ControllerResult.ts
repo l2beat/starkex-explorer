@@ -17,3 +17,7 @@ export interface ControllerRedirectResult {
   type: 'redirect'
   url: string
 }
+
+export interface ControllerCreatedResult {
+  type: 'created'
+}
