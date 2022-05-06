@@ -2,6 +2,9 @@ import React from 'react'
 
 import { Page } from '../common'
 import { AmountInput } from './AmountInput'
+import { PositionIdView } from './PositionIdView'
+import { PriceInput } from './PriceInput'
+import { TotalInput } from './TotalInput'
 import { TransactionFormProps } from './TransactionFormProps'
 
 export function TransactionForm(props: TransactionFormProps) {
@@ -22,15 +25,10 @@ export function TransactionForm(props: TransactionFormProps) {
       </div>
       <form className="max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex flex-col gap-2.5">
         <div className="text-lg font-medium">Forced exit</div>
-        <div>Position</div>
-        <div className="bg-grey-100 rounded-md p-2 gap-2 flex items-center">
-          <span className="text-2xl leading-none font-mono">
-            #{props.positionId.toString()}
-          </span>
-          <span className="px-2 rounded-full bg-blue-100">Owned by you</span>
-        </div>
-        <label htmlFor="amount">Amount</label>
+        <PositionIdView positionId={props.positionId} />
         <AmountInput {...props} />
+        <PriceInput {...props} />
+        <TotalInput />
       </form>
     </Page>
   )
