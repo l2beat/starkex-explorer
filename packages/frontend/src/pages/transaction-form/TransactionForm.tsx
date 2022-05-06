@@ -9,6 +9,9 @@ import { TotalInput } from './TotalInput'
 import { TransactionFormProps } from './TransactionFormProps'
 
 export function TransactionForm(props: TransactionFormProps) {
+  const propsJson = JSON.stringify(props, (k, v) =>
+    typeof v === 'bigint' ? v.toString() : v
+  )
   return (
     <Page
       title={`L2BEAT dYdX Explorer | Force transaction`}
@@ -24,7 +27,11 @@ export function TransactionForm(props: TransactionFormProps) {
         <button className="w-[91px] py-1.5 rounded-md">Buy</button>
         <button className="w-[91px] py-1.5 rounded-md">Sell</button>
       </div>
-      <form className="max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex flex-col gap-2.5">
+      <form
+        id="transaction-form"
+        className="max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex flex-col gap-2.5"
+        data-props={propsJson}
+      >
         <div className="text-lg font-medium">Forced exit</div>
         <PositionIdView positionId={props.positionId} />
         <AmountInput {...props} />
