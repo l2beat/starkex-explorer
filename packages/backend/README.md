@@ -1,14 +1,5 @@
 # @explorer/backend
 
-## Setup
-
-To run or develop the backend you need to install and build its dependencies. You can do it by running the following commands in the repository root:
-
-```
-yarn
-yarn build
-```
-
 ## Scripts
 
 - `yarn build` - build the application
@@ -27,6 +18,7 @@ To run or develop the backend you need to install and build its dependencies. Yo
 
 ```
 yarn
+yarn build
 ```
 
 After the nodejs dependencies have been installed you should also install a Postgres database. The recommended way is through docker using the commands below.
@@ -37,13 +29,14 @@ docker exec -it state_explorer_postgres psql -U postgres -c 'CREATE DATABASE loc
 docker exec -it state_explorer_postgres psql -U postgres -c 'CREATE DATABASE test'
 ```
 
-If you restart your system running `docker start state_explorer_postgres` will bring the database back online.
+If you restart your system, running `docker start state_explorer_postgres` will bring the database back online.
 
-Once you have everything create a `.env` file with the following contents:
+Once you have everything, create a `.env` file with the following contents:
 
 ```
 LOCAL_DB_URL=postgresql://postgres:password@localhost:5432/local
 TEST_DB_URL=postgresql://postgres:password@localhost:5432/test
+LOCAL_JSON_RPC_URL=https://eth-mainnet.alchemyapi.io/v2/zR5UQGm__S5p1pVRUG3vCsK5elOgJL6v
 ```
 
 ## Environment variables
