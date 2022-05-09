@@ -27,11 +27,13 @@ export function getInitialState(
     selectedAsset: props.assets[0],
     amountInputString: '',
     amountInputValue: 0n,
+    amountInputError: false,
     priceInputString: '',
     priceInputValue: 0n,
     totalInputString: '',
     totalInputValue: 0n,
     boundVariable: 'price',
+    canSubmit: false,
 
     exitButtonVisible: hasUSDC,
     buyButtonVisible: hasBuy,
@@ -63,10 +65,12 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
       selectedAsset,
       amountInputString: '',
       amountInputValue: 0n,
+      amountInputError: false,
       priceInputString: '',
       priceInputValue: 0n,
       totalInputString: '',
       totalInputValue: 0n,
+      canSubmit: false,
       exitButtonSelected: isUSDC,
       buyButtonSelected: !isUSDC && !isPositive,
       sellButtonSelected: !isUSDC && isPositive,
@@ -74,7 +78,9 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
       totalSectionVisible: !isUSDC,
       infoSectionVisible: isUSDC,
     }
-  } else if (action.type === 'SwitchToBuy') {
+  }
+
+  if (action.type === 'SwitchToBuy') {
     const buyable = state.props.assets.find(isBuyable)
     if (!buyable) {
       throw new Error('Programmer error: Buy button should be invisible')
@@ -83,7 +89,9 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
       type: 'AssetChange',
       assetId: buyable.assetId,
     })
-  } else if (action.type === 'SwitchToSell') {
+  }
+
+  if (action.type === 'SwitchToSell') {
     const sellable = state.props.assets.find(isSellable)
     if (!sellable) {
       throw new Error('Programmer error: Sell button should be invisible')
@@ -92,7 +100,9 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
       type: 'AssetChange',
       assetId: sellable.assetId,
     })
-  } else if (action.type === 'UseMaxBalance') {
+  }
+
+  if (action.type === 'UseMaxBalance') {
     return nextFormState(state, {
       type: 'ModifyAmount',
       value: formatCurrencyInput(
@@ -100,7 +110,9 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
         state.selectedAsset.assetId
       ),
     })
-  } else if (action.type === 'UseSuggestedPrice') {
+  }
+
+  if (action.type === 'UseSuggestedPrice') {
     return nextFormState(state, {
       type: 'ModifyPrice',
       value: formatCurrencyInput(
@@ -108,7 +120,9 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
         AssetId.USDC
       ),
     })
-  } else if (action.type === 'ModifyAmount') {
+  }
+
+  if (action.type === 'ModifyAmount') {
     const parsed = parseCurrencyInput(action.value, state.selectedAsset.assetId)
     const amountInputString =
       parsed !== undefined ? action.value : state.amountInputString
@@ -130,7 +144,9 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
         state.totalInputValue
       )
     }
-  } else if (action.type === 'ModifyPrice') {
+  }
+
+  if (action.type === 'ModifyPrice') {
     const parsed = parseCurrencyInput(action.value, AssetId.USDC)
     const priceInputString =
       parsed !== undefined ? action.value : state.priceInputString
@@ -142,7 +158,9 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
       priceInputString,
       priceInputValue
     )
-  } else if (action.type === 'ModifyTotal') {
+  }
+
+  if (action.type === 'ModifyTotal') {
     const parsed = parseCurrencyInput(action.value, AssetId.USDC)
     const totalInputString =
       parsed !== undefined ? action.value : state.totalInputString
@@ -155,6 +173,7 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
       totalInputValue
     )
   }
+
   return state
 }
 
@@ -166,7 +185,7 @@ function stateFromAmountAndPrice(
   priceInputValue: bigint
 ): FormState {
   if (amountInputString === '' || priceInputString === '') {
-    return {
+    return withChecks({
       ...state,
       boundVariable: 'price',
       amountInputString,
@@ -175,12 +194,12 @@ function stateFromAmountAndPrice(
       priceInputValue,
       totalInputString: '',
       totalInputValue: 0n,
-    }
+    })
   }
   const totalInputValue =
     (amountInputValue * priceInputValue) /
     10n ** BigInt(AssetId.decimals(state.selectedAsset.assetId))
-  return {
+  return withChecks({
     ...state,
     boundVariable: 'price',
     amountInputString,
@@ -189,7 +208,7 @@ function stateFromAmountAndPrice(
     priceInputValue,
     totalInputString: formatCurrencyInput(totalInputValue, AssetId.USDC),
     totalInputValue,
-  }
+  })
 }
 
 function stateFromAmountAndTotal(
@@ -200,7 +219,7 @@ function stateFromAmountAndTotal(
   totalInputValue: bigint
 ): FormState {
   if (amountInputString === '' || totalInputString === '') {
-    return {
+    return withChecks({
       ...state,
       boundVariable: 'total',
       amountInputString,
@@ -209,14 +228,14 @@ function stateFromAmountAndTotal(
       totalInputValue,
       priceInputString: '',
       priceInputValue: 0n,
-    }
+    })
   }
   const priceInputValue =
     (totalInputValue *
       10n ** BigInt(AssetId.decimals(state.selectedAsset.assetId))) /
     amountInputValue
 
-  return {
+  return withChecks({
     ...state,
     boundVariable: 'total',
     amountInputString,
@@ -225,5 +244,32 @@ function stateFromAmountAndTotal(
     totalInputValue,
     priceInputString: formatCurrencyInput(priceInputValue, AssetId.USDC),
     priceInputValue,
+  })
+}
+
+function withChecks(state: FormState): FormState {
+  const balance = state.selectedAsset.balance
+  const absolute = balance < 0 ? -balance : balance
+  if (state.amountInputValue > absolute) {
+    return {
+      ...state,
+      amountInputError: true,
+      canSubmit: false,
+    }
+  }
+  if (state.exitButtonSelected) {
+    return {
+      ...state,
+      amountInputError: false,
+      canSubmit: state.amountInputValue > 0n,
+    }
+  }
+  return {
+    ...state,
+    amountInputError: false,
+    canSubmit:
+      state.amountInputValue > 0n &&
+      state.priceInputValue > 0n &&
+      state.totalInputValue > 0n,
   }
 }

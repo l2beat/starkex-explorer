@@ -55,6 +55,10 @@ export function initTransactionForm() {
     dispatch({ type: 'ModifyTotal', value: ui.totalInput.value })
   )
 
+  ui.submitButton.addEventListener('click', () => {
+    alert('Submit!')
+  })
+
   let state: FormState | undefined
   updateUI(getInitialState(props, location.search))
 
@@ -74,14 +78,14 @@ export function initTransactionForm() {
       ui.assetIconView.setAttribute('src', getAssetImageUrl(assetId))
       ui.assetSymbolView.innerText = AssetId.symbol(assetId).toUpperCase()
 
-      ui.assetBalanceView.innerText = `Balance: ${formatCurrencyInput(
-        balance,
-        assetId
-      )}`
-      ui.suggestedPriceView.innerText = `Suggested: ${formatCurrencyInput(
+      const sign = balance < 0 ? '-' : ''
+      const balanceFormatted = formatCurrencyInput(balance, assetId)
+      ui.assetBalanceView.innerText = `Balance: ${sign}${balanceFormatted}`
+      const priceFormatted = formatCurrencyInput(
         priceUSDCents * 10000n,
         AssetId.USDC
-      )}`
+      )
+      ui.suggestedPriceView.innerText = `Suggested: ${priceFormatted}`
 
       history.replaceState(
         null,
@@ -94,6 +98,14 @@ export function initTransactionForm() {
       ui.assetAmountInput.value = newState.amountInputString
     }
 
+    if (!state || state.amountInputError !== newState.amountInputError) {
+      ui.amountErrorView.classList.toggle('hidden', !newState.amountInputError)
+      ui.assetAmountInput.classList.toggle(
+        'text-red-100',
+        newState.amountInputError
+      )
+    }
+
     if (ui.priceInput.value !== newState.priceInputString) {
       ui.priceInput.value = newState.priceInputString
     }
@@ -102,12 +114,31 @@ export function initTransactionForm() {
       ui.totalInput.value = newState.totalInputString
     }
 
+    if (!state || state.canSubmit !== newState.canSubmit) {
+      if (!newState.canSubmit) {
+        ui.submitButton.setAttribute('disabled', '')
+      } else {
+        ui.submitButton.removeAttribute('disabled')
+      }
+      ui.submitButton.classList.toggle(
+        'cursor-not-allowed',
+        !newState.canSubmit
+      )
+      ui.submitButton.classList.toggle('bg-blue-100', newState.canSubmit)
+      ui.submitButton.classList.toggle('bg-grey-300', !newState.canSubmit)
+      ui.submitButton.classList.toggle('text-grey-400', !newState.canSubmit)
+    }
+
     if (!state || state.exitButtonVisible !== newState.exitButtonVisible) {
       ui.exitButton.classList.toggle('hidden', !newState.exitButtonVisible)
     }
 
     if (!state || state.exitButtonSelected !== newState.exitButtonSelected) {
       ui.exitButton.classList.toggle('bg-grey-300', newState.exitButtonSelected)
+      if (newState.exitButtonSelected) {
+        ui.formTitle.innerText = 'Forced exit'
+        ui.submitButton.innerText = 'Submit forced exit'
+      }
     }
 
     if (!state || state.buyButtonVisible !== newState.buyButtonVisible) {
@@ -116,6 +147,10 @@ export function initTransactionForm() {
 
     if (!state || state.buyButtonSelected !== newState.buyButtonSelected) {
       ui.buyButton.classList.toggle('bg-grey-300', newState.buyButtonSelected)
+      if (newState.buyButtonSelected) {
+        ui.formTitle.innerText = 'Forced buy'
+        ui.submitButton.innerText = 'Create forced buy offer'
+      }
     }
 
     if (!state || state.sellButtonVisible !== newState.sellButtonVisible) {
@@ -124,6 +159,10 @@ export function initTransactionForm() {
 
     if (!state || state.sellButtonSelected !== newState.sellButtonSelected) {
       ui.sellButton.classList.toggle('bg-grey-300', newState.sellButtonSelected)
+      if (newState.sellButtonSelected) {
+        ui.formTitle.innerText = 'Forced sell'
+        ui.submitButton.innerText = 'Create forced sell offer'
+      }
     }
 
     if (!state || state.priceSectionVisible !== newState.priceSectionVisible) {

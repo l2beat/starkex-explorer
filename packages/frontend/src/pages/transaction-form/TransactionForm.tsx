@@ -41,7 +41,9 @@ export function TransactionForm(props: TransactionFormProps) {
         className="hidden max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex-col gap-2.5"
         data-props={propsJson}
       >
-        <div className="text-lg font-medium">Forced exit</div>
+        <div id="form-title" className="text-lg font-medium">
+          Forced exit
+        </div>
         <PositionIdView positionId={props.positionId} />
         <AmountInput {...props} />
         <PriceInput {...props} />
@@ -52,7 +54,7 @@ export function TransactionForm(props: TransactionFormProps) {
           type="button"
           className="bg-blue-100 w-full block text-lg font-bold py-2 rounded-md"
         >
-          Force exit
+          Forced exit
         </button>
       </form>
     </Page>

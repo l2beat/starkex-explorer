@@ -9,11 +9,13 @@ export interface FormState {
   selectedAsset: PositionAssetEntry
   amountInputString: string
   amountInputValue: bigint
+  amountInputError: boolean
   priceInputString: string
   priceInputValue: bigint
   totalInputString: string
   totalInputValue: bigint
   boundVariable: 'price' | 'total'
+  canSubmit: boolean
 
   exitButtonVisible: boolean
   exitButtonSelected: boolean

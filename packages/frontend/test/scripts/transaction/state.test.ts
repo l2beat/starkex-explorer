@@ -55,10 +55,44 @@ describe(nextFormState.name, () => {
       { type: 'ModifyAmount', value: '123' },
       { type: 'ModifyAmount', value: '' },
     ])
+    expect(state).toEqual(INITIAL_STATE)
+  })
+
+  it('input amount too large for selling', () => {
+    const state = reduce([{ type: 'ModifyAmount', value: '123456789' }])
     expect(state).toEqual({
       ...INITIAL_STATE,
-      amountInputString: '',
-      amountInputValue: 0n,
+      amountInputError: true,
+      amountInputString: '123456789',
+      amountInputValue: 123456789_000000000n,
+    })
+  })
+
+  it('input amount for buying', () => {
+    const state = reduce([
+      { type: 'AssetChange', assetId: AssetId('BTC-10') },
+      { type: 'ModifyAmount', value: '0.0001' },
+    ])
+    expect(state.amountInputError).toEqual(false)
+  })
+
+  it('input amount too large for buying', () => {
+    const state = reduce([
+      { type: 'AssetChange', assetId: AssetId('BTC-10') },
+      { type: 'ModifyAmount', value: '12345678901234567890' },
+    ])
+    expect(state.amountInputError).toEqual(true)
+  })
+
+  it('input amount too large and delete', () => {
+    const state = reduce([
+      { type: 'ModifyAmount', value: '123456789' },
+      { type: 'ModifyAmount', value: '12' },
+    ])
+    expect(state).toEqual({
+      ...INITIAL_STATE,
+      amountInputString: '12',
+      amountInputValue: 12_000000000n,
     })
   })
 
@@ -78,6 +112,7 @@ describe(nextFormState.name, () => {
     ])
     expect(state).toEqual({
       ...INITIAL_STATE,
+      canSubmit: true,
       amountInputString: '2',
       amountInputValue: 2_000000000n,
       priceInputString: '4',
@@ -94,6 +129,7 @@ describe(nextFormState.name, () => {
     ])
     expect(state).toEqual({
       ...INITIAL_STATE,
+      canSubmit: true,
       amountInputString: '2',
       amountInputValue: 2_000000000n,
       priceInputString: '4',
@@ -110,6 +146,7 @@ describe(nextFormState.name, () => {
     ])
     expect(state).toEqual({
       ...INITIAL_STATE,
+      canSubmit: true,
       boundVariable: 'total',
       amountInputString: '2',
       amountInputValue: 2_000000000n,
@@ -127,6 +164,7 @@ describe(nextFormState.name, () => {
     ])
     expect(state).toEqual({
       ...INITIAL_STATE,
+      canSubmit: true,
       boundVariable: 'total',
       amountInputString: '2',
       amountInputValue: 2_000000000n,

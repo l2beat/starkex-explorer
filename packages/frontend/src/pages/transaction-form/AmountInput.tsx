@@ -53,6 +53,9 @@ export function AmountInput(props: TransactionFormProps) {
           </button>
         </div>
       </div>
+      <div id="amount-error" className="hidden text-red-100 font-medium">
+        Amount too large
+      </div>
     </div>
   )
 }
