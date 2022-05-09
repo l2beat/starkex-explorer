@@ -5,9 +5,9 @@ import { Page } from '../common/Page'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
-import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { formatHashLong } from '../formatting/formatHashLong'
 import { PositionAtUpdateProps } from './PositionAtUpdateProps'
 
 const balanceChangesTableColumns = [
@@ -80,11 +80,13 @@ export function PositionAtUpdate({
           },
           {
             title: 'Previous stark key',
-            content: previousPublicKey ? formatHash(previousPublicKey) : '-',
+            content: previousPublicKey
+              ? formatHashLong(previousPublicKey)
+              : '-',
           },
           {
             title: 'Stark key',
-            content: formatHash(publicKey),
+            content: formatHashLong(publicKey),
           },
         ]}
       />
@@ -120,7 +122,7 @@ export function PositionAtUpdate({
             cells: [
               transaction.type,
               formatTime(transaction.lastUpdate),
-              formatHash(transaction.hash.toString()),
+              formatHashLong(transaction.hash),
               formatLargeNumber(transaction.amount),
               <AssetNameCell assetId={transaction.assetId} />,
             ],

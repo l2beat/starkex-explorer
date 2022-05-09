@@ -5,9 +5,9 @@ import { AssetNameCell } from '../common/AssetNameCell'
 import { SearchBar } from '../common/SearchBar'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
-import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { formatHashLong } from '../formatting/formatHashLong'
 import { FreezeButton } from './FreezeButton'
 import { HomeProps } from './HomeProps'
 import { Stat } from './Stat'
@@ -62,7 +62,7 @@ export function Home(props: HomeProps) {
             link,
             cells: [
               update.id.toString(),
-              formatHash(update.hash),
+              formatHashLong(update.hash),
               formatTime(update.timestamp),
               update.positionCount.toString(),
             ],
@@ -100,7 +100,7 @@ export function Home(props: HomeProps) {
               transaction.type,
               formatTime(transaction.lastUpdate),
               transaction.status,
-              formatHash(transaction.hash.toString()),
+              formatHashLong(transaction.hash),
               formatLargeNumber(transaction.amount),
               <AssetNameCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),

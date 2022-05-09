@@ -5,9 +5,9 @@ import { Page } from '../common/Page'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
-import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { formatHashLong } from '../formatting/formatHashLong'
 import { formatUSDCents } from '../formatUSDCents'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 
@@ -38,11 +38,11 @@ export function StateUpdateDetails({
         rows={[
           {
             title: 'State update hash',
-            content: hash.toString(),
+            content: formatHashLong(hash),
           },
           {
             title: 'State tree root',
-            content: formatHash(rootHash),
+            content: formatHashLong(rootHash),
           },
           {
             title: 'Ethereum block number',
@@ -117,7 +117,7 @@ export function StateUpdateDetails({
             cells: [
               transaction.type,
               formatTime(transaction.lastUpdate),
-              formatHash(transaction.hash.toString()),
+              formatHashLong(transaction.hash),
               formatLargeNumber(transaction.amount),
               <AssetNameCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),

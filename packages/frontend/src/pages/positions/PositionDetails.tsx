@@ -6,9 +6,9 @@ import { Page } from '../common/Page'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Column, Table } from '../common/Table'
-import { formatHash } from '../formatHash'
 import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { formatHashLong } from '../formatting/formatHashLong'
 import { formatUSDCents } from '../formatUSDCents'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
@@ -118,7 +118,7 @@ const buildTransactionHistoryTableRow = (
       transaction.type,
       formatTime(transaction.lastUpdate),
       transaction.status,
-      formatHash(transaction.hash.toString()),
+      formatHashLong(transaction.hash),
       formatLargeNumber(transaction.amount),
       <AssetNameCell assetId={transaction.assetId} />,
     ],
@@ -166,7 +166,7 @@ export function PositionDetails({
           },
           {
             title: 'Owner stark key',
-            content: formatHash(publicKey),
+            content: formatHashLong(publicKey),
           },
           {
             title: 'Last state update',

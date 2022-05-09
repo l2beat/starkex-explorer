@@ -4,6 +4,8 @@ import { Page } from '../common'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { formatLargeNumber } from '../formatLargeNumber'
+import { formatHashLong } from '../formatting/formatHashLong'
+import { formatHashShort } from '../formatting/formatHashShort'
 import {
   ForcedTransactionDetailsProps,
   TransactionStatusEntry,
@@ -29,7 +31,7 @@ export function ForcedTransactionDetails({
       account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-12 overflow-x-hidden text-ellipsis whitespace-nowrap">
-        Forced exit {transactionHash.toString()}
+        Forced exit {formatHashShort(transactionHash)}
       </h1>
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
@@ -52,7 +54,7 @@ export function ForcedTransactionDetails({
           },
           {
             title: 'Transaction hash',
-            content: transactionHash.toString(),
+            content: formatHashLong(transactionHash),
           },
           {
             title: 'State update id',

@@ -3,8 +3,8 @@ import React from 'react'
 import { Page } from '../common'
 import { Pagination } from '../common/Pagination'
 import { Table } from '../common/Table'
-import { formatHash } from '../formatHash'
 import { formatTime } from '../formatTime'
+import { formatHashLong } from '../formatting/formatHashLong'
 import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 
 export function StateUpdatesIndex({
@@ -50,7 +50,7 @@ export function StateUpdatesIndex({
             link,
             cells: [
               update.id.toString(),
-              formatHash(update.hash),
+              formatHashLong(update.hash),
               formatTime(update.timestamp),
               update.positionCount.toString(),
             ],
