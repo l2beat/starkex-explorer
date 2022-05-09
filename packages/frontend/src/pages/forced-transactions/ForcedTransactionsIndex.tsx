@@ -4,8 +4,8 @@ import { Page } from '../common'
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Pagination } from '../common/Pagination'
 import { Table } from '../common/Table'
-import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { formatCurrencyUnits } from '../formatting/formatCurrency'
 import { formatHashLong } from '../formatting/formatHashLong'
 import { ForcedTransactionsIndexProps } from './ForcedTransactionsIndexProps'
 
@@ -58,7 +58,7 @@ export function ForcedTransactionsIndex({
               formatTime(transaction.lastUpdate),
               transaction.status,
               formatHashLong(transaction.hash),
-              formatLargeNumber(transaction.amount),
+              formatCurrencyUnits(transaction.amount, transaction.assetId),
               <AssetNameCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),
             ],

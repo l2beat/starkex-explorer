@@ -5,10 +5,12 @@ import { Page } from '../common/Page'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
-import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import {
+  formatCurrency,
+  formatCurrencyUnits,
+} from '../formatting/formatCurrency'
 import { formatHashLong } from '../formatting/formatHashLong'
-import { formatUSDCents } from '../formatUSDCents'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 
 export function StateUpdateDetails({
@@ -84,9 +86,9 @@ export function StateUpdateDetails({
               positionId.toString(),
               formatHashLong(publicKey),
               previousTotalUSDCents
-                ? formatUSDCents(previousTotalUSDCents)
+                ? formatCurrency(previousTotalUSDCents, 'USD')
                 : '-',
-              formatUSDCents(totalUSDCents),
+              formatCurrency(totalUSDCents, 'USD'),
               assetsUpdated ? assetsUpdated.toString() : '0',
             ],
             link: `/positions/${positionId}`,
@@ -118,7 +120,7 @@ export function StateUpdateDetails({
               transaction.type,
               formatTime(transaction.lastUpdate),
               formatHashLong(transaction.hash),
-              formatLargeNumber(transaction.amount),
+              formatCurrencyUnits(transaction.amount, transaction.assetId),
               <AssetNameCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),
             ],

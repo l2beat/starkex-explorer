@@ -5,8 +5,8 @@ import { Page } from '../common/Page'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
-import { formatLargeNumber } from '../formatLargeNumber'
 import { formatTime } from '../formatTime'
+import { formatCurrencyUnits } from '../formatting/formatCurrency'
 import { formatHashLong } from '../formatting/formatHashLong'
 import { PositionAtUpdateProps } from './PositionAtUpdateProps'
 
@@ -123,7 +123,7 @@ export function PositionAtUpdate({
               transaction.type,
               formatTime(transaction.lastUpdate),
               formatHashLong(transaction.hash),
-              formatLargeNumber(transaction.amount),
+              formatCurrencyUnits(transaction.amount, transaction.assetId),
               <AssetNameCell assetId={transaction.assetId} />,
             ],
           }

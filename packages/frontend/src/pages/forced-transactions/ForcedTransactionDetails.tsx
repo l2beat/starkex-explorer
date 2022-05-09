@@ -1,9 +1,10 @@
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { formatLargeNumber } from '../formatLargeNumber'
+import { formatCurrency } from '../formatting/formatCurrency'
 import { formatHashLong } from '../formatting/formatHashLong'
 import { formatHashShort } from '../formatting/formatHashShort'
 import {
@@ -50,7 +51,7 @@ export function ForcedTransactionDetails({
           },
           {
             title: 'Value',
-            content: formatLargeNumber(value) + ' USDC',
+            content: formatCurrency(value, AssetId.USDC),
           },
           {
             title: 'Transaction hash',
