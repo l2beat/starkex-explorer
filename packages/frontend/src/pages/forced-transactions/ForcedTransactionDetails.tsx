@@ -2,9 +2,14 @@ import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { formatCurrency, formatHashLong, formatHashShort } from '../formatting'
+import {
+  formatCurrency,
+  formatHashLong,
+  formatHashShort,
+  formatTimestamp,
+} from '../formatting'
 import {
   ForcedTransactionDetailsProps,
   TransactionStatusEntry,

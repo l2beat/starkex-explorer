@@ -2,7 +2,7 @@ import React from 'react'
 
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
 import {
@@ -10,6 +10,7 @@ import {
   formatCurrencyUnits,
   formatHashLong,
   formatTime,
+  formatTimestamp,
 } from '../formatting'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 
