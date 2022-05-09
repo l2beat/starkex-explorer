@@ -2,7 +2,7 @@ import { Timestamp } from '@explorer/types'
 import classNames from 'classnames'
 import React, { ReactNode } from 'react'
 
-import { formatTime } from '../formatTime'
+import { formatTime } from '../formatting'
 
 export function formatTimestamp(timestamp: Timestamp) {
   const date = new Date(Number(timestamp))

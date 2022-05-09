@@ -1,6 +1,6 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
-import { formatCurrency } from '../../../src/pages/formatting/formatCurrency'
+import { formatCurrency } from '../../../src/pages/formatting'
 
 describe(formatCurrency.name, () => {
   const cases: [bigint, AssetId | 'USD', string][] = [

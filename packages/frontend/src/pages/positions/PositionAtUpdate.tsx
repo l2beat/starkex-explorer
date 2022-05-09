@@ -5,9 +5,7 @@ import { Page } from '../common/Page'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
-import { formatTime } from '../formatTime'
-import { formatCurrencyUnits } from '../formatting/formatCurrency'
-import { formatHashLong } from '../formatting/formatHashLong'
+import { formatCurrencyUnits, formatHashLong, formatTime } from '../formatting'
 import { PositionAtUpdateProps } from './PositionAtUpdateProps'
 
 const balanceChangesTableColumns = [

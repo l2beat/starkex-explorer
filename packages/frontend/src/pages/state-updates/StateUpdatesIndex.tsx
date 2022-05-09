@@ -3,8 +3,7 @@ import React from 'react'
 import { Page } from '../common'
 import { Pagination } from '../common/Pagination'
 import { Table } from '../common/Table'
-import { formatTime } from '../formatTime'
-import { formatHashLong } from '../formatting/formatHashLong'
+import { formatHashLong, formatTime } from '../formatting'
 import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 
 export function StateUpdatesIndex({

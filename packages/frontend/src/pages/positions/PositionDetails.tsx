@@ -6,12 +6,12 @@ import { Page } from '../common/Page'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Column, Table } from '../common/Table'
-import { formatTime } from '../formatTime'
 import {
   formatCurrency,
   formatCurrencyUnits,
-} from '../formatting/formatCurrency'
-import { formatHashLong } from '../formatting/formatHashLong'
+  formatHashLong,
+  formatTime,
+} from '../formatting'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
 const balanceTableColumns = (ownedByYou: boolean) => {

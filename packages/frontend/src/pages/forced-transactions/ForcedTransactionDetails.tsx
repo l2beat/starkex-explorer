@@ -4,9 +4,7 @@ import React from 'react'
 import { Page } from '../common'
 import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { formatCurrency } from '../formatting/formatCurrency'
-import { formatHashLong } from '../formatting/formatHashLong'
-import { formatHashShort } from '../formatting/formatHashShort'
+import { formatCurrency, formatHashLong, formatHashShort } from '../formatting'
 import {
   ForcedTransactionDetailsProps,
   TransactionStatusEntry,

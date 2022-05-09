@@ -4,9 +4,7 @@ import { Page } from '../common'
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Pagination } from '../common/Pagination'
 import { Table } from '../common/Table'
-import { formatTime } from '../formatTime'
-import { formatCurrencyUnits } from '../formatting/formatCurrency'
-import { formatHashLong } from '../formatting/formatHashLong'
+import { formatCurrencyUnits, formatHashLong, formatTime } from '../formatting'
 import { ForcedTransactionsIndexProps } from './ForcedTransactionsIndexProps'
 
 export function ForcedTransactionsIndex({

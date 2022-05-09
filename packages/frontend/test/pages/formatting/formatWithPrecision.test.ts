@@ -1,5 +1,5 @@
 import { expect } from 'earljs'
-import { formatWithPrecision } from '../../../src/pages/formatting/formatWithPrecision'
+import { formatWithPrecision } from '../../../src/pages/formatting'
 
 describe(formatWithPrecision.name, () => {
   const cases: [number, number, string][] = [
