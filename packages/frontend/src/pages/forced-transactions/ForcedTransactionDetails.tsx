@@ -5,10 +5,10 @@ import { Page } from '../common'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import {
+  formatAbsoluteTime,
   formatCurrency,
   formatHashLong,
   formatHashShort,
-  formatTimestamp,
 } from '../formatting'
 import {
   ForcedTransactionDetailsProps,
@@ -78,7 +78,7 @@ export function ForcedTransactionDetails({
           {history.map((event, i) => (
             <tr className="bg-grey-200 border-2 border-grey-100" key={i}>
               <th className="font-normal text-left w-[268px] py-2 px-1.5">
-                {formatTimestamp(event.timestamp)}
+                {formatAbsoluteTime(event.timestamp)}
               </th>
               <td className="font-normal first-letter:capitalize py-2 px-1.5">
                 {getStatusText(event)}

@@ -6,11 +6,11 @@ import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
 import {
+  formatAbsoluteTime,
   formatCurrency,
   formatCurrencyUnits,
   formatHashLong,
-  formatTime,
-  formatTimestamp,
+  formatRelativeTime,
 } from '../formatting'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 
@@ -53,7 +53,7 @@ export function StateUpdateDetails({
           },
           {
             title: 'Timestamp',
-            content: formatTimestamp(timestamp),
+            content: formatAbsoluteTime(timestamp),
             fontRegular: true,
           },
         ]}
@@ -119,7 +119,7 @@ export function StateUpdateDetails({
             link,
             cells: [
               transaction.type,
-              formatTime(transaction.lastUpdate),
+              formatRelativeTime(transaction.lastUpdate),
               formatHashLong(transaction.hash),
               formatCurrencyUnits(transaction.amount, transaction.assetId),
               <AssetNameCell assetId={transaction.assetId} />,

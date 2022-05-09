@@ -7,11 +7,11 @@ import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Column, Table } from '../common/Table'
 import {
+  formatAbsoluteTime,
   formatCurrency,
   formatCurrencyUnits,
   formatHashLong,
-  formatTime,
-  formatTimestamp,
+  formatRelativeTime,
 } from '../formatting'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
@@ -121,7 +121,7 @@ const buildTransactionHistoryTableRow = (
     link,
     cells: [
       transaction.type,
-      formatTime(transaction.lastUpdate),
+      formatRelativeTime(transaction.lastUpdate),
       transaction.status,
       formatHashLong(transaction.hash),
       formatCurrencyUnits(transaction.amount, transaction.assetId),
@@ -183,7 +183,7 @@ export function PositionDetails({
           },
           {
             title: 'Last update timestamp',
-            content: formatTimestamp(lastUpdateTimestamp),
+            content: formatAbsoluteTime(lastUpdateTimestamp),
             fontRegular: true,
           },
         ]}

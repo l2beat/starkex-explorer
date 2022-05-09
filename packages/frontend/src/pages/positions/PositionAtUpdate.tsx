@@ -6,10 +6,10 @@ import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
 import {
+  formatAbsoluteTime,
   formatCurrencyUnits,
   formatHashLong,
-  formatTime,
-  formatTimestamp,
+  formatRelativeTime,
 } from '../formatting'
 import { PositionAtUpdateProps } from './PositionAtUpdateProps'
 
@@ -78,7 +78,7 @@ export function PositionAtUpdate({
           },
           {
             title: 'State update timestamp',
-            content: formatTimestamp(lastUpdateTimestamp),
+            content: formatAbsoluteTime(lastUpdateTimestamp),
             fontRegular: true,
           },
           {
@@ -124,7 +124,7 @@ export function PositionAtUpdate({
             link,
             cells: [
               transaction.type,
-              formatTime(transaction.lastUpdate),
+              formatRelativeTime(transaction.lastUpdate),
               formatHashLong(transaction.hash),
               formatCurrencyUnits(transaction.amount, transaction.assetId),
               <AssetNameCell assetId={transaction.assetId} />,
