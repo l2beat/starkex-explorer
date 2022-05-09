@@ -75,7 +75,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   account: undefined,
   positionId: 123n,
   publicKey: StarkKey.fake(),
-  ethAddress: '0x1234567890ABCDEF1234567890ABCDEF12345678',
+  ethAddress: EthereumAddress.fake(),
   lastUpdateTimestamp: Timestamp(Date.now()),
   stateUpdateId: 1,
   assets: [

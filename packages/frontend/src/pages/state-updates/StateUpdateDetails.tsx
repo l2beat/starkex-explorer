@@ -82,7 +82,7 @@ export function StateUpdateDetails({
           }) => ({
             cells: [
               positionId.toString(),
-              publicKey,
+              formatHashLong(publicKey),
               previousTotalUSDCents
                 ? formatUSDCents(previousTotalUSDCents)
                 : '-',
