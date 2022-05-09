@@ -178,7 +178,7 @@ function stateFromAmountAndPrice(
     }
   }
   const totalInputValue =
-    (amountInputValue * state.priceInputValue) /
+    (amountInputValue * priceInputValue) /
     10n ** BigInt(AssetId.decimals(state.selectedAsset.assetId))
   return {
     ...state,
@@ -188,7 +188,7 @@ function stateFromAmountAndPrice(
     priceInputString,
     priceInputValue,
     totalInputString: formatCurrencyInput(totalInputValue, AssetId.USDC),
-    totalInputValue: 0n,
+    totalInputValue,
   }
 }
 
@@ -212,7 +212,7 @@ function stateFromAmountAndTotal(
     }
   }
   const priceInputValue =
-    (state.totalInputValue *
+    (totalInputValue *
       10n ** BigInt(AssetId.decimals(state.selectedAsset.assetId))) /
     amountInputValue
 
