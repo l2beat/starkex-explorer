@@ -49,7 +49,7 @@ export function withTypedContext<T extends z.AnyZodObject>(
     }
     ctx.params = parseResult.data.params
     ctx.query = parseResult.data.query
-    ctx.request.body = parseResult.data.request.body
+    ctx.request.body = parseResult.data.request?.body
     await handler(ctx)
   }
 }
