@@ -23,13 +23,22 @@ export function TransactionForm(props: TransactionFormProps) {
       account={props.account}
     >
       <div className="w-min mx-auto flex bg-grey-200 drop-shadow-lg rounded-md mb-4">
-        <button id="exit-button" className="w-[91px] py-1.5 rounded-md bg-grey-300">Exit</button>
-        <button id="buy-button" className="w-[91px] py-1.5 rounded-md">Buy</button>
-        <button id="sell-button" className="w-[91px] py-1.5 rounded-md">Sell</button>
+        <button
+          id="exit-button"
+          className="w-[91px] py-1.5 rounded-md bg-grey-300"
+        >
+          Exit
+        </button>
+        <button id="buy-button" className="w-[91px] py-1.5 rounded-md">
+          Buy
+        </button>
+        <button id="sell-button" className="w-[91px] py-1.5 rounded-md">
+          Sell
+        </button>
       </div>
       <form
         id="transaction-form"
-        className="max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex flex-col gap-2.5"
+        className="hidden max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex-col gap-2.5"
         data-props={propsJson}
       >
         <div className="text-lg font-medium">Forced exit</div>

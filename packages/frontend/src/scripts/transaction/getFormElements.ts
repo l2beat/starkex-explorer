@@ -24,5 +24,6 @@ export function getFormElements() {
     exitButton: $<HTMLButtonElement>('#exit-button'),
     buyButton: $<HTMLButtonElement>('#buy-button'),
     sellButton: $<HTMLButtonElement>('#sell-button'),
+    infoSection: $<HTMLDivElement>('#info-section'),
   }
 }
