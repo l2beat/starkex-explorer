@@ -1,9 +1,10 @@
 import { AssetId } from '@explorer/types'
 
-import { PositionAssetEntry } from '../../pages'
 import { getAssetImageUrl } from '../../pages/common/icons/getAssetImageUrl'
 import { getFormElements } from './getFormElements'
 import { jsonToProps } from './jsonToProps'
+import { formatCurrencyInput, getInitialState, nextFormState } from './state'
+import { FormAction, FormState } from './types'
 
 export function initTransactionForm() {
   if (!document.querySelector('#transaction-form')) {
@@ -16,88 +17,111 @@ export function initTransactionForm() {
 
   const propsJson = JSON.parse(ui.form.dataset.props ?? '{}')
   const props = jsonToProps(propsJson)
-  const search = new URLSearchParams(location.search)
-  const fromUrl = search.get('assetId')
-
-  let selectedAsset = getAsset(fromUrl ? AssetId(fromUrl) : props.selectedAsset)
-  updateUI(selectedAsset)
 
   ui.assetSelect.addEventListener('change', () =>
-    setSelected(AssetId(ui.assetSelect.value))
+    dispatch({ type: 'AssetChange', assetId: AssetId(ui.assetSelect.value) })
   )
 
-  ui.assetMaxButton.addEventListener('click', () => {
-    ui.assetAmountInput.value = selectedAsset.balance.toString()
-  })
+  ui.exitButton.addEventListener('click', () =>
+    dispatch({ type: 'AssetChange', assetId: AssetId.USDC })
+  )
 
-  ui.exitButton.addEventListener('click', () => setSelected(AssetId.USDC))
+  ui.buyButton.addEventListener('click', () =>
+    dispatch({ type: 'SwitchToBuy' })
+  )
 
-  ui.buyButton.addEventListener('click', () => {
-    const buyable = props.assets.find(isBuyable)
-    if (!buyable) {
-      throw new Error('Programmer error: Buy button should be invisible')
+  ui.sellButton.addEventListener('click', () =>
+    dispatch({ type: 'SwitchToSell' })
+  )
+
+  ui.assetMaxButton.addEventListener('click', () =>
+    dispatch({ type: 'UseMaxBalance' })
+  )
+
+  ui.assetAmountInput.addEventListener('input', () =>
+    dispatch({ type: 'ModifyAmount', value: ui.assetAmountInput.value })
+  )
+
+  let state: FormState | undefined
+  updateUI(getInitialState(props, location.search))
+
+  function dispatch(action: FormAction) {
+    if (state) {
+      const newState = nextFormState(state, action)
+      updateUI(newState)
     }
-    setSelected(buyable.assetId)
-  })
-
-  ui.sellButton.addEventListener('click', () => {
-    const sellable = props.assets.find(isSellable)
-    if (!sellable) {
-      throw new Error('Programmer error: Sell button should be invisible')
-    }
-    setSelected(sellable.assetId)
-  })
-
-  function getAsset(selected: AssetId) {
-    const asset = props.assets.find((x) => x.assetId === selected)
-    if (!asset) {
-      console.error('Programmer error: Nonexistent asset selected')
-      return props.assets[0]
-    }
-    return asset
   }
 
-  function setSelected(selected: AssetId) {
-    selectedAsset = getAsset(selected)
-    updateUI(selectedAsset)
+  function updateUI(newState: FormState) {
+    if (
+      !state ||
+      state.selectedAsset.assetId !== newState.selectedAsset.assetId
+    ) {
+      const { assetId, balance } = newState.selectedAsset
+      ui.assetIconView.setAttribute('src', getAssetImageUrl(assetId))
+      ui.assetSymbolView.innerText = AssetId.symbol(assetId).toUpperCase()
+
+      ui.assetBalanceView.innerText = `Balance: ${formatCurrencyInput(
+        balance,
+        assetId
+      )}`
+      ui.assetAmountInput.value = ''
+
+      history.replaceState(
+        null,
+        '',
+        `${location.origin}${location.pathname}?assetId=${assetId}`
+      )
+    }
+
+    if (ui.assetAmountInput.value !== newState.amountInputString) {
+      ui.assetAmountInput.value = newState.amountInputString
+    }
+
+    if (ui.priceInput.value !== newState.priceInputString) {
+      ui.priceInput.value = newState.priceInputString
+    }
+
+    if (ui.totalInput.value !== newState.totalInputString) {
+      ui.totalInput.value = newState.totalInputString
+    }
+
+    if (!state || state.exitButtonVisible !== newState.exitButtonVisible) {
+      ui.exitButton.classList.toggle('hidden', !newState.exitButtonVisible)
+    }
+
+    if (!state || state.exitButtonSelected !== newState.exitButtonSelected) {
+      ui.exitButton.classList.toggle('bg-grey-300', newState.exitButtonSelected)
+    }
+
+    if (!state || state.buyButtonVisible !== newState.buyButtonVisible) {
+      ui.buyButton.classList.toggle('hidden', !newState.buyButtonVisible)
+    }
+
+    if (!state || state.buyButtonSelected !== newState.buyButtonSelected) {
+      ui.buyButton.classList.toggle('bg-grey-300', newState.buyButtonSelected)
+    }
+
+    if (!state || state.sellButtonVisible !== newState.sellButtonVisible) {
+      ui.sellButton.classList.toggle('hidden', !newState.sellButtonVisible)
+    }
+
+    if (!state || state.sellButtonSelected !== newState.sellButtonSelected) {
+      ui.sellButton.classList.toggle('bg-grey-300', newState.sellButtonSelected)
+    }
+
+    if (!state || state.priceSectionVisible !== newState.priceSectionVisible) {
+      ui.priceSection.classList.toggle('hidden', !newState.priceSectionVisible)
+    }
+
+    if (!state || state.totalSectionVisible !== newState.totalSectionVisible) {
+      ui.totalSection.classList.toggle('hidden', !newState.totalSectionVisible)
+    }
+
+    if (!state || state.infoSectionVisible !== newState.infoSectionVisible) {
+      ui.infoSection.classList.toggle('hidden', !newState.infoSectionVisible)
+    }
+
+    state = newState
   }
-
-  function updateUI(asset: PositionAssetEntry) {
-    ui.assetIconView.setAttribute('src', getAssetImageUrl(asset.assetId))
-    ui.assetSymbolView.innerText = AssetId.symbol(asset.assetId).toUpperCase()
-
-    ui.assetBalanceView.innerText = `Balance: ${asset.balance}`
-    ui.assetAmountInput.value = ''
-
-    const isUSDC = asset.assetId === AssetId.USDC
-    const isPositive = asset.balance > 0n
-    const hasUSDC = props.assets.some((x) => x.assetId === AssetId.USDC)
-    const hasBuy = props.assets.some(isBuyable)
-    const hasSell = props.assets.some(isSellable)
-
-    ui.exitButton.classList.toggle('bg-grey-300', isUSDC)
-    ui.exitButton.classList.toggle('hidden', !hasUSDC)
-    ui.buyButton.classList.toggle('bg-grey-300', !isUSDC && !isPositive)
-    ui.buyButton.classList.toggle('hidden', !hasBuy)
-    ui.sellButton.classList.toggle('bg-grey-300', !isUSDC && isPositive)
-    ui.sellButton.classList.toggle('hidden', !hasSell)
-    ui.priceSection.classList.toggle('hidden', isUSDC)
-    ui.totalSection.classList.toggle('hidden', isUSDC)
-    ui.infoSection.classList.toggle('hidden', !isUSDC)
-
-    search.set('assetId', asset.assetId.toString())
-    history.replaceState(
-      null,
-      '',
-      `${location.origin}${location.pathname}?${search}`
-    )
-  }
-}
-
-function isSellable(x: PositionAssetEntry): boolean {
-  return x.assetId !== AssetId.USDC && x.balance > 0n
-}
-
-function isBuyable(x: PositionAssetEntry): boolean {
-  return x.assetId !== AssetId.USDC && x.balance < 0n
 }
