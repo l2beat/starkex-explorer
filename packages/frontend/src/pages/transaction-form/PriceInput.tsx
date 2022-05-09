@@ -21,7 +21,7 @@ export function PriceInput(props: TransactionFormProps) {
           <span>USDC</span>
         </div>
         <div className="absolute bottom-2 right-2 w-full flex items-center justify-end gap-2">
-          <span className="font-mono text-grey-400">
+          <span id="asset-price" className="font-mono text-grey-400">
             Suggested: {props.assets[0].priceUSDCents.toString()}
           </span>
           <button

@@ -1,8 +1,14 @@
 import { AssetId } from '@explorer/types'
 
-import { PositionAssetEntry } from '../../pages'
 import { TransactionFormProps } from '../../pages/transaction-form'
 import { FormAction, FormState } from './types'
+import {
+  formatCurrencyInput,
+  getAsset,
+  isBuyable,
+  isSellable,
+  parseCurrencyInput,
+} from './utils'
 
 export function getInitialState(
   props: TransactionFormProps,
@@ -25,6 +31,7 @@ export function getInitialState(
     priceInputValue: 0n,
     totalInputString: '',
     totalInputValue: 0n,
+    boundVariable: 'price',
 
     exitButtonVisible: hasUSDC,
     buyButtonVisible: hasBuy,
@@ -86,77 +93,137 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
       assetId: sellable.assetId,
     })
   } else if (action.type === 'UseMaxBalance') {
-    return {
-      ...state,
-      amountInputString: formatCurrencyInput(
+    return nextFormState(state, {
+      type: 'ModifyAmount',
+      value: formatCurrencyInput(
         state.selectedAsset.balance,
         state.selectedAsset.assetId
       ),
-      amountInputValue: state.selectedAsset.balance,
-    }
+    })
+  } else if (action.type === 'UseSuggestedPrice') {
+    return nextFormState(state, {
+      type: 'ModifyPrice',
+      value: formatCurrencyInput(
+        state.selectedAsset.priceUSDCents * 10000n,
+        AssetId.USDC
+      ),
+    })
   } else if (action.type === 'ModifyAmount') {
     const parsed = parseCurrencyInput(action.value, state.selectedAsset.assetId)
-    return {
-      ...state,
-      amountInputString:
-        parsed !== undefined ? action.value : state.amountInputString,
-      amountInputValue: parsed ?? state.amountInputValue,
+    const amountInputString =
+      parsed !== undefined ? action.value : state.amountInputString
+    const amountInputValue = parsed ?? state.amountInputValue
+    if (state.boundVariable === 'price') {
+      return stateFromAmountAndPrice(
+        state,
+        amountInputString,
+        amountInputValue,
+        state.priceInputString,
+        state.priceInputValue
+      )
+    } else {
+      return stateFromAmountAndTotal(
+        state,
+        amountInputString,
+        amountInputValue,
+        state.totalInputString,
+        state.totalInputValue
+      )
     }
+  } else if (action.type === 'ModifyPrice') {
+    const parsed = parseCurrencyInput(action.value, AssetId.USDC)
+    const priceInputString =
+      parsed !== undefined ? action.value : state.priceInputString
+    const priceInputValue = parsed ?? state.priceInputValue
+    return stateFromAmountAndPrice(
+      state,
+      state.amountInputString,
+      state.amountInputValue,
+      priceInputString,
+      priceInputValue
+    )
+  } else if (action.type === 'ModifyTotal') {
+    const parsed = parseCurrencyInput(action.value, AssetId.USDC)
+    const totalInputString =
+      parsed !== undefined ? action.value : state.totalInputString
+    const totalInputValue = parsed ?? state.totalInputValue
+    return stateFromAmountAndTotal(
+      state,
+      state.amountInputString,
+      state.amountInputValue,
+      totalInputString,
+      totalInputValue
+    )
   }
   return state
 }
 
-function getAsset(selected: AssetId, assets: readonly PositionAssetEntry[]) {
-  let asset = assets.find((x) => x.assetId === selected)
-  if (!asset) {
-    console.error('Nonexistent asset selected')
-    asset = assets[0]
-    if (!asset) {
-      throw new Error('Programmer error: No assets')
+function stateFromAmountAndPrice(
+  state: FormState,
+  amountInputString: string,
+  amountInputValue: bigint,
+  priceInputString: string,
+  priceInputValue: bigint
+): FormState {
+  if (amountInputString === '' || priceInputString === '') {
+    return {
+      ...state,
+      boundVariable: 'price',
+      amountInputString,
+      amountInputValue,
+      priceInputString,
+      priceInputValue,
+      totalInputString: '',
+      totalInputValue: 0n,
     }
   }
-  return asset
-}
-
-function isSellable(x: PositionAssetEntry): boolean {
-  return x.assetId !== AssetId.USDC && x.balance > 0n
-}
-
-function isBuyable(x: PositionAssetEntry): boolean {
-  return x.assetId !== AssetId.USDC && x.balance < 0n
-}
-
-export function formatCurrencyInput(value: bigint, assetId: AssetId): string {
-  if (value < 0) {
-    return formatCurrencyInput(-value, assetId)
+  const totalInputValue =
+    (amountInputValue * state.priceInputValue) /
+    10n ** BigInt(AssetId.decimals(state.selectedAsset.assetId))
+  return {
+    ...state,
+    boundVariable: 'price',
+    amountInputString,
+    amountInputValue,
+    priceInputString,
+    priceInputValue,
+    totalInputString: formatCurrencyInput(totalInputValue, AssetId.USDC),
+    totalInputValue: 0n,
   }
-  const decimals = AssetId.decimals(assetId)
-  const base = value.toString().padStart(decimals + 1, '0')
-  const integerPart = base.slice(0, base.length - decimals)
-  let fractionPart = decimals !== 0 ? '.' + base.slice(-decimals) : ''
-  while (fractionPart.endsWith('0')) {
-    fractionPart = fractionPart.slice(0, -1)
-  }
-  return integerPart + fractionPart
 }
 
-function parseCurrencyInput(
-  value: string,
-  assetId: AssetId
-): bigint | undefined {
-  if (value === '') {
-    return 0n
-  }
-  const INPUT_RE = /^\d+\.?\d*$/
-  if (INPUT_RE.test(value)) {
-    const decimals = AssetId.decimals(assetId)
-    const [integer, fraction] = value.split('.')
-    if (!fraction || fraction.length <= decimals) {
-      return (
-        BigInt(integer) * 10n ** BigInt(decimals) +
-        BigInt((fraction ?? '').padEnd(decimals, '0'))
-      )
+function stateFromAmountAndTotal(
+  state: FormState,
+  amountInputString: string,
+  amountInputValue: bigint,
+  totalInputString: string,
+  totalInputValue: bigint
+): FormState {
+  if (amountInputString === '' || totalInputString === '') {
+    return {
+      ...state,
+      boundVariable: 'total',
+      amountInputString,
+      amountInputValue,
+      totalInputString,
+      totalInputValue,
+      priceInputString: '',
+      priceInputValue: 0n,
     }
   }
-  return undefined
+  const priceInputValue =
+    (state.totalInputValue *
+      10n ** BigInt(AssetId.decimals(state.selectedAsset.assetId))) /
+    amountInputValue
+
+  return {
+    ...state,
+    boundVariable: 'total',
+    amountInputString,
+    amountInputValue,
+    totalInputString,
+    totalInputValue,
+    priceInputString: formatCurrencyInput(priceInputValue, AssetId.USDC),
+    priceInputValue,
+  }
 }

@@ -13,6 +13,7 @@ export interface FormState {
   priceInputValue: bigint
   totalInputString: string
   totalInputValue: bigint
+  boundVariable: 'price' | 'total'
 
   exitButtonVisible: boolean
   exitButtonSelected: boolean
@@ -30,6 +31,7 @@ export type FormAction =
   | SwitchToBuyAction
   | SwitchToSellAction
   | UseMaxBalanceAction
+  | UseSuggestedPriceAction
   | ModifyAmountAction
   | ModifyPriceAction
   | ModifyTotalAction
@@ -49,6 +51,10 @@ export interface SwitchToSellAction {
 
 export interface UseMaxBalanceAction {
   type: 'UseMaxBalance'
+}
+
+export interface UseSuggestedPriceAction {
+  type: 'UseSuggestedPrice'
 }
 
 export interface ModifyAmountAction {

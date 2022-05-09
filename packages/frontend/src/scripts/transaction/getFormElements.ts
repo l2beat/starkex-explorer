@@ -17,6 +17,7 @@ export function getFormElements() {
     assetSymbolView: $<HTMLImageElement>('#asset-symbol'),
     priceSection: $<HTMLDivElement>('#price-section'),
     priceInput: $<HTMLInputElement>('#price'),
+    suggestedPriceView: $<HTMLSpanElement>('#asset-price'),
     suggestedPriceButton: $<HTMLButtonElement>('#suggested-price'),
     totalSection: $<HTMLDivElement>('#total-section'),
     totalInput: $<HTMLInputElement>('#total'),

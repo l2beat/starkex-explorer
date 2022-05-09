@@ -3,8 +3,9 @@ import { AssetId } from '@explorer/types'
 import { getAssetImageUrl } from '../../pages/common/icons/getAssetImageUrl'
 import { getFormElements } from './getFormElements'
 import { jsonToProps } from './jsonToProps'
-import { formatCurrencyInput, getInitialState, nextFormState } from './state'
+import { getInitialState, nextFormState } from './state'
 import { FormAction, FormState } from './types'
+import { formatCurrencyInput } from './utils'
 
 export function initTransactionForm() {
   if (!document.querySelector('#transaction-form')) {
@@ -38,8 +39,20 @@ export function initTransactionForm() {
     dispatch({ type: 'UseMaxBalance' })
   )
 
+  ui.suggestedPriceButton.addEventListener('click', () =>
+    dispatch({ type: 'UseSuggestedPrice' })
+  )
+
   ui.assetAmountInput.addEventListener('input', () =>
     dispatch({ type: 'ModifyAmount', value: ui.assetAmountInput.value })
+  )
+
+  ui.priceInput.addEventListener('input', () =>
+    dispatch({ type: 'ModifyPrice', value: ui.priceInput.value })
+  )
+
+  ui.totalInput.addEventListener('input', () =>
+    dispatch({ type: 'ModifyTotal', value: ui.totalInput.value })
   )
 
   let state: FormState | undefined
@@ -57,7 +70,7 @@ export function initTransactionForm() {
       !state ||
       state.selectedAsset.assetId !== newState.selectedAsset.assetId
     ) {
-      const { assetId, balance } = newState.selectedAsset
+      const { assetId, balance, priceUSDCents } = newState.selectedAsset
       ui.assetIconView.setAttribute('src', getAssetImageUrl(assetId))
       ui.assetSymbolView.innerText = AssetId.symbol(assetId).toUpperCase()
 
@@ -65,7 +78,10 @@ export function initTransactionForm() {
         balance,
         assetId
       )}`
-      ui.assetAmountInput.value = ''
+      ui.suggestedPriceView.innerText = `Suggested: ${formatCurrencyInput(
+        priceUSDCents * 10000n,
+        AssetId.USDC
+      )}`
 
       history.replaceState(
         null,
