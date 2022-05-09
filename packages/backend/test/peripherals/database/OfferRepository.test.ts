@@ -2,13 +2,13 @@ import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
-  OfferRecord,
+  OfferRecordCandidate,
   OfferRepository,
 } from '../../../src/peripherals/database/OfferRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
-const record1: OfferRecord = {
+const record1: OfferRecordCandidate = {
   createdAt: Timestamp(1),
   starkKeyA: StarkKey.fake(),
   positionIdA: 1n,
@@ -18,7 +18,7 @@ const record1: OfferRecord = {
   aIsBuyingSynthetic: true,
 }
 
-const record2: OfferRecord = {
+const record2: OfferRecordCandidate = {
   createdAt: Timestamp(100),
   starkKeyA: StarkKey.fake(),
   positionIdA: 2n,
@@ -28,7 +28,7 @@ const record2: OfferRecord = {
   aIsBuyingSynthetic: false,
 }
 
-const record3: OfferRecord = {
+const record3: OfferRecordCandidate = {
   createdAt: Timestamp(1000),
   starkKeyA: StarkKey.fake(),
   positionIdA: 3n,
@@ -45,29 +45,38 @@ describe(OfferRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    await repository.add([record1])
+    const id = await repository.addOne(record1)
 
     const actual = await repository.getAll()
 
-    expect(actual).toEqual([record1])
+    expect(actual).toEqual([{ id, ...record1 }])
   })
 
-  it('adds 0 records', async () => {
-    await repository.add([])
-    expect(await repository.getAll()).toEqual([])
-  })
+  it('queries all records', async () => {
+    const id1 = await repository.addOne(record1)
+    const id2 = await repository.addOne(record2)
 
-  it('adds multiple records and queries them', async () => {
-    const records = [record1, record2, record3]
-
-    await repository.add(records)
     const actual = await repository.getAll()
 
-    expect(actual).toEqual(records)
+    expect(actual).toEqual([
+      { id: id1, ...record1 },
+      { id: id2, ...record2 },
+    ])
+  })
+
+  it('queries record by id', async () => {
+    await repository.addOne(record2)
+    const id = await repository.addOne(record1)
+    await repository.addOne(record3)
+
+    const actual = await repository.getById(id)
+
+    expect(actual).toEqual({ id, ...record1 })
   })
 
   it('deletes all records', async () => {
-    await repository.add([record1, record2])
+    await repository.addOne(record1)
+    await repository.addOne(record2)
 
     await repository.deleteAll()
 

@@ -40,7 +40,7 @@ export function withTypedContext<T extends z.AnyZodObject>(
     const parseResult = parser.safeParse({
       params: ctx.params,
       query: ctx.query,
-      body: ctx.request.body,
+      request: ctx.request,
     })
     if (!parseResult.success) {
       ctx.status = 400
@@ -49,7 +49,7 @@ export function withTypedContext<T extends z.AnyZodObject>(
     }
     ctx.params = parseResult.data.params
     ctx.query = parseResult.data.query
-    ctx.request.body = parseResult.data.body
+    ctx.request.body = parseResult.data.request.body
     await handler(ctx)
   }
 }

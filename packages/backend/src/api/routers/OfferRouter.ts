@@ -14,19 +14,25 @@ export function createOffersRouter(offerController: OfferController) {
     bodyParser(),
     withTypedContext(
       z.object({
-        body: z.object({
-          starkKeyA: stringAs(StarkKey),
-          positionIdA: stringAsBigInt(),
-          syntheticAssetId: stringAs(AssetId),
-          amountCollateral: stringAsBigInt(),
-          amountSynthetic: stringAsBigInt(),
-          aIsBuyingSynthetic: z.boolean(),
+        request: z.object({
+          body: z.object({
+            starkKeyA: stringAs(StarkKey),
+            positionIdA: stringAsBigInt(),
+            syntheticAssetId: stringAs(AssetId),
+            amountCollateral: stringAsBigInt(),
+            amountSynthetic: stringAsBigInt(),
+            aIsBuyingSynthetic: z.boolean(),
+          }),
         }),
       }),
       async (ctx) => {
         const result = await offerController.postOffer(ctx.request.body)
         if (result.type === 'created') {
           ctx.status = 201
+          ctx.body = result.content
+        } else if (result.type === 'bad-request') {
+          ctx.status = 400
+          ctx.body = result.content
         }
       }
     )

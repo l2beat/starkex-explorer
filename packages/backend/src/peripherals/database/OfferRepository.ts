@@ -5,6 +5,7 @@ import { Logger } from '../../tools/Logger'
 import { Repository } from './types'
 
 export interface OfferRecord {
+  id: number
   createdAt: Timestamp
   starkKeyA: StarkKey
   positionIdA: bigint
@@ -14,7 +15,10 @@ export interface OfferRecord {
   aIsBuyingSynthetic: boolean
 }
 
+export type OfferRecordCandidate = Omit<OfferRecord, 'id'>
+
 interface OfferRow {
+  id: number
   created_at: number
   stark_key_a: string
   position_id_a: bigint
@@ -29,16 +33,13 @@ export class OfferRepository implements Repository<OfferRecord> {
     this.logger = logger.for(this)
   }
 
-  async add(offers: OfferRecord[]) {
-    if (offers.length === 0) {
-      this.logger.debug({ method: 'add', rows: 0 })
-      return
-    }
+  async addOne(offer: OfferRecordCandidate) {
+    const row = toRow(offer)
+    const [id] = await this.knex('offers').insert(row).returning('id')
 
-    const rows: OfferRow[] = offers.map(toRow)
-    await this.knex('offers').insert(rows)
+    this.logger.debug({ method: 'add' })
 
-    this.logger.debug({ method: 'add', rows: rows.length })
+    return id
   }
 
   async getAll(): Promise<OfferRecord[]> {
@@ -47,13 +48,19 @@ export class OfferRepository implements Repository<OfferRecord> {
     return rows.map(toRecord)
   }
 
+  async getById(id: bigint): Promise<OfferRecord> {
+    const [offer] = await this.knex('offers').where({ id })
+    this.logger.debug({ method: 'getById' })
+    return toRecord(offer)
+  }
+
   async deleteAll() {
     await this.knex('offers').delete()
     this.logger.debug({ method: 'deleteAll' })
   }
 }
 
-function toRow(offer: OfferRecord): OfferRow {
+function toRow(offer: OfferRecordCandidate): Omit<OfferRow, 'id'> {
   return {
     created_at: offer.createdAt as unknown as number,
     stark_key_a: offer.starkKeyA.toString(),
@@ -67,6 +74,7 @@ function toRow(offer: OfferRecord): OfferRow {
 
 function toRecord(row: OfferRow): OfferRecord {
   return {
+    id: row.id,
     createdAt: Timestamp(row.created_at),
     starkKeyA: StarkKey(row.stark_key_a),
     positionIdA: BigInt(row.position_id_a),

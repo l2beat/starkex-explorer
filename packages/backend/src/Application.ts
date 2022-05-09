@@ -7,7 +7,7 @@ import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
-import { createOffersRouter } from './api/routers/OffersRouter'
+import { createOffersRouter } from './api/routers/OfferRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { DataSyncService } from './core/DataSyncService'
@@ -160,7 +160,10 @@ export class Application {
       stateUpdateRepository,
       userRegistrationEventRepository
     )
-    const offerController = new OfferController(offerRepository)
+    const offerController = new OfferController(
+      offerRepository,
+      stateUpdateRepository
+    )
 
     const apiServer = new ApiServer(config.port, logger, {
       routers: [

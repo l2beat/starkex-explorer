@@ -2,6 +2,8 @@ export type ControllerResult =
   | ControllerSuccessResult
   | ControllerNotFoundResult
   | ControllerRedirectResult
+  | ControllerCreatedResult
+  | ControllerBadRequestResult
 
 export interface ControllerSuccessResult {
   type: 'success'
@@ -20,4 +22,10 @@ export interface ControllerRedirectResult {
 
 export interface ControllerCreatedResult {
   type: 'created'
+  content: { id: number }
+}
+
+export interface ControllerBadRequestResult {
+  type: 'bad-request'
+  content: string
 }
