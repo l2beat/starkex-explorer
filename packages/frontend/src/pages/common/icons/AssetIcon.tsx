@@ -6,7 +6,7 @@ type AssetIconProps = {
 } & React.ClassAttributes<HTMLImageElement> &
   React.ImgHTMLAttributes<HTMLImageElement>
 
-const usdcLogoUrl = 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg'
+const usdcLogoUrl = '/images/usdc.svg'
 const buildDydxUrl = (symbol: string) =>
   `https://dydx.exchange/currencies/${symbol.toLowerCase()}.svg`
 const buildUrl = (assetId: AssetId) => {

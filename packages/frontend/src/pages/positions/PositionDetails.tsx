@@ -54,12 +54,12 @@ const buildBalanceTableRow =
     assetId,
     balance,
     totalUSDCents,
-    price,
+    priceUSDCents,
   }: PositionDetailsProps['assets'][number]) => {
     const cells = [
       <AssetNameCell assetId={assetId} />,
       balance.toString(),
-      price ? `${formatUSDCents(price)}` : '-',
+      formatUSDCents(priceUSDCents),
       formatUSDCents(totalUSDCents),
     ]
     if (ownedByYou) {

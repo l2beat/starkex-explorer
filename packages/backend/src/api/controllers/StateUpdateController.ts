@@ -10,9 +10,9 @@ import {
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
-import { applyAssetPrices } from './utils/applyAssetPrices'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
+import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 
 export class StateUpdateController {
@@ -90,7 +90,7 @@ export function toPositionUpdateEntry(
   position: PositionWithPricesRecord,
   previous: PositionWithPricesRecord | undefined
 ) {
-  const assets = applyAssetPrices(
+  const assets = toPositionAssetEntries(
     position.balances,
     position.collateralBalance,
     position.prices
@@ -101,7 +101,7 @@ export function toPositionUpdateEntry(
   )
   const previousAssets =
     previous &&
-    applyAssetPrices(
+    toPositionAssetEntries(
       previous.balances,
       previous.collateralBalance,
       previous.prices

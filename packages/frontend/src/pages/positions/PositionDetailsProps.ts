@@ -18,7 +18,7 @@ export interface PositionAssetEntry {
   readonly assetId: AssetId
   readonly balance: bigint
   readonly totalUSDCents: bigint
-  readonly price?: bigint
+  readonly priceUSDCents: bigint
 }
 
 export interface PositionHistoryEntry {
