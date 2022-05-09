@@ -2,13 +2,16 @@ import React from 'react'
 
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
-import { formatHash } from '../formatHash'
-import { formatLargeNumber } from '../formatLargeNumber'
-import { formatTime } from '../formatTime'
-import { formatUSDCents } from '../formatUSDCents'
+import {
+  formatAbsoluteTime,
+  formatCurrency,
+  formatCurrencyUnits,
+  formatHashLong,
+  formatRelativeTime,
+} from '../formatting'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 
 export function StateUpdateDetails({
@@ -38,11 +41,11 @@ export function StateUpdateDetails({
         rows={[
           {
             title: 'State update hash',
-            content: hash.toString(),
+            content: formatHashLong(hash),
           },
           {
             title: 'State tree root',
-            content: formatHash(rootHash),
+            content: formatHashLong(rootHash),
           },
           {
             title: 'Ethereum block number',
@@ -50,7 +53,7 @@ export function StateUpdateDetails({
           },
           {
             title: 'Timestamp',
-            content: formatTimestamp(timestamp),
+            content: formatAbsoluteTime(timestamp),
             fontRegular: true,
           },
         ]}
@@ -82,11 +85,11 @@ export function StateUpdateDetails({
           }) => ({
             cells: [
               positionId.toString(),
-              publicKey,
+              formatHashLong(publicKey),
               previousTotalUSDCents
-                ? formatUSDCents(previousTotalUSDCents)
+                ? formatCurrency(previousTotalUSDCents, 'USD')
                 : '-',
-              formatUSDCents(totalUSDCents),
+              formatCurrency(totalUSDCents, 'USD'),
               assetsUpdated ? assetsUpdated.toString() : '0',
             ],
             link: `/positions/${positionId}`,
@@ -116,9 +119,9 @@ export function StateUpdateDetails({
             link,
             cells: [
               transaction.type,
-              formatTime(transaction.lastUpdate),
-              formatHash(transaction.hash.toString()),
-              formatLargeNumber(transaction.amount),
+              formatRelativeTime(transaction.lastUpdate),
+              formatHashLong(transaction.hash),
+              formatCurrencyUnits(transaction.amount, transaction.assetId),
               <AssetNameCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),
             ],

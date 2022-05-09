@@ -11,6 +11,7 @@
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "build": "NODE_ENV=production gulp build",
+    "test": "mocha",
     "dev": "gulp watch"
   },
   "dependencies": {

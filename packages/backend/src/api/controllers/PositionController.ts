@@ -61,7 +61,7 @@ export class PositionController {
       account,
       positionId,
       publicKey: current.publicKey,
-      ethAddress: lastUserRegistrationEvent?.ethAddress.toString(),
+      ethAddress: lastUserRegistrationEvent?.ethAddress,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
       assets: current.assets,

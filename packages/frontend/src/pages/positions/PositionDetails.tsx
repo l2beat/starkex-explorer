@@ -3,13 +3,16 @@ import React from 'react'
 
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Column, Table } from '../common/Table'
-import { formatHash } from '../formatHash'
-import { formatLargeNumber } from '../formatLargeNumber'
-import { formatTime } from '../formatTime'
-import { formatUSDCents } from '../formatUSDCents'
+import {
+  formatAbsoluteTime,
+  formatCurrency,
+  formatCurrencyUnits,
+  formatHashLong,
+  formatRelativeTime,
+} from '../formatting'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
 const balanceTableColumns = (ownedByYou: boolean) => {
@@ -59,8 +62,8 @@ const buildBalanceTableRow =
     const cells = [
       <AssetNameCell assetId={assetId} />,
       balance.toString(),
-      formatUSDCents(priceUSDCents),
-      formatUSDCents(totalUSDCents),
+      formatCurrency(priceUSDCents, 'USD'),
+      formatCurrency(totalUSDCents, 'USD'),
     ]
     if (ownedByYou) {
       cells.push(<ActionButton text={actionButtonText({ assetId, balance })} />)
@@ -86,14 +89,16 @@ const buildUpdateHistoryTableRow =
     history: PositionDetailsProps['history']
   ) => {
     const previousTotal = history[i + 1]?.totalUSDCents
-    const valueBefore = previousTotal ? `${formatUSDCents(previousTotal)}` : '-'
+    const valueBefore = previousTotal
+      ? `${formatCurrency(previousTotal, 'USD')}`
+      : '-'
 
     return {
       link: `/positions/${positionId}/updates/${stateUpdateId}`,
       cells: [
         stateUpdateId.toString(),
         valueBefore,
-        formatUSDCents(totalUSDCents),
+        formatCurrency(totalUSDCents, 'USD'),
         assetsUpdated.toString(),
       ],
     }
@@ -116,10 +121,10 @@ const buildTransactionHistoryTableRow = (
     link,
     cells: [
       transaction.type,
-      formatTime(transaction.lastUpdate),
+      formatRelativeTime(transaction.lastUpdate),
       transaction.status,
-      formatHash(transaction.hash.toString()),
-      formatLargeNumber(transaction.amount),
+      formatHashLong(transaction.hash),
+      formatCurrencyUnits(transaction.amount, transaction.assetId),
       <AssetNameCell assetId={transaction.assetId} />,
     ],
   }
@@ -166,7 +171,7 @@ export function PositionDetails({
           },
           {
             title: 'Owner stark key',
-            content: formatHash(publicKey),
+            content: formatHashLong(publicKey),
           },
           {
             title: 'Last state update',
@@ -178,7 +183,7 @@ export function PositionDetails({
           },
           {
             title: 'Last update timestamp',
-            content: formatTimestamp(lastUpdateTimestamp),
+            content: formatAbsoluteTime(lastUpdateTimestamp),
             fontRegular: true,
           },
         ]}

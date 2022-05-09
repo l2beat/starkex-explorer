@@ -6,7 +6,7 @@ export interface PositionDetailsProps {
   readonly account: EthereumAddress | undefined
   readonly positionId: bigint
   readonly publicKey: StarkKey
-  readonly ethAddress?: string
+  readonly ethAddress?: EthereumAddress
   readonly stateUpdateId: number
   readonly lastUpdateTimestamp: Timestamp
   readonly assets: readonly PositionAssetEntry[]
