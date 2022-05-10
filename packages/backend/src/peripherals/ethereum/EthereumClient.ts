@@ -43,6 +43,10 @@ export class EthereumClient {
     return await this.provider.getTransaction(transactionHash.toString())
   }
 
+  async waitForTransactionReceipt(hash: Hash256) {
+    return this.provider.waitForTransaction(hash.toString())
+  }
+
   onBlock(handler: (block: providers.Block) => void) {
     this.provider.on('block', handler)
     return () => {

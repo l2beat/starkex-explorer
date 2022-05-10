@@ -536,4 +536,10 @@ export class ForcedTransactionsRepository {
       )
     return eventRowsToTransactions(rows)
   }
+
+  async delete(hash: Hash256): Promise<void> {
+    await this.knex('forced_transaction_events')
+      .delete()
+      .where('transaction_hash', '=', hash.toString())
+  }
 }

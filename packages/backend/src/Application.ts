@@ -10,6 +10,7 @@ import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { DataSyncService } from './core/DataSyncService'
 import { ForcedEventsCollector } from './core/ForcedEventsCollector'
+import { ForcedTransactionMonitor } from './core/ForcedTransactionMonitor'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
 import { PageCollector } from './core/PageCollector'
 import { StateTransitionFactCollector } from './core/StateTransitionFactCollector'
@@ -131,6 +132,10 @@ export class Application {
       logger,
       { maxBlockNumber: config.core.maxBlockNumber }
     )
+    const forcedTransactionMonitor = new ForcedTransactionMonitor(
+      ethereumClient,
+      forcedTransactionsRepository
+    )
 
     // #endregion core
     // #region api
@@ -182,6 +187,7 @@ export class Application {
       await apiServer.listen()
       await syncScheduler.start()
       await blockDownloader.start()
+      await forcedTransactionMonitor.startWatching()
 
       logger.for(this).info('Started')
     }
