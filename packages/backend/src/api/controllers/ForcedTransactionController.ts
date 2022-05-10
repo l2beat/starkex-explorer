@@ -81,6 +81,8 @@ export class ForcedTransactionController {
 
 function toTransactionStatusEntry(event: EventRecord): TransactionStatusEntry {
   switch (event.eventType) {
+    case 'sent':
+      return { type: 'sent', timestamp: event.timestamp }
     case 'mined':
       return { type: 'mined', timestamp: event.timestamp }
     case 'verified':

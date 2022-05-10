@@ -253,6 +253,7 @@ describe(ForcedTransactionsRepository.name, () => {
         publicKeyB: StarkKey.fake('123b'),
         syntheticAmount: 456n,
         syntheticAssetId: AssetId('ETH-7'),
+        nonce: 1n,
       },
       {
         hash: hash1,
@@ -529,5 +530,102 @@ describe(ForcedTransactionsRepository.name, () => {
       stateUpdateId,
       lastUpdate: events[1].timestamp,
     })
+  })
+
+  it('returns pending transactions', async () => {
+    const hash1 = Hash256.fake()
+    const data1 = {
+      amount: 123n,
+      positionId: 123n,
+      publicKey: StarkKey.fake('123'),
+    }
+
+    const hash2 = Hash256.fake()
+    const data2 = {
+      publicKeyA: StarkKey.fake('123a'),
+      publicKeyB: StarkKey.fake('123b'),
+      positionIdA: 456n,
+      positionIdB: 789n,
+      syntheticAssetId: AssetId('ETH-7'),
+      isABuyingSynthetic: true,
+      syntheticAmount: 456n,
+      collateralAmount: 789n,
+      nonce: 1n,
+    }
+    const stateUpdateId = 1
+
+    const hash3 = Hash256.fake()
+    const data3 = {
+      ...data1,
+      amount: 456n,
+    }
+
+    const events = [
+      {
+        id: 1,
+        transactionType: 'withdrawal' as const,
+        eventType: 'sent' as const,
+        timestamp: Timestamp(0),
+        transactionHash: hash1,
+        ...data1,
+      },
+      {
+        id: 2,
+        transactionType: 'withdrawal' as const,
+        eventType: 'mined' as const,
+        blockNumber: 1,
+        timestamp: Timestamp(1),
+        transactionHash: hash1,
+        ...data1,
+      },
+      {
+        id: 3,
+        transactionType: 'withdrawal' as const,
+        eventType: 'verified' as const,
+        blockNumber: 1,
+        timestamp: Timestamp(2),
+        transactionHash: hash1,
+        stateUpdateId,
+      },
+      {
+        id: 4,
+        transactionType: 'trade' as const,
+        eventType: 'sent' as const,
+        timestamp: Timestamp(2),
+        transactionHash: hash2,
+        blockNumber: 1,
+        ...data2,
+      },
+      {
+        id: 5,
+        transactionType: 'withdrawal' as const,
+        eventType: 'sent' as const,
+        timestamp: Timestamp(2),
+        transactionHash: hash3,
+        ...data3,
+      },
+    ]
+
+    await repository.addEvents(events)
+
+    const transactions = await repository.getPendingTransactions()
+
+    expect(transactions).toEqual([
+      {
+        ...data2,
+        hash: hash2,
+        status: 'sent',
+        lastUpdate: Timestamp(2),
+        type: 'trade',
+        nonce: 1n,
+      },
+      {
+        ...data3,
+        hash: hash3,
+        lastUpdate: Timestamp(2),
+        status: 'sent',
+        type: 'withdrawal',
+      },
+    ])
   })
 })
