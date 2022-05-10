@@ -1,4 +1,5 @@
-import { Timestamp } from '@explorer/types'
+import { Hash256, Timestamp } from '@explorer/types'
+import promiseRetry from 'promise-retry'
 
 import {
   ForcedTransaction,
@@ -17,13 +18,42 @@ export class ForcedTransactionMonitor {
     transactions.forEach((tx) => this.watchTransaction(tx))
   }
 
+  private async waitForTransaction(hash: Hash256) {
+    try {
+      return await promiseRetry(
+        async (retry) => {
+          try {
+            const transaction = await this.ethereumClient.getTransaction(hash)
+            if (transaction) return transaction
+            throw new Error('Transaction not found')
+          } catch (error) {
+            retry(error)
+            return null
+          }
+        },
+        { factor: 2, forever: false, retries: 10 }
+      )
+    } catch (error) {
+      console.error(error) // TODO: log properly
+      return null
+    }
+  }
+
+  private async waitForReceipt(hash: Hash256) {
+    return promiseRetry(
+      (retry) =>
+        this.ethereumClient.waitForTransactionReceipt(hash).catch(retry),
+      { forever: true }
+    )
+  }
+
   async watchTransaction(tx: ForcedTransaction) {
-    const transaction = await this.ethereumClient.getTransaction(tx.hash) // TODO: make sure we watch this long enough
+    const transaction = await this.waitForTransaction(tx.hash)
     if (!transaction) {
       await this.forcedTransactionRepository.delete(tx.hash)
       return
     }
-    const receipt = await this.ethereumClient.waitForTransactionReceipt(tx.hash) // TODO: handle network errors
+    const receipt = await this.waitForReceipt(tx.hash)
     if (receipt.status === 0) {
       await this.forcedTransactionRepository.delete(tx.hash)
       return
