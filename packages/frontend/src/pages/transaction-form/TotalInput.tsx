@@ -2,14 +2,15 @@ import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { AssetIcon } from '../common/icons/AssetIcon'
+import { FormId } from './ids'
 
 export function TotalInput() {
   return (
-    <div className="flex flex-col gap-1">
+    <div id={FormId.TotalSection} className="flex flex-col gap-1">
       <label htmlFor="total">Total</label>
       <div className="relative">
         <input
-          id="total"
+          id={FormId.TotalInput}
           type="text"
           autoComplete="off"
           placeholder="0.00"

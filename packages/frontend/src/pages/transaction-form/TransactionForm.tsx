@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Page } from '../common'
 import { AmountInput } from './AmountInput'
+import { FormId } from './ids'
 import { InfoText } from './InfoText'
 import { PositionIdView } from './PositionIdView'
 import { PriceInput } from './PriceInput'
@@ -9,6 +10,9 @@ import { TotalInput } from './TotalInput'
 import { TransactionFormProps } from './TransactionFormProps'
 
 export function TransactionForm(props: TransactionFormProps) {
+  const propsJson = JSON.stringify(props, (k, v) =>
+    typeof v === 'bigint' ? v.toString() : v
+  )
   return (
     <Page
       title={`L2BEAT dYdX Explorer | Force transaction`}
@@ -19,23 +23,39 @@ export function TransactionForm(props: TransactionFormProps) {
       scripts={['/scripts/main.js']}
       account={props.account}
     >
-      <div className="w-[273px] mx-auto flex bg-grey-200 drop-shadow-lg rounded-md mb-4">
-        <button className="w-[91px] py-1.5 rounded-md bg-grey-300">Exit</button>
-        <button className="w-[91px] py-1.5 rounded-md">Buy</button>
-        <button className="w-[91px] py-1.5 rounded-md">Sell</button>
+      <div className="w-min mx-auto flex bg-grey-200 drop-shadow-lg rounded-md mb-4">
+        <button
+          id={FormId.ExitButton}
+          className="w-[91px] py-1.5 rounded-md bg-grey-300"
+        >
+          Exit
+        </button>
+        <button id={FormId.BuyButton} className="w-[91px] py-1.5 rounded-md">
+          Buy
+        </button>
+        <button id={FormId.SellButton} className="w-[91px] py-1.5 rounded-md">
+          Sell
+        </button>
       </div>
-      <form className="max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex flex-col gap-2.5">
-        <div className="text-lg font-medium">Forced exit</div>
+      <form
+        id={FormId.Form}
+        className="hidden max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex-col gap-2.5"
+        data-props={propsJson}
+      >
+        <div id={FormId.FormTitle} className="text-lg font-medium">
+          Forced exit
+        </div>
         <PositionIdView positionId={props.positionId} />
         <AmountInput {...props} />
         <PriceInput {...props} />
         <TotalInput />
         <InfoText />
         <button
+          id={FormId.SubmitButton}
           type="button"
           className="bg-blue-100 w-full block text-lg font-bold py-2 rounded-md"
         >
-          Force exit
+          Forced exit
         </button>
       </form>
     </Page>

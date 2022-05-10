@@ -23,6 +23,9 @@ module.exports = {
       orange: {
         100: '#9C4D03',
       },
+      red: {
+        100: '#f43636',
+      },
     },
   },
   plugins: [],

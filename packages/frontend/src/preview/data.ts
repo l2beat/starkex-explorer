@@ -222,7 +222,7 @@ export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
     },
     {
       assetId: AssetId('ETH-9'),
-      balance: 21_377654321n,
+      balance: 21_370000000n,
       priceUSDCents: 2839_39n,
       totalUSDCents: 60678_04n,
     },

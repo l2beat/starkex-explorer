@@ -2,15 +2,16 @@ import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { AssetIcon } from '../common/icons/AssetIcon'
+import { FormId } from './ids'
 import { TransactionFormProps } from './TransactionFormProps'
 
 export function PriceInput(props: TransactionFormProps) {
   return (
-    <div className="flex flex-col gap-1">
+    <div id={FormId.PriceSection} className="flex flex-col gap-1">
       <label htmlFor="price">Price</label>
       <div className="relative">
         <input
-          id="price"
+          id={FormId.PriceInput}
           type="text"
           autoComplete="off"
           placeholder="0.00"
@@ -21,10 +22,14 @@ export function PriceInput(props: TransactionFormProps) {
           <span>USDC</span>
         </div>
         <div className="absolute bottom-2 right-2 w-full flex items-center justify-end gap-2">
-          <span className="font-mono text-grey-400">
+          <span
+            id={FormId.SuggestedPriceView}
+            className="font-mono text-grey-400"
+          >
             Suggested: {props.assets[0].priceUSDCents.toString()}
           </span>
           <button
+            id={FormId.SuggestedPriceButton}
             type="button"
             className="uppercase bg-grey-300 px-2 py-0.5 text-xs rounded-md"
           >
