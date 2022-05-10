@@ -7,9 +7,9 @@ import {
   EventRecordCandidate,
   ForcedTransactionsRepository,
 } from '../peripherals/database/ForcedTransactionsRepository'
+import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 
-const PERPETUAL_ADDRESS = '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'
 const PERPETUAL_ABI = new utils.Interface([
   'event LogForcedWithdrawalRequest(uint256 starkKey, uint256 vaultId, uint256 quantizedAmount)',
   `event LogForcedTradeRequest(
