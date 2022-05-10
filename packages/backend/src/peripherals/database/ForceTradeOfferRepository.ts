@@ -53,7 +53,7 @@ interface ForceTradeAcceptRow {
 type ForceTradeOfferRecord = ForceTradeInitialOfferRecord &
   ForceTradeAcceptRecord
 
-export class OfferRepository {
+export class ForceTradeOfferRepository {
   constructor(private knex: Knex, private logger: Logger) {
     this.logger = logger.for(this)
   }

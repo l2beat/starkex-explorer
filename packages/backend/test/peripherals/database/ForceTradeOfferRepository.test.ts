@@ -3,8 +3,8 @@ import { expect } from 'earljs'
 
 import {
   ForceTradeAcceptRecord,
-  OfferRepository,
-} from '../../../src/peripherals/database/OfferRepository'
+  ForceTradeOfferRepository,
+} from '../../../src/peripherals/database/ForceTradeOfferRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
@@ -61,9 +61,9 @@ const acceptOffer2: ForceTradeAcceptRecord = {
   signature: '0x',
 }
 
-describe(OfferRepository.name, () => {
+describe(ForceTradeOfferRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()
-  const repository = new OfferRepository(knex, Logger.SILENT)
+  const repository = new ForceTradeOfferRepository(knex, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

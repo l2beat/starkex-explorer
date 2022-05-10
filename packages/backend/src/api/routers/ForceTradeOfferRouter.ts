@@ -3,7 +3,7 @@ import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
 import { string, z } from 'zod'
 
-import { OfferController } from '../controllers/OfferController'
+import { ForceTradeOfferController } from '../controllers/ForceTradeOfferController'
 import { applyControllerResult } from './FrontendRouter'
 import {
   stringAs,
@@ -12,7 +12,9 @@ import {
   withTypedContext,
 } from './types'
 
-export function createOffersRouter(offerController: OfferController) {
+export function createForceTradeOfferRouter(
+  offerController: ForceTradeOfferController
+) {
   const router = new Router()
 
   router.post(

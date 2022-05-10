@@ -3,17 +3,17 @@ import { Timestamp } from '@explorer/types'
 import {
   ForceTradeAcceptRecord,
   ForceTradeInitialOfferRecord,
-  OfferRepository,
-} from '../../peripherals/database/OfferRepository'
+  ForceTradeOfferRepository,
+} from '../../peripherals/database/ForceTradeOfferRepository'
 import {
   PositionRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
 
-export class OfferController {
+export class ForceTradeOfferController {
   constructor(
-    private offerRepository: OfferRepository,
+    private offerRepository: ForceTradeOfferRepository,
     private stateUpdateRepository: StateUpdateRepository
   ) {}
 
