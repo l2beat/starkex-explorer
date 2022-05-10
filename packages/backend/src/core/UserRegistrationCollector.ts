@@ -6,10 +6,10 @@ import {
   UserRegistrationEventRecordCandidate,
   UserRegistrationEventRepository,
 } from '../peripherals/database/UserRegistrationEventRepository'
+import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 
-const PERPETUAL_ADDRESS = '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'
 const PERPETUAL_ABI = new utils.Interface([
   'event LogUserRegistered(address ethKey, uint256 starkKey, address sender)',
 ])
