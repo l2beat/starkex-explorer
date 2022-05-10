@@ -1,10 +1,16 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
-import { z } from 'zod'
+import { string, z } from 'zod'
 
 import { OfferController } from '../controllers/OfferController'
-import { stringAs, stringAsBigInt, withTypedContext } from './types'
+import { applyControllerResult } from './FrontendRouter'
+import {
+  stringAs,
+  stringAsBigInt,
+  stringAsInt,
+  withTypedContext,
+} from './types'
 
 export function createOffersRouter(offerController: OfferController) {
   const router = new Router()
@@ -27,13 +33,35 @@ export function createOffersRouter(offerController: OfferController) {
       }),
       async (ctx) => {
         const result = await offerController.postOffer(ctx.request.body)
-        if (result.type === 'created') {
-          ctx.status = 201
-          ctx.body = result.content
-        } else if (result.type === 'bad-request') {
-          ctx.status = 400
-          ctx.body = result.content
-        }
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/offer/:initialOfferId/accept',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        params: z.object({
+          initialOfferId: stringAsInt(),
+        }),
+        request: z.object({
+          body: z.object({
+            starkKeyB: stringAs(StarkKey),
+            positionIdB: stringAsBigInt(),
+            submissionExpirationTime: stringAsInt(), // Timestamp?
+            nonce: stringAsBigInt(),
+            signature: string(),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result = await offerController.acceptOffer(
+          ctx.params.initialOfferId,
+          ctx.request.body
+        )
+        applyControllerResult(ctx, result)
       }
     )
   )

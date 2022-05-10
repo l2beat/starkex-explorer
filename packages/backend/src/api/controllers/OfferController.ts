@@ -1,7 +1,8 @@
 import { Timestamp } from '@explorer/types'
 
 import {
-  OfferRecord,
+  ForceTradeAcceptRecord,
+  ForceTradeInitialOfferRecord,
   OfferRepository,
 } from '../../peripherals/database/OfferRepository'
 import {
@@ -17,47 +18,95 @@ export class OfferController {
   ) {}
 
   async postOffer(
-    offer: Omit<OfferRecord, 'createdAt' | 'id'>
+    offer: Omit<ForceTradeInitialOfferRecord, 'createdAt' | 'id'>
   ): Promise<ControllerResult> {
     const positionA = await this.stateUpdateRepository.getPositionById(
       offer.positionIdA
     )
 
     if (!positionA) {
-      return { type: 'bad-request', content: 'Position does not exist.' }
+      return { type: 'not found', content: 'Position does not exist.' }
     }
 
-    const offerValidated = validateOffer(offer, positionA)
+    const offerValidated = validateInitialOffer(offer, positionA)
 
     if (!offerValidated) {
-      return { type: 'bad-request', content: 'Your offer is invalid.' }
+      return { type: 'bad request', content: 'Your offer is invalid.' }
     }
 
     const createdAt = Timestamp(Date.now())
 
-    const id = await this.offerRepository.addOne({ createdAt, ...offer })
+    const id = await this.offerRepository.addInitialOffer({
+      createdAt,
+      ...offer,
+    })
     return { type: 'created', content: { id } }
+  }
+
+  async acceptOffer(
+    initialOfferId: number,
+    acceptOfferData: Omit<ForceTradeAcceptRecord, 'acceptedAt'>
+  ): Promise<ControllerResult> {
+    const positionB = await this.stateUpdateRepository.getPositionById(
+      acceptOfferData.positionIdB
+    )
+
+    if (!positionB) {
+      return { type: 'not found', content: 'Position does not exist.' }
+    }
+
+    const initialOffer = await this.offerRepository.getInitialOfferById(
+      initialOfferId
+    )
+
+    const offerValidated = validateAcceptOffer(initialOffer, positionB)
+
+    if (!offerValidated) {
+      return { type: 'bad request', content: 'Your offer is invalid' }
+    }
+
+    const acceptedAt = Timestamp(Date.now())
+    await this.offerRepository.addAcceptOffer(initialOfferId, {
+      acceptedAt,
+      ...acceptOfferData,
+    })
+
+    return { type: 'success', content: 'Accept offer was submitted' }
   }
 }
 
-export function validateOffer(
-  offer: Omit<OfferRecord, 'createdAt' | 'id'>,
+function validateInitialOffer(
+  offer: Omit<ForceTradeInitialOfferRecord, 'createdAt' | 'id'>,
   position: PositionRecord
 ) {
-  const {
-    amountCollateral,
-    amountSynthetic,
-    aIsBuyingSynthetic,
-    syntheticAssetId,
-  } = offer
+  const userIsBuyingSynthetic = offer.aIsBuyingSynthetic
+
+  return validateBalance(offer, position, userIsBuyingSynthetic)
+}
+
+function validateAcceptOffer(
+  offer: ForceTradeInitialOfferRecord,
+  position: PositionRecord
+) {
+  const userIsBuyingSynthetic = !offer.aIsBuyingSynthetic
+
+  return validateBalance(offer, position, userIsBuyingSynthetic)
+}
+
+function validateBalance(
+  offer: Omit<ForceTradeInitialOfferRecord, 'createdAt' | 'id'>,
+  position: PositionRecord,
+  userIsBuyingSynthetic: boolean
+) {
+  const { amountCollateral, amountSynthetic, syntheticAssetId } = offer
 
   const { collateralBalance } = position
 
-  if (aIsBuyingSynthetic && amountCollateral <= collateralBalance) {
+  if (userIsBuyingSynthetic && amountCollateral <= collateralBalance) {
     return true
   }
 
-  if (!aIsBuyingSynthetic) {
+  if (!userIsBuyingSynthetic) {
     const balanceSynthetic = position.balances.find(
       (balance) => balance.assetId === syntheticAssetId
     )?.balance

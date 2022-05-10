@@ -14,9 +14,10 @@ should create a new migration file that fixes the issue.
 import { Knex } from 'knex'
 
 export async function up(knex: Knex) {
-  await knex.schema.createTable('offers', (table) => {
+  await knex.schema.createTable('initial_offers', (table) => {
     table.increments('id').primary()
-    table.integer('created_at').notNullable()
+    table.bigInteger('created_at').notNullable()
+    table.bigInteger('submitted_at')
     table.string('stark_key_a').notNullable()
     table.bigInteger('position_id_a').notNullable()
     table.string('synthetic_asset_id').notNullable()
@@ -24,8 +25,27 @@ export async function up(knex: Knex) {
     table.bigInteger('amount_synthetic').notNullable()
     table.boolean('a_is_buying_synthetic').notNullable()
   })
+
+  await knex.schema.createTable('accept_offers', (table) => {
+    table
+      .integer('initial_offer_id')
+      .notNullable()
+      .primary()
+      .references('id')
+      .inTable('initial_offers')
+      .onDelete('CASCADE')
+
+    table.bigInteger('accepted_at')
+    table.string('stark_key_b')
+    table.bigInteger('position_id_b')
+    table.bigInteger('submission_expiration_time')
+    table.bigInteger('nonce')
+    table.boolean('premium_cost')
+    table.string('signature')
+  })
 }
 
 export async function down(knex: Knex) {
-  await knex.schema.dropTable('offers')
+  await knex.schema.dropTable('accept_offers')
+  await knex.schema.dropTable('initial_offers')
 }

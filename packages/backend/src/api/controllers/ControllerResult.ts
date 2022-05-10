@@ -26,6 +26,6 @@ export interface ControllerCreatedResult {
 }
 
 export interface ControllerBadRequestResult {
-  type: 'bad-request'
+  type: 'bad request'
   content: string
 }

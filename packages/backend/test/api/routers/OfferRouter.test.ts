@@ -1,6 +1,9 @@
 import { AssetId, StarkKey } from '@explorer/types'
 
-import { ControllerCreatedResult } from '../../../src/api/controllers/ControllerResult'
+import {
+  ControllerCreatedResult,
+  ControllerSuccessResult,
+} from '../../../src/api/controllers/ControllerResult'
 import { OfferController } from '../../../src/api/controllers/OfferController'
 import { createOffersRouter } from '../../../src/api/routers/OfferRouter'
 import { mock } from '../../mock'
@@ -15,7 +18,7 @@ const offer = {
   aIsBuyingSynthetic: true,
 }
 
-const acceptedOffer = {
+const acceptOffer = {
   starkKeyB: StarkKey.fake().toString(),
   positionIdB: 2n.toString(),
   submissionExpirationTime: '100000', // Timestamp?
@@ -29,9 +32,17 @@ const CREATED_RESULT: ControllerCreatedResult = {
   content: { id: 1 },
 }
 
+const SUCCESS_RESULT: ControllerSuccessResult = {
+  type: 'success',
+  content: 'Accept offer was submitted',
+}
+
 describe('OfferRouter', () => {
   const router = createOffersRouter(
-    mock<OfferController>({ postOffer: async () => CREATED_RESULT })
+    mock<OfferController>({
+      postOffer: async () => CREATED_RESULT,
+      acceptOffer: async () => SUCCESS_RESULT,
+    })
   )
   const server = createTestApiServer([router])
   describe('/offer', () => {
@@ -40,6 +51,12 @@ describe('OfferRouter', () => {
         .post('/offer')
         .send(offer)
         .expect(201, CREATED_RESULT.content)
+    })
+  })
+
+  describe('/offer/:initialOfferId/accept', () => {
+    it('returnes success', async () => {
+      await server.post('/offer/1/accept').send(acceptOffer).expect(200)
     })
   })
 })
