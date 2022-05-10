@@ -87,7 +87,7 @@ export class ForceTradeOfferRepository {
   async getAllAcceptOffers(): Promise<ForceTradeAcceptRecord[]> {
     const rows = await this.knex('accept_offers').select('*')
     this.logger.debug({
-      method: 'getAllIgetAllAcceptOffersnitialOffers',
+      method: 'getAllAcceptOffers',
       rows: rows.length,
     })
     return rows.map(acceptOfferToRecord)
