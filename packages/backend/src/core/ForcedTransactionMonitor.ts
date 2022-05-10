@@ -21,15 +21,16 @@ export class ForcedTransactionMonitor {
   private async waitForTransaction(hash: Hash256) {
     try {
       return await promiseRetry(
-        async (retry) => {
-          try {
-            const transaction = await this.ethereumClient.getTransaction(hash)
-            if (transaction) return transaction
-            throw new Error('Transaction not found')
-          } catch (error) {
-            retry(error)
-            return null
-          }
+        (retry) => {
+          return this.ethereumClient
+            .getTransaction(hash)
+            .then((transaction) => {
+              if (!transaction) {
+                throw new Error('Transaction not found')
+              }
+              return transaction
+            })
+            .catch(retry)
         },
         { factor: 2, forever: false, retries: 10 }
       )
@@ -91,6 +92,6 @@ export class ForcedTransactionMonitor {
             amount: tx.amount,
           }
 
-    this.forcedTransactionRepository.addEvents([event])
+    await this.forcedTransactionRepository.addEvents([event])
   }
 }
