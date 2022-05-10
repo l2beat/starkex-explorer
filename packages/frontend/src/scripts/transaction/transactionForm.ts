@@ -1,6 +1,7 @@
 import { AssetId } from '@explorer/types'
 
 import { getAssetImageUrl } from '../../pages/common/icons/getAssetImageUrl'
+import { FormId } from '../../pages/transaction-form/ids'
 import { getFormElements } from './getFormElements'
 import { jsonToProps } from './jsonToProps'
 import { getInitialState, nextFormState } from './state'
@@ -8,7 +9,7 @@ import { FormAction, FormState } from './types'
 import { formatCurrencyInput } from './utils'
 
 export function initTransactionForm() {
-  if (!document.querySelector('#transaction-form')) {
+  if (!document.getElementById(FormId.Form)) {
     return
   }
 

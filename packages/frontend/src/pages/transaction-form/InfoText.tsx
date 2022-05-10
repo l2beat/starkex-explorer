@@ -1,10 +1,11 @@
 import React from 'react'
 
 import { InfoIcon } from '../common/icons/InfoIcon'
+import { FormId } from './ids'
 
 export function InfoText() {
   return (
-    <div id="info-section" className="flex gap-4 items-center">
+    <div id={FormId.InfoSection} className="flex gap-4 items-center">
       <InfoIcon className="min-w-[20px]" />
       <p>
         This position also contains other assets. Exiting USDC will leave those

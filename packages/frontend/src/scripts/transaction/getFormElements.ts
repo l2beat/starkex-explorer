@@ -1,32 +1,34 @@
+import { FormId } from '../../pages/transaction-form/ids'
+
 export function getFormElements() {
-  function $<T extends HTMLElement>(query: string) {
-    const element = document.querySelector<T>(query)
+  function $<T extends HTMLElement>(id: string) {
+    const element = document.getElementById(id)
     if (!element) {
-      throw new Error(`Cannot find ${query}`)
+      throw new Error(`Cannot find #${id}`)
     }
-    return element
+    return element as T
   }
 
   return {
-    form: $<HTMLFormElement>('#transaction-form'),
-    formTitle: $('#form-title'),
-    assetSelect: $<HTMLSelectElement>('#asset-select'),
-    assetAmountInput: $<HTMLInputElement>('#asset-amount'),
-    amountErrorView: $('#amount-error'),
-    assetMaxButton: $<HTMLSelectElement>('#asset-max'),
-    assetBalanceView: $<HTMLSelectElement>('#asset-balance'),
-    assetIconView: $<HTMLImageElement>('#asset-icon'),
-    assetSymbolView: $('#asset-symbol'),
-    priceSection: $('#price-section'),
-    priceInput: $<HTMLInputElement>('#price'),
-    suggestedPriceView: $('#asset-price'),
-    suggestedPriceButton: $<HTMLButtonElement>('#suggested-price'),
-    totalSection: $('#total-section'),
-    totalInput: $<HTMLInputElement>('#total'),
-    submitButton: $<HTMLButtonElement>('#submit'),
-    exitButton: $<HTMLButtonElement>('#exit-button'),
-    buyButton: $<HTMLButtonElement>('#buy-button'),
-    sellButton: $<HTMLButtonElement>('#sell-button'),
-    infoSection: $('#info-section'),
+    form: $<HTMLFormElement>(FormId.Form),
+    formTitle: $(FormId.FormTitle),
+    assetSelect: $<HTMLSelectElement>(FormId.AssetSelect),
+    assetAmountInput: $<HTMLInputElement>(FormId.AssetAmountInput),
+    amountErrorView: $(FormId.AmountErrorView),
+    assetMaxButton: $<HTMLSelectElement>(FormId.AssetMaxButton),
+    assetBalanceView: $<HTMLSelectElement>(FormId.AssetBalanceView),
+    assetIconView: $<HTMLImageElement>(FormId.AssetIconView),
+    assetSymbolView: $(FormId.AssetSymbolView),
+    priceSection: $(FormId.PriceSection),
+    priceInput: $<HTMLInputElement>(FormId.PriceInput),
+    suggestedPriceView: $(FormId.SuggestedPriceView),
+    suggestedPriceButton: $<HTMLButtonElement>(FormId.SuggestedPriceButton),
+    totalSection: $(FormId.TotalSection),
+    totalInput: $<HTMLInputElement>(FormId.TotalInput),
+    submitButton: $<HTMLButtonElement>(FormId.SubmitButton),
+    exitButton: $<HTMLButtonElement>(FormId.ExitButton),
+    buyButton: $<HTMLButtonElement>(FormId.BuyButton),
+    sellButton: $<HTMLButtonElement>(FormId.SellButton),
+    infoSection: $(FormId.InfoSection),
   }
 }
