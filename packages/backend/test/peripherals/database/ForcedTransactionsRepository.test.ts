@@ -608,7 +608,7 @@ describe(ForcedTransactionsRepository.name, () => {
 
     await repository.addEvents(events)
 
-    const transactions = await repository.getPendingTransactions()
+    const transactions = await repository.getPending()
 
     expect(transactions).toEqual([
       {

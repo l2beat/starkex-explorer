@@ -525,7 +525,7 @@ export class ForcedTransactionsRepository {
     return BigInt(result[0].count)
   }
 
-  async getPendingTransactions(): Promise<ForcedTransaction[]> {
+  async getPending(): Promise<ForcedTransaction[]> {
     const rows = await this.knex
       .from('forced_transaction_events')
       .whereNotIn(
