@@ -6,16 +6,9 @@ import { BlockRange } from '../../model'
 import { BlockTag } from './types'
 
 export class EthereumClient {
-  private readonly provider: providers.Provider
+  private provider = new ethers.providers.JsonRpcProvider(this.rpcUrl)
 
-  constructor(rpcUrl: string)
-  constructor(provider: providers.Provider)
-  constructor(provider: string | providers.Provider) {
-    this.provider =
-      provider instanceof providers.Provider
-        ? provider
-        : new ethers.providers.JsonRpcProvider(provider)
-  }
+  constructor(private readonly rpcUrl: string) {}
 
   async getBlockNumber(): Promise<number> {
     return await this.provider.getBlockNumber()
@@ -46,14 +39,8 @@ export class EthereumClient {
     return logs
   }
 
-  async getTransaction(
-    transactionHash: Hash256
-  ): Promise<providers.TransactionResponse | null> {
+  async getTransaction(transactionHash: Hash256) {
     return await this.provider.getTransaction(transactionHash.toString())
-  }
-
-  async getTransactionReceipt(transactionHash: Hash256) {
-    return await this.provider.getTransactionReceipt(transactionHash.toString())
   }
 
   onBlock(handler: (block: providers.Block) => void) {
