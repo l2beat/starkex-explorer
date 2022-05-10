@@ -394,7 +394,10 @@ export class ForcedTransactionsRepository {
       return
     }
     const rowCandidates = candidates.map(recordCandidateToRow)
-    await this.knex('forced_transaction_events').insert(rowCandidates)
+    await this.knex('forced_transaction_events')
+      .insert(rowCandidates)
+      .onConflict(['transaction_hash', 'event_type'])
+      .ignore()
     this.logger.debug({
       method: 'addEvents',
       count: candidates.length,

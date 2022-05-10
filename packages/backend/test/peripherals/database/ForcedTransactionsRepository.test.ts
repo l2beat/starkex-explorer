@@ -628,4 +628,40 @@ describe(ForcedTransactionsRepository.name, () => {
       },
     ])
   })
+
+  it('skips duplicate events for transaction', async () => {
+    const transactionHash = Hash256.fake()
+    const timestamp = Timestamp(0)
+    const data1 = {
+      amount: 123n,
+      positionId: 123n,
+      publicKey: StarkKey.fake('123'),
+    }
+    const data2 = {
+      amount: 345n,
+      positionId: 123n,
+      publicKey: StarkKey.fake('123'),
+    }
+
+    await repository.addEvents([
+      {
+        transactionHash,
+        eventType: 'sent',
+        transactionType: 'withdrawal',
+        timestamp,
+        ...data1,
+      },
+      {
+        transactionHash,
+        eventType: 'sent',
+        transactionType: 'withdrawal',
+        timestamp,
+        ...data2,
+      },
+    ])
+
+    const events = await repository.getAllEvents()
+
+    expect(events.length).toEqual(1)
+  })
 })
