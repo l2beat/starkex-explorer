@@ -4,8 +4,8 @@ import {
   ControllerCreatedResult,
   ControllerSuccessResult,
 } from '../../../src/api/controllers/ControllerResult'
-import { ForceTradeOfferController } from '../../../src/api/controllers/ForceTradeOfferController'
-import { createForceTradeOfferRouter } from '../../../src/api/routers/ForceTradeOfferRouter'
+import { ForcedTradeOfferController } from '../../../src/api/controllers/ForcedTradeOfferController'
+import { createForcedTradeOfferRouter } from '../../../src/api/routers/ForcedTradeOfferRouter'
 import { mock } from '../../mock'
 import { createTestApiServer } from '../TestApiServer'
 
@@ -38,8 +38,8 @@ const SUCCESS_RESULT: ControllerSuccessResult = {
 }
 
 describe('OfferRouter', () => {
-  const router = createForceTradeOfferRouter(
-    mock<ForceTradeOfferController>({
+  const router = createForcedTradeOfferRouter(
+    mock<ForcedTradeOfferController>({
       postOffer: async () => CREATED_RESULT,
       acceptOffer: async () => SUCCESS_RESULT,
     })

@@ -2,9 +2,9 @@ import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
-  ForceTradeAcceptRecord,
-  ForceTradeOfferRepository,
-} from '../../../src/peripherals/database/ForceTradeOfferRepository'
+  ForcedTradeAcceptRecord,
+  ForcedTradeOfferRepository,
+} from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
@@ -41,7 +41,7 @@ const initialOffer3 = {
   aIsBuyingSynthetic: true,
 }
 
-const acceptOffer1: ForceTradeAcceptRecord = {
+const acceptOffer1: ForcedTradeAcceptRecord = {
   acceptedAt: Timestamp(Date.now()),
   starkKeyB: StarkKey.fake(),
   positionIdB: 4n,
@@ -51,7 +51,7 @@ const acceptOffer1: ForceTradeAcceptRecord = {
   signature: '0x',
 }
 
-const acceptOffer2: ForceTradeAcceptRecord = {
+const acceptOffer2: ForcedTradeAcceptRecord = {
   acceptedAt: Timestamp(Date.now()),
   starkKeyB: StarkKey.fake(),
   positionIdB: 5n,
@@ -61,9 +61,9 @@ const acceptOffer2: ForceTradeAcceptRecord = {
   signature: '0x',
 }
 
-describe(ForceTradeOfferRepository.name, () => {
+describe(ForcedTradeOfferRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()
-  const repository = new ForceTradeOfferRepository(knex, Logger.SILENT)
+  const repository = new ForcedTradeOfferRepository(knex, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

@@ -1,12 +1,12 @@
 import { ApiServer } from './api/ApiServer'
+import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
-import { ForceTradeOfferController } from './api/controllers/ForceTradeOfferController'
 import { HomeController } from './api/controllers/HomeController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
-import { createForceTradeOfferRouter } from './api/routers/ForceTradeOfferRouter'
+import { createForcedTradeOfferRouter } from './api/routers/ForcedTradeOfferRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
@@ -24,8 +24,8 @@ import { VerifierCollector } from './core/VerifierCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
+import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
-import { ForceTradeOfferRepository } from './peripherals/database/ForceTradeOfferRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
@@ -71,7 +71,10 @@ export class Application {
       knex,
       logger
     )
-    const offerRepository = new ForceTradeOfferRepository(knex, logger)
+    const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
+      knex,
+      logger
+    )
 
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
@@ -160,9 +163,10 @@ export class Application {
       stateUpdateRepository,
       userRegistrationEventRepository
     )
-    const offerController = new ForceTradeOfferController(
-      offerRepository,
-      stateUpdateRepository
+    const forcedTradeOfferController = new ForcedTradeOfferController(
+      forcedTradeOfferRepository,
+      stateUpdateRepository,
+      userRegistrationEventRepository
     )
 
     const apiServer = new ApiServer(config.port, logger, {
@@ -175,7 +179,7 @@ export class Application {
           stateUpdateController,
           searchController
         ),
-        createForceTradeOfferRouter(offerController),
+        createForcedTradeOfferRouter(forcedTradeOfferController),
       ],
       middleware: [createFrontendMiddleware()],
     })

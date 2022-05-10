@@ -3,7 +3,7 @@ import { Knex } from 'knex'
 
 import { Logger } from '../../tools/Logger'
 
-export interface ForceTradeInitialOfferRecord {
+export interface ForcedTradeInitialOfferRecord {
   id: number
   createdAt: Timestamp
   submittedAt?: Timestamp
@@ -15,7 +15,7 @@ export interface ForceTradeInitialOfferRecord {
   aIsBuyingSynthetic: boolean
 }
 
-interface ForceTradeInitialOfferRow {
+interface ForcedTradeInitialOfferRow {
   id: number
   created_at: number
   submitted_at?: number
@@ -27,7 +27,7 @@ interface ForceTradeInitialOfferRow {
   a_is_buying_synthetic: boolean
 }
 
-export interface ForceTradeAcceptRecord {
+export interface ForcedTradeAcceptRecord {
   acceptedAt: Timestamp
   starkKeyB: StarkKey
   positionIdB: bigint
@@ -39,7 +39,7 @@ export interface ForceTradeAcceptRecord {
   signature: string // HEX string signature of all parameters
 }
 
-interface ForceTradeAcceptRow {
+interface ForcedTradeAcceptRow {
   initial_offer_id: number
   accepted_at: number
   stark_key_b: string
@@ -50,16 +50,16 @@ interface ForceTradeAcceptRow {
   signature: string
 }
 
-type ForceTradeOfferRecord = ForceTradeInitialOfferRecord &
-  ForceTradeAcceptRecord
+type ForcedTradeOfferRecord = ForcedTradeInitialOfferRecord &
+  ForcedTradeAcceptRecord
 
-export class ForceTradeOfferRepository {
+export class ForcedTradeOfferRepository {
   constructor(private knex: Knex, private logger: Logger) {
     this.logger = logger.for(this)
   }
 
   async addInitialOffer(
-    offer: Omit<ForceTradeInitialOfferRecord, 'id'>
+    offer: Omit<ForcedTradeInitialOfferRecord, 'id'>
   ): Promise<number> {
     const row = initialOfferToRow(offer)
     const [id] = await this.knex('initial_offers').insert(row).returning('id')
@@ -71,20 +71,20 @@ export class ForceTradeOfferRepository {
 
   async addAcceptOffer(
     initialOfferId: number,
-    acceptOffer: ForceTradeAcceptRecord
+    acceptOffer: ForcedTradeAcceptRecord
   ): Promise<void> {
     const row = acceptOfferToRow(initialOfferId, acceptOffer)
     await this.knex('accept_offers').insert(row)
     this.logger.debug({ method: 'addAcceptOffer' })
   }
 
-  async getAllInitialOffers(): Promise<ForceTradeInitialOfferRecord[]> {
+  async getAllInitialOffers(): Promise<ForcedTradeInitialOfferRecord[]> {
     const rows = await this.knex('initial_offers').select('*')
     this.logger.debug({ method: 'getAllInitialOffers', rows: rows.length })
     return rows.map(initialOfferToRecord)
   }
 
-  async getAllAcceptOffers(): Promise<ForceTradeAcceptRecord[]> {
+  async getAllAcceptOffers(): Promise<ForcedTradeAcceptRecord[]> {
     const rows = await this.knex('accept_offers').select('*')
     this.logger.debug({
       method: 'getAllAcceptOffers',
@@ -93,7 +93,9 @@ export class ForceTradeOfferRepository {
     return rows.map(acceptOfferToRecord)
   }
 
-  async getInitialOfferById(id: number): Promise<ForceTradeInitialOfferRecord> {
+  async getInitialOfferById(
+    id: number
+  ): Promise<ForcedTradeInitialOfferRecord> {
     const [offer] = await this.knex('initial_offers').where({ id })
 
     this.logger.debug({ method: 'getInitialOfferById' })
@@ -101,7 +103,7 @@ export class ForceTradeOfferRepository {
     return initialOfferToRecord(offer)
   }
 
-  async getAcceptOfferById(id: number): Promise<ForceTradeAcceptRecord> {
+  async getAcceptOfferById(id: number): Promise<ForcedTradeAcceptRecord> {
     const [row] = await this.knex('accept_offers').where({
       initial_offer_id: id,
     })
@@ -110,7 +112,7 @@ export class ForceTradeOfferRepository {
     return acceptOfferToRecord(row)
   }
 
-  async getOfferById(id: number): Promise<ForceTradeOfferRecord> {
+  async getOfferById(id: number): Promise<ForcedTradeOfferRecord> {
     const offer = await this.getInitialOfferById(id)
     const acceptOffer = await this.getAcceptOfferById(id)
 
@@ -128,8 +130,8 @@ export class ForceTradeOfferRepository {
 
 function acceptOfferToRow(
   initialOfferId: number,
-  acceptOffer: ForceTradeAcceptRecord
-): ForceTradeAcceptRow {
+  acceptOffer: ForcedTradeAcceptRecord
+): ForcedTradeAcceptRow {
   return {
     initial_offer_id: initialOfferId,
     accepted_at: acceptOffer.acceptedAt as unknown as number,
@@ -143,7 +145,9 @@ function acceptOfferToRow(
   }
 }
 
-function acceptOfferToRecord(row: ForceTradeAcceptRow): ForceTradeAcceptRecord {
+function acceptOfferToRecord(
+  row: ForcedTradeAcceptRow
+): ForcedTradeAcceptRecord {
   return {
     acceptedAt: Timestamp(row.accepted_at),
     starkKeyB: StarkKey(row.stark_key_b),
@@ -156,8 +160,8 @@ function acceptOfferToRecord(row: ForceTradeAcceptRow): ForceTradeAcceptRecord {
 }
 
 function initialOfferToRow(
-  offer: Omit<ForceTradeInitialOfferRecord, 'id'>
-): Omit<ForceTradeInitialOfferRow, 'id'> {
+  offer: Omit<ForcedTradeInitialOfferRecord, 'id'>
+): Omit<ForcedTradeInitialOfferRow, 'id'> {
   return {
     created_at: offer.createdAt as unknown as number,
     submitted_at: offer.submittedAt as unknown as number,
@@ -171,8 +175,8 @@ function initialOfferToRow(
 }
 
 function initialOfferToRecord(
-  row: ForceTradeInitialOfferRow
-): ForceTradeInitialOfferRecord {
+  row: ForcedTradeInitialOfferRow
+): ForcedTradeInitialOfferRecord {
   let submittedAt: Timestamp | undefined
   if (row.submitted_at) {
     submittedAt = Timestamp(row.submitted_at)
