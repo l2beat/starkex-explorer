@@ -82,6 +82,7 @@ export class StateUpdateRepository {
   async getPositionById(positionId: bigint) {
     const row = await this.knex('positions')
       .where('position_id', positionId)
+      .orderBy('positions.state_update_id', 'desc')
       .first()
 
     if (!row) {

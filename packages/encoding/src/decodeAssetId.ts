@@ -1,10 +1,14 @@
 import { AssetId } from '@explorer/types'
 
+import { DYDX_INTERNAL_USDC_ID_ENDODED } from './constants'
 import { DecodingError } from './DecodingError'
 
 export function decodeAssetId(value: string) {
   if (value.length !== 30) {
     throw new DecodingError('Invalid AssetId length')
+  }
+  if (value === DYDX_INTERNAL_USDC_ID_ENDODED) {
+    return AssetId.USDC
   }
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const idString = value

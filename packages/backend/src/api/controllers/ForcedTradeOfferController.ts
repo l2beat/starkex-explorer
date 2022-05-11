@@ -90,8 +90,6 @@ export class ForcedTradeOfferController {
 
     return { type: 'success', content: 'Accept offer was submitted' }
   }
-
-  // async submitOffer(): ControllerResult {}
 }
 
 function validateInitialOffer(

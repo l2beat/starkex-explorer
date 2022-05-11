@@ -86,6 +86,58 @@ describe(StateUpdateRepository.name, () => {
       prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
     })
 
+    const position = await repository.getPositionById(positionId)
+
+    expect(position).toEqual({
+      stateUpdateId: 2,
+      publicKey: StarkKey.fake('1'),
+      positionId,
+      collateralBalance: 0n,
+      balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+    })
+  })
+
+  it('gets position history by id', async () => {
+    const positionId = 12345n
+
+    await repository.add({
+      stateUpdate: {
+        id: 1,
+        blockNumber: 1,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake('1'),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+    })
+
+    await repository.add({
+      stateUpdate: {
+        id: 2,
+        blockNumber: 2,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake('1'),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+    })
+
     const position = await repository.getPositionHistoryById(positionId)
 
     expect(position).toEqual([
