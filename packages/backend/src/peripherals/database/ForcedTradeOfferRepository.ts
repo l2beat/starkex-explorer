@@ -32,8 +32,8 @@ export interface ForcedTradeAcceptRecord {
   starkKeyB: StarkKey
   positionIdB: bigint
   submissionExpirationTime: Timestamp
-  nonce: bigint // TODO: figure out
-  premiumCost: boolean // TODO: figure out
+  nonce: bigint
+  premiumCost: boolean
 
   // https://github.com/starkware-libs/starkex-contracts/blob/StarkExchange-v3.0/scalable-dex/contracts/src/perpetual/interactions/ForcedTrades.sol#L138-L181
   signature: string // HEX string signature of all parameters
@@ -93,8 +93,11 @@ export class ForcedTradeOfferRepository {
 
   async getInitialOfferById(
     id: number
-  ): Promise<ForcedTradeInitialOfferRecord> {
+  ): Promise<ForcedTradeInitialOfferRecord | undefined> {
     const [offer] = await this.knex('initial_offers').where({ id })
+    if (!offer) {
+      return undefined
+    }
     this.logger.debug({ method: 'getInitialOfferById' })
     return initialOfferToRecord(offer)
   }

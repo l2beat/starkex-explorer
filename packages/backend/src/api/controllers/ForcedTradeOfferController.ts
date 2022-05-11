@@ -36,7 +36,7 @@ export class ForcedTradeOfferController {
       return { type: 'not found', content: 'Position does not exist.' }
     }
 
-    const offerValidated = validateInitialOffer(offer, positionA)
+    const offerValidated = validateInitialOffer(offer, positionA) // TODO: check if user has other active offers
 
     if (!offerValidated) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
@@ -66,10 +66,13 @@ export class ForcedTradeOfferController {
     if (!positionB || !userRegistrationEventB) {
       return { type: 'not found', content: 'Position does not exist.' }
     }
-
     const initialOffer = await this.offerRepository.getInitialOfferById(
       initialOfferId
     )
+
+    if (!initialOffer) {
+      return { type: 'not found', content: 'Offer does not exist' }
+    }
 
     const offerValidated = validateAcceptOffer(
       initialOffer,
@@ -109,7 +112,7 @@ function validateAcceptOffer(
 ) {
   const userIsBuyingSynthetic = !initialOffer.aIsBuyingSynthetic
 
-  if (validateBalance(initialOffer, position, userIsBuyingSynthetic)) {
+  if (!validateBalance(initialOffer, position, userIsBuyingSynthetic)) {
     return false
   }
 
