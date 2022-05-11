@@ -87,6 +87,7 @@ export class StateUpdateRepository {
     if (!row) {
       return undefined
     }
+
     return toPositionRecord(row)
   }
 

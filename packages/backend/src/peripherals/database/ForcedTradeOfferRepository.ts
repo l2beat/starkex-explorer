@@ -63,9 +63,7 @@ export class ForcedTradeOfferRepository {
   ): Promise<number> {
     const row = initialOfferToRow(offer)
     const [id] = await this.knex('initial_offers').insert(row).returning('id')
-
     this.logger.debug({ method: 'add' })
-
     return id
   }
 
@@ -97,9 +95,7 @@ export class ForcedTradeOfferRepository {
     id: number
   ): Promise<ForcedTradeInitialOfferRecord> {
     const [offer] = await this.knex('initial_offers').where({ id })
-
     this.logger.debug({ method: 'getInitialOfferById' })
-
     return initialOfferToRecord(offer)
   }
 
@@ -108,7 +104,6 @@ export class ForcedTradeOfferRepository {
       initial_offer_id: id,
     })
     this.logger.debug({ method: 'getAcceptOfferById' })
-
     return acceptOfferToRecord(row)
   }
 

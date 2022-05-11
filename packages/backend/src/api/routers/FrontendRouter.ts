@@ -202,7 +202,6 @@ export function applyControllerResult(ctx: Context, result: ControllerResult) {
     } else if (result.type === 'not found') {
       ctx.status = 404
     }
-
     ctx.body = result.content
   }
 }
