@@ -10,10 +10,9 @@ import {
   VerifierEventRecord,
   VerifierEventRepository,
 } from '../peripherals/database/VerifierEventRepository'
+import { PROXY_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
-
-const PROXY_ADDRESS = '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'
 
 const PROXY_ABI = new utils.Interface([
   'event ImplementationAdded(address indexed implementation, bytes initializer, bool finalize)',

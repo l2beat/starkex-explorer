@@ -6,14 +6,13 @@ import {
   PageRecord,
   PageRepository,
 } from '../peripherals/database/PageRepository'
+import { REGISTRY_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 
 const REGISTRY_ABI = new utils.Interface([
   'event LogMemoryPageFactContinuous(bytes32 factHash, uint256 memoryHash, uint256 prod)',
 ])
-
-const REGISTRY_ADDRESS = '0xEfbCcE4659db72eC6897F46783303708cf9ACef8'
 
 /** @internal exported only for tests */
 export const PAGE_ABI = new utils.Interface([
