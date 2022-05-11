@@ -110,9 +110,13 @@ export class ForcedTradeOfferRepository {
     return acceptOfferToRecord(row)
   }
 
-  async getOfferById(id: number): Promise<ForcedTradeOfferRecord> {
+  async getOfferById(id: number): Promise<ForcedTradeOfferRecord | undefined> {
     const offer = await this.getInitialOfferById(id)
     const acceptOffer = await this.getAcceptOfferById(id)
+
+    if (!offer) {
+      return undefined
+    }
 
     return {
       ...offer,
