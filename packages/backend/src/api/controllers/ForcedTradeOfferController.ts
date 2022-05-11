@@ -1,3 +1,4 @@
+import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 import {
   recoverAddress,
@@ -142,8 +143,8 @@ function validateBalance(
   return false
 }
 
-function validateSignature(
-  initialOffer: ForcedTradeInitialOfferRecord,
+export function validateSignature(
+  initialOffer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
   acceptOffer: Omit<ForcedTradeAcceptRecord, 'acceptedAt'>,
   ethAddressB: EthereumAddress
 ): boolean {
@@ -176,8 +177,8 @@ function validateSignature(
       starkKeyB,
       positionIdA,
       positionIdB,
-      AssetId.USDC,
-      syntheticAssetId,
+      `0x${encodeAssetId(AssetId.USDC)}`,
+      `0x${encodeAssetId(syntheticAssetId)}`,
       amountCollateral,
       amountSynthetic,
       aIsBuyingSynthetic,
