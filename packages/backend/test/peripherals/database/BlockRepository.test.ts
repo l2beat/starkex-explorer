@@ -18,7 +18,7 @@ describe(BlockRepository.name, () => {
   it('adds single record and queries it', async () => {
     const record: BlockRecord = { number: 1, hash: Hash256.fake() }
 
-    await repository.add([record])
+    await repository.addMany([record])
 
     const actual = await repository.getAll()
 
@@ -26,7 +26,7 @@ describe(BlockRepository.name, () => {
   })
 
   it('adds 0 records', async () => {
-    await repository.add([])
+    await repository.addMany([])
     expect(await repository.getAll()).toEqual([])
   })
 
@@ -37,14 +37,14 @@ describe(BlockRepository.name, () => {
       { number: 3, hash: Hash256.fake() },
     ]
 
-    await repository.add(records)
+    await repository.addMany(records)
     const actual = await repository.getAll()
 
     expect(actual).toEqual(records)
   })
 
   it('deletes all records', async () => {
-    await repository.add([
+    await repository.addMany([
       { number: 1, hash: Hash256.fake() },
       { number: 2, hash: Hash256.fake() },
     ])
@@ -60,7 +60,7 @@ describe(BlockRepository.name, () => {
       hash: Hash256.fake(),
       number: i,
     }))
-    await repository.add(records)
+    await repository.addMany(records)
 
     await repository.deleteAllAfter(5)
 
@@ -71,36 +71,36 @@ describe(BlockRepository.name, () => {
   it('gets by hash', async () => {
     const record = { number: 1, hash: Hash256.fake() }
 
-    await repository.add([record])
+    await repository.addMany([record])
 
-    expect(await repository.getByHash(record.hash)).toEqual(record)
+    expect(await repository.findByHash(record.hash)).toEqual(record)
 
-    expect(await repository.getByHash(Hash256.fake('000'))).toEqual(undefined)
+    expect(await repository.findByHash(Hash256.fake('000'))).toEqual(undefined)
   })
 
   it('gets by number', async () => {
     const record = { number: 1, hash: Hash256.fake() }
 
-    await repository.add([record])
+    await repository.addMany([record])
 
-    expect(await repository.getByNumber(record.number)).toEqual(record)
+    expect(await repository.findByNumber(record.number)).toEqual(record)
 
-    expect(await repository.getByNumber(2)).toEqual(undefined)
+    expect(await repository.findByNumber(2)).toEqual(undefined)
   })
 
   it('gets last by number', async () => {
-    expect(await repository.getLast()).toEqual(undefined)
+    expect(await repository.findLast()).toEqual(undefined)
 
     const block = { number: 11813208, hash: Hash256.fake() }
-    await repository.add([block])
+    await repository.addMany([block])
 
-    expect(await repository.getLast()).toEqual(block)
+    expect(await repository.findLast()).toEqual(block)
 
     const earlierBlock = { number: 11813206, hash: Hash256.fake() }
     const laterBlock = { number: 11813209, hash: Hash256.fake() }
-    await repository.add([laterBlock, earlierBlock])
+    await repository.addMany([laterBlock, earlierBlock])
 
-    expect(await repository.getLast()).toEqual(laterBlock)
+    expect(await repository.findLast()).toEqual(laterBlock)
   })
 
   it('gets all blocks in range between given numbers (inclusive)', async () => {
@@ -108,7 +108,7 @@ describe(BlockRepository.name, () => {
       number: i,
       hash: Hash256.fake(),
     }))
-    await repository.add(blocks)
+    await repository.addMany(blocks)
 
     expect(await repository.getAllInRange(13, 17)).toEqual([
       blocks[3],
