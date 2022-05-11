@@ -162,6 +162,13 @@ describe(StateUpdateRepository.name, () => {
     ])
   })
 
+  it('returns undefined if position not in the DB', async () => {
+    const positionId = 1n
+    const position = await repository.getPositionById(positionId)
+
+    expect(position).not.toBeDefined()
+  })
+
   it('gets state update id by root hash', async () => {
     const stateRootId = 1
     const positionId = 12345n
