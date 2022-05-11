@@ -2,12 +2,15 @@ import React from 'react'
 
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/Table'
-import { formatHash } from '../formatHash'
-import { formatLargeNumber } from '../formatLargeNumber'
-import { formatTime } from '../formatTime'
+import {
+  formatAbsoluteTime,
+  formatCurrencyUnits,
+  formatHashLong,
+  formatRelativeTime,
+} from '../formatting'
 import { PositionAtUpdateProps } from './PositionAtUpdateProps'
 
 const balanceChangesTableColumns = [
@@ -75,16 +78,18 @@ export function PositionAtUpdate({
           },
           {
             title: 'State update timestamp',
-            content: formatTimestamp(lastUpdateTimestamp),
+            content: formatAbsoluteTime(lastUpdateTimestamp),
             fontRegular: true,
           },
           {
             title: 'Previous stark key',
-            content: previousPublicKey ? formatHash(previousPublicKey) : '-',
+            content: previousPublicKey
+              ? formatHashLong(previousPublicKey)
+              : '-',
           },
           {
             title: 'Stark key',
-            content: formatHash(publicKey),
+            content: formatHashLong(publicKey),
           },
         ]}
       />
@@ -119,9 +124,9 @@ export function PositionAtUpdate({
             link,
             cells: [
               transaction.type,
-              formatTime(transaction.lastUpdate),
-              formatHash(transaction.hash.toString()),
-              formatLargeNumber(transaction.amount),
+              formatRelativeTime(transaction.lastUpdate),
+              formatHashLong(transaction.hash),
+              formatCurrencyUnits(transaction.amount, transaction.assetId),
               <AssetNameCell assetId={transaction.assetId} />,
             ],
           }

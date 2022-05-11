@@ -17,7 +17,10 @@ function buildScripts() {
 }
 
 function watchScripts() {
-  return gulp.watch('src/scripts/**/*.ts', buildScripts)
+  return gulp.watch(
+    ['src/scripts/**/*.ts', 'src/pages/**/*.{ts,tsx}'],
+    buildScripts
+  )
 }
 
 function buildStyles() {

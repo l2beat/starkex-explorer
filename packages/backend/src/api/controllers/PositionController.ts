@@ -8,9 +8,9 @@ import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedT
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
-import { applyAssetPrices } from './utils/applyAssetPrices'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
+import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
 export class PositionController {
   constructor(
@@ -34,7 +34,7 @@ export class PositionController {
     }
 
     const historyWithAssets = history.map((update) => {
-      const assets = applyAssetPrices(
+      const assets = toPositionAssetEntries(
         update.balances,
         update.collateralBalance,
         update.prices
@@ -61,7 +61,7 @@ export class PositionController {
       account,
       positionId,
       publicKey: current.publicKey,
-      ethAddress: lastUserRegistrationEvent?.ethAddress.toString(),
+      ethAddress: lastUserRegistrationEvent?.ethAddress,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
       assets: current.assets,

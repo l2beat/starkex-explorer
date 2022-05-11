@@ -13,6 +13,7 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '../pages'
+import { renderTransactionForm } from '../pages/transaction-form'
 import * as DATA from './data'
 
 const app = new Koa()
@@ -47,6 +48,10 @@ router.get('/forced-transactions', (ctx) => {
   const data = { ...DATA.FORCED_TRANSACTIONS_INDEX_PROPS }
   data.account = getAccount(ctx)
   ctx.body = renderForcedTransactionsIndexPage(data)
+})
+router.get('/forced-transactions/form', (ctx) => {
+  const data = { ...DATA.TRANSACTION_FORM_PROPS }
+  ctx.body = renderTransactionForm(data)
 })
 router.get('/forced-transactions/:hash', (ctx) => {
   const data = { ...DATA.FORCED_TRANSACTION_DETAILS_PROPS }

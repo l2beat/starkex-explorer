@@ -1,9 +1,15 @@
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
-import { formatTimestamp, PageHeaderStats } from '../common/PageHeaderStats'
+import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { formatLargeNumber } from '../formatLargeNumber'
+import {
+  formatAbsoluteTime,
+  formatCurrency,
+  formatHashLong,
+  formatHashShort,
+} from '../formatting'
 import {
   ForcedTransactionDetailsProps,
   TransactionStatusEntry,
@@ -29,7 +35,7 @@ export function ForcedTransactionDetails({
       account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-12 overflow-x-hidden text-ellipsis whitespace-nowrap">
-        Forced exit {transactionHash.toString()}
+        Forced exit {formatHashShort(transactionHash)}
       </h1>
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
@@ -48,11 +54,11 @@ export function ForcedTransactionDetails({
           },
           {
             title: 'Value',
-            content: formatLargeNumber(value) + ' USDC',
+            content: formatCurrency(value, AssetId.USDC),
           },
           {
             title: 'Transaction hash',
-            content: transactionHash.toString(),
+            content: formatHashLong(transactionHash),
           },
           {
             title: 'State update id',
@@ -72,7 +78,7 @@ export function ForcedTransactionDetails({
           {history.map((event, i) => (
             <tr className="bg-grey-200 border-2 border-grey-100" key={i}>
               <th className="font-normal text-left w-[268px] py-2 px-1.5">
-                {formatTimestamp(event.timestamp)}
+                {formatAbsoluteTime(event.timestamp)}
               </th>
               <td className="font-normal first-letter:capitalize py-2 px-1.5">
                 {getStatusText(event)}
