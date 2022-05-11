@@ -4,13 +4,13 @@ import bodyParser from 'koa-bodyparser'
 import { string, z } from 'zod'
 
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
-import { applyControllerResult } from './FrontendRouter'
 import {
   stringAs,
   stringAsBigInt,
   stringAsInt,
   withTypedContext,
 } from './types'
+import { applyControllerResult } from './utils'
 
 export function createForcedTradeOfferRouter(
   offerController: ForcedTradeOfferController
