@@ -196,7 +196,7 @@ describe('OfferRouter', () => {
 
     it('returnes success', async () => {
       await server
-        .post(`/offer/${id}`)
+        .put(`/offer/${id}`)
         .send({
           starkKeyB: starkKeyB.toString(),
           positionIdB: 718n.toString(),
