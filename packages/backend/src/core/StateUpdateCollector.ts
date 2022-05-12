@@ -80,6 +80,9 @@ export class StateUpdateCollector {
     if (rootHash !== PedersenHash(decoded.newState.positionRoot)) {
       throw new Error('State transition calculated incorrectly')
     }
+    const transactionHashes = await this.extractTransactionHashes(
+      decoded.forcedActions
+    )
     await Promise.all([
       this.stateUpdateRepository.add({
         stateUpdate: {
@@ -98,27 +101,17 @@ export class StateUpdateCollector {
           })
         ),
         prices: decoded.newState.oraclePrices,
+        transactionHashes,
       }),
-      this.processForcedActions(
-        decoded.forcedActions,
-        timestamp,
-        blockNumber,
-        id
-      ),
     ])
   }
 
-  async processForcedActions(
-    forcedActions: ForcedAction[],
-    timestamp: Timestamp,
-    blockNumber: number,
-    stateUpdateId: number
-  ): Promise<void> {
+  async extractTransactionHashes(
+    forcedActions: ForcedAction[]
+  ): Promise<Hash256[]> {
     const datas = forcedActions.map(({ type: _type, ...data }) => data)
     const hashes =
-      await this.forcedTransactionsRepository.getTransactionHashesByMinedEventsData(
-        datas
-      )
+      await this.forcedTransactionsRepository.getTransactionHashesByData(datas)
     const filteredHashes = hashes.filter(
       (h): h is Exclude<typeof h, undefined> => h !== undefined
     )
@@ -129,23 +122,11 @@ export class StateUpdateCollector {
       )
     }
 
-    const events = filteredHashes.map((transactionHash, i) => {
-      return {
-        eventType: 'verified' as const,
-        transactionType: forcedActions[i].type,
-        transactionHash,
-        timestamp,
-        blockNumber,
-        stateUpdateId,
-      }
-    })
-
-    await this.forcedTransactionsRepository.addEvents(events)
+    return filteredHashes
   }
 
   async discardAfter(blockNumber: BlockNumber) {
     await this.stateUpdateRepository.deleteAllAfter(blockNumber)
-    await this.forcedTransactionsRepository.discardAfter(blockNumber)
   }
 
   private async readLastUpdate() {

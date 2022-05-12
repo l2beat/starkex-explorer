@@ -1,12 +1,9 @@
-import { decodeAssetId } from '@explorer/encoding'
+import { decodeAssetId, ForcedAction } from '@explorer/encoding'
 import { Hash256, Timestamp } from '@explorer/types'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
-import {
-  EventRecordCandidate,
-  ForcedTransactionsRepository,
-} from '../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 
@@ -33,21 +30,61 @@ const LogForcedTradeRequest = PERPETUAL_ABI.getEventTopic(
   'LogForcedTradeRequest'
 )
 
+type MinedTransaction = ForcedAction & {
+  hash: Hash256
+  blockNumber: number
+  minedAt: Timestamp
+}
+
 export class ForcedEventsCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly forcedTransactionsRepository: ForcedTransactionsRepository
-  ) {}
-
-  async collect(blockRange: BlockRange): Promise<EventRecordCandidate[]> {
-    const events = await this.getEvents(blockRange)
-    await this.forcedTransactionsRepository.addEvents(events)
-    return events
+    private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
+    private readonly _getMinedTransactions?: (
+      blockRange: BlockRange
+    ) => Promise<MinedTransaction[]>
+  ) {
+    this.getMinedTransactions =
+      _getMinedTransactions || this.getMinedTransactions
   }
 
-  private async getEvents(
+  async collect(
     blockRange: BlockRange
-  ): Promise<EventRecordCandidate[]> {
+  ): Promise<{ added: number; updated: number; ignored: number }> {
+    const transactions = await this.getMinedTransactions(blockRange)
+    const results = await Promise.all(
+      transactions.map(async (transaction) => {
+        const dbTransaction =
+          await this.forcedTransactionsRepository.findByHash(transaction.hash)
+        if (!dbTransaction) {
+          await this.forcedTransactionsRepository.addMined(transaction)
+          return 'added'
+        }
+        if (dbTransaction.status === 'sent') {
+          const { hash, blockNumber, minedAt } = transaction
+          await this.forcedTransactionsRepository.markAsMined(
+            hash,
+            blockNumber,
+            minedAt
+          )
+          return 'updated'
+        }
+        return 'ignored'
+      })
+    )
+    return results.reduce(
+      (acc, result) => ({ ...acc, [result]: acc[result] + 1 }),
+      { added: 0, updated: 0, ignored: 0 }
+    )
+  }
+
+  private async getMinedTransactions(blockRange: BlockRange): Promise<
+    (ForcedAction & {
+      hash: Hash256
+      blockNumber: number
+      minedAt: Timestamp
+    })[]
+  > {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: PERPETUAL_ADDRESS,
       topics: [[LogForcedTradeRequest, LogForcedWithdrawalRequest]],
@@ -57,17 +94,15 @@ export class ForcedEventsCollector {
         const event = PERPETUAL_ABI.parseLog(log)
         const block = await this.ethereumClient.getBlock(log.blockNumber)
         const blockNumber = log.blockNumber
-        const transactionHash = Hash256(log.transactionHash)
-        const timestamp = Timestamp.fromSeconds(block.timestamp)
+        const hash = Hash256(log.transactionHash)
+        const minedAt = Timestamp.fromSeconds(block.timestamp)
+        const base = { hash, blockNumber, minedAt }
 
         switch (event.name) {
           case 'LogForcedTradeRequest':
             return {
-              transactionType: 'trade' as const,
-              eventType: 'mined' as const,
-              blockNumber,
-              transactionHash,
-              timestamp,
+              ...base,
+              type: 'trade',
               publicKeyA: event.args.starkKeyA.toHexString(),
               publicKeyB: event.args.starkKeyB.toHexString(),
               positionIdA: BigInt(event.args.vaultIdA),
@@ -82,11 +117,8 @@ export class ForcedEventsCollector {
             }
           case 'LogForcedWithdrawalRequest':
             return {
-              transactionType: 'withdrawal' as const,
-              eventType: 'mined' as const,
-              blockNumber,
-              transactionHash,
-              timestamp,
+              ...base,
+              type: 'withdrawal',
               publicKey: event.args.starkKey.toHexString(),
               positionId: BigInt(event.args.vaultId),
               amount: BigInt(event.args.quantizedAmount),
@@ -96,9 +128,5 @@ export class ForcedEventsCollector {
         }
       })
     )
-  }
-
-  async discardAfter(blockNumber: number): Promise<void> {
-    await this.forcedTransactionsRepository.discardAfter(blockNumber)
   }
 }

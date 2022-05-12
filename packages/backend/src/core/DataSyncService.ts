@@ -45,7 +45,7 @@ export class DataSyncService {
       newPageRecords: pageRecords.length,
       newStateTransitionFacts: stateTransitionFacts.length,
       userRegistrationEvents: userRegistrationEvents.length,
-      forcedEvents: forcedEvents.length,
+      forcedEvents,
     })
 
     await this.stateUpdateCollector.save(stateTransitionFacts)
@@ -58,6 +58,5 @@ export class DataSyncService {
     await this.stateTransitionFactCollector.discardAfter(blockNumber)
     await this.stateUpdateCollector.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
-    await this.forcedEventsCollector.discardAfter(blockNumber)
   }
 }

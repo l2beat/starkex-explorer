@@ -97,9 +97,7 @@ describe(DataSyncService.name, () => {
       const stateUpdateCollector = mock<StateUpdateCollector>({
         discardAfter: noop,
       })
-      const forcedEventsCollector = mock<ForcedEventsCollector>({
-        discardAfter: noop,
-      })
+      const forcedEventsCollector = mock<ForcedEventsCollector>()
 
       const dataSyncService = new DataSyncService(
         verifierCollector,
@@ -121,7 +119,6 @@ describe(DataSyncService.name, () => {
         10,
       ])
       expect(stateUpdateCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(forcedEventsCollector.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })

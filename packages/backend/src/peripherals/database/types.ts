@@ -118,6 +118,23 @@ declare module 'knex/types/tables' {
     data_hash: string
   }
 
+  interface ForcedTransactionRow {
+    hash: string
+    type: string
+    data: json
+    data_hash: string
+    state_update_id?: number
+  }
+
+  interface TransactionStatusRow {
+    hash: string
+    sent_at?: bigint
+    mined_at?: bigint
+    reverted_at?: bigint
+    forgotten_at?: bigint
+    block_number?: number
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -134,6 +151,8 @@ declare module 'knex/types/tables' {
     prices: PriceRow
     user_registration_evens: UserRegistrationEventRow
     forced_transaction_events: ForcedTransactionEventRow
+    forced_transactions: ForcedTransactionRow
+    transaction_status: TransactionStatusRow
   }
 }
 

@@ -14,6 +14,7 @@ export type TransactionStatusEntry =
   | TransactionSentEntry
   | TransactionMinedEntry
   | TransactionVerifiedEntry
+  | TransactionRevertedEntry
 
 export interface TransactionSentEntry {
   readonly type: 'sent'
@@ -28,6 +29,11 @@ export interface TransactionMinedEntry {
 export interface TransactionVerifiedEntry {
   readonly type: 'verified'
   readonly stateUpdateId: number
+  readonly timestamp: Timestamp
+}
+
+export interface TransactionRevertedEntry {
+  readonly type: 'reverted'
   readonly timestamp: Timestamp
 }
 

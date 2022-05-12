@@ -16,7 +16,7 @@ import { Knex } from 'knex'
 export async function up(knex: Knex) {
   await knex.schema.createTable('transaction_status', (table) => {
     table.string('hash').primary()
-    table.bigInteger('created_at')
+    table.bigInteger('sent_at')
     table.bigInteger('mined_at')
     table.bigInteger('reverted_at')
     table.bigInteger('forgotten_at')

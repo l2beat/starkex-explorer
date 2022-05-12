@@ -47,7 +47,12 @@ export class StateUpdateRepository {
     this.logger = logger.for(this)
   }
 
-  async add({ stateUpdate, positions, prices }: StateUpdateBundle) {
+  async add({
+    stateUpdate,
+    positions,
+    prices,
+    transactionHashes,
+  }: StateUpdateBundle) {
     await this.knex.transaction(async (trx) => {
       await trx('state_updates').insert([toStateUpdateRow(stateUpdate)])
 
@@ -60,6 +65,11 @@ export class StateUpdateRepository {
         await trx('prices').insert(
           prices.map((price) => toPriceRow(price, stateUpdate.id))
         )
+
+      if (transactionHashes && transactionHashes.length > 0)
+        await trx('forced_transactions')
+          .update({ state_update_id: stateUpdate.id })
+          .whereIn('hash', transactionHashes.map(String))
 
       this.logger.debug({
         method: 'add',
@@ -263,6 +273,7 @@ export interface StateUpdateBundle {
   stateUpdate: StateUpdateRecord
   positions: PositionRecord[]
   prices: OraclePrice[]
+  transactionHashes?: Hash256[]
 }
 
 function toStateUpdateRecord(row: StateUpdateRow): StateUpdateRecord {
