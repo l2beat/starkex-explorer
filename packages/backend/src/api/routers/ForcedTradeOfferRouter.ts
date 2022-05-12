@@ -40,8 +40,8 @@ export function createForcedTradeOfferRouter(
     )
   )
 
-  router.post(
-    '/offer/:initialOfferId/accept',
+  router.put(
+    '/offer/:initialOfferId',
     bodyParser(),
     withTypedContext(
       z.object({

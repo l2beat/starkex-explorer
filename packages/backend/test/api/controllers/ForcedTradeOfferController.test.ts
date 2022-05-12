@@ -3,7 +3,7 @@ import { expect } from 'earljs'
 
 import { validateSignature } from '../../../src/api/controllers/ForcedTradeOfferController'
 import {
-  ForcedTradeAcceptRecord,
+  ForcedTradeAcceptedOfferRecord,
   ForcedTradeInitialOfferRecord,
 } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 
@@ -20,7 +20,7 @@ const initialOffer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'> = {
   aIsBuyingSynthetic: true,
 }
 
-const acceptOffer: Omit<ForcedTradeAcceptRecord, 'acceptedAt'> = {
+const acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'> = {
   starkKeyB: StarkKey(
     '069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41'
   ),
@@ -39,7 +39,7 @@ const expectedEthAddress = EthereumAddress(
 describe(validateSignature.name, () => {
   it('decodes example tx', () => {
     expect(
-      validateSignature(initialOffer, acceptOffer, expectedEthAddress)
+      validateSignature(initialOffer, acceptedOffer, expectedEthAddress)
     ).toBeTruthy()
   })
 })

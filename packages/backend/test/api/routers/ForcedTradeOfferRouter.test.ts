@@ -80,7 +80,6 @@ const stateUpdate = {
 
 describe('OfferRouter', () => {
   const { knex } = setupDatabaseTestSuite()
-
   let server: SuperAgentTest
 
   describe('/offer', () => {
@@ -115,19 +114,22 @@ describe('OfferRouter', () => {
     it('returnes created', async () => {
       await server.post('/offer').send(initialOffer).expect(201, { id: 1 })
     })
+
     it('returnes not found when position does not exist', async () => {
       await server.post('/offer').send(initialOfferInvalidPosition).expect(404)
     })
+
     it('returnes bad request when position does not have enough assets', async () => {
       await server.post('/offer').send(initialOfferInvalidAmount).expect(400)
     })
+
     it('returnes bad request when assets are already offered', async () => {
       await server.post('/offer').send(initialOffer).expect(201)
       await server.post('/offer').send(initialOffer).expect(400)
     })
   })
 
-  describe('/offer/:initialOfferId/accept', () => {
+  describe('/offer/:initialOfferId', () => {
     let offerRepository: ForcedTradeOfferRepository
     let id: number
 
@@ -194,7 +196,7 @@ describe('OfferRouter', () => {
 
     it('returnes success', async () => {
       await server
-        .post(`/offer/${id}/accept`)
+        .post(`/offer/${id}`)
         .send({
           starkKeyB: starkKeyB.toString(),
           positionIdB: 718n.toString(),
@@ -206,8 +208,9 @@ describe('OfferRouter', () => {
         })
         .expect(200)
     })
+
     it('returnes bad request when offer already accepted', async () => {
-      await server.post(`/offer/${id}/accept`).send({
+      await server.put(`/offer/${id}`).send({
         starkKeyB: starkKeyB.toString(),
         positionIdB: 718n.toString(),
         submissionExpirationTime: '3456000000000',
@@ -218,7 +221,7 @@ describe('OfferRouter', () => {
       })
 
       await server
-        .post(`/offer/${id}/accept`)
+        .put(`/offer/${id}`)
         .send({
           starkKeyB: starkKeyB.toString(),
           positionIdB: 718n.toString(),
@@ -230,9 +233,10 @@ describe('OfferRouter', () => {
         })
         .expect(400, 'Offer already accepted by a user.')
     })
+
     it('returnes bad request when signature invalid', async () => {
       await server
-        .post(`/offer/${id}/accept`)
+        .put(`/offer/${id}`)
         .send({
           starkKeyB: starkKeyB.toString(),
           positionIdB: 718n.toString(),

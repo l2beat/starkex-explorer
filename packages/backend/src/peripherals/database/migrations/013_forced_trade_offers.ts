@@ -26,7 +26,7 @@ export async function up(knex: Knex) {
     table.boolean('a_is_buying_synthetic').notNullable()
   })
 
-  await knex.schema.createTable('accept_offers', (table) => {
+  await knex.schema.createTable('accepted_offers', (table) => {
     table
       .integer('initial_offer_id')
       .notNullable()
@@ -46,6 +46,6 @@ export async function up(knex: Knex) {
 }
 
 export async function down(knex: Knex) {
-  await knex.schema.dropTable('accept_offers')
+  await knex.schema.dropTable('accepted_offers')
   await knex.schema.dropTable('initial_offers')
 }

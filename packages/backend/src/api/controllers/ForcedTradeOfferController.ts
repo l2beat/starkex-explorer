@@ -7,7 +7,7 @@ import {
 } from 'ethers/lib/utils'
 
 import {
-  ForcedTradeAcceptRecord,
+  ForcedTradeAcceptedOfferRecord,
   ForcedTradeInitialOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
@@ -58,14 +58,14 @@ export class ForcedTradeOfferController {
 
   async acceptOffer(
     initialOfferId: number,
-    acceptOfferData: Omit<ForcedTradeAcceptRecord, 'acceptedAt'>
+    acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>
   ): Promise<ControllerResult> {
     const positionB = await this.stateUpdateRepository.getPositionById(
-      acceptOfferData.positionIdB
+      acceptedOffer.positionIdB
     )
     const userRegistrationEventB =
       await this.userRegistrationEventRepository.findByStarkKey(
-        acceptOfferData.starkKeyB
+        acceptedOffer.starkKeyB
       )
 
     if (!positionB || !userRegistrationEventB) {
@@ -79,7 +79,7 @@ export class ForcedTradeOfferController {
       return { type: 'not found', content: 'Offer does not exist.' }
     }
 
-    const accceptOffer = await this.offerRepository.findAcceptOfferById(
+    const accceptOffer = await this.offerRepository.findAcceptedOfferById(
       initialOfferId
     )
 
@@ -91,15 +91,15 @@ export class ForcedTradeOfferController {
     }
 
     const frozenBalance = await this.calculateFrozenBalance(
-      acceptOfferData.starkKeyB,
+      acceptedOffer.starkKeyB,
       initialOffer.aIsBuyingSynthetic
         ? initialOffer.syntheticAssetId
         : AssetId.USDC
     )
 
-    const offerValidated = validateAcceptOffer(
+    const offerValidated = validateAcceptedOffer(
       initialOffer,
-      acceptOfferData,
+      acceptedOffer,
       positionB,
       userRegistrationEventB.ethAddress,
       frozenBalance
@@ -110,9 +110,9 @@ export class ForcedTradeOfferController {
     }
 
     const acceptedAt = Timestamp(Date.now())
-    await this.offerRepository.addAcceptOffer(initialOfferId, {
+    await this.offerRepository.addAcceptedOffer(initialOfferId, {
       acceptedAt,
-      ...acceptOfferData,
+      ...acceptedOffer,
     })
 
     return { type: 'success', content: 'Accept offer was submitted.' }
@@ -123,9 +123,8 @@ export class ForcedTradeOfferController {
       starkKey
     )
 
-    const acceptOffers = await this.offerRepository.getAcceptOffersByStarkKey(
-      starkKey
-    )
+    const acceptedOffers =
+      await this.offerRepository.getAcceptedOffersByStarkKey(starkKey)
 
     let frozenBalance = 0n
 
@@ -135,7 +134,7 @@ export class ForcedTradeOfferController {
           frozenBalance += offer.amountCollateral
         }
       })
-      acceptOffers.forEach((offer) => {
+      acceptedOffers.forEach((offer) => {
         if (offer.aIsBuyingSynthetic) {
           frozenBalance += offer.amountCollateral
         }
@@ -146,7 +145,7 @@ export class ForcedTradeOfferController {
           frozenBalance += offer.amountSynthetic
         }
       })
-      acceptOffers.forEach((offer) => {
+      acceptedOffers.forEach((offer) => {
         if (offer.aIsBuyingSynthetic && offer.syntheticAssetId === assetId) {
           frozenBalance += offer.amountSynthetic
         }
@@ -167,9 +166,9 @@ function validateInitialOffer(
   return validateBalance(offer, position, userIsBuyingSynthetic, frozenBalance)
 }
 
-function validateAcceptOffer(
+function validateAcceptedOffer(
   initialOffer: ForcedTradeInitialOfferRecord,
-  acceptOffer: Omit<ForcedTradeAcceptRecord, 'acceptedAt'>,
+  acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>,
   position: PositionRecord,
   ethAddressB: EthereumAddress,
   frozenBalance: bigint
@@ -187,7 +186,7 @@ function validateAcceptOffer(
     return false
   }
 
-  return validateSignature(initialOffer, acceptOffer, ethAddressB)
+  return validateSignature(initialOffer, acceptedOffer, ethAddressB)
 }
 
 function validateBalance(
@@ -224,7 +223,7 @@ function validateBalance(
 
 export function validateSignature(
   initialOffer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
-  acceptOffer: Omit<ForcedTradeAcceptRecord, 'acceptedAt'>,
+  acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>,
   ethAddressB: EthereumAddress
 ): boolean {
   const {
@@ -236,7 +235,7 @@ export function validateSignature(
     aIsBuyingSynthetic,
   } = initialOffer
   const { starkKeyB, positionIdB, nonce, submissionExpirationTime, signature } =
-    acceptOffer
+    acceptedOffer
 
   try {
     const packedParemeters = solidityPack(
