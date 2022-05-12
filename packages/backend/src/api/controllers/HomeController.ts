@@ -23,9 +23,9 @@ export class HomeController {
 
     const [stateUpdates, transactions, totalUpdates, totalPositions] =
       await Promise.all([
-        this.stateUpdateRepository.getStateUpdateList({ offset, limit }),
+        this.stateUpdateRepository.getPaginated({ offset, limit }),
         this.forcedTransactionsRepository.getLatest({ limit, offset }),
-        this.stateUpdateRepository.countStateUpdates(),
+        this.stateUpdateRepository.count(),
         this.positionRepository.count(),
       ])
 

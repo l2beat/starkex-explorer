@@ -189,7 +189,7 @@ describe(StateUpdateCollector.name, () => {
   describe(StateUpdateCollector.prototype.discardAfter.name, () => {
     it('deletes updates after block number', async () => {
       const stateUpdateRepository = mock<StateUpdateRepository>({
-        deleteAllAfter: async () => {},
+        deleteAfter: async () => {},
       })
 
       const stateUpdateCollector = new StateUpdateCollector(
@@ -205,7 +205,7 @@ describe(StateUpdateCollector.name, () => {
       await stateUpdateCollector.discardAfter(20)
       await stateUpdateCollector.discardAfter(40)
 
-      expect(stateUpdateRepository.deleteAllAfter).toHaveBeenCalledExactlyWith([
+      expect(stateUpdateRepository.deleteAfter).toHaveBeenCalledExactlyWith([
         [20],
         [40],
       ])

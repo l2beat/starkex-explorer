@@ -154,6 +154,7 @@ export class Application {
     )
     const stateUpdateController = new StateUpdateController(
       stateUpdateRepository,
+      positionRepository,
       forcedTransactionsRepository
     )
     const searchController = new SearchController(

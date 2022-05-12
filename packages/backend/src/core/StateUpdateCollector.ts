@@ -142,7 +142,7 @@ export class StateUpdateCollector {
   }
 
   async discardAfter(blockNumber: BlockNumber) {
-    await this.stateUpdateRepository.deleteAllAfter(blockNumber)
+    await this.stateUpdateRepository.deleteAfter(blockNumber)
     await this.forcedTransactionsRepository.discardAfter(blockNumber)
   }
 

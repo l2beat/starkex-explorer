@@ -90,7 +90,7 @@ export class PositionController {
   ): Promise<ControllerResult> {
     const [history, update, transactions] = await Promise.all([
       this.positionRepository.getHistoryById(positionId),
-      this.stateUpdateRepository.getStateUpdateById(stateUpdateId),
+      this.stateUpdateRepository.findByIdWithPositions(stateUpdateId),
       this.forcedTransactionsRepository.getIncludedInStateUpdate(stateUpdateId),
     ])
     const updateIndex = history.findIndex(

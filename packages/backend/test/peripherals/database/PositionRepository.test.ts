@@ -143,4 +143,50 @@ describe(PositionRepository.name, () => {
       expect(result).toEqual(undefined)
     })
   })
+
+  it('gets positions state from previous update', async () => {
+    const stateUpdateId = 10
+    const nextStateUpdateId = 11
+    const positionId = 1n
+    await stateUpdateRepository.add({
+      stateUpdate: mockStateUpdate(stateUpdateId),
+      positions: [
+        {
+          publicKey: StarkKey.fake(),
+          positionId,
+          collateralBalance: 10n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
+    })
+    await stateUpdateRepository.add({
+      stateUpdate: mockStateUpdate(nextStateUpdateId),
+      positions: [
+        {
+          publicKey: StarkKey.fake(),
+          positionId,
+          collateralBalance: 20n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+        {
+          publicKey: StarkKey.fake(),
+          positionId: 2n,
+          collateralBalance: 30n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 30n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(nextStateUpdateId) }],
+    })
+    const positions = await positionRepository.getPreviousStates(
+      [positionId],
+      nextStateUpdateId
+    )
+    expect(positions.length).toEqual(1)
+    expect(positions[0]).toBeAnObjectWith({
+      stateUpdateId,
+      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
+      balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
+    })
+  })
 })
