@@ -36,6 +36,7 @@ export class StateUpdateRepository extends BaseRepository {
     super(knex, logger)
     this.add = this.wrapAdd(this.add)
     this.findLast = this.wrapFind(this.findLast)
+    this.findIdByRootHash = this.wrapFind(this.findIdByRootHash)
   }
 
   async add({ stateUpdate, positions, prices }: StateUpdateBundle) {
@@ -62,14 +63,11 @@ export class StateUpdateRepository extends BaseRepository {
     return row && toStateUpdateRecord(row)
   }
 
-  async getStateUpdateIdByRootHash(
-    hash: PedersenHash
-  ): Promise<number | undefined> {
-    const rows = await this.knex('state_updates')
+  async findIdByRootHash(hash: PedersenHash): Promise<number | undefined> {
+    const row = await this.knex('state_updates')
       .where('root_hash', hash.toString())
-      .select('state_updates.id as id')
-
-    return rows[0]?.id
+      .first('id')
+    return row?.id
   }
 
   async getPositionIdByPublicKey(

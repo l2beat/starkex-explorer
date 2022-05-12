@@ -61,7 +61,7 @@ export class SearchController {
     hash: PedersenHash
   ): Promise<ControllerResult | undefined> {
     const stateUpdateId =
-      await this.stateUpdateRepository.getStateUpdateIdByRootHash(hash)
+      await this.stateUpdateRepository.findIdByRootHash(hash)
     if (stateUpdateId === undefined) {
       return
     }

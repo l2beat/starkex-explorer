@@ -46,27 +46,18 @@ describe(StateUpdateRepository.name, () => {
   })
 
   it('gets state update id by root hash', async () => {
-    const stateRootId = 1
-    const positionId = 12345n
     const rootHash = PedersenHash.fake()
 
     await repository.add({
       stateUpdate: {
-        id: stateRootId,
+        id: 1,
         blockNumber: 1,
         rootHash,
         factHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
-      positions: [
-        {
-          publicKey: StarkKey.fake(),
-          positionId,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+      positions: [],
+      prices: [],
     })
 
     await repository.add({
@@ -77,26 +68,18 @@ describe(StateUpdateRepository.name, () => {
         factHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
-      positions: [
-        {
-          publicKey: StarkKey.fake(),
-          positionId,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+      positions: [],
+      prices: [],
     })
 
-    const position = await repository.getStateUpdateIdByRootHash(rootHash)
-
-    expect(position).toEqual(stateRootId)
+    const result = await repository.findIdByRootHash(rootHash)
+    expect(result).toEqual(1)
   })
 
   it('gets undefined when root hash not found', async () => {
     const rootHash = PedersenHash.fake()
 
-    const position = await repository.getStateUpdateIdByRootHash(rootHash)
+    const position = await repository.findIdByRootHash(rootHash)
 
     expect(position).toEqual(undefined)
   })
