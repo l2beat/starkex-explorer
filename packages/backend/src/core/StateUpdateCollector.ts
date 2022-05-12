@@ -4,12 +4,10 @@ import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
+import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionFactRecord } from '../peripherals/database/StateTransitionFactsRepository'
-import {
-  PositionRecord,
-  StateUpdateRepository,
-} from '../peripherals/database/StateUpdateRepository'
+import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 

@@ -15,6 +15,7 @@ import { PositionController } from '../../../src/api/controllers/PositionControl
 import { SearchController } from '../../../src/api/controllers/SearchController'
 import { StateUpdateController } from '../../../src/api/controllers/StateUpdateController'
 import { createFrontendRouter } from '../../../src/api/routers/FrontendRouter'
+import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
 import { Logger } from '../../../src/tools/Logger'
@@ -204,6 +205,7 @@ describe('FrontendRouter', () => {
         knex,
         Logger.SILENT
       )
+      const positionRepository = new PositionRepository(knex, Logger.SILENT)
 
       const userRegistrationEventRepository =
         new UserRegistrationEventRepository(knex, Logger.SILENT)
@@ -237,6 +239,7 @@ describe('FrontendRouter', () => {
 
       const searchController = new SearchController(
         stateUpdateRepository,
+        positionRepository,
         userRegistrationEventRepository
       )
       const frontendRouter = createFrontendRouter(

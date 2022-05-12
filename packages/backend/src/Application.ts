@@ -158,6 +158,7 @@ export class Application {
     )
     const searchController = new SearchController(
       stateUpdateRepository,
+      positionRepository,
       userRegistrationEventRepository
     )
     const apiServer = new ApiServer(config.port, logger, {

@@ -21,8 +21,9 @@ export interface PositionWithPricesRecord extends PositionRecord {
 export class PositionRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
-    this.count = this.wrapAny(this.count)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
+    this.findIdByPublicKey = this.wrapFind(this.findIdByPublicKey)
+    this.count = this.wrapAny(this.count)
   }
 
   async getHistoryById(positionId: bigint) {
@@ -48,6 +49,13 @@ export class PositionRepository extends BaseRepository {
         timestamp: Timestamp(r.timestamp),
       }
     })
+  }
+
+  async findIdByPublicKey(publicKey: StarkKey): Promise<bigint | undefined> {
+    const row = await this.knex('positions')
+      .where('public_key', publicKey.toString())
+      .first('position_id')
+    return row?.position_id
   }
 
   async count() {

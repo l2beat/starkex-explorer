@@ -1,5 +1,6 @@
 import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
 
+import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
@@ -7,6 +8,7 @@ import { ControllerResult } from './ControllerResult'
 export class SearchController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
+    private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository
   ) {}
 
@@ -46,10 +48,9 @@ export class SearchController {
       return
     }
 
-    const positionId =
-      await this.stateUpdateRepository.getPositionIdByPublicKey(
-        userRegistrationEvent.starkKey
-      )
+    const positionId = await this.positionRepository.findIdByPublicKey(
+      userRegistrationEvent.starkKey
+    )
     if (positionId === undefined) {
       return
     }
@@ -60,8 +61,9 @@ export class SearchController {
   private async searchForRootHash(
     hash: PedersenHash
   ): Promise<ControllerResult | undefined> {
-    const stateUpdateId =
-      await this.stateUpdateRepository.findIdByRootHash(hash)
+    const stateUpdateId = await this.stateUpdateRepository.findIdByRootHash(
+      hash
+    )
     if (stateUpdateId === undefined) {
       return
     }
@@ -78,10 +80,9 @@ export class SearchController {
       return
     }
 
-    const positionId =
-      await this.stateUpdateRepository.getPositionIdByPublicKey(
-        userRegistrationEvent.starkKey
-      )
+    const positionId = await this.positionRepository.findIdByPublicKey(
+      userRegistrationEvent.starkKey
+    )
     if (positionId === undefined) {
       return
     }

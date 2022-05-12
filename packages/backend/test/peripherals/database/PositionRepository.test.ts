@@ -21,29 +21,30 @@ describe(PositionRepository.name, () => {
 
   afterEach(() => stateUpdateRepository.deleteAll())
 
-  it('counts all positions', async () => {
-    const fakeUpdate = (id: number) => ({
-      id,
-      blockNumber: id * 1000,
-      rootHash: PedersenHash.fake(),
-      factHash: Hash256.fake(),
-      timestamp: Timestamp(0),
-    })
-    const fakePosition = (id: bigint) => ({
-      publicKey: StarkKey.fake(),
-      positionId: id,
-      collateralBalance: 0n,
-      balances: [],
-    })
+  const mockStateUpdate = (id: number) => ({
+    id,
+    blockNumber: id * 1000,
+    rootHash: PedersenHash.fake(),
+    factHash: Hash256.fake(),
+    timestamp: Timestamp(0),
+  })
 
+  const mockPosition = (id: bigint, key = StarkKey.fake()) => ({
+    positionId: id,
+    publicKey: key,
+    collateralBalance: 0n,
+    balances: [],
+  })
+
+  it('counts all positions', async () => {
     await stateUpdateRepository.add({
-      stateUpdate: fakeUpdate(1),
-      positions: [fakePosition(123n), fakePosition(456n)],
+      stateUpdate: mockStateUpdate(1),
+      positions: [mockPosition(123n), mockPosition(456n)],
       prices: [],
     })
     await stateUpdateRepository.add({
-      stateUpdate: fakeUpdate(2),
-      positions: [fakePosition(456n), fakePosition(789n)],
+      stateUpdate: mockStateUpdate(2),
+      positions: [mockPosition(456n), mockPosition(789n)],
       prices: [],
     })
 
@@ -114,5 +115,32 @@ describe(PositionRepository.name, () => {
         timestamp: Timestamp(0),
       },
     ])
+  })
+
+  describe(positionRepository.findIdByPublicKey.name, () => {
+    it('finds the id', async () => {
+      const positionId = 12345n
+      const publicKey = StarkKey.fake()
+
+      await stateUpdateRepository.add({
+        stateUpdate: mockStateUpdate(1),
+        positions: [mockPosition(positionId, publicKey)],
+        prices: [],
+      })
+
+      await stateUpdateRepository.add({
+        stateUpdate: mockStateUpdate(2),
+        positions: [mockPosition(positionId)],
+        prices: [],
+      })
+
+      const result = await positionRepository.findIdByPublicKey(publicKey)
+      expect(result).toEqual(positionId)
+    })
+
+    it('returns undefined when not found', async () => {
+      const result = await positionRepository.findIdByPublicKey(StarkKey.fake())
+      expect(result).toEqual(undefined)
+    })
   })
 })

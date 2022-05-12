@@ -5,10 +5,8 @@ import {
 import { EthereumAddress } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
-import {
-  PositionWithPricesRecord,
-  StateUpdateRepository,
-} from '../../peripherals/database/StateUpdateRepository'
+import { PositionWithPricesRecord } from '../../peripherals/database/PositionRepository'
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'

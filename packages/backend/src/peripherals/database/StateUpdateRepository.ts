@@ -1,11 +1,5 @@
 import { OraclePrice } from '@explorer/encoding'
-import {
-  AssetId,
-  Hash256,
-  PedersenHash,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { PriceRow, StateUpdateRow } from 'knex/types/tables'
 
@@ -68,16 +62,6 @@ export class StateUpdateRepository extends BaseRepository {
       .where('root_hash', hash.toString())
       .first('id')
     return row?.id
-  }
-
-  async getPositionIdByPublicKey(
-    publicKey: StarkKey
-  ): Promise<bigint | undefined> {
-    const rows = await this.knex('positions')
-      .where('public_key', publicKey.toString())
-      .select('positions.position_id as id')
-
-    return rows[0]?.id
   }
 
   async getAll() {
