@@ -6,29 +6,31 @@ import { mock } from '../../mock'
 
 describe(SyncStatusRepository.name, () => {
   it('writes value to store', async () => {
-    const store = mock<KeyValueStore<'lastBlockNumberSynced'>>({
-      set: async () => {},
+    const store = mock<KeyValueStore>({
+      addOrUpdate: async () => 'lastBlockNumberSynced',
     })
     const repository = new SyncStatusRepository(store)
 
     await repository.setLastSynced(20)
-    expect(store.set).toHaveBeenCalledWith(['lastBlockNumberSynced', '20'])
+    expect(store.addOrUpdate).toHaveBeenCalledWith([
+      { key: 'lastBlockNumberSynced', value: '20' },
+    ])
   })
 
   it('reads value from store', async () => {
-    const store = mock<KeyValueStore<'lastBlockNumberSynced'>>({
-      get: async () => '20',
+    const store = mock<KeyValueStore>({
+      findByKey: async () => '20',
     })
     const repository = new SyncStatusRepository(store)
 
     const actual = await repository.getLastSynced()
     expect(actual).toEqual(20)
-    expect(store.get).toHaveBeenCalledWith(['lastBlockNumberSynced'])
+    expect(store.findByKey).toHaveBeenCalledWith(['lastBlockNumberSynced'])
   })
 
   it('returns undefined when store is empty', async () => {
-    const store = mock<KeyValueStore<'lastBlockNumberSynced'>>({
-      get: async () => undefined,
+    const store = mock<KeyValueStore>({
+      findByKey: async () => undefined,
     })
     const repository = new SyncStatusRepository(store)
 
@@ -37,8 +39,8 @@ describe(SyncStatusRepository.name, () => {
   })
 
   it('returns undefined when the store is corrupt', async () => {
-    const store = mock<KeyValueStore<'lastBlockNumberSynced'>>({
-      get: async () => '3 is my favorite number',
+    const store = mock<KeyValueStore>({
+      findByKey: async () => '3 is my favorite number',
     })
     const repository = new SyncStatusRepository(store)
 

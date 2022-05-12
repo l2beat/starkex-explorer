@@ -73,7 +73,7 @@ describe(PageRepository.name, () => {
     afterEach(() => factToPageRepository.deleteAll())
 
     it('gets pages for ordered by .index and fact hash position in array #1', async () => {
-      await factToPageRepository.add([
+      await factToPageRepository.addMany([
         dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa22'), 2),
         dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa13'), 3),
         dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
@@ -111,7 +111,7 @@ describe(PageRepository.name, () => {
     })
 
     it('gets pages for ordered by .index and fact hash position in array #2', async () => {
-      await factToPageRepository.add([
+      await factToPageRepository.addMany([
         dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
         dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
         dummyFactToPage(300, Hash256.fake('ff03'), Hash256.fake('aa30'), 0),
@@ -143,7 +143,7 @@ describe(PageRepository.name, () => {
     })
 
     it('handles multiple mappings and pages', async () => {
-      await factToPageRepository.add([
+      await factToPageRepository.addMany([
         dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 0),
         dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa22'), 1),
         dummyFactToPage(200, Hash256.fake('ff01'), Hash256.fake('aa11'), 0),
@@ -207,7 +207,7 @@ function dummyFactToPage(
   factHash: Hash256,
   pageHash: Hash256,
   index: number
-): FactToPageRecord {
+): Omit<FactToPageRecord, 'id'> {
   return {
     blockNumber,
     factHash,

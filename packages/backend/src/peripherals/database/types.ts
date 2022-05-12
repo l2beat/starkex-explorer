@@ -20,7 +20,7 @@ declare module 'knex/types/tables' {
 
   interface FactToPageRow {
     /** surrogate key */
-    id?: number
+    id: number
     block_number: number
     fact_hash: string
     page_hash: string

@@ -2,54 +2,49 @@ import { Knex } from 'knex'
 import { KeyValueRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { Repository } from './types'
+import { BaseRepository } from './BaseRepository'
 
-type KeyValueRecord = KeyValueRow
+export interface KeyValueRecord {
+  key: string
+  value: string
+}
 
-export class KeyValueStore<K extends string>
-  implements Omit<Repository<KeyValueRecord>, 'addOrUpdate'>
-{
-  constructor(private readonly knex: Knex, private readonly logger: Logger) {
-    this.logger = logger.for(this)
+export class KeyValueStore extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.findByKey = this.wrapFind(this.findByKey)
+    this.addOrUpdate = this.wrapAdd(this.addOrUpdate)
+    this.getAll = this.wrapGet(this.getAll)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.deleteByKey = this.wrapDelete(this.deleteByKey)
   }
 
-  async get(key: K): Promise<string | undefined> {
+  async findByKey(key: string): Promise<string | undefined> {
     const row = await this.knex('key_values')
       .select('value')
       .where({ key })
       .first()
-    const value = row?.value
-    this.logger.debug({ method: 'get', key, value: value || null })
-    return value
+    return row?.value
   }
 
-  async set(key: K, value: string): Promise<void> {
+  async addOrUpdate(record: KeyValueRecord) {
     const primaryKey: keyof KeyValueRow = 'key'
-    const res: unknown = await this.knex('key_values')
-      .insert({ key, value })
+    await this.knex('key_values')
+      .insert(record)
       .onConflict([primaryKey])
       .merge()
-
-    this.logger.debug({
-      method: 'set',
-      key,
-      value,
-      rowCount: (res as { rowCount: number }).rowCount,
-    })
+    return record.key
   }
 
-  async getAll(): Promise<KeyValueRow[]> {
-    const rows = await this.knex('key_values').select('*')
-    this.logger.debug({ method: 'getAll', rows: rows.length })
-    return rows
+  async getAll(): Promise<KeyValueRecord[]> {
+    return this.knex('key_values').select('*')
   }
 
-  async deleteAll(): Promise<void> {
-    await this.knex('key_values').delete()
-    this.logger.debug({ method: 'deleteAll' })
+  async deleteAll() {
+    return this.knex('key_values').delete()
   }
 
-  async delete(key: string): Promise<void> {
-    await this.knex('key_values').where({ key }).delete()
+  async deleteByKey(key: string) {
+    return this.knex('key_values').where({ key }).delete()
   }
 }
