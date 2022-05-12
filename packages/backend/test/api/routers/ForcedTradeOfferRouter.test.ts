@@ -121,6 +121,10 @@ describe('OfferRouter', () => {
     it('returnes bad request when position does not have enough assets', async () => {
       await server.post('/offer').send(initialOfferInvalidAmount).expect(400)
     })
+    it('returnes bad request when assets are already offered', async () => {
+      await server.post('/offer').send(initialOffer).expect(201)
+      await server.post('/offer').send(initialOffer).expect(400)
+    })
   })
 
   describe('/offer/:initialOfferId/accept', () => {
@@ -163,6 +167,16 @@ describe('OfferRouter', () => {
 
       await userRegistrationEventRepository.add([userRegistrationEvent])
 
+      const offerController = new ForcedTradeOfferController(
+        offerRepository,
+        stateUpdateRepository,
+        userRegistrationEventRepository
+      )
+      const router = createForcedTradeOfferRouter(offerController)
+      server = createTestApiServer([router])
+    })
+
+    beforeEach(async () => {
       id = await offerRepository.addInitialOffer({
         createdAt: Timestamp(Date.now()),
         starkKeyA: starkKeyA,
@@ -172,14 +186,6 @@ describe('OfferRouter', () => {
         amountSynthetic: 1000000n,
         aIsBuyingSynthetic: true,
       })
-
-      const offerController = new ForcedTradeOfferController(
-        offerRepository,
-        stateUpdateRepository,
-        userRegistrationEventRepository
-      )
-      const router = createForcedTradeOfferRouter(offerController)
-      server = createTestApiServer([router])
     })
 
     afterEach(async () => {
@@ -199,6 +205,43 @@ describe('OfferRouter', () => {
             '0x1bb089c2686c65d8d2e5800761b2826e0fc1f68f7e228fc161384958222bbc271458f40ed77507d59ca77c56204b0134b429eaface39b196d1f07e917a14c7641b',
         })
         .expect(200)
+    })
+    it('returnes bad request when offer already accepted', async () => {
+      await server.post(`/offer/${id}/accept`).send({
+        starkKeyB: starkKeyB.toString(),
+        positionIdB: 718n.toString(),
+        submissionExpirationTime: '3456000000000',
+        nonce: 38404830n.toString(),
+        premiumCost: true,
+        signature:
+          '0x1bb089c2686c65d8d2e5800761b2826e0fc1f68f7e228fc161384958222bbc271458f40ed77507d59ca77c56204b0134b429eaface39b196d1f07e917a14c7641b',
+      })
+
+      await server
+        .post(`/offer/${id}/accept`)
+        .send({
+          starkKeyB: starkKeyB.toString(),
+          positionIdB: 718n.toString(),
+          submissionExpirationTime: '3456000000000',
+          nonce: 38404830n.toString(),
+          premiumCost: true,
+          signature:
+            '0x1bb089c2686c65d8d2e5800761b2826e0fc1f68f7e228fc161384958222bbc271458f40ed77507d59ca77c56204b0134b429eaface39b196d1f07e917a14c7641b',
+        })
+        .expect(400, 'Offer already accepted by a user.')
+    })
+    it('returnes bad request when signature invalid', async () => {
+      await server
+        .post(`/offer/${id}/accept`)
+        .send({
+          starkKeyB: starkKeyB.toString(),
+          positionIdB: 718n.toString(),
+          submissionExpirationTime: '3456000000000',
+          nonce: 38404830n.toString(),
+          premiumCost: true,
+          signature: '0x0',
+        })
+        .expect(400, 'Your offer is invalid.')
     })
   })
 })

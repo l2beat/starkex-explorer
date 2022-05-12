@@ -22,7 +22,7 @@ const initialOffer1 = {
 const initialOffer2 = {
   createdAt: Timestamp(Date.now()),
   submittedAt: undefined,
-  starkKeyA: StarkKey.fake(),
+  starkKeyA: StarkKey.fake('1'),
   positionIdA: 2n,
   syntheticAssetId: AssetId('LINK-18'),
   amountCollateral: 50n,
@@ -43,7 +43,7 @@ const initialOffer3 = {
 
 const acceptOffer1: ForcedTradeAcceptRecord = {
   acceptedAt: Timestamp(Date.now()),
-  starkKeyB: StarkKey.fake(),
+  starkKeyB: StarkKey.fake('4'),
   positionIdB: 4n,
   submissionExpirationTime: Timestamp(Date.now() + 7 * 24 * 60 * 60 * 1000),
   nonce: 1n,
@@ -53,7 +53,7 @@ const acceptOffer1: ForcedTradeAcceptRecord = {
 
 const acceptOffer2: ForcedTradeAcceptRecord = {
   acceptedAt: Timestamp(Date.now()),
-  starkKeyB: StarkKey.fake(),
+  starkKeyB: StarkKey.fake('5'),
   positionIdB: 5n,
   submissionExpirationTime: Timestamp(Date.now() + 7 * 24 * 60 * 60 * 1000),
   nonce: 1n,
@@ -104,9 +104,34 @@ describe(ForcedTradeOfferRepository.name, () => {
     const id = await repository.addInitialOffer(initialOffer1)
     await repository.addInitialOffer(initialOffer3)
 
-    const actual = await repository.getInitialOfferById(id)
+    const actual = await repository.findInitialOfferById(id)
 
     expect(actual).toEqual({ id, ...initialOffer1 })
+  })
+
+  it('queries initial offers by stark key', async () => {
+    await repository.addInitialOffer(initialOffer1)
+    const id = await repository.addInitialOffer(initialOffer2)
+    await repository.addInitialOffer(initialOffer3)
+
+    const actual = await repository.getInitialOffersByStarkKey(
+      initialOffer2.starkKeyA
+    )
+    expect(actual).toEqual([{ id, ...initialOffer2 }])
+  })
+
+  it('queries accept offers by stark key', async () => {
+    const id1 = await repository.addInitialOffer(initialOffer1)
+    const id2 = await repository.addInitialOffer(initialOffer2)
+    await repository.addInitialOffer(initialOffer3)
+
+    await repository.addAcceptOffer(id1, acceptOffer1)
+    await repository.addAcceptOffer(id2, acceptOffer2)
+
+    const actual = await repository.getAcceptOffersByStarkKey(
+      acceptOffer2.starkKeyB
+    )
+    expect(actual).toEqual([{ id: id2, ...initialOffer2, ...acceptOffer2 }])
   })
 
   describe('accept offer', async () => {
@@ -114,7 +139,7 @@ describe(ForcedTradeOfferRepository.name, () => {
       const id = await repository.addInitialOffer(initialOffer1)
       await repository.addAcceptOffer(id, acceptOffer1)
 
-      const actual = await repository.getAcceptOfferById(id)
+      const actual = await repository.findAcceptOfferById(id)
 
       expect(actual).toEqual(acceptOffer1)
     })
@@ -123,7 +148,7 @@ describe(ForcedTradeOfferRepository.name, () => {
       const id = await repository.addInitialOffer(initialOffer1)
       await repository.addAcceptOffer(id, acceptOffer1)
 
-      const actual = await repository.getOfferById(id)
+      const actual = await repository.findOfferById(id)
 
       expect(actual).toEqual({ id, ...initialOffer1, ...acceptOffer1 })
     })

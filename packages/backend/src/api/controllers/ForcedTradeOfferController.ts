@@ -1,5 +1,5 @@
 import { encodeAssetId } from '@explorer/encoding'
-import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 import {
   recoverAddress,
   solidityKeccak256,
@@ -36,7 +36,12 @@ export class ForcedTradeOfferController {
       return { type: 'not found', content: 'Position does not exist.' }
     }
 
-    const offerValidated = validateInitialOffer(offer, positionA) // TODO: check if user has other active offers
+    const frozenBalance = await this.calculateFrozenBalance(
+      offer.starkKeyA,
+      offer.aIsBuyingSynthetic ? AssetId.USDC : offer.syntheticAssetId
+    )
+
+    const offerValidated = validateInitialOffer(offer, positionA, frozenBalance)
 
     if (!offerValidated) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
@@ -66,23 +71,42 @@ export class ForcedTradeOfferController {
     if (!positionB || !userRegistrationEventB) {
       return { type: 'not found', content: 'Position does not exist.' }
     }
-    const initialOffer = await this.offerRepository.getInitialOfferById(
+    const initialOffer = await this.offerRepository.findInitialOfferById(
       initialOfferId
     )
 
     if (!initialOffer) {
-      return { type: 'not found', content: 'Offer does not exist' }
+      return { type: 'not found', content: 'Offer does not exist.' }
     }
+
+    const accceptOffer = await this.offerRepository.findAcceptOfferById(
+      initialOfferId
+    )
+
+    if (accceptOffer) {
+      return {
+        type: 'bad request',
+        content: 'Offer already accepted by a user.',
+      }
+    }
+
+    const frozenBalance = await this.calculateFrozenBalance(
+      acceptOfferData.starkKeyB,
+      initialOffer.aIsBuyingSynthetic
+        ? initialOffer.syntheticAssetId
+        : AssetId.USDC
+    )
 
     const offerValidated = validateAcceptOffer(
       initialOffer,
       acceptOfferData,
       positionB,
-      userRegistrationEventB.ethAddress
+      userRegistrationEventB.ethAddress,
+      frozenBalance
     )
 
     if (!offerValidated) {
-      return { type: 'bad request', content: 'Your offer is invalid' }
+      return { type: 'bad request', content: 'Your offer is invalid.' }
     }
 
     const acceptedAt = Timestamp(Date.now())
@@ -91,28 +115,79 @@ export class ForcedTradeOfferController {
       ...acceptOfferData,
     })
 
-    return { type: 'success', content: 'Accept offer was submitted' }
+    return { type: 'success', content: 'Accept offer was submitted.' }
+  }
+
+  async calculateFrozenBalance(starkKey: StarkKey, assetId: AssetId) {
+    const initialOffers = await this.offerRepository.getInitialOffersByStarkKey(
+      starkKey
+    )
+
+    const acceptOffers = await this.offerRepository.getAcceptOffersByStarkKey(
+      starkKey
+    )
+
+    let frozenBalance = 0n
+
+    if (assetId === AssetId.USDC) {
+      initialOffers.forEach((offer) => {
+        if (offer.aIsBuyingSynthetic) {
+          frozenBalance += offer.amountCollateral
+        }
+      })
+      acceptOffers.forEach((offer) => {
+        if (offer && !offer.aIsBuyingSynthetic) {
+          frozenBalance += offer.amountCollateral
+        }
+      })
+    } else {
+      initialOffers.forEach((offer) => {
+        if (!offer.aIsBuyingSynthetic && offer.syntheticAssetId === assetId) {
+          frozenBalance += offer.amountSynthetic
+        }
+      })
+      acceptOffers.forEach((offer) => {
+        if (
+          offer &&
+          offer.aIsBuyingSynthetic &&
+          offer.syntheticAssetId === assetId
+        ) {
+          frozenBalance += offer.amountSynthetic
+        }
+      })
+    }
+
+    return frozenBalance
   }
 }
 
 function validateInitialOffer(
   offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
-  position: PositionRecord
+  position: PositionRecord,
+  frozenBalance: bigint
 ) {
   const userIsBuyingSynthetic = offer.aIsBuyingSynthetic
 
-  return validateBalance(offer, position, userIsBuyingSynthetic)
+  return validateBalance(offer, position, userIsBuyingSynthetic, frozenBalance)
 }
 
 function validateAcceptOffer(
   initialOffer: ForcedTradeInitialOfferRecord,
   acceptOffer: Omit<ForcedTradeAcceptRecord, 'acceptedAt'>,
   position: PositionRecord,
-  ethAddressB: EthereumAddress
+  ethAddressB: EthereumAddress,
+  frozenBalance: bigint
 ) {
   const userIsBuyingSynthetic = !initialOffer.aIsBuyingSynthetic
 
-  if (!validateBalance(initialOffer, position, userIsBuyingSynthetic)) {
+  if (
+    !validateBalance(
+      initialOffer,
+      position,
+      userIsBuyingSynthetic,
+      frozenBalance
+    )
+  ) {
     return false
   }
 
@@ -122,13 +197,17 @@ function validateAcceptOffer(
 function validateBalance(
   offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
   position: PositionRecord,
-  userIsBuyingSynthetic: boolean
+  userIsBuyingSynthetic: boolean,
+  frozenBalance: bigint
 ) {
   const { amountCollateral, amountSynthetic, syntheticAssetId } = offer
 
   const { collateralBalance } = position
 
-  if (userIsBuyingSynthetic && amountCollateral <= collateralBalance) {
+  if (
+    userIsBuyingSynthetic &&
+    amountCollateral <= collateralBalance - frozenBalance
+  ) {
     return true
   }
 
@@ -136,7 +215,10 @@ function validateBalance(
     const balanceSynthetic = position.balances.find(
       (balance) => balance.assetId === syntheticAssetId
     )?.balance
-    if (balanceSynthetic && balanceSynthetic >= amountSynthetic) {
+    if (
+      balanceSynthetic &&
+      balanceSynthetic - frozenBalance >= amountSynthetic
+    ) {
       return true
     }
   }
@@ -160,44 +242,48 @@ export function validateSignature(
   const { starkKeyB, positionIdB, nonce, submissionExpirationTime, signature } =
     acceptOffer
 
-  const packedParemeters = solidityPack(
-    [
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'bool',
-      'uint256',
-    ],
-    [
-      starkKeyA,
-      starkKeyB,
-      positionIdA,
-      positionIdB,
-      `0x${encodeAssetId(AssetId.USDC)}`,
-      `0x${encodeAssetId(syntheticAssetId)}`,
-      amountCollateral,
-      amountSynthetic,
-      aIsBuyingSynthetic,
-      nonce,
-    ]
-  )
+  try {
+    const packedParemeters = solidityPack(
+      [
+        'uint256',
+        'uint256',
+        'uint256',
+        'uint256',
+        'uint256',
+        'uint256',
+        'uint256',
+        'uint256',
+        'bool',
+        'uint256',
+      ],
+      [
+        starkKeyA,
+        starkKeyB,
+        positionIdA,
+        positionIdB,
+        `0x${encodeAssetId(AssetId.USDC)}`,
+        `0x${encodeAssetId(syntheticAssetId)}`,
+        amountCollateral,
+        amountSynthetic,
+        aIsBuyingSynthetic,
+        nonce,
+      ]
+    )
 
-  const actionHash = solidityKeccak256(
-    ['string', 'bytes'],
-    ['FORCED_TRADE', packedParemeters]
-  )
+    const actionHash = solidityKeccak256(
+      ['string', 'bytes'],
+      ['FORCED_TRADE', packedParemeters]
+    )
 
-  const signedData = solidityKeccak256(
-    ['bytes32', 'uint256'],
-    [actionHash, submissionExpirationTime]
-  )
+    const signedData = solidityKeccak256(
+      ['bytes32', 'uint256'],
+      [actionHash, submissionExpirationTime]
+    )
 
-  const signer = recoverAddress(signedData, signature)
+    const signer = recoverAddress(signedData, signature)
 
-  return signer === ethAddressB.toString()
+    return signer === ethAddressB.toString()
+  } catch (e) {
+    return false
+  }
 }
