@@ -139,6 +139,7 @@ export class Application {
 
     const positionController = new PositionController(
       stateUpdateRepository,
+      positionRepository,
       userRegistrationEventRepository,
       forcedTransactionsRepository
     )

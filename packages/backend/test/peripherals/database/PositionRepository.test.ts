@@ -1,4 +1,10 @@
-import { Hash256, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect } from 'earljs'
 
 import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
@@ -6,7 +12,7 @@ import { StateUpdateRepository } from '../../../src/peripherals/database/StateUp
 import { Logger, LogLevel } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
-describe(StateUpdateRepository.name, () => {
+describe(PositionRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()
 
   const logger = new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
@@ -15,7 +21,7 @@ describe(StateUpdateRepository.name, () => {
 
   afterEach(() => stateUpdateRepository.deleteAll())
 
-  it('returns the count of all positions', async () => {
+  it('counts all positions', async () => {
     const fakeUpdate = (id: number) => ({
       id,
       blockNumber: id * 1000,
@@ -43,5 +49,70 @@ describe(StateUpdateRepository.name, () => {
 
     const count = await positionRepository.count()
     expect(count).toEqual(3n)
+  })
+
+  it('finds history by id', async () => {
+    const positionId = 12345n
+
+    await stateUpdateRepository.add({
+      stateUpdate: {
+        id: 1,
+        blockNumber: 1,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake('1'),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+    })
+
+    await stateUpdateRepository.add({
+      stateUpdate: {
+        id: 2,
+        blockNumber: 2,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake('1'),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+    })
+
+    const position = await positionRepository.getHistoryById(positionId)
+
+    expect(position).toEqual([
+      {
+        stateUpdateId: 2,
+        publicKey: StarkKey.fake('1'),
+        positionId,
+        collateralBalance: 0n,
+        balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+        timestamp: Timestamp(0),
+      },
+      {
+        stateUpdateId: 1,
+        publicKey: StarkKey.fake('1'),
+        positionId,
+        collateralBalance: 0n,
+        balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+        timestamp: Timestamp(0),
+      },
+    ])
   })
 })

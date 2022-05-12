@@ -1,4 +1,4 @@
-import { AssetBalance, OraclePrice } from '@explorer/encoding'
+import { OraclePrice } from '@explorer/encoding'
 import {
   AssetId,
   Hash256,
@@ -7,14 +7,15 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { Knex } from 'knex'
-import {
-  AssetBalanceJson,
-  PositionRow,
-  PriceRow,
-  StateUpdateRow,
-} from 'knex/types/tables'
+import { PriceRow, StateUpdateRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
+import { BaseRepository } from './BaseRepository'
+import {
+  PositionRecord,
+  toPositionRow,
+  toPositionWithPricesRecord,
+} from './PositionRepository'
 
 export interface StateUpdateRecord {
   id: number
@@ -24,27 +25,17 @@ export interface StateUpdateRecord {
   timestamp: Timestamp
 }
 
-export interface PositionRecord {
-  positionId: bigint
-  publicKey: StarkKey
-  collateralBalance: bigint
-  balances: readonly AssetBalance[]
-}
-
-export interface PositionWithPricesRecord extends PositionRecord {
-  stateUpdateId: number
-  prices: { assetId: AssetId; price: bigint }[]
-}
-
 export interface StateUpdatePriceRecord {
   stateUpdateId: number
   assetId: AssetId
   price: bigint
 }
 
-export class StateUpdateRepository {
-  constructor(private knex: Knex, private logger: Logger) {
-    this.logger = logger.for(this)
+export class StateUpdateRepository extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.add = this.wrapAdd(this.add)
+    this.findLast = this.wrapFind(this.findLast)
   }
 
   async add({ stateUpdate, positions, prices }: StateUpdateBundle) {
@@ -60,48 +51,15 @@ export class StateUpdateRepository {
         await trx('prices').insert(
           prices.map((price) => toPriceRow(price, stateUpdate.id))
         )
-
-      this.logger.debug({
-        method: 'add',
-        id: stateUpdate.id,
-        blockNumber: stateUpdate.blockNumber,
-      })
     })
+    return stateUpdate.id
   }
 
-  async getLast(): Promise<StateUpdateRecord | undefined> {
+  async findLast(): Promise<StateUpdateRecord | undefined> {
     const row = await this.knex('state_updates')
       .orderBy('block_number', 'desc')
       .first()
-
-    this.logger.debug({ method: 'getLast', id: row?.id || null })
-
     return row && toStateUpdateRecord(row)
-  }
-
-  async getPositionHistoryById(positionId: bigint) {
-    const rows = await this.knex('positions')
-      .where('position_id', positionId)
-      .orderBy('positions.state_update_id', 'desc')
-      .join('prices', 'prices.state_update_id', 'positions.state_update_id')
-      .join('state_updates', 'state_updates.id', 'positions.state_update_id')
-      .groupBy(
-        'positions.position_id',
-        'positions.state_update_id',
-        'state_updates.timestamp'
-      )
-      .select(
-        'positions.*',
-        'state_updates.timestamp as timestamp',
-        this.knex.raw('array_agg(row_to_json(prices)) as prices')
-      )
-
-    return rows.map((r) => {
-      return {
-        ...toPositionWithPricesRecord(r),
-        timestamp: Timestamp(r.timestamp),
-      }
-    })
   }
 
   async getStateUpdateIdByRootHash(
@@ -275,56 +233,6 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
     fact_hash: record.factHash.toString(),
     root_hash: record.rootHash.toString(),
     timestamp: BigInt(Number(record.timestamp)),
-  }
-}
-
-function toPositionRecord(
-  row: PositionRow
-): PositionRecord & { stateUpdateId: number } {
-  return {
-    stateUpdateId: row.state_update_id,
-    positionId: BigInt(row.position_id),
-    publicKey: StarkKey(row.public_key),
-    collateralBalance: BigInt(row.collateral_balance),
-    balances: (typeof row.balances === 'string'
-      ? (JSON.parse(row.balances) as AssetBalanceJson[])
-      : row.balances
-    ).map((x) => ({
-      assetId: AssetId(x.asset_id),
-      balance: BigInt(x.balance),
-    })),
-  }
-}
-
-function toPositionWithPricesRecord(
-  row: PositionRow & { prices: PriceRow[] }
-): PositionWithPricesRecord {
-  return {
-    ...toPositionRecord(row),
-    prices: row.prices.filter(Boolean).map((p) => ({
-      assetId: AssetId(p.asset_id),
-      price: BigInt(p.price),
-    })),
-  }
-}
-
-function toPositionRow(
-  record: PositionRecord,
-  stateUpdateId: number
-): PositionRow {
-  const balances = record.balances.map(
-    (x): AssetBalanceJson => ({
-      asset_id: x.assetId.toString(),
-      balance: x.balance.toString(),
-    })
-  )
-
-  return {
-    state_update_id: stateUpdateId,
-    position_id: record.positionId,
-    public_key: record.publicKey.toString(),
-    collateral_balance: record.collateralBalance,
-    balances: JSON.stringify(balances),
   }
 }
 

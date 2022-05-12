@@ -117,7 +117,7 @@ describe(StateUpdateCollector.name, () => {
         ],
       })
       const stateUpdateRepository = mock<StateUpdateRepository>({
-        getLast: async () => ({
+        findLast: async () => ({
           rootHash: PedersenHash.fake('1234'),
           id: 567,
           timestamp: Timestamp(1),

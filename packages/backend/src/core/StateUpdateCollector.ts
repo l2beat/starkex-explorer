@@ -149,7 +149,7 @@ export class StateUpdateCollector {
   }
 
   private async readLastUpdate() {
-    const lastUpdate = await this.stateUpdateRepository.getLast()
+    const lastUpdate = await this.stateUpdateRepository.findLast()
     if (lastUpdate) {
       return { oldHash: lastUpdate.rootHash, id: lastUpdate.id }
     }

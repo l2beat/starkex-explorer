@@ -137,17 +137,10 @@ declare module 'knex/types/tables' {
   }
 }
 
-export interface Repository<TRecord> {
-  addOrUpdate?(records: TRecord[]): Promise<void>
-  add?(records: TRecord[]): Promise<void>
-  getAll(): Promise<TRecord[]>
-  deleteAll(): Promise<void>
-}
-
 /**
  * JSON object stored in a column of type `json` or `jsonb`.
  *
  * We need to pass arrays as stringified JSON to the database — https://knexjs.org/#Schema-jsonb.
- * But, when we receive it from the database, we get the JSON object alraedy partially parsed with JSON.parse.
+ * But, when we receive it from the database, we get the JSON object already partially parsed with JSON.parse.
  */
 export type JsonB<T> = T | string
