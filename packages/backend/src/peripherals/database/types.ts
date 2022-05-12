@@ -132,7 +132,7 @@ declare module 'knex/types/tables' {
     state_updates: StateUpdateRow
     positions: PositionRow
     prices: PriceRow
-    user_registration_evens: UserRegistrationEventRow
+    user_registration_events: UserRegistrationEventRow
     forced_transaction_events: ForcedTransactionEventRow
   }
 }

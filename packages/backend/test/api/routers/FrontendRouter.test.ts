@@ -227,7 +227,7 @@ describe('FrontendRouter', () => {
         prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
       })
 
-      await userRegistrationEventRepository.add([
+      await userRegistrationEventRepository.addMany([
         {
           blockNumber: 1,
           ethAddress,
