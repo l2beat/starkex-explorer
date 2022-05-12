@@ -249,7 +249,7 @@ describe(BlockDownloader.name, () => {
 
     function mockBlockRepository(blocks: BlockRecord[]) {
       return mock<BlockRepository>({
-        deleteAllAfter: async () => 0,
+        deleteAfter: async () => 0,
         addMany: async () => [],
         findByNumber: async (number: number) => {
           return blocks.find((x) => x.number === number)
@@ -320,7 +320,7 @@ describe(BlockDownloader.name, () => {
       const result = await blockDownloader.testAdvanceChain(BLOCK_C1.number)
       expect(result).toEqual(['reorg', [record(BLOCK_B1), record(BLOCK_C1)]])
       expect(blockDownloader.getLastKnown()).toEqual(BLOCK_C1.number)
-      expect(blockRepository.deleteAllAfter).toHaveBeenCalledExactlyWith([
+      expect(blockRepository.deleteAfter).toHaveBeenCalledExactlyWith([
         [BLOCK_A.number],
       ])
       expect(blockRepository.addMany).toHaveBeenCalledExactlyWith([
@@ -358,7 +358,7 @@ describe(BlockDownloader.name, () => {
         ],
       ])
       expect(blockDownloader.getLastKnown()).toEqual(BLOCK_E1.number)
-      expect(blockRepository.deleteAllAfter).toHaveBeenCalledExactlyWith([
+      expect(blockRepository.deleteAfter).toHaveBeenCalledExactlyWith([
         [BLOCK_A.number],
       ])
       expect(blockRepository.addMany).toHaveBeenCalledExactlyWith([

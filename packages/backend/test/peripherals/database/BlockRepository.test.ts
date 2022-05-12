@@ -62,7 +62,7 @@ describe(BlockRepository.name, () => {
     }))
     await repository.addMany(records)
 
-    await repository.deleteAllAfter(5)
+    await repository.deleteAfter(5)
 
     const actual = await repository.getAll()
     expect(actual).toEqual(records.filter((r) => r.number <= 5))

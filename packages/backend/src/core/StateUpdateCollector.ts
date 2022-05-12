@@ -42,7 +42,7 @@ export class StateUpdateCollector {
       return
     }
 
-    const dbTransitions = await this.pageRepository.getAllForFacts(
+    const dbTransitions = await this.pageRepository.getByFactHashes(
       stateTransitionFacts.map((f) => f.hash)
     )
     const stateTransitions = dbTransitions.map((x, i) => ({

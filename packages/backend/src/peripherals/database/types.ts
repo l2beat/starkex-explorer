@@ -29,7 +29,7 @@ declare module 'knex/types/tables' {
 
   interface PageRow {
     /** surrogate key */
-    id?: number
+    id: number
     block_number: number
     page_hash: string
     data: string

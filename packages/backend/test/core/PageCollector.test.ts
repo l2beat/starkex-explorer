@@ -24,7 +24,7 @@ describe(PageCollector.name, () => {
       getLogsInRange: async () => testData().logs,
     })
     const pageRepository = mock<PageRepository>({
-      add: async () => {},
+      addMany: async () => [],
     })
 
     const pageCollector = new PageCollector(ethereumClient, pageRepository)
@@ -46,7 +46,7 @@ describe(PageCollector.name, () => {
 
     const actualRecords = await pageCollector.collect(blockRange)
 
-    const expectedRecords: PageRecord[] = [
+    const expectedRecords: Omit<PageRecord, 'id'>[] = [
       {
         blockNumber: 9,
         data: [5, 6, 7].map(BigNumber.from).map(bignumToPaddedString).join(''),
@@ -76,19 +76,19 @@ describe(PageCollector.name, () => {
       },
     ])
 
-    expect(pageRepository.add).toHaveBeenCalledWith([expectedRecords])
+    expect(pageRepository.addMany).toHaveBeenCalledWith([expectedRecords])
   })
 
   it('discards all records from repository after given block', async () => {
     const pageRepository = mock<PageRepository>({
-      deleteAllAfter: async () => {},
+      deleteAfter: async () => 0,
     })
 
     const collector = new PageCollector(mock<EthereumClient>(), pageRepository)
 
     await collector.discardAfter(123)
 
-    expect(pageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
+    expect(pageRepository.deleteAfter).toHaveBeenCalledWith([123])
   })
 
   it('crashes on logs from reorged chain histories', async () => {
@@ -97,7 +97,7 @@ describe(PageCollector.name, () => {
       getLogs: async () => testData().logs,
     })
     const pageRepository = mock<PageRepository>({
-      add: async () => {},
+      addMany: async () => [],
     })
 
     const pageCollector = new PageCollector(ethereumClient, pageRepository)

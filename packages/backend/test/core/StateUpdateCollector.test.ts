@@ -95,7 +95,7 @@ describe(StateUpdateCollector.name, () => {
   describe(StateUpdateCollector.prototype.save.name, () => {
     it('throws if state transition facts are missing in database', async () => {
       const pageRepository = mock<PageRepository>({
-        getAllForFacts: async () => [],
+        getByFactHashes: async () => [],
       })
       const stateUpdateCollector = new StateUpdateCollector(
         pageRepository,
@@ -113,7 +113,7 @@ describe(StateUpdateCollector.name, () => {
 
     it('calls processStateTransition for every update', async () => {
       const pageRepository = mock<PageRepository>({
-        getAllForFacts: async () => [
+        getByFactHashes: async () => [
           { factHash: Hash256.fake('a'), pages: ['aa', 'ab', 'ac'] },
           { factHash: Hash256.fake('b'), pages: ['ba', 'bb'] },
         ],

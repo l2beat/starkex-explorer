@@ -19,13 +19,13 @@ describe(PageRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    const record: PageRecord = {
+    const record: Omit<PageRecord, 'id'> = {
       blockNumber: 1,
       pageHash: Hash256.fake(),
       data: '11223344',
     }
 
-    await repository.add([record])
+    await repository.addMany([record])
 
     const actual = await repository.getAll()
 
@@ -38,16 +38,16 @@ describe(PageRepository.name, () => {
   })
 
   it('adds multiple records and queries them', async () => {
-    const records: PageRecord[] = [dummyPage(10), dummyPage(11), dummyPage(12)]
+    const records = [dummyPage(10), dummyPage(11), dummyPage(12)]
 
-    await repository.add(records)
+    await repository.addMany(records)
     const actual = await repository.getAll()
 
     expect(actual).toEqual(records.map((r) => ({ ...r, id: expect.a(Number) })))
   })
 
   it('deletes all records', async () => {
-    await repository.add([dummyPage(1), dummyPage(2)])
+    await repository.addMany([dummyPage(1), dummyPage(2)])
 
     await repository.deleteAll()
 
@@ -57,9 +57,9 @@ describe(PageRepository.name, () => {
 
   it('deletes all records after a block number', async () => {
     const records = Array.from({ length: 10 }).map((_, i) => dummyPage(i))
-    await repository.add(records)
+    await repository.addMany(records)
 
-    await repository.deleteAllAfter(5)
+    await repository.deleteAfter(5)
 
     const actual = await repository.getAll()
     expect(actual).toEqual(
@@ -86,7 +86,7 @@ describe(PageRepository.name, () => {
         dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa14'), 4),
       ])
 
-      await repository.add([
+      await repository.addMany([
         dummyPage(2, Hash256.fake('aa10'), '{{1-1}}'),
         dummyPage(1, Hash256.fake('aa11'), '{{1-2}}'),
         dummyPage(3, Hash256.fake('aa12'), '{{1-3}}'),
@@ -99,7 +99,7 @@ describe(PageRepository.name, () => {
         dummyPage(2, Hash256.fake('aa23'), '{{2-4}}'),
       ])
 
-      const actual = await repository.getAllForFacts([
+      const actual = await repository.getByFactHashes([
         Hash256.fake('ff02'),
         Hash256.fake('ff01'),
       ])
@@ -120,7 +120,7 @@ describe(PageRepository.name, () => {
         dummyFactToPage(300, Hash256.fake('ff03'), Hash256.fake('aa31'), 1),
       ])
 
-      await repository.add([
+      await repository.addMany([
         dummyPage(2, Hash256.fake('aa10'), '{{1-0}}'),
         dummyPage(1, Hash256.fake('aa11'), '{{1-1}}'),
         dummyPage(2, Hash256.fake('aa20'), '{{2-0}}'),
@@ -129,7 +129,7 @@ describe(PageRepository.name, () => {
         dummyPage(2, Hash256.fake('aa31'), '{{3-1}}'),
       ])
 
-      const actual = await repository.getAllForFacts([
+      const actual = await repository.getByFactHashes([
         Hash256.fake('ff01'),
         Hash256.fake('ff02'),
         Hash256.fake('ff03'),
@@ -158,7 +158,7 @@ describe(PageRepository.name, () => {
         dummyFactToPage(600, Hash256.fake('ff03'), Hash256.fake('cc11'), 0),
       ])
 
-      await repository.add([
+      await repository.addMany([
         dummyPage(90, Hash256.fake('aa11'), '{{old-1}}'),
         dummyPage(90, Hash256.fake('aa22'), '{{old-2}}'),
         dummyPage(190, Hash256.fake('aa11'), '{{new-1}}'),
@@ -169,7 +169,7 @@ describe(PageRepository.name, () => {
         dummyPage(412, Hash256.fake('cc22'), '{{3-2}}'),
       ])
 
-      const actual = await repository.getAllForFacts([
+      const actual = await repository.getByFactHashes([
         Hash256.fake('ff01'),
         Hash256.fake('ff02'),
         Hash256.fake('ff03'),
@@ -194,7 +194,7 @@ function dummyPage(
   blockNumber: number,
   pageHash = Hash256.fake(),
   data = `{{ data ${blockNumber} }}`
-): PageRecord {
+): Omit<PageRecord, 'id'> {
   return {
     blockNumber,
     pageHash,

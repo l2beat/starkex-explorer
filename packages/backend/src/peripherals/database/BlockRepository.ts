@@ -21,7 +21,7 @@ export class BlockRepository extends BaseRepository {
     this.findByNumber = this.wrapFind(this.findByNumber)
     this.findByHash = this.wrapFind(this.findByHash)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.deleteAllAfter = this.wrapDelete(this.deleteAllAfter)
+    this.deleteAfter = this.wrapDelete(this.deleteAfter)
   }
 
   async addMany(records: BlockRecord[]) {
@@ -63,7 +63,7 @@ export class BlockRepository extends BaseRepository {
     return await this.knex('blocks').delete()
   }
 
-  async deleteAllAfter(blockNumber: number) {
+  async deleteAfter(blockNumber: number) {
     return await this.knex('blocks').where('number', '>', blockNumber).delete()
   }
 }
