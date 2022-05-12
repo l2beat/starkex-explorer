@@ -25,6 +25,7 @@ import { FactToPageRepository } from './peripherals/database/FactToPageRepositor
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
+import { PositionRepository } from './peripherals/database/PositionRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
 import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
@@ -60,6 +61,7 @@ export class Application {
     const blockRepository = new BlockRepository(knex, logger)
     const rollupStateRepository = new RollupStateRepository(knex, logger)
     const stateUpdateRepository = new StateUpdateRepository(knex, logger)
+    const positionRepository = new PositionRepository(knex, logger)
     const userRegistrationEventRepository = new UserRegistrationEventRepository(
       knex,
       logger
@@ -142,6 +144,7 @@ export class Application {
     )
     const homeController = new HomeController(
       stateUpdateRepository,
+      positionRepository,
       forcedTransactionsRepository
     )
     const forcedTransactionController = new ForcedTransactionController(
