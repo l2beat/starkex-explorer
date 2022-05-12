@@ -37,7 +37,7 @@ export class StateUpdateCollector {
     private rollupState?: RollupState
   ) {}
 
-  async save(stateTransitionFacts: StateTransitionFactRecord[]) {
+  async save(stateTransitionFacts: Omit<StateTransitionFactRecord, 'id'>[]) {
     if (stateTransitionFacts.length === 0) {
       return
     }

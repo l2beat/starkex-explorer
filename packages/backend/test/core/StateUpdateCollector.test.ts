@@ -105,9 +105,7 @@ describe(StateUpdateCollector.name, () => {
         mock<ForcedTransactionsRepository>()
       )
       expect(
-        stateUpdateCollector.save([
-          { id: 1, hash: Hash256.fake('a'), blockNumber: 1 },
-        ])
+        stateUpdateCollector.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
       ).toBeRejected('Missing state transition facts in database')
     })
 

@@ -37,7 +37,7 @@ declare module 'knex/types/tables' {
 
   interface StateTransitionFactRow {
     /** surrogate key */
-    id?: number
+    id: number
     block_number: number
     hash: string
   }

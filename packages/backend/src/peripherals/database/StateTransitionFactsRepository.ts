@@ -3,59 +3,50 @@ import { Knex } from 'knex'
 import { StateTransitionFactRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { Repository } from './types'
+import { BaseRepository } from './BaseRepository'
 
 export interface StateTransitionFactRecord {
-  id?: number
+  id: number
   blockNumber: number
   hash: Hash256
 }
 
-export class StateTransitionFactRepository
-  implements Repository<StateTransitionFactRecord>
-{
-  constructor(private readonly knex: Knex, private readonly logger: Logger) {
-    this.logger = this.logger.for(this)
+export class StateTransitionFactRepository extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.addMany = this.wrapAddMany(this.addMany)
+    this.getAll = this.wrapGet(this.getAll)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.deleteAfter = this.wrapDelete(this.deleteAfter)
   }
 
-  async add(records: StateTransitionFactRecord[]) {
-    if (records.length === 0) {
-      this.logger.debug({ method: 'add', rows: 0 })
-      return
-    }
-
-    const rows: StateTransitionFactRow[] = records.map(toRow)
-
-    await this.knex('state_transition_facts').insert(rows)
-
-    this.logger.debug({ method: 'add', rows: rows.length })
+  async addMany(records: Omit<StateTransitionFactRecord, 'id'>[]) {
+    const rows = records.map(toRow)
+    return this.knex('state_transition_facts').insert(rows).returning('id')
   }
 
   async getAll() {
     const rows = await this.knex('state_transition_facts')
       .select('*')
       .orderBy('block_number')
-    this.logger.debug({ method: 'getAll', rows: rows.length })
-
     return rows.map(toRecord)
   }
 
   async deleteAll() {
-    await this.knex('state_transition_facts').delete()
-    this.logger.debug({ method: 'deleteAll' })
+    return this.knex('state_transition_facts').delete()
   }
 
-  async deleteAllAfter(blockNumber: number) {
-    const rowsCount = await this.knex('state_transition_facts')
+  async deleteAfter(blockNumber: number) {
+    return this.knex('state_transition_facts')
       .where('block_number', '>', blockNumber)
       .delete()
-    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
   }
 }
 
-function toRow(record: StateTransitionFactRecord): StateTransitionFactRow {
+function toRow(
+  record: Omit<StateTransitionFactRecord, 'id'>
+): Omit<StateTransitionFactRow, 'id'> {
   return {
-    id: record.id,
     block_number: record.blockNumber,
     hash: record.hash.toString(),
   }

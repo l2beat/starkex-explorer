@@ -24,12 +24,14 @@ export class StateTransitionFactCollector {
     private readonly stateTransitionFactRepository: StateTransitionFactRepository
   ) {}
 
-  async collect(blockRange: BlockRange): Promise<StateTransitionFactRecord[]> {
+  async collect(
+    blockRange: BlockRange
+  ): Promise<Omit<StateTransitionFactRecord, 'id'>[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: PERPETUAL_ADDRESS,
       topics: [LOG_STATE_TRANSITION_FACT],
     })
-    const records = logs.map((log): StateTransitionFactRecord => {
+    const records = logs.map((log): Omit<StateTransitionFactRecord, 'id'> => {
       const event = PERPETUAL_ABI.parseLog(log)
       return {
         blockNumber: log.blockNumber,
@@ -37,11 +39,11 @@ export class StateTransitionFactCollector {
       }
     })
 
-    await this.stateTransitionFactRepository.add(records)
+    await this.stateTransitionFactRepository.addMany(records)
     return records
   }
 
   async discardAfter(lastToKeep: BlockNumber) {
-    await this.stateTransitionFactRepository.deleteAllAfter(lastToKeep)
+    await this.stateTransitionFactRepository.deleteAfter(lastToKeep)
   }
 }
