@@ -147,9 +147,9 @@ export class ForcedTradeOfferRepository {
 
   async getAcceptOffersByStarkKey(
     starkKey: StarkKey
-  ): Promise<(ForcedTradeOfferRecord | undefined)[]> {
+  ): Promise<ForcedTradeOfferRecord[]> {
     const rows = await this.knex('initial_offers')
-      .leftOuterJoin(
+      .join(
         'accept_offers',
         'initial_offers.id',
         'accept_offers.initial_offer_id'
@@ -257,29 +257,27 @@ function tradeOfferToRecord({
   premium_cost,
   signature,
 }: ForcedTradeOfferRow) {
-  if (initial_offer_id) {
-    return {
-      ...initialOfferToRecord({
-        id,
-        created_at,
-        submitted_at,
-        stark_key_a,
-        position_id_a,
-        synthetic_asset_id,
-        amount_collateral,
-        amount_synthetic,
-        a_is_buying_synthetic,
-      }),
-      ...acceptOfferToRecord({
-        initial_offer_id,
-        accepted_at,
-        stark_key_b,
-        position_id_b,
-        submission_expiration_time,
-        nonce,
-        premium_cost,
-        signature,
-      }),
-    }
+  return {
+    ...initialOfferToRecord({
+      id,
+      created_at,
+      submitted_at,
+      stark_key_a,
+      position_id_a,
+      synthetic_asset_id,
+      amount_collateral,
+      amount_synthetic,
+      a_is_buying_synthetic,
+    }),
+    ...acceptOfferToRecord({
+      initial_offer_id,
+      accepted_at,
+      stark_key_b,
+      position_id_b,
+      submission_expiration_time,
+      nonce,
+      premium_cost,
+      signature,
+    }),
   }
 }

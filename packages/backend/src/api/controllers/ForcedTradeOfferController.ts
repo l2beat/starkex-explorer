@@ -136,7 +136,7 @@ export class ForcedTradeOfferController {
         }
       })
       acceptOffers.forEach((offer) => {
-        if (offer && !offer.aIsBuyingSynthetic) {
+        if (offer.aIsBuyingSynthetic) {
           frozenBalance += offer.amountCollateral
         }
       })
@@ -147,11 +147,7 @@ export class ForcedTradeOfferController {
         }
       })
       acceptOffers.forEach((offer) => {
-        if (
-          offer &&
-          offer.aIsBuyingSynthetic &&
-          offer.syntheticAssetId === assetId
-        ) {
+        if (offer.aIsBuyingSynthetic && offer.syntheticAssetId === assetId) {
           frozenBalance += offer.amountSynthetic
         }
       })
