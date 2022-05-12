@@ -12,7 +12,7 @@ import { mock } from '../mock'
 
 describe(VerifierCollector.name, () => {
   it('saves events to repository and returns verifier addresses', async () => {
-    const add = mockFn(async (_records: VerifierEventRecord[]) => {})
+    const addMany = mockFn(async (_records: VerifierEventRecord[]) => [])
 
     const ethereumClient = mock<EthereumClient>({
       getLogsInRange: async () => testData().logs,
@@ -20,7 +20,7 @@ describe(VerifierCollector.name, () => {
     const collector = new VerifierCollector(
       ethereumClient,
       mock<VerifierEventRepository>({
-        add,
+        addMany,
         async getAll() {
           return []
         },
@@ -70,7 +70,7 @@ describe(VerifierCollector.name, () => {
         ],
       },
     ])
-    expect(add).toHaveBeenCalledWith([
+    expect(addMany).toHaveBeenCalledWith([
       [
         expect.objectWith({
           name: 'ImplementationAdded',
@@ -107,7 +107,7 @@ describe(VerifierCollector.name, () => {
 
   it('discards all records from repository after given block', async () => {
     const verifierEventRepository = mock<VerifierEventRepository>({
-      deleteAllAfter: async (_blockNumber: number) => {},
+      deleteAfter: async (_blockNumber: number) => 0,
     })
     const collector = new VerifierCollector(
       mock<EthereumClient>(),
@@ -116,12 +116,12 @@ describe(VerifierCollector.name, () => {
 
     await collector.discardAfter(123)
 
-    expect(verifierEventRepository.deleteAllAfter).toHaveBeenCalledWith([123])
+    expect(verifierEventRepository.deleteAfter).toHaveBeenCalledWith([123])
   })
 
   it('crashes on logs from reorged chain histories', async () => {
     const verifierEventRepository = mock<VerifierEventRepository>({
-      add: async () => {},
+      addMany: async () => [],
       getAll: async () => [],
     })
 
@@ -153,7 +153,7 @@ describe(VerifierCollector.name, () => {
     const collector = new VerifierCollector(
       mock<EthereumClient>({ getLogsInRange: async () => [] }),
       mock<VerifierEventRepository>({
-        add: async () => {},
+        addMany: async () => [],
         getAll: async () => [],
       }),
       hardcodedAddresses
