@@ -1,9 +1,7 @@
-import { ForcedTrade,ForcedWithdrawal } from '@explorer/encoding'
+import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
-import {
-  Updates,
-} from '../src/peripherals/database/ForcedTransactionsRepository'
+import { Updates } from '../src/peripherals/database/ForcedTransactionsRepository'
 
 const MAX_SAFE_POSTGRES_INT = 2 ** 31 - 1
 export function fakeInt(max = MAX_SAFE_POSTGRES_INT): number {
