@@ -46,93 +46,19 @@ describe(StateUpdateRepository.name, () => {
     })
   })
 
-  it('gets position by id', async () => {
-    const positionId = 12345n
-
-    await repository.add({
-      stateUpdate: {
-        id: 1,
-        blockNumber: 1,
-        rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
-        timestamp: Timestamp(0),
-      },
-      positions: [
-        {
-          publicKey: StarkKey.fake('1'),
-          positionId,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
-    })
-
-    await repository.add({
-      stateUpdate: {
-        id: 2,
-        blockNumber: 2,
-        rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
-        timestamp: Timestamp(0),
-      },
-      positions: [
-        {
-          publicKey: StarkKey.fake('1'),
-          positionId,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
-    })
-
-    const position = await repository.getPositionHistoryById(positionId)
-
-    expect(position).toEqual([
-      {
-        stateUpdateId: 2,
-        publicKey: StarkKey.fake('1'),
-        positionId,
-        collateralBalance: 0n,
-        balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
-        prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
-        timestamp: Timestamp(0),
-      },
-      {
-        stateUpdateId: 1,
-        publicKey: StarkKey.fake('1'),
-        positionId,
-        collateralBalance: 0n,
-        balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
-        prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
-        timestamp: Timestamp(0),
-      },
-    ])
-  })
-
   it('gets state update id by root hash', async () => {
-    const stateRootId = 1
-    const positionId = 12345n
     const rootHash = PedersenHash.fake()
 
     await repository.add({
       stateUpdate: {
-        id: stateRootId,
+        id: 1,
         blockNumber: 1,
         rootHash,
         factHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
-      positions: [
-        {
-          publicKey: StarkKey.fake(),
-          positionId,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+      positions: [],
+      prices: [],
     })
 
     await repository.add({
@@ -143,81 +69,18 @@ describe(StateUpdateRepository.name, () => {
         factHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
-      positions: [
-        {
-          publicKey: StarkKey.fake(),
-          positionId,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+      positions: [],
+      prices: [],
     })
 
-    const position = await repository.getStateUpdateIdByRootHash(rootHash)
-
-    expect(position).toEqual(stateRootId)
+    const result = await repository.findIdByRootHash(rootHash)
+    expect(result).toEqual(1)
   })
 
   it('gets undefined when root hash not found', async () => {
     const rootHash = PedersenHash.fake()
 
-    const position = await repository.getStateUpdateIdByRootHash(rootHash)
-
-    expect(position).toEqual(undefined)
-  })
-
-  it('gets position by public key', async () => {
-    const positionId = 12345n
-    const publicKey = StarkKey.fake()
-
-    await repository.add({
-      stateUpdate: {
-        id: 1,
-        blockNumber: 1,
-        rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
-        timestamp: Timestamp(0),
-      },
-      positions: [
-        {
-          publicKey,
-          positionId,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
-    })
-
-    await repository.add({
-      stateUpdate: {
-        id: 2,
-        blockNumber: 2,
-        rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
-        timestamp: Timestamp(0),
-      },
-      positions: [
-        {
-          publicKey: StarkKey.fake(),
-          positionId,
-          collateralBalance: 0n,
-          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
-    })
-
-    const position = await repository.getPositionIdByPublicKey(publicKey)
-
-    expect(position).toEqual(positionId)
-  })
-
-  it('gets undefined when root hash not found', async () => {
-    const publicKey = StarkKey.fake()
-
-    const position = await repository.getPositionIdByPublicKey(publicKey)
+    const position = await repository.findIdByRootHash(rootHash)
 
     expect(position).toEqual(undefined)
   })
@@ -237,7 +100,7 @@ describe(StateUpdateRepository.name, () => {
   })
 
   it('gets last state update by block number', async () => {
-    let last = await repository.getLast()
+    let last = await repository.findLast()
 
     expect(last).toEqual(undefined)
 
@@ -263,7 +126,7 @@ describe(StateUpdateRepository.name, () => {
     }
     await repository.add({ stateUpdate, positions: [], prices: [] })
 
-    last = await repository.getLast()
+    last = await repository.findLast()
 
     expect(last).toEqual(stateUpdate)
   })
@@ -290,7 +153,7 @@ describe(StateUpdateRepository.name, () => {
       })
     }
 
-    await repository.deleteAllAfter(20_002)
+    await repository.deleteAfter(20_002)
 
     const records = await repository.getAll()
     expect(records.map((x) => x.blockNumber)).toEqual([20_001, 20_002])
@@ -336,7 +199,7 @@ describe(StateUpdateRepository.name, () => {
       prices: [],
     })
 
-    const actual = await repository.getStateUpdateList({ offset: 0, limit: 2 })
+    const actual = await repository.getPaginated({ offset: 0, limit: 2 })
 
     expect(actual).toEqual([
       {
@@ -377,7 +240,7 @@ describe(StateUpdateRepository.name, () => {
       prices: [{ assetId: AssetId('ETH-9'), price: 10n }],
     })
 
-    const actual = await repository.getStateUpdateById(blockNumber)
+    const actual = await repository.findByIdWithPositions(blockNumber)
 
     expect(actual).toEqual({
       id: blockNumber,
@@ -417,71 +280,13 @@ describe(StateUpdateRepository.name, () => {
       })
     }
 
-    const fullCount = await repository.getStateUpdateCount()
+    const fullCount = await repository.count()
 
     expect(fullCount).toEqual(4n)
   })
 
-  it('gets positions state from previous update', async () => {
-    const stateUpdateId = 10
-    const nextStateUpdateId = 11
-    const positionId = 1n
-    await repository.add({
-      stateUpdate: {
-        id: stateUpdateId,
-        blockNumber: stateUpdateId,
-        rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
-        timestamp: Timestamp(0),
-      },
-      positions: [
-        {
-          publicKey: StarkKey.fake(),
-          positionId,
-          collateralBalance: 10n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
-    })
-    await repository.add({
-      stateUpdate: {
-        id: nextStateUpdateId,
-        blockNumber: nextStateUpdateId,
-        rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
-        timestamp: Timestamp(0),
-      },
-      positions: [
-        {
-          publicKey: StarkKey.fake(),
-          positionId,
-          collateralBalance: 20n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
-        },
-        {
-          publicKey: StarkKey.fake(),
-          positionId: 2n,
-          collateralBalance: 30n,
-          balances: [{ assetId: AssetId('ETH-9'), balance: 30n }],
-        },
-      ],
-      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(nextStateUpdateId) }],
-    })
-    const positions = await repository.getPositionsPreviousState(
-      [positionId],
-      nextStateUpdateId
-    )
-    expect(positions.length).toEqual(1)
-    expect(positions[0]).toBeAnObjectWith({
-      stateUpdateId,
-      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
-      balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
-    })
-  })
-
   it('returns undefined if update is missing', async () => {
-    const update = await repository.getStateUpdateById(1)
+    const update = await repository.findByIdWithPositions(1)
     expect(update).not.toBeDefined()
   })
 })

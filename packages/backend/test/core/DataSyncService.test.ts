@@ -29,7 +29,7 @@ describe(DataSyncService.name, () => {
       collect: async (_blockRange) => [],
     })
 
-    const transitionFacts: StateTransitionFactRecord[] = [
+    const transitionFacts: Omit<StateTransitionFactRecord, 'id'>[] = [
       { hash: Hash256.fake('abcd'), blockNumber: 1 },
     ]
 

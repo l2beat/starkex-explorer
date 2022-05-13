@@ -3,39 +3,36 @@ import { Knex } from 'knex'
 import { PageRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { Repository } from './types'
+import { BaseRepository } from './BaseRepository'
 
 export interface PageRecord {
-  id?: number
+  id: number
   blockNumber: number
   pageHash: Hash256
   data: string
 }
 
-export class PageRepository implements Repository<PageRecord> {
-  constructor(private knex: Knex, private logger: Logger) {
-    this.logger = logger.for(this)
+export class PageRepository extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.addMany = this.wrapAddMany(this.addMany)
+    this.getAll = this.wrapGet(this.getAll)
+    this.getByFactHashes = this.wrapGet(this.getByFactHashes)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.deleteAfter = this.wrapDelete(this.deleteAfter)
   }
 
-  async add(records: PageRecord[]) {
-    if (records.length === 0) {
-      this.logger.debug({ method: 'add', rows: 0 })
-      return
-    }
-
-    const rows: PageRow[] = records.map(toRow)
-    await this.knex('pages').insert(rows)
-
-    this.logger.debug({ method: 'add', rows: rows.length })
+  async addMany(records: Omit<PageRecord, 'id'>[]) {
+    const rows = records.map(toRow)
+    return this.knex('pages').insert(rows).returning('id')
   }
 
   async getAll() {
     const rows = await this.knex('pages').select('*')
-    this.logger.debug({ method: 'getAll', rows: rows.length })
     return rows.map(toRecord)
   }
 
-  async getAllForFacts(factHashes: Hash256[]) {
+  async getByFactHashes(factHashes: Hash256[]) {
     type Row = {
       fact_hash: string
       page_block: number
@@ -57,8 +54,6 @@ export class PageRepository implements Repository<PageRecord> {
         'fact_hash',
         factHashes.map((x) => x.toString())
       )) as Row[]
-
-    this.logger.debug({ method: 'getAllPagesForFacts', rows: rows.length })
 
     const records = rows.map((row) => ({
       factBlockNumber: row.fact_block,
@@ -98,22 +93,16 @@ export class PageRepository implements Repository<PageRecord> {
   }
 
   async deleteAll() {
-    await this.knex('pages').delete()
-    this.logger.debug({ method: 'deleteAll' })
+    return this.knex('pages').delete()
   }
 
-  async deleteAllAfter(blockNumber: number) {
-    const rowsCount = await this.knex('pages')
-      .where('block_number', '>', blockNumber)
-      .delete()
-
-    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
+  async deleteAfter(blockNumber: number) {
+    return this.knex('pages').where('block_number', '>', blockNumber).delete()
   }
 }
 
-function toRow(record: PageRecord): PageRow {
+function toRow(record: Omit<PageRecord, 'id'>): Omit<PageRow, 'id'> {
   return {
-    id: record.id,
     block_number: record.blockNumber,
     page_hash: record.pageHash.toString(),
     data: record.data,

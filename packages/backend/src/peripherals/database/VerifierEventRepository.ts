@@ -2,109 +2,72 @@ import { Knex } from 'knex'
 import { VerifierEventRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { Repository } from './types'
+import { BaseRepository } from './BaseRepository'
 
-export type VerifierEventRecord = (
-  | ImplementationAddedEventRecord
-  | UpgradedEventRecord
-) & {
-  id?: number
-}
-
-export interface ImplementationAddedEventRecord {
+export interface VerifierEventRecord {
+  id: number
+  name: 'ImplementationAdded' | 'Upgraded'
   implementation: string
-  initializer: string
+  initializer?: string
   blockNumber: number
-  name: 'ImplementationAdded'
 }
 
-export interface UpgradedEventRecord {
-  implementation: string
-  blockNumber: number
-  name: 'Upgraded'
-}
-
-export class VerifierEventRepository
-  implements Repository<VerifierEventRecord>
-{
-  constructor(private readonly knex: Knex, private readonly logger: Logger) {
-    this.logger = this.logger.for(this)
+export class VerifierEventRepository extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.addMany = this.wrapAddMany(this.addMany)
+    this.getAll = this.wrapGet(this.getAll)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.deleteAfter = this.wrapDelete(this.deleteAfter)
   }
 
-  async add(records: VerifierEventRecord[]) {
-    if (records.length === 0) {
-      this.logger.debug({ method: 'add', rows: 0 })
-      return
-    }
-
-    const rows: VerifierEventRow[] = records.map(toRow)
-
-    await this.knex('verifier_events').insert(rows)
-
-    this.logger.debug({ method: 'add', rows: rows.length })
+  async addMany(records: Omit<VerifierEventRecord, 'id'>[]) {
+    const rows = records.map(toRow)
+    return this.knex('verifier_events').insert(rows).returning('id')
   }
 
   async getAll() {
     const rows = await this.knex('verifier_events').select('*')
-    this.logger.debug({ method: 'getAll', rows: rows.length })
-
     return rows.map(toRecord)
   }
 
   async deleteAll() {
-    await this.knex('verifier_events').delete()
-    this.logger.debug({ method: 'deleteAll' })
+    return this.knex('verifier_events').delete()
   }
 
-  async deleteAllAfter(blockNumber: number) {
-    const rowsCount = await this.knex('verifier_events')
+  async deleteAfter(blockNumber: number) {
+    return await this.knex('verifier_events')
       .where('block_number', '>', blockNumber)
       .delete()
-    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
   }
 }
 
-function toRow(record: VerifierEventRecord): VerifierEventRow {
-  switch (record.name) {
-    case 'ImplementationAdded':
-      return {
-        id: record.id,
-        block_number: record.blockNumber,
-        implementation: record.implementation,
-        initializer: record.initializer,
-        name: 'ImplementationAdded',
-      }
-    case 'Upgraded':
-      return {
-        id: record.id,
-        block_number: record.blockNumber,
-        implementation: record.implementation,
-        name: 'Upgraded',
-      }
+function toRow(
+  record: Omit<VerifierEventRecord, 'id'>
+): Omit<VerifierEventRow, 'id'> {
+  if (record.name === 'ImplementationAdded' && !record.initializer) {
+    throw new Error("'initializer' is required on ImplementationAdded event")
+  }
+  return {
+    name: record.name,
+    block_number: record.blockNumber,
+    implementation: record.implementation,
+    initializer: record.initializer,
   }
 }
 
 function toRecord(row: VerifierEventRow): VerifierEventRecord {
-  switch (row.name) {
-    case 'ImplementationAdded':
-      if (!row.initializer)
-        throw new Error(
-          "'initializer' is required on ImplmenedationAdded event"
-        )
-
-      return {
-        id: row.id,
-        implementation: row.implementation,
-        initializer: row.initializer,
-        blockNumber: row.block_number,
-        name: 'ImplementationAdded',
-      }
-    case 'Upgraded':
-      return {
-        id: row.id,
-        implementation: row.implementation,
-        blockNumber: row.block_number,
-        name: 'Upgraded',
-      }
+  if (row.name === 'ImplementationAdded' && !row.initializer) {
+    throw new Error("'initializer' is required on ImplementationAdded event")
   }
+  const record: VerifierEventRecord = {
+    id: row.id,
+    name: row.name,
+    implementation: row.implementation,
+    blockNumber: row.block_number,
+  }
+  if (row.initializer) {
+    record.initializer = row.initializer
+  }
+  return record
 }

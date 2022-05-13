@@ -30,12 +30,15 @@ export class PageCollector {
     private readonly pageRepository: PageRepository
   ) {}
 
-  async collect(blockRange: BlockRange): Promise<PageRecord[]> {
+  async collect(blockRange: BlockRange): Promise<Omit<PageRecord, 'id'>[]> {
     const memoryPageEvents = await this.getMemoryPageEvents(blockRange)
 
     const records = await Promise.all(
       memoryPageEvents.map(
-        async ({ memoryHash, transactionHash }): Promise<PageRecord> => {
+        async ({
+          memoryHash,
+          transactionHash,
+        }): Promise<Omit<PageRecord, 'id'>> => {
           const tx = await this.ethereumClient.getTransaction(transactionHash)
 
           const decoded = PAGE_ABI.decodeFunctionData(
@@ -55,12 +58,12 @@ export class PageCollector {
       )
     )
 
-    await this.pageRepository.add(records)
+    await this.pageRepository.addMany(records)
     return records
   }
 
   async discardAfter(lastToKeep: BlockNumber) {
-    await this.pageRepository.deleteAllAfter(lastToKeep)
+    await this.pageRepository.deleteAfter(lastToKeep)
   }
 
   private async getMemoryPageEvents(

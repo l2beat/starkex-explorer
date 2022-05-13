@@ -6,9 +6,10 @@ import { EthereumAddress } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import {
+  PositionRepository,
   PositionWithPricesRecord,
-  StateUpdateRepository,
-} from '../../peripherals/database/StateUpdateRepository'
+} from '../../peripherals/database/PositionRepository'
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
@@ -18,6 +19,7 @@ import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 export class StateUpdateController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
+    private positionRepository: PositionRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
 
@@ -26,11 +28,11 @@ export class StateUpdateController {
     perPage: number,
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const stateUpdates = await this.stateUpdateRepository.getStateUpdateList({
+    const stateUpdates = await this.stateUpdateRepository.getPaginated({
       offset: (page - 1) * perPage,
       limit: perPage,
     })
-    const fullCount = await this.stateUpdateRepository.getStateUpdateCount()
+    const fullCount = await this.stateUpdateRepository.count()
 
     const content = renderStateUpdatesIndexPage({
       account,
@@ -46,7 +48,7 @@ export class StateUpdateController {
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
     const [stateUpdate, transactions] = await Promise.all([
-      this.stateUpdateRepository.getStateUpdateById(id),
+      this.stateUpdateRepository.findByIdWithPositions(id),
       this.forcedTransactionsRepository.getIncludedInStateUpdate(id),
     ])
 
@@ -55,11 +57,10 @@ export class StateUpdateController {
       return { type: 'not found', content }
     }
 
-    const previousPositions =
-      await this.stateUpdateRepository.getPositionsPreviousState(
-        stateUpdate.positions.map((p) => p.positionId),
-        id
-      )
+    const previousPositions = await this.positionRepository.getPreviousStates(
+      stateUpdate.positions.map((p) => p.positionId),
+      id
+    )
 
     const positions = stateUpdate.positions
       .map((position) => ({

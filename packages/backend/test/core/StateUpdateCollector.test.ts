@@ -95,7 +95,7 @@ describe(StateUpdateCollector.name, () => {
   describe(StateUpdateCollector.prototype.save.name, () => {
     it('throws if state transition facts are missing in database', async () => {
       const pageRepository = mock<PageRepository>({
-        getAllForFacts: async () => [],
+        getByFactHashes: async () => [],
       })
       const stateUpdateCollector = new StateUpdateCollector(
         pageRepository,
@@ -105,21 +105,19 @@ describe(StateUpdateCollector.name, () => {
         mock<ForcedTransactionsRepository>()
       )
       expect(
-        stateUpdateCollector.save([
-          { id: 1, hash: Hash256.fake('a'), blockNumber: 1 },
-        ])
+        stateUpdateCollector.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
       ).toBeRejected('Missing state transition facts in database')
     })
 
     it('calls processStateTransition for every update', async () => {
       const pageRepository = mock<PageRepository>({
-        getAllForFacts: async () => [
+        getByFactHashes: async () => [
           { factHash: Hash256.fake('a'), pages: ['aa', 'ab', 'ac'] },
           { factHash: Hash256.fake('b'), pages: ['ba', 'bb'] },
         ],
       })
       const stateUpdateRepository = mock<StateUpdateRepository>({
-        getLast: async () => ({
+        findLast: async () => ({
           rootHash: PedersenHash.fake('1234'),
           id: 567,
           timestamp: Timestamp(1),
@@ -191,7 +189,7 @@ describe(StateUpdateCollector.name, () => {
   describe(StateUpdateCollector.prototype.discardAfter.name, () => {
     it('deletes updates after block number', async () => {
       const stateUpdateRepository = mock<StateUpdateRepository>({
-        deleteAllAfter: async () => {},
+        deleteAfter: async () => 0,
       })
 
       const stateUpdateCollector = new StateUpdateCollector(
@@ -205,7 +203,7 @@ describe(StateUpdateCollector.name, () => {
       await stateUpdateCollector.discardAfter(20)
       await stateUpdateCollector.discardAfter(40)
 
-      expect(stateUpdateRepository.deleteAllAfter).toHaveBeenCalledExactlyWith([
+      expect(stateUpdateRepository.deleteAfter).toHaveBeenCalledExactlyWith([
         [20],
         [40],
       ])

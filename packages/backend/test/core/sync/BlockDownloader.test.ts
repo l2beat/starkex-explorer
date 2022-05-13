@@ -26,7 +26,7 @@ describe(BlockDownloader.name, () => {
         },
       })
       const blockRepository = mock<BlockRepository>({
-        getLast: async () =>
+        findLast: async () =>
           lastBlockNumber
             ? { hash: Hash256.fake(), number: lastBlockNumber }
             : undefined,
@@ -154,7 +154,7 @@ describe(BlockDownloader.name, () => {
         onBlock: () => () => {},
       })
       const blockRepository = mock<BlockRepository>({
-        getLast: async () => ({ hash: Hash256.fake(), number: 10_000_000 }),
+        findLast: async () => ({ hash: Hash256.fake(), number: 10_000_000 }),
       })
       const blockDownloader = new BlockDownloader(
         ethereumClient,
@@ -176,7 +176,7 @@ describe(BlockDownloader.name, () => {
     it('returns no blocks if the repository is empty', async () => {
       const ethereumClient = mock<EthereumClient>()
       const blockRepository = mock<BlockRepository>({
-        getLast: async () => undefined,
+        findLast: async () => undefined,
       })
       const blockDownloader = new BlockDownloader(
         ethereumClient,
@@ -189,7 +189,7 @@ describe(BlockDownloader.name, () => {
     it('returns no blocks if there are no blocks in range', async () => {
       const ethereumClient = mock<EthereumClient>()
       const blockRepository = mock<BlockRepository>({
-        getLast: async () => ({ number: 2_000_000, hash: Hash256.fake() }),
+        findLast: async () => ({ number: 2_000_000, hash: Hash256.fake() }),
         getAllInRange: async () => [],
       })
       const blockDownloader = new BlockDownloader(
@@ -203,7 +203,7 @@ describe(BlockDownloader.name, () => {
     it('returns the blocks in range', async () => {
       const ethereumClient = mock<EthereumClient>()
       const blockRepository = mock<BlockRepository>({
-        getLast: async () => ({ number: 2_000_000, hash: Hash256.fake() }),
+        findLast: async () => ({ number: 2_000_000, hash: Hash256.fake() }),
         getAllInRange: async () => [
           { number: 1_500_000, hash: Hash256.fake('abc') },
           { number: 1_700_000, hash: Hash256.fake('def') },
@@ -249,9 +249,9 @@ describe(BlockDownloader.name, () => {
 
     function mockBlockRepository(blocks: BlockRecord[]) {
       return mock<BlockRepository>({
-        deleteAllAfter: async () => {},
-        add: async () => {},
-        getByNumber: async (number: number) => {
+        deleteAfter: async () => 0,
+        addMany: async () => [],
+        findByNumber: async (number: number) => {
           return blocks.find((x) => x.number === number)
         },
       })
@@ -285,7 +285,7 @@ describe(BlockDownloader.name, () => {
       const result = await blockDownloader.testAdvanceChain(BLOCK_B.number)
       expect(result).toEqual(['newBlock', record(BLOCK_B)])
       expect(blockDownloader.getLastKnown()).toEqual(BLOCK_B.number)
-      expect(blockRepository.add).toHaveBeenCalledExactlyWith([
+      expect(blockRepository.addMany).toHaveBeenCalledExactlyWith([
         [[record(BLOCK_B)]],
       ])
     })
@@ -302,7 +302,7 @@ describe(BlockDownloader.name, () => {
       const result = await blockDownloader.testAdvanceChain(BLOCK_B.number)
       expect(result).toEqual(['newBlock', record(BLOCK_B)])
       expect(blockDownloader.getLastKnown()).toEqual(BLOCK_B.number)
-      expect(blockRepository.add).toHaveBeenCalledExactlyWith([
+      expect(blockRepository.addMany).toHaveBeenCalledExactlyWith([
         [[record(BLOCK_A)]],
         [[record(BLOCK_B)]],
       ])
@@ -320,10 +320,10 @@ describe(BlockDownloader.name, () => {
       const result = await blockDownloader.testAdvanceChain(BLOCK_C1.number)
       expect(result).toEqual(['reorg', [record(BLOCK_B1), record(BLOCK_C1)]])
       expect(blockDownloader.getLastKnown()).toEqual(BLOCK_C1.number)
-      expect(blockRepository.deleteAllAfter).toHaveBeenCalledExactlyWith([
+      expect(blockRepository.deleteAfter).toHaveBeenCalledExactlyWith([
         [BLOCK_A.number],
       ])
-      expect(blockRepository.add).toHaveBeenCalledExactlyWith([
+      expect(blockRepository.addMany).toHaveBeenCalledExactlyWith([
         [[record(BLOCK_B1), record(BLOCK_C1)]],
       ])
     })
@@ -358,10 +358,10 @@ describe(BlockDownloader.name, () => {
         ],
       ])
       expect(blockDownloader.getLastKnown()).toEqual(BLOCK_E1.number)
-      expect(blockRepository.deleteAllAfter).toHaveBeenCalledExactlyWith([
+      expect(blockRepository.deleteAfter).toHaveBeenCalledExactlyWith([
         [BLOCK_A.number],
       ])
-      expect(blockRepository.add).toHaveBeenCalledExactlyWith([
+      expect(blockRepository.addMany).toHaveBeenCalledExactlyWith([
         [
           [
             record(BLOCK_B1),

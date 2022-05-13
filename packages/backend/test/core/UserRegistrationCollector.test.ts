@@ -66,7 +66,7 @@ describe(UserRegistrationCollector.name, () => {
       getLogsInRange: async () => TEST_LOGS,
     })
     const repository = mock<UserRegistrationEventRepository>({
-      add: async () => {},
+      addMany: async () => [],
     })
     const collector = new UserRegistrationCollector(ethereumClient, repository)
 
@@ -104,7 +104,9 @@ describe(UserRegistrationCollector.name, () => {
       },
     ]
 
-    expect(repository.add).toHaveBeenCalledWith([expectedRegistrationEvents])
+    expect(repository.addMany).toHaveBeenCalledWith([
+      expectedRegistrationEvents,
+    ])
 
     expect(registrations).toEqual(
       expectedRegistrationEvents.map((e) => ({
@@ -116,7 +118,7 @@ describe(UserRegistrationCollector.name, () => {
 
   it('discards all records from repository after given block', async () => {
     const userRegistrationRepository = mock<UserRegistrationEventRepository>({
-      deleteAllAfter: async (_blockNumber: number) => {},
+      deleteAfter: async () => 0,
     })
     const collector = new UserRegistrationCollector(
       mock<EthereumClient>(),
@@ -125,8 +127,6 @@ describe(UserRegistrationCollector.name, () => {
 
     await collector.discardAfter(123)
 
-    expect(userRegistrationRepository.deleteAllAfter).toHaveBeenCalledWith([
-      123,
-    ])
+    expect(userRegistrationRepository.deleteAfter).toHaveBeenCalledWith([123])
   })
 })

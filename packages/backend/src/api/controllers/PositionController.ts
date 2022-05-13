@@ -5,6 +5,7 @@ import {
 import { EthereumAddress } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
+import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
@@ -15,6 +16,7 @@ import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 export class PositionController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
+    private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
@@ -24,7 +26,7 @@ export class PositionController {
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
     const [history, transactions] = await Promise.all([
-      this.stateUpdateRepository.getPositionHistoryById(positionId),
+      this.positionRepository.getHistoryById(positionId),
       this.forcedTransactionsRepository.getAffectingPosition(positionId),
     ])
 
@@ -87,8 +89,8 @@ export class PositionController {
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
     const [history, update, transactions] = await Promise.all([
-      this.stateUpdateRepository.getPositionHistoryById(positionId),
-      this.stateUpdateRepository.getStateUpdateById(stateUpdateId),
+      this.positionRepository.getHistoryById(positionId),
+      this.stateUpdateRepository.findByIdWithPositions(stateUpdateId),
       this.forcedTransactionsRepository.getIncludedInStateUpdate(stateUpdateId),
     ])
     const updateIndex = history.findIndex(

@@ -3,7 +3,7 @@ import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
 import {
-  UserRegistrationEventRecordCandidate,
+  UserRegistrationEventRecord,
   UserRegistrationEventRepository,
 } from '../peripherals/database/UserRegistrationEventRepository'
 import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
@@ -18,10 +18,10 @@ const PERPETUAL_ABI = new utils.Interface([
 export const LOG_USER_REGISTERED =
   PERPETUAL_ABI.getEventTopic('LogUserRegistered')
 
-type UserRegistration = Omit<
-  UserRegistrationEventRecordCandidate,
-  'blockNumber'
->
+export interface UserRegistration {
+  ethAddress: EthereumAddress
+  starkKey: StarkKey
+}
 
 export class UserRegistrationCollector {
   constructor(
@@ -31,7 +31,7 @@ export class UserRegistrationCollector {
 
   async collect(blockRange: BlockRange): Promise<UserRegistration[]> {
     const events = await this.getEvents(blockRange)
-    await this.userRegistrationRepository.add(events)
+    await this.userRegistrationRepository.addMany(events)
     return events.map((e) => ({
       ethAddress: e.ethAddress,
       starkKey: e.starkKey,
@@ -40,7 +40,7 @@ export class UserRegistrationCollector {
 
   private async getEvents(
     blockRange: BlockRange
-  ): Promise<UserRegistrationEventRecordCandidate[]> {
+  ): Promise<Omit<UserRegistrationEventRecord, 'id'>[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: PERPETUAL_ADDRESS,
       topics: [LOG_USER_REGISTERED],
@@ -56,6 +56,6 @@ export class UserRegistrationCollector {
   }
 
   async discardAfter(lastToKeep: BlockNumber) {
-    await this.userRegistrationRepository.deleteAllAfter(lastToKeep)
+    await this.userRegistrationRepository.deleteAfter(lastToKeep)
   }
 }
