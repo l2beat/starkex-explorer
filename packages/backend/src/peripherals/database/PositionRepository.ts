@@ -1,5 +1,5 @@
 import { AssetBalance } from '@explorer/encoding'
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { AssetBalanceJson, PositionRow, PriceRow } from 'knex/types/tables'
 
@@ -22,7 +22,9 @@ export class PositionRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
+    this.findById = this.wrapFind(this.findById)
     this.findIdByPublicKey = this.wrapFind(this.findIdByPublicKey)
+    this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
     this.getPreviousStates = this.wrapGet(this.getPreviousStates)
     this.count = this.wrapAny(this.count)
   }
@@ -52,10 +54,40 @@ export class PositionRepository extends BaseRepository {
     })
   }
 
+  async findById(id: bigint) {
+    const row = await this.knex('positions')
+      .where('position_id', id)
+      .orderBy('positions.state_update_id', 'desc')
+      .join('prices', 'prices.state_update_id', 'positions.state_update_id')
+      .groupBy('positions.position_id', 'positions.state_update_id')
+      .first(
+        'positions.*',
+        this.knex.raw('array_agg(row_to_json(prices)) as prices')
+      )
+    return row ? toPositionWithPricesRecord(row) : undefined
+  }
+
   async findIdByPublicKey(publicKey: StarkKey): Promise<bigint | undefined> {
     const row = await this.knex('positions')
       .where('public_key', publicKey.toString())
       .first('position_id')
+    return row?.position_id
+  }
+
+  async findIdByEthereumAddress(
+    address: EthereumAddress
+  ): Promise<bigint | undefined> {
+    const row = await this.knex('user_registration_events')
+      .first('position_id')
+      .orderBy('block_number', 'desc')
+      .where('eth_address', address.toString())
+      .join('positions', function () {
+        this.on(
+          'positions.public_key',
+          '=',
+          'user_registration_events.stark_key'
+        )
+      })
     return row?.position_id
   }
 
