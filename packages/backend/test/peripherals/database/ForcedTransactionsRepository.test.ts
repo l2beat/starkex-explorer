@@ -168,12 +168,15 @@ describe(ForcedTransactionsRepository.name, () => {
   it('returns latest transactions', async () => {
     const hash1 = Hash256.fake()
     const data1 = fakeWithdrawal()
-    const sentAt1 = fakeTimestamp(1)
+    const sentAt1 = fakeTimestamp(3)
     const hash2 = Hash256.fake()
     const data2 = fakeTrade()
-    const sentAt2 = fakeTimestamp(2)
-    const minedAt2 = fakeTimestamp(3)
+    const sentAt2 = fakeTimestamp(1)
+    const minedAt2 = fakeTimestamp(2)
     const blockNumber2 = fakeInt()
+    const hash3 = Hash256.fake()
+    const data3 = fakeWithdrawal()
+    const sentAt3 = fakeTimestamp(4)
 
     await repository.add(
       {
@@ -191,10 +194,25 @@ describe(ForcedTransactionsRepository.name, () => {
       minedAt2,
       blockNumber2
     )
+    await repository.add(
+      {
+        hash: hash3,
+        data: data3,
+      },
+      sentAt3
+    )
 
     const latest = await repository.getLatest({ limit: 10, offset: 0 })
 
-    expect(latest).toEqual([
+    const expected = [
+      {
+        hash: hash3,
+        data: data3,
+        lastUpdateAt: sentAt3,
+        updates: updates({
+          sentAt: sentAt3,
+        }),
+      },
       {
         hash: hash1,
         data: data1,
@@ -212,10 +230,12 @@ describe(ForcedTransactionsRepository.name, () => {
           minedAt: minedAt2,
         }),
       },
-    ])
+    ]
+
+    expect(latest).toEqual(expected)
 
     const offset = await repository.getLatest({ limit: 10, offset: 2 })
-    expect(offset).toEqual([])
+    expect(offset).toEqual([expected[2]])
   })
 
   it('returns transactions affecting position', async () => {

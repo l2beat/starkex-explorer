@@ -156,11 +156,20 @@ export class ForcedTransactionsRepository {
     limit: number
     offset: number
   }): Promise<ForcedTransactionRecord[]> {
-    // TODO: paginate in sql
     const rows = await this.rowsQuery()
-    const transactions = rows.map(toRecord)
-    transactions.sort((a, b) => +a.lastUpdateAt - +b.lastUpdateAt)
-    return transactions.slice(offset, offset + limit)
+      .select(
+        this.knex.raw(`greatest(
+      "timestamp",
+      "mined_at",
+      "sent_at",
+      "reverted_at",
+      "forgotten_at"
+    ) as last_update_at`)
+      )
+      .orderBy('last_update_at', 'desc')
+      .offset(offset)
+      .limit(limit)
+    return rows.map(toRecord)
   }
 
   async getIncludedInStateUpdate(
