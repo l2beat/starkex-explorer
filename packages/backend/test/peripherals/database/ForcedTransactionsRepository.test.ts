@@ -1,55 +1,17 @@
-import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
-import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import {
-  ForcedTransactionRecord,
-  ForcedTransactionsRepository,
-} from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { fakeBigInt, fakeBoolean, fakeInt, fakeTimestamp } from '../../utils'
+import {
+  fakeBigInt,
+  fakeForcedUpdates,
+  fakeInt,
+  fakeTimestamp,
+  fakeTrade,
+  fakeWithdrawal,
+} from '../../fakes'
 import { setupDatabaseTestSuite } from './setup'
-
-function fakeWithdrawal(
-  withdrawal?: Partial<Omit<ForcedWithdrawal, 'type'>>
-): ForcedWithdrawal {
-  return {
-    type: 'withdrawal',
-    publicKey: StarkKey.fake(),
-    positionId: fakeBigInt(),
-    amount: fakeBigInt(),
-    ...withdrawal,
-  }
-}
-
-function fakeTrade(trade?: Partial<Omit<ForcedTrade, 'type'>>): ForcedTrade {
-  return {
-    type: 'trade',
-    collateralAmount: fakeBigInt(),
-    isABuyingSynthetic: fakeBoolean(),
-    nonce: fakeBigInt(),
-    positionIdA: fakeBigInt(),
-    positionIdB: fakeBigInt(),
-    publicKeyA: StarkKey.fake(),
-    publicKeyB: StarkKey.fake(),
-    syntheticAmount: fakeBigInt(),
-    syntheticAssetId: AssetId.USDC,
-    ...trade,
-  }
-}
-
-function updates(
-  updates?: Partial<ForcedTransactionRecord['updates']>
-): ForcedTransactionRecord['updates'] {
-  return {
-    forgottenAt: null,
-    minedAt: null,
-    revertedAt: null,
-    sentAt: null,
-    verified: undefined,
-    ...updates,
-  }
-}
 
 describe(ForcedTransactionsRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()
@@ -95,21 +57,21 @@ describe(ForcedTransactionsRepository.name, () => {
       {
         ...tx1,
         lastUpdateAt: sentAt1,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt1,
         }),
       },
       {
         ...tx2,
         lastUpdateAt: sentAt2,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt2,
         }),
       },
       {
         ...tx3,
         lastUpdateAt: minedAt3,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt3,
           minedAt: minedAt3,
         }),
@@ -117,7 +79,7 @@ describe(ForcedTransactionsRepository.name, () => {
       {
         ...tx4,
         lastUpdateAt: minedAt4,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt4,
           minedAt: minedAt4,
         }),
@@ -209,7 +171,7 @@ describe(ForcedTransactionsRepository.name, () => {
         hash: hash3,
         data: data3,
         lastUpdateAt: sentAt3,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt3,
         }),
       },
@@ -217,7 +179,7 @@ describe(ForcedTransactionsRepository.name, () => {
         hash: hash1,
         data: data1,
         lastUpdateAt: sentAt1,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt1,
         }),
       },
@@ -225,7 +187,7 @@ describe(ForcedTransactionsRepository.name, () => {
         hash: hash2,
         data: data2,
         lastUpdateAt: minedAt2,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt2,
           minedAt: minedAt2,
         }),
@@ -282,7 +244,7 @@ describe(ForcedTransactionsRepository.name, () => {
         hash: hash1,
         data: data1,
         lastUpdateAt: sentAt1,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt1,
         }),
       },
@@ -290,7 +252,7 @@ describe(ForcedTransactionsRepository.name, () => {
         hash: hash2,
         data: data2,
         lastUpdateAt: minedAt2,
-        updates: updates({
+        updates: fakeForcedUpdates({
           sentAt: sentAt2,
           minedAt: minedAt2,
         }),
@@ -357,7 +319,7 @@ describe(ForcedTransactionsRepository.name, () => {
       data,
       hash,
       lastUpdateAt: sentAt,
-      updates: updates({ sentAt }),
+      updates: fakeForcedUpdates({ sentAt }),
     })
   })
 })
