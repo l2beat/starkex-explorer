@@ -31,7 +31,7 @@ export interface ForcedTradeAcceptedOfferRecord {
   acceptedAt: Timestamp
   starkKeyB: StarkKey
   positionIdB: bigint
-  submissionExpirationTime: Timestamp
+  submissionExpirationTime: number // unix time in hours
   nonce: bigint
   premiumCost: boolean
 
@@ -41,10 +41,10 @@ export interface ForcedTradeAcceptedOfferRecord {
 
 interface ForcedTradeAcceptedOfferRow {
   initial_offer_id: number
-  accepted_at: number
+  accepted_at: bigint
   stark_key_b: string
   position_id_b: bigint
-  submission_expiration_time: number
+  submission_expiration_time: bigint
   nonce: bigint
   premium_cost: boolean
   signature: string
@@ -178,11 +178,10 @@ function acceptedOfferToRow(
 ): ForcedTradeAcceptedOfferRow {
   return {
     initial_offer_id: initialOfferId,
-    accepted_at: acceptedOffer.acceptedAt as unknown as number,
+    accepted_at: BigInt(acceptedOffer.acceptedAt as unknown as number),
     stark_key_b: acceptedOffer.starkKeyB.toString(),
     position_id_b: acceptedOffer.positionIdB,
-    submission_expiration_time:
-      acceptedOffer.submissionExpirationTime as unknown as number,
+    submission_expiration_time: BigInt(acceptedOffer.submissionExpirationTime),
     nonce: acceptedOffer.nonce,
     premium_cost: acceptedOffer.premiumCost,
     signature: acceptedOffer.signature,
@@ -196,7 +195,7 @@ function acceptedOfferToRecord(
     acceptedAt: Timestamp(row.accepted_at),
     starkKeyB: StarkKey(row.stark_key_b),
     positionIdB: row.position_id_b,
-    submissionExpirationTime: Timestamp(row.submission_expiration_time),
+    submissionExpirationTime: Number(row.submission_expiration_time),
     nonce: BigInt(row.nonce),
     premiumCost: row.premium_cost,
     signature: row.signature,

@@ -1,4 +1,4 @@
-import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { validateSignature } from '../../../src/api/controllers/ForcedTradeOfferController'
@@ -25,7 +25,7 @@ const acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'> = {
     '069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41'
   ),
   positionIdB: BigInt('0x2ce'),
-  submissionExpirationTime: Timestamp(3456000000000),
+  submissionExpirationTime: BigInt(3456000000000),
   nonce: BigInt(38404830),
   premiumCost: true,
   signature:
