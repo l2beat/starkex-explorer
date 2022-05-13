@@ -2,6 +2,7 @@ import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 
 import { Logger } from '../../tools/Logger'
+import { BaseRepository } from './BaseRepository'
 
 export interface ForcedTradeInitialOfferRecord {
   id: number
@@ -55,9 +56,17 @@ type ForcedTradeOfferRecord = ForcedTradeInitialOfferRecord &
 type ForcedTradeOfferRow = ForcedTradeInitialOfferRow &
   ForcedTradeAcceptedOfferRow
 
-export class ForcedTradeOfferRepository {
-  constructor(private knex: Knex, private logger: Logger) {
-    this.logger = logger.for(this)
+export class ForcedTradeOfferRepository extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.addInitialOffer = this.wrapAdd(this.addInitialOffer)
+    this.addAcceptedOffer = this.wrapAdd(this.addAcceptedOffer)
+    this.findInitialOfferById = this.wrapFind(this.findInitialOfferById)
+    this.findAcceptedOfferById = this.wrapFind(this.findAcceptedOfferById)
+    this.findOfferById = this.wrapFind(this.findOfferById)
+    this.getAllInitialOffers = this.wrapGet(this.getAllInitialOffers)
+    this.getAllAcceptedOffers = this.wrapGet(this.getAllAcceptedOffers)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
   async addInitialOffer(
@@ -69,18 +78,20 @@ export class ForcedTradeOfferRepository {
     return id
   }
 
-  async addAcceptedOffer(
-    initialOfferId: number,
+  async addAcceptedOffer({
+    initialOfferId,
+    acceptedOffer,
+  }: {
+    initialOfferId: number
     acceptedOffer: ForcedTradeAcceptedOfferRecord
-  ): Promise<void> {
+  }): Promise<number> {
     const row = acceptedOfferToRow(initialOfferId, acceptedOffer)
     await this.knex('accepted_offers').insert(row)
-    this.logger.debug({ method: 'addAcceptedOffer' })
+    return initialOfferId
   }
 
   async getAllInitialOffers(): Promise<ForcedTradeInitialOfferRecord[]> {
     const rows = await this.knex('initial_offers').select('*')
-    this.logger.debug({ method: 'getAllInitialOffers', rows: rows.length })
     return rows.map(initialOfferToRecord)
   }
 
@@ -139,10 +150,7 @@ export class ForcedTradeOfferRepository {
     const rows = await this.knex('initial_offers')
       .where('stark_key_a', starkKey)
       .select('*')
-    this.logger.debug({
-      method: 'getInitialOffersByStarkKey',
-      rows: rows.length,
-    })
+
     return rows.map(initialOfferToRecord)
   }
 
@@ -158,17 +166,11 @@ export class ForcedTradeOfferRepository {
       .where('stark_key_b', starkKey)
       .select('*')
 
-    this.logger.debug({
-      method: 'getAcceptedOffersByStarkKey',
-      rows: rows.length,
-    })
-
     return rows.map(tradeOfferToRecord)
   }
 
   async deleteAll() {
-    await this.knex('initial_offers').delete()
-    this.logger.debug({ method: 'deleteAll' })
+    return await this.knex('initial_offers').delete()
   }
 }
 

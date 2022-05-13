@@ -1,7 +1,7 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
-import { string, z } from 'zod'
+import { z } from 'zod'
 
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import {
@@ -54,7 +54,8 @@ export function createForcedTradeOfferRouter(
             positionIdB: stringAsBigInt(),
             submissionExpirationTime: stringAsInt(),
             nonce: stringAsBigInt(),
-            signature: string(),
+            signature: z.string(),
+            premiumCost: z.boolean(),
           }),
         }),
       }),

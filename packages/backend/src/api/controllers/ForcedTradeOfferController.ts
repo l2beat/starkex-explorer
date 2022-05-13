@@ -95,9 +95,12 @@ export class ForcedTradeOfferController {
     }
 
     const acceptedAt = Timestamp(Date.now())
-    await this.offerRepository.addAcceptedOffer(initialOfferId, {
-      acceptedAt,
-      ...acceptedOffer,
+    await this.offerRepository.addAcceptedOffer({
+      initialOfferId,
+      acceptedOffer: {
+        acceptedAt,
+        ...acceptedOffer,
+      },
     })
 
     return { type: 'success', content: 'Accept offer was submitted.' }

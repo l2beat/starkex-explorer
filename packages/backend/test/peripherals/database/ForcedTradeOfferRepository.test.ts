@@ -91,8 +91,14 @@ describe(ForcedTradeOfferRepository.name, () => {
     const id1 = await repository.addInitialOffer(initialOffer1)
     const id2 = await repository.addInitialOffer(initialOffer2)
 
-    await repository.addAcceptedOffer(id1, acceptedOffer1)
-    await repository.addAcceptedOffer(id2, acceptedOffer2)
+    await repository.addAcceptedOffer({
+      initialOfferId: id1,
+      acceptedOffer: acceptedOffer1,
+    })
+    await repository.addAcceptedOffer({
+      initialOfferId: id2,
+      acceptedOffer: acceptedOffer2,
+    })
 
     const actual = await repository.getAllAcceptedOffers()
 
@@ -125,8 +131,14 @@ describe(ForcedTradeOfferRepository.name, () => {
     const id2 = await repository.addInitialOffer(initialOffer2)
     await repository.addInitialOffer(initialOffer3)
 
-    await repository.addAcceptedOffer(id1, acceptedOffer1)
-    await repository.addAcceptedOffer(id2, acceptedOffer2)
+    await repository.addAcceptedOffer({
+      initialOfferId: id1,
+      acceptedOffer: acceptedOffer1,
+    })
+    await repository.addAcceptedOffer({
+      initialOfferId: id2,
+      acceptedOffer: acceptedOffer2,
+    })
 
     const actual = await repository.getAcceptedOffersByStarkKey(
       acceptedOffer2.starkKeyB
@@ -137,7 +149,10 @@ describe(ForcedTradeOfferRepository.name, () => {
   describe('accept offer', async () => {
     it('adds single accept offer', async () => {
       const id = await repository.addInitialOffer(initialOffer1)
-      await repository.addAcceptedOffer(id, acceptedOffer1)
+      await repository.addAcceptedOffer({
+        initialOfferId: id,
+        acceptedOffer: acceptedOffer1,
+      })
 
       const actual = await repository.findAcceptedOfferById(id)
 
@@ -146,8 +161,10 @@ describe(ForcedTradeOfferRepository.name, () => {
 
     it('queries offer with accept offer', async () => {
       const id = await repository.addInitialOffer(initialOffer1)
-      await repository.addAcceptedOffer(id, acceptedOffer1)
-
+      await repository.addAcceptedOffer({
+        initialOfferId: id,
+        acceptedOffer: acceptedOffer1,
+      })
       const actual = await repository.findOfferById(id)
 
       expect(actual).toEqual({ id, ...initialOffer1, ...acceptedOffer1 })
