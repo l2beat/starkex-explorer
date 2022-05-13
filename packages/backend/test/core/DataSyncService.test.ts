@@ -41,7 +41,7 @@ describe(DataSyncService.name, () => {
       collect: async () => [],
     })
     const forcedEventsCollector = mock<ForcedEventsCollector>({
-      collect: async () => [],
+      collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
     })
     const stateUpdateCollector = mock<StateUpdateCollector>({
       save: noop,
