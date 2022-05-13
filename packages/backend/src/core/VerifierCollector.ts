@@ -5,8 +5,6 @@ import { partition } from 'lodash'
 
 import { BlockRange } from '../model/BlockRange'
 import {
-  ImplementationAddedEventRecord,
-  UpgradedEventRecord,
   VerifierEventRecord,
   VerifierEventRepository,
 } from '../peripherals/database/VerifierEventRepository'
@@ -41,10 +39,10 @@ export class VerifierCollector {
   async collect(blockRange: BlockRange): Promise<EthereumAddress[]> {
     const oldEvents = this.verifierEventRepository.getAll()
     const newEvents = await this.getEvents(blockRange)
-    const savingNewEventsToDb = this.verifierEventRepository.add(newEvents)
+    const savingNewEventsToDb = this.verifierEventRepository.addMany(newEvents)
 
     const events = [...(await oldEvents), ...newEvents]
-    const [upgraded, added] = partitionVerifierEvents(events)
+    const [upgraded, added] = partition(events, (e) => e.name === 'Upgraded')
 
     added.sort(byBlockNumberDescending)
 
@@ -58,7 +56,7 @@ export class VerifierCollector {
   }
 
   async discardAfter(lastToKeep: BlockNumber) {
-    await this.verifierEventRepository.deleteAllAfter(lastToKeep)
+    await this.verifierEventRepository.deleteAfter(lastToKeep)
   }
 
   private async getEvents(blockRange: BlockRange) {
@@ -66,7 +64,7 @@ export class VerifierCollector {
       address: PROXY_ADDRESS,
       topics: [[ImplementationAdded, Upgraded]],
     })
-    return logs.map((log): VerifierEventRecord => {
+    return logs.map((log): Omit<VerifierEventRecord, 'id'> => {
       const event = PROXY_ABI.parseLog(log)
       return {
         name: event.name as 'ImplementationAdded' | 'Upgraded',
@@ -83,8 +81,8 @@ export class VerifierCollector {
  * which addresses are found in the `upgradeEvent.initializer` field.
  */
 function computeVerifiersFromEvents(
-  added: ImplementationAddedEventRecord[],
-  upgraded: UpgradedEventRecord[]
+  added: Omit<VerifierEventRecord, 'id'>[],
+  upgraded: Omit<VerifierEventRecord, 'id'>[]
 ): EthereumAddress[] {
   return upgraded
     .map(
@@ -96,20 +94,12 @@ function computeVerifiersFromEvents(
             a.blockNumber <= u.blockNumber
         )
     )
-    .filter((x): x is ImplementationAddedEventRecord => x !== undefined)
-    .map((x) => decodeAddress(x.initializer))
+    .flatMap((x) => (x?.initializer ? [decodeAddress(x.initializer)] : []))
 }
 
 function decodeAddress(data: string): EthereumAddress {
   const decoded = new AbiCoder().decode(['address'], data)[0]
   return EthereumAddress(decoded)
-}
-
-function partitionVerifierEvents(events: VerifierEventRecord[]) {
-  return partition(
-    events,
-    (e): e is UpgradedEventRecord => e.name === 'Upgraded'
-  )
 }
 
 function byBlockNumberDescending(

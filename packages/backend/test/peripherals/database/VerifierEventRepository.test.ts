@@ -14,14 +14,14 @@ describe(VerifierEventRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    const record: VerifierEventRecord = {
+    const record: Omit<VerifierEventRecord, 'id'> = {
       name: 'ImplementationAdded',
       implementation: '0x0000000000000000000000000000000000000000',
       initializer: '0x0000000000000000000000000000000000000000',
       blockNumber: 1,
     }
 
-    await repository.add([record])
+    await repository.addMany([record])
 
     const actual = await repository.getAll()
 
@@ -34,12 +34,12 @@ describe(VerifierEventRepository.name, () => {
   })
 
   it('adds 0 records', async () => {
-    await repository.add([])
+    await repository.addMany([])
     expect(await repository.getAll()).toEqual([])
   })
 
   it('adds multiple records and queries them', async () => {
-    const records: VerifierEventRecord[] = [
+    const records: Omit<VerifierEventRecord, 'id'>[] = [
       {
         name: 'ImplementationAdded',
         implementation: '0x0000000000000000000000000000000000000000',
@@ -59,14 +59,14 @@ describe(VerifierEventRepository.name, () => {
       },
     ]
 
-    await repository.add(records)
+    await repository.addMany(records)
     const actual = await repository.getAll()
 
     expect(actual).toEqual(records.map((r) => ({ ...r, id: expect.a(Number) })))
   })
 
   it('deletes all records', async () => {
-    await repository.add([
+    await repository.addMany([
       {
         name: 'ImplementationAdded',
         initializer: '0x0000000000000000000000000000000000000001',
@@ -87,7 +87,7 @@ describe(VerifierEventRepository.name, () => {
   })
 
   it('deletes all records after a block number', async () => {
-    await repository.add([
+    await repository.addMany([
       {
         name: 'Upgraded',
         implementation: '0x0000000000000000000000000000000000000001',
@@ -105,7 +105,7 @@ describe(VerifierEventRepository.name, () => {
       },
     ])
 
-    await repository.deleteAllAfter(2)
+    await repository.deleteAfter(2)
 
     const actual = await repository.getAll()
     expect(actual).toEqual([

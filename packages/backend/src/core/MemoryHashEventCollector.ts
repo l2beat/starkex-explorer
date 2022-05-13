@@ -32,7 +32,7 @@ export class MemoryHashEventCollector {
     )
     const hashEvents = events.flat()
 
-    await this.factToPageRepository.add(
+    await this.factToPageRepository.addMany(
       hashEvents.flatMap((event) =>
         event.pagesHashes.map((pageHash, index) => ({
           index,

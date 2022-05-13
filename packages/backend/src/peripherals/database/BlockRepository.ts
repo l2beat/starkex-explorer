@@ -3,33 +3,35 @@ import { Knex } from 'knex'
 import { BlockRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { Repository } from './types'
+import { BaseRepository } from './BaseRepository'
 
 export interface BlockRecord {
   number: number
   hash: Hash256
 }
 
-export class BlockRepository implements Repository<BlockRecord> {
-  constructor(private knex: Knex, private logger: Logger) {
-    this.logger = logger.for(this)
+export class BlockRepository extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+
+    this.addMany = this.wrapAddMany(this.addMany)
+    this.getAll = this.wrapGet(this.getAll)
+    this.getAllInRange = this.wrapGet(this.getAllInRange)
+    this.findLast = this.wrapFind(this.findLast)
+    this.findByNumber = this.wrapFind(this.findByNumber)
+    this.findByHash = this.wrapFind(this.findByHash)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.deleteAfter = this.wrapDelete(this.deleteAfter)
   }
 
-  async add(records: BlockRecord[]) {
-    if (records.length === 0) {
-      this.logger.debug({ method: 'add', rows: 0 })
-      return
-    }
-
+  async addMany(records: BlockRecord[]) {
     const rows: BlockRow[] = records.map(toRow)
-    await this.knex('blocks').insert(rows)
-
-    this.logger.debug({ method: 'add', rows: rows.length })
+    const numbers = await this.knex('blocks').insert(rows).returning('number')
+    return numbers
   }
 
   async getAll(): Promise<BlockRecord[]> {
     const rows = await this.knex('blocks').select('*')
-    this.logger.debug({ method: 'getAll', rows: rows.length })
     return rows.map(toRecord)
   }
 
@@ -39,57 +41,30 @@ export class BlockRepository implements Repository<BlockRecord> {
       .where('number', '>=', from)
       .andWhere('number', '<=', to)
       .orderBy('number')
-    this.logger.debug({ method: 'getAllUntil', rows: rows.length })
     return rows.map(toRecord)
   }
 
-  async getLast(): Promise<BlockRecord | undefined> {
+  async findLast(): Promise<BlockRecord | undefined> {
     const row = await this.knex('blocks').orderBy('number', 'desc').first()
-
-    this.logger.debug({
-      method: 'getLast',
-      number: row?.number ?? null,
-      hash: row?.hash ?? null,
-    })
-
     return row && toRecord(row)
   }
 
-  async getByNumber(number: number): Promise<BlockRecord | undefined> {
+  async findByNumber(number: number): Promise<BlockRecord | undefined> {
     const row = await this.knex('blocks').where('number', number).first()
-
-    this.logger.debug({
-      method: 'getByNumber',
-      number,
-      hash: row?.hash ?? null,
-    })
-
     return row && toRecord(row)
   }
 
-  async getByHash(hash: Hash256): Promise<BlockRecord | undefined> {
+  async findByHash(hash: Hash256): Promise<BlockRecord | undefined> {
     const row = await this.knex('blocks').where('hash', hash.toString()).first()
-
-    this.logger.debug({
-      method: 'getByHash',
-      hash: hash.toString(),
-      number: row?.number ?? null,
-    })
-
     return row && toRecord(row)
   }
 
   async deleteAll() {
-    await this.knex('blocks').delete()
-    this.logger.debug({ method: 'deleteAll' })
+    return await this.knex('blocks').delete()
   }
 
-  async deleteAllAfter(blockNumber: number) {
-    const rowsCount = await this.knex('blocks')
-      .where('number', '>', blockNumber)
-      .delete()
-
-    this.logger.debug({ method: 'deleteAllAfter', rows: rowsCount })
+  async deleteAfter(blockNumber: number) {
+    return await this.knex('blocks').where('number', '>', blockNumber).delete()
   }
 }
 

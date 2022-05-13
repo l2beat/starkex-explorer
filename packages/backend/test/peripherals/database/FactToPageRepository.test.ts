@@ -15,14 +15,14 @@ describe(FactToPageRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    const record: FactToPageRecord = {
+    const record: Omit<FactToPageRecord, 'id'> = {
       blockNumber: 1,
       index: 0,
       factHash: Hash256.fake(),
       pageHash: Hash256.fake(),
     }
 
-    await repository.add([record])
+    await repository.addMany([record])
 
     const actual = await repository.getAll()
 
@@ -35,25 +35,25 @@ describe(FactToPageRepository.name, () => {
   })
 
   it('adds 0 records', async () => {
-    await repository.add([])
+    await repository.addMany([])
     expect(await repository.getAll()).toEqual([])
   })
 
   it('adds multiple records and queries them', async () => {
-    const records: FactToPageRecord[] = [
+    const records = [
       dummyFactToPageRecord({ index: 0 }),
       dummyFactToPageRecord({ index: 1 }),
       dummyFactToPageRecord({ index: 2 }),
     ]
 
-    await repository.add(records)
+    await repository.addMany(records)
     const actual = await repository.getAll()
 
     expect(actual).toEqual(records.map((r) => ({ ...r, id: expect.a(Number) })))
   })
 
   it('deletes all records', async () => {
-    await repository.add([
+    await repository.addMany([
       dummyFactToPageRecord({ index: 0 }),
       dummyFactToPageRecord({ index: 1 }),
     ])
@@ -68,7 +68,7 @@ describe(FactToPageRepository.name, () => {
     const records = Array.from({ length: 10 }).map((_, i) =>
       dummyFactToPageRecord({ blockNumber: i })
     )
-    await repository.add(records)
+    await repository.addMany(records)
 
     await repository.deleteAllAfter(5)
 
@@ -80,14 +80,12 @@ describe(FactToPageRepository.name, () => {
 })
 
 function dummyFactToPageRecord({
-  id,
   blockNumber = 0,
   index = 0,
   pageHash = Hash256.fake(),
   factHash = Hash256.fake(),
-}: Partial<FactToPageRecord>): FactToPageRecord {
+}: Partial<FactToPageRecord>): Omit<FactToPageRecord, 'id'> {
   return {
-    id,
     blockNumber,
     index,
     pageHash,

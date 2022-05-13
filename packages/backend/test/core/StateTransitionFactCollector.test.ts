@@ -19,7 +19,7 @@ describe(StateTransitionFactCollector.name, () => {
       getLogsInRange: async () => testData().logs,
     })
     const transitionFactRepository = mock<StateTransitionFactRepository>({
-      add: async () => {},
+      addMany: async () => [],
     })
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,
@@ -55,7 +55,7 @@ describe(StateTransitionFactCollector.name, () => {
 
     const records = await stateTransitionFactCollector.collect(blockRange)
 
-    const expectedRecords: StateTransitionFactRecord[] = [
+    const expectedRecords: Omit<StateTransitionFactRecord, 'id'>[] = [
       {
         blockNumber: 13986068,
         hash: Hash256(
@@ -90,12 +90,14 @@ describe(StateTransitionFactCollector.name, () => {
         topics: [LOG_STATE_TRANSITION_FACT],
       },
     ])
-    expect(transitionFactRepository.add).toHaveBeenCalledWith([expectedRecords])
+    expect(transitionFactRepository.addMany).toHaveBeenCalledWith([
+      expectedRecords,
+    ])
   })
 
   it('discards all records from factToPageRepository after given block', async () => {
     const transitionFactRepository = mock<StateTransitionFactRepository>({
-      deleteAllAfter: async () => {},
+      deleteAfter: async () => 0,
     })
 
     const collector = new StateTransitionFactCollector(
@@ -105,7 +107,7 @@ describe(StateTransitionFactCollector.name, () => {
 
     await collector.discardAfter(123)
 
-    expect(transitionFactRepository.deleteAllAfter).toHaveBeenCalledWith([123])
+    expect(transitionFactRepository.deleteAfter).toHaveBeenCalledWith([123])
   })
 
   it('crashes on logs from reorged chain histories', async () => {
@@ -113,7 +115,7 @@ describe(StateTransitionFactCollector.name, () => {
       getLogs: async () => testData().logs,
     })
     const transitionFactRepository = mock<StateTransitionFactRepository>({
-      add: async () => {},
+      addMany: async () => [],
     })
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,

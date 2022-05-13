@@ -2,6 +2,7 @@ import { renderHomePage } from '@explorer/frontend'
 import { EthereumAddress } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
+import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
@@ -10,6 +11,7 @@ import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 export class HomeController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
+    private positionRepository: PositionRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
 
@@ -21,10 +23,10 @@ export class HomeController {
 
     const [stateUpdates, transactions, totalUpdates, totalPositions] =
       await Promise.all([
-        this.stateUpdateRepository.getStateUpdateList({ offset, limit }),
+        this.stateUpdateRepository.getPaginated({ offset, limit }),
         this.forcedTransactionsRepository.getLatest({ limit, offset }),
-        this.stateUpdateRepository.countStateUpdates(),
-        this.stateUpdateRepository.countPositions(),
+        this.stateUpdateRepository.count(),
+        this.positionRepository.count(),
       ])
 
     const content = renderHomePage({

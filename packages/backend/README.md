@@ -49,3 +49,13 @@ You can configure the behavior of the app with the following environment variabl
 - `LOG_LEVEL` - Integer specifying the log level (`0 | 1 | 2 | 3`). See `src/tools/Logger.ts`
 - `PORT` - The port on which the application exposes the api
 - `MAX_BLOCK_NUMBER` - Integer specifying the maximum block number that is going to be stored - all blocks created later in time will be skipped (used in environments with limited database space e.g. heroku review apps)
+
+## Repository naming convention
+
+- `add(T): number` - adds a new record and returns it's id
+- `addMany(T[]): number[]` - adds many new records and returns their ids
+- `getAll(): T[]` - returns an array of all records
+- `getByKey(K): T[]` - returns an array of all matching records
+- `findByKey(K): T?` - returns a single matching record or undefined
+- `deleteAll(): number` - removes all records and returns the number of removed records
+- `deleteByKey(K): number` - removes all matching records and returns the number of removed records

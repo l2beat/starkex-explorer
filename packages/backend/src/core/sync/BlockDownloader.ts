@@ -37,7 +37,7 @@ export class BlockDownloader {
 
   async start() {
     this.started = true
-    this.lastKnown = (await this.blockRepository.getLast())?.number ?? 0
+    this.lastKnown = (await this.blockRepository.findLast())?.number ?? 0
     this.queueTip = await this.ethereumClient.getBlockNumber()
 
     const queueStart = Math.max(
@@ -70,7 +70,7 @@ export class BlockDownloader {
   }
 
   async getKnownBlocks(from: number) {
-    const lastKnown = await this.blockRepository.getLast()
+    const lastKnown = await this.blockRepository.findLast()
     if (!lastKnown) {
       return []
     }
@@ -111,7 +111,7 @@ export class BlockDownloader {
         number: block.number,
         hash: Hash256(block.hash),
       }
-      await this.blockRepository.add([record])
+      await this.blockRepository.addMany([record])
       this.lastKnown = blockNumber
       return ['newBlock', record] as const
     } else {
@@ -129,15 +129,15 @@ export class BlockDownloader {
         number: block.number,
         hash: Hash256(block.hash),
       }))
-      await this.blockRepository.deleteAllAfter(records[0].number - 1)
-      await this.blockRepository.add(records)
+      await this.blockRepository.deleteAfter(records[0].number - 1)
+      await this.blockRepository.addMany(records)
       this.lastKnown = blockNumber
       return ['reorg', records] as const
     }
   }
 
   private async getKnownBlock(blockNumber: number): Promise<BlockRecord> {
-    const known = await this.blockRepository.getByNumber(blockNumber)
+    const known = await this.blockRepository.findByNumber(blockNumber)
     if (known) {
       return known
     }
@@ -146,7 +146,7 @@ export class BlockDownloader {
       number: downloaded.number,
       hash: Hash256(downloaded.hash),
     }
-    await this.blockRepository.add([record])
+    await this.blockRepository.addMany([record])
     return record
   }
 }
