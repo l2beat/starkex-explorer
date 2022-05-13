@@ -64,7 +64,7 @@ export class ForcedTradeOfferController {
     if (!positionB || !userRegistrationEventB) {
       return { type: 'not found', content: 'Position does not exist.' }
     }
-    const initialOffer = await this.offerRepository.findInitialOfferById(
+    const initialOffer = await this.offerRepository.findOfferById(
       initialOfferId
     )
 
@@ -72,11 +72,7 @@ export class ForcedTradeOfferController {
       return { type: 'not found', content: 'Offer does not exist.' }
     }
 
-    const accceptOffer = await this.offerRepository.findAcceptedOfferById(
-      initialOfferId
-    )
-
-    if (accceptOffer) {
+    if ((initialOffer as ForcedTradeAcceptedOfferRecord).acceptedAt) {
       return {
         type: 'bad request',
         content: 'Offer already accepted by a user.',

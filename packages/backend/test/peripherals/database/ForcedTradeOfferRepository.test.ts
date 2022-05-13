@@ -1,10 +1,7 @@
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import {
-  ForcedTradeAcceptedOfferRecord,
-  ForcedTradeOfferRepository,
-} from '../../../src/peripherals/database/ForcedTradeOfferRepository'
+import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
@@ -41,7 +38,7 @@ const initialOffer3 = {
   aIsBuyingSynthetic: true,
 }
 
-const acceptedOffer1: ForcedTradeAcceptedOfferRecord = {
+const acceptedOffer1 = {
   acceptedAt: Timestamp(Date.now()),
   starkKeyB: StarkKey.fake('4'),
   positionIdB: 4n,
@@ -51,7 +48,7 @@ const acceptedOffer1: ForcedTradeAcceptedOfferRecord = {
   signature: '0x',
 }
 
-const acceptedOffer2: ForcedTradeAcceptedOfferRecord = {
+const acceptedOffer2 = {
   acceptedAt: Timestamp(Date.now()),
   starkKeyB: StarkKey.fake('5'),
   positionIdB: 5n,
@@ -102,7 +99,10 @@ describe(ForcedTradeOfferRepository.name, () => {
 
     const actual = await repository.getAllAcceptedOffers()
 
-    expect(actual).toEqual([acceptedOffer1, acceptedOffer2])
+    expect(actual).toEqual([
+      { id: id1, ...initialOffer1, ...acceptedOffer1 },
+      { id: id2, ...initialOffer2, ...acceptedOffer2 },
+    ])
   })
 
   it('queries initial offer by id', async () => {
@@ -110,7 +110,7 @@ describe(ForcedTradeOfferRepository.name, () => {
     const id = await repository.addInitialOffer(initialOffer1)
     await repository.addInitialOffer(initialOffer3)
 
-    const actual = await repository.findInitialOfferById(id)
+    const actual = await repository.findOfferById(id)
 
     expect(actual).toEqual({ id, ...initialOffer1 })
   })
@@ -154,9 +154,9 @@ describe(ForcedTradeOfferRepository.name, () => {
         acceptedOffer: acceptedOffer1,
       })
 
-      const actual = await repository.findAcceptedOfferById(id)
+      const actual = await repository.findOfferById(id)
 
-      expect(actual).toEqual(acceptedOffer1)
+      expect(actual).toEqual({ id, ...initialOffer1, ...acceptedOffer1 })
     })
 
     it('queries offer with accept offer', async () => {

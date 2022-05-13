@@ -41,7 +41,6 @@ export interface ForcedTradeAcceptedOfferRecord {
 }
 
 interface ForcedTradeAcceptedOfferRow {
-  initial_offer_id: number
   accepted_at: bigint
   stark_key_b: string
   position_id_b: bigint
@@ -53,16 +52,14 @@ interface ForcedTradeAcceptedOfferRow {
 
 type ForcedTradeOfferRecord = ForcedTradeInitialOfferRecord &
   ForcedTradeAcceptedOfferRecord
+
 type ForcedTradeOfferRow = ForcedTradeInitialOfferRow &
   ForcedTradeAcceptedOfferRow
-
 export class ForcedTradeOfferRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
     this.addInitialOffer = this.wrapAdd(this.addInitialOffer)
     this.addAcceptedOffer = this.wrapAdd(this.addAcceptedOffer)
-    this.findInitialOfferById = this.wrapFind(this.findInitialOfferById)
-    this.findAcceptedOfferById = this.wrapFind(this.findAcceptedOfferById)
     this.findOfferById = this.wrapFind(this.findOfferById)
     this.getAllInitialOffers = this.wrapGet(this.getAllInitialOffers)
     this.getAllAcceptedOffers = this.wrapGet(this.getAllAcceptedOffers)
@@ -73,7 +70,9 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     offer: Omit<ForcedTradeInitialOfferRecord, 'id'>
   ): Promise<number> {
     const row = initialOfferToRow(offer)
-    const [id] = await this.knex('initial_offers').insert(row).returning('id')
+    const [id] = await this.knex('forced_trade_offers')
+      .insert(row)
+      .returning('id')
     this.logger.debug({ method: 'add' })
     return id
   }
@@ -85,47 +84,24 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     initialOfferId: number
     acceptedOffer: ForcedTradeAcceptedOfferRecord
   }): Promise<number> {
-    const row = acceptedOfferToRow(initialOfferId, acceptedOffer)
-    await this.knex('accepted_offers').insert(row)
+    const row = acceptedOfferToRow(acceptedOffer)
+    await this.knex('forced_trade_offers')
+      .update(row)
+      .where('id', initialOfferId)
     return initialOfferId
   }
 
   async getAllInitialOffers(): Promise<ForcedTradeInitialOfferRecord[]> {
-    const rows = await this.knex('initial_offers').select('*')
+    const rows = await this.knex('forced_trade_offers').select('*')
     return rows.map(initialOfferToRecord)
   }
 
-  async getAllAcceptedOffers(): Promise<ForcedTradeAcceptedOfferRecord[]> {
-    const rows = await this.knex('accepted_offers').select('*')
-    this.logger.debug({
-      method: 'getAllAcceptedOffers',
-      rows: rows.length,
-    })
+  async getAllAcceptedOffers() {
+    const rows = await this.knex('forced_trade_offers')
+      .whereNotNull('accepted_at')
+      .select('*')
+
     return rows.map(acceptedOfferToRecord)
-  }
-
-  async findInitialOfferById(
-    id: number
-  ): Promise<ForcedTradeInitialOfferRecord | undefined> {
-    const [offer] = await this.knex('initial_offers').where({ id })
-    if (!offer) {
-      return undefined
-    }
-    this.logger.debug({ method: 'findInitialOfferById' })
-    return initialOfferToRecord(offer)
-  }
-
-  async findAcceptedOfferById(
-    id: number
-  ): Promise<ForcedTradeAcceptedOfferRecord | undefined> {
-    const [row] = await this.knex('accepted_offers').where({
-      initial_offer_id: id,
-    })
-    if (!row) {
-      return undefined
-    }
-    this.logger.debug({ method: 'findAcceptedOfferById' })
-    return acceptedOfferToRecord(row)
   }
 
   async findOfferById(
@@ -133,53 +109,48 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   ): Promise<
     ForcedTradeOfferRecord | ForcedTradeInitialOfferRecord | undefined
   > {
-    const initialOffer = await this.findInitialOfferById(id)
-    const acceptedOffer = await this.findAcceptedOfferById(id)
+    const offer = await this.knex('forced_trade_offers').where({ id }).first()
 
-    if (!initialOffer) {
-      return undefined
+    if (acceptedOfferRowTypeGuard(offer)) {
+      return acceptedOfferToRecord(offer)
     }
 
-    return {
-      ...initialOffer,
-      ...acceptedOffer,
+    if (offer) {
+      return initialOfferToRecord(offer)
     }
+
+    return undefined
   }
 
   async getInitialOffersByStarkKey(starkKey: StarkKey) {
-    const rows = await this.knex('initial_offers')
+    const rows = await this.knex('forced_trade_offers')
       .where('stark_key_a', starkKey)
       .select('*')
 
     return rows.map(initialOfferToRecord)
   }
 
-  async getAcceptedOffersByStarkKey(
-    starkKey: StarkKey
-  ): Promise<ForcedTradeOfferRecord[]> {
-    const rows = await this.knex('initial_offers')
-      .join(
-        'accepted_offers',
-        'initial_offers.id',
-        'accepted_offers.initial_offer_id'
-      )
+  async getAcceptedOffersByStarkKey(starkKey: StarkKey) {
+    const rows = await this.knex('forced_trade_offers')
       .where('stark_key_b', starkKey)
       .select('*')
 
-    return rows.map(tradeOfferToRecord)
+    return rows.map(acceptedOfferToRecord)
   }
 
   async deleteAll() {
-    return await this.knex('initial_offers').delete()
+    return await this.knex('forced_trade_offers').delete()
   }
 }
 
-function acceptedOfferToRow(
-  initialOfferId: number,
-  acceptedOffer: ForcedTradeAcceptedOfferRecord
-): ForcedTradeAcceptedOfferRow {
+function acceptedOfferRowTypeGuard(
+  offerRow: ForcedTradeOfferRow | ForcedTradeInitialOfferRow | undefined
+): offerRow is ForcedTradeOfferRow {
+  return !!offerRow && !!(offerRow as ForcedTradeOfferRow).accepted_at
+}
+
+function acceptedOfferToRow(acceptedOffer: ForcedTradeAcceptedOfferRecord) {
   return {
-    initial_offer_id: initialOfferId,
     accepted_at: BigInt(acceptedOffer.acceptedAt as unknown as number),
     stark_key_b: acceptedOffer.starkKeyB.toString(),
     position_id_b: acceptedOffer.positionIdB,
@@ -191,9 +162,10 @@ function acceptedOfferToRow(
 }
 
 function acceptedOfferToRecord(
-  row: ForcedTradeAcceptedOfferRow
-): ForcedTradeAcceptedOfferRecord {
+  row: ForcedTradeOfferRow
+): ForcedTradeOfferRecord {
   return {
+    ...initialOfferToRecord(row),
     acceptedAt: Timestamp(row.accepted_at),
     starkKeyB: StarkKey(row.stark_key_b),
     positionIdB: row.position_id_b,
@@ -237,31 +209,5 @@ function initialOfferToRecord(
     amountCollateral: BigInt(row.amount_collateral),
     amountSynthetic: BigInt(row.amount_synthetic),
     aIsBuyingSynthetic: row.a_is_buying_synthetic,
-  }
-}
-
-function tradeOfferToRecord(row: ForcedTradeOfferRow) {
-  return {
-    ...initialOfferToRecord({
-      id: row.id,
-      created_at: row.created_at,
-      submitted_at: row.submitted_at,
-      stark_key_a: row.stark_key_a,
-      position_id_a: row.position_id_a,
-      synthetic_asset_id: row.synthetic_asset_id,
-      amount_collateral: row.amount_collateral,
-      amount_synthetic: row.amount_synthetic,
-      a_is_buying_synthetic: row.a_is_buying_synthetic,
-    }),
-    ...acceptedOfferToRecord({
-      initial_offer_id: row.initial_offer_id,
-      accepted_at: row.accepted_at,
-      stark_key_b: row.stark_key_b,
-      position_id_b: row.position_id_b,
-      submission_expiration_time: row.submission_expiration_time,
-      nonce: row.nonce,
-      premium_cost: row.premium_cost,
-      signature: row.signature,
-    }),
   }
 }
