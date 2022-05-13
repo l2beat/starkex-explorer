@@ -109,14 +109,15 @@ export class StateUpdateCollector {
   async extractTransactionHashes(
     forcedActions: ForcedAction[]
   ): Promise<Hash256[]> {
-    const datas = forcedActions.map(({ type: _type, ...data }) => data)
     const hashes =
-      await this.forcedTransactionsRepository.getTransactionHashesByData(datas)
+      await this.forcedTransactionsRepository.getTransactionHashesByData(
+        forcedActions
+      )
     const filteredHashes = hashes.filter(
       (h): h is Exclude<typeof h, undefined> => h !== undefined
     )
 
-    if (filteredHashes.length !== datas.length) {
+    if (filteredHashes.length !== forcedActions.length) {
       throw new Error(
         'Forced action included in state update does not have a matching mined transaction'
       )

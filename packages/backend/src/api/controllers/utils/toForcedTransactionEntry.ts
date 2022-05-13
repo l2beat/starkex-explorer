@@ -1,33 +1,41 @@
 import { ForcedTransactionEntry } from '@explorer/frontend'
 import { AssetId } from '@explorer/types'
 
-import { ForcedTransaction } from '../../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionsRepository'
 
 export function toForcedTransactionEntry(
-  transaction: ForcedTransaction
+  transaction: ForcedTransactionRecord
 ): ForcedTransactionEntry {
+  let status: ForcedTransactionEntry['status'] = 'sent'
+  if (transaction.updates.verified) {
+    status = 'completed'
+  } else if (transaction.updates.minedAt) {
+    status = 'waiting to be included'
+  } else if (transaction.updates.revertedAt) {
+    status = 'reverted'
+  }
+
   return {
     type:
-      transaction.type === 'withdrawal'
+      transaction.data.type === 'withdrawal'
         ? 'exit'
-        : transaction.isABuyingSynthetic
+        : transaction.data.isABuyingSynthetic
         ? 'buy'
         : 'sell',
-    status:
-      transaction.status === 'mined' ? 'waiting to be included' : 'completed',
+    status,
     hash: transaction.hash,
-    lastUpdate: transaction.lastUpdate,
+    lastUpdate: transaction.lastUpdateAt,
     amount:
-      transaction.type === 'trade'
-        ? transaction.syntheticAmount
-        : transaction.amount,
+      transaction.data.type === 'trade'
+        ? transaction.data.syntheticAmount
+        : transaction.data.amount,
     assetId:
-      transaction.type === 'trade'
-        ? transaction.syntheticAssetId
+      transaction.data.type === 'trade'
+        ? transaction.data.syntheticAssetId
         : AssetId.USDC,
     positionId:
-      transaction.type === 'trade'
-        ? transaction.positionIdA
-        : transaction.positionId,
+      transaction.data.type === 'trade'
+        ? transaction.data.positionIdA
+        : transaction.data.positionId,
   }
 }

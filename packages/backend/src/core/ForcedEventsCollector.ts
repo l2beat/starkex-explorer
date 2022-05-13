@@ -6,6 +6,7 @@ import { BlockRange } from '../model/BlockRange'
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
+import { getTransactionStatus } from './getForcedTransactionStatus'
 
 const PERPETUAL_ABI = new utils.Interface([
   'event LogForcedWithdrawalRequest(uint256 starkKey, uint256 vaultId, uint256 quantizedAmount)',
@@ -40,7 +41,7 @@ export class ForcedEventsCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
-    private readonly _getMinedTransactions?: (
+    readonly _getMinedTransactions?: (
       blockRange: BlockRange
     ) => Promise<MinedTransaction[]>
   ) {
@@ -60,7 +61,7 @@ export class ForcedEventsCollector {
           await this.forcedTransactionsRepository.addMined(transaction)
           return 'added'
         }
-        if (dbTransaction.status === 'sent') {
+        if (getTransactionStatus(dbTransaction) === 'sent') {
           const { hash, blockNumber, minedAt } = transaction
           await this.forcedTransactionsRepository.markAsMined(
             hash,
