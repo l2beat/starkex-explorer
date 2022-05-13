@@ -7,6 +7,7 @@ import { MD5 as hashData } from 'object-hash'
 import { Logger } from '../../tools/Logger'
 import { Nullable } from '../../utils/Nullable'
 import { toSerializableJson } from '../../utils/toSerializableJson'
+import { BaseRepository } from './BaseRepository'
 
 export interface Updates {
   sentAt: Nullable<Timestamp>
@@ -109,22 +110,16 @@ function toRecord(row: Row): ForcedTransactionRecord {
   }
 }
 
-export class ForcedTransactionsRepository {
-  constructor(private knex: Knex, private logger: Logger) {
-    this.logger = logger.for(this)
-  }
-
-  async deleteAll(): Promise<void> {
-    await this.knex.transaction(async (trx) => {
-      const hashes = await trx('forced_transactions').select('hash')
-      await trx('forced_transactions').delete()
-      await trx('transaction_status')
-        .whereIn(
-          'hash',
-          hashes.map((h) => h.toString())
-        )
-        .delete()
-    })
+export class ForcedTransactionsRepository extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.getAll = this.wrapGet(this.getAll)
+    this.getLatest = this.wrapGet(this.getLatest)
+    this.getIncludedInStateUpdate = this.wrapGet(this.getIncludedInStateUpdate)
+    this.getAffectingPosition = this.wrapGet(this.getAffectingPosition)
+    this.getAffectingPosition = this.wrapGet(this.getAffectingPosition)
+    this.findByHash = this.wrapFind(this.findByHash)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
   private rowsQuery() {
@@ -147,6 +142,11 @@ export class ForcedTransactionsRepository {
         'transaction_status.reverted_at',
         'transaction_status.forgotten_at'
       )
+  }
+
+  async getAll(): Promise<ForcedTransactionRecord[]> {
+    const rows = await this.rowsQuery()
+    return rows.map(toRecord)
   }
 
   async getLatest({
@@ -183,11 +183,6 @@ export class ForcedTransactionsRepository {
     return rows.map(toRecord)
   }
 
-  async getAll(): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.rowsQuery()
-    return rows.map(toRecord)
-  }
-
   async getAffectingPosition(
     positionId: bigint
   ): Promise<ForcedTransactionRecord[]> {
@@ -209,16 +204,16 @@ export class ForcedTransactionsRepository {
       .whereIn('data_hash', hashes)
       .andWhereRaw('state_update_id is null')
       .orderBy('hash')
-
-    return hashes.map((hash) => {
+    const matched = hashes.map((hash) => {
       const transaction = transactions.find((event) => event.data_hash === hash)
       return transaction ? Hash256(transaction.hash) : undefined
     })
-  }
-
-  async countAll(): Promise<bigint> {
-    const result = await this.knex('forced_transactions').count()
-    return BigInt(result[0].count)
+    this.logger.debug({
+      method: 'getTransactionHashesByData',
+      requested: hashes.length,
+      matched: matched.length,
+    })
+    return matched
   }
 
   async findByHash(
@@ -230,33 +225,28 @@ export class ForcedTransactionsRepository {
       hash.toString()
     )
 
-    if (!row) {
-      return undefined
-    }
-
-    return toRecord(row)
+    return row ? toRecord(row) : undefined
   }
 
   async add(
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
     sentAt: Timestamp
-  ): Promise<void>
+  ): Promise<Hash256>
 
   async add(
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
     sentAt: Nullable<Timestamp>,
     minedAt: Timestamp,
     blockNumber: number
-  ): Promise<void>
+  ): Promise<Hash256>
 
   async add(
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
     sentAt: Nullable<Timestamp>,
     minedAt?: Timestamp,
     blockNumber?: number
-  ): Promise<void> {
+  ): Promise<Hash256> {
     const { hash, data } = transaction
-
     await this.knex.transaction(async (trx) => {
       await trx('forced_transactions').insert({
         hash: hash.toString(),
@@ -274,18 +264,44 @@ export class ForcedTransactionsRepository {
         block_number: blockNumber,
       })
     })
+    this.logger.debug({ method: 'add', id: hash.toString() })
+    return hash
   }
 
   async markAsMined(
     hash: Hash256,
     blockNumber: number,
     minedAt: Timestamp
-  ): Promise<void> {
-    await this.knex('transaction_status')
+  ): Promise<boolean> {
+    const updated = await this.knex('transaction_status')
       .update({
         block_number: blockNumber,
         mined_at: BigInt(minedAt.toString()),
       })
       .where('hash', '=', hash.toString())
+    this.logger.debug({ method: 'markAsMined', updated })
+    return !!updated
+  }
+
+  async countAll(): Promise<bigint> {
+    const result = await this.knex('forced_transactions').count()
+    const count = result[0].count
+    this.logger.debug({ method: 'countAll', count })
+    return BigInt(count)
+  }
+
+  async deleteAll(): Promise<number> {
+    const deleted = await this.knex.transaction(async (trx) => {
+      const hashes = await trx('forced_transactions').select('hash')
+      await trx('forced_transactions').delete()
+      await trx('transaction_status')
+        .whereIn(
+          'hash',
+          hashes.map((h) => h.toString())
+        )
+        .delete()
+      return hashes.length
+    })
+    return deleted
   }
 }

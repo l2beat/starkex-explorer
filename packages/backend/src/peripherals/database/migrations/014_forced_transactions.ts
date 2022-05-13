@@ -14,7 +14,7 @@ should create a new migration file that fixes the issue.
 import { Knex } from 'knex'
 
 export async function up(knex: Knex) {
-  await knex.schema.dropTable('forced_transaction_events')
+  await knex.schema.dropTableIfExists('forced_transaction_events')
   await knex.schema.createTable('forced_transactions', (table) => {
     table.string('hash').notNullable().index()
     table.string('type').notNullable().index()
