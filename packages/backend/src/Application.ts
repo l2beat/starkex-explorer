@@ -171,7 +171,7 @@ export class Application {
     )
     const forcedTradeOfferController = new ForcedTradeOfferController(
       forcedTradeOfferRepository,
-      stateUpdateRepository,
+      positionRepository,
       userRegistrationEventRepository
     )
 

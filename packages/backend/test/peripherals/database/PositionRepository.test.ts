@@ -52,6 +52,58 @@ describe(PositionRepository.name, () => {
     expect(count).toEqual(3n)
   })
 
+  it('finds position by id', async () => {
+    const positionId = 12345n
+
+    await stateUpdateRepository.add({
+      stateUpdate: {
+        id: 1,
+        blockNumber: 1,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake('1'),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+    })
+
+    await stateUpdateRepository.add({
+      stateUpdate: {
+        id: 2,
+        blockNumber: 2,
+        rootHash: PedersenHash.fake(),
+        factHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          publicKey: StarkKey.fake('1'),
+          positionId,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+    })
+
+    const position = await positionRepository.findById(positionId)
+
+    expect(position).toEqual({
+      publicKey: StarkKey.fake('1'),
+      positionId,
+      collateralBalance: 0n,
+      balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+      stateUpdateId: 2,
+    })
+  })
+
   it('finds history by id', async () => {
     const positionId = 12345n
 

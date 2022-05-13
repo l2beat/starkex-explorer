@@ -13,24 +13,22 @@ import {
 } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   PositionRecord,
-  StateUpdateRepository,
-} from '../../peripherals/database/StateUpdateRepository'
+  PositionRepository,
+} from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 
 export class ForcedTradeOfferController {
   constructor(
     private offerRepository: ForcedTradeOfferRepository,
-    private stateUpdateRepository: StateUpdateRepository,
+    private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository
   ) {}
 
   async postOffer(
     offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>
   ): Promise<ControllerResult> {
-    const positionA = await this.stateUpdateRepository.getPositionById(
-      offer.positionIdA
-    )
+    const positionA = await this.positionRepository.findById(offer.positionIdA)
 
     if (!positionA) {
       return { type: 'not found', content: 'Position does not exist.' }
@@ -55,7 +53,7 @@ export class ForcedTradeOfferController {
     initialOfferId: number,
     acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>
   ): Promise<ControllerResult> {
-    const positionB = await this.stateUpdateRepository.getPositionById(
+    const positionB = await this.positionRepository.findById(
       acceptedOffer.positionIdB
     )
     const userRegistrationEventB =

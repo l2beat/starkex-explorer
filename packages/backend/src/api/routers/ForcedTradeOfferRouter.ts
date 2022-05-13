@@ -52,7 +52,7 @@ export function createForcedTradeOfferRouter(
           body: z.object({
             starkKeyB: stringAs(StarkKey),
             positionIdB: stringAsBigInt(),
-            submissionExpirationTime: stringAsInt(), // Timestamp?
+            submissionExpirationTime: stringAsInt(),
             nonce: stringAsBigInt(),
             signature: string(),
           }),

@@ -11,6 +11,7 @@ import { SuperAgentTest } from 'supertest'
 import { ForcedTradeOfferController } from '../../../src/api/controllers/ForcedTradeOfferController'
 import { createForcedTradeOfferRouter } from '../../../src/api/routers/ForcedTradeOfferRouter'
 import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
+import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
 import { Logger } from '../../../src/tools/Logger'
@@ -88,6 +89,7 @@ describe('OfferRouter', () => {
 
     before(async () => {
       offerRepository = new ForcedTradeOfferRepository(knex, Logger.SILENT)
+      const positionRepository = new PositionRepository(knex, Logger.SILENT)
       stateUpdateRepository = new StateUpdateRepository(knex, Logger.SILENT)
       const userRegistrationEventRepository =
         mock<UserRegistrationEventRepository>()
@@ -96,7 +98,7 @@ describe('OfferRouter', () => {
 
       const offerController = new ForcedTradeOfferController(
         offerRepository,
-        stateUpdateRepository,
+        positionRepository,
         userRegistrationEventRepository
       )
       const router = createForcedTradeOfferRouter(offerController)
@@ -130,6 +132,7 @@ describe('OfferRouter', () => {
 
     before(async () => {
       offerRepository = new ForcedTradeOfferRepository(knex, Logger.SILENT)
+      const positionRepository = new PositionRepository(knex, Logger.SILENT)
       const stateUpdateRepository = new StateUpdateRepository(
         knex,
         Logger.SILENT
@@ -162,11 +165,11 @@ describe('OfferRouter', () => {
         prices: [{ assetId: AssetId('AAVE-8'), price: 40n }],
       })
 
-      await userRegistrationEventRepository.add([userRegistrationEvent])
+      await userRegistrationEventRepository.addMany([userRegistrationEvent])
 
       const offerController = new ForcedTradeOfferController(
         offerRepository,
-        stateUpdateRepository,
+        positionRepository,
         userRegistrationEventRepository
       )
       const router = createForcedTradeOfferRouter(offerController)
