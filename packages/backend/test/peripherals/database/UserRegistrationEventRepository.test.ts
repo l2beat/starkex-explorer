@@ -18,7 +18,7 @@ describe(UserRegistrationEventRepository.name, () => {
       starkKey: StarkKey.fake(),
     }
 
-    await repository.add([record])
+    await repository.addMany([record])
 
     const actual = await repository.getAll()
 
@@ -31,7 +31,7 @@ describe(UserRegistrationEventRepository.name, () => {
   })
 
   it('adds 0 records', async () => {
-    await repository.add([])
+    await repository.addMany([])
     expect(await repository.getAll()).toEqual([])
   })
 
@@ -49,14 +49,14 @@ describe(UserRegistrationEventRepository.name, () => {
       },
     ]
 
-    await repository.add(records)
+    await repository.addMany(records)
     const actual = await repository.getAll()
 
     expect(actual).toEqual(records.map((r) => ({ ...r, id: expect.a(Number) })))
   })
 
   it('deletes all records', async () => {
-    await repository.add([
+    await repository.addMany([
       {
         blockNumber: 1,
         ethAddress: EthereumAddress.fake(),
@@ -71,7 +71,7 @@ describe(UserRegistrationEventRepository.name, () => {
   })
 
   it('deletes all records after a block number', async () => {
-    await repository.add([
+    await repository.addMany([
       {
         blockNumber: 1,
         ethAddress: EthereumAddress.fake('1'),
@@ -89,7 +89,7 @@ describe(UserRegistrationEventRepository.name, () => {
       },
     ])
 
-    await repository.deleteAllAfter(2)
+    await repository.deleteAfter(2)
 
     const actual = await repository.getAll()
     expect(actual).toEqual([
@@ -111,7 +111,7 @@ describe(UserRegistrationEventRepository.name, () => {
   it('finds last event for stark key', async () => {
     const starkKey = StarkKey.fake()
     const ethAddress = EthereumAddress.fake()
-    await repository.add([
+    await repository.addMany([
       {
         blockNumber: 1,
         ethAddress: EthereumAddress.ZERO,
@@ -154,7 +154,7 @@ describe(UserRegistrationEventRepository.name, () => {
       event,
     ]
 
-    await repository.add(records)
+    await repository.addMany(records)
     const actual = await repository.findByEthereumAddress(event.ethAddress)
 
     expect(actual).toEqual({ id: expect.a(Number), ...event })

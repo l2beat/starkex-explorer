@@ -11,7 +11,7 @@ declare module 'knex/types/tables' {
 
   interface VerifierEventRow {
     /** surrogate key */
-    id?: number
+    id: number
     implementation: string
     block_number: number
     name: 'ImplementationAdded' | 'Upgraded'
@@ -20,7 +20,7 @@ declare module 'knex/types/tables' {
 
   interface FactToPageRow {
     /** surrogate key */
-    id?: number
+    id: number
     block_number: number
     fact_hash: string
     page_hash: string
@@ -29,7 +29,7 @@ declare module 'knex/types/tables' {
 
   interface PageRow {
     /** surrogate key */
-    id?: number
+    id: number
     block_number: number
     page_hash: string
     data: string
@@ -37,7 +37,7 @@ declare module 'knex/types/tables' {
 
   interface StateTransitionFactRow {
     /** surrogate key */
-    id?: number
+    id: number
     block_number: number
     hash: string
   }
@@ -132,22 +132,15 @@ declare module 'knex/types/tables' {
     state_updates: StateUpdateRow
     positions: PositionRow
     prices: PriceRow
-    user_registration_evens: UserRegistrationEventRow
+    user_registration_events: UserRegistrationEventRow
     forced_transaction_events: ForcedTransactionEventRow
   }
-}
-
-export interface Repository<TRecord> {
-  addOrUpdate?(records: TRecord[]): Promise<void>
-  add?(records: TRecord[]): Promise<void>
-  getAll(): Promise<TRecord[]>
-  deleteAll(): Promise<void>
 }
 
 /**
  * JSON object stored in a column of type `json` or `jsonb`.
  *
  * We need to pass arrays as stringified JSON to the database — https://knexjs.org/#Schema-jsonb.
- * But, when we receive it from the database, we get the JSON object alraedy partially parsed with JSON.parse.
+ * But, when we receive it from the database, we get the JSON object already partially parsed with JSON.parse.
  */
 export type JsonB<T> = T | string

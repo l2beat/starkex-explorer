@@ -17,7 +17,7 @@ describe(StateTransitionFactRepository.name, () => {
   it('adds single record and queries it', async () => {
     const record = dummyRecord({ blockNumber: 1 })
 
-    await repository.add([record])
+    await repository.addMany([record])
 
     const actual = await repository.getAll()
 
@@ -36,19 +36,19 @@ describe(StateTransitionFactRepository.name, () => {
       dummyRecord({ blockNumber: 3 }),
     ]
 
-    await repository.add(records)
+    await repository.addMany(records)
     const actual = await repository.getAll()
 
     expect(actual).toEqual(records.map((r) => ({ ...r, id: expect.a(Number) })))
   })
 
   it('adds 0 records', async () => {
-    await repository.add([])
+    await repository.addMany([])
     expect(await repository.getAll()).toEqual([])
   })
 
   it('deletes all records', async () => {
-    await repository.add([
+    await repository.addMany([
       dummyRecord({ blockNumber: 1 }),
       dummyRecord({ blockNumber: 2 }),
       dummyRecord({ blockNumber: 3 }),
@@ -68,9 +68,9 @@ describe(StateTransitionFactRepository.name, () => {
       dummyRecord({ blockNumber: 4 }),
       dummyRecord({ blockNumber: 5 }),
     ]
-    await repository.add(records)
+    await repository.addMany(records)
 
-    await repository.deleteAllAfter(2)
+    await repository.deleteAfter(2)
 
     const actual = await repository.getAll()
     expect(actual).toEqual(
@@ -80,9 +80,11 @@ describe(StateTransitionFactRepository.name, () => {
 })
 
 function dummyRecord({
-  id,
   blockNumber = 0,
   hash = Hash256.fake(),
-}: Partial<StateTransitionFactRecord>): StateTransitionFactRecord {
-  return { id, blockNumber, hash }
+}: Partial<Omit<StateTransitionFactRecord, 'id'>>): Omit<
+  StateTransitionFactRecord,
+  'id'
+> {
+  return { blockNumber, hash }
 }

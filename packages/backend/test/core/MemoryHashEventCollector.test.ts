@@ -18,7 +18,7 @@ describe(MemoryHashEventCollector.name, () => {
         testData().logs.filter((log) => filter.address === log.address),
     })
     const factToPageRepository = mock<FactToPageRepository>({
-      add: async () => {},
+      addMany: async () => [],
     })
     const collector = new MemoryHashEventCollector(
       ethereumClient,
@@ -129,7 +129,7 @@ describe(MemoryHashEventCollector.name, () => {
       ])
     }
 
-    expect(factToPageRepository.add).toHaveBeenCalledWith([
+    expect(factToPageRepository.addMany).toHaveBeenCalledWith([
       [
         {
           index: 0,
@@ -183,9 +183,9 @@ describe(MemoryHashEventCollector.name, () => {
     ])
   })
 
-  it('discards all records from factToPageRepostiory after given block', async () => {
+  it('discards all records from factToPageRepository after given block', async () => {
     const factToPageRepository = mock<FactToPageRepository>({
-      deleteAllAfter: async () => {},
+      deleteAllAfter: async () => 0,
     })
 
     const collector = new MemoryHashEventCollector(
@@ -204,7 +204,7 @@ describe(MemoryHashEventCollector.name, () => {
         testData().logs.filter((log) => filter.address === log.address),
     })
     const factToPageRepository = mock<FactToPageRepository>({
-      add: async () => {},
+      addMany: async () => [],
     })
     const collector = new MemoryHashEventCollector(
       ethereumClient,

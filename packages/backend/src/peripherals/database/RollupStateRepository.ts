@@ -10,10 +10,19 @@ import { Knex } from 'knex'
 import { partition } from 'lodash'
 
 import { Logger } from '../../tools/Logger'
+import { BaseRepository } from './BaseRepository'
 
-export class RollupStateRepository implements IRollupStateStorage {
-  constructor(private knex: Knex, private logger: Logger) {
-    this.logger = logger.for(this)
+export class RollupStateRepository
+  extends BaseRepository
+  implements IRollupStateStorage
+{
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.getParameters = this.wrapAny(this.getParameters)
+    this.setParameters = this.wrapAny(this.setParameters)
+    this.persist = this.wrapAny(this.persist)
+    this.recover = this.wrapAny(this.recover)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
   async getParameters(rootHash: PedersenHash): Promise<RollupParameters> {
@@ -37,7 +46,6 @@ export class RollupStateRepository implements IRollupStateStorage {
       })
       .onConflict('root_hash')
       .merge()
-    this.logger.debug({ method: 'setParameters' })
   }
 
   async persist(values: NodeOrLeaf<Position>[]): Promise<void> {
@@ -88,12 +96,6 @@ export class RollupStateRepository implements IRollupStateStorage {
     }
 
     await Promise.all(queries)
-
-    this.logger.debug({
-      method: 'persist',
-      nodes: nodeRows.length,
-      positions: positionRows.length,
-    })
   }
 
   async recover(hash: PedersenHash): Promise<NodeOrLeaf<Position>> {
@@ -120,12 +122,12 @@ export class RollupStateRepository implements IRollupStateStorage {
   }
 
   async deleteAll() {
-    await Promise.all([
+    const [a, b, c] = await Promise.all([
       this.knex('merkle_nodes').delete(),
       this.knex('merkle_positions').delete(),
       this.knex('rollup_parameters').delete(),
     ])
-    this.logger.debug({ method: 'deleteAll' })
+    return a + b + c
   }
 }
 
