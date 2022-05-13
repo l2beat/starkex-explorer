@@ -150,6 +150,7 @@ export class Application {
     )
     const forcedTransactionController = new ForcedTransactionController(
       userRegistrationEventRepository,
+      positionRepository,
       forcedTransactionsRepository
     )
     const stateUpdateController = new StateUpdateController(

@@ -12,8 +12,8 @@ import {
   renderPositionDetailsPage,
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
+  renderTransactionForm,
 } from '../pages'
-import { renderTransactionForm } from '../pages/transaction-form'
 import * as DATA from './data'
 
 const app = new Koa()

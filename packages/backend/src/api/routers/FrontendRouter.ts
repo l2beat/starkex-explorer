@@ -54,6 +54,14 @@ export function createFrontendRouter(
     )
   )
 
+  router.get('/forced/new', async (ctx) => {
+    const account = getAccount(ctx)
+    const result = await forcedTransactionController.getTransactionFormPage(
+      account
+    )
+    applyControllerResult(ctx, result)
+  })
+
   router.get(
     '/forced/:hash',
     withTypedContext(
