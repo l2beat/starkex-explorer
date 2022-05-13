@@ -198,130 +198,32 @@ interface Row
 }
 
 function toRecord(row: Row): ForcedTransaction {
-  const statusWithTimestamps = getStatusWithTimestamps(row)
-  const status = statusWithTimestamps.status
   const type = getType(row.type)
-  const hash = Hash256(row.hash)
-  const lastUpdate = getLastUpdate(row)
-
-  const base = {
-    hash,
-    lastUpdate,
-  }
-
-  if (type === 'trade' && status === 'sent') {
-    return {
-      ...base,
-      type: 'trade',
-      status: 'sent',
-      sentAt: statusWithTimestamps.sentAt,
+  if (type === 'trade') {
+    const record = {
+      type,
+      hash: Hash256(row.hash),
+      lastUpdate: getLastUpdate(row),
+      ...getStatusWithTimestamps(row),
       ...tradeDataFromJson(row.data),
     }
-  }
-
-  if (type === 'trade' && status === 'mined') {
-    return {
-      ...base,
-      type: 'trade',
-      status: 'mined',
-      sentAt: statusWithTimestamps.sentAt,
-      minedAt: statusWithTimestamps.minedAt,
-      ...tradeDataFromJson(row.data),
+    if (record.status === 'verified') {
+      return { ...record, stateUpdateId: Number(row.state_update_id) }
     }
-  }
-
-  if (type === 'trade' && status === 'verified') {
-    return {
-      ...base,
-      type: 'trade',
-      status: 'verified',
-      sentAt: statusWithTimestamps.sentAt,
-      minedAt: statusWithTimestamps.minedAt,
-      verifiedAt: statusWithTimestamps.verifiedAt,
-      stateUpdateId: Number(row.state_update_id),
-      ...tradeDataFromJson(row.data),
-    }
-  }
-
-  if (type === 'trade' && status === 'reverted') {
-    return {
-      ...base,
-      type: 'trade',
-      status: 'reverted',
-      sentAt: statusWithTimestamps.sentAt,
-      revertedAt: statusWithTimestamps.revertedAt,
-      ...tradeDataFromJson(row.data),
-    }
-  }
-
-  if (type === 'trade' && status === 'forgotten') {
-    return {
-      ...base,
-      type: 'trade',
-      status: 'forgotten',
-      sentAt: statusWithTimestamps.sentAt,
-      forgottenAt: statusWithTimestamps.forgottenAt,
-      ...tradeDataFromJson(row.data),
-    }
-  }
-
-  if (type === 'withdrawal' && status === 'sent') {
-    return {
-      ...base,
-      type: 'withdrawal',
-      status: 'sent',
-      sentAt: statusWithTimestamps.sentAt,
+    return record
+  } else {
+    const record = {
+      type,
+      hash: Hash256(row.hash),
+      lastUpdate: getLastUpdate(row),
+      ...getStatusWithTimestamps(row),
       ...withdrawalDataFromJson(row.data),
     }
-  }
-
-  if (type === 'withdrawal' && status === 'mined') {
-    return {
-      ...base,
-      type: 'withdrawal',
-      status: 'mined',
-      sentAt: statusWithTimestamps.sentAt,
-      minedAt: statusWithTimestamps.minedAt,
-      ...withdrawalDataFromJson(row.data),
+    if (record.status === 'verified') {
+      return { ...record, stateUpdateId: Number(row.state_update_id) }
     }
+    return record
   }
-
-  if (type === 'withdrawal' && status === 'verified') {
-    return {
-      ...base,
-      type: 'withdrawal',
-      status: 'verified',
-      sentAt: statusWithTimestamps.sentAt,
-      minedAt: statusWithTimestamps.minedAt,
-      verifiedAt: statusWithTimestamps.verifiedAt,
-      stateUpdateId: Number(row.state_update_id),
-      ...withdrawalDataFromJson(row.data),
-    }
-  }
-
-  if (type === 'withdrawal' && status === 'reverted') {
-    return {
-      ...base,
-      type: 'withdrawal',
-      status: 'reverted',
-      sentAt: statusWithTimestamps.sentAt,
-      revertedAt: statusWithTimestamps.revertedAt,
-      ...withdrawalDataFromJson(row.data),
-    }
-  }
-
-  if (type === 'withdrawal' && status === 'forgotten') {
-    return {
-      ...base,
-      type: 'withdrawal',
-      status: 'forgotten',
-      sentAt: statusWithTimestamps.sentAt,
-      forgottenAt: statusWithTimestamps.forgottenAt,
-      ...withdrawalDataFromJson(row.data),
-    }
-  }
-
-  throw new Error('Cannot build record: ' + row)
 }
 
 export class ForcedTransactionsRepository {
@@ -342,7 +244,7 @@ export class ForcedTransactionsRepository {
     })
   }
 
-  rowsQuery() {
+  private rowsQuery() {
     return this.knex('forced_transactions')
       .innerJoin(
         'transaction_status',
