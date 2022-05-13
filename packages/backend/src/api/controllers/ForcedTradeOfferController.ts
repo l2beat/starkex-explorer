@@ -1,5 +1,5 @@
 import { encodeAssetId } from '@explorer/encoding'
-import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 import {
   recoverAddress,
   solidityKeccak256,
@@ -36,12 +36,7 @@ export class ForcedTradeOfferController {
       return { type: 'not found', content: 'Position does not exist.' }
     }
 
-    const frozenBalance = await this.calculateFrozenBalance(
-      offer.starkKeyA,
-      offer.aIsBuyingSynthetic ? AssetId.USDC : offer.syntheticAssetId
-    )
-
-    const offerValidated = validateInitialOffer(offer, positionA, frozenBalance)
+    const offerValidated = validateInitialOffer(offer, positionA)
 
     if (!offerValidated) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
@@ -90,19 +85,11 @@ export class ForcedTradeOfferController {
       }
     }
 
-    const frozenBalance = await this.calculateFrozenBalance(
-      acceptedOffer.starkKeyB,
-      initialOffer.aIsBuyingSynthetic
-        ? initialOffer.syntheticAssetId
-        : AssetId.USDC
-    )
-
     const offerValidated = validateAcceptedOffer(
       initialOffer,
       acceptedOffer,
       positionB,
-      userRegistrationEventB.ethAddress,
-      frozenBalance
+      userRegistrationEventB.ethAddress
     )
 
     if (!offerValidated) {
@@ -117,72 +104,26 @@ export class ForcedTradeOfferController {
 
     return { type: 'success', content: 'Accept offer was submitted.' }
   }
-
-  async calculateFrozenBalance(starkKey: StarkKey, assetId: AssetId) {
-    const initialOffers = await this.offerRepository.getInitialOffersByStarkKey(
-      starkKey
-    )
-
-    const acceptedOffers =
-      await this.offerRepository.getAcceptedOffersByStarkKey(starkKey)
-
-    let frozenBalance = 0n
-
-    if (assetId === AssetId.USDC) {
-      initialOffers.forEach((offer) => {
-        if (offer.aIsBuyingSynthetic) {
-          frozenBalance += offer.amountCollateral
-        }
-      })
-      acceptedOffers.forEach((offer) => {
-        if (offer.aIsBuyingSynthetic) {
-          frozenBalance += offer.amountCollateral
-        }
-      })
-    } else {
-      initialOffers.forEach((offer) => {
-        if (!offer.aIsBuyingSynthetic && offer.syntheticAssetId === assetId) {
-          frozenBalance += offer.amountSynthetic
-        }
-      })
-      acceptedOffers.forEach((offer) => {
-        if (offer.aIsBuyingSynthetic && offer.syntheticAssetId === assetId) {
-          frozenBalance += offer.amountSynthetic
-        }
-      })
-    }
-
-    return frozenBalance
-  }
 }
 
 function validateInitialOffer(
   offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
-  position: PositionRecord,
-  frozenBalance: bigint
+  position: PositionRecord
 ) {
   const userIsBuyingSynthetic = offer.aIsBuyingSynthetic
 
-  return validateBalance(offer, position, userIsBuyingSynthetic, frozenBalance)
+  return validateBalance(offer, position, userIsBuyingSynthetic)
 }
 
 function validateAcceptedOffer(
   initialOffer: ForcedTradeInitialOfferRecord,
   acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>,
   position: PositionRecord,
-  ethAddressB: EthereumAddress,
-  frozenBalance: bigint
+  ethAddressB: EthereumAddress
 ) {
   const userIsBuyingSynthetic = !initialOffer.aIsBuyingSynthetic
 
-  if (
-    !validateBalance(
-      initialOffer,
-      position,
-      userIsBuyingSynthetic,
-      frozenBalance
-    )
-  ) {
+  if (!validateBalance(initialOffer, position, userIsBuyingSynthetic)) {
     return false
   }
 
@@ -192,17 +133,13 @@ function validateAcceptedOffer(
 function validateBalance(
   offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
   position: PositionRecord,
-  userIsBuyingSynthetic: boolean,
-  frozenBalance: bigint
+  userIsBuyingSynthetic: boolean
 ) {
   const { amountCollateral, amountSynthetic, syntheticAssetId } = offer
 
   const { collateralBalance } = position
 
-  if (
-    userIsBuyingSynthetic &&
-    amountCollateral <= collateralBalance - frozenBalance
-  ) {
+  if (userIsBuyingSynthetic && amountCollateral <= collateralBalance) {
     return true
   }
 
@@ -210,10 +147,7 @@ function validateBalance(
     const balanceSynthetic = position.balances.find(
       (balance) => balance.assetId === syntheticAssetId
     )?.balance
-    if (
-      balanceSynthetic &&
-      balanceSynthetic - frozenBalance >= amountSynthetic
-    ) {
+    if (balanceSynthetic && balanceSynthetic >= amountSynthetic) {
       return true
     }
   }
