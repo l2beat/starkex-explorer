@@ -123,16 +123,16 @@ declare module 'knex/types/tables' {
     type: string
     data: json
     data_hash: string
-    state_update_id?: number
+    state_update_id: number | null
   }
 
   interface TransactionStatusRow {
     hash: string
-    sent_at?: bigint
-    mined_at?: bigint
-    reverted_at?: bigint
-    forgotten_at?: bigint
-    block_number?: number
+    sent_at: bigint | null
+    mined_at: bigint | null
+    reverted_at: bigint | null
+    forgotten_at: bigint | null
+    block_number: number | null
   }
 
   interface Tables {

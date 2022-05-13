@@ -1,21 +1,22 @@
-import { ForcedAction, ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
+import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
 import { AssetId, Hash256, json, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { ForcedTransactionRow, TransactionStatusRow } from 'knex/types/tables'
 import { MD5 as hashData } from 'object-hash'
 
 import { Logger } from '../../tools/Logger'
-import { noUndefined } from '../../utils/noUndefined'
 import { toSerializableJson } from '../../utils/toSerializableJson'
+
+type Nullable<T> = T | null
 
 export interface ForcedTransactionRecord {
   hash: Hash256
   data: ForcedWithdrawal | ForcedTrade
   updates: {
-    sentAt: Timestamp | undefined
-    minedAt: Timestamp | undefined
-    revertedAt: Timestamp | undefined
-    forgottenAt: Timestamp | undefined
+    sentAt: Nullable<Timestamp>
+    minedAt: Nullable<Timestamp>
+    revertedAt: Nullable<Timestamp>
+    forgottenAt: Nullable<Timestamp>
     verified:
       | {
           at: Timestamp
@@ -61,7 +62,8 @@ function getLastUpdate(updates: ForcedTransactionRecord['updates']): Timestamp {
     updates.verified?.at,
   ]
   const max = values.reduce<Timestamp>(
-    (max, value) => (value === undefined ? max : value > max ? value : max),
+    (max, value) =>
+      value === null || value === undefined ? max : value > max ? value : max,
     Timestamp(0n)
   )
   return max
@@ -77,13 +79,13 @@ function getType(type: string): 'withdrawal' | 'trade' {
 interface Row
   extends ForcedTransactionRow,
     Omit<TransactionStatusRow, 'block_number' | 'hash'> {
-  verified_at?: bigint
+  verified_at: bigint | null
 }
 
 function toRecord(row: Row): ForcedTransactionRecord {
   const type = getType(row.type)
-  const toTimestamp = (value: bigint | undefined) =>
-    value !== undefined ? Timestamp(value) : undefined
+  const toTimestamp = (value: bigint | null) =>
+    value !== null ? Timestamp(value) : null
 
   const updates: ForcedTransactionRecord['updates'] = {
     sentAt: toTimestamp(row.sent_at),
@@ -91,10 +93,10 @@ function toRecord(row: Row): ForcedTransactionRecord {
     revertedAt: toTimestamp(row.reverted_at),
     minedAt: toTimestamp(row.mined_at),
     verified:
-      row.verified_at !== undefined
+      row.verified_at !== null && row.state_update_id !== null
         ? {
             at: Timestamp(row.verified_at),
-            stateUpdateId: noUndefined(row.state_update_id),
+            stateUpdateId: row.state_update_id,
           }
         : undefined,
   }
@@ -226,47 +228,40 @@ export class ForcedTransactionsRepository {
     return toRecord(row)
   }
 
-  async addSent(
-    transaction: ForcedAction & {
-      hash: Hash256
-      sentAt: Timestamp
-    }
-  ): Promise<void> {
-    const { hash, type, sentAt, ...data } = transaction
-    await this.knex.transaction(async (trx) => {
-      await trx('forced_transactions').insert({
-        hash: hash.toString(),
-        type,
-        data: toSerializableJson(data),
-        data_hash: hashData(data),
-      })
-      await trx('transaction_status').insert({
-        hash: hash.toString(),
-        sent_at: sentAt ? BigInt(sentAt.toString()) : undefined,
-      })
-    })
-  }
+  async add(
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    sentAt: Timestamp
+  ): Promise<void>
 
-  async addMined(
-    transaction: ForcedAction & {
-      hash: Hash256
-      minedAt: Timestamp
-      sentAt?: Timestamp
-      blockNumber: number
-    }
+  async add(
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    sentAt: Nullable<Timestamp>,
+    minedAt: Timestamp,
+    blockNumber: number
+  ): Promise<void>
+
+  async add(
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    sentAt: Nullable<Timestamp>,
+    minedAt?: Timestamp,
+    blockNumber?: number
   ): Promise<void> {
-    const { hash, type, blockNumber, minedAt, sentAt, ...data } = transaction
+    const { hash, data } = transaction
+
     await this.knex.transaction(async (trx) => {
       await trx('forced_transactions').insert({
         hash: hash.toString(),
-        type,
+        type: data.type,
         data: toSerializableJson(data),
         data_hash: hashData(data),
       })
       await trx('transaction_status').insert({
         hash: hash.toString(),
-        mined_at: BigInt(minedAt.toString()),
-        sent_at: sentAt ? BigInt(sentAt.toString()) : undefined,
+        mined_at:
+          minedAt !== null && minedAt !== undefined
+            ? BigInt(minedAt.toString())
+            : null,
+        sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
         block_number: blockNumber,
       })
     })

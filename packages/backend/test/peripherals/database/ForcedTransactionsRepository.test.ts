@@ -1,9 +1,55 @@
-import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
+import { AssetId, Hash256, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import {
+  ForcedTransactionRecord,
+  ForcedTransactionsRepository,
+} from '../../../src/peripherals/database/ForcedTransactionsRepository'
 import { Logger } from '../../../src/tools/Logger'
+import { fakeBigInt, fakeBoolean, fakeInt, fakeTimestamp } from '../../utils'
 import { setupDatabaseTestSuite } from './setup'
+
+function fakeWithdrawal(
+  withdrawal?: Partial<Omit<ForcedWithdrawal, 'type'>>
+): ForcedWithdrawal {
+  return {
+    type: 'withdrawal',
+    publicKey: StarkKey.fake(),
+    positionId: fakeBigInt(),
+    amount: fakeBigInt(),
+    ...withdrawal,
+  }
+}
+
+function fakeTrade(trade?: Partial<Omit<ForcedTrade, 'type'>>): ForcedTrade {
+  return {
+    type: 'trade',
+    collateralAmount: fakeBigInt(),
+    isABuyingSynthetic: fakeBoolean(),
+    nonce: fakeBigInt(),
+    positionIdA: fakeBigInt(),
+    positionIdB: fakeBigInt(),
+    publicKeyA: StarkKey.fake(),
+    publicKeyB: StarkKey.fake(),
+    syntheticAmount: fakeBigInt(),
+    syntheticAssetId: AssetId.USDC,
+    ...trade,
+  }
+}
+
+function updates(
+  updates?: Partial<ForcedTransactionRecord['updates']>
+): ForcedTransactionRecord['updates'] {
+  return {
+    forgottenAt: null,
+    minedAt: null,
+    revertedAt: null,
+    sentAt: null,
+    verified: undefined,
+    ...updates,
+  }
+}
 
 describe(ForcedTransactionsRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()
@@ -11,90 +57,70 @@ describe(ForcedTransactionsRepository.name, () => {
 
   beforeEach(() => repository.deleteAll())
 
-  it('adds sent transaction', async () => {
-    const withdrawal = {
+  it('adds transaction', async () => {
+    const tx1 = {
       hash: Hash256.fake(),
-      type: 'withdrawal' as const,
-      sentAt: Timestamp(1),
-      amount: 123n,
-      positionId: 123n,
-      publicKey: StarkKey.fake('123'),
+      data: fakeWithdrawal(),
     }
-    const trade = {
+    const tx2 = {
       hash: Hash256.fake(),
-      type: 'trade' as const,
-      sentAt: Timestamp(2),
-      publicKeyA: StarkKey.fake('123a'),
-      publicKeyB: StarkKey.fake('123b'),
-      positionIdA: 456n,
-      positionIdB: 789n,
-      syntheticAssetId: AssetId('ETH-7'),
-      isABuyingSynthetic: true,
-      syntheticAmount: 456n,
-      collateralAmount: 789n,
-      nonce: 1n,
+      data: fakeWithdrawal(),
+    }
+    const tx3 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+    const tx4 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
     }
 
-    await repository.addSent(withdrawal)
-    await repository.addSent(trade)
+    const sentAt1 = fakeTimestamp()
+    const sentAt2 = fakeTimestamp()
+    const sentAt3 = null
+    const minedAt3 = fakeTimestamp()
+    const blockNumber3 = fakeInt()
+    const sentAt4 = fakeTimestamp(1)
+    const minedAt4 = fakeTimestamp(2)
+    const blockNumber4 = fakeInt()
+
+    await repository.add(tx1, sentAt1)
+    await repository.add(tx2, sentAt2)
+    await repository.add(tx3, sentAt3, minedAt3, blockNumber3)
+    await repository.add(tx4, sentAt4, minedAt4, blockNumber4)
 
     const actual = await repository.getAll()
 
     expect(actual).toEqual([
       {
-        ...withdrawal,
-        status: 'sent',
-        lastUpdate: Timestamp(1),
+        ...tx1,
+        lastUpdateAt: sentAt1,
+        updates: updates({
+          sentAt: sentAt1,
+        }),
       },
       {
-        ...trade,
-        status: 'sent',
-        lastUpdate: Timestamp(2),
-      },
-    ])
-  })
-
-  it('adds mined transaction', async () => {
-    const withdrawal = {
-      hash: Hash256.fake(),
-      type: 'withdrawal' as const,
-      minedAt: Timestamp(1),
-      amount: 123n,
-      positionId: 123n,
-      publicKey: StarkKey.fake('123'),
-    }
-    const trade = {
-      hash: Hash256.fake(),
-      type: 'trade' as const,
-      minedAt: Timestamp(2),
-      publicKeyA: StarkKey.fake('123a'),
-      publicKeyB: StarkKey.fake('123b'),
-      positionIdA: 456n,
-      positionIdB: 789n,
-      syntheticAssetId: AssetId('ETH-7'),
-      isABuyingSynthetic: true,
-      syntheticAmount: 456n,
-      collateralAmount: 789n,
-      nonce: 1n,
-    }
-
-    await repository.addMined({ ...withdrawal, blockNumber: 1 })
-    await repository.addMined({ ...trade, blockNumber: 1 })
-
-    const actual = await repository.getAll()
-
-    expect(actual).toEqual([
-      {
-        ...withdrawal,
-        status: 'mined',
-        lastUpdate: Timestamp(1),
-        sentAt: undefined,
+        ...tx2,
+        lastUpdateAt: sentAt2,
+        updates: updates({
+          sentAt: sentAt2,
+        }),
       },
       {
-        ...trade,
-        status: 'mined',
-        lastUpdate: Timestamp(2),
-        sentAt: undefined,
+        ...tx3,
+        lastUpdateAt: minedAt3,
+        updates: updates({
+          sentAt: sentAt3,
+          minedAt: minedAt3,
+        }),
+      },
+      {
+        ...tx4,
+        lastUpdateAt: minedAt4,
+        updates: updates({
+          sentAt: sentAt4,
+          minedAt: minedAt4,
+        }),
       },
     ])
   })
@@ -106,42 +132,32 @@ describe(ForcedTransactionsRepository.name, () => {
 
   it('returns transaction hashes', async () => {
     const hash1 = Hash256.fake()
-    const data1 = {
-      amount: 123n,
-      positionId: 123n,
-      publicKey: StarkKey.fake('123'),
-    }
+    const data1 = fakeWithdrawal()
 
     const hash2 = Hash256.fake()
-    const data2 = {
-      publicKeyA: StarkKey.fake('123a'),
-      publicKeyB: StarkKey.fake('123b'),
-      positionIdA: 456n,
-      positionIdB: 789n,
-      syntheticAssetId: AssetId('ETH-7'),
-      isABuyingSynthetic: true,
-      syntheticAmount: 456n,
-      collateralAmount: 789n,
-      nonce: 1n,
-    }
+    const data2 = fakeTrade()
 
-    await repository.addMined({
-      hash: hash1,
-      type: 'withdrawal' as const,
-      ...data1,
-      minedAt: Timestamp(1),
-      blockNumber: 1,
-    })
-    await repository.addMined({
-      hash: hash2,
-      type: 'trade' as const,
-      ...data2,
-      minedAt: Timestamp(2),
-      blockNumber: 2,
-    })
+    await repository.add(
+      {
+        hash: hash1,
+        data: data1,
+      },
+      null,
+      fakeTimestamp(),
+      fakeInt()
+    )
+    await repository.add(
+      {
+        hash: hash2,
+        data: data2,
+      },
+      null,
+      fakeTimestamp(),
+      fakeInt()
+    )
 
     const hashes = await repository.getTransactionHashesByData([
-      { positionId: 123n, amount: 123n, publicKey: StarkKey.fake('123') },
+      data1,
       data2,
       { ...data2, publicKeyA: StarkKey.fake() },
     ])
@@ -151,130 +167,113 @@ describe(ForcedTransactionsRepository.name, () => {
 
   it('returns latest transactions', async () => {
     const hash1 = Hash256.fake()
-    const data1 = {
-      amount: 123n,
-      positionId: 123n,
-      publicKey: StarkKey.fake('123'),
-    }
-
+    const data1 = fakeWithdrawal()
+    const sentAt1 = fakeTimestamp(1)
     const hash2 = Hash256.fake()
-    const data2 = {
-      publicKeyA: StarkKey.fake('123a'),
-      publicKeyB: StarkKey.fake('123b'),
-      positionIdA: 456n,
-      positionIdB: 789n,
-      syntheticAssetId: AssetId('ETH-7'),
-      isABuyingSynthetic: true,
-      syntheticAmount: 456n,
-      collateralAmount: 789n,
-      nonce: 1n,
-    }
+    const data2 = fakeTrade()
+    const sentAt2 = fakeTimestamp(2)
+    const minedAt2 = fakeTimestamp(3)
+    const blockNumber2 = fakeInt()
 
-    await repository.addSent({
-      hash: hash1,
-      type: 'withdrawal' as const,
-      ...data1,
-      sentAt: Timestamp(1),
-    })
-    await repository.addMined({
-      hash: hash2,
-      type: 'trade' as const,
-      ...data2,
-      minedAt: Timestamp(2),
-      blockNumber: 2,
-    })
+    await repository.add(
+      {
+        hash: hash1,
+        data: data1,
+      },
+      sentAt1
+    )
+    await repository.add(
+      {
+        hash: hash2,
+        data: data2,
+      },
+      sentAt2,
+      minedAt2,
+      blockNumber2
+    )
 
     const latest = await repository.getLatest({ limit: 10, offset: 0 })
 
     expect(latest).toEqual([
       {
-        ...data1,
         hash: hash1,
-        type: 'withdrawal' as const,
-        status: 'sent',
-        lastUpdate: Timestamp(1),
-        sentAt: Timestamp(1),
+        data: data1,
+        lastUpdateAt: sentAt1,
+        updates: updates({
+          sentAt: sentAt1,
+        }),
       },
       {
-        ...data2,
         hash: hash2,
-        type: 'trade' as const,
-        status: 'mined',
-        lastUpdate: Timestamp(2),
-        sentAt: undefined,
-        minedAt: Timestamp(2),
+        data: data2,
+        lastUpdateAt: minedAt2,
+        updates: updates({
+          sentAt: sentAt2,
+          minedAt: minedAt2,
+        }),
       },
     ])
+
     const offset = await repository.getLatest({ limit: 10, offset: 2 })
     expect(offset).toEqual([])
   })
 
   it('returns transactions affecting position', async () => {
+    const positionId = fakeBigInt()
     const hash1 = Hash256.fake()
-    const data1 = {
-      amount: 123n,
-      positionId: 123n,
-      publicKey: StarkKey.fake('123'),
-    }
-
+    const data1 = fakeWithdrawal({ positionId })
+    const sentAt1 = fakeTimestamp()
     const hash2 = Hash256.fake()
-    const data2 = {
-      publicKeyA: StarkKey.fake('123a'),
-      publicKeyB: StarkKey.fake('123b'),
-      positionIdA: 123n,
-      positionIdB: 789n,
-      syntheticAssetId: AssetId('ETH-7'),
-      isABuyingSynthetic: true,
-      syntheticAmount: 456n,
-      collateralAmount: 789n,
-      nonce: 1n,
-    }
-
+    const data2 = fakeTrade({ positionIdA: positionId })
+    const sentAt2 = fakeTimestamp(1)
+    const minedAt2 = fakeTimestamp(2)
+    const blockNumber2 = fakeInt()
     const hash3 = Hash256.fake()
-    const data3 = {
-      amount: 123n,
-      positionId: 297n,
-      publicKey: StarkKey.fake('123'),
-    }
+    const data3 = fakeWithdrawal({ positionId: positionId + 1n })
+    const sentAt3 = fakeTimestamp()
 
-    await repository.addSent({
-      hash: hash1,
-      type: 'withdrawal' as const,
-      ...data1,
-      sentAt: Timestamp(1),
-    })
-    await repository.addMined({
-      hash: hash2,
-      type: 'trade' as const,
-      ...data2,
-      minedAt: Timestamp(2),
-      blockNumber: 2,
-    })
-    await repository.addSent({
-      hash: hash3,
-      type: 'withdrawal' as const,
-      ...data3,
-      sentAt: Timestamp(3),
-    })
+    await repository.add(
+      {
+        hash: hash1,
+        data: data1,
+      },
+      sentAt1
+    )
+    await repository.add(
+      {
+        hash: hash2,
+        data: data2,
+      },
+      sentAt2,
+      minedAt2,
+      blockNumber2
+    )
+    await repository.add(
+      {
+        hash: hash3,
+        data: data3,
+      },
+      sentAt3
+    )
 
-    const transactions = await repository.getAffectingPosition(123n)
+    const transactions = await repository.getAffectingPosition(positionId)
     expect(transactions).toEqual([
       {
-        type: 'withdrawal',
-        ...data1,
         hash: hash1,
-        status: 'sent',
-        sentAt: Timestamp(1),
-        lastUpdate: Timestamp(1),
+        data: data1,
+        lastUpdateAt: sentAt1,
+        updates: updates({
+          sentAt: sentAt1,
+        }),
       },
       {
-        type: 'trade',
-        ...data2,
         hash: hash2,
-        status: 'mined',
-        sentAt: undefined,
-        minedAt: Timestamp(2),
-        lastUpdate: Timestamp(2),
+        data: data2,
+        lastUpdateAt: minedAt2,
+        updates: updates({
+          sentAt: sentAt2,
+          minedAt: minedAt2,
+        }),
       },
     ])
 
@@ -286,38 +285,30 @@ describe(ForcedTransactionsRepository.name, () => {
 
   it('counts all transactions', async () => {
     const hash1 = Hash256.fake()
-    const data1 = {
-      amount: 123n,
-      positionId: 123n,
-      publicKey: StarkKey.fake('123'),
-    }
-
+    const data1 = fakeWithdrawal()
+    const sentAt1 = fakeTimestamp()
     const hash2 = Hash256.fake()
-    const data2 = {
-      publicKeyA: StarkKey.fake('123a'),
-      publicKeyB: StarkKey.fake('123b'),
-      positionIdA: 456n,
-      positionIdB: 789n,
-      syntheticAssetId: AssetId('ETH-7'),
-      isABuyingSynthetic: true,
-      syntheticAmount: 456n,
-      collateralAmount: 789n,
-      nonce: 1n,
-    }
+    const data2 = fakeTrade()
+    const sentAt2 = fakeTimestamp(1)
+    const minedAt2 = fakeTimestamp(2)
+    const blockNumber2 = fakeInt()
 
-    await repository.addSent({
-      hash: hash1,
-      type: 'withdrawal' as const,
-      ...data1,
-      sentAt: Timestamp(1),
-    })
-    await repository.addMined({
-      hash: hash2,
-      type: 'trade' as const,
-      ...data2,
-      minedAt: Timestamp(2),
-      blockNumber: 2,
-    })
+    await repository.add(
+      {
+        hash: hash1,
+        data: data1,
+      },
+      sentAt1
+    )
+    await repository.add(
+      {
+        hash: hash2,
+        data: data2,
+      },
+      sentAt2,
+      minedAt2,
+      blockNumber2
+    )
 
     const count = await repository.countAll()
 
@@ -330,16 +321,23 @@ describe(ForcedTransactionsRepository.name, () => {
   })
 
   it('gets by hash', async () => {
-    const withdrawal = {
-      hash: Hash256.fake(),
-      type: 'withdrawal' as const,
-      sentAt: Timestamp(1),
-      amount: 123n,
-      positionId: 123n,
-      publicKey: StarkKey.fake('123'),
-    }
-    await repository.addSent(withdrawal)
-    const transaction = await repository.findByHash(withdrawal.hash)
-    expect(transaction).toBeDefined()
+    const hash = Hash256.fake()
+    const data = fakeWithdrawal()
+    const sentAt = fakeTimestamp()
+
+    await repository.add(
+      {
+        hash,
+        data,
+      },
+      sentAt
+    )
+    const transaction = await repository.findByHash(hash)
+    expect(transaction).toEqual({
+      data,
+      hash,
+      lastUpdateAt: sentAt,
+      updates: updates({ sentAt }),
+    })
   })
 })
