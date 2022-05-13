@@ -31,8 +31,9 @@ const LogForcedTradeRequest = PERPETUAL_ABI.getEventTopic(
   'LogForcedTradeRequest'
 )
 
-type MinedTransaction = ForcedAction & {
+type MinedTransaction = {
   hash: Hash256
+  data: ForcedAction
   blockNumber: number
   minedAt: Timestamp
 }
@@ -54,15 +55,20 @@ export class ForcedEventsCollector {
   ): Promise<{ added: number; updated: number; ignored: number }> {
     const transactions = await this.getMinedTransactions(blockRange)
     const results = await Promise.all(
-      transactions.map(async (transaction) => {
-        const dbTransaction =
-          await this.forcedTransactionsRepository.findByHash(transaction.hash)
-        if (!dbTransaction) {
-          await this.forcedTransactionsRepository.addMined(transaction)
+      transactions.map(async ({ hash, data, minedAt, blockNumber }) => {
+        const transaction = await this.forcedTransactionsRepository.findByHash(
+          hash
+        )
+        if (!transaction) {
+          await this.forcedTransactionsRepository.add(
+            { hash, data },
+            null,
+            minedAt,
+            blockNumber
+          )
           return 'added'
         }
-        if (getTransactionStatus(dbTransaction) === 'sent') {
-          const { hash, blockNumber, minedAt } = transaction
+        if (getTransactionStatus(transaction) === 'sent') {
           await this.forcedTransactionsRepository.markAsMined(
             hash,
             blockNumber,
@@ -79,13 +85,9 @@ export class ForcedEventsCollector {
     )
   }
 
-  private async getMinedTransactions(blockRange: BlockRange): Promise<
-    (ForcedAction & {
-      hash: Hash256
-      blockNumber: number
-      minedAt: Timestamp
-    })[]
-  > {
+  private async getMinedTransactions(
+    blockRange: BlockRange
+  ): Promise<MinedTransaction[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: PERPETUAL_ADDRESS,
       topics: [[LogForcedTradeRequest, LogForcedWithdrawalRequest]],
@@ -103,26 +105,30 @@ export class ForcedEventsCollector {
           case 'LogForcedTradeRequest':
             return {
               ...base,
-              type: 'trade',
-              publicKeyA: event.args.starkKeyA.toHexString(),
-              publicKeyB: event.args.starkKeyB.toHexString(),
-              positionIdA: BigInt(event.args.vaultIdA),
-              positionIdB: BigInt(event.args.vaultIdB),
-              syntheticAssetId: decodeAssetId(
-                event.args.syntheticAssetId.toHexString().slice(2)
-              ),
-              isABuyingSynthetic: event.args.aIsBuyingSynthetic,
-              collateralAmount: BigInt(event.args.amountCollateral),
-              syntheticAmount: BigInt(event.args.amountSynthetic),
-              nonce: BigInt(event.args.nonce),
+              data: {
+                type: 'trade',
+                publicKeyA: event.args.starkKeyA.toHexString(),
+                publicKeyB: event.args.starkKeyB.toHexString(),
+                positionIdA: BigInt(event.args.vaultIdA),
+                positionIdB: BigInt(event.args.vaultIdB),
+                syntheticAssetId: decodeAssetId(
+                  event.args.syntheticAssetId.toHexString().slice(2)
+                ),
+                isABuyingSynthetic: event.args.aIsBuyingSynthetic,
+                collateralAmount: BigInt(event.args.amountCollateral),
+                syntheticAmount: BigInt(event.args.amountSynthetic),
+                nonce: BigInt(event.args.nonce),
+              },
             }
           case 'LogForcedWithdrawalRequest':
             return {
               ...base,
-              type: 'withdrawal',
-              publicKey: event.args.starkKey.toHexString(),
-              positionId: BigInt(event.args.vaultId),
-              amount: BigInt(event.args.quantizedAmount),
+              data: {
+                type: 'withdrawal',
+                publicKey: event.args.starkKey.toHexString(),
+                positionId: BigInt(event.args.vaultId),
+                amount: BigInt(event.args.quantizedAmount),
+              },
             }
           default:
             throw new Error('Unknown event!')
