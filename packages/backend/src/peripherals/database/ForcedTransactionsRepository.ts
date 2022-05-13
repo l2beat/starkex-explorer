@@ -5,25 +5,25 @@ import { ForcedTransactionRow, TransactionStatusRow } from 'knex/types/tables'
 import { MD5 as hashData } from 'object-hash'
 
 import { Logger } from '../../tools/Logger'
+import { Nullable } from '../../utils/Nullable'
 import { toSerializableJson } from '../../utils/toSerializableJson'
 
-type Nullable<T> = T | null
-
+export interface Updates {
+  sentAt: Nullable<Timestamp>
+  minedAt: Nullable<Timestamp>
+  revertedAt: Nullable<Timestamp>
+  forgottenAt: Nullable<Timestamp>
+  verified:
+    | {
+        at: Timestamp
+        stateUpdateId: number
+      }
+    | undefined
+}
 export interface ForcedTransactionRecord {
   hash: Hash256
   data: ForcedWithdrawal | ForcedTrade
-  updates: {
-    sentAt: Nullable<Timestamp>
-    minedAt: Nullable<Timestamp>
-    revertedAt: Nullable<Timestamp>
-    forgottenAt: Nullable<Timestamp>
-    verified:
-      | {
-          at: Timestamp
-          stateUpdateId: number
-        }
-      | undefined
-  }
+  updates: Updates
   lastUpdateAt: Timestamp
 }
 
@@ -53,7 +53,7 @@ function tradeFromJson(jsonData: json): ForcedTrade {
   }
 }
 
-function getLastUpdate(updates: ForcedTransactionRecord['updates']): Timestamp {
+function getLastUpdate(updates: Updates): Timestamp {
   const values = [
     updates.sentAt,
     updates.forgottenAt,
@@ -87,7 +87,7 @@ function toRecord(row: Row): ForcedTransactionRecord {
   const toTimestamp = (value: bigint | null) =>
     value !== null ? Timestamp(value) : null
 
-  const updates: ForcedTransactionRecord['updates'] = {
+  const updates = {
     sentAt: toTimestamp(row.sent_at),
     forgottenAt: toTimestamp(row.forgotten_at),
     revertedAt: toTimestamp(row.reverted_at),

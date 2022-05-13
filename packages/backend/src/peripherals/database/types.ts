@@ -1,6 +1,8 @@
 import { Position } from '@explorer/state'
 import { json } from '@explorer/types'
 
+import { Nullable } from '../../utils/Nullable'
+
 export {}
 
 declare module 'knex/types/tables' {
@@ -107,32 +109,21 @@ declare module 'knex/types/tables' {
     eth_address: string
   }
 
-  interface ForcedTransactionEventRow {
-    id: number
-    transaction_hash: string
-    transaction_type: string
-    event_type: string
-    block_number?: number
-    timestamp: bigint
-    data: json
-    data_hash: string
-  }
-
   interface ForcedTransactionRow {
     hash: string
     type: string
     data: json
     data_hash: string
-    state_update_id: number | null
+    state_update_id: Nullable<number>
   }
 
   interface TransactionStatusRow {
     hash: string
-    sent_at: bigint | null
-    mined_at: bigint | null
-    reverted_at: bigint | null
-    forgotten_at: bigint | null
-    block_number: number | null
+    sent_at: Nullable<bigint>
+    mined_at: Nullable<bigint>
+    reverted_at: Nullable<bigint>
+    forgotten_at: Nullable<bigint>
+    block_number: Nullable<number>
   }
 
   interface Tables {
@@ -150,7 +141,6 @@ declare module 'knex/types/tables' {
     positions: PositionRow
     prices: PriceRow
     user_registration_evens: UserRegistrationEventRow
-    forced_transaction_events: ForcedTransactionEventRow
     forced_transactions: ForcedTransactionRow
     transaction_status: TransactionStatusRow
   }
