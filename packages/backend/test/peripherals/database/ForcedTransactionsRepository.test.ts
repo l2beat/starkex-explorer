@@ -1,5 +1,5 @@
 import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
-import { AssetId, Hash256, StarkKey } from '@explorer/types'
+import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -80,8 +80,8 @@ describe(ForcedTransactionsRepository.name, () => {
     const sentAt3 = null
     const minedAt3 = fakeTimestamp()
     const blockNumber3 = fakeInt()
-    const sentAt4 = fakeTimestamp(1)
-    const minedAt4 = fakeTimestamp(2)
+    const sentAt4 = Timestamp(1)
+    const minedAt4 = Timestamp(2)
     const blockNumber4 = fakeInt()
 
     await repository.add(tx1, sentAt1)
@@ -168,15 +168,15 @@ describe(ForcedTransactionsRepository.name, () => {
   it('returns latest transactions', async () => {
     const hash1 = Hash256.fake()
     const data1 = fakeWithdrawal()
-    const sentAt1 = fakeTimestamp(3)
+    const sentAt1 = Timestamp(3)
     const hash2 = Hash256.fake()
     const data2 = fakeTrade()
-    const sentAt2 = fakeTimestamp(1)
-    const minedAt2 = fakeTimestamp(2)
+    const sentAt2 = Timestamp(1)
+    const minedAt2 = Timestamp(2)
     const blockNumber2 = fakeInt()
     const hash3 = Hash256.fake()
     const data3 = fakeWithdrawal()
-    const sentAt3 = fakeTimestamp(4)
+    const sentAt3 = Timestamp(4)
 
     await repository.add(
       {
@@ -245,8 +245,8 @@ describe(ForcedTransactionsRepository.name, () => {
     const sentAt1 = fakeTimestamp()
     const hash2 = Hash256.fake()
     const data2 = fakeTrade({ positionIdA: positionId })
-    const sentAt2 = fakeTimestamp(1)
-    const minedAt2 = fakeTimestamp(2)
+    const sentAt2 = Timestamp(1)
+    const minedAt2 = Timestamp(2)
     const blockNumber2 = fakeInt()
     const hash3 = Hash256.fake()
     const data3 = fakeWithdrawal({ positionId: positionId + 1n })
@@ -309,8 +309,8 @@ describe(ForcedTransactionsRepository.name, () => {
     const sentAt1 = fakeTimestamp()
     const hash2 = Hash256.fake()
     const data2 = fakeTrade()
-    const sentAt2 = fakeTimestamp(1)
-    const minedAt2 = fakeTimestamp(2)
+    const sentAt2 = Timestamp(1)
+    const minedAt2 = Timestamp(2)
     const blockNumber2 = fakeInt()
 
     await repository.add(

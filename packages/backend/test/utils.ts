@@ -13,6 +13,6 @@ export function fakeBoolean(): boolean {
   return Math.random() > 0.5
 }
 
-export function fakeTimestamp(seed?: number): Timestamp {
-  return Timestamp(seed || fakeInt())
+export function fakeTimestamp(max?: number): Timestamp {
+  return Timestamp(fakeInt(max))
 }
