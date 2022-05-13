@@ -122,11 +122,6 @@ describe('OfferRouter', () => {
     it('returnes bad request when position does not have enough assets', async () => {
       await server.post('/offer').send(initialOfferInvalidAmount).expect(400)
     })
-
-    it('returnes bad request when assets are already offered', async () => {
-      await server.post('/offer').send(initialOffer).expect(201)
-      await server.post('/offer').send(initialOffer).expect(400)
-    })
   })
 
   describe('/offer/:initialOfferId', () => {
