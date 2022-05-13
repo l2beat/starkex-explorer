@@ -32,7 +32,7 @@ export function createFrontendRouter(
   })
 
   router.get(
-    '/forced-transactions',
+    '/forced',
     withTypedContext(
       z.object({
         query: z.object({
@@ -55,7 +55,7 @@ export function createFrontendRouter(
   )
 
   router.get(
-    '/forced-transactions/:hash',
+    '/forced/:hash',
     withTypedContext(
       z.object({
         params: z.object({

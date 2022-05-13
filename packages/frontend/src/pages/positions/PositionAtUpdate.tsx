@@ -119,7 +119,7 @@ export function PositionAtUpdate({
           { header: 'Asset' },
         ]}
         rows={transactions.map((transaction) => {
-          const link = `/forced-transactions/${transaction.hash}`
+          const link = `/forced/${transaction.hash}`
           return {
             link,
             cells: [

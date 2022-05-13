@@ -44,16 +44,16 @@ router.get('/positions/:positionId/updates/:updateId', (ctx) => {
   data.account = getAccount(ctx)
   ctx.body = renderPositionAtUpdatePage(data)
 })
-router.get('/forced-transactions', (ctx) => {
+router.get('/forced', (ctx) => {
   const data = { ...DATA.FORCED_TRANSACTIONS_INDEX_PROPS }
   data.account = getAccount(ctx)
   ctx.body = renderForcedTransactionsIndexPage(data)
 })
-router.get('/forced-transactions/form', (ctx) => {
+router.get('/forced/new', (ctx) => {
   const data = { ...DATA.TRANSACTION_FORM_PROPS }
   ctx.body = renderTransactionForm(data)
 })
-router.get('/forced-transactions/:hash', (ctx) => {
+router.get('/forced/:hash', (ctx) => {
   const data = { ...DATA.FORCED_TRANSACTION_DETAILS_PROPS }
   data.account = getAccount(ctx)
   ctx.body = renderForcedTransactionDetailsPage(data)

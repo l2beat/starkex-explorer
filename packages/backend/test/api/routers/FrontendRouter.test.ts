@@ -138,7 +138,7 @@ describe('FrontendRouter', () => {
     })
   })
 
-  describe('/forced-transactions', () => {
+  describe('/forced', () => {
     const frontendRouter = createFrontendRouter(
       mock<PositionController>(),
       mock<HomeController>(),
@@ -151,22 +151,22 @@ describe('FrontendRouter', () => {
     const server = createTestApiServer([frontendRouter])
 
     it('returns html', async () => {
-      await server.get('/forced-transactions').expect(200).expect(TEST_PAGE)
+      await server.get('/forced').expect(200).expect(TEST_PAGE)
     })
 
     it('accepts pagination params', async () => {
       await server
-        .get('/forced-transactions?page=123&perPage=100')
+        .get('/forced?page=123&perPage=100')
         .expect(200)
         .expect(TEST_PAGE)
     })
 
     it('does not allow invalid input', async () => {
-      await server.get('/forced-transactions?page=foo&perPage=bar').expect(400)
+      await server.get('/forced?page=foo&perPage=bar').expect(400)
     })
   })
 
-  describe('/forced-transactions/:hash', () => {
+  describe('/forced/:hash', () => {
     const frontendRouter = createFrontendRouter(
       mock<PositionController>(),
       mock<HomeController>(),
@@ -180,13 +180,13 @@ describe('FrontendRouter', () => {
 
     it('returns html', async () => {
       await server
-        .get(`/forced-transactions/${Hash256.fake()}`)
+        .get(`/forced/${Hash256.fake()}`)
         .expect(200)
         .expect(TEST_PAGE)
     })
 
     it('does not allow invalid input', async () => {
-      await server.get('/forced-transactions/not-a-hash').expect(400)
+      await server.get('/forced/not-a-hash').expect(400)
     })
   })
 
