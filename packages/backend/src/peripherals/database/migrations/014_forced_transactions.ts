@@ -13,6 +13,8 @@ should create a new migration file that fixes the issue.
 
 import { Knex } from 'knex'
 
+import { up as createForcedTransactionEvents } from './012_forced_transaction_events'
+
 export async function up(knex: Knex) {
   await knex.schema.dropTableIfExists('forced_transaction_events')
   await knex.schema.createTable('forced_transactions', (table) => {
@@ -30,4 +32,5 @@ export async function up(knex: Knex) {
 
 export async function down(knex: Knex) {
   await knex.schema.dropTable('forced_transactions')
+  await createForcedTransactionEvents(knex)
 }
