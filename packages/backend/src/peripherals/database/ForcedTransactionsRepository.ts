@@ -63,8 +63,7 @@ function getLastUpdate(updates: Updates): Timestamp {
     updates.verified?.at,
   ]
   const max = values.reduce<Timestamp>(
-    (max, value) =>
-      value === null || value === undefined ? max : value > max ? value : max,
+    (max, value) => (!value ? max : value > max ? value : max),
     Timestamp(0n)
   )
   return max
