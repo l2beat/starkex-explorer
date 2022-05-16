@@ -14,8 +14,8 @@ should create a new migration file that fixes the issue.
 import { Knex } from 'knex'
 
 import {
-  up as createForcedTransactionEvents,
   down as dropForcedTransactionEvents,
+  up as createForcedTransactionEvents,
 } from './012_forced_transaction_events'
 
 export async function up(knex: Knex) {
