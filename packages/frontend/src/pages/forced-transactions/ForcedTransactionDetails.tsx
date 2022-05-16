@@ -99,5 +99,7 @@ function getStatusText(entry: TransactionStatusEntry): string {
       return 'transaction mined (waiting for inclusion in state update)'
     case 'verified':
       return `exit included in state update #${entry.stateUpdateId}`
+    case 'reverted':
+      return 'transaction reverted'
   }
 }

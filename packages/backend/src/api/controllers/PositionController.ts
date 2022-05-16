@@ -125,9 +125,9 @@ export class PositionController {
       assetChanges,
       transactions: transactions
         .filter((t) => {
-          return t.type === 'trade'
-            ? [t.positionIdA, t.positionIdB].includes(positionId)
-            : t.positionId === positionId
+          return t.data.type === 'trade'
+            ? [t.data.positionIdA, t.data.positionIdB].includes(positionId)
+            : t.data.positionId === positionId
         })
         .map(toForcedTransactionEntry),
     })

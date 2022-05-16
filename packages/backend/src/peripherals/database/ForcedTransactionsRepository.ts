@@ -1,351 +1,150 @@
+import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
 import { AssetId, Hash256, json, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
-import { ForcedTransactionEventRow as EventRow } from 'knex/types/tables'
-import { groupBy, pick } from 'lodash'
+import { ForcedTransactionRow, TransactionStatusRow } from 'knex/types/tables'
 import { MD5 as hashData } from 'object-hash'
 
 import { Logger } from '../../tools/Logger'
+import { Nullable } from '../../utils/Nullable'
+import { toSerializableJson } from '../../utils/toSerializableJson'
+import { BaseRepository } from './BaseRepository'
 
-interface EventRecordCandidateBase {
-  id?: number
-  transactionHash: Hash256
-  timestamp: Timestamp
+export interface Updates {
+  sentAt: Nullable<Timestamp>
+  minedAt: Nullable<Timestamp>
+  revertedAt: Nullable<Timestamp>
+  forgottenAt: Nullable<Timestamp>
+  verified:
+    | {
+        at: Timestamp
+        stateUpdateId: number
+      }
+    | undefined
+}
+export interface ForcedTransactionRecord {
+  hash: Hash256
+  data: ForcedWithdrawal | ForcedTrade
+  updates: Updates
+  lastUpdateAt: Timestamp
 }
 
-interface WithdrawalMinedEventData {
-  publicKey: StarkKey
-  positionId: bigint
-  amount: bigint
-}
-
-interface WithdrawalMinedEventRecordCandidate
-  extends EventRecordCandidateBase,
-    WithdrawalMinedEventData {
-  transactionType: 'withdrawal'
-  eventType: 'mined'
-  blockNumber: number
-}
-
-interface VerifiedEventBase {
-  eventType: 'verified'
-  stateUpdateId: number
-}
-
-export interface WithdrawalVerifiedEventRecordCandidate
-  extends EventRecordCandidateBase,
-    VerifiedEventBase {
-  transactionType: 'withdrawal'
-  blockNumber: number
-}
-
-interface TradeMinedEventData {
-  publicKeyA: StarkKey
-  publicKeyB: StarkKey
-  positionIdA: bigint
-  positionIdB: bigint
-  syntheticAssetId: AssetId
-  isABuyingSynthetic: boolean
-  collateralAmount: bigint
-  syntheticAmount: bigint
-  nonce: bigint
-}
-
-interface TradeMinedEventRecordCandidate
-  extends EventRecordCandidateBase,
-    TradeMinedEventData {
-  transactionType: 'trade'
-  eventType: 'mined'
-  blockNumber: number
-}
-
-export interface TradeVerifiedEventRecordCandidate
-  extends EventRecordCandidateBase,
-    VerifiedEventBase {
-  transactionType: 'trade'
-  blockNumber: number
-}
-
-export type EventRecordCandidate =
-  | TradeMinedEventRecordCandidate
-  | TradeVerifiedEventRecordCandidate
-  | WithdrawalMinedEventRecordCandidate
-  | WithdrawalVerifiedEventRecordCandidate
-
-export type EventRecord = EventRecordCandidate & {
-  id: EventRow['id']
-}
-
-type EventRowCandidate = Omit<EventRow, 'id'> & {
-  id?: EventRow['id']
-}
-
-function toSerializableJson(data: object): json {
-  return Object.entries(data).reduce((acc, [key, val]) => {
-    return {
-      ...acc,
-      [key]: typeof val === 'bigint' ? val.toString() : val,
-    }
-  }, {})
-}
-
-function recordCandidateToRow(
-  candidate: EventRecordCandidate
-): EventRowCandidate {
-  const {
-    id,
-    transactionHash,
-    transactionType: transaction_type,
-    eventType: event_type,
-    blockNumber: block_number,
-    timestamp,
-    ...data
-  } = candidate
-
-  const data_hash = hashData(data)
-
+function withdrawalFromJson(jsonData: json): ForcedWithdrawal {
+  const data = Object(jsonData)
   return {
-    id,
-    transaction_hash: transactionHash.toString(),
-    transaction_type,
-    event_type,
-    block_number,
-    timestamp: BigInt(Number(timestamp)),
-    data: toSerializableJson(data),
-    data_hash,
+    type: 'withdrawal',
+    publicKey: StarkKey(data.publicKey),
+    amount: BigInt(data.amount),
+    positionId: BigInt(data.positionId),
   }
 }
 
-function toRecord(row: EventRow): EventRecord {
-  const {
-    id,
-    transaction_hash,
-    transaction_type: transactionType,
-    event_type: eventType,
-  } = row
-  const data = Object(row.data)
-  const timestamp = Timestamp(row.timestamp)
-  const transactionHash = Hash256(transaction_hash)
-
-  if (transactionType === 'withdrawal' && eventType === 'mined') {
-    return {
-      id,
-      transactionHash,
-      transactionType: 'withdrawal',
-      eventType: 'mined',
-      timestamp,
-      blockNumber: Number(row.block_number),
-      publicKey: StarkKey(data.publicKey),
-      positionId: BigInt(data.positionId),
-      amount: BigInt(data.amount),
-    }
+function tradeFromJson(jsonData: json): ForcedTrade {
+  const data = Object(jsonData)
+  return {
+    type: 'trade',
+    publicKeyA: StarkKey(data.publicKeyA),
+    publicKeyB: StarkKey(data.publicKeyB),
+    positionIdA: BigInt(data.positionIdA),
+    positionIdB: BigInt(data.positionIdB),
+    collateralAmount: BigInt(data.collateralAmount),
+    syntheticAmount: BigInt(data.syntheticAmount),
+    isABuyingSynthetic: Boolean(data.isABuyingSynthetic),
+    syntheticAssetId: AssetId(data.syntheticAssetId),
+    nonce: BigInt(data.nonce),
   }
-  if (row.transaction_type === 'trade' && row.event_type === 'mined') {
-    return {
-      id,
-      transactionHash,
-      transactionType: 'trade',
-      eventType: 'mined',
-      timestamp,
-      blockNumber: Number(row.block_number),
-      publicKeyA: StarkKey(data.publicKeyA),
-      publicKeyB: StarkKey(data.publicKeyB),
-      positionIdA: BigInt(data.positionIdA),
-      positionIdB: BigInt(data.positionIdB),
-      collateralAmount: BigInt(data.collateralAmount),
-      syntheticAmount: BigInt(data.syntheticAmount),
-      isABuyingSynthetic: Boolean(data.isABuyingSynthetic),
-      syntheticAssetId: AssetId(data.syntheticAssetId),
-      nonce: BigInt(data.nonce),
-    }
-  }
-  if (transactionType === 'withdrawal' && eventType === 'verified') {
-    return {
-      id,
-      transactionHash,
-      transactionType: 'withdrawal',
-      eventType: 'verified',
-      timestamp,
-      blockNumber: Number(row.block_number),
-      stateUpdateId: Number(data.stateUpdateId),
-    }
-  }
-  if (transactionType === 'trade' && eventType === 'verified') {
-    return {
-      id,
-      transactionHash,
-      transactionType: 'trade',
-      eventType: 'verified',
-      timestamp,
-      blockNumber: Number(row.block_number),
-      stateUpdateId: Number(data.stateUpdateId),
-    }
-  }
-  throw new Error('Unknown event type')
 }
 
-interface MinedWithdrawal extends WithdrawalMinedEventData {
-  hash: Hash256
-  type: 'withdrawal'
-  status: 'mined'
-  lastUpdate: Timestamp
-}
-
-interface VerifiedWithdrawal extends Omit<MinedWithdrawal, 'status'> {
-  status: 'verified'
-  stateUpdateId: number
-}
-
-type Withdrawal = MinedWithdrawal | VerifiedWithdrawal
-
-interface MinedTrade extends Omit<TradeMinedEventData, 'nonce'> {
-  hash: Hash256
-  type: 'trade'
-  status: 'mined'
-  lastUpdate: Timestamp
-}
-
-interface VerifiedTrade extends Omit<MinedTrade, 'status'> {
-  status: 'verified'
-  stateUpdateId: number
-}
-
-type Trade = MinedTrade | VerifiedTrade
-
-export type ForcedTransaction = Withdrawal | Trade
-
-function applyEvent(
-  transaction: ForcedTransaction,
-  event: EventRecord
-): ForcedTransaction {
-  if (event.transactionType === 'withdrawal' && event.eventType === 'mined') {
-    return {
-      type: 'withdrawal',
-      status: 'mined',
-      hash: event.transactionHash,
-      lastUpdate: event.timestamp,
-      ...pick(event, 'amount', 'positionId', 'publicKey'),
-    }
-  }
-  if (
-    transaction.type === 'withdrawal' &&
-    event.transactionType === 'withdrawal' &&
-    event.eventType === 'verified'
-  ) {
-    return {
-      ...transaction,
-      status: 'verified',
-      stateUpdateId: event.stateUpdateId,
-      lastUpdate: event.timestamp,
-    }
-  }
-  if (event.transactionType === 'trade' && event.eventType === 'mined') {
-    return {
-      type: 'trade',
-      status: 'mined',
-      hash: event.transactionHash,
-      ...pick(
-        event,
-        'collateralAmount',
-        'publicKeyA',
-        'publicKeyB',
-        'positionIdA',
-        'positionIdB',
-        'syntheticAssetId',
-        'isABuyingSynthetic',
-        'collateralAmount',
-        'syntheticAmount'
-      ),
-      lastUpdate: event.timestamp,
-    }
-  }
-  if (
-    transaction.type === 'trade' &&
-    event.transactionType === 'trade' &&
-    event.eventType === 'verified'
-  ) {
-    return {
-      ...transaction,
-      status: 'verified',
-      stateUpdateId: event.stateUpdateId,
-    }
-  }
-  throw new Error(
-    'Unknown type combination: ' +
-      transaction.toString() +
-      ' ' +
-      event.toString()
+function getLastUpdate(updates: Updates): Timestamp {
+  const values = [
+    updates.sentAt,
+    updates.forgottenAt,
+    updates.revertedAt,
+    updates.minedAt,
+    updates.verified?.at,
+  ]
+  const max = values.reduce<Timestamp>(
+    (max, value) => (!value ? max : value > max ? value : max),
+    Timestamp(0n)
   )
+  return max
 }
 
-function reduceEventsToTransaction(events: EventRecord[]): ForcedTransaction {
-  const sorted = events.sort(
-    (a, b) => Number(a.timestamp) - Number(b.timestamp)
-  )
-  return sorted.reduce(applyEvent, {} as ForcedTransaction)
+function getType(type: string): 'withdrawal' | 'trade' {
+  if (type !== 'trade' && type !== 'withdrawal') {
+    throw new Error('Cannot determine type: ' + type)
+  }
+  return type
 }
 
-function eventRowsToTransactions(rows: EventRow[]): ForcedTransaction[] {
-  const events = rows.map(toRecord)
-  const eventsGroupedByTransactionHash = Object.values(
-    groupBy(events, (e) => e.transactionHash)
-  ).sort((a, b) => Number(b[0].timestamp) - Number(a[0].timestamp))
-
-  return eventsGroupedByTransactionHash.map(reduceEventsToTransaction)
+interface Row
+  extends ForcedTransactionRow,
+    Omit<TransactionStatusRow, 'block_number' | 'hash'> {
+  verified_at: bigint | null
 }
 
-export class ForcedTransactionsRepository {
-  constructor(private knex: Knex, private logger: Logger) {
-    this.logger = logger.for(this)
+function toRecord(row: Row): ForcedTransactionRecord {
+  const type = getType(row.type)
+  const toTimestamp = (value: bigint | null) =>
+    value !== null ? Timestamp(value) : null
+
+  const updates = {
+    sentAt: toTimestamp(row.sent_at),
+    forgottenAt: toTimestamp(row.forgotten_at),
+    revertedAt: toTimestamp(row.reverted_at),
+    minedAt: toTimestamp(row.mined_at),
+    verified:
+      row.verified_at !== null && row.state_update_id !== null
+        ? {
+            at: Timestamp(row.verified_at),
+            stateUpdateId: row.state_update_id,
+          }
+        : undefined,
+  }
+  return {
+    hash: Hash256(row.hash),
+    data:
+      type === 'trade' ? tradeFromJson(row.data) : withdrawalFromJson(row.data),
+    updates,
+    lastUpdateAt: getLastUpdate(updates),
+  }
+}
+
+export class ForcedTransactionsRepository extends BaseRepository {
+  constructor(knex: Knex, logger: Logger) {
+    super(knex, logger)
+    this.getAll = this.wrapGet(this.getAll)
+    this.getLatest = this.wrapGet(this.getLatest)
+    this.getIncludedInStateUpdate = this.wrapGet(this.getIncludedInStateUpdate)
+    this.getAffectingPosition = this.wrapGet(this.getAffectingPosition)
+    this.getAffectingPosition = this.wrapGet(this.getAffectingPosition)
+    this.findByHash = this.wrapFind(this.findByHash)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
-  async addEvents(candidates: EventRecordCandidate[]): Promise<void> {
-    if (candidates.length === 0) {
-      return
-    }
-    const rowCandidates = candidates.map(recordCandidateToRow)
-    await this.knex('forced_transaction_events').insert(rowCandidates)
-    this.logger.debug({
-      method: 'addEvents',
-      count: candidates.length,
-    })
-  }
-
-  async getTransactionHashesByMinedEventsData(
-    datas: (TradeMinedEventData | WithdrawalMinedEventData)[]
-  ): Promise<(Hash256 | undefined)[]> {
-    if (datas.length === 0) {
-      return []
-    }
-    const hashes = datas.map(hashData)
-    const events = await this.knex('forced_transaction_events')
-      .whereIn('data_hash', hashes)
-      .andWhere('event_type', '=', 'mined')
-      .whereNotIn(
-        'transaction_hash',
-        this.knex('forced_transaction_events')
-          .select('transaction_hash')
-          .where('event_type', '=', 'verified')
+  private rowsQuery() {
+    return this.knex('forced_transactions')
+      .innerJoin(
+        'transaction_status',
+        'transaction_status.hash',
+        'forced_transactions.hash'
       )
-      .orderBy('id')
-
-    return hashes.map((hash) => {
-      const event = events.find((event) => event.data_hash === hash)
-      return event ? Hash256(event.transaction_hash) : undefined
-    })
+      .leftJoin(
+        'state_updates',
+        'state_updates.id',
+        'forced_transactions.state_update_id'
+      )
+      .select(
+        'forced_transactions.*',
+        'state_updates.timestamp as verified_at',
+        'transaction_status.mined_at',
+        'transaction_status.sent_at',
+        'transaction_status.reverted_at',
+        'transaction_status.forgotten_at'
+      )
   }
 
-  async discardAfter(blockNumber: number): Promise<void> {
-    await this.knex('forced_transaction_events')
-      .delete()
-      .where('block_number', '>', blockNumber)
-  }
-
-  async deleteAll(): Promise<void> {
-    await this.knex('forced_transaction_events').delete()
-  }
-
-  async getAllEvents(): Promise<EventRecord[]> {
-    const rows = await this.knex('forced_transaction_events').select()
+  async getAll(): Promise<ForcedTransactionRecord[]> {
+    const rows = await this.rowsQuery()
     return rows.map(toRecord)
   }
 
@@ -355,82 +154,153 @@ export class ForcedTransactionsRepository {
   }: {
     limit: number
     offset: number
-  }): Promise<ForcedTransaction[]> {
-    const latestTable = this.knex
+  }): Promise<ForcedTransactionRecord[]> {
+    const rows = await this.rowsQuery()
       .select(
-        this.knex.raw('max(timestamp) as max_timestamp'),
-        'transaction_hash'
+        this.knex.raw(`greatest(
+      "timestamp",
+      "mined_at",
+      "sent_at",
+      "reverted_at",
+      "forgotten_at"
+    ) as last_update_at`)
       )
-      .from('forced_transaction_events as f1')
-      .as('f1')
-      .groupBy('transaction_hash')
-      .orderBy('max_timestamp', 'desc')
-      .limit(limit)
+      .orderBy('last_update_at', 'desc')
       .offset(offset)
-
-    const rows = await this.knex
-      .from('forced_transaction_events as f2')
-      .as('f2')
-      .innerJoin(latestTable, function () {
-        return this.on('f1.transaction_hash', '=', 'f2.transaction_hash')
-      })
-
-    return eventRowsToTransactions(rows)
+      .limit(limit)
+    return rows.map(toRecord)
   }
 
   async getIncludedInStateUpdate(
     stateUpdateId: number
-  ): Promise<ForcedTransaction[]> {
-    const rows = await this.knex
-      .from('forced_transaction_events')
-      .whereIn(
-        'transaction_hash',
-        this.knex('forced_transaction_events')
-          .select('transaction_hash')
-          .whereRaw("data->>'stateUpdateId' = ?", stateUpdateId)
-      )
-
-    return eventRowsToTransactions(rows)
+  ): Promise<ForcedTransactionRecord[]> {
+    const rows = await this.rowsQuery().where(
+      'state_update_id',
+      '=',
+      stateUpdateId
+    )
+    return rows.map(toRecord)
   }
 
-  async getAffectingPosition(positionId: bigint): Promise<ForcedTransaction[]> {
-    const rows = await this.knex
-      .from('forced_transaction_events')
-      .whereIn(
-        'transaction_hash',
-        this.knex('forced_transaction_events')
-          .select('transaction_hash')
-          .whereRaw("data->>'positionId' = ?", String(positionId))
-          .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
-          .orWhereRaw("data->>'positionIdB' = ?", String(positionId))
-      )
-
-    return eventRowsToTransactions(rows)
+  async getAffectingPosition(
+    positionId: bigint
+  ): Promise<ForcedTransactionRecord[]> {
+    const rows = await this.rowsQuery()
+      .whereRaw("data->>'positionId' = ?", String(positionId))
+      .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
+      .orWhereRaw("data->>'positionIdB' = ?", String(positionId))
+    return rows.map(toRecord)
   }
 
-  async getByHashWithEvents(
-    transactionHash: Hash256
-  ): Promise<
-    { transaction: ForcedTransaction; events: EventRecord[] } | undefined
-  > {
-    const rows = await this.knex('forced_transaction_events')
-      .where('transaction_hash', '=', transactionHash.toString())
-      .orderBy('timestamp')
-    if (rows.length === 0) {
-      return undefined
+  async getTransactionHashesByData(
+    datas: (ForcedWithdrawal | ForcedTrade)[]
+  ): Promise<(Hash256 | undefined)[]> {
+    if (datas.length === 0) {
+      return []
     }
-    const events = rows.map(toRecord)
-    const transaction = reduceEventsToTransaction(events)
-    return {
-      transaction,
-      events,
-    }
+    const hashes = datas.map(hashData)
+    const transactions = await this.knex('forced_transactions')
+      .whereIn('data_hash', hashes)
+      .andWhereRaw('state_update_id is null')
+      .orderBy('hash')
+    const matched = hashes.map((hash) => {
+      const transaction = transactions.find((event) => event.data_hash === hash)
+      return transaction ? Hash256(transaction.hash) : undefined
+    })
+    this.logger.debug({
+      method: 'getTransactionHashesByData',
+      requested: hashes.length,
+      matched: matched.length,
+    })
+    return matched
+  }
+
+  async findByHash(
+    hash: Hash256
+  ): Promise<ForcedTransactionRecord | undefined> {
+    const [row] = await this.rowsQuery().where(
+      'forced_transactions.hash',
+      '=',
+      hash.toString()
+    )
+
+    return row ? toRecord(row) : undefined
+  }
+
+  async add(
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    sentAt: Timestamp
+  ): Promise<Hash256>
+
+  async add(
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    sentAt: Nullable<Timestamp>,
+    minedAt: Timestamp,
+    blockNumber: number
+  ): Promise<Hash256>
+
+  async add(
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    sentAt: Nullable<Timestamp>,
+    minedAt?: Timestamp,
+    blockNumber?: number
+  ): Promise<Hash256> {
+    const { hash, data } = transaction
+    await this.knex.transaction(async (trx) => {
+      await trx('forced_transactions').insert({
+        hash: hash.toString(),
+        type: data.type,
+        data: toSerializableJson(data),
+        data_hash: hashData(data),
+      })
+      await trx('transaction_status').insert({
+        hash: hash.toString(),
+        mined_at:
+          minedAt !== null && minedAt !== undefined
+            ? BigInt(minedAt.toString())
+            : null,
+        sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
+        block_number: blockNumber,
+      })
+    })
+    this.logger.debug({ method: 'add', id: hash.toString() })
+    return hash
+  }
+
+  async markAsMined(
+    hash: Hash256,
+    blockNumber: number,
+    minedAt: Timestamp
+  ): Promise<boolean> {
+    const updated = await this.knex('transaction_status')
+      .update({
+        block_number: blockNumber,
+        mined_at: BigInt(minedAt.toString()),
+      })
+      .where('hash', '=', hash.toString())
+    this.logger.debug({ method: 'markAsMined', updated })
+    return !!updated
   }
 
   async countAll(): Promise<bigint> {
-    const result = await this.knex('forced_transaction_events').countDistinct(
-      'transaction_hash'
-    )
-    return BigInt(result[0].count)
+    const result = await this.knex('forced_transactions').count()
+    const count = result[0].count
+    this.logger.debug({ method: 'countAll', count })
+    return BigInt(count)
+  }
+
+  async deleteAll(): Promise<number> {
+    const deleted = await this.knex.transaction(async (trx) => {
+      const hashes = await trx('forced_transactions').select('hash')
+      await trx('forced_transactions').delete()
+      await trx('transaction_status')
+        .whereIn(
+          'hash',
+          hashes.map((h) => h.toString())
+        )
+        .delete()
+      return hashes.length
+    })
+    return deleted
   }
 }
