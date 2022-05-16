@@ -169,7 +169,7 @@ export function validateSignature(
     acceptedOffer
 
   try {
-    const packedParemeters = solidityPack(
+    const packedParameters = solidityPack(
       [
         'uint256',
         'uint256',
@@ -198,7 +198,7 @@ export function validateSignature(
 
     const actionHash = solidityKeccak256(
       ['string', 'bytes'],
-      ['FORCED_TRADE', packedParemeters]
+      ['FORCED_TRADE', packedParameters]
     )
 
     const signedData = solidityKeccak256(
