@@ -13,10 +13,13 @@ should create a new migration file that fixes the issue.
 
 import { Knex } from 'knex'
 
-import { up as createForcedTransactionEvents } from './012_forced_transaction_events'
+import {
+  up as createForcedTransactionEvents,
+  down as dropForcedTransactionEvents,
+} from './012_forced_transaction_events'
 
 export async function up(knex: Knex) {
-  await knex.schema.dropTable('forced_transaction_events')
+  await dropForcedTransactionEvents(knex)
   await knex.schema.createTable('forced_transactions', (table) => {
     table.string('hash').notNullable().index()
     table.string('type').notNullable().index()
