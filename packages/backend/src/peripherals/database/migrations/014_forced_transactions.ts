@@ -16,7 +16,7 @@ import { Knex } from 'knex'
 import { up as createForcedTransactionEvents } from './012_forced_transaction_events'
 
 export async function up(knex: Knex) {
-  await knex.schema.dropTableIfExists('forced_transaction_events')
+  await knex.schema.dropTable('forced_transaction_events')
   await knex.schema.createTable('forced_transactions', (table) => {
     table.string('hash').notNullable().index()
     table.string('type').notNullable().index()
