@@ -87,7 +87,7 @@ export class ForcedTransactionController {
     if (id === undefined) {
       return { type: 'redirect', url: '/' }
     }
-    const position = await this.positionRepository.findById(id)
+    const position = await this.positionRepository.findByIdWithPrices(id)
     if (!position) {
       return { type: 'redirect', url: '/' }
     }

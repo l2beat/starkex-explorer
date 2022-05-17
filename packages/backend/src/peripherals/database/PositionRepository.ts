@@ -64,7 +64,7 @@ export class PositionRepository extends BaseRepository {
     })
   }
 
-  async findById(id: bigint) {
+  async findByIdWithPrices(id: bigint) {
     const row = await this.knex('positions')
       .where('position_id', id)
       .orderBy('positions.state_update_id', 'desc')

@@ -242,7 +242,7 @@ describe(PositionRepository.name, () => {
     })
   })
 
-  describe(positionRepository.findById.name, () => {
+  describe(positionRepository.findByIdWithPrices.name, () => {
     it('returns latest update', async () => {
       const positionId = 12345n
 
@@ -284,7 +284,7 @@ describe(PositionRepository.name, () => {
         prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
       })
 
-      const position = await positionRepository.findById(positionId)
+      const position = await positionRepository.findByIdWithPrices(positionId)
 
       expect(position).toEqual({
         stateUpdateId: 2,
