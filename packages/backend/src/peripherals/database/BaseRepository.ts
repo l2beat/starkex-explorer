@@ -45,7 +45,7 @@ export class BaseRepository {
     method: AddMethod<T, R>
   ): AddMethod<T, R> {
     return this.wrap(method, (id) =>
-      this.logger.debug({ method: method.name, id: id.toString() })
+      this.logger.debug({ method: method.name, id: id.valueOf() })
     )
   }
 
