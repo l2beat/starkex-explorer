@@ -10,6 +10,7 @@ export interface Config {
   }
   port: number
   databaseConnection: string | Knex.StaticConnectionConfig
+  enableSync: boolean
   jsonRpcUrl: string
   core: {
     syncBatchSize: number
