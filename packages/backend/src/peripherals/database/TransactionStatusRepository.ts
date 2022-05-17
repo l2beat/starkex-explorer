@@ -13,140 +13,82 @@ interface Row {
   reverted_at: Nullable<bigint>
   forgotten_at: Nullable<bigint>
   block_number: Nullable<number>
+  not_found_retries: number
 }
 
-type Status = 'sent' | 'mined' | 'reverted' | 'forgotten'
+export const NOT_FOUND_RETRIES = 5
 
-interface Sent {
+export interface Record {
   hash: Hash256
-  status: 'sent'
-  sentAt: Timestamp
-}
-interface Mined {
-  hash: Hash256
-  status: 'mined'
   sentAt: Nullable<Timestamp>
-  minedAt: Timestamp
-  blockNumber: number
+  mined?: {
+    at: Nullable<Timestamp>
+    blockNumber: number
+  }
+  forgottenAt: Nullable<Timestamp>
+  revertedAt: Nullable<Timestamp>
+  notFoundRetries: number
 }
-interface Forgotten {
-  hash: Hash256
-  status: 'forgotten'
-  sentAt: Timestamp
-  forgottenAt: Timestamp
-}
-interface Reverted {
-  hash: Hash256
-  status: 'reverted'
-  sentAt: Timestamp
-  revertedAt: Timestamp
-}
-type Record = Sent | Mined | Forgotten | Reverted
 
 function toRecord(row: Row): Record {
-  const hash = Hash256(row.hash)
-  const { sent_at, reverted_at, forgotten_at, mined_at, block_number } = row
-  if (forgotten_at && sent_at) {
-    return {
-      hash,
-      status: 'forgotten',
-      sentAt: Timestamp(sent_at),
-      forgottenAt: Timestamp(forgotten_at),
-    }
+  const { sent_at, mined_at, block_number } = row
+  const toTimestamp = (value: bigint | null) =>
+    value !== null ? Timestamp(value) : null
+  return {
+    hash: Hash256(row.hash),
+    sentAt: toTimestamp(sent_at),
+    mined:
+      mined_at && block_number
+        ? { at: Timestamp(mined_at), blockNumber: block_number }
+        : undefined,
+    revertedAt: toTimestamp(row.reverted_at),
+    forgottenAt: toTimestamp(row.forgotten_at),
+    notFoundRetries: row.not_found_retries,
   }
-  if (reverted_at && sent_at) {
-    return {
-      hash,
-      status: 'reverted',
-      sentAt: Timestamp(sent_at),
-      revertedAt: Timestamp(reverted_at),
-    }
+}
+
+function toRow(record: Record): Row {
+  const toBigInt = (timestamp?: Nullable<Timestamp>): Nullable<bigint> =>
+    !timestamp ? null : BigInt(timestamp.toString())
+  assert(record.notFoundRetries >= 0, 'notFoundRetries must be non-negative')
+  return {
+    hash: record.hash.toString(),
+    mined_at: toBigInt(record.mined?.at),
+    block_number: record.mined?.blockNumber || null,
+    reverted_at: toBigInt(record.revertedAt),
+    forgotten_at: toBigInt(record.forgottenAt),
+    sent_at: toBigInt(record.sentAt),
+    not_found_retries: record.notFoundRetries,
   }
-  if (mined_at && block_number) {
-    return {
-      hash,
-      status: 'mined',
-      minedAt: Timestamp(mined_at),
-      sentAt: sent_at ? Timestamp(sent_at) : null,
-      blockNumber: block_number,
-    }
-  }
-  if (sent_at) {
-    return {
-      hash,
-      status: 'sent',
-      sentAt: Timestamp(sent_at),
-    }
-  }
-  throw new Error('Could not build transaction status record')
 }
 
 export class TransactionStatusRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
-    this.getByStatus = this.wrapGet(this.getByStatus)
+    this.getWaitingToBeMined = this.wrapGet(this.getWaitingToBeMined)
   }
 
-  private toStatusWhere(status: Status) {
-    switch (status) {
-      case 'sent':
-        return this.knex
-          .whereRaw('sent_at is not null')
-          .andWhereRaw('mined_at is null')
-          .andWhereRaw('reverted_at is null')
-          .andWhereRaw('forgotten_at is null')
-      case 'mined':
-        return this.knex.whereRaw('mined_at is not null')
-      case 'reverted':
-        return this.knex.whereRaw('reverted_at is not null')
-      case 'forgotten':
-        return this.knex.whereRaw('forgotten_at is not null')
-    }
+  private waitingToBeMinedWhere() {
+    return this.knex
+      .whereRaw('sent_at is not null')
+      .andWhereRaw('mined_at is null')
+      .andWhereRaw('reverted_at is null')
+      .andWhereRaw('forgotten_at is null')
   }
 
-  async getByStatus(status: Status): Promise<Record[]> {
+  async getWaitingToBeMined(): Promise<Record[]> {
     const rows = await this.knex('transaction_status').where(
-      this.toStatusWhere(status)
+      this.waitingToBeMinedWhere()
     )
-    const records = rows.map(row => {
-        const record = toRecord(row)
-        assert(record.status === status)
-        return record
-    })
-    return records
+    return rows.map(toRecord)
   }
 
-  private async markSent(hash: Hash256, row: Partial<Row>): Promise<boolean> {
+  async updateWaitingToBeMined(record: Record): Promise<boolean> {
+    const row = toRow(record)
     const updates = await this.knex('transaction_status')
       .update(row)
-      .where('hash', '=', hash.toString())
-      .andWhere(this.toStatusWhere('sent'))
+      .where('hash', '=', row.hash)
+      .andWhere(this.waitingToBeMinedWhere())
     return !!updates
-  }
-
-  async markSentAsMined(
-    hash: Hash256,
-    blockNumber: number,
-    minedAt: Timestamp
-  ): Promise<boolean> {
-    return await this.markSent(hash, {
-      block_number: blockNumber,
-      mined_at: BigInt(String(minedAt)),
-    })
-  }
-
-  async markSentAsForgotten(
-    hash: Hash256,
-    forgottenAt: Timestamp
-  ): Promise<boolean> {
-    return await this.markSent(hash, {
-      forgotten_at: BigInt(String(forgottenAt)),
-    })
-  }
-
-  async markSentAsReverted(hash: Hash256, revertedAt: Timestamp): Promise<boolean> {
-    return await this.markSent(hash, {
-      reverted_at: BigInt(String(revertedAt)),
-    })
   }
 }

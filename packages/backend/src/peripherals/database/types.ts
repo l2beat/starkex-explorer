@@ -117,13 +117,14 @@ declare module 'knex/types/tables' {
     state_update_id: Nullable<number>
   }
 
-  export interface TransactionStatusRow {
+  interface TransactionStatusRow {
     hash: string
     sent_at: Nullable<bigint>
     mined_at: Nullable<bigint>
     reverted_at: Nullable<bigint>
     forgotten_at: Nullable<bigint>
     block_number: Nullable<number>
+    not_found_retries: number
   }
 
   interface Tables {

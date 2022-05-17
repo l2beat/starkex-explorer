@@ -1,5 +1,8 @@
 import { Hash256, Timestamp } from '@explorer/types'
-import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
+import {
+  TransactionStatusRepository,
+  Record as Transaction,
+} from '../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { Logger } from '../tools/Logger'
 
@@ -10,13 +13,46 @@ type CheckResult =
   | { status: 'not found' }
   | { status: 'reverted'; revertedAt: Timestamp }
 
+function applyCheckResult(
+  transaction: Transaction,
+  result: CheckResult
+): Transaction {
+  switch (result.status) {
+    case 'mined':
+      return {
+        ...transaction,
+        mined: {
+          at: result.minedAt,
+          blockNumber: result.blockNumber,
+        },
+      }
+    case 'not found':
+      if (transaction.notFoundRetries === 0) {
+        return {
+          ...transaction,
+          forgottenAt: Timestamp(Date.now()),
+        }
+      }
+      return {
+        ...transaction,
+        notFoundRetries: transaction.notFoundRetries - 1,
+      }
+    case 'reverted':
+      return {
+        ...transaction,
+        revertedAt: Timestamp(Date.now()),
+      }
+  }
+}
+
 export class TransactionStatusMonitor {
   private timeout?: NodeJS.Timeout
 
   constructor(
     private readonly transactionStatusRepository: TransactionStatusRepository,
     private readonly ethereumClient: EthereumClient,
-    private logger: Logger
+    private logger: Logger,
+    private readonly syncInterval = MINUTE
   ) {
     this.logger = this.logger.for(this)
   }
@@ -39,47 +75,19 @@ export class TransactionStatusMonitor {
     }
   }
 
-  private async handleTransactionCheck(
-    hash: Hash256,
-    result: CheckResult
-  ): Promise<void> {
-    switch (result.status) {
-      case 'mined':
-        await this.transactionStatusRepository.markSentAsMined(
-          hash,
-          result.blockNumber,
-          result.minedAt
-        )
-        break
-      case 'not found':
-        // TODO: handle retries
-        await this.transactionStatusRepository.markSentAsForgotten(
-          hash,
-          Timestamp(Date.now())
-        )
-        break
-      case 'reverted':
-        await this.transactionStatusRepository.markSentAsReverted(
-          hash,
-          result.revertedAt
-        )
-        break
-    }
-  }
-
-  private async syncTransaction(hash: Hash256): Promise<void> {
-    const result = await this.checkTransaction(hash)
-    await this.handleTransactionCheck(hash, result)
+  private async syncTransaction(transaction: Transaction): Promise<void> {
+    const result = await this.checkTransaction(transaction.hash)
+    const updated = applyCheckResult(transaction, result)
+    await this.transactionStatusRepository.updateWaitingToBeMined(updated)
   }
 
   private async syncTransactions(): Promise<void> {
-    const transactions = await this.transactionStatusRepository.getByStatus(
-      'sent'
-    )
+    const transactions =
+      await this.transactionStatusRepository.getWaitingToBeMined()
     await Promise.allSettled(
-      transactions.map(async ({ hash }) => {
+      transactions.map(async (transaction) => {
         try {
-          await this.syncTransaction(hash)
+          await this.syncTransaction(transaction)
         } catch (error) {
           this.logger.error(error)
         }
@@ -91,7 +99,7 @@ export class TransactionStatusMonitor {
     this.timeout = setTimeout(async () => {
       await this.syncTransactions()
       this.scheduleNextCheck()
-    }, MINUTE)
+    }, this.syncInterval)
   }
 
   start() {
