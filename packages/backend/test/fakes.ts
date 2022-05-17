@@ -1,7 +1,8 @@
 import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 
 import { Updates } from '../src/peripherals/database/ForcedTransactionsRepository'
+import { Record as TransactionStatusRecord } from '../src/peripherals/database/TransactionStatusRepository'
 
 const MAX_SAFE_POSTGRES_INT = 2 ** 31 - 1
 export function fakeInt(max = MAX_SAFE_POSTGRES_INT): number {
@@ -58,5 +59,19 @@ export function fakeForcedUpdates(updates?: Partial<Updates>): Updates {
     sentAt: null,
     verified: undefined,
     ...updates,
+  }
+}
+
+export function fakeSentTransaction(
+  record?: Partial<TransactionStatusRecord>
+): TransactionStatusRecord & { sentAt: Timestamp } {
+  return {
+    hash: Hash256.fake(),
+    forgottenAt: null,
+    revertedAt: null,
+    notFoundRetries: fakeInt(),
+    ...record,
+    sentAt: fakeTimestamp(),
+    mined: undefined,
   }
 }

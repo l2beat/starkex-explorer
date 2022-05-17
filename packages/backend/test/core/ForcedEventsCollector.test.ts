@@ -4,6 +4,7 @@ import { expect } from 'earljs'
 import { ForcedEventsCollector } from '../../src/core/ForcedEventsCollector'
 import { BlockRange } from '../../src/model'
 import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
+import { TransactionStatusRepository } from '../../src/peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import {
   fakeForcedUpdates,
@@ -31,13 +32,15 @@ describe(ForcedEventsCollector.name, () => {
       const data = fakeWithdrawal()
       const blockNumber = fakeInt()
       const minedAt = fakeTimestamp()
-      const repo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionsRepository>({
         findByHash: async () => undefined,
         add: async () => hash,
       })
+      const statusRepo = mock<TransactionStatusRepository>({})
       const collector = new ForcedEventsCollector(
         mock<EthereumClient>({}),
-        repo,
+        forcedRepo,
+        statusRepo,
         async () => [
           {
             hash,
@@ -49,7 +52,7 @@ describe(ForcedEventsCollector.name, () => {
       )
       const result = await collector.collect(blockRange)
       expect(result).toEqual({ updated: 0, added: 1, ignored: 0 })
-      expect(repo.add).toHaveBeenCalledExactlyWith([
+      expect(forcedRepo.add).toHaveBeenCalledExactlyWith([
         [{ hash, data }, null, minedAt, blockNumber],
       ])
     })
@@ -60,18 +63,22 @@ describe(ForcedEventsCollector.name, () => {
       const blockNumber = fakeInt()
       const minedAt = Timestamp(2)
       const sentAt = Timestamp(1)
-      const repo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionsRepository>({
         findByHash: async () => ({
           data,
           hash,
           lastUpdateAt: sentAt,
           updates: fakeForcedUpdates({ sentAt }),
         }),
-        markAsMined: async () => true,
       })
+      const statusRepo = mock<TransactionStatusRepository>({
+        updateWaitingToBeMined: async () => true,
+      })
+
       const collector = new ForcedEventsCollector(
         mock<EthereumClient>({}),
-        repo,
+        forcedRepo,
+        statusRepo,
         async () => [
           {
             hash,
@@ -83,8 +90,8 @@ describe(ForcedEventsCollector.name, () => {
       )
       const result = await collector.collect(blockRange)
       expect(result).toEqual({ updated: 1, added: 0, ignored: 0 })
-      expect(repo.markAsMined).toHaveBeenCalledExactlyWith([
-        [hash, blockNumber, minedAt],
+      expect(statusRepo.updateWaitingToBeMined).toHaveBeenCalledExactlyWith([
+        [{ hash, mined: { blockNumber, at: minedAt } }],
       ])
     })
 
@@ -94,19 +101,22 @@ describe(ForcedEventsCollector.name, () => {
       const blockNumber = fakeInt()
       const minedAt = Timestamp(2)
       const sentAt = Timestamp(1)
-      const repo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionsRepository>({
         findByHash: async () => ({
           data,
           hash,
           lastUpdateAt: minedAt,
           updates: fakeForcedUpdates({ sentAt, minedAt }),
         }),
-        markAsMined: async () => true,
         add: async () => hash,
+      })
+      const statusRepo = mock<TransactionStatusRepository>({
+        updateWaitingToBeMined: async () => true,
       })
       const collector = new ForcedEventsCollector(
         mock<EthereumClient>({}),
-        repo,
+        forcedRepo,
+        statusRepo,
         async () => [
           {
             hash,
@@ -118,8 +128,8 @@ describe(ForcedEventsCollector.name, () => {
       )
       const result = await collector.collect(blockRange)
       expect(result).toEqual({ updated: 0, added: 0, ignored: 1 })
-      expect(repo.markAsMined.calls.length).toEqual(0)
-      expect(repo.add.calls.length).toEqual(0)
+      expect(statusRepo.updateWaitingToBeMined.calls.length).toEqual(0)
+      expect(forcedRepo.add.calls.length).toEqual(0)
     })
   })
 })

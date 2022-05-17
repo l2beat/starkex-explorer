@@ -12,6 +12,7 @@ should create a new migration file that fixes the issue.
 */
 
 import { Knex } from 'knex'
+
 import { NOT_FOUND_RETRIES } from '../TransactionStatusRepository'
 
 export async function up(knex: Knex) {

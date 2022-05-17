@@ -19,6 +19,8 @@ import { StateUpdateCollector } from './core/StateUpdateCollector'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
+import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
+import { TransactionStatusService } from './core/TransactionStatusService'
 import { UserRegistrationCollector } from './core/UserRegistrationCollector'
 import { VerifierCollector } from './core/VerifierCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
@@ -33,6 +35,7 @@ import { RollupStateRepository } from './peripherals/database/RollupStateReposit
 import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
+import { TransactionStatusRepository } from './peripherals/database/TransactionStatusRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
@@ -77,7 +80,10 @@ export class Application {
       knex,
       logger
     )
-
+    const transactionStatusRepository = new TransactionStatusRepository(
+      knex,
+      logger
+    )
     const ethereumClient = new EthereumClient(config.jsonRpcUrl)
 
     // #endregion peripherals
@@ -120,7 +126,8 @@ export class Application {
     )
     const forcedEventsCollector = new ForcedEventsCollector(
       ethereumClient,
-      forcedTransactionsRepository
+      forcedTransactionsRepository,
+      transactionStatusRepository
     )
 
     const dataSyncService = new DataSyncService(
@@ -139,6 +146,14 @@ export class Application {
       dataSyncService,
       logger,
       { maxBlockNumber: config.core.maxBlockNumber }
+    )
+    const transactionStatusService = new TransactionStatusService(
+      transactionStatusRepository,
+      ethereumClient,
+      logger
+    )
+    const transactionStatusMonitor = new TransactionStatusMonitor(
+      transactionStatusService
     )
 
     // #endregion core
@@ -203,6 +218,7 @@ export class Application {
       await apiServer.listen()
       await syncScheduler.start()
       await blockDownloader.start()
+      transactionStatusMonitor.start()
 
       logger.for(this).info('Started')
     }

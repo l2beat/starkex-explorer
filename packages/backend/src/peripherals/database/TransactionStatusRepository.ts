@@ -1,5 +1,4 @@
 import { Hash256, Timestamp } from '@explorer/types'
-import assert from 'assert'
 import { Knex } from 'knex'
 
 import { Logger } from '../../tools/Logger'
@@ -47,18 +46,36 @@ function toRecord(row: Row): Record {
   }
 }
 
-function toRow(record: Record): Row {
-  const toBigInt = (timestamp?: Nullable<Timestamp>): Nullable<bigint> =>
-    !timestamp ? null : BigInt(timestamp.toString())
-  assert(record.notFoundRetries >= 0, 'notFoundRetries must be non-negative')
-  return {
+function timestampToBigInt(timestamp?: Nullable<Timestamp>): Nullable<bigint> {
+  return !timestamp ? null : BigInt(timestamp.toString())
+}
+
+function toPartialRow(
+  record: Partial<Record> & { hash: Record['hash'] }
+): Partial<Row> & { hash: Row['hash'] } {
+  const result: Partial<Row> & { hash: Row['hash'] } = {
     hash: record.hash.toString(),
-    mined_at: toBigInt(record.mined?.at),
-    block_number: record.mined?.blockNumber || null,
-    reverted_at: toBigInt(record.revertedAt),
-    forgotten_at: toBigInt(record.forgottenAt),
-    sent_at: toBigInt(record.sentAt),
+    sent_at: record.sentAt && timestampToBigInt(record.sentAt),
+    reverted_at: record.revertedAt && timestampToBigInt(record.revertedAt),
+    forgotten_at: record.forgottenAt && timestampToBigInt(record.forgottenAt),
     not_found_retries: record.notFoundRetries,
+  }
+  if (record.mined) {
+    result.mined_at = timestampToBigInt(record.mined.at)
+    result.block_number = record.mined.blockNumber
+  }
+  return result
+}
+
+function toRow(record: Record): Row {
+  return {
+    sent_at: null,
+    reverted_at: null,
+    forgotten_at: null,
+    mined_at: null,
+    block_number: null,
+    not_found_retries: NOT_FOUND_RETRIES,
+    ...toPartialRow(record),
   }
 }
 
@@ -66,29 +83,40 @@ export class TransactionStatusRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
     this.getWaitingToBeMined = this.wrapGet(this.getWaitingToBeMined)
+    this.add = this.wrapAdd(this.add)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
-  private waitingToBeMinedWhere() {
-    return this.knex
+  private waitingToBeMinedQuery() {
+    return this.knex('transaction_status')
       .whereRaw('sent_at is not null')
       .andWhereRaw('mined_at is null')
       .andWhereRaw('reverted_at is null')
       .andWhereRaw('forgotten_at is null')
   }
 
+  async add(record: Record): Promise<Hash256> {
+    await this.knex('transaction_status').insert(toRow(record))
+    return record.hash
+  }
+
+  async deleteAll(): Promise<number> {
+    const deleted = await this.knex('transaction_status').delete()
+    return deleted
+  }
+
   async getWaitingToBeMined(): Promise<Record[]> {
-    const rows = await this.knex('transaction_status').where(
-      this.waitingToBeMinedWhere()
-    )
+    const rows = await this.waitingToBeMinedQuery()
     return rows.map(toRecord)
   }
 
-  async updateWaitingToBeMined(record: Record): Promise<boolean> {
-    const row = toRow(record)
-    const updates = await this.knex('transaction_status')
-      .update(row)
+  async updateWaitingToBeMined(
+    record: Parameters<typeof toPartialRow>[0]
+  ): Promise<boolean> {
+    const row = toPartialRow(record)
+    const updates = await this.waitingToBeMinedQuery()
       .where('hash', '=', row.hash)
-      .andWhere(this.waitingToBeMinedWhere())
+      .update(row)
     return !!updates
   }
 }
