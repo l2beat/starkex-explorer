@@ -3,7 +3,6 @@ import Router from '@koa/router'
 import { Context } from 'koa'
 import { z } from 'zod'
 
-import { ControllerResult } from '../controllers/ControllerResult'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
 import { HomeController } from '../controllers/HomeController'
 import { PositionController } from '../controllers/PositionController'
@@ -15,6 +14,7 @@ import {
   stringAsInt,
   withTypedContext,
 } from './types'
+import { applyControllerResult } from './utils'
 
 export function createFrontendRouter(
   positionController: PositionController,
@@ -194,18 +194,5 @@ export function getAccount(ctx: Context) {
     } catch {
       return
     }
-  }
-}
-
-function applyControllerResult(ctx: Context, result: ControllerResult) {
-  if (result.type === 'redirect') {
-    ctx.redirect(result.url)
-  } else {
-    if (result.type === 'success') {
-      ctx.status = 200
-    } else if (result.type === 'not found') {
-      ctx.status = 404
-    }
-    ctx.body = result.content
   }
 }

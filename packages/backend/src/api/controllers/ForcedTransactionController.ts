@@ -7,7 +7,7 @@ import {
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
 import {
-  EventRecord,
+  ForcedTransactionRecord,
   ForcedTransactionsRepository,
 } from '../../peripherals/database/ForcedTransactionsRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
@@ -48,36 +48,31 @@ export class ForcedTransactionController {
     transactionHash: Hash256,
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const result = await this.forcedTransactionsRepository.getByHashWithEvents(
+    const transaction = await this.forcedTransactionsRepository.findByHash(
       transactionHash
     )
-    if (!result) {
+    if (!transaction) {
       const content = 'Could not find transaction for that hash'
       return { type: 'not found', content }
     }
 
-    const { transaction, events } = result
-
-    if (transaction.type === 'trade') {
+    if (transaction.data.type === 'trade') {
       throw new Error('Rendering trades not implemented yet')
     }
 
     const registrationEvent =
       await this.userRegistrationEventRepository.findByStarkKey(
-        transaction.publicKey
+        transaction.data.publicKey
       )
 
     const content = renderForcedTransactionDetailsPage({
       account,
-      history: events.map(toTransactionStatusEntry),
+      history: buildTransactionHistory(transaction),
       ethereumAddress: registrationEvent?.ethAddress,
-      positionId: transaction.positionId,
+      positionId: transaction.data.positionId,
       transactionHash,
-      value: transaction.amount,
-      stateUpdateId:
-        transaction.status === 'verified'
-          ? transaction.stateUpdateId
-          : undefined,
+      value: transaction.data.amount,
+      stateUpdateId: transaction.updates.verified?.stateUpdateId,
     })
     return { type: 'success', content }
   }
@@ -120,15 +115,26 @@ export class ForcedTransactionController {
   }
 }
 
-function toTransactionStatusEntry(event: EventRecord): TransactionStatusEntry {
-  switch (event.eventType) {
-    case 'mined':
-      return { type: 'mined', timestamp: event.timestamp }
-    case 'verified':
-      return {
-        type: 'verified',
-        stateUpdateId: event.stateUpdateId,
-        timestamp: event.timestamp,
-      }
+function buildTransactionHistory({
+  updates,
+}: ForcedTransactionRecord): TransactionStatusEntry[] {
+  const history: TransactionStatusEntry[] = []
+  if (updates.sentAt) {
+    history.push({ type: 'sent', timestamp: updates.sentAt })
   }
+  if (updates.revertedAt) {
+    history.push({ type: 'reverted', timestamp: updates.revertedAt })
+    return history
+  }
+  if (updates.minedAt) {
+    history.push({ type: 'mined', timestamp: updates.minedAt })
+  }
+  if (updates.verified) {
+    history.push({
+      type: 'verified',
+      stateUpdateId: updates.verified.stateUpdateId,
+      timestamp: updates.verified.at,
+    })
+  }
+  return history
 }

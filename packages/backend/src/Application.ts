@@ -1,10 +1,12 @@
 import { ApiServer } from './api/ApiServer'
+import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
+import { createForcedTradeOfferRouter } from './api/routers/ForcedTradeOfferRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
@@ -22,6 +24,7 @@ import { VerifierCollector } from './core/VerifierCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
+import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
@@ -67,6 +70,10 @@ export class Application {
       logger
     )
     const forcedTransactionsRepository = new ForcedTransactionsRepository(
+      knex,
+      logger
+    )
+    const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
       knex,
       logger
     )
@@ -163,6 +170,12 @@ export class Application {
       positionRepository,
       userRegistrationEventRepository
     )
+    const forcedTradeOfferController = new ForcedTradeOfferController(
+      forcedTradeOfferRepository,
+      positionRepository,
+      userRegistrationEventRepository
+    )
+
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
@@ -173,6 +186,7 @@ export class Application {
           stateUpdateController,
           searchController
         ),
+        createForcedTradeOfferRouter(forcedTradeOfferController),
       ],
       middleware: [createFrontendMiddleware()],
     })

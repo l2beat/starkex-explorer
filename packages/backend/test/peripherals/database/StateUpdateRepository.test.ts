@@ -42,6 +42,7 @@ describe(StateUpdateRepository.name, () => {
         },
       ],
       prices: [{ assetId: AssetId('ETH-9'), price: 40n }],
+      transactionHashes: [Hash256.fake()],
     })
   })
 

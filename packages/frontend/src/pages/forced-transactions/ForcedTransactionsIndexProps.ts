@@ -12,7 +12,7 @@ export interface ForcedTransactionsIndexProps {
 
 export interface ForcedTransactionEntry {
   readonly type: 'exit' | 'buy' | 'sell'
-  readonly status: 'waiting to be included' | 'completed'
+  readonly status: 'sent' | 'reverted' | 'waiting to be included' | 'completed'
   readonly hash: Hash256
   readonly lastUpdate: Timestamp
   readonly amount: bigint

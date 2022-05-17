@@ -78,6 +78,9 @@ export class StateUpdateCollector {
     if (rootHash !== PedersenHash(decoded.newState.positionRoot)) {
       throw new Error('State transition calculated incorrectly')
     }
+    const transactionHashes = await this.extractTransactionHashes(
+      decoded.forcedActions
+    )
     await Promise.all([
       this.stateUpdateRepository.add({
         stateUpdate: {
@@ -96,54 +99,33 @@ export class StateUpdateCollector {
           })
         ),
         prices: decoded.newState.oraclePrices,
+        transactionHashes,
       }),
-      this.processForcedActions(
-        decoded.forcedActions,
-        timestamp,
-        blockNumber,
-        id
-      ),
     ])
   }
 
-  async processForcedActions(
-    forcedActions: ForcedAction[],
-    timestamp: Timestamp,
-    blockNumber: number,
-    stateUpdateId: number
-  ): Promise<void> {
-    const datas = forcedActions.map(({ type: _type, ...data }) => data)
+  async extractTransactionHashes(
+    forcedActions: ForcedAction[]
+  ): Promise<Hash256[]> {
     const hashes =
-      await this.forcedTransactionsRepository.getTransactionHashesByMinedEventsData(
-        datas
+      await this.forcedTransactionsRepository.getTransactionHashesByData(
+        forcedActions
       )
     const filteredHashes = hashes.filter(
       (h): h is Exclude<typeof h, undefined> => h !== undefined
     )
 
-    if (filteredHashes.length !== datas.length) {
+    if (filteredHashes.length !== forcedActions.length) {
       throw new Error(
         'Forced action included in state update does not have a matching mined transaction'
       )
     }
 
-    const events = filteredHashes.map((transactionHash, i) => {
-      return {
-        eventType: 'verified' as const,
-        transactionType: forcedActions[i].type,
-        transactionHash,
-        timestamp,
-        blockNumber,
-        stateUpdateId,
-      }
-    })
-
-    await this.forcedTransactionsRepository.addEvents(events)
+    return filteredHashes
   }
 
   async discardAfter(blockNumber: BlockNumber) {
     await this.stateUpdateRepository.deleteAfter(blockNumber)
-    await this.forcedTransactionsRepository.discardAfter(blockNumber)
   }
 
   private async readLastUpdate() {

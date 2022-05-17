@@ -21,12 +21,22 @@ export interface PositionWithPricesRecord extends PositionRecord {
 export class PositionRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
+    this.findById = this.wrapFind(this.findById)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
     this.findById = this.wrapFind(this.findById)
     this.findIdByPublicKey = this.wrapFind(this.findIdByPublicKey)
     this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
     this.getPreviousStates = this.wrapGet(this.getPreviousStates)
     this.count = this.wrapAny(this.count)
+  }
+
+  async findById(positionId: bigint) {
+    const row = await this.knex('positions')
+      .where('position_id', positionId)
+      .orderBy('state_update_id', 'desc')
+      .first()
+
+    if (row) return toPositionRecord(row)
   }
 
   async getHistoryById(positionId: bigint) {

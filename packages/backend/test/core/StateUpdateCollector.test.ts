@@ -197,9 +197,7 @@ describe(StateUpdateCollector.name, () => {
         stateUpdateRepository,
         mock<RollupStateRepository>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>({
-          discardAfter: async () => {},
-        })
+        mock<ForcedTransactionsRepository>()
       )
 
       await stateUpdateCollector.discardAfter(20)
@@ -212,14 +210,10 @@ describe(StateUpdateCollector.name, () => {
     })
   })
 
-  describe(StateUpdateCollector.prototype.processForcedActions.name, () => {
-    it('adds verified events only for existing mined events', async () => {
+  describe(StateUpdateCollector.prototype.extractTransactionHashes.name, () => {
+    it('throws if forced transaction missing in database', async () => {
       const forcedTransactionsRepository = mock<ForcedTransactionsRepository>({
-        getTransactionHashesByMinedEventsData: async () => [
-          Hash256.fake(),
-          undefined,
-        ],
-        addEvents: async () => {},
+        getTransactionHashesByData: async () => [Hash256.fake(), undefined],
       })
 
       const stateUpdateCollector = new StateUpdateCollector(
@@ -231,32 +225,29 @@ describe(StateUpdateCollector.name, () => {
       )
 
       expect(
-        stateUpdateCollector.processForcedActions(
-          [
-            {
-              type: 'withdrawal',
-              amount: 1n,
-              positionId: 12n,
-              publicKey: StarkKey.fake(),
-            },
-            {
-              type: 'trade',
-              positionIdA: 12n,
-              positionIdB: 34n,
-              publicKeyA: StarkKey.fake(),
-              publicKeyB: StarkKey.fake(),
-              collateralAmount: 123n,
-              syntheticAmount: 456n,
-              isABuyingSynthetic: true,
-              nonce: 123n,
-              syntheticAssetId: AssetId('ETH-7'),
-            },
-          ],
-          Timestamp(0),
-          1,
-          1
-        )
-      ).toBeRejected()
+        stateUpdateCollector.extractTransactionHashes([
+          {
+            type: 'withdrawal',
+            amount: 1n,
+            positionId: 12n,
+            publicKey: StarkKey.fake(),
+          },
+          {
+            type: 'trade',
+            positionIdA: 12n,
+            positionIdB: 34n,
+            publicKeyA: StarkKey.fake(),
+            publicKeyB: StarkKey.fake(),
+            collateralAmount: 123n,
+            syntheticAmount: 456n,
+            isABuyingSynthetic: true,
+            nonce: 123n,
+            syntheticAssetId: AssetId('ETH-7'),
+          },
+        ])
+      ).toBeRejected(
+        'Forced action included in state update does not have a matching mined transaction'
+      )
     })
   })
 })
