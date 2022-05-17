@@ -107,8 +107,8 @@ export class ForcedEventsCollector {
               ...base,
               data: {
                 type: 'trade',
-                publicKeyA: StarkKey(event.args.starkKeyA),
-                publicKeyB: StarkKey(event.args.starkKeyB),
+                publicKeyA: StarkKey.from(event.args.starkKeyA),
+                publicKeyB: StarkKey.from(event.args.starkKeyB),
                 positionIdA: BigInt(event.args.vaultIdA),
                 positionIdB: BigInt(event.args.vaultIdB),
                 syntheticAssetId: decodeAssetId(
@@ -125,7 +125,7 @@ export class ForcedEventsCollector {
               ...base,
               data: {
                 type: 'withdrawal',
-                publicKey: StarkKey(event.args.starkKey),
+                publicKey: StarkKey.from(event.args.starkKey),
                 positionId: BigInt(event.args.vaultId),
                 amount: BigInt(event.args.quantizedAmount),
               },
