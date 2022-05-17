@@ -12,22 +12,17 @@ export function Footer() {
   return (
     <footer className="mt-24 mb-12">
       <div className="flex justify-between pb-3 mb-3 border-b-[1px] border-grey-300 flex-wrap gap-y-3">
-        <div>
-          <SimpleLink href="/" className="mr-3">
-            API documentation
+        <SimpleLink href="https://l2beat.com/donate">Donate</SimpleLink>
+        <div className="flex gap-3">
+          <SimpleLink href="https://twitter.com/l2beatcom">
+            <TwitterLogo height={24} />
           </SimpleLink>
-          <SimpleLink href="/">Donate</SimpleLink>
-        </div>
-        <div className="flex">
-          <a href="/">
-            <TwitterLogo height={24} className="mr-3" />
-          </a>
-          <a href="/">
-            <DiscordLogo height={24} className="mr-3" />
-          </a>
-          <a href="/">
+          <SimpleLink href="https://discord.gg/eaVKXPmtWk">
+            <DiscordLogo height={24} />
+          </SimpleLink>
+          <SimpleLink href="https://github.com/l2beat/dydx-state-explorer/">
             <GithubLogo height={24} />
-          </a>
+          </SimpleLink>
         </div>
       </div>
       <div className="flex justify-between flex-wrap gap-y-3">
