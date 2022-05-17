@@ -5,5 +5,5 @@ export function getAssetImageUrl(assetId: AssetId) {
     return '/images/usdc.svg'
   }
   const symbol = AssetId.symbol(assetId).toLowerCase()
-  return `https://dydx.exchange/currencies/${symbol.toLowerCase()}.svg`
+  return `https://trade.dydx.exchange/currencies/${symbol.toLowerCase()}.svg`
 }
