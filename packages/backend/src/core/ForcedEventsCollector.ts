@@ -71,7 +71,7 @@ export class ForcedEventsCollector {
           return 'added'
         }
         if (getTransactionStatus(transaction) === 'sent') {
-          await this.transactionStatusRepository.updateWaitingToBeMined({
+          await this.transactionStatusRepository.updateIfWaitingToBeMined({
             hash,
             mined: {
               blockNumber,

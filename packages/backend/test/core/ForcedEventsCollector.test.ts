@@ -72,7 +72,7 @@ describe(ForcedEventsCollector.name, () => {
         }),
       })
       const statusRepo = mock<TransactionStatusRepository>({
-        updateWaitingToBeMined: async () => true,
+        updateIfWaitingToBeMined: async () => true,
       })
 
       const collector = new ForcedEventsCollector(
@@ -90,7 +90,7 @@ describe(ForcedEventsCollector.name, () => {
       )
       const result = await collector.collect(blockRange)
       expect(result).toEqual({ updated: 1, added: 0, ignored: 0 })
-      expect(statusRepo.updateWaitingToBeMined).toHaveBeenCalledExactlyWith([
+      expect(statusRepo.updateIfWaitingToBeMined).toHaveBeenCalledExactlyWith([
         [{ hash, mined: { blockNumber, at: minedAt } }],
       ])
     })
@@ -111,7 +111,7 @@ describe(ForcedEventsCollector.name, () => {
         add: async () => hash,
       })
       const statusRepo = mock<TransactionStatusRepository>({
-        updateWaitingToBeMined: async () => true,
+        updateIfWaitingToBeMined: async () => true,
       })
       const collector = new ForcedEventsCollector(
         mock<EthereumClient>({}),
@@ -128,7 +128,7 @@ describe(ForcedEventsCollector.name, () => {
       )
       const result = await collector.collect(blockRange)
       expect(result).toEqual({ updated: 0, added: 0, ignored: 1 })
-      expect(statusRepo.updateWaitingToBeMined.calls.length).toEqual(0)
+      expect(statusRepo.updateIfWaitingToBeMined.calls.length).toEqual(0)
       expect(forcedRepo.add.calls.length).toEqual(0)
     })
   })

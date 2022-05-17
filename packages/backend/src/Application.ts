@@ -216,8 +216,8 @@ export class Application {
       await databaseService.migrateToLatest()
 
       await apiServer.listen()
-      transactionStatusMonitor.start()
       if (config.enableSync) {
+        transactionStatusMonitor.start()
         await syncScheduler.start()
         await blockDownloader.start()
       }

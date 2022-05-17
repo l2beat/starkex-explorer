@@ -21,7 +21,7 @@ export interface Record {
   hash: Hash256
   sentAt: Nullable<Timestamp>
   mined?: {
-    at: Nullable<Timestamp>
+    at: Timestamp
     blockNumber: number
   }
   forgottenAt: Nullable<Timestamp>
@@ -46,8 +46,12 @@ function toRecord(row: Row): Record {
   }
 }
 
-function timestampToBigInt(timestamp?: Nullable<Timestamp>): Nullable<bigint> {
-  return !timestamp ? null : BigInt(timestamp.toString())
+function timestampToBigInt(
+  timestamp?: Nullable<Timestamp>
+): Nullable<bigint> | undefined {
+  return timestamp === undefined || timestamp === null
+    ? timestamp
+    : BigInt(timestamp.toString())
 }
 
 function toPartialRow(
@@ -55,9 +59,9 @@ function toPartialRow(
 ): Partial<Row> & { hash: Row['hash'] } {
   const result: Partial<Row> & { hash: Row['hash'] } = {
     hash: record.hash.toString(),
-    sent_at: record.sentAt && timestampToBigInt(record.sentAt),
-    reverted_at: record.revertedAt && timestampToBigInt(record.revertedAt),
-    forgotten_at: record.forgottenAt && timestampToBigInt(record.forgottenAt),
+    sent_at: timestampToBigInt(record.sentAt),
+    reverted_at: timestampToBigInt(record.revertedAt),
+    forgotten_at: timestampToBigInt(record.forgottenAt),
     not_found_retries: record.notFoundRetries,
   }
   if (record.mined) {
@@ -110,7 +114,7 @@ export class TransactionStatusRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async updateWaitingToBeMined(
+  async updateIfWaitingToBeMined(
     record: Parameters<typeof toPartialRow>[0]
   ): Promise<boolean> {
     const row = toPartialRow(record)

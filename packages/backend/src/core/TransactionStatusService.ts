@@ -78,7 +78,7 @@ export class TransactionStatusService {
   async syncTransaction(transaction: Transaction): Promise<void> {
     const result = await this.checkTransaction(transaction.hash)
     const updated = applyCheckResult(transaction, result)
-    await this.transactionStatusRepository.updateWaitingToBeMined(updated)
+    await this.transactionStatusRepository.updateIfWaitingToBeMined(updated)
   }
 
   async syncTransactions(): Promise<void> {

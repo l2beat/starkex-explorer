@@ -48,7 +48,7 @@ describe(TransactionStatusRepository.name, () => {
     const minedAt = fakeTimestamp()
     const blockNumber = 1
 
-    const updated = await repository.updateWaitingToBeMined({
+    const updated = await repository.updateIfWaitingToBeMined({
       ...sent,
       mined: {
         at: minedAt,
