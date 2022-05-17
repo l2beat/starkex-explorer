@@ -267,21 +267,6 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return hash
   }
 
-  async markAsMined(
-    hash: Hash256,
-    blockNumber: number,
-    minedAt: Timestamp
-  ): Promise<boolean> {
-    const updated = await this.knex('transaction_status')
-      .update({
-        block_number: blockNumber,
-        mined_at: BigInt(minedAt.toString()),
-      })
-      .where('hash', '=', hash.toString())
-    this.logger.debug({ method: 'markAsMined', updated })
-    return !!updated
-  }
-
   async countAll(): Promise<bigint> {
     const result = await this.knex('forced_transactions').count()
     const count = result[0].count
