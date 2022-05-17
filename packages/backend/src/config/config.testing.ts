@@ -16,6 +16,7 @@ export function getTestConfig(): Config {
     },
     port: 1337,
     databaseConnection: getEnv('TEST_DB_URL', __SKIP_DB_TESTS__),
+    enableSync: true,
     jsonRpcUrl: getEnv('TEST_JSON_RPC_URL', 'http://localhost:8545'),
     core: {
       syncBatchSize: 6_000,
