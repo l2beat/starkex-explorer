@@ -1,5 +1,5 @@
 import { decodeAssetId, ForcedAction } from '@explorer/encoding'
-import { Hash256, Timestamp } from '@explorer/types'
+import { Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
@@ -111,8 +111,8 @@ export class ForcedEventsCollector {
               ...base,
               data: {
                 type: 'trade',
-                publicKeyA: event.args.starkKeyA.toHexString(),
-                publicKeyB: event.args.starkKeyB.toHexString(),
+                publicKeyA: StarkKey.from(event.args.starkKeyA),
+                publicKeyB: StarkKey.from(event.args.starkKeyB),
                 positionIdA: BigInt(event.args.vaultIdA),
                 positionIdB: BigInt(event.args.vaultIdB),
                 syntheticAssetId: decodeAssetId(
@@ -129,7 +129,7 @@ export class ForcedEventsCollector {
               ...base,
               data: {
                 type: 'withdrawal',
-                publicKey: event.args.starkKey.toHexString(),
+                publicKey: StarkKey.from(event.args.starkKey),
                 positionId: BigInt(event.args.vaultId),
                 amount: BigInt(event.args.quantizedAmount),
               },

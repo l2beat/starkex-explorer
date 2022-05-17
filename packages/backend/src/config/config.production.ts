@@ -14,6 +14,7 @@ export function getProductionConfig(): Config {
       connectionString: getEnv('DATABASE_URL'),
       ssl: { rejectUnauthorized: false },
     },
+    enableSync: true,
     jsonRpcUrl: getEnv('JSON_RPC_URL'),
     core: {
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
