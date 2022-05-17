@@ -113,15 +113,15 @@ describe('OfferRouter', () => {
       stateUpdateRepository.deleteAll()
     })
 
-    it('returnes created', async () => {
+    it('returns created', async () => {
       await server.post('/offer').send(initialOffer).expect(201, { id: 1 })
     })
 
-    it('returnes not found when position does not exist', async () => {
+    it('returns not found when position does not exist', async () => {
       await server.post('/offer').send(initialOfferInvalidPosition).expect(404)
     })
 
-    it('returnes bad request when position does not have enough assets', async () => {
+    it('returns bad request when position does not have enough assets', async () => {
       await server.post('/offer').send(initialOfferInvalidAmount).expect(400)
     })
   })
@@ -192,7 +192,7 @@ describe('OfferRouter', () => {
       offerRepository.deleteAll()
     })
 
-    it('returnes success', async () => {
+    it('returns success', async () => {
       await server
         .put(`/offer/${id}`)
         .send({
@@ -207,7 +207,7 @@ describe('OfferRouter', () => {
         .expect(200)
     })
 
-    it('returnes bad request when offer already accepted', async () => {
+    it('returns bad request when offer already accepted', async () => {
       await server.put(`/offer/${id}`).send({
         starkKeyB: starkKeyB.toString(),
         positionIdB: 718n.toString(),
@@ -232,7 +232,7 @@ describe('OfferRouter', () => {
         .expect(400, 'Offer already accepted by a user.')
     })
 
-    it('returnes bad request when signature invalid', async () => {
+    it('returns bad request when signature invalid', async () => {
       await server
         .put(`/offer/${id}`)
         .send({
