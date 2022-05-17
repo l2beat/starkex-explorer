@@ -14,6 +14,7 @@ import {
   renderStateUpdatesIndexPage,
   renderTransactionForm,
 } from '../pages'
+import { renderTestPagePage } from '../pages/test'
 import * as DATA from './data'
 
 const app = new Koa()
@@ -23,6 +24,9 @@ router.get('/', (ctx) => {
   const data = { ...DATA.HOME_PROPS }
   data.account = getAccount(ctx)
   ctx.body = renderHomePage(data)
+})
+router.get('/test', (ctx) => {
+  ctx.body = renderTestPagePage({ account: getAccount(ctx) })
 })
 router.get('/state-updates', (ctx) => {
   const data = { ...DATA.STATE_CHANGES_INDEX_PROPS }

@@ -15,6 +15,7 @@
     "dev": "gulp watch"
   },
   "dependencies": {
+    "@ethersproject/solidity": "5.5.0",
     "@explorer/crypto": "*",
     "@explorer/types": "*",
     "@types/js-cookie": "^3.0.1",
