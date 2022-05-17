@@ -34,7 +34,7 @@ export function ForcedTransactionsIndex({
         perPage={perPage}
         page={page}
         fullCount={fullCount}
-        baseUrl="/forced-transactions"
+        baseUrl="/forced"
       />
       <Table
         noRowsText="no forced transactions have been issued so far"
@@ -52,7 +52,7 @@ export function ForcedTransactionsIndex({
           { header: 'Position ID', numeric: true },
         ]}
         rows={transactions.map((transaction) => {
-          const link = `/forced-transactions/${transaction.hash}`
+          const link = `/forced/${transaction.hash}`
           return {
             link,
             cells: [

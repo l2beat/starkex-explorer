@@ -32,7 +32,7 @@ export function createFrontendRouter(
   })
 
   router.get(
-    '/forced-transactions',
+    '/forced',
     withTypedContext(
       z.object({
         query: z.object({
@@ -54,8 +54,16 @@ export function createFrontendRouter(
     )
   )
 
+  router.get('/forced/new', async (ctx) => {
+    const account = getAccount(ctx)
+    const result = await forcedTransactionController.getTransactionFormPage(
+      account
+    )
+    applyControllerResult(ctx, result)
+  })
+
   router.get(
-    '/forced-transactions/:hash',
+    '/forced/:hash',
     withTypedContext(
       z.object({
         params: z.object({

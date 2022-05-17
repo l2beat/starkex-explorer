@@ -1,5 +1,6 @@
 import {
   AssetId,
+  EthereumAddress,
   Hash256,
   PedersenHash,
   StarkKey,
@@ -9,6 +10,7 @@ import { expect } from 'earljs'
 
 import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
+import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
 import { Logger, LogLevel } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './setup'
 
@@ -192,6 +194,110 @@ describe(PositionRepository.name, () => {
 
     it('returns undefined when not found', async () => {
       const result = await positionRepository.findIdByPublicKey(StarkKey.fake())
+      expect(result).toEqual(undefined)
+    })
+  })
+
+  describe(positionRepository.findIdByEthereumAddress.name, () => {
+    const userRegistrationEventRepository = new UserRegistrationEventRepository(
+      knex,
+      logger
+    )
+    afterEach(() => userRegistrationEventRepository.deleteAll())
+
+    it('finds latest association', async () => {
+      await userRegistrationEventRepository.addMany([
+        {
+          blockNumber: 1,
+          ethAddress: EthereumAddress.fake('abc'),
+          starkKey: StarkKey.fake('abc'),
+        },
+        {
+          blockNumber: 2,
+          ethAddress: EthereumAddress.fake('abc'),
+          starkKey: StarkKey.fake('def'),
+        },
+      ])
+
+      await stateUpdateRepository.add({
+        stateUpdate: mockStateUpdate(1),
+        positions: [
+          mockPosition(12345n, StarkKey.fake('abc')),
+          mockPosition(6789n, StarkKey.fake('def')),
+        ],
+        prices: [],
+      })
+
+      const result = await positionRepository.findIdByEthereumAddress(
+        EthereumAddress.fake('abc')
+      )
+      expect(result).toEqual(6789n)
+    })
+
+    it('returns undefined when not found', async () => {
+      const result = await positionRepository.findIdByEthereumAddress(
+        EthereumAddress.fake()
+      )
+      expect(result).toEqual(undefined)
+    })
+  })
+
+  describe(positionRepository.findByIdWithPrices.name, () => {
+    it('returns latest update', async () => {
+      const positionId = 12345n
+
+      await stateUpdateRepository.add({
+        stateUpdate: {
+          id: 1,
+          blockNumber: 1,
+          rootHash: PedersenHash.fake(),
+          factHash: Hash256.fake(),
+          timestamp: Timestamp(0),
+        },
+        positions: [
+          {
+            publicKey: StarkKey.fake('1'),
+            positionId,
+            collateralBalance: 0n,
+            balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+          },
+        ],
+        prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+      })
+
+      await stateUpdateRepository.add({
+        stateUpdate: {
+          id: 2,
+          blockNumber: 2,
+          rootHash: PedersenHash.fake(),
+          factHash: Hash256.fake(),
+          timestamp: Timestamp(0),
+        },
+        positions: [
+          {
+            publicKey: StarkKey.fake('1'),
+            positionId,
+            collateralBalance: 0n,
+            balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+          },
+        ],
+        prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+      })
+
+      const position = await positionRepository.findByIdWithPrices(positionId)
+
+      expect(position).toEqual({
+        stateUpdateId: 2,
+        publicKey: StarkKey.fake('1'),
+        positionId,
+        collateralBalance: 0n,
+        balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        prices: [{ assetId: AssetId('BTC-10'), price: 40n }],
+      })
+    })
+
+    it('returns undefined when not found', async () => {
+      const result = await positionRepository.findById(1n)
       expect(result).toEqual(undefined)
     })
   })

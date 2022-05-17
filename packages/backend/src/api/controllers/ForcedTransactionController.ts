@@ -1,6 +1,7 @@
 import {
   renderForcedTransactionDetailsPage,
   renderForcedTransactionsIndexPage,
+  renderTransactionForm,
   TransactionStatusEntry,
 } from '@explorer/frontend'
 import { EthereumAddress, Hash256 } from '@explorer/types'
@@ -9,13 +10,16 @@ import {
   ForcedTransactionRecord,
   ForcedTransactionsRepository,
 } from '../../peripherals/database/ForcedTransactionsRepository'
+import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
+import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
 export class ForcedTransactionController {
   constructor(
     private userRegistrationEventRepository: UserRegistrationEventRepository,
+    private positionRepository: PositionRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
 
@@ -71,6 +75,43 @@ export class ForcedTransactionController {
       stateUpdateId: transaction.updates.verified?.stateUpdateId,
     })
     return { type: 'success', content }
+  }
+
+  async getTransactionFormPage(
+    account: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
+    if (!account) {
+      return { type: 'redirect', url: '/' }
+    }
+    const id = await this.positionRepository.findIdByEthereumAddress(account)
+    if (id === undefined) {
+      return { type: 'redirect', url: '/' }
+    }
+    const position = await this.positionRepository.findByIdWithPrices(id)
+    if (!position) {
+      return { type: 'redirect', url: '/' }
+    }
+
+    const assets = toPositionAssetEntries(
+      position.balances,
+      position.collateralBalance,
+      position.prices
+    )
+
+    if (assets.length === 0) {
+      return { type: 'redirect', url: '/' }
+    }
+
+    return {
+      type: 'success',
+      content: renderTransactionForm({
+        account,
+        positionId: position.positionId,
+        publicKey: position.publicKey,
+        selectedAsset: assets[0].assetId,
+        assets,
+      }),
+    }
   }
 }
 

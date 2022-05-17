@@ -75,7 +75,7 @@ export function Home(props: HomeProps) {
         <span className="float-left font-medium text-lg">
           Latest forced transactions
         </span>
-        <SimpleLink className="float-right" href="/forced-transactions">
+        <SimpleLink className="float-right" href="/forced">
           view all
         </SimpleLink>
       </div>
@@ -95,7 +95,7 @@ export function Home(props: HomeProps) {
           { header: 'Position ID', numeric: true },
         ]}
         rows={props.forcedTransactions.map((transaction) => {
-          const link = `/forced-transactions/${transaction.hash}`
+          const link = `/forced/${transaction.hash}`
           return {
             link,
             cells: [
