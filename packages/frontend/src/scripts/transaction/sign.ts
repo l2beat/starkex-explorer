@@ -14,10 +14,12 @@ export async function signInitial(
 
   const stringOffer = JSON.stringify(offer, null, 2)
 
-  const signature = (await provider.request({
-    method: 'personal_sign',
-    params: [address.toString(), stringOffer],
-  })) as string
-
-  return signature
+  try {
+    return await provider.request({
+      method: 'personal_sign',
+      params: [address.toString(), stringOffer],
+    })
+  } catch (e) {
+    console.error(e)
+  }
 }

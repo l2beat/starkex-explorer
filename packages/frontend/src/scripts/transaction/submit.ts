@@ -19,28 +19,29 @@ export async function submit(state: FormState) {
     aIsBuyingSynthetic: state.buyButtonSelected,
   }
 
-  try {
-    const signature = await signInitial(
-      offer,
-      EthereumAddress('0x6235538E538067Db89E72d24F4D1a757E234Bed1')
-    )
+  const signature = await signInitial(
+    offer,
+    EthereumAddress('0x6235538E538067Db89E72d24F4D1a757E234Bed1')
+  )
 
-    fetch('/forced/offers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        offer,
-        signature,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        window.location.href = `/forced/${res.id}`
-      })
-      .catch(console.error)
-  } catch (e) {
-    console.error(e)
+  if (!signature) {
+    console.error('Offer parameters need to be signed.')
+    return
   }
+
+  fetch('/forced/offers', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      offer,
+      signature,
+    }),
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      window.location.href = `/forced/${res.id}`
+    })
+    .catch(console.error)
 }
