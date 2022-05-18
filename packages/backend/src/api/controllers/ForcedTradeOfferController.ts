@@ -173,14 +173,21 @@ export function validateInitialSignature(
   ethAddressA: EthereumAddress
 ) {
   const stringOffer = JSON.stringify(
-    offer,
-    (_: string, value: unknown) =>
-      typeof value === 'bigint' ? value.toString() : value,
+    {
+      starkKeyA: offer.starkKeyA,
+      positionIdA: offer.positionIdA.toString(),
+      syntheticAssetId: offer.syntheticAssetId,
+      amountCollateral: offer.amountCollateral.toString(),
+      amountSynthetic: offer.amountSynthetic.toString(),
+      aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
+    },
+    null,
     2
   )
 
   const signer = recoverAddress(hashMessage(stringOffer), signature)
 
+  console.log(signer)
   return signer === ethAddressA.toString()
 }
 

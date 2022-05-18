@@ -1,5 +1,3 @@
-import { EthereumAddress } from '@explorer/types'
-
 import { signInitial } from './sign'
 import { FormState } from './types'
 
@@ -12,17 +10,14 @@ export async function submit(state: FormState) {
 
   const offer = {
     starkKeyA: state.props.publicKey,
-    positionIdA: state.props.positionId.toString(),
-    amountCollateral: state.totalInputValue.toString(),
-    amountSynthetic: state.amountInputValue.toString(),
+    positionIdA: state.props.positionId,
+    amountCollateral: state.totalInputValue,
+    amountSynthetic: state.amountInputValue,
     syntheticAssetId: state.selectedAsset.assetId,
     aIsBuyingSynthetic: state.buyButtonSelected,
   }
 
-  const signature = await signInitial(
-    offer,
-    EthereumAddress('0x6235538E538067Db89E72d24F4D1a757E234Bed1')
-  )
+  const signature = await signInitial(offer, state.props.account)
 
   if (!signature) {
     console.error('Offer parameters need to be signed.')
@@ -34,10 +29,14 @@ export async function submit(state: FormState) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      offer,
-      signature,
-    }),
+    body: JSON.stringify(
+      {
+        offer,
+        signature,
+      },
+      (_, value: unknown) =>
+        typeof value === 'bigint' ? value.toString() : value
+    ),
   })
     .then((res) => res.json())
     .then((res) => {

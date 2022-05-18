@@ -12,7 +12,18 @@ export async function signInitial(
     return
   }
 
-  const stringOffer = JSON.stringify(offer, null, 2)
+  const stringOffer = JSON.stringify(
+    {
+      starkKeyA: offer.starkKeyA,
+      positionIdA: offer.positionIdA.toString(),
+      syntheticAssetId: offer.syntheticAssetId,
+      amountCollateral: offer.amountCollateral.toString(),
+      amountSynthetic: offer.amountSynthetic.toString(),
+      aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
+    },
+    null,
+    2
+  )
 
   try {
     return await provider.request({

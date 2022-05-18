@@ -53,22 +53,22 @@ describe(validateAcceptedSignature.name, () => {
 
 describe(ForcedTradeOfferController.name, () => {
   describe('postOffer', () => {
+    const starkKeyA = StarkKey(
+      '0x0d06c518b04d2606f57fb8b54dcc1e3053928da108055a5c69ef39011afd47e7'
+    )
+
     const INITIAL_OFFER = {
-      starkKeyA: StarkKey(
-        '0x014d2466bea041ea796e5f8a68fa87ffcbfbfffbfdcdd29fe3087b516ffac867'
-      ),
+      starkKeyA,
       positionIdA: 1234n,
+      syntheticAssetId: AssetId('BTC-10'),
       amountCollateral: 20359763977n,
       amountSynthetic: 5287654321n,
-      syntheticAssetId: AssetId('BTC-10'),
       aIsBuyingSynthetic: true,
     }
 
     const POSITION_A = {
       positionId: 1234n,
-      publicKey: StarkKey(
-        '0x014d2466bea041ea796e5f8a68fa87ffcbfbfffbfdcdd29fe3087b516ffac867'
-      ),
+      publicKey: starkKeyA,
       collateralBalance: 20359763977n,
       balances: [],
       stateUpdateId: 1,
@@ -77,14 +77,12 @@ describe(ForcedTradeOfferController.name, () => {
     const REGISTRATION_EVENT_A = {
       id: 1,
       blockNumber: 1,
-      starkKey: StarkKey(
-        '0x014d2466bea041ea796e5f8a68fa87ffcbfbfffbfdcdd29fe3087b516ffac867'
-      ),
+      starkKey: starkKeyA,
       ethAddress: EthereumAddress('0x6235538E538067Db89E72d24F4D1a757E234Bed1'),
     }
 
     const SIGNATURE =
-      '0x5e8f7ae6fcb90b4316f2b517353880aad67be0b3009123fe639ffac7136eb9de0e9c8d8ccdebb14341c77ccd83ad9202622be4abdb5b76e6c717f718075f43ba1c'
+      '0x566e6942c5f7c88cf644a93a78f9ebe614a33d0f0254a8d56b9f4f77b1228f194fa533f1bd3589b2816f1575abb99b7087956840ff0bf631c65f2df2bd37ef9a1c'
 
     const FAKE_SIGNATURE =
       '0xf377b79e3c3e1d9674a6f6153c388218c8ac31a8be38d77a8b74accdc332599a4cbd2abdb9f9dc81260540b86c8daf66380283a9f70ebceb2097c0db20ec243c1c'

@@ -73,11 +73,12 @@ export interface ModifyTotalAction {
   type: 'ModifyTotal'
   value: string
 }
+
 export interface ForcedTradeInitialOfferEntry {
   starkKeyA: StarkKey
-  positionIdA: string
+  positionIdA: bigint
   syntheticAssetId: AssetId
-  amountCollateral: string
-  amountSynthetic: string
+  amountCollateral: bigint
+  amountSynthetic: bigint
   aIsBuyingSynthetic: boolean
 }
