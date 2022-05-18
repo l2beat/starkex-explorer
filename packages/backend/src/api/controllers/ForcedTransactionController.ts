@@ -30,7 +30,7 @@ export class ForcedTransactionController {
   ): Promise<ControllerResult> {
     const limit = perPage
     const offset = (page - 1) * perPage
-    const [transactions, fullCount] = await Promise.all([
+    const [transactions, total] = await Promise.all([
       this.forcedTransactionsRepository.getLatest({ limit, offset }),
       this.forcedTransactionsRepository.countAll(),
     ])
@@ -38,7 +38,7 @@ export class ForcedTransactionController {
     const content = renderForcedTransactionsIndexPage({
       account,
       transactions: transactions.map(toForcedTransactionEntry),
-      fullCount,
+      total,
       params: { page, perPage },
     })
     return { type: 'success', content }

@@ -1,7 +1,5 @@
 export function initPagination() {
-  const select = document.querySelector<HTMLSelectElement>(
-    'form.pagination select[name="perPage"]'
-  )
+  const select = document.querySelector<HTMLSelectElement>('#perPage')
   if (!select) {
     return
   }

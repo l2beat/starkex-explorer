@@ -165,7 +165,7 @@ export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)
     ),
   })),
-  fullCount: 121,
+  total: 121,
   params: {
     perPage: 10,
     page: 5,
@@ -179,7 +179,7 @@ export const FORCED_TRANSACTIONS_INDEX_PROPS: ForcedTransactionsIndexProps = {
     page: 1,
     perPage: 50,
   },
-  fullCount: 100n,
+  total: 100,
 }
 
 export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {

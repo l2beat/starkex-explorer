@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Page } from '../common'
-import { Pagination } from '../common/Pagination'
+import { ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
 import { formatHashLong, formatRelativeTime } from '../formatting'
 import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
@@ -9,7 +9,7 @@ import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 export function StateUpdatesIndex({
   stateUpdates,
   params: { perPage, page },
-  fullCount,
+  total,
   account,
 }: StateUpdatesIndexProps) {
   return (
@@ -25,10 +25,10 @@ export function StateUpdatesIndex({
       <h1 className="font-sans font-bold text-2xl mb-12">
         Latest state updates
       </h1>
-      <Pagination
+      <ServerPagination
         perPage={perPage}
         page={page}
-        fullCount={fullCount}
+        total={total}
         baseUrl="/state-updates"
       />
       <Table

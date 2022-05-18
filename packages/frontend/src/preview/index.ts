@@ -26,6 +26,10 @@ router.get('/', (ctx) => {
 })
 router.get('/state-updates', (ctx) => {
   const data = { ...DATA.STATE_CHANGES_INDEX_PROPS }
+  data.params = {
+    page: ctx.query.page ? Number(ctx.query.page) : 1,
+    perPage: ctx.query.perPage ? Number(ctx.query.perPage) : 10,
+  }
   data.account = getAccount(ctx)
   ctx.body = renderStateUpdatesIndexPage(data)
 })
@@ -46,6 +50,10 @@ router.get('/positions/:positionId/updates/:updateId', (ctx) => {
 })
 router.get('/forced', (ctx) => {
   const data = { ...DATA.FORCED_TRANSACTIONS_INDEX_PROPS }
+  data.params = {
+    page: ctx.query.page ? Number(ctx.query.page) : 1,
+    perPage: ctx.query.perPage ? Number(ctx.query.perPage) : 10,
+  }
   data.account = getAccount(ctx)
   ctx.body = renderForcedTransactionsIndexPage(data)
 })
