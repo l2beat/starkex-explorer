@@ -10,7 +10,7 @@ export type AssetNameCellProps = {
 export function AssetNameCell({ assetId }: AssetNameCellProps) {
   const symbol = AssetId.symbol(assetId)
   return (
-    <div className="flex gap-x-1 items-center">
+    <div className="flex gap-x-1 items-center w-max">
       <AssetIcon assetId={assetId} width="16" height="16" />
       {symbol}
     </div>
