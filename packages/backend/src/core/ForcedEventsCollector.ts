@@ -4,6 +4,7 @@ import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
+import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
 import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { getTransactionStatus } from './getForcedTransactionStatus'
@@ -42,6 +43,7 @@ export class ForcedEventsCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
+    private readonly transactionStatusRepository: TransactionStatusRepository,
     readonly _getMinedTransactions?: (
       blockRange: BlockRange
     ) => Promise<MinedTransaction[]>
@@ -69,11 +71,13 @@ export class ForcedEventsCollector {
           return 'added'
         }
         if (getTransactionStatus(transaction) === 'sent') {
-          await this.forcedTransactionsRepository.markAsMined(
+          await this.transactionStatusRepository.updateIfWaitingToBeMined({
             hash,
-            blockNumber,
-            minedAt
-          )
+            mined: {
+              blockNumber,
+              at: minedAt,
+            },
+          })
           return 'updated'
         }
         return 'ignored'

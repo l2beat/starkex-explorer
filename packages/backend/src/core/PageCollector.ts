@@ -41,6 +41,10 @@ export class PageCollector {
         }): Promise<Omit<PageRecord, 'id'>> => {
           const tx = await this.ethereumClient.getTransaction(transactionHash)
 
+          if (!tx) {
+            throw new Error('Transaction does not exist')
+          }
+
           const decoded = PAGE_ABI.decodeFunctionData(
             'registerContinuousMemoryPage',
             tx.data

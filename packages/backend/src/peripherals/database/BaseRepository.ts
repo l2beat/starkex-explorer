@@ -40,11 +40,12 @@ export class BaseRepository {
     return this.wrap(method, () => this.logger.debug({ method: method.name }))
   }
 
-  protected wrapAdd<T, R extends number | string>(
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  protected wrapAdd<T, R extends number | string | String | Number>(
     method: AddMethod<T, R>
   ): AddMethod<T, R> {
     return this.wrap(method, (id) =>
-      this.logger.debug({ method: method.name, id })
+      this.logger.debug({ method: method.name, id: id.valueOf() })
     )
   }
 
