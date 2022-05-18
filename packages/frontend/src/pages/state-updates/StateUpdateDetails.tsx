@@ -3,6 +3,7 @@ import React from 'react'
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
+import { ClientPagination } from '../common/pagination'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'
 import {
@@ -61,7 +62,10 @@ export function StateUpdateDetails({
       <div className="mb-1.5 font-medium text-lg text-left">
         Updated positions
       </div>
+      <ClientPagination total={positions.length} tableId="state-positions" />
       <Table
+        id="state-positions"
+        hasClientPagination
         noRowsText="this update did not affect any position"
         className="mb-8"
         columns={[
@@ -95,7 +99,10 @@ export function StateUpdateDetails({
       <div className="mb-1.5 font-medium text-lg text-left">
         Included forced transactions
       </div>
+      <ClientPagination total={positions.length} tableId="state-transactions" />
       <Table
+        id="state-transactions"
+        hasClientPagination
         noRowsText="this update does not include any forced transactions"
         columns={[
           { header: 'Type' },

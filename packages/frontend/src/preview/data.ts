@@ -22,15 +22,31 @@ import { TransactionFormProps } from '../pages/transaction-form'
 const ONE_HOUR = 60 * 60 * 1000
 
 const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
-  Array.from({ length: count }).map((_, i) => ({
-    type: i % 2 === 0 ? 'exit' : i % 3 === 0 ? 'buy' : 'sell',
-    status: i % 3 === 0 ? 'waiting to be included' : 'completed',
-    assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-7'),
-    lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
-    hash: Hash256.fake(),
-    amount: 10000n * (BigInt(i) + 1n),
-    positionId: 100n * BigInt(i),
-  }))
+  Array.from({ length: count }).map((_, i) => {
+    const assets = [AssetId('LINK-7'), AssetId('MKR-9'), AssetId('BTC-10')]
+    const assetId = assets[Math.floor(Math.random() * assets.length)]
+
+    const types = ['exit', 'buy', 'sell'] as const
+    const type = types[Math.floor(Math.random() * types.length)]
+
+    const statuses = ['waiting to be included', 'completed'] as const
+    const status = statuses[Math.floor(Math.random() * statuses.length)]
+
+    const decimals = AssetId.decimals(assetId)
+    const digits = Math.floor(Math.random() * decimals + 6)
+    const randomDigit = () => '0123456789'[Math.floor(Math.random() * 10)]
+    const amount = Array.from({ length: digits }).map(randomDigit).join('')
+
+    return {
+      type,
+      status,
+      assetId,
+      lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
+      hash: Hash256.fake(),
+      amount: BigInt(amount),
+      positionId: BigInt(Math.floor(Math.random() * 10_000 + 1)),
+    }
+  })
 
 export const HOME_PROPS: HomeProps = {
   account: undefined,
@@ -54,21 +70,14 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   rootHash: PedersenHash.fake(),
   blockNumber: Math.floor(Math.random() * 100),
   timestamp: Timestamp(Date.now()),
-  positions: [
-    {
-      publicKey: StarkKey.fake(),
-      positionId: 1n,
-      totalUSDCents: 100n,
-      previousTotalUSDCents: 90n,
-    },
-    {
-      publicKey: StarkKey.fake(),
-      positionId: 2n,
-      totalUSDCents: 100n,
-      previousTotalUSDCents: 90n,
-    },
-  ],
-  transactions: createFakeTransactions(5),
+  positions: Array.from({ length: 57 }).map((_, i) => ({
+    publicKey: StarkKey.fake(),
+    positionId: BigInt(i + 1),
+    totalUSDCents: BigInt(Math.floor(Math.random() * 500_000_00)),
+    previousTotalUSDCents: BigInt(Math.floor(Math.random() * 500_000_00)),
+    assetsUpdated: Math.floor(Math.random() * 20 + 1),
+  })),
+  transactions: createFakeTransactions(7),
 }
 
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {

@@ -5,13 +5,13 @@ import { NoRowsMessage } from './NoRowsMessage'
 import { TableRow } from './TableRow'
 import { TableProps } from './types'
 
-export function Table({ columns, rows, className, noRowsText }: TableProps) {
+export function Table(props: TableProps) {
   return (
-    <div className={cx('overflow-x-auto w-full', className)}>
-      <table className="w-full whitespace-nowrap">
+    <div className={cx('overflow-x-auto w-full', props.className)}>
+      <table id={props.id} className="w-full whitespace-nowrap">
         <thead>
           <tr className="bg-grey-100 font-medium">
-            {columns.map(({ header, numeric, fullWidth }, i) => (
+            {props.columns.map(({ header, numeric, fullWidth }, i) => (
               <th
                 scope="col"
                 key={i}
@@ -29,18 +29,22 @@ export function Table({ columns, rows, className, noRowsText }: TableProps) {
           </tr>
         </thead>
         <tbody>
-          {rows.length > 0 ? (
-            rows.map(({ cells, link }, i) => (
+          {props.rows.length > 0 ? (
+            props.rows.map(({ cells, link }, i) => (
               <TableRow
+                hidden={props.hasClientPagination && i > 10}
                 cells={cells}
                 link={link}
-                columns={columns}
+                columns={props.columns}
                 i={i}
                 key={i}
               />
             ))
           ) : (
-            <NoRowsMessage text={noRowsText} colSpan={columns.length} />
+            <NoRowsMessage
+              text={props.noRowsText}
+              colSpan={props.columns.length}
+            />
           )}
         </tbody>
       </table>

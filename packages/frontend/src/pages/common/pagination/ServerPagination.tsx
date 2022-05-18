@@ -18,7 +18,6 @@ export function ServerPagination({
   total,
   baseUrl = '/',
 }: ServerPaginationProps) {
-  const first = 1
   const last = Math.ceil(total / perPage)
 
   const link = (page: number, perPage: number) => {
@@ -32,7 +31,7 @@ export function ServerPagination({
   return (
     <div className={styles.outerWrapper}>
       <div className={styles.innerWrapper}>
-        {page === first ? (
+        {page === 1 ? (
           <>
             <span className={styles.textButtonInactive}>First</span>
             <span className={styles.arrowButtonInactive}>
@@ -41,7 +40,7 @@ export function ServerPagination({
           </>
         ) : (
           <>
-            <a href={link(first, perPage)} className={styles.textButtonActive}>
+            <a href={link(1, perPage)} className={styles.textButtonActive}>
               First
             </a>
             <a
@@ -52,7 +51,7 @@ export function ServerPagination({
             </a>
           </>
         )}
-        <span className={styles.textButtonInactive}>
+        <span className={styles.pagesText}>
           Page {page} out of {last}
         </span>
         {page === last ? (
@@ -78,7 +77,12 @@ export function ServerPagination({
       </div>
       <form action={baseUrl} method="get" className={styles.innerWrapper}>
         <label htmlFor="perPage">Per page</label>
-        <select name="perPage" id="perPage" className={styles.textButtonActive}>
+        <select
+          name="perPage"
+          id="perPage"
+          className={styles.textButtonActive}
+          autoComplete="off"
+        >
           {[10, 25, 50, 100].map((n) => (
             <option key={n} selected={n === perPage}>
               {n}
