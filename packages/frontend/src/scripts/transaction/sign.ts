@@ -2,7 +2,7 @@ import { EthereumAddress } from '@explorer/types'
 
 import { ForcedTradeInitialOfferEntry } from './types'
 
-export async function initSign(
+export async function signInitial(
   offer: ForcedTradeInitialOfferEntry,
   address: EthereumAddress
 ) {

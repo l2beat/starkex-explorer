@@ -1,6 +1,6 @@
 import { EthereumAddress } from '@explorer/types'
 
-import { initSign } from './sign'
+import { signInitial } from './sign'
 import { FormState } from './types'
 
 export async function submit(state: FormState) {
@@ -20,7 +20,7 @@ export async function submit(state: FormState) {
   }
 
   try {
-    const signature = await initSign(
+    const signature = await signInitial(
       offer,
       EthereumAddress('0x6235538E538067Db89E72d24F4D1a757E234Bed1')
     )
