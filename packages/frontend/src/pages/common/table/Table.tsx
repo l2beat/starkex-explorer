@@ -32,7 +32,7 @@ export function Table(props: TableProps) {
           {props.rows.length > 0 ? (
             props.rows.map(({ cells, link }, i) => (
               <TableRow
-                hidden={props.hasClientPagination && i > 10}
+                hidden={props.hasClientPagination && i >= 10}
                 cells={cells}
                 link={link}
                 columns={props.columns}
