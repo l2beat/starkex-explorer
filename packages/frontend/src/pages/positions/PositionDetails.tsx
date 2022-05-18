@@ -5,7 +5,7 @@ import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { Column, Table } from '../common/Table'
+import { Column, Table } from '../common/table'
 import {
   formatAbsoluteTime,
   formatCurrency,
@@ -24,7 +24,7 @@ const balanceTableColumns = (ownedByYou: boolean) => {
   ]
 
   if (ownedByYou) {
-    columns.push({ header: 'Forced', className: 'w-0' })
+    columns.push({ header: 'Forced' })
   }
 
   return columns
@@ -104,11 +104,11 @@ const buildUpdateHistoryTableRow =
     }
   }
 
-const transactionHistoryTableColumns = [
+const transactionHistoryTableColumns: Column[] = [
   { header: 'Type' },
   { header: 'Time' },
   { header: 'Status' },
-  { header: 'Hash', cellFontMono: true, maxWidthClass: 'max-w-[250px]' },
+  { header: 'Hash', monospace: true, fullWidth: true },
   { header: 'Amount', numeric: true },
   { header: 'Asset' },
 ]

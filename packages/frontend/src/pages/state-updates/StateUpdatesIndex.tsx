@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Page } from '../common'
 import { Pagination } from '../common/Pagination'
-import { Table } from '../common/Table'
+import { Table } from '../common/table'
 import { formatHashLong, formatRelativeTime } from '../formatting'
 import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 
@@ -35,11 +35,7 @@ export function StateUpdatesIndex({
         noRowsText="no state updates have occurred so far"
         columns={[
           { header: 'No.' },
-          {
-            header: 'Hash',
-            cellFontMono: true,
-            className: 'max-w-[320px]',
-          },
+          { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
         ]}

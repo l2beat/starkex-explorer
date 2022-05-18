@@ -4,7 +4,7 @@ import { Page } from '../common'
 import { AssetNameCell } from '../common/AssetNameCell'
 import { SearchBar } from '../common/SearchBar'
 import { SimpleLink } from '../common/SimpleLink'
-import { Table } from '../common/Table'
+import { Table } from '../common/table'
 import {
   formatCurrencyUnits,
   formatHashLong,
@@ -50,11 +50,7 @@ export function Home(props: HomeProps) {
         className="mb-8"
         columns={[
           { header: 'No.' },
-          {
-            header: 'Hash',
-            cellFontMono: true,
-            className: 'max-w-[320px]',
-          },
+          { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
         ]}
@@ -85,11 +81,7 @@ export function Home(props: HomeProps) {
           { header: 'Type' },
           { header: 'Time' },
           { header: 'Status' },
-          {
-            header: 'Hash',
-            cellFontMono: true,
-            className: 'max-w-[250px]',
-          },
+          { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
           { header: 'Position ID', numeric: true },
