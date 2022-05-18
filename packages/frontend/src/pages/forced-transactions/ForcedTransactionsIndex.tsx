@@ -3,7 +3,7 @@ import React from 'react'
 import { Page } from '../common'
 import { AssetNameCell } from '../common/AssetNameCell'
 import { Pagination } from '../common/Pagination'
-import { Table } from '../common/Table'
+import { Table } from '../common/table'
 import {
   formatCurrencyUnits,
   formatHashLong,
@@ -42,11 +42,7 @@ export function ForcedTransactionsIndex({
           { header: 'Type' },
           { header: 'Time' },
           { header: 'Status' },
-          {
-            header: 'Hash',
-            cellFontMono: true,
-            className: 'max-w-[250px]',
-          },
+          { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
           { header: 'Position ID', numeric: true },

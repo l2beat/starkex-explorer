@@ -4,7 +4,7 @@ import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { Table } from '../common/Table'
+import { Table } from '../common/table'
 import {
   formatAbsoluteTime,
   formatCurrencyUnits,
@@ -110,11 +110,7 @@ export function PositionAtUpdate({
         columns={[
           { header: 'Type' },
           { header: 'Time' },
-          {
-            header: 'Hash',
-            cellFontMono: true,
-            className: 'max-w-[250px]',
-          },
+          { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
         ]}
