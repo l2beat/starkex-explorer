@@ -5,6 +5,12 @@ import { ethers, providers } from 'ethers'
 import { BlockRange } from '../../model'
 import { BlockTag } from './types'
 
+export function isReverted(
+  receipt: ethers.providers.TransactionReceipt
+): boolean {
+  return receipt.status === 0
+}
+
 export class EthereumClient {
   private provider = new ethers.providers.JsonRpcProvider(this.rpcUrl)
 
@@ -39,8 +45,18 @@ export class EthereumClient {
     return logs
   }
 
-  async getTransaction(transactionHash: Hash256) {
-    return await this.provider.getTransaction(transactionHash.toString())
+  async getTransaction(
+    transactionHash: Hash256
+  ): Promise<ethers.providers.TransactionResponse | undefined> {
+    const tx = await this.provider.getTransaction(transactionHash.toString())
+    if (!tx) {
+      return undefined
+    }
+    return tx
+  }
+
+  async getTransactionReceipt(transactionHash: Hash256) {
+    return await this.provider.getTransactionReceipt(transactionHash.toString())
   }
 
   onBlock(handler: (block: providers.Block) => void) {

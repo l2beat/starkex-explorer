@@ -124,6 +124,7 @@ declare module 'knex/types/tables' {
     reverted_at: Nullable<bigint>
     forgotten_at: Nullable<bigint>
     block_number: Nullable<number>
+    not_found_retries: number
   }
 
   interface Tables {
