@@ -3,7 +3,7 @@ import { TransactionStatusService } from './TransactionStatusService'
 const MINUTE = 1000 * 60
 
 export class TransactionStatusMonitor {
-  private timeout?: NodeJS.Timeout
+  private running = false
 
   constructor(
     private readonly transactionStatusService: TransactionStatusService,
@@ -11,20 +11,27 @@ export class TransactionStatusMonitor {
   ) {}
 
   private scheduleNextCheck() {
-    this.timeout = setTimeout(async () => {
-      await this.transactionStatusService.syncTransactions()
-      this.scheduleNextCheck()
+    if (!this.running) {
+      return
+    }
+    setTimeout(async () => {
+      if (!this.running) {
+        return
+      }
+      try {
+        await this.transactionStatusService.syncTransactions()
+      } finally {
+        this.scheduleNextCheck()
+      }
     }, this.syncInterval)
   }
 
   start() {
+    this.running = true
     this.scheduleNextCheck()
   }
 
   stop() {
-    if (!this.timeout) {
-      return
-    }
-    clearTimeout(this.timeout)
+    this.running = false
   }
 }
