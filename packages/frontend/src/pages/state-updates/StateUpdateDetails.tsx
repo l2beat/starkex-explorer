@@ -4,7 +4,7 @@ import { AssetNameCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { Table } from '../common/Table'
+import { Table } from '../common/table'
 import {
   formatAbsoluteTime,
   formatCurrency,
@@ -66,11 +66,7 @@ export function StateUpdateDetails({
         className="mb-8"
         columns={[
           { header: 'Position id' },
-          {
-            header: 'Owner',
-            className: 'max-w-[320px]',
-            cellFontMono: true,
-          },
+          { header: 'Owner', monospace: true, fullWidth: true },
           { header: 'Value before', numeric: true },
           { header: 'Value after', numeric: true },
           { header: 'Assets updated', numeric: true },
@@ -104,11 +100,7 @@ export function StateUpdateDetails({
         columns={[
           { header: 'Type' },
           { header: 'Time' },
-          {
-            header: 'Hash',
-            cellFontMono: true,
-            className: 'max-w-[250px]',
-          },
+          { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
           { header: 'Position ID', numeric: true },
