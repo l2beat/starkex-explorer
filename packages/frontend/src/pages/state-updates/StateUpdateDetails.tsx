@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { AssetNameCell } from '../common/AssetNameCell'
+import { AssetCell } from '../common/AssetNameCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
@@ -114,7 +114,7 @@ export function StateUpdateDetails({
               formatRelativeTime(transaction.lastUpdate),
               formatHashLong(transaction.hash),
               formatCurrencyUnits(transaction.amount, transaction.assetId),
-              <AssetNameCell assetId={transaction.assetId} />,
+              <AssetCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),
             ],
           }

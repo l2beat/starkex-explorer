@@ -8,6 +8,7 @@ import {
 } from '@explorer/types'
 
 import {
+  ForcedTradeOffer,
   ForcedTransactionDetailsProps,
   ForcedTransactionsIndexProps,
   HomeProps,
@@ -25,12 +26,28 @@ const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
   Array.from({ length: count }).map((_, i) => ({
     type: i % 2 === 0 ? 'exit' : i % 3 === 0 ? 'buy' : 'sell',
     status: i % 3 === 0 ? 'waiting to be included' : 'completed',
-    assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-7'),
+    assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-9'),
     lastUpdate: Timestamp(Date.now() - i * 1000 * 3600),
     hash: Hash256.fake(),
     amount: 10000n * (BigInt(i) + 1n),
     positionId: 100n * BigInt(i),
   }))
+
+const createFakeOffers = (count: number): ForcedTradeOffer[] =>
+  Array.from({ length: count }).map((_, i) => {
+    const price = BigInt(Math.floor(Math.random() * 1000000 * (i + 1)))
+    const amount = BigInt(Math.floor(Math.random() * 1000000 * (i + 1)))
+    const total = amount * price
+    return {
+      id: i,
+      type: i % 2 === 0 ? 'buy' : 'sell',
+      assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-9'),
+      positionId: 100n * BigInt(i),
+      price,
+      amount,
+      total,
+    }
+  })
 
 export const HOME_PROPS: HomeProps = {
   account: undefined,
@@ -43,6 +60,7 @@ export const HOME_PROPS: HomeProps = {
     ),
   })),
   forcedTransactions: createFakeTransactions(10),
+  forcedTradeOffers: createFakeOffers(10),
   totalPositions: 45762n,
   totalUpdates: 5143n,
 }

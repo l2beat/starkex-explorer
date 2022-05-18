@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Page } from '../common'
-import { AssetNameCell } from '../common/AssetNameCell'
+import { AssetCell } from '../common/AssetNameCell'
 import { Pagination } from '../common/Pagination'
 import { Table } from '../common/table'
 import {
@@ -57,7 +57,7 @@ export function ForcedTransactionsIndex({
               transaction.status,
               formatHashLong(transaction.hash),
               formatCurrencyUnits(transaction.amount, transaction.assetId),
-              <AssetNameCell assetId={transaction.assetId} />,
+              <AssetCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),
             ],
           }
