@@ -5,6 +5,7 @@ import { FormId } from '../../pages/transaction-form/ids'
 import { getFormElements } from './getFormElements'
 import { jsonToProps } from './jsonToProps'
 import { getInitialState, nextFormState } from './state'
+import { submit } from './submit'
 import { FormAction, FormState } from './types'
 import { formatCurrencyInput } from './utils'
 
@@ -56,8 +57,11 @@ export function initTransactionForm() {
     dispatch({ type: 'ModifyTotal', value: ui.totalInput.value })
   )
 
-  ui.submitButton.addEventListener('click', () => {
-    alert('Submit!')
+  ui.submitButton.addEventListener('click', async () => {
+    if (!state || !state.canSubmit) {
+      throw new Error('Programmer error: Submit button should be disabled')
+    }
+    await submit(state)
   })
 
   let state: FormState | undefined

@@ -18,30 +18,34 @@ export function createForcedTradeOfferRouter(
   const router = new Router()
 
   router.post(
-    '/offer',
+    '/forced/offers',
     bodyParser(),
     withTypedContext(
       z.object({
         request: z.object({
           body: z.object({
-            starkKeyA: stringAs(StarkKey),
-            positionIdA: stringAsBigInt(),
-            syntheticAssetId: stringAs(AssetId),
-            amountCollateral: stringAsBigInt(),
-            amountSynthetic: stringAsBigInt(),
-            aIsBuyingSynthetic: z.boolean(),
+            offer: z.object({
+              starkKeyA: stringAs(StarkKey),
+              positionIdA: stringAsBigInt(),
+              syntheticAssetId: stringAs(AssetId),
+              amountCollateral: stringAsBigInt(),
+              amountSynthetic: stringAsBigInt(),
+              aIsBuyingSynthetic: z.boolean(),
+            }),
+            signature: z.string(),
           }),
         }),
       }),
       async (ctx) => {
-        const result = await offerController.postOffer(ctx.request.body)
+        const { offer, signature } = ctx.request.body
+        const result = await offerController.postOffer(offer, signature)
         applyControllerResult(ctx, result)
       }
     )
   )
 
   router.put(
-    '/offer/:initialOfferId',
+    '/forced/offers/:initialOfferId',
     bodyParser(),
     withTypedContext(
       z.object({

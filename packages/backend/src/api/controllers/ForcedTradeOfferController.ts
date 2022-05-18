@@ -1,6 +1,7 @@
 import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 import {
+  hashMessage,
   recoverAddress,
   solidityKeccak256,
   solidityPack,
@@ -26,15 +27,23 @@ export class ForcedTradeOfferController {
   ) {}
 
   async postOffer(
-    offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>
+    offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+    signature: string
   ): Promise<ControllerResult> {
     const positionA = await this.positionRepository.findById(offer.positionIdA)
+    const userRegistrationEventA =
+      await this.userRegistrationEventRepository.findByStarkKey(offer.starkKeyA)
 
-    if (!positionA) {
+    if (!positionA || !userRegistrationEventA) {
       return { type: 'not found', content: 'Position does not exist.' }
     }
 
-    const offerValidated = validateInitialOffer(offer, positionA)
+    const offerValidated = validateInitialOffer(
+      offer,
+      positionA,
+      signature,
+      userRegistrationEventA.ethAddress
+    )
 
     if (!offerValidated) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
@@ -105,11 +114,17 @@ export class ForcedTradeOfferController {
 
 function validateInitialOffer(
   offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
-  position: PositionRecord
+  position: PositionRecord,
+  signature: string,
+  ethAddressA: EthereumAddress
 ) {
   const userIsBuyingSynthetic = offer.aIsBuyingSynthetic
 
-  return validateBalance(offer, position, userIsBuyingSynthetic)
+  if (!validateBalance(offer, position, userIsBuyingSynthetic)) {
+    return false
+  }
+
+  return validateInitialSignature(offer, signature, ethAddressA)
 }
 
 function validateAcceptedOffer(
@@ -124,7 +139,7 @@ function validateAcceptedOffer(
     return false
   }
 
-  return validateSignature(initialOffer, acceptedOffer, ethAddressB)
+  return validateAcceptedSignature(initialOffer, acceptedOffer, ethAddressB)
 }
 
 function validateBalance(
@@ -152,7 +167,24 @@ function validateBalance(
   return false
 }
 
-export function validateSignature(
+export function validateInitialSignature(
+  offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+  signature: string,
+  ethAddressA: EthereumAddress
+) {
+  const stringOffer = JSON.stringify(
+    offer,
+    (_: string, value: unknown) =>
+      typeof value === 'bigint' ? value.toString() : value,
+    2
+  )
+
+  const signer = recoverAddress(hashMessage(stringOffer), signature)
+
+  return signer === ethAddressA.toString()
+}
+
+export function validateAcceptedSignature(
   initialOffer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
   acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>,
   ethAddressB: EthereumAddress

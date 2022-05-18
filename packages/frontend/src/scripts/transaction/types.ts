@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, StarkKey } from '@explorer/types'
 
 import { PositionAssetEntry } from '../../pages'
 import { TransactionFormProps } from '../../pages/transaction-form'
@@ -72,4 +72,12 @@ export interface ModifyPriceAction {
 export interface ModifyTotalAction {
   type: 'ModifyTotal'
   value: string
+}
+export interface ForcedTradeInitialOfferEntry {
+  starkKeyA: StarkKey
+  positionIdA: string
+  syntheticAssetId: AssetId
+  amountCollateral: string
+  amountSynthetic: string
+  aIsBuyingSynthetic: boolean
 }
