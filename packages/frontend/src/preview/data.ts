@@ -35,17 +35,26 @@ const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
 
 const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
   Array.from({ length: count }).map((_, i) => {
-    const price = BigInt(Math.floor(Math.random() * 1000000 * (i + 1)))
-    const amount = BigInt(Math.floor(Math.random() * 1000000 * (i + 1)))
-    const total = amount * price
+    const amountCollateral = BigInt(
+      Math.floor(Math.random() * 1000000 * (i + 1))
+    )
+    const amountSynthetic = BigInt(
+      Math.floor(Math.random() * 1000000 * (i + 1))
+    )
+    const assetId = i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-9')
+    const price =
+      (amountCollateral * BigInt(10 ** AssetId.decimals(assetId))) /
+      amountSynthetic /
+      10_000n
+
     return {
       id: i,
       type: i % 2 === 0 ? 'buy' : 'sell',
-      assetId: i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-9'),
+      assetId,
       positionId: 100n * BigInt(i),
+      amount: amountSynthetic,
       price,
-      amount,
-      total,
+      total: amountCollateral,
     }
   })
 
