@@ -6,7 +6,7 @@ import {
   validateAcceptedSignature,
 } from '../../../src/api/controllers/ForcedTradeOfferController'
 import {
-  AcceptedData,
+  Accepted,
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
@@ -27,7 +27,7 @@ const initialOffer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'> = {
   aIsBuyingSynthetic: true,
 }
 
-const acceptedData: Omit<AcceptedData, 'at'> = {
+const acceptedData: Omit<Accepted, 'at'> = {
   starkKeyB: StarkKey(
     '069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41'
   ),

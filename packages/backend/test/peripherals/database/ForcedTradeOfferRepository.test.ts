@@ -3,7 +3,7 @@ import { fakeHexString } from '@explorer/types/src/fake'
 import { expect } from 'earljs'
 
 import {
-  AcceptedData,
+  Accepted,
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
@@ -11,7 +11,7 @@ import { Logger } from '../../../src/tools/Logger'
 import { fakeBigInt, fakeBoolean, fakeInt, fakeTimestamp } from '../../fakes'
 import { setupDatabaseTestSuite } from './setup'
 
-function fakeAcceptedData(data?: Partial<AcceptedData>): AcceptedData {
+function fakeAccepted(accepted?: Partial<Accepted>): Accepted {
   return {
     at: fakeTimestamp(),
     nonce: fakeBigInt(),
@@ -21,7 +21,7 @@ function fakeAcceptedData(data?: Partial<AcceptedData>): AcceptedData {
     starkKeyB: StarkKey.fake(),
     submissionExpirationTime: fakeBigInt(),
     transactionHash: undefined,
-    ...data,
+    ...accepted,
   }
 }
 
@@ -37,7 +37,7 @@ function fakeOffer(
     amountCollateral: fakeBigInt(),
     amountSynthetic: fakeBigInt(),
     aIsBuyingSynthetic: true,
-    accepted: fakeAcceptedData(offer?.accepted),
+    accepted: fakeAccepted(offer?.accepted),
     ...offer,
   }
 }
@@ -61,7 +61,7 @@ describe(ForcedTradeOfferRepository.name, () => {
     const accepted = {
       ...initial,
       id,
-      accepted: fakeAcceptedData(),
+      accepted: fakeAccepted(),
     }
     const updated = await repository.save(accepted)
     expect(updated).toEqual(true)
@@ -78,7 +78,7 @@ describe(ForcedTradeOfferRepository.name, () => {
       ...initial,
       id,
       accepted: {
-        ...fakeAcceptedData(),
+        ...fakeAccepted(),
         transactionHash: Hash256.fake(),
       },
     }

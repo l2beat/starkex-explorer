@@ -5,7 +5,7 @@ import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './BaseRepository'
 
-export interface AcceptedData {
+export interface Accepted {
   at: Timestamp
   starkKeyB: StarkKey
   positionIdB: bigint
@@ -25,7 +25,7 @@ interface Record {
   amountCollateral: bigint
   amountSynthetic: bigint
   aIsBuyingSynthetic: boolean
-  accepted?: AcceptedData
+  accepted?: Accepted
 }
 export { type Record as ForcedTradeOfferRecord }
 
