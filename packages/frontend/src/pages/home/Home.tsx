@@ -7,6 +7,7 @@ import { SearchBar } from '../common/SearchBar'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'
 import {
+  formatCurrency,
   formatCurrencyUnits,
   formatHashLong,
   formatRelativeTime,
@@ -133,8 +134,8 @@ export function Home(props: HomeProps) {
             cells: [
               offer.type,
               <AssetCell assetId={offer.assetId} amount={offer.amount} />,
-              formatCurrencyUnits(offer.price, 'USD'),
-              formatCurrencyUnits(offer.total, AssetId.USDC),
+              formatCurrency(offer.price, 'USD'),
+              formatCurrency(offer.total, AssetId.USDC),
               offer.positionId.toString(),
             ],
           }
