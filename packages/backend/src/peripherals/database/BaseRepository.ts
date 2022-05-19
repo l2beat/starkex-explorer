@@ -92,8 +92,8 @@ export class BaseRepository {
   }
 
   protected wrapSave<T>(method: SaveMethod<T>): SaveMethod<T> {
-    return this.wrap(method, (count) =>
-      this.logger.debug({ method: method.name, count })
+    return this.wrap(method, (updated) =>
+      this.logger.debug({ method: method.name, updated })
     )
   }
 
