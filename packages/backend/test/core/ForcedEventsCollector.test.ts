@@ -1,4 +1,4 @@
-import { Hash256, Timestamp } from '@explorer/types'
+import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { ForcedEventsCollector } from '../../src/core/ForcedEventsCollector'
@@ -41,6 +41,7 @@ describe(ForcedEventsCollector.name, () => {
         mock<EthereumClient>({}),
         forcedRepo,
         statusRepo,
+        EthereumAddress.fake(),
         async () => [
           {
             hash,
@@ -79,6 +80,7 @@ describe(ForcedEventsCollector.name, () => {
         mock<EthereumClient>({}),
         forcedRepo,
         statusRepo,
+        EthereumAddress.fake(),
         async () => [
           {
             hash,
@@ -117,6 +119,7 @@ describe(ForcedEventsCollector.name, () => {
         mock<EthereumClient>({}),
         forcedRepo,
         statusRepo,
+        EthereumAddress.fake(),
         async () => [
           {
             hash,

@@ -1,3 +1,4 @@
+import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
@@ -5,7 +6,6 @@ import {
   StateTransitionFactRecord,
   StateTransitionFactRepository,
 } from '../peripherals/database/StateTransitionFactsRepository'
-import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 
@@ -21,14 +21,15 @@ export const LOG_STATE_TRANSITION_FACT = PERPETUAL_ABI.getEventTopic(
 export class StateTransitionFactCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly stateTransitionFactRepository: StateTransitionFactRepository
+    private readonly stateTransitionFactRepository: StateTransitionFactRepository,
+    private readonly perpetualAddress: EthereumAddress
   ) {}
 
   async collect(
     blockRange: BlockRange
   ): Promise<Omit<StateTransitionFactRecord, 'id'>[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
-      address: PERPETUAL_ADDRESS,
+      address: this.perpetualAddress.toString(),
       topics: [LOG_STATE_TRANSITION_FACT],
     })
     const records = logs.map((log): Omit<StateTransitionFactRecord, 'id'> => {

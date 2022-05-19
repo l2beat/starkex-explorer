@@ -111,7 +111,8 @@ export class Application {
     const pageCollector = new PageCollector(ethereumClient, pageRepository)
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,
-      stateTransitionFactRepository
+      stateTransitionFactRepository,
+      config.contracts.perpetual
     )
     const stateUpdateCollector = new StateUpdateCollector(
       pageRepository,
@@ -122,12 +123,14 @@ export class Application {
     )
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
-      userRegistrationEventRepository
+      userRegistrationEventRepository,
+      config.contracts.perpetual
     )
     const forcedEventsCollector = new ForcedEventsCollector(
       ethereumClient,
       forcedTransactionsRepository,
-      transactionStatusRepository
+      transactionStatusRepository,
+      config.contracts.perpetual
     )
 
     const dataSyncService = new DataSyncService(
