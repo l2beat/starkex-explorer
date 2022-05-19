@@ -1,4 +1,4 @@
-import { Hash256 } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -13,6 +13,8 @@ import type {
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../mock'
 
+const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
+
 describe(StateTransitionFactCollector.name, () => {
   it('parses logs, saves and returns records', async () => {
     const ethereumClient = mock<EthereumClient>({
@@ -23,7 +25,8 @@ describe(StateTransitionFactCollector.name, () => {
     })
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,
-      transitionFactRepository
+      transitionFactRepository,
+      PERPETUAL_ADDRESS
     )
 
     const blockRange = new BlockRange([
@@ -86,7 +89,7 @@ describe(StateTransitionFactCollector.name, () => {
     expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
       blockRange,
       {
-        address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
+        address: PERPETUAL_ADDRESS.toString(),
         topics: [LOG_STATE_TRANSITION_FACT],
       },
     ])
@@ -102,7 +105,8 @@ describe(StateTransitionFactCollector.name, () => {
 
     const collector = new StateTransitionFactCollector(
       mock<EthereumClient>(),
-      transitionFactRepository
+      transitionFactRepository,
+      PERPETUAL_ADDRESS
     )
 
     await collector.discardAfter(123)
@@ -119,7 +123,8 @@ describe(StateTransitionFactCollector.name, () => {
     })
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,
-      transitionFactRepository
+      transitionFactRepository,
+      PERPETUAL_ADDRESS
     )
 
     const blockRange = new BlockRange([
@@ -150,7 +155,7 @@ function testData() {
           '0x60b59393cb31785e21f40fc3004496069e8fb69b0117af27ac40f4a949e705ac',
         transactionIndex: 49,
         removed: false,
-        address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
+        address: PERPETUAL_ADDRESS.toString(),
         data: '0xf7a4d368103ca720efb0ba4873ca2e0b9dee88e385d14de8ac743cec81a048f2',
         topics: [
           '0x9866f8ddfe70bb512b2f2b28b49d4017c43f7ba775f1a20c61c13eea8cdac111',
@@ -165,7 +170,7 @@ function testData() {
           '0x0a4c7eb5e4c57f31a84d57df23c038e6c439d9e3feae9420898269b748853cae',
         transactionIndex: 80,
         removed: false,
-        address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
+        address: PERPETUAL_ADDRESS.toString(),
         data: '0x32e69820f8b6742959585b306e6be0bb003b86d5473286369123f6760de86176',
         topics: [
           '0x9866f8ddfe70bb512b2f2b28b49d4017c43f7ba775f1a20c61c13eea8cdac111',
@@ -180,7 +185,7 @@ function testData() {
           '0x3e9938b5f3233be2ada3b0928b8ddd57e6b630fe3c3a372fd0aceab7e3f5accd',
         transactionIndex: 17,
         removed: false,
-        address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
+        address: PERPETUAL_ADDRESS.toString(),
         data: '0x48d39c9b67d74937929a0b03845518e34c011c9b281ec9e058471c56ba8f1d80',
         topics: [
           '0x9866f8ddfe70bb512b2f2b28b49d4017c43f7ba775f1a20c61c13eea8cdac111',
@@ -195,7 +200,7 @@ function testData() {
           '0xb801060a71983b17e37d1307306c7dbd7f79ab12feba8020cae00bdf8c0bd911',
         transactionIndex: 105,
         removed: false,
-        address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
+        address: PERPETUAL_ADDRESS.toString(),
         data: '0x6cd9ea43d47f77a502974d7c6e110e13dd5675af8c0d429b97b73c82eaeebc54',
         topics: [
           '0x9866f8ddfe70bb512b2f2b28b49d4017c43f7ba775f1a20c61c13eea8cdac111',

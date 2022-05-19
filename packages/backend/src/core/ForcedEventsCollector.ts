@@ -1,11 +1,10 @@
 import { decodeAssetId, ForcedAction } from '@explorer/encoding'
-import { Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
-import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { getTransactionStatus } from './getForcedTransactionStatus'
 
@@ -44,6 +43,7 @@ export class ForcedEventsCollector {
     private readonly ethereumClient: EthereumClient,
     private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     private readonly transactionStatusRepository: TransactionStatusRepository,
+    private readonly perpetualAddress: EthereumAddress,
     readonly _getMinedTransactions?: (
       blockRange: BlockRange
     ) => Promise<MinedTransaction[]>
@@ -93,7 +93,7 @@ export class ForcedEventsCollector {
     blockRange: BlockRange
   ): Promise<MinedTransaction[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
-      address: PERPETUAL_ADDRESS,
+      address: this.perpetualAddress.toString(),
       topics: [[LogForcedTradeRequest, LogForcedWithdrawalRequest]],
     })
     return Promise.all(
