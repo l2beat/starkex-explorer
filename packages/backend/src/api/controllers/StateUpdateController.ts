@@ -32,12 +32,12 @@ export class StateUpdateController {
       offset: (page - 1) * perPage,
       limit: perPage,
     })
-    const fullCount = await this.stateUpdateRepository.count()
+    const total = await this.stateUpdateRepository.count()
 
     const content = renderStateUpdatesIndexPage({
       account,
       stateUpdates: stateUpdates.map(toStateUpdateEntry),
-      fullCount: Number(fullCount),
+      total: Number(total),
       params: { page, perPage },
     })
     return { type: 'success', content }

@@ -267,11 +267,11 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return hash
   }
 
-  async countAll(): Promise<bigint> {
+  async countAll(): Promise<number> {
     const result = await this.knex('forced_transactions').count()
-    const count = result[0].count
+    const count = Number(result[0].count)
     this.logger.debug({ method: 'countAll', count })
-    return BigInt(count)
+    return count
   }
 
   async deleteAll(): Promise<number> {

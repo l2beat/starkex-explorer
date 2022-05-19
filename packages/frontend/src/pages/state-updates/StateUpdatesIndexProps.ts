@@ -7,7 +7,7 @@ export interface StateUpdatesIndexProps {
     readonly perPage: number
     readonly page: number
   }
-  readonly fullCount: number
+  readonly total: number
 }
 
 export interface StateUpdateEntry {

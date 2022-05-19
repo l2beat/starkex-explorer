@@ -294,7 +294,7 @@ describe(ForcedTransactionsRepository.name, () => {
 
     const count = await repository.countAll()
 
-    expect(count).toEqual(2n)
+    expect(count).toEqual(2)
   })
 
   it('returns undefined if transaction not found by hash', async () => {

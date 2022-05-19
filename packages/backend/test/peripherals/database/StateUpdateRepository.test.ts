@@ -280,9 +280,9 @@ describe(StateUpdateRepository.name, () => {
       })
     }
 
-    const fullCount = await repository.count()
+    const total = await repository.count()
 
-    expect(fullCount).toEqual(4n)
+    expect(total).toEqual(4n)
   })
 
   it('returns undefined if update is missing', async () => {
