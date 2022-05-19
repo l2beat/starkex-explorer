@@ -143,6 +143,7 @@ declare module 'knex/types/tables' {
     nonce: Nullable<bigint>
     premium_cost: Nullable<boolean>
     signature: Nullable<string>
+    transaction_hash: Nullable<string>
   }
 
   interface Tables {

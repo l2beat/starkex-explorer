@@ -1,4 +1,4 @@
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { fakeHexString } from '@explorer/types/src/fake'
 import { expect } from 'earljs'
 
@@ -20,6 +20,7 @@ function fakeAcceptedData(data?: Partial<AcceptedData>): AcceptedData {
     signature: fakeHexString(32),
     starkKeyB: StarkKey.fake(),
     submissionExpirationTime: fakeBigInt(),
+    transactionHash: undefined,
     ...data,
   }
 }
@@ -68,6 +69,25 @@ describe(ForcedTradeOfferRepository.name, () => {
     const actual = await repository.findById(id)
 
     expect(actual).toEqual(accepted)
+  })
+
+  it('saves submitted offer', async () => {
+    const initial = fakeOffer({ id: undefined, accepted: undefined })
+    const id = await repository.add(initial)
+    const submitted = {
+      ...initial,
+      id,
+      accepted: {
+        ...fakeAcceptedData(),
+        transactionHash: Hash256.fake(),
+      },
+    }
+    const updated = await repository.save(submitted)
+    expect(updated).toEqual(true)
+
+    const actual = await repository.findById(id)
+
+    expect(actual).toEqual(submitted)
   })
 
   it('deletes all records', async () => {

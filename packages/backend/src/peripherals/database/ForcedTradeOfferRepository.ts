@@ -1,4 +1,4 @@
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 
@@ -13,6 +13,7 @@ export interface AcceptedData {
   nonce: bigint
   premiumCost: boolean
   signature: string // HEX string signature of all parameters
+  transactionHash?: Hash256
 }
 
 interface Record {
@@ -49,8 +50,12 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
     submission_expiration_time:
       record.accepted?.submissionExpirationTime || null,
     nonce: record.accepted?.nonce || null,
-    premium_cost: record.accepted?.premiumCost || null,
+    premium_cost:
+      record.accepted?.premiumCost !== undefined
+        ? record.accepted?.premiumCost
+        : null,
     signature: record.accepted?.signature || null,
+    transaction_hash: record.accepted?.transactionHash?.toString() || null,
   }
 }
 
@@ -92,6 +97,9 @@ function toRecord(row: Row): Record {
         signature: row.signature,
         starkKeyB: StarkKey(row.stark_key_b),
         submissionExpirationTime: row.submission_expiration_time,
+        transactionHash: row.transaction_hash
+          ? Hash256(row.transaction_hash)
+          : undefined,
       },
     }
   } else {
