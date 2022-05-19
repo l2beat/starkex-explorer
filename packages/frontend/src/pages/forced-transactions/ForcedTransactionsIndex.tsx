@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Page } from '../common'
-import { AssetCell } from '../common/AssetNameCell'
+import { AssetCell } from '../common/AssetCell'
 import { Pagination } from '../common/Pagination'
 import { Table } from '../common/table'
 import {

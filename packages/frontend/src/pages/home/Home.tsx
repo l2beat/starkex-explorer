@@ -2,7 +2,7 @@ import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
-import { AssetCell } from '../common/AssetNameCell'
+import { AssetCell } from '../common/AssetCell'
 import { SearchBar } from '../common/SearchBar'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'

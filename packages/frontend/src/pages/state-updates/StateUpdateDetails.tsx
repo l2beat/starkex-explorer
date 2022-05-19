@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { AssetCell } from '../common/AssetNameCell'
+import { AssetCell } from '../common/AssetCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
