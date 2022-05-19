@@ -59,3 +59,4 @@ You can configure the behavior of the app with the following environment variabl
 - `findByKey(K): T?` - returns a single matching record or undefined
 - `deleteAll(): number` - removes all records and returns the number of removed records
 - `deleteByKey(K): number` - removes all matching records and returns the number of removed records
+- `save(T): boolean` - updates a record and returns boolean indicating if record was updated

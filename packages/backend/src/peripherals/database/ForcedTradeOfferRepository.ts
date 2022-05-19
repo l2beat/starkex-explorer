@@ -113,6 +113,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.findById = this.wrapFind(this.findById)
     this.getLatest = this.wrapGet(this.getLatest)
     this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.save = this.wrapSave(this.save)
   }
 
   async add(record: RecordCandidate): Promise<Record['id']> {
