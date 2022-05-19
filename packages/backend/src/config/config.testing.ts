@@ -1,3 +1,4 @@
+import { EthereumAddress } from '@explorer/types'
 import { config as dotenv } from 'dotenv'
 
 import { LogLevel } from '../tools/Logger'
@@ -20,6 +21,12 @@ export function getTestConfig(): Config {
     jsonRpcUrl: getEnv('TEST_JSON_RPC_URL', 'http://localhost:8545'),
     core: {
       syncBatchSize: 6_000,
+    },
+    contracts: {
+      perpetual: EthereumAddress.ZERO,
+      registry: EthereumAddress.ZERO,
+      proxy: EthereumAddress.ZERO,
+      verifiers: [],
     },
     freshStart: true, // not relevant for tests
   }

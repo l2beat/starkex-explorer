@@ -7,6 +7,8 @@ import { UserRegistrationEventRepository } from '../../src/peripherals/database/
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../mock'
 
+const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
+
 const TEST_LOGS = [
   {
     blockNumber: 11910225,
@@ -14,7 +16,7 @@ const TEST_LOGS = [
       '0x525086c3f8e1a2cec590b20f841c7fcbc8ccdd66a59158e04a54f2929ff587b0',
     transactionIndex: 97,
     removed: false,
-    address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
+    address: PERPETUAL_ADDRESS.toString(),
     data: '0x000000000000000000000000b30e6ecdb51fe9a5edf84c58b2c0f20ad3b62c3d0138b0aff25a4effbc4c12c17dc27ce64a210d5837cbb32757ccd43e715a5f37000000000000000000000000b30e6ecdb51fe9a5edf84c58b2c0f20ad3b62c3d',
     topics: [
       '0xcab1cf17c190e4e2195a7b8f7b362023246fa774390432b4704ab6b29d56b07b',
@@ -29,7 +31,7 @@ const TEST_LOGS = [
       '0xea27a10eb4e19fe9984d6406310cf487a03e5dbf86e5950004ea07973936ef05',
     transactionIndex: 132,
     removed: false,
-    address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
+    address: PERPETUAL_ADDRESS.toString(),
     data: '0x0000000000000000000000000d012ea1a2ee7308106b4618bdf8b832199181180421d25472e1f2dff8e5a31ab231b1bec8f9037ab0cae36eaf46a62842b4a2180000000000000000000000000d012ea1a2ee7308106b4618bdf8b83219918118',
     topics: [
       '0xcab1cf17c190e4e2195a7b8f7b362023246fa774390432b4704ab6b29d56b07b',
@@ -44,7 +46,7 @@ const TEST_LOGS = [
       '0x10e001bfa165fdd5e7de0307a961581c643c8a1c8535e6b9c09d35cf4bf85fdd',
     transactionIndex: 249,
     removed: false,
-    address: '0xD54f502e184B6B739d7D27a6410a67dc462D69c8',
+    address: PERPETUAL_ADDRESS.toString(),
     data: '0x000000000000000000000000f3ad7be69629d05d1df1d4bacf0fab33a3cdf50c035086df5c48598c68b4a36828e49cac61832b148a898e963f04493b29341cd1000000000000000000000000f3ad7be69629d05d1df1d4bacf0fab33a3cdf50c',
     topics: [
       '0xcab1cf17c190e4e2195a7b8f7b362023246fa774390432b4704ab6b29d56b07b',
@@ -68,7 +70,11 @@ describe(UserRegistrationCollector.name, () => {
     const repository = mock<UserRegistrationEventRepository>({
       addMany: async () => [],
     })
-    const collector = new UserRegistrationCollector(ethereumClient, repository)
+    const collector = new UserRegistrationCollector(
+      ethereumClient,
+      repository,
+      PERPETUAL_ADDRESS
+    )
 
     const blockRange = new BlockRange(TEST_BLOCKS)
 
@@ -122,7 +128,8 @@ describe(UserRegistrationCollector.name, () => {
     })
     const collector = new UserRegistrationCollector(
       mock<EthereumClient>(),
-      userRegistrationRepository
+      userRegistrationRepository,
+      PERPETUAL_ADDRESS
     )
 
     await collector.discardAfter(123)

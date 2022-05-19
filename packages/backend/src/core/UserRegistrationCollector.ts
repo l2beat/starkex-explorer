@@ -6,7 +6,6 @@ import {
   UserRegistrationEventRecord,
   UserRegistrationEventRepository,
 } from '../peripherals/database/UserRegistrationEventRepository'
-import { PERPETUAL_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 
@@ -26,7 +25,8 @@ export interface UserRegistration {
 export class UserRegistrationCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly userRegistrationRepository: UserRegistrationEventRepository
+    private readonly userRegistrationRepository: UserRegistrationEventRepository,
+    private readonly perpetualAddress: EthereumAddress
   ) {}
 
   async collect(blockRange: BlockRange): Promise<UserRegistration[]> {
@@ -42,7 +42,7 @@ export class UserRegistrationCollector {
     blockRange: BlockRange
   ): Promise<Omit<UserRegistrationEventRecord, 'id'>[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
-      address: PERPETUAL_ADDRESS,
+      address: this.perpetualAddress.toString(),
       topics: [LOG_USER_REGISTERED],
     })
     return logs.map((log) => {
