@@ -20,3 +20,11 @@ export interface TableProps {
   className?: string
   noRowsText: string
 }
+
+export interface ClientPaginatedTableProps {
+  id: string
+  columns: Column[]
+  rows: Row[]
+  className?: string
+  noRowsText: string
+}
