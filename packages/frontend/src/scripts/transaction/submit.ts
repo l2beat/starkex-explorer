@@ -1,4 +1,4 @@
-import { signInitial } from './sign'
+import { signInitial } from '../offer/sign'
 import { FormState } from './types'
 
 export async function submit(state: FormState) {

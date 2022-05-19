@@ -187,7 +187,6 @@ export function validateInitialSignature(
 
   const signer = recoverAddress(hashMessage(stringOffer), signature)
 
-  console.log(signer)
   return signer === ethAddressA.toString()
 }
 

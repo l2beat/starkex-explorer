@@ -82,3 +82,11 @@ export interface ForcedTradeInitialOfferEntry {
   amountSynthetic: bigint
   aIsBuyingSynthetic: boolean
 }
+
+export interface ForcedTradeAcceptedOfferEntry {
+  starkKeyB: StarkKey
+  positionIdB: bigint
+  nonce: bigint
+  submissionExpirationTime: number
+  premiumCost: boolean
+}
