@@ -14,6 +14,16 @@ export interface Column {
 }
 
 export interface TableProps {
+  id?: string
+  hasClientPagination?: boolean
+  columns: Column[]
+  rows: Row[]
+  className?: string
+  noRowsText: string
+}
+
+export interface ClientPaginatedTableProps {
+  id: string
   columns: Column[]
   rows: Row[]
   className?: string

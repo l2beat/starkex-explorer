@@ -6,6 +6,7 @@ import { Column, Row } from './types'
 export interface TableRowProps extends Row {
   i: number
   columns: Column[]
+  hidden?: boolean
 }
 
 export function TableRow(props: TableRowProps) {
@@ -14,7 +15,8 @@ export function TableRow(props: TableRowProps) {
       className={cx(
         'my-4 whitespace-nowrap',
         props.link && 'hover:bg-blue-100',
-        props.i % 2 !== 0 && 'bg-grey-200'
+        props.i % 2 !== 0 && 'bg-grey-200',
+        props.hidden && 'hidden'
       )}
     >
       {props.cells.map((cell, col) => {

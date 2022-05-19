@@ -7,7 +7,7 @@ export interface ForcedTransactionsIndexProps {
     readonly perPage: number
     readonly page: number
   }
-  readonly fullCount: bigint
+  readonly total: number
 }
 
 export interface ForcedTransactionEntry {

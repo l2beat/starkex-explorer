@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Page } from '../common'
 import { AssetCell } from '../common/AssetCell'
-import { Pagination } from '../common/Pagination'
+import { ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
 import {
   formatCurrencyUnits,
@@ -14,7 +14,7 @@ import { ForcedTransactionsIndexProps } from './ForcedTransactionsIndexProps'
 export function ForcedTransactionsIndex({
   transactions,
   params: { perPage, page },
-  fullCount,
+  total,
   account,
 }: ForcedTransactionsIndexProps) {
   return (
@@ -30,10 +30,10 @@ export function ForcedTransactionsIndex({
       <h1 className="font-sans font-bold text-2xl mb-12">
         Latest forced transactions
       </h1>
-      <Pagination
+      <ServerPagination
         perPage={perPage}
         page={page}
-        fullCount={fullCount}
+        total={total}
         baseUrl="/forced"
       />
       <Table
