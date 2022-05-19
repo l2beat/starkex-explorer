@@ -1,11 +1,13 @@
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
-import { AssetNameCell } from '../common/AssetNameCell'
+import { AssetCell } from '../common/AssetCell'
 import { SearchBar } from '../common/SearchBar'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'
 import {
+  formatCurrency,
   formatCurrencyUnits,
   formatHashLong,
   formatRelativeTime,
@@ -77,6 +79,7 @@ export function Home(props: HomeProps) {
       </div>
       <Table
         noRowsText="no forced transactions have been issued so far"
+        className="mb-8"
         columns={[
           { header: 'Type' },
           { header: 'Time' },
@@ -96,8 +99,44 @@ export function Home(props: HomeProps) {
               transaction.status,
               formatHashLong(transaction.hash),
               formatCurrencyUnits(transaction.amount, transaction.assetId),
-              <AssetNameCell assetId={transaction.assetId} />,
+              <AssetCell assetId={transaction.assetId} />,
               transaction.positionId.toString(),
+            ],
+          }
+        })}
+      />
+      <div className="mb-1.5">
+        <span className="float-left font-medium text-lg">
+          Latest forced trade offers
+        </span>
+        <SimpleLink className="float-right" href="/forced/offers">
+          view all
+        </SimpleLink>
+      </div>
+      <Table
+        noRowsText="there is no active offers at the moment"
+        columns={[
+          { header: 'Type' },
+          {
+            header: 'Asset',
+            numeric: true,
+            textAlignClass: 'text-left',
+            fullWidth: true,
+          },
+          { header: 'Price', numeric: true },
+          { header: 'Total', numeric: true },
+          { header: 'Position ID', numeric: true },
+        ]}
+        rows={props.forcedTradeOffers.map((offer) => {
+          const link = `/forced/offers/${offer.id}`
+          return {
+            link,
+            cells: [
+              offer.type,
+              <AssetCell assetId={offer.assetId} amount={offer.amount} />,
+              formatCurrency(offer.price, 'USD'),
+              formatCurrency(offer.total, AssetId.USDC),
+              offer.positionId.toString(),
             ],
           }
         })}

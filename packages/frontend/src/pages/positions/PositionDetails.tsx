@@ -1,7 +1,7 @@
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
-import { AssetNameCell } from '../common/AssetNameCell'
+import { AssetCell } from '../common/AssetCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
@@ -60,7 +60,7 @@ const buildBalanceTableRow =
     priceUSDCents,
   }: PositionDetailsProps['assets'][number]) => {
     const cells = [
-      <AssetNameCell assetId={assetId} />,
+      <AssetCell assetId={assetId} />,
       balance.toString(),
       formatCurrency(priceUSDCents, 'USD'),
       formatCurrency(totalUSDCents, 'USD'),
@@ -125,7 +125,7 @@ const buildTransactionHistoryTableRow = (
       transaction.status,
       formatHashLong(transaction.hash),
       formatCurrencyUnits(transaction.amount, transaction.assetId),
-      <AssetNameCell assetId={transaction.assetId} />,
+      <AssetCell assetId={transaction.assetId} />,
     ],
   }
 }
