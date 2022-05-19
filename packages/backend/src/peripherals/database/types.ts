@@ -127,6 +127,24 @@ declare module 'knex/types/tables' {
     not_found_retries: number
   }
 
+  interface ForcedTradeOfferRow {
+    id: number
+    created_at: bigint
+    stark_key_a: string
+    position_id_a: bigint
+    synthetic_asset_id: string
+    amount_collateral: bigint
+    amount_synthetic: bigint
+    a_is_buying_synthetic: boolean
+    accepted_at: Nullable<bigint>
+    stark_key_b: Nullable<string>
+    position_id_b: Nullable<bigint>
+    submission_expiration_time: Nullable<bigint>
+    nonce: Nullable<bigint>
+    premium_cost: Nullable<boolean>
+    signature: Nullable<string>
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -145,6 +163,7 @@ declare module 'knex/types/tables' {
     forced_transactions: ForcedTransactionRow
     transaction_status: TransactionStatusRow
     user_registration_events: UserRegistrationEventRow
+    forced_trade_offers: ForcedTradeOfferRow
   }
 }
 

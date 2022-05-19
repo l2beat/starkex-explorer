@@ -1,108 +1,127 @@
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
+import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './BaseRepository'
 
-export interface ForcedTradeInitialOfferRecord {
+export interface AcceptedData {
+  at: Timestamp
+  starkKeyB: StarkKey
+  positionIdB: bigint
+  submissionExpirationTime: bigint // unix time in hours
+  nonce: bigint
+  premiumCost: boolean
+  signature: string // HEX string signature of all parameters
+}
+
+interface Record {
   id: number
   createdAt: Timestamp
-  submittedAt?: Timestamp
   starkKeyA: StarkKey
   positionIdA: bigint
   syntheticAssetId: AssetId
   amountCollateral: bigint
   amountSynthetic: bigint
   aIsBuyingSynthetic: boolean
+  accepted?: AcceptedData
+}
+export { type Record as ForcedTradeOfferRecord }
+
+type RecordCandidate = Omit<Record, 'id'> & { id?: Record['id'] }
+type RowCandidate = Omit<Row, 'id'> & { id?: Row['id'] }
+
+function toRowCandidate(record: RecordCandidate): RowCandidate {
+  return {
+    id: record.id,
+    created_at: BigInt(record.createdAt.toString()),
+    stark_key_a: record.starkKeyA.toString(),
+    position_id_a: record.positionIdA,
+    synthetic_asset_id: record.syntheticAssetId.toString(),
+    amount_collateral: record.amountCollateral,
+    amount_synthetic: record.amountSynthetic,
+    a_is_buying_synthetic: record.aIsBuyingSynthetic,
+    accepted_at: record.accepted?.at
+      ? BigInt(record.accepted.at.toString())
+      : null,
+    stark_key_b: record.accepted?.starkKeyB.toString() || null,
+    position_id_b: record.accepted?.positionIdB || null,
+    submission_expiration_time:
+      record.accepted?.submissionExpirationTime || null,
+    nonce: record.accepted?.nonce || null,
+    premium_cost: record.accepted?.premiumCost || null,
+    signature: record.accepted?.signature || null,
+  }
 }
 
-interface ForcedTradeInitialOfferRow {
-  id: number
-  created_at: number
-  submitted_at?: number
-  stark_key_a: string
-  position_id_a: bigint
-  synthetic_asset_id: string
-  amount_collateral: bigint
-  amount_synthetic: bigint
-  a_is_buying_synthetic: boolean
+function toRow(record: Record): Row {
+  return {
+    ...toRowCandidate(record),
+    id: record.id,
+  }
 }
 
-export interface ForcedTradeAcceptedOfferRecord {
-  acceptedAt: Timestamp
-  starkKeyB: StarkKey
-  positionIdB: bigint
-  submissionExpirationTime: number // unix time in hours
-  nonce: bigint
-  premiumCost: boolean
-
-  // https://github.com/starkware-libs/starkex-contracts/blob/StarkExchange-v3.0/scalable-dex/contracts/src/perpetual/interactions/ForcedTrades.sol#L138-L181
-  signature: string // HEX string signature of all parameters
+function toRecord(row: Row): Record {
+  const record = {
+    id: row.id,
+    createdAt: Timestamp(row.created_at),
+    starkKeyA: StarkKey(row.stark_key_a),
+    positionIdA: row.position_id_a,
+    syntheticAssetId: AssetId(row.synthetic_asset_id),
+    amountCollateral: row.amount_collateral,
+    amountSynthetic: row.amount_synthetic,
+    aIsBuyingSynthetic: row.a_is_buying_synthetic,
+    accepted: undefined,
+  }
+  if (
+    row.accepted_at !== null &&
+    row.stark_key_b !== null &&
+    row.position_id_b !== null &&
+    row.submission_expiration_time !== null &&
+    row.nonce !== null &&
+    row.premium_cost !== null &&
+    row.signature !== null
+  ) {
+    return {
+      ...record,
+      accepted: {
+        at: Timestamp(row.accepted_at),
+        nonce: row.nonce,
+        positionIdB: row.position_id_b,
+        premiumCost: row.premium_cost,
+        signature: row.signature,
+        starkKeyB: StarkKey(row.stark_key_b),
+        submissionExpirationTime: row.submission_expiration_time,
+      },
+    }
+  } else {
+    return record
+  }
 }
 
-interface ForcedTradeAcceptedOfferRow {
-  accepted_at: bigint
-  stark_key_b: string
-  position_id_b: bigint
-  submission_expiration_time: bigint
-  nonce: bigint
-  premium_cost: boolean
-  signature: string
-}
-
-export type ForcedTradeOfferRecord = ForcedTradeInitialOfferRecord &
-  ForcedTradeAcceptedOfferRecord
-
-type ForcedTradeOfferRow = ForcedTradeInitialOfferRow &
-  ForcedTradeAcceptedOfferRow
 export class ForcedTradeOfferRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
-    this.addInitialOffer = this.wrapAdd(this.addInitialOffer)
-    this.addAcceptedOffer = this.wrapAdd(this.addAcceptedOffer)
-    this.findOfferById = this.wrapFind(this.findOfferById)
-    this.getAllInitialOffers = this.wrapGet(this.getAllInitialOffers)
-    this.getAllAcceptedOffers = this.wrapGet(this.getAllAcceptedOffers)
+    this.add = this.wrapAdd(this.add)
+    this.findById = this.wrapFind(this.findById)
     this.getLatest = this.wrapGet(this.getLatest)
     this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
-  async addInitialOffer(
-    offer: Omit<ForcedTradeInitialOfferRecord, 'id'>
-  ): Promise<number> {
-    const row = initialOfferToRow(offer)
+  async add(record: RecordCandidate): Promise<Record['id']> {
+    const row = toRowCandidate(record)
     const [id] = await this.knex('forced_trade_offers')
       .insert(row)
       .returning('id')
-    this.logger.debug({ method: 'add' })
     return id
   }
 
-  async addAcceptedOffer({
-    initialOfferId,
-    acceptedOffer,
-  }: {
-    initialOfferId: number
-    acceptedOffer: ForcedTradeAcceptedOfferRecord
-  }): Promise<number> {
-    const row = acceptedOfferToRow(acceptedOffer)
-    await this.knex('forced_trade_offers')
+  async save(record: Record): Promise<boolean> {
+    const row = toRow(record)
+    const updates = await this.knex('forced_trade_offers')
       .update(row)
-      .where('id', initialOfferId)
-    return initialOfferId
-  }
-
-  async getAllInitialOffers(): Promise<ForcedTradeInitialOfferRecord[]> {
-    const rows = await this.knex('forced_trade_offers').select('*')
-    return rows.map(initialOfferToRecord)
-  }
-
-  async getAllAcceptedOffers() {
-    const rows = await this.knex('forced_trade_offers')
-      .whereNotNull('accepted_at')
-      .select('*')
-
-    return rows.map(acceptedOfferToRecord)
+      .where('id', '=', row.id)
+    return !!updates
   }
 
   async getLatest({
@@ -111,123 +130,21 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   }: {
     limit: number
     offset: number
-  }): Promise<(ForcedTradeOfferRecord | ForcedTradeInitialOfferRecord)[]> {
+  }): Promise<Record[]> {
     const rows = await this.knex('forced_trade_offers')
       .limit(limit)
       .offset(offset)
       .orderBy('created_at', 'desc')
-    const records = rows.map((row) =>
-      acceptedOfferRowTypeGuard(row)
-        ? acceptedOfferToRecord(row)
-        : initialOfferToRecord(row)
-    )
-    return records
+
+    return rows.map(toRecord)
   }
 
-  async findOfferById(
-    id: number
-  ): Promise<
-    ForcedTradeOfferRecord | ForcedTradeInitialOfferRecord | undefined
-  > {
-    const offer = await this.knex('forced_trade_offers').where({ id }).first()
-
-    if (acceptedOfferRowTypeGuard(offer)) {
-      return acceptedOfferToRecord(offer)
-    }
-
-    if (offer) {
-      return initialOfferToRecord(offer)
-    }
-
-    return undefined
-  }
-
-  async getInitialOffersByStarkKey(starkKey: StarkKey) {
-    const rows = await this.knex('forced_trade_offers')
-      .where('stark_key_a', starkKey)
-      .select('*')
-
-    return rows.map(initialOfferToRecord)
-  }
-
-  async getAcceptedOffersByStarkKey(starkKey: StarkKey) {
-    const rows = await this.knex('forced_trade_offers')
-      .where('stark_key_b', starkKey)
-      .select('*')
-
-    return rows.map(acceptedOfferToRecord)
+  async findById(id: Record['id']): Promise<Record | undefined> {
+    const row = await this.knex('forced_trade_offers').where({ id }).first()
+    return row ? toRecord(row) : undefined
   }
 
   async deleteAll() {
     return await this.knex('forced_trade_offers').delete()
-  }
-}
-
-function acceptedOfferRowTypeGuard(
-  offerRow: ForcedTradeOfferRow | ForcedTradeInitialOfferRow | undefined
-): offerRow is ForcedTradeOfferRow {
-  return !!offerRow && !!(offerRow as ForcedTradeOfferRow).accepted_at
-}
-
-function acceptedOfferToRow(acceptedOffer: ForcedTradeAcceptedOfferRecord) {
-  return {
-    accepted_at: BigInt(acceptedOffer.acceptedAt as unknown as number),
-    stark_key_b: acceptedOffer.starkKeyB.toString(),
-    position_id_b: acceptedOffer.positionIdB,
-    submission_expiration_time: BigInt(acceptedOffer.submissionExpirationTime),
-    nonce: acceptedOffer.nonce,
-    premium_cost: acceptedOffer.premiumCost,
-    signature: acceptedOffer.signature,
-  }
-}
-
-function acceptedOfferToRecord(
-  row: ForcedTradeOfferRow
-): ForcedTradeOfferRecord {
-  return {
-    ...initialOfferToRecord(row),
-    acceptedAt: Timestamp(row.accepted_at),
-    starkKeyB: StarkKey(row.stark_key_b),
-    positionIdB: row.position_id_b,
-    submissionExpirationTime: Number(row.submission_expiration_time),
-    nonce: BigInt(row.nonce),
-    premiumCost: row.premium_cost,
-    signature: row.signature,
-  }
-}
-
-function initialOfferToRow(
-  offer: Omit<ForcedTradeInitialOfferRecord, 'id'>
-): Omit<ForcedTradeInitialOfferRow, 'id'> {
-  return {
-    created_at: offer.createdAt as unknown as number,
-    submitted_at: offer.submittedAt as unknown as number,
-    stark_key_a: offer.starkKeyA.toString(),
-    position_id_a: offer.positionIdA,
-    synthetic_asset_id: offer.syntheticAssetId.toString(),
-    amount_collateral: offer.amountCollateral,
-    amount_synthetic: offer.amountSynthetic,
-    a_is_buying_synthetic: offer.aIsBuyingSynthetic,
-  }
-}
-
-function initialOfferToRecord(
-  row: ForcedTradeInitialOfferRow
-): ForcedTradeInitialOfferRecord {
-  let submittedAt: Timestamp | undefined
-  if (row.submitted_at) {
-    submittedAt = Timestamp(row.submitted_at)
-  }
-
-  return {
-    id: row.id,
-    createdAt: Timestamp(row.created_at),
-    submittedAt,
-    starkKeyA: StarkKey(row.stark_key_a),
-    positionIdA: BigInt(row.position_id_a),
-    syntheticAssetId: AssetId(row.synthetic_asset_id),
-    amountCollateral: BigInt(row.amount_collateral),
-    amountSynthetic: BigInt(row.amount_synthetic),
-    aIsBuyingSynthetic: row.a_is_buying_synthetic,
   }
 }

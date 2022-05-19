@@ -8,8 +8,8 @@ import {
 } from 'ethers/lib/utils'
 
 import {
-  ForcedTradeAcceptedOfferRecord,
-  ForcedTradeInitialOfferRecord,
+  AcceptedData,
+  ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
@@ -27,7 +27,7 @@ export class ForcedTradeOfferController {
   ) {}
 
   async postOffer(
-    offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+    offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
     signature: string
   ): Promise<ControllerResult> {
     const positionA = await this.positionRepository.findById(offer.positionIdA)
@@ -38,73 +38,68 @@ export class ForcedTradeOfferController {
       return { type: 'not found', content: 'Position does not exist.' }
     }
 
-    const offerValidated = validateInitialOffer(
+    const offerValid = validateInitialOffer(
       offer,
       positionA,
       signature,
       userRegistrationEventA.ethAddress
     )
 
-    if (!offerValidated) {
+    if (!offerValid) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
     }
 
-    const createdAt = Timestamp(Date.now())
-
-    const id = await this.offerRepository.addInitialOffer({
-      createdAt,
+    const id = await this.offerRepository.add({
+      createdAt: Timestamp(Date.now()),
       ...offer,
     })
     return { type: 'created', content: { id } }
   }
 
   async acceptOffer(
-    initialOfferId: number,
-    acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>
+    offerId: number,
+    acceptedData: Omit<AcceptedData, 'at'>
   ): Promise<ControllerResult> {
     const positionB = await this.positionRepository.findById(
-      acceptedOffer.positionIdB
+      acceptedData.positionIdB
     )
     const userRegistrationEventB =
       await this.userRegistrationEventRepository.findByStarkKey(
-        acceptedOffer.starkKeyB
+        acceptedData.starkKeyB
       )
 
     if (!positionB || !userRegistrationEventB) {
       return { type: 'not found', content: 'Position does not exist.' }
     }
-    const initialOffer = await this.offerRepository.findOfferById(
-      initialOfferId
-    )
+    const offer = await this.offerRepository.findById(offerId)
 
-    if (!initialOffer) {
+    if (!offer) {
       return { type: 'not found', content: 'Offer does not exist.' }
     }
 
-    if ((initialOffer as ForcedTradeAcceptedOfferRecord).acceptedAt) {
+    if (offer.accepted) {
       return {
         type: 'bad request',
         content: 'Offer already accepted by a user.',
       }
     }
 
-    const offerValidated = validateAcceptedOffer(
-      initialOffer,
-      acceptedOffer,
+    const offerValid = validateAcceptedOffer(
+      offer,
+      acceptedData,
       positionB,
       userRegistrationEventB.ethAddress
     )
 
-    if (!offerValidated) {
+    if (!offerValid) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
     }
 
-    const acceptedAt = Timestamp(Date.now())
-    await this.offerRepository.addAcceptedOffer({
-      initialOfferId,
-      acceptedOffer: {
-        acceptedAt,
-        ...acceptedOffer,
+    await this.offerRepository.save({
+      ...offer,
+      accepted: {
+        ...acceptedData,
+        at: Timestamp(Date.now()),
       },
     })
 
@@ -113,7 +108,7 @@ export class ForcedTradeOfferController {
 }
 
 function validateInitialOffer(
-  offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   position: PositionRecord,
   signature: string,
   ethAddressA: EthereumAddress
@@ -128,8 +123,8 @@ function validateInitialOffer(
 }
 
 function validateAcceptedOffer(
-  initialOffer: ForcedTradeInitialOfferRecord,
-  acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>,
+  initialOffer: ForcedTradeOfferRecord,
+  acceptedData: Omit<AcceptedData, 'at'>,
   position: PositionRecord,
   ethAddressB: EthereumAddress
 ) {
@@ -139,11 +134,11 @@ function validateAcceptedOffer(
     return false
   }
 
-  return validateAcceptedSignature(initialOffer, acceptedOffer, ethAddressB)
+  return validateAcceptedSignature(initialOffer, acceptedData, ethAddressB)
 }
 
 function validateBalance(
-  offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   position: PositionRecord,
   userIsBuyingSynthetic: boolean
 ) {
@@ -168,7 +163,7 @@ function validateBalance(
 }
 
 export function validateInitialSignature(
-  offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   signature: string,
   ethAddressA: EthereumAddress
 ) {
@@ -192,8 +187,8 @@ export function validateInitialSignature(
 }
 
 export function validateAcceptedSignature(
-  initialOffer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
-  acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>,
+  initialOffer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
+  acceptedOffer: Omit<AcceptedData, 'at'>,
   ethAddressB: EthereumAddress
 ): boolean {
   const {
