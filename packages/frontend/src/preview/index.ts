@@ -58,6 +58,10 @@ router.get('/forced/:hash', (ctx) => {
   data.account = getAccount(ctx)
   ctx.body = renderForcedTransactionDetailsPage(data)
 })
+router.post('/forced/offers', (ctx) => {
+  ctx.status = 201
+  ctx.body = { id: 1 }
+})
 
 function getAccount(ctx: Koa.Context) {
   const cookie = ctx.cookies.get('account')
