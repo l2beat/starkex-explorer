@@ -1,3 +1,4 @@
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
@@ -133,7 +134,7 @@ export function Home(props: HomeProps) {
               offer.type,
               <AssetCell assetId={offer.assetId} amount={offer.amount} />,
               formatCurrencyUnits(offer.price, 'USD'),
-              formatCurrencyUnits(offer.total, 'USD'),
+              formatCurrencyUnits(offer.total, AssetId.USDC),
               offer.positionId.toString(),
             ],
           }

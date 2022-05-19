@@ -8,7 +8,7 @@ import {
 } from '@explorer/types'
 
 import {
-  ForcedTradeOffer,
+  ForcedTradeOfferEntry,
   ForcedTransactionDetailsProps,
   ForcedTransactionsIndexProps,
   HomeProps,
@@ -33,7 +33,7 @@ const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
     positionId: 100n * BigInt(i),
   }))
 
-const createFakeOffers = (count: number): ForcedTradeOffer[] =>
+const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
   Array.from({ length: count }).map((_, i) => {
     const price = BigInt(Math.floor(Math.random() * 1000000 * (i + 1)))
     const amount = BigInt(Math.floor(Math.random() * 1000000 * (i + 1)))

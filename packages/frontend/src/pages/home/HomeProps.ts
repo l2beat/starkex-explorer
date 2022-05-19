@@ -3,7 +3,7 @@ import { AssetId, EthereumAddress } from '@explorer/types'
 import { ForcedTransactionEntry } from '../forced-transactions/ForcedTransactionsIndexProps'
 import { StateUpdateEntry } from '../state-updates/StateUpdatesIndexProps'
 
-export interface ForcedTradeOffer {
+export interface ForcedTradeOfferEntry {
   id: number
   type: 'buy' | 'sell'
   assetId: AssetId
@@ -17,7 +17,7 @@ export interface HomeProps {
   readonly account: EthereumAddress | undefined
   readonly stateUpdates: readonly StateUpdateEntry[]
   readonly forcedTransactions: readonly ForcedTransactionEntry[]
-  readonly forcedTradeOffers: readonly ForcedTradeOffer[]
+  readonly forcedTradeOffers: readonly ForcedTradeOfferEntry[]
   readonly totalUpdates: bigint
   readonly totalPositions: bigint
 }
