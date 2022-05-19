@@ -102,13 +102,19 @@ export class Application {
 
     const verifierCollector = new VerifierCollector(
       ethereumClient,
-      verifierEventRepository
+      verifierEventRepository,
+      config.contracts.proxy,
+      config.contracts.verifiers
     )
     const memoryHashEventCollector = new MemoryHashEventCollector(
       ethereumClient,
       factToPageRepository
     )
-    const pageCollector = new PageCollector(ethereumClient, pageRepository)
+    const pageCollector = new PageCollector(
+      ethereumClient,
+      pageRepository,
+      config.contracts.registry
+    )
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,
       stateTransitionFactRepository,

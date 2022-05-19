@@ -10,6 +10,12 @@ import {
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../mock'
 
+const PROXY_ADDRESS = EthereumAddress.fake('1234')
+const VERIFIER_ADDRESSES = [
+  EthereumAddress.fake('aaaa1111'),
+  EthereumAddress.fake('bbbb2222'),
+]
+
 describe(VerifierCollector.name, () => {
   it('saves events to repository and returns verifier addresses', async () => {
     const addMany = mockFn(async (_records: VerifierEventRecord[]) => [])
@@ -24,7 +30,9 @@ describe(VerifierCollector.name, () => {
         async getAll() {
           return []
         },
-      })
+      }),
+      PROXY_ADDRESS,
+      []
     )
 
     const blockRange = new BlockRange([
@@ -111,7 +119,9 @@ describe(VerifierCollector.name, () => {
     })
     const collector = new VerifierCollector(
       mock<EthereumClient>(),
-      verifierEventRepository
+      verifierEventRepository,
+      PROXY_ADDRESS,
+      VERIFIER_ADDRESSES
     )
 
     await collector.discardAfter(123)
@@ -127,7 +137,9 @@ describe(VerifierCollector.name, () => {
 
     const collector = new VerifierCollector(
       mock<EthereumClient>({ getLogs: async () => testData().logs }),
-      verifierEventRepository
+      verifierEventRepository,
+      PROXY_ADDRESS,
+      VERIFIER_ADDRESSES
     )
 
     const blockRange: BlockRange = new BlockRange([
@@ -149,14 +161,14 @@ describe(VerifierCollector.name, () => {
   })
 
   it('includes hardcoded addresses in collected', async () => {
-    const hardcodedAddresses = [EthereumAddress.ZERO]
     const collector = new VerifierCollector(
       mock<EthereumClient>({ getLogsInRange: async () => [] }),
       mock<VerifierEventRepository>({
         addMany: async () => [],
         getAll: async () => [],
       }),
-      hardcodedAddresses
+      PROXY_ADDRESS,
+      VERIFIER_ADDRESSES
     )
 
     const addresses = await collector.collect(
@@ -172,7 +184,7 @@ describe(VerifierCollector.name, () => {
       ])
     )
 
-    expect(addresses).toEqual(hardcodedAddresses)
+    expect(addresses).toEqual(VERIFIER_ADDRESSES)
   })
 })
 
@@ -184,7 +196,7 @@ function testData() {
         '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53',
       transactionIndex: 180,
       removed: false,
-      address: '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C',
+      address: PROXY_ADDRESS.toString(),
       data: '0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000b1eda32c467569fbdc8c3e041c81825d76b32b84',
       topics: [
         '0x723a7080d63c133cf338e44e00705cc1b7b2bde7e88d6218a8d62710a329ce1b',
@@ -200,7 +212,7 @@ function testData() {
         '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53',
       transactionIndex: 181,
       removed: false,
-      address: '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C',
+      address: PROXY_ADDRESS.toString(),
       data: '0x',
       topics: [
         '0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b',
@@ -216,7 +228,7 @@ function testData() {
         '0x867fdd66b6dee527e1f5f6c9d742ca6776a8fd72a1919e019bff85b0a2c1005d',
       transactionIndex: 118,
       removed: false,
-      address: '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C',
+      address: PROXY_ADDRESS.toString(),
       data: '0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000894c4a12548fb18eaa48cf34f9cd874fc08b7fc3',
       topics: [
         '0x723a7080d63c133cf338e44e00705cc1b7b2bde7e88d6218a8d62710a329ce1b',
@@ -232,7 +244,7 @@ function testData() {
         '0x867fdd66b6dee527e1f5f6c9d742ca6776a8fd72a1919e019bff85b0a2c1005d',
       transactionIndex: 119,
       removed: false,
-      address: '0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C',
+      address: PROXY_ADDRESS.toString(),
       data: '0x',
       topics: [
         '0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b',

@@ -1,5 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { Hash256 } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 import { BigNumber, BigNumberish } from 'ethers'
 
@@ -17,6 +17,8 @@ import {
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../mock'
 
+const REGISTRY_ADDRESS = EthereumAddress.fake('b00b135')
+
 describe(PageCollector.name, () => {
   it('fetches memory page logs and transactions and then saves records to repository', async () => {
     const ethereumClient = mock<EthereumClient>({
@@ -27,7 +29,11 @@ describe(PageCollector.name, () => {
       addMany: async () => [],
     })
 
-    const pageCollector = new PageCollector(ethereumClient, pageRepository)
+    const pageCollector = new PageCollector(
+      ethereumClient,
+      pageRepository,
+      REGISTRY_ADDRESS
+    )
 
     const blockRange = new BlockRange([
       {
@@ -71,7 +77,7 @@ describe(PageCollector.name, () => {
     expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
       blockRange,
       {
-        address: '0xEfbCcE4659db72eC6897F46783303708cf9ACef8',
+        address: REGISTRY_ADDRESS.toString(),
         topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
       },
     ])
@@ -84,7 +90,11 @@ describe(PageCollector.name, () => {
       deleteAfter: async () => 0,
     })
 
-    const collector = new PageCollector(mock<EthereumClient>(), pageRepository)
+    const collector = new PageCollector(
+      mock<EthereumClient>(),
+      pageRepository,
+      REGISTRY_ADDRESS
+    )
 
     await collector.discardAfter(123)
 
@@ -100,7 +110,11 @@ describe(PageCollector.name, () => {
       addMany: async () => [],
     })
 
-    const pageCollector = new PageCollector(ethereumClient, pageRepository)
+    const pageCollector = new PageCollector(
+      ethereumClient,
+      pageRepository,
+      REGISTRY_ADDRESS
+    )
 
     const blockRange = new BlockRange([
       {
@@ -142,7 +156,7 @@ function testData() {
         '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c',
       transactionIndex: 59,
       removed: false,
-      address: '0xEfbCcE4659db72eC6897F46783303708cf9ACef8',
+      address: REGISTRY_ADDRESS.toString(),
       data: '0x458785283eceff24d5f46c6a333160fbaf9ed5050ca04f0bb1e18eb8b0f636ee450c6bd64d9066a35eea0d4b9ec956d88dd2d3d8589321aa41d950f2f57a708f06e73d81b22c663f984090926f3d782f0c55d7b2463e53b472b9f02c36102dcb',
       topics: [
         '0xb8b9c39aeba1cfd98c38dfeebe11c2f7e02b334cbe9f05f22b442a5d9c1ea0c5',
@@ -156,7 +170,7 @@ function testData() {
         '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c',
       transactionIndex: 60,
       removed: false,
-      address: '0xEfbCcE4659db72eC6897F46783303708cf9ACef8',
+      address: REGISTRY_ADDRESS.toString(),
       data: '0x418a9ccbff23e2c392fd74b0a537b3326d85bf23c64eec97ef154178313677c2a2485807235f3ee4984796b7a1e2275a84f3bf5ae364c3a4c0c2e5c5ebaa495a063b09143b426906236a8aae7da527d8568729ff0ea87a87956ff12692a6838c',
       topics: [
         '0xb8b9c39aeba1cfd98c38dfeebe11c2f7e02b334cbe9f05f22b442a5d9c1ea0c5',

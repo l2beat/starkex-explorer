@@ -1,4 +1,4 @@
-import { Hash256 } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { BigNumber, utils } from 'ethers'
 
 import { BlockRange } from '../model'
@@ -6,7 +6,6 @@ import {
   PageRecord,
   PageRepository,
 } from '../peripherals/database/PageRepository'
-import { REGISTRY_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 
@@ -27,7 +26,8 @@ export const LOG_MEMORY_PAGE_FACT_CONTINUOUS = REGISTRY_ABI.getEventTopic(
 export class PageCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly pageRepository: PageRepository
+    private readonly pageRepository: PageRepository,
+    private readonly registryAddress: EthereumAddress
   ) {}
 
   async collect(blockRange: BlockRange): Promise<Omit<PageRecord, 'id'>[]> {
@@ -74,7 +74,7 @@ export class PageCollector {
     blockRange: BlockRange
   ): Promise<MemoryPageEvent[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
-      address: REGISTRY_ADDRESS,
+      address: this.registryAddress.toString(),
       topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
     })
     return logs.map((log): MemoryPageEvent => {
