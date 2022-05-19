@@ -8,6 +8,7 @@ import {
 } from '@explorer/types'
 
 import {
+  ForcedTradeOfferEntry,
   ForcedTransactionDetailsProps,
   ForcedTransactionsIndexProps,
   HomeProps,
@@ -48,6 +49,31 @@ const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
     }
   })
 
+const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
+  Array.from({ length: count }).map((_, i) => {
+    const amountCollateral = BigInt(
+      Math.floor(Math.random() * 1000000 * (i + 1))
+    )
+    const amountSynthetic = BigInt(
+      Math.floor(Math.random() * 1000000 * (i + 1))
+    )
+    const assetId = i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-9')
+    const price =
+      (amountCollateral * BigInt(10 ** AssetId.decimals(assetId))) /
+      amountSynthetic /
+      10_000n
+
+    return {
+      id: i,
+      type: i % 2 === 0 ? 'buy' : 'sell',
+      assetId,
+      positionId: 100n * BigInt(i),
+      amount: amountSynthetic,
+      price,
+      total: amountCollateral,
+    }
+  })
+
 export const HOME_PROPS: HomeProps = {
   account: undefined,
   stateUpdates: Array.from({ length: 6 }).map((_, i) => ({
@@ -59,6 +85,7 @@ export const HOME_PROPS: HomeProps = {
     ),
   })),
   forcedTransactions: createFakeTransactions(10),
+  forcedTradeOffers: createFakeOffers(10),
   totalPositions: 45762n,
   totalUpdates: 5143n,
 }

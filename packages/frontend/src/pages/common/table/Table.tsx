@@ -11,21 +11,23 @@ export function Table(props: TableProps) {
       <table id={props.id} className="w-full whitespace-nowrap">
         <thead>
           <tr className="bg-grey-100 font-medium">
-            {props.columns.map(({ header, numeric, fullWidth }, i) => (
-              <th
-                scope="col"
-                key={i}
-                className={cx(
-                  'p-px pb-0.5 first:pl-0 last:pr-0',
-                  numeric ? 'text-right' : 'text-left',
-                  !fullWidth && 'w-0'
-                )}
-              >
-                <div className="px-1.5 py0.5 bg-grey-300 rounded-[3px]">
-                  {header}
-                </div>
-              </th>
-            ))}
+            {props.columns.map(
+              ({ header, numeric, fullWidth, textAlignClass }, i) => (
+                <th
+                  scope="col"
+                  key={i}
+                  className={cx(
+                    'p-px pb-0.5 first:pl-0 last:pr-0',
+                    textAlignClass || (numeric ? 'text-right' : 'text-left'),
+                    !fullWidth && 'w-0'
+                  )}
+                >
+                  <div className="px-1.5 py0.5 bg-grey-300 rounded-[3px]">
+                    {header}
+                  </div>
+                </th>
+              )
+            )}
           </tr>
         </thead>
         <tbody>

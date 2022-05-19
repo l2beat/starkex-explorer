@@ -102,16 +102,23 @@ export class Application {
 
     const verifierCollector = new VerifierCollector(
       ethereumClient,
-      verifierEventRepository
+      verifierEventRepository,
+      config.contracts.proxy,
+      config.contracts.verifiers
     )
     const memoryHashEventCollector = new MemoryHashEventCollector(
       ethereumClient,
       factToPageRepository
     )
-    const pageCollector = new PageCollector(ethereumClient, pageRepository)
+    const pageCollector = new PageCollector(
+      ethereumClient,
+      pageRepository,
+      config.contracts.registry
+    )
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,
-      stateTransitionFactRepository
+      stateTransitionFactRepository,
+      config.contracts.perpetual
     )
     const stateUpdateCollector = new StateUpdateCollector(
       pageRepository,
@@ -122,12 +129,14 @@ export class Application {
     )
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
-      userRegistrationEventRepository
+      userRegistrationEventRepository,
+      config.contracts.perpetual
     )
     const forcedEventsCollector = new ForcedEventsCollector(
       ethereumClient,
       forcedTransactionsRepository,
-      transactionStatusRepository
+      transactionStatusRepository,
+      config.contracts.perpetual
     )
 
     const dataSyncService = new DataSyncService(
@@ -168,7 +177,8 @@ export class Application {
     const homeController = new HomeController(
       stateUpdateRepository,
       positionRepository,
-      forcedTransactionsRepository
+      forcedTransactionsRepository,
+      forcedTradeOfferRepository
     )
     const forcedTransactionController = new ForcedTransactionController(
       userRegistrationEventRepository,

@@ -10,6 +10,7 @@ export interface Column {
   numeric?: boolean
   monospace?: boolean
   fullWidth?: boolean
+  textAlignClass?: 'text-left' | 'text-right'
 }
 
 export interface TableProps {

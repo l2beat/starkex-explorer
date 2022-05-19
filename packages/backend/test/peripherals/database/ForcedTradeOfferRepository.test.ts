@@ -84,7 +84,7 @@ describe(ForcedTradeOfferRepository.name, () => {
     ])
   })
 
-  it('queries all acccept offers', async () => {
+  it('queries all accepted offers', async () => {
     const id1 = await repository.addInitialOffer(initialOffer1)
     const id2 = await repository.addInitialOffer(initialOffer2)
 
@@ -182,5 +182,28 @@ describe(ForcedTradeOfferRepository.name, () => {
 
     const actualAccepted = await repository.getAllAcceptedOffers()
     expect(actualAccepted).toEqual([])
+  })
+
+  it('returns latest offers', async () => {
+    const id1 = await repository.addInitialOffer({
+      ...initialOffer1,
+      createdAt: Timestamp(3),
+    })
+    const id2 = await repository.addInitialOffer({
+      ...initialOffer2,
+      createdAt: Timestamp(2),
+    })
+    await repository.addAcceptedOffer({
+      initialOfferId: id1,
+      acceptedOffer: acceptedOffer1,
+    })
+    const id3 = await repository.addInitialOffer({
+      ...initialOffer3,
+      createdAt: Timestamp(1),
+    })
+
+    const latest = await repository.getLatest({ limit: 10, offset: 1 })
+
+    expect(latest.map((o) => o.id)).toEqual([id2, id3])
   })
 })

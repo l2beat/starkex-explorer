@@ -50,7 +50,7 @@ interface ForcedTradeAcceptedOfferRow {
   signature: string
 }
 
-type ForcedTradeOfferRecord = ForcedTradeInitialOfferRecord &
+export type ForcedTradeOfferRecord = ForcedTradeInitialOfferRecord &
   ForcedTradeAcceptedOfferRecord
 
 type ForcedTradeOfferRow = ForcedTradeInitialOfferRow &
@@ -63,6 +63,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.findOfferById = this.wrapFind(this.findOfferById)
     this.getAllInitialOffers = this.wrapGet(this.getAllInitialOffers)
     this.getAllAcceptedOffers = this.wrapGet(this.getAllAcceptedOffers)
+    this.getLatest = this.wrapGet(this.getLatest)
     this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
@@ -102,6 +103,25 @@ export class ForcedTradeOfferRepository extends BaseRepository {
       .select('*')
 
     return rows.map(acceptedOfferToRecord)
+  }
+
+  async getLatest({
+    limit,
+    offset,
+  }: {
+    limit: number
+    offset: number
+  }): Promise<(ForcedTradeOfferRecord | ForcedTradeInitialOfferRecord)[]> {
+    const rows = await this.knex('forced_trade_offers')
+      .limit(limit)
+      .offset(offset)
+      .orderBy('created_at', 'desc')
+    const records = rows.map((row) =>
+      acceptedOfferRowTypeGuard(row)
+        ? acceptedOfferToRecord(row)
+        : initialOfferToRecord(row)
+    )
+    return records
   }
 
   async findOfferById(

@@ -8,7 +8,6 @@ import {
   VerifierEventRecord,
   VerifierEventRepository,
 } from '../peripherals/database/VerifierEventRepository'
-import { PROXY_ADDRESS } from '../peripherals/ethereum/addresses'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 
@@ -20,16 +19,12 @@ const PROXY_ABI = new utils.Interface([
 const Upgraded = PROXY_ABI.getEventTopic('Upgraded')
 const ImplementationAdded = PROXY_ABI.getEventTopic('ImplementationAdded')
 
-const HARDCODED_VERIFIERS = [
-  EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84'),
-  EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
-]
-
 export class VerifierCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly verifierEventRepository: VerifierEventRepository,
-    private readonly hardcodedAddresses: EthereumAddress[] = HARDCODED_VERIFIERS
+    private readonly proxyAddress: EthereumAddress,
+    private readonly hardcodedAddresses: EthereumAddress[]
   ) {}
 
   /**
@@ -61,7 +56,7 @@ export class VerifierCollector {
 
   private async getEvents(blockRange: BlockRange) {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
-      address: PROXY_ADDRESS,
+      address: this.proxyAddress.toString(),
       topics: [[ImplementationAdded, Upgraded]],
     })
     return logs.map((log): Omit<VerifierEventRecord, 'id'> => {
