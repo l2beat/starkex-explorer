@@ -33,6 +33,7 @@ type RecordCandidate = Omit<Record, 'id'> & { id?: Record['id'] }
 type RowCandidate = Omit<Row, 'id'> & { id?: Row['id'] }
 
 function toRowCandidate(record: RecordCandidate): RowCandidate {
+  const orNull = <T>(value?: T) => (value !== undefined ? value : null)
   return {
     id: record.id,
     created_at: BigInt(record.createdAt.toString()),
@@ -45,17 +46,15 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
     accepted_at: record.accepted?.at
       ? BigInt(record.accepted.at.toString())
       : null,
-    stark_key_b: record.accepted?.starkKeyB.toString() || null,
-    position_id_b: record.accepted?.positionIdB || null,
-    submission_expiration_time:
-      record.accepted?.submissionExpirationTime || null,
-    nonce: record.accepted?.nonce || null,
-    premium_cost:
-      record.accepted?.premiumCost !== undefined
-        ? record.accepted?.premiumCost
-        : null,
-    signature: record.accepted?.signature || null,
-    transaction_hash: record.accepted?.transactionHash?.toString() || null,
+    stark_key_b: orNull(record.accepted?.starkKeyB.toString()),
+    position_id_b: orNull(record.accepted?.positionIdB),
+    submission_expiration_time: orNull(
+      record.accepted?.submissionExpirationTime
+    ),
+    nonce: orNull(record.accepted?.nonce),
+    premium_cost: orNull(record.accepted?.premiumCost),
+    signature: orNull(record.accepted?.signature),
+    transaction_hash: orNull(record.accepted?.transactionHash?.toString()),
   }
 }
 
