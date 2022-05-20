@@ -207,6 +207,7 @@ export class Application {
         createFrontendRouter(
           positionController,
           homeController,
+          forcedTradeOfferController,
           forcedTransactionController,
           stateUpdateController,
           searchController

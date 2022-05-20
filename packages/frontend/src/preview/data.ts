@@ -18,6 +18,7 @@ import {
   StateUpdatesIndexProps,
 } from '../pages'
 import { ForcedTransactionEntry } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
+import { ForcedTradeOffersIndexProps } from '../pages/offers/ForcedTradeOffersIndexProps'
 import { TransactionFormProps } from '../pages/transaction-form'
 
 const ONE_HOUR = 60 * 60 * 1000
@@ -62,9 +63,11 @@ const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
       (amountCollateral * BigInt(10 ** AssetId.decimals(assetId))) /
       amountSynthetic /
       10_000n
+    const createdAt = Timestamp(Date.now() - 50000 - i * 480 * 3570)
 
     return {
       id: i,
+      createdAt,
       type: i % 2 === 0 ? 'buy' : 'sell',
       assetId,
       positionId: 100n * BigInt(i),
@@ -242,6 +245,13 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
       stateUpdateId: 1,
     },
   ],
+}
+
+export const FORCED_TRADE_OFFERS_INDEX_PROPS: ForcedTradeOffersIndexProps = {
+  account: EthereumAddress.fake(),
+  offers: createFakeOffers(10),
+  params: { page: 3, perPage: 10 },
+  total: 100,
 }
 
 export const TRANSACTION_FORM_PROPS: TransactionFormProps = {

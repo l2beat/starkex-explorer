@@ -3,6 +3,7 @@ import Router from '@koa/router'
 import { Context } from 'koa'
 import { z } from 'zod'
 
+import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
 import { HomeController } from '../controllers/HomeController'
 import { PositionController } from '../controllers/PositionController'
@@ -19,6 +20,7 @@ import { applyControllerResult } from './utils'
 export function createFrontendRouter(
   positionController: PositionController,
   homeController: HomeController,
+  forcedTradeOfferController: ForcedTradeOfferController,
   forcedTransactionController: ForcedTransactionController,
   stateUpdateController: StateUpdateController,
   searchController: SearchController
@@ -61,6 +63,28 @@ export function createFrontendRouter(
     )
     applyControllerResult(ctx, result)
   })
+
+  router.get(
+    '/forced/offers',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: stringAsInt(1),
+          perPage: stringAsInt(10),
+        }),
+      }),
+      async (ctx) => {
+        const { page, perPage } = ctx.query
+        const account = getAccount(ctx)
+        const result = await forcedTradeOfferController.getOffersIndexPage(
+          page,
+          perPage,
+          account
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
 
   router.get(
     '/forced/:hash',

@@ -1,4 +1,5 @@
 import { encodeAssetId } from '@explorer/encoding'
+import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 import {
   hashMessage,
@@ -18,6 +19,7 @@ import {
 } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
+import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
 
 export class ForcedTradeOfferController {
   constructor(
@@ -25,6 +27,28 @@ export class ForcedTradeOfferController {
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository
   ) {}
+
+  async getOffersIndexPage(
+    page: number,
+    perPage: number,
+    account: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
+    const [total, offers] = await Promise.all([
+      this.offerRepository.initialCount(),
+      this.offerRepository.getLatestInitial({
+        offset: (page - 1) * perPage,
+        limit: perPage,
+      }),
+    ])
+
+    const content = renderForcedTradeOffersIndexPage({
+      account,
+      offers: offers.map(toForcedTradeOfferEntry),
+      total,
+      params: { page, perPage },
+    })
+    return { type: 'success', content }
+  }
 
   async postOffer(
     offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,

@@ -5,6 +5,7 @@ import Koa from 'koa'
 import serve from 'koa-static'
 
 import {
+  renderForcedTradeOffersIndexPage,
   renderForcedTransactionDetailsPage,
   renderForcedTransactionsIndexPage,
   renderHomePage,
@@ -60,6 +61,11 @@ router.get('/forced', (ctx) => {
 router.get('/forced/new', (ctx) => {
   const data = { ...DATA.TRANSACTION_FORM_PROPS }
   ctx.body = renderTransactionForm(data)
+})
+router.get('/forced/offers', (ctx) => {
+  const data = { ...DATA.FORCED_TRADE_OFFERS_INDEX_PROPS }
+  data.account = getAccount(ctx)
+  ctx.body = renderForcedTradeOffersIndexPage(data)
 })
 router.get('/forced/:hash', (ctx) => {
   const data = { ...DATA.FORCED_TRANSACTION_DETAILS_PROPS }

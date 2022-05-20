@@ -96,6 +96,18 @@ describe(ForcedTradeOfferRepository.name, () => {
     expect(actual).toEqual(submitted)
   })
 
+  it('get initial count', async () => {
+    await repository.add(fakeInitialOffer())
+    expect(await repository.initialCount()).toEqual(1)
+
+    const initial = fakeInitialOffer()
+    const id = await repository.add(initial)
+    expect(await repository.initialCount()).toEqual(2)
+
+    await repository.save({ ...initial, id, accepted: fakeAccepted() })
+    expect(await repository.initialCount()).toEqual(1)
+  })
+
   it('deletes all records', async () => {
     await repository.add(fakeInitialOffer())
     await repository.add(fakeOffer())
