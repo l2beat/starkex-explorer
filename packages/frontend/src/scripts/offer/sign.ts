@@ -2,15 +2,9 @@ import { keccak256, pack } from '@ethersproject/solidity'
 import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, EthereumAddress } from '@explorer/types'
 
-import {
-  ForcedTradeAcceptedOfferEntry,
-  ForcedTradeInitialOfferEntry,
-} from '../transaction/types'
+import { AcceptedData, OfferData } from './types'
 
-export async function signInitial(
-  offer: ForcedTradeInitialOfferEntry,
-  address: EthereumAddress
-) {
+export async function signInitial(offer: OfferData, address: EthereumAddress) {
   const provider = window.ethereum
 
   if (!provider || !address) {
@@ -41,8 +35,8 @@ export async function signInitial(
 }
 
 export async function signAccepted(
-  initialOffer: ForcedTradeInitialOfferEntry,
-  acceptedOffer: ForcedTradeAcceptedOfferEntry,
+  offer: OfferData,
+  accepted: AcceptedData,
   address: EthereumAddress
 ): Promise<string | undefined> {
   const provider = window.ethereum
@@ -65,16 +59,16 @@ export async function signAccepted(
       'uint256',
     ],
     [
-      initialOffer.starkKeyA,
-      acceptedOffer.starkKeyB,
-      initialOffer.positionIdA,
-      acceptedOffer.positionIdB,
+      offer.starkKeyA,
+      accepted.starkKeyB,
+      offer.positionIdA,
+      accepted.positionIdB,
       `0x${encodeAssetId(AssetId.USDC)}`,
-      `0x${encodeAssetId(initialOffer.syntheticAssetId)}`,
-      initialOffer.amountCollateral,
-      initialOffer.amountSynthetic,
-      initialOffer.aIsBuyingSynthetic,
-      acceptedOffer.nonce,
+      `0x${encodeAssetId(offer.syntheticAssetId)}`,
+      offer.amountCollateral,
+      offer.amountSynthetic,
+      offer.aIsBuyingSynthetic,
+      accepted.nonce,
     ]
   )
 
@@ -85,7 +79,7 @@ export async function signAccepted(
 
   const dataHashToSign = keccak256(
     ['bytes32', 'uint256'],
-    [actionHash, acceptedOffer.submissionExpirationTime]
+    [actionHash, accepted.submissionExpirationTime]
   )
 
   try {
