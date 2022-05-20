@@ -18,6 +18,7 @@
     "@ethersproject/solidity": "5.5.0",
     "@explorer/crypto": "*",
     "@explorer/encoding": "*",
+    "@explorer/shared": "*",
     "@explorer/types": "*",
     "@types/js-cookie": "^3.0.1",
     "@types/mersenne-twister": "^1.1.2",

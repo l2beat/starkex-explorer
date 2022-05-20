@@ -1,7 +1,6 @@
+import { keccak256, pack } from '@ethersproject/solidity'
+import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, StarkKey } from '@explorer/types'
-import { solidityKeccak256, solidityPack } from 'ethers/lib/utils'
-
-import { encodeAssetId } from '../encodeAssetId'
 
 export function digestAcceptedOfferParams(
   offer: {
@@ -19,7 +18,7 @@ export function digestAcceptedOfferParams(
     submissionExpirationTime: bigint
   }
 ) {
-  const packedParameters = solidityPack(
+  const packedParameters = pack(
     [
       'uint256',
       'uint256',
@@ -46,12 +45,12 @@ export function digestAcceptedOfferParams(
     ]
   )
 
-  const actionHash = solidityKeccak256(
+  const actionHash = keccak256(
     ['string', 'bytes'],
     ['FORCED_TRADE', packedParameters]
   )
 
-  const digestToSign = solidityKeccak256(
+  const digestToSign = keccak256(
     ['bytes32', 'uint256'],
     [actionHash, accepted.submissionExpirationTime]
   )

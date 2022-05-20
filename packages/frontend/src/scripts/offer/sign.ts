@@ -1,7 +1,7 @@
 import {
   digestAcceptedOfferParams,
   stringifyInitialOffer,
-} from '@explorer/encoding'
+} from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 import { AcceptedData, OfferData } from './types'

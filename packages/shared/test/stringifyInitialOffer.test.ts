@@ -1,7 +1,7 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { stringifyInitialOffer } from '../../src'
+import { stringifyInitialOffer } from '../src'
 
 const offer = {
   starkKeyA: StarkKey.fake(),

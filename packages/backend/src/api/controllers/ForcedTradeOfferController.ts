@@ -1,8 +1,8 @@
+import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
 import {
   digestAcceptedOfferParams,
   stringifyInitialOffer,
-} from '@explorer/encoding'
-import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
+} from '@explorer/shared'
 import { EthereumAddress, Timestamp } from '@explorer/types'
 import { hashMessage, recoverAddress } from 'ethers/lib/utils'
 
