@@ -173,6 +173,24 @@ describe('FrontendRouter', () => {
     })
   })
 
+  describe('/forced/offers', () => {
+    const frontendRouter = createFrontendRouter(
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTradeOfferController>({
+        getOffersIndexPage: async () => SUCCESS_RESULT,
+      }),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>(),
+      mock<SearchController>()
+    )
+    const server = createTestApiServer([frontendRouter])
+
+    it('returns html', async () => {
+      await server.get(`/forced/offers`).expect(200).expect(TEST_PAGE)
+    })
+  })
+
   describe('/forced/:hash', () => {
     const frontendRouter = createFrontendRouter(
       mock<PositionController>(),
