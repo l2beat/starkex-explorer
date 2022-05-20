@@ -1,17 +1,22 @@
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
 export interface ForcedTradeOfferEntry {
-  id: number
-  createdAt: Timestamp
-  type: 'buy' | 'sell'
-  assetId: AssetId
-  price: bigint
-  amount: bigint
-  total: bigint
-  positionId: bigint
+  readonly id: number
+  readonly createdAt: Timestamp
+  readonly type: 'buy' | 'sell'
+  readonly assetId: AssetId
+  readonly price: bigint
+  readonly amount: bigint
+  readonly total: bigint
+  readonly positionId: bigint
 }
 
 export interface ForcedTradeOffersIndexProps {
-  offers: readonly ForcedTradeOfferEntry[]
-  account: EthereumAddress | undefined
+  readonly account: EthereumAddress | undefined
+  readonly offers: ForcedTradeOfferEntry[]
+  readonly params: {
+    readonly perPage: number
+    readonly page: number
+  }
+  readonly total: number
 }

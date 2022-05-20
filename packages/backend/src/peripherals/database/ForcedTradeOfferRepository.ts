@@ -111,7 +111,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     super(knex, logger)
     this.add = this.wrapAdd(this.add)
     this.findById = this.wrapFind(this.findById)
-    this.getInitial = this.wrapGet(this.getInitial)
+    this.initialCount = this.wrapAny(this.initialCount)
     this.getLatestInitial = this.wrapGet(this.getLatestInitial)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.save = this.wrapSave(this.save)
@@ -133,12 +133,12 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return !!updates
   }
 
-  async getInitial(): Promise<Record[]> {
-    const rows = await this.knex('forced_trade_offers')
+  async initialCount(): Promise<number> {
+    const row = await this.knex('forced_trade_offers')
       .whereNull('accepted_at')
-      .orderBy('created_at', 'desc')
+      .count()
 
-    return rows.map(toRecord)
+    return Number(row[0].count)
   }
 
   async getLatestInitial({

@@ -64,11 +64,27 @@ export function createFrontendRouter(
     applyControllerResult(ctx, result)
   })
 
-  router.get('/forced/offers', async (ctx) => {
-    const account = getAccount(ctx)
-    const result = await forcedTradeOfferController.getOffersIndexPage(account)
-    applyControllerResult(ctx, result)
-  })
+  router.get(
+    '/forced/offers',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: stringAsInt(1),
+          perPage: stringAsInt(10),
+        }),
+      }),
+      async (ctx) => {
+        const { page, perPage } = ctx.query
+        const account = getAccount(ctx)
+        const result = await forcedTradeOfferController.getOffersIndexPage(
+          page,
+          perPage,
+          account
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
 
   router.get(
     '/forced/:hash',

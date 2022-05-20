@@ -248,8 +248,10 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
 }
 
 export const FORCED_TRADE_OFFERS_INDEX_PROPS: ForcedTradeOffersIndexProps = {
-  account: undefined,
+  account: EthereumAddress.fake(),
   offers: createFakeOffers(10),
+  params: { page: 3, perPage: 10 },
+  total: 100,
 }
 
 export const TRANSACTION_FORM_PROPS: TransactionFormProps = {

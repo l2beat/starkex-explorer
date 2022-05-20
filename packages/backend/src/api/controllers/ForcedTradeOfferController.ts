@@ -29,12 +29,22 @@ export class ForcedTradeOfferController {
   ) {}
 
   async getOffersIndexPage(
+    page: number,
+    perPage: number,
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const offers = await this.offerRepository.getInitial()
+    const offers = await this.offerRepository.getLatestInitial({
+      offset: (page - 1) * perPage,
+      limit: perPage,
+    })
+
+    const total = await this.offerRepository.initialCount()
+
     const content = renderForcedTradeOffersIndexPage({
       account,
       offers: offers.map(toForcedTradeOfferEntry),
+      total,
+      params: { page, perPage },
     })
     return { type: 'success', content }
   }
