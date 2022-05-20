@@ -107,18 +107,18 @@ describe(ForcedTradeOfferRepository.name, () => {
   })
 
   it('returns latest initial offers', async () => {
-    const initial1 = fakeInitialOffer({ createdAt: Timestamp(4) })
-    const initial2 = fakeInitialOffer({ createdAt: Timestamp(3) })
-    const initial3 = fakeInitialOffer({ createdAt: Timestamp(2) })
-    const initial4 = fakeOffer({ createdAt: Timestamp(1) })
+    const initial1 = fakeInitialOffer({ createdAt: Timestamp(1) })
+    const initial2 = fakeInitialOffer({ createdAt: Timestamp(2) })
+    const initial3 = fakeInitialOffer({ createdAt: Timestamp(3) })
+    const accepted1 = fakeOffer({ createdAt: Timestamp(1) })
 
-    await repository.add(initial1)
+    const id1 = await repository.add(initial1)
     const id2 = await repository.add(initial2)
-    const id3 = await repository.add(initial3)
-    await repository.add(initial4)
+    await repository.add(initial3)
+    await repository.add(accepted1)
 
     const latest = await repository.getLatestInitial({ limit: 10, offset: 1 })
 
-    expect(latest.map((o) => o.id)).toEqual([id2, id3])
+    expect(latest.map((o) => o.id)).toEqual([id2, id1])
   })
 })
