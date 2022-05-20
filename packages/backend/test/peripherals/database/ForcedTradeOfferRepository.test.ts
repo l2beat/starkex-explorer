@@ -42,6 +42,12 @@ function fakeOffer(
   }
 }
 
+function fakeInitialOffer(
+  offer?: Partial<Omit<ForcedTradeOfferRecord, 'accepted'>>
+) {
+  return fakeOffer({ ...offer, accepted: undefined })
+}
+
 describe(ForcedTradeOfferRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()
   const repository = new ForcedTradeOfferRepository(knex, Logger.SILENT)
@@ -49,14 +55,14 @@ describe(ForcedTradeOfferRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds initial offer', async () => {
-    const offer = fakeOffer({ id: undefined, accepted: undefined })
+    const offer = fakeInitialOffer({ id: undefined })
     const id = await repository.add(offer)
     const actual = await repository.findById(id)
     expect(actual).toEqual({ ...offer, id })
   })
 
   it('saves accepted offer', async () => {
-    const initial = fakeOffer({ id: undefined, accepted: undefined })
+    const initial = fakeInitialOffer({ id: undefined })
     const id = await repository.add(initial)
     const accepted = {
       ...initial,
@@ -72,7 +78,7 @@ describe(ForcedTradeOfferRepository.name, () => {
   })
 
   it('saves submitted offer', async () => {
-    const initial = fakeOffer({ id: undefined, accepted: undefined })
+    const initial = fakeInitialOffer({ id: undefined })
     const id = await repository.add(initial)
     const submitted = {
       ...initial,
@@ -91,21 +97,27 @@ describe(ForcedTradeOfferRepository.name, () => {
   })
 
   it('deletes all records', async () => {
-    await repository.add(fakeOffer({ accepted: undefined }))
+    await repository.add(fakeInitialOffer())
     await repository.add(fakeOffer())
 
     await repository.deleteAll()
 
-    const actual = await repository.getLatest({ limit: 10, offset: 0 })
+    const actual = await repository.getLatestInitial({ limit: 10, offset: 0 })
     expect(actual).toEqual([])
   })
 
-  it('returns latest offers', async () => {
-    await repository.add(fakeOffer({ createdAt: Timestamp(3) }))
-    const id2 = await repository.add(fakeOffer({ createdAt: Timestamp(2) }))
-    const id3 = await repository.add(fakeOffer({ createdAt: Timestamp(1) }))
+  it('returns latest initial offers', async () => {
+    const initial1 = fakeInitialOffer({ createdAt: Timestamp(4) })
+    const initial2 = fakeInitialOffer({ createdAt: Timestamp(3) })
+    const initial3 = fakeInitialOffer({ createdAt: Timestamp(2) })
+    const initial4 = fakeOffer({ createdAt: Timestamp(1) })
 
-    const latest = await repository.getLatest({ limit: 10, offset: 1 })
+    await repository.add(initial1)
+    const id2 = await repository.add(initial2)
+    const id3 = await repository.add(initial3)
+    await repository.add(initial4)
+
+    const latest = await repository.getLatestInitial({ limit: 10, offset: 1 })
 
     expect(latest.map((o) => o.id)).toEqual([id2, id3])
   })
