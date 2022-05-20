@@ -33,12 +33,13 @@ export class ForcedTradeOfferController {
     perPage: number,
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const offers = await this.offerRepository.getLatestInitial({
-      offset: (page - 1) * perPage,
-      limit: perPage,
-    })
-
-    const total = await this.offerRepository.initialCount()
+    const [total, offers] = await Promise.all([
+      this.offerRepository.initialCount(),
+      this.offerRepository.getLatestInitial({
+        offset: (page - 1) * perPage,
+        limit: perPage,
+      }),
+    ])
 
     const content = renderForcedTradeOffersIndexPage({
       account,
