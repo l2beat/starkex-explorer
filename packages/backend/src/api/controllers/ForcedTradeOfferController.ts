@@ -31,7 +31,7 @@ export class ForcedTradeOfferController {
   async getOffersIndexPage(
     account: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const offers = await this.offerRepository.getAllInitialOffers()
+    const offers = await this.offerRepository.getInitial()
     const content = renderForcedTradeOffersIndexPage({
       account,
       offers: offers.map(toForcedTradeOfferEntry),
