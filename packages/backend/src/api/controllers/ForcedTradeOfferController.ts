@@ -8,8 +8,8 @@ import {
 } from 'ethers/lib/utils'
 
 import {
-  ForcedTradeAcceptedOfferRecord,
-  ForcedTradeInitialOfferRecord,
+  Accepted,
+  ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
@@ -27,7 +27,7 @@ export class ForcedTradeOfferController {
   ) {}
 
   async postOffer(
-    offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+    offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
     signature: string
   ): Promise<ControllerResult> {
     const positionA = await this.positionRepository.findById(offer.positionIdA)
@@ -38,73 +38,68 @@ export class ForcedTradeOfferController {
       return { type: 'not found', content: 'Position does not exist.' }
     }
 
-    const offerValidated = validateInitialOffer(
+    const offerValid = validateInitialOffer(
       offer,
       positionA,
       signature,
       userRegistrationEventA.ethAddress
     )
 
-    if (!offerValidated) {
+    if (!offerValid) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
     }
 
-    const createdAt = Timestamp(Date.now())
-
-    const id = await this.offerRepository.addInitialOffer({
-      createdAt,
+    const id = await this.offerRepository.add({
+      createdAt: Timestamp(Date.now()),
       ...offer,
     })
     return { type: 'created', content: { id } }
   }
 
   async acceptOffer(
-    initialOfferId: number,
-    acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>
+    offerId: number,
+    accepted: Omit<Accepted, 'at'>
   ): Promise<ControllerResult> {
     const positionB = await this.positionRepository.findById(
-      acceptedOffer.positionIdB
+      accepted.positionIdB
     )
     const userRegistrationEventB =
       await this.userRegistrationEventRepository.findByStarkKey(
-        acceptedOffer.starkKeyB
+        accepted.starkKeyB
       )
 
     if (!positionB || !userRegistrationEventB) {
       return { type: 'not found', content: 'Position does not exist.' }
     }
-    const initialOffer = await this.offerRepository.findOfferById(
-      initialOfferId
-    )
+    const offer = await this.offerRepository.findById(offerId)
 
-    if (!initialOffer) {
+    if (!offer) {
       return { type: 'not found', content: 'Offer does not exist.' }
     }
 
-    if ((initialOffer as ForcedTradeAcceptedOfferRecord).acceptedAt) {
+    if (offer.accepted) {
       return {
         type: 'bad request',
         content: 'Offer already accepted by a user.',
       }
     }
 
-    const offerValidated = validateAcceptedOffer(
-      initialOffer,
-      acceptedOffer,
+    const offerValid = validateAcceptedOffer(
+      offer,
+      accepted,
       positionB,
       userRegistrationEventB.ethAddress
     )
 
-    if (!offerValidated) {
+    if (!offerValid) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
     }
 
-    const acceptedAt = Timestamp(Date.now())
-    await this.offerRepository.addAcceptedOffer({
-      initialOfferId,
-      acceptedOffer: {
-        acceptedAt,
-        ...acceptedOffer,
+    await this.offerRepository.save({
+      ...offer,
+      accepted: {
+        ...accepted,
+        at: Timestamp(Date.now()),
       },
     })
 
@@ -113,7 +108,7 @@ export class ForcedTradeOfferController {
 }
 
 function validateInitialOffer(
-  offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   position: PositionRecord,
   signature: string,
   ethAddressA: EthereumAddress
@@ -128,22 +123,22 @@ function validateInitialOffer(
 }
 
 function validateAcceptedOffer(
-  initialOffer: ForcedTradeInitialOfferRecord,
-  acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>,
+  offer: ForcedTradeOfferRecord,
+  accepted: Omit<Accepted, 'at'>,
   position: PositionRecord,
   ethAddressB: EthereumAddress
 ) {
-  const userIsBuyingSynthetic = !initialOffer.aIsBuyingSynthetic
+  const userIsBuyingSynthetic = !offer.aIsBuyingSynthetic
 
-  if (!validateBalance(initialOffer, position, userIsBuyingSynthetic)) {
+  if (!validateBalance(offer, position, userIsBuyingSynthetic)) {
     return false
   }
 
-  return validateAcceptedSignature(initialOffer, acceptedOffer, ethAddressB)
+  return validateAcceptedSignature(offer, accepted, ethAddressB)
 }
 
 function validateBalance(
-  offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   position: PositionRecord,
   userIsBuyingSynthetic: boolean
 ) {
@@ -168,9 +163,9 @@ function validateBalance(
 }
 
 export function validateInitialSignature(
-  offer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   signature: string,
-  ethAddressA: EthereumAddress
+  address: EthereumAddress
 ) {
   const stringOffer = JSON.stringify(
     {
@@ -187,14 +182,13 @@ export function validateInitialSignature(
 
   const signer = recoverAddress(hashMessage(stringOffer), signature)
 
-  console.log(signer)
-  return signer === ethAddressA.toString()
+  return signer === address.toString()
 }
 
 export function validateAcceptedSignature(
-  initialOffer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'>,
-  acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'>,
-  ethAddressB: EthereumAddress
+  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
+  accepted: Omit<Accepted, 'at'>,
+  address: EthereumAddress
 ): boolean {
   const {
     starkKeyA,
@@ -203,9 +197,9 @@ export function validateAcceptedSignature(
     amountCollateral,
     amountSynthetic,
     aIsBuyingSynthetic,
-  } = initialOffer
+  } = offer
   const { starkKeyB, positionIdB, nonce, submissionExpirationTime, signature } =
-    acceptedOffer
+    accepted
 
   try {
     const packedParameters = solidityPack(
@@ -247,7 +241,7 @@ export function validateAcceptedSignature(
 
     const signer = recoverAddress(signedData, signature)
 
-    return signer === ethAddressB.toString()
+    return signer === address.toString()
   } catch (e) {
     return false
   }
