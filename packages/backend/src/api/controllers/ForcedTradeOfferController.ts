@@ -1,11 +1,9 @@
-import { encodeAssetId } from '@explorer/encoding'
-import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 import {
-  hashMessage,
-  recoverAddress,
-  solidityKeccak256,
-  solidityPack,
-} from 'ethers/lib/utils'
+  digestAcceptedOfferParams,
+  stringifyInitialOffer,
+} from '@explorer/encoding'
+import { EthereumAddress, Timestamp } from '@explorer/types'
+import { hashMessage, recoverAddress } from 'ethers/lib/utils'
 
 import {
   Accepted,
@@ -167,18 +165,7 @@ export function validateInitialSignature(
   signature: string,
   address: EthereumAddress
 ) {
-  const stringOffer = JSON.stringify(
-    {
-      starkKeyA: offer.starkKeyA,
-      positionIdA: offer.positionIdA.toString(),
-      syntheticAssetId: offer.syntheticAssetId,
-      amountCollateral: offer.amountCollateral.toString(),
-      amountSynthetic: offer.amountSynthetic.toString(),
-      aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
-    },
-    null,
-    2
-  )
+  const stringOffer = stringifyInitialOffer(offer)
 
   const signer = recoverAddress(hashMessage(stringOffer), signature)
 
@@ -190,56 +177,10 @@ export function validateAcceptedSignature(
   accepted: Omit<Accepted, 'at'>,
   address: EthereumAddress
 ): boolean {
-  const {
-    starkKeyA,
-    positionIdA,
-    syntheticAssetId,
-    amountCollateral,
-    amountSynthetic,
-    aIsBuyingSynthetic,
-  } = offer
-  const { starkKeyB, positionIdB, nonce, submissionExpirationTime, signature } =
-    accepted
-
   try {
-    const packedParameters = solidityPack(
-      [
-        'uint256',
-        'uint256',
-        'uint256',
-        'uint256',
-        'uint256',
-        'uint256',
-        'uint256',
-        'uint256',
-        'bool',
-        'uint256',
-      ],
-      [
-        starkKeyA,
-        starkKeyB,
-        positionIdA,
-        positionIdB,
-        `0x${encodeAssetId(AssetId.USDC)}`,
-        `0x${encodeAssetId(syntheticAssetId)}`,
-        amountCollateral,
-        amountSynthetic,
-        aIsBuyingSynthetic,
-        nonce,
-      ]
-    )
+    const digest = digestAcceptedOfferParams(offer, accepted)
 
-    const actionHash = solidityKeccak256(
-      ['string', 'bytes'],
-      ['FORCED_TRADE', packedParameters]
-    )
-
-    const signedData = solidityKeccak256(
-      ['bytes32', 'uint256'],
-      [actionHash, submissionExpirationTime]
-    )
-
-    const signer = recoverAddress(signedData, signature)
+    const signer = recoverAddress(digest, accepted.signature)
 
     return signer === address.toString()
   } catch (e) {

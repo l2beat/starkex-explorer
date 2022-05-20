@@ -13,6 +13,6 @@ export interface AcceptedData {
   starkKeyB: StarkKey
   positionIdB: bigint
   nonce: bigint
-  submissionExpirationTime: number
+  submissionExpirationTime: bigint
   premiumCost: boolean
 }

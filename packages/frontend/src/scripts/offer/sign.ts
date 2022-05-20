@@ -1,6 +1,8 @@
-import { keccak256, pack } from '@ethersproject/solidity'
-import { encodeAssetId } from '@explorer/encoding'
-import { AssetId, EthereumAddress } from '@explorer/types'
+import {
+  digestAcceptedOfferParams,
+  stringifyInitialOffer,
+} from '@explorer/encoding'
+import { EthereumAddress } from '@explorer/types'
 
 import { AcceptedData, OfferData } from './types'
 
@@ -11,18 +13,7 @@ export async function signInitial(offer: OfferData, address: EthereumAddress) {
     return
   }
 
-  const stringOffer = JSON.stringify(
-    {
-      starkKeyA: offer.starkKeyA,
-      positionIdA: offer.positionIdA.toString(),
-      syntheticAssetId: offer.syntheticAssetId,
-      amountCollateral: offer.amountCollateral.toString(),
-      amountSynthetic: offer.amountSynthetic.toString(),
-      aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
-    },
-    null,
-    2
-  )
+  const stringOffer = stringifyInitialOffer(offer)
 
   try {
     return (await provider.request({
@@ -45,47 +36,12 @@ export async function signAccepted(
     return
   }
 
-  const packedParameters = pack(
-    [
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'uint256',
-      'bool',
-      'uint256',
-    ],
-    [
-      offer.starkKeyA,
-      accepted.starkKeyB,
-      offer.positionIdA,
-      accepted.positionIdB,
-      `0x${encodeAssetId(AssetId.USDC)}`,
-      `0x${encodeAssetId(offer.syntheticAssetId)}`,
-      offer.amountCollateral,
-      offer.amountSynthetic,
-      offer.aIsBuyingSynthetic,
-      accepted.nonce,
-    ]
-  )
-
-  const actionHash = keccak256(
-    ['string', 'bytes'],
-    ['FORCED_TRADE', packedParameters]
-  )
-
-  const dataHashToSign = keccak256(
-    ['bytes32', 'uint256'],
-    [actionHash, accepted.submissionExpirationTime]
-  )
+  const digestToSign = digestAcceptedOfferParams(offer, accepted)
 
   try {
     return (await provider.request({
       method: 'eth_sign',
-      params: [address, dataHashToSign],
+      params: [address, digestToSign],
     })) as string
   } catch (e) {
     console.error(e)
