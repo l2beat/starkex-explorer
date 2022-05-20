@@ -26,6 +26,10 @@ interface DeleteMethod<A extends unknown[]> {
   (...args: A): Promise<number>
 }
 
+interface SaveMethod<T> {
+  (record: T): Promise<boolean>
+}
+
 export class BaseRepository {
   constructor(
     protected readonly knex: Knex,
@@ -84,6 +88,12 @@ export class BaseRepository {
   ): DeleteMethod<A> {
     return this.wrap(method, (count) =>
       this.logger.debug({ method: method.name, count })
+    )
+  }
+
+  protected wrapSave<T>(method: SaveMethod<T>): SaveMethod<T> {
+    return this.wrap(method, (updated) =>
+      this.logger.debug({ method: method.name, updated })
     )
   }
 

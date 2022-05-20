@@ -1,13 +1,10 @@
 import { ForcedTradeOfferEntry } from '@explorer/frontend'
 
 import { getTradeOfferPriceUSDCents } from '../../../core/getTradeOfferPriceUSDCents'
-import {
-  ForcedTradeInitialOfferRecord,
-  ForcedTradeOfferRecord,
-} from '../../../peripherals/database/ForcedTradeOfferRepository'
+import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
 
 export function toForcedTradeOfferEntry(
-  offer: ForcedTradeInitialOfferRecord | ForcedTradeOfferRecord
+  offer: ForcedTradeOfferRecord
 ): ForcedTradeOfferEntry {
   return {
     id: offer.id,

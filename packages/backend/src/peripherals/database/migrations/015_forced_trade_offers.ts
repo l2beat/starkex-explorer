@@ -23,7 +23,6 @@ export async function up(knex: Knex) {
     table.bigInteger('amount_collateral').notNullable()
     table.bigInteger('amount_synthetic').notNullable()
     table.boolean('a_is_buying_synthetic').notNullable()
-
     table.bigInteger('accepted_at')
     table.string('stark_key_b')
     table.bigInteger('position_id_b')
@@ -31,7 +30,6 @@ export async function up(knex: Knex) {
     table.bigInteger('nonce')
     table.boolean('premium_cost')
     table.string('signature')
-
     table.bigInteger('submitted_at')
   })
 }

@@ -6,8 +6,8 @@ import {
   validateAcceptedSignature,
 } from '../../../src/api/controllers/ForcedTradeOfferController'
 import {
-  ForcedTradeAcceptedOfferRecord,
-  ForcedTradeInitialOfferRecord,
+  Accepted,
+  ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
@@ -16,7 +16,7 @@ import { mock } from '../../mock'
 
 // Mock data taken from real transaction:https://etherscan.io/tx/0x9b2dce5538d0c8c08511c9383be9b67da6f952b367baff0c8bdb5f66c9395634
 
-const initialOffer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'> = {
+const initialOffer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'> = {
   starkKeyA: StarkKey(
     '05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e'
   ),
@@ -27,12 +27,12 @@ const initialOffer: Omit<ForcedTradeInitialOfferRecord, 'createdAt' | 'id'> = {
   aIsBuyingSynthetic: true,
 }
 
-const acceptedOffer: Omit<ForcedTradeAcceptedOfferRecord, 'acceptedAt'> = {
+const acceptedData: Omit<Accepted, 'at'> = {
   starkKeyB: StarkKey(
     '069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41'
   ),
   positionIdB: BigInt('0x2ce'),
-  submissionExpirationTime: 3456000000000,
+  submissionExpirationTime: 3456000000000n,
   nonce: BigInt(38404830),
   premiumCost: true,
   signature:
@@ -46,7 +46,7 @@ const expectedEthAddress = EthereumAddress(
 describe(validateAcceptedSignature.name, () => {
   it('decodes example tx', () => {
     expect(
-      validateAcceptedSignature(initialOffer, acceptedOffer, expectedEthAddress)
+      validateAcceptedSignature(initialOffer, acceptedData, expectedEthAddress)
     ).toBeTruthy()
   })
 })
@@ -89,7 +89,7 @@ describe(ForcedTradeOfferController.name, () => {
 
     it('happy path', async () => {
       const offerRepository = mock<ForcedTradeOfferRepository>({
-        addInitialOffer: async () => 1,
+        add: async () => 1,
       })
       const positionRepository = mock<PositionRepository>({
         findById: async () => POSITION_A,
@@ -111,7 +111,7 @@ describe(ForcedTradeOfferController.name, () => {
     })
     it('returns bad request when signature not valid', async () => {
       const offerRepository = mock<ForcedTradeOfferRepository>({
-        addInitialOffer: async () => 1,
+        add: async () => 1,
       })
       const positionRepository = mock<PositionRepository>({
         findById: async () => POSITION_A,
@@ -240,8 +240,9 @@ describe(ForcedTradeOfferController.name, () => {
     it('happy path', async () => {
       const controller = new ForcedTradeOfferController(
         mock<ForcedTradeOfferRepository>({
-          addAcceptedOffer: async () => 1,
-          findOfferById: async () => INITIAL_OFFER,
+          add: async () => 1,
+          findById: async () => INITIAL_OFFER,
+          save: async () => true,
         }),
         mock<PositionRepository>({
           findById: async (id) => {
@@ -265,7 +266,7 @@ describe(ForcedTradeOfferController.name, () => {
         })
       )
 
-      expect(await controller.acceptOffer(1, acceptedOffer)).toEqual({
+      expect(await controller.acceptOffer(1, acceptedData)).toEqual({
         type: 'success',
         content: 'Accept offer was submitted.',
       })
@@ -288,7 +289,7 @@ describe(ForcedTradeOfferController.name, () => {
         })
       )
 
-      expect(await controller.acceptOffer(1, acceptedOffer)).toEqual({
+      expect(await controller.acceptOffer(1, acceptedData)).toEqual({
         type: 'not found',
         content: 'Position does not exist.',
       })
@@ -311,7 +312,7 @@ describe(ForcedTradeOfferController.name, () => {
         })
       )
 
-      expect(await controller.acceptOffer(1, acceptedOffer)).toEqual({
+      expect(await controller.acceptOffer(1, acceptedData)).toEqual({
         type: 'not found',
         content: 'Position does not exist.',
       })
@@ -319,7 +320,7 @@ describe(ForcedTradeOfferController.name, () => {
     it('return not found when initialOffer not found', async () => {
       const controller = new ForcedTradeOfferController(
         mock<ForcedTradeOfferRepository>({
-          findOfferById: async () => undefined,
+          findById: async () => undefined,
         }),
         mock<PositionRepository>({
           findById: async (id) => {
@@ -343,7 +344,7 @@ describe(ForcedTradeOfferController.name, () => {
         })
       )
 
-      expect(await controller.acceptOffer(1, acceptedOffer)).toEqual({
+      expect(await controller.acceptOffer(1, acceptedData)).toEqual({
         type: 'not found',
         content: 'Offer does not exist.',
       })
@@ -351,8 +352,8 @@ describe(ForcedTradeOfferController.name, () => {
     it('return bad request when balance invalid', async () => {
       const controller = new ForcedTradeOfferController(
         mock<ForcedTradeOfferRepository>({
-          addAcceptedOffer: async () => 1,
-          findOfferById: async () => INITIAL_OFFER,
+          add: async () => 1,
+          findById: async () => INITIAL_OFFER,
         }),
         mock<PositionRepository>({
           findById: async (id) => {
@@ -376,7 +377,7 @@ describe(ForcedTradeOfferController.name, () => {
         })
       )
 
-      expect(await controller.acceptOffer(1, acceptedOffer)).toEqual({
+      expect(await controller.acceptOffer(1, acceptedData)).toEqual({
         type: 'bad request',
         content: 'Your offer is invalid.',
       })
