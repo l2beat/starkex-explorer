@@ -1,4 +1,10 @@
-import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -80,7 +86,7 @@ describe(validateInitialSignature.name, () => {
 })
 
 describe(ForcedTradeOfferController.name, () => {
-  describe('postOffer', () => {
+  describe(ForcedTradeOfferController.prototype.postOffer.name, () => {
     const starkKeyA = StarkKey(
       '0x0d06c518b04d2606f57fb8b54dcc1e3053928da108055a5c69ef39011afd47e7'
     )
@@ -217,7 +223,7 @@ describe(ForcedTradeOfferController.name, () => {
     })
   })
 
-  describe('acceptOffer', () => {
+  describe(ForcedTradeOfferController.prototype.acceptOffer.name, () => {
     const starkKeyA = StarkKey(
       '05733b2b5e71223285e7966386a4e81d3c55480782af122227cf7d1b0b08c32e'
     )
@@ -408,6 +414,125 @@ describe(ForcedTradeOfferController.name, () => {
       expect(await controller.acceptOffer(1, acceptedData)).toEqual({
         type: 'bad request',
         content: 'Your offer is invalid.',
+      })
+    })
+  })
+
+  describe(ForcedTradeOfferController.prototype.cancelOffer.name, () => {
+    it('blocks missing offer', async () => {
+      const controller = new ForcedTradeOfferController(
+        mock<ForcedTradeOfferRepository>({
+          findById: async () => undefined,
+        }),
+        mock<PositionRepository>(),
+        mock<UserRegistrationEventRepository>()
+      )
+
+      expect(await controller.cancelOffer(1, '123')).toEqual({
+        type: 'not found',
+        content: 'Offer does not exist.',
+      })
+    })
+
+    it('blocks cancelled offer', async () => {
+      const controller = new ForcedTradeOfferController(
+        mock<ForcedTradeOfferRepository>({
+          findById: async () => ({
+            ...initialOffer,
+            id: 1,
+            accepted: undefined,
+            createdAt: Timestamp(Date.now() - 1000),
+            cancelledAt: Timestamp(Date.now()),
+          }),
+        }),
+        mock<PositionRepository>(),
+        mock<UserRegistrationEventRepository>()
+      )
+
+      expect(await controller.cancelOffer(1, '123')).toEqual({
+        type: 'bad request',
+        content: 'Offer already cancelled.',
+      })
+    })
+
+    it('blocks submitted offer', async () => {
+      const controller = new ForcedTradeOfferController(
+        mock<ForcedTradeOfferRepository>({
+          findById: async () => ({
+            ...initialOffer,
+            id: 1,
+            createdAt: Timestamp(Date.now() - 1000),
+            accepted: {
+              ...acceptedData,
+              at: Timestamp(Date.now() - 500),
+              transactionHash: Hash256.fake(),
+            },
+          }),
+        }),
+        mock<PositionRepository>(),
+        mock<UserRegistrationEventRepository>()
+      )
+
+      expect(await controller.cancelOffer(1, '123')).toEqual({
+        type: 'bad request',
+        content: 'Offer already submitted.',
+      })
+    })
+
+    it('blocks missing position', async () => {
+      const controller = new ForcedTradeOfferController(
+        mock<ForcedTradeOfferRepository>({
+          findById: async () => ({
+            ...initialOffer,
+            id: 1,
+            createdAt: Timestamp(Date.now() - 1000),
+            accepted: {
+              ...acceptedData,
+              at: Timestamp(Date.now() - 500),
+            },
+          }),
+        }),
+        mock<PositionRepository>(),
+        mock<UserRegistrationEventRepository>({
+          findByStarkKey: async () => undefined,
+        })
+      )
+
+      expect(await controller.cancelOffer(1, '123')).toEqual({
+        type: 'not found',
+        content: 'Position does not exist.',
+      })
+    })
+
+    it('blocks invalid signature', async () => {
+      const controller = new ForcedTradeOfferController(
+        mock<ForcedTradeOfferRepository>({
+          findById: async () => ({
+            ...initialOffer,
+            id: 1,
+            createdAt: Timestamp(Date.now() - 1000),
+            accepted: {
+              ...acceptedData,
+              at: Timestamp(Date.now() - 500),
+            },
+          }),
+        }),
+        mock<PositionRepository>(),
+        mock<UserRegistrationEventRepository>({
+          findByStarkKey: async () => ({
+            id: 1,
+            blockNumber: 1,
+            starkKey: initialOffer.starkKeyA,
+            ethAddress: EthereumAddress(
+              '0x6235538E538067Db89E72d24F4D1a757E234Bed1'
+            ),
+          }),
+        })
+      )
+
+      expect(await controller.cancelOffer(1, '123')).toEqual({
+        type: 'bad request',
+        content: 'Signature does not match.',
       })
     })
   })

@@ -80,13 +80,17 @@ export function createForcedTradeOfferRouter(
       z.object({
         params: z.object({
           offerId: stringAsInt(),
-          signature: z.string(),
+        }),
+        request: z.object({
+          body: z.object({
+            signature: z.string(),
+          }),
         }),
       }),
       async (ctx) => {
         const result = await offerController.cancelOffer(
           ctx.params.offerId,
-          ctx.params.signature
+          ctx.request.body.signature
         )
         applyControllerResult(ctx, result)
       }

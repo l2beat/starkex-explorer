@@ -31,6 +31,7 @@ describe('OfferRouter', () => {
             content: 'Accept offer was submitted.',
           }
         : { type: 'not found', content: 'Offer does not exist.' },
+    cancelOffer: async () => ({ type: 'success', content: 'Offer cancelled.' }),
   })
   const router = createForcedTradeOfferRouter(offerController)
   const server = createTestApiServer([router])
@@ -72,6 +73,26 @@ describe('OfferRouter', () => {
             '0x1bb089c2686c65d8d2e5800761b2826e0fc1f68f7e228fc161384958222bbc271458f40ed77507d59ca77c56204b0134b429eaface39b196d1f07e917a14c7641b',
         })
         .expect(404)
+    })
+  })
+
+  describe('/forced/offers/:initialOfferId', () => {
+    it('returns success', async () => {
+      await server
+        .post('/forced/offers/1/cancel')
+        .send({
+          signature:
+            '0x1bb089c2686c65d8d2e5800761b2826e0fc1f68f7e228fc161384958222bbc271458f40ed77507d59ca77c56204b0134b429eaface39b196d1f07e917a14c7641b',
+        })
+        .expect(200)
+    })
+    it('returns bad request for invalid input', async () => {
+      await server
+        .post('/forced/offers/1/cancel')
+        .send({
+          signature: 123,
+        })
+        .expect(400)
     })
   })
 })

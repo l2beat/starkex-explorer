@@ -234,14 +234,26 @@ function validateBalance(
   return false
 }
 
+function validateAddress(
+  digest: string,
+  signature: string,
+  address: EthereumAddress
+): boolean {
+  try {
+    const signer = recoverAddress(digest, signature)
+    return signer === address.toString()
+  } catch (error) {
+    return false
+  }
+}
+
 function validateCancelRequest(
   offerId: ForcedTradeOfferRecord['id'],
   address: EthereumAddress,
   signature: string
 ): boolean {
   const request = getCancelRequest(offerId)
-  const signer = recoverAddress(hashMessage(request), signature)
-  return signer === address.toString()
+  return validateAddress(hashMessage(request), signature, address)
 }
 
 export function validateInitialSignature(
@@ -249,9 +261,8 @@ export function validateInitialSignature(
   signature: string,
   address: EthereumAddress
 ) {
-  const stringOffer = stringifyInitialOffer(offer)
-  const signer = recoverAddress(hashMessage(stringOffer), signature)
-  return signer === address.toString()
+  const request = stringifyInitialOffer(offer)
+  return validateAddress(hashMessage(request), signature, address)
 }
 
 export function validateAcceptedSignature(
