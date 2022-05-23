@@ -4,6 +4,7 @@ import { expect } from 'earljs'
 import {
   ForcedTradeOfferController,
   validateAcceptedSignature,
+  validateInitialSignature,
 } from '../../../src/api/controllers/ForcedTradeOfferController'
 import {
   Accepted,
@@ -47,6 +48,33 @@ describe(validateAcceptedSignature.name, () => {
   it('decodes example tx', () => {
     expect(
       validateAcceptedSignature(initialOffer, acceptedData, expectedEthAddress)
+    ).toBeTruthy()
+  })
+})
+
+describe(validateInitialSignature.name, () => {
+  const starkKeyA = StarkKey(
+    '0x0d06c518b04d2606f57fb8b54dcc1e3053928da108055a5c69ef39011afd47e7'
+  )
+
+  const INITIAL_OFFER = {
+    starkKeyA,
+    positionIdA: 1234n,
+    syntheticAssetId: AssetId('BTC-10'),
+    amountCollateral: 20359763977n,
+    amountSynthetic: 5287654321n,
+    aIsBuyingSynthetic: true,
+  }
+  const ETH_ADDRESS = EthereumAddress(
+    '0x6235538E538067Db89E72d24F4D1a757E234Bed1'
+  )
+
+  const SIGNATURE =
+    '0x566e6942c5f7c88cf644a93a78f9ebe614a33d0f0254a8d56b9f4f77b1228f194fa533f1bd3589b2816f1575abb99b7087956840ff0bf631c65f2df2bd37ef9a1c'
+
+  it('decodes example message', () => {
+    expect(
+      validateInitialSignature(INITIAL_OFFER, SIGNATURE, ETH_ADDRESS)
     ).toBeTruthy()
   })
 })

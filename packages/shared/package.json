@@ -1,0 +1,25 @@
+{
+  "name": "@explorer/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "scripts": {
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint --ext .ts --max-warnings 0 src test",
+    "lint:fix": "yarn lint --fix",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc",
+    "test": "mocha",
+    "coverage": "nyc --reporter=lcov --reporter=text mocha"
+  },
+  "dependencies": {
+    "@ethersproject/solidity": "5.5.0",
+    "@explorer/encoding": "*",
+    "@explorer/types": "*"
+  },
+  "devDependencies": {
+    "@ethersproject/transactions": "5.5.0"
+  }
+}

@@ -25,6 +25,7 @@
     "@explorer/crypto": "*",
     "@explorer/encoding": "*",
     "@explorer/frontend": "*",
+    "@explorer/shared": "*",
     "@explorer/state": "*",
     "@explorer/types": "*",
     "@koa/router": "^10.1.1",
