@@ -1,6 +1,7 @@
 import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
 import {
   digestAcceptedOfferParams,
+  getCancelRequest,
   stringifyInitialOffer,
 } from '@explorer/shared'
 import { EthereumAddress, Timestamp } from '@explorer/types'
@@ -127,6 +128,55 @@ export class ForcedTradeOfferController {
 
     return { type: 'success', content: 'Accept offer was submitted.' }
   }
+
+  async cancelOffer(
+    offerId: number,
+    signature: string
+  ): Promise<ControllerResult> {
+    const offer = await this.offerRepository.findById(offerId)
+    if (!offer) {
+      return {
+        type: 'not found',
+        content: 'Offer does not exist.',
+      }
+    }
+    if (offer.cancelledAt) {
+      return {
+        type: 'bad request',
+        content: 'Offer already cancelled.',
+      }
+    }
+    if (offer.accepted?.transactionHash) {
+      return {
+        type: 'bad request',
+        content: 'Offer already submitted.',
+      }
+    }
+    const userA = await this.userRegistrationEventRepository.findByStarkKey(
+      offer.starkKeyA
+    )
+    if (!userA) {
+      return { type: 'not found', content: 'Position does not exist.' }
+    }
+    const requestValid = validateCancelRequest(
+      offer.id,
+      userA.ethAddress,
+      signature
+    )
+    if (!requestValid) {
+      return {
+        type: 'bad request',
+        content: 'Signature does not match.',
+      }
+    }
+
+    await this.offerRepository.save({
+      ...offer,
+      cancelledAt: Timestamp(Date.now()),
+    })
+
+    return { type: 'success', content: 'Offer cancelled.' }
+  }
 }
 
 function validateInitialOffer(
@@ -184,15 +234,23 @@ function validateBalance(
   return false
 }
 
+function validateCancelRequest(
+  offerId: ForcedTradeOfferRecord['id'],
+  address: EthereumAddress,
+  signature: string
+): boolean {
+  const request = getCancelRequest(offerId)
+  const signer = recoverAddress(hashMessage(request), signature)
+  return signer === address.toString()
+}
+
 export function validateInitialSignature(
   offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   signature: string,
   address: EthereumAddress
 ) {
   const stringOffer = stringifyInitialOffer(offer)
-
   const signer = recoverAddress(hashMessage(stringOffer), signature)
-
   return signer === address.toString()
 }
 
@@ -203,9 +261,7 @@ export function validateAcceptedSignature(
 ): boolean {
   try {
     const digest = digestAcceptedOfferParams(offer, accepted)
-
     const signer = recoverAddress(digest, accepted.signature)
-
     return signer === address.toString()
   } catch (e) {
     return false

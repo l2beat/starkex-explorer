@@ -1,28 +1,35 @@
 import {
   digestAcceptedOfferParams,
+  getCancelRequest,
   stringifyInitialOffer,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 import { AcceptedData, OfferData } from './types'
 
-export async function signInitial(offer: OfferData, address: EthereumAddress) {
+async function sign(
+  method: 'personal_sign' | 'eth_sign',
+  address: EthereumAddress,
+  toSign: string
+) {
   const provider = window.ethereum
-
-  if (!provider || !address) {
-    return
-  }
-
-  const stringOffer = stringifyInitialOffer(offer)
-
+  if (!provider) return
   try {
     return (await provider.request({
-      method: 'personal_sign',
-      params: [address.toString(), stringOffer],
+      method,
+      params: [address.toString(), toSign],
     })) as string
   } catch (e) {
     console.error(e)
   }
+}
+
+export async function signInitial(
+  offer: OfferData,
+  address: EthereumAddress
+): Promise<string | undefined> {
+  const toSign = stringifyInitialOffer(offer)
+  return sign('personal_sign', address, toSign)
 }
 
 export async function signAccepted(
@@ -30,20 +37,14 @@ export async function signAccepted(
   accepted: AcceptedData,
   address: EthereumAddress
 ): Promise<string | undefined> {
-  const provider = window.ethereum
+  const toSign = digestAcceptedOfferParams(offer, accepted)
+  return sign('personal_sign', address, toSign)
+}
 
-  if (!provider || !address) {
-    return
-  }
-
-  const digestToSign = digestAcceptedOfferParams(offer, accepted)
-
-  try {
-    return (await provider.request({
-      method: 'eth_sign',
-      params: [address, digestToSign],
-    })) as string
-  } catch (e) {
-    console.error(e)
-  }
+export async function signCancel(
+  offerId: number,
+  address: EthereumAddress
+): Promise<string | undefined> {
+  const toSign = getCancelRequest(offerId)
+  return sign('personal_sign', address, toSign)
 }
