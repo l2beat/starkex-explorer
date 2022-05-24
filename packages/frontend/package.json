@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@ethersproject/solidity": "5.5.0",
+    "@ethersproject/abi": "5.5.0",
     "@explorer/crypto": "*",
     "@explorer/encoding": "*",
     "@explorer/shared": "*",

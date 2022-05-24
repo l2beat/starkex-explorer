@@ -11,6 +11,7 @@ describe(nextFormState.name, () => {
     {
       positionId: 123n,
       account: EthereumAddress.fake(),
+      perpetualAddress: EthereumAddress.fake(),
       publicKey: StarkKey.fake(),
       selectedAsset: AssetId('ETH-9'),
       assets: [

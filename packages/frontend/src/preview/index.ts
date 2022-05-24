@@ -60,6 +60,7 @@ router.get('/forced', (ctx) => {
 })
 router.get('/forced/new', (ctx) => {
   const data = { ...DATA.TRANSACTION_FORM_PROPS }
+  data.account = getAccount(ctx) ?? data.account
   ctx.body = renderTransactionForm(data)
 })
 router.get('/forced/offers', (ctx) => {
