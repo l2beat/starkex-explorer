@@ -18,9 +18,9 @@ import { PositionDetailsProps } from './PositionDetailsProps'
 const balanceTableColumns = (ownedByYou: boolean) => {
   const columns: Column[] = [
     { header: 'Name' },
-    { header: 'Balance', numeric: true },
+    { header: 'Balance', numeric: true, fullWidth: true },
     { header: 'Unit price', numeric: true },
-    { header: 'Value', numeric: true },
+    { header: 'Value', numeric: true, fullWidth: true },
   ]
 
   if (ownedByYou) {
@@ -61,7 +61,7 @@ const buildBalanceTableRow =
   }: PositionDetailsProps['assets'][number]) => {
     const cells = [
       <AssetCell assetId={assetId} />,
-      balance.toString(),
+      formatCurrencyUnits(balance, assetId),
       formatCurrency(priceUSDCents, 'USD'),
       formatCurrency(totalUSDCents, 'USD'),
     ]
