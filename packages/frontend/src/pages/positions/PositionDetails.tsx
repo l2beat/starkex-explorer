@@ -30,25 +30,23 @@ const balanceTableColumns = (ownedByYou: boolean) => {
   return columns
 }
 
-const ActionButton = ({ text }: { text?: string }) => (
-  <>{text && <button className="px-3 rounded bg-blue-100">{text}</button>}</>
-)
-
-const actionButtonText = ({
-  assetId,
-  balance,
-}: {
+interface ActionButtonProps {
   assetId: AssetId
   balance: bigint
-}) => {
-  if (assetId === AssetId.USDC && balance !== 0n) {
-    return 'Exit'
+}
+
+function ActionButton({ assetId, balance }: ActionButtonProps) {
+  if (balance === 0n) {
+    return null
   }
-  if (balance > 0) {
-    return 'Sell'
-  } else if (balance < 0) {
-    return 'Buy'
-  }
+  return (
+    <a
+      href={`/forced/new?assetId=${assetId}`}
+      className="px-3 py-0.5 rounded bg-blue-100"
+    >
+      {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Sell' : 'Buy'}
+    </a>
+  )
 }
 
 const buildBalanceTableRow =
@@ -66,7 +64,7 @@ const buildBalanceTableRow =
       formatCurrency(totalUSDCents, 'USD'),
     ]
     if (ownedByYou) {
-      cells.push(<ActionButton text={actionButtonText({ assetId, balance })} />)
+      cells.push(<ActionButton assetId={assetId} balance={balance} />)
     }
     return { cells }
   }
