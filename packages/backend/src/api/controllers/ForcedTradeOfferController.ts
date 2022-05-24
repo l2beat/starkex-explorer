@@ -1,5 +1,5 @@
 import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
-import { EthereumAddress, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
 import {
   Accepted,
@@ -23,16 +23,23 @@ export class ForcedTradeOfferController {
     private userRegistrationEventRepository: UserRegistrationEventRepository
   ) {}
 
-  async getOffersIndexPage(
-    page: number,
-    perPage: number,
+  async getOffersIndexPage({
+    page,
+    perPage,
+    assetId,
+    account,
+  }: {
+    page: number
+    perPage: number
+    assetId?: AssetId
     account: EthereumAddress | undefined
-  ): Promise<ControllerResult> {
+  }): Promise<ControllerResult> {
     const [total, offers] = await Promise.all([
-      this.offerRepository.initialCount(),
-      this.offerRepository.getLatestInitial({
+      this.offerRepository.countInitial(assetId),
+      this.offerRepository.getInitial({
         offset: (page - 1) * perPage,
         limit: perPage,
+        assetId,
       }),
     ])
 

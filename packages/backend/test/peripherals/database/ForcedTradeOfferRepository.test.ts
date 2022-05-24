@@ -96,16 +96,33 @@ describe(ForcedTradeOfferRepository.name, () => {
     expect(actual).toEqual(submitted)
   })
 
-  it('get initial count', async () => {
+  it('returns initial count', async () => {
     await repository.add(fakeInitialOffer())
-    expect(await repository.initialCount()).toEqual(1)
+    expect(await repository.countInitial()).toEqual(1)
 
     const initial = fakeInitialOffer()
     const id = await repository.add(initial)
-    expect(await repository.initialCount()).toEqual(2)
+    expect(await repository.countInitial()).toEqual(2)
 
     await repository.save({ ...initial, id, accepted: fakeAccepted() })
-    expect(await repository.initialCount()).toEqual(1)
+    expect(await repository.countInitial()).toEqual(1)
+  })
+
+  it('returns initial count with asset id', async () => {
+    await repository.add(
+      fakeInitialOffer({ syntheticAssetId: AssetId('BTC-10') })
+    )
+    await repository.add(
+      fakeInitialOffer({ syntheticAssetId: AssetId('ETH-9') })
+    )
+    await repository.add(
+      fakeInitialOffer({ syntheticAssetId: AssetId('AAVE-8') })
+    )
+    await repository.add(
+      fakeInitialOffer({ syntheticAssetId: AssetId('AAVE-8') })
+    )
+
+    expect(await repository.countInitial(AssetId('AAVE-8'))).toEqual(2)
   })
 
   it('deletes all records', async () => {
@@ -114,11 +131,11 @@ describe(ForcedTradeOfferRepository.name, () => {
 
     await repository.deleteAll()
 
-    const actual = await repository.getLatestInitial({ limit: 10, offset: 0 })
+    const actual = await repository.getInitial({ limit: 10, offset: 0 })
     expect(actual).toEqual([])
   })
 
-  it('returns latest initial offers', async () => {
+  it('returns initial offers', async () => {
     const initial1 = fakeInitialOffer({ createdAt: Timestamp(1) })
     const initial2 = fakeInitialOffer({ createdAt: Timestamp(2) })
     const initial3 = fakeInitialOffer({ createdAt: Timestamp(3) })
@@ -129,8 +146,40 @@ describe(ForcedTradeOfferRepository.name, () => {
     await repository.add(initial3)
     await repository.add(accepted1)
 
-    const latest = await repository.getLatestInitial({ limit: 10, offset: 1 })
+    const latest = await repository.getInitial({ limit: 10, offset: 1 })
 
     expect(latest.map((o) => o.id)).toEqual([id2, id1])
+  })
+
+  it('returns filtered initial offers', async () => {
+    const initial1 = fakeInitialOffer({
+      createdAt: Timestamp(1),
+      syntheticAssetId: AssetId('AAVE-8'),
+    })
+    const initial2 = fakeInitialOffer({
+      createdAt: Timestamp(2),
+      syntheticAssetId: AssetId('AAVE-8'),
+    })
+    const initial3 = fakeInitialOffer({
+      createdAt: Timestamp(3),
+      syntheticAssetId: AssetId('ETH-9'),
+    })
+    const accepted1 = fakeOffer({
+      createdAt: Timestamp(1),
+      syntheticAssetId: AssetId('ETH-9'),
+    })
+
+    const id1 = await repository.add(initial1)
+    await repository.add(initial2)
+    await repository.add(initial3)
+    await repository.add(accepted1)
+
+    const latest = await repository.getInitial({
+      limit: 10,
+      offset: 1,
+      assetId: AssetId('AAVE-8'),
+    })
+
+    expect(latest.map((o) => o.id)).toEqual([id1])
   })
 })
