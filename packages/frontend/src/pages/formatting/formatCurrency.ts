@@ -6,10 +6,13 @@ export function formatCurrency(
   units: bigint | number,
   currency: AssetId | 'USD'
 ) {
-  const value = formatCurrencyUnits(units, currency)
   if (currency === 'USD') {
-    return `$${value}`
+    if (units < 0) {
+      return `-$${formatCurrencyUnits(-units, currency)}`
+    }
+    return `$${formatCurrencyUnits(units, currency)}`
   } else {
+    const value = formatCurrencyUnits(units, currency)
     return `${value} ${AssetId.symbol(currency)}`
   }
 }
