@@ -2,7 +2,7 @@ import { recoverAddress } from '@ethersproject/transactions'
 import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { getAcceptRequest } from '../src'
+import { toSignableAcceptOffer } from '../src'
 
 // Mock data taken from real transaction:https://etherscan.io/tx/0x9b2dce5538d0c8c08511c9383be9b67da6f952b367baff0c8bdb5f66c9395634
 
@@ -31,9 +31,9 @@ const ACCEPTED = {
 
 const ETH_ADDRESS = '0xCE9a3e51B905997F1D098345a92B6c749A1f72B9'
 
-describe(getAcceptRequest.name, () => {
+describe(toSignableAcceptOffer.name, () => {
   it('works on an example tx', () => {
-    const digest = getAcceptRequest(INITIAL, ACCEPTED)
+    const digest = toSignableAcceptOffer(INITIAL, ACCEPTED)
     expect(recoverAddress(digest, ACCEPTED.signature)).toEqual(ETH_ADDRESS)
   })
 })

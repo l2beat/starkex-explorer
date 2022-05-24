@@ -1,15 +1,16 @@
-import { AssetId, StarkKey } from '@explorer/types'
+import {
+  CreateOfferBody,
+  stringAs,
+  stringAsBigInt,
+  stringAsInt,
+} from '@explorer/shared'
+import { StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
 import { z } from 'zod'
 
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
-import {
-  stringAs,
-  stringAsBigInt,
-  stringAsInt,
-  withTypedContext,
-} from './types'
+import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
 export function createForcedTradeOfferRouter(
@@ -22,19 +23,7 @@ export function createForcedTradeOfferRouter(
     bodyParser(),
     withTypedContext(
       z.object({
-        request: z.object({
-          body: z.object({
-            offer: z.object({
-              starkKeyA: stringAs(StarkKey),
-              positionIdA: stringAsBigInt(),
-              syntheticAssetId: stringAs(AssetId),
-              amountCollateral: stringAsBigInt(),
-              amountSynthetic: stringAsBigInt(),
-              aIsBuyingSynthetic: z.boolean(),
-            }),
-            signature: z.string(),
-          }),
-        }),
+        request: z.object({ body: CreateOfferBody }),
       }),
       async (ctx) => {
         const { offer, signature } = ctx.request.body

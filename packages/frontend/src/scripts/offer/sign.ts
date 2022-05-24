@@ -1,11 +1,12 @@
 import {
-  getAcceptRequest,
-  getCancelRequest,
-  getCreateRequest,
+  CreateOfferData,
+  toSignableAcceptOffer,
+  toSignableCancelOffer,
+  toSignableCreateOffer,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
-import { AcceptedData, OfferData } from './types'
+import { AcceptedData } from './types'
 
 async function sign(
   method: 'personal_sign' | 'eth_sign',
@@ -25,26 +26,26 @@ async function sign(
 }
 
 export async function signCreate(
-  offer: OfferData,
+  offer: CreateOfferData,
   address: EthereumAddress
 ): Promise<string | undefined> {
-  const toSign = getCreateRequest(offer)
-  return sign('personal_sign', address, toSign)
+  const signable = toSignableCreateOffer(offer)
+  return sign('personal_sign', address, signable)
 }
 
 export async function signAccepted(
-  offer: OfferData,
+  offer: CreateOfferData,
   accepted: AcceptedData,
   address: EthereumAddress
 ): Promise<string | undefined> {
-  const toSign = getAcceptRequest(offer, accepted)
-  return sign('eth_sign', address, toSign)
+  const signable = toSignableAcceptOffer(offer, accepted)
+  return sign('eth_sign', address, signable)
 }
 
 export async function signCancel(
   offerId: number,
   address: EthereumAddress
 ): Promise<string | undefined> {
-  const toSign = getCancelRequest(offerId)
-  return sign('personal_sign', address, toSign)
+  const signable = toSignableCancelOffer(offerId)
+  return sign('personal_sign', address, signable)
 }

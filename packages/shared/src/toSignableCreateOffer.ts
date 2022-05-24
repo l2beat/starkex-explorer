@@ -1,13 +1,15 @@
 import { AssetId, StarkKey } from '@explorer/types'
 
-export function getCreateRequest(offer: {
+export interface CreateOfferData {
   starkKeyA: StarkKey
   positionIdA: bigint
   syntheticAssetId: AssetId
   amountCollateral: bigint
   amountSynthetic: bigint
   aIsBuyingSynthetic: boolean
-}) {
+}
+
+export function toSignableCreateOffer(offer: CreateOfferData) {
   return JSON.stringify(
     {
       starkKeyA: offer.starkKeyA,
