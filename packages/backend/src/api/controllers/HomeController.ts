@@ -28,7 +28,7 @@ export class HomeController {
       await Promise.all([
         this.stateUpdateRepository.getPaginated({ offset, limit }),
         this.forcedTransactionsRepository.getLatest({ limit, offset }),
-        this.forcedTradeOffersRepository.getLatestInitial({ limit, offset }),
+        this.forcedTradeOffersRepository.getInitial({ limit, offset }),
         this.stateUpdateRepository.count(),
         this.positionRepository.count(),
       ])

@@ -50,7 +50,7 @@ export class ForcedTradeOfferController {
       account,
       offers: offers.map(toForcedTradeOfferEntry),
       total,
-      params: { page, perPage },
+      params: { page, perPage, type, assetId },
     })
     return { type: 'success', content }
   }
