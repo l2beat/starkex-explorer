@@ -95,7 +95,13 @@ export class ForcedTradeOfferController {
     if (offer.accepted) {
       return {
         type: 'bad request',
-        content: 'Offer already accepted by a user.',
+        content: 'Offer already accepted.',
+      }
+    }
+    if (offer.cancelledAt) {
+      return {
+        type: 'bad request',
+        content: 'Offer already cancelled.',
       }
     }
     const requestValid = validateAccept(

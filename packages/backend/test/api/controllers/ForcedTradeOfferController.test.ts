@@ -211,6 +211,57 @@ describe(ForcedTradeOfferController.name, async () => {
       })
     })
 
+    it('blocks accepted offer', async () => {
+      const controller = new ForcedTradeOfferController(
+        mock<ForcedTradeOfferRepository>({
+          findById: async () => ({
+            id: 1,
+            createdAt: Timestamp(Date.now() - 2000),
+            ...tradeMock.offer,
+            accepted: {
+              ...tradeMock.accepted,
+              at: Timestamp(Date.now() - 1000),
+            },
+          }),
+        }),
+        mock<PositionRepository>({
+          findById: async () => positionA,
+        }),
+        mock<UserRegistrationEventRepository>({
+          findByStarkKey: async () => userA,
+        })
+      )
+
+      expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
+        type: 'bad request',
+        content: 'Offer already accepted.',
+      })
+    })
+
+    it('blocks cancelled offer', async () => {
+      const controller = new ForcedTradeOfferController(
+        mock<ForcedTradeOfferRepository>({
+          findById: async () => ({
+            id: 1,
+            createdAt: Timestamp(Date.now() - 2000),
+            ...tradeMock.offer,
+            cancelledAt: Timestamp(Date.now() - 1000),
+          }),
+        }),
+        mock<PositionRepository>({
+          findById: async () => positionA,
+        }),
+        mock<UserRegistrationEventRepository>({
+          findByStarkKey: async () => userA,
+        })
+      )
+
+      expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
+        type: 'bad request',
+        content: 'Offer already cancelled.',
+      })
+    })
+
     it('blocks invalid balance', async () => {
       const id = 1
       const controller = new ForcedTradeOfferController(
