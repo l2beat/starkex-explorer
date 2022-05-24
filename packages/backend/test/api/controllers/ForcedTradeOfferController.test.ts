@@ -1,3 +1,4 @@
+import { getCancelRequest } from '@explorer/shared'
 import {
   AssetId,
   EthereumAddress,
@@ -6,6 +7,7 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { expect } from 'earljs'
+import { Wallet } from 'ethers'
 
 import {
   ForcedTradeOfferController,
@@ -533,6 +535,42 @@ describe(ForcedTradeOfferController.name, () => {
       expect(await controller.cancelOffer(1, '123')).toEqual({
         type: 'bad request',
         content: 'Signature does not match.',
+      })
+    })
+
+    it('cancels offer', async () => {
+      const wallet = Wallet.createRandom()
+      const address = EthereumAddress(wallet.address)
+      const id = 1
+      const request = getCancelRequest(id)
+      const signature = await wallet.signMessage(request)
+      const controller = new ForcedTradeOfferController(
+        mock<ForcedTradeOfferRepository>({
+          findById: async () => ({
+            ...initialOffer,
+            id,
+            createdAt: Timestamp(Date.now() - 1000),
+            accepted: {
+              ...acceptedData,
+              at: Timestamp(Date.now() - 500),
+            },
+          }),
+          save: async () => true,
+        }),
+        mock<PositionRepository>(),
+        mock<UserRegistrationEventRepository>({
+          findByStarkKey: async () => ({
+            id: 1,
+            blockNumber: 1,
+            starkKey: initialOffer.starkKeyA,
+            ethAddress: address,
+          }),
+        })
+      )
+
+      expect(await controller.cancelOffer(id, signature)).toEqual({
+        type: 'success',
+        content: 'Offer cancelled.',
       })
     })
   })
