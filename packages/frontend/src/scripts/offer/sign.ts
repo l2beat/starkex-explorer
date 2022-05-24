@@ -1,7 +1,7 @@
 import {
   getAcceptRequest,
   getCancelRequest,
-  getInitialOfferRequest,
+  getCreateRequest,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
@@ -28,7 +28,7 @@ export async function signCreate(
   offer: OfferData,
   address: EthereumAddress
 ): Promise<string | undefined> {
-  const toSign = getInitialOfferRequest(offer)
+  const toSign = getCreateRequest(offer)
   return sign('personal_sign', address, toSign)
 }
 
