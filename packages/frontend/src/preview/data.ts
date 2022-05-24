@@ -256,7 +256,9 @@ export const FORCED_TRADE_OFFERS_INDEX_PROPS: ForcedTradeOffersIndexProps = {
 
 export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
   account: EthereumAddress.fake(),
-  perpetualAddress: EthereumAddress.fake(),
+  perpetualAddress: EthereumAddress(
+    '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'
+  ),
   selectedAsset: AssetId('USDC-6'),
   positionId: 1234n,
   publicKey: StarkKey.fake(),

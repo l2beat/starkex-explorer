@@ -1,13 +1,50 @@
+import { Interface } from '@ethersproject/abi'
+import { Hash256 } from '@explorer/types'
+
 import { signCreate } from '../offer/sign'
 import { FormState } from './types'
 
 export async function submit(state: FormState) {
   if (state.exitButtonSelected) {
-    alert('Exit transaction')
-    // TODO: implement
+    return submitExit(state)
+  } else {
+    return submitOffer(state)
+  }
+}
+
+async function submitExit(state: FormState) {
+  const provider = window.ethereum
+  if (!provider) {
     return
   }
 
+  const coder = new Interface([
+    'function forcedWithdrawalRequest(uint256 starkKey, uint256 vaultId, uint256 quantizedAmount, bool premiumCost)',
+  ])
+
+  const data = coder.encodeFunctionData('forcedWithdrawalRequest', [
+    state.props.publicKey,
+    state.props.positionId.toString(),
+    state.amountInputValue.toString(),
+    false,
+  ])
+
+  const result = await provider.request({
+    method: 'eth_sendTransaction',
+    params: [
+      {
+        from: state.props.account,
+        to: state.props.perpetualAddress,
+        data,
+      },
+    ],
+  })
+  const hash = Hash256(result as string)
+
+  console.log(hash)
+}
+
+async function submitOffer(state: FormState) {
   const offer = {
     starkKeyA: state.props.publicKey,
     positionIdA: state.props.positionId,
@@ -29,13 +66,8 @@ export async function submit(state: FormState) {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(
-      {
-        offer,
-        signature,
-      },
-      (_, value: unknown) =>
-        typeof value === 'bigint' ? value.toString() : value
+    body: JSON.stringify({ offer, signature }, (_, value: unknown) =>
+      typeof value === 'bigint' ? value.toString() : value
     ),
   })
     .then((res) => res.json())
