@@ -13,6 +13,7 @@ describe(formatCurrency.name, () => {
     [1234567890123n, AssetId('ETH-9'), '1,234.567890123 ETH'],
     [1234567890123n, AssetId.USDC, '1,234,567.890123 USDC'],
     [1234567890123n, 'USD', '$12,345,678,901.23'],
+    [-1234n, 'USD', '-$12.34'],
   ]
 
   for (const [value, asset, expected] of cases) {
