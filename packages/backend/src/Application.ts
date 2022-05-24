@@ -183,7 +183,8 @@ export class Application {
     const forcedTransactionController = new ForcedTransactionController(
       userRegistrationEventRepository,
       positionRepository,
-      forcedTransactionsRepository
+      forcedTransactionsRepository,
+      config.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       stateUpdateRepository,

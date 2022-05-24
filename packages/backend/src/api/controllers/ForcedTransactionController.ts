@@ -20,7 +20,8 @@ export class ForcedTransactionController {
   constructor(
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private positionRepository: PositionRepository,
-    private forcedTransactionsRepository: ForcedTransactionsRepository
+    private forcedTransactionsRepository: ForcedTransactionsRepository,
+    private perpetualAddress: EthereumAddress
   ) {}
 
   async getForcedTransactionsPage(
@@ -106,6 +107,7 @@ export class ForcedTransactionController {
       type: 'success',
       content: renderTransactionForm({
         account,
+        perpetualAddress: this.perpetualAddress,
         positionId: position.positionId,
         publicKey: position.publicKey,
         selectedAsset: assets[0].assetId,
