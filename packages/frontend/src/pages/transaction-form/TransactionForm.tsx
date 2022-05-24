@@ -7,12 +7,13 @@ import { InfoText } from './InfoText'
 import { PositionIdView } from './PositionIdView'
 import { PriceInput } from './PriceInput'
 import { TotalInput } from './TotalInput'
-import { TransactionFormProps } from './TransactionFormProps'
+import {
+  serializeTransactionFormProps,
+  TransactionFormProps,
+} from './TransactionFormProps'
 
 export function TransactionForm(props: TransactionFormProps) {
-  const propsJson = JSON.stringify(props, (k, v) =>
-    typeof v === 'bigint' ? v.toString() : v
-  )
+  const propsJson = serializeTransactionFormProps(props)
   return (
     <Page
       title={`L2BEAT dYdX Explorer | Force transaction`}

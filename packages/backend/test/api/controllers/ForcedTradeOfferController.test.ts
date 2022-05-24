@@ -1,4 +1,4 @@
-import { getCancelRequest, getCreateRequest } from '@explorer/shared'
+import { toSignableCancelOffer, toSignableCreateOffer } from '@explorer/shared'
 import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 import { Wallet } from 'ethers'
@@ -148,7 +148,7 @@ describe(ForcedTradeOfferController.name, async () => {
         userRegistrationEventRepository
       )
 
-      const request = getCreateRequest(tradeMock.offer)
+      const request = toSignableCreateOffer(tradeMock.offer)
       const signature = await wallet.signMessage(request)
       expect(await controller.postOffer(tradeMock.offer, signature)).toEqual({
         type: 'created',
@@ -344,7 +344,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
   describe(ForcedTradeOfferController.prototype.cancelOffer.name, () => {
     const id = 1
-    const request = getCancelRequest(id)
+    const request = toSignableCancelOffer(id)
     const initial = {
       id,
       ...tradeMock.offer,

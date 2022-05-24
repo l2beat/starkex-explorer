@@ -1,4 +1,4 @@
-import { getCreateRequest } from '@explorer/shared'
+import { toSignableCreateOffer } from '@explorer/shared'
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 import { Wallet } from 'ethers'
@@ -23,7 +23,7 @@ describe(validateCreateSignature.name, () => {
     }
     const wallet = Wallet.createRandom()
     const address = EthereumAddress(wallet.address)
-    const request = getCreateRequest(offer)
+    const request = toSignableCreateOffer(offer)
     const signature = await wallet.signMessage(request)
     expect(validateCreateSignature(offer, signature, address)).toBeTruthy()
   })

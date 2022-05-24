@@ -1,4 +1,5 @@
 import { Interface } from '@ethersproject/abi'
+import { CreateOfferData, serializeCreateOfferBody } from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
 import { signCreate } from '../offer/sign'
@@ -45,7 +46,7 @@ async function submitExit(state: FormState) {
 }
 
 async function submitOffer(state: FormState) {
-  const offer = {
+  const offer: CreateOfferData = {
     starkKeyA: state.props.publicKey,
     positionIdA: state.props.positionId,
     amountCollateral: state.totalInputValue,
@@ -63,12 +64,8 @@ async function submitOffer(state: FormState) {
 
   fetch('/forced/offers', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ offer, signature }, (_, value: unknown) =>
-      typeof value === 'bigint' ? value.toString() : value
-    ),
+    headers: { 'Content-Type': 'application/json' },
+    body: serializeCreateOfferBody({ offer, signature }),
   })
     .then((res) => res.json())
     .then((res) => {

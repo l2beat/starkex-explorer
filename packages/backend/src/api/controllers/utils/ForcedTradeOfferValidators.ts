@@ -1,8 +1,8 @@
 import { AssetBalance } from '@explorer/encoding'
 import {
-  getAcceptRequest,
-  getCancelRequest,
-  getCreateRequest,
+  toSignableAcceptOffer,
+  toSignableCancelOffer,
+  toSignableCreateOffer,
 } from '@explorer/shared'
 import { AssetId, EthereumAddress } from '@explorer/types'
 import { hashMessage, recoverAddress } from 'ethers/lib/utils'
@@ -56,7 +56,7 @@ export function validateCreateSignature(
   signature: string,
   address: EthereumAddress
 ) {
-  const request = getCreateRequest(offer)
+  const request = toSignableCreateOffer(offer)
   return validatePersonalSignature(request, signature, address)
 }
 
@@ -65,7 +65,7 @@ export function validateAcceptSignature(
   accepted: Omit<Accepted, 'at' | 'premiumCost'>,
   address: EthereumAddress
 ): boolean {
-  const request = getAcceptRequest(offer, accepted)
+  const request = toSignableAcceptOffer(offer, accepted)
   return validateSignature(request, accepted.signature, address)
 }
 
@@ -110,6 +110,6 @@ export function validateCancel(
   address: EthereumAddress,
   signature: string
 ): boolean {
-  const request = getCancelRequest(offerId)
+  const request = toSignableCancelOffer(offerId)
   return validatePersonalSignature(request, signature, address)
 }

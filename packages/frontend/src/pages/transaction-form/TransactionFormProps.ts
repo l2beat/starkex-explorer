@@ -1,12 +1,28 @@
+import {
+  stringAs,
+  stringAsBigInt,
+  toJsonWithoutBigInts,
+} from '@explorer/shared'
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { z } from 'zod'
 
-import { PositionAssetEntry } from '../positions'
+export type TransactionFormProps = z.infer<typeof TransactionFormProps>
+export const TransactionFormProps = z.object({
+  account: stringAs(EthereumAddress),
+  perpetualAddress: stringAs(EthereumAddress),
+  selectedAsset: stringAs(AssetId),
+  positionId: stringAsBigInt(),
+  publicKey: stringAs(StarkKey),
+  assets: z.array(
+    z.object({
+      assetId: stringAs(AssetId),
+      balance: stringAsBigInt(),
+      totalUSDCents: stringAsBigInt(),
+      priceUSDCents: stringAsBigInt(),
+    })
+  ),
+})
 
-export interface TransactionFormProps {
-  readonly account: EthereumAddress
-  readonly perpetualAddress: EthereumAddress
-  readonly selectedAsset: AssetId
-  readonly positionId: bigint
-  readonly publicKey: StarkKey
-  readonly assets: readonly PositionAssetEntry[]
+export function serializeTransactionFormProps(props: TransactionFormProps) {
+  return toJsonWithoutBigInts(props)
 }

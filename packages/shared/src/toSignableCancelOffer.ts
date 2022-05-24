@@ -1,4 +1,4 @@
-export function getCancelRequest(offerId: number): string {
+export function toSignableCancelOffer(offerId: number): string {
   return JSON.stringify(
     {
       cancel: true,

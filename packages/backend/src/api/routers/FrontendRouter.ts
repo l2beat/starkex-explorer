@@ -1,3 +1,4 @@
+import { stringAs, stringAsBigInt, stringAsInt } from '@explorer/shared'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
@@ -9,12 +10,7 @@ import { HomeController } from '../controllers/HomeController'
 import { PositionController } from '../controllers/PositionController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
-import {
-  stringAs,
-  stringAsBigInt,
-  stringAsInt,
-  withTypedContext,
-} from './types'
+import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
 export function createFrontendRouter(

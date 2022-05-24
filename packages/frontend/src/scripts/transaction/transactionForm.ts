@@ -1,9 +1,9 @@
 import { AssetId } from '@explorer/types'
 
+import { TransactionFormProps } from '../../pages'
 import { getAssetImageUrl } from '../../pages/common/icons/getAssetImageUrl'
 import { FormId } from '../../pages/transaction-form/ids'
 import { getFormElements } from './getFormElements'
-import { jsonToProps } from './jsonToProps'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
 import { FormAction, FormState } from './types'
@@ -19,7 +19,7 @@ export function initTransactionForm() {
   ui.form.classList.add('flex')
 
   const propsJson = JSON.parse(ui.form.dataset.props ?? '{}')
-  const props = jsonToProps(propsJson)
+  const props = TransactionFormProps.parse(propsJson)
 
   ui.assetSelect.addEventListener('change', () =>
     dispatch({ type: 'AssetChange', assetId: AssetId(ui.assetSelect.value) })

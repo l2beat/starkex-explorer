@@ -1,5 +1,4 @@
 import React from 'react'
-import { URLSearchParams } from 'url'
 
 import { NextIcon } from '../icons/NextIcon'
 import { PrevIcon } from '../icons/PrevIcon'

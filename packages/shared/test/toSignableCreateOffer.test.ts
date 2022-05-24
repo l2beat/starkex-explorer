@@ -1,7 +1,7 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { getCreateRequest } from '../src'
+import { toSignableCreateOffer } from '../src'
 
 const offer = {
   starkKeyA: StarkKey.fake(),
@@ -12,9 +12,9 @@ const offer = {
   aIsBuyingSynthetic: true,
 }
 
-describe(getCreateRequest.name, () => {
+describe(toSignableCreateOffer.name, () => {
   it('works properly', () => {
-    expect(getCreateRequest(offer)).toEqual(
+    expect(toSignableCreateOffer(offer)).toEqual(
       [
         '{',
         `  "starkKeyA": "${offer.starkKeyA}",`,

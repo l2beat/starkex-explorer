@@ -1,13 +1,4 @@
-import { AssetId, StarkKey } from '@explorer/types'
-
-export interface OfferData {
-  starkKeyA: StarkKey
-  positionIdA: bigint
-  syntheticAssetId: AssetId
-  amountCollateral: bigint
-  amountSynthetic: bigint
-  aIsBuyingSynthetic: boolean
-}
+import { StarkKey } from '@explorer/types'
 
 export interface AcceptedData {
   starkKeyB: StarkKey
