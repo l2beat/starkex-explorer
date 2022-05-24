@@ -1,4 +1,4 @@
-import { signInitial } from '../offer/sign'
+import { signCreate } from '../offer/sign'
 import { FormState } from './types'
 
 export async function submit(state: FormState) {
@@ -17,7 +17,7 @@ export async function submit(state: FormState) {
     aIsBuyingSynthetic: state.buyButtonSelected,
   }
 
-  const signature = await signInitial(offer, state.props.account)
+  const signature = await signCreate(offer, state.props.account)
 
   if (!signature) {
     console.error('Offer parameters need to be signed.')

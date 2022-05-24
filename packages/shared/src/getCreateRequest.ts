@@ -1,6 +1,6 @@
 import { AssetId, StarkKey } from '@explorer/types'
 
-export function stringifyInitialOffer(offer: {
+export function getCreateRequest(offer: {
   starkKeyA: StarkKey
   positionIdA: bigint
   syntheticAssetId: AssetId

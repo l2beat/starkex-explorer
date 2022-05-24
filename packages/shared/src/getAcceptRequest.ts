@@ -2,7 +2,7 @@ import { keccak256, pack } from '@ethersproject/solidity'
 import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, StarkKey } from '@explorer/types'
 
-export function digestAcceptedOfferParams(
+export function getAcceptRequest(
   offer: {
     starkKeyA: StarkKey
     positionIdA: bigint

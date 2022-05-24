@@ -1,8 +1,8 @@
 import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
 import {
-  digestAcceptedOfferParams,
+  getAcceptRequest,
   getCancelRequest,
-  stringifyInitialOffer,
+  getCreateRequest,
 } from '@explorer/shared'
 import { EthereumAddress, Timestamp } from '@explorer/types'
 import { hashMessage, recoverAddress } from 'ethers/lib/utils'
@@ -247,13 +247,22 @@ function validateSignature(
   }
 }
 
+function validatePersonalSignature(
+  request: string,
+  signature: string,
+  address: EthereumAddress
+): boolean {
+  const toSign = hashMessage(request)
+  return validateSignature(toSign, signature, address)
+}
+
 function validateCancelRequest(
   offerId: ForcedTradeOfferRecord['id'],
   address: EthereumAddress,
   signature: string
 ): boolean {
   const request = getCancelRequest(offerId)
-  return validateSignature(hashMessage(request), signature, address)
+  return validatePersonalSignature(request, signature, address)
 }
 
 export function validateInitialSignature(
@@ -261,8 +270,8 @@ export function validateInitialSignature(
   signature: string,
   address: EthereumAddress
 ) {
-  const request = stringifyInitialOffer(offer)
-  return validateSignature(hashMessage(request), signature, address)
+  const request = getCreateRequest(offer)
+  return validatePersonalSignature(request, signature, address)
 }
 
 export function validateAcceptedSignature(
@@ -270,6 +279,6 @@ export function validateAcceptedSignature(
   accepted: Omit<Accepted, 'at'>,
   address: EthereumAddress
 ): boolean {
-  const digest = digestAcceptedOfferParams(offer, accepted)
+  const digest = getAcceptRequest(offer, accepted)
   return validateSignature(digest, accepted.signature, address)
 }
