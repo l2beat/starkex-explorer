@@ -57,7 +57,7 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
     signature: orNull(record.accepted?.signature),
     transaction_hash: orNull(record.accepted?.transactionHash?.toString()),
     cancelled_at:
-      record.cancelledAt !== undefined && record.cancelledAt !== null
+      record.cancelledAt !== undefined
         ? BigInt(record.cancelledAt.toString())
         : null,
   }
