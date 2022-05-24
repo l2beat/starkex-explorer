@@ -5,12 +5,11 @@ import { Wallet } from 'ethers'
 
 import {
   validateAcceptSignature,
+  validateBalance,
   validateCreateSignature,
 } from '../../../../src/api/controllers/utils/ForcedTradeOfferValidators'
 import { fakeBigInt } from '../../../fakes'
 import { accepted, addressB, offer } from './ForcedTradeOfferMockData'
-
-// Mock data taken from real transaction: https://etherscan.io/tx/0x9b2dce5538d0c8c08511c9383be9b67da6f952b367baff0c8bdb5f66c9395634
 
 describe(validateCreateSignature.name, () => {
   it('accepts correct input', async () => {
@@ -33,5 +32,105 @@ describe(validateCreateSignature.name, () => {
 describe(validateAcceptSignature.name, () => {
   it('accepts correct input', async () => {
     expect(validateAcceptSignature(offer, accepted, addressB)).toBeTruthy()
+  })
+})
+
+describe(validateBalance.name, () => {
+  it('returns true for sufficient synthetic buy', () => {
+    const amountCollateral = 5n
+    const collateralBalance = amountCollateral
+
+    const valid = validateBalance(
+      amountCollateral,
+      10n,
+      AssetId('BTC-10'),
+      collateralBalance,
+      [],
+      true
+    )
+
+    expect(valid).toBeTruthy()
+  })
+
+  it('returns true for sufficient synthetic sell', () => {
+    const amountSynthetic = 5n
+    const assetId = AssetId('BTC-10')
+    const balances = [
+      {
+        assetId,
+        balance: amountSynthetic,
+      },
+    ]
+
+    const valid = validateBalance(
+      5n,
+      amountSynthetic,
+      assetId,
+      5n,
+      balances,
+      false
+    )
+
+    expect(valid).toBeTruthy()
+  })
+
+  it('returns false for insufficient synthetic buy', () => {
+    const amountCollateral = 5n
+    const collateralBalance = amountCollateral - 1n
+
+    const valid = validateBalance(
+      amountCollateral,
+      10n,
+      AssetId('BTC-10'),
+      collateralBalance,
+      [],
+      true
+    )
+
+    expect(valid).toBeFalsy()
+  })
+
+  it('returns false for insufficient synthetic sell', () => {
+    const amountSynthetic = 5n
+    const assetId = AssetId('BTC-10')
+    const balances = [
+      {
+        assetId,
+        balance: amountSynthetic - 1n,
+      },
+    ]
+
+    const valid = validateBalance(
+      5n,
+      amountSynthetic,
+      assetId,
+      5n,
+      balances,
+      false
+    )
+
+    expect(valid).toBeFalsy()
+  })
+
+  it('returns false if buying missing asset', () => {
+    const amountSynthetic = 5n
+    const assetId = AssetId('ETH-9')
+    const balances = [
+      {
+        assetId,
+        balance: amountSynthetic - 1n,
+      },
+    ]
+
+    const valid = validateBalance(
+      5n,
+      amountSynthetic,
+      AssetId('BTC-10'),
+      5n,
+      balances,
+      false
+    )
+
+    expect(valid).toBeFalsy()
   })
 })
