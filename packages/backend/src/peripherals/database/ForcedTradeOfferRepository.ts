@@ -112,6 +112,11 @@ function toRecord(row: Row): Record {
   }
 }
 
+interface InitialFilters {
+  type?: 'buy' | 'sell'
+  assetId?: AssetId
+}
+
 export class ForcedTradeOfferRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
@@ -139,17 +144,25 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return !!updates
   }
 
-  async countInitial(assetId?: AssetId): Promise<number> {
+  private getInitialQuery({ assetId, type }: InitialFilters = {}) {
     const query = this.knex('forced_trade_offers')
       .whereNull('accepted_at')
       .whereNull('cancelled_at')
-      .count()
-
     if (assetId) {
       query.andWhere('synthetic_asset_id', '=', assetId.toString())
     }
+    if (type) {
+      query.andWhere(
+        'a_is_buying_synthetic',
+        '=',
+        type === 'buy' ? true : false
+      )
+    }
+    return query
+  }
 
-    const [{ count }] = await query
+  async countInitial({ assetId, type }: InitialFilters = {}): Promise<number> {
+    const [{ count }] = await this.getInitialQuery({ assetId, type }).count()
     return Number(count)
   }
 
@@ -157,23 +170,16 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     limit,
     offset,
     assetId,
+    type,
   }: {
     limit: number
     offset: number
-    assetId?: AssetId
-  }): Promise<Record[]> {
-    const query = this.knex('forced_trade_offers')
-      .whereNull('accepted_at')
-      .whereNull('cancelled_at')
+  } & InitialFilters): Promise<Record[]> {
+    const rows = await this.getInitialQuery({ assetId, type })
       .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(offset)
 
-    if (assetId) {
-      query.andWhere('synthetic_asset_id', '=', assetId.toString())
-    }
-
-    const rows = await query
     return rows.map(toRecord)
   }
 

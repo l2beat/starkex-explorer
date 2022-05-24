@@ -68,15 +68,17 @@ export function createFrontendRouter(
           page: stringAsInt(1),
           perPage: stringAsInt(10),
           assetId: stringAs(AssetId).optional(),
+          type: z.enum(['sell', 'buy']).optional(),
         }),
       }),
       async (ctx) => {
-        const { page, perPage, assetId } = ctx.query
+        const { page, perPage, assetId, type } = ctx.query
         const account = getAccount(ctx)
         const result = await forcedTradeOfferController.getOffersIndexPage({
           page,
           perPage,
           assetId,
+          type,
           account,
         })
         applyControllerResult(ctx, result)
