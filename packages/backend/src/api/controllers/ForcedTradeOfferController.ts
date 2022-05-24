@@ -234,7 +234,7 @@ function validateBalance(
   return false
 }
 
-function validateAddress(
+function validateSignature(
   digest: string,
   signature: string,
   address: EthereumAddress
@@ -253,7 +253,7 @@ function validateCancelRequest(
   signature: string
 ): boolean {
   const request = getCancelRequest(offerId)
-  return validateAddress(hashMessage(request), signature, address)
+  return validateSignature(hashMessage(request), signature, address)
 }
 
 export function validateInitialSignature(
@@ -262,7 +262,7 @@ export function validateInitialSignature(
   address: EthereumAddress
 ) {
   const request = stringifyInitialOffer(offer)
-  return validateAddress(hashMessage(request), signature, address)
+  return validateSignature(hashMessage(request), signature, address)
 }
 
 export function validateAcceptedSignature(
