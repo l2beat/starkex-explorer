@@ -45,7 +45,7 @@ function fakeOffer(
 function fakeInitialOffer(
   offer?: Partial<Omit<ForcedTradeOfferRecord, 'accepted'>>
 ) {
-  return fakeOffer({ ...offer, accepted: undefined, cancelledAt: null })
+  return fakeOffer({ ...offer, accepted: undefined, cancelledAt: undefined })
 }
 
 describe(ForcedTradeOfferRepository.name, () => {

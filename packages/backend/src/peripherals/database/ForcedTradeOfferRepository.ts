@@ -3,7 +3,6 @@ import { Knex } from 'knex'
 import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { Nullable } from '../../utils/Nullable'
 import { BaseRepository } from './BaseRepository'
 
 export interface Accepted {
@@ -27,7 +26,7 @@ interface Record {
   amountSynthetic: bigint
   aIsBuyingSynthetic: boolean
   accepted?: Accepted
-  cancelledAt?: Nullable<Timestamp>
+  cancelledAt?: Timestamp
 }
 export { type Record as ForcedTradeOfferRecord }
 
@@ -82,7 +81,7 @@ function toRecord(row: Row): Record {
     amountSynthetic: row.amount_synthetic,
     aIsBuyingSynthetic: row.a_is_buying_synthetic,
     accepted: undefined,
-    cancelledAt: row.cancelled_at ? Timestamp(row.cancelled_at) : null,
+    cancelledAt: row.cancelled_at ? Timestamp(row.cancelled_at) : undefined,
   }
   if (
     row.accepted_at !== null &&
