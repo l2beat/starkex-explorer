@@ -8,25 +8,25 @@ import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/Fo
 import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
 import { mock } from '../../mock'
-import { accepted, addressB, offer } from './utils/ForcedTradeOfferMockData'
+import * as tradeMock from './utils/ForcedTradeOfferMockData'
 
 describe(ForcedTradeOfferController.name, async () => {
   const stateUpdateId = 1
   const positionA = {
-    positionId: offer.positionIdA,
-    publicKey: offer.starkKeyA,
-    collateralBalance: offer.amountCollateral,
+    positionId: tradeMock.offer.positionIdA,
+    publicKey: tradeMock.offer.starkKeyA,
+    collateralBalance: tradeMock.offer.amountCollateral,
     balances: [],
     stateUpdateId,
   }
   const positionB = {
-    publicKey: accepted.starkKeyB,
-    positionId: accepted.positionIdB,
+    publicKey: tradeMock.accepted.starkKeyB,
+    positionId: tradeMock.accepted.positionIdB,
     collateralBalance: 0n,
     balances: [
       {
-        assetId: offer.syntheticAssetId,
-        balance: offer.amountSynthetic,
+        assetId: tradeMock.offer.syntheticAssetId,
+        balance: tradeMock.offer.amountSynthetic,
       },
     ],
     stateUpdateId,
@@ -36,14 +36,14 @@ describe(ForcedTradeOfferController.name, async () => {
   const userA = {
     id: 1,
     blockNumber: 1,
-    starkKey: offer.starkKeyA,
+    starkKey: tradeMock.offer.starkKeyA,
     ethAddress: addressA,
   }
   const userB = {
     id: 2,
     blockNumber: 1,
-    starkKey: accepted.starkKeyB,
-    ethAddress: addressB,
+    starkKey: tradeMock.accepted.starkKeyB,
+    ethAddress: tradeMock.addressB,
   }
   const invalidSignature = '0x12345'
 
@@ -65,7 +65,9 @@ describe(ForcedTradeOfferController.name, async () => {
         userRegistrationEventRepository
       )
 
-      expect(await controller.postOffer(offer, invalidSignature)).toEqual({
+      expect(
+        await controller.postOffer(tradeMock.offer, invalidSignature)
+      ).toEqual({
         type: 'bad request',
         content: 'Your offer is invalid.',
       })
@@ -82,7 +84,9 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      expect(await controller.postOffer(offer, invalidSignature)).toEqual({
+      expect(
+        await controller.postOffer(tradeMock.offer, invalidSignature)
+      ).toEqual({
         type: 'not found',
         content: 'Position does not exist.',
       })
@@ -99,7 +103,9 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      expect(await controller.postOffer(offer, invalidSignature)).toEqual({
+      expect(
+        await controller.postOffer(tradeMock.offer, invalidSignature)
+      ).toEqual({
         type: 'not found',
         content: 'Position does not exist.',
       })
@@ -116,7 +122,9 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      expect(await controller.postOffer(offer, invalidSignature)).toEqual({
+      expect(
+        await controller.postOffer(tradeMock.offer, invalidSignature)
+      ).toEqual({
         type: 'bad request',
         content: 'Your offer is invalid.',
       })
@@ -140,9 +148,9 @@ describe(ForcedTradeOfferController.name, async () => {
         userRegistrationEventRepository
       )
 
-      const request = getCreateRequest(offer)
+      const request = getCreateRequest(tradeMock.offer)
       const signature = await wallet.signMessage(request)
-      expect(await controller.postOffer(offer, signature)).toEqual({
+      expect(await controller.postOffer(tradeMock.offer, signature)).toEqual({
         type: 'created',
         content: { id },
       })
@@ -161,7 +169,7 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      expect(await controller.acceptOffer(1, accepted)).toEqual({
+      expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
         content: 'Position does not exist.',
       })
@@ -178,7 +186,7 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      expect(await controller.acceptOffer(1, accepted)).toEqual({
+      expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
         content: 'Position does not exist.',
       })
@@ -197,7 +205,7 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      expect(await controller.acceptOffer(1, accepted)).toEqual({
+      expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
         content: 'Offer does not exist.',
       })
@@ -209,7 +217,7 @@ describe(ForcedTradeOfferController.name, async () => {
         mock<ForcedTradeOfferRepository>({
           add: async () => id,
           findById: async () => ({
-            ...offer,
+            ...tradeMock.offer,
             id,
             createdAt: Timestamp(Date.now()),
           }),
@@ -236,7 +244,7 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      expect(await controller.acceptOffer(id, accepted)).toEqual({
+      expect(await controller.acceptOffer(id, tradeMock.accepted)).toEqual({
         type: 'bad request',
         content: 'Your offer is invalid.',
       })
@@ -250,7 +258,7 @@ describe(ForcedTradeOfferController.name, async () => {
           findById: async () => ({
             id,
             createdAt: Timestamp(Date.now()),
-            ...offer,
+            ...tradeMock.offer,
           }),
           save: async () => true,
         }),
@@ -276,7 +284,7 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      expect(await controller.acceptOffer(id, accepted)).toEqual({
+      expect(await controller.acceptOffer(id, tradeMock.accepted)).toEqual({
         type: 'success',
         content: 'Accept offer was submitted.',
       })
@@ -285,19 +293,17 @@ describe(ForcedTradeOfferController.name, async () => {
 
   describe(ForcedTradeOfferController.prototype.cancelOffer.name, () => {
     const id = 1
-    const wallet = Wallet.createRandom()
-    const address = EthereumAddress(wallet.address)
     const request = getCancelRequest(id)
     const initial = {
       id,
-      ...offer,
+      ...tradeMock.offer,
       createdAt: Timestamp(Date.now() - 1000),
       accepted: undefined,
     }
     const accepted = {
       ...initial,
       accepted: {
-        ...accept,
+        ...tradeMock.accepted,
         at: Timestamp(Date.now() - 500),
       },
     }
@@ -387,7 +393,7 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       )
 
-      const signature = await wallet.signMessage(request)
+      const signature = await wallet.signMessage(request + 'tampered')
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'bad request',
         content: 'Signature does not match.',
@@ -404,7 +410,7 @@ describe(ForcedTradeOfferController.name, async () => {
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => ({
             ...userA,
-            ethAddress: address,
+            ethAddress: addressA,
           }),
         })
       )
