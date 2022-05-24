@@ -5,7 +5,7 @@ import { AssetCell } from '../common/AssetCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { Column, Table } from '../common/table'
+import { ClientPaginatedTable, Column, Table } from '../common/table'
 import {
   formatAbsoluteTime,
   formatCurrency,
@@ -196,7 +196,8 @@ export function PositionDetails({
         rows={assets.map(buildBalanceTableRow(ownedByYou))}
       />
       <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
-      <Table
+      <ClientPaginatedTable
+        id="position-history"
         noRowsText="this position has no update history"
         className="mb-8"
         columns={updateHistoryTableColumns}
@@ -205,7 +206,8 @@ export function PositionDetails({
       <div className="mb-1.5 font-medium text-lg text-left">
         Force transaction history
       </div>
-      <Table
+      <ClientPaginatedTable
+        id="position-transactions"
         noRowsText="there are no forced transactions associated with this position"
         columns={transactionHistoryTableColumns}
         rows={transactions.map(buildTransactionHistoryTableRow)}
