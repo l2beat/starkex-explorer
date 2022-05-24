@@ -1,10 +1,4 @@
-import {
-  CreateOfferBody,
-  stringAs,
-  stringAsBigInt,
-  stringAsInt,
-} from '@explorer/shared'
-import { StarkKey } from '@explorer/types'
+import { AcceptOfferBody, CreateOfferBody, stringAsInt } from '@explorer/shared'
 import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
 import { z } from 'zod'
@@ -38,19 +32,8 @@ export function createForcedTradeOfferRouter(
     bodyParser(),
     withTypedContext(
       z.object({
-        params: z.object({
-          initialOfferId: stringAsInt(),
-        }),
-        request: z.object({
-          body: z.object({
-            starkKeyB: stringAs(StarkKey),
-            positionIdB: stringAsBigInt(),
-            submissionExpirationTime: stringAsBigInt(),
-            nonce: stringAsBigInt(),
-            signature: z.string(),
-            premiumCost: z.boolean(),
-          }),
-        }),
+        params: z.object({ initialOfferId: stringAsInt() }),
+        request: z.object({ body: AcceptOfferBody }),
       }),
       async (ctx) => {
         const result = await offerController.acceptOffer(
