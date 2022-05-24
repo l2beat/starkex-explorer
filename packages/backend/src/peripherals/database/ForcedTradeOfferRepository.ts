@@ -26,6 +26,7 @@ interface Record {
   amountSynthetic: bigint
   aIsBuyingSynthetic: boolean
   accepted?: Accepted
+  cancelledAt?: Timestamp
 }
 export { type Record as ForcedTradeOfferRecord }
 
@@ -55,6 +56,10 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
     premium_cost: orNull(record.accepted?.premiumCost),
     signature: orNull(record.accepted?.signature),
     transaction_hash: orNull(record.accepted?.transactionHash?.toString()),
+    cancelled_at:
+      record.cancelledAt !== undefined
+        ? BigInt(record.cancelledAt.toString())
+        : null,
   }
 }
 
@@ -76,6 +81,7 @@ function toRecord(row: Row): Record {
     amountSynthetic: row.amount_synthetic,
     aIsBuyingSynthetic: row.a_is_buying_synthetic,
     accepted: undefined,
+    cancelledAt: row.cancelled_at ? Timestamp(row.cancelled_at) : undefined,
   }
   if (
     row.accepted_at !== null &&

@@ -73,5 +73,29 @@ export function createForcedTradeOfferRouter(
     )
   )
 
+  router.post(
+    '/forced/offers/:offerId/cancel',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        params: z.object({
+          offerId: stringAsInt(),
+        }),
+        request: z.object({
+          body: z.object({
+            signature: z.string(),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result = await offerController.cancelOffer(
+          ctx.params.offerId,
+          ctx.request.body.signature
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
   return router
 }

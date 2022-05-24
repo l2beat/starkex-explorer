@@ -1,22 +1,19 @@
 import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
-import {
-  digestAcceptedOfferParams,
-  stringifyInitialOffer,
-} from '@explorer/shared'
 import { EthereumAddress, Timestamp } from '@explorer/types'
-import { hashMessage, recoverAddress } from 'ethers/lib/utils'
 
 import {
   Accepted,
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
-import {
-  PositionRecord,
-  PositionRepository,
-} from '../../peripherals/database/PositionRepository'
+import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
+import {
+  validateAccept,
+  validateCancel,
+  validateCreate,
+} from './utils/ForcedTradeOfferValidators'
 import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
 
 export class ForcedTradeOfferController {
@@ -53,21 +50,20 @@ export class ForcedTradeOfferController {
     signature: string
   ): Promise<ControllerResult> {
     const positionA = await this.positionRepository.findById(offer.positionIdA)
-    const userRegistrationEventA =
-      await this.userRegistrationEventRepository.findByStarkKey(offer.starkKeyA)
+    const userA = await this.userRegistrationEventRepository.findByStarkKey(
+      offer.starkKeyA
+    )
 
-    if (!positionA || !userRegistrationEventA) {
+    if (!positionA || !userA) {
       return { type: 'not found', content: 'Position does not exist.' }
     }
-
-    const offerValid = validateInitialOffer(
+    const requestValid = validateCreate(
       offer,
       positionA,
       signature,
-      userRegistrationEventA.ethAddress
+      userA.ethAddress
     )
-
-    if (!offerValid) {
+    if (!requestValid) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
     }
 
@@ -75,6 +71,7 @@ export class ForcedTradeOfferController {
       createdAt: Timestamp(Date.now()),
       ...offer,
     })
+
     return { type: 'created', content: { id } }
   }
 
@@ -85,35 +82,35 @@ export class ForcedTradeOfferController {
     const positionB = await this.positionRepository.findById(
       accepted.positionIdB
     )
-    const userRegistrationEventB =
-      await this.userRegistrationEventRepository.findByStarkKey(
-        accepted.starkKeyB
-      )
-
-    if (!positionB || !userRegistrationEventB) {
+    const userB = await this.userRegistrationEventRepository.findByStarkKey(
+      accepted.starkKeyB
+    )
+    if (!positionB || !userB) {
       return { type: 'not found', content: 'Position does not exist.' }
     }
     const offer = await this.offerRepository.findById(offerId)
-
     if (!offer) {
       return { type: 'not found', content: 'Offer does not exist.' }
     }
-
     if (offer.accepted) {
       return {
         type: 'bad request',
-        content: 'Offer already accepted by a user.',
+        content: 'Offer already accepted.',
       }
     }
-
-    const offerValid = validateAcceptedOffer(
+    if (offer.cancelledAt) {
+      return {
+        type: 'bad request',
+        content: 'Offer already cancelled.',
+      }
+    }
+    const requestValid = validateAccept(
       offer,
       accepted,
       positionB,
-      userRegistrationEventB.ethAddress
+      userB.ethAddress
     )
-
-    if (!offerValid) {
+    if (!requestValid) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
     }
 
@@ -127,87 +124,49 @@ export class ForcedTradeOfferController {
 
     return { type: 'success', content: 'Accept offer was submitted.' }
   }
-}
 
-function validateInitialOffer(
-  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
-  position: PositionRecord,
-  signature: string,
-  ethAddressA: EthereumAddress
-) {
-  const userIsBuyingSynthetic = offer.aIsBuyingSynthetic
-
-  if (!validateBalance(offer, position, userIsBuyingSynthetic)) {
-    return false
-  }
-
-  return validateInitialSignature(offer, signature, ethAddressA)
-}
-
-function validateAcceptedOffer(
-  offer: ForcedTradeOfferRecord,
-  accepted: Omit<Accepted, 'at'>,
-  position: PositionRecord,
-  ethAddressB: EthereumAddress
-) {
-  const userIsBuyingSynthetic = !offer.aIsBuyingSynthetic
-
-  if (!validateBalance(offer, position, userIsBuyingSynthetic)) {
-    return false
-  }
-
-  return validateAcceptedSignature(offer, accepted, ethAddressB)
-}
-
-function validateBalance(
-  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
-  position: PositionRecord,
-  userIsBuyingSynthetic: boolean
-) {
-  const { amountCollateral, amountSynthetic, syntheticAssetId } = offer
-
-  const { collateralBalance } = position
-
-  if (userIsBuyingSynthetic && amountCollateral <= collateralBalance) {
-    return true
-  }
-
-  if (!userIsBuyingSynthetic) {
-    const balanceSynthetic = position.balances.find(
-      (balance) => balance.assetId === syntheticAssetId
-    )?.balance
-    if (balanceSynthetic && balanceSynthetic >= amountSynthetic) {
-      return true
+  async cancelOffer(
+    offerId: number,
+    signature: string
+  ): Promise<ControllerResult> {
+    const offer = await this.offerRepository.findById(offerId)
+    if (!offer) {
+      return {
+        type: 'not found',
+        content: 'Offer does not exist.',
+      }
     }
-  }
+    if (offer.cancelledAt) {
+      return {
+        type: 'bad request',
+        content: 'Offer already cancelled.',
+      }
+    }
+    if (offer.accepted?.transactionHash) {
+      return {
+        type: 'bad request',
+        content: 'Offer already submitted.',
+      }
+    }
+    const userA = await this.userRegistrationEventRepository.findByStarkKey(
+      offer.starkKeyA
+    )
+    if (!userA) {
+      return { type: 'not found', content: 'Position does not exist.' }
+    }
+    const requestValid = validateCancel(offer.id, userA.ethAddress, signature)
+    if (!requestValid) {
+      return {
+        type: 'bad request',
+        content: 'Signature does not match.',
+      }
+    }
 
-  return false
-}
+    await this.offerRepository.save({
+      ...offer,
+      cancelledAt: Timestamp(Date.now()),
+    })
 
-export function validateInitialSignature(
-  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
-  signature: string,
-  address: EthereumAddress
-) {
-  const stringOffer = stringifyInitialOffer(offer)
-
-  const signer = recoverAddress(hashMessage(stringOffer), signature)
-
-  return signer === address.toString()
-}
-
-export function validateAcceptedSignature(
-  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
-  accepted: Omit<Accepted, 'at'>,
-  address: EthereumAddress
-): boolean {
-  try {
-    const digest = digestAcceptedOfferParams(offer, accepted)
-
-    const signer = recoverAddress(digest, accepted.signature)
-
-    return signer === address.toString()
-  } catch (e) {
-    return false
+    return { type: 'success', content: 'Offer cancelled.' }
   }
 }
