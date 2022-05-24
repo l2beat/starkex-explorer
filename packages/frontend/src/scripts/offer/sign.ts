@@ -38,7 +38,7 @@ export async function signAccepted(
   address: EthereumAddress
 ): Promise<string | undefined> {
   const toSign = digestAcceptedOfferParams(offer, accepted)
-  return sign('personal_sign', address, toSign)
+  return sign('eth_sign', address, toSign)
 }
 
 export async function signCancel(
