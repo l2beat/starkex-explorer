@@ -5,7 +5,7 @@ import { AssetCell } from '../common/AssetCell'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { Column, Table } from '../common/table'
+import { ClientPaginatedTable, Column, Table } from '../common/table'
 import {
   formatAbsoluteTime,
   formatCurrency,
@@ -18,9 +18,9 @@ import { PositionDetailsProps } from './PositionDetailsProps'
 const balanceTableColumns = (ownedByYou: boolean) => {
   const columns: Column[] = [
     { header: 'Name' },
-    { header: 'Balance', numeric: true },
+    { header: 'Balance', numeric: true, fullWidth: true },
     { header: 'Unit price', numeric: true },
-    { header: 'Value', numeric: true },
+    { header: 'Value', numeric: true, fullWidth: true },
   ]
 
   if (ownedByYou) {
@@ -30,25 +30,23 @@ const balanceTableColumns = (ownedByYou: boolean) => {
   return columns
 }
 
-const ActionButton = ({ text }: { text?: string }) => (
-  <>{text && <button className="px-3 rounded bg-blue-100">{text}</button>}</>
-)
-
-const actionButtonText = ({
-  assetId,
-  balance,
-}: {
+interface ActionButtonProps {
   assetId: AssetId
   balance: bigint
-}) => {
-  if (assetId === AssetId.USDC && balance !== 0n) {
-    return 'Exit'
+}
+
+function ActionButton({ assetId, balance }: ActionButtonProps) {
+  if (balance === 0n) {
+    return null
   }
-  if (balance > 0) {
-    return 'Sell'
-  } else if (balance < 0) {
-    return 'Buy'
-  }
+  return (
+    <a
+      href={`/forced/new?assetId=${assetId}`}
+      className="px-3 py-0.5 rounded bg-blue-100"
+    >
+      {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Sell' : 'Buy'}
+    </a>
+  )
 }
 
 const buildBalanceTableRow =
@@ -61,12 +59,12 @@ const buildBalanceTableRow =
   }: PositionDetailsProps['assets'][number]) => {
     const cells = [
       <AssetCell assetId={assetId} />,
-      balance.toString(),
+      formatCurrencyUnits(balance, assetId),
       formatCurrency(priceUSDCents, 'USD'),
       formatCurrency(totalUSDCents, 'USD'),
     ]
     if (ownedByYou) {
-      cells.push(<ActionButton text={actionButtonText({ assetId, balance })} />)
+      cells.push(<ActionButton assetId={assetId} balance={balance} />)
     }
     return { cells }
   }
@@ -196,7 +194,8 @@ export function PositionDetails({
         rows={assets.map(buildBalanceTableRow(ownedByYou))}
       />
       <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
-      <Table
+      <ClientPaginatedTable
+        id="position-history"
         noRowsText="this position has no update history"
         className="mb-8"
         columns={updateHistoryTableColumns}
@@ -205,7 +204,8 @@ export function PositionDetails({
       <div className="mb-1.5 font-medium text-lg text-left">
         Force transaction history
       </div>
-      <Table
+      <ClientPaginatedTable
+        id="position-transactions"
         noRowsText="there are no forced transactions associated with this position"
         columns={transactionHistoryTableColumns}
         rows={transactions.map(buildTransactionHistoryTableRow)}
