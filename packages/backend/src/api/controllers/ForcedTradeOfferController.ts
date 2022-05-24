@@ -270,11 +270,6 @@ export function validateAcceptedSignature(
   accepted: Omit<Accepted, 'at'>,
   address: EthereumAddress
 ): boolean {
-  try {
-    const digest = digestAcceptedOfferParams(offer, accepted)
-    const signer = recoverAddress(digest, accepted.signature)
-    return signer === address.toString()
-  } catch (e) {
-    return false
-  }
+  const digest = digestAcceptedOfferParams(offer, accepted)
+  return validateSignature(digest, accepted.signature, address)
 }
