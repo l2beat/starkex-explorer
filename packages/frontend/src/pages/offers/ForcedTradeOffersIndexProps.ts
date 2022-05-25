@@ -16,6 +16,7 @@ export interface ForcedTradeOfferEntry {
 export interface ForcedTradeOffersIndexProps {
   readonly account: EthereumAddress | undefined
   readonly offers: ForcedTradeOfferEntry[]
+  readonly assetIds: AssetId[]
   readonly params: {
     readonly perPage: number
     readonly page: number

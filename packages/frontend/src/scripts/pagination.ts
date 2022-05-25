@@ -6,13 +6,8 @@ export function initPagination() {
 }
 
 function initServerPagination() {
-  const select = document.querySelector<HTMLSelectElement>('#perPage')
-  if (!select) {
-    return
-  }
-  select.addEventListener('change', function () {
-    this.form?.submit()
-  })
+  const form = document.querySelector<HTMLFormElement>('#serverPagination')
+  form?.addEventListener('change', () => form.submit())
 }
 
 function initClientPagination() {

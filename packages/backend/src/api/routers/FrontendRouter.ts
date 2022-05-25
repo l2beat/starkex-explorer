@@ -67,7 +67,9 @@ export function createFrontendRouter(
         query: z.object({
           page: stringAsInt(1),
           perPage: stringAsInt(10),
-          assetId: stringAs(AssetId).optional(),
+          assetId: stringAs((s) =>
+            s === '' ? undefined : AssetId(s)
+          ).optional(),
           type: z.enum(['sell', 'buy']).optional(),
         }),
       }),

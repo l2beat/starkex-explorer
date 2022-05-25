@@ -11,7 +11,8 @@ import { ForcedTradeOffersIndexProps } from './ForcedTradeOffersIndexProps'
 export function ForcedTradeOffersIndex({
   account,
   offers,
-  params: { page, perPage },
+  assetIds,
+  params: { page, perPage, assetId },
   total,
 }: ForcedTradeOffersIndexProps) {
   return (
@@ -31,6 +32,8 @@ export function ForcedTradeOffersIndex({
         perPage={perPage}
         page={page}
         total={total}
+        assetId={assetId}
+        assetIds={assetIds}
         baseUrl="/forced/offers"
       />
       <Table

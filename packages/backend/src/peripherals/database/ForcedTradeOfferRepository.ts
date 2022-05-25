@@ -183,6 +183,11 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
+  async getInitialAssetIds(): Promise<AssetId[]> {
+    const rowIds = await this.getInitialQuery().distinct('synthetic_asset_id')
+    return rowIds.map(String).map(AssetId)
+  }
+
   async findById(id: Record['id']): Promise<Record | undefined> {
     const row = await this.knex('forced_trade_offers').where({ id }).first()
     return row ? toRecord(row) : undefined

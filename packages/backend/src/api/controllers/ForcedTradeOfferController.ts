@@ -36,7 +36,7 @@ export class ForcedTradeOfferController {
     type?: 'buy' | 'sell'
     account: EthereumAddress | undefined
   }): Promise<ControllerResult> {
-    const [total, offers] = await Promise.all([
+    const [total, offers, assetIds] = await Promise.all([
       this.offerRepository.countInitial({ assetId, type }),
       this.offerRepository.getInitial({
         offset: (page - 1) * perPage,
@@ -44,12 +44,14 @@ export class ForcedTradeOfferController {
         assetId,
         type,
       }),
+      this.offerRepository.getInitialAssetIds(),
     ])
 
     const content = renderForcedTradeOffersIndexPage({
       account,
       offers: offers.map(toForcedTradeOfferEntry),
       total,
+      assetIds,
       params: { page, perPage, type, assetId },
     })
     return { type: 'success', content }
