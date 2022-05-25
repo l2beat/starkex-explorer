@@ -1,6 +1,6 @@
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
-type OfferType = 'buy' | 'sell'
+export type OfferType = 'buy' | 'sell'
 
 export interface ForcedTradeOfferEntry {
   readonly id: number

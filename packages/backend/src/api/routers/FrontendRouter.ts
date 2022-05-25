@@ -1,4 +1,8 @@
-import { stringAs, stringAsBigInt, stringAsInt } from '@explorer/shared'
+import {
+  stringAs,
+  stringAsBigInt,
+  stringAsInt,
+} from '@explorer/shared'
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
@@ -12,6 +16,9 @@ import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
+
+const allToUndefined = <T>(v: 'all' | T): T | undefined =>
+  v === 'all' ? undefined : v
 
 export function createFrontendRouter(
   positionController: PositionController,
@@ -67,10 +74,15 @@ export function createFrontendRouter(
         query: z.object({
           page: stringAsInt(1),
           perPage: stringAsInt(10),
-          assetId: stringAs((s) =>
-            s === '' ? undefined : AssetId(s)
-          ).optional(),
-          type: z.enum(['sell', 'buy']).optional(),
+          assetId: z
+            .literal('all')
+            .or(stringAs(AssetId))
+            .transform(allToUndefined)
+            .optional(),
+          type: z
+            .enum(['sell', 'buy', 'all'])
+            .transform(allToUndefined)
+            .optional(),
         }),
       }),
       async (ctx) => {

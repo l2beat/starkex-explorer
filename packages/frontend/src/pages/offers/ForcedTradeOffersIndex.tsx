@@ -3,16 +3,16 @@ import React from 'react'
 
 import { Page } from '../common'
 import { AssetCell } from '../common/AssetCell'
-import { ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
 import { formatCurrency, formatRelativeTime } from '../formatting'
 import { ForcedTradeOffersIndexProps } from './ForcedTradeOffersIndexProps'
+import { Pagination } from './pagination/Pagination'
 
 export function ForcedTradeOffersIndex({
   account,
   offers,
   assetIds,
-  params: { page, perPage, assetId },
+  params: { page, perPage, assetId, type },
   total,
 }: ForcedTradeOffersIndexProps) {
   return (
@@ -28,13 +28,13 @@ export function ForcedTradeOffersIndex({
       <h1 className="font-sans font-bold text-2xl mb-12">
         Forced trade offers
       </h1>
-      <ServerPagination
+      <Pagination
         perPage={perPage}
         page={page}
         total={total}
         assetId={assetId}
         assetIds={assetIds}
-        baseUrl="/forced/offers"
+        type={type}
       />
       <Table
         noRowsText="there is no active offers at the moment"
