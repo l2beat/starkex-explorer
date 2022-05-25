@@ -1,8 +1,4 @@
-import {
-  stringAs,
-  stringAsBigInt,
-  stringAsInt,
-} from '@explorer/shared'
+import { stringAs, stringAsBigInt, stringAsInt } from '@explorer/shared'
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'

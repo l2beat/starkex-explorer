@@ -32,7 +32,3 @@ export function stringAs<T>(Brand: (s: string) => T) {
     })
     .transform(Brand)
 }
-
-export function fallback<T>(value: T) {
-  return z.any().transform(() => value)
-}
