@@ -27,7 +27,7 @@ export function FilteringForm({
       action={baseUrl}
       method="get"
       id={FormId}
-      className="flex justify-between"
+      className="flex justify-between mb-2"
     >
       <AssetSelect assetId={assetId} assetIds={assetIds} />
       <TypeRadio type={type} />
