@@ -3,10 +3,10 @@ import React from 'react'
 
 import { Page } from '../common'
 import { AssetCell } from '../common/AssetCell'
-import { ServerPagination } from '../common/pagination'
+import { ServerFormAttributes, ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
 import { formatCurrency, formatRelativeTime } from '../formatting'
-import { FilteringForm } from './filtering'
+import { AssetIdSelectName, FilteringForm, TypeRadioName } from './filtering'
 import { ForcedTradeOffersIndexProps } from './ForcedTradeOffersIndexProps'
 
 export function ForcedTradeOffersIndex({
@@ -19,15 +19,15 @@ export function ForcedTradeOffersIndex({
   const baseUrl = '/forced/offers'
 
   const paginationParams = new URLSearchParams({
-    page: page.toString(),
-    perPage: perPage.toString(),
+    [ServerFormAttributes.PageInputName]: page.toString(),
+    [ServerFormAttributes.PerPageSelectName]: perPage.toString(),
   })
   const filteringParams = new URLSearchParams()
   if (assetId) {
-    filteringParams.append('assetId', assetId.toString())
+    filteringParams.append(AssetIdSelectName, assetId.toString())
   }
   if (type) {
-    filteringParams.append('type', type.toString())
+    filteringParams.append(TypeRadioName, type.toString())
   }
 
   return (

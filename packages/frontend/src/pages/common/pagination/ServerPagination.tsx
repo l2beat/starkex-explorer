@@ -3,7 +3,7 @@ import React from 'react'
 import { HiddenInputs } from '../HiddenInputs'
 import { NextIcon } from '../icons/NextIcon'
 import { PrevIcon } from '../icons/PrevIcon'
-import { ServerAttributes } from './attributes'
+import { ServerFormAttributes } from './attributes'
 import { styles } from './styles'
 
 export interface ServerPaginationProps {
@@ -23,12 +23,12 @@ export function ServerPagination({
 }: ServerPaginationProps) {
   const last = Math.ceil(total / perPage)
   const hiddenParams = new URLSearchParams(additionalParams)
-  hiddenParams.set(ServerAttributes.PageInputName, page.toString())
+  hiddenParams.set(ServerFormAttributes.PageInputName, page.toString())
 
   const link = (page: number, perPage: number) => {
     const params = new URLSearchParams(additionalParams)
-    params.set(ServerAttributes.PageInputName, page.toString())
-    params.set(ServerAttributes.PerPageSelectName, perPage.toString())
+    params.set(ServerFormAttributes.PageInputName, page.toString())
+    params.set(ServerFormAttributes.PerPageSelectName, perPage.toString())
     return `${baseUrl}?${params}`
   }
 
@@ -83,11 +83,11 @@ export function ServerPagination({
         action={baseUrl}
         method="get"
         className={styles.innerWrapper}
-        id={ServerAttributes.FormId}
+        id={ServerFormAttributes.FormId}
       >
         <label htmlFor="per-page">Per page</label>
         <select
-          name={ServerAttributes.PerPageSelectName}
+          name={ServerFormAttributes.PerPageSelectName}
           id="per-page"
           className={styles.textButtonActive}
           autoComplete="off"
