@@ -4,18 +4,18 @@ import React from 'react'
 import { OfferType } from '../ForcedTradeOffersIndexProps'
 import { DisabledOptionValue, TypeRadioName } from './attributes'
 
-interface InputProps {
+interface TypeButtonProps {
   id: string
   value: string
   checked: boolean
   label: string
 }
 
-function Input({ id, value, checked, label }: InputProps) {
+function TypeButton({ id, value, checked, label }: TypeButtonProps) {
   return (
-    <div className={cx(checked && 'bg-grey-300', 'py-1 px-3 rounded-md')}>
+    <div className={cx(checked && 'bg-grey-300', 'rounded-md')}>
       <input
-        className="appearance-none"
+        className="appearance-none absolute"
         type="radio"
         id={id}
         name={TypeRadioName}
@@ -23,7 +23,7 @@ function Input({ id, value, checked, label }: InputProps) {
         checked={checked}
         readOnly
       />
-      <label htmlFor={id} className="cursor-pointer">
+      <label htmlFor={id} className="block cursor-pointer py-1 px-3">
         {label}
       </label>
     </div>
@@ -41,7 +41,7 @@ export function TypeRadio(props: TypeRadioProps) {
         const checked = props.type === type
         const label = type[0].toUpperCase() + type.slice(1)
         return (
-          <Input
+          <TypeButton
             id={type}
             value={type}
             checked={checked}
@@ -50,7 +50,7 @@ export function TypeRadio(props: TypeRadioProps) {
           />
         )
       })}
-      <Input
+      <TypeButton
         id="all"
         value={DisabledOptionValue}
         checked={!props.type}
