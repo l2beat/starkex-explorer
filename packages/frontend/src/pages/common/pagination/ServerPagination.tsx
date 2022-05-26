@@ -1,7 +1,9 @@
-import React, { ReactNode } from 'react'
+import React from 'react'
 
+import { HiddenInputs } from '../HiddenInputs'
 import { NextIcon } from '../icons/NextIcon'
 import { PrevIcon } from '../icons/PrevIcon'
+import { ServerAttributes } from './attributes'
 import { styles } from './styles'
 
 export interface ServerPaginationProps {
@@ -9,7 +11,7 @@ export interface ServerPaginationProps {
   perPage: number
   total: number
   baseUrl?: string
-  children?: ReactNode
+  additionalParams?: URLSearchParams
 }
 
 export function ServerPagination({
@@ -17,18 +19,17 @@ export function ServerPagination({
   perPage,
   total,
   baseUrl = '/',
-  children,
+  additionalParams,
 }: ServerPaginationProps) {
   const last = Math.ceil(total / perPage)
+  const hiddenParams = new URLSearchParams(additionalParams)
+  hiddenParams.set(ServerAttributes.PageInputName, page.toString())
 
   const link = (page: number, perPage: number) => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      perPage: perPage.toString(),
-    })
-    return baseUrl.includes('?')
-      ? `${baseUrl}&${params}`
-      : `${baseUrl}?${params}`
+    const params = new URLSearchParams(additionalParams)
+    params.set(ServerAttributes.PageInputName, page.toString())
+    params.set(ServerAttributes.PerPageSelectName, perPage.toString())
+    return `${baseUrl}?${params}`
   }
 
   return (
@@ -82,13 +83,12 @@ export function ServerPagination({
         action={baseUrl}
         method="get"
         className={styles.innerWrapper}
-        id="serverPagination"
+        id={ServerAttributes.FormId}
       >
-        {children}
-        <label htmlFor="perPage">Per page</label>
+        <label htmlFor="per-page">Per page</label>
         <select
-          name="perPage"
-          id="perPage"
+          name={ServerAttributes.PerPageSelectName}
+          id="per-page"
           className={styles.textButtonActive}
           autoComplete="off"
         >
@@ -98,6 +98,7 @@ export function ServerPagination({
             </option>
           ))}
         </select>
+        {<HiddenInputs params={hiddenParams} />}
       </form>
     </div>
   )

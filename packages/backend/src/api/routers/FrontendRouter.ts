@@ -13,9 +13,6 @@ import { StateUpdateController } from '../controllers/StateUpdateController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
-const allToUndefined = <T>(v: 'all' | T): T | undefined =>
-  v === 'all' ? undefined : v
-
 export function createFrontendRouter(
   positionController: PositionController,
   homeController: HomeController,
@@ -70,15 +67,8 @@ export function createFrontendRouter(
         query: z.object({
           page: stringAsInt(1),
           perPage: stringAsInt(10),
-          assetId: z
-            .literal('all')
-            .or(stringAs(AssetId))
-            .transform(allToUndefined)
-            .optional(),
-          type: z
-            .enum(['sell', 'buy', 'all'])
-            .transform(allToUndefined)
-            .optional(),
+          assetId: stringAs(AssetId).optional(),
+          type: z.enum(['sell', 'buy']).optional(),
         }),
       }),
       async (ctx) => {

@@ -131,7 +131,7 @@ describe(ForcedTradeOfferRepository.name, () => {
     const id5 = await repository.add(initial)
     await repository.save({ ...initial, id: id5, accepted: fakeAccepted() })
 
-    return [id1, id2, id3, id4, id5]
+    return { id1, id2, id3, id4, id5 }
   }
 
   async function getIdsAndTotal({
@@ -154,7 +154,7 @@ describe(ForcedTradeOfferRepository.name, () => {
   }
 
   it('returns initial offers without filters', async () => {
-    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
+    const { id1, id2, id3, id4 } = await seedInitialOffers()
     expect(await getIdsAndTotal({ limit: 10, offset: 0 })).toEqual([
       4,
       [id4, id3, id2, id1],
@@ -162,7 +162,7 @@ describe(ForcedTradeOfferRepository.name, () => {
   })
 
   it('returns initial offers filtered by asset id', async () => {
-    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
+    const { id2, id3, id4 } = await seedInitialOffers()
     expect(
       await getIdsAndTotal({ limit: 10, offset: 0, assetId: AssetId('AAVE-8') })
     ).toEqual([2, [id4, id3]])
@@ -172,7 +172,7 @@ describe(ForcedTradeOfferRepository.name, () => {
   })
 
   it('returns initial offers filtered by type', async () => {
-    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
+    const { id1, id2, id3, id4 } = await seedInitialOffers()
     expect(
       await getIdsAndTotal({ limit: 10, offset: 0, type: 'sell' })
     ).toEqual([2, [id3, id2]])
@@ -182,7 +182,7 @@ describe(ForcedTradeOfferRepository.name, () => {
   })
 
   it('returns initial offers filtered by asset id and type', async () => {
-    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
+    const { id4 } = await seedInitialOffers()
     expect(
       await getIdsAndTotal({
         limit: 10,
@@ -194,7 +194,7 @@ describe(ForcedTradeOfferRepository.name, () => {
   })
 
   it('returns initial offers filtered and paginated', async () => {
-    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
+    const { id2 } = await seedInitialOffers()
     expect(await getIdsAndTotal({ limit: 1, offset: 1, type: 'sell' })).toEqual(
       [2, [id2]]
     )

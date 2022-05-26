@@ -68,10 +68,7 @@ router.get('/forced/offers', (ctx) => {
   data.params = {
     page: ctx.query.page ? Number(ctx.query.page) : 1,
     perPage: ctx.query.perPage ? Number(ctx.query.perPage) : 10,
-    assetId:
-      ctx.query.assetId && ctx.query.assetId !== 'all'
-        ? AssetId(String(ctx.query.assetId))
-        : undefined,
+    assetId: ctx.query.assetId ? AssetId(String(ctx.query.assetId)) : undefined,
     type: (['buy', 'sell'] as const).find((type) => type === ctx.query.type),
   }
   data.account = getAccount(ctx)
