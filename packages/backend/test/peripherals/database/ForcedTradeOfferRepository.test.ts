@@ -96,7 +96,7 @@ describe(ForcedTradeOfferRepository.name, () => {
     expect(actual).toEqual(submitted)
   })
 
-  it('returns initial offers', async () => {
+  async function seedInitialOffers() {
     const id1 = await repository.add(
       fakeInitialOffer({
         syntheticAssetId: AssetId('BTC-10'),
@@ -131,31 +131,58 @@ describe(ForcedTradeOfferRepository.name, () => {
     const id5 = await repository.add(initial)
     await repository.save({ ...initial, id: id5, accepted: fakeAccepted() })
 
-    const getIdsAndTotal = ({
-      limit,
-      offset,
-      assetId,
-      type,
-    }: {
-      limit: number
-      offset: number
-      assetId?: AssetId
-      type?: 'buy' | 'sell'
-    }) =>
-      Promise.all([
-        repository.countInitial({ type, assetId }),
-        repository
-          .getInitial({ limit, offset, assetId, type })
-          .then((os) => os.map((o) => o.id)),
-      ])
+    return [id1, id2, id3, id4, id5]
+  }
 
+  async function getIdsAndTotal({
+    limit,
+    offset,
+    assetId,
+    type,
+  }: {
+    limit: number
+    offset: number
+    assetId?: AssetId
+    type?: 'buy' | 'sell'
+  }) {
+    return Promise.all([
+      repository.countInitial({ type, assetId }),
+      repository
+        .getInitial({ limit, offset, assetId, type })
+        .then((os) => os.map((o) => o.id)),
+    ])
+  }
+
+  it('returns initial offers without filters', async () => {
+    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
     expect(await getIdsAndTotal({ limit: 10, offset: 0 })).toEqual([
       4,
       [id4, id3, id2, id1],
     ])
+  })
+
+  it('returns initial offers filtered by asset id', async () => {
+    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
     expect(
       await getIdsAndTotal({ limit: 10, offset: 0, assetId: AssetId('AAVE-8') })
     ).toEqual([2, [id4, id3]])
+    expect(
+      await getIdsAndTotal({ limit: 10, offset: 0, assetId: AssetId('ETH-9') })
+    ).toEqual([1, [id2]])
+  })
+
+  it('returns initial offers filtered by type', async () => {
+    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
+    expect(
+      await getIdsAndTotal({ limit: 10, offset: 0, type: 'sell' })
+    ).toEqual([2, [id3, id2]])
+    expect(await getIdsAndTotal({ limit: 10, offset: 0, type: 'buy' })).toEqual(
+      [2, [id4, id1]]
+    )
+  })
+
+  it('returns initial offers filtered by asset id and type', async () => {
+    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
     expect(
       await getIdsAndTotal({
         limit: 10,
@@ -164,12 +191,10 @@ describe(ForcedTradeOfferRepository.name, () => {
         type: 'buy',
       })
     ).toEqual([1, [id4]])
-    expect(
-      await getIdsAndTotal({ limit: 10, offset: 0, type: 'sell' })
-    ).toEqual([2, [id3, id2]])
-    expect(
-      await getIdsAndTotal({ limit: 10, offset: 0, type: 'sell' })
-    ).toEqual([2, [id3, id2]])
+  })
+
+  it('returns initial offers filtered and paginated', async () => {
+    const [id1, id2, id3, id4, id5] = await seedInitialOffers()
     expect(await getIdsAndTotal({ limit: 1, offset: 1, type: 'sell' })).toEqual(
       [2, [id2]]
     )
