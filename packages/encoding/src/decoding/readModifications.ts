@@ -1,7 +1,7 @@
 import { StarkKey } from '@explorer/types'
 
+import { Modification } from '../OnChainData'
 import { ByteReader } from './ByteReader'
-import { Modification } from './OnChainData'
 
 export function readModifications(reader: ByteReader) {
   const count = reader.readNumber(32)

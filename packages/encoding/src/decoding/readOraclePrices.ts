@@ -1,6 +1,6 @@
+import { OraclePrice } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
-import { OraclePrice } from './OnChainData'
 
 export function readOraclePrices(reader: ByteReader) {
   const count = reader.readNumber(32)

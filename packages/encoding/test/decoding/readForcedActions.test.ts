@@ -1,8 +1,8 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError, encodeAssetId } from '../src'
-import { readForcedActions } from '../src/readForcedActions'
+import { DecodingError, encodeAssetId } from '../../src'
+import { readForcedActions } from '../../src/decoding/readForcedActions'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'
 

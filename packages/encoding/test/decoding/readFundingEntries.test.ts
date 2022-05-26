@@ -1,10 +1,10 @@
 import { AssetId, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError } from '../src'
-import { MIN_INT } from '../src/constants'
-import { encodeAssetId } from '../src/encodeAssetId'
-import { readFundingEntries } from '../src/readFundingEntries'
+import { DecodingError } from '../../src'
+import { MIN_INT } from '../../src/constants'
+import { readFundingEntries } from '../../src/decoding/readFundingEntries'
+import { encodeAssetId } from '../../src/encodeAssetId'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'
 

@@ -1,8 +1,8 @@
 import { StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError } from '../src'
-import { readModifications } from '../src/readModifications'
+import { DecodingError } from '../../src'
+import { readModifications } from '../../src/decoding/readModifications'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'
 

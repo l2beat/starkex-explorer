@@ -1,5 +1,5 @@
+import { PositionUpdate } from '../OnChainData'
 import { ByteReader } from './ByteReader'
-import { PositionUpdate } from './OnChainData'
 import { readFundingEntries } from './readFundingEntries'
 import { readPositionUpdate } from './readPositionUpdate'
 

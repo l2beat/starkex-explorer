@@ -1,8 +1,8 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DYDX_INTERNAL_USDC_ID_ENDODED } from '../src/constants'
-import { encodeAssetId } from '../src/encodeAssetId'
+import { DYDX_INTERNAL_USDC_ID_ENDODED } from '../../src/constants'
+import { encodeAssetId } from '../../src/encodeAssetId'
 
 describe('encodeAssetId', () => {
   it('can encode BTC-10', () => {

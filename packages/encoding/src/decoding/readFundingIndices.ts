@@ -1,7 +1,7 @@
+import { MIN_INT } from '../constants'
+import { FundingIndex } from '../OnChainData'
 import { ByteReader } from './ByteReader'
-import { MIN_INT } from './constants'
 import { decodeAssetId } from './decodeAssetId'
-import { FundingIndex } from './OnChainData'
 
 export function readFundingIndices(reader: ByteReader) {
   const count = reader.readNumber(32)

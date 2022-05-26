@@ -1,9 +1,9 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DYDX_INTERNAL_USDC_ID_ENDODED } from '../src/constants'
-import { decodeAssetId } from '../src/decodeAssetId'
-import { DecodingError } from '../src/DecodingError'
+import { DYDX_INTERNAL_USDC_ID_ENDODED } from '../../src/constants'
+import { decodeAssetId } from '../../src/decoding/decodeAssetId'
+import { DecodingError } from '../../src/decoding/DecodingError'
 
 describe('decodeAssetId', () => {
   it('fails for non-15 byte strings', () => {

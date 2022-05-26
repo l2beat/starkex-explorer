@@ -1,10 +1,10 @@
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { MIN_INT } from '../src/constants'
-import { decodeUpdates } from '../src/decodeUpdates'
-import { DecodingError } from '../src/DecodingError'
-import { encodeAssetId } from '../src/encodeAssetId'
+import { MIN_INT } from '../../src/constants'
+import { decodeUpdates } from '../../src/decoding/decodeUpdates'
+import { DecodingError } from '../../src/decoding/DecodingError'
+import { encodeAssetId } from '../../src/encodeAssetId'
 import { ByteWriter } from './ByteWriter'
 
 describe('decodeUpdates', () => {

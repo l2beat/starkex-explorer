@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 
-import { ByteReader } from '../src/ByteReader'
-import { DecodingError } from '../src/DecodingError'
+import { ByteReader } from '../../src/decoding/ByteReader'
+import { DecodingError } from '../../src/decoding/DecodingError'
 
 describe('ByteReader', () => {
   describe('constructor', () => {

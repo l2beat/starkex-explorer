@@ -1,9 +1,9 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError } from '../src'
-import { encodeAssetId } from '../src/encodeAssetId'
-import { readAssetConfigHashes } from '../src/readAssetConfigHashes'
+import { DecodingError } from '../../src'
+import { readAssetConfigHashes } from '../../src/decoding/readAssetConfigHashes'
+import { encodeAssetId } from '../../src/encodeAssetId'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'
 

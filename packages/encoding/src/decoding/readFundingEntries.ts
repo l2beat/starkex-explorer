@@ -1,7 +1,7 @@
 import { Timestamp } from '@explorer/types'
 
+import { FundingEntry } from '../OnChainData'
 import { ByteReader } from './ByteReader'
-import { FundingEntry } from './OnChainData'
 import { readFundingIndices } from './readFundingIndices'
 
 export function readFundingEntries(reader: ByteReader) {

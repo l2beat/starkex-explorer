@@ -1,9 +1,9 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError } from '../src'
-import { encodeAssetId } from '../src/encodeAssetId'
-import { readOraclePrices } from '../src/readOraclePrices'
+import { DecodingError } from '../../src'
+import { readOraclePrices } from '../../src/decoding/readOraclePrices'
+import { encodeAssetId } from '../../src/encodeAssetId'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'
 

@@ -1,4 +1,4 @@
-import { ByteReader } from '../src/ByteReader'
+import { ByteReader } from '../../src/decoding/ByteReader'
 
 export function readToDecode<T>(read: (reader: ByteReader) => T) {
   return function decode(data: string) {

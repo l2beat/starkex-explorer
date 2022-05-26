@@ -1,6 +1,6 @@
+import { AssetConfigHash } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
-import { AssetConfigHash } from './OnChainData'
 
 export function readAssetConfigHashes(reader: ByteReader) {
   const count = reader.readNumber(32)

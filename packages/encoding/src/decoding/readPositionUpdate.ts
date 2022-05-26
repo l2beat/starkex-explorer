@@ -1,9 +1,9 @@
 import { StarkKey, Timestamp } from '@explorer/types'
 
+import { MIN_INT } from '../constants'
+import { AssetBalance, PositionUpdate } from '../OnChainData'
 import { ByteReader } from './ByteReader'
-import { MIN_INT } from './constants'
 import { decodeAssetId } from './decodeAssetId'
-import { AssetBalance, PositionUpdate } from './OnChainData'
 
 export function readPositionUpdate(reader: ByteReader): PositionUpdate {
   const count = reader.readNumber(32)

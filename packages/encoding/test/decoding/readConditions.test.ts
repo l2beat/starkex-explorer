@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 
-import { DecodingError } from '../src'
-import { readConditions } from '../src/readConditions'
+import { DecodingError } from '../../src'
+import { readConditions } from '../../src/decoding/readConditions'
 import { ByteWriter } from './ByteWriter'
 import { readToDecode } from './readToDecode'
 

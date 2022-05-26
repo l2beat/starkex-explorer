@@ -1,9 +1,9 @@
 import { StarkKey } from '@explorer/types'
 
+import { ForcedAction } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
 import { DecodingError } from './DecodingError'
-import { ForcedAction } from './OnChainData'
 
 export function readForcedActions(reader: ByteReader) {
   const count = reader.readNumber(32)
