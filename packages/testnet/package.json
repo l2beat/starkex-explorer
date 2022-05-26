@@ -1,0 +1,26 @@
+{
+  "name": "@explorer/testnet",
+  "version": "0.1.0",
+  "private": true,
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "scripts": {
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "lint": "eslint --ext .ts --max-warnings 0 src",
+    "lint:fix": "yarn lint --fix",
+    "typecheck": "tsc --noEmit",
+    "build": "node contracts/compile.js",
+    "dev": "node -r esbuild-register src/index.ts"
+  },
+  "dependencies": {
+    "@explorer/encoding": "*",
+    "@explorer/types": "*",
+    "ethers": "^5.5.2",
+    "ganache": "^7.2.0"
+  },
+  "devDependencies": {
+    "@ethereum-waffle/compiler": "^3.4.4",
+    "prettier-plugin-solidity": "^1.0.0-beta.19"
+  }
+}
