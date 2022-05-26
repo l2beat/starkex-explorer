@@ -20,8 +20,8 @@ export interface ForcedTradeOffersIndexProps {
   readonly params: {
     readonly perPage: number
     readonly page: number
-    readonly assetId?: AssetId | 'all'
-    readonly type?: OfferType | 'all'
+    readonly assetId?: AssetId
+    readonly type?: OfferType
   }
   readonly total: number
 }
