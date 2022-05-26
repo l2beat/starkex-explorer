@@ -11,7 +11,7 @@ export function initOffersFilteringForm() {
     const assetIdEl = form.querySelector<HTMLSelectElement>(
       `[name="${AssetIdSelectName}"]`
     )
-    const typeEl = form.querySelector<HTMLSelectElement>(
+    const typeEl = form.querySelector<HTMLInputElement>(
       `[name="${TypeRadioName}"]:checked`
     )
 
