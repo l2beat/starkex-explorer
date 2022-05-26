@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.14;
+pragma solidity 0.6.12;
 
 contract Verifier {
     event LogMemoryPagesHashes(bytes32 factHash, bytes32[] pagesHashes);
