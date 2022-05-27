@@ -25,8 +25,8 @@ export function withTypedContext<T extends z.AnyZodObject>(
       return
     }
     ctx.params = parseResult.data.params
-    ctx.query = parseResult.data.query
     ctx.request.body = parseResult.data.request?.body
+    Object.defineProperty(ctx, 'query', { value: parseResult.data.query })
     await handler(ctx)
   }
 }

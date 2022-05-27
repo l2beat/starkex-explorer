@@ -112,13 +112,18 @@ function toRecord(row: Row): Record {
   }
 }
 
+interface InitialFilters {
+  type?: 'buy' | 'sell'
+  assetId?: AssetId
+}
+
 export class ForcedTradeOfferRepository extends BaseRepository {
   constructor(knex: Knex, logger: Logger) {
     super(knex, logger)
     this.add = this.wrapAdd(this.add)
     this.findById = this.wrapFind(this.findById)
-    this.initialCount = this.wrapAny(this.initialCount)
-    this.getLatestInitial = this.wrapGet(this.getLatestInitial)
+    this.countInitial = this.wrapAny(this.countInitial)
+    this.getInitial = this.wrapGet(this.getInitial)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.save = this.wrapSave(this.save)
   }
@@ -139,28 +144,48 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return !!updates
   }
 
-  async initialCount(): Promise<number> {
-    const row = await this.knex('forced_trade_offers')
+  private getInitialQuery({ assetId, type }: InitialFilters = {}) {
+    const query = this.knex('forced_trade_offers')
       .whereNull('accepted_at')
-      .count()
-
-    return Number(row[0].count)
+      .whereNull('cancelled_at')
+    if (assetId) {
+      query.andWhere('synthetic_asset_id', '=', assetId.toString())
+    }
+    if (type) {
+      query.andWhere(
+        'a_is_buying_synthetic',
+        '=',
+        type === 'buy' ? true : false
+      )
+    }
+    return query
   }
 
-  async getLatestInitial({
+  async countInitial({ assetId, type }: InitialFilters = {}): Promise<number> {
+    const [{ count }] = await this.getInitialQuery({ assetId, type }).count()
+    return Number(count)
+  }
+
+  async getInitial({
     limit,
     offset,
+    assetId,
+    type,
   }: {
     limit: number
     offset: number
-  }): Promise<Record[]> {
-    const rows = await this.knex('forced_trade_offers')
-      .whereNull('accepted_at')
+  } & InitialFilters): Promise<Record[]> {
+    const rows = await this.getInitialQuery({ assetId, type })
+      .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(offset)
-      .orderBy('created_at', 'desc')
 
     return rows.map(toRecord)
+  }
+
+  async getInitialAssetIds(): Promise<AssetId[]> {
+    const rowIds = await this.getInitialQuery().distinct('synthetic_asset_id')
+    return rowIds.map(String).map(AssetId)
   }
 
   async findById(id: Record['id']): Promise<Record | undefined> {

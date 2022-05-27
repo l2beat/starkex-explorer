@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { EthereumAddress } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 import Router from '@koa/router'
 import Koa from 'koa'
 import serve from 'koa-static'
@@ -65,6 +65,12 @@ router.get('/forced/new', (ctx) => {
 })
 router.get('/forced/offers', (ctx) => {
   const data = { ...DATA.FORCED_TRADE_OFFERS_INDEX_PROPS }
+  data.params = {
+    page: ctx.query.page ? Number(ctx.query.page) : 1,
+    perPage: ctx.query.perPage ? Number(ctx.query.perPage) : 10,
+    assetId: ctx.query.assetId ? AssetId(String(ctx.query.assetId)) : undefined,
+    type: (['buy', 'sell'] as const).find((type) => type === ctx.query.type),
+  }
   data.account = getAccount(ctx)
   ctx.body = renderForcedTradeOffersIndexPage(data)
 })

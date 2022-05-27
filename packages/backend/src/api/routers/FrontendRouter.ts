@@ -1,5 +1,5 @@
 import { stringAs, stringAsBigInt, stringAsInt } from '@explorer/shared'
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
 import { z } from 'zod'
@@ -67,16 +67,20 @@ export function createFrontendRouter(
         query: z.object({
           page: stringAsInt(1),
           perPage: stringAsInt(10),
+          assetId: stringAs(AssetId).optional(),
+          type: z.enum(['sell', 'buy']).optional(),
         }),
       }),
       async (ctx) => {
-        const { page, perPage } = ctx.query
+        const { page, perPage, assetId, type } = ctx.query
         const account = getAccount(ctx)
-        const result = await forcedTradeOfferController.getOffersIndexPage(
+        const result = await forcedTradeOfferController.getOffersIndexPage({
           page,
           perPage,
-          account
-        )
+          assetId,
+          type,
+          account,
+        })
         applyControllerResult(ctx, result)
       }
     )

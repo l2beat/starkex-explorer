@@ -1,3 +1,4 @@
+import { ServerFormAttributes } from '../pages/common/pagination'
 import { styles } from '../pages/common/pagination/styles'
 
 export function initPagination() {
@@ -6,13 +7,10 @@ export function initPagination() {
 }
 
 function initServerPagination() {
-  const select = document.querySelector<HTMLSelectElement>('#perPage')
-  if (!select) {
-    return
-  }
-  select.addEventListener('change', function () {
-    this.form?.submit()
-  })
+  const form = document.querySelector<HTMLFormElement>(
+    `#${ServerFormAttributes.FormId}`
+  )
+  form?.addEventListener('change', () => form.submit())
 }
 
 function initClientPagination() {
