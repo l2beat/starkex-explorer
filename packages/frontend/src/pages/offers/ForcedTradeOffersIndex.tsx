@@ -3,17 +3,33 @@ import React from 'react'
 
 import { Page } from '../common'
 import { AssetCell } from '../common/AssetCell'
-import { ServerPagination } from '../common/pagination'
+import { ServerFormAttributes, ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
 import { formatCurrency, formatRelativeTime } from '../formatting'
+import { AssetIdSelectName, FilteringForm, TypeRadioName } from './filtering'
 import { ForcedTradeOffersIndexProps } from './ForcedTradeOffersIndexProps'
 
 export function ForcedTradeOffersIndex({
   account,
   offers,
-  params: { page, perPage },
+  assetIds,
+  params: { page, perPage, assetId, type },
   total,
 }: ForcedTradeOffersIndexProps) {
+  const baseUrl = '/forced/offers'
+
+  const paginationParams = new URLSearchParams({
+    [ServerFormAttributes.PageInputName]: page.toString(),
+    [ServerFormAttributes.PerPageSelectName]: perPage.toString(),
+  })
+  const filteringParams = new URLSearchParams()
+  if (assetId) {
+    filteringParams.append(AssetIdSelectName, assetId.toString())
+  }
+  if (type) {
+    filteringParams.append(TypeRadioName, type.toString())
+  }
+
   return (
     <Page
       title="L2BEAT dYdX Explorer"
@@ -27,11 +43,19 @@ export function ForcedTradeOffersIndex({
       <h1 className="font-sans font-bold text-2xl mb-12">
         Forced trade offers
       </h1>
+      <FilteringForm
+        type={type}
+        assetId={assetId}
+        assetIds={assetIds}
+        baseUrl={baseUrl}
+        additionalParams={paginationParams}
+      />
       <ServerPagination
         perPage={perPage}
         page={page}
         total={total}
-        baseUrl="/forced/offers"
+        baseUrl={baseUrl}
+        additionalParams={filteringParams}
       />
       <Table
         noRowsText="there is no active offers at the moment"

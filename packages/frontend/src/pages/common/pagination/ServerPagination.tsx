@@ -1,7 +1,9 @@
 import React from 'react'
 
+import { HiddenInputs } from '../HiddenInputs'
 import { NextIcon } from '../icons/NextIcon'
 import { PrevIcon } from '../icons/PrevIcon'
+import { ServerFormAttributes } from './attributes'
 import { styles } from './styles'
 
 export interface ServerPaginationProps {
@@ -9,6 +11,7 @@ export interface ServerPaginationProps {
   perPage: number
   total: number
   baseUrl?: string
+  additionalParams?: URLSearchParams
 }
 
 export function ServerPagination({
@@ -16,14 +19,16 @@ export function ServerPagination({
   perPage,
   total,
   baseUrl = '/',
+  additionalParams,
 }: ServerPaginationProps) {
   const last = Math.ceil(total / perPage)
+  const hiddenParams = new URLSearchParams(additionalParams)
+  hiddenParams.set(ServerFormAttributes.PageInputName, page.toString())
 
   const link = (page: number, perPage: number) => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      perPage: perPage.toString(),
-    })
+    const params = new URLSearchParams(additionalParams)
+    params.set(ServerFormAttributes.PageInputName, page.toString())
+    params.set(ServerFormAttributes.PerPageSelectName, perPage.toString())
     return `${baseUrl}?${params}`
   }
 
@@ -74,11 +79,16 @@ export function ServerPagination({
           </>
         )}
       </div>
-      <form action={baseUrl} method="get" className={styles.innerWrapper}>
-        <label htmlFor="perPage">Per page</label>
+      <form
+        action={baseUrl}
+        method="get"
+        className={styles.innerWrapper}
+        id={ServerFormAttributes.FormId}
+      >
+        <label htmlFor="per-page">Per page</label>
         <select
-          name="perPage"
-          id="perPage"
+          name={ServerFormAttributes.PerPageSelectName}
+          id="per-page"
           className={styles.textButtonActive}
           autoComplete="off"
         >
@@ -88,6 +98,7 @@ export function ServerPagination({
             </option>
           ))}
         </select>
+        {<HiddenInputs params={hiddenParams} />}
       </form>
     </div>
   )
