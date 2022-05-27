@@ -252,6 +252,7 @@ export const FORCED_TRADE_OFFERS_INDEX_PROPS: ForcedTradeOffersIndexProps = {
   offers: createFakeOffers(10),
   params: { page: 3, perPage: 10 },
   total: 100,
+  assetIds: [AssetId('ETH-9'), AssetId('BTC-10'), AssetId('SUSHI-7')],
 }
 
 export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
