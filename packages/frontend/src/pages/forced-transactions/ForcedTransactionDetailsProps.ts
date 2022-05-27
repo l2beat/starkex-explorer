@@ -1,4 +1,6 @@
-import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
+
+import { ForcedHistoryEvent } from '../common/ForcedHistory'
 
 export type ForcedTransaction = ForcedExit | ForcedBuy | ForcedSell
 
@@ -9,9 +11,9 @@ export type ForcedTradeData = {
   readonly amountSynthetic: bigint
   readonly amountCollateral: bigint
   readonly assetId: AssetId
-  readonly positionIdB?: bigint
-  readonly addressB?: EthereumAddress
-  readonly transactionHash?: Hash256
+  readonly positionIdB: bigint
+  readonly addressB: EthereumAddress
+  readonly transactionHash: Hash256
 }
 
 export interface ForcedSell {
@@ -35,26 +37,8 @@ export interface ForcedExit {
   }
 }
 
-export type ForcedHistoryEntry =
-  | {
-      readonly type:
-        | 'created'
-        | 'accepted'
-        | 'cancelled'
-        | 'expired'
-        | 'sent'
-        | 'mined'
-        | 'reverted'
-      readonly timestamp: Timestamp
-    }
-  | {
-      readonly type: 'verified'
-      readonly timestamp: Timestamp
-      readonly stateUpdateId: number
-    }
-
 export type ForcedTransactionDetailsProps = {
   readonly transaction: ForcedTransaction
   readonly account: EthereumAddress | undefined
-  readonly history: readonly ForcedHistoryEntry[]
+  readonly history: ForcedHistoryEvent[]
 }

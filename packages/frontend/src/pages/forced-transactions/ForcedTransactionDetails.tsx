@@ -1,15 +1,18 @@
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
-import { formatAbsoluteTime, formatHashShort } from '../formatting'
+import { ForcedHistory } from '../common/ForcedHistory'
+import { PageHeaderStats } from '../common/PageHeaderStats'
+import { SimpleLink } from '../common/SimpleLink'
+import { formatCurrency, formatHashLong, formatHashShort } from '../formatting'
+import { toStatsRows as toOfferStatsRows } from '../offers/ForcedTradeOfferDetails'
 import {
-  ForcedHistoryEntry,
   ForcedTransaction,
   ForcedTransactionDetailsProps,
 } from './ForcedTransactionDetailsProps'
-import { Stats } from './Stats'
 
-function getHeaderText(props: ForcedTransaction): string {
+function toHeaderText(props: ForcedTransaction): string {
   if (props.type === 'exit') {
     return `Forced exit ${formatHashShort(props.data.transactionHash)}`
   }
@@ -20,29 +23,49 @@ function getHeaderText(props: ForcedTransaction): string {
   return `Forced ${props.type} ${id}`
 }
 
-function getStatusText(
-  entry: ForcedHistoryEntry,
-  type: ForcedTransaction['type']
-): string {
-  const partyB = type === 'buy' ? 'buyer' : 'seller'
-  switch (entry.type) {
-    case 'created':
-      return `offer created (looking for ${partyB})`
-    case 'accepted':
-      return `${partyB} found`
-    case 'cancelled':
-      return `offer cancelled`
-    case 'expired':
-      return `offer submission time has expired`
-    case 'sent':
-      return 'transaction sent'
-    case 'mined':
-      return 'transaction mined (waiting for inclusion in state update)'
-    case 'verified':
-      return `exit included in state update #${entry.stateUpdateId}`
-    case 'reverted':
-      return 'transaction reverted'
+function toStatsRows(transaction: ForcedTransaction) {
+  if (transaction.type === 'exit') {
+    return [
+      {
+        title: 'Position id',
+        content: (
+          <SimpleLink href={`/positions/${transaction.data.positionId}`}>
+            #{transaction.data.positionId.toString()}
+          </SimpleLink>
+        ),
+      },
+      {
+        title: 'Ethereum address',
+        content: transaction.data.ethereumAddress?.toString() || '-',
+      },
+      {
+        title: 'Value',
+        content: formatCurrency(transaction.data.value, AssetId.USDC),
+      },
+      {
+        title: 'Transaction hash',
+        content: formatHashLong(transaction.data.transactionHash),
+      },
+      {
+        title: 'State update id',
+        content: transaction.data.stateUpdateId ? (
+          <SimpleLink href={`/state-updates/${transaction.data.stateUpdateId}`}>
+            #{transaction.data.stateUpdateId.toString()}
+          </SimpleLink>
+        ) : (
+          '-'
+        ),
+      },
+    ]
   }
+
+  return [
+    ...toOfferStatsRows({ type: transaction.type, ...transaction.data }),
+    {
+      title: `Transaction hash`,
+      content: transaction.data.transactionHash.toString(),
+    },
+  ]
 }
 
 export function ForcedTransactionDetails({
@@ -61,24 +84,11 @@ export function ForcedTransactionDetails({
       account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-12 overflow-x-hidden text-ellipsis whitespace-nowrap">
-        {getHeaderText(transaction)}
+        {toHeaderText(transaction)}
       </h1>
-      <Stats transaction={transaction} />
-      <div className="mb-1.5 font-medium text-lg text-left">History</div>
-      <div className="w-full overflow-x-auto mb-12">
-        <table className="whitespace-nowrap w-full">
-          {history.map((entry, i) => (
-            <tr className="bg-grey-200 border-2 border-grey-100" key={i}>
-              <th className="font-normal text-left w-[268px] py-2 px-1.5">
-                {formatAbsoluteTime(entry.timestamp)}
-              </th>
-              <td className="font-normal first-letter:capitalize py-2 px-1.5">
-                {getStatusText(entry, transaction.type)}
-              </td>
-            </tr>
-          ))}
-        </table>
-      </div>
+      <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
+      <PageHeaderStats rows={toStatsRows(transaction)} />
+      <ForcedHistory events={history} />
     </Page>
   )
 }

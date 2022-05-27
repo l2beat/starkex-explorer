@@ -1,7 +1,6 @@
 import {
-  ForcedHistoryEntry,
+  renderForcedTradeOfferDetailsPage,
   renderForcedTradeOffersIndexPage,
-  renderForcedTransactionDetailsPage,
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
@@ -19,6 +18,7 @@ import {
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
 import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
+import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 
 export class ForcedTradeOfferController {
   constructor(
@@ -84,21 +84,19 @@ export class ForcedTradeOfferController {
         )
       : undefined
 
-    const content = renderForcedTransactionDetailsPage({
+    const content = renderForcedTradeOfferDetailsPage({
       account,
-      history: buildOfferHistory(offer),
-      transaction: {
+      history: toForcedTradeOfferHistory(offer),
+      offer: {
         type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
-        data: {
-          displayId: id,
-          addressA: userA.ethAddress,
-          positionIdA: offer.positionIdA,
-          amountCollateral: offer.amountCollateral,
-          amountSynthetic: offer.amountSynthetic,
-          assetId: offer.syntheticAssetId,
-          positionIdB: offer.accepted?.positionIdB,
-          addressB: userB?.ethAddress,
-        },
+        id,
+        addressA: userA.ethAddress,
+        positionIdA: offer.positionIdA,
+        amountCollateral: offer.amountCollateral,
+        amountSynthetic: offer.amountSynthetic,
+        assetId: offer.syntheticAssetId,
+        positionIdB: offer.accepted?.positionIdB,
+        addressB: userB?.ethAddress,
       },
     })
     return { type: 'success', content }
@@ -228,28 +226,4 @@ export class ForcedTradeOfferController {
 
     return { type: 'success', content: 'Offer cancelled.' }
   }
-}
-
-function buildOfferHistory(
-  offer: ForcedTradeOfferRecord
-): ForcedHistoryEntry[] {
-  const history: ForcedHistoryEntry[] = [
-    {
-      type: 'created',
-      timestamp: offer.createdAt,
-    },
-  ]
-  if (offer.accepted) {
-    history.push({
-      type: 'accepted',
-      timestamp: offer.accepted.at,
-    })
-  }
-  if (offer.cancelledAt) {
-    history.push({
-      type: 'cancelled',
-      timestamp: offer.cancelledAt,
-    })
-  }
-  return history
 }

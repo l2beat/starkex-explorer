@@ -1,5 +1,4 @@
 import {
-  ForcedHistoryEntry,
   ForcedTransaction,
   renderForcedTransactionDetailsPage,
   renderForcedTransactionsIndexPage,
@@ -15,6 +14,7 @@ import { PositionRepository } from '../../peripherals/database/PositionRepositor
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
+import { toForcedTransactionHistory } from './utils/toForcedTransactionHistory'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
 export class ForcedTransactionController {
@@ -64,40 +64,29 @@ export class ForcedTransactionController {
         },
       }
     }
-    const userA = await this.userRegistrationEventRepository.findByStarkKey(
-      transaction.data.publicKeyA
-    )
-    if (!userA) {
-      throw new Error('User A not found')
-    }
-    const type = transaction.data.isABuyingSynthetic ? 'buy' : 'sell'
-    const data = {
-      displayId: transaction.hash,
-      positionIdA: transaction.data.positionIdA,
-      addressA: userA.ethAddress,
-      amountSynthetic: transaction.data.syntheticAmount,
-      amountCollateral: transaction.data.collateralAmount,
-      assetId: transaction.data.syntheticAssetId,
-      transactionHash: transaction.hash,
-    }
-    if (!transaction.data.positionIdB) {
-      return {
-        type,
-        data,
-      }
-    }
-    const userB = await this.userRegistrationEventRepository.findByStarkKey(
-      transaction.data.publicKeyB
-    )
-    if (!userB) {
-      throw new Error('User B not found')
+    const [userA, userB] = await Promise.all([
+      this.userRegistrationEventRepository.findByStarkKey(
+        transaction.data.publicKeyA
+      ),
+      this.userRegistrationEventRepository.findByStarkKey(
+        transaction.data.publicKeyB
+      ),
+    ])
+    if (!userA || !userB) {
+      throw new Error('Transaction users missing')
     }
     return {
-      type,
+      type: transaction.data.isABuyingSynthetic ? 'buy' : 'sell',
       data: {
-        ...data,
+        displayId: transaction.hash,
+        positionIdA: transaction.data.positionIdA,
         positionIdB: transaction.data.positionIdB,
+        addressA: userA.ethAddress,
         addressB: userB.ethAddress,
+        amountSynthetic: transaction.data.syntheticAmount,
+        amountCollateral: transaction.data.collateralAmount,
+        assetId: transaction.data.syntheticAssetId,
+        transactionHash: transaction.hash,
       },
     }
   }
@@ -116,7 +105,7 @@ export class ForcedTransactionController {
 
     const content = renderForcedTransactionDetailsPage({
       account,
-      history: buildTransactionHistory(transaction),
+      history: toForcedTransactionHistory(transaction),
       transaction: await this.toForcedTransaction(transaction),
     })
     return { type: 'success', content }
@@ -159,28 +148,4 @@ export class ForcedTransactionController {
       }),
     }
   }
-}
-
-function buildTransactionHistory({
-  updates,
-}: ForcedTransactionRecord): ForcedHistoryEntry[] {
-  const history: ForcedHistoryEntry[] = []
-  if (updates.sentAt) {
-    history.push({ type: 'sent', timestamp: updates.sentAt })
-  }
-  if (updates.revertedAt) {
-    history.push({ type: 'reverted', timestamp: updates.revertedAt })
-    return history
-  }
-  if (updates.minedAt) {
-    history.push({ type: 'mined', timestamp: updates.minedAt })
-  }
-  if (updates.verified) {
-    history.push({
-      type: 'verified',
-      stateUpdateId: updates.verified.stateUpdateId,
-      timestamp: updates.verified.at,
-    })
-  }
-  return history
 }
