@@ -11,20 +11,20 @@ export function encodeFirstPage(data: OnChainData) {
 
   writer.write(data.configurationHash, 32)
 
-  writeAssetConfigHashes(writer, data)
+  writeAssetConfigHashes(writer, data.assetConfigHashes)
 
   writeState(writer, data.oldState)
   writeState(writer, data.newState)
 
   writer.writeNumber(data.minimumExpirationTimestamp, 32)
 
-  writeModifications(writer, data)
+  writeModifications(writer, data.modifications)
 
-  const forcedActionsBytes = encodeForcedActions(data)
+  const forcedActionsBytes = encodeForcedActions(data.forcedActions)
   writer.writeNumber(forcedActionsBytes.length / 2 / 32, 32)
   writer.write(forcedActionsBytes)
 
-  writeConditions(writer, data)
+  writeConditions(writer, data.conditions)
 
   return writer.getBytes()
 }

@@ -1,11 +1,15 @@
-import { OnChainData } from '../OnChainData'
+import { FundingEntry } from '../OnChainData'
 import { ByteWriter } from './ByteWriter'
-import { writeFundingIndices } from './writeFundingIndices.1'
+import { toSeconds } from './toSeconds'
+import { writeFundingIndices } from './writeFundingIndices'
 
-export function writeFundingEntries(writer: ByteWriter, data: OnChainData) {
-  writer.writeNumber(data.funding.length, 32)
-  for (const { indices, timestamp } of data.funding) {
+export function writeFundingEntries(
+  writer: ByteWriter,
+  funding: FundingEntry[]
+) {
+  writer.writeNumber(funding.length, 32)
+  for (const { indices, timestamp } of funding) {
     writeFundingIndices(writer, indices)
-    writer.writeNumber(Number(timestamp) / 1000, 32)
+    writer.writeNumber(toSeconds(timestamp), 32)
   }
 }

@@ -2,6 +2,10 @@ import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { decodeOnChainData, encodeOnChainData, OnChainData } from '../../src'
+import { ByteReader } from '../../src/decoding/ByteReader'
+import { readAssetConfigHashes } from '../../src/decoding/readAssetConfigHashes'
+import { ByteWriter } from '../../src/encoding/ByteWriter'
+import { writeAssetConfigHashes } from '../../src/encoding/writeAssetConfigHashes'
 
 describe(encodeOnChainData.name, () => {
   const data: OnChainData = {
@@ -84,5 +88,16 @@ describe(encodeOnChainData.name, () => {
     const encoded = encodeOnChainData(data)
     const decoded = decodeOnChainData(encoded)
     expect(decoded).toEqual(data)
+  })
+
+  describe(writeAssetConfigHashes.name, () => {
+    it(`is compatible with ${readAssetConfigHashes.name}`, () => {
+      const writer = new ByteWriter()
+      writeAssetConfigHashes(writer, data.assetConfigHashes)
+      const encoded = writer.getBytes()
+      const reader = new ByteReader(encoded)
+      const decoded = readAssetConfigHashes(reader)
+      expect(decoded).toEqual(data.assetConfigHashes)
+    })
   })
 })

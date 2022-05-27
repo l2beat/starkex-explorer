@@ -13,7 +13,7 @@ export function encodeOnChainData(data: OnChainData): string[] {
 export function encodeUpdates(data: OnChainData) {
   const writer = new ByteWriter()
 
-  writeFundingEntries(writer, data)
+  writeFundingEntries(writer, data.funding)
 
   for (const position of data.positions) {
     writePositionUpdate(writer, position)

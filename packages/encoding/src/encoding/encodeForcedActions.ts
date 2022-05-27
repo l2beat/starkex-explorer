@@ -1,11 +1,11 @@
-import { OnChainData } from '../OnChainData'
+import { ForcedAction } from '../OnChainData'
 import { ByteWriter } from './ByteWriter'
 import { encodeAssetId } from './encodeAssetId'
 
-export function encodeForcedActions(data: OnChainData) {
+export function encodeForcedActions(forcedActions: ForcedAction[]) {
   const writer = new ByteWriter()
-  writer.writeNumber(data.forcedActions.length, 32)
-  for (const action of data.forcedActions) {
+  writer.writeNumber(forcedActions.length, 32)
+  for (const action of forcedActions) {
     if (action.type === 'withdrawal') {
       writer.write(action.publicKey.toString(), 32)
       writer.writeNumber(action.positionId, 32)
