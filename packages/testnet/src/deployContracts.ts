@@ -4,6 +4,9 @@ import PerpetualArtifact from '../build/Perpetual.json'
 import RegistryArtifact from '../build/Registry.json'
 import VerifierArtifact from '../build/Verifier.json'
 
+type ContractsPromise = ReturnType<typeof deployContracts>
+export type Contracts = ContractsPromise extends Promise<infer T> ? T : never
+
 export async function deployContracts(deployer: Wallet) {
   const registryFactory = new ContractFactory(
     RegistryArtifact.abi,
