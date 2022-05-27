@@ -22,7 +22,8 @@ export interface ControllerRedirectResult {
 
 export interface ControllerCreatedResult {
   type: 'created'
-  content: { id: number }
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  content: { id: number | string | String | Number }
 }
 
 export interface ControllerBadRequestResult {

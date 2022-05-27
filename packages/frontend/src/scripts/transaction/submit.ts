@@ -42,7 +42,13 @@ async function submitExit(state: FormState) {
   })
   const hash = Hash256(result as string)
 
-  console.log(hash)
+  await fetch('/forced/exits', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ hash }),
+  })
+
+  window.location.href = `/forced/${hash}`
 }
 
 async function submitOffer(state: FormState) {

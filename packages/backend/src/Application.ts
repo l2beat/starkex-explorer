@@ -5,8 +5,9 @@ import { HomeController } from './api/controllers/HomeController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
+import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
-import { createForcedTradeOfferRouter } from './api/routers/ForcedTradeOfferRouter'
+import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
@@ -201,6 +202,11 @@ export class Application {
       positionRepository,
       userRegistrationEventRepository
     )
+    const userTransactionController = new TransactionSubmitController(
+      ethereumClient,
+      forcedTransactionsRepository,
+      config.contracts.perpetual
+    )
 
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
@@ -213,7 +219,10 @@ export class Application {
           stateUpdateController,
           searchController
         ),
-        createForcedTradeOfferRouter(forcedTradeOfferController),
+        createForcedTransactionRouter(
+          forcedTradeOfferController,
+          userTransactionController
+        ),
       ],
       middleware: [createFrontendMiddleware()],
     })
