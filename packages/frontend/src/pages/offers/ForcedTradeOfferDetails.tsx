@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
@@ -10,7 +10,9 @@ import { formatCurrency } from '../formatting'
 import { ForcedTradeOfferDetailsProps } from './ForcedTradeOfferDetailsProps'
 
 export function toStatsRows(
-  offer: Omit<ForcedTradeOfferDetailsProps['offer'], 'id'>
+  offer: Omit<ForcedTradeOfferDetailsProps['offer'], 'id' | 'addressA'> & {
+    addressA?: EthereumAddress
+  }
 ) {
   const partyA = offer.type === 'buy' ? 'Buyer' : 'Seller'
   const partyB = offer.type === 'buy' ? 'Seller' : 'Buyer'
@@ -26,7 +28,7 @@ export function toStatsRows(
     },
     {
       title: `${partyA} ethereum address`,
-      content: offer.addressA.toString(),
+      content: offer.addressA?.toString() || '-',
     },
     {
       title: 'Tokens sold',

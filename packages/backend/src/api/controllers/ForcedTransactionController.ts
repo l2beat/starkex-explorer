@@ -72,17 +72,14 @@ export class ForcedTransactionController {
         transaction.data.publicKeyB
       ),
     ])
-    if (!userA || !userB) {
-      throw new Error('Transaction users missing')
-    }
     return {
       type: transaction.data.isABuyingSynthetic ? 'buy' : 'sell',
       data: {
         displayId: transaction.hash,
         positionIdA: transaction.data.positionIdA,
         positionIdB: transaction.data.positionIdB,
-        addressA: userA.ethAddress,
-        addressB: userB.ethAddress,
+        addressA: userA?.ethAddress,
+        addressB: userB?.ethAddress,
         amountSynthetic: transaction.data.syntheticAmount,
         amountCollateral: transaction.data.collateralAmount,
         assetId: transaction.data.syntheticAssetId,

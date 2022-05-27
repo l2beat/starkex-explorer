@@ -7,12 +7,12 @@ export type ForcedTransaction = ForcedExit | ForcedBuy | ForcedSell
 export type ForcedTradeData = {
   readonly displayId: number | Hash256
   readonly positionIdA: bigint
-  readonly addressA: EthereumAddress
+  readonly addressA?: EthereumAddress
   readonly amountSynthetic: bigint
   readonly amountCollateral: bigint
   readonly assetId: AssetId
   readonly positionIdB: bigint
-  readonly addressB: EthereumAddress
+  readonly addressB?: EthereumAddress
   readonly transactionHash: Hash256
 }
 
