@@ -50,7 +50,7 @@ export function initMetamask() {
   }
 
   function updateChainId(chainId: string) {
-    if (chainId !== '0x1') {
+    if (chainId !== '0x1' && chainId !== '0x539') {
       alert('Please change your metamask to mainnet')
     }
   }

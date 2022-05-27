@@ -5,10 +5,10 @@ import { LogLevel } from '../tools/Logger'
 import { Config } from './Config'
 import { getEnv } from './getEnv'
 
-export function getLocalConfig(): Config {
+export function getTestnetConfig(): Config {
   dotenv()
   return {
-    name: 'dYdXStateExplorer/Local',
+    name: 'dYdXStateExplorer/Testnet',
     logger: {
       logLevel: getEnv.integer('LOG_LEVEL', LogLevel.INFO),
       format: 'pretty',
@@ -16,21 +16,20 @@ export function getLocalConfig(): Config {
     port: getEnv.integer('PORT', 3000),
     databaseConnection: getEnv('LOCAL_DB_URL'),
     enableSync: true,
-    jsonRpcUrl: getEnv('LOCAL_JSON_RPC_URL'),
+    jsonRpcUrl: 'http://127.0.0.1:8545',
     core: {
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
-      minBlockNumber: 11813207,
+      minBlockNumber: 0,
       maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     contracts: {
-      perpetual: EthereumAddress('0xD54f502e184B6B739d7D27a6410a67dc462D69c8'),
-      registry: EthereumAddress('0xEfbCcE4659db72eC6897F46783303708cf9ACef8'),
-      proxy: EthereumAddress('0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'),
+      perpetual: EthereumAddress('0x27fac828D6E6862901ea8471fF22552D84e155D0'),
+      registry: EthereumAddress('0xE068d37a67cAb19e0A6DFE88e720f076cfA7140E'),
+      proxy: EthereumAddress.ZERO,
       verifiers: [
-        EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84'),
-        EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
+        EthereumAddress('0x6ebcf3c79b5bC9195F26dE459f57B6d2f0f27861'),
       ],
     },
-    freshStart: getEnv.boolean('FRESH_START', false),
+    freshStart: true,
   }
 }

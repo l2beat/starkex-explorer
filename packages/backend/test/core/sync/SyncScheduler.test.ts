@@ -98,7 +98,8 @@ describe(SyncScheduler.name, () => {
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
-        Logger.SILENT
+        Logger.SILENT,
+        { earliestBlock: 1_000_000 }
       )
 
       syncScheduler['dispatch']({
@@ -131,7 +132,8 @@ describe(SyncScheduler.name, () => {
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
-        Logger.SILENT
+        Logger.SILENT,
+        { earliestBlock: 1_000_000 }
       )
 
       syncScheduler['dispatch']({
@@ -166,7 +168,8 @@ describe(SyncScheduler.name, () => {
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
-        Logger.SILENT
+        Logger.SILENT,
+        { earliestBlock: 1_000_000 }
       )
 
       syncScheduler['dispatch']({
@@ -207,7 +210,8 @@ describe(SyncScheduler.name, () => {
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
-        Logger.SILENT
+        Logger.SILENT,
+        { earliestBlock: 1_000_000 }
       )
 
       syncScheduler['dispatch']({
@@ -247,7 +251,7 @@ describe(SyncScheduler.name, () => {
         mock<BlockDownloader>(),
         dataSyncService,
         Logger.SILENT,
-        { maxBlockNumber }
+        { earliestBlock: 1, maxBlockNumber }
       )
 
       syncScheduler['handleSync'](

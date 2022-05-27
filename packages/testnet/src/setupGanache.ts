@@ -1,11 +1,13 @@
 import { providers } from 'ethers'
 import ganache from 'ganache'
 
-export async function setupGanache(keys: string[]) {
+import { PRIVATE_KEYS } from './constants'
+
+export async function setupGanache() {
   const server = ganache.server({
     wallet: {
       lock: true,
-      accounts: keys.map((secretKey) => ({
+      accounts: PRIVATE_KEYS.map((secretKey) => ({
         balance: 1234n * 10n ** 18n,
         secretKey,
       })),

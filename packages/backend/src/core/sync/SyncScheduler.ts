@@ -11,11 +11,8 @@ import {
   SyncState,
 } from './syncSchedulerReducer'
 
-/** block of the first verifier deploy */
-const EARLIEST_BLOCK = 11813207
-
 interface SyncSchedulerOptions {
-  earliestBlock?: number
+  earliestBlock: number
   maxBlockNumber?: number
 }
 
@@ -30,10 +27,10 @@ export class SyncScheduler {
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: DataSyncService,
     private readonly logger: Logger,
-    opts: SyncSchedulerOptions = {}
+    opts: SyncSchedulerOptions
   ) {
     this.logger = logger.for(this)
-    this.earliestBlock = opts.earliestBlock || EARLIEST_BLOCK
+    this.earliestBlock = opts.earliestBlock
     this.maxBlockNumber = opts.maxBlockNumber || Infinity
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
   }
