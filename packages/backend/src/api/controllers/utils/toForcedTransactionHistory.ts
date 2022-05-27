@@ -2,10 +2,15 @@ import { Timestamp } from '@explorer/types'
 
 import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionsRepository'
 
+interface Event {
+  timestamp: Timestamp
+  text: string
+}
+
 export function toForcedTransactionHistory({
   updates,
-}: ForcedTransactionRecord): { timestamp: Timestamp; text: string }[] {
-  const history: { timestamp: Timestamp; text: string }[] = []
+}: ForcedTransactionRecord) {
+  const history: Event[] = []
   if (updates.sentAt) {
     history.push({ text: 'transaction sent', timestamp: updates.sentAt })
   }

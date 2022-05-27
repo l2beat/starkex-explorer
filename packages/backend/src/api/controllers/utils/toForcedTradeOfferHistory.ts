@@ -2,12 +2,14 @@ import { Timestamp } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
 
-export function toForcedTradeOfferHistory(offer: ForcedTradeOfferRecord): {
+interface Event {
   timestamp: Timestamp
   text: string
-}[] {
+}
+
+export function toForcedTradeOfferHistory(offer: ForcedTradeOfferRecord) {
   const partyB = offer.aIsBuyingSynthetic ? 'buyer' : 'seller'
-  const history: { timestamp: Timestamp; text: string }[] = [
+  const history: Event[] = [
     {
       timestamp: offer.createdAt,
       text: `offer created (looking for ${partyB})`,

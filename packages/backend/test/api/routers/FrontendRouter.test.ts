@@ -216,6 +216,28 @@ describe('FrontendRouter', () => {
     })
   })
 
+  describe('/forced/offers/:id', () => {
+    const frontendRouter = createFrontendRouter(
+      mock<PositionController>(),
+      mock<HomeController>(),
+      mock<ForcedTradeOfferController>({
+        getOfferDetailsPage: async () => SUCCESS_RESULT,
+      }),
+      mock<ForcedTransactionController>(),
+      mock<StateUpdateController>(),
+      mock<SearchController>()
+    )
+    const server = createTestApiServer([frontendRouter])
+
+    it('returns html', async () => {
+      await server.get(`/forced/offers/1`).expect(200).expect(TEST_PAGE)
+    })
+
+    it('does not allow invalid input', async () => {
+      await server.get('/forced/offers/not-a-hash').expect(400)
+    })
+  })
+
   describe('/search', async () => {
     const { knex } = setupDatabaseTestSuite()
     const ethAddress = EthereumAddress.fake()
