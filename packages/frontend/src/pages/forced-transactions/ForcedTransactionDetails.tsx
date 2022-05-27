@@ -3,25 +3,15 @@ import React from 'react'
 
 import { Page } from '../common'
 import { ForcedHistory } from '../common/ForcedHistory'
+import { ForcedPageHeader } from '../common/ForcedPageHeader'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
-import { formatCurrency, formatHashLong, formatHashShort } from '../formatting'
+import { formatCurrency, formatHashLong } from '../formatting'
 import { toStatsRows as toOfferStatsRows } from '../offers/ForcedTradeOfferDetails'
 import {
   ForcedTransaction,
   ForcedTransactionDetailsProps,
 } from './ForcedTransactionDetailsProps'
-
-function toHeaderText(props: ForcedTransaction): string {
-  if (props.type === 'exit') {
-    return `Forced exit ${formatHashShort(props.data.transactionHash)}`
-  }
-  const id =
-    typeof props.data.displayId === 'number'
-      ? `#${props.data.displayId}`
-      : formatHashShort(props.data.displayId)
-  return `Forced ${props.type} ${id}`
-}
 
 function toStatsRows(transaction: ForcedTransaction) {
   if (transaction.type === 'exit') {
@@ -73,6 +63,10 @@ export function ForcedTransactionDetails({
   history,
   transaction,
 }: ForcedTransactionDetailsProps) {
+  const displayId =
+    transaction.type === 'exit'
+      ? transaction.data.transactionHash
+      : transaction.data.displayId
   return (
     <Page
       title="L2BEAT dYdX Explorer"
@@ -83,9 +77,7 @@ export function ForcedTransactionDetails({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-12 overflow-x-hidden text-ellipsis whitespace-nowrap">
-        {toHeaderText(transaction)}
-      </h1>
+      <ForcedPageHeader displayId={displayId} type={transaction.type} />
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats rows={toStatsRows(transaction)} />
       <ForcedHistory events={history} />

@@ -3,6 +3,7 @@ import React from 'react'
 
 import { Page } from '../common'
 import { ForcedHistory } from '../common/ForcedHistory'
+import { ForcedPageHeader } from '../common/ForcedPageHeader'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { formatCurrency } from '../formatting'
@@ -14,7 +15,7 @@ export function toStatsRows(
   const partyA = offer.type === 'buy' ? 'Buyer' : 'Seller'
   const partyB = offer.type === 'buy' ? 'Seller' : 'Buyer'
 
-  const base = [
+  const rows = [
     {
       title: `${partyA} position id`,
       content: (
@@ -38,7 +39,7 @@ export function toStatsRows(
   ]
 
   if (offer.positionIdB) {
-    base.push({
+    rows.push({
       title: `${partyB} position id`,
       content: (
         <SimpleLink href={`/positions/${offer.positionIdB}`}>
@@ -49,13 +50,13 @@ export function toStatsRows(
   }
 
   if (offer.addressB) {
-    base.push({
+    rows.push({
       title: `${partyB} ethereum address`,
       content: offer.addressB.toString(),
     })
   }
 
-  return base
+  return rows
 }
 
 export function ForcedTradeOfferDetails({
@@ -73,9 +74,7 @@ export function ForcedTradeOfferDetails({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-12 overflow-x-hidden text-ellipsis whitespace-nowrap">
-        Forced {offer.type} #{offer.id}
-      </h1>
+      <ForcedPageHeader displayId={offer.id} type={offer.type} />
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats rows={toStatsRows(offer)} />
       <ForcedHistory events={history} />
