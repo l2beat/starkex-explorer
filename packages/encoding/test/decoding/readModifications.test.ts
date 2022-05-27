@@ -3,7 +3,7 @@ import { expect } from 'earljs'
 
 import { DecodingError } from '../../src'
 import { readModifications } from '../../src/decoding/readModifications'
-import { ByteWriter } from './ByteWriter'
+import { ByteWriter } from '../../src/encoding/ByteWriter'
 import { readToDecode } from './readToDecode'
 
 describe(readModifications.name, () => {

@@ -4,8 +4,8 @@ import { expect } from 'earljs'
 import { MIN_INT } from '../../src/constants'
 import { decodeUpdates } from '../../src/decoding/decodeUpdates'
 import { DecodingError } from '../../src/decoding/DecodingError'
-import { encodeAssetId } from '../../src/encodeAssetId'
-import { ByteWriter } from './ByteWriter'
+import { ByteWriter } from '../../src/encoding/ByteWriter'
+import { encodeAssetId } from '../../src/encoding/encodeAssetId'
 
 describe('decodeUpdates', () => {
   it('fails for empty data', () => {

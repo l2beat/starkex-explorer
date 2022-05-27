@@ -2,7 +2,7 @@ import { expect } from 'earljs'
 
 import { DecodingError } from '../../src'
 import { readConditions } from '../../src/decoding/readConditions'
-import { ByteWriter } from './ByteWriter'
+import { ByteWriter } from '../../src/encoding/ByteWriter'
 import { readToDecode } from './readToDecode'
 
 describe(readConditions.name, () => {

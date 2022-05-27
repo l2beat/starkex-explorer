@@ -1,7 +1,7 @@
 export class ByteWriter {
   private result = ''
 
-  write(bytes: string) {
+  write(bytes: string, length?: number) {
     if (bytes.startsWith('0x')) {
       bytes = bytes.slice(2)
     }
@@ -10,6 +10,14 @@ export class ByteWriter {
     }
     if (bytes.length % 2 !== 0) {
       throw new TypeError('Data is not byte aligned')
+    }
+    if (length !== undefined) {
+      if (bytes.length / 2 < length) {
+        bytes.padStart(length * 2, '0')
+      }
+      if (bytes.length / 2 !== length) {
+        throw new TypeError('Data too large')
+      }
     }
     this.result += bytes.toLowerCase()
     return this

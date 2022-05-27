@@ -3,7 +3,7 @@ import { expect } from 'earljs'
 
 import { DecodingError, encodeAssetId } from '../../src'
 import { readForcedActions } from '../../src/decoding/readForcedActions'
-import { ByteWriter } from './ByteWriter'
+import { ByteWriter } from '../../src/encoding/ByteWriter'
 import { readToDecode } from './readToDecode'
 
 describe(readForcedActions.name, () => {

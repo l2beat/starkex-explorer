@@ -1,5 +1,6 @@
 export { decodeAssetId } from './decoding/decodeAssetId'
 export { decodeOnChainData } from './decoding/decodeOnChainData'
 export { DecodingError } from './decoding/DecodingError'
-export { encodeAssetId } from './encodeAssetId'
+export { encodeAssetId } from './encoding/encodeAssetId'
+export { encodeOnChainData } from './encoding/encodeOnChainData'
 export * from './OnChainData'

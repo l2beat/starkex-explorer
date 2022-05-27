@@ -3,8 +3,8 @@ import { expect } from 'earljs'
 
 import { DecodingError } from '../../src'
 import { readAssetConfigHashes } from '../../src/decoding/readAssetConfigHashes'
-import { encodeAssetId } from '../../src/encodeAssetId'
-import { ByteWriter } from './ByteWriter'
+import { ByteWriter } from '../../src/encoding/ByteWriter'
+import { encodeAssetId } from '../../src/encoding/encodeAssetId'
 import { readToDecode } from './readToDecode'
 
 describe(readAssetConfigHashes.name, () => {

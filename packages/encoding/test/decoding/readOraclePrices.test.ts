@@ -3,8 +3,8 @@ import { expect } from 'earljs'
 
 import { DecodingError } from '../../src'
 import { readOraclePrices } from '../../src/decoding/readOraclePrices'
-import { encodeAssetId } from '../../src/encodeAssetId'
-import { ByteWriter } from './ByteWriter'
+import { ByteWriter } from '../../src/encoding/ByteWriter'
+import { encodeAssetId } from '../../src/encoding/encodeAssetId'
 import { readToDecode } from './readToDecode'
 
 describe('readOraclePrices', () => {

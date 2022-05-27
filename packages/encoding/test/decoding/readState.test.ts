@@ -4,8 +4,8 @@ import { expect } from 'earljs'
 import { DecodingError } from '../../src'
 import { MIN_INT } from '../../src/constants'
 import { readState } from '../../src/decoding/readState'
-import { encodeAssetId } from '../../src/encodeAssetId'
-import { ByteWriter } from './ByteWriter'
+import { ByteWriter } from '../../src/encoding/ByteWriter'
+import { encodeAssetId } from '../../src/encoding/encodeAssetId'
 import { readToDecode } from './readToDecode'
 
 describe('readState', () => {
