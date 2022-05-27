@@ -10,6 +10,6 @@ export function writeAssetConfigHashes(
   for (const { assetId, hash } of assetConfigHashes) {
     writer.writePadding(17)
     writer.write(encodeAssetId(assetId), 15)
-    writer.write(hash, 32)
+    writer.write(hash.toString(), 32)
   }
 }

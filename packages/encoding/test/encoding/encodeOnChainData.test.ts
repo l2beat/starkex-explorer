@@ -1,4 +1,10 @@
-import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect } from 'earljs'
 
 import { decodeOnChainData, encodeOnChainData, OnChainData } from '../../src'
@@ -9,16 +15,16 @@ import { writeAssetConfigHashes } from '../../src/encoding/writeAssetConfigHashe
 
 describe(encodeOnChainData.name, () => {
   const data: OnChainData = {
-    configurationHash: PedersenHash.fake().toString(),
+    configurationHash: Hash256.fake(),
     assetConfigHashes: [
-      { assetId: AssetId('ABC-3'), hash: PedersenHash.fake().toString() },
-      { assetId: AssetId('DEF-6'), hash: PedersenHash.fake().toString() },
-      { assetId: AssetId('GHI-9'), hash: PedersenHash.fake().toString() },
+      { assetId: AssetId('ABC-3'), hash: PedersenHash.fake() },
+      { assetId: AssetId('DEF-6'), hash: PedersenHash.fake() },
+      { assetId: AssetId('GHI-9'), hash: PedersenHash.fake() },
     ],
     oldState: {
-      positionRoot: PedersenHash.fake().toString(),
+      positionRoot: PedersenHash.fake(),
       positionHeight: 64,
-      orderRoot: PedersenHash.fake().toString(),
+      orderRoot: PedersenHash.fake(),
       orderHeight: 64,
       indices: [
         { assetId: AssetId('ABC-3'), value: 123n },
@@ -34,9 +40,9 @@ describe(encodeOnChainData.name, () => {
       systemTime: Timestamp.fromSeconds(1337n),
     },
     newState: {
-      positionRoot: PedersenHash.fake().toString(),
+      positionRoot: PedersenHash.fake(),
       positionHeight: 64,
-      orderRoot: PedersenHash.fake().toString(),
+      orderRoot: PedersenHash.fake(),
       orderHeight: 64,
       indices: [
         { assetId: AssetId('ABC-3'), value: 1234n },
@@ -76,10 +82,7 @@ describe(encodeOnChainData.name, () => {
         syntheticAssetId: AssetId('ABC-3'),
       },
     ],
-    conditions: [
-      PedersenHash.fake().toString(),
-      PedersenHash.fake().toString(),
-    ],
+    conditions: [PedersenHash.fake(), PedersenHash.fake()],
     funding: [],
     positions: [],
   }

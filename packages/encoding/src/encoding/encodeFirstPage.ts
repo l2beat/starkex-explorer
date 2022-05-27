@@ -9,7 +9,7 @@ import { writeState } from './writeState'
 export function encodeFirstPage(data: OnChainData) {
   const writer = new ByteWriter()
 
-  writer.write(data.configurationHash, 32)
+  writer.write(data.configurationHash.toString(), 32)
 
   writeAssetConfigHashes(writer, data.assetConfigHashes)
 

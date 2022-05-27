@@ -7,9 +7,9 @@ import { writeOraclePrices } from './writeOraclePrices'
 export function encodeState(state: State) {
   const writer = new ByteWriter()
 
-  writer.write(state.positionRoot, 32)
+  writer.write(state.positionRoot.toString(), 32)
   writer.writeNumber(state.positionHeight, 32)
-  writer.write(state.orderRoot, 32)
+  writer.write(state.orderRoot.toString(), 32)
   writer.writeNumber(state.orderHeight, 32)
   writeFundingIndices(writer, state.indices)
   writer.writeNumber(toSeconds(state.timestamp), 32)

@@ -1,3 +1,5 @@
+import { Hash256 } from '@explorer/types'
+
 import { ByteReader } from './ByteReader'
 import { readAssetConfigHashes } from './readAssetConfigHashes'
 import { readConditions } from './readConditions'
@@ -8,7 +10,7 @@ import { readState } from './readState'
 export function decodeFirstPage(data: string) {
   const reader = new ByteReader(data)
 
-  const configurationHash = reader.readHex(32)
+  const configurationHash = Hash256(reader.readHex(32))
   const assetConfigHashes = readAssetConfigHashes(reader)
   const oldState = readState(reader)
   const newState = readState(reader)

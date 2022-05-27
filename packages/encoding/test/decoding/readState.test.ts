@@ -1,4 +1,4 @@
-import { AssetId, Timestamp } from '@explorer/types'
+import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError } from '../../src'
@@ -16,20 +16,22 @@ describe('readState', () => {
   })
 
   it('decodes a simple state', () => {
+    const positionRoot = PedersenHash.fake()
+    const orderRoot = PedersenHash.fake()
     const writer = new ByteWriter()
       .writeNumber(8, 32)
-      .write('deadbeef'.repeat(8))
+      .write(positionRoot.toString())
       .writeNumber(10, 32)
-      .write('abcd1234'.repeat(8))
+      .write(orderRoot.toString())
       .writeNumber(12, 32)
       .writeNumber(0, 32)
       .writeNumber(1234, 32)
       .writeNumber(0, 32)
       .writeNumber(5678, 32)
     expect(decode(writer.getBytes())).toEqual({
-      positionRoot: '0x' + 'deadbeef'.repeat(8),
+      positionRoot,
       positionHeight: 10,
-      orderRoot: '0x' + 'abcd1234'.repeat(8),
+      orderRoot,
       orderHeight: 12,
       indices: [],
       timestamp: Timestamp.fromSeconds(1234),
@@ -39,11 +41,13 @@ describe('readState', () => {
   })
 
   it('decodes state with indices and prices', () => {
+    const positionRoot = PedersenHash.fake()
+    const orderRoot = PedersenHash.fake()
     const writer = new ByteWriter()
       .writeNumber(16, 32)
-      .write('deadbeef'.repeat(8))
+      .write(positionRoot.toString())
       .writeNumber(10, 32)
-      .write('abcd1234'.repeat(8))
+      .write(orderRoot.toString())
       .writeNumber(12, 32)
       .writeNumber(2, 32)
       .writePadding(17)
@@ -62,9 +66,9 @@ describe('readState', () => {
       .writeNumber(420n, 32)
       .writeNumber(5678, 32)
     expect(decode(writer.getBytes())).toEqual({
-      positionRoot: '0x' + 'deadbeef'.repeat(8),
+      positionRoot,
       positionHeight: 10,
-      orderRoot: '0x' + 'abcd1234'.repeat(8),
+      orderRoot,
       orderHeight: 12,
       indices: [
         {

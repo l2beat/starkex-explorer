@@ -1,3 +1,4 @@
+import { PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DecodingError } from '../../src'
@@ -18,21 +19,19 @@ describe(readConditions.name, () => {
   })
 
   it('can read a single condition', () => {
-    const writer = new ByteWriter()
-      .writeNumber(1, 32)
-      .write('1234abcd'.repeat(8))
-    expect(decode(writer.getBytes())).toEqual(['0x' + '1234abcd'.repeat(8)])
+    const hash = PedersenHash.fake()
+    const writer = new ByteWriter().writeNumber(1, 32).write(hash.toString())
+    expect(decode(writer.getBytes())).toEqual([hash])
   })
 
   it('can read multiple conditions', () => {
+    const hash1 = PedersenHash.fake()
+    const hash2 = PedersenHash.fake()
     const writer = new ByteWriter()
       .writeNumber(2, 32)
-      .write('1234abcd'.repeat(8))
-      .write('deadbeef'.repeat(8))
+      .write(hash1.toString())
+      .write(hash2.toString())
 
-    expect(decode(writer.getBytes())).toEqual([
-      '0x' + '1234abcd'.repeat(8),
-      '0x' + 'deadbeef'.repeat(8),
-    ])
+    expect(decode(writer.getBytes())).toEqual([hash1, hash2])
   })
 })

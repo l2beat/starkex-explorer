@@ -75,7 +75,7 @@ export class StateUpdateCollector {
     this.rollupState = rollupState
 
     const rootHash = await rollupState.positions.hash()
-    if (rootHash !== PedersenHash(decoded.newState.positionRoot)) {
+    if (rootHash !== decoded.newState.positionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
     const transactionHashes = await this.extractTransactionHashes(

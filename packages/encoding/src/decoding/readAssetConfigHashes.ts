@@ -1,3 +1,5 @@
+import { PedersenHash } from '@explorer/types'
+
 import { AssetConfigHash } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
@@ -8,7 +10,7 @@ export function readAssetConfigHashes(reader: ByteReader) {
   for (let i = 0; i < count; i++) {
     reader.skip(17)
     const assetId = decodeAssetId(reader.read(15))
-    const hash = reader.readHex(32)
+    const hash = PedersenHash(reader.readHex(32))
     assetDataHashes.push({ assetId, hash })
   }
   return assetDataHashes
