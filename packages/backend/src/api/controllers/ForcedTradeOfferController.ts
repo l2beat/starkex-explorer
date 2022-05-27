@@ -1,4 +1,8 @@
-import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
+import {
+  ForcedHistoryEntry,
+  renderForcedTradeOffersIndexPage,
+  renderForcedTransactionDetailsPage,
+} from '@explorer/frontend'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
 import {
@@ -53,6 +57,49 @@ export class ForcedTradeOfferController {
       total,
       assetIds,
       params: { page, perPage, type, assetId },
+    })
+    return { type: 'success', content }
+  }
+
+  async getOfferDetailsPage(
+    id: number,
+    account: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
+    const offer = await this.offerRepository.findById(id)
+    if (!offer) {
+      return {
+        type: 'not found',
+        content: 'Offer not found.',
+      }
+    }
+    const userA = await this.userRegistrationEventRepository.findByStarkKey(
+      offer.starkKeyA
+    )
+    if (!userA) {
+      throw new Error('User A not found')
+    }
+    const userB = offer.accepted
+      ? await this.userRegistrationEventRepository.findByStarkKey(
+          offer.accepted.starkKeyB
+        )
+      : undefined
+
+    const content = renderForcedTransactionDetailsPage({
+      account,
+      history: buildOfferHistory(offer),
+      transaction: {
+        type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        data: {
+          displayId: id,
+          addressA: userA.ethAddress,
+          positionIdA: offer.positionIdA,
+          amountCollateral: offer.amountCollateral,
+          amountSynthetic: offer.amountSynthetic,
+          assetId: offer.syntheticAssetId,
+          positionIdB: offer.accepted?.positionIdB,
+          addressB: userB?.ethAddress,
+        },
+      },
     })
     return { type: 'success', content }
   }
@@ -181,4 +228,28 @@ export class ForcedTradeOfferController {
 
     return { type: 'success', content: 'Offer cancelled.' }
   }
+}
+
+function buildOfferHistory(
+  offer: ForcedTradeOfferRecord
+): ForcedHistoryEntry[] {
+  const history: ForcedHistoryEntry[] = [
+    {
+      type: 'created',
+      timestamp: offer.createdAt,
+    },
+  ]
+  if (offer.accepted) {
+    history.push({
+      type: 'accepted',
+      timestamp: offer.accepted.at,
+    })
+  }
+  if (offer.cancelledAt) {
+    history.push({
+      type: 'cancelled',
+      timestamp: offer.cancelledAt,
+    })
+  }
+  return history
 }

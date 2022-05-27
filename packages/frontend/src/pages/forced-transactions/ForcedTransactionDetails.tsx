@@ -1,28 +1,54 @@
-import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
-import { PageHeaderStats } from '../common/PageHeaderStats'
-import { SimpleLink } from '../common/SimpleLink'
+import { formatAbsoluteTime, formatHashShort } from '../formatting'
 import {
-  formatAbsoluteTime,
-  formatCurrency,
-  formatHashLong,
-  formatHashShort,
-} from '../formatting'
-import {
+  ForcedHistoryEntry,
+  ForcedTransaction,
   ForcedTransactionDetailsProps,
-  TransactionStatusEntry,
 } from './ForcedTransactionDetailsProps'
+import { Stats } from './Stats'
+
+function getHeaderText(props: ForcedTransaction): string {
+  if (props.type === 'exit') {
+    return `Forced exit ${formatHashShort(props.data.transactionHash)}`
+  }
+  const id =
+    typeof props.data.displayId === 'number'
+      ? `#${props.data.displayId}`
+      : formatHashShort(props.data.displayId)
+  return `Forced ${props.type} ${id}`
+}
+
+function getStatusText(
+  entry: ForcedHistoryEntry,
+  type: ForcedTransaction['type']
+): string {
+  const partyB = type === 'buy' ? 'buyer' : 'seller'
+  switch (entry.type) {
+    case 'created':
+      return `offer created (looking for ${partyB})`
+    case 'accepted':
+      return `${partyB} found`
+    case 'cancelled':
+      return `offer cancelled`
+    case 'expired':
+      return `offer submission time has expired`
+    case 'sent':
+      return 'transaction sent'
+    case 'mined':
+      return 'transaction mined (waiting for inclusion in state update)'
+    case 'verified':
+      return `exit included in state update #${entry.stateUpdateId}`
+    case 'reverted':
+      return 'transaction reverted'
+  }
+}
 
 export function ForcedTransactionDetails({
   account,
   history,
-  ethereumAddress,
-  positionId,
-  transactionHash,
-  value,
-  stateUpdateId,
+  transaction,
 }: ForcedTransactionDetailsProps) {
   return (
     <Page
@@ -35,53 +61,19 @@ export function ForcedTransactionDetails({
       account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-12 overflow-x-hidden text-ellipsis whitespace-nowrap">
-        Forced exit {formatHashShort(transactionHash)}
+        {getHeaderText(transaction)}
       </h1>
-      <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
-      <PageHeaderStats
-        rows={[
-          {
-            title: 'Position id',
-            content: (
-              <SimpleLink href={`/positions/${positionId}`}>
-                #{positionId.toString()}
-              </SimpleLink>
-            ),
-          },
-          {
-            title: 'Ethereum address',
-            content: ethereumAddress?.toString() || '-',
-          },
-          {
-            title: 'Value',
-            content: formatCurrency(value, AssetId.USDC),
-          },
-          {
-            title: 'Transaction hash',
-            content: formatHashLong(transactionHash),
-          },
-          {
-            title: 'State update id',
-            content: stateUpdateId ? (
-              <SimpleLink href={`/state-updates/${stateUpdateId}`}>
-                #{stateUpdateId.toString()}
-              </SimpleLink>
-            ) : (
-              '-'
-            ),
-          },
-        ]}
-      />
+      <Stats transaction={transaction} />
       <div className="mb-1.5 font-medium text-lg text-left">History</div>
       <div className="w-full overflow-x-auto mb-12">
         <table className="whitespace-nowrap w-full">
-          {history.map((event, i) => (
+          {history.map((entry, i) => (
             <tr className="bg-grey-200 border-2 border-grey-100" key={i}>
               <th className="font-normal text-left w-[268px] py-2 px-1.5">
-                {formatAbsoluteTime(event.timestamp)}
+                {formatAbsoluteTime(entry.timestamp)}
               </th>
               <td className="font-normal first-letter:capitalize py-2 px-1.5">
-                {getStatusText(event)}
+                {getStatusText(entry, transaction.type)}
               </td>
             </tr>
           ))}
@@ -89,17 +81,4 @@ export function ForcedTransactionDetails({
       </div>
     </Page>
   )
-}
-
-function getStatusText(entry: TransactionStatusEntry): string {
-  switch (entry.type) {
-    case 'sent':
-      return 'transaction sent'
-    case 'mined':
-      return 'transaction mined (waiting for inclusion in state update)'
-    case 'verified':
-      return `exit included in state update #${entry.stateUpdateId}`
-    case 'reverted':
-      return 'transaction reverted'
-  }
 }

@@ -1,8 +1,9 @@
 import {
+  ForcedHistoryEntry,
+  ForcedTransaction,
   renderForcedTransactionDetailsPage,
   renderForcedTransactionsIndexPage,
   renderTransactionForm,
-  TransactionStatusEntry,
 } from '@explorer/frontend'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
@@ -45,6 +46,62 @@ export class ForcedTransactionController {
     return { type: 'success', content }
   }
 
+  private async toForcedTransaction(
+    transaction: ForcedTransactionRecord
+  ): Promise<ForcedTransaction> {
+    if (transaction.data.type === 'withdrawal') {
+      const user = await this.userRegistrationEventRepository.findByStarkKey(
+        transaction.data.publicKey
+      )
+      return {
+        type: 'exit',
+        data: {
+          ethereumAddress: user?.ethAddress,
+          positionId: transaction.data.positionId,
+          transactionHash: transaction.hash,
+          value: transaction.data.amount,
+          stateUpdateId: transaction.updates.verified?.stateUpdateId,
+        },
+      }
+    }
+    const userA = await this.userRegistrationEventRepository.findByStarkKey(
+      transaction.data.publicKeyA
+    )
+    if (!userA) {
+      throw new Error('User A not found')
+    }
+    const type = transaction.data.isABuyingSynthetic ? 'buy' : 'sell'
+    const data = {
+      displayId: transaction.hash,
+      positionIdA: transaction.data.positionIdA,
+      addressA: userA.ethAddress,
+      amountSynthetic: transaction.data.syntheticAmount,
+      amountCollateral: transaction.data.collateralAmount,
+      assetId: transaction.data.syntheticAssetId,
+      transactionHash: transaction.hash,
+    }
+    if (!transaction.data.positionIdB) {
+      return {
+        type,
+        data,
+      }
+    }
+    const userB = await this.userRegistrationEventRepository.findByStarkKey(
+      transaction.data.publicKeyB
+    )
+    if (!userB) {
+      throw new Error('User B not found')
+    }
+    return {
+      type,
+      data: {
+        ...data,
+        positionIdB: transaction.data.positionIdB,
+        addressB: userB.ethAddress,
+      },
+    }
+  }
+
   async getForcedTransactionDetailsPage(
     transactionHash: Hash256,
     account: EthereumAddress | undefined
@@ -57,23 +114,10 @@ export class ForcedTransactionController {
       return { type: 'not found', content }
     }
 
-    if (transaction.data.type === 'trade') {
-      throw new Error('Rendering trades not implemented yet')
-    }
-
-    const registrationEvent =
-      await this.userRegistrationEventRepository.findByStarkKey(
-        transaction.data.publicKey
-      )
-
     const content = renderForcedTransactionDetailsPage({
       account,
       history: buildTransactionHistory(transaction),
-      ethereumAddress: registrationEvent?.ethAddress,
-      positionId: transaction.data.positionId,
-      transactionHash,
-      value: transaction.data.amount,
-      stateUpdateId: transaction.updates.verified?.stateUpdateId,
+      transaction: await this.toForcedTransaction(transaction),
     })
     return { type: 'success', content }
   }
@@ -119,8 +163,8 @@ export class ForcedTransactionController {
 
 function buildTransactionHistory({
   updates,
-}: ForcedTransactionRecord): TransactionStatusEntry[] {
-  const history: TransactionStatusEntry[] = []
+}: ForcedTransactionRecord): ForcedHistoryEntry[] {
+  const history: ForcedHistoryEntry[] = []
   if (updates.sentAt) {
     history.push({ type: 'sent', timestamp: updates.sentAt })
   }
