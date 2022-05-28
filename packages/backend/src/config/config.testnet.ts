@@ -10,7 +10,7 @@ export function getTestnetConfig(): Config {
   return {
     name: 'dYdXStateExplorer/Testnet',
     logger: {
-      logLevel: getEnv.integer('LOG_LEVEL', LogLevel.INFO),
+      logLevel: LogLevel.DEBUG,
       format: 'pretty',
     },
     port: getEnv.integer('PORT', 3000),

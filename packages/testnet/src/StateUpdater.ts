@@ -4,15 +4,19 @@ import {
   OnChainUpdate,
   RollupState,
 } from '@explorer/state'
-import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { solidityKeccak256 } from 'ethers/lib/utils'
+
 import { Contracts } from './deployContracts'
 
 export class StateUpdater {
   rollup?: RollupState
   lastState: State = {
     indices: [],
-    oraclePrices: [],
+    oraclePrices: [
+      { assetId: AssetId('ETH-9'), price: 11401806731n },
+      { assetId: AssetId('BTC-10'), price: 16622299667n },
+    ],
     orderHeight: 64,
     orderRoot: PedersenHash.fake(),
     positionHeight: 64,
@@ -34,12 +38,13 @@ export class StateUpdater {
       throw new Error('Not initialized!')
     }
 
-    this.rollup = (await this.rollup.update(data))[0]
+    const [nextRollup] = await this.rollup.update(data)
+    this.rollup = nextRollup
     const afterRoot = await this.rollup.positions.hash()
 
     const newState: State = {
       indices: [],
-      oraclePrices: [],
+      oraclePrices: this.lastState.oraclePrices,
       orderHeight: 64,
       orderRoot: PedersenHash.fake(),
       positionHeight: 64,

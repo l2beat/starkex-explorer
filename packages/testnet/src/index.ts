@@ -1,11 +1,4 @@
-import { encodeOnChainData, OnChainData } from '@explorer/encoding'
-import {
-  InMemoryRollupStorage,
-  OnChainUpdate,
-  RollupState,
-} from '@explorer/state'
-import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { solidityKeccak256 } from 'ethers/lib/utils'
+import { AssetId, Timestamp } from '@explorer/types'
 
 import {
   ALICE_POSITION,
