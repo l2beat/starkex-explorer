@@ -48,7 +48,10 @@ export class StateUpdater {
   }
 
   async registerUser(address: EthereumAddress, starkKey: StarkKey) {
-    await this.contracts.perpetual.registerUser(address, starkKey)
+    await this.contracts.perpetual.registerUser(
+      address.toString(),
+      starkKey.toString()
+    )
     console.log(`Registered ${address} as ${starkKey}`)
   }
 
