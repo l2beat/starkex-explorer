@@ -1,7 +1,7 @@
 import { Application } from './Application'
 import { getConfig } from './config'
 
-const env = process.env.NODE_ENV === 'production' ? 'production' : 'local'
+const env = process.env.NODE_ENV || 'local'
 
 try {
   const config = getConfig(env)

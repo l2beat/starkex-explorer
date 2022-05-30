@@ -15,6 +15,7 @@ export interface Config {
   jsonRpcUrl: string
   core: {
     syncBatchSize: number
+    minBlockNumber: number
     maxBlockNumber?: number
   }
   contracts: {
