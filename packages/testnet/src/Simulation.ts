@@ -39,6 +39,11 @@ export class Simulation {
 
   queueForcedAction(action: ForcedAction) {
     this.newForcedActions.push(action)
+    if (action.type === 'withdrawal') {
+      console.log('Withdrawal queued', action.publicKey)
+    } else {
+      console.log('Trade queued', action.publicKeyA)
+    }
   }
 
   async update() {

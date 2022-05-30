@@ -1,5 +1,10 @@
-import { AssetId, EthereumAddress } from '@explorer/types'
+import { decodeAssetId } from '@explorer/encoding'
+import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
+import {
+  LogForcedTradeRequestEventObject,
+  LogForcedWithdrawalRequestEventObject,
+} from '../build/typechain/Perpetual'
 import { ALICE_STARK_KEY, BOB_STARK_KEY, CHARLIE_STARK_KEY } from './constants'
 import { deployContracts } from './deployContracts'
 import { setupGanache } from './setupGanache'
@@ -27,6 +32,34 @@ async function main() {
     { assetId: AssetId('LINK-7'), priceUSDCents: 6_50n },
     { assetId: AssetId('SOL-7'), priceUSDCents: 42_11n },
   ])
+
+  contracts.perpetual.on('LogForcedWithdrawalRequest', (_1, _2, _3, event) => {
+    const args: LogForcedWithdrawalRequestEventObject = event.args
+    simulation.queueForcedAction({
+      type: 'withdrawal',
+      amount: args.quantizedAmount.toBigInt(),
+      positionId: args.vaultId.toBigInt(),
+      publicKey: StarkKey.from(args.starkKey),
+    })
+  })
+
+  contracts.perpetual.on('LogForcedTradeRequest', (_1, _2, _3, event) => {
+    const args: LogForcedTradeRequestEventObject = event.args
+    simulation.queueForcedAction({
+      type: 'trade',
+      positionIdA: args.vaultIdA.toBigInt(),
+      publicKeyA: StarkKey.from(args.starkKeyA),
+      positionIdB: args.vaultIdB.toBigInt(),
+      publicKeyB: StarkKey.from(args.starkKeyB),
+      collateralAmount: args.amountCollateral.toBigInt(),
+      syntheticAmount: args.amountSynthetic.toBigInt(),
+      isABuyingSynthetic: args.aIsBuyingSynthetic,
+      syntheticAssetId: decodeAssetId(
+        args.syntheticAssetId.toHexString().slice(0, 2)
+      ),
+      nonce: args.nonce.toBigInt(),
+    })
+  })
 
   await simulation.addUser(
     EthereumAddress(wallets.alice.address),
