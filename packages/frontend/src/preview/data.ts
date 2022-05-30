@@ -276,14 +276,6 @@ export const FORCED_TRADE_OFFER_DETAILS_PROPS: ForcedTradeOfferDetailsProps = {
       timestamp: Timestamp(Date.now() - 10000),
       text: `offer created (looking for buyer)`,
     },
-    {
-      timestamp: Timestamp(Date.now() - 1000),
-      text: `buyer found`,
-    },
-    {
-      timestamp: Timestamp(Date.now() - 100),
-      text: `offer cancelled`,
-    },
   ],
 }
 

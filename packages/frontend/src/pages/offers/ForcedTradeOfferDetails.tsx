@@ -66,6 +66,7 @@ export function ForcedTradeOfferDetails({
   offer,
   history,
 }: ForcedTradeOfferDetailsProps) {
+  const shouldRenderAccept = account !== offer.addressA && !offer.addressB
   return (
     <Page
       title="L2BEAT dYdX Explorer"
@@ -76,7 +77,13 @@ export function ForcedTradeOfferDetails({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <ForcedPageHeader displayId={offer.id} type={offer.type} />
+      <ForcedPageHeader displayId={offer.id} type={offer.type}>
+        {shouldRenderAccept && (
+          <button className="bg-blue-100 text-white float-right px-4 py-2 text-base rounded-md">
+            Accept {`& ${offer.type === 'buy' ? 'sell' : 'buy'}`}
+          </button>
+        )}
+      </ForcedPageHeader>
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats rows={toStatsRows(offer)} />
       <ForcedHistory events={history} />
