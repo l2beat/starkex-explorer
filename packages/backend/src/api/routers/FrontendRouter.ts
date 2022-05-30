@@ -87,6 +87,26 @@ export function createFrontendRouter(
   )
 
   router.get(
+    '/forced/offers/:id',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          id: stringAsInt(),
+        }),
+      }),
+      async (ctx) => {
+        const { id } = ctx.params
+        const account = getAccount(ctx)
+        const result = await forcedTradeOfferController.getOfferDetailsPage(
+          id,
+          account
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
     '/forced/:hash',
     withTypedContext(
       z.object({

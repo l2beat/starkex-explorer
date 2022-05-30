@@ -1,8 +1,8 @@
 import {
+  ForcedTransaction,
   renderForcedTransactionDetailsPage,
   renderForcedTransactionsIndexPage,
   renderTransactionForm,
-  TransactionStatusEntry,
 } from '@explorer/frontend'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
@@ -14,6 +14,7 @@ import { PositionRepository } from '../../peripherals/database/PositionRepositor
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
+import { toForcedTransactionHistory } from './utils/toForcedTransactionHistory'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
 export class ForcedTransactionController {
@@ -45,6 +46,48 @@ export class ForcedTransactionController {
     return { type: 'success', content }
   }
 
+  private async toForcedTransaction(
+    transaction: ForcedTransactionRecord
+  ): Promise<ForcedTransaction> {
+    if (transaction.data.type === 'withdrawal') {
+      const user = await this.userRegistrationEventRepository.findByStarkKey(
+        transaction.data.publicKey
+      )
+      return {
+        type: 'exit',
+        data: {
+          ethereumAddress: user?.ethAddress,
+          positionId: transaction.data.positionId,
+          transactionHash: transaction.hash,
+          value: transaction.data.amount,
+          stateUpdateId: transaction.updates.verified?.stateUpdateId,
+        },
+      }
+    }
+    const [userA, userB] = await Promise.all([
+      this.userRegistrationEventRepository.findByStarkKey(
+        transaction.data.publicKeyA
+      ),
+      this.userRegistrationEventRepository.findByStarkKey(
+        transaction.data.publicKeyB
+      ),
+    ])
+    return {
+      type: transaction.data.isABuyingSynthetic ? 'buy' : 'sell',
+      data: {
+        displayId: transaction.hash,
+        positionIdA: transaction.data.positionIdA,
+        positionIdB: transaction.data.positionIdB,
+        addressA: userA?.ethAddress,
+        addressB: userB?.ethAddress,
+        amountSynthetic: transaction.data.syntheticAmount,
+        amountCollateral: transaction.data.collateralAmount,
+        assetId: transaction.data.syntheticAssetId,
+        transactionHash: transaction.hash,
+      },
+    }
+  }
+
   async getForcedTransactionDetailsPage(
     transactionHash: Hash256,
     account: EthereumAddress | undefined
@@ -57,23 +100,10 @@ export class ForcedTransactionController {
       return { type: 'not found', content }
     }
 
-    if (transaction.data.type === 'trade') {
-      throw new Error('Rendering trades not implemented yet')
-    }
-
-    const registrationEvent =
-      await this.userRegistrationEventRepository.findByStarkKey(
-        transaction.data.publicKey
-      )
-
     const content = renderForcedTransactionDetailsPage({
       account,
-      history: buildTransactionHistory(transaction),
-      ethereumAddress: registrationEvent?.ethAddress,
-      positionId: transaction.data.positionId,
-      transactionHash,
-      value: transaction.data.amount,
-      stateUpdateId: transaction.updates.verified?.stateUpdateId,
+      history: toForcedTransactionHistory(transaction),
+      transaction: await this.toForcedTransaction(transaction),
     })
     return { type: 'success', content }
   }
@@ -115,28 +145,4 @@ export class ForcedTransactionController {
       }),
     }
   }
-}
-
-function buildTransactionHistory({
-  updates,
-}: ForcedTransactionRecord): TransactionStatusEntry[] {
-  const history: TransactionStatusEntry[] = []
-  if (updates.sentAt) {
-    history.push({ type: 'sent', timestamp: updates.sentAt })
-  }
-  if (updates.revertedAt) {
-    history.push({ type: 'reverted', timestamp: updates.revertedAt })
-    return history
-  }
-  if (updates.minedAt) {
-    history.push({ type: 'mined', timestamp: updates.minedAt })
-  }
-  if (updates.verified) {
-    history.push({
-      type: 'verified',
-      stateUpdateId: updates.verified.stateUpdateId,
-      timestamp: updates.verified.at,
-    })
-  }
-  return history
 }

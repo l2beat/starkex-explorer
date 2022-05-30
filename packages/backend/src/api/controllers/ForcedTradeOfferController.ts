@@ -1,4 +1,7 @@
-import { renderForcedTradeOffersIndexPage } from '@explorer/frontend'
+import {
+  renderForcedTradeOfferDetailsPage,
+  renderForcedTradeOffersIndexPage,
+} from '@explorer/frontend'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
 import {
@@ -15,6 +18,7 @@ import {
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
 import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
+import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 
 export class ForcedTradeOfferController {
   constructor(
@@ -53,6 +57,47 @@ export class ForcedTradeOfferController {
       total,
       assetIds,
       params: { page, perPage, type, assetId },
+    })
+    return { type: 'success', content }
+  }
+
+  async getOfferDetailsPage(
+    id: number,
+    account: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
+    const offer = await this.offerRepository.findById(id)
+    if (!offer) {
+      return {
+        type: 'not found',
+        content: 'Offer not found.',
+      }
+    }
+    const userA = await this.userRegistrationEventRepository.findByStarkKey(
+      offer.starkKeyA
+    )
+    if (!userA) {
+      throw new Error('User A not found')
+    }
+    const userB = offer.accepted
+      ? await this.userRegistrationEventRepository.findByStarkKey(
+          offer.accepted.starkKeyB
+        )
+      : undefined
+
+    const content = renderForcedTradeOfferDetailsPage({
+      account,
+      history: toForcedTradeOfferHistory(offer),
+      offer: {
+        type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        id,
+        addressA: userA.ethAddress,
+        positionIdA: offer.positionIdA,
+        amountCollateral: offer.amountCollateral,
+        amountSynthetic: offer.amountSynthetic,
+        assetId: offer.syntheticAssetId,
+        positionIdB: offer.accepted?.positionIdB,
+        addressB: userB?.ethAddress,
+      },
     })
     return { type: 'success', content }
   }

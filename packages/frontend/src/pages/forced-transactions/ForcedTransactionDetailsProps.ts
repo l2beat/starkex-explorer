@@ -1,43 +1,44 @@
-import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
-export type ForcedTransaction = ForcedExitTransaction // TODO: | Buy | Sell
+import { ForcedHistoryEvent } from '../common/ForcedHistory'
 
-export interface ForcedExitTransaction {
+export type ForcedTransaction = ForcedExit | ForcedBuy | ForcedSell
+
+export type ForcedTradeData = {
+  readonly displayId: number | Hash256
+  readonly positionIdA: bigint
+  readonly addressA?: EthereumAddress
+  readonly amountSynthetic: bigint
+  readonly amountCollateral: bigint
+  readonly assetId: AssetId
+  readonly positionIdB: bigint
+  readonly addressB?: EthereumAddress
   readonly transactionHash: Hash256
-  readonly positionId: bigint
-  readonly ethereumAddress?: EthereumAddress
-  readonly value: bigint
-  readonly stateUpdateId?: number
 }
 
-export type TransactionStatusEntry =
-  | TransactionSentEntry
-  | TransactionMinedEntry
-  | TransactionVerifiedEntry
-  | TransactionRevertedEntry
-
-export interface TransactionSentEntry {
-  readonly type: 'sent'
-  readonly timestamp: Timestamp
+export interface ForcedSell {
+  readonly type: 'sell'
+  readonly data: ForcedTradeData
 }
 
-export interface TransactionMinedEntry {
-  readonly type: 'mined'
-  readonly timestamp: Timestamp
+export interface ForcedBuy {
+  readonly type: 'buy'
+  readonly data: ForcedTradeData
 }
 
-export interface TransactionVerifiedEntry {
-  readonly type: 'verified'
-  readonly stateUpdateId: number
-  readonly timestamp: Timestamp
+export interface ForcedExit {
+  readonly type: 'exit'
+  readonly data: {
+    readonly transactionHash: Hash256
+    readonly positionId: bigint
+    readonly ethereumAddress?: EthereumAddress
+    readonly value: bigint
+    readonly stateUpdateId?: number
+  }
 }
 
-export interface TransactionRevertedEntry {
-  readonly type: 'reverted'
-  readonly timestamp: Timestamp
-}
-
-export interface ForcedTransactionDetailsProps extends ForcedTransaction {
+export type ForcedTransactionDetailsProps = {
+  readonly transaction: ForcedTransaction
   readonly account: EthereumAddress | undefined
-  readonly history: readonly TransactionStatusEntry[]
+  readonly history: ForcedHistoryEvent[]
 }

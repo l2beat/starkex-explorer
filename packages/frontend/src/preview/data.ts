@@ -8,6 +8,7 @@ import {
 } from '@explorer/types'
 
 import {
+  ForcedTradeOfferDetailsProps,
   ForcedTradeOfferEntry,
   ForcedTransactionDetailsProps,
   ForcedTransactionsIndexProps,
@@ -223,26 +224,30 @@ export const FORCED_TRANSACTIONS_INDEX_PROPS: ForcedTransactionsIndexProps = {
 
 export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
   account: undefined,
-  ethereumAddress: EthereumAddress(
-    '0x1234567890ABCDEF1234567890ABCDEF12345678'
-  ),
-  positionId: 1n,
-  transactionHash: Hash256.fake(),
-  value: 12345n,
-  stateUpdateId: 1,
+  transaction: {
+    type: 'exit',
+    data: {
+      ethereumAddress: EthereumAddress(
+        '0x1234567890ABCDEF1234567890ABCDEF12345678'
+      ),
+      positionId: 1n,
+      transactionHash: Hash256.fake(),
+      value: 12345n,
+      stateUpdateId: 1,
+    },
+  },
   history: [
     {
       timestamp: Timestamp(Date.now() - 100000),
-      type: 'sent',
+      text: 'transaction sent',
     },
     {
       timestamp: Timestamp(Date.now() - 10000),
-      type: 'mined',
+      text: 'transaction mined (waiting for inclusion in state update)',
     },
     {
       timestamp: Timestamp(Date.now() - 1000),
-      type: 'verified',
-      stateUpdateId: 1,
+      text: `exit included in state update #1`,
     },
   ],
 }
@@ -253,6 +258,25 @@ export const FORCED_TRADE_OFFERS_INDEX_PROPS: ForcedTradeOffersIndexProps = {
   params: { page: 3, perPage: 10 },
   total: 100,
   assetIds: [AssetId('ETH-9'), AssetId('BTC-10'), AssetId('SUSHI-7')],
+}
+
+export const FORCED_TRADE_OFFER_DETAILS_PROPS: ForcedTradeOfferDetailsProps = {
+  account: EthereumAddress.fake(),
+  offer: {
+    addressA: EthereumAddress.fake(),
+    amountCollateral: 10n,
+    amountSynthetic: 100n,
+    assetId: AssetId('BTC-10'),
+    id: 1,
+    positionIdA: 1n,
+    type: 'buy',
+  },
+  history: [
+    {
+      timestamp: Timestamp(Date.now() - 10000),
+      text: `offer created (looking for buyer)`,
+    },
+  ],
 }
 
 export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
