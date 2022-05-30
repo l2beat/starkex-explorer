@@ -155,7 +155,10 @@ export class Application {
       blockDownloader,
       dataSyncService,
       logger,
-      { maxBlockNumber: config.core.maxBlockNumber }
+      {
+        earliestBlock: config.core.minBlockNumber,
+        maxBlockNumber: config.core.maxBlockNumber,
+      }
     )
     const transactionStatusService = new TransactionStatusService(
       transactionStatusRepository,

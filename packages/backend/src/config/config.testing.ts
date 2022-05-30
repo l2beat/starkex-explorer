@@ -21,6 +21,7 @@ export function getTestConfig(): Config {
     jsonRpcUrl: getEnv('TEST_JSON_RPC_URL', 'http://localhost:8545'),
     core: {
       syncBatchSize: 6_000,
+      minBlockNumber: 11813207,
     },
     contracts: {
       perpetual: EthereumAddress.ZERO,

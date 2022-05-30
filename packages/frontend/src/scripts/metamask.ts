@@ -49,8 +49,10 @@ export function initMetamask() {
     }
   }
 
+  const MAINNET_CHAIN_ID = '0x1'
+  const GANACHE_CHAIN_ID = '0x539'
   function updateChainId(chainId: string) {
-    if (chainId !== '0x1') {
+    if (chainId !== MAINNET_CHAIN_ID && chainId !== GANACHE_CHAIN_ID) {
       alert('Please change your metamask to mainnet')
     }
   }
