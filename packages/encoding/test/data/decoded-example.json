@@ -3,69 +3,69 @@
   "assetConfigHashes": [
     {
       "assetId": "1INCH-7",
-      "hash": "0x06d50d2c9b4ba8477d0a6189efd223e0a7bc8903e5e5502c2596bfd037d5cf1a"
+      "hash": "06d50d2c9b4ba8477d0a6189efd223e0a7bc8903e5e5502c2596bfd037d5cf1a"
     },
     {
       "assetId": "AAVE-8",
-      "hash": "0x05b754de68ac6ca37456b54e3d6740dfb10ad6c991c6ea8e63b4c207f12e657c"
+      "hash": "05b754de68ac6ca37456b54e3d6740dfb10ad6c991c6ea8e63b4c207f12e657c"
     },
     {
       "assetId": "AVAX-7",
-      "hash": "0x06f6133d524c663a9cb6bc55da515e2906c3e3648bb756b085b5d66065d0e41b"
+      "hash": "06f6133d524c663a9cb6bc55da515e2906c3e3648bb756b085b5d66065d0e41b"
     },
     {
       "assetId": "BTC-10",
-      "hash": "0x06b17c0ea15e9924ea938b1405c6cdd1253861524369999aba9f5e9183757082"
+      "hash": "06b17c0ea15e9924ea938b1405c6cdd1253861524369999aba9f5e9183757082"
     },
     {
       "assetId": "CRV-6",
-      "hash": "0x065486a27ad7673fcd39e2087e09c5d93ad80e151e69323035460bc0a2b9afe5"
+      "hash": "065486a27ad7673fcd39e2087e09c5d93ad80e151e69323035460bc0a2b9afe5"
     },
     {
       "assetId": "DOGE-5",
-      "hash": "0x038b40a3cc927314917883295666bd170d67b008e30361ebbb2a6ef6ff499d42"
+      "hash": "038b40a3cc927314917883295666bd170d67b008e30361ebbb2a6ef6ff499d42"
     },
     {
       "assetId": "DOT-7",
-      "hash": "0x03cc4f20f85dfd549c4d1e3f2ba7cd7f206a24a506b21e0a6e7bd23c40b61fc1"
+      "hash": "03cc4f20f85dfd549c4d1e3f2ba7cd7f206a24a506b21e0a6e7bd23c40b61fc1"
     },
     {
       "assetId": "ETH-9",
-      "hash": "0x0706a231efa8932e2cf71ee572dff6eeee3b1eb14ae44a035a60b896643e85db"
+      "hash": "0706a231efa8932e2cf71ee572dff6eeee3b1eb14ae44a035a60b896643e85db"
     },
     {
       "assetId": "LINK-7",
-      "hash": "0x031bccd53de4ce5aa144cf96f832e4093e3e993f35f11cd4918bf92de996043d"
+      "hash": "031bccd53de4ce5aa144cf96f832e4093e3e993f35f11cd4918bf92de996043d"
     },
     {
       "assetId": "SNX-7",
-      "hash": "0x073233e2abb9d0b13c6e77c2dd815a3c89fdc6135ecec80ae963d415ae34a07e"
+      "hash": "073233e2abb9d0b13c6e77c2dd815a3c89fdc6135ecec80ae963d415ae34a07e"
     },
     {
       "assetId": "SOL-7",
-      "hash": "0x01772242cd4849b1883a5ce776942fbe69461e0074aae1dc610933d50fb1f412"
+      "hash": "01772242cd4849b1883a5ce776942fbe69461e0074aae1dc610933d50fb1f412"
     },
     {
       "assetId": "SUSHI-7",
-      "hash": "0x029b76f6d536776777d7153cc79151a4cad6bc3e2dc7802e50dee1090035ad5e"
+      "hash": "029b76f6d536776777d7153cc79151a4cad6bc3e2dc7802e50dee1090035ad5e"
     },
     {
       "assetId": "UMA-7",
-      "hash": "0x0716d18347420ea748219ee4f2dff5a072f20726e10d6e30585d571eaf122ead"
+      "hash": "0716d18347420ea748219ee4f2dff5a072f20726e10d6e30585d571eaf122ead"
     },
     {
       "assetId": "UNI-7",
-      "hash": "0x014b8c123616fb4ee47ceb9d003e5e17be5b6baf90f0de24c2fbfa0236ceb258"
+      "hash": "014b8c123616fb4ee47ceb9d003e5e17be5b6baf90f0de24c2fbfa0236ceb258"
     },
     {
       "assetId": "YFI-10",
-      "hash": "0x03cbc25167ffc91de5f57dc6595eb0b760007bde9f82cf84f0ce485c9cb335d1"
+      "hash": "03cbc25167ffc91de5f57dc6595eb0b760007bde9f82cf84f0ce485c9cb335d1"
     }
   ],
   "oldState": {
-    "positionRoot": "0x0407bd3f313f2e6c1138af58cd26162a959eafaa8ec2e41d129e5e7ac4630d1a",
+    "positionRoot": "0407bd3f313f2e6c1138af58cd26162a959eafaa8ec2e41d129e5e7ac4630d1a",
     "positionHeight": 64,
-    "orderRoot": "0x054f4644ab416329cfcc63d6e348a2c7dccad7208ccaed21dd54ce2753281ae7",
+    "orderRoot": "054f4644ab416329cfcc63d6e348a2c7dccad7208ccaed21dd54ce2753281ae7",
     "orderHeight": 64,
     "indices": [
       { "assetId": "1INCH-7", "value": 31640531 },
@@ -101,9 +101,9 @@
     "systemTime": 1621930024000
   },
   "newState": {
-    "positionRoot": "0x03df522756c24ce244c65ed7c33a9f96e25ce1e9bffd54cdbc6092a621cd4f64",
+    "positionRoot": "03df522756c24ce244c65ed7c33a9f96e25ce1e9bffd54cdbc6092a621cd4f64",
     "positionHeight": 64,
-    "orderRoot": "0x0578f88f158a0c2501a18b9f7e693b1836804a4a72f5190ce81485623a17847f",
+    "orderRoot": "0578f88f158a0c2501a18b9f7e693b1836804a4a72f5190ce81485623a17847f",
     "orderHeight": 64,
     "indices": [
       { "assetId": "1INCH-7", "value": 31758182 },
@@ -408,16 +408,16 @@
   ],
   "forcedActions": [],
   "conditions": [
-    "0x00e93195fcad133eb7e2adcac515e5c0d9d8adb41e6ab8bc1a77c5868c73924b",
-    "0x0119b47f77b549a1ddd4f9c1afec2deda5f1f7893a77599235457f6f3b05f903",
-    "0x01395922721f5fd40de0e1bdcfc70864c424fcf15704f6e9c7c1fe70dba0624f",
-    "0x03e6c29c633c8067f9d6d1f3d758c3f4fa224486f26ddbe2c1b5ab58ab06d439",
-    "0x037b530fce7c4d363275e73af7aba2f513e144cdc206185144cbc13e5751d355",
-    "0x030c7e83e213f7c4eee348b6cad8be18b55184c874c83d6c3ebf18f0ceeaf9ed",
-    "0x011cc41741402b1ace74e6486c411bfe64aca0ac146f88ac42988e9ff836541e",
-    "0x01c08ee6cd3eabc111a2f12a9c1a65a563ab58f52a640ce8e7d94cba3d8685b8",
-    "0x010ab7d2a831609be8d2e5d79a6550316bff3d226f59fc13d299f199078c0cb9",
-    "0x0004a26d2b5c05145dc64d58a1aebf3076000af644545647618d6003e8df510c"
+    "00e93195fcad133eb7e2adcac515e5c0d9d8adb41e6ab8bc1a77c5868c73924b",
+    "0119b47f77b549a1ddd4f9c1afec2deda5f1f7893a77599235457f6f3b05f903",
+    "01395922721f5fd40de0e1bdcfc70864c424fcf15704f6e9c7c1fe70dba0624f",
+    "03e6c29c633c8067f9d6d1f3d758c3f4fa224486f26ddbe2c1b5ab58ab06d439",
+    "037b530fce7c4d363275e73af7aba2f513e144cdc206185144cbc13e5751d355",
+    "030c7e83e213f7c4eee348b6cad8be18b55184c874c83d6c3ebf18f0ceeaf9ed",
+    "011cc41741402b1ace74e6486c411bfe64aca0ac146f88ac42988e9ff836541e",
+    "01c08ee6cd3eabc111a2f12a9c1a65a563ab58f52a640ce8e7d94cba3d8685b8",
+    "010ab7d2a831609be8d2e5d79a6550316bff3d226f59fc13d299f199078c0cb9",
+    "0004a26d2b5c05145dc64d58a1aebf3076000af644545647618d6003e8df510c"
   ],
   "funding": [
     {

@@ -1,16 +1,22 @@
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/program_output.cairo#L34-L49
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
 export interface OnChainData {
-  configurationHash: string
+  configurationHash: Hash256 // we use Hash256 here because we don't know if it is PedersenHash
   assetConfigHashes: AssetConfigHash[]
   oldState: State
   newState: State
   minimumExpirationTimestamp: bigint
   modifications: Modification[]
   forcedActions: ForcedAction[]
-  conditions: string[]
+  conditions: PedersenHash[]
   funding: FundingEntry[]
   positions: PositionUpdate[]
 }
@@ -18,7 +24,7 @@ export interface OnChainData {
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/definitions/general_config_hash.cairo#L9-L13
 export interface AssetConfigHash {
   assetId: AssetId
-  hash: string
+  hash: PedersenHash
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/program_output.cairo#L11-L19
@@ -61,9 +67,9 @@ export interface FundingIndex {
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/state/state.cairo#L84-L93
 export interface State {
-  positionRoot: string
+  positionRoot: PedersenHash
   positionHeight: number
-  orderRoot: string
+  orderRoot: PedersenHash
   orderHeight: number
   indices: FundingIndex[]
   timestamp: Timestamp
