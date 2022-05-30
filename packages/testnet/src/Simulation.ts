@@ -68,7 +68,7 @@ export class Simulation {
         publicKey: position.publicKey,
         balances: position.balances.filter(
           (x) =>
-            x.balance ===
+            x.balance !==
             old.balances.find((y) => y.assetId === x.assetId)?.balance
         ),
       }
@@ -130,10 +130,10 @@ export class Simulation {
   }
 
   private fluctuatePrices() {
-    // this.prices = this.prices.map(({ assetId, price }) => ({
-    //   assetId,
-    //   price: (price * randomBigInt(95n, 106n)) / 100n,
-    // }))
+    this.prices = this.prices.map(({ assetId, price }) => ({
+      assetId,
+      price: (price * randomBigInt(95n, 106n)) / 100n,
+    }))
   }
 
   private addTrade() {
@@ -145,29 +145,6 @@ export class Simulation {
     const subUnits = randomBigInt(0n, unitSize)
     const syntheticDiff = units * unitSize + subUnits
     const collateralDiff = -(syntheticDiff * price) / 2n ** 32n
-
-    function getAssetPriceUSDCents(price: bigint, assetId: AssetId) {
-      return getAssetValueUSDCents(
-        10n ** BigInt(AssetId.decimals(assetId)),
-        price
-      )
-    }
-
-    function getAssetValueUSDCents(balance: bigint, price: bigint) {
-      return (balance * price) / 2n ** 32n / 10_000n
-    }
-
-    console.log()
-    console.log('TRADE', assetId, syntheticDiff / unitSize, syntheticDiff)
-    console.log(
-      'FOR',
-      AssetId.USDC,
-      collateralDiff / 1_000_000n,
-      collateralDiff
-    )
-    console.log('AT', getAssetPriceUSDCents(price, assetId))
-    console.log('VALUE', getAssetValueUSDCents(syntheticDiff, price))
-    console.log()
 
     position.collateralBalance += collateralDiff
     const balance = position.balances.find((x) => x.assetId === assetId)
