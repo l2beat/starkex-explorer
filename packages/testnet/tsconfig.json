@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "build"
+    "outDir": "build",
+    // This is needed because ganache is misbehaving
+    "skipLibCheck": true
   }
 }
