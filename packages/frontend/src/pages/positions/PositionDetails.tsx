@@ -46,7 +46,7 @@ function ActionButton({ assetId, balance }: ActionButtonProps) {
       href={`/forced/new?assetId=${assetId}`}
       className="px-3 py-0.5 rounded bg-blue-100"
     >
-      {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Sell' : 'Buy'}
+      {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Buy' : 'Sell'}
     </a>
   )
 }
