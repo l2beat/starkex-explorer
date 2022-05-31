@@ -6,7 +6,7 @@ import { formatCurrencyUnits } from '../../formatting'
 import { OfferType } from '../../offers'
 import { PendingRow } from './row'
 
-interface PendingOfferEntry {
+export interface PendingOfferEntry {
   type: OfferType
   assetId: AssetId
   amountSynthetic: bigint
