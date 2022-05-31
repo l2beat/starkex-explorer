@@ -25,7 +25,7 @@ const AcceptButton = () => (
 )
 
 const FinalizeButton = () => (
-  <button className="px-3  rounded bg-blue-100">Finalize</button>
+  <button className="px-3 rounded bg-blue-100">Finalize</button>
 )
 
 interface PendingOffersProps {
