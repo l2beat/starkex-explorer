@@ -82,7 +82,7 @@ export class ForcedTransactionController {
         addressB: userB?.ethAddress,
         amountSynthetic: transaction.data.syntheticAmount,
         amountCollateral: transaction.data.collateralAmount,
-        assetId: transaction.data.syntheticAssetId,
+        syntheticAssetId: transaction.data.syntheticAssetId,
         transactionHash: transaction.hash,
       },
     }
