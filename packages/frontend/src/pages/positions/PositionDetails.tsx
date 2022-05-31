@@ -162,7 +162,9 @@ export function PositionDetails({
           </span>
         )}
       </div>
-      {pendingOffers.length > 0 && <PendingOffers offers={pendingOffers} />}
+      {pendingOffers.length > 0 && (
+        <PendingOffers offers={pendingOffers} ownedByYou={ownedByYou} />
+      )}
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
         rows={[

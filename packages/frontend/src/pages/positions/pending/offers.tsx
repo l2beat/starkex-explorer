@@ -24,11 +24,24 @@ interface MatchedOfferEntry extends OfferEntry {
 
 export type PendingOfferEntry = CreatedOfferEntry | MatchedOfferEntry
 
-export function PendingOffers({
-  offers,
-}: {
-  readonly offers: readonly PendingOfferEntry[]
-}) {
+const CancelButton = () => (
+  <button className="px-3 rounded bg-grey-300">Cancel</button>
+)
+
+const AcceptButton = () => (
+  <button className="px-3 rounded bg-blue-100">Accept offer</button>
+)
+
+const FinalizeButton = () => (
+  <button className="px-3  rounded bg-blue-100">Finalize</button>
+)
+
+interface PendingOffersProps {
+  offers: readonly PendingOfferEntry[]
+  ownedByYou: boolean
+}
+
+export function PendingOffers({ offers, ownedByYou }: PendingOffersProps) {
   return (
     <>
       <div className="mb-1.5 font-medium text-lg text-left">Pending Offers</div>
@@ -51,9 +64,13 @@ export function PendingOffers({
               ),
               offer.status === 'matched' && <button>Cancel</button>,
               offer.status === 'created' ? (
-                <button>Accept Offer</button>
+                ownedByYou ? (
+                  <CancelButton />
+                ) : (
+                  <AcceptButton />
+                )
               ) : (
-                <button>Finalize!</button>
+                ownedByYou && <FinalizeButton />
               ),
             ]}
             accent={offer.status === 'matched'}
