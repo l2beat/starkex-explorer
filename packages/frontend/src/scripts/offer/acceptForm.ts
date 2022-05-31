@@ -11,6 +11,7 @@ import {
   FormId,
   OfferInputName,
 } from '../../pages/offers/accept-form'
+import { findAndParse } from './findAndParse'
 import { signAccepted } from './sign'
 
 export function initAcceptOfferForm() {
@@ -41,16 +42,4 @@ export function initAcceptOfferForm() {
 
     window.location.reload()
   })
-}
-
-function findAndParse<T>(
-  form: HTMLFormElement,
-  name: string,
-  parse: (text: string) => T
-): T {
-  const value = form.querySelector<HTMLInputElement>(`[name="${name}"]`)?.value
-  if (!value) {
-    throw new Error(`Element ${name} not found in ${FormId} form`)
-  }
-  return parse(value)
 }
