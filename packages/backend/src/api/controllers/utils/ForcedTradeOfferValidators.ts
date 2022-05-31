@@ -87,15 +87,6 @@ export function validateCreate(
   return balanceValid && signatureValid
 }
 
-export function validateAccept(
-  offer: ForcedTradeOfferRecord,
-  accepted: Omit<Accepted, 'at'>,
-  addressB: EthereumAddress
-) {
-  const signatureValid = validateAcceptSignature(offer, accepted, addressB)
-  return signatureValid
-}
-
 export function validateCancel(
   offerId: ForcedTradeOfferRecord['id'],
   address: EthereumAddress,

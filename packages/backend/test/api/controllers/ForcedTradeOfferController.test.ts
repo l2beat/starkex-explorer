@@ -302,7 +302,7 @@ describe(ForcedTradeOfferController.name, async () => {
         })
       ).toEqual({
         type: 'bad request',
-        content: 'Your offer is invalid.',
+        content: 'Invalid signature.',
       })
     })
 

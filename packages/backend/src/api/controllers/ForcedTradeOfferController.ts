@@ -13,7 +13,7 @@ import { PositionRepository } from '../../peripherals/database/PositionRepositor
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import {
-  validateAccept,
+  validateAcceptSignature,
   validateCancel,
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
@@ -195,9 +195,13 @@ export class ForcedTradeOfferController {
         content: 'Offer already cancelled.',
       }
     }
-    const requestValid = validateAccept(offer, accepted, userB.ethAddress)
-    if (!requestValid) {
-      return { type: 'bad request', content: 'Your offer is invalid.' }
+    const signatureValid = validateAcceptSignature(
+      offer,
+      accepted,
+      userB.ethAddress
+    )
+    if (!signatureValid) {
+      return { type: 'bad request', content: 'Invalid signature.' }
     }
 
     await this.offerRepository.save({
