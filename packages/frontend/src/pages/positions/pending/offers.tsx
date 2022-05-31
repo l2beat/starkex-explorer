@@ -24,10 +24,24 @@ interface MatchedOfferEntry extends OfferEntry {
 
 export type PendingOfferEntry = CreatedOfferEntry | MatchedOfferEntry
 
+const CancelButton = () => (
+  <button className="px-3 rounded bg-grey-300">Cancel</button>
+)
+
+const AcceptButton = () => (
+  <button className="px-3 rounded bg-blue-100">Accept offer</button>
+)
+
+const FinalizeButton = () => (
+  <button className="px-3  rounded bg-blue-100">Finalize</button>
+)
+
 export function PendingOffers({
   offers,
+  ownedByYou,
 }: {
-  readonly offers: readonly PendingOfferEntry[]
+  offers: readonly PendingOfferEntry[]
+  ownedByYou: boolean
 }) {
   return (
     <>
@@ -48,11 +62,15 @@ export function PendingOffers({
               offer.status === 'created' ? 'Offer created' : 'Matched!',
               offer.status === 'matched' &&
                 formatRelativeTime(offer.expirationTime),
-              offer.status === 'matched' && <button>Cancel</button>,
+              offer.status === 'matched' && ownedByYou && <CancelButton />,
               offer.status === 'created' ? (
-                <button>Accept Offer</button>
+                ownedByYou ? (
+                  <CancelButton />
+                ) : (
+                  <AcceptButton />
+                )
               ) : (
-                <button>Finalize!</button>
+                ownedByYou && <FinalizeButton />
               ),
             ]}
             accent={offer.status === 'matched'}
