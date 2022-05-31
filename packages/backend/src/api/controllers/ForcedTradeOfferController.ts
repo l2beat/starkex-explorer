@@ -76,7 +76,7 @@ export class ForcedTradeOfferController {
       userPositionId &&
       userPositionId !== offer.positionIdA
     const submissionExpirationTime = BigInt(
-      (Date.now() + 3 * 24 * 60 * 60 * 1000) / (60 * 60 * 1000)
+      Math.floor((Date.now() + 3 * 24 * 60 * 60 * 1000) / (60 * 60 * 1000))
     )
     if (!shouldRenderForm) {
       return undefined
