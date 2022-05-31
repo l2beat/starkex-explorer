@@ -36,7 +36,7 @@ interface ActionButtonProps {
 }
 
 function ActionButton({ assetId, balance }: ActionButtonProps) {
-  if (balance === 0n) {
+  if (balance === 0n || (assetId === AssetId.USDC && balance < 0n)) {
     return null
   }
   return (
