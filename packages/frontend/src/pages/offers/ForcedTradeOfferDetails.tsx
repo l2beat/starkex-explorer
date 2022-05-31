@@ -2,6 +2,7 @@ import { AssetId, EthereumAddress } from '@explorer/types'
 import React from 'react'
 
 import { Page } from '../common'
+import { EtherscanLink } from '../common/EtherscanLink'
 import { ForcedHistory } from '../common/ForcedHistory'
 import { ForcedPageHeader } from '../common/ForcedPageHeader'
 import { PageHeaderStats } from '../common/PageHeaderStats'
@@ -29,7 +30,11 @@ export function toStatsRows(
     },
     {
       title: `${partyA} ethereum address`,
-      content: offer.addressA?.toString() || '-',
+      content: offer.addressA ? (
+        <EtherscanLink address={offer.addressA}>{offer.addressA}</EtherscanLink>
+      ) : (
+        '-'
+      ),
     },
     {
       title: 'Tokens sold',
@@ -55,7 +60,11 @@ export function toStatsRows(
   if (offer.addressB) {
     rows.push({
       title: `${partyB} ethereum address`,
-      content: offer.addressB.toString(),
+      content: offer.addressB ? (
+        <EtherscanLink address={offer.addressB}>{offer.addressB}</EtherscanLink>
+      ) : (
+        '-'
+      ),
     })
   }
 
