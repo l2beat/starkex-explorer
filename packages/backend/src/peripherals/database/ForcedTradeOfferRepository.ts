@@ -188,6 +188,13 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rowIds.map(String).map(AssetId)
   }
 
+  async getByPositionId(position_id_a: bigint) {
+    const rows = await this.knex('forced_trade_offers')
+      .where({ position_id_a })
+      .whereNull('transaction_hash')
+    return rows.map(toRecord)
+  }
+
   async findById(id: Record['id']): Promise<Record | undefined> {
     const row = await this.knex('forced_trade_offers').where({ id }).first()
     return row ? toRecord(row) : undefined
