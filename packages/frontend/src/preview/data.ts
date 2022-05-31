@@ -179,6 +179,14 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       status: 'matched',
       expirationTime: Timestamp(Date.now() + 5 * 3600 * 1000),
     },
+    {
+      type: 'sell',
+      assetId: AssetId('ETH-9'),
+      amountSynthetic: 1000000n,
+      amountCollateral: 10000000n,
+      status: 'matched',
+      expirationTime: Timestamp(Date.now() + 6 * 3560 * 900),
+    },
   ],
 }
 

@@ -2,7 +2,7 @@ import { AssetId, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { AssetCell } from '../../common/AssetCell'
-import { formatCurrencyUnits, formatRelativeTime } from '../../formatting'
+import { formatCurrencyUnits } from '../../formatting'
 import { OfferType } from '../../offers'
 import { PendingRow } from './row'
 
@@ -46,8 +46,9 @@ export function PendingOffers({
               formatCurrencyUnits(offer.amountCollateral, AssetId.USDC),
               <AssetCell assetId={AssetId.USDC} />,
               offer.status === 'created' ? 'Offer created' : 'Matched!',
-              offer.status === 'matched' &&
-                formatRelativeTime(offer.expirationTime),
+              offer.status === 'matched' && (
+                <span data-timestamp={offer.expirationTime}>...</span>
+              ),
               offer.status === 'matched' && <button>Cancel</button>,
               offer.status === 'created' ? (
                 <button>Accept Offer</button>
