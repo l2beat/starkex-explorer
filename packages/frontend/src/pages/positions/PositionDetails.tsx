@@ -2,6 +2,7 @@ import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { AssetCell } from '../common/AssetCell'
+import { EtherscanLink } from '../common/EtherscanLink'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
@@ -45,7 +46,7 @@ function ActionButton({ assetId, balance }: ActionButtonProps) {
       href={`/forced/new?assetId=${assetId}`}
       className="px-3 py-0.5 rounded bg-blue-100"
     >
-      {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Sell' : 'Buy'}
+      {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Buy' : 'Sell'}
     </a>
   )
 }
@@ -170,7 +171,11 @@ export function PositionDetails({
         rows={[
           {
             title: 'Owner ETH address',
-            content: ethAddress || '-',
+            content: ethAddress ? (
+              <EtherscanLink address={ethAddress}>{ethAddress}</EtherscanLink>
+            ) : (
+              '-'
+            ),
           },
           {
             title: 'Owner stark key',
