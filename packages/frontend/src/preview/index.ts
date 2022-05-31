@@ -10,6 +10,7 @@ import {
   renderForcedTransactionDetailsPage,
   renderForcedTransactionsIndexPage,
   renderHomePage,
+  renderNotFoundPage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
   renderStateUpdateDetailsPage,
@@ -88,6 +89,11 @@ router.get('/forced/:hash', (ctx) => {
 router.post('/forced/offers', (ctx) => {
   ctx.status = 201
   ctx.body = { id: 1 }
+})
+router.get('/not-found', (ctx) => {
+  const data = { ...DATA.NOT_FOUND_PROPS }
+  data.account = getAccount(ctx)
+  ctx.body = renderNotFoundPage(data)
 })
 
 function getAccount(ctx: Koa.Context) {

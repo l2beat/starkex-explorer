@@ -19,6 +19,7 @@ import {
   StateUpdatesIndexProps,
 } from '../pages'
 import { ForcedTransactionEntry } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
+import { NotFoundProps } from '../pages/not-found/NotFoundProps'
 import { ForcedTradeOffersIndexProps } from '../pages/offers/ForcedTradeOffersIndexProps'
 import { TransactionFormProps } from '../pages/transaction-form'
 
@@ -319,4 +320,8 @@ export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
       totalUSDCents: 6_75n,
     },
   ],
+}
+
+export const NOT_FOUND_PROPS: NotFoundProps = {
+  text: 'These are not the droids you are looking for',
 }
