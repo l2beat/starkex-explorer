@@ -26,6 +26,7 @@ export function PendingRow({
             i !== fullWidth && 'w-0',
             numeric.includes(i) && 'font-mono'
           )}
+          key={i}
         >
           {cell}
         </td>

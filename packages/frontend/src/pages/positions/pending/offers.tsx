@@ -36,8 +36,9 @@ export function PendingOffers({
         className="w-full border-separate mb-12"
         style={{ borderSpacing: '0 4px' }}
       >
-        {offers.map((offer) => (
+        {offers.map((offer, i) => (
           <PendingRow
+            key={i}
             cells={[
               offer.type === 'buy' ? 'Buy' : 'Sell',
               formatCurrencyUnits(offer.amountSynthetic, offer.assetId),
