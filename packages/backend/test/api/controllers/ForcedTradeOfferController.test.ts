@@ -4,6 +4,7 @@ import { expect } from 'earljs'
 import { Wallet } from 'ethers'
 
 import { ForcedTradeOfferController } from '../../../src/api/controllers/ForcedTradeOfferController'
+import { AccountService } from '../../../src/core/AccountService'
 import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
@@ -47,6 +48,17 @@ describe(ForcedTradeOfferController.name, async () => {
   }
   const invalidSignature = '0x12345'
 
+  const mockAccountService = mock<AccountService>({
+    getAccount: async (address) =>
+      address
+        ? {
+            address: address,
+            positionId: 123n,
+            hasUpdates: false,
+          }
+        : undefined,
+  })
+
   describe(ForcedTradeOfferController.prototype.postOffer.name, () => {
     it('blocks invalid signature', async () => {
       const offerRepository = mock<ForcedTradeOfferRepository>({
@@ -60,6 +72,7 @@ describe(ForcedTradeOfferController.name, async () => {
           findByStarkKey: async () => userA,
         })
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         offerRepository,
         positionRepository,
         userRegistrationEventRepository
@@ -75,6 +88,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks missing position', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>(),
         mock<PositionRepository>({
           findById: async () => undefined,
@@ -94,6 +108,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks missing user', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>(),
         mock<PositionRepository>({
           findById: async () => positionA,
@@ -113,6 +128,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks invalid balance', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>(),
         mock<PositionRepository>({
           findById: async () => ({ ...positionA, amountCollateral: 0n }),
@@ -143,6 +159,7 @@ describe(ForcedTradeOfferController.name, async () => {
           findByStarkKey: async () => userA,
         })
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         offerRepository,
         positionRepository,
         userRegistrationEventRepository
@@ -160,7 +177,8 @@ describe(ForcedTradeOfferController.name, async () => {
   describe(ForcedTradeOfferController.prototype.acceptOffer.name, () => {
     it('blocks missing position', async () => {
       const controller = new ForcedTradeOfferController(
-        mock<ForcedTradeOfferRepository>({}),
+        mockAccountService,
+        mock<ForcedTradeOfferRepository>(),
         mock<PositionRepository>({
           findById: async () => undefined,
         }),
@@ -177,7 +195,8 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks missing user', async () => {
       const controller = new ForcedTradeOfferController(
-        mock<ForcedTradeOfferRepository>({}),
+        mockAccountService,
+        mock<ForcedTradeOfferRepository>(),
         mock<PositionRepository>({
           findById: async () => positionA,
         }),
@@ -194,6 +213,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks missing offer', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => undefined,
         }),
@@ -213,6 +233,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks accepted offer', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => ({
             id: 1,
@@ -240,6 +261,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks cancelled offer', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => ({
             id: 1,
@@ -265,6 +287,7 @@ describe(ForcedTradeOfferController.name, async () => {
     it('blocks invalid signature', async () => {
       const id = 1
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           add: async () => id,
           findById: async () => ({
@@ -309,6 +332,7 @@ describe(ForcedTradeOfferController.name, async () => {
     it('accepts offer', async () => {
       const id = 1
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           add: async () => id,
           findById: async () => ({
@@ -366,6 +390,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks missing offer', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => undefined,
         }),
@@ -381,6 +406,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks cancelled offer', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => ({
             ...initial,
@@ -400,6 +426,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks submitted offer', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => ({
             ...accepted,
@@ -422,6 +449,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks missing position', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => accepted,
         }),
@@ -440,6 +468,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('blocks invalid signature', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => accepted,
         }),
@@ -458,6 +487,7 @@ describe(ForcedTradeOfferController.name, async () => {
 
     it('cancels offer', async () => {
       const controller = new ForcedTradeOfferController(
+        mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => accepted,
           save: async () => true,

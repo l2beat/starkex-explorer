@@ -4,6 +4,7 @@ import {
 } from '@explorer/frontend'
 import { EthereumAddress } from '@explorer/types'
 
+import { AccountService } from '../../core/AccountService'
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import {
   PositionRepository,
@@ -18,6 +19,7 @@ import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 
 export class StateUpdateController {
   constructor(
+    private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
@@ -26,12 +28,15 @@ export class StateUpdateController {
   async getStateUpdatesPage(
     page: number,
     perPage: number,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const stateUpdates = await this.stateUpdateRepository.getPaginated({
-      offset: (page - 1) * perPage,
-      limit: perPage,
-    })
+    const [account, stateUpdates] = await Promise.all([
+      this.accountService.getAccount(address),
+      this.stateUpdateRepository.getPaginated({
+        offset: (page - 1) * perPage,
+        limit: perPage,
+      }),
+    ])
     const total = await this.stateUpdateRepository.count()
 
     const content = renderStateUpdatesIndexPage({
@@ -45,9 +50,10 @@ export class StateUpdateController {
 
   async getStateUpdateDetailsPage(
     id: number,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [stateUpdate, transactions] = await Promise.all([
+    const [account, stateUpdate, transactions] = await Promise.all([
+      this.accountService.getAccount(address),
       this.stateUpdateRepository.findByIdWithPositions(id),
       this.forcedTransactionsRepository.getIncludedInStateUpdate(id),
     ])

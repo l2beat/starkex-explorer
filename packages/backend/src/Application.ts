@@ -11,6 +11,7 @@ import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRo
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
+import { AccountService } from './core/AccountService'
 import { DataSyncService } from './core/DataSyncService'
 import { ForcedEventsCollector } from './core/ForcedEventsCollector'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
@@ -168,29 +169,34 @@ export class Application {
     const transactionStatusMonitor = new TransactionStatusMonitor(
       transactionStatusService
     )
+    const accountService = new AccountService(positionRepository)
 
     // #endregion core
     // #region api
 
     const positionController = new PositionController(
+      accountService,
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository,
       forcedTransactionsRepository
     )
     const homeController = new HomeController(
+      accountService,
       stateUpdateRepository,
       positionRepository,
       forcedTransactionsRepository,
       forcedTradeOfferRepository
     )
     const forcedTransactionController = new ForcedTransactionController(
+      accountService,
       userRegistrationEventRepository,
       positionRepository,
       forcedTransactionsRepository,
       config.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
+      accountService,
       stateUpdateRepository,
       positionRepository,
       forcedTransactionsRepository
@@ -201,6 +207,7 @@ export class Application {
       userRegistrationEventRepository
     )
     const forcedTradeOfferController = new ForcedTradeOfferController(
+      accountService,
       forcedTradeOfferRepository,
       positionRepository,
       userRegistrationEventRepository

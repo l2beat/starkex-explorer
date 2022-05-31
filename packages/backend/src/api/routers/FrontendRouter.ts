@@ -24,8 +24,8 @@ export function createFrontendRouter(
   const router = new Router()
 
   router.get('/', async (ctx) => {
-    const account = getAccount(ctx)
-    const result = await homeController.getHomePage(account)
+    const address = getAccountAddress(ctx)
+    const result = await homeController.getHomePage(address)
     applyControllerResult(ctx, result)
   })
 
@@ -40,12 +40,12 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const { page, perPage } = ctx.query
-        const account = getAccount(ctx)
+        const address = getAccountAddress(ctx)
         const result =
           await forcedTransactionController.getForcedTransactionsPage(
             page,
             perPage,
-            account
+            address
           )
         applyControllerResult(ctx, result)
       }
@@ -53,9 +53,9 @@ export function createFrontendRouter(
   )
 
   router.get('/forced/new', async (ctx) => {
-    const account = getAccount(ctx)
+    const address = getAccountAddress(ctx)
     const result = await forcedTransactionController.getTransactionFormPage(
-      account
+      address
     )
     applyControllerResult(ctx, result)
   })
@@ -73,13 +73,13 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const { page, perPage, assetId, type } = ctx.query
-        const account = getAccount(ctx)
+        const address = getAccountAddress(ctx)
         const result = await forcedTradeOfferController.getOffersIndexPage({
           page,
           perPage,
           assetId,
           type,
-          account,
+          address,
         })
         applyControllerResult(ctx, result)
       }
@@ -96,10 +96,10 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const { id } = ctx.params
-        const account = getAccount(ctx)
+        const address = getAccountAddress(ctx)
         const result = await forcedTradeOfferController.getOfferDetailsPage(
           id,
-          account
+          address
         )
         applyControllerResult(ctx, result)
       }
@@ -116,11 +116,11 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const { hash } = ctx.params
-        const account = getAccount(ctx)
+        const address = getAccountAddress(ctx)
         const result =
           await forcedTransactionController.getForcedTransactionDetailsPage(
             hash,
-            account
+            address
           )
         applyControllerResult(ctx, result)
       }
@@ -138,11 +138,11 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const { page, perPage } = ctx.query
-        const account = getAccount(ctx)
+        const address = getAccountAddress(ctx)
         const result = await stateUpdateController.getStateUpdatesPage(
           page,
           perPage,
-          account
+          address
         )
         applyControllerResult(ctx, result)
       }
@@ -159,10 +159,10 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const { id } = ctx.params
-        const account = getAccount(ctx)
+        const address = getAccountAddress(ctx)
         const result = await stateUpdateController.getStateUpdateDetailsPage(
           id,
-          account
+          address
         )
         applyControllerResult(ctx, result)
       }
@@ -179,10 +179,10 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const { positionId } = ctx.params
-        const account = getAccount(ctx)
+        const address = getAccountAddress(ctx)
         const result = await positionController.getPositionDetailsPage(
           positionId,
-          account
+          address
         )
         applyControllerResult(ctx, result)
       }
@@ -200,11 +200,11 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const { positionId, updateId } = ctx.params
-        const account = getAccount(ctx)
+        const address = getAccountAddress(ctx)
         const result = await positionController.getPositionUpdatePage(
           positionId,
           updateId,
-          account
+          address
         )
         applyControllerResult(ctx, result)
       }
@@ -230,7 +230,7 @@ export function createFrontendRouter(
   return router
 }
 
-export function getAccount(ctx: Context) {
+export function getAccountAddress(ctx: Context) {
   const cookie = ctx.cookies.get('account')
   if (cookie) {
     try {

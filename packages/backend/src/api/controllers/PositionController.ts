@@ -4,6 +4,7 @@ import {
 } from '@explorer/frontend'
 import { EthereumAddress } from '@explorer/types'
 
+import { AccountService } from '../../core/AccountService'
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
@@ -15,6 +16,7 @@ import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
 export class PositionController {
   constructor(
+    private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
@@ -23,9 +25,10 @@ export class PositionController {
 
   async getPositionDetailsPage(
     positionId: bigint,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [history, transactions] = await Promise.all([
+    const [account, history, transactions] = await Promise.all([
+      this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.forcedTransactionsRepository.getAffectingPosition(positionId),
     ])
@@ -86,9 +89,10 @@ export class PositionController {
   async getPositionUpdatePage(
     positionId: bigint,
     stateUpdateId: number,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [history, update, transactions] = await Promise.all([
+    const [account, history, update, transactions] = await Promise.all([
+      this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.stateUpdateRepository.findByIdWithPositions(stateUpdateId),
       this.forcedTransactionsRepository.getIncludedInStateUpdate(stateUpdateId),
