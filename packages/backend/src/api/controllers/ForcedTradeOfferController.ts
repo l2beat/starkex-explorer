@@ -195,12 +195,7 @@ export class ForcedTradeOfferController {
         content: 'Offer already cancelled.',
       }
     }
-    const requestValid = validateAccept(
-      offer,
-      accepted,
-      positionB,
-      userB.ethAddress
-    )
+    const requestValid = validateAccept(offer, accepted, userB.ethAddress)
     if (!requestValid) {
       return { type: 'bad request', content: 'Your offer is invalid.' }
     }
