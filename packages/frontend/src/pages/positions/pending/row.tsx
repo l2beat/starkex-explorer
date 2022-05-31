@@ -1,17 +1,19 @@
 import cx from 'classnames'
 import React, { ReactNode } from 'react'
 
+interface PendingRowProps {
+  cells: ReactNode[]
+  accent: boolean
+  fullWidth: number
+  numeric: number[]
+}
+
 export function PendingRow({
   cells,
   accent,
   fullWidth,
   numeric,
-}: {
-  cells: ReactNode[]
-  accent: boolean
-  fullWidth: number
-  numeric: number[]
-}) {
+}: PendingRowProps) {
   return (
     <tr
       className={cx(

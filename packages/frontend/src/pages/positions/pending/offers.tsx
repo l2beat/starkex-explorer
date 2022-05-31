@@ -36,13 +36,12 @@ const FinalizeButton = () => (
   <button className="px-3  rounded bg-blue-100">Finalize</button>
 )
 
-export function PendingOffers({
-  offers,
-  ownedByYou,
-}: {
+interface PendingOffersProps {
   offers: readonly PendingOfferEntry[]
   ownedByYou: boolean
-}) {
+}
+
+export function PendingOffers({ offers, ownedByYou }: PendingOffersProps) {
   return (
     <>
       <div className="mb-1.5 font-medium text-lg text-left">Pending Offers</div>
