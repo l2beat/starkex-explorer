@@ -1,12 +1,12 @@
-import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
+import { AccountDetails } from './AccountDetails'
 import { Footer } from './Footer'
 import { Head, HeadProps } from './Head'
 import { Navbar } from './Navbar'
 
 interface Props extends HeadProps {
-  account?: EthereumAddress
+  account: AccountDetails | undefined
   scripts: string[]
   children: ReactNode
   withoutSearch?: boolean

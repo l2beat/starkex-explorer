@@ -6,9 +6,11 @@ import {
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { z } from 'zod'
 
+import { AccountDetails } from '../common/AccountDetails'
+
 export type TransactionFormProps = z.infer<typeof TransactionFormProps>
 export const TransactionFormProps = z.object({
-  account: stringAs(EthereumAddress),
+  account: AccountDetails,
   perpetualAddress: stringAs(EthereumAddress),
   selectedAsset: stringAs(AssetId),
   positionId: stringAsBigInt(),

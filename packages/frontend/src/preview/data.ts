@@ -254,7 +254,7 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
 }
 
 export const FORCED_TRADE_OFFERS_INDEX_PROPS: ForcedTradeOffersIndexProps = {
-  account: EthereumAddress.fake(),
+  account: undefined,
   offers: createFakeOffers(10),
   params: { page: 3, perPage: 10 },
   total: 100,
@@ -262,7 +262,7 @@ export const FORCED_TRADE_OFFERS_INDEX_PROPS: ForcedTradeOffersIndexProps = {
 }
 
 export const FORCED_TRADE_OFFER_DETAILS_PROPS: ForcedTradeOfferDetailsProps = {
-  account: EthereumAddress.fake(),
+  account: undefined,
   offer: {
     addressA: EthereumAddress.fake(),
     amountCollateral: 10n,
@@ -281,7 +281,11 @@ export const FORCED_TRADE_OFFER_DETAILS_PROPS: ForcedTradeOfferDetailsProps = {
 }
 
 export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
-  account: EthereumAddress.fake(),
+  account: {
+    address: EthereumAddress.fake(),
+    positionId: 123n,
+    hasUpdates: false,
+  },
   perpetualAddress: EthereumAddress(
     '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'
   ),
@@ -323,5 +327,6 @@ export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
 }
 
 export const NOT_FOUND_PROPS: NotFoundProps = {
+  account: undefined,
   text: 'These are not the droids you are looking for',
 }

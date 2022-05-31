@@ -1,13 +1,13 @@
-import { EthereumAddress } from '@explorer/types'
 import React from 'react'
 
+import { AccountDetails } from './AccountDetails'
 import { JazzIcon } from './jazzicon/JazzIcon'
 import { DydxLogo } from './logos/DydxLogo'
 import { L2beatExplorerLogo } from './logos/L2beatExplorerLogo'
 import { SearchBar } from './SearchBar'
 
 export interface NavbarProps {
-  readonly account: EthereumAddress | undefined
+  readonly account: AccountDetails | undefined
   readonly searchBar: boolean
 }
 
@@ -31,12 +31,16 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
           </button>
         )}
         {account && (
-          <div className="bg-grey-300 px-4 rounded-md h-[44px] w-full lg:w-auto align-middle flex items-center justify-center space-x-2">
-            <JazzIcon address={account} size={25} />
+          <a
+            href={`/positions/${account.positionId ?? 'not-found'}`}
+            className="bg-grey-300 px-4 rounded-md h-[44px] w-full lg:w-auto align-middle flex items-center justify-center space-x-2"
+          >
+            <JazzIcon address={account.address} size={25} />
             <span className="font-mono">
-              {account.slice(0, 6)}&hellip;{account.slice(-4)}
+              {account.address.slice(0, 6)}&hellip;
+              {account.address.slice(-4)}
             </span>
-          </div>
+          </a>
         )}
       </div>
     </div>

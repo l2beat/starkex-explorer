@@ -1,6 +1,6 @@
-import { EthereumAddress } from '@explorer/types'
+import { AccountDetails } from '../common/AccountDetails'
 
 export interface NotFoundProps {
-  account?: EthereumAddress
-  text: string
+  readonly account: AccountDetails | undefined
+  readonly text: string
 }

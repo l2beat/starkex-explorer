@@ -100,7 +100,11 @@ function getAccount(ctx: Koa.Context) {
   const cookie = ctx.cookies.get('account')
   if (cookie) {
     try {
-      return EthereumAddress(cookie)
+      return {
+        address: EthereumAddress(cookie),
+        positionId: 123n,
+        hasUpdates: Math.random() < 0.5,
+      }
     } catch {
       return
     }
