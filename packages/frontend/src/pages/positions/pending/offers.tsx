@@ -6,23 +6,15 @@ import { formatCurrencyUnits } from '../../formatting'
 import { OfferType } from '../../offers'
 import { PendingRow } from './row'
 
-interface OfferEntry {
+interface PendingOfferEntry {
   type: OfferType
   assetId: AssetId
   amountSynthetic: bigint
   amountCollateral: bigint
+  accepted?: {
+    submissionExpirationTime: Timestamp
+  }
 }
-
-interface CreatedOfferEntry extends OfferEntry {
-  status: 'created'
-}
-
-interface MatchedOfferEntry extends OfferEntry {
-  status: 'matched'
-  expirationTime: Timestamp
-}
-
-export type PendingOfferEntry = CreatedOfferEntry | MatchedOfferEntry
 
 const CancelButton = () => (
   <button className="px-3 rounded bg-grey-300">Cancel</button>
@@ -58,22 +50,22 @@ export function PendingOffers({ offers, ownedByYou }: PendingOffersProps) {
               <AssetCell assetId={offer.assetId} />,
               formatCurrencyUnits(offer.amountCollateral, AssetId.USDC),
               <AssetCell assetId={AssetId.USDC} />,
-              offer.status === 'created' ? 'Offer created' : 'Matched!',
-              offer.status === 'matched' && (
-                <span data-timestamp={offer.expirationTime}>...</span>
+              offer.accepted ? 'Matched!' : 'Offer created',
+              offer.accepted && (
+                <span data-timestamp={offer.accepted.submissionExpirationTime}>
+                  ...
+                </span>
               ),
-              offer.status === 'matched' && <button>Cancel</button>,
-              offer.status === 'created' ? (
-                ownedByYou ? (
-                  <CancelButton />
-                ) : (
-                  <AcceptButton />
-                )
-              ) : (
+              offer.accepted && ownedByYou && <button>Cancel</button>,
+              offer.accepted ? (
                 ownedByYou && <FinalizeButton />
+              ) : ownedByYou ? (
+                <CancelButton />
+              ) : (
+                <AcceptButton />
               ),
             ]}
-            accent={offer.status === 'matched'}
+            accent={!!offer.accepted}
             fullWidth={6}
             numeric={[1, 3]}
           />
