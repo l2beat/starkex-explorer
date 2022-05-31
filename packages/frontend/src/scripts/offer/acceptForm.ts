@@ -30,7 +30,7 @@ export function initAcceptOfferForm() {
       throw new Error('Could not create a signature for accept form')
     }
 
-    fetch(form.action, {
+    await fetch(form.action, {
       method: form.method,
       headers: { 'Content-Type': 'application/json' },
       body: serializeAcceptOfferBody({
@@ -38,6 +38,8 @@ export function initAcceptOfferForm() {
         signature,
       }),
     })
+
+    window.location.reload()
   })
 }
 
