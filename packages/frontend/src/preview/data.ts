@@ -180,7 +180,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       amountCollateral: 10000000n,
       accepted: {
         submissionExpirationTime: BigInt(
-          (Date.now() + 5 * 3600 * 1000) / (60 * 1000)
+          Math.floor((Date.now() + 5 * 3600 * 1000) / (60 * 1000))
         ),
       },
     },
@@ -192,7 +192,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       amountCollateral: 10000000n,
       accepted: {
         submissionExpirationTime: BigInt(
-          (Date.now() + 6 * 3560 * 900) / (60 * 1000)
+          Math.floor((Date.now() + 6 * 3560 * 900) / (60 * 1000))
         ),
       },
     },
