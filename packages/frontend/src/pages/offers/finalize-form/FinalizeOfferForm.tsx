@@ -19,7 +19,7 @@ interface FinalizeOfferFormProps extends FinalizeOfferFormData {
 }
 
 export function FinalizeOfferForm(props: FinalizeOfferFormProps) {
-  const { address, ...offer } = props
+  const { address, perpetualAddress, ...offer } = props
   const offerJson = serializeFinalizeOfferData(offer)
   return (
     <form id={FormId} action={`/forced/trades`} method="POST">
@@ -28,7 +28,7 @@ export function FinalizeOfferForm(props: FinalizeOfferFormProps) {
       <input
         name={PerpetualAddressInputName}
         type="hidden"
-        value={props.perpetualAddress.toString()}
+        value={perpetualAddress.toString()}
       />
       {props.children}
     </form>
