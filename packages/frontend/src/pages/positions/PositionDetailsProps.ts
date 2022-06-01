@@ -1,10 +1,11 @@
 import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
+import { AccountDetails } from '../common/AccountDetails'
 import { ForcedTransactionEntry } from '../forced-transactions/ForcedTransactionsIndexProps'
 import { PendingOfferEntry } from './pending/offers'
 
 export interface PositionDetailsProps {
-  readonly account: EthereumAddress | undefined
+  readonly account: AccountDetails | undefined
   readonly positionId: bigint
   readonly publicKey: StarkKey
   readonly ethAddress?: EthereumAddress

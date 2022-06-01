@@ -9,8 +9,12 @@ import { FormAction } from '../../../src/scripts/transaction/types'
 describe(nextFormState.name, () => {
   const INITIAL_STATE = getInitialState(
     {
+      account: {
+        address: EthereumAddress.fake(),
+        positionId: 123n,
+        hasUpdates: false,
+      },
       positionId: 123n,
-      account: EthereumAddress.fake(),
       perpetualAddress: EthereumAddress.fake(),
       publicKey: StarkKey.fake(),
       selectedAsset: AssetId('ETH-9'),

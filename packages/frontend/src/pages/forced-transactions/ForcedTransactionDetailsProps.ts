@@ -1,5 +1,6 @@
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
+import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
 
 export type ForcedTransaction = ForcedExit | ForcedBuy | ForcedSell
@@ -38,7 +39,7 @@ export interface ForcedExit {
 }
 
 export type ForcedTransactionDetailsProps = {
+  readonly account: AccountDetails | undefined
   readonly transaction: ForcedTransaction
-  readonly account: EthereumAddress | undefined
   readonly history: ForcedHistoryEvent[]
 }

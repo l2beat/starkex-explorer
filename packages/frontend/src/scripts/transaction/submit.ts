@@ -61,7 +61,7 @@ async function submitOffer(state: FormState) {
     aIsBuyingSynthetic: state.buyButtonSelected,
   }
 
-  const signature = await signCreate(offer, state.props.account)
+  const signature = await signCreate(offer, state.props.account.address)
 
   if (!signature) {
     console.error('Offer parameters need to be signed.')

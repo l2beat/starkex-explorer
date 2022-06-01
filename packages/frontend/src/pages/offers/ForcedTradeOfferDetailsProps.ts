@@ -1,5 +1,6 @@
 import { AssetId, EthereumAddress } from '@explorer/types'
 
+import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
 import { AcceptOfferFormData } from './accept-form'
 import { CancelOfferFormData } from './cancel-form'
@@ -18,7 +19,7 @@ export type ForcedTradeOffer = {
 
 export type ForcedTradeOfferDetailsProps = {
   readonly offer: ForcedTradeOffer
-  readonly account: EthereumAddress | undefined
+  readonly account: AccountDetails | undefined
   readonly history: ForcedHistoryEvent[]
   readonly acceptForm?: AcceptOfferFormData
   readonly cancelForm?: CancelOfferFormData

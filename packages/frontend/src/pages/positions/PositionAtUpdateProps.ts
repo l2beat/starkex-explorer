@@ -1,9 +1,10 @@
-import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
+import { AccountDetails } from '../common/AccountDetails'
 import { ForcedTransactionEntry } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface PositionAtUpdateProps {
-  readonly account: EthereumAddress | undefined
+  readonly account: AccountDetails | undefined
   readonly stateUpdateId: number
   readonly positionId: bigint
   readonly lastUpdateTimestamp: Timestamp
