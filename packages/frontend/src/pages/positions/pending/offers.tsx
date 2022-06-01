@@ -1,4 +1,4 @@
-import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 import React from 'react'
 
 import { AssetCell } from '../../common/AssetCell'
