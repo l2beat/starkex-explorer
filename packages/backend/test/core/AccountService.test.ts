@@ -1,5 +1,6 @@
 import { EthereumAddress } from '@explorer/types'
 import { expect } from 'earljs'
+
 import { AccountService } from '../../src/core/AccountService'
 import { PositionRepository } from '../../src/peripherals/database/PositionRepository'
 import { mock } from '../mock'
