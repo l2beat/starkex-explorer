@@ -192,6 +192,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     const rows = await this.knex('forced_trade_offers')
       .where({ position_id_a: positionIdA })
       .whereNull('transaction_hash')
+      .whereNull('cancelled_at')
     return rows.map(toRecord)
   }
 
