@@ -11,6 +11,7 @@ import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRep
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
+import { getAcceptForm, getCancelForm } from './utils/offerForms'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
@@ -57,16 +58,25 @@ export class PositionController {
 
     const current = historyWithAssets[0]
 
-    const lastUserRegistrationEvent =
-      await this.userRegistrationEventRepository.findByStarkKey(
-        current.publicKey
-      )
+    const [userPositionId, userEvent] = await Promise.all([
+      account && this.positionRepository.findIdByEthereumAddress(account),
+      account &&
+        this.userRegistrationEventRepository.findByEthereumAddress(account),
+    ])
+    const user =
+      userPositionId && userEvent
+        ? {
+            address: userEvent.ethAddress,
+            starkKey: userEvent.starkKey,
+            positionId: userPositionId,
+          }
+        : undefined
 
     const content = renderPositionDetailsPage({
       account,
       positionId,
       publicKey: current.publicKey,
-      ethAddress: lastUserRegistrationEvent?.ethAddress,
+      ethAddress: user?.address,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
       assets: current.assets,
@@ -85,6 +95,8 @@ export class PositionController {
       pendingOffers: pendingOffers.map((offer) => ({
         ...offer,
         type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        acceptForm: user && getAcceptForm(offer, user),
+        cancelForm: user && getCancelForm(offer, user),
       })),
     })
     return { type: 'success', content }

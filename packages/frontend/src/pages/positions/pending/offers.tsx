@@ -1,10 +1,11 @@
-import { AssetId, EthereumAddress } from '@explorer/types'
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { AssetCell } from '../../common/AssetCell'
 import { formatCurrencyUnits } from '../../formatting'
 import { OfferType } from '../../offers'
-import { CancelOfferForm } from '../../offers/cancel-form'
+import { AcceptOfferForm, AcceptOfferFormData } from '../../offers/accept-form'
+import { CancelOfferForm, CancelOfferFormData } from '../../offers/cancel-form'
 import { PendingRow } from './row'
 
 export interface PendingOfferEntry {
@@ -16,28 +17,15 @@ export interface PendingOfferEntry {
   accepted?: {
     submissionExpirationTime: bigint
   }
+  acceptForm?: AcceptOfferFormData
+  cancelForm?: CancelOfferFormData
 }
-
-const AcceptButton = () => (
-  <button className="px-3 rounded bg-blue-100">Accept offer</button>
-)
-
-const FinalizeButton = () => (
-  <button className="px-3 rounded bg-blue-100">Finalize</button>
-)
 
 interface PendingOffersProps {
   offers: readonly PendingOfferEntry[]
-  account?: EthereumAddress
-  positionAddress?: EthereumAddress
 }
 
-export function PendingOffers({
-  offers,
-  account,
-  positionAddress,
-}: PendingOffersProps) {
-  const ownedByYou = positionAddress && account && positionAddress === account
+export function PendingOffers({ offers }: PendingOffersProps) {
   return (
     <>
       <div className="mb-1.5 font-medium text-lg text-left">Pending Offers</div>
@@ -53,13 +41,16 @@ export function PendingOffers({
             </span>
           )
           const controls = [
-            offer.accepted && ownedByYou && (
-              <CancelOfferForm offerId={offer.id} address={account}>
+            offer.cancelForm && (
+              <CancelOfferForm {...offer.cancelForm}>
                 <button className="px-3 rounded bg-grey-300">Cancel</button>
               </CancelOfferForm>
             ),
-            offer.accepted && ownedByYou && <FinalizeButton />,
-            !offer.accepted && !ownedByYou && <AcceptButton />,
+            offer.acceptForm && (
+              <AcceptOfferForm {...offer.acceptForm}>
+                <button className="px-3 rounded bg-grey-300">Accept</button>
+              </AcceptOfferForm>
+            ),
           ]
           return (
             <PendingRow

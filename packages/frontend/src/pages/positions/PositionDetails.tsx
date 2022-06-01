@@ -163,13 +163,7 @@ export function PositionDetails({
           </span>
         )}
       </div>
-      {pendingOffers.length > 0 && (
-        <PendingOffers
-          offers={pendingOffers}
-          positionAddress={ethAddress}
-          account={account}
-        />
-      )}
+      {pendingOffers.length > 0 && <PendingOffers offers={pendingOffers} />}
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
         rows={[

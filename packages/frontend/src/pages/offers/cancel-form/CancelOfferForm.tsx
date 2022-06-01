@@ -3,9 +3,12 @@ import React, { ReactNode } from 'react'
 
 import { AddressInputName, FormId, OfferIdInputName } from './attributes'
 
-interface CancelOfferFormProps {
+export interface CancelOfferFormData {
   offerId: number
   address: EthereumAddress
+}
+
+interface CancelOfferFormProps extends CancelOfferFormData {
   children: ReactNode
 }
 

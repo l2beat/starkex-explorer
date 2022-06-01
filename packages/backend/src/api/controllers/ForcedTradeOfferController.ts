@@ -2,7 +2,7 @@ import {
   renderForcedTradeOfferDetailsPage,
   renderForcedTradeOffersIndexPage,
 } from '@explorer/frontend'
-import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
 import {
   Accepted,
@@ -17,6 +17,7 @@ import {
   validateCancel,
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
+import { getAcceptForm, getCancelForm } from './utils/offerForms'
 import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
 import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 
@@ -59,47 +60,6 @@ export class ForcedTradeOfferController {
       params: { page, perPage, type, assetId },
     })
     return { type: 'success', content }
-  }
-
-  private getAcceptFormData(
-    offer: ForcedTradeOfferRecord,
-    user: { starkKey: StarkKey; positionId: bigint; address: EthereumAddress }
-  ) {
-    const isAcceptable = !offer.accepted && !offer.cancelledAt
-    const shouldRenderForm =
-      isAcceptable && user.positionId !== offer.positionIdA
-    const submissionExpirationTime = BigInt(
-      Math.floor((Date.now() + 3 * 24 * 60 * 60 * 1000) / (60 * 60 * 1000))
-    )
-    if (!shouldRenderForm) {
-      return undefined
-    }
-    return {
-      nonce: BigInt(Date.now()),
-      positionIdB: user.positionId,
-      premiumCost: false,
-      starkKeyA: offer.starkKeyA,
-      starkKeyB: user.starkKey,
-      submissionExpirationTime,
-      aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
-      address: user.address,
-    }
-  }
-
-  private getCancelFormData(
-    offer: ForcedTradeOfferRecord,
-    user: { starkKey: StarkKey; positionId: bigint; address: EthereumAddress }
-  ) {
-    const isOwner = user.positionId === offer.positionIdA
-    const isCancellable = !offer.cancelledAt
-    const shouldRenderForm = isOwner && isCancellable
-    if (!shouldRenderForm) {
-      return undefined
-    }
-    return {
-      address: user.address,
-      offerId: offer.id,
-    }
   }
 
   async getOfferDetailsPage(
@@ -153,8 +113,8 @@ export class ForcedTradeOfferController {
         positionIdB: offer.accepted?.positionIdB,
         addressB: userB?.ethAddress,
       },
-      acceptForm: user && this.getAcceptFormData(offer, user),
-      cancelForm: user && this.getCancelFormData(offer, user),
+      acceptForm: user && getAcceptForm(offer, user),
+      cancelForm: user && getCancelForm(offer, user),
     })
     return { type: 'success', content }
   }
