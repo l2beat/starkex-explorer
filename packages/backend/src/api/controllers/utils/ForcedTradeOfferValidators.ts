@@ -13,17 +13,11 @@ import {
 } from '../../../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRecord } from '../../../peripherals/database/PositionRepository'
 
-export function validateBalance(
-  amountCollateral: bigint,
+export function validateSyntheticBalance(
   amountSynthetic: bigint,
   syntheticAssetId: AssetId,
-  collateralBalance: bigint,
-  positionBalances: readonly AssetBalance[],
-  buyingSynthetic: boolean
+  positionBalances: readonly AssetBalance[]
 ): boolean {
-  if (buyingSynthetic) {
-    return amountCollateral <= collateralBalance
-  }
   const syntheticBalance =
     positionBalances.find((b) => b.assetId === syntheticAssetId)?.balance || 0n
   return amountSynthetic <= syntheticBalance
@@ -75,14 +69,14 @@ export function validateCreate(
   signature: string,
   addressA: EthereumAddress
 ) {
-  const balanceValid = validateBalance(
-    offer.amountCollateral,
-    offer.amountSynthetic,
-    offer.syntheticAssetId,
-    positionA.collateralBalance,
-    positionA.balances,
-    offer.aIsBuyingSynthetic
-  )
+  const balanceValid =
+    offer.aIsBuyingSynthetic ||
+    validateSyntheticBalance(
+      offer.amountSynthetic,
+      offer.syntheticAssetId,
+      positionA.balances
+    )
+
   const signatureValid = validateCreateSignature(offer, signature, addressA)
   return balanceValid && signatureValid
 }
