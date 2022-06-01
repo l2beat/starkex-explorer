@@ -4,6 +4,7 @@ import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
 import { AcceptOfferFormData } from './accept-form'
 import { CancelOfferFormData } from './cancel-form'
+import { FinalizeOfferFormData } from './finalize-form'
 
 export type ForcedTradeOffer = {
   readonly type: 'sell' | 'buy'
@@ -23,4 +24,5 @@ export type ForcedTradeOfferDetailsProps = {
   readonly history: ForcedHistoryEvent[]
   readonly acceptForm?: AcceptOfferFormData
   readonly cancelForm?: CancelOfferFormData
+  readonly finalizeForm?: FinalizeOfferFormData
 }

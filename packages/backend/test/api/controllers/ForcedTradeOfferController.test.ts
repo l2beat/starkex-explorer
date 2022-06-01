@@ -75,7 +75,8 @@ describe(ForcedTradeOfferController.name, async () => {
         mockAccountService,
         offerRepository,
         positionRepository,
-        userRegistrationEventRepository
+        userRegistrationEventRepository,
+        EthereumAddress.fake()
       )
 
       expect(
@@ -95,7 +96,8 @@ describe(ForcedTradeOfferController.name, async () => {
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(
@@ -115,7 +117,8 @@ describe(ForcedTradeOfferController.name, async () => {
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(
@@ -135,7 +138,8 @@ describe(ForcedTradeOfferController.name, async () => {
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(
@@ -162,7 +166,8 @@ describe(ForcedTradeOfferController.name, async () => {
         mockAccountService,
         offerRepository,
         positionRepository,
-        userRegistrationEventRepository
+        userRegistrationEventRepository,
+        EthereumAddress.fake()
       )
 
       const request = toSignableCreateOffer(tradeMock.offer)
@@ -184,7 +189,8 @@ describe(ForcedTradeOfferController.name, async () => {
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
@@ -202,7 +208,8 @@ describe(ForcedTradeOfferController.name, async () => {
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
@@ -222,7 +229,8 @@ describe(ForcedTradeOfferController.name, async () => {
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
@@ -250,7 +258,8 @@ describe(ForcedTradeOfferController.name, async () => {
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
@@ -275,7 +284,8 @@ describe(ForcedTradeOfferController.name, async () => {
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
@@ -315,7 +325,8 @@ describe(ForcedTradeOfferController.name, async () => {
               return userB
             }
           },
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(
@@ -361,7 +372,8 @@ describe(ForcedTradeOfferController.name, async () => {
               return userB
             }
           },
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       expect(await controller.acceptOffer(id, tradeMock.accepted)).toEqual({
@@ -395,7 +407,8 @@ describe(ForcedTradeOfferController.name, async () => {
           findById: async () => undefined,
         }),
         mock<PositionRepository>(),
-        mock<UserRegistrationEventRepository>()
+        mock<UserRegistrationEventRepository>(),
+        EthereumAddress.fake()
       )
 
       expect(await controller.cancelOffer(1, '123')).toEqual({
@@ -414,7 +427,8 @@ describe(ForcedTradeOfferController.name, async () => {
           }),
         }),
         mock<PositionRepository>(),
-        mock<UserRegistrationEventRepository>()
+        mock<UserRegistrationEventRepository>(),
+        EthereumAddress.fake()
       )
 
       const signature = await wallet.signMessage(request)
@@ -437,7 +451,8 @@ describe(ForcedTradeOfferController.name, async () => {
           }),
         }),
         mock<PositionRepository>(),
-        mock<UserRegistrationEventRepository>()
+        mock<UserRegistrationEventRepository>(),
+        EthereumAddress.fake()
       )
 
       const signature = await wallet.signMessage(request)
@@ -456,7 +471,8 @@ describe(ForcedTradeOfferController.name, async () => {
         mock<PositionRepository>(),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       const signature = await wallet.signMessage(request)
@@ -475,7 +491,8 @@ describe(ForcedTradeOfferController.name, async () => {
         mock<PositionRepository>(),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
-        })
+        }),
+        EthereumAddress.fake()
       )
 
       const signature = await wallet.signMessage(request + 'tampered')
@@ -498,7 +515,8 @@ describe(ForcedTradeOfferController.name, async () => {
             ...userA,
             ethAddress: addressA,
           }),
-        })
+        }),
+        EthereumAddress.fake()
       )
       const signature = await wallet.signMessage(request)
 

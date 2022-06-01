@@ -1,4 +1,8 @@
-import { AcceptedData, CreateOfferData } from '@explorer/shared'
+import {
+  AcceptedData,
+  CreateOfferData,
+  FinalizeOfferData,
+} from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
@@ -61,5 +65,37 @@ export function getCancelForm(
   return {
     address: user.address,
     offerId: offer.id,
+  }
+}
+
+interface FinalizeForm extends FinalizeOfferData {
+  address: EthereumAddress
+  perpetualAddress: EthereumAddress
+}
+
+export function getFinalizeForm(
+  offer: ForcedTradeOfferRecord,
+  user: User,
+  perpetualAddress: EthereumAddress
+): FinalizeForm | undefined {
+  const isOwner = user.positionId === offer.positionIdA
+  if (!(offer.accepted !== undefined && !offer.cancelledAt && isOwner)) {
+    return undefined
+  }
+  return {
+    nonce: offer.accepted.nonce,
+    positionIdA: offer.positionIdA,
+    positionIdB: offer.accepted.positionIdB,
+    premiumCost: offer.accepted.premiumCost,
+    starkKeyA: offer.starkKeyA,
+    starkKeyB: offer.accepted.starkKeyB,
+    submissionExpirationTime: offer.accepted.submissionExpirationTime,
+    aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
+    amountCollateral: offer.amountCollateral,
+    amountSynthetic: offer.amountSynthetic,
+    syntheticAssetId: offer.syntheticAssetId,
+    address: user.address,
+    perpetualAddress,
+    signature: offer.accepted.signature,
   }
 }

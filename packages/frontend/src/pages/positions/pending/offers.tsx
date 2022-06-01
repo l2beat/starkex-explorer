@@ -6,9 +6,17 @@ import { formatCurrencyUnits } from '../../formatting'
 import { OfferType } from '../../offers'
 import { AcceptOfferForm, AcceptOfferFormData } from '../../offers/accept-form'
 import { CancelOfferForm, CancelOfferFormData } from '../../offers/cancel-form'
+import {
+  FinalizeOfferForm,
+  FinalizeOfferFormData,
+} from '../../offers/finalize-form'
 import { PendingRow } from './row'
 
-export interface PendingOfferEntry {
+function Button({ text }: { text: string }) {
+  return <button className="px-3 rounded bg-grey-300">{text}</button>
+}
+
+export interface PendingOffer {
   id: number
   type: OfferType
   syntheticAssetId: AssetId
@@ -19,10 +27,11 @@ export interface PendingOfferEntry {
   }
   acceptForm?: AcceptOfferFormData
   cancelForm?: CancelOfferFormData
+  finalizeForm?: FinalizeOfferFormData
 }
 
 interface PendingOffersProps {
-  offers: readonly PendingOfferEntry[]
+  offers: readonly PendingOffer[]
 }
 
 export function PendingOffers({ offers }: PendingOffersProps) {
@@ -43,13 +52,18 @@ export function PendingOffers({ offers }: PendingOffersProps) {
           const controls = [
             offer.cancelForm && (
               <CancelOfferForm {...offer.cancelForm}>
-                <button className="px-3 rounded bg-grey-300">Cancel</button>
+                <Button text="Cancel" />
               </CancelOfferForm>
             ),
             offer.acceptForm && (
               <AcceptOfferForm {...offer.acceptForm}>
-                <button className="px-3 rounded bg-grey-300">Accept</button>
+                <Button text="Accept" />
               </AcceptOfferForm>
+            ),
+            offer.finalizeForm && (
+              <FinalizeOfferForm {...offer.finalizeForm}>
+                <Button text="Finalize" />Ū
+              </FinalizeOfferForm>
             ),
           ]
           return (
