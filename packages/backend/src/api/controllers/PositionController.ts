@@ -74,10 +74,6 @@ export class PositionController {
       this.userRegistrationEventRepository.findByStarkKey(current.publicKey),
     ])
 
-    if (!ownerEvent) {
-      return { type: 'not found', content: 'Owner not found' }
-    }
-
     const user =
       userPositionId && userEvent
         ? {
@@ -91,7 +87,7 @@ export class PositionController {
       account,
       positionId,
       publicKey: current.publicKey,
-      ethAddress: ownerEvent.ethAddress,
+      ethAddress: ownerEvent?.ethAddress,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
       assets: current.assets,
