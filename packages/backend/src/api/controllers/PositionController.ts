@@ -90,6 +90,7 @@ export class PositionController {
       ethAddress: ownerEvent?.ethAddress,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
+      ownedByYou: !!account && account.address === ownerEvent?.ethAddress,
       assets: current.assets,
       history: historyWithAssets.map((update, i) => {
         const previousUpdate = historyWithAssets[i + 1]

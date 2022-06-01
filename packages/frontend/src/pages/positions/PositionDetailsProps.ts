@@ -11,6 +11,7 @@ export interface PositionDetailsProps {
   readonly ethAddress?: EthereumAddress
   readonly stateUpdateId: number
   readonly lastUpdateTimestamp: Timestamp
+  readonly ownedByYou: boolean
   readonly assets: readonly PositionAssetEntry[]
   readonly history: readonly PositionHistoryEntry[]
   readonly transactions: readonly ForcedTransactionEntry[]
