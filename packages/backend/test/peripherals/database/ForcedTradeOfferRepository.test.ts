@@ -211,6 +211,13 @@ describe(ForcedTradeOfferRepository.name, () => {
     ).toEqual([0, []])
   })
 
+  it('returns offer by position id', async () => {
+    const offer = fakeInitialOffer()
+    await repository.add(offer)
+
+    expect(await repository.getByPositionId(offer.positionIdA)).toEqual([offer])
+  })
+
   it('deletes all records', async () => {
     await repository.add(fakeInitialOffer())
     await repository.add(fakeOffer())
