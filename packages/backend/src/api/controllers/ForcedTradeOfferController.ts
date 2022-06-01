@@ -65,38 +65,6 @@ export class ForcedTradeOfferController {
     return { type: 'success', content }
   }
 
-  private async getAcceptFormData(
-    offer: ForcedTradeOfferRecord,
-    address: EthereumAddress
-  ) {
-    const [userPositionId, userEvent] = await Promise.all([
-      this.positionRepository.findIdByEthereumAddress(address),
-      this.userRegistrationEventRepository.findByEthereumAddress(address),
-    ])
-    const isAcceptable = !offer.accepted && !offer.cancelledAt
-    const shouldRenderForm =
-      userEvent &&
-      isAcceptable &&
-      userPositionId &&
-      userPositionId !== offer.positionIdA
-    const submissionExpirationTime = BigInt(
-      Math.floor((Date.now() + 3 * 24 * 60 * 60 * 1000) / (60 * 60 * 1000))
-    )
-    if (!shouldRenderForm) {
-      return undefined
-    }
-    return {
-      nonce: BigInt(Date.now()),
-      positionIdB: userPositionId,
-      premiumCost: false,
-      starkKeyA: offer.starkKeyA,
-      starkKeyB: userEvent.starkKey,
-      submissionExpirationTime,
-      aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
-      address: userEvent.ethAddress,
-    }
-  }
-
   async getOfferDetailsPage(
     id: number,
     address: EthereumAddress | undefined
