@@ -5,12 +5,14 @@ import {
 import { EthereumAddress } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
+import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
+import { getAcceptForm, getCancelForm } from './utils/offerForms'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
@@ -20,17 +22,19 @@ export class PositionController {
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private forcedTransactionsRepository: ForcedTransactionsRepository
+    private forcedTransactionsRepository: ForcedTransactionsRepository,
+    private forcedTradeOfferRepository: ForcedTradeOfferRepository
   ) {}
 
   async getPositionDetailsPage(
     positionId: bigint,
     address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [account, history, transactions] = await Promise.all([
+    const [account, history, transactions, pendingOffers] = await Promise.all([
       this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.forcedTransactionsRepository.getAffectingPosition(positionId),
+      this.forcedTradeOfferRepository.getPendingByPositionIdA(positionId),
     ])
 
     if (!history[0]) {
@@ -57,16 +61,25 @@ export class PositionController {
 
     const current = historyWithAssets[0]
 
-    const lastUserRegistrationEvent =
-      await this.userRegistrationEventRepository.findByStarkKey(
-        current.publicKey
-      )
+    const [userPositionId, userEvent] = await Promise.all([
+      address && this.positionRepository.findIdByEthereumAddress(address),
+      address &&
+        this.userRegistrationEventRepository.findByEthereumAddress(address),
+    ])
+    const user =
+      userPositionId && userEvent
+        ? {
+            address: userEvent.ethAddress,
+            starkKey: userEvent.starkKey,
+            positionId: userPositionId,
+          }
+        : undefined
 
     const content = renderPositionDetailsPage({
       account,
       positionId,
       publicKey: current.publicKey,
-      ethAddress: lastUserRegistrationEvent?.ethAddress,
+      ethAddress: user?.address,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
       assets: current.assets,
@@ -82,6 +95,12 @@ export class PositionController {
         }
       }),
       transactions: transactions.map(toForcedTransactionEntry),
+      pendingOffers: pendingOffers.map((offer) => ({
+        ...offer,
+        type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        acceptForm: user && getAcceptForm(offer, user),
+        cancelForm: user && getCancelForm(offer, user),
+      })),
     })
     return { type: 'success', content }
   }

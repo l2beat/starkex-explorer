@@ -5,7 +5,7 @@ import {
   serializeCreateOfferData,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import {
   AcceptedInputName,
@@ -14,9 +14,13 @@ import {
   OfferInputName,
 } from './attributes'
 
-export interface AcceptOfferFormProps extends CreateOfferData, AcceptedData {
+export interface AcceptOfferFormData extends CreateOfferData, AcceptedData {
   id: number
   address: EthereumAddress
+}
+
+interface AcceptOfferFormProps extends AcceptOfferFormData {
+  children: ReactNode
 }
 
 export function AcceptOfferForm(props: AcceptOfferFormProps) {
@@ -48,9 +52,7 @@ export function AcceptOfferForm(props: AcceptOfferFormProps) {
         type="hidden"
         value={props.address.toString()}
       />
-      <button className="bg-blue-100 text-white px-4 py-2 text-base rounded-md">
-        Accept {`& ${props.aIsBuyingSynthetic ? 'sell' : 'buy'}`}
-      </button>
+      {props.children}
     </form>
   )
 }

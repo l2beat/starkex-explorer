@@ -2,6 +2,7 @@ import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedTransactionEntry } from '../forced-transactions/ForcedTransactionsIndexProps'
+import { PendingOfferEntry } from './pending/offers'
 
 export interface PositionDetailsProps {
   readonly account: AccountDetails | undefined
@@ -13,6 +14,7 @@ export interface PositionDetailsProps {
   readonly assets: readonly PositionAssetEntry[]
   readonly history: readonly PositionHistoryEntry[]
   readonly transactions: readonly ForcedTransactionEntry[]
+  readonly pendingOffers: readonly PendingOfferEntry[]
 }
 
 export interface PositionAssetEntry {

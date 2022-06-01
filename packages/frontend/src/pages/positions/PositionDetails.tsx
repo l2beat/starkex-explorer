@@ -2,6 +2,7 @@ import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { AssetCell } from '../common/AssetCell'
+import { EtherscanLink } from '../common/EtherscanLink'
 import { Page } from '../common/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
@@ -13,6 +14,7 @@ import {
   formatHashLong,
   formatRelativeTime,
 } from '../formatting'
+import { PendingOffers } from './pending/offers'
 import { PositionDetailsProps } from './PositionDetailsProps'
 
 const balanceTableColumns = (ownedByYou: boolean) => {
@@ -44,7 +46,7 @@ function ActionButton({ assetId, balance }: ActionButtonProps) {
       href={`/forced/new?assetId=${assetId}`}
       className="px-3 py-0.5 rounded bg-blue-100"
     >
-      {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Sell' : 'Buy'}
+      {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Buy' : 'Sell'}
     </a>
   )
 }
@@ -138,6 +140,7 @@ export function PositionDetails({
   history,
   transactions,
   account,
+  pendingOffers,
 }: PositionDetailsProps) {
   const ownedByYou = ethAddress === account
   return (
@@ -160,12 +163,17 @@ export function PositionDetails({
           </span>
         )}
       </div>
+      {pendingOffers.length > 0 && <PendingOffers offers={pendingOffers} />}
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
         rows={[
           {
             title: 'Owner ETH address',
-            content: ethAddress || '-',
+            content: ethAddress ? (
+              <EtherscanLink address={ethAddress}>{ethAddress}</EtherscanLink>
+            ) : (
+              '-'
+            ),
           },
           {
             title: 'Owner stark key',

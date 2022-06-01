@@ -18,6 +18,7 @@ import {
   validateCancel,
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
+import { getAcceptForm, getCancelForm } from './utils/offerForms'
 import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
 import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 
@@ -122,6 +123,19 @@ export class ForcedTradeOfferController {
     if (!userA) {
       throw new Error('User A not found')
     }
+    const [userPositionId, userEvent] = await Promise.all([
+      address && this.positionRepository.findIdByEthereumAddress(address),
+      address &&
+        this.userRegistrationEventRepository.findByEthereumAddress(address),
+    ])
+    const user =
+      userPositionId && userEvent
+        ? {
+            address: userEvent.ethAddress,
+            starkKey: userEvent.starkKey,
+            positionId: userPositionId,
+          }
+        : undefined
 
     const content = renderForcedTradeOfferDetailsPage({
       account,
@@ -137,7 +151,8 @@ export class ForcedTradeOfferController {
         positionIdB: offer.accepted?.positionIdB,
         addressB: userB?.ethAddress,
       },
-      acceptForm: address && (await this.getAcceptFormData(offer, address)),
+      acceptForm: user && getAcceptForm(offer, user),
+      cancelForm: user && getCancelForm(offer, user),
     })
     return { type: 'success', content }
   }

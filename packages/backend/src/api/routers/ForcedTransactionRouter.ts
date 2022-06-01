@@ -1,5 +1,6 @@
 import {
   AcceptOfferBody,
+  CancelOfferBody,
   CreateOfferBody,
   stringAs,
   stringAsInt,
@@ -62,9 +63,7 @@ export function createForcedTransactionRouter(
           offerId: stringAsInt(),
         }),
         request: z.object({
-          body: z.object({
-            signature: z.string(),
-          }),
+          body: CancelOfferBody,
         }),
       }),
       async (ctx) => {

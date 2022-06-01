@@ -164,6 +164,39 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
     },
   ],
   transactions: createFakeTransactions(5),
+  pendingOffers: [
+    {
+      id: 1,
+      type: 'buy',
+      syntheticAssetId: AssetId('ETH-9'),
+      amountSynthetic: 10000000n,
+      amountCollateral: 10000000n,
+    },
+    {
+      id: 2,
+      type: 'sell',
+      syntheticAssetId: AssetId('ETH-9'),
+      amountSynthetic: 1000000n,
+      amountCollateral: 10000000n,
+      accepted: {
+        submissionExpirationTime: BigInt(
+          (Date.now() + 5 * 3600 * 1000) / (60 * 1000)
+        ),
+      },
+    },
+    {
+      id: 3,
+      type: 'sell',
+      syntheticAssetId: AssetId('ETH-9'),
+      amountSynthetic: 1000000n,
+      amountCollateral: 10000000n,
+      accepted: {
+        submissionExpirationTime: BigInt(
+          (Date.now() + 6 * 3560 * 900) / (60 * 1000)
+        ),
+      },
+    },
+  ],
 }
 
 export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
