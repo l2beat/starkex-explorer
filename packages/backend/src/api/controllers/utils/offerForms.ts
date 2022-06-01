@@ -79,7 +79,7 @@ export function getFinalizeForm(
   perpetualAddress: EthereumAddress
 ): FinalizeForm | undefined {
   const isOwner = user.positionId === offer.positionIdA
-  if (!(offer.accepted !== undefined && !offer.cancelledAt && isOwner)) {
+  if (!(offer.accepted && !offer.cancelledAt && isOwner)) {
     return undefined
   }
   return {
