@@ -92,7 +92,7 @@ export function ForcedTradeOfferDetails({
       <ForcedPageHeader displayId={offer.id} type={offer.type}>
         <div>
           {acceptForm && (
-            <AcceptOfferForm {...offer} {...acceptForm}>
+            <AcceptOfferForm {...acceptForm}>
               <button className="bg-blue-100 text-white px-4 py-2 text-base rounded-md">
                 Accept {`& ${offer.type ? 'sell' : 'buy'}`}
               </button>

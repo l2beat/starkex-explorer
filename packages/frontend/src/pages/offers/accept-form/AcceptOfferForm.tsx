@@ -14,9 +14,12 @@ import {
   OfferInputName,
 } from './attributes'
 
-export interface AcceptOfferFormProps extends CreateOfferData, AcceptedData {
+export interface AcceptOfferFormData extends CreateOfferData, AcceptedData {
   id: number
   address: EthereumAddress
+}
+
+interface AcceptOfferFormProps extends AcceptOfferFormData {
   children: ReactNode
 }
 
