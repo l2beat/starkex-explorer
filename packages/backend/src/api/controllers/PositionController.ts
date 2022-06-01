@@ -1,4 +1,5 @@
 import {
+  renderNotFoundPage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
 } from '@explorer/frontend'
@@ -155,5 +156,20 @@ export class PositionController {
         .map(toForcedTransactionEntry),
     })
     return { type: 'success', content }
+  }
+
+  async getPositionNotFoundPage(
+    address: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
+    const account = await this.accountService.getAccount(address)
+    return {
+      type: 'not found',
+      content: renderNotFoundPage({
+        account,
+        text: address
+          ? `Position for ${address} not found`
+          : 'Position not found',
+      }),
+    }
   }
 }

@@ -169,6 +169,12 @@ export function createFrontendRouter(
     )
   )
 
+  router.get('/positions/not-found', async (ctx) => {
+    const address = getAccountAddress(ctx)
+    const result = await positionController.getPositionNotFoundPage(address)
+    applyControllerResult(ctx, result)
+  })
+
   router.get(
     '/positions/:positionId',
     withTypedContext(
