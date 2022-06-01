@@ -167,28 +167,32 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
     {
       id: 1,
       type: 'buy',
-      assetId: AssetId('ETH-9'),
+      syntheticAssetId: AssetId('ETH-9'),
       amountSynthetic: 10000000n,
       amountCollateral: 10000000n,
     },
     {
       id: 2,
       type: 'sell',
-      assetId: AssetId('ETH-9'),
+      syntheticAssetId: AssetId('ETH-9'),
       amountSynthetic: 1000000n,
       amountCollateral: 10000000n,
       accepted: {
-        submissionExpirationTime: Timestamp(Date.now() + 5 * 3600 * 1000),
+        submissionExpirationTime: BigInt(
+          (Date.now() + 5 * 3600 * 1000) / (60 * 1000)
+        ),
       },
     },
     {
       id: 3,
       type: 'sell',
-      assetId: AssetId('ETH-9'),
+      syntheticAssetId: AssetId('ETH-9'),
       amountSynthetic: 1000000n,
       amountCollateral: 10000000n,
       accepted: {
-        submissionExpirationTime: Timestamp(Date.now() + 6 * 3560 * 900),
+        submissionExpirationTime: BigInt(
+          (Date.now() + 6 * 3560 * 900) / (60 * 1000)
+        ),
       },
     },
   ],

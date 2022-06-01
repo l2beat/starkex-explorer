@@ -10,11 +10,11 @@ import { PendingRow } from './row'
 export interface PendingOfferEntry {
   id: number
   type: OfferType
-  assetId: AssetId
+  syntheticAssetId: AssetId
   amountSynthetic: bigint
   amountCollateral: bigint
   accepted?: {
-    submissionExpirationTime: Timestamp
+    submissionExpirationTime: bigint
   }
 }
 
@@ -66,8 +66,11 @@ export function PendingOffers({
               key={i}
               cells={[
                 offer.type === 'buy' ? 'Buy' : 'Sell',
-                formatCurrencyUnits(offer.amountSynthetic, offer.assetId),
-                <AssetCell assetId={offer.assetId} />,
+                formatCurrencyUnits(
+                  offer.amountSynthetic,
+                  offer.syntheticAssetId
+                ),
+                <AssetCell assetId={offer.syntheticAssetId} />,
                 formatCurrencyUnits(offer.amountCollateral, AssetId.USDC),
                 <AssetCell assetId={AssetId.USDC} />,
                 status,
