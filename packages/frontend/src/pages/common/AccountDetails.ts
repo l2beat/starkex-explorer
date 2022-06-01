@@ -6,5 +6,5 @@ export type AccountDetails = z.infer<typeof AccountDetails>
 export const AccountDetails = z.object({
   address: stringAs(EthereumAddress),
   positionId: stringAsBigInt().optional(),
-  hasUpdates: z.boolean(),
+  hasUpdates: z.boolean().optional(),
 })
