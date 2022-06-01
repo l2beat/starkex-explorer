@@ -4,7 +4,7 @@ import React, { ReactNode } from 'react'
 
 import {
   AddressInputName,
-  FormId,
+  FormClass,
   OfferInputName,
   PerpetualAddressInputName,
 } from './attributes'
@@ -22,7 +22,7 @@ export function FinalizeOfferForm(props: FinalizeOfferFormProps) {
   const { address, perpetualAddress, ...offer } = props
   const offerJson = serializeFinalizeOfferData(offer)
   return (
-    <form id={FormId} action={`/forced/trades`} method="POST">
+    <form className={FormClass} action={`/forced/trades`} method="POST">
       <input name={OfferInputName} type="hidden" value={offerJson} />
       <input name={AddressInputName} type="hidden" value={address.toString()} />
       <input

@@ -10,7 +10,7 @@ import React, { ReactNode } from 'react'
 import {
   AcceptedInputName,
   AddressInputName,
-  FormId,
+  FormClass,
   OfferInputName,
 } from './attributes'
 
@@ -41,7 +41,7 @@ export function AcceptOfferForm(props: AcceptOfferFormProps) {
   })
   return (
     <form
-      id={FormId}
+      className={FormClass}
       action={`/forced/offers/${props.id}/accept`}
       method="POST"
     >
