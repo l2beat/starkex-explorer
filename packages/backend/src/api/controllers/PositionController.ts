@@ -67,11 +67,13 @@ export class PositionController {
 
     const current = historyWithAssets[0]
 
-    const [userPositionId, userEvent] = await Promise.all([
+    const [userPositionId, userEvent, ownerEvent] = await Promise.all([
       address && this.positionRepository.findIdByEthereumAddress(address),
       address &&
         this.userRegistrationEventRepository.findByEthereumAddress(address),
+      this.userRegistrationEventRepository.findByStarkKey(current.publicKey),
     ])
+
     const user =
       userPositionId && userEvent
         ? {
@@ -85,9 +87,10 @@ export class PositionController {
       account,
       positionId,
       publicKey: current.publicKey,
-      ethAddress: user?.address,
+      ethAddress: ownerEvent?.ethAddress,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
+      ownedByYou: account?.positionId === positionId,
       assets: current.assets,
       history: historyWithAssets.map((update, i) => {
         const previousUpdate = historyWithAssets[i + 1]
