@@ -142,7 +142,7 @@ export function PositionDetails({
   account,
   pendingOffers,
 }: PositionDetailsProps) {
-  const ownedByYou = ethAddress === account
+  const ownedByYou = !!account && ethAddress === account.address
   return (
     <Page
       title={`L2BEAT dYdX Explorer | ${positionId.toString()}`}
