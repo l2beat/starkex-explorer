@@ -10,6 +10,7 @@ import { SimpleLink } from '../common/SimpleLink'
 import { formatCurrency } from '../formatting'
 import { AcceptOfferForm } from './accept-form/AcceptOfferForm'
 import { CancelOfferForm } from './cancel-form'
+import { FinalizeOfferForm } from './finalize-form'
 import { ForcedTradeOfferDetailsProps } from './ForcedTradeOfferDetailsProps'
 
 export function toStatsRows(
@@ -78,6 +79,7 @@ export function ForcedTradeOfferDetails({
   history,
   acceptForm,
   cancelForm,
+  finalizeForm,
 }: ForcedTradeOfferDetailsProps) {
   return (
     <Page
@@ -90,7 +92,7 @@ export function ForcedTradeOfferDetails({
       account={account}
     >
       <ForcedPageHeader displayId={offer.id} type={offer.type}>
-        <div>
+        <div className="flex gap-x-2">
           {acceptForm && (
             <AcceptOfferForm {...acceptForm}>
               <button className="bg-blue-100 text-white px-4 py-2 text-base rounded-md">
@@ -104,6 +106,13 @@ export function ForcedTradeOfferDetails({
                 Cancel
               </button>
             </CancelOfferForm>
+          )}
+          {finalizeForm && (
+            <FinalizeOfferForm {...finalizeForm}>
+              <button className="bg-blue-100 text-white px-4 py-2 text-base rounded-md">
+                Finalize
+              </button>
+            </FinalizeOfferForm>
           )}
         </div>
       </ForcedPageHeader>

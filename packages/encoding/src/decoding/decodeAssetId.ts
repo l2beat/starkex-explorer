@@ -1,10 +1,10 @@
 import { AssetId } from '@explorer/types'
 
-import { DYDX_INTERNAL_USDC_ID_ENDODED } from '../constants'
+import { DYDX_INTERNAL_USDC_ID_ENCODED } from '../constants'
 import { DecodingError } from './DecodingError'
 
 export function decodeAssetId(value: string) {
-  if (value === DYDX_INTERNAL_USDC_ID_ENDODED) {
+  if (value === DYDX_INTERNAL_USDC_ID_ENCODED) {
     return AssetId.USDC
   }
 

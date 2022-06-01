@@ -1,7 +1,7 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DYDX_INTERNAL_USDC_ID_ENDODED } from '../../src/constants'
+import { DYDX_INTERNAL_USDC_ID_ENCODED } from '../../src/constants'
 import { encodeAssetId } from '../../src/encoding/encodeAssetId'
 
 describe('encodeAssetId', () => {
@@ -11,6 +11,6 @@ describe('encodeAssetId', () => {
   })
   it('can encode USDC-6', () => {
     const result = encodeAssetId(AssetId.USDC)
-    expect(result).toEqual(DYDX_INTERNAL_USDC_ID_ENDODED)
+    expect(result).toEqual(DYDX_INTERNAL_USDC_ID_ENCODED)
   })
 })

@@ -13,7 +13,11 @@ import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRep
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
-import { getAcceptForm, getCancelForm } from './utils/offerForms'
+import {
+  getAcceptForm,
+  getCancelForm,
+  getFinalizeForm,
+} from './utils/offerForms'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
@@ -24,7 +28,8 @@ export class PositionController {
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository,
-    private forcedTradeOfferRepository: ForcedTradeOfferRepository
+    private forcedTradeOfferRepository: ForcedTradeOfferRepository,
+    private perpetualAddress: EthereumAddress
   ) {}
 
   async getPositionDetailsPage(
@@ -101,6 +106,8 @@ export class PositionController {
         type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
         acceptForm: user && getAcceptForm(offer, user),
         cancelForm: user && getCancelForm(offer, user),
+        finalizeForm:
+          user && getFinalizeForm(offer, user, this.perpetualAddress),
       })),
     })
     return { type: 'success', content }

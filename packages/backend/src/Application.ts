@@ -180,7 +180,8 @@ export class Application {
       positionRepository,
       userRegistrationEventRepository,
       forcedTransactionsRepository,
-      forcedTradeOfferRepository
+      forcedTradeOfferRepository,
+      config.contracts.perpetual
     )
     const homeController = new HomeController(
       accountService,
@@ -211,7 +212,8 @@ export class Application {
       accountService,
       forcedTradeOfferRepository,
       positionRepository,
-      userRegistrationEventRepository
+      userRegistrationEventRepository,
+      config.contracts.perpetual
     )
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,

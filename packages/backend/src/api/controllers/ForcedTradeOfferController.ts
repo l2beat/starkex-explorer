@@ -18,7 +18,11 @@ import {
   validateCancel,
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
-import { getAcceptForm, getCancelForm } from './utils/offerForms'
+import {
+  getAcceptForm,
+  getCancelForm,
+  getFinalizeForm,
+} from './utils/offerForms'
 import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
 import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 
@@ -27,7 +31,8 @@ export class ForcedTradeOfferController {
     private accountService: AccountService,
     private offerRepository: ForcedTradeOfferRepository,
     private positionRepository: PositionRepository,
-    private userRegistrationEventRepository: UserRegistrationEventRepository
+    private userRegistrationEventRepository: UserRegistrationEventRepository,
+    private perpetualAddress: EthereumAddress
   ) {}
 
   async getOffersIndexPage({
@@ -121,6 +126,7 @@ export class ForcedTradeOfferController {
       },
       acceptForm: user && getAcceptForm(offer, user),
       cancelForm: user && getCancelForm(offer, user),
+      finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
     })
     return { type: 'success', content }
   }
