@@ -9,6 +9,7 @@ import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { formatCurrency } from '../formatting'
 import { AcceptOfferForm } from './accept-form/AcceptOfferForm'
+import { CancelOfferForm } from './cancel-form'
 import { ForcedTradeOfferDetailsProps } from './ForcedTradeOfferDetailsProps'
 
 export function toStatsRows(
@@ -76,6 +77,7 @@ export function ForcedTradeOfferDetails({
   offer,
   history,
   acceptForm,
+  cancelForm,
 }: ForcedTradeOfferDetailsProps) {
   return (
     <Page
@@ -88,13 +90,22 @@ export function ForcedTradeOfferDetails({
       account={account}
     >
       <ForcedPageHeader displayId={offer.id} type={offer.type}>
-        {acceptForm && (
-          <AcceptOfferForm {...offer} {...acceptForm}>
-            <button className="bg-blue-100 text-white px-4 py-2 text-base rounded-md">
-              Accept {`& ${offer.type ? 'sell' : 'buy'}`}
-            </button>
-          </AcceptOfferForm>
-        )}
+        <div>
+          {acceptForm && (
+            <AcceptOfferForm {...offer} {...acceptForm}>
+              <button className="bg-blue-100 text-white px-4 py-2 text-base rounded-md">
+                Accept {`& ${offer.type ? 'sell' : 'buy'}`}
+              </button>
+            </AcceptOfferForm>
+          )}
+          {cancelForm && (
+            <CancelOfferForm {...cancelForm}>
+              <button className="bg-blue-100 text-white px-4 py-2 text-base rounded-md">
+                Cancel
+              </button>
+            </CancelOfferForm>
+          )}
+        </div>
       </ForcedPageHeader>
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats rows={toStatsRows(offer)} />

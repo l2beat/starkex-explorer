@@ -1,12 +1,12 @@
 import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
-import { AddressInputName,FormId, OfferIdInputName } from './attributes'
+import { AddressInputName, FormId, OfferIdInputName } from './attributes'
 
 interface CancelOfferFormProps {
   offerId: number
   address: EthereumAddress
-  children?: ReactNode
+  children: ReactNode
 }
 
 export function CancelOfferForm(props: CancelOfferFormProps) {
