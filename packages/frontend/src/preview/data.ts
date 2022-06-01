@@ -119,6 +119,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   ethAddress: EthereumAddress.fake(),
   lastUpdateTimestamp: Timestamp(Date.now()),
   stateUpdateId: 1,
+  ownedByYou: false,
   assets: [
     {
       assetId: AssetId('ETH-9'),
