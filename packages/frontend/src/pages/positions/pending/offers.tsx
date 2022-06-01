@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { AssetCell } from '../../common/AssetCell'
@@ -45,7 +45,11 @@ export function PendingOffers({ offers }: PendingOffersProps) {
         {offers.map((offer, i) => {
           const status = offer.accepted ? 'Matched!' : 'Offer created'
           const timeLeft = offer.accepted && (
-            <span data-timestamp={offer.accepted.submissionExpirationTime}>
+            <span
+              data-timestamp={Timestamp.fromHours(
+                offer.accepted.submissionExpirationTime
+              )}
+            >
               ...
             </span>
           )
