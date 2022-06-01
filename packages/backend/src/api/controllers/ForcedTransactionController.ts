@@ -6,6 +6,7 @@ import {
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
+import { AccountService } from '../../core/AccountService'
 import {
   ForcedTransactionRecord,
   ForcedTransactionsRepository,
@@ -19,6 +20,7 @@ import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
 export class ForcedTransactionController {
   constructor(
+    private accountService: AccountService,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private positionRepository: PositionRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository,
@@ -28,11 +30,12 @@ export class ForcedTransactionController {
   async getForcedTransactionsPage(
     page: number,
     perPage: number,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
     const limit = perPage
     const offset = (page - 1) * perPage
-    const [transactions, total] = await Promise.all([
+    const [account, transactions, total] = await Promise.all([
+      this.accountService.getAccount(address),
       this.forcedTransactionsRepository.getLatest({ limit, offset }),
       this.forcedTransactionsRepository.countAll(),
     ])
@@ -90,11 +93,12 @@ export class ForcedTransactionController {
 
   async getForcedTransactionDetailsPage(
     transactionHash: Hash256,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const transaction = await this.forcedTransactionsRepository.findByHash(
-      transactionHash
-    )
+    const [account, transaction] = await Promise.all([
+      this.accountService.getAccount(address),
+      this.forcedTransactionsRepository.findByHash(transactionHash),
+    ])
     if (!transaction) {
       const content = 'Could not find transaction for that hash'
       return { type: 'not found', content }
@@ -109,16 +113,18 @@ export class ForcedTransactionController {
   }
 
   async getTransactionFormPage(
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    if (!account) {
+    if (!address) {
       return { type: 'redirect', url: '/' }
     }
-    const id = await this.positionRepository.findIdByEthereumAddress(account)
-    if (id === undefined) {
+    const account = await this.accountService.getAccount(address)
+    if (account?.positionId === undefined) {
       return { type: 'redirect', url: '/' }
     }
-    const position = await this.positionRepository.findByIdWithPrices(id)
+    const position = await this.positionRepository.findByIdWithPrices(
+      account.positionId
+    )
     if (!position) {
       return { type: 'redirect', url: '/' }
     }

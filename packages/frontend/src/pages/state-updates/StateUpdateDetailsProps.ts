@@ -1,15 +1,10 @@
-import {
-  EthereumAddress,
-  Hash256,
-  PedersenHash,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { Hash256, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
 
+import { AccountDetails } from '../common/AccountDetails'
 import { ForcedTransactionEntry } from '../forced-transactions/ForcedTransactionsIndexProps'
 
 export interface StateUpdateDetailsProps {
-  readonly account: EthereumAddress | undefined
+  readonly account: AccountDetails | undefined
   readonly id: number
   readonly hash: Hash256
   readonly rootHash: PedersenHash

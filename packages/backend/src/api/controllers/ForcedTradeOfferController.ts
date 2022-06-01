@@ -4,6 +4,7 @@ import {
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
+import { AccountService } from '../../core/AccountService'
 import {
   Accepted,
   ForcedTradeOfferRecord,
@@ -23,6 +24,7 @@ import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 
 export class ForcedTradeOfferController {
   constructor(
+    private accountService: AccountService,
     private offerRepository: ForcedTradeOfferRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository
@@ -33,15 +35,16 @@ export class ForcedTradeOfferController {
     perPage,
     assetId,
     type,
-    account,
+    address,
   }: {
     page: number
     perPage: number
     assetId?: AssetId
     type?: 'buy' | 'sell'
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   }): Promise<ControllerResult> {
-    const [total, offers, assetIds] = await Promise.all([
+    const [account, total, offers, assetIds] = await Promise.all([
+      this.accountService.getAccount(address),
       this.offerRepository.countInitial({ assetId, type }),
       this.offerRepository.getInitial({
         offset: (page - 1) * perPage,
@@ -64,9 +67,12 @@ export class ForcedTradeOfferController {
 
   async getOfferDetailsPage(
     id: number,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const offer = await this.offerRepository.findById(id)
+    const [account, offer] = await Promise.all([
+      this.accountService.getAccount(address),
+      this.offerRepository.findById(id),
+    ])
     if (!offer) {
       return {
         type: 'not found',
@@ -86,9 +92,9 @@ export class ForcedTradeOfferController {
       throw new Error('User A not found')
     }
     const [userPositionId, userEvent] = await Promise.all([
-      account && this.positionRepository.findIdByEthereumAddress(account),
-      account &&
-        this.userRegistrationEventRepository.findByEthereumAddress(account),
+      address && this.positionRepository.findIdByEthereumAddress(address),
+      address &&
+        this.userRegistrationEventRepository.findByEthereumAddress(address),
     ])
     const user =
       userPositionId && userEvent

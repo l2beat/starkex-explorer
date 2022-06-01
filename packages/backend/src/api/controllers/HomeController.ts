@@ -1,6 +1,7 @@
 import { renderHomePage } from '@explorer/frontend'
 import { EthereumAddress } from '@explorer/types'
 
+import { AccountService } from '../../core/AccountService'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
@@ -12,6 +13,7 @@ import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 
 export class HomeController {
   constructor(
+    private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository,
@@ -19,19 +21,26 @@ export class HomeController {
   ) {}
 
   async getHomePage(
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
     const offset = 0
     const limit = 5
 
-    const [stateUpdates, transactions, offers, totalUpdates, totalPositions] =
-      await Promise.all([
-        this.stateUpdateRepository.getPaginated({ offset, limit }),
-        this.forcedTransactionsRepository.getLatest({ limit, offset }),
-        this.forcedTradeOffersRepository.getInitial({ limit, offset }),
-        this.stateUpdateRepository.count(),
-        this.positionRepository.count(),
-      ])
+    const [
+      account,
+      stateUpdates,
+      transactions,
+      offers,
+      totalUpdates,
+      totalPositions,
+    ] = await Promise.all([
+      this.accountService.getAccount(address),
+      this.stateUpdateRepository.getPaginated({ offset, limit }),
+      this.forcedTransactionsRepository.getLatest({ limit, offset }),
+      this.forcedTradeOffersRepository.getInitial({ limit, offset }),
+      this.stateUpdateRepository.count(),
+      this.positionRepository.count(),
+    ])
 
     const content = renderHomePage({
       account,

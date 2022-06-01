@@ -1,4 +1,6 @@
-import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
+
+import { AccountDetails } from '../common/AccountDetails'
 
 export type OfferType = 'buy' | 'sell'
 
@@ -14,7 +16,7 @@ export interface ForcedTradeOfferEntry {
 }
 
 export interface ForcedTradeOffersIndexProps {
-  readonly account: EthereumAddress | undefined
+  readonly account: AccountDetails | undefined
   readonly offers: ForcedTradeOfferEntry[]
   readonly assetIds: AssetId[]
   readonly params: {

@@ -1,9 +1,11 @@
 import {
+  renderNotFoundPage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
 } from '@explorer/frontend'
 import { EthereumAddress } from '@explorer/types'
 
+import { AccountService } from '../../core/AccountService'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
@@ -17,6 +19,7 @@ import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
 export class PositionController {
   constructor(
+    private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
@@ -26,9 +29,10 @@ export class PositionController {
 
   async getPositionDetailsPage(
     positionId: bigint,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [history, transactions, pendingOffers] = await Promise.all([
+    const [account, history, transactions, pendingOffers] = await Promise.all([
+      this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.forcedTransactionsRepository.getAffectingPosition(positionId),
       this.forcedTradeOfferRepository.getPendingByPositionIdA(positionId),
@@ -59,9 +63,9 @@ export class PositionController {
     const current = historyWithAssets[0]
 
     const [userPositionId, userEvent] = await Promise.all([
-      account && this.positionRepository.findIdByEthereumAddress(account),
-      account &&
-        this.userRegistrationEventRepository.findByEthereumAddress(account),
+      address && this.positionRepository.findIdByEthereumAddress(address),
+      address &&
+        this.userRegistrationEventRepository.findByEthereumAddress(address),
     ])
     const user =
       userPositionId && userEvent
@@ -105,9 +109,10 @@ export class PositionController {
   async getPositionUpdatePage(
     positionId: bigint,
     stateUpdateId: number,
-    account: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [history, update, transactions] = await Promise.all([
+    const [account, history, update, transactions] = await Promise.all([
+      this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.stateUpdateRepository.findByIdWithPositions(stateUpdateId),
       this.forcedTransactionsRepository.getIncludedInStateUpdate(stateUpdateId),
@@ -151,5 +156,20 @@ export class PositionController {
         .map(toForcedTransactionEntry),
     })
     return { type: 'success', content }
+  }
+
+  async getPositionNotFoundPage(
+    address: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
+    const account = await this.accountService.getAccount(address)
+    return {
+      type: 'not found',
+      content: renderNotFoundPage({
+        account,
+        text: address
+          ? `Position for ${address} not found`
+          : 'Position not found',
+      }),
+    }
   }
 }
