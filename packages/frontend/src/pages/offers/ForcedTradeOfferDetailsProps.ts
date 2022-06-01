@@ -28,4 +28,8 @@ export type ForcedTradeOfferDetailsProps = {
     readonly aIsBuyingSynthetic: boolean
     readonly address: EthereumAddress
   }
+  readonly cancelForm?: {
+    readonly offerId: number
+    readonly address: EthereumAddress
+  }
 }

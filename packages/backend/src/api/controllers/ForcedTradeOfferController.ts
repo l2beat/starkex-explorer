@@ -2,7 +2,7 @@ import {
   renderForcedTradeOfferDetailsPage,
   renderForcedTradeOffersIndexPage,
 } from '@explorer/frontend'
-import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
 import {
   Accepted,
@@ -61,20 +61,13 @@ export class ForcedTradeOfferController {
     return { type: 'success', content }
   }
 
-  private async getAcceptFormData(
+  private getAcceptFormData(
     offer: ForcedTradeOfferRecord,
-    account: EthereumAddress
+    user: { starkKey: StarkKey; positionId: bigint; address: EthereumAddress }
   ) {
-    const [userPositionId, userEvent] = await Promise.all([
-      this.positionRepository.findIdByEthereumAddress(account),
-      this.userRegistrationEventRepository.findByEthereumAddress(account),
-    ])
     const isAcceptable = !offer.accepted && !offer.cancelledAt
     const shouldRenderForm =
-      userEvent &&
-      isAcceptable &&
-      userPositionId &&
-      userPositionId !== offer.positionIdA
+      isAcceptable && user.positionId !== offer.positionIdA
     const submissionExpirationTime = BigInt(
       Math.floor((Date.now() + 3 * 24 * 60 * 60 * 1000) / (60 * 60 * 1000))
     )
@@ -83,13 +76,29 @@ export class ForcedTradeOfferController {
     }
     return {
       nonce: BigInt(Date.now()),
-      positionIdB: userPositionId,
+      positionIdB: user.positionId,
       premiumCost: false,
       starkKeyA: offer.starkKeyA,
-      starkKeyB: userEvent.starkKey,
+      starkKeyB: user.starkKey,
       submissionExpirationTime,
       aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
-      address: userEvent.ethAddress,
+      address: user.address,
+    }
+  }
+
+  private getCancelFormData(
+    offer: ForcedTradeOfferRecord,
+    user: { starkKey: StarkKey; positionId: bigint; address: EthereumAddress }
+  ) {
+    const isOwner = user.positionId === offer.positionIdA
+    const isCancellable = !offer.cancelledAt
+    const shouldRenderForm = isOwner && isCancellable
+    if (!shouldRenderForm) {
+      return undefined
+    }
+    return {
+      address: user.address,
+      offerId: offer.id,
     }
   }
 
@@ -116,6 +125,19 @@ export class ForcedTradeOfferController {
     if (!userA) {
       throw new Error('User A not found')
     }
+    const [userPositionId, userEvent] = await Promise.all([
+      account && this.positionRepository.findIdByEthereumAddress(account),
+      account &&
+        this.userRegistrationEventRepository.findByEthereumAddress(account),
+    ])
+    const user =
+      userPositionId && userEvent
+        ? {
+            address: userEvent.ethAddress,
+            starkKey: userEvent.starkKey,
+            positionId: userPositionId,
+          }
+        : undefined
 
     const content = renderForcedTradeOfferDetailsPage({
       account,
@@ -131,7 +153,8 @@ export class ForcedTradeOfferController {
         positionIdB: offer.accepted?.positionIdB,
         addressB: userB?.ethAddress,
       },
-      acceptForm: account && (await this.getAcceptFormData(offer, account)),
+      acceptForm: user && this.getAcceptFormData(offer, user),
+      cancelForm: user && this.getCancelFormData(offer, user),
     })
     return { type: 'success', content }
   }

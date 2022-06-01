@@ -165,12 +165,14 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   transactions: createFakeTransactions(5),
   pendingOffers: [
     {
+      id: 1,
       type: 'buy',
       syntheticAssetId: AssetId('ETH-9'),
       amountSynthetic: 10000000n,
       amountCollateral: 10000000n,
     },
     {
+      id: 2,
       type: 'sell',
       syntheticAssetId: AssetId('ETH-9'),
       amountSynthetic: 1000000n,
@@ -182,6 +184,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       },
     },
     {
+      id: 3,
       type: 'sell',
       syntheticAssetId: AssetId('ETH-9'),
       amountSynthetic: 1000000n,
