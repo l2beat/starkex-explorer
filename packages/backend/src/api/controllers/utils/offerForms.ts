@@ -1,5 +1,5 @@
 import { AcceptedData, CreateOfferData } from '@explorer/shared'
-import { EthereumAddress,StarkKey } from '@explorer/types'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
 
