@@ -188,9 +188,9 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rowIds.map(String).map(AssetId)
   }
 
-  async getByPositionId(position_id_a: bigint) {
+  async getPendingByPositionIdA(positionIdA: bigint) {
     const rows = await this.knex('forced_trade_offers')
-      .where({ position_id_a })
+      .where({ position_id_a: positionIdA })
       .whereNull('transaction_hash')
     return rows.map(toRecord)
   }
