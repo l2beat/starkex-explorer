@@ -218,6 +218,7 @@ export class Application {
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
       forcedTransactionsRepository,
+      forcedTradeOfferRepository,
       config.contracts.perpetual
     )
 

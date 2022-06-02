@@ -3,12 +3,14 @@ import { encodeAssetId } from '@explorer/encoding'
 import {
   deserializeFinalizeOfferData,
   FinalizeOfferData,
+  serializeFinalizeOfferBody,
 } from '@explorer/shared'
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import {
   AddressInputName,
   FormClass,
+  OfferIdInputName,
   OfferInputName,
   PerpetualAddressInputName,
 } from '../../pages/offers/finalize-form'
@@ -30,10 +32,23 @@ export async function initFinalizeForm() {
         OfferInputName,
         deserializeFinalizeOfferData
       )
+      const offerId = findAndParse(form, OfferIdInputName, Number)
 
-      const tx = await sendTransaction(address, perpetualAddress, offer)
-      console.log({ tx })
-      // TODO: send to backend
+      const hash = await sendTransaction(address, perpetualAddress, offer)
+      if (!hash) {
+        throw new Error('Could not send a transaction')
+      }
+
+      await fetch(form.action, {
+        method: form.method,
+        headers: { 'Content-Type': 'application/json' },
+        body: serializeFinalizeOfferBody({
+          offerId,
+          hash,
+        }),
+      })
+
+      window.location.href = `/forced/${hash}`
     })
   })
 }
@@ -65,7 +80,7 @@ async function sendTransaction(
     offer.submissionExpirationTime,
     offer.nonce,
     offer.signature,
-    false,
+    offer.premiumCost,
   ])
 
   const result = await provider.request({

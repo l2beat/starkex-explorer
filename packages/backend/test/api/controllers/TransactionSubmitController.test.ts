@@ -6,6 +6,7 @@ import {
   coder,
   TransactionSubmitController,
 } from '../../../src/api/controllers/TransactionSubmitController'
+import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
 import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../../mock'
@@ -16,6 +17,7 @@ describe(TransactionSubmitController.name, () => {
       const controller = new TransactionSubmitController(
         mock<EthereumClient>(),
         mock<ForcedTransactionsRepository>(),
+        mock<ForcedTradeOfferRepository>(),
         EthereumAddress.fake()
       )
 
@@ -46,6 +48,7 @@ describe(TransactionSubmitController.name, () => {
             } as providers.TransactionResponse),
         }),
         mock<ForcedTransactionsRepository>(),
+        mock<ForcedTradeOfferRepository>(),
         EthereumAddress.fake('a')
       )
 
@@ -68,6 +71,7 @@ describe(TransactionSubmitController.name, () => {
             } as providers.TransactionResponse),
         }),
         mock<ForcedTransactionsRepository>(),
+        mock<ForcedTradeOfferRepository>(),
         EthereumAddress.fake('a')
       )
 
@@ -105,6 +109,7 @@ describe(TransactionSubmitController.name, () => {
             } as providers.TransactionResponse),
         }),
         repository,
+        mock<ForcedTradeOfferRepository>(),
         perpetualAddress
       )
 
