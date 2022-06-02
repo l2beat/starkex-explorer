@@ -8,31 +8,33 @@ import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import {
   AddressInputName,
-  FormId,
+  FormClass,
   OfferInputName,
   PerpetualAddressInputName,
 } from '../../pages/offers/finalize-form'
 import { findAndParse } from './findAndParse'
 
 export async function initFinalizeForm() {
-  const form = document.querySelector<HTMLFormElement>(`#${FormId}`)
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const address = findAndParse(form, AddressInputName, EthereumAddress)
-    const perpetualAddress = findAndParse(
-      form,
-      PerpetualAddressInputName,
-      EthereumAddress
-    )
-    const offer = findAndParse(
-      form,
-      OfferInputName,
-      deserializeFinalizeOfferData
-    )
+  const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
+  forms.forEach((form) => {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const address = findAndParse(form, AddressInputName, EthereumAddress)
+      const perpetualAddress = findAndParse(
+        form,
+        PerpetualAddressInputName,
+        EthereumAddress
+      )
+      const offer = findAndParse(
+        form,
+        OfferInputName,
+        deserializeFinalizeOfferData
+      )
 
-    const tx = await sendTransaction(address, perpetualAddress, offer)
-    console.log({ tx })
-    // TODO: send to backend
+      const tx = await sendTransaction(address, perpetualAddress, offer)
+      console.log({ tx })
+      // TODO: send to backend
+    })
   })
 }
 
