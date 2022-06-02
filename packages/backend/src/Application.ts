@@ -195,6 +195,7 @@ export class Application {
       userRegistrationEventRepository,
       positionRepository,
       forcedTransactionsRepository,
+      forcedTradeOfferRepository,
       config.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(

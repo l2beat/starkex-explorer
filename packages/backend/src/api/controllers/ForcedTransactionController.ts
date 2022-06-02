@@ -7,6 +7,7 @@ import {
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
+import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   ForcedTransactionRecord,
   ForcedTransactionsRepository,
@@ -14,6 +15,7 @@ import {
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
+import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toForcedTransactionHistory } from './utils/toForcedTransactionHistory'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
@@ -24,6 +26,7 @@ export class ForcedTransactionController {
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private positionRepository: PositionRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository,
+    private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress
   ) {}
 
@@ -103,10 +106,12 @@ export class ForcedTransactionController {
       const content = 'Could not find transaction for that hash'
       return { type: 'not found', content }
     }
+    const offer = await this.offersRepository.findByHash(transaction.hash)
+    const offerHistory = offer ? toForcedTradeOfferHistory(offer) : []
 
     const content = renderForcedTransactionDetailsPage({
       account,
-      history: toForcedTransactionHistory(transaction),
+      history: offerHistory.concat(toForcedTransactionHistory(transaction)),
       transaction: await this.toForcedTransaction(transaction),
     })
     return { type: 'success', content }
