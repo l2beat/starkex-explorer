@@ -75,7 +75,7 @@ export class TransactionSubmitController {
   ): Promise<ControllerResult> {
     const offer = await this.offersRepository.findById(offerId)
     if (!offer) {
-      return { type: 'not found', content: `Offer not found` }
+      return { type: 'not found', content: `Offer ${offerId} not found` }
     }
     if (
       !offer.accepted ||
@@ -191,7 +191,9 @@ function decodeTradeData(data: string): DecodedTrade | undefined {
       starkKeyB: StarkKey.from(decoded.starkKeyB),
       positionIdA: BigInt(decoded.vaultIdA),
       positionIdB: BigInt(decoded.vaultIdB),
-      collateralAssetId: decodeAssetId(decoded.collateralAssetId),
+      collateralAssetId: decodeAssetId(
+        decoded.collateralAssetId.toHexString().slice(2)
+      ),
       syntheticAssetId: decodeAssetId(
         decoded.syntheticAssetId.toHexString().slice(2)
       ),
