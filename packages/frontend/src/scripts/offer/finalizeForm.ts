@@ -1,7 +1,9 @@
 import {
   deserializeFinalizeOfferData,
- encodeForcedTradeRequest,  FinalizeOfferData,
-  serializeFinalizeOfferBody } from '@explorer/shared'
+  encodeForcedTradeRequest,
+  FinalizeOfferData,
+  serializeFinalizeOfferBody,
+} from '@explorer/shared'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
 import {
