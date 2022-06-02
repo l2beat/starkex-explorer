@@ -85,6 +85,13 @@ export class ForcedTradeOfferController {
       }
     }
 
+    if (offer.accepted?.transactionHash) {
+      return {
+        type: 'redirect',
+        url: `/forced/${offer.accepted?.transactionHash}`,
+      }
+    }
+
     const [userA, userB] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(offer.starkKeyA),
       offer.accepted
