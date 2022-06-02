@@ -315,12 +315,6 @@ describe(StateUpdateRepository.name, () => {
             collateralBalance: 0n,
             balances: [],
           },
-          {
-            publicKey: StarkKey.fake(),
-            positionId: BigInt(3n),
-            collateralBalance: 0n,
-            balances: [],
-          },
         ],
         prices: [],
         transactionHashes: [tx1.hash, tx2.hash, tx3.hash],
@@ -330,14 +324,14 @@ describe(StateUpdateRepository.name, () => {
 
       expect(actual).toEqual([
         {
-          forcedCount: 3,
-          positionCount: 3,
+          forcedTxsCount: 3,
+          positionCount: 2,
           rootHash: PedersenHash.fake('20005'),
           timestamp: Timestamp(20_005),
           id: 20_005,
         },
         {
-          forcedCount: 0,
+          forcedTxsCount: 0,
           id: 20_004,
           positionCount: 4,
           rootHash: PedersenHash.fake('20004'),
