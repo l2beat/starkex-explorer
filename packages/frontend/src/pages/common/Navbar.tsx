@@ -33,13 +33,16 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
         {account && (
           <a
             href={`/positions/${account.positionId ?? 'not-found'}`}
-            className="bg-grey-300 px-4 rounded-md h-[44px] w-full lg:w-auto align-middle flex items-center justify-center space-x-2"
+            className="bg-grey-300 px-4 rounded-md h-[44px] w-full lg:w-auto align-middle flex items-center justify-center space-x-2 relative"
           >
             <JazzIcon address={account.address} size={25} />
             <span className="font-mono">
               {account.address.slice(0, 6)}&hellip;
               {account.address.slice(-4)}
             </span>
+            {account.hasUpdates && (
+              <div className="rounded-full bg-blue-200 h-4 w-4 absolute right-0 top-0 translate-x-1/3 translate-y-[-33%]"></div>
+            )}
           </a>
         )}
       </div>

@@ -169,7 +169,10 @@ export class Application {
     const transactionStatusMonitor = new TransactionStatusMonitor(
       transactionStatusService
     )
-    const accountService = new AccountService(positionRepository)
+    const accountService = new AccountService(
+      positionRepository,
+      forcedTradeOfferRepository
+    )
 
     // #endregion core
     // #region api
