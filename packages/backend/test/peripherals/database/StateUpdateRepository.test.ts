@@ -7,11 +7,13 @@ import {
 } from '@explorer/types'
 import { expect } from 'earljs'
 
+import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../../src/peripherals/database/StateUpdateRepository'
 import { Logger, LogLevel } from '../../../src/tools/Logger'
+import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../fakes'
 import { setupDatabaseTestSuite } from './setup'
 
 describe(StateUpdateRepository.name, () => {
@@ -185,6 +187,7 @@ describe(StateUpdateRepository.name, () => {
           balances: [],
         })),
         prices: [],
+        transactionHashes: [Hash256.fake()],
       })
     }
     await repository.add({
@@ -197,24 +200,151 @@ describe(StateUpdateRepository.name, () => {
       },
       positions: [],
       prices: [],
+      transactionHashes: [Hash256.fake()],
     })
 
     const actual = await repository.getPaginated({ offset: 0, limit: 2 })
 
     expect(actual).toEqual([
       {
+        forcedTxsCount: 0,
         positionCount: 0,
         rootHash: PedersenHash.fake('20005'),
         timestamp: Timestamp(20_005),
         id: 20_005,
       },
       {
+        forcedTxsCount: 0,
         id: 20_004,
         positionCount: 4,
         rootHash: PedersenHash.fake('20004'),
         timestamp: Timestamp(20_004),
       },
     ])
+  })
+
+  describe('count forced txs', async () => {
+    const tx1 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+    const tx2 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+    const tx3 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+    const tx4 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+
+    const sentAt1 = fakeTimestamp()
+    const sentAt2 = fakeTimestamp()
+    const sentAt3 = null
+    const minedAt3 = fakeTimestamp()
+    const blockNumber3 = fakeInt()
+    const sentAt4 = Timestamp(1)
+    const minedAt4 = Timestamp(2)
+    const blockNumber4 = fakeInt()
+
+    beforeEach(async () => {
+      const forcedTransactionsRepository = new ForcedTransactionsRepository(
+        knex,
+        new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+      )
+
+      await forcedTransactionsRepository.add(tx1, sentAt1)
+      await forcedTransactionsRepository.add(tx2, sentAt2)
+      await forcedTransactionsRepository.add(
+        tx3,
+        sentAt3,
+        minedAt3,
+        blockNumber3
+      )
+      await forcedTransactionsRepository.add(
+        tx4,
+        sentAt4,
+        minedAt4,
+        blockNumber4
+      )
+    })
+
+    it('works properly', async () => {
+      for (const blockNumber of [20_001, 20_002, 20_003, 20_004]) {
+        await repository.add({
+          stateUpdate: {
+            id: blockNumber,
+            blockNumber,
+            rootHash: PedersenHash.fake(blockNumber.toString()),
+            factHash: Hash256.fake(),
+            timestamp: Timestamp(blockNumber),
+          },
+          positions: Array.from({ length: blockNumber - 20_000 }).map(
+            (_, i) => ({
+              publicKey: StarkKey.fake(),
+              positionId: BigInt(blockNumber * 10 + i),
+              collateralBalance: 0n,
+              balances: [],
+            })
+          ),
+          prices: [],
+          transactionHashes: [],
+        })
+      }
+      await repository.add({
+        stateUpdate: {
+          id: 20_005,
+          blockNumber: 20_005,
+          rootHash: PedersenHash.fake('20005'),
+          factHash: Hash256.fake(),
+          timestamp: Timestamp(20_005),
+        },
+        positions: [
+          {
+            publicKey: StarkKey.fake(),
+            positionId: BigInt(1n),
+            collateralBalance: 0n,
+            balances: [],
+          },
+          {
+            publicKey: StarkKey.fake(),
+            positionId: BigInt(2n),
+            collateralBalance: 0n,
+            balances: [],
+          },
+          {
+            publicKey: StarkKey.fake(),
+            positionId: BigInt(3n),
+            collateralBalance: 0n,
+            balances: [],
+          },
+        ],
+        prices: [],
+        transactionHashes: [tx1.hash, tx2.hash, tx3.hash],
+      })
+
+      const actual = await repository.getPaginated({ offset: 0, limit: 2 })
+
+      expect(actual).toEqual([
+        {
+          forcedCount: 3,
+          positionCount: 3,
+          rootHash: PedersenHash.fake('20005'),
+          timestamp: Timestamp(20_005),
+          id: 20_005,
+        },
+        {
+          forcedCount: 0,
+          id: 20_004,
+          positionCount: 4,
+          rootHash: PedersenHash.fake('20004'),
+          timestamp: Timestamp(20_004),
+        },
+      ])
+    })
   })
 
   it('gets state by its id', async () => {

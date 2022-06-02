@@ -91,18 +91,25 @@ export class StateUpdateRepository extends BaseRepository {
       root_hash: string
       timestamp: number
       position_count: bigint
+      forced_txs_count: number
     }
     const rows = (await this.knex('state_updates')
       .orderBy('timestamp', 'desc')
       .offset(offset)
       .limit(limit)
       .leftJoin('positions', 'state_updates.id', 'positions.state_update_id')
+      .leftJoin(
+        'forced_transactions',
+        'state_updates.id',
+        'forced_transactions.state_update_id'
+      )
       .groupBy('root_hash', 'id', 'timestamp')
       .select(
         'id',
         'root_hash',
         'timestamp',
-        this.knex.raw('count(position_id) as position_count')
+        this.knex.raw('count(distinct position_id) as position_count'),
+        this.knex.raw('count(distinct hash) as forced_txs_count')
       )) as Row[]
 
     return rows.map((row) => ({
@@ -110,6 +117,7 @@ export class StateUpdateRepository extends BaseRepository {
       rootHash: PedersenHash(row.root_hash),
       timestamp: Timestamp(row.timestamp),
       positionCount: Number(row.position_count),
+      forcedTxsCount: Number(row.forced_txs_count),
     }))
   }
 
