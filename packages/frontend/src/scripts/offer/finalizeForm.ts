@@ -1,11 +1,8 @@
-import { Interface } from '@ethersproject/abi'
-import { encodeAssetId } from '@explorer/encoding'
 import {
   deserializeFinalizeOfferData,
-  FinalizeOfferData,
-  serializeFinalizeOfferBody,
-} from '@explorer/shared'
-import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
+ encodeForcedTradeRequest,  FinalizeOfferData,
+  serializeFinalizeOfferBody } from '@explorer/shared'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 
 import {
   AddressInputName,
@@ -63,47 +60,13 @@ async function sendTransaction(
     return
   }
 
-  const coder = new Interface([
-    `function forcedTradeRequest(
-      uint256 starkKeyA,
-      uint256 starkKeyB,
-      uint256 vaultIdA,
-      uint256 vaultIdB,
-      uint256 collateralAssetId,
-      uint256 syntheticAssetId,
-      uint256 amountCollateral,
-      uint256 amountSynthetic,
-      bool aIsBuyingSynthetic,
-      uint256 submissionExpirationTime,
-      uint256 nonce,
-      bytes calldata signature,
-      bool premiumCost
-    )`,
-  ])
-
-  const data = coder.encodeFunctionData('forcedTradeRequest', [
-    offer.starkKeyA,
-    offer.starkKeyB,
-    offer.positionIdA,
-    offer.positionIdB,
-    '0x' + encodeAssetId(AssetId.USDC),
-    '0x' + encodeAssetId(offer.syntheticAssetId),
-    offer.amountCollateral,
-    offer.amountSynthetic,
-    offer.aIsBuyingSynthetic,
-    offer.submissionExpirationTime,
-    offer.nonce,
-    offer.signature,
-    offer.premiumCost,
-  ])
-
   const result = await provider.request({
     method: 'eth_sendTransaction',
     params: [
       {
         from: address,
         to: perpetualAddress,
-        data,
+        data: encodeForcedTradeRequest(offer),
       },
     ],
   })

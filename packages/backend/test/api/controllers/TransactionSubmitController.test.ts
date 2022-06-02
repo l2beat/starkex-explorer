@@ -1,4 +1,7 @@
-import { encodeAssetId } from '@explorer/encoding'
+import {
+  encodeForcedTradeRequest,
+  encodeForcedWithdrawalRequest,
+} from '@explorer/shared'
 import {
   AssetId,
   EthereumAddress,
@@ -9,10 +12,7 @@ import {
 import { expect } from 'earljs'
 import { providers } from 'ethers'
 
-import {
-  coder,
-  TransactionSubmitController,
-} from '../../../src/api/controllers/TransactionSubmitController'
+import { TransactionSubmitController } from '../../../src/api/controllers/TransactionSubmitController'
 import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
 import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
@@ -41,12 +41,12 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction to a wrong address', async () => {
-      const data = coder.encodeFunctionData('forcedWithdrawalRequest', [
-        0,
-        0,
-        0,
-        false,
-      ])
+      const data = encodeForcedWithdrawalRequest({
+        starkKey: StarkKey.fake(),
+        vaultId: 0n,
+        quantizedAmount: 0n,
+        premiumCost: false,
+      })
       const controller = new TransactionSubmitController(
         mock<EthereumClient>({
           getTransaction: async () =>
@@ -93,15 +93,12 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction with correct data and address', async () => {
-      const publicKey = StarkKey.fake()
-      const positionId = 123n
-      const amount = 456n
-      const data = coder.encodeFunctionData('forcedWithdrawalRequest', [
-        publicKey,
-        positionId,
-        amount,
-        false,
-      ])
+      const data = encodeForcedWithdrawalRequest({
+        starkKey: StarkKey.fake(),
+        vaultId: 0n,
+        quantizedAmount: 0n,
+        premiumCost: false,
+      })
       const perpetualAddress = EthereumAddress.fake()
       const hash = Hash256.fake()
 
@@ -224,21 +221,20 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction to a wrong address', async () => {
-      const data = coder.encodeFunctionData('forcedTradeRequest', [
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        false,
-        0,
-        0,
-        0,
-        false,
-      ])
+      const data = encodeForcedTradeRequest({
+        starkKeyA: StarkKey.fake(),
+        positionIdA: 0n,
+        syntheticAssetId: AssetId.USDC,
+        amountCollateral: 0n,
+        amountSynthetic: 0n,
+        aIsBuyingSynthetic: false,
+        nonce: 0n,
+        signature: Hash256.fake().toString(),
+        starkKeyB: StarkKey.fake(),
+        positionIdB: 0n,
+        submissionExpirationTime: 0n,
+        premiumCost: false,
+      })
       const offer = fakeOffer()
       const controller = new TransactionSubmitController(
         mock<EthereumClient>({
@@ -265,21 +261,11 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction with unknown data', async () => {
       const accepted = fakeAccepted({ signature: Hash256.fake().toString() })
       const offer = fakeOffer({ accepted })
-      const data = coder.encodeFunctionData('forcedTradeRequest', [
-        StarkKey.fake(),
-        offer.accepted?.starkKeyB,
-        offer.positionIdA,
-        offer.accepted?.positionIdB,
-        '0x' + encodeAssetId(AssetId.USDC),
-        '0x' + encodeAssetId(offer.syntheticAssetId),
-        offer.amountCollateral,
-        offer.amountSynthetic,
-        offer.aIsBuyingSynthetic,
-        offer.accepted?.submissionExpirationTime,
-        offer.accepted?.nonce,
-        offer.accepted?.signature,
-        offer.accepted?.premiumCost,
-      ])
+      const data = encodeForcedTradeRequest({
+        ...offer,
+        ...accepted,
+        starkKeyA: StarkKey.fake(),
+      })
       const perpetualAddress = EthereumAddress.fake()
 
       const controller = new TransactionSubmitController(
@@ -307,21 +293,10 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction with correct data and address', async () => {
       const accepted = fakeAccepted({ signature: Hash256.fake().toString() })
       const offer = fakeOffer({ accepted })
-      const data = coder.encodeFunctionData('forcedTradeRequest', [
-        offer.starkKeyA,
-        offer.accepted?.starkKeyB,
-        offer.positionIdA,
-        offer.accepted?.positionIdB,
-        '0x' + encodeAssetId(AssetId.USDC),
-        '0x' + encodeAssetId(offer.syntheticAssetId),
-        offer.amountCollateral,
-        offer.amountSynthetic,
-        offer.aIsBuyingSynthetic,
-        offer.accepted?.submissionExpirationTime,
-        offer.accepted?.nonce,
-        offer.accepted?.signature,
-        offer.accepted?.premiumCost,
-      ])
+      const data = encodeForcedTradeRequest({
+        ...offer,
+        ...accepted,
+      })
       const perpetualAddress = EthereumAddress.fake()
       const hash = Hash256.fake()
 

@@ -15,6 +15,7 @@
     "coverage": "nyc --reporter=lcov --reporter=text mocha"
   },
   "dependencies": {
+    "@ethersproject/abi": "^5.6.3",
     "@ethersproject/solidity": "5.5.0",
     "@explorer/encoding": "*",
     "@explorer/types": "*",

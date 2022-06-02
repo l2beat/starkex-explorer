@@ -1,12 +1,9 @@
-import { decodeAssetId } from '@explorer/encoding'
 import {
-  AssetId,
-  EthereumAddress,
-  Hash256,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
-import { utils } from 'ethers'
+  decodeForcedTradeRequest,
+  decodeForcedWithdrawalRequest,
+  ForcedTradeRequest,
+} from '@explorer/shared'
+import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 
 import {
   ForcedTradeOfferRecord,
@@ -16,25 +13,6 @@ import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedT
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { sleep } from '../../tools/sleep'
 import { ControllerResult } from './ControllerResult'
-
-export const coder = new utils.Interface([
-  'function forcedWithdrawalRequest(uint256 starkKey, uint256 vaultId, uint256 quantizedAmount, bool premiumCost)',
-  `function forcedTradeRequest(
-      uint256 starkKeyA,
-      uint256 starkKeyB,
-      uint256 vaultIdA,
-      uint256 vaultIdB,
-      uint256 collateralAssetId,
-      uint256 syntheticAssetId,
-      uint256 amountCollateral,
-      uint256 amountSynthetic,
-      bool aIsBuyingSynthetic,
-      uint256 submissionExpirationTime,
-      uint256 nonce,
-      bytes calldata signature,
-      bool premiumCost
-    )`,
-])
 
 export class TransactionSubmitController {
   constructor(
@@ -49,7 +27,7 @@ export class TransactionSubmitController {
     if (!tx) {
       return { type: 'bad request', content: `Transaction ${hash} not found` }
     }
-    const data = decodeWithdrawalData(tx.data)
+    const data = decodeForcedWithdrawalRequest(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
@@ -88,7 +66,7 @@ export class TransactionSubmitController {
     if (!tx) {
       return { type: 'bad request', content: `Transaction ${hash} not found` }
     }
-    const data = decodeTradeData(tx.data)
+    const data = decodeForcedTradeRequest(tx.data)
     if (
       !tx.to ||
       EthereumAddress(tx.to) !== this.perpetualAddress ||
@@ -133,23 +111,9 @@ export class TransactionSubmitController {
   }
 }
 
-function decodeWithdrawalData(data: string) {
-  try {
-    const decoded = coder.decodeFunctionData('forcedWithdrawalRequest', data)
-    return {
-      starkKey: StarkKey.from(decoded.starkKey),
-      vaultId: BigInt(decoded.vaultId),
-      quantizedAmount: BigInt(decoded.quantizedAmount),
-      premiumCost: Boolean(decoded.premiumCost),
-    }
-  } catch {
-    return
-  }
-}
-
 function tradeMatchesOffer(
   offer: ForcedTradeOfferRecord,
-  trade: DecodedTrade
+  trade: ForcedTradeRequest
 ): boolean {
   return (
     offer.starkKeyA === trade.starkKeyA &&
@@ -165,47 +129,4 @@ function tradeMatchesOffer(
     offer.accepted?.signature === trade.signature &&
     offer.accepted?.premiumCost === trade.premiumCost
   )
-}
-
-interface DecodedTrade {
-  starkKeyA: StarkKey
-  starkKeyB: StarkKey
-  positionIdA: bigint
-  positionIdB: bigint
-  collateralAssetId: AssetId
-  syntheticAssetId: AssetId
-  amountCollateral: bigint
-  amountSynthetic: bigint
-  aIsBuyingSynthetic: boolean
-  submissionExpirationTime: bigint
-  nonce: bigint
-  signature: string
-  premiumCost: boolean
-}
-
-function decodeTradeData(data: string): DecodedTrade | undefined {
-  try {
-    const decoded = coder.decodeFunctionData('forcedTradeRequest', data)
-    return {
-      starkKeyA: StarkKey.from(decoded.starkKeyA),
-      starkKeyB: StarkKey.from(decoded.starkKeyB),
-      positionIdA: BigInt(decoded.vaultIdA),
-      positionIdB: BigInt(decoded.vaultIdB),
-      collateralAssetId: decodeAssetId(
-        decoded.collateralAssetId.toHexString().slice(2)
-      ),
-      syntheticAssetId: decodeAssetId(
-        decoded.syntheticAssetId.toHexString().slice(2)
-      ),
-      amountCollateral: BigInt(decoded.amountCollateral),
-      amountSynthetic: BigInt(decoded.amountSynthetic),
-      aIsBuyingSynthetic: Boolean(decoded.aIsBuyingSynthetic),
-      submissionExpirationTime: BigInt(decoded.submissionExpirationTime),
-      nonce: BigInt(decoded.nonce),
-      signature: String(decoded.signature),
-      premiumCost: Boolean(decoded.premiumCost),
-    }
-  } catch {
-    return
-  }
 }
