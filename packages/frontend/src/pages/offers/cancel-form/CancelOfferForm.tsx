@@ -1,7 +1,7 @@
 import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
-import { AddressInputName, FormId, OfferIdInputName } from './attributes'
+import { AddressInputName, FormClass, OfferIdInputName } from './attributes'
 
 export interface CancelOfferFormData {
   offerId: number
@@ -15,7 +15,7 @@ interface CancelOfferFormProps extends CancelOfferFormData {
 export function CancelOfferForm(props: CancelOfferFormProps) {
   return (
     <form
-      id={FormId}
+      className={FormClass}
       method="POST"
       action={`/forced/offers/${props.offerId}/cancel`}
     >
