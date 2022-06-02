@@ -27,7 +27,7 @@ export class AccountService {
     return {
       address,
       positionId: id,
-      hasUpdates: !!pendingCount,
+      hasUpdates: pendingCount > 0,
     }
   }
 }
