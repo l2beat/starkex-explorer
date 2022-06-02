@@ -64,7 +64,21 @@ async function sendTransaction(
   }
 
   const coder = new Interface([
-    'function forcedTradeRequest(uint256 starkKeyA, uint256 starkKeyB, uint256 vaultIdA, uint256 vaultIdB, uint256 collateralAssetId, uint256 syntheticAssetId, uint256 amountCollateral, uint256 amountSynthetic, bool aIsBuyingSynthetic, uint256 submissionExpirationTime, uint256 nonce, bytes calldata signature, bool premiumCost)',
+    `function forcedTradeRequest(
+      uint256 starkKeyA,
+      uint256 starkKeyB,
+      uint256 vaultIdA,
+      uint256 vaultIdB,
+      uint256 collateralAssetId,
+      uint256 syntheticAssetId,
+      uint256 amountCollateral,
+      uint256 amountSynthetic,
+      bool aIsBuyingSynthetic,
+      uint256 submissionExpirationTime,
+      uint256 nonce,
+      bytes calldata signature,
+      bool premiumCost
+    )`,
   ])
 
   const data = coder.encodeFunctionData('forcedTradeRequest', [
@@ -93,5 +107,6 @@ async function sendTransaction(
       },
     ],
   })
+
   return Hash256(result as string)
 }
