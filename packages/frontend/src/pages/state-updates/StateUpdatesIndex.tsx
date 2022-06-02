@@ -38,6 +38,7 @@ export function StateUpdatesIndex({
           { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
+          { header: 'Forced txs', numeric: true },
         ]}
         rows={stateUpdates.map((update) => {
           const link = `/state-updates/${update.id}`
@@ -48,6 +49,9 @@ export function StateUpdatesIndex({
               formatHashLong(update.hash),
               formatRelativeTime(update.timestamp),
               update.positionCount.toString(),
+              update.forcedTxsCount > 0
+                ? update.forcedTxsCount.toString()
+                : '-',
             ],
           }
         })}

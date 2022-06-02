@@ -84,6 +84,7 @@ export const HOME_PROPS: HomeProps = {
   stateUpdates: Array.from({ length: 6 }).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),
+    forcedTxsCount: Math.floor(Math.random() * 3),
     positionCount: Math.floor(Math.random() * 30 + 4),
     timestamp: Timestamp(
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)
@@ -235,6 +236,7 @@ export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
   stateUpdates: Array.from({ length: 10 }).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),
+    forcedTxsCount: Math.floor(Math.random() * 3),
     positionCount: Math.floor(Math.random() * 30 + 4),
     timestamp: Timestamp(
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)

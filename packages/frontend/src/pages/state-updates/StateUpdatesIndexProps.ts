@@ -17,4 +17,5 @@ export interface StateUpdateEntry {
   readonly hash: PedersenHash
   readonly timestamp: Timestamp
   readonly positionCount: number
+  readonly forcedTxsCount: number
 }
