@@ -36,7 +36,7 @@ describe('decodeUpdates', () => {
       .writeNumber(789, 32) // timestamp
       .writeNumber(4 + 2, 32) // 2 values
       .writeNumber(123, 32) // positionId
-      .write(StarkKey.fake('1234abcd').toString()) // publicKey
+      .write(StarkKey.fake('1234abcd').toString()) // starkKey
       .writeNumber(10n - MIN_INT, 32) // collateralBalance
       .writeNumber(456, 32) // fundingTimestamp
       .writePadding(9)
@@ -47,7 +47,7 @@ describe('decodeUpdates', () => {
       .writeNumber(20n - MIN_INT, 8)
       .writeNumber(4 + 1, 32) // 1 value
       .writeNumber(124, 32) // positionId
-      .write(StarkKey.fake('deadbeef').toString()) // publicKey
+      .write(StarkKey.fake('deadbeef').toString()) // starkKey
       .writeNumber(33n - MIN_INT, 32) // collateralBalance
       .writeNumber(457, 32) // fundingTimestamp
       .writePadding(9)
@@ -74,7 +74,7 @@ describe('decodeUpdates', () => {
       positions: [
         {
           positionId: 123n,
-          publicKey: StarkKey.fake('1234abcd'),
+          starkKey: StarkKey.fake('1234abcd'),
           collateralBalance: 10n,
           fundingTimestamp: Timestamp.fromSeconds(456),
           balances: [
@@ -84,7 +84,7 @@ describe('decodeUpdates', () => {
         },
         {
           positionId: 124n,
-          publicKey: StarkKey.fake('deadbeef'),
+          starkKey: StarkKey.fake('deadbeef'),
           collateralBalance: 33n,
           fundingTimestamp: Timestamp.fromSeconds(457),
           balances: [{ assetId: AssetId('ETH-9'), balance: 66n }],

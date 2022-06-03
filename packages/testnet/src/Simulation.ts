@@ -40,9 +40,9 @@ export class Simulation {
   queueForcedAction(action: ForcedAction) {
     this.newForcedActions.push(action)
     if (action.type === 'withdrawal') {
-      console.log('Withdrawal queued', action.publicKey)
+      console.log('Withdrawal queued', action.starkKey)
     } else {
-      console.log('Trade queued', action.publicKeyA)
+      console.log('Trade queued', action.starkKeyA)
     }
   }
 
@@ -65,7 +65,7 @@ export class Simulation {
         positionId: position.positionId,
         collateralBalance: position.collateralBalance,
         fundingTimestamp: position.fundingTimestamp,
-        publicKey: position.publicKey,
+        starkKey: position.starkKey,
         balances: position.balances.filter(
           (x) =>
             x.balance !==
@@ -194,11 +194,11 @@ function randomNextTimestamp(last: Timestamp) {
 }
 
 function positionAfterDeposit(
-  publicKey: StarkKey,
+  starkKey: StarkKey,
   fundingTimestamp: Timestamp
 ): PositionUpdate {
   return {
-    publicKey,
+    starkKey,
     positionId: randomBigInt(1n, 10_000n),
     collateralBalance: randomBigInt(1_000n, 100_000n) * 1_000_000n,
     fundingTimestamp,

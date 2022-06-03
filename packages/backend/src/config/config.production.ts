@@ -33,5 +33,6 @@ export function getProductionConfig(): Config {
       ],
     },
     freshStart: false,
+    forceHttps: true,
   }
 }

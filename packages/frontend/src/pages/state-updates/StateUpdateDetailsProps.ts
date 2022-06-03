@@ -15,7 +15,7 @@ export interface StateUpdateDetailsProps {
 }
 
 export interface PositionUpdateEntry {
-  readonly publicKey: StarkKey
+  readonly starkKey: StarkKey
   readonly positionId: bigint
   readonly totalUSDCents: bigint
   readonly previousTotalUSDCents?: bigint

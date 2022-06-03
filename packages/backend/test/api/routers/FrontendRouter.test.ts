@@ -268,7 +268,7 @@ describe('FrontendRouter', () => {
         },
         positions: [
           {
-            publicKey: starkKey,
+            starkKey: starkKey,
             positionId: 0n,
             collateralBalance: 0n,
             balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
