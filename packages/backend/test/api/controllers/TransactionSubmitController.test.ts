@@ -43,7 +43,7 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction to a wrong address', async () => {
       const data = encodeForcedWithdrawalRequest({
         starkKey: StarkKey.fake(),
-        vaultId: 0n,
+        positionId: 0n,
         quantizedAmount: 0n,
         premiumCost: false,
       })
@@ -95,7 +95,7 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction with correct data and address', async () => {
       const data = encodeForcedWithdrawalRequest({
         starkKey: StarkKey.fake(),
-        vaultId: 0n,
+        positionId: 0n,
         quantizedAmount: 0n,
         premiumCost: false,
       })
@@ -225,8 +225,8 @@ describe(TransactionSubmitController.name, () => {
         starkKeyA: StarkKey.fake(),
         positionIdA: 0n,
         syntheticAssetId: AssetId.USDC,
-        amountCollateral: 0n,
-        amountSynthetic: 0n,
+        collateralAmount: 0n,
+        syntheticAmount: 0n,
         aIsBuyingSynthetic: false,
         nonce: 0n,
         signature: Hash256.fake().toString(),

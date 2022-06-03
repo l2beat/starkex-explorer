@@ -9,16 +9,16 @@ import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { getTransactionStatus } from './getForcedTransactionStatus'
 
 const PERPETUAL_ABI = new utils.Interface([
-  'event LogForcedWithdrawalRequest(uint256 starkKey, uint256 vaultId, uint256 quantizedAmount)',
+  'event LogForcedWithdrawalRequest(uint256 starkKey, uint256 positionId, uint256 quantizedAmount)',
   `event LogForcedTradeRequest(
     uint256 starkKeyA,
     uint256 starkKeyB,
-    uint256 vaultIdA,
-    uint256 vaultIdB,
+    uint256 positionIdA,
+    uint256 positionIdB,
     uint256 collateralAssetId,
     uint256 syntheticAssetId,
-    uint256 amountCollateral,
-    uint256 amountSynthetic,
+    uint256 collateralAmount,
+    uint256 syntheticAmount,
     bool aIsBuyingSynthetic,
     uint256 nonce
   )`,
@@ -111,16 +111,16 @@ export class ForcedEventsCollector {
               ...base,
               data: {
                 type: 'trade',
-                publicKeyA: StarkKey.from(event.args.starkKeyA),
-                publicKeyB: StarkKey.from(event.args.starkKeyB),
-                positionIdA: BigInt(event.args.vaultIdA),
-                positionIdB: BigInt(event.args.vaultIdB),
+                starkKeyA: StarkKey.from(event.args.starkKeyA),
+                starkKeyB: StarkKey.from(event.args.starkKeyB),
+                positionIdA: BigInt(event.args.positionIdA),
+                positionIdB: BigInt(event.args.positionIdB),
                 syntheticAssetId: decodeAssetId(
                   event.args.syntheticAssetId.toHexString().slice(2)
                 ),
                 isABuyingSynthetic: event.args.aIsBuyingSynthetic,
-                collateralAmount: BigInt(event.args.amountCollateral),
-                syntheticAmount: BigInt(event.args.amountSynthetic),
+                collateralAmount: BigInt(event.args.collateralAmount),
+                syntheticAmount: BigInt(event.args.syntheticAmount),
                 nonce: BigInt(event.args.nonce),
               },
             }
@@ -129,8 +129,8 @@ export class ForcedEventsCollector {
               ...base,
               data: {
                 type: 'withdrawal',
-                publicKey: StarkKey.from(event.args.starkKey),
-                positionId: BigInt(event.args.vaultId),
+                starkKey: StarkKey.from(event.args.starkKey),
+                positionId: BigInt(event.args.positionId),
                 amount: BigInt(event.args.quantizedAmount),
               },
             }

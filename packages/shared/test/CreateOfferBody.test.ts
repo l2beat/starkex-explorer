@@ -8,8 +8,8 @@ describe('CreateOfferBody', () => {
     const body: CreateOfferBody = {
       offer: {
         aIsBuyingSynthetic: true,
-        amountCollateral: 123n,
-        amountSynthetic: 456n,
+        collateralAmount: 123n,
+        syntheticAmount: 456n,
         positionIdA: 789n,
         starkKeyA: StarkKey.fake(),
         syntheticAssetId: AssetId('ABC-6'),

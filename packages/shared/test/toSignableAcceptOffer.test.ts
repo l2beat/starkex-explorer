@@ -12,8 +12,8 @@ const INITIAL = {
   ),
   positionIdA: BigInt('0x205'),
   syntheticAssetId: AssetId('AAVE-8'),
-  amountCollateral: BigInt('0x684ee1800'),
-  amountSynthetic: BigInt('0xf4240'),
+  collateralAmount: BigInt('0x684ee1800'),
+  syntheticAmount: BigInt('0xf4240'),
   aIsBuyingSynthetic: true,
 }
 

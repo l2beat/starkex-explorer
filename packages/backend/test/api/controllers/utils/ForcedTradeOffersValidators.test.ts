@@ -15,8 +15,8 @@ describe(validateCreateSignature.name, () => {
   it('accepts correct input', async () => {
     const offer = {
       aIsBuyingSynthetic: true,
-      amountCollateral: fakeBigInt(),
-      amountSynthetic: fakeBigInt(),
+      collateralAmount: fakeBigInt(),
+      syntheticAmount: fakeBigInt(),
       positionIdA: fakeBigInt(),
       starkKeyA: StarkKey.fake(),
       syntheticAssetId: AssetId('BTC-10'),
@@ -37,47 +37,47 @@ describe(validateAcceptSignature.name, () => {
 
 describe(validateSyntheticBalance.name, () => {
   it('returns true for sufficient synthetic sell', () => {
-    const amountSynthetic = 5n
+    const syntheticAmount = 5n
     const assetId = AssetId('BTC-10')
     const balances = [
       {
         assetId,
-        balance: amountSynthetic,
+        balance: syntheticAmount,
       },
     ]
 
-    const valid = validateSyntheticBalance(amountSynthetic, assetId, balances)
+    const valid = validateSyntheticBalance(syntheticAmount, assetId, balances)
 
     expect(valid).toBeTruthy()
   })
 
   it('returns false for insufficient synthetic sell', () => {
-    const amountSynthetic = 5n
+    const syntheticAmount = 5n
     const assetId = AssetId('BTC-10')
     const balances = [
       {
         assetId,
-        balance: amountSynthetic - 1n,
+        balance: syntheticAmount - 1n,
       },
     ]
 
-    const valid = validateSyntheticBalance(amountSynthetic, assetId, balances)
+    const valid = validateSyntheticBalance(syntheticAmount, assetId, balances)
 
     expect(valid).toBeFalsy()
   })
 
   it('returns false if buying missing asset', () => {
-    const amountSynthetic = 5n
+    const syntheticAmount = 5n
     const assetId = AssetId('ETH-9')
     const balances = [
       {
         assetId,
-        balance: amountSynthetic - 1n,
+        balance: syntheticAmount - 1n,
       },
     ]
 
     const valid = validateSyntheticBalance(
-      amountSynthetic,
+      syntheticAmount,
       AssetId('BTC-10'),
       balances
     )

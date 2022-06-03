@@ -37,8 +37,8 @@ export class TransactionSubmitController {
         data: {
           type: 'withdrawal',
           amount: data.quantizedAmount,
-          positionId: data.vaultId,
-          publicKey: data.starkKey,
+          positionId: data.positionId,
+          starkKey: data.starkKey,
         },
         hash,
       },
@@ -80,15 +80,15 @@ export class TransactionSubmitController {
       {
         data: {
           type: 'trade',
-          publicKeyA: data.starkKeyA,
-          publicKeyB: data.starkKeyB,
+          starkKeyA: data.starkKeyA,
+          starkKeyB: data.starkKeyB,
           positionIdA: data.positionIdA,
           positionIdB: data.positionIdB,
           syntheticAssetId: data.syntheticAssetId,
-          collateralAmount: data.amountCollateral,
+          collateralAmount: data.collateralAmount,
           isABuyingSynthetic: data.aIsBuyingSynthetic,
           nonce: data.nonce,
-          syntheticAmount: data.amountSynthetic,
+          syntheticAmount: data.syntheticAmount,
         },
         hash,
         offerId,
@@ -120,8 +120,8 @@ function tradeMatchesOffer(
     offer.accepted?.starkKeyB === trade.starkKeyB &&
     offer.positionIdA === trade.positionIdA &&
     offer.accepted?.positionIdB === trade.positionIdB &&
-    offer.amountCollateral === trade.amountCollateral &&
-    offer.amountSynthetic === trade.amountSynthetic &&
+    offer.collateralAmount === trade.collateralAmount &&
+    offer.syntheticAmount === trade.syntheticAmount &&
     offer.aIsBuyingSynthetic === trade.aIsBuyingSynthetic &&
     offer.accepted?.submissionExpirationTime ===
       trade.submissionExpirationTime &&

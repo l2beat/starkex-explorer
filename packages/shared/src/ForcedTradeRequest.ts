@@ -6,12 +6,12 @@ const coder = new Interface([
   `function forcedTradeRequest(
       uint256 starkKeyA,
       uint256 starkKeyB,
-      uint256 vaultIdA,
-      uint256 vaultIdB,
+      uint256 positionIdA,
+      uint256 positionIdB,
       uint256 collateralAssetId,
       uint256 syntheticAssetId,
-      uint256 amountCollateral,
-      uint256 amountSynthetic,
+      uint256 collateralAmount,
+      uint256 syntheticAmount,
       bool aIsBuyingSynthetic,
       uint256 submissionExpirationTime,
       uint256 nonce,
@@ -27,8 +27,8 @@ export interface ForcedTradeRequest {
   positionIdB: bigint
   collateralAssetId: AssetId
   syntheticAssetId: AssetId
-  amountCollateral: bigint
-  amountSynthetic: bigint
+  collateralAmount: bigint
+  syntheticAmount: bigint
   aIsBuyingSynthetic: boolean
   submissionExpirationTime: bigint
   nonce: bigint
@@ -44,16 +44,16 @@ export function decodeForcedTradeRequest(
     return {
       starkKeyA: StarkKey.from(decoded.starkKeyA),
       starkKeyB: StarkKey.from(decoded.starkKeyB),
-      positionIdA: BigInt(decoded.vaultIdA),
-      positionIdB: BigInt(decoded.vaultIdB),
+      positionIdA: BigInt(decoded.positionIdA),
+      positionIdB: BigInt(decoded.positionIdB),
       collateralAssetId: decodeAssetId(
         decoded.collateralAssetId.toHexString().slice(2)
       ),
       syntheticAssetId: decodeAssetId(
         decoded.syntheticAssetId.toHexString().slice(2)
       ),
-      amountCollateral: BigInt(decoded.amountCollateral),
-      amountSynthetic: BigInt(decoded.amountSynthetic),
+      collateralAmount: BigInt(decoded.collateralAmount),
+      syntheticAmount: BigInt(decoded.syntheticAmount),
       aIsBuyingSynthetic: Boolean(decoded.aIsBuyingSynthetic),
       submissionExpirationTime: BigInt(decoded.submissionExpirationTime),
       nonce: BigInt(decoded.nonce),
@@ -75,8 +75,8 @@ export function encodeForcedTradeRequest(
     data.positionIdB,
     '0x' + encodeAssetId(AssetId.USDC),
     '0x' + encodeAssetId(data.syntheticAssetId),
-    data.amountCollateral,
-    data.amountSynthetic,
+    data.collateralAmount,
+    data.syntheticAmount,
     data.aIsBuyingSynthetic,
     data.submissionExpirationTime,
     data.nonce,

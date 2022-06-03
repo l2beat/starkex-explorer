@@ -9,8 +9,8 @@ export const CreateOfferData = z.object({
   starkKeyA: stringAs(StarkKey),
   positionIdA: stringAsBigInt(),
   syntheticAssetId: stringAs(AssetId),
-  amountCollateral: stringAsBigInt(),
-  amountSynthetic: stringAsBigInt(),
+  collateralAmount: stringAsBigInt(),
+  syntheticAmount: stringAsBigInt(),
   aIsBuyingSynthetic: z.boolean(),
 })
 

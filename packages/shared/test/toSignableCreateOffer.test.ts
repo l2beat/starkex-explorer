@@ -7,8 +7,8 @@ const offer = {
   starkKeyA: StarkKey.fake(),
   positionIdA: 1n,
   syntheticAssetId: AssetId('BTC-10'),
-  amountCollateral: 2n,
-  amountSynthetic: 3n,
+  collateralAmount: 2n,
+  syntheticAmount: 3n,
   aIsBuyingSynthetic: true,
 }
 
@@ -20,8 +20,8 @@ describe(toSignableCreateOffer.name, () => {
         `  "starkKeyA": "${offer.starkKeyA}",`,
         '  "positionIdA": "1",',
         '  "syntheticAssetId": "BTC-10",',
-        '  "amountCollateral": "2",',
-        '  "amountSynthetic": "3",',
+        '  "collateralAmount": "2",',
+        '  "syntheticAmount": "3",',
         '  "aIsBuyingSynthetic": true',
         '}',
       ].join('\n')

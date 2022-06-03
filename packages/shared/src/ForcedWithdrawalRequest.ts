@@ -4,7 +4,7 @@ import { StarkKey } from '@explorer/types'
 const coder = new Interface([
   `function forcedWithdrawalRequest(
       uint256 starkKey,
-      uint256 vaultId,
+      uint256 positionId,
       uint256 quantizedAmount,
       bool premiumCost
     )`,
@@ -12,7 +12,7 @@ const coder = new Interface([
 
 export interface ForcedWithdrawalRequest {
   starkKey: StarkKey
-  vaultId: bigint
+  positionId: bigint
   quantizedAmount: bigint
   premiumCost: boolean
 }
@@ -24,7 +24,7 @@ export function decodeForcedWithdrawalRequest(
     const decoded = coder.decodeFunctionData('forcedWithdrawalRequest', data)
     return {
       starkKey: StarkKey.from(decoded.starkKey),
-      vaultId: BigInt(decoded.vaultId),
+      positionId: BigInt(decoded.positionId),
       quantizedAmount: BigInt(decoded.quantizedAmount),
       premiumCost: Boolean(decoded.premiumCost),
     }
@@ -36,7 +36,7 @@ export function decodeForcedWithdrawalRequest(
 export function encodeForcedWithdrawalRequest(data: ForcedWithdrawalRequest) {
   return coder.encodeFunctionData('forcedWithdrawalRequest', [
     data.starkKey,
-    data.vaultId.toString(),
+    data.positionId.toString(),
     data.quantizedAmount.toString(),
     data.premiumCost,
   ])

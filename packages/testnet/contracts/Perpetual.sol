@@ -8,19 +8,19 @@ contract Perpetual {
 
     event LogForcedWithdrawalRequest(
         uint256 starkKey,
-        uint256 vaultId,
+        uint256 positionId,
         uint256 quantizedAmount
     );
 
     event LogForcedTradeRequest(
         uint256 starkKeyA,
         uint256 starkKeyB,
-        uint256 vaultIdA,
-        uint256 vaultIdB,
+        uint256 positionIdA,
+        uint256 positionIdB,
         uint256 collateralAssetId,
         uint256 syntheticAssetId,
-        uint256 amountCollateral,
-        uint256 amountSynthetic,
+        uint256 collateralAmount,
+        uint256 syntheticAmount,
         bool aIsBuyingSynthetic,
         uint256 nonce
     );
@@ -35,22 +35,22 @@ contract Perpetual {
 
     function forcedWithdrawalRequest(
         uint256 starkKey,
-        uint256 vaultId,
+        uint256 positionId,
         uint256 quantizedAmount,
         bool
     ) external {
-        emit LogForcedWithdrawalRequest(starkKey, vaultId, quantizedAmount);
+        emit LogForcedWithdrawalRequest(starkKey, positionId, quantizedAmount);
     }
 
     function forcedTradeRequest(
         uint256 starkKeyA,
         uint256 starkKeyB,
-        uint256 vaultIdA,
-        uint256 vaultIdB,
+        uint256 positionIdA,
+        uint256 positionIdB,
         uint256 collateralAssetId,
         uint256 syntheticAssetId,
-        uint256 amountCollateral,
-        uint256 amountSynthetic,
+        uint256 collateralAmount,
+        uint256 syntheticAmount,
         bool aIsBuyingSynthetic,
         uint256,
         uint256 nonce,
@@ -60,12 +60,12 @@ contract Perpetual {
         emit LogForcedTradeRequest(
             starkKeyA,
             starkKeyB,
-            vaultIdA,
-            vaultIdB,
+            positionIdA,
+            positionIdB,
             collateralAssetId,
             syntheticAssetId,
-            amountCollateral,
-            amountSynthetic,
+            collateralAmount,
+            syntheticAmount,
             aIsBuyingSynthetic,
             nonce
         );

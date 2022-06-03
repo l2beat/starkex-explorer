@@ -7,8 +7,8 @@ export function toSignableAcceptOffer(
     starkKeyA: StarkKey
     positionIdA: bigint
     syntheticAssetId: AssetId
-    amountCollateral: bigint
-    amountSynthetic: bigint
+    collateralAmount: bigint
+    syntheticAmount: bigint
     aIsBuyingSynthetic: boolean
   },
   accepted: {
@@ -38,8 +38,8 @@ export function toSignableAcceptOffer(
       accepted.positionIdB,
       `0x${encodeAssetId(AssetId.USDC)}`,
       `0x${encodeAssetId(offer.syntheticAssetId)}`,
-      offer.amountCollateral,
-      offer.amountSynthetic,
+      offer.collateralAmount,
+      offer.syntheticAmount,
       offer.aIsBuyingSynthetic,
       accepted.nonce,
     ]

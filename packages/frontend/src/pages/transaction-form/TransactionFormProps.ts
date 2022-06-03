@@ -14,7 +14,7 @@ export const TransactionFormProps = z.object({
   perpetualAddress: stringAs(EthereumAddress),
   selectedAsset: stringAs(AssetId),
   positionId: stringAsBigInt(),
-  publicKey: stringAs(StarkKey),
+  starkKey: stringAs(StarkKey),
   assets: z.array(
     z.object({
       assetId: stringAs(AssetId),

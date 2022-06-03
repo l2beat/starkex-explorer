@@ -23,8 +23,8 @@ async function submitExit(state: FormState) {
   }
 
   const data = encodeForcedWithdrawalRequest({
-    starkKey: state.props.publicKey,
-    vaultId: state.props.positionId,
+    starkKey: state.props.starkKey,
+    positionId: state.props.positionId,
     quantizedAmount: state.amountInputValue,
     premiumCost: false,
   })
@@ -52,10 +52,10 @@ async function submitExit(state: FormState) {
 
 async function submitOffer(state: FormState) {
   const offer: CreateOfferData = {
-    starkKeyA: state.props.publicKey,
+    starkKeyA: state.props.starkKey,
     positionIdA: state.props.positionId,
-    amountCollateral: state.totalInputValue,
-    amountSynthetic: state.amountInputValue,
+    collateralAmount: state.totalInputValue,
+    syntheticAmount: state.amountInputValue,
     syntheticAssetId: state.selectedAsset.assetId,
     aIsBuyingSynthetic: state.buyButtonSelected,
   }

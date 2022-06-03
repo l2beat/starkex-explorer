@@ -33,7 +33,7 @@ describe(PositionRepository.name, () => {
 
   const mockPosition = (id: bigint, key = StarkKey.fake()) => ({
     positionId: id,
-    publicKey: key,
+    starkKey: key,
     collateralBalance: 0n,
     balances: [],
   })
@@ -67,7 +67,7 @@ describe(PositionRepository.name, () => {
       },
       positions: [
         {
-          publicKey: StarkKey.fake('1'),
+          starkKey: StarkKey.fake('1'),
           positionId,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
@@ -86,7 +86,7 @@ describe(PositionRepository.name, () => {
       },
       positions: [
         {
-          publicKey: StarkKey.fake('1'),
+          starkKey: StarkKey.fake('1'),
           positionId,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
@@ -98,7 +98,7 @@ describe(PositionRepository.name, () => {
     const position = await positionRepository.findById(positionId)
 
     expect(position).toEqual({
-      publicKey: StarkKey.fake('1'),
+      starkKey: StarkKey.fake('1'),
       positionId,
       collateralBalance: 0n,
       balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
@@ -119,7 +119,7 @@ describe(PositionRepository.name, () => {
       },
       positions: [
         {
-          publicKey: StarkKey.fake('1'),
+          starkKey: StarkKey.fake('1'),
           positionId,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
@@ -138,7 +138,7 @@ describe(PositionRepository.name, () => {
       },
       positions: [
         {
-          publicKey: StarkKey.fake('1'),
+          starkKey: StarkKey.fake('1'),
           positionId,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
@@ -152,7 +152,7 @@ describe(PositionRepository.name, () => {
     expect(position).toEqual([
       {
         stateUpdateId: 2,
-        publicKey: StarkKey.fake('1'),
+        starkKey: StarkKey.fake('1'),
         positionId,
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
@@ -161,7 +161,7 @@ describe(PositionRepository.name, () => {
       },
       {
         stateUpdateId: 1,
-        publicKey: StarkKey.fake('1'),
+        starkKey: StarkKey.fake('1'),
         positionId,
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
@@ -171,14 +171,14 @@ describe(PositionRepository.name, () => {
     ])
   })
 
-  describe(positionRepository.findIdByPublicKey.name, () => {
+  describe(positionRepository.findIdBystarkKey.name, () => {
     it('finds the id', async () => {
       const positionId = 12345n
-      const publicKey = StarkKey.fake()
+      const starkKey = StarkKey.fake()
 
       await stateUpdateRepository.add({
         stateUpdate: mockStateUpdate(1),
-        positions: [mockPosition(positionId, publicKey)],
+        positions: [mockPosition(positionId, starkKey)],
         prices: [],
       })
 
@@ -188,12 +188,12 @@ describe(PositionRepository.name, () => {
         prices: [],
       })
 
-      const result = await positionRepository.findIdByPublicKey(publicKey)
+      const result = await positionRepository.findIdBystarkKey(starkKey)
       expect(result).toEqual(positionId)
     })
 
     it('returns undefined when not found', async () => {
-      const result = await positionRepository.findIdByPublicKey(StarkKey.fake())
+      const result = await positionRepository.findIdBystarkKey(StarkKey.fake())
       expect(result).toEqual(undefined)
     })
   })
@@ -256,7 +256,7 @@ describe(PositionRepository.name, () => {
         },
         positions: [
           {
-            publicKey: StarkKey.fake('1'),
+            starkKey: StarkKey.fake('1'),
             positionId,
             collateralBalance: 0n,
             balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
@@ -275,7 +275,7 @@ describe(PositionRepository.name, () => {
         },
         positions: [
           {
-            publicKey: StarkKey.fake('1'),
+            starkKey: StarkKey.fake('1'),
             positionId,
             collateralBalance: 0n,
             balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
@@ -288,7 +288,7 @@ describe(PositionRepository.name, () => {
 
       expect(position).toEqual({
         stateUpdateId: 2,
-        publicKey: StarkKey.fake('1'),
+        starkKey: StarkKey.fake('1'),
         positionId,
         collateralBalance: 0n,
         balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
@@ -310,7 +310,7 @@ describe(PositionRepository.name, () => {
       stateUpdate: mockStateUpdate(stateUpdateId),
       positions: [
         {
-          publicKey: StarkKey.fake(),
+          starkKey: StarkKey.fake(),
           positionId,
           collateralBalance: 10n,
           balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
@@ -322,13 +322,13 @@ describe(PositionRepository.name, () => {
       stateUpdate: mockStateUpdate(nextStateUpdateId),
       positions: [
         {
-          publicKey: StarkKey.fake(),
+          starkKey: StarkKey.fake(),
           positionId,
           collateralBalance: 20n,
           balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
         },
         {
-          publicKey: StarkKey.fake(),
+          starkKey: StarkKey.fake(),
           positionId: 2n,
           collateralBalance: 30n,
           balances: [{ assetId: AssetId('ETH-9'), balance: 30n }],
