@@ -2,8 +2,7 @@ import { FinalizeOfferData, serializeFinalizeOfferData } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
-import { toDataProps } from '../toDataProps'
-import { DataAttributes, FormClass } from './attributes'
+import { FormClass } from './attributes'
 
 export interface FinalizeOfferFormData extends FinalizeOfferData {
   offerId: number
@@ -23,12 +22,10 @@ export function FinalizeOfferForm(props: FinalizeOfferFormProps) {
       className={FormClass}
       action="/forced/trades"
       method="POST"
-      {...toDataProps({
-        [DataAttributes.OfferId]: offerId.toString(),
-        [DataAttributes.Offer]: offerJson,
-        [DataAttributes.Address]: address.toString(),
-        [DataAttributes.PerpetualAddress]: perpetualAddress.toString(),
-      })}
+      data-offer-id={offerId.toString()}
+      data-offer={offerJson}
+      data-address={address.toString()}
+      data-perpetual-address={perpetualAddress.toString()}
     >
       {props.children}
     </form>
