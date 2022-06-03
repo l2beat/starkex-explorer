@@ -19,8 +19,8 @@
     "dev": "gulp watch"
   },
   "dependencies": {
-    "@ethersproject/solidity": "5.5.0",
     "@ethersproject/abi": "5.5.0",
+    "@ethersproject/solidity": "5.5.0",
     "@explorer/crypto": "*",
     "@explorer/encoding": "*",
     "@explorer/shared": "*",
@@ -42,16 +42,13 @@
     "@types/koa": "^2.13.4",
     "@types/koa-static": "^4.0.2",
     "@types/koa__router": "^8.0.11",
-    "autoprefixer": "^10.4.2",
-    "del": "^6.0.0",
+    "autoprefixer": "^10.4.7",
+    "del": "^6.1.1",
     "gulp": "^4.0.2",
-    "gulp-postcss": "^9.0.1",
-    "gulp-sass": "^5.0.0",
     "koa": "^2.13.4",
     "koa-static": "^5.0.0",
-    "nodemon": "^2.0.15",
-    "path": "^0.12.7",
-    "postcss": "^8.4.6",
-    "tailwindcss": "^3.0.21"
+    "nodemon": "^2.0.16",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.0.24"
   }
 }
