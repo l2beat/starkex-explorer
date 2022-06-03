@@ -6,13 +6,13 @@ export function toStateUpdateEntry(stateUpdate: {
   rootHash: PedersenHash
   timestamp: Timestamp
   positionCount: number
-  forcedTxsCount: number
+  forcedTransactionsCount: number
 }): StateUpdateEntry {
   return {
     id: stateUpdate.id,
     hash: stateUpdate.rootHash,
     timestamp: stateUpdate.timestamp,
     positionCount: stateUpdate.positionCount,
-    forcedTxsCount: stateUpdate.forcedTxsCount,
+    forcedTransactionsCount: stateUpdate.forcedTransactionsCount,
   }
 }

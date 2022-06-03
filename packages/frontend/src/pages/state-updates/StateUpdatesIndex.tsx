@@ -49,9 +49,7 @@ export function StateUpdatesIndex({
               formatHashLong(update.hash),
               formatRelativeTime(update.timestamp),
               update.positionCount.toString(),
-              update.forcedTxsCount > 0
-                ? update.forcedTxsCount.toString()
-                : '-',
+              update.forcedTransactionsCount.toString(),
             ],
           }
         })}

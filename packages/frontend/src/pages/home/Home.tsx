@@ -66,9 +66,7 @@ export function Home(props: HomeProps) {
               formatHashLong(update.hash),
               formatRelativeTime(update.timestamp),
               update.positionCount.toString(),
-              update.forcedTxsCount > 0
-                ? update.forcedTxsCount.toString()
-                : '-',
+              update.forcedTransactionsCount,
             ],
           }
         })}

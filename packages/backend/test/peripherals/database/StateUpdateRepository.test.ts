@@ -207,14 +207,14 @@ describe(StateUpdateRepository.name, () => {
 
     expect(actual).toEqual([
       {
-        forcedTxsCount: 0,
+        forcedTransactionsCount: 0,
         positionCount: 0,
         rootHash: PedersenHash.fake('20005'),
         timestamp: Timestamp(20_005),
         id: 20_005,
       },
       {
-        forcedTxsCount: 0,
+        forcedTransactionsCount: 0,
         id: 20_004,
         positionCount: 4,
         rootHash: PedersenHash.fake('20004'),
@@ -324,14 +324,14 @@ describe(StateUpdateRepository.name, () => {
 
       expect(actual).toEqual([
         {
-          forcedTxsCount: 3,
+          forcedTransactionsCount: 3,
           positionCount: 2,
           rootHash: PedersenHash.fake('20005'),
           timestamp: Timestamp(20_005),
           id: 20_005,
         },
         {
-          forcedTxsCount: 0,
+          forcedTransactionsCount: 0,
           id: 20_004,
           positionCount: 4,
           rootHash: PedersenHash.fake('20004'),
