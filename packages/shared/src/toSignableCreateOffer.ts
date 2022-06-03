@@ -6,9 +6,9 @@ export function toSignableCreateOffer(offer: CreateOfferData) {
       starkKeyA: offer.starkKeyA,
       positionIdA: offer.positionIdA.toString(),
       syntheticAssetId: offer.syntheticAssetId,
-      amountCollateral: offer.amountCollateral.toString(),
-      amountSynthetic: offer.amountSynthetic.toString(),
-      aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
+      collateralAmount: offer.collateralAmount.toString(),
+      syntheticAmount: offer.syntheticAmount.toString(),
+      isABuyingSynthetic: offer.isABuyingSynthetic,
     },
     null,
     2

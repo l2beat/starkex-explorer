@@ -37,7 +37,7 @@ describe(StateUpdateRepository.name, () => {
       },
       positions: [
         {
-          publicKey: StarkKey.fake(),
+          starkKey: StarkKey.fake(),
           positionId: 0n,
           collateralBalance: 0n,
           balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
@@ -145,7 +145,7 @@ describe(StateUpdateRepository.name, () => {
         },
         positions: [
           {
-            publicKey: StarkKey.fake(blockNumber.toString()),
+            starkKey: StarkKey.fake(blockNumber.toString()),
             positionId: BigInt(blockNumber),
             collateralBalance: 0n,
             balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
@@ -160,9 +160,9 @@ describe(StateUpdateRepository.name, () => {
     const records = await repository.getAll()
     expect(records.map((x) => x.blockNumber)).toEqual([20_001, 20_002])
 
-    expect(await knex('positions').select('public_key')).toEqual([
-      { public_key: StarkKey.fake('20001').toString() },
-      { public_key: StarkKey.fake('20002').toString() },
+    expect(await knex('positions').select('stark_key')).toEqual([
+      { stark_key: StarkKey.fake('20001').toString() },
+      { stark_key: StarkKey.fake('20002').toString() },
     ])
     expect(await knex('prices').select('asset_id', 'price')).toEqual([
       { asset_id: 'ETH-9', price: 20001n },
@@ -181,7 +181,7 @@ describe(StateUpdateRepository.name, () => {
           timestamp: Timestamp(blockNumber),
         },
         positions: Array.from({ length: blockNumber - 20_000 }).map((_, i) => ({
-          publicKey: StarkKey.fake(),
+          starkKey: StarkKey.fake(),
           positionId: BigInt(blockNumber * 10 + i),
           collateralBalance: 0n,
           balances: [],
@@ -356,7 +356,7 @@ describe(StateUpdateRepository.name, () => {
         timestamp,
       },
       positions: Array.from({ length: 4 }).map((_, i) => ({
-        publicKey: StarkKey.fake(`${blockNumber}${i}`),
+        starkKey: StarkKey.fake(`${blockNumber}${i}`),
         positionId: BigInt(blockNumber * 10 + i),
         collateralBalance: collateralBalance,
         balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
@@ -374,7 +374,7 @@ describe(StateUpdateRepository.name, () => {
       timestamp,
       positions: Array.from({ length: 4 }).map((_, i) =>
         expect.objectWith({
-          publicKey: StarkKey.fake(`${blockNumber}${i}`),
+          starkKey: StarkKey.fake(`${blockNumber}${i}`),
           positionId: BigInt(blockNumber * 10 + i),
           collateralBalance: collateralBalance,
           balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
@@ -395,7 +395,7 @@ describe(StateUpdateRepository.name, () => {
           timestamp: Timestamp(blockNumber),
         },
         positions: Array.from({ length: blockNumber - 40_000 }).map((_, i) => ({
-          publicKey: StarkKey.fake(),
+          starkKey: StarkKey.fake(),
           positionId: BigInt(blockNumber * 10 + i),
           collateralBalance: 0n,
           balances: [],

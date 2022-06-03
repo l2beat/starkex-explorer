@@ -13,9 +13,9 @@ const initialData = {
     starkKeyA: StarkKey.fake(),
     positionIdA: 0n.toString(),
     syntheticAssetId: AssetId('ETH-9').toString(),
-    amountCollateral: 2000n.toString(),
-    amountSynthetic: 1n.toString(),
-    aIsBuyingSynthetic: true,
+    collateralAmount: 2000n.toString(),
+    syntheticAmount: 1n.toString(),
+    isABuyingSynthetic: true,
   },
   signature,
 }

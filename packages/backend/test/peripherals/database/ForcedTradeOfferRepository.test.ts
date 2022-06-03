@@ -58,28 +58,28 @@ describe(ForcedTradeOfferRepository.name, () => {
     const id1 = await repository.add(
       fakeInitialOffer({
         syntheticAssetId: AssetId('BTC-10'),
-        aIsBuyingSynthetic: true,
+        isABuyingSynthetic: true,
         createdAt: Timestamp(1),
       })
     )
     const id2 = await repository.add(
       fakeInitialOffer({
         syntheticAssetId: AssetId('ETH-9'),
-        aIsBuyingSynthetic: false,
+        isABuyingSynthetic: false,
         createdAt: Timestamp(2),
       })
     )
     const id3 = await repository.add(
       fakeInitialOffer({
         syntheticAssetId: AssetId('AAVE-8'),
-        aIsBuyingSynthetic: false,
+        isABuyingSynthetic: false,
         createdAt: Timestamp(3),
       })
     )
     const id4 = await repository.add(
       fakeInitialOffer({
         syntheticAssetId: AssetId('AAVE-8'),
-        aIsBuyingSynthetic: true,
+        isABuyingSynthetic: true,
         createdAt: Timestamp(4),
       })
     )

@@ -39,7 +39,7 @@ async function main() {
       type: 'withdrawal',
       amount: args.quantizedAmount.toBigInt(),
       positionId: args.vaultId.toBigInt(),
-      publicKey: StarkKey.from(args.starkKey),
+      starkKey: StarkKey.from(args.starkKey),
     })
   })
 
@@ -48,9 +48,9 @@ async function main() {
     simulation.queueForcedAction({
       type: 'trade',
       positionIdA: args.vaultIdA.toBigInt(),
-      publicKeyA: StarkKey.from(args.starkKeyA),
+      starkKeyA: StarkKey.from(args.starkKeyA),
       positionIdB: args.vaultIdB.toBigInt(),
-      publicKeyB: StarkKey.from(args.starkKeyB),
+      starkKeyB: StarkKey.from(args.starkKeyB),
       collateralAmount: args.amountCollateral.toBigInt(),
       syntheticAmount: args.amountSynthetic.toBigInt(),
       isABuyingSynthetic: args.aIsBuyingSynthetic,

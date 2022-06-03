@@ -8,7 +8,7 @@ import { BaseRepository } from './BaseRepository'
 
 export interface PositionRecord {
   positionId: bigint
-  publicKey: StarkKey
+  starkKey: StarkKey
   collateralBalance: bigint
   balances: readonly AssetBalance[]
 }
@@ -24,7 +24,7 @@ export class PositionRepository extends BaseRepository {
     this.findById = this.wrapFind(this.findById)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
     this.findById = this.wrapFind(this.findById)
-    this.findIdByPublicKey = this.wrapFind(this.findIdByPublicKey)
+    this.findIdByStarkKey = this.wrapFind(this.findIdByStarkKey)
     this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
     this.getPreviousStates = this.wrapGet(this.getPreviousStates)
     this.count = this.wrapAny(this.count)
@@ -77,9 +77,9 @@ export class PositionRepository extends BaseRepository {
     return row ? toPositionWithPricesRecord(row) : undefined
   }
 
-  async findIdByPublicKey(publicKey: StarkKey): Promise<bigint | undefined> {
+  async findIdByStarkKey(starkKey: StarkKey): Promise<bigint | undefined> {
     const row = await this.knex('positions')
-      .where('public_key', publicKey.toString())
+      .where('stark_key', starkKey.toString())
       .first('position_id')
     return row?.position_id
   }
@@ -93,7 +93,7 @@ export class PositionRepository extends BaseRepository {
       .where('eth_address', address.toString())
       .join('positions', function () {
         this.on(
-          'positions.public_key',
+          'positions.stark_key',
           '=',
           'user_registration_events.stark_key'
         )
@@ -144,7 +144,7 @@ export function toPositionRecord(
   return {
     stateUpdateId: row.state_update_id,
     positionId: BigInt(row.position_id),
-    publicKey: StarkKey(row.public_key),
+    starkKey: StarkKey(row.stark_key),
     collateralBalance: BigInt(row.collateral_balance),
     balances: (typeof row.balances === 'string'
       ? (JSON.parse(row.balances) as AssetBalanceJson[])
@@ -182,7 +182,7 @@ export function toPositionRow(
   return {
     state_update_id: stateUpdateId,
     position_id: record.positionId,
-    public_key: record.publicKey.toString(),
+    stark_key: record.starkKey.toString(),
     collateral_balance: record.collateralBalance,
     balances: JSON.stringify(balances),
   }
