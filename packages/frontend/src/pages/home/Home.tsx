@@ -29,7 +29,8 @@ export function Home(props: HomeProps) {
       account={props.account}
       withoutSearch
     >
-      <div className="mb-12 flex gap-x-4 items-center">
+      <SearchBar className="drop-shadow-lg mb-6 sm:mb-12" />
+      <div className="mb-6 sm:mb-12 flex flex-col md:flex-row gap-x-4 gap-y-1 items-center">
         <Stat title="Total Value Locked" value="-" valueId={tvlElId} />
         <Stat title="State updates" value={props.totalUpdates.toString()} />
         <Stat
@@ -38,7 +39,6 @@ export function Home(props: HomeProps) {
         />
         <FreezeButton />
       </div>
-      <SearchBar className="drop-shadow-lg mb-12" />
       <div className="mb-1.5">
         <span className="float-left font-medium text-lg">
           Latest state updates

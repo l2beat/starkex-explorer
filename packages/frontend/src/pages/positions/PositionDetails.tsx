@@ -153,7 +153,7 @@ export function PositionDetails({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <div className="mb-12 flex items-center">
+      <div className="mb-6 sm:mb-12 flex items-center">
         <h1 className="font-sans font-bold text-2xl">
           Position #{positionId.toString()}
         </h1>
