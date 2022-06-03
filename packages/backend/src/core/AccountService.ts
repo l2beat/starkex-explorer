@@ -21,9 +21,7 @@ export class AccountService {
       }
     }
 
-    const pendingCount = await this.offerRepository.countPendingByPositionIdA(
-      id
-    )
+    const pendingCount = await this.offerRepository.countPendingByPositionId(id)
     return {
       address,
       positionId: id,

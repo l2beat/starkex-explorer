@@ -40,7 +40,7 @@ export class PositionController {
       this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.forcedTransactionsRepository.getAffectingPosition(positionId),
-      this.forcedTradeOfferRepository.getPendingByPositionIdA(positionId),
+      this.forcedTradeOfferRepository.getPendingByPositionId(positionId),
     ])
 
     if (!history[0]) {
@@ -107,6 +107,7 @@ export class PositionController {
       pendingOffers: pendingOffers.map((offer) => ({
         ...offer,
         type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        role: offer.positionIdA === positionId ? 'maker' : 'taker',
         acceptForm: user && getAcceptForm(offer, user),
         cancelForm: user && getCancelForm(offer, user),
         finalizeForm:

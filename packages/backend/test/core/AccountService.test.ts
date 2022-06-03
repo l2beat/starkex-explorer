@@ -36,7 +36,7 @@ describe(AccountService.name, () => {
         findIdByEthereumAddress: async () => 123n,
       }),
       mock<ForcedTradeOfferRepository>({
-        countPendingByPositionIdA: async () => 0,
+        countPendingByPositionId: async () => 0,
       })
     )
     const address = EthereumAddress.fake()
@@ -54,7 +54,7 @@ describe(AccountService.name, () => {
         findIdByEthereumAddress: async () => 123n,
       }),
       mock<ForcedTradeOfferRepository>({
-        countPendingByPositionIdA: async () => 1,
+        countPendingByPositionId: async () => 1,
       })
     )
     const address = EthereumAddress.fake()

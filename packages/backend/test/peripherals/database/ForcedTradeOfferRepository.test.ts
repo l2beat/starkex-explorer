@@ -215,9 +215,9 @@ describe(ForcedTradeOfferRepository.name, () => {
     const offer = fakeInitialOffer()
     await repository.add(offer)
 
-    expect(await repository.getPendingByPositionIdA(offer.positionIdA)).toEqual(
-      [offer]
-    )
+    expect(await repository.getPendingByPositionId(offer.positionIdA)).toEqual([
+      offer,
+    ])
   })
 
   it('deletes all records', async () => {
