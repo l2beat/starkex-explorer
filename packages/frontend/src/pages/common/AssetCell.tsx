@@ -14,7 +14,7 @@ export function AssetCell({ assetId, amount }: AssetCellProps) {
   return (
     <div className="flex gap-x-1 items-center w-max">
       <AssetIcon assetId={assetId} width="16" height="16" />
-      {amount && `${formatCurrencyUnits(amount, assetId)} `}
+      {amount !== undefined && `${formatCurrencyUnits(amount, assetId)} `}
       {symbol}
     </div>
   )

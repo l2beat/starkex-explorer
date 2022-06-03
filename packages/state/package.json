@@ -22,7 +22,7 @@
     "@explorer/crypto": "*",
     "@explorer/encoding": "*",
     "@explorer/types": "*",
-    "@types/lodash": "^4.14.178",
+    "@types/lodash": "^4.14.182",
     "lodash": "^4.17.21"
   },
   "devDependencies": {}
