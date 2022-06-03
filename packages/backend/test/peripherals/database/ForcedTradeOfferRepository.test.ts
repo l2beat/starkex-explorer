@@ -1,52 +1,10 @@
-import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
-import { fakeHexString } from '@explorer/types/src/fake'
+import { AssetId, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import {
-  Accepted,
-  ForcedTradeOfferRecord,
-  ForcedTradeOfferRepository,
-} from '../../../src/peripherals/database/ForcedTradeOfferRepository'
+import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { fakeBigInt, fakeBoolean, fakeInt, fakeTimestamp } from '../../fakes'
+import { fakeAccepted, fakeInitialOffer, fakeOffer } from '../../fakes'
 import { setupDatabaseTestSuite } from './setup'
-
-function fakeAccepted(accepted?: Partial<Accepted>): Accepted {
-  return {
-    at: fakeTimestamp(),
-    nonce: fakeBigInt(),
-    positionIdB: fakeBigInt(),
-    premiumCost: fakeBoolean(),
-    signature: fakeHexString(32),
-    starkKeyB: StarkKey.fake(),
-    submissionExpirationTime: fakeBigInt(),
-    transactionHash: undefined,
-    ...accepted,
-  }
-}
-
-function fakeOffer(
-  offer?: Partial<ForcedTradeOfferRecord>
-): ForcedTradeOfferRecord {
-  return {
-    id: fakeInt(),
-    createdAt: fakeTimestamp(),
-    starkKeyA: StarkKey.fake(),
-    positionIdA: fakeBigInt(),
-    syntheticAssetId: AssetId('ETH-9'),
-    amountCollateral: fakeBigInt(),
-    amountSynthetic: fakeBigInt(),
-    aIsBuyingSynthetic: true,
-    accepted: fakeAccepted(offer?.accepted),
-    ...offer,
-  }
-}
-
-function fakeInitialOffer(
-  offer?: Partial<Omit<ForcedTradeOfferRecord, 'accepted'>>
-) {
-  return fakeOffer({ ...offer, accepted: undefined, cancelledAt: undefined })
-}
 
 describe(ForcedTradeOfferRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()

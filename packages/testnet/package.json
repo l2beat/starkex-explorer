@@ -4,6 +4,10 @@
   "private": true,
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
+  "engines": {
+    "node": "^16.0.0",
+    "yarn": ">=1.22.0"
+  },
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
@@ -17,7 +21,7 @@
     "@explorer/encoding": "*",
     "@explorer/state": "*",
     "@explorer/types": "*",
-    "ethers": "^5.5.2",
+    "ethers": "^5.6.8",
     "ganache": "^7.2.0"
   },
   "devDependencies": {

@@ -69,6 +69,7 @@ export function getCancelForm(
 }
 
 interface FinalizeForm extends FinalizeOfferData {
+  offerId: number
   address: EthereumAddress
   perpetualAddress: EthereumAddress
 }
@@ -83,6 +84,7 @@ export function getFinalizeForm(
     return undefined
   }
   return {
+    offerId: offer.id,
     nonce: offer.accepted.nonce,
     positionIdA: offer.positionIdA,
     positionIdB: offer.accepted.positionIdB,
