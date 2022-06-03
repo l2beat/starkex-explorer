@@ -14,13 +14,13 @@ import {
 import { PositionRecord } from '../../../peripherals/database/PositionRepository'
 
 export function validateSyntheticBalance(
-  amountSynthetic: bigint,
+  syntheticAmount: bigint,
   syntheticAssetId: AssetId,
   positionBalances: readonly AssetBalance[]
 ): boolean {
   const syntheticBalance =
     positionBalances.find((b) => b.assetId === syntheticAssetId)?.balance || 0n
-  return amountSynthetic <= syntheticBalance
+  return syntheticAmount <= syntheticBalance
 }
 
 function validateSignature(
@@ -70,9 +70,9 @@ export function validateCreate(
   addressA: EthereumAddress
 ) {
   const balanceValid =
-    offer.aIsBuyingSynthetic ||
+    offer.isABuyingSynthetic ||
     validateSyntheticBalance(
-      offer.amountSynthetic,
+      offer.syntheticAmount,
       offer.syntheticAssetId,
       positionA.balances
     )

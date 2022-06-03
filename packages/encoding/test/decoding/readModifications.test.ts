@@ -26,7 +26,7 @@ describe(readModifications.name, () => {
       .writeNumber(32n + 2n ** 64n, 32)
     expect(decode(writer.getBytes())).toEqual([
       {
-        publicKey: StarkKey.fake('1234abcd'),
+        starkKey: StarkKey.fake('1234abcd'),
         positionId: 123n,
         difference: 32n,
       },
@@ -45,12 +45,12 @@ describe(readModifications.name, () => {
 
     expect(decode(writer.getBytes())).toEqual([
       {
-        publicKey: StarkKey.fake('1234abcd'),
+        starkKey: StarkKey.fake('1234abcd'),
         positionId: 123n,
         difference: 32n,
       },
       {
-        publicKey: StarkKey.fake('deadbeef'),
+        starkKey: StarkKey.fake('deadbeef'),
         positionId: 456n,
         difference: -32n,
       },

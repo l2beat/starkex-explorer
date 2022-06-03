@@ -71,7 +71,7 @@ export class PositionController {
       address && this.positionRepository.findIdByEthereumAddress(address),
       address &&
         this.userRegistrationEventRepository.findByEthereumAddress(address),
-      this.userRegistrationEventRepository.findByStarkKey(current.publicKey),
+      this.userRegistrationEventRepository.findByStarkKey(current.starkKey),
     ])
 
     const user =
@@ -86,7 +86,7 @@ export class PositionController {
     const content = renderPositionDetailsPage({
       account,
       positionId,
-      publicKey: current.publicKey,
+      starkKey: current.starkKey,
       ethAddress: ownerEvent?.ethAddress,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
@@ -106,7 +106,7 @@ export class PositionController {
       transactions: transactions.map(toForcedTransactionEntry),
       pendingOffers: pendingOffers.map((offer) => ({
         ...offer,
-        type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        type: offer.isABuyingSynthetic ? 'buy' : 'sell',
         acceptForm: user && getAcceptForm(offer, user),
         cancelForm: user && getCancelForm(offer, user),
         finalizeForm:
@@ -154,8 +154,8 @@ export class PositionController {
       stateUpdateId,
       positionId,
       lastUpdateTimestamp: update.timestamp,
-      previousPublicKey: previousPosition?.publicKey,
-      publicKey: position.publicKey,
+      previousStarkKey: previousPosition?.starkKey,
+      starkKey: position.starkKey,
       assetChanges,
       transactions: transactions
         .filter((t) => {
