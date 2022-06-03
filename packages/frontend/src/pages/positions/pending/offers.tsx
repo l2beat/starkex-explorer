@@ -7,11 +7,8 @@ import {
   formatRelativeTime,
 } from '../../formatting'
 import { OfferType } from '../../offers'
-import { AcceptOfferFormData } from '../../offers/accept-form'
-import { CancelOfferFormData } from '../../offers/cancel-form'
-import { FinalizeOfferFormData } from '../../offers/finalize-form'
 
-function buildPendingOfferRow(offer: PendingOffer) {
+function buildPendingOfferRow(offer: OfferHistoryEntry) {
   return {
     link: `/forced/offers/${offer.id}`,
     cells: [
@@ -29,7 +26,11 @@ function buildPendingOfferRow(offer: PendingOffer) {
       ) : (
         formatRelativeTime(offer.createdAt)
       ),
-      offer.accepted ? 'Taker found' : 'Looking for a taker',
+      offer.cancelledAt
+        ? 'Cancelled'
+        : offer.accepted
+        ? 'Taker found'
+        : 'Looking for a taker',
       formatCurrencyApproximation(
         offer.amountSynthetic,
         offer.syntheticAssetId,
@@ -40,27 +41,28 @@ function buildPendingOfferRow(offer: PendingOffer) {
   }
 }
 
-export interface PendingOffer {
+export interface OfferHistoryEntry {
   id: number
   type: OfferType
   role: 'maker' | 'taker'
   createdAt: Timestamp
-  syntheticAssetId: AssetId
-  amountSynthetic: bigint
-  amountCollateral: bigint
   accepted?: {
     submissionExpirationTime: bigint
   }
-  acceptForm?: AcceptOfferFormData
-  cancelForm?: CancelOfferFormData
-  finalizeForm?: FinalizeOfferFormData
+  cancelledAt?: Timestamp
+  syntheticAssetId: AssetId
+  amountSynthetic: bigint
+  amountCollateral: bigint
 }
 
-interface PendingOffersProps {
-  offers: readonly PendingOffer[]
+interface ActiveOffersProps {
+  offers: readonly OfferHistoryEntry[]
 }
 
-export function PendingOffers({ offers }: PendingOffersProps) {
+export function ActiveOffers({ offers }: ActiveOffersProps) {
+  if (offers.length === 0) {
+    return null
+  }
   return (
     <>
       <div className="mb-1.5 font-medium text-lg text-left">

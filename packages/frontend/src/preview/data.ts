@@ -165,7 +165,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
     },
   ],
   transactions: createFakeTransactions(5),
-  pendingOffers: [
+  offers: [
     {
       id: 1,
       role: 'maker',

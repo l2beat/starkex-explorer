@@ -173,7 +173,7 @@ describe(ForcedTradeOfferRepository.name, () => {
     const offer = fakeInitialOffer()
     await repository.add(offer)
 
-    expect(await repository.getPendingByPositionId(offer.positionIdA)).toEqual([
+    expect(await repository.getHistoryByPositionId(offer.positionIdA)).toEqual([
       offer,
     ])
   })
