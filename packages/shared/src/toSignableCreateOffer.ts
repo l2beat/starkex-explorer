@@ -8,7 +8,7 @@ export function toSignableCreateOffer(offer: CreateOfferData) {
       syntheticAssetId: offer.syntheticAssetId,
       collateralAmount: offer.collateralAmount.toString(),
       syntheticAmount: offer.syntheticAmount.toString(),
-      aIsBuyingSynthetic: offer.aIsBuyingSynthetic,
+      isABuyingSynthetic: offer.isABuyingSynthetic,
     },
     null,
     2

@@ -14,7 +14,7 @@ const INITIAL = {
   syntheticAssetId: AssetId('AAVE-8'),
   collateralAmount: BigInt('0x684ee1800'),
   syntheticAmount: BigInt('0xf4240'),
-  aIsBuyingSynthetic: true,
+  isABuyingSynthetic: true,
 }
 
 const ACCEPTED = {

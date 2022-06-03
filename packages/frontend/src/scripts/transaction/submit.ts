@@ -57,7 +57,7 @@ async function submitOffer(state: FormState) {
     collateralAmount: state.totalInputValue,
     syntheticAmount: state.amountInputValue,
     syntheticAssetId: state.selectedAsset.assetId,
-    aIsBuyingSynthetic: state.buyButtonSelected,
+    isABuyingSynthetic: state.buyButtonSelected,
   }
 
   const signature = await signCreate(offer, state.props.account.address)

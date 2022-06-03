@@ -9,7 +9,7 @@ const offer = {
   syntheticAssetId: AssetId('BTC-10'),
   collateralAmount: 2n,
   syntheticAmount: 3n,
-  aIsBuyingSynthetic: true,
+  isABuyingSynthetic: true,
 }
 
 describe(toSignableCreateOffer.name, () => {
@@ -22,7 +22,7 @@ describe(toSignableCreateOffer.name, () => {
         '  "syntheticAssetId": "BTC-10",',
         '  "collateralAmount": "2",',
         '  "syntheticAmount": "3",',
-        '  "aIsBuyingSynthetic": true',
+        '  "isABuyingSynthetic": true',
         '}',
       ].join('\n')
     )

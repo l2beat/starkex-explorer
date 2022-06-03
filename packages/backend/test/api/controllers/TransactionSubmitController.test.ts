@@ -227,7 +227,7 @@ describe(TransactionSubmitController.name, () => {
         syntheticAssetId: AssetId.USDC,
         collateralAmount: 0n,
         syntheticAmount: 0n,
-        aIsBuyingSynthetic: false,
+        isABuyingSynthetic: false,
         nonce: 0n,
         signature: Hash256.fake().toString(),
         starkKeyB: StarkKey.fake(),

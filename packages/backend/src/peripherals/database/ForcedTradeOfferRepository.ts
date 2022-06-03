@@ -24,7 +24,7 @@ interface Record {
   syntheticAssetId: AssetId
   collateralAmount: bigint
   syntheticAmount: bigint
-  aIsBuyingSynthetic: boolean
+  isABuyingSynthetic: boolean
   accepted?: Accepted
   cancelledAt?: Timestamp
 }
@@ -43,7 +43,7 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
     synthetic_asset_id: record.syntheticAssetId.toString(),
     collateral_amount: record.collateralAmount,
     synthetic_amount: record.syntheticAmount,
-    is_a_buying_synthetic: record.aIsBuyingSynthetic,
+    is_a_buying_synthetic: record.isABuyingSynthetic,
     accepted_at: record.accepted?.at
       ? BigInt(record.accepted.at.toString())
       : null,
@@ -79,7 +79,7 @@ function toRecord(row: Row): Record {
     syntheticAssetId: AssetId(row.synthetic_asset_id),
     collateralAmount: row.collateral_amount,
     syntheticAmount: row.synthetic_amount,
-    aIsBuyingSynthetic: row.is_a_buying_synthetic,
+    isABuyingSynthetic: row.is_a_buying_synthetic,
     accepted: undefined,
     cancelledAt: row.cancelled_at ? Timestamp(row.cancelled_at) : undefined,
   }

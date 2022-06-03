@@ -121,7 +121,7 @@ export class ForcedTradeOfferController {
       account,
       history: toForcedTradeOfferHistory(offer),
       offer: {
-        type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        type: offer.isABuyingSynthetic ? 'buy' : 'sell',
         id,
         addressA: userA.ethAddress,
         positionIdA: offer.positionIdA,

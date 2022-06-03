@@ -53,7 +53,7 @@ async function main() {
       starkKeyB: StarkKey.from(args.starkKeyB),
       collateralAmount: args.collateralAmount.toBigInt(),
       syntheticAmount: args.syntheticAmount.toBigInt(),
-      isABuyingSynthetic: args.aIsBuyingSynthetic,
+      isABuyingSynthetic: args.isABuyingSynthetic,
       syntheticAssetId: decodeAssetId(
         args.syntheticAssetId.toHexString().slice(0, 2)
       ),

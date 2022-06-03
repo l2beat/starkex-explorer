@@ -106,7 +106,7 @@ export class PositionController {
       transactions: transactions.map(toForcedTransactionEntry),
       pendingOffers: pendingOffers.map((offer) => ({
         ...offer,
-        type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        type: offer.isABuyingSynthetic ? 'buy' : 'sell',
         acceptForm: user && getAcceptForm(offer, user),
         cancelForm: user && getCancelForm(offer, user),
         finalizeForm:

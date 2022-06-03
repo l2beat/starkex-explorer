@@ -15,7 +15,7 @@ const initialData = {
     syntheticAssetId: AssetId('ETH-9').toString(),
     collateralAmount: 2000n.toString(),
     syntheticAmount: 1n.toString(),
-    aIsBuyingSynthetic: true,
+    isABuyingSynthetic: true,
   },
   signature,
 }

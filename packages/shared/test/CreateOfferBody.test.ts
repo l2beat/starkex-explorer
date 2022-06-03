@@ -7,7 +7,7 @@ describe('CreateOfferBody', () => {
   it('can be serialized and deserialized', () => {
     const body: CreateOfferBody = {
       offer: {
-        aIsBuyingSynthetic: true,
+        isABuyingSynthetic: true,
         collateralAmount: 123n,
         syntheticAmount: 456n,
         positionIdA: 789n,

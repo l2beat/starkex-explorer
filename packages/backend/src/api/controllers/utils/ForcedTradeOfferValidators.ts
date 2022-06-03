@@ -70,7 +70,7 @@ export function validateCreate(
   addressA: EthereumAddress
 ) {
   const balanceValid =
-    offer.aIsBuyingSynthetic ||
+    offer.isABuyingSynthetic ||
     validateSyntheticBalance(
       offer.syntheticAmount,
       offer.syntheticAssetId,

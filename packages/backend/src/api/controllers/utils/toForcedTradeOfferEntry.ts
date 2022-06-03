@@ -9,7 +9,7 @@ export function toForcedTradeOfferEntry(
   return {
     id: offer.id,
     createdAt: offer.createdAt,
-    type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+    type: offer.isABuyingSynthetic ? 'buy' : 'sell',
     amount: offer.syntheticAmount,
     assetId: offer.syntheticAssetId,
     positionId: offer.positionIdA,

@@ -21,7 +21,7 @@ contract Perpetual {
         uint256 syntheticAssetId,
         uint256 collateralAmount,
         uint256 syntheticAmount,
-        bool aIsBuyingSynthetic,
+        bool isABuyingSynthetic,
         uint256 nonce
     );
 
@@ -51,7 +51,7 @@ contract Perpetual {
         uint256 syntheticAssetId,
         uint256 collateralAmount,
         uint256 syntheticAmount,
-        bool aIsBuyingSynthetic,
+        bool isABuyingSynthetic,
         uint256,
         uint256 nonce,
         bytes calldata,
@@ -66,7 +66,7 @@ contract Perpetual {
             syntheticAssetId,
             collateralAmount,
             syntheticAmount,
-            aIsBuyingSynthetic,
+            isABuyingSynthetic,
             nonce
         );
     }

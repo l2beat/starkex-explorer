@@ -9,7 +9,7 @@ export function toSignableAcceptOffer(
     syntheticAssetId: AssetId
     collateralAmount: bigint
     syntheticAmount: bigint
-    aIsBuyingSynthetic: boolean
+    isABuyingSynthetic: boolean
   },
   accepted: {
     starkKeyB: StarkKey
@@ -40,7 +40,7 @@ export function toSignableAcceptOffer(
       `0x${encodeAssetId(offer.syntheticAssetId)}`,
       offer.collateralAmount,
       offer.syntheticAmount,
-      offer.aIsBuyingSynthetic,
+      offer.isABuyingSynthetic,
       accepted.nonce,
     ]
   )

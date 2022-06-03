@@ -11,7 +11,7 @@ export const CreateOfferData = z.object({
   syntheticAssetId: stringAs(AssetId),
   collateralAmount: stringAsBigInt(),
   syntheticAmount: stringAsBigInt(),
-  aIsBuyingSynthetic: z.boolean(),
+  isABuyingSynthetic: z.boolean(),
 })
 
 export function serializeCreateOfferData(data: CreateOfferData) {

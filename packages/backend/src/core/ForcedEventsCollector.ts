@@ -19,7 +19,7 @@ const PERPETUAL_ABI = new utils.Interface([
     uint256 syntheticAssetId,
     uint256 collateralAmount,
     uint256 syntheticAmount,
-    bool aIsBuyingSynthetic,
+    bool isABuyingSynthetic,
     uint256 nonce
   )`,
 ])
@@ -118,7 +118,7 @@ export class ForcedEventsCollector {
                 syntheticAssetId: decodeAssetId(
                   event.args.syntheticAssetId.toHexString().slice(2)
                 ),
-                isABuyingSynthetic: event.args.aIsBuyingSynthetic,
+                isABuyingSynthetic: event.args.isABuyingSynthetic,
                 collateralAmount: BigInt(event.args.collateralAmount),
                 syntheticAmount: BigInt(event.args.syntheticAmount),
                 nonce: BigInt(event.args.nonce),

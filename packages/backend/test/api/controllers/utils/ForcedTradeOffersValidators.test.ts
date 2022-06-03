@@ -14,7 +14,7 @@ import { accepted, addressB, offer } from './ForcedTradeOfferMockData'
 describe(validateCreateSignature.name, () => {
   it('accepts correct input', async () => {
     const offer = {
-      aIsBuyingSynthetic: true,
+      isABuyingSynthetic: true,
       collateralAmount: fakeBigInt(),
       syntheticAmount: fakeBigInt(),
       positionIdA: fakeBigInt(),

@@ -86,7 +86,7 @@ export class TransactionSubmitController {
           positionIdB: data.positionIdB,
           syntheticAssetId: data.syntheticAssetId,
           collateralAmount: data.collateralAmount,
-          isABuyingSynthetic: data.aIsBuyingSynthetic,
+          isABuyingSynthetic: data.isABuyingSynthetic,
           nonce: data.nonce,
           syntheticAmount: data.syntheticAmount,
         },
@@ -122,7 +122,7 @@ function tradeMatchesOffer(
     offer.accepted?.positionIdB === trade.positionIdB &&
     offer.collateralAmount === trade.collateralAmount &&
     offer.syntheticAmount === trade.syntheticAmount &&
-    offer.aIsBuyingSynthetic === trade.aIsBuyingSynthetic &&
+    offer.isABuyingSynthetic === trade.isABuyingSynthetic &&
     offer.accepted?.submissionExpirationTime ===
       trade.submissionExpirationTime &&
     offer.accepted?.nonce === trade.nonce &&

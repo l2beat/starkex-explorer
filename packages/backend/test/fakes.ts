@@ -106,7 +106,7 @@ export function fakeOffer(
     syntheticAssetId: AssetId('ETH-9'),
     collateralAmount: fakeBigInt(),
     syntheticAmount: fakeBigInt(),
-    aIsBuyingSynthetic: true,
+    isABuyingSynthetic: true,
     accepted: fakeAccepted(offer?.accepted),
     ...offer,
   }

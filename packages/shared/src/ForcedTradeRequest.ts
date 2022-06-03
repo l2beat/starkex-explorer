@@ -12,7 +12,7 @@ const coder = new Interface([
       uint256 syntheticAssetId,
       uint256 collateralAmount,
       uint256 syntheticAmount,
-      bool aIsBuyingSynthetic,
+      bool isABuyingSynthetic,
       uint256 submissionExpirationTime,
       uint256 nonce,
       bytes calldata signature,
@@ -29,7 +29,7 @@ export interface ForcedTradeRequest {
   syntheticAssetId: AssetId
   collateralAmount: bigint
   syntheticAmount: bigint
-  aIsBuyingSynthetic: boolean
+  isABuyingSynthetic: boolean
   submissionExpirationTime: bigint
   nonce: bigint
   signature: string
@@ -54,7 +54,7 @@ export function decodeForcedTradeRequest(
       ),
       collateralAmount: BigInt(decoded.collateralAmount),
       syntheticAmount: BigInt(decoded.syntheticAmount),
-      aIsBuyingSynthetic: Boolean(decoded.aIsBuyingSynthetic),
+      isABuyingSynthetic: Boolean(decoded.isABuyingSynthetic),
       submissionExpirationTime: BigInt(decoded.submissionExpirationTime),
       nonce: BigInt(decoded.nonce),
       signature: String(decoded.signature),
@@ -77,7 +77,7 @@ export function encodeForcedTradeRequest(
     '0x' + encodeAssetId(data.syntheticAssetId),
     data.collateralAmount,
     data.syntheticAmount,
-    data.aIsBuyingSynthetic,
+    data.isABuyingSynthetic,
     data.submissionExpirationTime,
     data.nonce,
     data.signature,
