@@ -1,11 +1,11 @@
 import {
   deserializeAcceptedData,
+  deserializeCreateOfferData,
   serializeAcceptOfferBody,
 } from '@explorer/shared'
-import { deserializeCreateOfferData } from '@explorer/shared/build/src/CreateOfferData'
 import { EthereumAddress } from '@explorer/types'
 
-import { FormClass } from '../../pages/offers/accept-form'
+import { FormClass } from '../../pages/offers/accept-form/attributes'
 import { getAttribute } from './getAttribute'
 import { signAccepted } from './sign'
 
