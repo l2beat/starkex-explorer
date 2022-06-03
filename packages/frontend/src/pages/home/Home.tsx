@@ -55,6 +55,7 @@ export function Home(props: HomeProps) {
           { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
+          { header: 'Forced txs', numeric: true },
         ]}
         rows={props.stateUpdates.map((update) => {
           const link = `/state-updates/${update.id}`
@@ -65,6 +66,7 @@ export function Home(props: HomeProps) {
               formatHashLong(update.hash),
               formatRelativeTime(update.timestamp),
               update.positionCount.toString(),
+              update.forcedTransactionsCount,
             ],
           }
         })}
