@@ -27,17 +27,14 @@ export function AssetSelect({ assetId, assetIds = [] }: AssetSelectProps) {
         id="assetId"
         name={AssetIdSelectName}
         className="absolute top-0 left-0 w-full h-full opacity-0 bg-white appearance-none cursor-pointer"
+        defaultValue={assetId?.toString() ?? DisabledOptionValue}
       >
         {assetIds.map((id) => (
-          <option
-            key={id.toString()}
-            value={id.toString()}
-            selected={id === assetId}
-          >
+          <option key={id.toString()} value={id.toString()}>
             {AssetId.symbol(id)}
           </option>
         ))}
-        <option key="all" value={DisabledOptionValue} selected={!assetId}>
+        <option key="all" value={DisabledOptionValue}>
           All assets
         </option>
       </select>

@@ -39,7 +39,7 @@ export function PendingOffers({ offers }: PendingOffersProps) {
     <>
       <div className="mb-1.5 font-medium text-lg text-left">Pending Offers</div>
       <table
-        className="w-full border-separate mb-12"
+        className="w-full border-separate mb-6 sm:mb-12"
         style={{ borderSpacing: '0 4px' }}
       >
         {offers.map((offer, i) => {

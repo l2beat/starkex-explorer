@@ -53,7 +53,7 @@ export function PositionAtUpdate({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-12">
+      <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
         Position #{positionId.toString()} - Update at #
         {stateUpdateId.toString()}
       </h1>

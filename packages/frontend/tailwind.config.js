@@ -7,6 +7,9 @@ module.exports = {
         sans: ['Fira Sans', 'sans-serif'],
         mono: ['Fira Mono', 'mono'],
       },
+      screens: {
+        wide: '900px',
+      },
     },
     colors: {
       grey: {
