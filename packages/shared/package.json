@@ -4,6 +4,10 @@
   "private": true,
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
+  "engines": {
+    "node": "^16.0.0",
+    "yarn": ">=1.22.0"
+  },
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
@@ -15,12 +19,13 @@
     "coverage": "nyc --reporter=lcov --reporter=text mocha"
   },
   "dependencies": {
-    "@ethersproject/solidity": "5.5.0",
+    "@ethersproject/abi": "^5.6.3",
+    "@ethersproject/solidity": "^5.6.1",
     "@explorer/encoding": "*",
     "@explorer/types": "*",
-    "zod": "^3.11.6"
+    "zod": "^3.17.3"
   },
   "devDependencies": {
-    "@ethersproject/transactions": "5.5.0"
+    "@ethersproject/transactions": "^5.6.2"
   }
 }

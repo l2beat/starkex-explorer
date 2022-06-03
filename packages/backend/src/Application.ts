@@ -198,6 +198,7 @@ export class Application {
       userRegistrationEventRepository,
       positionRepository,
       forcedTransactionsRepository,
+      forcedTradeOfferRepository,
       config.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
@@ -221,6 +222,7 @@ export class Application {
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
       forcedTransactionsRepository,
+      forcedTradeOfferRepository,
       config.contracts.perpetual
     )
 
