@@ -188,9 +188,9 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rowIds.map(String).map(AssetId)
   }
 
-  private getByPositionIdQuery(positionId: bigint, pending?: boolean) {
+  private getByPositionIdQuery(positionId: bigint, active?: boolean) {
     let query = this.knex('forced_trade_offers').whereNull('transaction_hash')
-    if (pending) {
+    if (active) {
       query = query.whereNull('cancelled_at')
     }
     return query
@@ -198,7 +198,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
       .orWhere({ position_id_b: positionId })
   }
 
-  async countPendingByPositionId(positionId: bigint) {
+  async countActiveByPositionId(positionId: bigint) {
     const [{ count }] = await this.getByPositionIdQuery(
       positionId,
       true

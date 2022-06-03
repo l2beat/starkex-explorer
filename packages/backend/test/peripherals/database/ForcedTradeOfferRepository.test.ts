@@ -169,7 +169,7 @@ describe(ForcedTradeOfferRepository.name, () => {
     ).toEqual([0, []])
   })
 
-  it('returns pending offers by position id A', async () => {
+  it('returns active offers by position id A', async () => {
     const offer = fakeInitialOffer()
     await repository.add(offer)
 
