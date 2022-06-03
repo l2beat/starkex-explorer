@@ -40,11 +40,11 @@ export function toStatsRows(
     },
     {
       title: 'Tokens sold',
-      content: formatCurrency(offer.amountSynthetic, offer.syntheticAssetId),
+      content: formatCurrency(offer.syntheticAmount, offer.syntheticAssetId),
     },
     {
       title: 'Value received',
-      content: formatCurrency(offer.amountCollateral, AssetId.USDC),
+      content: formatCurrency(offer.collateralAmount, AssetId.USDC),
     },
   ]
 

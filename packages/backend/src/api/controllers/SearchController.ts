@@ -48,7 +48,7 @@ export class SearchController {
       return
     }
 
-    const positionId = await this.positionRepository.findIdByPublicKey(
+    const positionId = await this.positionRepository.findIdByStarkKey(
       userRegistrationEvent.starkKey
     )
     if (positionId === undefined) {
@@ -80,7 +80,7 @@ export class SearchController {
       return
     }
 
-    const positionId = await this.positionRepository.findIdByPublicKey(
+    const positionId = await this.positionRepository.findIdByStarkKey(
       userRegistrationEvent.starkKey
     )
     if (positionId === undefined) {

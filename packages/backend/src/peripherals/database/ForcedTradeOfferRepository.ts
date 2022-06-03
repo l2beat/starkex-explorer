@@ -22,9 +22,9 @@ interface Record {
   starkKeyA: StarkKey
   positionIdA: bigint
   syntheticAssetId: AssetId
-  amountCollateral: bigint
-  amountSynthetic: bigint
-  aIsBuyingSynthetic: boolean
+  collateralAmount: bigint
+  syntheticAmount: bigint
+  isABuyingSynthetic: boolean
   accepted?: Accepted
   cancelledAt?: Timestamp
 }
@@ -41,9 +41,9 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
     stark_key_a: record.starkKeyA.toString(),
     position_id_a: record.positionIdA,
     synthetic_asset_id: record.syntheticAssetId.toString(),
-    amount_collateral: record.amountCollateral,
-    amount_synthetic: record.amountSynthetic,
-    a_is_buying_synthetic: record.aIsBuyingSynthetic,
+    collateral_amount: record.collateralAmount,
+    synthetic_amount: record.syntheticAmount,
+    is_a_buying_synthetic: record.isABuyingSynthetic,
     accepted_at: record.accepted?.at
       ? BigInt(record.accepted.at.toString())
       : null,
@@ -77,9 +77,9 @@ function toRecord(row: Row): Record {
     starkKeyA: StarkKey(row.stark_key_a),
     positionIdA: row.position_id_a,
     syntheticAssetId: AssetId(row.synthetic_asset_id),
-    amountCollateral: row.amount_collateral,
-    amountSynthetic: row.amount_synthetic,
-    aIsBuyingSynthetic: row.a_is_buying_synthetic,
+    collateralAmount: row.collateral_amount,
+    syntheticAmount: row.synthetic_amount,
+    isABuyingSynthetic: row.is_a_buying_synthetic,
     accepted: undefined,
     cancelledAt: row.cancelled_at ? Timestamp(row.cancelled_at) : undefined,
   }
@@ -153,7 +153,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     }
     if (type) {
       query.andWhere(
-        'a_is_buying_synthetic',
+        'is_a_buying_synthetic',
         '=',
         type === 'buy' ? true : false
       )

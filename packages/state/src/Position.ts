@@ -16,7 +16,7 @@ export class Position extends MerkleValue {
   static EMPTY = new Position(StarkKey.ZERO, 0n, [])
 
   constructor(
-    public readonly publicKey: StarkKey,
+    public readonly starkKey: StarkKey,
     public readonly collateralBalance: bigint,
     public readonly assets: readonly PositionAsset[],
     protected knownHash?: PedersenHash
@@ -31,7 +31,7 @@ export class Position extends MerkleValue {
     ])
     const items = [
       ...this.assets.map(packAsset).sort(),
-      this.publicKey.substring(2),
+      this.starkKey.substring(2),
       packedPosition,
     ]
     let hash = PedersenHash.ZERO
@@ -43,7 +43,7 @@ export class Position extends MerkleValue {
 
   getData() {
     return {
-      publicKey: this.publicKey,
+      starkKey: this.starkKey,
       collateralBalance: this.collateralBalance,
       assets: this.assets,
     }
@@ -54,7 +54,7 @@ export class Position extends MerkleValue {
     knownHash?: PedersenHash
   ) {
     return new Position(
-      data.publicKey,
+      data.starkKey,
       BigInt(data.collateralBalance),
       data.assets.map((x) => ({
         assetId: AssetId(x.assetId),
@@ -67,7 +67,7 @@ export class Position extends MerkleValue {
 
   toJSON() {
     return {
-      publicKey: this.publicKey,
+      starkKey: this.starkKey,
       collateralBalance: this.collateralBalance.toString(),
       assets: this.assets.map((x) => ({
         assetId: x.assetId.toString(),

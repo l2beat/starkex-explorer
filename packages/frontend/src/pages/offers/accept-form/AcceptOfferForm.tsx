@@ -35,9 +35,9 @@ export function AcceptOfferForm(props: AcceptOfferFormProps) {
     starkKeyA: props.starkKeyA,
     positionIdA: props.positionIdA,
     syntheticAssetId: props.syntheticAssetId,
-    amountCollateral: props.amountCollateral,
-    amountSynthetic: props.amountSynthetic,
-    aIsBuyingSynthetic: props.aIsBuyingSynthetic,
+    collateralAmount: props.collateralAmount,
+    syntheticAmount: props.syntheticAmount,
+    isABuyingSynthetic: props.isABuyingSynthetic,
   })
   return (
     <form

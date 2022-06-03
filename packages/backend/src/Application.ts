@@ -242,6 +242,7 @@ export class Application {
         ),
       ],
       middleware: [createFrontendMiddleware()],
+      forceHttps: config.forceHttps,
     })
 
     // #endregion api

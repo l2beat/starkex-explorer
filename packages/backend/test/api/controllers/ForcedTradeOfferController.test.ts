@@ -16,19 +16,19 @@ describe(ForcedTradeOfferController.name, async () => {
   const stateUpdateId = 1
   const positionA = {
     positionId: tradeMock.offer.positionIdA,
-    publicKey: tradeMock.offer.starkKeyA,
-    collateralBalance: tradeMock.offer.amountCollateral,
+    starkKey: tradeMock.offer.starkKeyA,
+    collateralBalance: tradeMock.offer.collateralAmount,
     balances: [],
     stateUpdateId,
   }
   const positionB = {
-    publicKey: tradeMock.accepted.starkKeyB,
+    starkKey: tradeMock.accepted.starkKeyB,
     positionId: tradeMock.accepted.positionIdB,
     collateralBalance: 0n,
     balances: [
       {
         assetId: tradeMock.offer.syntheticAssetId,
-        balance: tradeMock.offer.amountSynthetic,
+        balance: tradeMock.offer.syntheticAmount,
       },
     ],
     stateUpdateId,
@@ -163,7 +163,7 @@ describe(ForcedTradeOfferController.name, async () => {
         mockAccountService,
         mock<ForcedTradeOfferRepository>(),
         mock<PositionRepository>({
-          findById: async () => ({ ...positionA, amountCollateral: 0n }),
+          findById: async () => ({ ...positionA, collateralAmount: 0n }),
         }),
         mock<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,

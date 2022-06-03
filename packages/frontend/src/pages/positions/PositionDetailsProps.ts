@@ -7,7 +7,7 @@ import { OfferType } from '../offers'
 export interface PositionDetailsProps {
   readonly account: AccountDetails | undefined
   readonly positionId: bigint
-  readonly publicKey: StarkKey
+  readonly starkKey: StarkKey
   readonly ethAddress?: EthereumAddress
   readonly stateUpdateId: number
   readonly lastUpdateTimestamp: Timestamp
@@ -41,6 +41,6 @@ export interface OfferHistoryEntry {
   }
   cancelledAt?: Timestamp
   syntheticAssetId: AssetId
-  amountSynthetic: bigint
-  amountCollateral: bigint
+  syntheticAmount: bigint
+  collateralAmount: bigint
 }

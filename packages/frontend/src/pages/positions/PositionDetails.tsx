@@ -178,7 +178,7 @@ const offerHistoryColumns = [
 export function PositionDetails({
   positionId,
   assets,
-  publicKey,
+  starkKey,
   stateUpdateId,
   lastUpdateTimestamp,
   ethAddress,
@@ -236,7 +236,7 @@ export function PositionDetails({
           },
           {
             title: 'Owner stark key',
-            content: formatHashLong(publicKey),
+            content: formatHashLong(starkKey),
           },
           {
             title: 'Last state update',

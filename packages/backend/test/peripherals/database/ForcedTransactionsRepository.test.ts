@@ -121,7 +121,7 @@ describe(ForcedTransactionsRepository.name, () => {
     const hashes = await repository.getTransactionHashesByData([
       data1,
       data2,
-      { ...data2, publicKeyA: StarkKey.fake() },
+      { ...data2, starkKeyA: StarkKey.fake() },
     ])
 
     expect(hashes).toEqual([hash1, hash2, undefined])

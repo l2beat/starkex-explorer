@@ -68,7 +68,7 @@ export class PositionController {
     const content = renderPositionDetailsPage({
       account,
       positionId,
-      publicKey: current.publicKey,
+      starkKey: current.starkKey,
       ethAddress: ownerEvent?.ethAddress,
       stateUpdateId: current.stateUpdateId,
       lastUpdateTimestamp: current.timestamp,
@@ -133,8 +133,8 @@ export class PositionController {
       stateUpdateId,
       positionId,
       lastUpdateTimestamp: update.timestamp,
-      previousPublicKey: previousPosition?.publicKey,
-      publicKey: position.publicKey,
+      previousStarkKey: previousPosition?.starkKey,
+      starkKey: position.starkKey,
       assetChanges,
       transactions: transactions
         .filter((t) => {
