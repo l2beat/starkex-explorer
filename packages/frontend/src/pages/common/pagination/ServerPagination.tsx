@@ -1,9 +1,9 @@
 import React from 'react'
 
 import { HiddenInputs } from '../HiddenInputs'
-import { NextIcon } from '../icons/NextIcon'
-import { PrevIcon } from '../icons/PrevIcon'
 import { ServerFormAttributes } from './attributes'
+import { Inside } from './Inside'
+import { PageText } from './PageText'
 import { styles } from './styles'
 
 export interface ServerPaginationProps {
@@ -37,33 +37,35 @@ export function ServerPagination({
       <div className={styles.innerWrapper}>
         {page === 1 ? (
           <>
-            <span className={styles.textButtonInactive}>First</span>
+            <span className={styles.textButtonInactive}>
+              <Inside.FirstPage />
+            </span>
             <span className={styles.arrowButtonInactive}>
-              <PrevIcon width={8} height={12} />
+              <Inside.Previous />
             </span>
           </>
         ) : (
           <>
             <a href={link(1, perPage)} className={styles.textButtonActive}>
-              First
+              <Inside.FirstPage />
             </a>
             <a
               href={link(page - 1, perPage)}
               className={styles.arrowButtonActive}
             >
-              <PrevIcon width={8} height={12} />
+              <Inside.Previous />
             </a>
           </>
         )}
-        <span className={styles.pagesText}>
-          Page {page} out of {last}
-        </span>
+        <PageText current={page} total={last} />
         {page === last ? (
           <>
             <span className={styles.arrowButtonInactive}>
-              <NextIcon width={8} height={12} />
+              <Inside.Next />
             </span>
-            <span className={styles.textButtonInactive}>Last</span>
+            <span className={styles.textButtonInactive}>
+              <Inside.LastPage />
+            </span>
           </>
         ) : (
           <>
@@ -71,10 +73,10 @@ export function ServerPagination({
               href={link(page + 1, perPage)}
               className={styles.arrowButtonActive}
             >
-              <NextIcon width={8} height={12} />
+              <Inside.Next />
             </a>
             <a href={link(last, perPage)} className={styles.textButtonActive}>
-              Last
+              <Inside.LastPage />
             </a>
           </>
         )}

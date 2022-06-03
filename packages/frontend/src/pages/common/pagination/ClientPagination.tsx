@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { NextIcon } from '../icons/NextIcon'
-import { PrevIcon } from '../icons/PrevIcon'
+import { Inside } from './Inside'
+import { PageText } from './PageText'
 import { styles } from './styles'
 
 export interface ClientPaginationProps {
@@ -15,15 +15,19 @@ export function ClientPagination({ total, tableId }: ClientPaginationProps) {
   return (
     <div data-paginates={tableId} className={styles.outerWrapper}>
       <div className={styles.innerWrapper}>
-        <button className={styles.textButtonActive}>First</button>
-        <button className={styles.arrowButtonActive}>
-          <PrevIcon width={8} height={12} />
+        <button className={styles.textButtonActive}>
+          <Inside.FirstPage />
         </button>
-        <span className={styles.pagesText}>Page 1 out of {last}</span>
         <button className={styles.arrowButtonActive}>
-          <NextIcon width={8} height={12} />
+          <Inside.Previous />
         </button>
-        <button className={styles.textButtonActive}>Last</button>
+        <PageText current={1} total={last} />
+        <button className={styles.arrowButtonActive}>
+          <Inside.Next />
+        </button>
+        <button className={styles.textButtonActive}>
+          <Inside.LastPage />
+        </button>
       </div>
       <label className={styles.innerWrapper}>
         <span>Per page</span>

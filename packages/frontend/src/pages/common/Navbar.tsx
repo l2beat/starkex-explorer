@@ -13,7 +13,7 @@ export interface NavbarProps {
 
 export function Navbar({ account, searchBar = true }: NavbarProps) {
   return (
-    <div className="flex justify-between items-center px-4 py-2.5 border-b-[1px] border-grey-300 flex-wrap gap-y-2">
+    <div className="flex justify-between items-center px-2 wide:px-4 py-2.5 border-b-[1px] border-grey-300 flex-wrap gap-y-2">
       <a className="flex" href="/">
         <span className="pr-4">
           <L2beatExplorerLogo height={36} />
