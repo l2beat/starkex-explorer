@@ -91,7 +91,7 @@ export class RollupState {
         })
 
         const newPosition = new Position(
-          update.publicKey,
+          update.starkKey,
           update.collateralBalance,
           newPositionAssets
         )

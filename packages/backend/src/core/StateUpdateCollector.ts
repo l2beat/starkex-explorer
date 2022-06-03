@@ -93,7 +93,7 @@ export class StateUpdateCollector {
         positions: newPositions.map(
           ({ value, index }): PositionRecord => ({
             positionId: index,
-            publicKey: value.publicKey,
+            starkKey: value.starkKey,
             balances: value.assets,
             collateralBalance: value.collateralBalance,
           })

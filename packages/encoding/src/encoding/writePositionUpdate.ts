@@ -10,7 +10,7 @@ export function writePositionUpdate(
 ) {
   writer.writeNumber(position.balances.length + 4, 32)
   writer.writeNumber(position.positionId, 32)
-  writer.write(position.publicKey.toString(), 32)
+  writer.write(position.starkKey.toString(), 32)
   writer.writeNumber(position.collateralBalance - MIN_INT, 32)
   writer.writeNumber(toSeconds(position.fundingTimestamp), 32)
 

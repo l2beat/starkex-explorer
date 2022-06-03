@@ -9,15 +9,15 @@ export function toForcedTradeOfferEntry(
   return {
     id: offer.id,
     createdAt: offer.createdAt,
-    type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
-    amount: offer.amountSynthetic,
+    type: offer.isABuyingSynthetic ? 'buy' : 'sell',
+    amount: offer.syntheticAmount,
     assetId: offer.syntheticAssetId,
     positionId: offer.positionIdA,
     price: getTradeOfferPriceUSDCents(
-      offer.amountCollateral,
+      offer.collateralAmount,
       offer.syntheticAssetId,
-      offer.amountSynthetic
+      offer.syntheticAmount
     ),
-    total: offer.amountCollateral,
+    total: offer.collateralAmount,
   }
 }

@@ -28,7 +28,7 @@ describe(readForcedActions.name, () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'withdrawal',
-        publicKey: StarkKey.fake('1234abcd'),
+        starkKey: StarkKey.fake('1234abcd'),
         positionId: 123n,
         amount: 1500100900n,
       },
@@ -52,8 +52,8 @@ describe(readForcedActions.name, () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'trade',
-        publicKeyA: StarkKey.fake('1234abcd'),
-        publicKeyB: StarkKey.fake('deadbeef'),
+        starkKeyA: StarkKey.fake('1234abcd'),
+        starkKeyB: StarkKey.fake('deadbeef'),
         positionIdA: 123n,
         positionIdB: 456n,
         syntheticAssetId: AssetId('ETH-9'),
@@ -87,14 +87,14 @@ describe(readForcedActions.name, () => {
     expect(decode(writer.getBytes())).toEqual([
       {
         type: 'withdrawal',
-        publicKey: StarkKey.fake('1234abcd'),
+        starkKey: StarkKey.fake('1234abcd'),
         positionId: 123n,
         amount: 1500100900n,
       },
       {
         type: 'trade',
-        publicKeyA: StarkKey.fake('1234abcd'),
-        publicKeyB: StarkKey.fake('deadbeef'),
+        starkKeyA: StarkKey.fake('1234abcd'),
+        starkKeyB: StarkKey.fake('deadbeef'),
         positionIdA: 123n,
         positionIdB: 456n,
         syntheticAssetId: AssetId('ETH-9'),

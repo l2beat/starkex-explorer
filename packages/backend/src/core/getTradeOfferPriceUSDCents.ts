@@ -1,13 +1,13 @@
 import { AssetId } from '@explorer/types'
 
 export function getTradeOfferPriceUSDCents(
-  amountCollateral: bigint,
+  collateralAmount: bigint,
   syntheticAssetId: AssetId,
-  amountSynthetic: bigint
+  syntheticAmount: bigint
 ): bigint {
   return (
-    (amountCollateral * BigInt(10 ** AssetId.decimals(syntheticAssetId))) /
-    amountSynthetic /
+    (collateralAmount * BigInt(10 ** AssetId.decimals(syntheticAssetId))) /
+    syntheticAmount /
     10_000n
   )
 }

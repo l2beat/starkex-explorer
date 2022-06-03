@@ -12,9 +12,9 @@ export const offer = {
   ),
   positionIdA: BigInt('0x205'),
   syntheticAssetId: AssetId('AAVE-8'),
-  amountCollateral: BigInt('0x684ee1800'),
-  amountSynthetic: BigInt('0xf4240'),
-  aIsBuyingSynthetic: true,
+  collateralAmount: BigInt('0x684ee1800'),
+  syntheticAmount: BigInt('0xf4240'),
+  isABuyingSynthetic: true,
 }
 
 export const accepted = {
