@@ -190,10 +190,10 @@ export class ForcedTradeOfferRepository extends BaseRepository {
 
   private getPendingByPositionIdQuery(positionId: bigint) {
     return this.knex('forced_trade_offers')
-      .where({ position_id_a: positionId })
-      .orWhere({ position_id_b: positionId })
       .whereNull('transaction_hash')
       .whereNull('cancelled_at')
+      .where({ position_id_a: positionId })
+      .orWhere({ position_id_b: positionId })
   }
 
   async countPendingByPositionId(positionId: bigint) {
