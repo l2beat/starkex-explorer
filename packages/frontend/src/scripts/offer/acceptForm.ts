@@ -1,17 +1,12 @@
 import {
   deserializeAcceptedData,
+  deserializeCreateOfferData,
   serializeAcceptOfferBody,
 } from '@explorer/shared'
-import { deserializeCreateOfferData } from '@explorer/shared/build/src/CreateOfferData'
 import { EthereumAddress } from '@explorer/types'
 
-import {
-  AcceptedInputName,
-  AddressInputName,
-  FormClass,
-  OfferInputName,
-} from '../../pages/offers/accept-form'
-import { findAndParse } from './findAndParse'
+import { FormClass } from '../../pages/offers/accept-form/attributes'
+import { getAttribute } from './getAttribute'
 import { signAccepted } from './sign'
 
 export function initAcceptOfferForm() {
@@ -19,23 +14,13 @@ export function initAcceptOfferForm() {
   forms.forEach((form) => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
-      const address = findAndParse(form, AddressInputName, EthereumAddress)
-      const offer = findAndParse(
-        form,
-        OfferInputName,
-        deserializeCreateOfferData
-      )
-      const accepted = findAndParse(
-        form,
-        AcceptedInputName,
-        deserializeAcceptedData
-      )
-
+      const address = EthereumAddress(getAttribute(form, 'address'))
+      const offer = deserializeCreateOfferData(getAttribute(form, 'offer'))
+      const accepted = deserializeAcceptedData(getAttribute(form, 'accepted'))
       const signature = await signAccepted(offer, accepted, address)
       if (!signature) {
         throw new Error('Could not create a signature for accept form')
       }
-
       await fetch(form.action, {
         method: form.method,
         headers: { 'Content-Type': 'application/json' },
@@ -44,7 +29,6 @@ export function initAcceptOfferForm() {
           signature,
         }),
       })
-
       window.location.reload()
     })
   })

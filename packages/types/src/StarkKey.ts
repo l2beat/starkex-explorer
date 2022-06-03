@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers'
+import { type BigNumber } from '@ethersproject/bignumber'
 
 import { fakeHexString } from './fake'
 
@@ -19,7 +19,7 @@ export function StarkKey(value: string) {
 StarkKey.ZERO = StarkKey('0x' + '0'.repeat(64))
 
 StarkKey.from = function from(value: BigNumber | bigint) {
-  if (BigNumber.isBigNumber(value)) {
+  if (typeof value !== 'bigint') {
     value = value.toBigInt()
   }
   return StarkKey('0x' + value.toString(16).padStart(64, '0'))

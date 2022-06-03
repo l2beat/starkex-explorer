@@ -1,4 +1,4 @@
-import { ServerFormAttributes } from '../pages/common/pagination'
+import { ServerFormAttributes } from '../pages/common/pagination/attributes'
 import { styles } from '../pages/common/pagination/styles'
 
 export function initPagination() {
@@ -78,7 +78,8 @@ function initClientPaginationInstance(pagination: HTMLElement) {
       ui.lastButton.className = styles.textButtonActive
     }
 
-    ui.currentPageView.innerText = `Page ${page} out of ${last}`
+    ui.currentPageView.innerText = page.toString()
+    ui.totalPagesView.innerText = last.toString()
   }
 }
 
@@ -88,9 +89,10 @@ function getPaginationElements(pagination: HTMLElement) {
   const [firstButton, previousButton, nextButton, lastButton] = Array.from(
     pagination.querySelectorAll<HTMLButtonElement>('button')
   )
-  const currentPageView = pagination.querySelector<HTMLSpanElement>(
-    'div:first-child span'
-  )
+  const currentPageView =
+    pagination.querySelector<HTMLSpanElement>('[data-current]')
+  const totalPagesView =
+    pagination.querySelector<HTMLSpanElement>('[data-total]')
   const perPageSelect = pagination.querySelector<HTMLSelectElement>('select')
 
   if (
@@ -99,6 +101,7 @@ function getPaginationElements(pagination: HTMLElement) {
     !nextButton ||
     !lastButton ||
     !currentPageView ||
+    !totalPagesView ||
     !perPageSelect ||
     !table
   ) {
@@ -115,6 +118,7 @@ function getPaginationElements(pagination: HTMLElement) {
     nextButton,
     lastButton,
     currentPageView,
+    totalPagesView,
     perPageSelect,
     rows,
   }

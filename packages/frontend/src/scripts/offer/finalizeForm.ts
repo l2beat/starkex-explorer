@@ -6,38 +6,24 @@ import {
 } from '@explorer/shared'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
-import {
-  AddressInputName,
-  FormClass,
-  OfferIdInputName,
-  OfferInputName,
-  PerpetualAddressInputName,
-} from '../../pages/offers/finalize-form'
-import { findAndParse } from './findAndParse'
+import { FormClass } from '../../pages/offers/finalize-form/attributes'
+import { getAttribute } from './getAttribute'
 
 export async function initFinalizeForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
-      const address = findAndParse(form, AddressInputName, EthereumAddress)
-      const perpetualAddress = findAndParse(
-        form,
-        PerpetualAddressInputName,
-        EthereumAddress
+      const address = EthereumAddress(getAttribute(form, 'address'))
+      const offer = deserializeFinalizeOfferData(getAttribute(form, 'offer'))
+      const offerId = Number(getAttribute(form, 'offer-id'))
+      const perpetualAddress = EthereumAddress(
+        getAttribute(form, 'perpetual-address')
       )
-      const offer = findAndParse(
-        form,
-        OfferInputName,
-        deserializeFinalizeOfferData
-      )
-      const offerId = findAndParse(form, OfferIdInputName, Number)
-
       const hash = await sendTransaction(address, perpetualAddress, offer)
       if (!hash) {
         throw new Error('Could not send a transaction')
       }
-
       await fetch(form.action, {
         method: form.method,
         headers: { 'Content-Type': 'application/json' },
@@ -46,7 +32,6 @@ export async function initFinalizeForm() {
           hash,
         }),
       })
-
       window.location.href = `/forced/${hash}`
     })
   })

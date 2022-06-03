@@ -35,7 +35,7 @@ export type PageHeaderStatsProps = {
 
 export function PageHeaderStats({ rows }: PageHeaderStatsProps) {
   return (
-    <div className="w-full overflow-x-auto mb-12 ">
+    <div className="w-full overflow-x-auto mb-6 sm:mb-12 ">
       <table className="whitespace-nowrap w-full">
         <tbody>
           {rows.map((stat, i) => (

@@ -1,4 +1,4 @@
-import { constants, utils } from 'ethers'
+import { getAddress } from '@ethersproject/address'
 
 import { fakeHexString } from './fake'
 
@@ -8,13 +8,13 @@ export interface EthereumAddress extends String {
 
 export function EthereumAddress(value: string) {
   try {
-    return utils.getAddress(value) as unknown as EthereumAddress
+    return getAddress(value) as unknown as EthereumAddress
   } catch {
     throw new TypeError('Invalid EthereumAddress')
   }
 }
 
-EthereumAddress.ZERO = EthereumAddress(constants.AddressZero)
+EthereumAddress.ZERO = EthereumAddress('0x' + '0'.repeat(40))
 
 EthereumAddress.isBefore = function (a: EthereumAddress, b: EthereumAddress) {
   return a.toLowerCase() < b.toLowerCase()

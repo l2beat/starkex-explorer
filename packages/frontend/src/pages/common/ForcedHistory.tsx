@@ -16,7 +16,7 @@ export function ForcedHistory({ events }: ForcedHistoryProps) {
   return (
     <>
       <div className="mb-1.5 font-medium text-lg text-left">History</div>
-      <div className="w-full overflow-x-auto mb-12">
+      <div className="w-full overflow-x-auto mb-6 sm:mb-12">
         <table className="whitespace-nowrap w-full">
           {events.map((event, i) => (
             <tr className="bg-grey-200 border-2 border-grey-100" key={i}>

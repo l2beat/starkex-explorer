@@ -1,9 +1,8 @@
 import { serializeCancelOfferBody } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
-import { AddressInputName } from '../../pages/offers/accept-form'
-import { FormClass, OfferIdInputName } from '../../pages/offers/cancel-form'
-import { findAndParse } from './findAndParse'
+import { FormClass } from '../../pages/offers/cancel-form/attributes'
+import { getAttribute } from './getAttribute'
 import { signCancel } from './sign'
 
 export function initCancelOfferForm() {
@@ -11,8 +10,8 @@ export function initCancelOfferForm() {
   forms.forEach((form) => {
     form?.addEventListener('submit', async (e) => {
       e.preventDefault()
-      const offerId = findAndParse(form, OfferIdInputName, Number)
-      const address = findAndParse(form, AddressInputName, EthereumAddress)
+      const offerId = Number(getAttribute(form, 'offer-id'))
+      const address = EthereumAddress(getAttribute(form, 'address'))
       const signature = await signCancel(offerId, address)
       if (!signature) {
         throw new Error('Could not create a signature for cancel form')

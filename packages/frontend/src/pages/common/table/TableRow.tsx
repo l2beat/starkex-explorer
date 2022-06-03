@@ -30,7 +30,7 @@ export function TableRow(props: TableRowProps) {
               'first-letter:capitalize',
               (numeric || monospace) && 'font-mono',
               numeric ? 'text-right' : 'text-left',
-              fullWidth ? 'max-w-[10px] truncate' : 'w-0',
+              fullWidth ? 'wide:max-w-[10px] truncate' : 'w-0',
               props.link && 'cursor-pointer',
               className
             )}
