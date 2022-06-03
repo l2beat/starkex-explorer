@@ -6,7 +6,7 @@ import { deserializeCreateOfferData } from '@explorer/shared/build/src/CreateOff
 import { EthereumAddress } from '@explorer/types'
 
 import { FormClass } from '../../pages/offers/accept-form'
-import { parseAttribute } from './parseAttribute'
+import { getAttribute } from './getAttribute'
 import { signAccepted } from './sign'
 
 export function initAcceptOfferForm() {
@@ -14,10 +14,9 @@ export function initAcceptOfferForm() {
   forms.forEach((form) => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
-      const data = form.dataset
-      const address = parseAttribute(data.address, EthereumAddress)
-      const offer = parseAttribute(data.offer, deserializeCreateOfferData)
-      const accepted = parseAttribute(data.accepted, deserializeAcceptedData)
+      const address = EthereumAddress(getAttribute(form, 'address'))
+      const offer = deserializeCreateOfferData(getAttribute(form, 'offer'))
+      const accepted = deserializeAcceptedData(getAttribute(form, 'accepted'))
       const signature = await signAccepted(offer, accepted, address)
       if (!signature) {
         throw new Error('Could not create a signature for accept form')

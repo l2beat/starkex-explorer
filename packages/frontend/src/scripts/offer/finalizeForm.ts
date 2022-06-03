@@ -7,20 +7,18 @@ import {
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
 import { FormClass } from '../../pages/offers/finalize-form'
-import { parseAttribute } from './parseAttribute'
+import { getAttribute } from './getAttribute'
 
 export async function initFinalizeForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
-      const data = form.dataset
-      const address = parseAttribute(data.address, EthereumAddress)
-      const offer = parseAttribute(data.offer, deserializeFinalizeOfferData)
-      const offerId = parseAttribute(data.offerId, Number)
-      const perpetualAddress = parseAttribute(
-        data.perpetualAddress,
-        EthereumAddress
+      const address = EthereumAddress(getAttribute(form, 'address'))
+      const offer = deserializeFinalizeOfferData(getAttribute(form, 'offer'))
+      const offerId = Number(getAttribute(form, 'offer-id'))
+      const perpetualAddress = EthereumAddress(
+        getAttribute(form, 'perpetual-address')
       )
       const hash = await sendTransaction(address, perpetualAddress, offer)
       if (!hash) {
