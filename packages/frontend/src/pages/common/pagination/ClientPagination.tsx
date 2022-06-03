@@ -27,11 +27,13 @@ export function ClientPagination({ total, tableId }: ClientPaginationProps) {
       </div>
       <label className={styles.innerWrapper}>
         <span>Per page</span>
-        <select className={styles.textButtonActive} autoComplete="off">
+        <select
+          className={styles.textButtonActive}
+          autoComplete="off"
+          defaultValue={10}
+        >
           {[10, 25, 50, 100].map((n) => (
-            <option key={n} selected={n === 10}>
-              {n}
-            </option>
+            <option key={n}>{n}</option>
           ))}
         </select>
       </label>

@@ -91,11 +91,10 @@ export function ServerPagination({
           id="per-page"
           className={styles.textButtonActive}
           autoComplete="off"
+          defaultValue={perPage}
         >
           {[10, 25, 50, 100].map((n) => (
-            <option key={n} selected={n === perPage}>
-              {n}
-            </option>
+            <option key={n}>{n}</option>
           ))}
         </select>
         {<HiddenInputs params={hiddenParams} />}
