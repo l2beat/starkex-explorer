@@ -8,20 +8,20 @@ contract Perpetual {
 
     event LogForcedWithdrawalRequest(
         uint256 starkKey,
-        uint256 positionId,
+        uint256 vaultId,
         uint256 quantizedAmount
     );
 
     event LogForcedTradeRequest(
         uint256 starkKeyA,
         uint256 starkKeyB,
-        uint256 positionIdA,
-        uint256 positionIdB,
+        uint256 vaultIdA,
+        uint256 vaultIdB,
         uint256 collateralAssetId,
         uint256 syntheticAssetId,
-        uint256 collateralAmount,
-        uint256 syntheticAmount,
-        bool isABuyingSynthetic,
+        uint256 amountCollateral,
+        uint256 amountSynthetic,
+        bool aIsBuyingSynthetic,
         uint256 nonce
     );
 
@@ -35,23 +35,23 @@ contract Perpetual {
 
     function forcedWithdrawalRequest(
         uint256 starkKey,
-        uint256 positionId,
+        uint256 vaultId,
         uint256 quantizedAmount,
         bool
     ) external {
-        emit LogForcedWithdrawalRequest(starkKey, positionId, quantizedAmount);
+        emit LogForcedWithdrawalRequest(starkKey, vaultId, quantizedAmount);
     }
 
     function forcedTradeRequest(
         uint256 starkKeyA,
         uint256 starkKeyB,
-        uint256 positionIdA,
-        uint256 positionIdB,
+        uint256 vaultIdA,
+        uint256 vaultIdB,
         uint256 collateralAssetId,
         uint256 syntheticAssetId,
-        uint256 collateralAmount,
-        uint256 syntheticAmount,
-        bool isABuyingSynthetic,
+        uint256 amountCollateral,
+        uint256 amountSynthetic,
+        bool aIsBuyingSynthetic,
         uint256,
         uint256 nonce,
         bytes calldata,
@@ -60,13 +60,13 @@ contract Perpetual {
         emit LogForcedTradeRequest(
             starkKeyA,
             starkKeyB,
-            positionIdA,
-            positionIdB,
+            vaultIdA,
+            vaultIdB,
             collateralAssetId,
             syntheticAssetId,
-            collateralAmount,
-            syntheticAmount,
-            isABuyingSynthetic,
+            amountCollateral,
+            amountSynthetic,
+            aIsBuyingSynthetic,
             nonce
         );
     }
