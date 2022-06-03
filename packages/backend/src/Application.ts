@@ -6,7 +6,6 @@ import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
-import { forceHerokuHttps } from './api/middleware/forceHttps'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
@@ -227,11 +226,6 @@ export class Application {
       config.contracts.perpetual
     )
 
-    const middleware = [createFrontendMiddleware()]
-    if (config.forceHttps) {
-      middleware.push(forceHerokuHttps)
-    }
-
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
@@ -248,7 +242,8 @@ export class Application {
           userTransactionController
         ),
       ],
-      middleware,
+      middleware: [createFrontendMiddleware()],
+      forceHttps: config.forceHttps,
     })
 
     // #endregion api
