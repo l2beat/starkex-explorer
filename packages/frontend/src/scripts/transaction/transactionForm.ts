@@ -1,8 +1,8 @@
 import { AssetId } from '@explorer/types'
 
-import { TransactionFormProps } from '../../pages'
 import { getAssetImageUrl } from '../../pages/common/icons/getAssetImageUrl'
 import { FormId } from '../../pages/transaction-form/ids'
+import { TransactionFormProps } from '../../pages/transaction-form/TransactionFormProps'
 import { getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'

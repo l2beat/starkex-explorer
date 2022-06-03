@@ -4,6 +4,7 @@
   "private": true,
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
+  "sideEffects": false,
   "engines": {
     "node": "^16.0.0",
     "yarn": ">=1.22.0"
@@ -19,7 +20,8 @@
     "coverage": "nyc --reporter=lcov --reporter=text mocha"
   },
   "dependencies": {
-    "ethers": "^5.6.8"
+    "@ethersproject/address": "^5.6.1",
+    "@ethersproject/bignumber": "^5.6.2"
   },
   "devDependencies": {}
 }

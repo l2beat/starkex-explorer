@@ -1,8 +1,11 @@
 import { serializeCancelOfferBody } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
-import { AddressInputName } from '../../pages/offers/accept-form'
-import { FormClass, OfferIdInputName } from '../../pages/offers/cancel-form'
+import { AddressInputName } from '../../pages/offers/accept-form/attributes'
+import {
+  FormClass,
+  OfferIdInputName,
+} from '../../pages/offers/cancel-form/attributes'
 import { findAndParse } from './findAndParse'
 import { signCancel } from './sign'
 
