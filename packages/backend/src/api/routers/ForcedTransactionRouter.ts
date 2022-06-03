@@ -2,6 +2,7 @@ import {
   AcceptOfferBody,
   CancelOfferBody,
   CreateOfferBody,
+  FinalizeOfferBody,
   stringAs,
   stringAsInt,
 } from '@explorer/shared'
@@ -90,6 +91,25 @@ export function createForcedTransactionRouter(
       async (ctx) => {
         const result = await transactionSubmitController.submitForcedExit(
           ctx.request.body.hash
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/forced/trades',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: FinalizeOfferBody,
+        }),
+      }),
+      async (ctx) => {
+        const result = await transactionSubmitController.submitForcedTrade(
+          ctx.request.body.hash,
+          ctx.request.body.offerId
         )
         applyControllerResult(ctx, result)
       }

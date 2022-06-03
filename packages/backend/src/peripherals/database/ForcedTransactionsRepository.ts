@@ -228,19 +228,25 @@ export class ForcedTransactionsRepository extends BaseRepository {
   }
 
   async add(
-    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
+      offerId?: number
+    },
     sentAt: Timestamp
   ): Promise<Hash256>
 
   async add(
-    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
+      offerId?: number
+    },
     sentAt: Nullable<Timestamp>,
     minedAt: Timestamp,
     blockNumber: number
   ): Promise<Hash256>
 
   async add(
-    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'>,
+    transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
+      offerId?: number
+    },
     sentAt: Nullable<Timestamp>,
     minedAt?: Timestamp,
     blockNumber?: number
@@ -262,6 +268,12 @@ export class ForcedTransactionsRepository extends BaseRepository {
         sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
         block_number: blockNumber,
       })
+      if (transaction.offerId && transaction.data.type === 'trade') {
+        await trx('forced_trade_offers')
+          .update({ transaction_hash: hash.toString() })
+          .whereNull('transaction_hash')
+          .andWhere({ id: transaction.offerId })
+      }
     })
     this.logger.debug({ method: 'add', id: hash.toString() })
     return hash
