@@ -6,13 +6,13 @@ const coder = new Interface([
   `function forcedTradeRequest(
       uint256 starkKeyA,
       uint256 starkKeyB,
-      uint256 vaultIdA,
-      uint256 vaultIdB,
+      uint256 positionIdA,
+      uint256 positionIdB,
       uint256 collateralAssetId,
       uint256 syntheticAssetId,
-      uint256 amountCollateral,
-      uint256 amountSynthetic,
-      bool aIsBuyingSynthetic,
+      uint256 collateralAmount,
+      uint256 syntheticAmount,
+      bool isABuyingSynthetic,
       uint256 submissionExpirationTime,
       uint256 nonce,
       bytes calldata signature,
@@ -27,9 +27,9 @@ export interface ForcedTradeRequest {
   positionIdB: bigint
   collateralAssetId: AssetId
   syntheticAssetId: AssetId
-  amountCollateral: bigint
-  amountSynthetic: bigint
-  aIsBuyingSynthetic: boolean
+  collateralAmount: bigint
+  syntheticAmount: bigint
+  isABuyingSynthetic: boolean
   submissionExpirationTime: bigint
   nonce: bigint
   signature: string
@@ -44,17 +44,17 @@ export function decodeForcedTradeRequest(
     return {
       starkKeyA: StarkKey.from(decoded.starkKeyA),
       starkKeyB: StarkKey.from(decoded.starkKeyB),
-      positionIdA: BigInt(decoded.vaultIdA),
-      positionIdB: BigInt(decoded.vaultIdB),
+      positionIdA: BigInt(decoded.positionIdA),
+      positionIdB: BigInt(decoded.positionIdB),
       collateralAssetId: decodeAssetId(
         decoded.collateralAssetId.toHexString().slice(2)
       ),
       syntheticAssetId: decodeAssetId(
         decoded.syntheticAssetId.toHexString().slice(2)
       ),
-      amountCollateral: BigInt(decoded.amountCollateral),
-      amountSynthetic: BigInt(decoded.amountSynthetic),
-      aIsBuyingSynthetic: Boolean(decoded.aIsBuyingSynthetic),
+      collateralAmount: BigInt(decoded.collateralAmount),
+      syntheticAmount: BigInt(decoded.syntheticAmount),
+      isABuyingSynthetic: Boolean(decoded.isABuyingSynthetic),
       submissionExpirationTime: BigInt(decoded.submissionExpirationTime),
       nonce: BigInt(decoded.nonce),
       signature: String(decoded.signature),
@@ -75,9 +75,9 @@ export function encodeForcedTradeRequest(
     data.positionIdB,
     '0x' + encodeAssetId(AssetId.USDC),
     '0x' + encodeAssetId(data.syntheticAssetId),
-    data.amountCollateral,
-    data.amountSynthetic,
-    data.aIsBuyingSynthetic,
+    data.collateralAmount,
+    data.syntheticAmount,
+    data.isABuyingSynthetic,
     data.submissionExpirationTime,
     data.nonce,
     data.signature,

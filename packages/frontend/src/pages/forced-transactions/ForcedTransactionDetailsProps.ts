@@ -9,8 +9,8 @@ export type ForcedTradeData = {
   readonly displayId: number | Hash256
   readonly positionIdA: bigint
   readonly addressA?: EthereumAddress
-  readonly amountSynthetic: bigint
-  readonly amountCollateral: bigint
+  readonly syntheticAmount: bigint
+  readonly collateralAmount: bigint
   readonly syntheticAssetId: AssetId
   readonly positionIdB: bigint
   readonly addressB?: EthereumAddress

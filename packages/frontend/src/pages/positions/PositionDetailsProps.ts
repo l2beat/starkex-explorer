@@ -7,7 +7,7 @@ import { PendingOffer } from './pending/offers'
 export interface PositionDetailsProps {
   readonly account: AccountDetails | undefined
   readonly positionId: bigint
-  readonly publicKey: StarkKey
+  readonly starkKey: StarkKey
   readonly ethAddress?: EthereumAddress
   readonly stateUpdateId: number
   readonly lastUpdateTimestamp: Timestamp

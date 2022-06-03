@@ -9,9 +9,9 @@ export const CreateOfferData = z.object({
   starkKeyA: stringAs(StarkKey),
   positionIdA: stringAsBigInt(),
   syntheticAssetId: stringAs(AssetId),
-  amountCollateral: stringAsBigInt(),
-  amountSynthetic: stringAsBigInt(),
-  aIsBuyingSynthetic: z.boolean(),
+  collateralAmount: stringAsBigInt(),
+  syntheticAmount: stringAsBigInt(),
+  isABuyingSynthetic: z.boolean(),
 })
 
 export function serializeCreateOfferData(data: CreateOfferData) {

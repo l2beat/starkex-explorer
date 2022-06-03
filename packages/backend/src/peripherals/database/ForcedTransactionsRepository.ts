@@ -32,7 +32,7 @@ function withdrawalFromJson(jsonData: json): ForcedWithdrawal {
   const data = Object(jsonData)
   return {
     type: 'withdrawal',
-    publicKey: StarkKey(data.publicKey),
+    starkKey: StarkKey(data.starkKey),
     amount: BigInt(data.amount),
     positionId: BigInt(data.positionId),
   }
@@ -42,8 +42,8 @@ function tradeFromJson(jsonData: json): ForcedTrade {
   const data = Object(jsonData)
   return {
     type: 'trade',
-    publicKeyA: StarkKey(data.publicKeyA),
-    publicKeyB: StarkKey(data.publicKeyB),
+    starkKeyA: StarkKey(data.starkKeyA),
+    starkKeyB: StarkKey(data.starkKeyB),
     positionIdA: BigInt(data.positionIdA),
     positionIdB: BigInt(data.positionIdB),
     collateralAmount: BigInt(data.collateralAmount),

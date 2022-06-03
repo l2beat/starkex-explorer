@@ -20,8 +20,8 @@ export interface PendingOffer {
   id: number
   type: OfferType
   syntheticAssetId: AssetId
-  amountSynthetic: bigint
-  amountCollateral: bigint
+  syntheticAmount: bigint
+  collateralAmount: bigint
   accepted?: {
     submissionExpirationTime: bigint
   }
@@ -76,11 +76,11 @@ export function PendingOffers({ offers }: PendingOffersProps) {
               cells={[
                 offer.type === 'buy' ? 'Buy' : 'Sell',
                 formatCurrencyUnits(
-                  offer.amountSynthetic,
+                  offer.syntheticAmount,
                   offer.syntheticAssetId
                 ),
                 <AssetCell assetId={offer.syntheticAssetId} />,
-                formatCurrencyUnits(offer.amountCollateral, AssetId.USDC),
+                formatCurrencyUnits(offer.collateralAmount, AssetId.USDC),
                 <AssetCell assetId={AssetId.USDC} />,
                 status,
                 timeLeft,
