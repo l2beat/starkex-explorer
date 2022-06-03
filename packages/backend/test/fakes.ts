@@ -1,6 +1,11 @@
 import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
 import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { fakeHexString } from '@explorer/types/src/fake'
 
+import {
+  Accepted,
+  ForcedTradeOfferRecord,
+} from '../src/peripherals/database/ForcedTradeOfferRepository'
 import { Updates } from '../src/peripherals/database/ForcedTransactionsRepository'
 import { Record as TransactionStatusRecord } from '../src/peripherals/database/TransactionStatusRepository'
 
@@ -74,4 +79,41 @@ export function fakeSentTransaction(
     sentAt: fakeTimestamp(),
     mined: undefined,
   }
+}
+
+export function fakeAccepted(accepted?: Partial<Accepted>): Accepted {
+  return {
+    at: fakeTimestamp(),
+    nonce: fakeBigInt(),
+    positionIdB: fakeBigInt(),
+    premiumCost: fakeBoolean(),
+    signature: fakeHexString(32),
+    starkKeyB: StarkKey.fake(),
+    submissionExpirationTime: fakeBigInt(),
+    transactionHash: undefined,
+    ...accepted,
+  }
+}
+
+export function fakeOffer(
+  offer?: Partial<ForcedTradeOfferRecord>
+): ForcedTradeOfferRecord {
+  return {
+    id: fakeInt(),
+    createdAt: fakeTimestamp(),
+    starkKeyA: StarkKey.fake(),
+    positionIdA: fakeBigInt(),
+    syntheticAssetId: AssetId('ETH-9'),
+    amountCollateral: fakeBigInt(),
+    amountSynthetic: fakeBigInt(),
+    aIsBuyingSynthetic: true,
+    accepted: fakeAccepted(offer?.accepted),
+    ...offer,
+  }
+}
+
+export function fakeInitialOffer(
+  offer?: Partial<Omit<ForcedTradeOfferRecord, 'accepted'>>
+) {
+  return fakeOffer({ ...offer, accepted: undefined, cancelledAt: undefined })
 }

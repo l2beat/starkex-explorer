@@ -8,6 +8,7 @@ import { AccountService } from '../../../src/core/AccountService'
 import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
+import { fakeAccepted, fakeOffer } from '../../fakes'
 import { mock } from '../../mock'
 import * as tradeMock from './utils/ForcedTradeOfferMockData'
 
@@ -58,6 +59,34 @@ describe(ForcedTradeOfferController.name, async () => {
           }
         : undefined,
   })
+
+  describe(
+    ForcedTradeOfferController.prototype.getOfferDetailsPage.name,
+    () => {
+      it('redirects to transaction page after submission', async () => {
+        const offer = fakeOffer({
+          accepted: fakeAccepted({ transactionHash: Hash256.fake() }),
+        })
+        const offerRepository = mock<ForcedTradeOfferRepository>({
+          findById: async () => offer,
+        })
+        const controller = new ForcedTradeOfferController(
+          mockAccountService,
+          offerRepository,
+          mock<PositionRepository>(),
+          mock<UserRegistrationEventRepository>(),
+          EthereumAddress.fake()
+        )
+
+        expect(
+          await controller.getOfferDetailsPage(offer.id, undefined)
+        ).toEqual({
+          type: 'redirect',
+          url: `/forced/${offer.accepted?.transactionHash}`,
+        })
+      })
+    }
+  )
 
   describe(ForcedTradeOfferController.prototype.postOffer.name, () => {
     it('blocks invalid signature', async () => {

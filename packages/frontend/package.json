@@ -4,6 +4,10 @@
   "private": true,
   "main": "build/pages/index.js",
   "types": "build/pages/index.d.ts",
+  "engines": {
+    "node": "^16.0.0",
+    "yarn": ">=1.22.0"
+  },
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
@@ -15,39 +19,36 @@
     "dev": "gulp watch"
   },
   "dependencies": {
-    "@ethersproject/solidity": "5.5.0",
-    "@ethersproject/abi": "5.5.0",
+    "@ethersproject/abi": "^5.6.3",
+    "@ethersproject/solidity": "^5.6.1",
     "@explorer/crypto": "*",
     "@explorer/encoding": "*",
     "@explorer/shared": "*",
     "@explorer/types": "*",
-    "@types/js-cookie": "^3.0.1",
+    "@types/js-cookie": "^3.0.2",
     "@types/mersenne-twister": "^1.1.2",
-    "@types/react": "^17.0.37",
-    "@types/react-dom": "^17.0.11",
+    "@types/react": "^18.0.10",
+    "@types/react-dom": "^18.0.5",
     "classnames": "^2.3.1",
     "js-cookie": "^3.0.1",
     "mersenne-twister": "^1.1.0",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0",
     "timeago.js": "^4.0.2",
-    "zod": "^3.11.6"
+    "zod": "^3.17.3"
   },
   "devDependencies": {
     "@koa/router": "^10.1.1",
     "@types/koa": "^2.13.4",
     "@types/koa-static": "^4.0.2",
     "@types/koa__router": "^8.0.11",
-    "autoprefixer": "^10.4.2",
-    "del": "^6.0.0",
+    "autoprefixer": "^10.4.7",
+    "del": "^6.1.1",
     "gulp": "^4.0.2",
-    "gulp-postcss": "^9.0.1",
-    "gulp-sass": "^5.0.0",
     "koa": "^2.13.4",
     "koa-static": "^5.0.0",
-    "nodemon": "^2.0.15",
-    "path": "^0.12.7",
-    "postcss": "^8.4.6",
-    "tailwindcss": "^3.0.21"
+    "nodemon": "^2.0.16",
+    "postcss": "^8.4.14",
+    "tailwindcss": "^3.0.24"
   }
 }

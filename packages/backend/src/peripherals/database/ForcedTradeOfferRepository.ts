@@ -212,6 +212,13 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
+  async findByHash(hash: Hash256): Promise<Record | undefined> {
+    const row = await this.knex('forced_trade_offers')
+      .where({ transaction_hash: hash.toString() })
+      .first()
+    return row ? toRecord(row) : undefined
+  }
+
   async deleteAll() {
     return await this.knex('forced_trade_offers').delete()
   }
