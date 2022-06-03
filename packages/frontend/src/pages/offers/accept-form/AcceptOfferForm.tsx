@@ -7,12 +7,7 @@ import {
 import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
-import {
-  AcceptedInputName,
-  AddressInputName,
-  FormClass,
-  OfferInputName,
-} from './attributes'
+import { FormClass } from './attributes'
 
 export interface AcceptOfferFormData extends CreateOfferData, AcceptedData {
   id: number
@@ -44,14 +39,10 @@ export function AcceptOfferForm(props: AcceptOfferFormProps) {
       className={FormClass}
       action={`/forced/offers/${props.id}/accept`}
       method="POST"
+      data-offer={createdJson}
+      data-accepted={acceptedJson}
+      data-address={props.address.toString()}
     >
-      <input name={OfferInputName} type="hidden" value={createdJson} />
-      <input name={AcceptedInputName} type="hidden" value={acceptedJson} />
-      <input
-        name={AddressInputName}
-        type="hidden"
-        value={props.address.toString()}
-      />
       {props.children}
     </form>
   )
