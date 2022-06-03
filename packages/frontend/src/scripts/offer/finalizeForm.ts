@@ -12,7 +12,7 @@ import {
   OfferIdInputName,
   OfferInputName,
   PerpetualAddressInputName,
-} from '../../pages/offers/finalize-form'
+} from '../../pages/offers/finalize-form/attributes'
 import { findAndParse } from './findAndParse'
 
 export async function initFinalizeForm() {
