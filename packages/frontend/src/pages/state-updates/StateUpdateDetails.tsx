@@ -34,7 +34,7 @@ export function StateUpdateDetails({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-12">
+      <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
         State update #{id.toString()}
       </h1>
       <PageHeaderStats
