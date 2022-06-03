@@ -10,7 +10,7 @@ import { SimpleLink } from './SimpleLink'
 
 export function Footer() {
   return (
-    <footer className="mt-24 mb-12">
+    <footer className="mt-24 mb-6 sm:mb-12">
       <div className="flex justify-between pb-3 mb-3 border-b-[1px] border-grey-300 flex-wrap gap-y-3">
         <SimpleLink href="https://l2beat.com/donate">Donate</SimpleLink>
         <div className="flex gap-3">

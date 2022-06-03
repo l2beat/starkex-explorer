@@ -28,7 +28,7 @@ export function Page({
       <body>
         <div className="Page">
           <Navbar searchBar={!withoutSearch} account={account} />
-          <main className="px-4 max-w-[900px] mx-auto pt-20">
+          <main className="px-2 wide:px-4 max-w-[900px] mx-auto pt-4 wide:pt-20">
             {children}
             <Footer />
           </main>

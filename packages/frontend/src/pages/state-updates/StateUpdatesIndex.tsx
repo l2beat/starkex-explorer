@@ -22,7 +22,7 @@ export function StateUpdatesIndex({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-12">
+      <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
         Latest state updates
       </h1>
       <ServerPagination
@@ -38,6 +38,7 @@ export function StateUpdatesIndex({
           { header: 'Hash', monospace: true, fullWidth: true },
           { header: 'Time' },
           { header: 'Position updates', numeric: true },
+          { header: 'Forced txs', numeric: true },
         ]}
         rows={stateUpdates.map((update) => {
           const link = `/state-updates/${update.id}`
@@ -48,6 +49,7 @@ export function StateUpdatesIndex({
               formatHashLong(update.hash),
               formatRelativeTime(update.timestamp),
               update.positionCount.toString(),
+              update.forcedTransactionsCount.toString(),
             ],
           }
         })}
