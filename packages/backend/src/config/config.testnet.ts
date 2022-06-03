@@ -31,5 +31,6 @@ export function getTestnetConfig(): Config {
       ],
     },
     freshStart: true,
+    forceHttps: false,
   }
 }
