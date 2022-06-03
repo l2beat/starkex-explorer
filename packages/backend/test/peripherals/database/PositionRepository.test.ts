@@ -171,7 +171,7 @@ describe(PositionRepository.name, () => {
     ])
   })
 
-  describe(positionRepository.findIdBystarkKey.name, () => {
+  describe(positionRepository.findIdByStarkKey.name, () => {
     it('finds the id', async () => {
       const positionId = 12345n
       const starkKey = StarkKey.fake()
@@ -188,12 +188,12 @@ describe(PositionRepository.name, () => {
         prices: [],
       })
 
-      const result = await positionRepository.findIdBystarkKey(starkKey)
+      const result = await positionRepository.findIdByStarkKey(starkKey)
       expect(result).toEqual(positionId)
     })
 
     it('returns undefined when not found', async () => {
-      const result = await positionRepository.findIdBystarkKey(StarkKey.fake())
+      const result = await positionRepository.findIdByStarkKey(StarkKey.fake())
       expect(result).toEqual(undefined)
     })
   })

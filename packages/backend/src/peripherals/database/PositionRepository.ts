@@ -24,7 +24,7 @@ export class PositionRepository extends BaseRepository {
     this.findById = this.wrapFind(this.findById)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
     this.findById = this.wrapFind(this.findById)
-    this.findIdBystarkKey = this.wrapFind(this.findIdBystarkKey)
+    this.findIdByStarkKey = this.wrapFind(this.findIdByStarkKey)
     this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
     this.getPreviousStates = this.wrapGet(this.getPreviousStates)
     this.count = this.wrapAny(this.count)
@@ -77,7 +77,7 @@ export class PositionRepository extends BaseRepository {
     return row ? toPositionWithPricesRecord(row) : undefined
   }
 
-  async findIdBystarkKey(starkKey: StarkKey): Promise<bigint | undefined> {
+  async findIdByStarkKey(starkKey: StarkKey): Promise<bigint | undefined> {
     const row = await this.knex('positions')
       .where('public_key', starkKey.toString())
       .first('position_id')
