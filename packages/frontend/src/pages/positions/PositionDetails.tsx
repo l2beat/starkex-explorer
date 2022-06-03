@@ -219,7 +219,7 @@ export function PositionDetails({
             rows={offers
               .flatMap((offer) => (offer.cancelledAt ? [] : [offer]))
               .map(buildOfferHistoryRow)}
-            className="mb-12"
+            className="mb-6 sm:mb-12"
           />
         </>
       )}
