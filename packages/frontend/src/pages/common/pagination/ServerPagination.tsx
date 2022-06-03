@@ -22,8 +22,6 @@ export function ServerPagination({
   additionalParams,
 }: ServerPaginationProps) {
   const last = Math.ceil(total / perPage)
-  const hiddenParams = new URLSearchParams(additionalParams)
-  hiddenParams.set(ServerFormAttributes.PageInputName, page.toString())
 
   const link = (page: number, perPage: number) => {
     const params = new URLSearchParams(additionalParams)
@@ -99,7 +97,7 @@ export function ServerPagination({
             <option key={n}>{n}</option>
           ))}
         </select>
-        {<HiddenInputs params={hiddenParams} />}
+        {additionalParams && <HiddenInputs params={additionalParams} />}
       </form>
     </div>
   )
