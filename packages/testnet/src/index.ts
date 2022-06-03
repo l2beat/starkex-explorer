@@ -38,7 +38,7 @@ async function main() {
     simulation.queueForcedAction({
       type: 'withdrawal',
       amount: args.quantizedAmount.toBigInt(),
-      positionId: args.positionId.toBigInt(),
+      positionId: args.vaultId.toBigInt(),
       starkKey: StarkKey.from(args.starkKey),
     })
   })
@@ -47,13 +47,13 @@ async function main() {
     const args: LogForcedTradeRequestEventObject = event.args
     simulation.queueForcedAction({
       type: 'trade',
-      positionIdA: args.positionIdA.toBigInt(),
+      positionIdA: args.vaultIdA.toBigInt(),
       starkKeyA: StarkKey.from(args.starkKeyA),
-      positionIdB: args.positionIdB.toBigInt(),
+      positionIdB: args.vaultIdB.toBigInt(),
       starkKeyB: StarkKey.from(args.starkKeyB),
-      collateralAmount: args.collateralAmount.toBigInt(),
-      syntheticAmount: args.syntheticAmount.toBigInt(),
-      isABuyingSynthetic: args.isABuyingSynthetic,
+      collateralAmount: args.amountCollateral.toBigInt(),
+      syntheticAmount: args.amountSynthetic.toBigInt(),
+      isABuyingSynthetic: args.aIsBuyingSynthetic,
       syntheticAssetId: decodeAssetId(
         args.syntheticAssetId.toHexString().slice(0, 2)
       ),
