@@ -62,7 +62,7 @@ export class PositionController {
     const current = historyWithAssets[0]
 
     const [ownerEvent] = await Promise.all([
-      this.userRegistrationEventRepository.findByStarkKey(current.publicKey),
+      this.userRegistrationEventRepository.findByStarkKey(current.starkKey),
     ])
 
     const content = renderPositionDetailsPage({
@@ -88,7 +88,7 @@ export class PositionController {
       transactions: transactions.map(toForcedTransactionEntry),
       offers: offers.map((offer) => ({
         ...offer,
-        type: offer.aIsBuyingSynthetic ? 'buy' : 'sell',
+        type: offer.isABuyingSynthetic ? 'buy' : 'sell',
         role: offer.positionIdA === positionId ? 'maker' : 'taker',
       })),
     })

@@ -156,11 +156,11 @@ function buildOfferHistoryRow(offer: OfferHistoryEntry) {
         ? 'Taker found'
         : 'Looking for a taker',
       formatCurrencyApproximation(
-        offer.amountSynthetic,
+        offer.syntheticAmount,
         offer.syntheticAssetId,
         3
       ),
-      formatCurrencyApproximation(offer.amountCollateral, AssetId.USDC, 3),
+      formatCurrencyApproximation(offer.collateralAmount, AssetId.USDC, 3),
     ],
   }
 }
