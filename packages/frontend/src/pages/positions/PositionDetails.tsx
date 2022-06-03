@@ -210,7 +210,7 @@ export function PositionDetails({
       </div>
       {offers.some((offer) => !offer.cancelledAt) && (
         <>
-          <div className="mb-1.5 font-medium text-lg text-left">
+          <div className="mb-1.5 font-medium text-lg text-left after:ml-1 after:inline-block  after:content-[''] after:w-4 after:h-4 after:bg-blue-200 after:rounded-full">
             Active force trade offers
           </div>
           <Table
