@@ -209,6 +209,27 @@ export function PositionDetails({
           </span>
         )}
       </div>
+      {transactions.some(
+        (tx) => tx.status === 'waiting to be included' || tx.status === 'sent'
+      ) && (
+        <>
+          <div className="mb-1.5 font-medium text-lg text-left after:ml-1 after:inline-block  after:content-[''] after:w-4 after:h-4 after:bg-blue-200 after:rounded-full">
+            Pending force transactions
+          </div>
+          <Table
+            noRowsText=""
+            columns={transactionHistoryTableColumns}
+            rows={transactions
+              .flatMap((tx) =>
+                tx.status === 'waiting to be included' || tx.status === 'sent'
+                  ? [tx]
+                  : []
+              )
+              .map(buildTransactionHistoryTableRow)}
+            className="mb-6 sm:mb-12"
+          />
+        </>
+      )}
       {offers.some((offer) => !offer.cancelledAt) && (
         <>
           <div
