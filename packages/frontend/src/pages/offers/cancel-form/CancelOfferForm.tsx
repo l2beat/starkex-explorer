@@ -1,7 +1,8 @@
 import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
-import { AddressInputName, FormClass, OfferIdInputName } from './attributes'
+import { toDataProps } from '../toDataProps'
+import { DataAttributes, FormClass } from './attributes'
 
 export interface CancelOfferFormData {
   offerId: number
@@ -18,13 +19,11 @@ export function CancelOfferForm(props: CancelOfferFormProps) {
       className={FormClass}
       method="POST"
       action={`/forced/offers/${props.offerId}/cancel`}
+      {...toDataProps({
+        [DataAttributes.OfferId]: props.offerId.toString(),
+        [DataAttributes.Address]: props.address.toString(),
+      })}
     >
-      <input type="hidden" value={props.offerId} name={OfferIdInputName} />
-      <input
-        type="hidden"
-        value={props.address.toString()}
-        name={AddressInputName}
-      />
       {props.children}
     </form>
   )
