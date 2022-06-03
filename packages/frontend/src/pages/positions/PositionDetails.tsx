@@ -1,4 +1,4 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { AssetCell } from '../common/AssetCell'
@@ -10,12 +10,12 @@ import { ClientPaginatedTable, Column, Table } from '../common/table'
 import {
   formatAbsoluteTime,
   formatCurrency,
+  formatCurrencyApproximation,
   formatCurrencyUnits,
   formatHashLong,
   formatRelativeTime,
 } from '../formatting'
-import { ActiveOffers } from './pending/offers'
-import { PositionDetailsProps } from './PositionDetailsProps'
+import { OfferHistoryEntry, PositionDetailsProps } from './PositionDetailsProps'
 
 const balanceTableColumns = (ownedByYou: boolean) => {
   const columns: Column[] = [
@@ -130,6 +130,51 @@ const buildTransactionHistoryTableRow = (
   }
 }
 
+function buildOfferHistoryRow(offer: OfferHistoryEntry) {
+  return {
+    link: `/forced/offers/${offer.id}`,
+    cells: [
+      offer.id,
+      offer.type === 'buy' ? 'Buy' : 'Sell',
+      offer.role === 'maker' ? 'Maker' : 'Taker',
+      offer.cancelledAt ? (
+        formatRelativeTime(offer.cancelledAt)
+      ) : offer.accepted ? (
+        <span
+          data-timestamp={Timestamp.fromHours(
+            offer.accepted.submissionExpirationTime
+          )}
+        >
+          ...
+        </span>
+      ) : (
+        formatRelativeTime(offer.createdAt)
+      ),
+      offer.cancelledAt
+        ? 'Cancelled'
+        : offer.accepted
+        ? 'Taker found'
+        : 'Looking for a taker',
+      formatCurrencyApproximation(
+        offer.amountSynthetic,
+        offer.syntheticAssetId,
+        3
+      ),
+      formatCurrencyApproximation(offer.amountCollateral, AssetId.USDC, 3),
+    ],
+  }
+}
+
+const offerHistoryColumns = [
+  { header: 'Id' },
+  { header: 'Type' },
+  { header: 'Role' },
+  { header: 'Time', className: 'min-w-[12ch]' },
+  { header: 'Status' },
+  { header: 'Amount', numeric: true },
+  { header: 'Total', numeric: true },
+]
+
 export function PositionDetails({
   positionId,
   assets,
@@ -163,9 +208,21 @@ export function PositionDetails({
           </span>
         )}
       </div>
-      <ActiveOffers
-        offers={offers.flatMap((offer) => (offer.cancelledAt ? [] : [offer]))}
-      />
+      {offers.some((offer) => !offer.cancelledAt) && (
+        <>
+          <div className="mb-1.5 font-medium text-lg text-left">
+            Active force trade offers
+          </div>
+          <Table
+            noRowsText=""
+            columns={offerHistoryColumns}
+            rows={offers
+              .flatMap((offer) => (offer.cancelledAt ? [] : [offer]))
+              .map(buildOfferHistoryRow)}
+            className="mb-12"
+          />
+        </>
+      )}
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
         rows={[
@@ -219,6 +276,12 @@ export function PositionDetails({
         noRowsText="there are no forced transactions associated with this position"
         columns={transactionHistoryTableColumns}
         rows={transactions.map(buildTransactionHistoryTableRow)}
+      />
+      <ClientPaginatedTable
+        id="position-offers"
+        noRowsText="this position has no offer history"
+        columns={offerHistoryColumns}
+        rows={offers.map(buildOfferHistoryRow)}
       />
     </Page>
   )
