@@ -31,7 +31,7 @@ describe(RollupState.name, () => {
             positionId: 5n,
             collateralBalance: 555n,
             fundingTimestamp: Timestamp(0),
-            publicKey: StarkKey.fake('5'),
+            starkKey: StarkKey.fake('5'),
             balances: [],
           },
         ],
@@ -40,7 +40,7 @@ describe(RollupState.name, () => {
       const updated = await rollup.positions.getLeaf(5n)
       const data = updated.getData()
       expect(data).toEqual({
-        publicKey: StarkKey.fake('5'),
+        starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
         assets: [],
       })
@@ -51,7 +51,7 @@ describe(RollupState.name, () => {
           value: expect.objectWith({
             assets: [],
             collateralBalance: data.collateralBalance,
-            publicKey: data.publicKey,
+            starkKey: data.starkKey,
           }),
         },
       ])
@@ -75,7 +75,7 @@ describe(RollupState.name, () => {
             positionId: 5n,
             collateralBalance: 555n,
             fundingTimestamp: Timestamp(1001),
-            publicKey: StarkKey.fake('5'),
+            starkKey: StarkKey.fake('5'),
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
               { assetId: AssetId('ETH-9'), balance: 55n },
@@ -86,7 +86,7 @@ describe(RollupState.name, () => {
 
       const updated = await rollup.positions.getLeaf(5n)
       expect(updated.getData()).toEqual({
-        publicKey: StarkKey.fake('5'),
+        starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
         assets: [
           { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 1n },
@@ -120,7 +120,7 @@ describe(RollupState.name, () => {
             positionId: 5n,
             collateralBalance: 555n,
             fundingTimestamp: Timestamp(1001),
-            publicKey: StarkKey.fake('5'),
+            starkKey: StarkKey.fake('5'),
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
               { assetId: AssetId('ETH-9'), balance: 55n },
@@ -130,7 +130,7 @@ describe(RollupState.name, () => {
             positionId: 6n,
             collateralBalance: 666n,
             fundingTimestamp: Timestamp(1002),
-            publicKey: StarkKey.fake('6'),
+            starkKey: StarkKey.fake('6'),
             balances: [
               { assetId: AssetId('BTC-10'), balance: 6n },
               { assetId: AssetId('ETH-9'), balance: 66n },
@@ -140,7 +140,7 @@ describe(RollupState.name, () => {
             positionId: 7n,
             collateralBalance: 777n,
             fundingTimestamp: Timestamp(1002),
-            publicKey: StarkKey.fake('7'),
+            starkKey: StarkKey.fake('7'),
             balances: [
               { assetId: AssetId('BTC-10'), balance: 7n },
               { assetId: AssetId('ETH-9'), balance: 77n },
@@ -151,7 +151,7 @@ describe(RollupState.name, () => {
 
       const [five, six, seven] = await rollup.positions.getLeaves([5n, 6n, 7n])
       expect(five.getData()).toEqual({
-        publicKey: StarkKey.fake('5'),
+        starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
         assets: [
           { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 1n },
@@ -159,7 +159,7 @@ describe(RollupState.name, () => {
         ],
       })
       expect(six.getData()).toEqual({
-        publicKey: StarkKey.fake('6'),
+        starkKey: StarkKey.fake('6'),
         collateralBalance: 666n,
         assets: [
           { assetId: AssetId('BTC-10'), balance: 6n, fundingIndex: 2n },
@@ -167,7 +167,7 @@ describe(RollupState.name, () => {
         ],
       })
       expect(seven.getData()).toEqual({
-        publicKey: StarkKey.fake('7'),
+        starkKey: StarkKey.fake('7'),
         collateralBalance: 777n,
         assets: [
           { assetId: AssetId('BTC-10'), balance: 7n, fundingIndex: 2n },
@@ -215,7 +215,7 @@ describe(RollupState.name, () => {
             positionId: 5n,
             collateralBalance: 555n,
             fundingTimestamp: Timestamp(1002),
-            publicKey: StarkKey.fake('5'),
+            starkKey: StarkKey.fake('5'),
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
               { assetId: AssetId('ETH-9'), balance: 55n },
@@ -226,7 +226,7 @@ describe(RollupState.name, () => {
 
       const position = await rollup.positions.getLeaf(5n)
       expect(position.getData()).toEqual({
-        publicKey: StarkKey.fake('5'),
+        starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
         assets: [
           { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 2n },
@@ -256,7 +256,7 @@ describe(RollupState.name, () => {
             positionId: 5n,
             collateralBalance: 555n,
             fundingTimestamp: Timestamp(1001),
-            publicKey: StarkKey.fake('5'),
+            starkKey: StarkKey.fake('5'),
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
               { assetId: AssetId('ETH-9'), balance: 55n },
@@ -282,7 +282,7 @@ describe(RollupState.name, () => {
             positionId: 5n,
             collateralBalance: 555n,
             fundingTimestamp: Timestamp(1002),
-            publicKey: StarkKey.fake('5'),
+            starkKey: StarkKey.fake('5'),
             balances: [
               { assetId: AssetId('ETH-9'), balance: 0n },
               { assetId: AssetId('UNI-9'), balance: 20n },
@@ -294,7 +294,7 @@ describe(RollupState.name, () => {
 
       const updated = await rollup.positions.getLeaf(5n)
       expect(updated.getData()).toEqual({
-        publicKey: StarkKey.fake('5'),
+        starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
         assets: [
           { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 2n },
@@ -316,7 +316,7 @@ describe(RollupState.name, () => {
               positionId: 5n,
               collateralBalance: 555n,
               fundingTimestamp: Timestamp.fromSeconds(1001),
-              publicKey: StarkKey.fake('5'),
+              starkKey: StarkKey.fake('5'),
               balances: [{ assetId: AssetId('BTC-10'), balance: 5n }],
             },
           ],
@@ -336,7 +336,7 @@ describe(RollupState.name, () => {
               positionId: 5n,
               collateralBalance: 555n,
               fundingTimestamp: Timestamp.fromSeconds(1001),
-              publicKey: StarkKey.fake('5'),
+              starkKey: StarkKey.fake('5'),
               balances: [{ assetId: AssetId('BTC-10'), balance: 5n }],
             },
           ],
@@ -364,7 +364,7 @@ describe(RollupState.name, () => {
             positionId: 5n,
             collateralBalance: 555n,
             fundingTimestamp: Timestamp(1001),
-            publicKey: StarkKey.fake('5'),
+            starkKey: StarkKey.fake('5'),
             balances: [
               { assetId: AssetId('BTC-10'), balance: 5n },
               { assetId: AssetId('ETH-9'), balance: 55n },
@@ -388,7 +388,7 @@ describe(RollupState.name, () => {
       })
       const position = await recovered.positions.getLeaf(5n)
       expect(position.getData()).toEqual({
-        publicKey: StarkKey.fake('5'),
+        starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
         assets: [
           { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 1n },

@@ -3,10 +3,12 @@ import Koa, { Middleware } from 'koa'
 
 import { Logger } from '../tools/Logger'
 import { createApiLogger } from './ApiLogger'
+import { forceHerokuHttps } from './middleware/forceHttps'
 
 interface Options {
   routers?: Router[]
   middleware?: Middleware[]
+  forceHttps: boolean
 }
 
 export class ApiServer {
@@ -17,6 +19,11 @@ export class ApiServer {
     this.app = new Koa()
 
     this.app.use(createApiLogger(this.logger))
+
+    if (options.forceHttps) {
+      this.app.proxy = true
+      this.app.use(forceHerokuHttps)
+    }
 
     for (const middleware of options.middleware ?? []) {
       this.app.use(middleware)

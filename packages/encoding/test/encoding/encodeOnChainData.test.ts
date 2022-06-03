@@ -75,22 +75,22 @@ describe(encodeOnChainData.name, () => {
     },
     minimumExpirationTimestamp: 123456n,
     modifications: [
-      { positionId: 1n, publicKey: StarkKey.fake(), difference: 2n },
-      { positionId: 2n, publicKey: StarkKey.fake(), difference: -3n },
+      { positionId: 1n, starkKey: StarkKey.fake(), difference: 2n },
+      { positionId: 2n, starkKey: StarkKey.fake(), difference: -3n },
     ],
     forcedActions: [
       {
         type: 'withdrawal',
         positionId: 100n,
-        publicKey: StarkKey.fake(),
+        starkKey: StarkKey.fake(),
         amount: 50_000n,
       },
       {
         type: 'trade',
         positionIdA: 100n,
         positionIdB: 200n,
-        publicKeyA: StarkKey.fake(),
-        publicKeyB: StarkKey.fake(),
+        starkKeyA: StarkKey.fake(),
+        starkKeyB: StarkKey.fake(),
         collateralAmount: 20_000n,
         syntheticAmount: 10_000n,
         isABuyingSynthetic: true,
@@ -119,7 +119,7 @@ describe(encodeOnChainData.name, () => {
     positions: [
       {
         positionId: 1n,
-        publicKey: StarkKey.fake(),
+        starkKey: StarkKey.fake(),
         collateralBalance: 50_000n,
         balances: [
           { assetId: AssetId('ABC-3'), balance: 1234n },
@@ -129,7 +129,7 @@ describe(encodeOnChainData.name, () => {
       },
       {
         positionId: 2n,
-        publicKey: StarkKey.fake(),
+        starkKey: StarkKey.fake(),
         collateralBalance: -50_000n,
         balances: [
           { assetId: AssetId('ABC-3'), balance: -1234n },

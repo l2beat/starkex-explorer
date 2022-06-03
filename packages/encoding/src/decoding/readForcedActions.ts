@@ -11,13 +11,13 @@ export function readForcedActions(reader: ByteReader) {
   for (let i = 0; i < count; i++) {
     const type = reader.readNumber(32)
     if (type === 0) {
-      const publicKey = StarkKey(reader.readHex(32))
+      const starkKey = StarkKey(reader.readHex(32))
       const positionId = reader.readBigInt(32)
       const amount = reader.readBigInt(32)
-      forcedActions.push({ type: 'withdrawal', publicKey, positionId, amount })
+      forcedActions.push({ type: 'withdrawal', starkKey, positionId, amount })
     } else if (type === 1) {
-      const publicKeyA = StarkKey(reader.readHex(32))
-      const publicKeyB = StarkKey(reader.readHex(32))
+      const starkKeyA = StarkKey(reader.readHex(32))
+      const starkKeyB = StarkKey(reader.readHex(32))
       const positionIdA = reader.readBigInt(32)
       const positionIdB = reader.readBigInt(32)
       reader.skip(17)
@@ -28,8 +28,8 @@ export function readForcedActions(reader: ByteReader) {
       const nonce = reader.readBigInt(32)
       forcedActions.push({
         type: 'trade',
-        publicKeyA,
-        publicKeyB,
+        starkKeyA,
+        starkKeyB,
         positionIdA,
         positionIdB,
         syntheticAssetId,

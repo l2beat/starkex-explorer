@@ -8,7 +8,7 @@ interface Event {
 }
 
 export function toForcedTradeOfferHistory(offer: ForcedTradeOfferRecord) {
-  const partyB = offer.aIsBuyingSynthetic ? 'buyer' : 'seller'
+  const partyB = offer.isABuyingSynthetic ? 'buyer' : 'seller'
   const history: Event[] = [
     {
       timestamp: offer.createdAt,

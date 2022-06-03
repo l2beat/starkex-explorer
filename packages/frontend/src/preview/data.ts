@@ -54,16 +54,16 @@ const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
 
 const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
   Array.from({ length: count }).map((_, i) => {
-    const amountCollateral = BigInt(
+    const collateralAmount = BigInt(
       Math.floor(Math.random() * 1000000 * (i + 1))
     )
-    const amountSynthetic = BigInt(
+    const syntheticAmount = BigInt(
       Math.floor(Math.random() * 1000000 * (i + 1))
     )
     const assetId = i % 2 === 0 ? AssetId('LINK-7') : AssetId('ETH-9')
     const price =
-      (amountCollateral * BigInt(10 ** AssetId.decimals(assetId))) /
-      amountSynthetic /
+      (collateralAmount * BigInt(10 ** AssetId.decimals(assetId))) /
+      syntheticAmount /
       10_000n
     const createdAt = Timestamp(Date.now() - 50000 - i * 480 * 3570)
 
@@ -73,9 +73,9 @@ const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
       type: i % 2 === 0 ? 'buy' : 'sell',
       assetId,
       positionId: 100n * BigInt(i),
-      amount: amountSynthetic,
+      amount: syntheticAmount,
       price,
-      total: amountCollateral,
+      total: collateralAmount,
     }
   })
 
@@ -84,6 +84,7 @@ export const HOME_PROPS: HomeProps = {
   stateUpdates: Array.from({ length: 6 }).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),
+    forcedTransactionsCount: Math.floor(Math.random() * 3),
     positionCount: Math.floor(Math.random() * 30 + 4),
     timestamp: Timestamp(
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)
@@ -103,7 +104,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   blockNumber: Math.floor(Math.random() * 100),
   timestamp: Timestamp(Date.now()),
   positions: Array.from({ length: 57 }).map((_, i) => ({
-    publicKey: StarkKey.fake(),
+    starkKey: StarkKey.fake(),
     positionId: BigInt(i + 1),
     totalUSDCents: BigInt(Math.floor(Math.random() * 500_000_00)),
     previousTotalUSDCents: BigInt(Math.floor(Math.random() * 500_000_00)),
@@ -115,7 +116,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
 export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   account: undefined,
   positionId: 123n,
-  publicKey: StarkKey.fake(),
+  starkKey: StarkKey.fake(),
   ethAddress: EthereumAddress.fake(),
   lastUpdateTimestamp: Timestamp(Date.now()),
   stateUpdateId: 1,
@@ -170,15 +171,15 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       id: 1,
       type: 'buy',
       syntheticAssetId: AssetId('ETH-9'),
-      amountSynthetic: 10000000n,
-      amountCollateral: 10000000n,
+      syntheticAmount: 10000000n,
+      collateralAmount: 10000000n,
     },
     {
       id: 2,
       type: 'sell',
       syntheticAssetId: AssetId('ETH-9'),
-      amountSynthetic: 1000000n,
-      amountCollateral: 10000000n,
+      syntheticAmount: 1000000n,
+      collateralAmount: 10000000n,
       accepted: {
         submissionExpirationTime: BigInt(
           Math.floor((Date.now() + 5 * 3600 * 1000) / (60 * 1000))
@@ -189,8 +190,8 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       id: 3,
       type: 'sell',
       syntheticAssetId: AssetId('ETH-9'),
-      amountSynthetic: 1000000n,
-      amountCollateral: 10000000n,
+      syntheticAmount: 1000000n,
+      collateralAmount: 10000000n,
       accepted: {
         submissionExpirationTime: BigInt(
           Math.floor((Date.now() + 6 * 3560 * 900) / (60 * 1000))
@@ -204,8 +205,8 @@ export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
   account: undefined,
   stateUpdateId: 1,
   positionId: 123n,
-  publicKey: StarkKey.fake(),
-  previousPublicKey: StarkKey.fake(),
+  starkKey: StarkKey.fake(),
+  previousStarkKey: StarkKey.fake(),
   lastUpdateTimestamp: Timestamp(Date.now()),
   assetChanges: [
     {
@@ -235,6 +236,7 @@ export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
   stateUpdates: Array.from({ length: 10 }).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),
+    forcedTransactionsCount: Math.floor(Math.random() * 3),
     positionCount: Math.floor(Math.random() * 30 + 4),
     timestamp: Timestamp(
       Date.now() - Math.floor(i * 6 * ONE_HOUR + Math.random() * 2 * ONE_HOUR)
@@ -299,8 +301,8 @@ export const FORCED_TRADE_OFFER_DETAILS_PROPS: ForcedTradeOfferDetailsProps = {
   account: undefined,
   offer: {
     addressA: EthereumAddress.fake(),
-    amountCollateral: 10n,
-    amountSynthetic: 100n,
+    collateralAmount: 10n,
+    syntheticAmount: 100n,
     syntheticAssetId: AssetId('BTC-10'),
     id: 1,
     positionIdA: 1n,
@@ -325,7 +327,7 @@ export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
   ),
   selectedAsset: AssetId('USDC-6'),
   positionId: 1234n,
-  publicKey: StarkKey.fake(),
+  starkKey: StarkKey.fake(),
   assets: [
     {
       assetId: AssetId('USDC-6'),

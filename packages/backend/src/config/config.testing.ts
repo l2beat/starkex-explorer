@@ -30,5 +30,6 @@ export function getTestConfig(): Config {
       verifiers: [],
     },
     freshStart: true, // not relevant for tests
+    forceHttps: false, // not relevant for tests
   }
 }

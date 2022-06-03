@@ -57,7 +57,7 @@ export class ForcedTransactionController {
   ): Promise<ForcedTransaction> {
     if (transaction.data.type === 'withdrawal') {
       const user = await this.userRegistrationEventRepository.findByStarkKey(
-        transaction.data.publicKey
+        transaction.data.starkKey
       )
       return {
         type: 'exit',
@@ -72,10 +72,10 @@ export class ForcedTransactionController {
     }
     const [userA, userB] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(
-        transaction.data.publicKeyA
+        transaction.data.starkKeyA
       ),
       this.userRegistrationEventRepository.findByStarkKey(
-        transaction.data.publicKeyB
+        transaction.data.starkKeyB
       ),
     ])
     return {
@@ -86,8 +86,8 @@ export class ForcedTransactionController {
         positionIdB: transaction.data.positionIdB,
         addressA: userA?.ethAddress,
         addressB: userB?.ethAddress,
-        amountSynthetic: transaction.data.syntheticAmount,
-        amountCollateral: transaction.data.collateralAmount,
+        syntheticAmount: transaction.data.syntheticAmount,
+        collateralAmount: transaction.data.collateralAmount,
         syntheticAssetId: transaction.data.syntheticAssetId,
         transactionHash: transaction.hash,
       },
@@ -155,7 +155,7 @@ export class ForcedTransactionController {
         account,
         perpetualAddress: this.perpetualAddress,
         positionId: position.positionId,
-        publicKey: position.publicKey,
+        starkKey: position.starkKey,
         selectedAsset: assets[0].assetId,
         assets,
       }),

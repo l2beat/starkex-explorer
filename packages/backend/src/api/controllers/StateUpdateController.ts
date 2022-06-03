@@ -122,7 +122,7 @@ export function toPositionUpdateEntry(
     : 0
 
   return {
-    publicKey: position.publicKey,
+    starkKey: position.starkKey,
     positionId: position.positionId,
     totalUSDCents,
     previousTotalUSDCents,

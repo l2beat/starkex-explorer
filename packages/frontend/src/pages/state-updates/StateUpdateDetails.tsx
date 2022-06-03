@@ -77,14 +77,14 @@ export function StateUpdateDetails({
         rows={positions.map(
           ({
             positionId,
-            publicKey,
+            starkKey,
             totalUSDCents,
             previousTotalUSDCents,
             assetsUpdated,
           }) => ({
             cells: [
               positionId.toString(),
-              formatHashLong(publicKey),
+              formatHashLong(starkKey),
               previousTotalUSDCents
                 ? formatCurrency(previousTotalUSDCents, 'USD')
                 : '-',

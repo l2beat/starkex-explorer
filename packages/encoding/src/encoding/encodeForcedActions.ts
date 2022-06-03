@@ -8,13 +8,13 @@ export function encodeForcedActions(forcedActions: ForcedAction[]) {
   for (const action of forcedActions) {
     if (action.type === 'withdrawal') {
       writer.writeNumber(0, 32)
-      writer.write(action.publicKey.toString(), 32)
+      writer.write(action.starkKey.toString(), 32)
       writer.writeNumber(action.positionId, 32)
       writer.writeNumber(action.amount, 32)
     } else if (action.type === 'trade') {
       writer.writeNumber(1, 32)
-      writer.write(action.publicKeyA.toString(), 32)
-      writer.write(action.publicKeyB.toString(), 32)
+      writer.write(action.starkKeyA.toString(), 32)
+      writer.write(action.starkKeyB.toString(), 32)
       writer.writeNumber(action.positionIdA, 32)
       writer.writeNumber(action.positionIdB, 32)
       writer.writePadding(17)

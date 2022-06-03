@@ -25,4 +25,5 @@ export interface Config {
     verifiers: EthereumAddress[]
   }
   freshStart: boolean
+  forceHttps: boolean
 }
