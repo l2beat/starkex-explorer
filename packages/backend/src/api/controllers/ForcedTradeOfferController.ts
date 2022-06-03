@@ -88,7 +88,7 @@ export class ForcedTradeOfferController {
     if (offer.accepted?.transactionHash) {
       return {
         type: 'redirect',
-        url: `/forced/${offer.accepted?.transactionHash}`,
+        url: `/forced/${offer.accepted.transactionHash}`,
       }
     }
 
