@@ -9,6 +9,7 @@ function toCamelCase(name: string) {
     if (uppercaseNext) {
       result += name[i].toUpperCase()
       uppercaseNext = false
+      continue
     }
     result += name[i]
   }
