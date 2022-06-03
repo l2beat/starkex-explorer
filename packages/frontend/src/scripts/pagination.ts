@@ -1,4 +1,4 @@
-import { ServerFormAttributes } from '../pages/common/pagination'
+import { ServerFormAttributes } from '../pages/common/pagination/attributes'
 import { styles } from '../pages/common/pagination/styles'
 
 export function initPagination() {
