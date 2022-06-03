@@ -1,24 +1,50 @@
 import { AssetId, Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { AssetCell } from '../../common/AssetCell'
-import { formatCurrencyUnits } from '../../formatting'
-import { OfferType } from '../../offers'
-import { AcceptOfferForm, AcceptOfferFormData } from '../../offers/accept-form'
-import { CancelOfferForm, CancelOfferFormData } from '../../offers/cancel-form'
+import { Table } from '../../common/table'
 import {
-  FinalizeOfferForm,
-  FinalizeOfferFormData,
-} from '../../offers/finalize-form'
-import { PendingRow } from './row'
+  formatCurrencyApproximation,
+  formatRelativeTime,
+} from '../../formatting'
+import { OfferType } from '../../offers'
+import { AcceptOfferFormData } from '../../offers/accept-form'
+import { CancelOfferFormData } from '../../offers/cancel-form'
+import { FinalizeOfferFormData } from '../../offers/finalize-form'
 
-function Button({ text }: { text: string }) {
-  return <button className="px-3 rounded bg-grey-300">{text}</button>
+function buildPendingOfferRow(offer: PendingOffer) {
+  return {
+    link: `/forced/offers/${offer.id}`,
+    cells: [
+      offer.id,
+      offer.type === 'buy' ? 'Buy' : 'Sell',
+      offer.role === 'maker' ? 'Maker' : 'Taker',
+      offer.accepted ? (
+        <span
+          data-timestamp={Timestamp.fromHours(
+            offer.accepted.submissionExpirationTime
+          )}
+        >
+          ...
+        </span>
+      ) : (
+        formatRelativeTime(offer.createdAt)
+      ),
+      offer.accepted ? 'Taker found' : 'Looking for a taker',
+      formatCurrencyApproximation(
+        offer.amountSynthetic,
+        offer.syntheticAssetId,
+        3
+      ),
+      formatCurrencyApproximation(offer.amountCollateral, AssetId.USDC, 3),
+    ],
+  }
 }
 
 export interface PendingOffer {
   id: number
   type: OfferType
+  role: 'maker' | 'taker'
+  createdAt: Timestamp
   syntheticAssetId: AssetId
   amountSynthetic: bigint
   amountCollateral: bigint
@@ -37,62 +63,23 @@ interface PendingOffersProps {
 export function PendingOffers({ offers }: PendingOffersProps) {
   return (
     <>
-      <div className="mb-1.5 font-medium text-lg text-left">Pending Offers</div>
-      <table
-        className="w-full border-separate mb-12"
-        style={{ borderSpacing: '0 4px' }}
-      >
-        {offers.map((offer, i) => {
-          const status = offer.accepted ? 'Matched!' : 'Offer created'
-          const timeLeft = offer.accepted && (
-            <span
-              data-timestamp={Timestamp.fromHours(
-                offer.accepted.submissionExpirationTime
-              )}
-            >
-              ...
-            </span>
-          )
-          const controls = [
-            offer.cancelForm && (
-              <CancelOfferForm {...offer.cancelForm}>
-                <Button text="Cancel" />
-              </CancelOfferForm>
-            ),
-            offer.acceptForm && (
-              <AcceptOfferForm {...offer.acceptForm}>
-                <Button text="Accept" />
-              </AcceptOfferForm>
-            ),
-            offer.finalizeForm && (
-              <FinalizeOfferForm {...offer.finalizeForm}>
-                <Button text="Finalize" />Ū
-              </FinalizeOfferForm>
-            ),
-          ]
-          return (
-            <PendingRow
-              key={i}
-              cells={[
-                offer.type === 'buy' ? 'Buy' : 'Sell',
-                formatCurrencyUnits(
-                  offer.amountSynthetic,
-                  offer.syntheticAssetId
-                ),
-                <AssetCell assetId={offer.syntheticAssetId} />,
-                formatCurrencyUnits(offer.amountCollateral, AssetId.USDC),
-                <AssetCell assetId={AssetId.USDC} />,
-                status,
-                timeLeft,
-                ...controls,
-              ]}
-              accent={!!offer.accepted}
-              fullWidth={6}
-              numeric={[1, 3]}
-            />
-          )
-        })}
-      </table>
+      <div className="mb-1.5 font-medium text-lg text-left">
+        Active force trade offers
+      </div>
+      <Table
+        noRowsText=""
+        columns={[
+          { header: 'Id' },
+          { header: 'Type' },
+          { header: 'Role' },
+          { header: 'Time', className: 'min-w-[12ch]' },
+          { header: 'Status' },
+          { header: 'Amount', numeric: true },
+          { header: 'Total', numeric: true },
+        ]}
+        rows={offers.map(buildPendingOfferRow)}
+        className="mb-12"
+      />
     </>
   )
 }

@@ -19,3 +19,18 @@ function formatThousands(integer: string) {
   }
   return integer
 }
+
+export function formatApproximation(
+  units: bigint | number,
+  decimals: number,
+  precision: number
+): string {
+  if (units < 0) {
+    return '-' + formatApproximation(-units, decimals, precision)
+  }
+  const base = BigInt(units).toString()
+  const approximation = BigInt(
+    base.slice(0, base.length - (decimals - precision))
+  )
+  return formatWithPrecision(approximation, precision)
+}

@@ -1,6 +1,6 @@
 import { AssetId } from '@explorer/types'
 
-import { formatWithPrecision } from './formatWithPrecision'
+import { formatApproximation, formatWithPrecision } from './formatNumber'
 
 export function formatCurrency(
   units: bigint | number,
@@ -25,4 +25,17 @@ export function formatCurrencyUnits(
     units,
     currency === 'USD' ? 2 : AssetId.decimals(currency)
   )
+}
+
+export function formatCurrencyApproximation(
+  units: bigint | number,
+  currency: AssetId,
+  precision: number
+) {
+  const value = formatApproximation(
+    units,
+    AssetId.decimals(currency),
+    precision
+  )
+  return `${value} ${AssetId.symbol(currency)}`
 }

@@ -11,6 +11,7 @@ export interface Column {
   monospace?: boolean
   fullWidth?: boolean
   textAlignClass?: 'text-left' | 'text-right'
+  className?: string
 }
 
 export interface TableProps {

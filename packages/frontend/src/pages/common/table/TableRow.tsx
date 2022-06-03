@@ -20,7 +20,8 @@ export function TableRow(props: TableRowProps) {
       )}
     >
       {props.cells.map((cell, col) => {
-        const { fullWidth, numeric, monospace } = props.columns[col] || {}
+        const { fullWidth, numeric, monospace, className } =
+          props.columns[col] || {}
         return (
           <td
             key={col}
@@ -30,7 +31,8 @@ export function TableRow(props: TableRowProps) {
               (numeric || monospace) && 'font-mono',
               numeric ? 'text-right' : 'text-left',
               fullWidth ? 'max-w-[10px] truncate' : 'w-0',
-              props.link && 'cursor-pointer'
+              props.link && 'cursor-pointer',
+              className
             )}
           >
             {props.link ? (
