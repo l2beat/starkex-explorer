@@ -284,7 +284,7 @@ describe(StateUpdateRepository.name, () => {
           },
           positions: Array.from({ length: blockNumber - 20_000 }).map(
             (_, i) => ({
-              publicKey: StarkKey.fake(),
+              starkKey: StarkKey.fake(),
               positionId: BigInt(blockNumber * 10 + i),
               collateralBalance: 0n,
               balances: [],
@@ -304,13 +304,13 @@ describe(StateUpdateRepository.name, () => {
         },
         positions: [
           {
-            publicKey: StarkKey.fake(),
+            starkKey: StarkKey.fake(),
             positionId: BigInt(1n),
             collateralBalance: 0n,
             balances: [],
           },
           {
-            publicKey: StarkKey.fake(),
+            starkKey: StarkKey.fake(),
             positionId: BigInt(2n),
             collateralBalance: 0n,
             balances: [],
