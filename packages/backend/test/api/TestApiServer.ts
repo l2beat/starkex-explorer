@@ -12,6 +12,7 @@ export function createTestApiServer(
   const callback = new ApiServer(0, Logger.SILENT, {
     routers,
     middleware,
+    forceHttps: false,
   }).getNodeCallback()
   return agent(callback)
 }
