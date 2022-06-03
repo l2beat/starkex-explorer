@@ -36,7 +36,7 @@ const buildBalanceChangesTableRow = ({
 export function PositionAtUpdate({
   positionId,
   assetChanges,
-  previousstarkKey,
+  previousStarkKey,
   starkKey,
   stateUpdateId,
   lastUpdateTimestamp,
@@ -83,7 +83,7 @@ export function PositionAtUpdate({
           },
           {
             title: 'Previous stark key',
-            content: previousstarkKey ? formatHashLong(previousstarkKey) : '-',
+            content: previousStarkKey ? formatHashLong(previousStarkKey) : '-',
           },
           {
             title: 'Stark key',

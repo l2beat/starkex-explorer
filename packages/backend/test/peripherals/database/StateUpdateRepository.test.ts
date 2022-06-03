@@ -158,9 +158,9 @@ describe(StateUpdateRepository.name, () => {
     const records = await repository.getAll()
     expect(records.map((x) => x.blockNumber)).toEqual([20_001, 20_002])
 
-    expect(await knex('positions').select('public_key')).toEqual([
-      { public_key: StarkKey.fake('20001').toString() },
-      { public_key: StarkKey.fake('20002').toString() },
+    expect(await knex('positions').select('stark_key')).toEqual([
+      { stark_key: StarkKey.fake('20001').toString() },
+      { stark_key: StarkKey.fake('20002').toString() },
     ])
     expect(await knex('prices').select('asset_id', 'price')).toEqual([
       { asset_id: 'ETH-9', price: 20001n },

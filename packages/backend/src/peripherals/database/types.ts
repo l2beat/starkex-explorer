@@ -77,7 +77,7 @@ declare module 'knex/types/tables' {
   interface PositionUpdateRow {
     state_update_id: number
     position_id: bigint
-    public_key: string
+    stark_key: string
     collateral_balance: bigint
     funding_timestamp: bigint
     balances: JsonB<AssetBalanceJson[]>
@@ -86,7 +86,7 @@ declare module 'knex/types/tables' {
   interface PositionRow {
     state_update_id: number
     position_id: bigint
-    public_key: string
+    stark_key: string
     collateral_balance: bigint
     balances: JsonB<AssetBalanceJson[]>
   }

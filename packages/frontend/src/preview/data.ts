@@ -205,7 +205,7 @@ export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
   stateUpdateId: 1,
   positionId: 123n,
   starkKey: StarkKey.fake(),
-  previousstarkKey: StarkKey.fake(),
+  previousStarkKey: StarkKey.fake(),
   lastUpdateTimestamp: Timestamp(Date.now()),
   assetChanges: [
     {

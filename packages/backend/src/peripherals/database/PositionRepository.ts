@@ -79,7 +79,7 @@ export class PositionRepository extends BaseRepository {
 
   async findIdByStarkKey(starkKey: StarkKey): Promise<bigint | undefined> {
     const row = await this.knex('positions')
-      .where('public_key', starkKey.toString())
+      .where('stark_key', starkKey.toString())
       .first('position_id')
     return row?.position_id
   }
@@ -93,7 +93,7 @@ export class PositionRepository extends BaseRepository {
       .where('eth_address', address.toString())
       .join('positions', function () {
         this.on(
-          'positions.public_key',
+          'positions.stark_key',
           '=',
           'user_registration_events.stark_key'
         )
@@ -144,7 +144,7 @@ export function toPositionRecord(
   return {
     stateUpdateId: row.state_update_id,
     positionId: BigInt(row.position_id),
-    starkKey: StarkKey(row.public_key),
+    starkKey: StarkKey(row.stark_key),
     collateralBalance: BigInt(row.collateral_balance),
     balances: (typeof row.balances === 'string'
       ? (JSON.parse(row.balances) as AssetBalanceJson[])
@@ -182,7 +182,7 @@ export function toPositionRow(
   return {
     state_update_id: stateUpdateId,
     position_id: record.positionId,
-    public_key: record.starkKey.toString(),
+    stark_key: record.starkKey.toString(),
     collateral_balance: record.collateralBalance,
     balances: JSON.stringify(balances),
   }

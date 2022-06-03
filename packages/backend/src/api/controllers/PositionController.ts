@@ -154,7 +154,7 @@ export class PositionController {
       stateUpdateId,
       positionId,
       lastUpdateTimestamp: update.timestamp,
-      previousstarkKey: previousPosition?.starkKey,
+      previousStarkKey: previousPosition?.starkKey,
       starkKey: position.starkKey,
       assetChanges,
       transactions: transactions

@@ -19,6 +19,9 @@ export async function up(knex: Knex) {
     table.renameColumn('amount_synthetic', 'synthetic_amount')
     table.renameColumn('a_is_buying_synthetic', 'is_a_buying_synthetic')
   })
+  await knex.schema.alterTable('positions', (table) => {
+    table.renameColumn('public_key', 'stark_key')
+  })
 }
 
 export async function down(knex: Knex) {
@@ -26,5 +29,8 @@ export async function down(knex: Knex) {
     table.renameColumn('collateral_amount', 'amount_collateral')
     table.renameColumn('synthetic_amount', 'amount_synthetic')
     table.renameColumn('is_a_buying_synthetic', 'a_is_buying_synthetic')
+  })
+  await knex.schema.alterTable('positions', (table) => {
+    table.renameColumn('stark_key', 'public_key')
   })
 }
