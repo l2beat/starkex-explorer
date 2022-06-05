@@ -1,8 +1,9 @@
 import { AssetId, Timestamp } from '@explorer/types'
-import cx from 'classnames'
 import React from 'react'
 
 import { EtherscanLink } from '../common/EtherscanLink'
+import { PageHeading } from '../common/header/PageHeading'
+import { SectionHeading } from '../common/header/SectionHeading'
 import { Page } from '../common/page/Page'
 import { SimpleLink } from '../common/SimpleLink'
 import { ClientPaginatedTable, Column, Table } from '../common/table'
@@ -197,9 +198,9 @@ export function PositionDetails({
       account={account}
     >
       <div className="mb-8 flex items-center">
-        <h1 className="font-sans font-bold text-2xl">
+        <PageHeading className="!mb-0">
           Position #{positionId.toString()}
-        </h1>
+        </PageHeading>
         {ownedByYou && (
           <span className="ml-4 px-2 bg-blue-100 rounded-full">
             Owned by you
@@ -210,15 +211,9 @@ export function PositionDetails({
         (tx) => tx.status === 'waiting to be included' || tx.status === 'sent'
       ) && (
         <>
-          <div
-            className={cx(
-              'mb-1.5 font-medium text-lg text-left',
-              ownedByYou &&
-                'after:ml-1 after:inline-block after:w-4 after:h-4 after:bg-blue-200 after:rounded-full'
-            )}
-          >
+          <SectionHeading active={ownedByYou}>
             Pending force transactions
-          </div>
+          </SectionHeading>
           <Table
             noRowsText=""
             columns={transactionHistoryTableColumns}
@@ -229,34 +224,25 @@ export function PositionDetails({
                   : []
               )
               .map(buildTransactionHistoryTableRow)}
-            className="mb-6 sm:mb-12"
           />
         </>
       )}
       {offers.some((offer) => !offer.cancelledAt) && (
         <>
-          <div
-            className={cx(
-              'mb-1.5 font-medium text-lg text-left',
-              ownedByYou &&
-                'after:ml-1 after:inline-block after:w-4 after:h-4 after:bg-blue-200 after:rounded-full'
-            )}
-          >
+          <SectionHeading active={ownedByYou}>
             Active force trade offers
-          </div>
+          </SectionHeading>
           <Table
             noRowsText=""
             columns={offerHistoryColumns}
             rows={offers
               .flatMap((offer) => (offer.cancelledAt ? [] : [offer]))
               .map(buildOfferHistoryRow)}
-            className="mb-8"
           />
         </>
       )}
-      <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
+      <SectionHeading>Stats</SectionHeading>
       <StatsTable
-        className="mb-8"
         rows={[
           {
             title: 'Owner ETH address',
@@ -285,38 +271,30 @@ export function PositionDetails({
           },
         ]}
       />
-      <div className="mb-1.5 font-medium text-lg text-left">Balances</div>
+      <SectionHeading>Balances</SectionHeading>
       <Table
         noRowsText="this position has no balances"
-        className="mb-8"
         columns={balanceTableColumns(ownedByYou)}
         rows={assets.map(buildBalanceTableRow(ownedByYou))}
       />
-      <div className="mb-1.5 font-medium text-lg text-left">Update history</div>
+      <SectionHeading>Update history</SectionHeading>
       <ClientPaginatedTable
         id="position-history"
         noRowsText="this position has no update history"
-        className="mb-8"
         columns={updateHistoryTableColumns}
         rows={history.map(buildUpdateHistoryTableRow(positionId))}
       />
-      <div className="mb-1.5 font-medium text-lg text-left">
-        Force transaction history
-      </div>
+      <SectionHeading>Force transaction history</SectionHeading>
       <ClientPaginatedTable
         id="position-transactions"
         noRowsText="there are no forced transactions associated with this position"
-        className="mb-8"
         columns={transactionHistoryTableColumns}
         rows={transactions.map(buildTransactionHistoryTableRow)}
       />
-      <div className="mb-1.5 font-medium text-lg text-left">
-        Force trade offer history
-      </div>
+      <SectionHeading>Force trade offer history</SectionHeading>
       <ClientPaginatedTable
         id="position-offers"
         noRowsText="this position has no offer history"
-        className="mb-8"
         columns={offerHistoryColumns}
         rows={offers.map(buildOfferHistoryRow)}
       />

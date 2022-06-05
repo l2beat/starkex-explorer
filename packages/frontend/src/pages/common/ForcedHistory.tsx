@@ -2,6 +2,7 @@ import { Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { formatAbsoluteTime } from '../formatting'
+import { SectionHeading } from './header/SectionHeading'
 
 export interface ForcedHistoryEvent {
   timestamp: Timestamp
@@ -15,8 +16,8 @@ export interface ForcedHistoryProps {
 export function ForcedHistory({ events }: ForcedHistoryProps) {
   return (
     <>
-      <div className="mb-1.5 font-medium text-lg text-left">History</div>
-      <div className="w-full overflow-x-auto mb-6 sm:mb-12">
+      <SectionHeading>History</SectionHeading>
+      <div className="w-full overflow-x-auto mb-8">
         <table className="whitespace-nowrap w-full">
           {events.map((event, i) => (
             <tr className="bg-grey-200 border-2 border-grey-100" key={i}>
