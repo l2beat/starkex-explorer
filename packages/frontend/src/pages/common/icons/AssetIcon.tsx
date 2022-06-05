@@ -3,10 +3,10 @@ import React from 'react'
 
 import { getAssetImageUrl } from './getAssetImageUrl'
 
-type AssetIconProps = {
+export interface AssetIconProps
+  extends React.ImgHTMLAttributes<HTMLImageElement> {
   assetId: AssetId
-} & React.ClassAttributes<HTMLImageElement> &
-  React.ImgHTMLAttributes<HTMLImageElement>
+}
 
 export function AssetIcon({ assetId, ...rest }: AssetIconProps) {
   const src = getAssetImageUrl(assetId)
