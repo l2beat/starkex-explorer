@@ -369,6 +369,7 @@ export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
 }
 
 export const NOT_FOUND_PROPS: NotFoundProps = {
+  path: '/not-found',
   account: undefined,
   text: 'These are not the droids you are looking for',
 }

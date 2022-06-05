@@ -191,12 +191,9 @@ export function PositionDetails({
 }: PositionDetailsProps) {
   return (
     <Page
-      title={`L2BEAT dYdX Explorer | ${positionId.toString()}`}
-      description="Site under construction"
-      url="https://dydx.l2beat.com"
-      image="/images/under-construction.png"
-      stylesheets={['/styles/main.css']}
-      scripts={['/scripts/main.js']}
+      title={`Position ${positionId}`}
+      description="View details of this position including all assets, all changes to the position, all associated forced transactions and all associated forced trade offers."
+      path={`/positions/${positionId}`}
       account={account}
     >
       <div className="mb-8 flex items-center">

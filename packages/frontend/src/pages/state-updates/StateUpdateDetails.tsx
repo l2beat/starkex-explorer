@@ -26,12 +26,9 @@ export function StateUpdateDetails({
 }: StateUpdateDetailsProps) {
   return (
     <Page
-      title={`L2BEAT dYdX Explorer | ${hash.toString()}`}
-      description="Site under construction"
-      url="https://dydx.l2beat.com"
-      image="/images/under-construction.png"
-      stylesheets={['/styles/main.css']}
-      scripts={['/scripts/main.js']}
+      title={`State update ${id}`}
+      description="View details of this state update including all changed positions and all included forced transactions."
+      path={`/state-updates/${id}`}
       account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">

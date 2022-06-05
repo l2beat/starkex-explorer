@@ -19,12 +19,9 @@ export function ForcedTransactionsIndex({
 }: ForcedTransactionsIndexProps) {
   return (
     <Page
-      title="L2BEAT dYdX Explorer"
-      description="Site under construction"
-      url="https://dydx.l2beat.com"
-      image="/images/under-construction.png"
-      stylesheets={['/styles/main.css']}
-      scripts={['/scripts/main.js']}
+      title="Forced transaction list"
+      description="Browse the list of all forced transactions including withdrawals and trades."
+      path="/forced"
       account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">

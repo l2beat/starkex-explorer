@@ -6,12 +6,9 @@ import { NotFoundProps } from './NotFoundProps'
 export function NotFound(props: NotFoundProps) {
   return (
     <Page
-      title="L2BEAT dYdX Explorer"
-      description="Site under construction"
-      url="https://dydx.l2beat.com"
-      image="/images/under-construction.png"
-      stylesheets={['/styles/main.css']}
-      scripts={['/scripts/main.js']}
+      title="Not found"
+      description={props.text}
+      path={props.path}
       account={props.account}
       withoutSearch
     >

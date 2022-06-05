@@ -14,12 +14,9 @@ export function StateUpdatesIndex({
 }: StateUpdatesIndexProps) {
   return (
     <Page
-      title="L2BEAT dYdX Explorer"
-      description="Site under construction"
-      url="https://dydx.l2beat.com"
-      image="/images/under-construction.png"
-      stylesheets={['/styles/main.css']}
-      scripts={['/scripts/main.js']}
+      title="State update list"
+      description="Browse the list of all state updates of the dYdX rollup."
+      path="/state-updates"
       account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">

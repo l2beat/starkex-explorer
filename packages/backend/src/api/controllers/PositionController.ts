@@ -154,6 +154,7 @@ export class PositionController {
     return {
       type: 'not found',
       content: renderNotFoundPage({
+        path: '/positions/not-found',
         account,
         text: address
           ? `Position for ${address} not found`
