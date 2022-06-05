@@ -1,6 +1,8 @@
 import React from 'react'
 
 import { EtherscanLink } from '../common/EtherscanLink'
+import { PageHeading } from '../common/header/PageHeading'
+import { SectionHeading } from '../common/header/SectionHeading'
 import { Page } from '../common/page/Page'
 import { ClientPaginatedTable } from '../common/table'
 import { AssetCell } from '../common/table/AssetCell'
@@ -31,11 +33,8 @@ export function StateUpdateDetails({
       path={`/state-updates/${id}`}
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
-        State update #{id.toString()}
-      </h1>
+      <PageHeading>State update #{id.toString()}</PageHeading>
       <StatsTable
-        className="mb-8"
         rows={[
           {
             title: 'State update hash',
@@ -58,9 +57,7 @@ export function StateUpdateDetails({
           },
         ]}
       />
-      <div className="mb-1.5 font-medium text-lg text-left">
-        Updated positions
-      </div>
+      <SectionHeading>Updated positions</SectionHeading>
       <ClientPaginatedTable
         id="state-positions"
         noRowsText="this update did not affect any position"
@@ -93,9 +90,7 @@ export function StateUpdateDetails({
           })
         )}
       />
-      <div className="mb-1.5 font-medium text-lg text-left">
-        Included forced transactions
-      </div>
+      <SectionHeading>Included forced transactions</SectionHeading>
       <ClientPaginatedTable
         id="state-transactions"
         noRowsText="this update does not include any forced transactions"

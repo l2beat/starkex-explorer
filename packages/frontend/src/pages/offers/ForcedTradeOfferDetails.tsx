@@ -3,7 +3,8 @@ import React from 'react'
 
 import { EtherscanLink } from '../common/EtherscanLink'
 import { ForcedHistory } from '../common/ForcedHistory'
-import { ForcedPageHeader } from '../common/ForcedPageHeader'
+import { ForcedPageHeader } from '../common/header/ForcedPageHeader'
+import { SectionHeading } from '../common/header/SectionHeading'
 import { Page } from '../common/page/Page'
 import { SimpleLink } from '../common/SimpleLink'
 import { StatsTable } from '../common/table/StatsTable'
@@ -113,8 +114,8 @@ export function ForcedTradeOfferDetails({
           )}
         </div>
       </ForcedPageHeader>
-      <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
-      <StatsTable className="mb-8" rows={toStatsRows(offer)} />
+      <SectionHeading>Stats</SectionHeading>
+      <StatsTable rows={toStatsRows(offer)} />
       <ForcedHistory events={history} />
     </Page>
   )

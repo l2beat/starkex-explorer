@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { PageHeading } from '../common/header/PageHeading'
 import { Page } from '../common/page/Page'
 import { ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
@@ -19,9 +20,7 @@ export function StateUpdatesIndex({
       path="/state-updates"
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
-        Latest state updates
-      </h1>
+      <PageHeading>Latest state updates</PageHeading>
       <ServerPagination
         perPage={perPage}
         page={page}

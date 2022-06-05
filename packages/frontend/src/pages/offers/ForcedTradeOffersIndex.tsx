@@ -1,6 +1,7 @@
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
+import { PageHeading } from '../common/header/PageHeading'
 import { Page } from '../common/page/Page'
 import { ServerFormAttributes, ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
@@ -37,9 +38,7 @@ export function ForcedTradeOffersIndex({
       path="/forced/offers"
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
-        Forced trade offers
-      </h1>
+      <PageHeading>Forced trade offers</PageHeading>
       <FilteringForm
         type={type}
         assetId={assetId}

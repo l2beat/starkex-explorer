@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { PageHeading } from '../common/header/PageHeading'
 import { Page } from '../common/page/Page'
 import { ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
@@ -24,9 +25,7 @@ export function ForcedTransactionsIndex({
       path="/forced"
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
-        Latest forced transactions
-      </h1>
+      <PageHeading>Latest forced transactions</PageHeading>
       <ServerPagination
         perPage={perPage}
         page={page}

@@ -1,9 +1,9 @@
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
+import { SectionHeadingWithLink } from '../common/header/SectionHeadingWithLink'
 import { Page } from '../common/page/Page'
 import { SearchBar } from '../common/SearchBar'
-import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'
 import { AssetCell } from '../common/table/AssetCell'
 import {
@@ -25,8 +25,8 @@ export function Home(props: HomeProps) {
       account={props.account}
       withoutSearch
     >
-      <SearchBar className="drop-shadow-lg mb-6 sm:mb-12" />
-      <div className="mb-6 sm:mb-12 flex flex-col md:flex-row gap-x-4 gap-y-1 items-center">
+      <SearchBar className="drop-shadow-lg mb-8" />
+      <div className="mb-8 flex flex-col md:flex-row gap-x-4 gap-y-1 items-center">
         <Stat title="Total Value Locked" value="-" valueId={tvlElId} />
         <Stat title="State updates" value={props.totalUpdates.toString()} />
         <Stat
@@ -35,14 +35,9 @@ export function Home(props: HomeProps) {
         />
         <FreezeButton />
       </div>
-      <div className="mb-1.5">
-        <span className="float-left font-medium text-lg">
-          Latest state updates
-        </span>
-        <SimpleLink className="float-right" href="/state-updates">
-          view all
-        </SimpleLink>
-      </div>
+      <SectionHeadingWithLink linkUrl="/state-updates" linkText="view all">
+        Latest state updates
+      </SectionHeadingWithLink>
       <Table
         noRowsText="no state updates have occurred so far"
         className="mb-8"
@@ -67,14 +62,9 @@ export function Home(props: HomeProps) {
           }
         })}
       />
-      <div className="mb-1.5">
-        <span className="float-left font-medium text-lg">
-          Latest forced transactions
-        </span>
-        <SimpleLink className="float-right" href="/forced">
-          view all
-        </SimpleLink>
-      </div>
+      <SectionHeadingWithLink linkUrl="/forced" linkText="view all">
+        Latest forced transactions
+      </SectionHeadingWithLink>
       <Table
         noRowsText="no forced transactions have been issued so far"
         className="mb-8"
@@ -103,14 +93,9 @@ export function Home(props: HomeProps) {
           }
         })}
       />
-      <div className="mb-1.5">
-        <span className="float-left font-medium text-lg">
-          Latest forced trade offers
-        </span>
-        <SimpleLink className="float-right" href="/forced/offers">
-          view all
-        </SimpleLink>
-      </div>
+      <SectionHeadingWithLink linkUrl="/forced/offers" linkText="view all">
+        Latest forced trade offers
+      </SectionHeadingWithLink>
       <Table
         noRowsText="there is no active offers at the moment"
         columns={[

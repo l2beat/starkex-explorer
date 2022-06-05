@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { PageHeading } from '../common/header/PageHeading'
+import { SectionHeading } from '../common/header/SectionHeading'
 import { Page } from '../common/page/Page'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'
@@ -50,13 +52,12 @@ export function PositionAtUpdate({
       path={`/positions/${positionId}/updates/${stateUpdateId}`}
       account={account}
     >
-      <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
+      <PageHeading>
         Position #{positionId.toString()} - Update at #
         {stateUpdateId.toString()}
-      </h1>
-      <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
+      </PageHeading>
+      <SectionHeading>Stats</SectionHeading>
       <StatsTable
-        className="mb-8"
         rows={[
           {
             title: 'State update',
@@ -89,18 +90,14 @@ export function PositionAtUpdate({
           },
         ]}
       />
-      <div className="mb-1.5 font-medium text-lg text-left">
-        Balance changes
-      </div>
+      <SectionHeading>Balance changes</SectionHeading>
       <Table
         noRowsText="no balance changes happened in this update"
         className="mb-8"
         columns={balanceChangesTableColumns}
         rows={assetChanges.map(buildBalanceChangesTableRow)}
       />
-      <div className="mb-1.5 font-medium text-lg text-left">
-        Included forced transactions
-      </div>
+      <SectionHeading>Included forced transactions</SectionHeading>
       <Table
         noRowsText="no forced transactions were included in this update"
         columns={[
