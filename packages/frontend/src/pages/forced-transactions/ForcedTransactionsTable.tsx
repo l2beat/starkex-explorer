@@ -24,9 +24,9 @@ export function ForcedTransactionsTable({
         { header: 'Time' },
         { header: 'Status' },
         { header: 'Hash', monospace: true, fullWidth: true },
+        { header: 'Position' },
         { header: 'Amount', numeric: true },
         { header: 'Asset' },
-        { header: 'Position ID', numeric: true },
       ]}
       rows={transactions.map((transaction) => {
         const link = `/forced/${transaction.hash}`
@@ -37,9 +37,9 @@ export function ForcedTransactionsTable({
             formatRelativeTime(transaction.lastUpdate),
             transaction.status,
             formatHashLong(transaction.hash),
+            transaction.positionId.toString(),
             formatCurrencyUnits(transaction.amount, transaction.assetId),
             <AssetCell assetId={transaction.assetId} />,
-            transaction.positionId.toString(),
           ],
         }
       })}

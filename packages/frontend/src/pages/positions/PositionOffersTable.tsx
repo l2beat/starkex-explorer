@@ -2,7 +2,12 @@ import { AssetId, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { ClientPaginatedTable, Column, Table } from '../common/table'
-import { formatCurrencyApproximation, formatRelativeTime } from '../formatting'
+import { AssetCell } from '../common/table/AssetCell'
+import {
+  formatApproximation,
+  formatCurrencyApproximation,
+  formatRelativeTime,
+} from '../formatting'
 import { OfferHistoryEntry } from './PositionDetailsProps'
 
 export interface PositionOffersTableProps {
@@ -34,12 +39,13 @@ export function PositionOffersTable(props: PositionOffersTableProps) {
 }
 
 const offerHistoryColumns: Column[] = [
-  { header: 'Id' },
+  { header: 'No.' },
   { header: 'Type' },
   { header: 'Role' },
   { header: 'Time', className: 'min-w-[12ch]' },
   { header: 'Status' },
   { header: 'Amount', numeric: true, fullWidth: true },
+  { header: 'Asset' },
   { header: 'Total', numeric: true },
 ]
 
@@ -48,8 +54,8 @@ function buildOfferHistoryRow(offer: OfferHistoryEntry) {
     link: `/forced/offers/${offer.id}`,
     cells: [
       offer.id,
-      offer.type === 'buy' ? 'Buy' : 'Sell',
-      offer.role === 'maker' ? 'Maker' : 'Taker',
+      offer.type,
+      offer.role,
       offer.cancelledAt ? (
         formatRelativeTime(offer.cancelledAt)
       ) : offer.accepted ? (
@@ -68,11 +74,12 @@ function buildOfferHistoryRow(offer: OfferHistoryEntry) {
         : offer.accepted
         ? 'Taker found'
         : 'Looking for a taker',
-      formatCurrencyApproximation(
+      formatApproximation(
         offer.syntheticAmount,
-        offer.syntheticAssetId,
+        AssetId.decimals(offer.syntheticAssetId),
         3
       ),
+      <AssetCell assetId={offer.syntheticAssetId} />,
       formatCurrencyApproximation(offer.collateralAmount, AssetId.USDC, 3),
     ],
   }

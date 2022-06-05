@@ -12,7 +12,7 @@ import { PositionTransactionsTable } from './PositionTransactionsTable'
 
 export function PositionDetails(props: PositionDetailsProps) {
   const pendingTransactions = props.transactions.filter(
-    (tx) => tx.status === 'waiting to be included' || tx.status === 'sent'
+    (tx) => tx.status === 'sent' || tx.status === 'mined'
   )
   const activeOffers = props.offers.filter((offer) => !offer.cancelledAt)
 

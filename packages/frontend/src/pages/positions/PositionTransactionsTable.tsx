@@ -52,7 +52,7 @@ const transactionHistoryTableColumns: Column[] = [
 const buildTransactionHistoryTableRow = (
   transaction: ForcedTransactionEntry
 ) => {
-  const link = `/forced-transactions/${transaction.hash}`
+  const link = `/forced/${transaction.hash}`
   return {
     link,
     cells: [

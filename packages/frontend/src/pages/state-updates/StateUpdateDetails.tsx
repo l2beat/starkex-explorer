@@ -33,7 +33,7 @@ export function StateUpdateDetails({
       path={`/state-updates/${id}`}
       account={account}
     >
-      <PageHeading>State update #{id.toString()}</PageHeading>
+      <PageHeading>State update {id}</PageHeading>
       <StatsTable
         rows={[
           {
@@ -62,8 +62,8 @@ export function StateUpdateDetails({
         id="state-positions"
         noRowsText="this update did not affect any position"
         columns={[
-          { header: 'Position id' },
-          { header: 'Owner', monospace: true, fullWidth: true },
+          { header: 'Position' },
+          { header: 'Stark key', monospace: true, fullWidth: true },
           { header: 'Value before', numeric: true },
           { header: 'Value after', numeric: true },
           { header: 'Assets updated', numeric: true },

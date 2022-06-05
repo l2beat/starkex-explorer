@@ -24,8 +24,8 @@ export function PositionAssetsTable(props: PositionAssetsTableProps) {
 const balanceTableColumns = (ownedByYou: boolean) => {
   const columns: Column[] = [
     { header: 'Name' },
-    { header: 'Balance', numeric: true, fullWidth: true },
-    { header: 'Unit price', numeric: true },
+    { header: 'Balance', numeric: true },
+    { header: 'Unit price', numeric: true, fullWidth: true },
     { header: 'Value', numeric: true, fullWidth: true },
   ]
 
