@@ -1,6 +1,6 @@
 # dYdX State Explorer
 
-This tool will show decoded calldata stored on Ethereum L1 by the dYdX rollup. It will also allow users to perform force exits and trades by sending an L1 transaction.
+This tool will show decoded calldata stored on Ethereum L1 by the dYdX rollup. It will also allow users to perform forced exits and trades by sending an L1 transaction.
 
 ## License
 
