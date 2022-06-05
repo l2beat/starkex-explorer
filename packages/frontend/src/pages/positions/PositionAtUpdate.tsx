@@ -1,10 +1,10 @@
 import React from 'react'
 
 import { Page } from '../common/page/Page'
-import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'
 import { AssetCell } from '../common/table/AssetCell'
+import { StatsTable } from '../common/table/StatsTable'
 import {
   formatAbsoluteTime,
   formatCurrencyUnits,
@@ -58,7 +58,8 @@ export function PositionAtUpdate({
         {stateUpdateId.toString()}
       </h1>
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
-      <PageHeaderStats
+      <StatsTable
+        className="mb-8"
         rows={[
           {
             title: 'State update',
