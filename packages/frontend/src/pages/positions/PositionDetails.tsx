@@ -1,4 +1,5 @@
 import { AssetId, Timestamp } from '@explorer/types'
+import cx from 'classnames'
 import React from 'react'
 
 import { AssetCell } from '../common/AssetCell'
@@ -165,13 +166,13 @@ function buildOfferHistoryRow(offer: OfferHistoryEntry) {
   }
 }
 
-const offerHistoryColumns = [
+const offerHistoryColumns: Column[] = [
   { header: 'Id' },
   { header: 'Type' },
   { header: 'Role' },
   { header: 'Time', className: 'min-w-[12ch]' },
   { header: 'Status' },
-  { header: 'Amount', numeric: true },
+  { header: 'Amount', numeric: true, fullWidth: true },
   { header: 'Total', numeric: true },
 ]
 
@@ -198,7 +199,7 @@ export function PositionDetails({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <div className="mb-6 sm:mb-12 flex items-center">
+      <div className="mb-8 flex items-center">
         <h1 className="font-sans font-bold text-2xl">
           Position #{positionId.toString()}
         </h1>
@@ -210,7 +211,13 @@ export function PositionDetails({
       </div>
       {offers.some((offer) => !offer.cancelledAt) && (
         <>
-          <div className="mb-1.5 font-medium text-lg text-left after:ml-1 after:inline-block  after:content-[''] after:w-4 after:h-4 after:bg-blue-200 after:rounded-full">
+          <div
+            className={cx(
+              'mb-1.5 font-medium text-lg text-left',
+              ownedByYou &&
+                'after:ml-1 after:inline-block after:w-4 after:h-4 after:bg-blue-200 after:rounded-full'
+            )}
+          >
             Active force trade offers
           </div>
           <Table
@@ -219,7 +226,7 @@ export function PositionDetails({
             rows={offers
               .flatMap((offer) => (offer.cancelledAt ? [] : [offer]))
               .map(buildOfferHistoryRow)}
-            className="mb-6 sm:mb-12"
+            className="mb-8"
           />
         </>
       )}
@@ -274,12 +281,17 @@ export function PositionDetails({
       <ClientPaginatedTable
         id="position-transactions"
         noRowsText="there are no forced transactions associated with this position"
+        className="mb-8"
         columns={transactionHistoryTableColumns}
         rows={transactions.map(buildTransactionHistoryTableRow)}
       />
+      <div className="mb-1.5 font-medium text-lg text-left">
+        Force trade offer history
+      </div>
       <ClientPaginatedTable
         id="position-offers"
         noRowsText="this position has no offer history"
+        className="mb-8"
         columns={offerHistoryColumns}
         rows={offers.map(buildOfferHistoryRow)}
       />
