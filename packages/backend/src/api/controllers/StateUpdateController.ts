@@ -1,18 +1,18 @@
 import {
+  PositionUpdateEntry,
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
 } from '@explorer/frontend'
 import { EthereumAddress } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
-import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
 import {
-  PositionRepository,
-  PositionWithPricesRecord,
-} from '../../peripherals/database/PositionRepository'
+  ForcedTransactionRecord,
+  ForcedTransactionsRepository,
+} from '../../peripherals/database/ForcedTransactionsRepository'
+import { PositionWithPricesRecord } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
-import { countUpdatedAssets } from './utils/countUpdatedAssets'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
@@ -21,7 +21,6 @@ export class StateUpdateController {
   constructor(
     private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,
-    private positionRepository: PositionRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository
   ) {}
 
@@ -63,21 +62,9 @@ export class StateUpdateController {
       return { type: 'not found', content }
     }
 
-    const previousPositions = await this.positionRepository.getPreviousStates(
-      stateUpdate.positions.map((p) => p.positionId),
-      id
+    const positions = stateUpdate.positions.map((position) =>
+      toPositionUpdateEntry(position, transactions)
     )
-
-    const positions = stateUpdate.positions
-      .map((position) => ({
-        position,
-        previous: previousPositions.find(
-          (x) => x.positionId === position.positionId
-        ),
-      }))
-      .map(({ position, previous }) =>
-        toPositionUpdateEntry(position, previous)
-      )
 
     const content = renderStateUpdateDetailsPage({
       account,
@@ -95,8 +82,8 @@ export class StateUpdateController {
 
 export function toPositionUpdateEntry(
   position: PositionWithPricesRecord,
-  previous: PositionWithPricesRecord | undefined
-) {
+  transactions: ForcedTransactionRecord[]
+): PositionUpdateEntry {
   const assets = toPositionAssetEntries(
     position.balances,
     position.collateralBalance,
@@ -106,26 +93,23 @@ export function toPositionUpdateEntry(
     (total, { totalUSDCents }) => totalUSDCents + total,
     0n
   )
-  const previousAssets =
-    previous &&
-    toPositionAssetEntries(
-      previous.balances,
-      previous.collateralBalance,
-      previous.prices
-    )
-  const previousTotalUSDCents = previousAssets?.reduce(
-    (total, { totalUSDCents }) => totalUSDCents + total,
-    0n
-  )
-  const assetsUpdated = previous
-    ? countUpdatedAssets(previous.balances, position.balances)
-    : 0
+
+  const forcedTransactions = transactions.filter((tx) => {
+    if (tx.data.type === 'withdrawal') {
+      return tx.data.positionId === position.positionId
+    } else {
+      return (
+        tx.data.positionIdA === position.positionId ||
+        tx.data.positionIdB === position.positionId
+      )
+    }
+  }).length
 
   return {
     starkKey: position.starkKey,
     positionId: position.positionId,
+    collateralBalance: position.collateralBalance,
     totalUSDCents,
-    previousTotalUSDCents,
-    assetsUpdated,
+    forcedTransactions,
   }
 }

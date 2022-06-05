@@ -15,9 +15,9 @@ export interface StateUpdateDetailsProps {
 }
 
 export interface PositionUpdateEntry {
-  readonly starkKey: StarkKey
   readonly positionId: bigint
+  readonly starkKey: StarkKey
+  readonly forcedTransactions: number
+  readonly collateralBalance: bigint
   readonly totalUSDCents: bigint
-  readonly previousTotalUSDCents?: bigint
-  readonly assetsUpdated?: number
 }

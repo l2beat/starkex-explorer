@@ -107,8 +107,8 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
     starkKey: StarkKey.fake(),
     positionId: BigInt(i + 1),
     totalUSDCents: BigInt(Math.floor(Math.random() * 500_000_00)),
-    previousTotalUSDCents: BigInt(Math.floor(Math.random() * 500_000_00)),
-    assetsUpdated: Math.floor(Math.random() * 20 + 1),
+    collateralBalance: BigInt(Math.floor(Math.random() * 500_000_00)),
+    forcedTransactions: Math.floor(Math.random() * 2),
   })),
   transactions: createFakeTransactions(7),
 }
