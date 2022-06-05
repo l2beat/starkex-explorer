@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { AssetCell } from '../common/AssetCell'
 import { EtherscanLink } from '../common/EtherscanLink'
-import { Page } from '../common/Page'
-import { PageHeaderStats } from '../common/PageHeaderStats'
+import { Page } from '../common/page/Page'
 import { ClientPaginatedTable } from '../common/table'
+import { AssetCell } from '../common/table/AssetCell'
+import { StatsTable } from '../common/table/StatsTable'
 import {
   formatAbsoluteTime,
   formatCurrency,
@@ -37,7 +37,8 @@ export function StateUpdateDetails({
       <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">
         State update #{id.toString()}
       </h1>
-      <PageHeaderStats
+      <StatsTable
+        className="mb-8"
         rows={[
           {
             title: 'State update hash',

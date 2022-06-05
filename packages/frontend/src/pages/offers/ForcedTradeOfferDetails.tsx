@@ -1,12 +1,12 @@
 import { AssetId, EthereumAddress } from '@explorer/types'
 import React from 'react'
 
-import { Page } from '../common'
 import { EtherscanLink } from '../common/EtherscanLink'
 import { ForcedHistory } from '../common/ForcedHistory'
 import { ForcedPageHeader } from '../common/ForcedPageHeader'
-import { PageHeaderStats } from '../common/PageHeaderStats'
+import { Page } from '../common/page/Page'
 import { SimpleLink } from '../common/SimpleLink'
+import { StatsTable } from '../common/table/StatsTable'
 import { formatCurrency } from '../formatting'
 import { AcceptOfferForm } from './accept-form/AcceptOfferForm'
 import { CancelOfferForm } from './cancel-form'
@@ -117,7 +117,7 @@ export function ForcedTradeOfferDetails({
         </div>
       </ForcedPageHeader>
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
-      <PageHeaderStats rows={toStatsRows(offer)} />
+      <StatsTable className="mb-8" rows={toStatsRows(offer)} />
       <ForcedHistory events={history} />
     </Page>
   )

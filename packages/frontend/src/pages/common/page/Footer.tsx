@@ -1,16 +1,16 @@
 import React from 'react'
 
-import { DiscordLogo } from './logos/DiscordLogo'
-import { DydxLogo } from './logos/DydxLogo'
-import { GithubLogo } from './logos/GithubLogo'
-import { L2beatLogo } from './logos/L2beatLogo'
-import { StarkWareLogo } from './logos/StarkWareLogo'
-import { TwitterLogo } from './logos/TwitterLogo'
-import { SimpleLink } from './SimpleLink'
+import { DiscordLogo } from '../logos/DiscordLogo'
+import { DydxLogo } from '../logos/DydxLogo'
+import { GithubLogo } from '../logos/GithubLogo'
+import { L2beatLogo } from '../logos/L2beatLogo'
+import { StarkWareLogo } from '../logos/StarkWareLogo'
+import { TwitterLogo } from '../logos/TwitterLogo'
+import { SimpleLink } from '../SimpleLink'
 
 export function Footer() {
   return (
-    <footer className="mt-24 mb-6 sm:mb-12">
+    <footer className="px-2 wide:px-4 max-w-[900px] mx-auto mb-12">
       <div className="flex justify-between pb-3 mb-3 border-b-[1px] border-grey-300 flex-wrap gap-y-3">
         <SimpleLink href="https://l2beat.com/donate">Donate</SimpleLink>
         <div className="flex gap-3">

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Page } from '../common'
+import { Page } from '../common/page/Page'
 import { ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
 import { formatHashLong, formatRelativeTime } from '../formatting'

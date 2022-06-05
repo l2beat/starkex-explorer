@@ -2,12 +2,12 @@ import { AssetId, Timestamp } from '@explorer/types'
 import cx from 'classnames'
 import React from 'react'
 
-import { AssetCell } from '../common/AssetCell'
 import { EtherscanLink } from '../common/EtherscanLink'
-import { Page } from '../common/Page'
-import { PageHeaderStats } from '../common/PageHeaderStats'
+import { Page } from '../common/page/Page'
 import { SimpleLink } from '../common/SimpleLink'
 import { ClientPaginatedTable, Column, Table } from '../common/table'
+import { AssetCell } from '../common/table/AssetCell'
+import { StatsTable } from '../common/table/StatsTable'
 import {
   formatAbsoluteTime,
   formatCurrency,
@@ -258,7 +258,8 @@ export function PositionDetails({
         </>
       )}
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
-      <PageHeaderStats
+      <StatsTable
+        className="mb-8"
         rows={[
           {
             title: 'Owner ETH address',

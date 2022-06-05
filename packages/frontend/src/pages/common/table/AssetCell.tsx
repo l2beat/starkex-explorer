@@ -1,8 +1,8 @@
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
-import { formatCurrencyUnits } from '../formatting'
-import { AssetIcon } from './icons/AssetIcon'
+import { formatCurrencyUnits } from '../../formatting'
+import { AssetIcon } from '../icons/AssetIcon'
 
 export type AssetCellProps = {
   assetId: AssetId
