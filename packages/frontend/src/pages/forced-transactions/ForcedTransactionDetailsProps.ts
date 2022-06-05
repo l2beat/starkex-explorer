@@ -6,7 +6,6 @@ import { ForcedHistoryEvent } from '../common/ForcedHistory'
 export type ForcedTransaction = ForcedExit | ForcedBuy | ForcedSell
 
 export type ForcedTradeData = {
-  readonly displayId: number | Hash256
   readonly positionIdA: bigint
   readonly addressA?: EthereumAddress
   readonly syntheticAmount: bigint
@@ -15,6 +14,7 @@ export type ForcedTradeData = {
   readonly positionIdB: bigint
   readonly addressB?: EthereumAddress
   readonly transactionHash: Hash256
+  readonly stateUpdateId?: number
 }
 
 export interface ForcedSell {

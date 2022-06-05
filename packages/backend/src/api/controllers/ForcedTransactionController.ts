@@ -81,7 +81,6 @@ export class ForcedTransactionController {
     return {
       type: transaction.data.isABuyingSynthetic ? 'buy' : 'sell',
       data: {
-        displayId: transaction.hash,
         positionIdA: transaction.data.positionIdA,
         positionIdB: transaction.data.positionIdB,
         addressA: userA?.ethAddress,
@@ -90,6 +89,7 @@ export class ForcedTransactionController {
         collateralAmount: transaction.data.collateralAmount,
         syntheticAssetId: transaction.data.syntheticAssetId,
         transactionHash: transaction.hash,
+        stateUpdateId: transaction.updates.verified?.stateUpdateId,
       },
     }
   }
