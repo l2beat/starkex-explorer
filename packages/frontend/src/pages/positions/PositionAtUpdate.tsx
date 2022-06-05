@@ -53,8 +53,7 @@ export function PositionAtUpdate({
       account={account}
     >
       <PageHeading>
-        Position #{positionId.toString()} - Update at #
-        {stateUpdateId.toString()}
+        Position {positionId.toString()} at update {stateUpdateId}
       </PageHeading>
       <SectionHeading>Stats</SectionHeading>
       <StatsTable
@@ -63,7 +62,7 @@ export function PositionAtUpdate({
             title: 'State update',
             content: (
               <SimpleLink href={`/state-updates/${stateUpdateId}`}>
-                #{stateUpdateId.toString()}
+                {stateUpdateId}
               </SimpleLink>
             ),
           },
@@ -71,7 +70,7 @@ export function PositionAtUpdate({
             title: 'Position',
             content: (
               <SimpleLink href={`/positions/${positionId}`}>
-                #{positionId.toString()}
+                {positionId.toString()}
               </SimpleLink>
             ),
           },

@@ -33,7 +33,7 @@ export function StateUpdateDetails({
       path={`/state-updates/${id}`}
       account={account}
     >
-      <PageHeading>State update #{id.toString()}</PageHeading>
+      <PageHeading>State update {id}</PageHeading>
       <StatsTable
         rows={[
           {

@@ -10,7 +10,7 @@ export function PositionIdView(props: PositionIdViewProps) {
       <div>Position</div>
       <div className="bg-grey-100 rounded-md p-2 gap-2 flex items-center">
         <span className="text-2xl leading-none font-mono">
-          #{props.positionId.toString()}
+          {props.positionId.toString()}
         </span>
         <span className="px-2 rounded-full bg-blue-100">Owned by you</span>
       </div>
