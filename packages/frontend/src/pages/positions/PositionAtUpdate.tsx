@@ -45,12 +45,9 @@ export function PositionAtUpdate({
 }: PositionAtUpdateProps) {
   return (
     <Page
-      title={`L2BEAT dYdX Explorer | ${positionId.toString()} at ${stateUpdateId.toString()}`}
-      description="Site under construction"
-      url="https://dydx.l2beat.com"
-      image="/images/under-construction.png"
-      stylesheets={['/styles/main.css']}
-      scripts={['/scripts/main.js']}
+      title={`Position ${positionId} at update ${stateUpdateId}`}
+      description="View changes to this position that occurred during a specific state update."
+      path={`/positions/${positionId}/updates/${stateUpdateId}`}
       account={account}
     >
       <h1 className="font-sans font-bold text-2xl mb-6 sm:mb-12">

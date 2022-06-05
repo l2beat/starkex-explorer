@@ -7,7 +7,7 @@ import { ForcedPageHeader } from '../common/ForcedPageHeader'
 import { Page } from '../common/page/Page'
 import { SimpleLink } from '../common/SimpleLink'
 import { StatsTable } from '../common/table/StatsTable'
-import { formatCurrency, formatHashLong } from '../formatting'
+import { formatCurrency, formatHashLong, formatHashShort } from '../formatting'
 import { toStatsRows as toOfferStatsRows } from '../offers/ForcedTradeOfferDetails'
 import {
   ForcedTransaction,
@@ -84,12 +84,9 @@ export function ForcedTransactionDetails({
       : transaction.data.displayId
   return (
     <Page
-      title="L2BEAT dYdX Explorer"
-      description="Site under construction"
-      url="https://dydx.l2beat.com"
-      image="/images/under-construction.png"
-      stylesheets={['/styles/main.css']}
-      scripts={['/scripts/main.js']}
+      title={`Transaction ${formatHashShort(transaction.data.transactionHash)}`}
+      description="View the details of the forced transaction and a timeline of events from submission to inclusion in a state update."
+      path={`/forced/${transaction.data.transactionHash}`}
       account={account}
     >
       <ForcedPageHeader displayId={displayId} type={transaction.type} />

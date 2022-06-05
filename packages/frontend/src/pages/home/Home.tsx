@@ -20,12 +20,8 @@ import { tvlElId } from './tvlElId'
 export function Home(props: HomeProps) {
   return (
     <Page
-      title="L2BEAT dYdX Explorer"
-      description="Site under construction"
-      url="https://dydx.l2beat.com"
-      image="/images/under-construction.png"
-      stylesheets={['/styles/main.css']}
-      scripts={['/scripts/main.js']}
+      path="/"
+      description="This explorer allows you to view everything happening on dYdX from the perspective of the Ethereum blockchain. Browse positions, forced transaction and submit your own forced trades and withdrawals."
       account={props.account}
       withoutSearch
     >
