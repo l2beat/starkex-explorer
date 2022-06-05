@@ -23,7 +23,7 @@ export function Page({
   account,
   withoutSearch,
   description,
-  image = '/images/under-construction.png',
+  image = '/images/meta-image.png',
   baseTitle = 'L2BEAT dYdX Explorer',
   title,
   baseUrl = 'https://dydx.l2beat.com',
