@@ -1,11 +1,11 @@
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
-import { Page } from '../common'
-import { AssetCell } from '../common/AssetCell'
+import { Page } from '../common/page/Page'
 import { SearchBar } from '../common/SearchBar'
 import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'
+import { AssetCell } from '../common/table/AssetCell'
 import {
   formatCurrency,
   formatCurrencyUnits,

@@ -1,10 +1,10 @@
 import { AssetId, EthereumAddress } from '@explorer/types'
 import React from 'react'
 
-import { Page } from '../common'
 import { EtherscanLink } from '../common/EtherscanLink'
 import { ForcedHistory } from '../common/ForcedHistory'
 import { ForcedPageHeader } from '../common/ForcedPageHeader'
+import { Page } from '../common/page/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { SimpleLink } from '../common/SimpleLink'
 import { formatCurrency } from '../formatting'

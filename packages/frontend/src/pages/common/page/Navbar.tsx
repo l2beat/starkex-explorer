@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { AccountDetails } from './AccountDetails'
-import { JazzIcon } from './jazzicon/JazzIcon'
-import { DydxLogo } from './logos/DydxLogo'
-import { L2beatExplorerLogo } from './logos/L2beatExplorerLogo'
-import { SearchBar } from './SearchBar'
+import { AccountDetails } from '../AccountDetails'
+import { JazzIcon } from '../jazzicon/JazzIcon'
+import { DydxLogo } from '../logos/DydxLogo'
+import { L2beatExplorerLogo } from '../logos/L2beatExplorerLogo'
+import { SearchBar } from '../SearchBar'
 
 export interface NavbarProps {
   readonly account: AccountDetails | undefined
@@ -54,7 +54,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
               </span>
             </span>
             {account.hasUpdates && (
-              <div className="rounded-full bg-blue-200 h-4 w-4 absolute right-0 top-0 translate-x-1/3 translate-y-[-33%]"></div>
+              <div className="rounded-full bg-blue-200 h-4 w-4 absolute right-0 top-0 translate-x-1/3 translate-y-[-33%]" />
             )}
           </a>
         )}

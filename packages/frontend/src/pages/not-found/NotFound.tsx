@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Page } from '../common'
+import { Page } from '../common/page/Page'
 import { NotFoundProps } from './NotFoundProps'
 
 export function NotFound(props: NotFoundProps) {

@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { Page } from '../common'
-import { AssetCell } from '../common/AssetCell'
+import { Page } from '../common/page/Page'
 import { ServerPagination } from '../common/pagination'
 import { Table } from '../common/table'
+import { AssetCell } from '../common/table/AssetCell'
 import {
   formatCurrencyUnits,
   formatHashLong,

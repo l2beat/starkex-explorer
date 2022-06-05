@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 
-import { AccountDetails } from './AccountDetails'
+import { AccountDetails } from '../AccountDetails'
 import { Footer } from './Footer'
 import { Head, HeadProps } from './Head'
 import { Navbar } from './Navbar'

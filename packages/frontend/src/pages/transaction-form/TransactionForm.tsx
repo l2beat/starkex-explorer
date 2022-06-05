@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Page } from '../common'
+import { Page } from '../common/page/Page'
 import { AmountInput } from './AmountInput'
 import { FormId } from './ids'
 import { InfoText } from './InfoText'

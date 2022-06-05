@@ -1,10 +1,10 @@
 import React from 'react'
 
-import { AssetCell } from '../common/AssetCell'
 import { EtherscanLink } from '../common/EtherscanLink'
-import { Page } from '../common/Page'
+import { Page } from '../common/page/Page'
 import { PageHeaderStats } from '../common/PageHeaderStats'
 import { ClientPaginatedTable } from '../common/table'
+import { AssetCell } from '../common/table/AssetCell'
 import {
   formatAbsoluteTime,
   formatCurrency,
