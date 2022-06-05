@@ -1,11 +1,6 @@
-import { ForcedTransactionRecord } from '../peripherals/database/ForcedTransactionsRepository'
+import { TransactionStatus } from '@explorer/frontend'
 
-type TransactionStatus =
-  | 'sent'
-  | 'reverted'
-  | 'forgotten'
-  | 'mined'
-  | 'verified'
+import { ForcedTransactionRecord } from '../peripherals/database/ForcedTransactionsRepository'
 
 export function getTransactionStatus(
   transaction: ForcedTransactionRecord

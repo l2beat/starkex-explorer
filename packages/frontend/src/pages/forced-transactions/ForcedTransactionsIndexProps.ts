@@ -14,10 +14,17 @@ export interface ForcedTransactionsIndexProps {
 
 export interface ForcedTransactionEntry {
   readonly type: 'exit' | 'buy' | 'sell'
-  readonly status: 'sent' | 'reverted' | 'waiting to be included' | 'completed'
+  readonly status: TransactionStatus
   readonly hash: Hash256
   readonly lastUpdate: Timestamp
   readonly amount: bigint
   readonly assetId: AssetId
   readonly positionId: bigint
 }
+
+export type TransactionStatus =
+  | 'sent'
+  | 'reverted'
+  | 'forgotten'
+  | 'mined'
+  | 'verified'

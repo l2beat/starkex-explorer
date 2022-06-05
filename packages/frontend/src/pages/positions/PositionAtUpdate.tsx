@@ -1,3 +1,4 @@
+import { StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { PageHeading } from '../common/header/PageHeading'
@@ -7,33 +8,9 @@ import { SimpleLink } from '../common/SimpleLink'
 import { Table } from '../common/table'
 import { AssetCell } from '../common/table/AssetCell'
 import { StatsTable } from '../common/table/StatsTable'
-import {
-  formatAbsoluteTime,
-  formatCurrencyUnits,
-  formatHashLong,
-  formatRelativeTime,
-} from '../formatting'
+import { formatAbsoluteTime, formatHashLong } from '../formatting'
 import { PositionAtUpdateProps } from './PositionAtUpdateProps'
-
-const balanceChangesTableColumns = [
-  { header: 'Name' },
-  { header: 'Previous balance', numeric: true },
-  { header: 'New balance', numeric: true },
-  { header: 'Difference', numeric: true },
-]
-const buildBalanceChangesTableRow = ({
-  assetId,
-  previousBalance,
-  currentBalance,
-  balanceDiff,
-}: PositionAtUpdateProps['assetChanges'][number]) => ({
-  cells: [
-    <AssetCell assetId={assetId} />,
-    previousBalance.toString(),
-    currentBalance.toString(),
-    balanceDiff.toString(),
-  ],
-})
+import { PositionTransactionsTable } from './PositionTransactionsTable'
 
 export function PositionAtUpdate({
   positionId,
@@ -81,7 +58,9 @@ export function PositionAtUpdate({
           },
           {
             title: 'Previous stark key',
-            content: previousStarkKey ? formatHashLong(previousStarkKey) : '-',
+            content: previousStarkKey
+              ? formatHashLong(previousStarkKey)
+              : StarkKey.ZERO,
           },
           {
             title: 'Stark key',
@@ -96,29 +75,28 @@ export function PositionAtUpdate({
         rows={assetChanges.map(buildBalanceChangesTableRow)}
       />
       <SectionHeading>Included forced transactions</SectionHeading>
-      <Table
-        noRowsText="no forced transactions were included in this update"
-        columns={[
-          { header: 'Type' },
-          { header: 'Time' },
-          { header: 'Hash', monospace: true, fullWidth: true },
-          { header: 'Amount', numeric: true },
-          { header: 'Asset' },
-        ]}
-        rows={transactions.map((transaction) => {
-          const link = `/forced/${transaction.hash}`
-          return {
-            link,
-            cells: [
-              transaction.type,
-              formatRelativeTime(transaction.lastUpdate),
-              formatHashLong(transaction.hash),
-              formatCurrencyUnits(transaction.amount, transaction.assetId),
-              <AssetCell assetId={transaction.assetId} />,
-            ],
-          }
-        })}
-      />
+      <PositionTransactionsTable transactions={transactions} />
     </Page>
   )
 }
+
+const balanceChangesTableColumns = [
+  { header: 'Name' },
+  { header: 'Previous balance', numeric: true, fullWidth: true },
+  { header: 'New balance', numeric: true, fullWidth: true },
+  { header: 'Difference', numeric: true, fullWidth: true },
+]
+
+const buildBalanceChangesTableRow = ({
+  assetId,
+  previousBalance,
+  currentBalance,
+  balanceDiff,
+}: PositionAtUpdateProps['assetChanges'][number]) => ({
+  cells: [
+    <AssetCell assetId={assetId} />,
+    previousBalance.toString(),
+    currentBalance.toString(),
+    balanceDiff.toString(),
+  ],
+})

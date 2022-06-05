@@ -33,7 +33,7 @@ const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
     const types = ['exit', 'buy', 'sell'] as const
     const type = types[Math.floor(Math.random() * types.length)]
 
-    const statuses = ['waiting to be included', 'completed'] as const
+    const statuses = ['mined', 'verified'] as const
     const status = statuses[Math.floor(Math.random() * statuses.length)]
 
     const decimals = AssetId.decimals(assetId)

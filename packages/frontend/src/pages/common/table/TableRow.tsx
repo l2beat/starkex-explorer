@@ -37,7 +37,7 @@ export function TableRow(props: TableRowProps) {
           >
             {props.link ? (
               <a
-                className="px-1.5 py-0.5 block w-full truncate"
+                className="px-1.5 py-0.5 block w-full truncate first-letter:capitalize"
                 href={props.link}
               >
                 {cell}

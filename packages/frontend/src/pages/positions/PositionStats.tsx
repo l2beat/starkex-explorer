@@ -22,7 +22,7 @@ function getPositionStatRows(props: PositionStatsProps) {
 
   if (props.ethAddress) {
     rows.push({
-      title: 'Owner ETH address',
+      title: "Owner's ethereum address",
       content: (
         <EtherscanLink address={props.ethAddress}>
           {props.ethAddress}
@@ -32,7 +32,7 @@ function getPositionStatRows(props: PositionStatsProps) {
   }
 
   rows.push({
-    title: 'Owner stark key',
+    title: "Owner's stark key",
     content: formatHashLong(props.starkKey),
   })
 

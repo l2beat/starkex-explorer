@@ -3,7 +3,11 @@ import React from 'react'
 
 import { Table } from '../common/table'
 import { AssetCell } from '../common/table/AssetCell'
-import { formatCurrency, formatRelativeTime } from '../formatting'
+import {
+  formatCurrency,
+  formatCurrencyUnits,
+  formatRelativeTime,
+} from '../formatting'
 import { ForcedTradeOfferEntry } from './ForcedTradeOffersIndexProps'
 
 export interface ForcedTradeOffersTableProps {
@@ -17,29 +21,28 @@ export function ForcedTradeOffersTable({
     <Table
       noRowsText="there is no active offers at the moment"
       columns={[
-        { header: 'Position ID', numeric: true },
+        { header: 'No.' },
+        { header: 'Type' },
         { header: 'Time' },
-        {
-          header: 'Asset',
-          numeric: true,
-          textAlignClass: 'text-left',
-          fullWidth: true,
-        },
+        { header: 'Position' },
+        { header: 'Amount', numeric: true, fullWidth: true },
+        { header: 'Asset' },
         { header: 'Price', numeric: true },
         { header: 'Total', numeric: true },
-        { header: 'Type' },
       ]}
       rows={offers.map((offer) => {
         const link = `/forced/offers/${offer.id}`
         return {
           link,
           cells: [
-            offer.positionId.toString(),
+            offer.id,
+            offer.type,
             formatRelativeTime(offer.createdAt),
-            <AssetCell assetId={offer.assetId} amount={offer.amount} />,
+            offer.positionId.toString(),
+            formatCurrencyUnits(offer.amount, offer.assetId),
+            <AssetCell assetId={offer.assetId} />,
             formatCurrency(offer.price, 'USD'),
             formatCurrency(offer.total, AssetId.USDC),
-            offer.type,
           ],
         }
       })}
