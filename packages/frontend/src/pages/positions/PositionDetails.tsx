@@ -224,7 +224,6 @@ export function PositionDetails({
                   : []
               )
               .map(buildTransactionHistoryTableRow)}
-            className="mb-8"
           />
         </>
       )}
@@ -239,7 +238,6 @@ export function PositionDetails({
             rows={offers
               .flatMap((offer) => (offer.cancelledAt ? [] : [offer]))
               .map(buildOfferHistoryRow)}
-            className="mb-8"
           />
         </>
       )}
@@ -276,7 +274,6 @@ export function PositionDetails({
       <SectionHeading>Balances</SectionHeading>
       <Table
         noRowsText="this position has no balances"
-        className="mb-8"
         columns={balanceTableColumns(ownedByYou)}
         rows={assets.map(buildBalanceTableRow(ownedByYou))}
       />
@@ -284,7 +281,6 @@ export function PositionDetails({
       <ClientPaginatedTable
         id="position-history"
         noRowsText="this position has no update history"
-        className="mb-8"
         columns={updateHistoryTableColumns}
         rows={history.map(buildUpdateHistoryTableRow(positionId))}
       />
@@ -292,7 +288,6 @@ export function PositionDetails({
       <ClientPaginatedTable
         id="position-transactions"
         noRowsText="there are no forced transactions associated with this position"
-        className="mb-8"
         columns={transactionHistoryTableColumns}
         rows={transactions.map(buildTransactionHistoryTableRow)}
       />
@@ -300,7 +295,6 @@ export function PositionDetails({
       <ClientPaginatedTable
         id="position-offers"
         noRowsText="this position has no offer history"
-        className="mb-8"
         columns={offerHistoryColumns}
         rows={offers.map(buildOfferHistoryRow)}
       />

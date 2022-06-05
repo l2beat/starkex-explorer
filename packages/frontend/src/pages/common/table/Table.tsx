@@ -7,7 +7,7 @@ import { TableProps } from './types'
 
 export function Table(props: TableProps) {
   return (
-    <div className={cx('overflow-x-auto w-full', props.className)}>
+    <div className={cx('overflow-x-auto w-full mb-8', props.className)}>
       <table id={props.id} className="w-full whitespace-nowrap">
         <thead>
           <tr>

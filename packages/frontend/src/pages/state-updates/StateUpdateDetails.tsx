@@ -61,7 +61,6 @@ export function StateUpdateDetails({
       <ClientPaginatedTable
         id="state-positions"
         noRowsText="this update did not affect any position"
-        className="mb-8"
         columns={[
           { header: 'Position id' },
           { header: 'Owner', monospace: true, fullWidth: true },

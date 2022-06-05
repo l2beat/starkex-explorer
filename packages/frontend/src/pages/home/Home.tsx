@@ -1,17 +1,11 @@
-import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { SectionHeadingWithLink } from '../common/header/SectionHeadingWithLink'
 import { Page } from '../common/page/Page'
 import { SearchBar } from '../common/SearchBar'
-import { Table } from '../common/table'
-import { AssetCell } from '../common/table/AssetCell'
-import {
-  formatCurrency,
-  formatCurrencyUnits,
-  formatHashLong,
-  formatRelativeTime,
-} from '../formatting'
+import { ForcedTransactionsTable } from '../forced-transactions/ForcedTransactionsTable'
+import { ForcedTradeOffersTable } from '../offers/ForcedTradeOffersTable'
+import { StateUpdatesTable } from '../state-updates/StateUpdatesTable'
 import { FreezeButton } from './FreezeButton'
 import { HomeProps } from './HomeProps'
 import { Stat } from './Stat'
@@ -35,95 +29,21 @@ export function Home(props: HomeProps) {
         />
         <FreezeButton />
       </div>
+
       <SectionHeadingWithLink linkUrl="/state-updates" linkText="view all">
         Latest state updates
       </SectionHeadingWithLink>
-      <Table
-        noRowsText="no state updates have occurred so far"
-        className="mb-8"
-        columns={[
-          { header: 'No.' },
-          { header: 'Hash', monospace: true, fullWidth: true },
-          { header: 'Time' },
-          { header: 'Position updates', numeric: true },
-          { header: 'Forced txs', numeric: true },
-        ]}
-        rows={props.stateUpdates.map((update) => {
-          const link = `/state-updates/${update.id}`
-          return {
-            link,
-            cells: [
-              update.id.toString(),
-              formatHashLong(update.hash),
-              formatRelativeTime(update.timestamp),
-              update.positionCount.toString(),
-              update.forcedTransactionsCount,
-            ],
-          }
-        })}
-      />
+      <StateUpdatesTable stateUpdates={props.stateUpdates} />
+
       <SectionHeadingWithLink linkUrl="/forced" linkText="view all">
         Latest forced transactions
       </SectionHeadingWithLink>
-      <Table
-        noRowsText="no forced transactions have been issued so far"
-        className="mb-8"
-        columns={[
-          { header: 'Type' },
-          { header: 'Time' },
-          { header: 'Status' },
-          { header: 'Hash', monospace: true, fullWidth: true },
-          { header: 'Amount', numeric: true },
-          { header: 'Asset' },
-          { header: 'Position ID', numeric: true },
-        ]}
-        rows={props.forcedTransactions.map((transaction) => {
-          const link = `/forced/${transaction.hash}`
-          return {
-            link,
-            cells: [
-              transaction.type,
-              formatRelativeTime(transaction.lastUpdate),
-              transaction.status,
-              formatHashLong(transaction.hash),
-              formatCurrencyUnits(transaction.amount, transaction.assetId),
-              <AssetCell assetId={transaction.assetId} />,
-              transaction.positionId.toString(),
-            ],
-          }
-        })}
-      />
+      <ForcedTransactionsTable transactions={props.forcedTransactions} />
+
       <SectionHeadingWithLink linkUrl="/forced/offers" linkText="view all">
         Latest forced trade offers
       </SectionHeadingWithLink>
-      <Table
-        noRowsText="there is no active offers at the moment"
-        columns={[
-          { header: 'Type' },
-          {
-            header: 'Asset',
-            numeric: true,
-            textAlignClass: 'text-left',
-            fullWidth: true,
-          },
-          { header: 'Price', numeric: true },
-          { header: 'Total', numeric: true },
-          { header: 'Position ID', numeric: true },
-        ]}
-        rows={props.forcedTradeOffers.map((offer) => {
-          const link = `/forced/offers/${offer.id}`
-          return {
-            link,
-            cells: [
-              offer.type,
-              <AssetCell assetId={offer.assetId} amount={offer.amount} />,
-              formatCurrency(offer.price, 'USD'),
-              formatCurrency(offer.total, AssetId.USDC),
-              offer.positionId.toString(),
-            ],
-          }
-        })}
-      />
+      <ForcedTradeOffersTable offers={props.forcedTradeOffers} />
     </Page>
   )
 }

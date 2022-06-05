@@ -3,14 +3,8 @@ import React from 'react'
 import { PageHeading } from '../common/header/PageHeading'
 import { Page } from '../common/page/Page'
 import { ServerPagination } from '../common/pagination'
-import { Table } from '../common/table'
-import { AssetCell } from '../common/table/AssetCell'
-import {
-  formatCurrencyUnits,
-  formatHashLong,
-  formatRelativeTime,
-} from '../formatting'
 import { ForcedTransactionsIndexProps } from './ForcedTransactionsIndexProps'
+import { ForcedTransactionsTable } from './ForcedTransactionsTable'
 
 export function ForcedTransactionsIndex({
   transactions,
@@ -32,33 +26,7 @@ export function ForcedTransactionsIndex({
         total={total}
         baseUrl="/forced"
       />
-      <Table
-        noRowsText="no forced transactions have been issued so far"
-        columns={[
-          { header: 'Type' },
-          { header: 'Time' },
-          { header: 'Status' },
-          { header: 'Hash', monospace: true, fullWidth: true },
-          { header: 'Amount', numeric: true },
-          { header: 'Asset' },
-          { header: 'Position ID', numeric: true },
-        ]}
-        rows={transactions.map((transaction) => {
-          const link = `/forced/${transaction.hash}`
-          return {
-            link,
-            cells: [
-              transaction.type,
-              formatRelativeTime(transaction.lastUpdate),
-              transaction.status,
-              formatHashLong(transaction.hash),
-              formatCurrencyUnits(transaction.amount, transaction.assetId),
-              <AssetCell assetId={transaction.assetId} />,
-              transaction.positionId.toString(),
-            ],
-          }
-        })}
-      />
+      <ForcedTransactionsTable transactions={transactions} />
     </Page>
   )
 }

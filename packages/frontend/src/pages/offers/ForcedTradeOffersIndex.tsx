@@ -1,14 +1,11 @@
-import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { PageHeading } from '../common/header/PageHeading'
 import { Page } from '../common/page/Page'
 import { ServerFormAttributes, ServerPagination } from '../common/pagination'
-import { Table } from '../common/table'
-import { AssetCell } from '../common/table/AssetCell'
-import { formatCurrency, formatRelativeTime } from '../formatting'
 import { AssetIdSelectName, FilteringForm, TypeRadioName } from './filtering'
 import { ForcedTradeOffersIndexProps } from './ForcedTradeOffersIndexProps'
+import { ForcedTradeOffersTable } from './ForcedTradeOffersTable'
 
 export function ForcedTradeOffersIndex({
   account,
@@ -53,36 +50,7 @@ export function ForcedTradeOffersIndex({
         baseUrl={baseUrl}
         additionalParams={filteringParams}
       />
-      <Table
-        noRowsText="there is no active offers at the moment"
-        columns={[
-          { header: 'Position ID', numeric: true },
-          { header: 'Time' },
-          {
-            header: 'Asset',
-            numeric: true,
-            textAlignClass: 'text-left',
-            fullWidth: true,
-          },
-          { header: 'Price', numeric: true },
-          { header: 'Total', numeric: true },
-          { header: 'Type' },
-        ]}
-        rows={offers.map((offer) => {
-          const link = `/forced/offers/${offer.id}`
-          return {
-            link,
-            cells: [
-              offer.positionId.toString(),
-              formatRelativeTime(offer.createdAt),
-              <AssetCell assetId={offer.assetId} amount={offer.amount} />,
-              formatCurrency(offer.price, 'USD'),
-              formatCurrency(offer.total, AssetId.USDC),
-              offer.type,
-            ],
-          }
-        })}
-      />
+      <ForcedTradeOffersTable offers={offers} />
     </Page>
   )
 }

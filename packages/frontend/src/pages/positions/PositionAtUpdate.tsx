@@ -93,7 +93,6 @@ export function PositionAtUpdate({
       <SectionHeading>Balance changes</SectionHeading>
       <Table
         noRowsText="no balance changes happened in this update"
-        className="mb-8"
         columns={balanceChangesTableColumns}
         rows={assetChanges.map(buildBalanceChangesTableRow)}
       />
