@@ -1,3 +1,4 @@
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { EtherscanLink } from '../common/EtherscanLink'
@@ -64,26 +65,24 @@ export function StateUpdateDetails({
         columns={[
           { header: 'Position' },
           { header: 'Stark key', monospace: true, fullWidth: true },
-          { header: 'Value before', numeric: true },
           { header: 'Value after', numeric: true },
-          { header: 'Assets updated', numeric: true },
+          { header: 'Collateral balance', numeric: true },
+          { header: 'Forced txs', numeric: true },
         ]}
         rows={positions.map(
           ({
             positionId,
             starkKey,
+            forcedTransactions,
+            collateralBalance,
             totalUSDCents,
-            previousTotalUSDCents,
-            assetsUpdated,
           }) => ({
             cells: [
               positionId.toString(),
               formatHashLong(starkKey),
-              previousTotalUSDCents
-                ? formatCurrency(previousTotalUSDCents, 'USD')
-                : '-',
               formatCurrency(totalUSDCents, 'USD'),
-              assetsUpdated ? assetsUpdated.toString() : '0',
+              formatCurrency(collateralBalance, AssetId.USDC),
+              forcedTransactions,
             ],
             link: `/positions/${positionId}`,
           })
