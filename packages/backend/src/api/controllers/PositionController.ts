@@ -13,11 +13,6 @@ import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRep
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
-import {
-  getAcceptForm,
-  getCancelForm,
-  getFinalizeForm,
-} from './utils/offerForms'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
@@ -28,19 +23,18 @@ export class PositionController {
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private forcedTransactionsRepository: ForcedTransactionsRepository,
-    private forcedTradeOfferRepository: ForcedTradeOfferRepository,
-    private perpetualAddress: EthereumAddress
+    private forcedTradeOfferRepository: ForcedTradeOfferRepository
   ) {}
 
   async getPositionDetailsPage(
     positionId: bigint,
     address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [account, history, transactions, pendingOffers] = await Promise.all([
+    const [account, history, transactions, offers] = await Promise.all([
       this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.forcedTransactionsRepository.getAffectingPosition(positionId),
-      this.forcedTradeOfferRepository.getPendingByPositionIdA(positionId),
+      this.forcedTradeOfferRepository.getHistoryByPositionId(positionId),
     ])
 
     if (!history[0]) {
@@ -67,21 +61,9 @@ export class PositionController {
 
     const current = historyWithAssets[0]
 
-    const [userPositionId, userEvent, ownerEvent] = await Promise.all([
-      address && this.positionRepository.findIdByEthereumAddress(address),
-      address &&
-        this.userRegistrationEventRepository.findByEthereumAddress(address),
+    const [ownerEvent] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(current.starkKey),
     ])
-
-    const user =
-      userPositionId && userEvent
-        ? {
-            address: userEvent.ethAddress,
-            starkKey: userEvent.starkKey,
-            positionId: userPositionId,
-          }
-        : undefined
 
     const content = renderPositionDetailsPage({
       account,
@@ -104,13 +86,10 @@ export class PositionController {
         }
       }),
       transactions: transactions.map(toForcedTransactionEntry),
-      pendingOffers: pendingOffers.map((offer) => ({
+      offers: offers.map((offer) => ({
         ...offer,
         type: offer.isABuyingSynthetic ? 'buy' : 'sell',
-        acceptForm: user && getAcceptForm(offer, user),
-        cancelForm: user && getCancelForm(offer, user),
-        finalizeForm:
-          user && getFinalizeForm(offer, user, this.perpetualAddress),
+        role: offer.positionIdA === positionId ? 'maker' : 'taker',
       })),
     })
     return { type: 'success', content }

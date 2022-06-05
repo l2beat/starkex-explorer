@@ -188,22 +188,26 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rowIds.map(String).map(AssetId)
   }
 
-  private getPendingByPositionIdAQuery(positionIdA: bigint) {
-    return this.knex('forced_trade_offers')
-      .where({ position_id_a: positionIdA })
-      .whereNull('transaction_hash')
-      .whereNull('cancelled_at')
+  private getByPositionIdQuery(positionId: bigint, active?: boolean) {
+    let query = this.knex('forced_trade_offers').whereNull('transaction_hash')
+    if (active) {
+      query = query.whereNull('cancelled_at')
+    }
+    return query
+      .where({ position_id_a: positionId })
+      .orWhere({ position_id_b: positionId })
   }
 
-  async countPendingByPositionIdA(positionIdA: bigint) {
-    const [{ count }] = await this.getPendingByPositionIdAQuery(
-      positionIdA
+  async countActiveByPositionId(positionId: bigint) {
+    const [{ count }] = await this.getByPositionIdQuery(
+      positionId,
+      true
     ).count()
     return Number(count)
   }
 
-  async getPendingByPositionIdA(positionIdA: bigint) {
-    const rows = await this.getPendingByPositionIdAQuery(positionIdA)
+  async getHistoryByPositionId(positionId: bigint) {
+    const rows = await this.getByPositionIdQuery(positionId)
     return rows.map(toRecord)
   }
 

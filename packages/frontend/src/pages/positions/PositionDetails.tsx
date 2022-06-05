@@ -1,4 +1,5 @@
-import { AssetId } from '@explorer/types'
+import { AssetId, Timestamp } from '@explorer/types'
+import cx from 'classnames'
 import React from 'react'
 
 import { AssetCell } from '../common/AssetCell'
@@ -10,12 +11,12 @@ import { ClientPaginatedTable, Column, Table } from '../common/table'
 import {
   formatAbsoluteTime,
   formatCurrency,
+  formatCurrencyApproximation,
   formatCurrencyUnits,
   formatHashLong,
   formatRelativeTime,
 } from '../formatting'
-import { PendingOffers } from './pending/offers'
-import { PositionDetailsProps } from './PositionDetailsProps'
+import { OfferHistoryEntry, PositionDetailsProps } from './PositionDetailsProps'
 
 const balanceTableColumns = (ownedByYou: boolean) => {
   const columns: Column[] = [
@@ -130,6 +131,51 @@ const buildTransactionHistoryTableRow = (
   }
 }
 
+function buildOfferHistoryRow(offer: OfferHistoryEntry) {
+  return {
+    link: `/forced/offers/${offer.id}`,
+    cells: [
+      offer.id,
+      offer.type === 'buy' ? 'Buy' : 'Sell',
+      offer.role === 'maker' ? 'Maker' : 'Taker',
+      offer.cancelledAt ? (
+        formatRelativeTime(offer.cancelledAt)
+      ) : offer.accepted ? (
+        <span
+          data-timestamp={Timestamp.fromHours(
+            offer.accepted.submissionExpirationTime
+          )}
+        >
+          ...
+        </span>
+      ) : (
+        formatRelativeTime(offer.createdAt)
+      ),
+      offer.cancelledAt
+        ? 'Cancelled'
+        : offer.accepted
+        ? 'Taker found'
+        : 'Looking for a taker',
+      formatCurrencyApproximation(
+        offer.syntheticAmount,
+        offer.syntheticAssetId,
+        3
+      ),
+      formatCurrencyApproximation(offer.collateralAmount, AssetId.USDC, 3),
+    ],
+  }
+}
+
+const offerHistoryColumns: Column[] = [
+  { header: 'Id' },
+  { header: 'Type' },
+  { header: 'Role' },
+  { header: 'Time', className: 'min-w-[12ch]' },
+  { header: 'Status' },
+  { header: 'Amount', numeric: true, fullWidth: true },
+  { header: 'Total', numeric: true },
+]
+
 export function PositionDetails({
   positionId,
   assets,
@@ -140,7 +186,7 @@ export function PositionDetails({
   history,
   transactions,
   account,
-  pendingOffers,
+  offers,
   ownedByYou,
 }: PositionDetailsProps) {
   return (
@@ -153,7 +199,7 @@ export function PositionDetails({
       scripts={['/scripts/main.js']}
       account={account}
     >
-      <div className="mb-6 sm:mb-12 flex items-center">
+      <div className="mb-8 flex items-center">
         <h1 className="font-sans font-bold text-2xl">
           Position #{positionId.toString()}
         </h1>
@@ -163,7 +209,27 @@ export function PositionDetails({
           </span>
         )}
       </div>
-      {pendingOffers.length > 0 && <PendingOffers offers={pendingOffers} />}
+      {offers.some((offer) => !offer.cancelledAt) && (
+        <>
+          <div
+            className={cx(
+              'mb-1.5 font-medium text-lg text-left',
+              ownedByYou &&
+                'after:ml-1 after:inline-block after:w-4 after:h-4 after:bg-blue-200 after:rounded-full'
+            )}
+          >
+            Active force trade offers
+          </div>
+          <Table
+            noRowsText=""
+            columns={offerHistoryColumns}
+            rows={offers
+              .flatMap((offer) => (offer.cancelledAt ? [] : [offer]))
+              .map(buildOfferHistoryRow)}
+            className="mb-8"
+          />
+        </>
+      )}
       <div className="mb-1.5 font-medium text-lg text-left">Stats</div>
       <PageHeaderStats
         rows={[
@@ -215,8 +281,19 @@ export function PositionDetails({
       <ClientPaginatedTable
         id="position-transactions"
         noRowsText="there are no forced transactions associated with this position"
+        className="mb-8"
         columns={transactionHistoryTableColumns}
         rows={transactions.map(buildTransactionHistoryTableRow)}
+      />
+      <div className="mb-1.5 font-medium text-lg text-left">
+        Force trade offer history
+      </div>
+      <ClientPaginatedTable
+        id="position-offers"
+        noRowsText="this position has no offer history"
+        className="mb-8"
+        columns={offerHistoryColumns}
+        rows={offers.map(buildOfferHistoryRow)}
       />
     </Page>
   )

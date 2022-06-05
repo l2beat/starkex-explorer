@@ -21,13 +21,11 @@ export class AccountService {
       }
     }
 
-    const pendingCount = await this.offerRepository.countPendingByPositionIdA(
-      id
-    )
+    const activeCount = await this.offerRepository.countActiveByPositionId(id)
     return {
       address,
       positionId: id,
-      hasUpdates: pendingCount > 0,
+      hasUpdates: activeCount > 0,
     }
   }
 }

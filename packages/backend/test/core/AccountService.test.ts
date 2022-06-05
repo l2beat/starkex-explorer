@@ -36,7 +36,7 @@ describe(AccountService.name, () => {
         findIdByEthereumAddress: async () => 123n,
       }),
       mock<ForcedTradeOfferRepository>({
-        countPendingByPositionIdA: async () => 0,
+        countActiveByPositionId: async () => 0,
       })
     )
     const address = EthereumAddress.fake()
@@ -48,13 +48,13 @@ describe(AccountService.name, () => {
     })
   })
 
-  it('returns has updates when pending offers exist', async () => {
+  it('returns has updates when active offers exist', async () => {
     const accountService = new AccountService(
       mock<PositionRepository>({
         findIdByEthereumAddress: async () => 123n,
       }),
       mock<ForcedTradeOfferRepository>({
-        countPendingByPositionIdA: async () => 1,
+        countActiveByPositionId: async () => 1,
       })
     )
     const address = EthereumAddress.fake()

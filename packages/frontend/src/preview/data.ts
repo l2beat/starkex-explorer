@@ -166,9 +166,11 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
     },
   ],
   transactions: createFakeTransactions(5),
-  pendingOffers: [
+  offers: [
     {
       id: 1,
+      role: 'maker',
+      createdAt: Timestamp(Date.now() - 2 * 24 * 3600 * 1000),
       type: 'buy',
       syntheticAssetId: AssetId('ETH-9'),
       syntheticAmount: 10000000n,
@@ -177,24 +179,28 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
     {
       id: 2,
       type: 'sell',
+      role: 'taker',
+      createdAt: Timestamp(Date.now() - 2 * 24 * 3600 * 1000),
       syntheticAssetId: AssetId('ETH-9'),
       syntheticAmount: 1000000n,
       collateralAmount: 10000000n,
       accepted: {
         submissionExpirationTime: BigInt(
-          Math.floor((Date.now() + 5 * 3600 * 1000) / (60 * 1000))
+          Math.floor((Date.now() + 4 * 12 * 3600 * 1000) / (3600 * 1000))
         ),
       },
     },
     {
       id: 3,
       type: 'sell',
+      role: 'maker',
+      createdAt: Timestamp(Date.now() - 1 * 24 * 3500 * 1000),
       syntheticAssetId: AssetId('ETH-9'),
       syntheticAmount: 1000000n,
       collateralAmount: 10000000n,
       accepted: {
         submissionExpirationTime: BigInt(
-          Math.floor((Date.now() + 6 * 3560 * 900) / (60 * 1000))
+          Math.floor((Date.now() + 6 * 3560 * 900) / (3600 * 1000))
         ),
       },
     },

@@ -183,8 +183,7 @@ export class Application {
       positionRepository,
       userRegistrationEventRepository,
       forcedTransactionsRepository,
-      forcedTradeOfferRepository,
-      config.contracts.perpetual
+      forcedTradeOfferRepository
     )
     const homeController = new HomeController(
       accountService,

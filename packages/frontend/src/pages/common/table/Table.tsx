@@ -12,14 +12,18 @@ export function Table(props: TableProps) {
         <thead>
           <tr className="bg-grey-100 font-medium">
             {props.columns.map(
-              ({ header, numeric, fullWidth, textAlignClass }, i) => (
+              (
+                { header, numeric, fullWidth, textAlignClass, className },
+                i
+              ) => (
                 <th
                   scope="col"
                   key={i}
                   className={cx(
                     'p-px pb-0.5 first:pl-0 last:pr-0',
                     textAlignClass || (numeric ? 'text-right' : 'text-left'),
-                    !fullWidth && 'w-0'
+                    !fullWidth && 'w-0',
+                    className
                   )}
                 >
                   <div className="px-1.5 py0.5 bg-grey-300 rounded-[3px]">

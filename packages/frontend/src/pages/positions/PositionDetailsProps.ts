@@ -2,7 +2,7 @@ import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedTransactionEntry } from '../forced-transactions/ForcedTransactionsIndexProps'
-import { PendingOffer } from './pending/offers'
+import { OfferType } from '../offers'
 
 export interface PositionDetailsProps {
   readonly account: AccountDetails | undefined
@@ -15,7 +15,7 @@ export interface PositionDetailsProps {
   readonly assets: readonly PositionAssetEntry[]
   readonly history: readonly PositionHistoryEntry[]
   readonly transactions: readonly ForcedTransactionEntry[]
-  readonly pendingOffers: readonly PendingOffer[]
+  readonly offers: readonly OfferHistoryEntry[]
 }
 
 export interface PositionAssetEntry {
@@ -29,4 +29,18 @@ export interface PositionHistoryEntry {
   readonly stateUpdateId: number
   readonly totalUSDCents: bigint
   readonly assetsUpdated: number
+}
+
+export interface OfferHistoryEntry {
+  id: number
+  type: OfferType
+  role: 'maker' | 'taker'
+  createdAt: Timestamp
+  accepted?: {
+    submissionExpirationTime: bigint
+  }
+  cancelledAt?: Timestamp
+  syntheticAssetId: AssetId
+  syntheticAmount: bigint
+  collateralAmount: bigint
 }
