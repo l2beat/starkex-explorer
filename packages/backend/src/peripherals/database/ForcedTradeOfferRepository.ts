@@ -124,6 +124,8 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.findById = this.wrapFind(this.findById)
     this.countInitial = this.wrapAny(this.countInitial)
     this.getInitial = this.wrapGet(this.getInitial)
+    this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
+    this.getHistoryByPositionId = this.wrapGet(this.getHistoryByPositionId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.save = this.wrapSave(this.save)
   }
@@ -191,11 +193,13 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   private getByPositionIdQuery(positionId: bigint, active?: boolean) {
     let query = this.knex('forced_trade_offers').whereNull('transaction_hash')
     if (active) {
-      query = query.whereNull('cancelled_at')
+      query = query.andWhereRaw('cancelled_at is null')
     }
-    return query
-      .where({ position_id_a: positionId })
-      .orWhere({ position_id_b: positionId })
+    return query.andWhere(function () {
+      this.where({ position_id_a: positionId }).orWhere({
+        position_id_b: positionId,
+      })
+    })
   }
 
   async countActiveByPositionId(positionId: bigint) {
