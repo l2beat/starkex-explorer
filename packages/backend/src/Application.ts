@@ -41,8 +41,8 @@ import { TransactionStatusRepository } from './peripherals/database/TransactionS
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
+import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
-import { reportError, handleServerError } from './tools/ErrorReporter'
 
 export class Application {
   start: () => Promise<void>
