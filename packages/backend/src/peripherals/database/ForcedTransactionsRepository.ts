@@ -115,13 +115,13 @@ export class ForcedTransactionsRepository extends BaseRepository {
     this.getAll = this.wrapGet(this.getAll)
     this.getLatest = this.wrapGet(this.getLatest)
     this.getIncludedInStateUpdate = this.wrapGet(this.getIncludedInStateUpdate)
-    this.getAffectingPosition = this.wrapGet(this.getAffectingPosition)
-    this.getAffectingPosition = this.wrapGet(this.getAffectingPosition)
+    this.getByPositionId = this.wrapGet(this.getByPositionId)
+    this.countPendingByPositionId = this.wrapAny(this.countPendingByPositionId)
     this.findByHash = this.wrapFind(this.findByHash)
     this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
-  private rowsQuery() {
+  private joinQuery() {
     return this.knex('forced_transactions')
       .innerJoin(
         'transaction_status',
@@ -133,14 +133,17 @@ export class ForcedTransactionsRepository extends BaseRepository {
         'state_updates.id',
         'forced_transactions.state_update_id'
       )
-      .select(
-        'forced_transactions.*',
-        'state_updates.timestamp as verified_at',
-        'transaction_status.mined_at',
-        'transaction_status.sent_at',
-        'transaction_status.reverted_at',
-        'transaction_status.forgotten_at'
-      )
+  }
+
+  private rowsQuery() {
+    return this.joinQuery().select(
+      'forced_transactions.*',
+      'state_updates.timestamp as verified_at',
+      'transaction_status.mined_at',
+      'transaction_status.sent_at',
+      'transaction_status.reverted_at',
+      'transaction_status.forgotten_at'
+    )
   }
 
   async getAll(): Promise<ForcedTransactionRecord[]> {
@@ -182,7 +185,22 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async getAffectingPosition(
+  async countPendingByPositionId(positionId: bigint) {
+    const [{ count }] = await this.joinQuery()
+      .where(function () {
+        this.whereRaw("data->>'positionId' = ?", String(positionId))
+          .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
+          .orWhereRaw("data->>'positionIdB' = ?", String(positionId))
+      })
+      .andWhereRaw('state_update_id is null')
+      .andWhereRaw('reverted_at is null')
+      .andWhereRaw('forgotten_at is null')
+      .count()
+
+    return Number(count)
+  }
+
+  async getByPositionId(
     positionId: bigint
   ): Promise<ForcedTransactionRecord[]> {
     const rows = await this.rowsQuery()

@@ -171,7 +171,8 @@ export class Application {
     )
     const accountService = new AccountService(
       positionRepository,
-      forcedTradeOfferRepository
+      forcedTradeOfferRepository,
+      forcedTransactionsRepository
     )
 
     // #endregion core
