@@ -33,7 +33,7 @@ async function submitExit(state: FormState) {
     method: 'eth_sendTransaction',
     params: [
       {
-        from: state.props.account,
+        from: state.props.account.address,
         to: state.props.perpetualAddress,
         data,
       },
