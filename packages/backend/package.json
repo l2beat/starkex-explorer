@@ -29,6 +29,7 @@
     "@explorer/state": "*",
     "@explorer/types": "*",
     "@koa/router": "^10.1.1",
+    "@sentry/node": "^7.0.0",
     "@types/koa": "^2.13.4",
     "@types/koa-bodyparser": "^4.3.7",
     "@types/koa-static": "^4.0.2",

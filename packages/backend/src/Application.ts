@@ -42,6 +42,7 @@ import { UserRegistrationEventRepository } from './peripherals/database/UserRegi
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { Logger } from './tools/Logger'
+import { reportError, handleServerError } from './tools/ErrorReporter'
 
 export class Application {
   start: () => Promise<void>
@@ -49,7 +50,10 @@ export class Application {
   constructor(config: Config) {
     // #region tools
 
-    const logger = new Logger(config.logger)
+    const logger = new Logger({
+      ...config.logger,
+      reportError,
+    })
 
     // #endregion tools
     // #region peripherals
@@ -242,6 +246,7 @@ export class Application {
       ],
       middleware: [createFrontendMiddleware()],
       forceHttps: config.forceHttps,
+      handleServerError,
     })
 
     // #endregion api
