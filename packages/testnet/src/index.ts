@@ -33,7 +33,8 @@ async function main() {
     { assetId: AssetId('SOL-7'), priceUSDCents: 42_11n },
   ])
 
-  contracts.perpetual.on('LogForcedWithdrawalRequest', (_1, _2, _3, event) => {
+  contracts.perpetual.on('LogForcedWithdrawalRequest', (...argsAndEvent) => {
+    const event = argsAndEvent[argsAndEvent.length - 1]
     const args: LogForcedWithdrawalRequestEventObject = event.args
     simulation.queueForcedAction({
       type: 'withdrawal',
@@ -43,7 +44,8 @@ async function main() {
     })
   })
 
-  contracts.perpetual.on('LogForcedTradeRequest', (_1, _2, _3, event) => {
+  contracts.perpetual.on('LogForcedTradeRequest', (...argsAndEvent) => {
+    const event = argsAndEvent[argsAndEvent.length - 1]
     const args: LogForcedTradeRequestEventObject = event.args
     simulation.queueForcedAction({
       type: 'trade',
@@ -55,7 +57,7 @@ async function main() {
       syntheticAmount: args.amountSynthetic.toBigInt(),
       isABuyingSynthetic: args.aIsBuyingSynthetic,
       syntheticAssetId: decodeAssetId(
-        args.syntheticAssetId.toHexString().slice(0, 2)
+        args.syntheticAssetId.toHexString().slice(2)
       ),
       nonce: args.nonce.toBigInt(),
     })
@@ -71,6 +73,8 @@ async function main() {
     CHARLIE_STARK_KEY
   )
 
+  await simulation.update()
+  await simulation.update()
   await simulation.update()
   setInterval(async () => {
     await simulation.update()
