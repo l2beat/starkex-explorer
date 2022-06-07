@@ -72,7 +72,9 @@ function buildOfferHistoryRow(offer: OfferHistoryEntry) {
       offer.cancelledAt
         ? 'Cancelled'
         : offer.accepted
-        ? 'Taker found'
+        ? offer.accepted.transactionHash
+          ? 'Completed'
+          : 'Taker found'
         : 'Looking for a taker',
       formatApproximation(
         offer.syntheticAmount,
