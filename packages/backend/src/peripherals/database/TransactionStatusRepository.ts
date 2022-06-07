@@ -93,10 +93,10 @@ export class TransactionStatusRepository extends BaseRepository {
 
   private waitingToBeMinedQuery() {
     return this.knex('transaction_status')
-      .whereRaw('sent_at is not null')
-      .andWhereRaw('mined_at is null')
-      .andWhereRaw('reverted_at is null')
-      .andWhereRaw('forgotten_at is null')
+      .whereNotNull('sent_at')
+      .whereNull('mined_at')
+      .whereNull('reverted_at')
+      .whereNull('forgotten_at')
   }
 
   async add(record: Record): Promise<Hash256> {

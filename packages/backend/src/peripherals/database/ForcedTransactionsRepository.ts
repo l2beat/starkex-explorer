@@ -192,9 +192,9 @@ export class ForcedTransactionsRepository extends BaseRepository {
           .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
           .orWhereRaw("data->>'positionIdB' = ?", String(positionId))
       })
-      .andWhereRaw('state_update_id is null')
-      .andWhereRaw('reverted_at is null')
-      .andWhereRaw('forgotten_at is null')
+      .whereNull('state_update_id')
+      .whereNull('reverted_at')
+      .whereNull('forgotten_at')
       .count()
 
     return Number(count)
@@ -219,7 +219,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
     const hashes = datas.map(hashData)
     const transactions = await this.knex('forced_transactions')
       .whereIn('data_hash', hashes)
-      .andWhereRaw('state_update_id is null')
+      .whereNull('state_update_id')
       .orderBy('hash')
     const matched = hashes.map((hash) => {
       const transaction = transactions.find((event) => event.data_hash === hash)

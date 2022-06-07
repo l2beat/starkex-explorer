@@ -202,7 +202,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
 
   async countActiveByPositionId(positionId: bigint) {
     const [{ count }] = await this.getByPositionIdQuery(positionId)
-      .andWhereRaw('cancelled_at is null')
+      .whereNull('cancelled_at')
       .count()
     return Number(count)
   }
