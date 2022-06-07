@@ -3,7 +3,13 @@ import { expect } from 'earljs'
 
 import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { fakeAccepted, fakeInitialOffer, fakeOffer } from '../../fakes'
+import {
+  fakeAccepted,
+  fakeBigInt,
+  fakeInitialOffer,
+  fakeOffer,
+  fakeTimestamp,
+} from '../../fakes'
 import { setupDatabaseTestSuite } from './setup'
 
 describe(ForcedTradeOfferRepository.name, () => {
@@ -167,6 +173,22 @@ describe(ForcedTradeOfferRepository.name, () => {
         assetId: AssetId('ETH-9'),
       })
     ).toEqual([0, []])
+  })
+
+  it('counts active offers by position id', async () => {
+    const positionId = fakeBigInt()
+    const offer1 = fakeInitialOffer({ positionIdA: positionId })
+    const offer2 = fakeInitialOffer()
+    const accepted = fakeAccepted({ positionIdB: positionId })
+    await repository.add(offer1)
+    await repository.add(offer2)
+    await repository.save({ ...offer2, accepted })
+
+    expect(await repository.countActiveByPositionId(positionId)).toEqual(2)
+
+    await repository.save({ ...offer1, cancelledAt: fakeTimestamp() })
+
+    expect(await repository.countActiveByPositionId(positionId)).toEqual(1)
   })
 
   it('returns active offers by position id A', async () => {
