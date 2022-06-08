@@ -33,8 +33,8 @@ export class PositionController {
     const [account, history, transactions, offers] = await Promise.all([
       this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
-      this.forcedTransactionsRepository.getAffectingPosition(positionId),
-      this.forcedTradeOfferRepository.getHistoryByPositionId(positionId),
+      this.forcedTransactionsRepository.getByPositionId(positionId),
+      this.forcedTradeOfferRepository.getByPositionId(positionId),
     ])
 
     if (!history[0]) {

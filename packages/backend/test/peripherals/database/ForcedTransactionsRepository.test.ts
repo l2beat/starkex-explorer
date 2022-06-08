@@ -238,7 +238,7 @@ describe(ForcedTransactionsRepository.name, () => {
       sentAt3
     )
 
-    const transactions = await repository.getAffectingPosition(positionId)
+    const transactions = await repository.getByPositionId(positionId)
     expect(transactions).toEqual([
       {
         hash: hash1,
@@ -259,9 +259,7 @@ describe(ForcedTransactionsRepository.name, () => {
       },
     ])
 
-    const unknownPositionTransactions = await repository.getAffectingPosition(
-      999n
-    )
+    const unknownPositionTransactions = await repository.getByPositionId(999n)
     expect(unknownPositionTransactions).toEqual([])
   })
 
@@ -295,6 +293,46 @@ describe(ForcedTransactionsRepository.name, () => {
     const count = await repository.countAll()
 
     expect(count).toEqual(2)
+  })
+
+  it('counts pending transactions affecting position', async () => {
+    const positionId = fakeBigInt()
+    const hash1 = Hash256.fake()
+    const data1 = fakeWithdrawal({ positionId })
+    const sentAt1 = fakeTimestamp()
+    const hash2 = Hash256.fake()
+    const data2 = fakeTrade({ positionIdA: positionId })
+    const sentAt2 = Timestamp(1)
+    const minedAt2 = Timestamp(2)
+    const blockNumber2 = fakeInt()
+    const hash3 = Hash256.fake()
+    const data3 = fakeWithdrawal({ positionId: positionId + 1n })
+    const sentAt3 = fakeTimestamp()
+
+    await repository.add(
+      {
+        hash: hash1,
+        data: data1,
+      },
+      sentAt1
+    )
+    await repository.add(
+      {
+        hash: hash2,
+        data: data2,
+      },
+      sentAt2,
+      minedAt2,
+      blockNumber2
+    )
+    await repository.add(
+      {
+        hash: hash3,
+        data: data3,
+      },
+      sentAt3
+    )
+    expect(await repository.countPendingByPositionId(positionId)).toEqual(2)
   })
 
   it('returns undefined if transaction not found by hash', async () => {

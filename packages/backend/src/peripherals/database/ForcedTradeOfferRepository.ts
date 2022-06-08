@@ -124,6 +124,8 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.findById = this.wrapFind(this.findById)
     this.countInitial = this.wrapAny(this.countInitial)
     this.getInitial = this.wrapGet(this.getInitial)
+    this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
+    this.getByPositionId = this.wrapGet(this.getByPositionId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.save = this.wrapSave(this.save)
   }
@@ -188,25 +190,23 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rowIds.map(String).map(AssetId)
   }
 
-  private getByPositionIdQuery(positionId: bigint, active?: boolean) {
-    let query = this.knex('forced_trade_offers').whereNull('transaction_hash')
-    if (active) {
-      query = query.whereNull('cancelled_at')
-    }
-    return query
-      .where({ position_id_a: positionId })
-      .orWhere({ position_id_b: positionId })
+  private getByPositionIdQuery(positionId: bigint) {
+    return this.knex('forced_trade_offers').where(function () {
+      this.where({ position_id_a: positionId }).orWhere({
+        position_id_b: positionId,
+      })
+    })
   }
 
   async countActiveByPositionId(positionId: bigint) {
-    const [{ count }] = await this.getByPositionIdQuery(
-      positionId,
-      true
-    ).count()
+    const [{ count }] = await this.getByPositionIdQuery(positionId)
+      .whereNull('cancelled_at')
+      .whereNull('transaction_hash')
+      .count()
     return Number(count)
   }
 
-  async getHistoryByPositionId(positionId: bigint) {
+  async getByPositionId(positionId: bigint) {
     const rows = await this.getByPositionIdQuery(positionId)
     return rows.map(toRecord)
   }
