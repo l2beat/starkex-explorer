@@ -317,7 +317,7 @@ export const FORCED_TRADE_OFFER_DETAILS_PROPS: ForcedTradeOfferDetailsProps = {
   history: [
     {
       timestamp: Timestamp(Date.now() - 10000),
-      text: `offer created (looking for buyer)`,
+      text: `offer created (looking for taker)`,
     },
   ],
 }
