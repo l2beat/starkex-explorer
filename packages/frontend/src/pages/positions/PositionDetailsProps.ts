@@ -1,4 +1,10 @@
-import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedTransactionEntry } from '../forced-transactions/ForcedTransactionsIndexProps'
@@ -38,6 +44,7 @@ export interface OfferHistoryEntry {
   createdAt: Timestamp
   accepted?: {
     submissionExpirationTime: bigint
+    transactionHash?: Hash256
   }
   cancelledAt?: Timestamp
   syntheticAssetId: AssetId

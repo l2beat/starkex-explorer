@@ -34,7 +34,7 @@ export class PositionController {
       this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.forcedTransactionsRepository.getByPositionId(positionId),
-      this.forcedTradeOfferRepository.getHistoryByPositionId(positionId),
+      this.forcedTradeOfferRepository.getByPositionId(positionId),
     ])
 
     if (!history[0]) {
