@@ -8,17 +8,16 @@ interface Event {
 }
 
 export function toForcedTradeOfferHistory(offer: ForcedTradeOfferRecord) {
-  const partyB = offer.isABuyingSynthetic ? 'buyer' : 'seller'
   const history: Event[] = [
     {
       timestamp: offer.createdAt,
-      text: `offer created (looking for ${partyB})`,
+      text: `offer created (looking for taker)`,
     },
   ]
   if (offer.accepted) {
     history.push({
       timestamp: offer.accepted.at,
-      text: `${partyB} found`,
+      text: `taker found`,
     })
   }
   if (offer.cancelledAt) {
