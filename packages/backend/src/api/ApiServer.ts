@@ -1,5 +1,5 @@
 import Router from '@koa/router'
-import Koa, { Middleware } from 'koa'
+import Koa, { Context, Middleware } from 'koa'
 
 import { Logger } from '../tools/Logger'
 import { createApiLogger } from './ApiLogger'
@@ -9,6 +9,7 @@ interface Options {
   routers?: Router[]
   middleware?: Middleware[]
   forceHttps: boolean
+  handleServerError?: (error: Error, ctx: Context) => void
 }
 
 export class ApiServer {
@@ -37,6 +38,10 @@ export class ApiServer {
 
     this.app.use(router.routes())
     this.app.use(router.allowedMethods())
+
+    if (options.handleServerError) {
+      this.app.on('error', options.handleServerError)
+    }
   }
 
   listen() {

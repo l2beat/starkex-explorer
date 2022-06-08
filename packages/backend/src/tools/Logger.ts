@@ -13,6 +13,7 @@ export interface LoggerOptions {
   logLevel: LogLevel
   service?: string
   format: 'pretty' | 'json'
+  reportError?: (error: unknown) => void
 }
 
 export type LoggerParameters = Record<string, json>
@@ -47,6 +48,7 @@ export class Logger {
         .join(' ')
 
       this.print('error', { message })
+      this.options.reportError?.(error)
     }
   }
 
