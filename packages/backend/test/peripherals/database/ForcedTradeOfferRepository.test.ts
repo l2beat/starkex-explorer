@@ -207,4 +207,15 @@ describe(ForcedTradeOfferRepository.name, () => {
     const actual = await repository.getInitial({ limit: 10, offset: 0 })
     expect(actual).toEqual([])
   })
+
+  it('returns the ids', async () => {
+    await repository.add(
+      fakeInitialOffer({
+        syntheticAssetId: AssetId('ETH-9'),
+      })
+    )
+
+    const ids = await repository.getInitialAssetIds()
+    expect(ids).toEqual([AssetId('ETH-9')])
+  })
 })

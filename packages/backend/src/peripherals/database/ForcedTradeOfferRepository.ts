@@ -187,7 +187,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
 
   async getInitialAssetIds(): Promise<AssetId[]> {
     const rowIds = await this.getInitialQuery().distinct('synthetic_asset_id')
-    return rowIds.map(String).map(AssetId)
+    return rowIds.map((x) => x.synthetic_asset_id).map(AssetId)
   }
 
   private getByPositionIdQuery(positionId: bigint) {
