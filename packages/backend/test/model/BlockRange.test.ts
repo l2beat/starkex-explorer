@@ -108,6 +108,104 @@ describe(BlockRange.name, () => {
     })
   })
 
+  describe(BlockRange.prototype.splitByKnownHashes.name, () => {
+    it('empty', () => {
+      const blockRange = new BlockRange([], 5, 15)
+      expect(blockRange.splitByKnownHashes()).toEqual([5, 15, []])
+    })
+
+    it('hashes in the middle', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 11, hash: Hash256.fake('11') },
+          { number: 13, hash: Hash256.fake('13') },
+        ],
+        5,
+        15
+      )
+      expect(blockRange.splitByKnownHashes()).toEqual([5, 15, []])
+    })
+
+    it('hashes at the start', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 5, hash: Hash256.fake('5') },
+          { number: 6, hash: Hash256.fake('6') },
+          { number: 7, hash: Hash256.fake('7') },
+        ],
+        5,
+        15
+      )
+      expect(blockRange.splitByKnownHashes()).toEqual([5, 15, []])
+    })
+
+    it('single hash at the end', () => {
+      const blockRange = new BlockRange(
+        [{ number: 14, hash: Hash256.fake('14') }],
+        5,
+        15
+      )
+      expect(blockRange.splitByKnownHashes()).toEqual([
+        5,
+        14,
+        [Hash256.fake('14')],
+      ])
+    })
+
+    it('multiple hashes at the end', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 12, hash: Hash256.fake('12') },
+          { number: 13, hash: Hash256.fake('13') },
+          { number: 14, hash: Hash256.fake('14') },
+        ],
+        5,
+        15
+      )
+      expect(blockRange.splitByKnownHashes()).toEqual([
+        5,
+        12,
+        [Hash256.fake('12'), Hash256.fake('13'), Hash256.fake('14')],
+      ])
+    })
+
+    it('multiple hashes at the end some in the middle', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 7, hash: Hash256.fake('7') },
+          { number: 10, hash: Hash256.fake('10') },
+          { number: 12, hash: Hash256.fake('12') },
+          { number: 13, hash: Hash256.fake('13') },
+          { number: 14, hash: Hash256.fake('14') },
+        ],
+        5,
+        15
+      )
+      expect(blockRange.splitByKnownHashes()).toEqual([
+        5,
+        12,
+        [Hash256.fake('12'), Hash256.fake('13'), Hash256.fake('14')],
+      ])
+    })
+
+    it('all hashes', () => {
+      const blockRange = new BlockRange(
+        [
+          { number: 5, hash: Hash256.fake('5') },
+          { number: 6, hash: Hash256.fake('6') },
+        ],
+        5,
+        7
+      )
+      expect(blockRange.splitByKnownHashes()).toEqual([
+        5,
+        5,
+        [Hash256.fake('5'), Hash256.fake('6')],
+      ])
+    })
+  })
+
   describe(BlockRange.prototype.has.name, () => {
     const blockRange = new BlockRange(
       [

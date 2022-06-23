@@ -36,11 +36,33 @@ export class EthereumClient {
     if (blockRange.isEmpty()) {
       return []
     }
-    const logs = await this.provider.getLogs({
-      ...filter,
-      fromBlock: blockRange.start,
-      toBlock: blockRange.end - 1,
-    })
+    let [from, to, hashes] = blockRange.splitByKnownHashes()
+    if (hashes.length > 40) {
+      // This is completely arbitrary, but prevents us from doing thousands
+      // of requests in case those blocks were actually known. 40 should be
+      // safe from reorgs as multi-block reorgs are generally unheard of on
+      // eth mainnet those days
+
+      to += hashes.length - 40
+      hashes = hashes.slice(-40)
+    }
+
+    const nestedLogs = await Promise.all([
+      from !== to
+        ? this.provider.getLogs({
+            ...filter,
+            fromBlock: from,
+            toBlock: to - 1,
+          })
+        : [],
+      ...hashes.map((blockHash) =>
+        this.provider.getLogs({
+          ...filter,
+          blockHash: blockHash.toString(),
+        })
+      ),
+    ])
+    const logs = nestedLogs.flat()
     assert(blockRange.hasAll(logs), 'all logs must be from the block range')
     return logs
   }

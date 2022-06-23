@@ -75,6 +75,22 @@ export class BlockRange {
     return this.end - this.start
   }
 
+  splitByKnownHashes(): [BlockNumber, BlockNumber, Hash256[]] {
+    if (this.isEmpty()) {
+      return [this.start, this.end, []]
+    }
+    const hashes: Hash256[] = []
+    let i = this.end - 1
+    for (; i >= this.start; i--) {
+      const hash = this.hashes.get(i)
+      if (!hash) {
+        break
+      }
+      hashes.unshift(hash)
+    }
+    return [this.start, i + 1, hashes]
+  }
+
   has({ blockNumber, blockHash }: BlockReference) {
     if (blockNumber < this.start || blockNumber >= this.end) {
       return false
