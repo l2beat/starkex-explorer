@@ -20,6 +20,7 @@ export function getTestConfig(): Config {
     enableSync: true,
     jsonRpcUrl: getEnv('TEST_JSON_RPC_URL', 'http://localhost:8545'),
     core: {
+      safeBlockDistance: 5,
       syncBatchSize: 6_000,
       minBlockNumber: 11813207,
     },

@@ -90,7 +90,10 @@ export class Application {
       knex,
       logger
     )
-    const ethereumClient = new EthereumClient(config.jsonRpcUrl)
+    const ethereumClient = new EthereumClient(
+      config.jsonRpcUrl,
+      config.core.safeBlockDistance
+    )
 
     // #endregion peripherals
     // #region core
@@ -98,7 +101,8 @@ export class Application {
     const blockDownloader = new BlockDownloader(
       ethereumClient,
       blockRepository,
-      logger
+      logger,
+      config.core.safeBlockDistance
     )
 
     const statusService = new StatusService({

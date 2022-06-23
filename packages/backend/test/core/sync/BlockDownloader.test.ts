@@ -139,7 +139,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new BlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
       expect<unknown>(blockDownloader.getStatus()).toEqual({
         started: false,
@@ -159,7 +160,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new BlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
       blockDownloader['addJob'] = mockFn().returns(undefined)
 
@@ -181,7 +183,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new BlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
       expect(await blockDownloader.getKnownBlocks(1_000_000)).toEqual([])
     })
@@ -195,7 +198,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new BlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
       expect(await blockDownloader.getKnownBlocks(1_000_000)).toEqual([])
     })
@@ -212,7 +216,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new BlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
       expect(await blockDownloader.getKnownBlocks(1_000_000)).toEqual([
         { number: 1_500_000, hash: Hash256.fake('abc') },
@@ -279,7 +284,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new TestBlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
 
       const result = await blockDownloader.testAdvanceChain(BLOCK_B.number)
@@ -296,7 +302,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new TestBlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
 
       const result = await blockDownloader.testAdvanceChain(BLOCK_B.number)
@@ -314,7 +321,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new TestBlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
 
       const result = await blockDownloader.testAdvanceChain(BLOCK_C1.number)
@@ -344,7 +352,8 @@ describe(BlockDownloader.name, () => {
       const blockDownloader = new TestBlockDownloader(
         ethereumClient,
         blockRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        5
       )
 
       const result = await blockDownloader.testAdvanceChain(BLOCK_E1.number)
