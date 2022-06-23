@@ -62,7 +62,7 @@ export class Application {
     const databaseService = new DatabaseService(knex, logger)
 
     const kvStore = new KeyValueStore(knex, logger)
-    const syncStatusRepository = new SyncStatusRepository(kvStore)
+    const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
     const verifierEventRepository = new VerifierEventRepository(knex, logger)
     const factToPageRepository = new FactToPageRepository(knex, logger)
     const pageRepository = new PageRepository(knex, logger)
