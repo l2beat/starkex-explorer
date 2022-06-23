@@ -14,7 +14,10 @@ export function isReverted(
 export class EthereumClient {
   private provider = new ethers.providers.JsonRpcProvider(this.rpcUrl)
 
-  constructor(private readonly rpcUrl: string) {}
+  constructor(
+    private readonly rpcUrl: string,
+    private readonly safeBlockDistance: number
+  ) {}
 
   async getBlockNumber(): Promise<number> {
     return await this.provider.getBlockNumber()
@@ -37,14 +40,9 @@ export class EthereumClient {
       return []
     }
     let [from, to, hashes] = blockRange.splitByKnownHashes()
-    if (hashes.length > 40) {
-      // This is completely arbitrary, but prevents us from doing thousands
-      // of requests in case those blocks were actually known. 40 should be
-      // safe from reorgs as multi-block reorgs are generally unheard of on
-      // eth mainnet those days
-
-      to += hashes.length - 40
-      hashes = hashes.slice(-40)
+    if (hashes.length > this.safeBlockDistance) {
+      to += hashes.length - this.safeBlockDistance
+      hashes = hashes.slice(-this.safeBlockDistance)
     }
 
     const nestedLogs = await Promise.all([

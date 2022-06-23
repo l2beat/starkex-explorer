@@ -14,6 +14,7 @@ export interface Config {
   enableSync: boolean
   jsonRpcUrl: string
   core: {
+    safeBlockDistance: number
     syncBatchSize: number
     minBlockNumber: number
     maxBlockNumber?: number

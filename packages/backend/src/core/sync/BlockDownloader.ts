@@ -15,8 +15,6 @@ export interface BlockDownloaderEvents {
   reorg: BlockRecord[]
 }
 
-const SAFE_BLOCK_DISTANCE = 100
-
 export class BlockDownloader {
   private events = createEventEmitter<BlockDownloaderEvents>()
   private jobQueue: JobQueue
@@ -29,7 +27,7 @@ export class BlockDownloader {
     private ethereumClient: EthereumClient,
     private blockRepository: BlockRepository,
     private logger: Logger,
-    private safeBlockDistance = SAFE_BLOCK_DISTANCE
+    private safeBlockDistance: number
   ) {
     this.logger = this.logger.for(this)
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
