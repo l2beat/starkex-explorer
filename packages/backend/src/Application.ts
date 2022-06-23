@@ -131,7 +131,8 @@ export class Application {
       stateUpdateRepository,
       rollupStateRepository,
       ethereumClient,
-      forcedTransactionsRepository
+      forcedTransactionsRepository,
+      logger
     )
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,

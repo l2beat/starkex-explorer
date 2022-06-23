@@ -63,7 +63,6 @@ export class StateUpdateRepository extends BaseRepository {
           .update({ state_update_id: stateUpdate.id })
           .whereIn('hash', transactionHashes.map(String))
     })
-    this.logger.info({ method: this.add.name, id: stateUpdate.id })
     return stateUpdate.id
   }
 
