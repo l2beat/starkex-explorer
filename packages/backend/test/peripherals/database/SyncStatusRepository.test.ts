@@ -2,6 +2,7 @@ import { expect } from 'earljs'
 
 import { KeyValueStore } from '../../../src/peripherals/database/KeyValueStore'
 import { SyncStatusRepository } from '../../../src/peripherals/database/SyncStatusRepository'
+import { Logger } from '../../../src/tools/Logger'
 import { mock } from '../../mock'
 
 describe(SyncStatusRepository.name, () => {
@@ -9,7 +10,7 @@ describe(SyncStatusRepository.name, () => {
     const store = mock<KeyValueStore>({
       addOrUpdate: async () => 'lastBlockNumberSynced',
     })
-    const repository = new SyncStatusRepository(store)
+    const repository = new SyncStatusRepository(store, Logger.SILENT)
 
     await repository.setLastSynced(20)
     expect(store.addOrUpdate).toHaveBeenCalledWith([
@@ -21,7 +22,7 @@ describe(SyncStatusRepository.name, () => {
     const store = mock<KeyValueStore>({
       findByKey: async () => '20',
     })
-    const repository = new SyncStatusRepository(store)
+    const repository = new SyncStatusRepository(store, Logger.SILENT)
 
     const actual = await repository.getLastSynced()
     expect(actual).toEqual(20)
@@ -32,7 +33,7 @@ describe(SyncStatusRepository.name, () => {
     const store = mock<KeyValueStore>({
       findByKey: async () => undefined,
     })
-    const repository = new SyncStatusRepository(store)
+    const repository = new SyncStatusRepository(store, Logger.SILENT)
 
     const actual = await repository.getLastSynced()
     expect(actual).toEqual(undefined)
@@ -42,7 +43,7 @@ describe(SyncStatusRepository.name, () => {
     const store = mock<KeyValueStore>({
       findByKey: async () => '3 is my favorite number',
     })
-    const repository = new SyncStatusRepository(store)
+    const repository = new SyncStatusRepository(store, Logger.SILENT)
 
     const actual = await repository.getLastSynced()
     expect(actual).toEqual(undefined)
