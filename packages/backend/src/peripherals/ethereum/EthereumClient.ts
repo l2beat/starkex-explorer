@@ -11,10 +11,18 @@ export function isReverted(
   return receipt.status === 0
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Filter = providers.JsonRpcProvider['getLogs'] extends (arg: infer T) => any
+  ? T
+  : never
+
 export class EthereumClient {
   private provider = new ethers.providers.JsonRpcProvider(this.rpcUrl)
 
-  constructor(private readonly rpcUrl: string) {}
+  constructor(
+    private readonly rpcUrl: string,
+    private readonly safeBlockDistance: number
+  ) {}
 
   async getBlockNumber(): Promise<number> {
     return await this.provider.getBlockNumber()
@@ -36,12 +44,37 @@ export class EthereumClient {
     if (blockRange.isEmpty()) {
       return []
     }
-    const logs = await this.provider.getLogs({
-      ...filter,
-      fromBlock: blockRange.start,
-      toBlock: blockRange.end - 1,
-    })
+    let [from, to, hashes] = blockRange.splitByKnownHashes()
+    if (hashes.length > this.safeBlockDistance) {
+      to += hashes.length - this.safeBlockDistance
+      hashes = hashes.slice(-this.safeBlockDistance)
+    }
+
+    const filters: Filter[] = []
+    if (from !== to) {
+      filters.push({ ...filter, fromBlock: from, toBlock: to - 1 })
+    }
+    for (const hash of hashes) {
+      filters.push({ ...filter, blockHash: hash.toString() })
+    }
+    const logs = await this.getManyLogs(filters)
+
     assert(blockRange.hasAll(logs), 'all logs must be from the block range')
+    return logs
+  }
+
+  private async getManyLogs(filters: Filter[]) {
+    const batches: Filter[][] = []
+    while (filters.length > 0) {
+      batches.push(filters.splice(0, 10))
+    }
+    const logs: providers.Log[] = []
+    for (const batch of batches) {
+      const nestedLogs = await Promise.all(
+        batch.map((filter) => this.provider.getLogs(filter))
+      )
+      logs.push(...nestedLogs.flat())
+    }
     return logs
   }
 

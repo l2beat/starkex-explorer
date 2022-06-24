@@ -19,6 +19,11 @@ export function getProductionConfig(): Config {
     enableSync: true,
     jsonRpcUrl: getEnv('JSON_RPC_URL'),
     core: {
+      // This is completely arbitrary, but prevents us from doing thousands of
+      // requests in case those blocks were actually known. 40 should be safe
+      // from reorgs as multi-block reorgs are generally unheard of on eth
+      // mainnet those days
+      safeBlockDistance: 40,
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
       minBlockNumber: 11813207,
       maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),

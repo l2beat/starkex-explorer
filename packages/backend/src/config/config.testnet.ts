@@ -18,6 +18,7 @@ export function getTestnetConfig(): Config {
     enableSync: true,
     jsonRpcUrl: 'http://127.0.0.1:8545',
     core: {
+      safeBlockDistance: 5,
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
       minBlockNumber: 0,
       maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
