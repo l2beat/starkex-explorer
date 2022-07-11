@@ -189,6 +189,11 @@ describe('FrontendRouter', () => {
     it('returns html', async () => {
       await server.get(`/forced/offers`).expect(200).expect(TEST_PAGE)
     })
+
+    it('does not allow invalid input', async () => {
+      await server.get('/forced/offers?page=0').expect(400)
+      await server.get('/forced/offers?page=-1').expect(400)
+    })
   })
 
   describe('/forced/:hash', () => {

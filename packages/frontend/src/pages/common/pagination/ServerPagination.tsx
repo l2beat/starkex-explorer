@@ -21,7 +21,7 @@ export function ServerPagination({
   baseUrl = '/',
   additionalParams,
 }: ServerPaginationProps) {
-  const last = Math.ceil(total / perPage)
+  const last = Math.max(1, Math.ceil(total / perPage))
 
   const link = (page: number, perPage: number) => {
     const params = new URLSearchParams(additionalParams)
