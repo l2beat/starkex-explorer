@@ -1,10 +1,18 @@
-import { z } from 'zod'
+import { z, ZodTypeAny } from 'zod'
 
-export function stringAsInt(fallback?: number) {
+function preprocessStringAsNumber(finalType: ZodTypeAny, fallback?: number) {
   return z.preprocess((s) => {
     const res = z.string().safeParse(s)
     return res.success && s !== '' ? Number(res.data) : fallback
-  }, z.number().int())
+  }, finalType)
+}
+
+export function stringAsInt(fallback?: number) {
+  return preprocessStringAsNumber(z.number().int(), fallback)
+}
+
+export function stringAsPositiveInt(fallback?: number) {
+  return preprocessStringAsNumber(z.number().int().positive(), fallback)
 }
 
 export function stringAsBigInt(fallback?: bigint) {
