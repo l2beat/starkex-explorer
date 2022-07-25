@@ -2,6 +2,7 @@ import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
+import { TransactionStatus } from './ForcedTransactionsIndexProps'
 
 export type ForcedTransaction = ForcedExit | ForcedBuy | ForcedSell
 
@@ -35,6 +36,7 @@ export interface ForcedExit {
     readonly ethereumAddress?: EthereumAddress
     readonly value: bigint
     readonly stateUpdateId?: number
+    readonly status: TransactionStatus
   }
 }
 

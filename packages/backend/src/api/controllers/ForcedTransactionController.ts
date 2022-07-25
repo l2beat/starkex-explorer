@@ -7,6 +7,7 @@ import {
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
+import { getTransactionStatus } from '../../core/getForcedTransactionStatus'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   ForcedTransactionRecord,
@@ -67,6 +68,7 @@ export class ForcedTransactionController {
           transactionHash: transaction.hash,
           value: transaction.data.amount,
           stateUpdateId: transaction.updates.verified?.stateUpdateId,
+          status: getTransactionStatus(transaction),
         },
       }
     }
