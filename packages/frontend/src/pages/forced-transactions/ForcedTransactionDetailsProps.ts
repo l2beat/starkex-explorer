@@ -2,6 +2,7 @@ import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
+import { FinalizeExitFormData } from './finalize-form'
 import { TransactionStatus } from './ForcedTransactionsIndexProps'
 
 export type ForcedTransaction = ForcedExit | ForcedBuy | ForcedSell
@@ -44,4 +45,5 @@ export type ForcedTransactionDetailsProps = {
   readonly account: AccountDetails | undefined
   readonly transaction: ForcedTransaction
   readonly history: ForcedHistoryEvent[]
+  readonly finalizeForm?: FinalizeExitFormData
 }
