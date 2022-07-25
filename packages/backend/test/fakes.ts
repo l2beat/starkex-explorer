@@ -63,6 +63,7 @@ export function fakeForcedUpdates(updates?: Partial<Updates>): Updates {
     revertedAt: null,
     sentAt: null,
     verified: undefined,
+    finalizedAt: null,
     ...updates,
   }
 }

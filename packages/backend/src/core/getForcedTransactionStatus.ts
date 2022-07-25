@@ -5,6 +5,9 @@ import { ForcedTransactionRecord } from '../peripherals/database/ForcedTransacti
 export function getTransactionStatus(
   transaction: ForcedTransactionRecord
 ): TransactionStatus {
+  if (transaction.updates.finalizedAt) {
+    return 'finalized'
+  }
   if (transaction.updates.verified) {
     return 'verified'
   }

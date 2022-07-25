@@ -20,6 +20,7 @@ export interface Updates {
         stateUpdateId: number
       }
     | undefined
+  finalizedAt: Nullable<Timestamp>
 }
 export interface ForcedTransactionRecord {
   hash: Hash256
@@ -61,6 +62,7 @@ function getLastUpdate(updates: Updates): Timestamp {
     updates.revertedAt,
     updates.minedAt,
     updates.verified?.at,
+    updates.finalizedAt,
   ]
   const max = values.reduce<Timestamp>(
     (max, value) => (!value ? max : value > max ? value : max),
@@ -80,6 +82,7 @@ interface Row
   extends ForcedTransactionRow,
     Omit<TransactionStatusRow, 'block_number' | 'hash'> {
   verified_at: bigint | null
+  finalized_at: bigint | null
 }
 
 function toRecord(row: Row): ForcedTransactionRecord {
@@ -99,6 +102,7 @@ function toRecord(row: Row): ForcedTransactionRecord {
             stateUpdateId: row.state_update_id,
           }
         : undefined,
+    finalizedAt: toTimestamp(row.finalized_at),
   }
   return {
     hash: Hash256(row.hash),

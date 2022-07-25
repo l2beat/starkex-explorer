@@ -28,3 +28,4 @@ export type TransactionStatus =
   | 'forgotten'
   | 'mined'
   | 'verified'
+  | 'finalized'
