@@ -1,4 +1,9 @@
-import { stringAs, stringAsBigInt, stringAsInt } from '@explorer/shared'
+import {
+  stringAs,
+  stringAsBigInt,
+  stringAsInt,
+  stringAsPositiveInt,
+} from '@explorer/shared'
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
@@ -34,8 +39,8 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         query: z.object({
-          page: stringAsInt(1),
-          perPage: stringAsInt(10),
+          page: stringAsPositiveInt(1),
+          perPage: stringAsPositiveInt(10),
         }),
       }),
       async (ctx) => {
@@ -65,8 +70,8 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         query: z.object({
-          page: stringAsInt(1),
-          perPage: stringAsInt(10),
+          page: stringAsPositiveInt(1),
+          perPage: stringAsPositiveInt(10),
           assetId: stringAs(AssetId).optional(),
           type: z.enum(['sell', 'buy']).optional(),
         }),
@@ -132,8 +137,8 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         query: z.object({
-          page: stringAsInt(1),
-          perPage: stringAsInt(10),
+          page: stringAsPositiveInt(1),
+          perPage: stringAsPositiveInt(10),
         }),
       }),
       async (ctx) => {
