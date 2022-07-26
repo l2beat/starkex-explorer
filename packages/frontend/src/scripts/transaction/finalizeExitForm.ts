@@ -1,5 +1,5 @@
 import { encodeFinalizeExitRequest } from '@explorer/shared'
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 import { FormClass } from '../../pages/forced-transactions/finalize-form'
 import { getAttribute } from '../offer/getAttribute'
@@ -14,17 +14,17 @@ export async function initFinalizeExitForm() {
       const perpetualAddress = EthereumAddress(
         getAttribute(form, 'perpetual-address')
       )
-      const amount = BigInt(getAttribute(form, 'amount'))
+      const starkKey = StarkKey(getAttribute(form, 'stark-key'))
       const finalizeHash = await sendTransaction(
         address,
         perpetualAddress,
-        amount
+        starkKey
       )
       if (!finalizeHash) {
         throw new Error('Could not send a transaction')
       }
-      await fetch(`/forced/exits/finalize`, {
-        method: 'POST',
+      await fetch(form.action, {
+        method: form.method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           exitHash,
@@ -40,16 +40,14 @@ export async function initFinalizeExitForm() {
 async function sendTransaction(
   address: EthereumAddress,
   perpetualAddress: EthereumAddress,
-  amount: bigint
+  starkKey: StarkKey
 ) {
   const provider = window.ethereum
   if (!provider) {
     return
   }
 
-  const { eth, wei } = splitEthWei(amount)
-
-  const data = encodeFinalizeExitRequest(eth, wei)
+  const data = encodeFinalizeExitRequest(starkKey)
 
   const result = await provider.request({
     method: 'eth_sendTransaction',
@@ -62,10 +60,4 @@ async function sendTransaction(
     ],
   })
   return Hash256(result as string)
-}
-
-function splitEthWei(amount: bigint) {
-  const wei = amount % 10n ** 18n
-  const eth = (amount - wei) / 10n ** 18n
-  return { eth, wei }
 }

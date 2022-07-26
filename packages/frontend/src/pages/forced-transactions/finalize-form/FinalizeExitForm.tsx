@@ -1,4 +1,4 @@
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { FormClass } from './attributes'
@@ -7,7 +7,7 @@ export interface FinalizeExitFormData {
   transactionHash: Hash256
   address: EthereumAddress
   perpetualAddress: EthereumAddress
-  amount: bigint
+  starkKey: StarkKey
 }
 
 export interface FinalizeExitFormProps extends FinalizeExitFormData {
@@ -23,7 +23,7 @@ export function FinalizeExitForm(props: FinalizeExitFormProps) {
       data-transaction-hash={props.transactionHash.toString()}
       data-address={props.address.toString()}
       data-perpetual-address={props.perpetualAddress.toString()}
-      data-amount={props.amount}
+      data-stark-key={props.starkKey.toString()}
     >
       {props.children}
     </form>

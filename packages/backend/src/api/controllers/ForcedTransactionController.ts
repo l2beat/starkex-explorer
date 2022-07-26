@@ -60,6 +60,7 @@ export class ForcedTransactionController {
       const user = await this.userRegistrationEventRepository.findByStarkKey(
         transaction.data.starkKey
       )
+      const status = getTransactionStatus(transaction)
       return {
         type: 'exit',
         data: {
@@ -68,8 +69,17 @@ export class ForcedTransactionController {
           transactionHash: transaction.hash,
           value: transaction.data.amount,
           stateUpdateId: transaction.updates.verified?.stateUpdateId,
-          status: getTransactionStatus(transaction),
+          status,
         },
+        finalizeForm:
+          user && status === 'verified'
+            ? {
+                address: user.ethAddress,
+                transactionHash: transaction.hash,
+                perpetualAddress: this.perpetualAddress,
+                starkKey: user.starkKey,
+              }
+            : undefined,
       }
     }
     const [userA, userB] = await Promise.all([

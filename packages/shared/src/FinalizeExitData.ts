@@ -1,19 +1,22 @@
 import { Interface } from '@ethersproject/abi'
-import { EthereumAddress } from '@explorer/types'
+import { encodeAssetId } from '@explorer/encoding'
+import { AssetId, StarkKey } from '@explorer/types'
 
-const coder = new Interface(['function withdraw(uint256 _eth, uint256 _wei)'])
+const coder = new Interface([
+  'function withdraw(uint256 starkKey, uint256 assetId)',
+])
 
-export function encodeFinalizeExitRequest(eth: bigint, wei: bigint) {
-  return coder.encodeFunctionData('withdraw'), [eth, wei]
+export function encodeFinalizeExitRequest(starkKey: StarkKey) {
+  return coder.encodeFunctionData('withdraw', [
+    starkKey.toString(),
+    `0x${encodeAssetId(AssetId.USDC)}`,
+  ])
 }
 
 export function decodeFinalizeExitRequest(data: string) {
   try {
     const decoded = coder.decodeFunctionData('withdraw', data)
-    return {
-      eth: EthereumAddress(decoded._eth),
-      wei: EthereumAddress(decoded._wei),
-    }
+    return StarkKey(decoded.starkKey)
   } catch {
     return
   }

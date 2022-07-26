@@ -13,7 +13,6 @@ export function ForcedTransactionDetails({
   account,
   history,
   transaction,
-  finalizeForm,
 }: ForcedTransactionDetailsProps) {
   const shortHash = formatHashShort(transaction.data.transactionHash)
   const title = `Forced ${transaction.type} ${shortHash}`
@@ -25,8 +24,8 @@ export function ForcedTransactionDetails({
       account={account}
     >
       <ForcedTransactionHeader title={title}>
-        {finalizeForm && (
-          <FinalizeExitForm {...finalizeForm}>
+        {transaction.type === 'exit' && transaction.finalizeForm && (
+          <FinalizeExitForm {...transaction.finalizeForm}>
             <button className="bg-blue-100 text-white px-4 py-2 text-base rounded-md">
               Finalize
             </button>

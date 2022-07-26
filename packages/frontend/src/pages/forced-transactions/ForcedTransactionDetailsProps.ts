@@ -39,11 +39,11 @@ export interface ForcedExit {
     readonly stateUpdateId?: number
     readonly status: TransactionStatus
   }
+  readonly finalizeForm?: FinalizeExitFormData
 }
 
 export type ForcedTransactionDetailsProps = {
   readonly account: AccountDetails | undefined
   readonly transaction: ForcedTransaction
   readonly history: ForcedHistoryEvent[]
-  readonly finalizeForm?: FinalizeExitFormData
 }
