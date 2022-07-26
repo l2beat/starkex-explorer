@@ -1,5 +1,5 @@
 import { encodeFinalizeExitRequest } from '@explorer/shared'
-import { AssetId, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 import { FormClass } from '../../pages/forced-transactions/finalize-form'
 import { getAttribute } from '../offer/getAttribute'
