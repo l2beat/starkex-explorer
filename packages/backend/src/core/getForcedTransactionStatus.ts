@@ -5,7 +5,7 @@ import { ForcedTransactionRecord } from '../peripherals/database/ForcedTransacti
 export function getTransactionStatus(
   transaction: ForcedTransactionRecord
 ): TransactionStatus {
-  if (transaction.updates.finalizedAt) {
+  if (transaction.updates.finalized?.minedAt) {
     return 'finalized'
   }
   if (transaction.updates.verified) {

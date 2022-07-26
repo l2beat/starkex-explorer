@@ -15,12 +15,12 @@ import { Knex } from 'knex'
 
 export async function up(knex: Knex) {
   await knex.schema.alterTable('forced_transactions', (table) => {
-    table.bigInteger('finalized_at')
+    table.string('finalize_hash')
   })
 }
 
 export async function down(knex: Knex) {
   await knex.schema.alterTable('forced_transactions', (table) => {
-    table.dropColumn('finalized_at')
+    table.dropColumn('finalize_hash')
   })
 }

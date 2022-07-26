@@ -53,7 +53,8 @@ describe(ForcedTransactionsRepository.name, () => {
 
     const actual = await repository.getAll()
 
-    expect(actual).toEqual([
+    expect(actual).toBeAnArrayOfLength(4)
+    expect(actual).toBeAnArrayWith(
       {
         ...tx1,
         lastUpdateAt: sentAt1,
@@ -83,8 +84,8 @@ describe(ForcedTransactionsRepository.name, () => {
           sentAt: sentAt4,
           minedAt: minedAt4,
         }),
-      },
-    ])
+      }
+    )
   })
 
   it('returns no transaction hashes if no data passed', async () => {
@@ -239,7 +240,9 @@ describe(ForcedTransactionsRepository.name, () => {
     )
 
     const transactions = await repository.getByPositionId(positionId)
-    expect(transactions).toEqual([
+
+    expect(transactions).toBeAnArrayOfLength(2)
+    expect(transactions).toBeAnArrayWith(
       {
         hash: hash1,
         data: data1,
@@ -256,8 +259,8 @@ describe(ForcedTransactionsRepository.name, () => {
           sentAt: sentAt2,
           minedAt: minedAt2,
         }),
-      },
-    ])
+      }
+    )
 
     const unknownPositionTransactions = await repository.getByPositionId(999n)
     expect(unknownPositionTransactions).toEqual([])
