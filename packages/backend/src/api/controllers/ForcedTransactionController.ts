@@ -54,7 +54,8 @@ export class ForcedTransactionController {
   }
 
   private async toForcedTransaction(
-    transaction: ForcedTransactionRecord
+    transaction: ForcedTransactionRecord,
+    address?: EthereumAddress
   ): Promise<ForcedTransaction> {
     if (transaction.data.type === 'withdrawal') {
       const user = await this.userRegistrationEventRepository.findByStarkKey(
@@ -74,11 +75,12 @@ export class ForcedTransactionController {
         },
         finalizeForm:
           user &&
+          address &&
           (status === 'verified' ||
             status === 'finalize reverted' ||
             status === 'finalize forgotten')
             ? {
-                address: user.ethAddress,
+                address,
                 transactionHash: transaction.hash,
                 perpetualAddress: this.perpetualAddress,
                 starkKey: user.starkKey,
@@ -128,7 +130,10 @@ export class ForcedTransactionController {
     const content = renderForcedTransactionDetailsPage({
       account,
       history: offerHistory.concat(toForcedTransactionHistory(transaction)),
-      transaction: await this.toForcedTransaction(transaction),
+      transaction: await this.toForcedTransaction(
+        transaction,
+        account?.address
+      ),
     })
     return { type: 'success', content }
   }
