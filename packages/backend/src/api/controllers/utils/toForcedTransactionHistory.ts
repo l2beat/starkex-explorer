@@ -1,5 +1,4 @@
 import { Timestamp } from '@explorer/types'
-import { update } from 'lodash'
 
 import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionsRepository'
 
