@@ -38,6 +38,7 @@ export interface ForcedExit {
     readonly value: bigint
     readonly stateUpdateId?: number
     readonly status: TransactionStatus
+    readonly finalizeHash?: Hash256
   }
   readonly finalizeForm?: FinalizeExitFormData
 }

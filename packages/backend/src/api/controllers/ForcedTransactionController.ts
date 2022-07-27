@@ -70,6 +70,7 @@ export class ForcedTransactionController {
           value: transaction.data.amount,
           stateUpdateId: transaction.updates.verified?.stateUpdateId,
           status,
+          finalizeHash: transaction.updates.finalized?.hash,
         },
         finalizeForm:
           user && status === 'verified'

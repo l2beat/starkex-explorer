@@ -22,6 +22,7 @@ export interface Updates {
     | undefined
   finalized:
     | {
+        hash: Hash256
         sentAt: Nullable<Timestamp>
         minedAt: Nullable<Timestamp>
         revertedAt: Nullable<Timestamp>
@@ -118,6 +119,7 @@ function toRecord(row: Row): ForcedTransactionRecord {
     finalized:
       row.finalize_hash !== null
         ? {
+            hash: Hash256(row.finalize_hash),
             sentAt: toTimestamp(row.finalize_sent_at),
             forgottenAt: toTimestamp(row.finalize_forgotten_at),
             revertedAt: toTimestamp(row.finalize_reverted_at),
