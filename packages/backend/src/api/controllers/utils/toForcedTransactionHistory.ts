@@ -1,4 +1,5 @@
 import { Timestamp } from '@explorer/types'
+import { update } from 'lodash'
 
 import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionsRepository'
 
@@ -29,8 +30,26 @@ export function toForcedTransactionHistory({
   }
   if (updates.verified) {
     history.push({
-      text: `exit included in state update #${updates.verified.stateUpdateId}`,
+      text: `exit included in state update #${updates.verified.stateUpdateId} (please finalize)`,
       timestamp: updates.verified.at,
+    })
+  }
+  if (updates.finalized?.sentAt) {
+    history.push({
+      text: 'finalize transaction sent',
+      timestamp: updates.finalized.sentAt,
+    })
+  }
+  if (updates.finalized?.revertedAt) {
+    history.push({
+      text: 'finalize transaction reverted',
+      timestamp: updates.finalized.revertedAt,
+    })
+  }
+  if (updates.finalized?.minedAt) {
+    history.push({
+      text: 'finalize transaction mined',
+      timestamp: updates.finalized.minedAt,
     })
   }
   return history
