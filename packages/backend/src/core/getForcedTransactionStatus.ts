@@ -8,6 +8,15 @@ export function getTransactionStatus(
   if (transaction.updates.finalized?.minedAt) {
     return 'finalized'
   }
+  if (transaction.updates.finalized?.forgottenAt) {
+    return 'finalize forgotten'
+  }
+  if (transaction.updates.finalized?.revertedAt) {
+    return 'finalize reverted'
+  }
+  if (transaction.updates.finalized?.sentAt) {
+    return 'finalize sent'
+  }
   if (transaction.updates.verified) {
     return 'verified'
   }

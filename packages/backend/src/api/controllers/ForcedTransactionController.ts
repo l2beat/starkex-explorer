@@ -73,7 +73,10 @@ export class ForcedTransactionController {
           finalizeHash: transaction.updates.finalized?.hash,
         },
         finalizeForm:
-          user && status === 'verified'
+          user &&
+          (status === 'verified' ||
+            status === 'finalize reverted' ||
+            status === 'finalize forgotten')
             ? {
                 address: user.ethAddress,
                 transactionHash: transaction.hash,
