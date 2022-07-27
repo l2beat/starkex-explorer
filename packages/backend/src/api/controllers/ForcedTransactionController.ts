@@ -7,6 +7,7 @@ import {
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
+import { getTransactionStatus } from '../../core/getForcedTransactionStatus'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   ForcedTransactionRecord,
@@ -59,6 +60,7 @@ export class ForcedTransactionController {
       const user = await this.userRegistrationEventRepository.findByStarkKey(
         transaction.data.starkKey
       )
+      const status = getTransactionStatus(transaction)
       return {
         type: 'exit',
         data: {
@@ -67,7 +69,21 @@ export class ForcedTransactionController {
           transactionHash: transaction.hash,
           value: transaction.data.amount,
           stateUpdateId: transaction.updates.verified?.stateUpdateId,
+          status,
+          finalizeHash: transaction.updates.finalized?.hash,
         },
+        finalizeForm:
+          user &&
+          (status === 'verified' ||
+            status === 'finalize reverted' ||
+            status === 'finalize forgotten')
+            ? {
+                address: user.ethAddress,
+                transactionHash: transaction.hash,
+                perpetualAddress: this.perpetualAddress,
+                starkKey: user.starkKey,
+              }
+            : undefined,
       }
     }
     const [userA, userB] = await Promise.all([

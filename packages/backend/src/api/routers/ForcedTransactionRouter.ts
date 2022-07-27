@@ -98,6 +98,28 @@ export function createForcedTransactionRouter(
   )
 
   router.post(
+    '/forced/exits/finalize',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            exitHash: stringAs(Hash256),
+            finalizeHash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result = await transactionSubmitController.finalizeForcedExit(
+          ctx.request.body.exitHash,
+          ctx.request.body.finalizeHash
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
     '/forced/trades',
     bodyParser(),
     withTypedContext(

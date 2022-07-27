@@ -20,6 +20,15 @@ export interface Updates {
         stateUpdateId: number
       }
     | undefined
+  finalized:
+    | {
+        hash: Hash256
+        sentAt: Nullable<Timestamp>
+        minedAt: Nullable<Timestamp>
+        revertedAt: Nullable<Timestamp>
+        forgottenAt: Nullable<Timestamp>
+      }
+    | undefined
 }
 export interface ForcedTransactionRecord {
   hash: Hash256
@@ -61,6 +70,10 @@ function getLastUpdate(updates: Updates): Timestamp {
     updates.revertedAt,
     updates.minedAt,
     updates.verified?.at,
+    updates.finalized?.sentAt,
+    updates.finalized?.forgottenAt,
+    updates.finalized?.revertedAt,
+    updates.finalized?.minedAt,
   ]
   const max = values.reduce<Timestamp>(
     (max, value) => (!value ? max : value > max ? value : max),
@@ -80,6 +93,10 @@ interface Row
   extends ForcedTransactionRow,
     Omit<TransactionStatusRow, 'block_number' | 'hash'> {
   verified_at: bigint | null
+  finalize_sent_at: bigint | null
+  finalize_forgotten_at: bigint | null
+  finalize_reverted_at: bigint | null
+  finalize_mined_at: bigint | null
 }
 
 function toRecord(row: Row): ForcedTransactionRecord {
@@ -97,6 +114,16 @@ function toRecord(row: Row): ForcedTransactionRecord {
         ? {
             at: Timestamp(row.verified_at),
             stateUpdateId: row.state_update_id,
+          }
+        : undefined,
+    finalized:
+      row.finalize_hash !== null
+        ? {
+            hash: Hash256(row.finalize_hash),
+            sentAt: toTimestamp(row.finalize_sent_at),
+            forgottenAt: toTimestamp(row.finalize_forgotten_at),
+            revertedAt: toTimestamp(row.finalize_reverted_at),
+            minedAt: toTimestamp(row.finalize_mined_at),
           }
         : undefined,
   }
@@ -124,8 +151,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
   private joinQuery() {
     return this.knex('forced_transactions')
       .innerJoin(
-        'transaction_status',
-        'transaction_status.hash',
+        'transaction_status as exit_tx',
+        'exit_tx.hash',
         'forced_transactions.hash'
       )
       .leftJoin(
@@ -133,17 +160,44 @@ export class ForcedTransactionsRepository extends BaseRepository {
         'state_updates.id',
         'forced_transactions.state_update_id'
       )
+      .leftJoin(
+        'transaction_status as finalize_tx',
+        'finalize_tx.hash',
+        'forced_transactions.finalize_hash'
+      )
   }
 
   private rowsQuery() {
     return this.joinQuery().select(
       'forced_transactions.*',
       'state_updates.timestamp as verified_at',
-      'transaction_status.mined_at',
-      'transaction_status.sent_at',
-      'transaction_status.reverted_at',
-      'transaction_status.forgotten_at'
+      'exit_tx.mined_at',
+      'exit_tx.sent_at',
+      'exit_tx.reverted_at',
+      'exit_tx.forgotten_at',
+      'finalize_tx.mined_at as finalize_mined_at',
+      'finalize_tx.sent_at as finalize_sent_at',
+      'finalize_tx.reverted_at as finalize_reverted_at',
+      'finalize_tx.forgotten_at as finalize_forgotten_at'
     )
+  }
+
+  private sortedRowsQuery() {
+    return this.rowsQuery()
+      .select(
+        this.knex.raw(`greatest(
+      "timestamp",
+      "exit_tx"."mined_at",
+      "exit_tx"."sent_at",
+      "exit_tx"."reverted_at",
+      "exit_tx"."forgotten_at",
+      "finalize_tx"."mined_at",
+      "finalize_tx"."sent_at",
+      "finalize_tx"."reverted_at",
+      "finalize_tx"."forgotten_at"
+    ) as last_update_at`)
+      )
+      .orderBy('last_update_at', 'desc')
   }
 
   async getAll(): Promise<ForcedTransactionRecord[]> {
@@ -158,19 +212,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
     limit: number
     offset: number
   }): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.rowsQuery()
-      .select(
-        this.knex.raw(`greatest(
-      "timestamp",
-      "mined_at",
-      "sent_at",
-      "reverted_at",
-      "forgotten_at"
-    ) as last_update_at`)
-      )
-      .orderBy('last_update_at', 'desc')
-      .offset(offset)
-      .limit(limit)
+    const rows = await this.sortedRowsQuery().offset(offset).limit(limit)
     return rows.map(toRecord)
   }
 
@@ -193,8 +235,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
           .orWhereRaw("data->>'positionIdB' = ?", String(positionId))
       })
       .whereNull('state_update_id')
-      .whereNull('reverted_at')
-      .whereNull('forgotten_at')
+      .whereNull('exit_tx.reverted_at')
+      .whereNull('exit_tx.forgotten_at')
       .count()
 
     return Number(count)
@@ -203,7 +245,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
   async getByPositionId(
     positionId: bigint
   ): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.rowsQuery()
+    const rows = await this.sortedRowsQuery()
       .whereRaw("data->>'positionId' = ?", String(positionId))
       .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
       .orWhereRaw("data->>'positionIdB' = ?", String(positionId))
@@ -295,6 +337,46 @@ export class ForcedTransactionsRepository extends BaseRepository {
     })
     this.logger.debug({ method: 'add', id: hash.toString() })
     return hash
+  }
+  async saveFinalize(
+    exitHash: Hash256,
+    finalizeHash: Hash256,
+    sentAt: Timestamp
+  ): Promise<boolean>
+
+  async saveFinalize(
+    exitHash: Hash256,
+    finalizeHash: Hash256,
+    sentAt: Timestamp,
+    minedAt: Timestamp,
+    blockNumber: number
+  ): Promise<boolean>
+
+  async saveFinalize(
+    exitHash: Hash256,
+    finalizeHash: Hash256,
+    sentAt: Timestamp,
+    minedAt?: Timestamp,
+    blockNumber?: number
+  ): Promise<boolean> {
+    await this.knex.transaction(async (trx) => {
+      await trx('forced_transactions')
+        .where({ hash: exitHash.toString() })
+        .update({
+          finalize_hash: finalizeHash.toString(),
+        })
+      await trx('transaction_status').insert({
+        hash: finalizeHash.toString(),
+        mined_at:
+          minedAt !== null && minedAt !== undefined
+            ? BigInt(minedAt.toString())
+            : null,
+        sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
+        block_number: blockNumber,
+      })
+    })
+    this.logger.debug({ method: 'saveFinalize', id: exitHash.toString() })
+    return true
   }
 
   async countAll(): Promise<number> {

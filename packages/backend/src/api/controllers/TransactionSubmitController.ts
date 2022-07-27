@@ -1,4 +1,5 @@
 import {
+  decodeFinalizeExitRequest,
   decodeForcedTradeRequest,
   decodeForcedWithdrawalRequest,
   ForcedTradeRequest,
@@ -45,6 +46,30 @@ export class TransactionSubmitController {
       sentAt
     )
     return { type: 'created', content: { id: hash } }
+  }
+
+  async finalizeForcedExit(
+    exitHash: Hash256,
+    finalizeHash: Hash256
+  ): Promise<ControllerResult> {
+    const tx = await this.getTransaction(finalizeHash)
+    if (!tx) {
+      return {
+        type: 'bad request',
+        content: `Transaction ${finalizeHash} not found`,
+      }
+    }
+    const data = decodeFinalizeExitRequest(tx.data)
+    if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
+      return { type: 'bad request', content: `Invalid transaction` }
+    }
+    const sentAt = Timestamp(Date.now())
+    await this.forcedTransactionsRepository.saveFinalize(
+      exitHash,
+      finalizeHash,
+      sentAt
+    )
+    return { type: 'created', content: { id: finalizeHash } }
   }
 
   async submitForcedTrade(
