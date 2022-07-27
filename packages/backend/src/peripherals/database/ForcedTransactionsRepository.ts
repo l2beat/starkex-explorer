@@ -182,6 +182,24 @@ export class ForcedTransactionsRepository extends BaseRepository {
     )
   }
 
+  private sortedRowsQuery() {
+    return this.rowsQuery()
+      .select(
+        this.knex.raw(`greatest(
+      "timestamp",
+      "exit_tx"."mined_at",
+      "exit_tx"."sent_at",
+      "exit_tx"."reverted_at",
+      "exit_tx"."forgotten_at",
+      "finalize_tx"."mined_at",
+      "finalize_tx"."sent_at",
+      "finalize_tx"."reverted_at",
+      "finalize_tx"."forgotten_at"
+    ) as last_update_at`)
+      )
+      .orderBy('last_update_at', 'desc')
+  }
+
   async getAll(): Promise<ForcedTransactionRecord[]> {
     const rows = await this.rowsQuery()
     return rows.map(toRecord)
@@ -194,19 +212,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
     limit: number
     offset: number
   }): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.rowsQuery()
-      .select(
-        this.knex.raw(`greatest(
-      "timestamp",
-      "exit_tx"."mined_at",
-      "exit_tx"."sent_at",
-      "exit_tx"."reverted_at",
-      "exit_tx"."forgotten_at"
-    ) as last_update_at`)
-      )
-      .orderBy('last_update_at', 'desc')
-      .offset(offset)
-      .limit(limit)
+    const rows = await this.sortedRowsQuery().offset(offset).limit(limit)
     return rows.map(toRecord)
   }
 
@@ -239,7 +245,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
   async getByPositionId(
     positionId: bigint
   ): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.rowsQuery()
+    const rows = await this.sortedRowsQuery()
       .whereRaw("data->>'positionId' = ?", String(positionId))
       .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
       .orWhereRaw("data->>'positionIdB' = ?", String(positionId))

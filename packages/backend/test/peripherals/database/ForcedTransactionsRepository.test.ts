@@ -241,8 +241,7 @@ describe(ForcedTransactionsRepository.name, () => {
 
     const transactions = await repository.getByPositionId(positionId)
 
-    expect(transactions).toBeAnArrayOfLength(2)
-    expect(transactions).toBeAnArrayWith(
+    expect(transactions).toEqual([
       {
         hash: hash1,
         data: data1,
@@ -259,8 +258,8 @@ describe(ForcedTransactionsRepository.name, () => {
           sentAt: sentAt2,
           minedAt: minedAt2,
         }),
-      }
-    )
+      },
+    ])
 
     const unknownPositionTransactions = await repository.getByPositionId(999n)
     expect(unknownPositionTransactions).toEqual([])
