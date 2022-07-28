@@ -111,6 +111,7 @@ declare module 'knex/types/tables' {
 
   interface ForcedTransactionRow {
     hash: string
+    finalize_hash: string
     type: string
     data: json
     data_hash: string

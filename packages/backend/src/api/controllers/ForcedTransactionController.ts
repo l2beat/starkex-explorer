@@ -7,6 +7,7 @@ import {
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
+import { getTransactionStatus } from '../../core/getForcedTransactionStatus'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   ForcedTransactionRecord,
@@ -53,12 +54,14 @@ export class ForcedTransactionController {
   }
 
   private async toForcedTransaction(
-    transaction: ForcedTransactionRecord
+    transaction: ForcedTransactionRecord,
+    address?: EthereumAddress
   ): Promise<ForcedTransaction> {
     if (transaction.data.type === 'withdrawal') {
       const user = await this.userRegistrationEventRepository.findByStarkKey(
         transaction.data.starkKey
       )
+      const status = getTransactionStatus(transaction)
       return {
         type: 'exit',
         data: {
@@ -67,7 +70,22 @@ export class ForcedTransactionController {
           transactionHash: transaction.hash,
           value: transaction.data.amount,
           stateUpdateId: transaction.updates.verified?.stateUpdateId,
+          status,
+          finalizeHash: transaction.updates.finalized?.hash,
         },
+        finalizeForm:
+          user &&
+          address &&
+          (status === 'verified' ||
+            status === 'finalize reverted' ||
+            status === 'finalize forgotten')
+            ? {
+                address,
+                transactionHash: transaction.hash,
+                perpetualAddress: this.perpetualAddress,
+                starkKey: user.starkKey,
+              }
+            : undefined,
       }
     }
     const [userA, userB] = await Promise.all([
@@ -112,7 +130,10 @@ export class ForcedTransactionController {
     const content = renderForcedTransactionDetailsPage({
       account,
       history: offerHistory.concat(toForcedTransactionHistory(transaction)),
-      transaction: await this.toForcedTransaction(transaction),
+      transaction: await this.toForcedTransaction(
+        transaction,
+        account?.address
+      ),
     })
     return { type: 'success', content }
   }

@@ -74,5 +74,16 @@ function getForcedTransactionStatRows(transaction: ForcedTransaction) {
     })
   }
 
+  if (transaction.type === 'exit' && transaction.data.finalizeHash) {
+    rows.push({
+      title: 'Finalize transaction hash',
+      content: (
+        <EtherscanLink transaction={transaction.data.finalizeHash}>
+          {formatHashLong(transaction.data.finalizeHash)}
+        </EtherscanLink>
+      ),
+    })
+  }
+
   return rows
 }

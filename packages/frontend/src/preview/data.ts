@@ -277,6 +277,7 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
       transactionHash: Hash256.fake(),
       value: 12345n,
       stateUpdateId: 1,
+      status: 'finalized',
     },
   },
   history: [
@@ -290,7 +291,15 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
     },
     {
       timestamp: Timestamp(Date.now() - 1000),
-      text: `exit included in state update #1`,
+      text: `exit included in state update #1 (please finalize)`,
+    },
+    {
+      timestamp: Timestamp(Date.now() - 100),
+      text: 'finalize transaction sent',
+    },
+    {
+      timestamp: Timestamp(Date.now() - 10),
+      text: 'finalize transaction mined (waiting for inclusion in state update)',
     },
   ],
 }
