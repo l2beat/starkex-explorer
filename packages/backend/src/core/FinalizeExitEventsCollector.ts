@@ -4,8 +4,8 @@ import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
 import {
-  ForcedTransactionsRepository,
   FinalizeExitAction,
+  ForcedTransactionsRepository,
 } from '../peripherals/database/ForcedTransactionsRepository'
 import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
