@@ -1,15 +1,12 @@
 import { decodeAssetId } from '@explorer/encoding'
-import {
-  AssetId,
-  EthereumAddress,
-  Hash256,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
-import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
+import {
+  ForcedTransactionsRepository,
+  WithdrawalAction,
+} from '../peripherals/database/ForcedTransactionsRepository'
 import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { getTransactionStatus } from './getForcedTransactionStatus'
@@ -27,14 +24,6 @@ const PERPETUAL_ABI = new utils.Interface([
 const LogWithdrawalPerformed = PERPETUAL_ABI.getEventTopic(
   'LogWithdrawalPerformed'
 )
-
-export interface WithdrawalAction {
-  starkKey: StarkKey
-  assetType: AssetId
-  nonQuantizedAmount: bigint
-  quantizedAmount: bigint
-  recipient: EthereumAddress
-}
 
 type MinedTransaction = {
   hash: Hash256
@@ -62,12 +51,23 @@ export class WithdrawalEventsCollector {
   ): Promise<{ added: number; updated: number; ignored: number }> {
     const transactions = await this.getMinedTransactions(blockRange)
     const results = await Promise.all(
-      transactions.map(async ({ hash, minedAt, blockNumber }) => {
+      transactions.map(async ({ hash, data, minedAt, blockNumber }) => {
         const transaction =
           await this.forcedTransactionsRepository.findByFinalizeHash(hash)
         if (!transaction) {
-          // TODO: figure out how to find transaction when we didn't track the finalization
-          return 'ignored'
+          const exitTransaction =
+            await this.forcedTransactionsRepository.findByFinalizeData(data)
+          if (!exitTransaction) {
+            return 'ignored'
+          }
+          this.forcedTransactionsRepository.saveFinalize(
+            exitTransaction.hash,
+            hash,
+            null,
+            minedAt,
+            blockNumber
+          )
+          return 'added'
         }
         if (getTransactionStatus(transaction) === 'sent') {
           await this.transactionStatusRepository.updateIfWaitingToBeMined({

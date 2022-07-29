@@ -1,5 +1,12 @@
 import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
-import { AssetId, Hash256, json, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  json,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { Knex } from 'knex'
 import { ForcedTransactionRow, TransactionStatusRow } from 'knex/types/tables'
 import { MD5 as hashData } from 'object-hash'
@@ -8,6 +15,14 @@ import { Logger } from '../../tools/Logger'
 import { Nullable } from '../../utils/Nullable'
 import { toSerializableJson } from '../../utils/toSerializableJson'
 import { BaseRepository } from './BaseRepository'
+
+export interface WithdrawalAction {
+  starkKey: StarkKey
+  assetType: AssetId
+  nonQuantizedAmount: bigint
+  quantizedAmount: bigint
+  recipient: EthereumAddress
+}
 
 export interface Updates {
   sentAt: Nullable<Timestamp>
@@ -298,6 +313,18 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
+  async findByFinalizeData(
+    data: WithdrawalAction
+  ): Promise<ForcedTransactionRecord | undefined> {
+    const [row] = await this.rowsQuery()
+      .whereRaw("data->>'type' = 'withdrawal'")
+      .whereRaw("data->>'starkKey' = ?", String(data.starkKey))
+      .andWhereRaw("data->>'amount' = ?", data.quantizedAmount.toString())
+      .andWhereRaw("data->>'amount' = ?", data.nonQuantizedAmount.toString())
+
+    return row ? toRecord(row) : undefined
+  }
+
   async add(
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
       offerId?: number
@@ -358,7 +385,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
   async saveFinalize(
     exitHash: Hash256,
     finalizeHash: Hash256,
-    sentAt: Timestamp,
+    sentAt: Nullable<Timestamp>,
     minedAt: Timestamp,
     blockNumber: number
   ): Promise<boolean>
