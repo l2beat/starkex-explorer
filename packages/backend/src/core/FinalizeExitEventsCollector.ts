@@ -5,7 +5,7 @@ import { utils } from 'ethers'
 import { BlockRange } from '../model/BlockRange'
 import {
   ForcedTransactionsRepository,
-  WithdrawalAction,
+  FinalizeExitAction,
 } from '../peripherals/database/ForcedTransactionsRepository'
 import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
@@ -27,12 +27,12 @@ const LogWithdrawalPerformed = PERPETUAL_ABI.getEventTopic(
 
 type MinedTransaction = {
   hash: Hash256
-  data: WithdrawalAction
+  data: FinalizeExitAction
   blockNumber: number
   minedAt: Timestamp
 }
 
-export class WithdrawalEventsCollector {
+export class FinalizeExitEventsCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
@@ -103,10 +103,6 @@ export class WithdrawalEventsCollector {
         const hash = Hash256(log.transactionHash)
         const minedAt = Timestamp.fromSeconds(block.timestamp)
         const base = { hash, blockNumber, minedAt }
-
-        if (!(event.name === 'LogWithdrawalPerformed')) {
-          throw new Error('Unknown event!')
-        }
 
         return {
           ...base,

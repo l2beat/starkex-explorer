@@ -16,7 +16,7 @@ import { Nullable } from '../../utils/Nullable'
 import { toSerializableJson } from '../../utils/toSerializableJson'
 import { BaseRepository } from './BaseRepository'
 
-export interface WithdrawalAction {
+export interface FinalizeExitAction {
   starkKey: StarkKey
   assetType: AssetId
   nonQuantizedAmount: bigint
@@ -314,7 +314,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
   }
 
   async findByFinalizeData(
-    data: WithdrawalAction
+    data: FinalizeExitAction
   ): Promise<ForcedTransactionRecord | undefined> {
     const [row] = await this.rowsQuery()
       .whereRaw("data->>'type' = 'withdrawal'")

@@ -25,7 +25,7 @@ import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
 import { UserRegistrationCollector } from './core/UserRegistrationCollector'
 import { VerifierCollector } from './core/VerifierCollector'
-import { WithdrawalEventsCollector } from './core/WithdrawalEventsCollector'
+import { FinalizeExitEventsCollector } from './core/FinalizeExitEventsCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
@@ -150,7 +150,7 @@ export class Application {
       config.contracts.perpetual
     )
 
-    const withdrawalEventsCollector = new WithdrawalEventsCollector(
+    const finalizeExitEventsCollector = new FinalizeExitEventsCollector(
       ethereumClient,
       forcedTransactionsRepository,
       transactionStatusRepository,
@@ -165,7 +165,7 @@ export class Application {
       stateUpdateCollector,
       userRegistrationCollector,
       forcedEventsCollector,
-      withdrawalEventsCollector,
+      finalizeExitEventsCollector,
       logger
     )
     const syncScheduler = new SyncScheduler(
