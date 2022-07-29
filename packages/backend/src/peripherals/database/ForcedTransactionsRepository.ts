@@ -287,6 +287,17 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
+  async findByFinalizeHash(
+    hash: Hash256
+  ): Promise<ForcedTransactionRecord | undefined> {
+    const [row] = await this.rowsQuery().where(
+      'finalize_tx.hash',
+      hash.toString()
+    )
+
+    return row ? toRecord(row) : undefined
+  }
+
   async add(
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
       offerId?: number

@@ -8,6 +8,7 @@ import { StateTransitionFactCollector } from './StateTransitionFactCollector'
 import { StateUpdateCollector } from './StateUpdateCollector'
 import { UserRegistrationCollector } from './UserRegistrationCollector'
 import { VerifierCollector } from './VerifierCollector'
+import { WithdrawalEventsCollector } from './WithdrawalEventsCollector'
 
 export class DataSyncService {
   constructor(
@@ -18,6 +19,7 @@ export class DataSyncService {
     private readonly stateUpdateCollector: StateUpdateCollector,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
+    private readonly withdrawalEventsCollector: WithdrawalEventsCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -36,6 +38,9 @@ export class DataSyncService {
       blockRange
     )
     const forcedEvents = await this.forcedEventsCollector.collect(blockRange)
+    const withdrawalEvents = await this.withdrawalEventsCollector.collect(
+      blockRange
+    )
 
     this.logger.info({
       method: 'sync',
@@ -46,6 +51,7 @@ export class DataSyncService {
       newStateTransitionFacts: stateTransitionFacts.length,
       userRegistrationEvents: userRegistrationEvents.length,
       forcedEvents,
+      withdrawalEvents,
     })
 
     await this.stateUpdateCollector.save(stateTransitionFacts)

@@ -279,6 +279,12 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
       stateUpdateId: 1,
       status: 'finalized',
     },
+    finalizeForm: {
+      transactionHash: Hash256.fake(),
+      address: EthereumAddress('0x6235538E538067Db89E72d24F4D1a757E234Bed1'),
+      perpetualAddress: EthereumAddress.fake(),
+      starkKey: StarkKey.fake(),
+    },
   },
   history: [
     {

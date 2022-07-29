@@ -9,6 +9,7 @@ import { StateTransitionFactCollector } from '../../src/core/StateTransitionFact
 import { StateUpdateCollector } from '../../src/core/StateUpdateCollector'
 import { UserRegistrationCollector } from '../../src/core/UserRegistrationCollector'
 import type { VerifierCollector } from '../../src/core/VerifierCollector'
+import { WithdrawalEventsCollector } from '../../src/core/WithdrawalEventsCollector'
 import { BlockRange } from '../../src/model'
 import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
 import { Logger } from '../../src/tools/Logger'
@@ -43,6 +44,9 @@ describe(DataSyncService.name, () => {
     const forcedEventsCollector = mock<ForcedEventsCollector>({
       collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
     })
+    const withdrawalEventsCollector = mock<WithdrawalEventsCollector>({
+      collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
+    })
     const stateUpdateCollector = mock<StateUpdateCollector>({
       save: noop,
     })
@@ -55,6 +59,7 @@ describe(DataSyncService.name, () => {
       stateUpdateCollector,
       userRegistrationCollector,
       forcedEventsCollector,
+      withdrawalEventsCollector,
       Logger.SILENT
     )
 
@@ -98,6 +103,7 @@ describe(DataSyncService.name, () => {
         discardAfter: noop,
       })
       const forcedEventsCollector = mock<ForcedEventsCollector>()
+      const withdrawalEventsCollector = mock<WithdrawalEventsCollector>()
 
       const dataSyncService = new DataSyncService(
         verifierCollector,
@@ -107,6 +113,7 @@ describe(DataSyncService.name, () => {
         stateUpdateCollector,
         userRegistrationCollector,
         forcedEventsCollector,
+        withdrawalEventsCollector,
         Logger.SILENT
       )
 
