@@ -128,6 +128,25 @@ describe('ForcedTransactionRouter', () => {
         .expect(201)
     })
 
+    describe('POST /forced/exits/finalize', () => {
+      it('returns success', async () => {
+        const exitHash = Hash256.fake()
+        const finalizeHash = Hash256.fake()
+        await createServer(
+          mock<ForcedTradeOfferController>(),
+          mock<TransactionSubmitController>({
+            finalizeForcedExit: async () => ({
+              type: 'success',
+              content: finalizeHash.toString(),
+            }),
+          })
+        )
+          .post('/forced/exits/finalize')
+          .send({ exitHash, finalizeHash })
+          .expect(200)
+      })
+    })
+
     it('returns bad request for invalid input', async () => {
       await createServer(
         mock<ForcedTradeOfferController>(),
