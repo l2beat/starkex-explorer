@@ -18,7 +18,7 @@ export function FinalizeExitForm(props: FinalizeExitFormProps) {
   return (
     <form
       className={FormClass}
-      action="forced/trades/finalize"
+      action="/forced/exits/finalize"
       method="POST"
       data-transaction-hash={props.transactionHash.toString()}
       data-address={props.address.toString()}
