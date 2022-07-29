@@ -5,6 +5,7 @@ import { ForcedTransactionsRepository } from '../../../src/peripherals/database/
 import { Logger } from '../../../src/tools/Logger'
 import {
   fakeBigInt,
+  fakeFinalize,
   fakeForcedUpdates,
   fakeInt,
   fakeTimestamp,
@@ -361,5 +362,84 @@ describe(ForcedTransactionsRepository.name, () => {
       lastUpdateAt: sentAt,
       updates: fakeForcedUpdates({ sentAt }),
     })
+  })
+
+  it('saves finalize transaction', async () => {
+    const tx1 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+    const tx2 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+    const finalize1 = {
+      hash: Hash256.fake(),
+      data: fakeFinalize(),
+    }
+
+    const finalize2 = {
+      hash: Hash256.fake(),
+      data: fakeFinalize(),
+    }
+
+    const sentAtFinalize1 = fakeTimestamp()
+    const sentAt1 = fakeTimestamp(Number(sentAtFinalize1 as unknown as string))
+    const sentAt2 = null
+    const minedAtFinalize2 = fakeTimestamp()
+    const minedAt2 = fakeTimestamp(
+      Number(minedAtFinalize2 as unknown as string)
+    )
+    const blockNumber2 = fakeInt()
+
+    await repository.add(tx1, sentAt1)
+    await repository.add(tx2, sentAt2, minedAt2, blockNumber2)
+
+    const sentAtFinalize2 = null
+    const blockNumberFinalize2 = fakeInt()
+
+    await repository.saveFinalize(tx1.hash, finalize1.hash, sentAtFinalize1)
+    await repository.saveFinalize(
+      tx2.hash,
+      finalize2.hash,
+      sentAtFinalize2,
+      minedAtFinalize2,
+      blockNumberFinalize2
+    )
+
+    const actual = await repository.getAll()
+    expect(actual).toBeAnArrayOfLength(2)
+    expect(actual).toEqual([
+      {
+        ...tx1,
+        lastUpdateAt: sentAtFinalize1,
+        updates: fakeForcedUpdates({
+          sentAt: sentAt1,
+          finalized: {
+            hash: finalize1.hash,
+            sentAt: sentAtFinalize1,
+            forgottenAt: null,
+            revertedAt: null,
+            minedAt: null,
+          },
+        }),
+      },
+
+      {
+        ...tx2,
+        lastUpdateAt: minedAtFinalize2,
+        updates: fakeForcedUpdates({
+          sentAt: sentAt2,
+          minedAt: minedAt2,
+          finalized: {
+            hash: finalize2.hash,
+            sentAt: null,
+            forgottenAt: null,
+            revertedAt: null,
+            minedAt: minedAtFinalize2,
+          },
+        }),
+      },
+    ])
   })
 })

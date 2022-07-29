@@ -1,12 +1,21 @@
 import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
-import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { fakeHexString } from '@explorer/types/src/fake'
 
 import {
   Accepted,
   ForcedTradeOfferRecord,
 } from '../src/peripherals/database/ForcedTradeOfferRepository'
-import { Updates } from '../src/peripherals/database/ForcedTransactionsRepository'
+import {
+  FinalizeExitAction,
+  Updates,
+} from '../src/peripherals/database/ForcedTransactionsRepository'
 import { Record as TransactionStatusRecord } from '../src/peripherals/database/TransactionStatusRepository'
 
 const MAX_SAFE_POSTGRES_INT = 2 ** 31 - 1
@@ -35,6 +44,20 @@ export function fakeWithdrawal(
     positionId: fakeBigInt(),
     amount: fakeBigInt(),
     ...withdrawal,
+  }
+}
+
+export function fakeFinalize(
+  finalize?: Partial<FinalizeExitAction>
+): FinalizeExitAction {
+  const amount = fakeBigInt()
+  return {
+    starkKey: StarkKey.fake(),
+    assetType: AssetId.USDC,
+    quantizedAmount: amount,
+    nonQuantizedAmount: amount,
+    recipient: EthereumAddress.fake(),
+    ...finalize,
   }
 }
 
