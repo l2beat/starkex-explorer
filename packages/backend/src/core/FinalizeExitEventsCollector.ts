@@ -54,22 +54,8 @@ export class FinalizeExitEventsCollector {
       transactions.map(async ({ hash, data, minedAt, blockNumber }) => {
         const transaction =
           await this.forcedTransactionsRepository.findByFinalizeHash(hash)
-        if (!transaction) {
-          const exitTransaction =
-            await this.forcedTransactionsRepository.findByFinalizeData(data)
-          if (!exitTransaction) {
-            return 'ignored'
-          }
-          this.forcedTransactionsRepository.saveFinalize(
-            exitTransaction.hash,
-            hash,
-            null,
-            minedAt,
-            blockNumber
-          )
-          return 'added'
-        }
-        if (getTransactionStatus(transaction) === 'sent') {
+
+        if (transaction && getTransactionStatus(transaction) === 'sent') {
           await this.transactionStatusRepository.updateIfWaitingToBeMined({
             hash,
             mined: {
@@ -79,7 +65,26 @@ export class FinalizeExitEventsCollector {
           })
           return 'updated'
         }
-        return 'ignored'
+
+        if (transaction) {
+          return 'ignored'
+        }
+
+        const exitTransaction =
+          await this.forcedTransactionsRepository.findByFinalizeData(data)
+
+        if (!exitTransaction) {
+          return 'ignored'
+        }
+
+        this.forcedTransactionsRepository.saveFinalize(
+          exitTransaction.hash,
+          hash,
+          null,
+          minedAt,
+          blockNumber
+        )
+        return 'added'
       })
     )
     return results.reduce(
