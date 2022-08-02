@@ -12,7 +12,11 @@ import { setupWallets } from './setupWallets'
 import { Simulation } from './Simulation'
 import { StateUpdater } from './StateUpdater'
 
-main()
+main().catch((e) => {
+  console.error(e)
+  process.exit(1)
+})
+
 async function main() {
   const { provider } = await setupGanache()
   const wallets = setupWallets(provider)

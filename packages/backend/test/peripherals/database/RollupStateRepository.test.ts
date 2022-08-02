@@ -93,9 +93,9 @@ describe(RollupStateRepository.name, () => {
 
   describe(repository.getParameters.name, () => {
     it('throws when parameters for rootHash are missing from db', async () => {
-      expect(repository.getParameters(PedersenHash.fake('111'))).toBeRejected(
-        'Cannot find parameters for'
-      )
+      await expect(
+        repository.getParameters(PedersenHash.fake('111'))
+      ).toBeRejected('Cannot find parameters for')
     })
 
     it('gets parameters', async () => {

@@ -155,7 +155,7 @@ describe(VerifierCollector.name, () => {
       },
     ])
 
-    expect(collector.collect(blockRange)).toBeRejected(
+    await expect(collector.collect(blockRange)).toBeRejected(
       'all logs must be from the block range'
     )
   })

@@ -254,7 +254,7 @@ describe(SyncScheduler.name, () => {
         { earliestBlock: 1, maxBlockNumber }
       )
 
-      syncScheduler['handleSync'](
+      await syncScheduler['handleSync'](
         new BlockRange([block(maxBlockNumber - 2), block(maxBlockNumber - 1)])
       )
 
@@ -264,7 +264,7 @@ describe(SyncScheduler.name, () => {
         expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
       })
 
-      syncScheduler['handleSync'](
+      await syncScheduler['handleSync'](
         new BlockRange([block(maxBlockNumber), block(maxBlockNumber + 1)])
       )
 

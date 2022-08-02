@@ -104,7 +104,7 @@ describe(StateUpdateCollector.name, () => {
         mock<EthereumClient>(),
         mock<ForcedTransactionsRepository>()
       )
-      expect(
+      await expect(
         stateUpdateCollector.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
       ).toBeRejected('Missing state transition facts in database')
     })
@@ -177,7 +177,7 @@ describe(StateUpdateCollector.name, () => {
       )
       rollupState.positions.hash = mock(async () => '1234')
 
-      expect(
+      await expect(
         collector.processStateTransition(
           { pages: [], factHash: Hash256.fake('123'), blockNumber: 1 },
           1
@@ -224,7 +224,7 @@ describe(StateUpdateCollector.name, () => {
         forcedTransactionsRepository
       )
 
-      expect(
+      await expect(
         stateUpdateCollector.extractTransactionHashes([
           {
             type: 'withdrawal',

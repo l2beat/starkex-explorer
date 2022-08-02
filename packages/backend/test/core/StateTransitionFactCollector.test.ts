@@ -140,7 +140,7 @@ describe(StateTransitionFactCollector.name, () => {
       },
     ])
 
-    expect(stateTransitionFactCollector.collect(blockRange)).toBeRejected(
+    await expect(stateTransitionFactCollector.collect(blockRange)).toBeRejected(
       'all logs must be from the block range'
     )
   })

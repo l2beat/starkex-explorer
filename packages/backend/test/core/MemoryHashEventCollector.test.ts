@@ -211,7 +211,7 @@ describe(MemoryHashEventCollector.name, () => {
       factToPageRepository
     )
 
-    expect(
+    await expect(
       collector.collect(
         new BlockRange([
           {

@@ -16,7 +16,10 @@ export async function setupGanache() {
       quiet: true,
     },
   })
-  server.listen(8545)
+  server.listen(8545).catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
   const provider = new providers.Web3Provider(
     server.provider as unknown as providers.ExternalProvider
   )

@@ -129,7 +129,7 @@ describe(PageCollector.name, () => {
       },
     ])
 
-    expect(pageCollector.collect(blockRange)).toBeRejected(
+    await expect(pageCollector.collect(blockRange)).toBeRejected(
       'all logs must be from the block range'
     )
   })
