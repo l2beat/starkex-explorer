@@ -77,7 +77,7 @@ export class FinalizeExitEventsCollector {
           return 'ignored'
         }
 
-        this.forcedTransactionsRepository.saveFinalize(
+        await this.forcedTransactionsRepository.saveFinalize(
           exitTransaction.hash,
           hash,
           null,
