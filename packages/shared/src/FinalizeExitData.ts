@@ -16,7 +16,7 @@ export function encodeFinalizeExitRequest(starkKey: StarkKey) {
 export function decodeFinalizeExitRequest(data: string) {
   try {
     const decoded = coder.decodeFunctionData('withdraw', data)
-    return StarkKey(decoded.starkKey.toHexString())
+    return StarkKey.from(decoded.starkKey)
   } catch {
     return
   }

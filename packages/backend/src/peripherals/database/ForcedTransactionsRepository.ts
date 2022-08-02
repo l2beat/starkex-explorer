@@ -313,14 +313,16 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
-  async findByFinalizeData(
-    data: FinalizeExitAction
+  async findWithdrawalForFinalize(
+    starkKey: StarkKey,
+    finalizeMinedAt: Timestamp
   ): Promise<ForcedTransactionRecord | undefined> {
     const [row] = await this.rowsQuery()
+      .where('mined_at', '<', finalizeMinedAt)
       .whereRaw("data->>'type' = 'withdrawal'")
-      .whereRaw("data->>'starkKey' = ?", String(data.starkKey))
-      .andWhereRaw("data->>'amount' = ?", data.quantizedAmount.toString())
-      .andWhereRaw("data->>'amount' = ?", data.nonQuantizedAmount.toString())
+      .whereRaw("data->>'starkKey' = ?", String(starkKey))
+      .first()
+      .orderBy('mined_at', 'desc')
 
     return row ? toRecord(row) : undefined
   }

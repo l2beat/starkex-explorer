@@ -37,25 +37,22 @@ export class FinalizeExitEventsCollector {
     private readonly ethereumClient: EthereumClient,
     private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     private readonly transactionStatusRepository: TransactionStatusRepository,
-    private readonly perpetualAddress: EthereumAddress,
-    readonly _getMinedTransactions?: (
-      blockRange: BlockRange
-    ) => Promise<MinedTransaction[]>
-  ) {
-    this.getMinedTransactions =
-      _getMinedTransactions || this.getMinedTransactions
-  }
+    private readonly perpetualAddress: EthereumAddress
+  ) {}
 
   async collect(
     blockRange: BlockRange
   ): Promise<{ added: number; updated: number; ignored: number }> {
-    const transactions = await this.getMinedTransactions(blockRange)
+    const minedFinalizes = await this.getMinedFinalizes(blockRange)
     const results = await Promise.all(
-      transactions.map(async ({ hash, data, minedAt, blockNumber }) => {
-        const transaction =
+      minedFinalizes.map(async ({ hash, data, minedAt, blockNumber }) => {
+        const connectedExit =
           await this.forcedTransactionsRepository.findByFinalizeHash(hash)
 
-        if (transaction && getTransactionStatus(transaction) === 'sent') {
+        if (
+          connectedExit &&
+          getTransactionStatus(connectedExit) === 'finalize sent'
+        ) {
           await this.transactionStatusRepository.updateIfWaitingToBeMined({
             hash,
             mined: {
@@ -66,19 +63,24 @@ export class FinalizeExitEventsCollector {
           return 'updated'
         }
 
-        if (transaction) {
+        if (connectedExit) {
+          // This should never happen
           return 'ignored'
         }
 
-        const exitTransaction =
-          await this.forcedTransactionsRepository.findByFinalizeData(data)
+        const disconnectedExit =
+          await this.forcedTransactionsRepository.findWithdrawalForFinalize(
+            data.starkKey,
+            minedAt
+          )
 
-        if (!exitTransaction) {
+        if (!disconnectedExit) {
+          // Someone did a regular withdraw that wasn't for a forced exit
           return 'ignored'
         }
 
         await this.forcedTransactionsRepository.saveFinalize(
-          exitTransaction.hash,
+          disconnectedExit.hash,
           hash,
           null,
           minedAt,
@@ -93,7 +95,7 @@ export class FinalizeExitEventsCollector {
     )
   }
 
-  private async getMinedTransactions(
+  private async getMinedFinalizes(
     blockRange: BlockRange
   ): Promise<MinedTransaction[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
