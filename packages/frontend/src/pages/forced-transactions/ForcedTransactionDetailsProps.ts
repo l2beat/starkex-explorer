@@ -1,4 +1,4 @@
-import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
@@ -35,6 +35,7 @@ export interface ForcedExit {
     readonly transactionHash: Hash256
     readonly positionId: bigint
     readonly ethereumAddress?: EthereumAddress
+    readonly starkKey: StarkKey
     readonly value: bigint
     readonly stateUpdateId?: number
     readonly status: TransactionStatus

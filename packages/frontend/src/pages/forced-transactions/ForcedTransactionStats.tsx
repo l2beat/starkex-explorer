@@ -45,6 +45,13 @@ function getForcedTransactionStatRows(transaction: ForcedTransaction) {
 
   if (transaction.type === 'exit') {
     rows.push({
+      title: 'Stark key',
+      content: formatHashLong(transaction.data.starkKey),
+    })
+  }
+
+  if (transaction.type === 'exit') {
+    rows.push({
       title: 'Value',
       content: formatCurrency(transaction.data.value, AssetId.USDC),
     })

@@ -273,6 +273,7 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
       ethereumAddress: EthereumAddress(
         '0x1234567890ABCDEF1234567890ABCDEF12345678'
       ),
+      starkKey: StarkKey.fake(),
       positionId: 1n,
       transactionHash: Hash256.fake(),
       value: 12345n,
