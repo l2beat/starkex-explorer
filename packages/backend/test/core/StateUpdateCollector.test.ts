@@ -1,5 +1,5 @@
 import { Block } from '@ethersproject/providers'
-import { InMemoryRollupStorage, RollupState } from '@explorer/state'
+import { MerkleTree, Position, RollupState } from '@explorer/state'
 import {
   AssetId,
   Hash256,
@@ -18,6 +18,7 @@ import type { PageRepository } from '../../src/peripherals/database/PageReposito
 import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+import { fakePages } from '../fakes'
 import { mock } from '../mock'
 
 describe(StateUpdateCollector.name, () => {
@@ -162,7 +163,6 @@ describe(StateUpdateCollector.name, () => {
 
   describe(StateUpdateCollector.prototype.processStateTransition.name, () => {
     it('throws if calculated root hash does not match the one from verifier', async () => {
-      const rollupState = await RollupState.empty(new InMemoryRollupStorage())
       const collector = new StateUpdateCollector(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
@@ -173,13 +173,26 @@ describe(StateUpdateCollector.name, () => {
           },
         }),
         mock<ForcedTransactionsRepository>(),
-        rollupState
+        mock<RollupState>({
+          update: async () => [
+            mock<RollupState>({
+              positions: mock<MerkleTree<Position>>({
+                hash: async () => PedersenHash.fake('1234'),
+              }),
+            }),
+            [{ index: 1n, value: mock<Position>() }],
+          ],
+        })
       )
-      rollupState.positions.hash = mock(async () => '1234')
 
       await expect(
         collector.processStateTransition(
-          { pages: [], factHash: Hash256.fake('123'), blockNumber: 1 },
+          {
+            pages: fakePages,
+            factHash: Hash256.fake('123'),
+            blockNumber: 1,
+          },
+
           1
         )
       ).toBeRejected('State transition calculated incorrectly')
