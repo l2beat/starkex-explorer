@@ -24,26 +24,25 @@ export interface FinalizeExitAction {
   recipient: EthereumAddress
 }
 
-export interface Updates {
+export interface TransactionUpdates {
   sentAt: Nullable<Timestamp>
   minedAt: Nullable<Timestamp>
   revertedAt: Nullable<Timestamp>
   forgottenAt: Nullable<Timestamp>
+}
+
+export interface FinalizeUpdates extends TransactionUpdates {
+  hash: Hash256
+}
+
+export interface Updates extends TransactionUpdates {
   verified:
     | {
         at: Timestamp
         stateUpdateId: number
       }
     | undefined
-  finalized:
-    | {
-        hash: Hash256
-        sentAt: Nullable<Timestamp>
-        minedAt: Nullable<Timestamp>
-        revertedAt: Nullable<Timestamp>
-        forgottenAt: Nullable<Timestamp>
-      }
-    | undefined
+  finalized?: FinalizeUpdates
 }
 export interface ForcedTransactionRecord {
   hash: Hash256
@@ -317,12 +316,13 @@ export class ForcedTransactionsRepository extends BaseRepository {
     starkKey: StarkKey,
     finalizeMinedAt: Timestamp
   ): Promise<ForcedTransactionRecord | undefined> {
-    const [row] = await this.rowsQuery()
-      .where('mined_at', '<', finalizeMinedAt)
+    const row = await this.rowsQuery()
       .whereRaw("data->>'type' = 'withdrawal'")
       .whereRaw("data->>'starkKey' = ?", String(starkKey))
+      .whereNull('finalize_tx.mined_at')
+      .where('exit_tx.mined_at', '<', finalizeMinedAt)
       .first()
-      .orderBy('mined_at', 'desc')
+      .orderBy('exit_tx.mined_at', 'desc')
 
     return row ? toRecord(row) : undefined
   }

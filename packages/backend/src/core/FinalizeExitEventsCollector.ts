@@ -11,7 +11,7 @@ import { TransactionStatusRepository } from '../peripherals/database/Transaction
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { getTransactionStatus } from './getForcedTransactionStatus'
 
-const PERPETUAL_ABI = new utils.Interface([
+export const PERPETUAL_ABI = new utils.Interface([
   `event LogWithdrawalPerformed(
     uint256 starkKey,
     uint256 assetType,
@@ -21,7 +21,7 @@ const PERPETUAL_ABI = new utils.Interface([
 );`,
 ])
 
-const LogWithdrawalPerformed = PERPETUAL_ABI.getEventTopic(
+export const LogWithdrawalPerformed = PERPETUAL_ABI.getEventTopic(
   'LogWithdrawalPerformed'
 )
 
@@ -105,14 +105,15 @@ export class FinalizeExitEventsCollector {
     return Promise.all(
       logs.map(async (log) => {
         const event = PERPETUAL_ABI.parseLog(log)
-        const block = await this.ethereumClient.getBlock(log.blockNumber)
         const blockNumber = log.blockNumber
+        const block = await this.ethereumClient.getBlock(blockNumber)
         const hash = Hash256(log.transactionHash)
         const minedAt = Timestamp.fromSeconds(block.timestamp)
-        const base = { hash, blockNumber, minedAt }
 
         return {
-          ...base,
+          blockNumber,
+          hash,
+          minedAt,
           data: {
             starkKey: StarkKey.from(event.args.starkKey),
             assetType: decodeAssetId(

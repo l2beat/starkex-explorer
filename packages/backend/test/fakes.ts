@@ -1,4 +1,8 @@
-import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
+import {
+  encodeAssetId,
+  ForcedTrade,
+  ForcedWithdrawal,
+} from '@explorer/encoding'
 import {
   AssetId,
   EthereumAddress,
@@ -7,13 +11,20 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { fakeHexString } from '@explorer/types/src/fake'
+import { BigNumber, providers } from 'ethers'
 
+import {
+  LogWithdrawalPerformed,
+  PERPETUAL_ABI,
+} from '../src/core/FinalizeExitEventsCollector'
 import {
   Accepted,
   ForcedTradeOfferRecord,
 } from '../src/peripherals/database/ForcedTradeOfferRepository'
 import {
   FinalizeExitAction,
+  FinalizeUpdates,
+  ForcedTransactionRecord,
   Updates,
 } from '../src/peripherals/database/ForcedTransactionsRepository'
 import { Record as TransactionStatusRecord } from '../src/peripherals/database/TransactionStatusRepository'
@@ -91,6 +102,32 @@ export function fakeForcedUpdates(updates?: Partial<Updates>): Updates {
   }
 }
 
+export function fakeForcedUpdatesVerified(
+  finalized?: Partial<FinalizeUpdates>
+): Updates {
+  const verifiedAt = fakeTimestamp()
+  const minedAt = fakeTimestamp(Number(verifiedAt))
+  const sentAt = fakeTimestamp(Number(minedAt))
+  return {
+    forgottenAt: null,
+    revertedAt: null,
+    sentAt,
+    minedAt,
+    verified: {
+      at: verifiedAt,
+      stateUpdateId: fakeInt(),
+    },
+    finalized: {
+      hash: Hash256.fake(),
+      forgottenAt: null,
+      minedAt: null,
+      revertedAt: null,
+      sentAt: null,
+      ...finalized,
+    },
+  }
+}
+
 export function fakeSentTransaction(
   record?: Partial<TransactionStatusRecord>
 ): TransactionStatusRecord & { sentAt: Timestamp } {
@@ -140,4 +177,58 @@ export function fakeInitialOffer(
   offer?: Partial<Omit<ForcedTradeOfferRecord, 'accepted'>>
 ) {
   return fakeOffer({ ...offer, accepted: undefined, cancelledAt: undefined })
+}
+
+export function fakeExit(
+  exit?: Partial<ForcedTransactionRecord>
+): ForcedTransactionRecord {
+  return {
+    hash: Hash256.fake(),
+    data: fakeWithdrawal(),
+    updates: fakeForcedUpdates(),
+    lastUpdateAt: fakeTimestamp(),
+    ...exit,
+  }
+}
+
+export function fakeBlock(block?: Partial<providers.Block>): providers.Block {
+  return {
+    hash: Hash256.fake().toString(),
+    parentHash: Hash256.fake().toString(),
+    transactions: [Hash256.fake().toString()],
+    number: fakeInt(),
+    timestamp: Number(fakeTimestamp()),
+    nonce: fakeInt().toString(),
+    difficulty: fakeInt(),
+    _difficulty: BigNumber.from(fakeBigInt()),
+    gasLimit: BigNumber.from(fakeBigInt()),
+    gasUsed: BigNumber.from(fakeBigInt()),
+    miner: EthereumAddress.fake().toString(),
+    extraData: '',
+    ...block,
+  }
+}
+
+export function fakeFinalizeLog(log?: Partial<providers.Log>): providers.Log {
+  const amount = fakeBigInt()
+  return {
+    blockNumber: fakeInt(),
+    blockHash: Hash256.fake().toString(),
+    transactionHash: Hash256.fake().toString(),
+    transactionIndex: fakeInt(200),
+    logIndex: fakeInt(10),
+    address: EthereumAddress.fake().toString(),
+    removed: false,
+    ...PERPETUAL_ABI.encodeEventLog(
+      PERPETUAL_ABI.getEvent(LogWithdrawalPerformed),
+      [
+        StarkKey.fake().toString(),
+        '0x' + encodeAssetId(AssetId.USDC),
+        amount,
+        amount,
+        EthereumAddress.fake().toString(),
+      ]
+    ),
+    ...log,
+  }
 }

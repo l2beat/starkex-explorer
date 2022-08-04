@@ -5,6 +5,7 @@ import { ForcedTransactionsRepository } from '../../../src/peripherals/database/
 import { Logger } from '../../../src/tools/Logger'
 import {
   fakeBigInt,
+  fakeExit,
   fakeFinalize,
   fakeForcedUpdates,
   fakeInt,
@@ -441,5 +442,77 @@ describe(ForcedTransactionsRepository.name, () => {
         }),
       },
     ])
+  })
+
+  it('finds exit by data for finalize', async () => {
+    const expectedMinedAt = Timestamp(fakeInt() + 100)
+    const earlier = Timestamp(Number(expectedMinedAt) - 100)
+    const later = Timestamp(Number(expectedMinedAt) + 100)
+    const starkKey = StarkKey.fake()
+
+    const exit1 = fakeExit()
+    const expectedExit = fakeExit({ data: fakeWithdrawal({ starkKey }) })
+    const exit3 = fakeExit()
+
+    await repository.add(exit1, null, earlier, 0)
+    await repository.add(expectedExit, null, expectedMinedAt, 0)
+    await repository.add(exit3, null, later, 0)
+
+    const result = await repository.findWithdrawalForFinalize(
+      starkKey,
+      Timestamp(2 ** 32 - 1)
+    )
+    expect(result?.hash).toEqual(expectedExit.hash)
+  })
+
+  it('finds most recent exit for finalize', async () => {
+    const expectedMinedAt = fakeTimestamp()
+    const earlier = Timestamp(Number(expectedMinedAt) - 100)
+    const later = Timestamp(Number(expectedMinedAt) + 100)
+    const starkKey = StarkKey.fake()
+
+    const exit1 = fakeExit({ data: fakeWithdrawal({ starkKey }) })
+    const expectedExit = fakeExit({ data: fakeWithdrawal({ starkKey }) })
+    const exit3 = fakeExit({ data: fakeWithdrawal({ starkKey }) })
+
+    await repository.add(exit1, null, earlier, 0)
+    await repository.add(expectedExit, null, expectedMinedAt, 0)
+    await repository.add(exit3, null, later, 0)
+
+    const result = await repository.findWithdrawalForFinalize(
+      starkKey,
+      Timestamp(Number(expectedMinedAt) + 1)
+    )
+    expect(result?.hash).toEqual(expectedExit.hash)
+  })
+
+  it('ignores finalized transaction', async () => {
+    const finalizeMinedAt = fakeTimestamp()
+    const exitMinedAt = fakeTimestamp(Number(finalizeMinedAt))
+    const starkKey = StarkKey.fake()
+
+    const exit = fakeExit({ data: fakeWithdrawal({ starkKey }) })
+    const finalize = Hash256.fake()
+
+    await repository.add(exit, null, exitMinedAt, 0)
+    const beforeFinalize = await repository.findWithdrawalForFinalize(
+      starkKey,
+      Timestamp(Number(exitMinedAt) + 1)
+    )
+
+    await repository.saveFinalize(
+      exit.hash,
+      finalize,
+      null,
+      finalizeMinedAt,
+      fakeInt()
+    )
+    const afterFinalize = await repository.findWithdrawalForFinalize(
+      starkKey,
+      Timestamp(Number(exitMinedAt) + 1)
+    )
+
+    expect(beforeFinalize?.hash).toEqual(exit.hash)
+    expect(afterFinalize).not.toBeDefined()
   })
 })
