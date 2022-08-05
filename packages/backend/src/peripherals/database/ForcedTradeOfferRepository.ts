@@ -191,8 +191,8 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   }
 
   private getByPositionIdQuery(positionId: bigint) {
-    return this.knex('forced_trade_offers').where(async function () {
-      await this.where({ position_id_a: positionId }).orWhere({
+    return this.knex('forced_trade_offers').where(function () {
+      void this.where({ position_id_a: positionId }).orWhere({
         position_id_b: positionId,
       })
     })

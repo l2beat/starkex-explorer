@@ -229,8 +229,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
 
   async countPendingByPositionId(positionId: bigint) {
     const [{ count }] = await this.joinQuery()
-      .where(async function () {
-        await this.whereRaw("data->>'positionId' = ?", String(positionId))
+      .where(function () {
+        void this.whereRaw("data->>'positionId' = ?", String(positionId))
           .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
           .orWhereRaw("data->>'positionIdB' = ?", String(positionId))
       })
