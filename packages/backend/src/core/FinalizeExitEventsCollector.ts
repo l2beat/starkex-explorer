@@ -18,7 +18,7 @@ export const PERPETUAL_ABI = new utils.Interface([
     uint256 nonQuantizedAmount,
     uint256 quantizedAmount,
     address recipient
-);`,
+)`,
 ])
 
 export const LogWithdrawalPerformed = PERPETUAL_ABI.getEventTopic(
