@@ -1,6 +1,6 @@
 import { decodeAssetId } from '@explorer/encoding'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
-import { providers, utils } from 'ethers'
+import { utils } from 'ethers'
 
 import { BlockRange } from '../model/BlockRange'
 import {
@@ -47,7 +47,9 @@ export class FinalizeExitEventsCollector {
     blockRange: BlockRange
   ): Promise<{ added: number; updated: number; ignored: number }> {
     const minedFinalizes = await this.getMinedFinalizes(blockRange)
-    const results = await Promise.all(minedFinalizes.map(this.processFinalizes.bind(this)))
+    const results = await Promise.all(
+      minedFinalizes.map(this.processFinalizes.bind(this))
+    )
     return results.reduce(
       (acc, result) => ({ ...acc, [result]: acc[result] + 1 }),
       { added: 0, updated: 0, ignored: 0 }
@@ -111,7 +113,6 @@ export class FinalizeExitEventsCollector {
       return
     }
 
-
     const firstSyncedBlock = await this.syncStatusRepository.getLastSynced()
     if (!firstSyncedBlock || firstSyncedBlock < 14878490) {
       return
@@ -163,7 +164,9 @@ export class FinalizeExitEventsCollector {
       })
     )
 
-    const results = await Promise.all(minedFinalizes.map(this.processFinalizes.bind(this)))
+    const results = await Promise.all(
+      minedFinalizes.map(this.processFinalizes.bind(this))
+    )
 
     this.syncExecuted = true
     return results.reduce(
