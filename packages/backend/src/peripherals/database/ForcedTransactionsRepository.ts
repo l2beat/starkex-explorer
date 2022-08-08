@@ -320,11 +320,20 @@ export class ForcedTransactionsRepository extends BaseRepository {
       .whereRaw("data->>'type' = 'withdrawal'")
       .whereRaw("data->>'starkKey' = ?", String(starkKey))
       .whereNull('finalize_tx.mined_at')
-      .where('exit_tx.mined_at', '<', finalizeMinedAt)
+      .where('state_updates.timestamp', '<', finalizeMinedAt)
       .first()
-      .orderBy('exit_tx.mined_at', 'desc')
+      .orderBy('state_updates.timestamp', 'desc')
 
     return row ? toRecord(row) : undefined
+  }
+
+  // used only to sync finalized backwards
+  async getExitedStarkKeys(): Promise<StarkKey[]> {
+    const rows = await this.joinQuery()
+      .whereRaw("data->>'type' = 'withdrawal'")
+      .select(this.knex.raw("data->>'starkKey' as stark_key"))
+
+    return rows.map((row) => StarkKey(row.stark_key))
   }
 
   async add(
@@ -405,15 +414,18 @@ export class ForcedTransactionsRepository extends BaseRepository {
         .update({
           finalize_hash: finalizeHash.toString(),
         })
-      await trx('transaction_status').insert({
-        hash: finalizeHash.toString(),
-        mined_at:
-          minedAt !== null && minedAt !== undefined
-            ? BigInt(minedAt.toString())
-            : null,
-        sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
-        block_number: blockNumber,
-      })
+      await trx('transaction_status')
+        .insert({
+          hash: finalizeHash.toString(),
+          mined_at:
+            minedAt !== null && minedAt !== undefined
+              ? BigInt(minedAt.toString())
+              : null,
+          sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
+          block_number: blockNumber,
+        })
+        .onConflict()
+        .ignore() // TODO: not sure
     })
     this.logger.debug({ method: 'saveFinalize', id: exitHash.toString() })
     return true

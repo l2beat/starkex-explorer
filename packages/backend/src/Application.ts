@@ -155,6 +155,7 @@ export class Application {
       ethereumClient,
       forcedTransactionsRepository,
       transactionStatusRepository,
+      syncStatusRepository,
       config.contracts.perpetual
     )
 
@@ -276,6 +277,7 @@ export class Application {
       await apiServer.listen()
       if (config.enableSync) {
         transactionStatusMonitor.start()
+        await finalizeExitEventsCollector.oneTimeSync()
         await syncScheduler.start()
         await blockDownloader.start()
       }
