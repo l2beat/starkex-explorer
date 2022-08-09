@@ -18,6 +18,7 @@ import { ForcedTransactionsRepository } from '../../src/peripherals/database/For
 import { SyncStatusRepository } from '../../src/peripherals/database/SyncStatusRepository'
 import { TransactionStatusRepository } from '../../src/peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+import { Logger } from '../../src/tools/Logger'
 import {
   fakeBlock,
   fakeExit,
@@ -82,6 +83,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         forcedRepo,
         transactionStatusRepo,
         mock<SyncStatusRepository>(),
+        Logger.SILENT,
         EthereumAddress.fake()
       )
       const result = await collector.collect(blockRange)
@@ -123,6 +125,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         forcedRepo,
         mock<TransactionStatusRepository>({}),
         mock<SyncStatusRepository>(),
+        Logger.SILENT,
         EthereumAddress.fake()
       )
       const result = await collector.collect(blockRange)
@@ -163,6 +166,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         forcedRepo,
         statusRepo,
         mock<SyncStatusRepository>(),
+        Logger.SILENT,
         EthereumAddress.fake()
       )
       const result = await collector.collect(blockRange)
@@ -212,11 +216,12 @@ describe(FinalizeExitEventsCollector.name, () => {
         forcedTxRepo,
         mock<TransactionStatusRepository>(),
         syncStatusRepo,
+        Logger.SILENT,
         EthereumAddress.fake()
       )
-      const result = await collector.oneTimeSync()
+      await collector.oneTimeSync()
 
-      expect(result).toEqual({ added: 3, updated: 0, ignored: 0 })
+      expect(forcedTxRepo.saveFinalize.calls.length).toEqual(3)
     })
 
     it('runs one time only', async () => {
@@ -235,6 +240,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         forcedTxRepo,
         mock<TransactionStatusRepository>(),
         syncStatusRepo,
+        Logger.SILENT,
         EthereumAddress.fake()
       )
       await collector.oneTimeSync()

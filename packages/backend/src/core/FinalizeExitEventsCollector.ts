@@ -10,6 +10,7 @@ import {
 import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
 import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
+import { Logger } from '../tools/Logger'
 import { getTransactionStatus } from './getForcedTransactionStatus'
 
 export const PERPETUAL_ABI = new utils.Interface([
@@ -40,6 +41,8 @@ export class FinalizeExitEventsCollector {
     private readonly transactionStatusRepository: TransactionStatusRepository,
     // used only to sync finalized backwards
     private readonly syncStatusRepository: SyncStatusRepository,
+    // used only to sync finalized backwards
+    private readonly logger: Logger,
     private readonly perpetualAddress: EthereumAddress
   ) {}
 
@@ -191,10 +194,14 @@ export class FinalizeExitEventsCollector {
     )
 
     this.syncExecuted = true
-    return results.reduce(
-      (acc, result) => ({ ...acc, [result]: acc[result] + 1 }),
-      { added: 0, updated: 0, ignored: 0 }
-    )
+    this.logger.info({
+      method: 'oneTimeSync',
+      results: results.reduce(
+        (acc, result) => ({ ...acc, [result]: acc[result] + 1 }),
+        { added: 0, updated: 0, ignored: 0 }
+      ),
+    })
+    return
   }
   // #endregion sync-backwards
 

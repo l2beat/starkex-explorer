@@ -156,6 +156,7 @@ export class Application {
       forcedTransactionsRepository,
       transactionStatusRepository,
       syncStatusRepository,
+      logger,
       config.contracts.perpetual
     )
 
