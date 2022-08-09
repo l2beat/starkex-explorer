@@ -49,7 +49,10 @@ export class FinalizeExitEventsCollector {
     const minedFinalizes = await this.getMinedFinalizes(blockRange)
     const results = await Promise.all(
       minedFinalizes.map(async (finalize, i, array) => {
-        let previousFinalizeMinedAt = Timestamp(0)
+        let previousFinalizeMinedAt =
+          (await this.forcedTransactionsRepository.findLatestFinalize()) ??
+          Timestamp(0)
+
         if (i > 0) {
           previousFinalizeMinedAt = array[i - 1].minedAt
         }

@@ -61,6 +61,7 @@ describe(FinalizeExitEventsCollector.name, () => {
               sentAt,
             }),
           }),
+        findLatestFinalize: async () => undefined,
       })
       const ethereumClient = mock<EthereumClient>({
         getLogsInRange: async () => [
@@ -104,6 +105,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         findByFinalizeHash: async () => undefined,
         getWithdrawalsForFinalize: async () => [fakeExit({ hash: exitHash })],
         saveFinalize: async () => true,
+        findLatestFinalize: async () => undefined,
       })
       const ethereumClient = mock<EthereumClient>({
         getLogsInRange: async () => [
@@ -140,6 +142,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         findByFinalizeHash: async () => undefined,
         getWithdrawalsForFinalize: async () => [],
         saveFinalize: async () => true,
+        findLatestFinalize: async () => undefined,
       })
       const ethereumClient = mock<EthereumClient>({
         getLogsInRange: async () => [

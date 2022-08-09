@@ -312,6 +312,16 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
+  async findLatestFinalize(): Promise<Timestamp | undefined> {
+    const row = await this.rowsQuery()
+      .whereNotNull('finalize_tx.mined_at')
+      .orderBy('finalize_tx.mined_at', 'desc')
+      .first()
+      .select('finalize_tx.mined_at as finalized_at')
+
+    return row ? Timestamp(row.finalized_at) : undefined
+  }
+
   async getWithdrawalsForFinalize(
     starkKey: StarkKey,
     finalizeMinedAt: Timestamp,

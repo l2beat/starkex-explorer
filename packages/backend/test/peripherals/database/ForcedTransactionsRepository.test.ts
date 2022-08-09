@@ -649,4 +649,34 @@ describe(ForcedTransactionsRepository.name, () => {
     expect(actual).toBeAnArrayOfLength(2)
     expect(actual).toBeAnArrayWith(starkKey1, starkKey2)
   })
+
+  it('finds latest finalize timestamp', async () => {
+    const finalizeMinedAt = fakeTimestamp()
+    const exitMinedAt = fakeTimestamp(Number(finalizeMinedAt))
+    const starkKey = StarkKey.fake()
+
+    const exit = fakeExit({ data: fakeWithdrawal({ starkKey }) })
+    const finalize = Hash256.fake()
+
+    await repository.add(exit, null, exitMinedAt, 0)
+
+    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    await stateUpdateRepo.add({
+      stateUpdate: fakeStateUpdate(),
+      positions: [],
+      prices: [],
+      transactionHashes: [exit.hash],
+    })
+
+    await repository.saveFinalize(
+      exit.hash,
+      finalize,
+      null,
+      finalizeMinedAt,
+      fakeInt()
+    )
+    const result = await repository.findLatestFinalize()
+
+    expect(result).toEqual(finalizeMinedAt)
+  })
 })
