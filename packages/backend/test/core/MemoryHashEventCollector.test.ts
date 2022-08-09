@@ -197,38 +197,6 @@ describe(MemoryHashEventCollector.name, () => {
 
     expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
-
-  it('crashes on logs from reorged history', async () => {
-    const ethereumClient = mock<EthereumClient>({
-      getLogs: async (filter) =>
-        testData().logs.filter((log) => filter.address === log.address),
-    })
-    const factToPageRepository = mock<FactToPageRepository>({
-      addMany: async () => [],
-    })
-    const collector = new MemoryHashEventCollector(
-      ethereumClient,
-      factToPageRepository
-    )
-
-    expect(
-      collector.collect(
-        new BlockRange([
-          {
-            number: 11905858,
-            hash: Hash256(
-              '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55'
-            ),
-          },
-          {
-            number: 11905919,
-            hash: Hash256.fake('deadbeef'),
-          },
-        ]),
-        [EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84')]
-      )
-    ).toBeRejected('all logs must be from the block range')
-  })
 })
 
 function testData() {

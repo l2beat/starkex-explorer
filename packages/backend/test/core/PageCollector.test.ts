@@ -101,39 +101,6 @@ describe(PageCollector.name, () => {
     expect(pageRepository.deleteAfter).toHaveBeenCalledWith([123])
   })
 
-  it('crashes on logs from reorged chain histories', async () => {
-    const ethereumClient = mock<EthereumClient>({
-      getTransaction: async (txHash) => testData().getTransaction(txHash),
-      getLogs: async () => testData().logs,
-    })
-    const pageRepository = mock<PageRepository>({
-      addMany: async () => [],
-    })
-
-    const pageCollector = new PageCollector(
-      ethereumClient,
-      pageRepository,
-      REGISTRY_ADDRESS
-    )
-
-    const blockRange = new BlockRange([
-      {
-        number: 9,
-        hash: Hash256(
-          '0xdc022f1f9171af61f807e57d1f943d5491f6fb5f4235a9319638e30d54905e3c'
-        ),
-      },
-      {
-        number: 10,
-        hash: Hash256.fake('deadbeef'),
-      },
-    ])
-
-    expect(pageCollector.collect(blockRange)).toBeRejected(
-      'all logs must be from the block range'
-    )
-  })
-
   describe(bignumToPaddedString.name, () => {
     it('converts a BigNumber to a 0-padded 64 characters hexstring', () => {
       expect(bignumToPaddedString(BigNumber.from(123))).toEqual(

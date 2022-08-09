@@ -1,5 +1,5 @@
 import { Block } from '@ethersproject/providers'
-import { InMemoryRollupStorage, RollupState } from '@explorer/state'
+import { MerkleTree, Position, RollupState } from '@explorer/state'
 import {
   AssetId,
   Hash256,
@@ -19,6 +19,7 @@ import type { RollupStateRepository } from '../../src/peripherals/database/Rollu
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { Logger } from '../../src/tools/Logger'
+import { fakePages } from '../fakes'
 import { mock } from '../mock'
 
 describe(StateUpdateCollector.name, () => {
@@ -110,7 +111,7 @@ describe(StateUpdateCollector.name, () => {
         mock<ForcedTransactionsRepository>(),
         Logger.SILENT
       )
-      expect(
+      await expect(
         stateUpdateCollector.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
       ).toBeRejected('Missing state transition facts in database')
     })
@@ -169,7 +170,6 @@ describe(StateUpdateCollector.name, () => {
 
   describe(StateUpdateCollector.prototype.processStateTransition.name, () => {
     it('throws if calculated root hash does not match the one from verifier', async () => {
-      const rollupState = await RollupState.empty(new InMemoryRollupStorage())
       const collector = new StateUpdateCollector(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
@@ -181,13 +181,26 @@ describe(StateUpdateCollector.name, () => {
         }),
         mock<ForcedTransactionsRepository>(),
         Logger.SILENT,
-        rollupState
+        mock<RollupState>({
+          update: async () => [
+            mock<RollupState>({
+              positions: mock<MerkleTree<Position>>({
+                hash: async () => PedersenHash.fake('1234'),
+              }),
+            }),
+            [{ index: 1n, value: mock<Position>() }],
+          ],
+        })
       )
-      rollupState.positions.hash = mock(async () => '1234')
 
-      expect(
+      await expect(
         collector.processStateTransition(
-          { pages: [], factHash: Hash256.fake('123'), blockNumber: 1 },
+          {
+            pages: fakePages,
+            factHash: Hash256.fake('123'),
+            blockNumber: 1,
+          },
+
           1
         )
       ).toBeRejected('State transition calculated incorrectly')
@@ -234,7 +247,7 @@ describe(StateUpdateCollector.name, () => {
         Logger.SILENT
       )
 
-      expect(
+      await expect(
         stateUpdateCollector.extractTransactionHashes([
           {
             type: 'withdrawal',

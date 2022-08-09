@@ -4,7 +4,7 @@ import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import { FormClass } from '../../pages/forced-transactions/finalize-form'
 import { getAttribute } from '../offer/getAttribute'
 
-export async function initFinalizeExitForm() {
+export function initFinalizeExitForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
     form.addEventListener('submit', async (e) => {

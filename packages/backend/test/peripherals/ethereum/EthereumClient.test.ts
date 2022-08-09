@@ -90,5 +90,38 @@ describe(EthereumClient.name, () => {
         ]),
       ])
     })
+
+    it('crashes on logs from reorged history', async () => {
+      const blockRange = new BlockRange([
+        {
+          number: 11905858,
+          hash: Hash256(
+            '0x12cb67ca790064c5220f91ecf730ccdc0a558f03c77faf43509bc4790cfd3e55'
+          ),
+        },
+        {
+          number: 11905919,
+          hash: Hash256.fake('deadbeef'),
+        },
+      ])
+      const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
+      const log: providers.Log = {
+        blockNumber: 12000000,
+        blockHash: Hash256.fake().toString(),
+        transactionIndex: 1,
+        removed: false,
+        address: EthereumAddress.fake().toString(),
+        data: '',
+        topics: [],
+        transactionHash: Hash256.fake().toString(),
+        logIndex: 0,
+      }
+      const getLogs = mockFn().resolvesTo([]).resolvesToOnce([log])
+      ethereumClient['provider'] = mock<providers.JsonRpcProvider>({ getLogs })
+
+      await expect(
+        ethereumClient.getLogsInRange(blockRange, filter)
+      ).toBeRejected('all logs must be from the block range')
+    })
   })
 })

@@ -129,37 +129,6 @@ describe(VerifierCollector.name, () => {
     expect(verifierEventRepository.deleteAfter).toHaveBeenCalledWith([123])
   })
 
-  it('crashes on logs from reorged chain histories', async () => {
-    const verifierEventRepository = mock<VerifierEventRepository>({
-      addMany: async () => [],
-      getAll: async () => [],
-    })
-
-    const collector = new VerifierCollector(
-      mock<EthereumClient>({ getLogs: async () => testData().logs }),
-      verifierEventRepository,
-      PROXY_ADDRESS,
-      VERIFIER_ADDRESSES
-    )
-
-    const blockRange: BlockRange = new BlockRange([
-      {
-        number: 12004790,
-        hash: Hash256(
-          '0x50d4fde82ee2a75ad7983468fa326d8259d0aa20656e650027f6ad0e6d097f53'
-        ),
-      },
-      {
-        number: 12016212,
-        hash: Hash256.fake('deadbeef'),
-      },
-    ])
-
-    expect(collector.collect(blockRange)).toBeRejected(
-      'all logs must be from the block range'
-    )
-  })
-
   it('includes hardcoded addresses in collected', async () => {
     const collector = new VerifierCollector(
       mock<EthereumClient>({ getLogsInRange: async () => [] }),

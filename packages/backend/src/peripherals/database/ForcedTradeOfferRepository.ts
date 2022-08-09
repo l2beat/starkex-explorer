@@ -147,14 +147,14 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   }
 
   private getInitialQuery({ assetId, type }: InitialFilters = {}) {
-    const query = this.knex('forced_trade_offers')
+    let query = this.knex('forced_trade_offers')
       .whereNull('accepted_at')
       .whereNull('cancelled_at')
     if (assetId) {
-      query.andWhere('synthetic_asset_id', '=', assetId.toString())
+      query = query.andWhere('synthetic_asset_id', '=', assetId.toString())
     }
     if (type) {
-      query.andWhere(
+      query = query.andWhere(
         'is_a_buying_synthetic',
         '=',
         type === 'buy' ? true : false
@@ -192,7 +192,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
 
   private getByPositionIdQuery(positionId: bigint) {
     return this.knex('forced_trade_offers').where(function () {
-      this.where({ position_id_a: positionId }).orWhere({
+      void this.where({ position_id_a: positionId }).orWhere({
         position_id_b: positionId,
       })
     })
