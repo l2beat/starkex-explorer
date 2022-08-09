@@ -9,7 +9,7 @@ export function initMetamask() {
   if (connectButton) {
     connectButton.addEventListener('click', () => {
       if (provider) {
-        provider.request({ method: 'eth_requestAccounts' })
+        provider.request({ method: 'eth_requestAccounts' }).catch(console.error)
       } else {
         window.open('https://metamask.io/download/')
       }
@@ -20,13 +20,19 @@ export function initMetamask() {
     return
   }
 
-  provider.request({ method: 'eth_accounts' }).then((accounts) => {
-    updateAccount((accounts as string[])[0])
-  })
+  provider
+    .request({ method: 'eth_accounts' })
+    .then((accounts) => {
+      updateAccount((accounts as string[])[0])
+    })
+    .catch(console.error)
 
-  provider.request({ method: 'eth_chainId' }).then((chainId) => {
-    updateChainId(chainId as string)
-  })
+  provider
+    .request({ method: 'eth_chainId' })
+    .then((chainId) => {
+      updateChainId(chainId as string)
+    })
+    .catch(console.error)
 
   provider.on('accountsChanged', (accounts) => {
     updateAccount(accounts[0])

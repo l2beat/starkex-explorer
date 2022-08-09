@@ -11,7 +11,7 @@ describe(KeyValueStore.name, () => {
   afterEach(() => kvStore.deleteAll())
 
   it('sets and reads value', async () => {
-    kvStore.addOrUpdate({ key: 'key', value: 'value' })
+    await kvStore.addOrUpdate({ key: 'key', value: 'value' })
     const actual = await kvStore.findByKey('key')
     expect(actual).toEqual('value')
     await kvStore.deleteByKey('key')

@@ -1,5 +1,4 @@
 import { Hash256 } from '@explorer/types'
-import { assert } from 'console'
 import { ethers, providers } from 'ethers'
 
 import { BlockRange } from '../../model'
@@ -59,7 +58,9 @@ export class EthereumClient {
     }
     const logs = await this.getManyLogs(filters)
 
-    assert(blockRange.hasAll(logs), 'all logs must be from the block range')
+    if (!blockRange.hasAll(logs)) {
+      throw new Error('all logs must be from the block range')
+    }
     return logs
   }
 

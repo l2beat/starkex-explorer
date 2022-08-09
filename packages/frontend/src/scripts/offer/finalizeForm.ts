@@ -9,7 +9,7 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { FormClass } from '../../pages/offers/finalize-form/attributes'
 import { getAttribute } from './getAttribute'
 
-export async function initFinalizeForm() {
+export function initFinalizeForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
     form.addEventListener('submit', async (e) => {
