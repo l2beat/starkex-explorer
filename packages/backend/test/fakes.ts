@@ -7,6 +7,7 @@ import {
   AssetId,
   EthereumAddress,
   Hash256,
+  PedersenHash,
   StarkKey,
   Timestamp,
 } from '@explorer/types'
@@ -27,6 +28,7 @@ import {
   ForcedTransactionRecord,
   Updates,
 } from '../src/peripherals/database/ForcedTransactionsRepository'
+import { StateUpdateRecord } from '../src/peripherals/database/StateUpdateRepository'
 import { Record as TransactionStatusRecord } from '../src/peripherals/database/TransactionStatusRepository'
 
 const MAX_SAFE_POSTGRES_INT = 2 ** 31 - 1
@@ -230,5 +232,18 @@ export function fakeFinalizeLog(log?: Partial<providers.Log>): providers.Log {
       ]
     ),
     ...log,
+  }
+}
+
+export function fakeStateUpdate(
+  stateUpdate?: Partial<StateUpdateRecord>
+): StateUpdateRecord {
+  return {
+    id: fakeInt(),
+    blockNumber: fakeInt(),
+    factHash: Hash256.fake(),
+    rootHash: PedersenHash.fake(),
+    timestamp: fakeTimestamp(),
+    ...stateUpdate,
   }
 }

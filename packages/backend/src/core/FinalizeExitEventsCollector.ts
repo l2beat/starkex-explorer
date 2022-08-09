@@ -48,20 +48,26 @@ export class FinalizeExitEventsCollector {
   ): Promise<{ added: number; updated: number; ignored: number }> {
     const minedFinalizes = await this.getMinedFinalizes(blockRange)
     const results = await Promise.all(
-      minedFinalizes.map(this.processFinalizes.bind(this))
+      minedFinalizes.map(async (finalize, i, array) => {
+        let previousFinalizeMinedAt = Timestamp(0)
+        if (i > 0) {
+          previousFinalizeMinedAt = array[i - 1].minedAt
+        }
+
+        return await this.processFinalizes(finalize, previousFinalizeMinedAt)
+      })
     )
+
     return results.reduce(
       (acc, result) => ({ ...acc, [result]: acc[result] + 1 }),
       { added: 0, updated: 0, ignored: 0 }
     )
   }
 
-  private async processFinalizes({
-    hash,
-    data,
-    minedAt,
-    blockNumber,
-  }: MinedTransaction) {
+  private async processFinalizes(
+    { hash, data, minedAt, blockNumber }: MinedTransaction,
+    previousWithdrawMinedAt: Timestamp
+  ) {
     const connectedExit =
       await this.forcedTransactionsRepository.findByFinalizeHash(hash)
 
@@ -84,24 +90,30 @@ export class FinalizeExitEventsCollector {
       return 'ignored'
     }
 
-    const disconnectedExit =
-      await this.forcedTransactionsRepository.findWithdrawalForFinalize(
+    const disconnectedExits =
+      await this.forcedTransactionsRepository.getWithdrawalsForFinalize(
         data.starkKey,
-        minedAt
+        minedAt,
+        previousWithdrawMinedAt
       )
 
-    if (!disconnectedExit) {
+    if (disconnectedExits.length === 0) {
       // Someone did a regular withdraw that wasn't for a forced exit
       return 'ignored'
     }
 
-    await this.forcedTransactionsRepository.saveFinalize(
-      disconnectedExit.hash,
-      hash,
-      null,
-      minedAt,
-      blockNumber
+    await Promise.all(
+      disconnectedExits.map((exit) =>
+        this.forcedTransactionsRepository.saveFinalize(
+          exit.hash,
+          hash,
+          null,
+          minedAt,
+          blockNumber
+        )
+      )
     )
+
     return 'added'
   }
 
@@ -165,7 +177,14 @@ export class FinalizeExitEventsCollector {
     )
 
     const results = await Promise.all(
-      minedFinalizes.map(this.processFinalizes.bind(this))
+      minedFinalizes.map(async (finalize, i, array) => {
+        let previousFinalizeMinedAt = Timestamp(0)
+        if (i > 0) {
+          previousFinalizeMinedAt = array[i - 1].minedAt
+        }
+
+        return await this.processFinalizes(finalize, previousFinalizeMinedAt)
+      })
     )
 
     this.syncExecuted = true

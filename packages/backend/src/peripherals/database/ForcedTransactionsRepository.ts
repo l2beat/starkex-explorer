@@ -312,19 +312,20 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
-  async findWithdrawalForFinalize(
+  async getWithdrawalsForFinalize(
     starkKey: StarkKey,
-    finalizeMinedAt: Timestamp
-  ): Promise<ForcedTransactionRecord | undefined> {
-    const row = await this.rowsQuery()
+    finalizeMinedAt: Timestamp,
+    previousFinalizeMinedAt: Timestamp
+  ): Promise<ForcedTransactionRecord[]> {
+    const rows = await this.rowsQuery()
       .whereRaw("data->>'type' = 'withdrawal'")
       .whereRaw("data->>'starkKey' = ?", String(starkKey))
       .whereNull('finalize_tx.mined_at')
-      .where('state_updates.timestamp', '<', finalizeMinedAt)
-      .first()
+      .where('state_updates.timestamp', '<', Number(finalizeMinedAt))
+      .where('state_updates.timestamp', '>', Number(previousFinalizeMinedAt))
       .orderBy('state_updates.timestamp', 'desc')
 
-    return row ? toRecord(row) : undefined
+    return rows.map(toRecord)
   }
 
   // used only to sync finalized backwards

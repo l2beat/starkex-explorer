@@ -29,7 +29,7 @@ export function toForcedTransactionHistory({
   }
   if (updates.verified) {
     history.push({
-      text: `exit included in state update #${updates.verified.stateUpdateId} (please finalize)`,
+      text: `exit included in state update #${updates.verified.stateUpdateId}`,
       timestamp: updates.verified.at,
     })
   }

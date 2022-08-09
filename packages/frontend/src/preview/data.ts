@@ -298,7 +298,7 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
     },
     {
       timestamp: Timestamp(Date.now() - 1000),
-      text: `exit included in state update #1 (please finalize)`,
+      text: `exit included in state update #1`,
     },
     {
       timestamp: Timestamp(Date.now() - 100),

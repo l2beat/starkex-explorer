@@ -102,7 +102,7 @@ describe(FinalizeExitEventsCollector.name, () => {
 
       const forcedRepo = mock<ForcedTransactionsRepository>({
         findByFinalizeHash: async () => undefined,
-        findWithdrawalForFinalize: async () => fakeExit({ hash: exitHash }),
+        getWithdrawalsForFinalize: async () => [fakeExit({ hash: exitHash })],
         saveFinalize: async () => true,
       })
       const ethereumClient = mock<EthereumClient>({
@@ -138,7 +138,7 @@ describe(FinalizeExitEventsCollector.name, () => {
 
       const forcedRepo = mock<ForcedTransactionsRepository>({
         findByFinalizeHash: async () => undefined,
-        findWithdrawalForFinalize: async () => undefined,
+        getWithdrawalsForFinalize: async () => [],
         saveFinalize: async () => true,
       })
       const ethereumClient = mock<EthereumClient>({
@@ -200,7 +200,7 @@ describe(FinalizeExitEventsCollector.name, () => {
       const forcedTxRepo = mock<ForcedTransactionsRepository>({
         getExitedStarkKeys: async () => [exitedStarkKey],
         findByFinalizeHash: async () => undefined,
-        findWithdrawalForFinalize: async () => fakeExit(),
+        getWithdrawalsForFinalize: async () => [fakeExit()],
         saveFinalize: async () => true,
       })
 
