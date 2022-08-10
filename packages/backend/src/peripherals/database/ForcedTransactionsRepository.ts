@@ -435,8 +435,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
           sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
           block_number: blockNumber,
         })
-        .onConflict()
-        .ignore() // TODO: not sure
+        .onConflict('hash')
+        .ignore()
     })
     this.logger.debug({ method: 'saveFinalize', id: exitHash.toString() })
     return true
