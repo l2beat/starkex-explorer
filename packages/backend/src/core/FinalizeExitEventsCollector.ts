@@ -7,10 +7,8 @@ import {
   FinalizeExitAction,
   ForcedTransactionsRepository,
 } from '../peripherals/database/ForcedTransactionsRepository'
-import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
 import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 import { getTransactionStatus } from './getForcedTransactionStatus'
 
 export const PERPETUAL_ABI = new utils.Interface([
@@ -39,10 +37,6 @@ export class FinalizeExitEventsCollector {
     private readonly ethereumClient: EthereumClient,
     private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     private readonly transactionStatusRepository: TransactionStatusRepository,
-    // used only to sync finalized backwards
-    private readonly syncStatusRepository: SyncStatusRepository,
-    // used only to sync finalized backwards
-    private readonly logger: Logger,
     private readonly perpetualAddress: EthereumAddress
   ) {}
 
@@ -122,88 +116,6 @@ export class FinalizeExitEventsCollector {
 
     return 'added'
   }
-
-  // used only to sync finalized backwards
-  // #region sync-backwards
-  private syncExecuted = false
-  async oneTimeSync() {
-    if (this.syncExecuted) {
-      return
-    }
-
-    const firstSyncedBlock = await this.syncStatusRepository.getLastSynced()
-    if (!firstSyncedBlock || firstSyncedBlock < 14878490) {
-      return
-    }
-
-    const ranges = [
-      { start: 11834295, end: 13422633 },
-      { start: 13422634, end: 14878489 },
-      { start: 14878490, end: firstSyncedBlock },
-    ]
-
-    const blockRanges = ranges.map(
-      ({ start, end }) => new BlockRange([], start, end)
-    )
-
-    const logs = (
-      await Promise.all(blockRanges.map((range) => this.getLogs(range)))
-    ).flat()
-
-    const exitedStarkKeys =
-      await this.forcedTransactionsRepository.getExitedStarkKeys()
-
-    const transactions = logs.map((log) => {
-      const event = PERPETUAL_ABI.parseLog(log)
-      return {
-        blockNumber: log.blockNumber,
-        hash: Hash256(log.transactionHash),
-        data: {
-          starkKey: StarkKey.from(event.args.starkKey),
-          assetType: decodeAssetId(event.args.assetType.toHexString().slice(2)),
-          nonQuantizedAmount: BigInt(event.args.nonQuantizedAmount),
-          quantizedAmount: BigInt(event.args.quantizedAmount),
-          recipient: EthereumAddress(event.args.recipient),
-        },
-      }
-    })
-
-    const filteredTxs = transactions.filter((tx) =>
-      exitedStarkKeys.some((exited) => exited === tx.data.starkKey)
-    )
-
-    const minedFinalizes: MinedTransaction[] = await Promise.all(
-      filteredTxs.map(async (tx) => {
-        const block = await this.ethereumClient.getBlock(tx.blockNumber)
-        return {
-          minedAt: Timestamp.fromSeconds(block.timestamp),
-          ...tx,
-        }
-      })
-    )
-
-    const results = await Promise.all(
-      minedFinalizes.map(async (finalize, i, array) => {
-        let previousFinalizeMinedAt = Timestamp(0)
-        if (i > 0) {
-          previousFinalizeMinedAt = array[i - 1].minedAt
-        }
-
-        return await this.processFinalizes(finalize, previousFinalizeMinedAt)
-      })
-    )
-
-    this.syncExecuted = true
-    this.logger.info({
-      method: 'oneTimeSync',
-      results: results.reduce(
-        (acc, result) => ({ ...acc, [result]: acc[result] + 1 }),
-        { added: 0, updated: 0, ignored: 0 }
-      ),
-    })
-    return
-  }
-  // #endregion sync-backwards
 
   private async getMinedFinalizes(
     blockRange: BlockRange

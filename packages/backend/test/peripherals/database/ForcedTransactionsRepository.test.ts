@@ -614,42 +614,6 @@ describe(ForcedTransactionsRepository.name, () => {
     expect(afterFinalize).toEqual([])
   })
 
-  it('gets array of starkKeys', async () => {
-    const starkKey1 = StarkKey.fake()
-    const starkKey2 = StarkKey.fake()
-
-    const tx1 = {
-      hash: Hash256.fake(),
-      data: fakeWithdrawal({ starkKey: starkKey1 }),
-    }
-    const tx2 = {
-      hash: Hash256.fake(),
-      data: fakeWithdrawal({ starkKey: starkKey2 }),
-    }
-    const finalize1 = {
-      hash: Hash256.fake(),
-      data: fakeFinalize(),
-    }
-
-    const sentAtFinalize1 = fakeTimestamp()
-    const sentAt1 = fakeTimestamp(Number(sentAtFinalize1 as unknown as string))
-    const sentAt2 = null
-    const minedAtFinalize2 = fakeTimestamp()
-    const minedAt2 = fakeTimestamp(
-      Number(minedAtFinalize2 as unknown as string)
-    )
-    const blockNumber2 = fakeInt()
-
-    await repository.add(tx1, sentAt1)
-    await repository.add(tx2, sentAt2, minedAt2, blockNumber2)
-    await repository.saveFinalize(tx1.hash, finalize1.hash, sentAtFinalize1)
-
-    const actual = await repository.getExitedStarkKeys()
-
-    expect(actual).toBeAnArrayOfLength(2)
-    expect(actual).toBeAnArrayWith(starkKey1, starkKey2)
-  })
-
   it('finds latest finalize timestamp', async () => {
     const finalizeMinedAt = fakeTimestamp()
     const exitMinedAt = fakeTimestamp(Number(finalizeMinedAt))
