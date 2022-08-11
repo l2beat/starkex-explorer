@@ -1,12 +1,34 @@
-import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
-import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import {
+  encodeAssetId,
+  ForcedTrade,
+  ForcedWithdrawal,
+} from '@explorer/encoding'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { fakeHexString } from '@explorer/types/src/fake'
+import { BigNumber, providers } from 'ethers'
 
+import {
+  LogWithdrawalPerformed,
+  PERPETUAL_ABI,
+} from '../src/core/FinalizeExitEventsCollector'
 import {
   Accepted,
   ForcedTradeOfferRecord,
 } from '../src/peripherals/database/ForcedTradeOfferRepository'
-import { Updates } from '../src/peripherals/database/ForcedTransactionsRepository'
+import {
+  FinalizeExitAction,
+  FinalizeUpdates,
+  ForcedTransactionRecord,
+  Updates,
+} from '../src/peripherals/database/ForcedTransactionsRepository'
+import { StateUpdateRecord } from '../src/peripherals/database/StateUpdateRepository'
 import { Record as TransactionStatusRecord } from '../src/peripherals/database/TransactionStatusRepository'
 
 const MAX_SAFE_POSTGRES_INT = 2 ** 31 - 1
@@ -38,6 +60,20 @@ export function fakeWithdrawal(
   }
 }
 
+export function fakeFinalize(
+  finalize?: Partial<FinalizeExitAction>
+): FinalizeExitAction {
+  const amount = fakeBigInt()
+  return {
+    starkKey: StarkKey.fake(),
+    assetType: AssetId.USDC,
+    quantizedAmount: amount,
+    nonQuantizedAmount: amount,
+    recipient: EthereumAddress.fake(),
+    ...finalize,
+  }
+}
+
 export function fakeTrade(
   trade?: Partial<Omit<ForcedTrade, 'type'>>
 ): ForcedTrade {
@@ -65,6 +101,32 @@ export function fakeForcedUpdates(updates?: Partial<Updates>): Updates {
     verified: undefined,
     finalized: undefined,
     ...updates,
+  }
+}
+
+export function fakeForcedUpdatesVerified(
+  finalized?: Partial<FinalizeUpdates>
+): Updates {
+  const verifiedAt = fakeTimestamp()
+  const minedAt = fakeTimestamp(Number(verifiedAt))
+  const sentAt = fakeTimestamp(Number(minedAt))
+  return {
+    forgottenAt: null,
+    revertedAt: null,
+    sentAt,
+    minedAt,
+    verified: {
+      at: verifiedAt,
+      stateUpdateId: fakeInt(),
+    },
+    finalized: {
+      hash: Hash256.fake(),
+      forgottenAt: null,
+      minedAt: null,
+      revertedAt: null,
+      sentAt: null,
+      ...finalized,
+    },
   }
 }
 
@@ -119,6 +181,72 @@ export function fakeInitialOffer(
   return fakeOffer({ ...offer, accepted: undefined, cancelledAt: undefined })
 }
 
+export function fakeExit(
+  exit?: Partial<ForcedTransactionRecord>
+): ForcedTransactionRecord {
+  return {
+    hash: Hash256.fake(),
+    data: fakeWithdrawal(),
+    updates: fakeForcedUpdates(),
+    lastUpdateAt: fakeTimestamp(),
+    ...exit,
+  }
+}
+
+export function fakeBlock(block?: Partial<providers.Block>): providers.Block {
+  return {
+    hash: Hash256.fake().toString(),
+    parentHash: Hash256.fake().toString(),
+    transactions: [Hash256.fake().toString()],
+    number: fakeInt(),
+    timestamp: Number(fakeTimestamp()),
+    nonce: fakeInt().toString(),
+    difficulty: fakeInt(),
+    _difficulty: BigNumber.from(fakeBigInt()),
+    gasLimit: BigNumber.from(fakeBigInt()),
+    gasUsed: BigNumber.from(fakeBigInt()),
+    miner: EthereumAddress.fake().toString(),
+    extraData: '',
+    ...block,
+  }
+}
+
+export function fakeFinalizeLog(log?: Partial<providers.Log>): providers.Log {
+  const amount = fakeBigInt()
+  return {
+    blockNumber: fakeInt(),
+    blockHash: Hash256.fake().toString(),
+    transactionHash: Hash256.fake().toString(),
+    transactionIndex: fakeInt(200),
+    logIndex: fakeInt(10),
+    address: EthereumAddress.fake().toString(),
+    removed: false,
+    ...PERPETUAL_ABI.encodeEventLog(
+      PERPETUAL_ABI.getEvent(LogWithdrawalPerformed),
+      [
+        StarkKey.fake().toString(),
+        '0x' + encodeAssetId(AssetId.USDC),
+        amount,
+        amount,
+        EthereumAddress.fake().toString(),
+      ]
+    ),
+    ...log,
+  }
+}
+
+export function fakeStateUpdate(
+  stateUpdate?: Partial<StateUpdateRecord>
+): StateUpdateRecord {
+  return {
+    id: fakeInt(),
+    blockNumber: fakeInt(),
+    factHash: Hash256.fake(),
+    rootHash: PedersenHash.fake(),
+    timestamp: fakeTimestamp(),
+    ...stateUpdate,
+  }
+}
 export const fakePages = [
   '0xf01149464d55e9d6091ea8ce90e067fcdf255190c250c11c9ff223daa8f053c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008052ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec962600000000000000000000000000000000000000000000000000000000000000400106637e21413d60a10ac416032cdcd6c01e78d20cc78049080dc97d13d60f29000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000062e3e4a100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000062e3e4a10000000000000000000000000000000000000000000000000000000000000018078b04cad286193af3b3e01ca0e2ee7726aeb74cf0ca3f4b89867b943d4be99c00000000000000000000000000000000000000000000000000000000000000400f3010c31764422dcb4202071950625fd63a980fb2e1f066b8baeb6615abf39b000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000062e3e4a2000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000004554482d390000000000000000000000000000000000000000000000000000000000000000000000000001c97635e700000000000000000000000000000000004254432d313000000000000000000000000000000000000000000000000000000000000000000000000002e592b7fe000000000000000000000000000000000031494e43482d37000000000000000000000000000000000000000000000000000000000000000000000000178d4fdf0000000000000000000000000000000000414156452d3800000000000000000000000000000000000000000000000000000000000000000000000000ef212d7700000000000000000000000000000000004352562d360000000000000000000000000000000000000000000000000000000000000000000000000001451eb8510000000000000000000000000000000000444f47452d3500000000000000000000000000000000000000000000000000000000000000000000000000cccccccc00000000000000000000000000000000004c494e4b2d3700000000000000000000000000000000000000000000000000000000000000000000000000a66666660000000000000000000000000000000000534f4c2d370000000000000000000000000000000000000000000000000000000000000000000000000004360418930000000000000000000000000000000000000000000000000000000062e3e4a200000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
   '000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000062e3e4a1000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000017c30a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a00000000000000000000000000000000000000000000000080000013ad3043800000000000000000000000000000000000000000000000000000000062e3e4a100000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000001b550b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b000000000000000000000000000000000000000000000000800000059de707000000000000000000000000000000000000000000000000000000000062e3e4a100000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000b090c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c0000000000000000000000000000000000000000000000008000000458e0d9c00000000000000000000000000000000000000000000000000000000062e3e4a1',

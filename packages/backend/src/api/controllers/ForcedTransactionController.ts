@@ -66,6 +66,7 @@ export class ForcedTransactionController {
         type: 'exit',
         data: {
           ethereumAddress: user?.ethAddress,
+          starkKey: transaction.data.starkKey,
           positionId: transaction.data.positionId,
           transactionHash: transaction.hash,
           value: transaction.data.amount,
@@ -83,7 +84,7 @@ export class ForcedTransactionController {
                 address,
                 transactionHash: transaction.hash,
                 perpetualAddress: this.perpetualAddress,
-                starkKey: user.starkKey,
+                starkKey: transaction.data.starkKey,
               }
             : undefined,
       }

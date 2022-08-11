@@ -13,6 +13,7 @@ import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
 import { DataSyncService } from './core/DataSyncService'
+import { FinalizeExitEventsCollector } from './core/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './core/ForcedEventsCollector'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
 import { PageCollector } from './core/PageCollector'
@@ -150,6 +151,15 @@ export class Application {
       config.contracts.perpetual
     )
 
+    const finalizeExitEventsCollector = new FinalizeExitEventsCollector(
+      ethereumClient,
+      forcedTransactionsRepository,
+      transactionStatusRepository,
+      syncStatusRepository,
+      logger,
+      config.contracts.perpetual
+    )
+
     const dataSyncService = new DataSyncService(
       verifierCollector,
       memoryHashEventCollector,
@@ -158,6 +168,7 @@ export class Application {
       stateUpdateCollector,
       userRegistrationCollector,
       forcedEventsCollector,
+      finalizeExitEventsCollector,
       logger
     )
     const syncScheduler = new SyncScheduler(
@@ -267,6 +278,7 @@ export class Application {
       await apiServer.listen()
       if (config.enableSync) {
         transactionStatusMonitor.start()
+        await finalizeExitEventsCollector.oneTimeSync()
         await syncScheduler.start()
         await blockDownloader.start()
       }

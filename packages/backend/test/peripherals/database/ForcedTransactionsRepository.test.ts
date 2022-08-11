@@ -2,17 +2,22 @@ import { Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
 import { Logger } from '../../../src/tools/Logger'
 import {
   fakeBigInt,
+  fakeExit,
+  fakeFinalize,
   fakeForcedUpdates,
   fakeInt,
+  fakeStateUpdate,
   fakeTimestamp,
   fakeTrade,
   fakeWithdrawal,
 } from '../../fakes'
 import { setupDatabaseTestSuite } from './setup'
 
+const MAX_TIME = 2 ** 32 - 1
 describe(ForcedTransactionsRepository.name, () => {
   const { knex } = setupDatabaseTestSuite()
   const repository = new ForcedTransactionsRepository(knex, Logger.SILENT)
@@ -361,5 +366,317 @@ describe(ForcedTransactionsRepository.name, () => {
       lastUpdateAt: sentAt,
       updates: fakeForcedUpdates({ sentAt }),
     })
+  })
+
+  it('saves finalize transaction', async () => {
+    const tx1 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+    const tx2 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal(),
+    }
+    const finalize1 = {
+      hash: Hash256.fake(),
+      data: fakeFinalize(),
+    }
+    const finalize2 = {
+      hash: Hash256.fake(),
+      data: fakeFinalize(),
+    }
+
+    const sentAtFinalize1 = fakeTimestamp()
+    const sentAt1 = fakeTimestamp(Number(sentAtFinalize1 as unknown as string))
+    const sentAt2 = null
+    const minedAtFinalize2 = fakeTimestamp()
+    const minedAt2 = fakeTimestamp(
+      Number(minedAtFinalize2 as unknown as string)
+    )
+    const blockNumber2 = fakeInt()
+
+    await repository.add(tx1, sentAt1)
+    await repository.add(tx2, sentAt2, minedAt2, blockNumber2)
+
+    const sentAtFinalize2 = null
+    const blockNumberFinalize2 = fakeInt()
+
+    await repository.saveFinalize(tx1.hash, finalize1.hash, sentAtFinalize1)
+    await repository.saveFinalize(
+      tx2.hash,
+      finalize2.hash,
+      sentAtFinalize2,
+      minedAtFinalize2,
+      blockNumberFinalize2
+    )
+
+    const actual = await repository.getAll()
+    expect(actual).toBeAnArrayOfLength(2)
+    expect(actual).toEqual([
+      {
+        ...tx1,
+        lastUpdateAt: sentAtFinalize1,
+        updates: fakeForcedUpdates({
+          sentAt: sentAt1,
+          finalized: {
+            hash: finalize1.hash,
+            sentAt: sentAtFinalize1,
+            forgottenAt: null,
+            revertedAt: null,
+            minedAt: null,
+          },
+        }),
+      },
+
+      {
+        ...tx2,
+        lastUpdateAt: minedAtFinalize2,
+        updates: fakeForcedUpdates({
+          sentAt: sentAt2,
+          minedAt: minedAt2,
+          finalized: {
+            hash: finalize2.hash,
+            sentAt: null,
+            forgottenAt: null,
+            revertedAt: null,
+            minedAt: minedAtFinalize2,
+          },
+        }),
+      },
+    ])
+  })
+
+  it('finds exit by data for finalize', async () => {
+    const starkKey = StarkKey.fake()
+    const expectedMinedAt = fakeTimestamp()
+    const stateUpdateAt = fakeTimestamp()
+    const stateUpdateId = fakeInt()
+
+    const exit1 = fakeExit()
+    const expectedExit = fakeExit({
+      data: fakeWithdrawal({ starkKey }),
+    })
+    const exit3 = fakeExit()
+
+    await repository.add(exit1, null, fakeTimestamp(), 0)
+    await repository.add(expectedExit, null, expectedMinedAt, 0)
+    await repository.add(exit3, null, fakeTimestamp(), 0)
+
+    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    await stateUpdateRepo.add({
+      stateUpdate: fakeStateUpdate({
+        timestamp: stateUpdateAt,
+        id: stateUpdateId,
+      }),
+      positions: [],
+      prices: [],
+      transactionHashes: [expectedExit.hash],
+    })
+
+    const result = await repository.getWithdrawalsForFinalize(
+      starkKey,
+      Timestamp(MAX_TIME),
+      Timestamp(0)
+    )
+    expect(result).toEqual([
+      {
+        ...expectedExit,
+        updates: {
+          finalized: undefined,
+          sentAt: null,
+          forgottenAt: null,
+          revertedAt: null,
+          minedAt: expectedMinedAt,
+          verified: {
+            at: stateUpdateAt,
+            stateUpdateId,
+          },
+        },
+        lastUpdateAt:
+          Number(stateUpdateAt) > Number(expectedMinedAt)
+            ? stateUpdateAt
+            : expectedMinedAt,
+      },
+    ])
+    expect(result[0].hash).toEqual(expectedExit.hash)
+  })
+  it('finds exit by data for finalize', async () => {
+    const starkKey = StarkKey.fake()
+    const expectedMinedAt = fakeTimestamp()
+
+    const stateUpdateAt = fakeTimestamp()
+    const earlierStateAt = Timestamp(Number(stateUpdateAt) - 100)
+    const laterStateAt = Timestamp(Number(stateUpdateAt) + 100)
+    const stateUpdateId = fakeInt()
+
+    const exit1 = fakeExit()
+    const expectedExit = fakeExit({
+      data: fakeWithdrawal({ starkKey }),
+    })
+    const exit3 = fakeExit()
+
+    await repository.add(exit1, null, fakeTimestamp(), 0)
+    await repository.add(expectedExit, null, expectedMinedAt, 0)
+    await repository.add(exit3, null, fakeTimestamp(), 0)
+
+    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    await stateUpdateRepo.add({
+      stateUpdate: fakeStateUpdate({
+        timestamp: earlierStateAt,
+      }),
+      positions: [],
+      prices: [],
+      transactionHashes: [exit1.hash],
+    })
+    await stateUpdateRepo.add({
+      stateUpdate: fakeStateUpdate({
+        timestamp: stateUpdateAt,
+        id: stateUpdateId,
+      }),
+      positions: [],
+      prices: [],
+      transactionHashes: [expectedExit.hash],
+    })
+    await stateUpdateRepo.add({
+      stateUpdate: fakeStateUpdate({
+        timestamp: laterStateAt,
+      }),
+      positions: [],
+      prices: [],
+      transactionHashes: [exit3.hash],
+    })
+
+    const result = await repository.getWithdrawalsForFinalize(
+      starkKey,
+      Timestamp(MAX_TIME),
+      Timestamp(0)
+    )
+
+    expect(result).toEqual([
+      {
+        ...expectedExit,
+        updates: {
+          finalized: undefined,
+          sentAt: null,
+          forgottenAt: null,
+          revertedAt: null,
+          minedAt: expectedMinedAt,
+          verified: {
+            at: stateUpdateAt,
+            stateUpdateId,
+          },
+        },
+        lastUpdateAt:
+          Number(stateUpdateAt) > Number(expectedMinedAt)
+            ? stateUpdateAt
+            : expectedMinedAt,
+      },
+    ])
+  })
+
+  it('ignores finalized transaction', async () => {
+    const finalizeMinedAt = fakeTimestamp()
+    const exitMinedAt = fakeTimestamp(Number(finalizeMinedAt))
+    const starkKey = StarkKey.fake()
+
+    const exit = fakeExit({ data: fakeWithdrawal({ starkKey }) })
+    const finalize = Hash256.fake()
+
+    await repository.add(exit, null, exitMinedAt, 0)
+
+    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    await stateUpdateRepo.add({
+      stateUpdate: fakeStateUpdate(),
+      positions: [],
+      prices: [],
+      transactionHashes: [exit.hash],
+    })
+    const beforeFinalize = await repository.getWithdrawalsForFinalize(
+      starkKey,
+      Timestamp(MAX_TIME),
+      Timestamp(0)
+    )
+
+    await repository.saveFinalize(
+      exit.hash,
+      finalize,
+      null,
+      finalizeMinedAt,
+      fakeInt()
+    )
+    const afterFinalize = await repository.getWithdrawalsForFinalize(
+      starkKey,
+      Timestamp(Number(exitMinedAt) + 1),
+      Timestamp(0)
+    )
+
+    expect(beforeFinalize[0].hash).toEqual(exit.hash)
+    expect(afterFinalize).toEqual([])
+  })
+
+  it('gets array of starkKeys', async () => {
+    const starkKey1 = StarkKey.fake()
+    const starkKey2 = StarkKey.fake()
+
+    const tx1 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal({ starkKey: starkKey1 }),
+    }
+    const tx2 = {
+      hash: Hash256.fake(),
+      data: fakeWithdrawal({ starkKey: starkKey2 }),
+    }
+    const finalize1 = {
+      hash: Hash256.fake(),
+      data: fakeFinalize(),
+    }
+
+    const sentAtFinalize1 = fakeTimestamp()
+    const sentAt1 = fakeTimestamp(Number(sentAtFinalize1 as unknown as string))
+    const sentAt2 = null
+    const minedAtFinalize2 = fakeTimestamp()
+    const minedAt2 = fakeTimestamp(
+      Number(minedAtFinalize2 as unknown as string)
+    )
+    const blockNumber2 = fakeInt()
+
+    await repository.add(tx1, sentAt1)
+    await repository.add(tx2, sentAt2, minedAt2, blockNumber2)
+    await repository.saveFinalize(tx1.hash, finalize1.hash, sentAtFinalize1)
+
+    const actual = await repository.getExitedStarkKeys()
+
+    expect(actual).toBeAnArrayOfLength(2)
+    expect(actual).toBeAnArrayWith(starkKey1, starkKey2)
+  })
+
+  it('finds latest finalize timestamp', async () => {
+    const finalizeMinedAt = fakeTimestamp()
+    const exitMinedAt = fakeTimestamp(Number(finalizeMinedAt))
+    const starkKey = StarkKey.fake()
+
+    const exit = fakeExit({ data: fakeWithdrawal({ starkKey }) })
+    const finalize = Hash256.fake()
+
+    await repository.add(exit, null, exitMinedAt, 0)
+
+    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    await stateUpdateRepo.add({
+      stateUpdate: fakeStateUpdate(),
+      positions: [],
+      prices: [],
+      transactionHashes: [exit.hash],
+    })
+
+    await repository.saveFinalize(
+      exit.hash,
+      finalize,
+      null,
+      finalizeMinedAt,
+      fakeInt()
+    )
+    const result = await repository.findLatestFinalize()
+
+    expect(result).toEqual(finalizeMinedAt)
   })
 })

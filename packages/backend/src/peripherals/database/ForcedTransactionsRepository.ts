@@ -1,5 +1,12 @@
 import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
-import { AssetId, Hash256, json, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  json,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { Knex } from 'knex'
 import { ForcedTransactionRow, TransactionStatusRow } from 'knex/types/tables'
 import { MD5 as hashData } from 'object-hash'
@@ -9,26 +16,33 @@ import { Nullable } from '../../utils/Nullable'
 import { toSerializableJson } from '../../utils/toSerializableJson'
 import { BaseRepository } from './BaseRepository'
 
-export interface Updates {
+export interface FinalizeExitAction {
+  starkKey: StarkKey
+  assetType: AssetId
+  nonQuantizedAmount: bigint
+  quantizedAmount: bigint
+  recipient: EthereumAddress
+}
+
+export interface TransactionUpdates {
   sentAt: Nullable<Timestamp>
   minedAt: Nullable<Timestamp>
   revertedAt: Nullable<Timestamp>
   forgottenAt: Nullable<Timestamp>
+}
+
+export interface FinalizeUpdates extends TransactionUpdates {
+  hash: Hash256
+}
+
+export interface Updates extends TransactionUpdates {
   verified:
     | {
         at: Timestamp
         stateUpdateId: number
       }
     | undefined
-  finalized:
-    | {
-        hash: Hash256
-        sentAt: Nullable<Timestamp>
-        minedAt: Nullable<Timestamp>
-        revertedAt: Nullable<Timestamp>
-        forgottenAt: Nullable<Timestamp>
-      }
-    | undefined
+  finalized?: FinalizeUpdates
 }
 export interface ForcedTransactionRecord {
   hash: Hash256
@@ -287,6 +301,52 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
+  async findByFinalizeHash(
+    hash: Hash256
+  ): Promise<ForcedTransactionRecord | undefined> {
+    const [row] = await this.rowsQuery().where(
+      'finalize_tx.hash',
+      hash.toString()
+    )
+
+    return row ? toRecord(row) : undefined
+  }
+
+  async findLatestFinalize(): Promise<Timestamp | undefined> {
+    const row = await this.rowsQuery()
+      .whereNotNull('finalize_tx.mined_at')
+      .orderBy('finalize_tx.mined_at', 'desc')
+      .first()
+      .select('finalize_tx.mined_at as finalized_at')
+
+    return row ? Timestamp(row.finalized_at) : undefined
+  }
+
+  async getWithdrawalsForFinalize(
+    starkKey: StarkKey,
+    finalizeMinedAt: Timestamp,
+    previousFinalizeMinedAt: Timestamp
+  ): Promise<ForcedTransactionRecord[]> {
+    const rows = await this.rowsQuery()
+      .whereRaw("data->>'type' = 'withdrawal'")
+      .whereRaw("data->>'starkKey' = ?", String(starkKey))
+      .whereNull('finalize_tx.mined_at')
+      .where('state_updates.timestamp', '<', Number(finalizeMinedAt))
+      .where('state_updates.timestamp', '>', Number(previousFinalizeMinedAt))
+      .orderBy('state_updates.timestamp', 'desc')
+
+    return rows.map(toRecord)
+  }
+
+  // used only to sync finalized backwards
+  async getExitedStarkKeys(): Promise<StarkKey[]> {
+    const rows = await this.joinQuery()
+      .whereRaw("data->>'type' = 'withdrawal'")
+      .select(this.knex.raw("data->>'starkKey' as stark_key"))
+
+    return rows.map((row) => StarkKey(row.stark_key))
+  }
+
   async add(
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
       offerId?: number
@@ -347,7 +407,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
   async saveFinalize(
     exitHash: Hash256,
     finalizeHash: Hash256,
-    sentAt: Timestamp,
+    sentAt: Nullable<Timestamp>,
     minedAt: Timestamp,
     blockNumber: number
   ): Promise<boolean>
@@ -365,15 +425,18 @@ export class ForcedTransactionsRepository extends BaseRepository {
         .update({
           finalize_hash: finalizeHash.toString(),
         })
-      await trx('transaction_status').insert({
-        hash: finalizeHash.toString(),
-        mined_at:
-          minedAt !== null && minedAt !== undefined
-            ? BigInt(minedAt.toString())
-            : null,
-        sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
-        block_number: blockNumber,
-      })
+      await trx('transaction_status')
+        .insert({
+          hash: finalizeHash.toString(),
+          mined_at:
+            minedAt !== null && minedAt !== undefined
+              ? BigInt(minedAt.toString())
+              : null,
+          sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
+          block_number: blockNumber,
+        })
+        .onConflict('hash')
+        .ignore()
     })
     this.logger.debug({ method: 'saveFinalize', id: exitHash.toString() })
     return true

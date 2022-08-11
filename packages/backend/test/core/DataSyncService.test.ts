@@ -2,6 +2,7 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { DataSyncService } from '../../src/core/DataSyncService'
+import { FinalizeExitEventsCollector } from '../../src/core/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from '../../src/core/ForcedEventsCollector'
 import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCollector'
 import type { PageCollector } from '../../src/core/PageCollector'
@@ -43,6 +44,9 @@ describe(DataSyncService.name, () => {
     const forcedEventsCollector = mock<ForcedEventsCollector>({
       collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
     })
+    const finalizeExitEventsCollector = mock<FinalizeExitEventsCollector>({
+      collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
+    })
     const stateUpdateCollector = mock<StateUpdateCollector>({
       save: noop,
     })
@@ -55,6 +59,7 @@ describe(DataSyncService.name, () => {
       stateUpdateCollector,
       userRegistrationCollector,
       forcedEventsCollector,
+      finalizeExitEventsCollector,
       Logger.SILENT
     )
 
@@ -98,6 +103,7 @@ describe(DataSyncService.name, () => {
         discardAfter: noop,
       })
       const forcedEventsCollector = mock<ForcedEventsCollector>()
+      const finalizeExitEventsCollector = mock<FinalizeExitEventsCollector>()
 
       const dataSyncService = new DataSyncService(
         verifierCollector,
@@ -107,6 +113,7 @@ describe(DataSyncService.name, () => {
         stateUpdateCollector,
         userRegistrationCollector,
         forcedEventsCollector,
+        finalizeExitEventsCollector,
         Logger.SILENT
       )
 

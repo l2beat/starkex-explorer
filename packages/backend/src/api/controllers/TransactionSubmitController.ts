@@ -69,7 +69,7 @@ export class TransactionSubmitController {
       finalizeHash,
       sentAt
     )
-    return { type: 'created', content: { id: finalizeHash } }
+    return { type: 'success', content: finalizeHash.toString() }
   }
 
   async submitForcedTrade(

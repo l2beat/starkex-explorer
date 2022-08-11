@@ -273,11 +273,18 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
       ethereumAddress: EthereumAddress(
         '0x1234567890ABCDEF1234567890ABCDEF12345678'
       ),
+      starkKey: StarkKey.fake(),
       positionId: 1n,
       transactionHash: Hash256.fake(),
       value: 12345n,
       stateUpdateId: 1,
       status: 'finalized',
+    },
+    finalizeForm: {
+      transactionHash: Hash256.fake(),
+      address: EthereumAddress('0x6235538E538067Db89E72d24F4D1a757E234Bed1'),
+      perpetualAddress: EthereumAddress.fake(),
+      starkKey: StarkKey.fake(),
     },
   },
   history: [
@@ -291,7 +298,7 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
     },
     {
       timestamp: Timestamp(Date.now() - 1000),
-      text: `exit included in state update #1 (please finalize)`,
+      text: `exit included in state update #1`,
     },
     {
       timestamp: Timestamp(Date.now() - 100),

@@ -25,6 +25,14 @@ contract Perpetual {
         uint256 nonce
     );
 
+    event LogWithdrawalPerformed(
+        uint256 starkKey,
+        uint256 assetType,
+        uint256 nonQuantizedAmount,
+        uint256 quantizedAmount,
+        address recipient
+    );
+
     function registerUser(address ethKey, uint256 starkKey) external {
         emit LogUserRegistered(ethKey, starkKey, msg.sender);
     }
@@ -68,6 +76,16 @@ contract Perpetual {
             amountSynthetic,
             aIsBuyingSynthetic,
             nonce
+        );
+    }
+
+    function withdraw(uint256 starkKey, uint256 collateralAssetId) external {
+        emit LogWithdrawalPerformed(
+            starkKey,
+            collateralAssetId,
+            0,
+            0,
+            msg.sender
         );
     }
 }
