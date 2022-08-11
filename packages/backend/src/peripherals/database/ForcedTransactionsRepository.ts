@@ -338,15 +338,6 @@ export class ForcedTransactionsRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  // used only to sync finalized backwards
-  async getExitedStarkKeys(): Promise<StarkKey[]> {
-    const rows = await this.joinQuery()
-      .whereRaw("data->>'type' = 'withdrawal'")
-      .select(this.knex.raw("data->>'starkKey' as stark_key"))
-
-    return rows.map((row) => StarkKey(row.stark_key))
-  }
-
   async add(
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
       offerId?: number
