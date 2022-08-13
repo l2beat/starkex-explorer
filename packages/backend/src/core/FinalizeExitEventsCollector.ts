@@ -134,6 +134,7 @@ export class FinalizeExitEventsCollector {
           hash,
           minedAt,
           data: {
+            /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
             starkKey: StarkKey.from(event.args.starkKey),
             assetType: decodeAssetId(
               event.args.assetType.toHexString().slice(2)
@@ -141,6 +142,7 @@ export class FinalizeExitEventsCollector {
             nonQuantizedAmount: BigInt(event.args.nonQuantizedAmount),
             quantizedAmount: BigInt(event.args.quantizedAmount),
             recipient: EthereumAddress(event.args.recipient),
+            /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
           },
         }
       })

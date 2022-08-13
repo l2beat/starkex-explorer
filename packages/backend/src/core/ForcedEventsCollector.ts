@@ -106,6 +106,7 @@ export class ForcedEventsCollector {
         const minedAt = Timestamp.fromSeconds(block.timestamp)
         const base = { hash, blockNumber, minedAt }
 
+        /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
         switch (event.name) {
           case 'LogForcedTradeRequest':
             return {
@@ -138,6 +139,7 @@ export class ForcedEventsCollector {
           default:
             throw new Error('Unknown event!')
         }
+        /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
       })
     )
   }
