@@ -16,6 +16,7 @@ export function encodeFinalizeExitRequest(starkKey: StarkKey) {
 export function decodeFinalizeExitRequest(data: string) {
   try {
     const decoded = coder.decodeFunctionData('withdraw', data)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return StarkKey.from(decoded.starkKey)
   } catch {
     return

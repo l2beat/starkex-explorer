@@ -12,6 +12,7 @@ import { getAttribute } from './getAttribute'
 export function initFinalizeForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
       const address = EthereumAddress(getAttribute(form, 'address'))
@@ -32,7 +33,7 @@ export function initFinalizeForm() {
           hash,
         }),
       })
-      window.location.href = `/forced/${hash}`
+      window.location.href = `/forced/${hash.toString()}`
     })
   })
 }

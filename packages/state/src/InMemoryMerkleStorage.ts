@@ -8,10 +8,11 @@ export class InMemoryMerkleStorage<T extends MerkleValue = MerkleValue>
 {
   private store = new Map<PedersenHash, T>()
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async recover(hash: PedersenHash): Promise<T> {
     const value = this.store.get(hash)
     if (!value) {
-      throw new Error(`Cannot recover value for hash ${hash}`)
+      throw new Error(`Cannot recover value for hash ${hash.toString()}`)
     }
     return value
   }

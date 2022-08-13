@@ -31,7 +31,7 @@ const LogForcedTradeRequest = PERPETUAL_ABI.getEventTopic(
   'LogForcedTradeRequest'
 )
 
-type MinedTransaction = {
+interface MinedTransaction {
   hash: Hash256
   data: ForcedAction
   blockNumber: number

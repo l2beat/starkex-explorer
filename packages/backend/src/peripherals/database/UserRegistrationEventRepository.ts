@@ -5,7 +5,7 @@ import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export type UserRegistrationEventRecord = {
+export interface UserRegistrationEventRecord {
   id: number
   blockNumber: number
   ethAddress: EthereumAddress

@@ -17,7 +17,7 @@ describe(toSignableCreateOffer.name, () => {
     expect(toSignableCreateOffer(offer)).toEqual(
       [
         '{',
-        `  "starkKeyA": "${offer.starkKeyA}",`,
+        `  "starkKeyA": "${offer.starkKeyA.toString()}",`,
         '  "positionIdA": "1",',
         '  "syntheticAssetId": "BTC-10",',
         '  "collateralAmount": "2",',

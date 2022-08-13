@@ -52,7 +52,7 @@ export class StateUpdater {
       address.toString(),
       starkKey.toString()
     )
-    console.log(`Registered ${address} as ${starkKey}`)
+    console.log(`Registered ${address.toString()} as ${starkKey.toString()}`)
   }
 
   async update(updateData: UpdateData) {
@@ -118,7 +118,7 @@ export class StateUpdater {
       console.log(`Registered memory page ${i} of ${pages.length} ${hash}`)
     }
 
-    const stateTransitionFact = '0x' + PedersenHash.fake()
+    const stateTransitionFact = `0x${PedersenHash.fake().toString()}`
 
     await this.contracts.verifier.emitLogMemoryPagesHashes(
       stateTransitionFact,

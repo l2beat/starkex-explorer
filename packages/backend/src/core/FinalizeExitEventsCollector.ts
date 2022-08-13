@@ -25,7 +25,7 @@ export const LogWithdrawalPerformed = PERPETUAL_ABI.getEventTopic(
   'LogWithdrawalPerformed'
 )
 
-type MinedTransaction = {
+interface MinedTransaction {
   hash: Hash256
   data: FinalizeExitAction
   blockNumber: number

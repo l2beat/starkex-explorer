@@ -12,6 +12,7 @@ import { signAccepted } from './sign'
 export function initAcceptOfferForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
       const address = EthereumAddress(getAttribute(form, 'address'))

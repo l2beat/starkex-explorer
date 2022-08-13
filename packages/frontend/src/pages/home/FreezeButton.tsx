@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 
-type FreezeButtonProps = {
+interface FreezeButtonProps {
   active?: boolean
 }
 

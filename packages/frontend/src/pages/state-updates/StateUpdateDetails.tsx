@@ -101,7 +101,7 @@ export function StateUpdateDetails({
           { header: 'Position ID', numeric: true },
         ]}
         rows={transactions.map((transaction) => {
-          const link = `/forced/${transaction.hash}`
+          const link = `/forced/${transaction.hash.toString()}`
           return {
             link,
             cells: [

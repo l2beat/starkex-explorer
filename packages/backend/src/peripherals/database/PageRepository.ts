@@ -36,7 +36,7 @@ export class PageRepository extends BaseRepository {
   }
 
   async getByFactHashes(factHashes: Hash256[]) {
-    type Row = {
+    interface Row {
       fact_hash: string
       page_block: number
       fact_block: number

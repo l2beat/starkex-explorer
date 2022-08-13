@@ -22,12 +22,14 @@ export function decodeForcedWithdrawalRequest(
 ): ForcedWithdrawalRequest | undefined {
   try {
     const decoded = coder.decodeFunctionData('forcedWithdrawalRequest', data)
+    /* eslint-disable @typescript-eslint/no-unsafe-argument */
     return {
       starkKey: StarkKey.from(decoded.starkKey),
       positionId: BigInt(decoded.positionId),
       quantizedAmount: BigInt(decoded.quantizedAmount),
       premiumCost: Boolean(decoded.premiumCost),
     }
+    /* eslint-enable @typescript-eslint/no-unsafe-argument */
   } catch {
     return
   }

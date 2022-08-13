@@ -27,7 +27,7 @@ export function ServerPagination({
     const params = new URLSearchParams(additionalParams)
     params.set(ServerFormAttributes.PageInputName, page.toString())
     params.set(ServerFormAttributes.PerPageSelectName, perPage.toString())
-    return `${baseUrl}?${params}`
+    return `${baseUrl}?${params.toString()}`
   }
 
   return (

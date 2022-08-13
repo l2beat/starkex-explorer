@@ -144,14 +144,14 @@ function tradeMatchesOffer(
     offer.starkKeyA === trade.starkKeyA &&
     offer.accepted?.starkKeyB === trade.starkKeyB &&
     offer.positionIdA === trade.positionIdA &&
-    offer.accepted?.positionIdB === trade.positionIdB &&
+    offer.accepted.positionIdB === trade.positionIdB &&
     offer.collateralAmount === trade.collateralAmount &&
     offer.syntheticAmount === trade.syntheticAmount &&
     offer.isABuyingSynthetic === trade.isABuyingSynthetic &&
-    offer.accepted?.submissionExpirationTime ===
+    offer.accepted.submissionExpirationTime ===
       trade.submissionExpirationTime &&
-    offer.accepted?.nonce === trade.nonce &&
-    offer.accepted?.signature === trade.signature &&
-    offer.accepted?.premiumCost === trade.premiumCost
+    offer.accepted.nonce === trade.nonce &&
+    offer.accepted.signature === trade.signature &&
+    offer.accepted.premiumCost === trade.premiumCost
   )
 }

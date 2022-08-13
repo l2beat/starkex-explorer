@@ -46,6 +46,7 @@ describe(Position.name, () => {
     ])
     const json = position.toJSON()
     const transformed = JSON.parse(JSON.stringify(json))
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const recovered = Position.fromJSON(transformed)
     expect(recovered).toEqual(position)
   })

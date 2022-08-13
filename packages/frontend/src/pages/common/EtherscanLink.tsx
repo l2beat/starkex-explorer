@@ -16,9 +16,9 @@ export function EtherscanLink(props: EtherscanLinkProps) {
   if (props.block !== undefined) {
     href = `https://etherscan.io/block/${props.block}`
   } else if (props.address) {
-    href = `https://etherscan.io/address/${props.address}`
+    href = `https://etherscan.io/address/${props.address.toString()}`
   } else if (props.transaction) {
-    href = `https://etherscan.io/tx/${props.transaction}`
+    href = `https://etherscan.io/tx/${props.transaction.toString()}`
   }
   if (!href) {
     return null

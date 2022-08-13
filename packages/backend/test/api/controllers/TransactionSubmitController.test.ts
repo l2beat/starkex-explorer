@@ -30,7 +30,7 @@ describe(TransactionSubmitController.name, () => {
         EthereumAddress.fake()
       )
 
-      controller['getTransaction'] = async () => undefined
+      controller.getTransaction = async () => undefined
 
       const hash = Hash256.fake()
       const result = await controller.submitForcedExit(hash)
@@ -210,7 +210,7 @@ describe(TransactionSubmitController.name, () => {
         EthereumAddress.fake()
       )
 
-      controller['getTransaction'] = async () => undefined
+      controller.getTransaction = async () => undefined
 
       const hash = Hash256.fake()
       const result = await controller.submitForcedTrade(hash, offer.id)
@@ -336,7 +336,7 @@ describe(TransactionSubmitController.name, () => {
           EthereumAddress.fake()
         )
 
-        controller['getTransaction'] = async () => undefined
+        controller.getTransaction = async () => undefined
 
         const exitHash = Hash256.fake()
         const finalizeHash = Hash256.fake()

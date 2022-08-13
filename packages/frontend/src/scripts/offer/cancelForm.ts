@@ -8,7 +8,8 @@ import { signCancel } from './sign'
 export function initCancelOfferForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
-    form?.addEventListener('submit', async (e) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    form.addEventListener('submit', async (e) => {
       e.preventDefault()
       const offerId = Number(getAttribute(form, 'offer-id'))
       const address = EthereumAddress(getAttribute(form, 'address'))

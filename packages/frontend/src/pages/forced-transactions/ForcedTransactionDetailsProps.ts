@@ -7,7 +7,7 @@ import { TransactionStatus } from './ForcedTransactionsIndexProps'
 
 export type ForcedTransaction = ForcedExit | ForcedBuy | ForcedSell
 
-export type ForcedTradeData = {
+export interface ForcedTradeData {
   readonly positionIdA: bigint
   readonly addressA?: EthereumAddress
   readonly syntheticAmount: bigint
@@ -44,7 +44,7 @@ export interface ForcedExit {
   readonly finalizeForm?: FinalizeExitFormData
 }
 
-export type ForcedTransactionDetailsProps = {
+export interface ForcedTransactionDetailsProps {
   readonly account: AccountDetails | undefined
   readonly transaction: ForcedTransaction
   readonly history: ForcedHistoryEvent[]

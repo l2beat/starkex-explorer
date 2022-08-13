@@ -6,6 +6,7 @@ export function initTVLDisplay() {
     fetch('https://l2beat.com/api/dydx.json')
       .then((res) => res.json())
       .then((res) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const tvl = Number(res.data?.[res.data?.length - 1]?.[1])
         if (Number.isNaN(tvl)) {
           return

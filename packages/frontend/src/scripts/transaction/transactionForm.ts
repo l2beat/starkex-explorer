@@ -18,6 +18,7 @@ export function initTransactionForm() {
   ui.form.classList.remove('hidden')
   ui.form.classList.add('flex')
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(ui.form.dataset.props ?? '{}')
   const props = TransactionFormProps.parse(propsJson)
 
@@ -57,11 +58,11 @@ export function initTransactionForm() {
     dispatch({ type: 'ModifyTotal', value: ui.totalInput.value })
   )
 
-  ui.submitButton.addEventListener('click', async () => {
+  ui.submitButton.addEventListener('click', () => {
     if (!state || !state.canSubmit) {
       throw new Error('Programmer error: Submit button should be disabled')
     }
-    await submit(state)
+    submit(state).catch(console.error)
   })
 
   let state: FormState | undefined
@@ -95,7 +96,7 @@ export function initTransactionForm() {
       history.replaceState(
         null,
         '',
-        `${location.origin}${location.pathname}?assetId=${assetId}`
+        `${location.origin}${location.pathname}?assetId=${assetId.toString()}`
       )
     }
 

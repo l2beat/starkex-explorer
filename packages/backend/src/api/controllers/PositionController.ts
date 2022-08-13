@@ -117,7 +117,7 @@ export class PositionController {
     const previousPosition = history[updateIndex + 1]
     const assetChanges = position.balances.map((balance) => {
       const previousBalance =
-        previousPosition?.balances.find((b) => b.assetId === balance.assetId)
+        previousPosition.balances.find((b) => b.assetId === balance.assetId)
           ?.balance || 0n
       const currentBalance = balance.balance
       return {
@@ -133,7 +133,7 @@ export class PositionController {
       stateUpdateId,
       positionId,
       lastUpdateTimestamp: update.timestamp,
-      previousStarkKey: previousPosition?.starkKey,
+      previousStarkKey: previousPosition.starkKey,
       starkKey: position.starkKey,
       assetChanges,
       transactions: transactions

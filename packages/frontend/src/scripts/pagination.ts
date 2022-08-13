@@ -85,10 +85,13 @@ function initClientPaginationInstance(pagination: HTMLElement) {
 
 function getPaginationElements(pagination: HTMLElement) {
   const tableId = pagination.dataset.paginates
+  if (!tableId) {
+    throw new Error('Programmer error: missing table id!')
+  }
   const table = document.querySelector<HTMLTableElement>(`#${tableId}`)
   const [firstButton, previousButton, nextButton, lastButton] = Array.from(
     pagination.querySelectorAll<HTMLButtonElement>('button')
-  )
+  ) as (HTMLButtonElement | undefined)[]
   const currentPageView =
     pagination.querySelector<HTMLSpanElement>('[data-current]')
   const totalPagesView =

@@ -15,8 +15,7 @@ export function PositionDetails(props: PositionDetailsProps) {
     (tx) => tx.status === 'sent' || tx.status === 'mined'
   )
   const activeOffers = props.offers.filter(
-    (offer) =>
-      !offer.cancelledAt && !(offer.accepted && offer.accepted.transactionHash)
+    (offer) => !offer.cancelledAt && !offer.accepted?.transactionHash
   )
 
   return (

@@ -3,7 +3,7 @@ import React from 'react'
 
 import { AssetIcon } from '../icons/AssetIcon'
 
-export type AssetCellProps = {
+export interface AssetCellProps {
   assetId: AssetId
 }
 

@@ -20,7 +20,7 @@ export function ForcedTransactionDetails({
     <Page
       title={title}
       description="View the details of the forced transaction and a timeline of events from submission to inclusion in a state update."
-      path={`/forced/${transaction.data.transactionHash}`}
+      path={`/forced/${transaction.data.transactionHash.toString()}`}
       account={account}
     >
       <ForcedTransactionHeader title={title}>

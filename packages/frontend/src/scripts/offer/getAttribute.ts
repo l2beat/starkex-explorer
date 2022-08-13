@@ -1,17 +1,17 @@
 function toCamelCase(name: string) {
   let result = ''
   let uppercaseNext = false
-  for (let i = 0; i < name.length; i++) {
-    if (name[i] === '-') {
+  for (const character of name) {
+    if (character === '-') {
       uppercaseNext = true
       continue
     }
     if (uppercaseNext) {
-      result += name[i].toUpperCase()
+      result += character.toUpperCase()
       uppercaseNext = false
       continue
     }
-    result += name[i]
+    result += character
   }
   return result
 }

@@ -56,6 +56,7 @@ export function hexToHSL(hex: string) {
 }
 
 export function HSLToHex(hsl: { h: number; s: number; l: number }) {
+  // eslint-disable-next-line prefer-const
   let { h, s, l } = hsl
   s /= 100
   l /= 100
@@ -93,15 +94,17 @@ export function HSLToHex(hsl: { h: number; s: number; l: number }) {
     g = 0
     b = x
   }
-  // Having obtained RGB, convert channels to hex
-  let rHex = Math.round((r + m) * 255).toString(16)
-  let gHex = Math.round((g + m) * 255).toString(16)
-  let bHex = Math.round((b + m) * 255).toString(16)
 
-  // Prepend 0s, if necessary
-  if (rHex.length == 1) rHex = '0' + r
-  if (gHex.length == 1) gHex = '0' + g
-  if (bHex.length == 1) bHex = '0' + b
+  // Having obtained RGB, convert channels to hex
+  const rHex = Math.round((r + m) * 255)
+    .toString(16)
+    .padStart(2, '0')
+  const gHex = Math.round((g + m) * 255)
+    .toString(16)
+    .padStart(2, '0')
+  const bHex = Math.round((b + m) * 255)
+    .toString(16)
+    .padStart(2, '0')
 
   return '#' + rHex + gHex + bHex
 }

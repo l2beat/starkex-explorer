@@ -17,7 +17,7 @@ export function Table(props: TableProps) {
                 key={i}
                 className={cx(
                   'p-px pb-0.5 first:pl-0 last:pr-0 font-medium',
-                  column.textAlignClass ||
+                  column.textAlignClass ??
                     (column.numeric ? 'text-right' : 'text-left'),
                   !column.fullWidth && 'w-0',
                   column.className

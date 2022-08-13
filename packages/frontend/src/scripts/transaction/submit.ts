@@ -47,7 +47,7 @@ async function submitExit(state: FormState) {
     body: JSON.stringify({ hash }),
   })
 
-  window.location.href = `/forced/${hash}`
+  window.location.href = `/forced/${hash.toString()}`
 }
 
 async function submitOffer(state: FormState) {
@@ -74,6 +74,7 @@ async function submitOffer(state: FormState) {
   })
     .then((res) => res.json())
     .then((res) => {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-member-access
       window.location.href = `/forced/offers/${res.id}`
     })
     .catch(console.error)

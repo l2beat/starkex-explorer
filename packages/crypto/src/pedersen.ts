@@ -9,6 +9,7 @@ export async function pedersen(
   a: PedersenHash,
   b: PedersenHash
 ): Promise<PedersenHash> {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   return PedersenHash(await pool.exec('pedersenSync', [a, b]))
 }
 

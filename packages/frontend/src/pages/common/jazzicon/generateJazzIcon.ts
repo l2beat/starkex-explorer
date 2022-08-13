@@ -50,12 +50,12 @@ function genShape(
   const tx = Math.cos(angle) * velocity
   const ty = Math.sin(angle) * velocity
 
-  const translate = 'translate(' + tx + ' ' + ty + ')'
+  const translate = `translate(${tx} ${ty})`
 
   // Third random is a shape rotation on top of all of that.
   const secondRot = generator.random()
   const rot = firstRot * 360 + secondRot * 180
-  const rotate = 'rotate(' + rot.toFixed(1) + ' ' + center + ' ' + center + ')'
+  const rotate = `rotate(${rot.toFixed(1)} ${center} ${center})`
   const transform = translate + ' ' + rotate
   const color = pickColor(generator, colors)
 
