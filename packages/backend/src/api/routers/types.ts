@@ -15,8 +15,11 @@ export function withTypedContext<T extends z.AnyZodObject>(
 ) {
   return async (ctx: Context) => {
     const parseResult = parser.safeParse({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       params: ctx.params,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       query: ctx.query,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       request: ctx.request,
     })
     if (!parseResult.success) {
@@ -24,8 +27,11 @@ export function withTypedContext<T extends z.AnyZodObject>(
       ctx.body = { issues: parseResult.error.issues }
       return
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     ctx.params = parseResult.data.params
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     ctx.request.body = parseResult.data.request?.body
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     Object.defineProperty(ctx, 'query', { value: parseResult.data.query })
     await handler(ctx)
   }

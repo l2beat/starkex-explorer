@@ -36,6 +36,7 @@ export class StateTransitionFactCollector {
       const event = PERPETUAL_ABI.parseLog(log)
       return {
         blockNumber: log.blockNumber,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         hash: event.args.stateTransitionFact,
       }
     })

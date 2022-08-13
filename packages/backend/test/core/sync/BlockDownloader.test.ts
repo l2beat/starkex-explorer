@@ -39,6 +39,7 @@ describe(BlockDownloader.name, () => {
       )
 
       const mockAdvanceChain = mockFn().returns(undefined)
+      // @ts-expect-error acccess private member
       blockDownloader.addJob = mockAdvanceChain
 
       await blockDownloader.start()
@@ -163,6 +164,7 @@ describe(BlockDownloader.name, () => {
         Logger.SILENT,
         5
       )
+      // @ts-expect-error acccess private member
       blockDownloader.addJob = mockFn().returns(undefined)
 
       await blockDownloader.start()
@@ -245,7 +247,7 @@ describe(BlockDownloader.name, () => {
             (x) => x.number === hashOrTag || x.hash === hashOrTag
           )
           if (!block) {
-            throw new Error(`Block ${hashOrTag} not specified`)
+            throw new Error(`Block ${hashOrTag.toString()} not specified`)
           }
           return block as unknown as providers.Block
         },

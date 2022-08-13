@@ -224,7 +224,7 @@ describe(StateUpdateRepository.name, () => {
     ])
   })
 
-  describe('count forced txs', async () => {
+  describe('count forced txs', () => {
     const tx1 = {
       hash: Hash256.fake(),
       data: fakeWithdrawal(),

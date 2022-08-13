@@ -19,7 +19,7 @@ export function validateSyntheticBalance(
   positionBalances: readonly AssetBalance[]
 ): boolean {
   const syntheticBalance =
-    positionBalances.find((b) => b.assetId === syntheticAssetId)?.balance || 0n
+    positionBalances.find((b) => b.assetId === syntheticAssetId)?.balance ?? 0n
   return syntheticAmount <= syntheticBalance
 }
 

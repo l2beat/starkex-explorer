@@ -14,7 +14,9 @@ export class InMemoryRollupStorage
   async getParameters(rootHash: PedersenHash): Promise<RollupParameters> {
     const values = this.parameters.get(rootHash)
     if (!values) {
-      throw new Error(`Cannot recover parameters for hash ${rootHash.toString()}`)
+      throw new Error(
+        `Cannot recover parameters for hash ${rootHash.toString()}`
+      )
     }
     return values
   }

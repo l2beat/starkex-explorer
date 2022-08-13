@@ -43,6 +43,7 @@ export class EthereumClient {
     if (blockRange.isEmpty()) {
       return []
     }
+    // eslint-disable-next-line prefer-const
     let [from, to, hashes] = blockRange.splitByKnownHashes()
     if (hashes.length > this.safeBlockDistance) {
       to += hashes.length - this.safeBlockDistance
@@ -83,6 +84,7 @@ export class EthereumClient {
     transactionHash: Hash256
   ): Promise<ethers.providers.TransactionResponse | undefined> {
     const tx = await this.provider.getTransaction(transactionHash.toString())
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!tx) {
       return undefined
     }

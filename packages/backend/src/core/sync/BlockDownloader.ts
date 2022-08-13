@@ -19,7 +19,7 @@ export class BlockDownloader {
   private events = createEventEmitter<BlockDownloaderEvents>()
   private jobQueue: JobQueue
 
-  private lastKnown = 0
+  protected lastKnown = 0
   private queueTip = 0
   private started = false
 
@@ -100,7 +100,7 @@ export class BlockDownloader {
     })
   }
 
-  private async advanceChain(blockNumber: number) {
+  protected async advanceChain(blockNumber: number) {
     let [block, parent] = await Promise.all([
       this.ethereumClient.getBlock(blockNumber),
       this.getKnownBlock(blockNumber - 1),

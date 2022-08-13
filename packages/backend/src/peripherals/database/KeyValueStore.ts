@@ -12,11 +12,16 @@ export interface KeyValueRecord {
 export class KeyValueStore extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.findByKey = this.wrapFind(this.findByKey)
     this.addOrUpdate = this.wrapAdd(this.addOrUpdate)
     this.getAll = this.wrapGet(this.getAll)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteByKey = this.wrapDelete(this.deleteByKey)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async findByKey(key: string): Promise<string | undefined> {

@@ -76,6 +76,7 @@ export class PositionController {
       assets: current.assets,
       history: historyWithAssets.map((update, i) => {
         const previousUpdate = historyWithAssets[i + 1]
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         const assetsUpdated = previousUpdate
           ? countUpdatedAssets(previousUpdate.balances, update.balances)
           : 0
@@ -118,7 +119,7 @@ export class PositionController {
     const assetChanges = position.balances.map((balance) => {
       const previousBalance =
         previousPosition.balances.find((b) => b.assetId === balance.assetId)
-          ?.balance || 0n
+          ?.balance ?? 0n
       const currentBalance = balance.balance
       return {
         assetId: balance.assetId,
@@ -157,7 +158,7 @@ export class PositionController {
         path: '/positions/not-found',
         account,
         text: address
-          ? `Position for ${address} not found`
+          ? `Position for ${address.toString()} not found`
           : 'Position not found',
       }),
     }

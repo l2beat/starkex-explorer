@@ -21,6 +21,9 @@ export interface PositionWithPricesRecord extends PositionRecord {
 export class PositionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.findById = this.wrapFind(this.findById)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
     this.findById = this.wrapFind(this.findById)
@@ -28,6 +31,8 @@ export class PositionRepository extends BaseRepository {
     this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
     this.getPreviousStates = this.wrapGet(this.getPreviousStates)
     this.count = this.wrapAny(this.count)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async findById(positionId: bigint) {
@@ -58,9 +63,12 @@ export class PositionRepository extends BaseRepository {
         knex.raw('array_agg(row_to_json(prices)) as prices')
       )
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return rows.map((r) => {
       return {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         ...toPositionWithPricesRecord(r),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
         timestamp: Timestamp(r.timestamp),
       }
     })
@@ -68,6 +76,7 @@ export class PositionRepository extends BaseRepository {
 
   async findByIdWithPrices(id: bigint) {
     const knex = await this.knex()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const row = await knex('positions')
       .where('position_id', id)
       .orderBy('positions.state_update_id', 'desc')
@@ -77,6 +86,7 @@ export class PositionRepository extends BaseRepository {
         'positions.*',
         knex.raw('array_agg(row_to_json(prices)) as prices')
       )
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return row ? toPositionWithPricesRecord(row) : undefined
   }
 

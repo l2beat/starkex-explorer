@@ -31,7 +31,7 @@ export class SyncScheduler {
   ) {
     this.logger = logger.for(this)
     this.earliestBlock = opts.earliestBlock
-    this.maxBlockNumber = opts.maxBlockNumber || Infinity
+    this.maxBlockNumber = opts.maxBlockNumber ?? Infinity
     this.jobQueue = new JobQueue({ maxConcurrentJobs: 1 }, this.logger)
   }
 
@@ -55,7 +55,7 @@ export class SyncScheduler {
     this.logger.info('start', { lastSynced })
   }
 
-  private dispatch(action: SyncSchedulerAction) {
+  dispatch(action: SyncSchedulerAction) {
     const [newState, effect] = syncSchedulerReducer(this.state, action)
     this.state = newState
 
@@ -69,7 +69,7 @@ export class SyncScheduler {
 
           if (effect.type === 'sync') {
             await this.handleSync(effect.blocks)
-          } else if (effect.type === 'discardAfter') {
+          } else {
             await this.handleDiscardAfter(effect.blockNumber)
           }
         },
@@ -77,7 +77,7 @@ export class SyncScheduler {
     }
   }
 
-  private async handleSync(blocks: BlockRange) {
+  async handleSync(blocks: BlockRange) {
     if (blocks.end > this.maxBlockNumber) {
       this.logger.info(
         'Skipping data sync - the end of block range is after the max acceptable block number',

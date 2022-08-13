@@ -1,6 +1,9 @@
 import { z, ZodTypeAny } from 'zod'
 
-function preprocessStringAsNumber(finalType: ZodTypeAny, fallback?: number) {
+function preprocessStringAsNumber<T extends ZodTypeAny>(
+  finalType: T,
+  fallback?: number
+) {
   return z.preprocess((s) => {
     const res = z.string().safeParse(s)
     return res.success && s !== '' ? Number(res.data) : fallback

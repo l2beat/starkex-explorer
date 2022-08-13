@@ -154,6 +154,9 @@ function toRecord(row: Row): ForcedTransactionRecord {
 export class ForcedTransactionsRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.getAll = this.wrapGet(this.getAll)
     this.getLatest = this.wrapGet(this.getLatest)
     this.getIncludedInStateUpdate = this.wrapGet(this.getIncludedInStateUpdate)
@@ -161,6 +164,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
     this.countPendingByPositionId = this.wrapAny(this.countPendingByPositionId)
     this.findByHash = this.wrapFind(this.findByHash)
     this.deleteAll = this.wrapDelete(this.deleteAll)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   private joinQuery(knex: Knex) {
@@ -459,12 +464,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
     const deleted = await knex.transaction(async (trx) => {
       const hashes = await trx('forced_transactions').select('hash')
       await trx('forced_transactions').delete()
-      await trx('transaction_status')
-        .whereIn(
-          'hash',
-          hashes.map((h) => h.toString())
-        )
-        .delete()
+      await trx('transaction_status').whereIn('hash', hashes).delete()
       return hashes.length
     })
     return deleted

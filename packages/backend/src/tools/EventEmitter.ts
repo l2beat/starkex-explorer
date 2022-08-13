@@ -36,7 +36,7 @@ export interface IEventEmitter<EventTypes> {
 
   listeners<EventName extends keyof EventTypes>(
     type: EventName
-  ): (event: EventTypes[EventName]) => void[]
+  ): ((event: EventTypes[EventName]) => void)[]
 
   listenerCount<EventName extends keyof EventTypes>(type: EventName): number
 

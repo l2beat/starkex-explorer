@@ -85,7 +85,9 @@ export class RollupState {
         const newPositionAssets = assets.map((x) => {
           const fundingIndex = funding.get(x.assetId)
           if (fundingIndex === undefined) {
-            throw new Error(`Missing funding for asset: ${x.assetId.toString()}!`)
+            throw new Error(
+              `Missing funding for asset: ${x.assetId.toString()}!`
+            )
           }
           return { ...x, fundingIndex }
         })

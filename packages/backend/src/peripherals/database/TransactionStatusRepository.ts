@@ -87,9 +87,14 @@ function toRow(record: Record): Row {
 export class TransactionStatusRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.getWaitingToBeMined = this.wrapGet(this.getWaitingToBeMined)
     this.add = this.wrapAdd(this.add)
     this.deleteAll = this.wrapDelete(this.deleteAll)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   private waitingToBeMinedQuery(knex: Knex) {

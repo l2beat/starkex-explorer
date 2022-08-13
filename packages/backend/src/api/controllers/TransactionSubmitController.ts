@@ -26,7 +26,10 @@ export class TransactionSubmitController {
   async submitForcedExit(hash: Hash256): Promise<ControllerResult> {
     const tx = await this.getTransaction(hash)
     if (!tx) {
-      return { type: 'bad request', content: `Transaction ${hash} not found` }
+      return {
+        type: 'bad request',
+        content: `Transaction ${hash.toString()} not found`,
+      }
     }
     const data = decodeForcedWithdrawalRequest(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
@@ -56,7 +59,7 @@ export class TransactionSubmitController {
     if (!tx) {
       return {
         type: 'bad request',
-        content: `Transaction ${finalizeHash} not found`,
+        content: `Transaction ${finalizeHash.toString()} not found`,
       }
     }
     const data = decodeFinalizeExitRequest(tx.data)
@@ -89,7 +92,10 @@ export class TransactionSubmitController {
     }
     const tx = await this.getTransaction(hash)
     if (!tx) {
-      return { type: 'bad request', content: `Transaction ${hash} not found` }
+      return {
+        type: 'bad request',
+        content: `Transaction ${hash.toString()} not found`,
+      }
     }
     const data = decodeForcedTradeRequest(tx.data)
     if (

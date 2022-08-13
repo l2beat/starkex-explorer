@@ -49,7 +49,8 @@ export class ForcedEventsCollector {
     ) => Promise<MinedTransaction[]>
   ) {
     this.getMinedTransactions =
-      _getMinedTransactions || this.getMinedTransactions
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      _getMinedTransactions ?? this.getMinedTransactions
   }
 
   async collect(
