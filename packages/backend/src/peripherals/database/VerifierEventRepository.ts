@@ -1,8 +1,8 @@
-import { Knex } from 'knex'
 import { VerifierEventRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export interface VerifierEventRecord {
   id: number
@@ -13,8 +13,8 @@ export interface VerifierEventRecord {
 }
 
 export class VerifierEventRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -23,20 +23,25 @@ export class VerifierEventRepository extends BaseRepository {
 
   async addMany(records: Omit<VerifierEventRecord, 'id'>[]) {
     const rows = records.map(toRow)
-    return this.knex('verifier_events').insert(rows).returning('id')
+    const knex = await this.knex()
+    const ids = await knex('verifier_events').insert(rows).returning('id')
+    return ids.map((x) => x.id)
   }
 
   async getAll() {
-    const rows = await this.knex('verifier_events').select('*')
+    const knex = await this.knex()
+    const rows = await knex('verifier_events').select('*')
     return rows.map(toRecord)
   }
 
   async deleteAll() {
-    return this.knex('verifier_events').delete()
+    const knex = await this.knex()
+    return knex('verifier_events').delete()
   }
 
   async deleteAfter(blockNumber: number) {
-    return await this.knex('verifier_events')
+    const knex = await this.knex()
+    return await knex('verifier_events')
       .where('block_number', '>', blockNumber)
       .delete()
   }

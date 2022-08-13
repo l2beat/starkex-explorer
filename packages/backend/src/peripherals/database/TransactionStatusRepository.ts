@@ -3,7 +3,8 @@ import { Knex } from 'knex'
 
 import { Logger } from '../../tools/Logger'
 import { Nullable } from '../../utils/Nullable'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 interface Row {
   hash: string
@@ -84,15 +85,15 @@ function toRow(record: Record): Row {
 }
 
 export class TransactionStatusRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.getWaitingToBeMined = this.wrapGet(this.getWaitingToBeMined)
     this.add = this.wrapAdd(this.add)
     this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
-  private waitingToBeMinedQuery() {
-    return this.knex('transaction_status')
+  private waitingToBeMinedQuery(knex: Knex) {
+    return knex('transaction_status')
       .whereNotNull('sent_at')
       .whereNull('mined_at')
       .whereNull('reverted_at')
@@ -100,17 +101,20 @@ export class TransactionStatusRepository extends BaseRepository {
   }
 
   async add(record: Record): Promise<Hash256> {
-    await this.knex('transaction_status').insert(toRow(record))
+    const knex = await this.knex()
+    await knex('transaction_status').insert(toRow(record))
     return record.hash
   }
 
   async deleteAll(): Promise<number> {
-    const deleted = await this.knex('transaction_status').delete()
+    const knex = await this.knex()
+    const deleted = await knex('transaction_status').delete()
     return deleted
   }
 
   async getWaitingToBeMined(): Promise<Record[]> {
-    const rows = await this.waitingToBeMinedQuery()
+    const knex = await this.knex()
+    const rows = await this.waitingToBeMinedQuery(knex)
     return rows.map(toRecord)
   }
 
@@ -118,7 +122,8 @@ export class TransactionStatusRepository extends BaseRepository {
     record: Parameters<typeof toPartialRow>[0]
   ): Promise<boolean> {
     const row = toPartialRow(record)
-    const updates = await this.waitingToBeMinedQuery()
+    const knex = await this.knex()
+    const updates = await this.waitingToBeMinedQuery(knex)
       .where('hash', '=', row.hash)
       .update(row)
     return !!updates

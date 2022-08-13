@@ -15,12 +15,12 @@ import {
   fakeTrade,
   fakeWithdrawal,
 } from '../../fakes'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 const MAX_TIME = 2 ** 32 - 1
 describe(ForcedTransactionsRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new ForcedTransactionsRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new ForcedTransactionsRepository(database, Logger.SILENT)
 
   beforeEach(() => repository.deleteAll())
 
@@ -462,7 +462,7 @@ describe(ForcedTransactionsRepository.name, () => {
     await repository.add(expectedExit, null, expectedMinedAt, 0)
     await repository.add(exit3, null, fakeTimestamp(), 0)
 
-    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    const stateUpdateRepo = new StateUpdateRepository(database, Logger.SILENT)
     await stateUpdateRepo.add({
       stateUpdate: fakeStateUpdate({
         timestamp: stateUpdateAt,
@@ -519,7 +519,7 @@ describe(ForcedTransactionsRepository.name, () => {
     await repository.add(expectedExit, null, expectedMinedAt, 0)
     await repository.add(exit3, null, fakeTimestamp(), 0)
 
-    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    const stateUpdateRepo = new StateUpdateRepository(database, Logger.SILENT)
     await stateUpdateRepo.add({
       stateUpdate: fakeStateUpdate({
         timestamp: earlierStateAt,
@@ -584,7 +584,7 @@ describe(ForcedTransactionsRepository.name, () => {
 
     await repository.add(exit, null, exitMinedAt, 0)
 
-    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    const stateUpdateRepo = new StateUpdateRepository(database, Logger.SILENT)
     await stateUpdateRepo.add({
       stateUpdate: fakeStateUpdate(),
       positions: [],
@@ -624,7 +624,7 @@ describe(ForcedTransactionsRepository.name, () => {
 
     await repository.add(exit, null, exitMinedAt, 0)
 
-    const stateUpdateRepo = new StateUpdateRepository(knex, Logger.SILENT)
+    const stateUpdateRepo = new StateUpdateRepository(database, Logger.SILENT)
     await stateUpdateRepo.add({
       stateUpdate: fakeStateUpdate(),
       positions: [],

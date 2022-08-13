@@ -14,7 +14,8 @@ import { MD5 as hashData } from 'object-hash'
 import { Logger } from '../../tools/Logger'
 import { Nullable } from '../../utils/Nullable'
 import { toSerializableJson } from '../../utils/toSerializableJson'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export interface FinalizeExitAction {
   starkKey: StarkKey
@@ -151,8 +152,8 @@ function toRecord(row: Row): ForcedTransactionRecord {
 }
 
 export class ForcedTransactionsRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.getAll = this.wrapGet(this.getAll)
     this.getLatest = this.wrapGet(this.getLatest)
     this.getIncludedInStateUpdate = this.wrapGet(this.getIncludedInStateUpdate)
@@ -162,8 +163,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
     this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
-  private joinQuery() {
-    return this.knex('forced_transactions')
+  private joinQuery(knex: Knex) {
+    return knex('forced_transactions')
       .innerJoin(
         'transaction_status as exit_tx',
         'exit_tx.hash',
@@ -181,8 +182,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
       )
   }
 
-  private rowsQuery() {
-    return this.joinQuery().select(
+  private rowsQuery(knex: Knex) {
+    return this.joinQuery(knex).select(
       'forced_transactions.*',
       'state_updates.timestamp as verified_at',
       'exit_tx.mined_at',
@@ -196,10 +197,10 @@ export class ForcedTransactionsRepository extends BaseRepository {
     )
   }
 
-  private sortedRowsQuery() {
-    return this.rowsQuery()
+  private sortedRowsQuery(knex: Knex) {
+    return this.rowsQuery(knex)
       .select(
-        this.knex.raw(`greatest(
+        knex.raw(`greatest(
       "timestamp",
       "exit_tx"."mined_at",
       "exit_tx"."sent_at",
@@ -215,7 +216,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
   }
 
   async getAll(): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.rowsQuery()
+    const knex = await this.knex()
+    const rows = await this.rowsQuery(knex)
     return rows.map(toRecord)
   }
 
@@ -226,14 +228,16 @@ export class ForcedTransactionsRepository extends BaseRepository {
     limit: number
     offset: number
   }): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.sortedRowsQuery().offset(offset).limit(limit)
+    const knex = await this.knex()
+    const rows = await this.sortedRowsQuery(knex).offset(offset).limit(limit)
     return rows.map(toRecord)
   }
 
   async getIncludedInStateUpdate(
     stateUpdateId: number
   ): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.rowsQuery().where(
+    const knex = await this.knex()
+    const rows = await this.rowsQuery(knex).where(
       'state_update_id',
       '=',
       stateUpdateId
@@ -242,7 +246,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
   }
 
   async countPendingByPositionId(positionId: bigint) {
-    const [{ count }] = await this.joinQuery()
+    const knex = await this.knex()
+    const [{ count }] = await this.joinQuery(knex)
       .where(function () {
         void this.whereRaw("data->>'positionId' = ?", String(positionId))
           .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
@@ -259,7 +264,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
   async getByPositionId(
     positionId: bigint
   ): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.sortedRowsQuery()
+    const knex = await this.knex()
+    const rows = await this.sortedRowsQuery(knex)
       .whereRaw("data->>'positionId' = ?", String(positionId))
       .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
       .orWhereRaw("data->>'positionIdB' = ?", String(positionId))
@@ -273,7 +279,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
       return []
     }
     const hashes = datas.map(hashData)
-    const transactions = await this.knex('forced_transactions')
+    const knex = await this.knex()
+    const transactions = await knex('forced_transactions')
       .whereIn('data_hash', hashes)
       .whereNull('state_update_id')
       .orderBy('hash')
@@ -292,7 +299,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
   async findByHash(
     hash: Hash256
   ): Promise<ForcedTransactionRecord | undefined> {
-    const [row] = await this.rowsQuery().where(
+    const knex = await this.knex()
+    const [row] = await this.rowsQuery(knex).where(
       'forced_transactions.hash',
       '=',
       hash.toString()
@@ -304,7 +312,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
   async findByFinalizeHash(
     hash: Hash256
   ): Promise<ForcedTransactionRecord | undefined> {
-    const [row] = await this.rowsQuery().where(
+    const knex = await this.knex()
+    const [row] = await this.rowsQuery(knex).where(
       'finalize_tx.hash',
       hash.toString()
     )
@@ -313,7 +322,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
   }
 
   async findLatestFinalize(): Promise<Timestamp | undefined> {
-    const row = await this.rowsQuery()
+    const knex = await this.knex()
+    const row = await this.rowsQuery(knex)
       .whereNotNull('finalize_tx.mined_at')
       .orderBy('finalize_tx.mined_at', 'desc')
       .first()
@@ -327,7 +337,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
     finalizeMinedAt: Timestamp,
     previousFinalizeMinedAt: Timestamp
   ): Promise<ForcedTransactionRecord[]> {
-    const rows = await this.rowsQuery()
+    const knex = await this.knex()
+    const rows = await this.rowsQuery(knex)
       .whereRaw("data->>'type' = 'withdrawal'")
       .whereRaw("data->>'starkKey' = ?", String(starkKey))
       .whereNull('finalize_tx.mined_at')
@@ -363,7 +374,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
     blockNumber?: number
   ): Promise<Hash256> {
     const { hash, data } = transaction
-    await this.knex.transaction(async (trx) => {
+    const knex = await this.knex()
+    await knex.transaction(async (trx) => {
       await trx('forced_transactions').insert({
         hash: hash.toString(),
         type: data.type,
@@ -410,7 +422,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
     minedAt?: Timestamp,
     blockNumber?: number
   ): Promise<boolean> {
-    await this.knex.transaction(async (trx) => {
+    const knex = await this.knex()
+    await knex.transaction(async (trx) => {
       await trx('forced_transactions')
         .where({ hash: exitHash.toString() })
         .update({
@@ -434,14 +447,16 @@ export class ForcedTransactionsRepository extends BaseRepository {
   }
 
   async countAll(): Promise<number> {
-    const result = await this.knex('forced_transactions').count()
+    const knex = await this.knex()
+    const result = await knex('forced_transactions').count()
     const count = Number(result[0].count)
     this.logger.debug({ method: 'countAll', count })
     return count
   }
 
   async deleteAll(): Promise<number> {
-    const deleted = await this.knex.transaction(async (trx) => {
+    const knex = await this.knex()
+    const deleted = await knex.transaction(async (trx) => {
       const hashes = await trx('forced_transactions').select('hash')
       await trx('forced_transactions').delete()
       await trx('transaction_status')

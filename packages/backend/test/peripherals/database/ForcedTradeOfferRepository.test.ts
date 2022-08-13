@@ -10,11 +10,11 @@ import {
   fakeOffer,
   fakeTimestamp,
 } from '../../fakes'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(ForcedTradeOfferRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new ForcedTradeOfferRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new ForcedTradeOfferRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

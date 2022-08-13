@@ -6,11 +6,11 @@ import {
   StateTransitionFactRepository,
 } from '../../../src/peripherals/database/StateTransitionFactsRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(StateTransitionFactRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new StateTransitionFactRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new StateTransitionFactRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

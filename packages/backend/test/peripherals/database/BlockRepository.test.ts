@@ -7,11 +7,11 @@ import {
   BlockRepository,
 } from '../../../src/peripherals/database/BlockRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(BlockRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new BlockRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new BlockRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

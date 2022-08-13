@@ -4,11 +4,11 @@ import { expect } from 'earljs'
 
 import { RollupStateRepository } from '../../../src/peripherals/database/RollupStateRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(RollupStateRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new RollupStateRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new RollupStateRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

@@ -1,15 +1,15 @@
 import { OraclePrice } from '@explorer/encoding'
 import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { Knex } from 'knex'
 import { PriceRow, StateUpdateRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './BaseRepository'
 import {
   PositionRecord,
   toPositionRow,
   toPositionWithPricesRecord,
 } from './PositionRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export interface StateUpdateRecord {
   id: number
@@ -26,8 +26,8 @@ export interface StateUpdatePriceRecord {
 }
 
 export class StateUpdateRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.add = this.wrapAdd(this.add)
     this.findLast = this.wrapFind(this.findLast)
     this.findIdByRootHash = this.wrapFind(this.findIdByRootHash)
@@ -45,7 +45,8 @@ export class StateUpdateRepository extends BaseRepository {
     prices,
     transactionHashes,
   }: StateUpdateBundle) {
-    await this.knex.transaction(async (trx) => {
+    const knex = await this.knex()
+    await knex.transaction(async (trx) => {
       await trx('state_updates').insert([toStateUpdateRow(stateUpdate)])
 
       if (positions.length > 0)
@@ -67,21 +68,24 @@ export class StateUpdateRepository extends BaseRepository {
   }
 
   async findLast(): Promise<StateUpdateRecord | undefined> {
-    const row = await this.knex('state_updates')
+    const knex = await this.knex()
+    const row = await knex('state_updates')
       .orderBy('block_number', 'desc')
       .first()
     return row && toStateUpdateRecord(row)
   }
 
   async findIdByRootHash(hash: PedersenHash): Promise<number | undefined> {
-    const row = await this.knex('state_updates')
+    const knex = await this.knex()
+    const row = await knex('state_updates')
       .where('root_hash', hash.toString())
       .first('id')
     return row?.id
   }
 
   async getAll() {
-    const rows = await this.knex('state_updates').select('*')
+    const knex = await this.knex()
+    const rows = await knex('state_updates').select('*')
     return rows.map(toStateUpdateRecord)
   }
 
@@ -93,7 +97,8 @@ export class StateUpdateRepository extends BaseRepository {
       position_count: bigint
       forced_transactions_count: number
     }
-    const rows = (await this.knex('state_updates')
+    const knex = await this.knex()
+    const rows = (await knex('state_updates')
       .orderBy('timestamp', 'desc')
       .offset(offset)
       .limit(limit)
@@ -108,8 +113,8 @@ export class StateUpdateRepository extends BaseRepository {
         'id',
         'root_hash',
         'timestamp',
-        this.knex.raw('count(distinct position_id) as position_count'),
-        this.knex.raw('count(distinct hash) as forced_transactions_count')
+        knex.raw('count(distinct position_id) as position_count'),
+        knex.raw('count(distinct hash) as forced_transactions_count')
       )) as Row[]
 
     return rows.map((row) => ({
@@ -122,14 +127,16 @@ export class StateUpdateRepository extends BaseRepository {
   }
 
   async count() {
-    const row = await this.knex('state_updates').count()
+    const knex = await this.knex()
+    const row = await knex('state_updates').count()
     return BigInt(row[0].count)
   }
 
   async findByIdWithPositions(id: number) {
+    const knex = await this.knex()
     const [update, positions] = await Promise.all([
-      this.knex('state_updates').where('id', '=', id).first(),
-      this.knex('positions')
+      knex('state_updates').where('id', '=', id).first(),
+      knex('positions')
         .where('positions.state_update_id', '=', id)
         .leftJoin(
           'prices',
@@ -139,7 +146,7 @@ export class StateUpdateRepository extends BaseRepository {
         .groupBy('positions.position_id', 'positions.state_update_id')
         .select(
           'positions.*',
-          this.knex.raw('array_agg(row_to_json(prices)) as prices')
+          knex.raw('array_agg(row_to_json(prices)) as prices')
         ),
     ])
 
@@ -158,11 +165,13 @@ export class StateUpdateRepository extends BaseRepository {
   }
 
   async deleteAll() {
-    return this.knex('state_updates').delete()
+    const knex = await this.knex()
+    return knex('state_updates').delete()
   }
 
   async deleteAfter(blockNumber: number) {
-    return this.knex('state_updates')
+    const knex = await this.knex()
+    return knex('state_updates')
       .where('block_number', '>', blockNumber)
       .delete()
   }

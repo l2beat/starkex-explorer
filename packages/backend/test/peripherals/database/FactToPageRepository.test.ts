@@ -6,11 +6,11 @@ import {
   FactToPageRepository,
 } from '../../../src/peripherals/database/FactToPageRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(FactToPageRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new FactToPageRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new FactToPageRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

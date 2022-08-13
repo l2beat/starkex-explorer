@@ -27,7 +27,6 @@ import { TransactionStatusService } from './core/TransactionStatusService'
 import { UserRegistrationCollector } from './core/UserRegistrationCollector'
 import { VerifierCollector } from './core/VerifierCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
-import { DatabaseService } from './peripherals/database/DatabaseService'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
@@ -35,6 +34,7 @@ import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
+import { Database } from './peripherals/database/shared/Database'
 import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
@@ -59,36 +59,38 @@ export class Application {
     // #endregion tools
     // #region peripherals
 
-    const knex = DatabaseService.createKnexInstance(config.databaseConnection)
-    const databaseService = new DatabaseService(knex, logger)
+    const database = new Database(config.databaseConnection, logger)
 
-    const kvStore = new KeyValueStore(knex, logger)
+    const kvStore = new KeyValueStore(database, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
-    const verifierEventRepository = new VerifierEventRepository(knex, logger)
-    const factToPageRepository = new FactToPageRepository(knex, logger)
-    const pageRepository = new PageRepository(knex, logger)
-    const stateTransitionFactRepository = new StateTransitionFactRepository(
-      knex,
+    const verifierEventRepository = new VerifierEventRepository(
+      database,
       logger
     )
-    const blockRepository = new BlockRepository(knex, logger)
-    const rollupStateRepository = new RollupStateRepository(knex, logger)
-    const stateUpdateRepository = new StateUpdateRepository(knex, logger)
-    const positionRepository = new PositionRepository(knex, logger)
+    const factToPageRepository = new FactToPageRepository(database, logger)
+    const pageRepository = new PageRepository(database, logger)
+    const stateTransitionFactRepository = new StateTransitionFactRepository(
+      database,
+      logger
+    )
+    const blockRepository = new BlockRepository(database, logger)
+    const rollupStateRepository = new RollupStateRepository(database, logger)
+    const stateUpdateRepository = new StateUpdateRepository(database, logger)
+    const positionRepository = new PositionRepository(database, logger)
     const userRegistrationEventRepository = new UserRegistrationEventRepository(
-      knex,
+      database,
       logger
     )
     const forcedTransactionsRepository = new ForcedTransactionsRepository(
-      knex,
+      database,
       logger
     )
     const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
-      knex,
+      database,
       logger
     )
     const transactionStatusRepository = new TransactionStatusRepository(
-      knex,
+      database,
       logger
     )
     const ethereumClient = new EthereumClient(
@@ -107,7 +109,6 @@ export class Application {
     )
 
     const statusService = new StatusService({
-      databaseService,
       blockDownloader,
     })
 
@@ -270,10 +271,10 @@ export class Application {
     this.start = async () => {
       logger.for(this).info('Starting')
 
-      if (config.freshStart) await databaseService.rollbackAll()
-      await databaseService.migrateToLatest()
-
       await apiServer.listen()
+      if (config.freshStart) await database.rollbackAll()
+      await database.migrateToLatest()
+
       if (config.enableSync) {
         transactionStatusMonitor.start()
         await syncScheduler.start()

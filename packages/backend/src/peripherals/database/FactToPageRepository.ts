@@ -1,9 +1,9 @@
 import { Hash256 } from '@explorer/types'
-import { Knex } from 'knex'
 import { FactToPageRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export interface FactToPageRecord {
   id: number
@@ -14,8 +14,8 @@ export interface FactToPageRecord {
 }
 
 export class FactToPageRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -24,20 +24,25 @@ export class FactToPageRepository extends BaseRepository {
 
   async addMany(records: Omit<FactToPageRecord, 'id'>[]) {
     const rows = records.map(toRow)
-    return await this.knex('fact_to_pages').insert(rows).returning('id')
+    const knex = await this.knex()
+    const ids = await knex('fact_to_pages').insert(rows).returning('id')
+    return ids.map((x) => x.id)
   }
 
   async getAll() {
-    const rows = await this.knex('fact_to_pages').select('*')
+    const knex = await this.knex()
+    const rows = await knex('fact_to_pages').select('*')
     return rows.map(toRecord)
   }
 
   async deleteAll() {
-    return await this.knex('fact_to_pages').delete()
+    const knex = await this.knex()
+    return await knex('fact_to_pages').delete()
   }
 
   async deleteAllAfter(blockNumber: number) {
-    return await this.knex('fact_to_pages')
+    const knex = await this.knex()
+    return await knex('fact_to_pages')
       .where('block_number', '>', blockNumber)
       .delete()
   }

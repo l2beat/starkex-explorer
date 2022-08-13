@@ -1,9 +1,9 @@
 import { Hash256 } from '@explorer/types'
-import { Knex } from 'knex'
 import { PageRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export interface PageRecord {
   id: number
@@ -13,8 +13,8 @@ export interface PageRecord {
 }
 
 export class PageRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.getByFactHashes = this.wrapGet(this.getByFactHashes)
@@ -24,11 +24,14 @@ export class PageRepository extends BaseRepository {
 
   async addMany(records: Omit<PageRecord, 'id'>[]) {
     const rows = records.map(toRow)
-    return this.knex('pages').insert(rows).returning('id')
+    const knex = await this.knex()
+    const ids = await knex('pages').insert(rows).returning('id')
+    return ids.map((x) => x.id)
   }
 
   async getAll() {
-    const rows = await this.knex('pages').select('*')
+    const knex = await this.knex()
+    const rows = await knex('pages').select('*')
     return rows.map(toRecord)
   }
 
@@ -41,7 +44,8 @@ export class PageRepository extends BaseRepository {
       index: number
     }
 
-    const rows = (await this.knex('fact_to_pages')
+    const knex = await this.knex()
+    const rows = (await knex('fact_to_pages')
       .select(
         'fact_hash',
         'fact_to_pages.block_number as fact_block',
@@ -93,11 +97,13 @@ export class PageRepository extends BaseRepository {
   }
 
   async deleteAll() {
-    return this.knex('pages').delete()
+    const knex = await this.knex()
+    return knex('pages').delete()
   }
 
   async deleteAfter(blockNumber: number) {
-    return this.knex('pages').where('block_number', '>', blockNumber).delete()
+    const knex = await this.knex()
+    return knex('pages').where('block_number', '>', blockNumber).delete()
   }
 }
 
