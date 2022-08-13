@@ -20,5 +20,6 @@ export const starkCurve = new ec(
 )
 
 export function starkCurvePoint(a: BN, b: BN): curve.base.BasePoint {
+  // eslint-disable-next-line
   return starkCurve.curve.point(a, b)
 }

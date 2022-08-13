@@ -12,6 +12,7 @@ const rollbar = accessToken
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function reportError(...args: any[]): void {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   rollbar?.error(...args)
 }
 

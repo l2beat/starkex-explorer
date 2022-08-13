@@ -15,10 +15,15 @@ export interface VerifierEventRecord {
 export class VerifierEventRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async addMany(records: Omit<VerifierEventRecord, 'id'>[]) {

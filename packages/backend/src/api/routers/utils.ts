@@ -12,6 +12,7 @@ export function applyControllerResult(ctx: Context, result: ControllerResult) {
       ctx.status = 201
     } else if (result.type === 'bad request') {
       ctx.status = 400
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (result.type === 'not found') {
       ctx.status = 404
     }

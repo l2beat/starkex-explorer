@@ -95,7 +95,7 @@ describe(RollupStateRepository.name, () => {
     it('throws when parameters for rootHash are missing from db', async () => {
       const fakePedersen = PedersenHash.fake('111')
       await expect(repository.getParameters(fakePedersen)).toBeRejected(
-        `Cannot find parameters for ${fakePedersen}`
+        `Cannot find parameters for ${fakePedersen.toString()}`
       )
     })
 

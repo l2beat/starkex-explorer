@@ -38,6 +38,7 @@ async function main() {
   ])
 
   contracts.perpetual.on('LogForcedWithdrawalRequest', (...argsAndEvent) => {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     const event = argsAndEvent[argsAndEvent.length - 1]
     const args: LogForcedWithdrawalRequestEventObject = event.args
     simulation.queueForcedAction({
@@ -46,9 +47,11 @@ async function main() {
       positionId: args.vaultId.toBigInt(),
       starkKey: StarkKey.from(args.starkKey),
     })
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
   })
 
   contracts.perpetual.on('LogForcedTradeRequest', (...argsAndEvent) => {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     const event = argsAndEvent[argsAndEvent.length - 1]
     const args: LogForcedTradeRequestEventObject = event.args
     simulation.queueForcedAction({
@@ -65,6 +68,7 @@ async function main() {
       ),
       nonce: args.nonce.toBigInt(),
     })
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
   })
 
   await simulation.addUser(
@@ -80,7 +84,7 @@ async function main() {
   await simulation.update()
   await simulation.update()
   await simulation.update()
-  setInterval(async () => {
-    await simulation.update()
+  setInterval(() => {
+    void simulation.update()
   }, 60 * 1000)
 }

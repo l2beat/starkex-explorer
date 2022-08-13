@@ -117,6 +117,7 @@ describe(JobQueue.name, () => {
     })
 
     await waitForExpect(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       expect(queue.getStats()).toEqual(expect.objectWith({ jobsInProgress: 1 }))
     })
 

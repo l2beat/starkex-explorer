@@ -5,7 +5,7 @@ import { Logger } from '../tools/Logger'
 export function createApiLogger(logger: Logger) {
   return async function (ctx: Context, next: Next) {
     const key = Symbol.for('request-received.startTime')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line
     const start: number = ctx[key as any]?.getTime?.() ?? Date.now()
 
     logger.info({ type: 'request', method: ctx.method, url: ctx.originalUrl })

@@ -5,7 +5,7 @@ import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export type UserRegistrationEventRecord = {
+export interface UserRegistrationEventRecord {
   id: number
   blockNumber: number
   ethAddress: EthereumAddress
@@ -15,11 +15,16 @@ export type UserRegistrationEventRecord = {
 export class UserRegistrationEventRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.findByStarkKey = this.wrapFind(this.findByStarkKey)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async addMany(records: Omit<UserRegistrationEventRecord, 'id'>[]) {
@@ -55,6 +60,7 @@ export class UserRegistrationEventRepository extends BaseRepository {
       .first('*')
       .orderBy('block_number', 'desc')
       .where('stark_key', starkKey.toString())
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return row ? toRecord(row) : undefined
   }
 
@@ -66,6 +72,7 @@ export class UserRegistrationEventRepository extends BaseRepository {
       .first('*')
       .orderBy('block_number', 'desc')
       .where('eth_address', ethereumAddress.toString())
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return row ? toRecord(row) : undefined
   }
 }

@@ -30,13 +30,13 @@ export interface IEventEmitter<EventTypes> {
     event: EventTypes[EventName]
   ): boolean
 
-  eventNames<EventName extends keyof EventTypes>(): Array<EventName>
+  eventNames<EventName extends keyof EventTypes>(): EventName[]
   setMaxListeners(n: number): IEventEmitter<EventTypes>
   getMaxListeners(): number
 
   listeners<EventName extends keyof EventTypes>(
     type: EventName
-  ): (event: EventTypes[EventName]) => void[]
+  ): ((event: EventTypes[EventName]) => void)[]
 
   listenerCount<EventName extends keyof EventTypes>(type: EventName): number
 

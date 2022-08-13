@@ -14,6 +14,7 @@ export class TransactionStatusMonitor {
     if (!this.running) {
       return
     }
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setTimeout(async () => {
       if (!this.running) {
         return

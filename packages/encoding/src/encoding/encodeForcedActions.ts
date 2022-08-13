@@ -11,7 +11,8 @@ export function encodeForcedActions(forcedActions: ForcedAction[]) {
       writer.write(action.starkKey.toString(), 32)
       writer.writeNumber(action.positionId, 32)
       writer.writeNumber(action.amount, 32)
-    } else if (action.type === 'trade') {
+    } else {
+      // trade
       writer.writeNumber(1, 32)
       writer.write(action.starkKeyA.toString(), 32)
       writer.write(action.starkKeyB.toString(), 32)

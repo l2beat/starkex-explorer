@@ -8,7 +8,9 @@
     "eslint:recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:@typescript-eslint/strict"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -17,12 +19,14 @@
   },
   "plugins": ["simple-import-sort", "no-only-tests", "unused-imports"],
   "rules": {
+    "@typescript-eslint/ban-tslint-comment": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-extra-semi": "off",
     "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-floating-promises": "error",
-    "@typescript-eslint/no-unused-vars": "off",
-
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }
+    ],
     "import/no-cycle": "error",
     "import/no-default-export": "error",
     "import/no-extraneous-dependencies": [
@@ -30,21 +34,15 @@
       { "devDependencies": false }
     ],
     "import/no-unresolved": ["error", { "ignore": ["^knex/types/tables$"] }],
-
+    "no-constant-condition": "off",
     "no-only-tests/no-only-tests": "error",
     "no-restricted-imports": [
       "error",
       { "paths": [".", "..", "../..", "../../.."] }
     ],
-    "prefer-const": ["warn", { "destructuring": "all" }],
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
-
-    "unused-imports/no-unused-imports": "error",
-    "unused-imports/no-unused-vars": [
-      "warn",
-      { "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }
-    ]
+    "unused-imports/no-unused-imports": "error"
   },
   "overrides": [
     {
@@ -52,6 +50,12 @@
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/require-await": "off",
+        "@typescript-eslint/unbound-method": "off",
         "import/no-extraneous-dependencies": "off",
         "no-unused-expressions": "off"
       }

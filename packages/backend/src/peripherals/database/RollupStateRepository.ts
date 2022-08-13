@@ -18,11 +18,16 @@ export class RollupStateRepository
 {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.getParameters = this.wrapAny(this.getParameters)
     this.setParameters = this.wrapAny(this.setParameters)
     this.persist = this.wrapAny(this.persist)
     this.recover = this.wrapAny(this.recover)
     this.deleteAll = this.wrapDelete(this.deleteAll)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async getParameters(rootHash: PedersenHash): Promise<RollupParameters> {
@@ -31,7 +36,7 @@ export class RollupStateRepository
       .first('funding', 'timestamp')
       .where('root_hash', rootHash.toString())
     if (!result) {
-      throw new Error(`Cannot find parameters for ${rootHash}`)
+      throw new Error(`Cannot find parameters for ${rootHash.toString()}`)
     }
     return parametersFromRow(result)
   }
@@ -118,7 +123,7 @@ export class RollupStateRepository
     } else if (position) {
       return Position.fromJSON(position.data, PedersenHash(position.hash))
     } else {
-      throw new Error(`Cannot find node or position: ${hash}`)
+      throw new Error(`Cannot find node or position: ${hash.toString()}`)
     }
   }
 

@@ -20,6 +20,7 @@ export class StatusService {
   }
 
   getReporterStatus(name: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!this.reporters[name]) {
       throw new Error(`Unknown reporter ${name}!`)
     }

@@ -160,6 +160,7 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
     )
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (action.type === 'ModifyTotal') {
     const parsed = parseCurrencyInput(action.value, AssetId.USDC)
     const totalInputString =

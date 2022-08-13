@@ -10,14 +10,18 @@ export class InMemoryRollupStorage
 {
   private parameters = new Map<PedersenHash, RollupParameters>()
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async getParameters(rootHash: PedersenHash): Promise<RollupParameters> {
     const values = this.parameters.get(rootHash)
     if (!values) {
-      throw new Error(`Cannot recover parameters for hash ${rootHash}`)
+      throw new Error(
+        `Cannot recover parameters for hash ${rootHash.toString()}`
+      )
     }
     return values
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async setParameters(rootHash: PedersenHash, values: RollupParameters) {
     this.parameters.set(rootHash, values)
   }

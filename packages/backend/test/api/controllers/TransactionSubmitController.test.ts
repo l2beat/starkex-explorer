@@ -30,14 +30,15 @@ describe(TransactionSubmitController.name, () => {
         EthereumAddress.fake()
       )
 
-      controller['getTransaction'] = async () => undefined
+      // @ts-expect-error acccess private member
+      controller.getTransaction = async () => undefined
 
       const hash = Hash256.fake()
       const result = await controller.submitForcedExit(hash)
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Transaction ${hash} not found`,
+        content: `Transaction ${hash.toString()} not found`,
       })
     })
 
@@ -210,14 +211,15 @@ describe(TransactionSubmitController.name, () => {
         EthereumAddress.fake()
       )
 
-      controller['getTransaction'] = async () => undefined
+      // @ts-expect-error acccess private member
+      controller.getTransaction = async () => undefined
 
       const hash = Hash256.fake()
       const result = await controller.submitForcedTrade(hash, offer.id)
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Transaction ${hash} not found`,
+        content: `Transaction ${hash.toString()} not found`,
       })
     })
 
@@ -336,7 +338,8 @@ describe(TransactionSubmitController.name, () => {
           EthereumAddress.fake()
         )
 
-        controller['getTransaction'] = async () => undefined
+        // @ts-expect-error acccess private member
+        controller.getTransaction = async () => undefined
 
         const exitHash = Hash256.fake()
         const finalizeHash = Hash256.fake()
@@ -347,7 +350,7 @@ describe(TransactionSubmitController.name, () => {
 
         expect(result).toEqual({
           type: 'bad request',
-          content: `Transaction ${finalizeHash} not found`,
+          content: `Transaction ${finalizeHash.toString()} not found`,
         })
       })
 

@@ -7,6 +7,7 @@ import { getAttribute } from '../offer/getAttribute'
 export function initFinalizeExitForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
       const exitHash = Hash256(getAttribute(form, 'transaction-hash'))

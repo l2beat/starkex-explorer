@@ -39,7 +39,8 @@ describe(BlockDownloader.name, () => {
       )
 
       const mockAdvanceChain = mockFn().returns(undefined)
-      blockDownloader['addJob'] = mockAdvanceChain
+      // @ts-expect-error acccess private member
+      blockDownloader.addJob = mockAdvanceChain
 
       await blockDownloader.start()
       return mockAdvanceChain.calls.map((x) => x.args[0])
@@ -163,7 +164,8 @@ describe(BlockDownloader.name, () => {
         Logger.SILENT,
         5
       )
-      blockDownloader['addJob'] = mockFn().returns(undefined)
+      // @ts-expect-error acccess private member
+      blockDownloader.addJob = mockFn().returns(undefined)
 
       await blockDownloader.start()
       expect<unknown>(blockDownloader.getStatus()).toEqual({
@@ -229,10 +231,10 @@ describe(BlockDownloader.name, () => {
   describe('handling block reorganizations', () => {
     class TestBlockDownloader extends BlockDownloader {
       getLastKnown() {
-        return this['lastKnown']
+        return this.lastKnown
       }
       async testAdvanceChain(blockNumber: number) {
-        return this['advanceChain'](blockNumber)
+        return this.advanceChain(blockNumber)
       }
     }
 
@@ -245,7 +247,7 @@ describe(BlockDownloader.name, () => {
             (x) => x.number === hashOrTag || x.hash === hashOrTag
           )
           if (!block) {
-            throw new Error(`Block ${hashOrTag} not specified`)
+            throw new Error(`Block ${hashOrTag.toString()} not specified`)
           }
           return block as unknown as providers.Block
         },

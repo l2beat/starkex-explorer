@@ -14,6 +14,8 @@ export class BlockRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.getAllInRange = this.wrapGet(this.getAllInRange)
@@ -22,6 +24,8 @@ export class BlockRepository extends BaseRepository {
     this.findByHash = this.wrapFind(this.findByHash)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async addMany(records: BlockRecord[]) {

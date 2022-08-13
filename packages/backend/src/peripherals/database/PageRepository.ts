@@ -15,11 +15,16 @@ export interface PageRecord {
 export class PageRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.getByFactHashes = this.wrapGet(this.getByFactHashes)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async addMany(records: Omit<PageRecord, 'id'>[]) {
@@ -36,7 +41,7 @@ export class PageRepository extends BaseRepository {
   }
 
   async getByFactHashes(factHashes: Hash256[]) {
-    type Row = {
+    interface Row {
       fact_hash: string
       page_block: number
       fact_block: number
@@ -70,7 +75,7 @@ export class PageRepository extends BaseRepository {
     return factHashes.map((factHash) => {
       const relevant = records.filter((x) => x.factHash === factHash)
       if (relevant.length === 0) {
-        throw new Error(`Missing pages for fact: ${factHash}`)
+        throw new Error(`Missing pages for fact: ${factHash.toString()}`)
       }
       const maxFactBlockNumber = Math.max(
         ...relevant.map((x) => x.factBlockNumber)

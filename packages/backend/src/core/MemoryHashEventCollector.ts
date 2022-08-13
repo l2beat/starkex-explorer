@@ -62,7 +62,9 @@ export class MemoryHashEventCollector {
       const event = GPS_VERIFIER_ABI.parseLog(log)
       return {
         blockNumber: log.blockNumber,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         factHash: Hash256(event.args.factHash),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         pagesHashes: event.args.pagesHashes.map(Hash256),
       }
     })

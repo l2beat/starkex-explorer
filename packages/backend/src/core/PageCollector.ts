@@ -80,6 +80,7 @@ export class PageCollector {
     return logs.map((log): MemoryPageEvent => {
       const event = REGISTRY_ABI.parseLog(log)
       return {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         memoryHash: Hash256.from(event.args.memoryHash),
         transactionHash: Hash256(log.transactionHash),
       }

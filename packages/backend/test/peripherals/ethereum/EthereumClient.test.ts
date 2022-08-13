@@ -16,7 +16,8 @@ describe(EthereumClient.name, () => {
 
       const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
       const getLogs = mockFn().resolvesTo([])
-      ethereumClient['provider'] = mock<providers.JsonRpcProvider>({ getLogs })
+      // @ts-expect-error acccess private member
+      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
@@ -37,7 +38,8 @@ describe(EthereumClient.name, () => {
 
       const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
       const getLogs = mockFn().resolvesTo([])
-      ethereumClient['provider'] = mock<providers.JsonRpcProvider>({ getLogs })
+      // @ts-expect-error acccess private member
+      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
@@ -55,7 +57,8 @@ describe(EthereumClient.name, () => {
 
       const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
       const getLogs = mockFn().resolvesTo([])
-      ethereumClient['provider'] = mock<providers.JsonRpcProvider>({ getLogs })
+      // @ts-expect-error acccess private member
+      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
@@ -74,7 +77,8 @@ describe(EthereumClient.name, () => {
 
       const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
       const getLogs = mockFn().resolvesTo([])
-      ethereumClient['provider'] = mock<providers.JsonRpcProvider>({ getLogs })
+      // @ts-expect-error acccess private member
+      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
@@ -117,7 +121,8 @@ describe(EthereumClient.name, () => {
         logIndex: 0,
       }
       const getLogs = mockFn().resolvesTo([]).resolvesToOnce([log])
-      ethereumClient['provider'] = mock<providers.JsonRpcProvider>({ getLogs })
+      // @ts-expect-error acccess private member
+      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
 
       await expect(
         ethereumClient.getLogsInRange(blockRange, filter)

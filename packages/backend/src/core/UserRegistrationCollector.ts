@@ -49,7 +49,9 @@ export class UserRegistrationCollector {
       const event = PERPETUAL_ABI.parseLog(log)
       return {
         blockNumber: log.blockNumber,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         ethAddress: EthereumAddress(event.args.ethKey),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         starkKey: StarkKey.from(event.args.starkKey),
       }
     })

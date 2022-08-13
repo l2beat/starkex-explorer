@@ -12,7 +12,7 @@ import { fakeAccepted, fakeOffer } from '../../fakes'
 import { mock } from '../../mock'
 import * as tradeMock from './utils/ForcedTradeOfferMockData'
 
-describe(ForcedTradeOfferController.name, async () => {
+describe(ForcedTradeOfferController.name, () => {
   const stateUpdateId = 1
   const positionA = {
     positionId: tradeMock.offer.positionIdA,
@@ -82,7 +82,7 @@ describe(ForcedTradeOfferController.name, async () => {
           await controller.getOfferDetailsPage(offer.id, undefined)
         ).toEqual({
           type: 'redirect',
-          url: `/forced/${offer.accepted?.transactionHash}`,
+          url: `/forced/${offer.accepted?.transactionHash?.toString() ?? ''}`,
         })
       })
     }

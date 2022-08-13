@@ -28,6 +28,9 @@ export interface StateUpdatePriceRecord {
 export class StateUpdateRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.add = this.wrapAdd(this.add)
     this.findLast = this.wrapFind(this.findLast)
     this.findIdByRootHash = this.wrapFind(this.findIdByRootHash)
@@ -37,6 +40,8 @@ export class StateUpdateRepository extends BaseRepository {
     this.findByIdWithPositions = this.wrapFind(this.findByIdWithPositions)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async add({

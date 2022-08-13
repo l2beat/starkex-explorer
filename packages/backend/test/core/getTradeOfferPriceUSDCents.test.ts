@@ -26,7 +26,7 @@ describe(getTradeOfferPriceUSDCents.name, () => {
   ]
 
   cases.forEach(({ collateralAmount, syntheticAmount, assetId, expected }) => {
-    it(`calculates ${assetId} price properly`, () => {
+    it(`calculates ${assetId.toString()} price properly`, () => {
       expect(
         getTradeOfferPriceUSDCents(collateralAmount, assetId, syntheticAmount)
       ).toEqual(expected)

@@ -9,10 +9,10 @@ export function getAsset(
   let asset = assets.find((x) => x.assetId === selected)
   if (!asset) {
     console.error('Nonexistent asset selected')
-    asset = assets[0]
-    if (!asset) {
+    if (assets.length === 0) {
       throw new Error('Programmer error: No assets')
     }
+    asset = assets[0]
   }
   return asset
 }
@@ -53,6 +53,7 @@ export function parseCurrencyInput(
     if (!fraction || fraction.length <= decimals) {
       return (
         BigInt(integer) * 10n ** BigInt(decimals) +
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         BigInt((fraction ?? '').padEnd(decimals, '0'))
       )
     }

@@ -67,7 +67,7 @@ describe(SyncScheduler.name, () => {
       )
 
       const dispatch = mockFn().returns(undefined)
-      syncScheduler['dispatch'] = dispatch
+      syncScheduler.dispatch = dispatch
       await syncScheduler.start()
 
       expect(dataSyncService.discardAfter).toHaveBeenCalledWith([2_000_000])
@@ -84,7 +84,7 @@ describe(SyncScheduler.name, () => {
     })
   })
 
-  describe(SyncScheduler.prototype['dispatch'].name, () => {
+  describe(SyncScheduler.prototype.dispatch.name, () => {
     it('handles a successful sync', async () => {
       const syncStatusRepository = mock<SyncStatusRepository>({
         setLastSynced: async () => {},
@@ -102,7 +102,7 @@ describe(SyncScheduler.name, () => {
         { earliestBlock: 1_000_000 }
       )
 
-      syncScheduler['dispatch']({
+      syncScheduler.dispatch({
         type: 'initialized',
         lastSynced: 1_000_000,
         knownBlocks: [block(1_000_001), block(1_000_002)],
@@ -136,7 +136,7 @@ describe(SyncScheduler.name, () => {
         { earliestBlock: 1_000_000 }
       )
 
-      syncScheduler['dispatch']({
+      syncScheduler.dispatch({
         type: 'initialized',
         lastSynced: 1_000_000,
         knownBlocks: [block(1_000_001), block(1_000_002)],
@@ -172,12 +172,12 @@ describe(SyncScheduler.name, () => {
         { earliestBlock: 1_000_000 }
       )
 
-      syncScheduler['dispatch']({
+      syncScheduler.dispatch({
         type: 'initialized',
         lastSynced: 1_000_000,
         knownBlocks: [],
       })
-      syncScheduler['dispatch']({
+      syncScheduler.dispatch({
         type: 'reorgOccurred',
         blocks: [block(1_000_000), block(1_000_001)],
       })
@@ -214,12 +214,12 @@ describe(SyncScheduler.name, () => {
         { earliestBlock: 1_000_000 }
       )
 
-      syncScheduler['dispatch']({
+      syncScheduler.dispatch({
         type: 'initialized',
         lastSynced: 1_000_000,
         knownBlocks: [],
       })
-      syncScheduler['dispatch']({
+      syncScheduler.dispatch({
         type: 'reorgOccurred',
         blocks: [block(1_000_000), block(1_000_001)],
       })
@@ -236,7 +236,7 @@ describe(SyncScheduler.name, () => {
     })
   })
 
-  describe(SyncScheduler.prototype['handleSync'].name, () => {
+  describe(SyncScheduler.prototype.handleSync.name, () => {
     it('triggers data sync only if block range is inside the limit', async () => {
       const maxBlockNumber = 10
       const dataSyncService = mock<DataSyncService>({
@@ -254,7 +254,7 @@ describe(SyncScheduler.name, () => {
         { earliestBlock: 1, maxBlockNumber }
       )
 
-      await syncScheduler['handleSync'](
+      await syncScheduler.handleSync(
         new BlockRange([block(maxBlockNumber - 2), block(maxBlockNumber - 1)])
       )
 
@@ -264,7 +264,7 @@ describe(SyncScheduler.name, () => {
         expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
       })
 
-      await syncScheduler['handleSync'](
+      await syncScheduler.handleSync(
         new BlockRange([block(maxBlockNumber), block(maxBlockNumber + 1)])
       )
 

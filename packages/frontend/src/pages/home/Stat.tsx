@@ -1,6 +1,6 @@
 import React from 'react'
 
-type StatProps = {
+interface StatProps {
   title: string
   value: string
   valueId?: string

@@ -211,7 +211,7 @@ describe('FrontendRouter', () => {
 
     it('returns html', async () => {
       await server
-        .get(`/forced/${Hash256.fake()}`)
+        .get(`/forced/${Hash256.fake().toString()}`)
         .expect(200)
         .expect(TEST_PAGE)
     })
@@ -243,7 +243,7 @@ describe('FrontendRouter', () => {
     })
   })
 
-  describe('/search', async () => {
+  describe('/search', () => {
     const { database } = setupDatabaseTestSuite()
     const ethAddress = EthereumAddress.fake()
     const starkKey = StarkKey(
@@ -308,21 +308,21 @@ describe('FrontendRouter', () => {
 
     it('searches for ethereum address', async () => {
       await server
-        .get(`/search?query=${ethAddress}`)
+        .get(`/search?query=${ethAddress.toString()}`)
         .expect(302)
         .expect('Location', '/positions/0')
     })
 
     it('searches for starknet key', async () => {
       await server
-        .get(`/search?query=${starkKey}`)
+        .get(`/search?query=${starkKey.toString()}`)
         .expect(302)
         .expect('Location', '/positions/0')
     })
 
     it('searches for state tree hash', async () => {
       await server
-        .get(`/search?query=0x${rootHash}`)
+        .get(`/search?query=0x${rootHash.toString()}`)
         .expect(302)
         .expect('Location', '/state-updates/0')
     })

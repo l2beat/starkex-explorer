@@ -41,6 +41,7 @@ export function decodeForcedTradeRequest(
 ): ForcedTradeRequest | undefined {
   try {
     const decoded = coder.decodeFunctionData('forcedTradeRequest', data)
+    /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
     return {
       starkKeyA: StarkKey.from(decoded.starkKeyA),
       starkKeyB: StarkKey.from(decoded.starkKeyB),
@@ -60,6 +61,7 @@ export function decodeForcedTradeRequest(
       signature: String(decoded.signature),
       premiumCost: Boolean(decoded.premiumCost),
     }
+    /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
   } catch {
     return
   }

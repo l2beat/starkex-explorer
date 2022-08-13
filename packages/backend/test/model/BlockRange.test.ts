@@ -99,7 +99,8 @@ describe(BlockRange.name, () => {
       )
       expect(blockRange.start).toEqual(11)
       expect(blockRange.end).toEqual(13)
-      expect(blockRange['hashes']).toEqual(
+      // @ts-expect-error acccess private member
+      expect(blockRange.hashes).toEqual(
         new Map([
           [11, Hash256.fake('11')],
           [12, Hash256.fake('12')],

@@ -31,7 +31,7 @@ const LogForcedTradeRequest = PERPETUAL_ABI.getEventTopic(
   'LogForcedTradeRequest'
 )
 
-type MinedTransaction = {
+interface MinedTransaction {
   hash: Hash256
   data: ForcedAction
   blockNumber: number
@@ -49,7 +49,8 @@ export class ForcedEventsCollector {
     ) => Promise<MinedTransaction[]>
   ) {
     this.getMinedTransactions =
-      _getMinedTransactions || this.getMinedTransactions
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      _getMinedTransactions ?? this.getMinedTransactions
   }
 
   async collect(
@@ -105,6 +106,7 @@ export class ForcedEventsCollector {
         const minedAt = Timestamp.fromSeconds(block.timestamp)
         const base = { hash, blockNumber, minedAt }
 
+        /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
         switch (event.name) {
           case 'LogForcedTradeRequest':
             return {
@@ -137,6 +139,7 @@ export class ForcedEventsCollector {
           default:
             throw new Error('Unknown event!')
         }
+        /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
       })
     )
   }

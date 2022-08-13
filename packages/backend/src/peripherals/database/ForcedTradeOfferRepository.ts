@@ -121,6 +121,9 @@ interface InitialFilters {
 export class ForcedTradeOfferRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.add = this.wrapAdd(this.add)
     this.findById = this.wrapFind(this.findById)
     this.countInitial = this.wrapAny(this.countInitial)
@@ -129,14 +132,16 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.getByPositionId = this.wrapGet(this.getByPositionId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.save = this.wrapSave(this.save)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async add(record: RecordCandidate): Promise<Record['id']> {
     const row = toRowCandidate(record)
     const knex = await this.knex()
-    const [result] = await knex('forced_trade_offers')
+    const [result] = (await knex('forced_trade_offers')
       .insert(row)
-      .returning('id')
+      .returning('id')) as { id: number }[]
     return result.id
   }
 

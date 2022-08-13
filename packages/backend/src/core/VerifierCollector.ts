@@ -61,12 +61,14 @@ export class VerifierCollector {
     })
     return logs.map((log): Omit<VerifierEventRecord, 'id'> => {
       const event = PROXY_ABI.parseLog(log)
+      /* eslint-disable @typescript-eslint/no-unsafe-assignment */
       return {
         name: event.name as 'ImplementationAdded' | 'Upgraded',
         blockNumber: log.blockNumber,
         implementation: event.args.implementation,
         initializer: event.args.initializer,
       }
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment */
     })
   }
 }
@@ -93,7 +95,7 @@ function computeVerifiersFromEvents(
 }
 
 function decodeAddress(data: string): EthereumAddress {
-  const decoded = new AbiCoder().decode(['address'], data)[0]
+  const decoded = new AbiCoder().decode(['address'], data)[0] as string
   return EthereumAddress(decoded)
 }
 

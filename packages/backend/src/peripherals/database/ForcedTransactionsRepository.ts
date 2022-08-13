@@ -53,6 +53,7 @@ export interface ForcedTransactionRecord {
 }
 
 function withdrawalFromJson(jsonData: json): ForcedWithdrawal {
+  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
   const data = Object(jsonData)
   return {
     type: 'withdrawal',
@@ -60,9 +61,11 @@ function withdrawalFromJson(jsonData: json): ForcedWithdrawal {
     amount: BigInt(data.amount),
     positionId: BigInt(data.positionId),
   }
+  /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
 }
 
 function tradeFromJson(jsonData: json): ForcedTrade {
+  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
   const data = Object(jsonData)
   return {
     type: 'trade',
@@ -76,6 +79,7 @@ function tradeFromJson(jsonData: json): ForcedTrade {
     syntheticAssetId: AssetId(data.syntheticAssetId),
     nonce: BigInt(data.nonce),
   }
+  /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access */
 }
 
 function getLastUpdate(updates: Updates): Timestamp {
@@ -132,6 +136,7 @@ function toRecord(row: Row): ForcedTransactionRecord {
           }
         : undefined,
     finalized:
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       row.finalize_hash !== null
         ? {
             hash: Hash256(row.finalize_hash),
@@ -154,6 +159,9 @@ function toRecord(row: Row): ForcedTransactionRecord {
 export class ForcedTransactionsRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+
     this.getAll = this.wrapGet(this.getAll)
     this.getLatest = this.wrapGet(this.getLatest)
     this.getIncludedInStateUpdate = this.wrapGet(this.getIncludedInStateUpdate)
@@ -161,6 +169,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
     this.countPendingByPositionId = this.wrapAny(this.countPendingByPositionId)
     this.findByHash = this.wrapFind(this.findByHash)
     this.deleteAll = this.wrapDelete(this.deleteAll)
+
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   private joinQuery(knex: Knex) {
@@ -300,12 +310,13 @@ export class ForcedTransactionsRepository extends BaseRepository {
     hash: Hash256
   ): Promise<ForcedTransactionRecord | undefined> {
     const knex = await this.knex()
-    const [row] = await this.rowsQuery(knex).where(
+    const [row] = (await this.rowsQuery(knex).where(
       'forced_transactions.hash',
       '=',
       hash.toString()
-    )
+    )) as Row[]
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return row ? toRecord(row) : undefined
   }
 
@@ -313,22 +324,25 @@ export class ForcedTransactionsRepository extends BaseRepository {
     hash: Hash256
   ): Promise<ForcedTransactionRecord | undefined> {
     const knex = await this.knex()
-    const [row] = await this.rowsQuery(knex).where(
+    const [row] = (await this.rowsQuery(knex).where(
       'finalize_tx.hash',
       hash.toString()
-    )
+    )) as Row[]
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return row ? toRecord(row) : undefined
   }
 
   async findLatestFinalize(): Promise<Timestamp | undefined> {
     const knex = await this.knex()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const row = await this.rowsQuery(knex)
       .whereNotNull('finalize_tx.mined_at')
       .orderBy('finalize_tx.mined_at', 'desc')
       .first()
       .select('finalize_tx.mined_at as finalized_at')
 
+    // eslint-disable-next-line
     return row ? Timestamp(row.finalized_at) : undefined
   }
 
@@ -385,6 +399,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
       await trx('transaction_status').insert({
         hash: hash.toString(),
         mined_at:
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           minedAt !== null && minedAt !== undefined
             ? BigInt(minedAt.toString())
             : null,
@@ -433,9 +448,11 @@ export class ForcedTransactionsRepository extends BaseRepository {
         .insert({
           hash: finalizeHash.toString(),
           mined_at:
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             minedAt !== null && minedAt !== undefined
               ? BigInt(minedAt.toString())
               : null,
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           sent_at: sentAt !== null ? BigInt(sentAt.toString()) : null,
           block_number: blockNumber,
         })
@@ -459,12 +476,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
     const deleted = await knex.transaction(async (trx) => {
       const hashes = await trx('forced_transactions').select('hash')
       await trx('forced_transactions').delete()
-      await trx('transaction_status')
-        .whereIn(
-          'hash',
-          hashes.map((h) => h.toString())
-        )
-        .delete()
+      await trx('transaction_status').whereIn('hash', hashes).delete()
       return hashes.length
     })
     return deleted

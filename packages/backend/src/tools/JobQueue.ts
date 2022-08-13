@@ -25,7 +25,7 @@ export class JobQueue {
 
   add(job: Job) {
     this.queue.push({ ...job, failureCount: 0 })
-    setTimeout(() => this.execute())
+    setTimeout(() => void this.execute())
   }
 
   getStats() {
@@ -54,7 +54,7 @@ export class JobQueue {
     }
 
     this.inProgress.push(job)
-    setTimeout(() => this.execute())
+    setTimeout(() => void this.execute())
 
     try {
       await job.execute()
@@ -79,7 +79,7 @@ export class JobQueue {
         this.logger.error(`Job "${job.name}" failed with:`, error)
       }
     } finally {
-      setTimeout(() => this.execute())
+      setTimeout(() => void this.execute())
     }
   }
 }

@@ -6,7 +6,7 @@ import { AcceptOfferFormData } from './accept-form'
 import { CancelOfferFormData } from './cancel-form'
 import { FinalizeOfferFormData } from './finalize-form'
 
-export type ForcedTradeOffer = {
+export interface ForcedTradeOffer {
   readonly type: 'sell' | 'buy'
   readonly id: number
   readonly positionIdA: bigint
@@ -18,7 +18,7 @@ export type ForcedTradeOffer = {
   readonly addressB?: EthereumAddress
 }
 
-export type ForcedTradeOfferDetailsProps = {
+export interface ForcedTradeOfferDetailsProps {
   readonly offer: ForcedTradeOffer
   readonly account: AccountDetails | undefined
   readonly history: ForcedHistoryEvent[]

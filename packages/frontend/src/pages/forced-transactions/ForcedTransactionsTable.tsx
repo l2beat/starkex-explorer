@@ -29,7 +29,7 @@ export function ForcedTransactionsTable({
         { header: 'Asset' },
       ]}
       rows={transactions.map((transaction) => {
-        const link = `/forced/${transaction.hash}`
+        const link = `/forced/${transaction.hash.toString()}`
         return {
           link,
           cells: [
