@@ -19,8 +19,7 @@
     "typecheck": "wsrun -ecsm typecheck",
     "test": "wsrun -ecsm test",
     "build": "wsrun -ecsm build",
-    "start": "cd packages/backend && yarn start",
-    "coverage": "wsrun -ecsm coverage"
+    "start": "cd packages/backend && yarn start"
   },
   "devDependencies": {
     "@types/mocha": "^9.1.1",
@@ -36,7 +35,6 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-unused-imports": "^2.0.0",
     "mocha": "^10.0.0",
-    "nyc": "^15.1.0",
     "prettier": "^2.6.2",
     "typescript": "^4.7.2",
     "wsrun": "^5.2.4"
