@@ -1,9 +1,9 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
-import { Knex } from 'knex'
 import { UserRegistrationEventRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export type UserRegistrationEventRecord = {
   id: number
@@ -13,8 +13,8 @@ export type UserRegistrationEventRecord = {
 }
 
 export class UserRegistrationEventRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
@@ -24,26 +24,34 @@ export class UserRegistrationEventRepository extends BaseRepository {
 
   async addMany(records: Omit<UserRegistrationEventRecord, 'id'>[]) {
     const rows = records.map(toRow)
-    return this.knex('user_registration_events').insert(rows).returning('id')
+    const knex = await this.knex()
+    const ids = await knex('user_registration_events')
+      .insert(rows)
+      .returning('id')
+    return ids.map((x) => x.id)
   }
 
   async getAll(): Promise<UserRegistrationEventRecord[]> {
-    const rows = await this.knex('user_registration_events').select('*')
+    const knex = await this.knex()
+    const rows = await knex('user_registration_events').select('*')
     return rows.map(toRecord)
   }
 
   async deleteAfter(blockNumber: number) {
-    return await this.knex('user_registration_events')
+    const knex = await this.knex()
+    return await knex('user_registration_events')
       .where('block_number', '>', blockNumber)
       .delete()
   }
 
   async deleteAll() {
-    return this.knex('user_registration_events').delete()
+    const knex = await this.knex()
+    return knex('user_registration_events').delete()
   }
 
   async findByStarkKey(starkKey: StarkKey) {
-    const row = await this.knex('user_registration_events')
+    const knex = await this.knex()
+    const row = await knex('user_registration_events')
       .first('*')
       .orderBy('block_number', 'desc')
       .where('stark_key', starkKey.toString())
@@ -53,7 +61,8 @@ export class UserRegistrationEventRepository extends BaseRepository {
   async findByEthereumAddress(
     ethereumAddress: EthereumAddress
   ): Promise<UserRegistrationEventRecord | undefined> {
-    const row = await this.knex('user_registration_events')
+    const knex = await this.knex()
+    const row = await knex('user_registration_events')
       .first('*')
       .orderBy('block_number', 'desc')
       .where('eth_address', ethereumAddress.toString())

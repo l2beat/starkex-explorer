@@ -3,7 +3,8 @@ import { Knex } from 'knex'
 import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export interface Accepted {
   at: Timestamp
@@ -118,8 +119,8 @@ interface InitialFilters {
 }
 
 export class ForcedTradeOfferRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.add = this.wrapAdd(this.add)
     this.findById = this.wrapFind(this.findById)
     this.countInitial = this.wrapAny(this.countInitial)
@@ -132,22 +133,24 @@ export class ForcedTradeOfferRepository extends BaseRepository {
 
   async add(record: RecordCandidate): Promise<Record['id']> {
     const row = toRowCandidate(record)
-    const [id] = await this.knex('forced_trade_offers')
+    const knex = await this.knex()
+    const [result] = await knex('forced_trade_offers')
       .insert(row)
       .returning('id')
-    return id
+    return result.id
   }
 
   async save(record: Record): Promise<boolean> {
     const row = toRow(record)
-    const updates = await this.knex('forced_trade_offers')
+    const knex = await this.knex()
+    const updates = await knex('forced_trade_offers')
       .update(row)
       .where('id', '=', row.id)
     return !!updates
   }
 
-  private getInitialQuery({ assetId, type }: InitialFilters = {}) {
-    let query = this.knex('forced_trade_offers')
+  private getInitialQuery(knex: Knex, { assetId, type }: InitialFilters = {}) {
+    let query = knex('forced_trade_offers')
       .whereNull('accepted_at')
       .whereNull('cancelled_at')
     if (assetId) {
@@ -164,7 +167,11 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   }
 
   async countInitial({ assetId, type }: InitialFilters = {}): Promise<number> {
-    const [{ count }] = await this.getInitialQuery({ assetId, type }).count()
+    const knex = await this.knex()
+    const [{ count }] = await this.getInitialQuery(knex, {
+      assetId,
+      type,
+    }).count()
     return Number(count)
   }
 
@@ -177,7 +184,8 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     limit: number
     offset: number
   } & InitialFilters): Promise<Record[]> {
-    const rows = await this.getInitialQuery({ assetId, type })
+    const knex = await this.knex()
+    const rows = await this.getInitialQuery(knex, { assetId, type })
       .orderBy('created_at', 'desc')
       .limit(limit)
       .offset(offset)
@@ -186,12 +194,15 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   }
 
   async getInitialAssetIds(): Promise<AssetId[]> {
-    const rowIds = await this.getInitialQuery().distinct('synthetic_asset_id')
+    const knex = await this.knex()
+    const rowIds = await this.getInitialQuery(knex).distinct(
+      'synthetic_asset_id'
+    )
     return rowIds.map((x) => x.synthetic_asset_id).map(AssetId)
   }
 
-  private getByPositionIdQuery(positionId: bigint) {
-    return this.knex('forced_trade_offers').where(function () {
+  private getByPositionIdQuery(knex: Knex, positionId: bigint) {
+    return knex('forced_trade_offers').where(function () {
       void this.where({ position_id_a: positionId }).orWhere({
         position_id_b: positionId,
       })
@@ -199,7 +210,8 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   }
 
   async countActiveByPositionId(positionId: bigint) {
-    const [{ count }] = await this.getByPositionIdQuery(positionId)
+    const knex = await this.knex()
+    const [{ count }] = await this.getByPositionIdQuery(knex, positionId)
       .whereNull('cancelled_at')
       .whereNull('transaction_hash')
       .count()
@@ -207,23 +219,27 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   }
 
   async getByPositionId(positionId: bigint) {
-    const rows = await this.getByPositionIdQuery(positionId)
+    const knex = await this.knex()
+    const rows = await this.getByPositionIdQuery(knex, positionId)
     return rows.map(toRecord)
   }
 
   async findById(id: Record['id']): Promise<Record | undefined> {
-    const row = await this.knex('forced_trade_offers').where({ id }).first()
+    const knex = await this.knex()
+    const row = await knex('forced_trade_offers').where({ id }).first()
     return row ? toRecord(row) : undefined
   }
 
   async findByHash(hash: Hash256): Promise<Record | undefined> {
-    const row = await this.knex('forced_trade_offers')
+    const knex = await this.knex()
+    const row = await knex('forced_trade_offers')
       .where({ transaction_hash: hash.toString() })
       .first()
     return row ? toRecord(row) : undefined
   }
 
   async deleteAll() {
-    return await this.knex('forced_trade_offers').delete()
+    const knex = await this.knex()
+    return await knex('forced_trade_offers').delete()
   }
 }

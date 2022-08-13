@@ -1,41 +1,34 @@
-import { Knex } from 'knex'
+import { Logger } from '../../../tools/Logger'
+import { Database } from './Database'
 
-import { Logger } from '../../tools/Logger'
+type AnyMethod<A extends unknown[], R> = (...args: A) => Promise<R>
 
-interface AnyMethod<A extends unknown[], R> {
-  (...args: A): Promise<R>
-}
+type AddMethod<T, R> = (record: T) => Promise<R>
 
-interface AddMethod<T, R> {
-  (record: T): Promise<R>
-}
+type AddManyMethod<T, R> = (records: T[]) => Promise<R[] | number>
 
-interface AddManyMethod<T> {
-  (records: T[]): Promise<number[]>
-}
+type AddManyMethodWithIds<T, R> = (records: T[]) => Promise<R[]>
 
-interface GetMethod<A extends unknown[], T> {
-  (...args: A): Promise<T[]>
-}
+type AddManyMethodWithCount<T> = (records: T[]) => Promise<number>
 
-interface FindMethod<A extends unknown[], T> {
-  (...args: A): Promise<T | undefined>
-}
+type GetMethod<A extends unknown[], T> = (...args: A) => Promise<T[]>
 
-interface DeleteMethod<A extends unknown[]> {
-  (...args: A): Promise<number>
-}
+type FindMethod<A extends unknown[], T> = (...args: A) => Promise<T | undefined>
 
-interface SaveMethod<T> {
-  (record: T): Promise<boolean>
-}
+type DeleteMethod<A extends unknown[]> = (...args: A) => Promise<number>
+
+type SaveMethod<T> = (record: T) => Promise<boolean>
 
 export class BaseRepository {
   constructor(
-    protected readonly knex: Knex,
+    protected readonly database: Database,
     protected readonly logger: Logger
   ) {
     this.logger = logger.for(this)
+  }
+
+  protected knex() {
+    return this.database.getKnex()
   }
 
   protected wrapAny<A extends unknown[], R>(
@@ -53,15 +46,25 @@ export class BaseRepository {
     )
   }
 
-  protected wrapAddMany<T>(method: AddManyMethod<T>): AddManyMethod<T> {
+  protected wrapAddMany<T, R>(
+    method: AddManyMethodWithIds<T, R>
+  ): AddManyMethodWithIds<T, R>
+  protected wrapAddMany<T>(
+    method: AddManyMethodWithCount<T>
+  ): AddManyMethodWithCount<T>
+  protected wrapAddMany<T, R>(
+    method: AddManyMethod<T, R>
+  ): AddManyMethod<T, R> {
     const fn = async (records: T[]) => {
       if (records.length === 0) {
         this.logger.debug({ method: method.name, count: 0 })
         return []
       }
-      const ids = await method.call(this, records)
-      this.logger.debug({ method: method.name, count: ids.length })
-      return ids
+      const idsOrCount = await method.call(this, records)
+      const count =
+        typeof idsOrCount === 'number' ? idsOrCount : idsOrCount.length
+      this.logger.debug({ method: method.name, count })
+      return idsOrCount
     }
     Object.defineProperty(fn, 'name', { value: method.name })
     return fn

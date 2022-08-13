@@ -3,11 +3,11 @@ import { expect } from 'earljs'
 import { TransactionStatusRepository } from '../../../src/peripherals/database/TransactionStatusRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { fakeSentTransaction, fakeTimestamp } from '../../fakes'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(TransactionStatusRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new TransactionStatusRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new TransactionStatusRepository(database, Logger.SILENT)
 
   beforeEach(() => repository.deleteAll())
 

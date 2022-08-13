@@ -6,18 +6,18 @@ import {
   RollupParameters,
 } from '@explorer/state'
 import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
-import { Knex } from 'knex'
 import { partition } from 'lodash'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export class RollupStateRepository
   extends BaseRepository
   implements IRollupStateStorage
 {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.getParameters = this.wrapAny(this.getParameters)
     this.setParameters = this.wrapAny(this.setParameters)
     this.persist = this.wrapAny(this.persist)
@@ -26,7 +26,8 @@ export class RollupStateRepository
   }
 
   async getParameters(rootHash: PedersenHash): Promise<RollupParameters> {
-    const result = await this.knex('rollup_parameters')
+    const knex = await this.knex()
+    const result = await knex('rollup_parameters')
       .first('funding', 'timestamp')
       .where('root_hash', rootHash.toString())
     if (!result) {
@@ -39,7 +40,8 @@ export class RollupStateRepository
     rootHash: PedersenHash,
     values: RollupParameters
   ): Promise<void> {
-    await this.knex('rollup_parameters')
+    const knex = await this.knex()
+    await knex('rollup_parameters')
       .insert({
         root_hash: rootHash.toString(),
         ...parametersToRow(values),
@@ -77,18 +79,16 @@ export class RollupStateRepository
       (x, i, a) => a.findIndex((y) => x.hash === y.hash) === i
     )
 
+    const knex = await this.knex()
     const queries = []
     if (filteredNodeRows.length > 0) {
       queries.push(
-        this.knex('merkle_nodes')
-          .insert(filteredNodeRows)
-          .onConflict('hash')
-          .merge()
+        knex('merkle_nodes').insert(filteredNodeRows).onConflict('hash').merge()
       )
     }
     if (filteredPositionRows.length > 0) {
       queries.push(
-        this.knex('merkle_positions')
+        knex('merkle_positions')
           .insert(filteredPositionRows)
           .onConflict('hash')
           .merge()
@@ -99,11 +99,12 @@ export class RollupStateRepository
   }
 
   async recover(hash: PedersenHash): Promise<NodeOrLeaf<Position>> {
+    const knex = await this.knex()
     const [node, position] = await Promise.all([
-      this.knex('merkle_nodes')
+      knex('merkle_nodes')
         .first('hash', 'left_hash', 'right_hash')
         .where('hash', hash.toString()),
-      this.knex('merkle_positions')
+      knex('merkle_positions')
         .first('hash', 'data')
         .where('hash', hash.toString()),
     ])
@@ -122,10 +123,11 @@ export class RollupStateRepository
   }
 
   async deleteAll() {
+    const knex = await this.knex()
     const [a, b, c] = await Promise.all([
-      this.knex('merkle_nodes').delete(),
-      this.knex('merkle_positions').delete(),
-      this.knex('rollup_parameters').delete(),
+      knex('merkle_nodes').delete(),
+      knex('merkle_positions').delete(),
+      knex('rollup_parameters').delete(),
     ])
     return a + b + c
   }

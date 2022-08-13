@@ -3,11 +3,14 @@ import { expect } from 'earljs'
 
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(UserRegistrationEventRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new UserRegistrationEventRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new UserRegistrationEventRepository(
+    database,
+    Logger.SILENT
+  )
 
   afterEach(() => repository.deleteAll())
 

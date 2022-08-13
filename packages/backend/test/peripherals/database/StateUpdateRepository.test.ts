@@ -14,13 +14,13 @@ import {
 } from '../../../src/peripherals/database/StateUpdateRepository'
 import { Logger, LogLevel } from '../../../src/tools/Logger'
 import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../fakes'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(StateUpdateRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
+  const { database } = setupDatabaseTestSuite()
 
   const repository = new StateUpdateRepository(
-    knex,
+    database,
     new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
   )
 
@@ -160,6 +160,7 @@ describe(StateUpdateRepository.name, () => {
     const records = await repository.getAll()
     expect(records.map((x) => x.blockNumber)).toEqual([20_001, 20_002])
 
+    const knex = await database.getKnex()
     expect(await knex('positions').select('stark_key')).toEqual([
       { stark_key: StarkKey.fake('20001').toString() },
       { stark_key: StarkKey.fake('20002').toString() },
@@ -252,7 +253,7 @@ describe(StateUpdateRepository.name, () => {
 
     beforeEach(async () => {
       const forcedTransactionsRepository = new ForcedTransactionsRepository(
-        knex,
+        database,
         new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
       )
 

@@ -5,11 +5,11 @@ import {
   VerifierEventRepository,
 } from '../../../src/peripherals/database/VerifierEventRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(VerifierEventRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new VerifierEventRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new VerifierEventRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

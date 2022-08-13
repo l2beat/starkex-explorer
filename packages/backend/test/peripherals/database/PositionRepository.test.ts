@@ -12,15 +12,16 @@ import { PositionRepository } from '../../../src/peripherals/database/PositionRe
 import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
 import { Logger, LogLevel } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(PositionRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
+  const { database } = setupDatabaseTestSuite()
 
   const logger = new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
-  const stateUpdateRepository = new StateUpdateRepository(knex, logger)
-  const positionRepository = new PositionRepository(knex, logger)
+  const stateUpdateRepository = new StateUpdateRepository(database, logger)
+  const positionRepository = new PositionRepository(database, logger)
 
+  before(() => stateUpdateRepository.deleteAll())
   afterEach(() => stateUpdateRepository.deleteAll())
 
   const mockStateUpdate = (id: number) => ({
@@ -200,7 +201,7 @@ describe(PositionRepository.name, () => {
 
   describe(positionRepository.findIdByEthereumAddress.name, () => {
     const userRegistrationEventRepository = new UserRegistrationEventRepository(
-      knex,
+      database,
       logger
     )
     afterEach(() => userRegistrationEventRepository.deleteAll())

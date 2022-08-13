@@ -21,7 +21,7 @@ import { StateUpdateRepository } from '../../../src/peripherals/database/StateUp
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { mock } from '../../mock'
-import { setupDatabaseTestSuite } from '../../peripherals/database/setup'
+import { setupDatabaseTestSuite } from '../../peripherals/database/shared/setup'
 import { createTestApiServer } from '../TestApiServer'
 
 const TEST_PAGE = '<!DOCTYPE html><p>test page</p>'
@@ -244,7 +244,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/search', async () => {
-    const { knex } = setupDatabaseTestSuite()
+    const { database } = setupDatabaseTestSuite()
     const ethAddress = EthereumAddress.fake()
     const starkKey = StarkKey(
       '0x0054f7db92d7826f24c4db2c9326d31d3f981952e388e770586cc081a41f7f33'
@@ -255,13 +255,13 @@ describe('FrontendRouter', () => {
 
     before(async () => {
       const stateUpdateRepository = new StateUpdateRepository(
-        knex,
+        database,
         Logger.SILENT
       )
-      const positionRepository = new PositionRepository(knex, Logger.SILENT)
+      const positionRepository = new PositionRepository(database, Logger.SILENT)
 
       const userRegistrationEventRepository =
-        new UserRegistrationEventRepository(knex, Logger.SILENT)
+        new UserRegistrationEventRepository(database, Logger.SILENT)
 
       await stateUpdateRepository.add({
         stateUpdate: {

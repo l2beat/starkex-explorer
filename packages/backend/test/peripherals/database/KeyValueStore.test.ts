@@ -2,11 +2,11 @@ import { expect } from 'earljs'
 
 import { KeyValueStore } from '../../../src/peripherals/database/KeyValueStore'
 import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(KeyValueStore.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const kvStore = new KeyValueStore(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const kvStore = new KeyValueStore(database, Logger.SILENT)
 
   afterEach(() => kvStore.deleteAll())
 

@@ -10,11 +10,11 @@ import {
   PageRepository,
 } from '../../../src/peripherals/database/PageRepository'
 import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './setup'
+import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(PageRepository.name, () => {
-  const { knex } = setupDatabaseTestSuite()
-  const repository = new PageRepository(knex, Logger.SILENT)
+  const { database } = setupDatabaseTestSuite()
+  const repository = new PageRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 
@@ -68,7 +68,10 @@ describe(PageRepository.name, () => {
   })
 
   describe(`with ${FactToPageRepository.name}`, () => {
-    const factToPageRepository = new FactToPageRepository(knex, Logger.SILENT)
+    const factToPageRepository = new FactToPageRepository(
+      database,
+      Logger.SILENT
+    )
 
     afterEach(() => factToPageRepository.deleteAll())
 

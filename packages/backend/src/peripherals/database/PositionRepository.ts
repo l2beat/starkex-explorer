@@ -1,10 +1,10 @@
 import { AssetBalance } from '@explorer/encoding'
 import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
-import { Knex } from 'knex'
 import { AssetBalanceJson, PositionRow, PriceRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './BaseRepository'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
 export interface PositionRecord {
   positionId: bigint
@@ -19,8 +19,8 @@ export interface PositionWithPricesRecord extends PositionRecord {
 }
 
 export class PositionRepository extends BaseRepository {
-  constructor(knex: Knex, logger: Logger) {
-    super(knex, logger)
+  constructor(database: Database, logger: Logger) {
+    super(database, logger)
     this.findById = this.wrapFind(this.findById)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
     this.findById = this.wrapFind(this.findById)
@@ -31,7 +31,8 @@ export class PositionRepository extends BaseRepository {
   }
 
   async findById(positionId: bigint) {
-    const row = await this.knex('positions')
+    const knex = await this.knex()
+    const row = await knex('positions')
       .where('position_id', positionId)
       .orderBy('state_update_id', 'desc')
       .first()
@@ -40,7 +41,8 @@ export class PositionRepository extends BaseRepository {
   }
 
   async getHistoryById(positionId: bigint) {
-    const rows = await this.knex('positions')
+    const knex = await this.knex()
+    const rows = await knex('positions')
       .where('position_id', positionId)
       .orderBy('positions.state_update_id', 'desc')
       .join('prices', 'prices.state_update_id', 'positions.state_update_id')
@@ -53,7 +55,7 @@ export class PositionRepository extends BaseRepository {
       .select(
         'positions.*',
         'state_updates.timestamp as timestamp',
-        this.knex.raw('array_agg(row_to_json(prices)) as prices')
+        knex.raw('array_agg(row_to_json(prices)) as prices')
       )
 
     return rows.map((r) => {
@@ -65,20 +67,22 @@ export class PositionRepository extends BaseRepository {
   }
 
   async findByIdWithPrices(id: bigint) {
-    const row = await this.knex('positions')
+    const knex = await this.knex()
+    const row = await knex('positions')
       .where('position_id', id)
       .orderBy('positions.state_update_id', 'desc')
       .join('prices', 'prices.state_update_id', 'positions.state_update_id')
       .groupBy('positions.position_id', 'positions.state_update_id')
       .first(
         'positions.*',
-        this.knex.raw('array_agg(row_to_json(prices)) as prices')
+        knex.raw('array_agg(row_to_json(prices)) as prices')
       )
     return row ? toPositionWithPricesRecord(row) : undefined
   }
 
   async findIdByStarkKey(starkKey: StarkKey): Promise<bigint | undefined> {
-    const row = await this.knex('positions')
+    const knex = await this.knex()
+    const row = await knex('positions')
       .where('stark_key', starkKey.toString())
       .first('position_id')
     return row?.position_id
@@ -87,7 +91,8 @@ export class PositionRepository extends BaseRepository {
   async findIdByEthereumAddress(
     address: EthereumAddress
   ): Promise<bigint | undefined> {
-    const row = await this.knex('user_registration_events')
+    const knex = await this.knex()
+    const row = await knex('user_registration_events')
       .first('position_id')
       .orderBy('block_number', 'desc')
       .where('eth_address', address.toString())
@@ -102,14 +107,15 @@ export class PositionRepository extends BaseRepository {
   }
 
   async getPreviousStates(positionIds: bigint[], stateUpdateId: number) {
-    const rows = await this.knex
-      .select('p1.*', this.knex.raw('array_agg(row_to_json(prices)) as prices'))
+    const knex = await this.knex()
+    const rows = await knex
+      .select('p1.*', knex.raw('array_agg(row_to_json(prices)) as prices'))
       .from('positions as p1')
       .innerJoin(
-        this.knex
+        knex
           .select(
             'position_id',
-            this.knex.raw('max(state_update_id) as prev_state_update_id')
+            knex.raw('max(state_update_id) as prev_state_update_id')
           )
           .from('positions')
           .as('p2')
@@ -131,7 +137,8 @@ export class PositionRepository extends BaseRepository {
   }
 
   async count() {
-    const [{ count }] = await this.knex('positions').countDistinct({
+    const knex = await this.knex()
+    const [{ count }] = await knex('positions').countDistinct({
       count: 'position_id',
     })
     return count ? BigInt(count) : 0n

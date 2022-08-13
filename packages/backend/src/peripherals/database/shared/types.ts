@@ -1,7 +1,7 @@
 import { Position } from '@explorer/state'
 import { json } from '@explorer/types'
 
-import { Nullable } from '../../utils/Nullable'
+import { Nullable } from '../../../utils/Nullable'
 
 export {}
 
