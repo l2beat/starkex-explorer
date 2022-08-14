@@ -20,7 +20,7 @@ export class PageRepository extends BaseRepository {
 
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
-    this.getByFactHashes = this.wrapGet(this.getByFactHashes)
+    this.getByStateTransitions = this.wrapGet(this.getByStateTransitions)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
 
@@ -40,7 +40,7 @@ export class PageRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async getByFactHashes(factHashes: Hash256[]) {
+  async getByStateTransitions(stateTransitions: Hash256[]) {
     interface Row {
       fact_hash: string
       page_block: number
@@ -61,43 +61,47 @@ export class PageRepository extends BaseRepository {
       .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
       .whereIn(
         'fact_hash',
-        factHashes.map((x) => x.toString())
+        stateTransitions.map((x) => x.toString())
       )) as Row[]
 
     const records = rows.map((row) => ({
-      factBlockNumber: row.fact_block,
-      pageBlockNumber: row.page_block,
-      factHash: Hash256(row.fact_hash),
-      data: row.data,
-      index: row.index,
+      stateTransition: Hash256(row.fact_hash),
+      stateTransitionBlock: row.fact_block,
+      pageIndex: row.index,
+      pageData: row.data,
+      pageBlock: row.page_block,
     }))
 
-    return factHashes.map((factHash) => {
-      const relevant = records.filter((x) => x.factHash === factHash)
+    return stateTransitions.map((stateTransition) => {
+      const relevant = records.filter(
+        (x) => x.stateTransition === stateTransition
+      )
       if (relevant.length === 0) {
-        throw new Error(`Missing pages for fact: ${factHash.toString()}`)
+        throw new Error(
+          `Missing pages for state transition: ${stateTransition.toString()}`
+        )
       }
-      const maxFactBlockNumber = Math.max(
-        ...relevant.map((x) => x.factBlockNumber)
+      const maxStateTransitionBlock = Math.max(
+        ...relevant.map((x) => x.stateTransitionBlock)
       )
       const allPages = relevant
-        .filter((x) => x.factBlockNumber === maxFactBlockNumber)
+        .filter((x) => x.stateTransitionBlock === maxStateTransitionBlock)
         .sort((a, b) => {
-          const indexDiff = a.index - b.index
+          const indexDiff = a.pageIndex - b.pageIndex
           if (indexDiff === 0) {
-            return b.pageBlockNumber - a.pageBlockNumber
+            return b.pageBlock - a.pageBlock
           }
           return indexDiff
         })
       const pages: string[] = []
       let lastIndex = -1
       for (const row of allPages) {
-        if (row.index !== lastIndex) {
-          lastIndex = row.index
-          pages.push(row.data)
+        if (row.pageIndex !== lastIndex) {
+          lastIndex = row.pageIndex
+          pages.push(row.pageData)
         }
       }
-      return { factHash, pages }
+      return pages
     })
   }
 

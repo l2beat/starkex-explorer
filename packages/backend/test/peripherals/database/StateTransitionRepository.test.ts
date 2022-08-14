@@ -2,7 +2,7 @@ import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
-  StateTransitionFactRecord,
+  StateTransitionRecord,
   StateTransitionRepository,
 } from '../../../src/peripherals/database/StateTransitionRepository'
 import { Logger } from '../../../src/tools/Logger'
@@ -82,8 +82,8 @@ describe(StateTransitionRepository.name, () => {
 function dummyRecord({
   blockNumber = 0,
   hash = Hash256.fake(),
-}: Partial<Omit<StateTransitionFactRecord, 'id'>>): Omit<
-  StateTransitionFactRecord,
+}: Partial<Omit<StateTransitionRecord, 'id'>>): Omit<
+  StateTransitionRecord,
   'id'
 > {
   return { blockNumber, hash }

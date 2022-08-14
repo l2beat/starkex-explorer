@@ -5,7 +5,7 @@ import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export interface StateTransitionFactRecord {
+export interface StateTransitionRecord {
   id: number
   blockNumber: number
   hash: Hash256
@@ -25,7 +25,7 @@ export class StateTransitionRepository extends BaseRepository {
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async addMany(records: Omit<StateTransitionFactRecord, 'id'>[]) {
+  async addMany(records: Omit<StateTransitionRecord, 'id'>[]) {
     const rows = records.map(toRow)
     const knex = await this.knex()
     const ids = await knex('state_transition_facts')
@@ -56,7 +56,7 @@ export class StateTransitionRepository extends BaseRepository {
 }
 
 function toRow(
-  record: Omit<StateTransitionFactRecord, 'id'>
+  record: Omit<StateTransitionRecord, 'id'>
 ): Omit<StateTransitionFactRow, 'id'> {
   return {
     block_number: record.blockNumber,
@@ -64,7 +64,7 @@ function toRow(
   }
 }
 
-function toRecord(row: StateTransitionFactRow): StateTransitionFactRecord {
+function toRecord(row: StateTransitionFactRow): StateTransitionRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,

@@ -5,13 +5,13 @@ import { FinalizeExitEventsCollector } from '../../src/core/collectors/FinalizeE
 import { ForcedEventsCollector } from '../../src/core/collectors/ForcedEventsCollector'
 import type { PageCollector } from '../../src/core/collectors/PageCollector'
 import type { PageMappingCollector } from '../../src/core/collectors/PageMappingCollector'
-import { StateTransitionFactCollector } from '../../src/core/collectors/StateTransitionFactCollector'
+import { StateTransitionCollector } from '../../src/core/collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from '../../src/core/collectors/UserRegistrationCollector'
 import type { VerifierCollector } from '../../src/core/collectors/VerifierCollector'
 import { DataSyncService } from '../../src/core/DataSyncService'
 import { StateUpdater } from '../../src/core/StateUpdater'
 import { BlockRange } from '../../src/model'
-import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionRepository'
+import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
@@ -30,11 +30,11 @@ describe(DataSyncService.name, () => {
       collect: async (_blockRange) => [],
     })
 
-    const transitionFacts: Omit<StateTransitionFactRecord, 'id'>[] = [
+    const transitionFacts: Omit<StateTransitionRecord, 'id'>[] = [
       { hash: Hash256.fake('abcd'), blockNumber: 1 },
     ]
 
-    const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
+    const stateTransitionCollector = mock<StateTransitionCollector>({
       collect: async (_blockRange) => transitionFacts,
     })
 
@@ -55,7 +55,7 @@ describe(DataSyncService.name, () => {
       verifierCollector,
       pageMappingCollector,
       pageCollector,
-      stateTransitionFactCollector,
+      stateTransitionCollector,
       stateUpdater,
       userRegistrationCollector,
       forcedEventsCollector,
@@ -74,7 +74,7 @@ describe(DataSyncService.name, () => {
         [blockRange, verifierAddresses],
       ])
       expect(pageCollector.collect).toHaveBeenCalledExactlyWith([[blockRange]])
-      expect(stateTransitionFactCollector.collect).toHaveBeenCalledExactlyWith([
+      expect(stateTransitionCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
       expect(stateUpdater.save).toHaveBeenCalledExactlyWith([[transitionFacts]])
@@ -91,7 +91,7 @@ describe(DataSyncService.name, () => {
         discardAfter: noop,
       })
       const pageCollector = mock<PageCollector>({ discardAfter: noop })
-      const stateTransitionFactCollector = mock<StateTransitionFactCollector>({
+      const stateTransitionCollector = mock<StateTransitionCollector>({
         discardAfter: noop,
       })
       const userRegistrationCollector = mock<UserRegistrationCollector>({
@@ -107,7 +107,7 @@ describe(DataSyncService.name, () => {
         verifierCollector,
         pageMappingCollector,
         pageCollector,
-        stateTransitionFactCollector,
+        stateTransitionCollector,
         stateUpdater,
         userRegistrationCollector,
         forcedEventsCollector,
@@ -120,9 +120,7 @@ describe(DataSyncService.name, () => {
       expect(verifierCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(pageMappingCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(pageCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(stateTransitionFactCollector.discardAfter).toHaveBeenCalledWith([
-        10,
-      ])
+      expect(stateTransitionCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(stateUpdater.discardAfter).toHaveBeenCalledWith([10])
     })
   })

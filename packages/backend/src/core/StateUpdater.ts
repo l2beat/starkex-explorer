@@ -6,7 +6,7 @@ import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTran
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
-import { StateTransitionFactRecord } from '../peripherals/database/StateTransitionRepository'
+import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
@@ -22,7 +22,7 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
 
 interface StateTransition {
   blockNumber: number
-  factHash: Hash256
+  hash: Hash256
   pages: string[]
 }
 
@@ -37,22 +37,22 @@ export class StateUpdater {
     private rollupState?: RollupState
   ) {}
 
-  async save(stateTransitionFacts: Omit<StateTransitionFactRecord, 'id'>[]) {
+  async save(stateTransitionFacts: Omit<StateTransitionRecord, 'id'>[]) {
     if (stateTransitionFacts.length === 0) {
       return
     }
 
-    const dbTransitions = await this.pageRepository.getByFactHashes(
+    const pageGroups = await this.pageRepository.getByStateTransitions(
       stateTransitionFacts.map((f) => f.hash)
     )
-    const stateTransitions = dbTransitions.map((x, i) => {
-      const blockNumber = stateTransitionFacts[i]?.blockNumber
-      if (blockNumber === undefined) {
+    const stateTransitions = pageGroups.map((pages, i) => {
+      const stateTransition = stateTransitionFacts[i]
+      if (stateTransition === undefined) {
         throw new Error('Programmer error: state transition count mismatch')
       }
-      return { ...x, blockNumber }
+      return { ...stateTransition, pages }
     })
-    if (dbTransitions.length !== stateTransitionFacts.length) {
+    if (pageGroups.length !== stateTransitionFacts.length) {
       throw new Error('Missing state transition facts in database')
     }
 
@@ -65,7 +65,7 @@ export class StateUpdater {
   }
 
   async processStateTransition(
-    { pages, factHash, blockNumber }: StateTransition,
+    { pages, hash, blockNumber }: StateTransition,
     id: number
   ) {
     if (!this.rollupState) {
@@ -91,7 +91,7 @@ export class StateUpdater {
         stateUpdate: {
           id,
           blockNumber,
-          factHash,
+          factHash: hash,
           rootHash,
           timestamp,
         },

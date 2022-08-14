@@ -16,7 +16,7 @@ import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEvent
 import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
-import { StateTransitionFactCollector } from './core/collectors/StateTransitionFactCollector'
+import { StateTransitionCollector } from './core/collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { DataSyncService } from './core/DataSyncService'
@@ -127,7 +127,7 @@ export class Application {
       pageRepository,
       config.contracts.registry
     )
-    const stateTransitionFactCollector = new StateTransitionFactCollector(
+    const stateTransitionCollector = new StateTransitionCollector(
       ethereumClient,
       stateTransitionRepository,
       config.contracts.perpetual
@@ -163,7 +163,7 @@ export class Application {
       verifierCollector,
       pageMappingCollector,
       pageCollector,
-      stateTransitionFactCollector,
+      stateTransitionCollector,
       stateUpdater,
       userRegistrationCollector,
       forcedEventsCollector,

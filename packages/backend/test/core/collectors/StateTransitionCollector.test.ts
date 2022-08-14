@@ -2,10 +2,10 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { LogStateTransitionFact } from '../../../src/core/collectors/events'
-import { StateTransitionFactCollector } from '../../../src/core/collectors/StateTransitionFactCollector'
+import { StateTransitionCollector } from '../../../src/core/collectors/StateTransitionCollector'
 import { BlockRange } from '../../../src/model'
 import type {
-  StateTransitionFactRecord,
+  StateTransitionRecord,
   StateTransitionRepository,
 } from '../../../src/peripherals/database/StateTransitionRepository'
 import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
@@ -13,7 +13,7 @@ import { mock } from '../../mock'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 
-describe(StateTransitionFactCollector.name, () => {
+describe(StateTransitionCollector.name, () => {
   it('parses logs, saves and returns records', async () => {
     const ethereumClient = mock<EthereumClient>({
       getLogsInRange: async () => testData().logs,
@@ -21,7 +21,7 @@ describe(StateTransitionFactCollector.name, () => {
     const stateTransitionRepository = mock<StateTransitionRepository>({
       addMany: async () => [],
     })
-    const stateTransitionFactCollector = new StateTransitionFactCollector(
+    const stateTransitionCollector = new StateTransitionCollector(
       ethereumClient,
       stateTransitionRepository,
       PERPETUAL_ADDRESS
@@ -54,9 +54,9 @@ describe(StateTransitionFactCollector.name, () => {
       },
     ])
 
-    const records = await stateTransitionFactCollector.collect(blockRange)
+    const records = await stateTransitionCollector.collect(blockRange)
 
-    const expectedRecords: Omit<StateTransitionFactRecord, 'id'>[] = [
+    const expectedRecords: Omit<StateTransitionRecord, 'id'>[] = [
       {
         blockNumber: 13986068,
         hash: Hash256(
@@ -101,7 +101,7 @@ describe(StateTransitionFactCollector.name, () => {
       deleteAfter: async () => 0,
     })
 
-    const collector = new StateTransitionFactCollector(
+    const collector = new StateTransitionCollector(
       mock<EthereumClient>(),
       stateTransitionRepository,
       PERPETUAL_ADDRESS

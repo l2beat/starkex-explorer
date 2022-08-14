@@ -77,16 +77,16 @@ describe(PageRepository.name, () => {
 
     it('gets pages for ordered by .index and fact hash position in array #1', async () => {
       await factToPageRepository.addMany([
-        dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa22'), 2),
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa13'), 3),
-        dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
-        dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa24'), 4),
-        dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa21'), 1),
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa12'), 2),
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa10'), 0),
-        dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa23'), 3),
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa14'), 4),
+        dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa22'), 2),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa13'), 3),
+        dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
+        dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa24'), 4),
+        dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa21'), 1),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa12'), 2),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa10'), 0),
+        dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa23'), 3),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa14'), 4),
       ])
 
       await repository.addMany([
@@ -102,25 +102,25 @@ describe(PageRepository.name, () => {
         dummyPage(2, Hash256.fake('aa23'), '{{2-4}}'),
       ])
 
-      const actual = await repository.getByFactHashes([
+      const pageGroups = await repository.getByStateTransitions([
         Hash256.fake('ff02'),
         Hash256.fake('ff01'),
       ])
 
-      expect(format(actual)).toEqual([
-        '0xff02 {{2-1}}{{2-2}}{{2-3}}{{2-4}}{{2-5}}',
-        '0xff01 {{1-1}}{{1-2}}{{1-3}}{{1-4}}{{1-5}}',
+      expect(pageGroups).toEqual([
+        ['{{2-1}}', '{{2-2}}', '{{2-3}}', '{{2-4}}', '{{2-5}}'],
+        ['{{1-1}}', '{{1-2}}', '{{1-3}}', '{{1-4}}', '{{1-5}}'],
       ])
     })
 
     it('gets pages for ordered by .index and fact hash position in array #2', async () => {
       await factToPageRepository.addMany([
-        dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
-        dummyFactToPage(300, Hash256.fake('ff03'), Hash256.fake('aa30'), 0),
-        dummyFactToPage(200, Hash256.fake('ff02'), Hash256.fake('aa21'), 1),
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa10'), 0),
-        dummyFactToPage(300, Hash256.fake('ff03'), Hash256.fake('aa31'), 1),
+        dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
+        dummyPageMapping(300, Hash256.fake('ff03'), Hash256.fake('aa30'), 0),
+        dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa21'), 1),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa10'), 0),
+        dummyPageMapping(300, Hash256.fake('ff03'), Hash256.fake('aa31'), 1),
       ])
 
       await repository.addMany([
@@ -132,33 +132,33 @@ describe(PageRepository.name, () => {
         dummyPage(2, Hash256.fake('aa31'), '{{3-1}}'),
       ])
 
-      const actual = await repository.getByFactHashes([
+      const pageGroups = await repository.getByStateTransitions([
         Hash256.fake('ff01'),
         Hash256.fake('ff02'),
         Hash256.fake('ff03'),
       ])
 
-      expect(format(actual)).toEqual([
-        '0xff01 {{1-0}}{{1-1}}',
-        '0xff02 {{2-0}}{{2-1}}',
-        '0xff03 {{3-0}}{{3-1}}',
+      expect(pageGroups).toEqual([
+        ['{{1-0}}', '{{1-1}}'],
+        ['{{2-0}}', '{{2-1}}'],
+        ['{{3-0}}', '{{3-1}}'],
       ])
     })
 
     it('handles multiple mappings and pages', async () => {
       await factToPageRepository.addMany([
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 0),
-        dummyFactToPage(100, Hash256.fake('ff01'), Hash256.fake('aa22'), 1),
-        dummyFactToPage(200, Hash256.fake('ff01'), Hash256.fake('aa11'), 0),
-        dummyFactToPage(200, Hash256.fake('ff01'), Hash256.fake('aa22'), 1),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 0),
+        dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa22'), 1),
+        dummyPageMapping(200, Hash256.fake('ff01'), Hash256.fake('aa11'), 0),
+        dummyPageMapping(200, Hash256.fake('ff01'), Hash256.fake('aa22'), 1),
 
-        dummyFactToPage(300, Hash256.fake('ff02'), Hash256.fake('bb11'), 0),
-        dummyFactToPage(400, Hash256.fake('ff02'), Hash256.fake('bb11'), 0),
-        dummyFactToPage(400, Hash256.fake('ff02'), Hash256.fake('bb22'), 1),
+        dummyPageMapping(300, Hash256.fake('ff02'), Hash256.fake('bb11'), 0),
+        dummyPageMapping(400, Hash256.fake('ff02'), Hash256.fake('bb11'), 0),
+        dummyPageMapping(400, Hash256.fake('ff02'), Hash256.fake('bb22'), 1),
 
-        dummyFactToPage(500, Hash256.fake('ff03'), Hash256.fake('cc11'), 0),
-        dummyFactToPage(500, Hash256.fake('ff03'), Hash256.fake('cc22'), 1),
-        dummyFactToPage(600, Hash256.fake('ff03'), Hash256.fake('cc11'), 0),
+        dummyPageMapping(500, Hash256.fake('ff03'), Hash256.fake('cc11'), 0),
+        dummyPageMapping(500, Hash256.fake('ff03'), Hash256.fake('cc22'), 1),
+        dummyPageMapping(600, Hash256.fake('ff03'), Hash256.fake('cc11'), 0),
       ])
 
       await repository.addMany([
@@ -172,24 +172,18 @@ describe(PageRepository.name, () => {
         dummyPage(412, Hash256.fake('cc22'), '{{3-2}}'),
       ])
 
-      const actual = await repository.getByFactHashes([
+      const pageGroups = await repository.getByStateTransitions([
         Hash256.fake('ff01'),
         Hash256.fake('ff02'),
         Hash256.fake('ff03'),
       ])
 
-      expect(format(actual)).toEqual([
-        '0xff01 {{new-1}}{{new-2}}',
-        '0xff02 {{2-1}}{{2-2}}',
-        '0xff03 {{3-1}}',
+      expect(pageGroups).toEqual([
+        ['{{new-1}}', '{{new-2}}'],
+        ['{{2-1}}', '{{2-2}}'],
+        ['{{3-1}}'],
       ])
     })
-
-    function format(xs: { factHash: Hash256; pages: string[] }[]) {
-      return xs.map((x) =>
-        `${x.factHash.slice(0, 6)} ${x.pages.join('')}`.trim()
-      )
-    }
   })
 })
 
@@ -205,7 +199,7 @@ function dummyPage(
   }
 }
 
-function dummyFactToPage(
+function dummyPageMapping(
   blockNumber: number,
   factHash: Hash256,
   pageHash: Hash256,

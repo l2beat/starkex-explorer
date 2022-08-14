@@ -101,7 +101,7 @@ describe(StateUpdater.name, () => {
   describe(StateUpdater.prototype.save.name, () => {
     it('throws if state transition facts are missing in database', async () => {
       const pageRepository = mock<PageRepository>({
-        getByFactHashes: async () => [],
+        getByStateTransitions: async () => [],
       })
       const stateUpdater = new StateUpdater(
         pageRepository,
@@ -118,9 +118,9 @@ describe(StateUpdater.name, () => {
 
     it('calls processStateTransition for every update', async () => {
       const pageRepository = mock<PageRepository>({
-        getByFactHashes: async () => [
-          { factHash: Hash256.fake('a'), pages: ['aa', 'ab', 'ac'] },
-          { factHash: Hash256.fake('b'), pages: ['ba', 'bb'] },
+        getByStateTransitions: async () => [
+          ['aa', 'ab', 'ac'],
+          ['ba', 'bb'],
         ],
       })
       const stateUpdateRepository = mock<StateUpdateRepository>({
@@ -151,7 +151,7 @@ describe(StateUpdater.name, () => {
         [
           {
             blockNumber: 123,
-            factHash: Hash256.fake('a'),
+            hash: Hash256.fake('123'),
             pages: ['aa', 'ab', 'ac'],
           },
           567 + 1,
@@ -159,7 +159,7 @@ describe(StateUpdater.name, () => {
         [
           {
             blockNumber: 456,
-            factHash: Hash256.fake('b'),
+            hash: Hash256.fake('456'),
             pages: ['ba', 'bb'],
           },
           567 + 2,
@@ -197,7 +197,7 @@ describe(StateUpdater.name, () => {
         collector.processStateTransition(
           {
             pages: fakePages,
-            factHash: Hash256.fake('123'),
+            hash: Hash256.fake('123'),
             blockNumber: 1,
           },
 
