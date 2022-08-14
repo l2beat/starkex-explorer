@@ -3,14 +3,14 @@ import { expect } from 'earljs'
 
 import {
   StateTransitionFactRecord,
-  StateTransitionFactRepository,
-} from '../../../src/peripherals/database/StateTransitionFactsRepository'
+  StateTransitionRepository,
+} from '../../../src/peripherals/database/StateTransitionRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './shared/setup'
 
-describe(StateTransitionFactRepository.name, () => {
+describe(StateTransitionRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
-  const repository = new StateTransitionFactRepository(database, Logger.SILENT)
+  const repository = new StateTransitionRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 

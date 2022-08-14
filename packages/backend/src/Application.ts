@@ -35,7 +35,7 @@ import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
 import { Database } from './peripherals/database/shared/Database'
-import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
+import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { TransactionStatusRepository } from './peripherals/database/TransactionStatusRepository'
@@ -69,7 +69,7 @@ export class Application {
     )
     const factToPageRepository = new FactToPageRepository(database, logger)
     const pageRepository = new PageRepository(database, logger)
-    const stateTransitionFactRepository = new StateTransitionFactRepository(
+    const stateTransitionRepository = new StateTransitionRepository(
       database,
       logger
     )
@@ -129,7 +129,7 @@ export class Application {
     )
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,
-      stateTransitionFactRepository,
+      stateTransitionRepository,
       config.contracts.perpetual
     )
     const stateUpdater = new StateUpdater(

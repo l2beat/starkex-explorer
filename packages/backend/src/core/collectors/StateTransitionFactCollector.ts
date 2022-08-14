@@ -4,8 +4,8 @@ import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
 import { BlockRange } from '../../model/BlockRange'
 import {
   StateTransitionFactRecord,
-  StateTransitionFactRepository,
-} from '../../peripherals/database/StateTransitionFactsRepository'
+  StateTransitionRepository,
+} from '../../peripherals/database/StateTransitionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
 import { LogStateTransitionFact } from './events'
@@ -13,7 +13,7 @@ import { LogStateTransitionFact } from './events'
 export class StateTransitionFactCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly stateTransitionFactRepository: StateTransitionFactRepository,
+    private readonly stateTransitionRepository: StateTransitionRepository,
     private readonly perpetualAddress: EthereumAddress
   ) {}
 
@@ -32,11 +32,11 @@ export class StateTransitionFactCollector {
       }
     })
 
-    await this.stateTransitionFactRepository.addMany(records)
+    await this.stateTransitionRepository.addMany(records)
     return records
   }
 
   async discardAfter(lastToKeep: BlockNumber) {
-    await this.stateTransitionFactRepository.deleteAfter(lastToKeep)
+    await this.stateTransitionRepository.deleteAfter(lastToKeep)
   }
 }

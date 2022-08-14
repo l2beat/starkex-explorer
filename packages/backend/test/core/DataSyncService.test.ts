@@ -11,7 +11,7 @@ import type { VerifierCollector } from '../../src/core/collectors/VerifierCollec
 import { DataSyncService } from '../../src/core/DataSyncService'
 import { StateUpdater } from '../../src/core/StateUpdater'
 import { BlockRange } from '../../src/model'
-import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
+import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 

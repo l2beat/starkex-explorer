@@ -6,8 +6,8 @@ import { StateTransitionFactCollector } from '../../../src/core/collectors/State
 import { BlockRange } from '../../../src/model'
 import type {
   StateTransitionFactRecord,
-  StateTransitionFactRepository,
-} from '../../../src/peripherals/database/StateTransitionFactsRepository'
+  StateTransitionRepository,
+} from '../../../src/peripherals/database/StateTransitionRepository'
 import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../../mock'
 
@@ -18,12 +18,12 @@ describe(StateTransitionFactCollector.name, () => {
     const ethereumClient = mock<EthereumClient>({
       getLogsInRange: async () => testData().logs,
     })
-    const transitionFactRepository = mock<StateTransitionFactRepository>({
+    const stateTransitionRepository = mock<StateTransitionRepository>({
       addMany: async () => [],
     })
     const stateTransitionFactCollector = new StateTransitionFactCollector(
       ethereumClient,
-      transitionFactRepository,
+      stateTransitionRepository,
       PERPETUAL_ADDRESS
     )
 
@@ -91,25 +91,25 @@ describe(StateTransitionFactCollector.name, () => {
         topics: [LogStateTransitionFact.topic],
       },
     ])
-    expect(transitionFactRepository.addMany).toHaveBeenCalledWith([
+    expect(stateTransitionRepository.addMany).toHaveBeenCalledWith([
       expectedRecords,
     ])
   })
 
   it('discards all records from factToPageRepository after given block', async () => {
-    const transitionFactRepository = mock<StateTransitionFactRepository>({
+    const stateTransitionRepository = mock<StateTransitionRepository>({
       deleteAfter: async () => 0,
     })
 
     const collector = new StateTransitionFactCollector(
       mock<EthereumClient>(),
-      transitionFactRepository,
+      stateTransitionRepository,
       PERPETUAL_ADDRESS
     )
 
     await collector.discardAfter(123)
 
-    expect(transitionFactRepository.deleteAfter).toHaveBeenCalledWith([123])
+    expect(stateTransitionRepository.deleteAfter).toHaveBeenCalledWith([123])
   })
 })
 

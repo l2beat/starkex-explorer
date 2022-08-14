@@ -6,7 +6,7 @@ import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTran
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
-import { StateTransitionFactRecord } from '../peripherals/database/StateTransitionFactsRepository'
+import { StateTransitionFactRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'

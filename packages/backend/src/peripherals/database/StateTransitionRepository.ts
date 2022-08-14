@@ -11,7 +11,7 @@ export interface StateTransitionFactRecord {
   hash: Hash256
 }
 
-export class StateTransitionFactRepository extends BaseRepository {
+export class StateTransitionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
