@@ -18,7 +18,7 @@ import { ForcedEventsCollector } from './core/ForcedEventsCollector'
 import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
 import { PageCollector } from './core/PageCollector'
 import { StateTransitionFactCollector } from './core/StateTransitionFactCollector'
-import { StateUpdateCollector } from './core/StateUpdateCollector'
+import { StateUpdater } from './core/StateUpdater'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
@@ -132,7 +132,7 @@ export class Application {
       stateTransitionFactRepository,
       config.contracts.perpetual
     )
-    const stateUpdateCollector = new StateUpdateCollector(
+    const stateUpdater = new StateUpdater(
       pageRepository,
       stateUpdateRepository,
       rollupStateRepository,
@@ -164,7 +164,7 @@ export class Application {
       memoryHashEventCollector,
       pageCollector,
       stateTransitionFactCollector,
-      stateUpdateCollector,
+      stateUpdater,
       userRegistrationCollector,
       forcedEventsCollector,
       finalizeExitEventsCollector,

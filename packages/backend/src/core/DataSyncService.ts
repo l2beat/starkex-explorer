@@ -6,7 +6,7 @@ import { ForcedEventsCollector } from './ForcedEventsCollector'
 import { MemoryHashEventCollector } from './MemoryHashEventCollector'
 import { PageCollector } from './PageCollector'
 import { StateTransitionFactCollector } from './StateTransitionFactCollector'
-import { StateUpdateCollector } from './StateUpdateCollector'
+import { StateUpdater } from './StateUpdater'
 import { UserRegistrationCollector } from './UserRegistrationCollector'
 import { VerifierCollector } from './VerifierCollector'
 
@@ -16,7 +16,7 @@ export class DataSyncService {
     private readonly memoryHashEventCollector: MemoryHashEventCollector,
     private readonly pageCollector: PageCollector,
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
-    private readonly stateUpdateCollector: StateUpdateCollector,
+    private readonly stateUpdater: StateUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
@@ -54,7 +54,7 @@ export class DataSyncService {
       finalizeExitEvents,
     })
 
-    await this.stateUpdateCollector.save(stateTransitionFacts)
+    await this.stateUpdater.save(stateTransitionFacts)
   }
 
   async discardAfter(blockNumber: BlockNumber) {
@@ -62,7 +62,7 @@ export class DataSyncService {
     await this.memoryHashEventCollector.discardAfter(blockNumber)
     await this.pageCollector.discardAfter(blockNumber)
     await this.stateTransitionFactCollector.discardAfter(blockNumber)
-    await this.stateUpdateCollector.discardAfter(blockNumber)
+    await this.stateUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }
 }
