@@ -11,8 +11,8 @@ import { expect, mockFn } from 'earljs'
 
 import {
   ROLLUP_STATE_EMPTY_HASH,
-  StateUpdateCollector,
-} from '../../src/core/StateUpdateCollector'
+  StateUpdater,
+} from '../../src/core/StateUpdater'
 import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
 import type { PageRepository } from '../../src/peripherals/database/PageRepository'
 import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
@@ -22,13 +22,13 @@ import { Logger } from '../../src/tools/Logger'
 import { fakePages } from '../fakes'
 import { mock } from '../mock'
 
-describe(StateUpdateCollector.name, () => {
-  describe(StateUpdateCollector.prototype.ensureRollupState.name, () => {
+describe(StateUpdater.name, () => {
+  describe(StateUpdater.prototype.ensureRollupState.name, () => {
     it('sets state before an initial state transition', async () => {
       const rollupStateRepository = mock<RollupStateRepository>({
         persist: async () => {},
       })
-      const stateUpdateCollector = new StateUpdateCollector(
+      const stateUpdater = new StateUpdater(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         rollupStateRepository,
@@ -38,7 +38,7 @@ describe(StateUpdateCollector.name, () => {
       )
       // ROLLUP_STATE_EMPTY_HASH is for tree of height 64 and  recalculating this hash
       // in tests on slower machines (e.g. CI) makes test flakey async-wise.
-      const rollupState = await stateUpdateCollector.ensureRollupState(
+      const rollupState = await stateUpdater.ensureRollupState(
         ROLLUP_STATE_EMPTY_HASH,
         3n
       )
@@ -52,7 +52,7 @@ describe(StateUpdateCollector.name, () => {
     })
 
     it('sets state after restart', async () => {
-      const stateUpdateCollector = new StateUpdateCollector(
+      const stateUpdater = new StateUpdater(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
@@ -61,12 +61,12 @@ describe(StateUpdateCollector.name, () => {
         Logger.SILENT
       )
       const hash = PedersenHash.fake()
-      const rollupState = await stateUpdateCollector.ensureRollupState(hash)
+      const rollupState = await stateUpdater.ensureRollupState(hash)
       expect(await rollupState.positions.hash()).toEqual(hash)
     })
 
     it('resets state after reorg', async () => {
-      const stateUpdateCollector = new StateUpdateCollector(
+      const stateUpdater = new StateUpdater(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
@@ -76,14 +76,14 @@ describe(StateUpdateCollector.name, () => {
       )
       const hashA = PedersenHash.fake('a')
       const hashB = PedersenHash.fake('b')
-      const rollupStateA = await stateUpdateCollector.ensureRollupState(hashA)
-      const rollupStateB = await stateUpdateCollector.ensureRollupState(hashB)
+      const rollupStateA = await stateUpdater.ensureRollupState(hashA)
+      const rollupStateB = await stateUpdater.ensureRollupState(hashB)
       expect(await rollupStateA.positions.hash()).toEqual(hashA)
       expect(await rollupStateB.positions.hash()).toEqual(hashB)
     })
 
     it('leaves state intact before a subsequent state transition', async () => {
-      const stateUpdateCollector = new StateUpdateCollector(
+      const stateUpdater = new StateUpdater(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
@@ -92,18 +92,18 @@ describe(StateUpdateCollector.name, () => {
         Logger.SILENT
       )
       const hash = PedersenHash.fake()
-      const rollupStateA = await stateUpdateCollector.ensureRollupState(hash)
-      const rollupStateB = await stateUpdateCollector.ensureRollupState(hash)
+      const rollupStateA = await stateUpdater.ensureRollupState(hash)
+      const rollupStateB = await stateUpdater.ensureRollupState(hash)
       expect(rollupStateA).toReferentiallyEqual(rollupStateB)
     })
   })
 
-  describe(StateUpdateCollector.prototype.save.name, () => {
+  describe(StateUpdater.prototype.save.name, () => {
     it('throws if state transition facts are missing in database', async () => {
       const pageRepository = mock<PageRepository>({
         getByFactHashes: async () => [],
       })
-      const stateUpdateCollector = new StateUpdateCollector(
+      const stateUpdater = new StateUpdater(
         pageRepository,
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
@@ -112,7 +112,7 @@ describe(StateUpdateCollector.name, () => {
         Logger.SILENT
       )
       await expect(
-        stateUpdateCollector.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
+        stateUpdater.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
       ).toBeRejected('Missing state transition facts in database')
     })
 
@@ -132,7 +132,7 @@ describe(StateUpdateCollector.name, () => {
           factHash: Hash256.fake(),
         }),
       })
-      const stateUpdateCollector = new StateUpdateCollector(
+      const stateUpdater = new StateUpdater(
         pageRepository,
         stateUpdateRepository,
         mock<RollupStateRepository>(),
@@ -141,9 +141,9 @@ describe(StateUpdateCollector.name, () => {
         Logger.SILENT
       )
       const processStateTransition = mockFn().resolvesTo(undefined)
-      stateUpdateCollector.processStateTransition = processStateTransition
+      stateUpdater.processStateTransition = processStateTransition
 
-      await stateUpdateCollector.save([
+      await stateUpdater.save([
         { blockNumber: 123, hash: Hash256.fake('123') },
         { blockNumber: 456, hash: Hash256.fake('456') },
       ])
@@ -168,9 +168,9 @@ describe(StateUpdateCollector.name, () => {
     })
   })
 
-  describe(StateUpdateCollector.prototype.processStateTransition.name, () => {
+  describe(StateUpdater.prototype.processStateTransition.name, () => {
     it('throws if calculated root hash does not match the one from verifier', async () => {
-      const collector = new StateUpdateCollector(
+      const collector = new StateUpdater(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
@@ -207,13 +207,13 @@ describe(StateUpdateCollector.name, () => {
     })
   })
 
-  describe(StateUpdateCollector.prototype.discardAfter.name, () => {
+  describe(StateUpdater.prototype.discardAfter.name, () => {
     it('deletes updates after block number', async () => {
       const stateUpdateRepository = mock<StateUpdateRepository>({
         deleteAfter: async () => 0,
       })
 
-      const stateUpdateCollector = new StateUpdateCollector(
+      const stateUpdater = new StateUpdater(
         mock<PageRepository>(),
         stateUpdateRepository,
         mock<RollupStateRepository>(),
@@ -222,8 +222,8 @@ describe(StateUpdateCollector.name, () => {
         Logger.SILENT
       )
 
-      await stateUpdateCollector.discardAfter(20)
-      await stateUpdateCollector.discardAfter(40)
+      await stateUpdater.discardAfter(20)
+      await stateUpdater.discardAfter(40)
 
       expect(stateUpdateRepository.deleteAfter).toHaveBeenCalledExactlyWith([
         [20],
@@ -232,13 +232,13 @@ describe(StateUpdateCollector.name, () => {
     })
   })
 
-  describe(StateUpdateCollector.prototype.extractTransactionHashes.name, () => {
+  describe(StateUpdater.prototype.extractTransactionHashes.name, () => {
     it('throws if forced transaction missing in database', async () => {
       const forcedTransactionsRepository = mock<ForcedTransactionsRepository>({
         getTransactionHashesByData: async () => [Hash256.fake(), undefined],
       })
 
-      const stateUpdateCollector = new StateUpdateCollector(
+      const stateUpdater = new StateUpdater(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository>(),
@@ -248,7 +248,7 @@ describe(StateUpdateCollector.name, () => {
       )
 
       await expect(
-        stateUpdateCollector.extractTransactionHashes([
+        stateUpdater.extractTransactionHashes([
           {
             type: 'withdrawal',
             amount: 1n,

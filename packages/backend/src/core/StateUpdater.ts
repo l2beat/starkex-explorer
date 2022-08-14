@@ -26,7 +26,7 @@ interface StateTransition {
   pages: string[]
 }
 
-export class StateUpdateCollector {
+export class StateUpdater {
   constructor(
     private readonly pageRepository: PageRepository,
     private readonly stateUpdateRepository: StateUpdateRepository,

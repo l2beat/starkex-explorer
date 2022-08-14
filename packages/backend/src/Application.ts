@@ -12,20 +12,20 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
+import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEventsCollector'
+import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
+import { MemoryHashEventCollector } from './core/collectors/MemoryHashEventCollector'
+import { PageCollector } from './core/collectors/PageCollector'
+import { StateTransitionFactCollector } from './core/collectors/StateTransitionFactCollector'
+import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
+import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { DataSyncService } from './core/DataSyncService'
-import { FinalizeExitEventsCollector } from './core/FinalizeExitEventsCollector'
-import { ForcedEventsCollector } from './core/ForcedEventsCollector'
-import { MemoryHashEventCollector } from './core/MemoryHashEventCollector'
-import { PageCollector } from './core/PageCollector'
-import { StateTransitionFactCollector } from './core/StateTransitionFactCollector'
-import { StateUpdateCollector } from './core/StateUpdateCollector'
+import { StateUpdater } from './core/StateUpdater'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
-import { UserRegistrationCollector } from './core/UserRegistrationCollector'
-import { VerifierCollector } from './core/VerifierCollector'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
@@ -132,7 +132,7 @@ export class Application {
       stateTransitionFactRepository,
       config.contracts.perpetual
     )
-    const stateUpdateCollector = new StateUpdateCollector(
+    const stateUpdater = new StateUpdater(
       pageRepository,
       stateUpdateRepository,
       rollupStateRepository,
@@ -164,7 +164,7 @@ export class Application {
       memoryHashEventCollector,
       pageCollector,
       stateTransitionFactCollector,
-      stateUpdateCollector,
+      stateUpdater,
       userRegistrationCollector,
       forcedEventsCollector,
       finalizeExitEventsCollector,

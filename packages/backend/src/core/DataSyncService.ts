@@ -1,14 +1,14 @@
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
-import { FinalizeExitEventsCollector } from './FinalizeExitEventsCollector'
-import { ForcedEventsCollector } from './ForcedEventsCollector'
-import { MemoryHashEventCollector } from './MemoryHashEventCollector'
-import { PageCollector } from './PageCollector'
-import { StateTransitionFactCollector } from './StateTransitionFactCollector'
-import { StateUpdateCollector } from './StateUpdateCollector'
-import { UserRegistrationCollector } from './UserRegistrationCollector'
-import { VerifierCollector } from './VerifierCollector'
+import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
+import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
+import { MemoryHashEventCollector } from './collectors/MemoryHashEventCollector'
+import { PageCollector } from './collectors/PageCollector'
+import { StateTransitionFactCollector } from './collectors/StateTransitionFactCollector'
+import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { VerifierCollector } from './collectors/VerifierCollector'
+import { StateUpdater } from './StateUpdater'
 
 export class DataSyncService {
   constructor(
@@ -16,7 +16,7 @@ export class DataSyncService {
     private readonly memoryHashEventCollector: MemoryHashEventCollector,
     private readonly pageCollector: PageCollector,
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
-    private readonly stateUpdateCollector: StateUpdateCollector,
+    private readonly stateUpdater: StateUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
@@ -54,7 +54,7 @@ export class DataSyncService {
       finalizeExitEvents,
     })
 
-    await this.stateUpdateCollector.save(stateTransitionFacts)
+    await this.stateUpdater.save(stateTransitionFacts)
   }
 
   async discardAfter(blockNumber: BlockNumber) {
@@ -62,7 +62,7 @@ export class DataSyncService {
     await this.memoryHashEventCollector.discardAfter(blockNumber)
     await this.pageCollector.discardAfter(blockNumber)
     await this.stateTransitionFactCollector.discardAfter(blockNumber)
-    await this.stateUpdateCollector.discardAfter(blockNumber)
+    await this.stateUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }
 }

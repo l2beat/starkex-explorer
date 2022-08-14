@@ -1,15 +1,15 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
+import { FinalizeExitEventsCollector } from '../../src/core/collectors/FinalizeExitEventsCollector'
+import { ForcedEventsCollector } from '../../src/core/collectors/ForcedEventsCollector'
+import type { MemoryHashEventCollector } from '../../src/core/collectors/MemoryHashEventCollector'
+import type { PageCollector } from '../../src/core/collectors/PageCollector'
+import { StateTransitionFactCollector } from '../../src/core/collectors/StateTransitionFactCollector'
+import { UserRegistrationCollector } from '../../src/core/collectors/UserRegistrationCollector'
+import type { VerifierCollector } from '../../src/core/collectors/VerifierCollector'
 import { DataSyncService } from '../../src/core/DataSyncService'
-import { FinalizeExitEventsCollector } from '../../src/core/FinalizeExitEventsCollector'
-import { ForcedEventsCollector } from '../../src/core/ForcedEventsCollector'
-import type { MemoryHashEventCollector } from '../../src/core/MemoryHashEventCollector'
-import type { PageCollector } from '../../src/core/PageCollector'
-import { StateTransitionFactCollector } from '../../src/core/StateTransitionFactCollector'
-import { StateUpdateCollector } from '../../src/core/StateUpdateCollector'
-import { UserRegistrationCollector } from '../../src/core/UserRegistrationCollector'
-import type { VerifierCollector } from '../../src/core/VerifierCollector'
+import { StateUpdater } from '../../src/core/StateUpdater'
 import { BlockRange } from '../../src/model'
 import { StateTransitionFactRecord } from '../../src/peripherals/database/StateTransitionFactsRepository'
 import { Logger } from '../../src/tools/Logger'
@@ -47,7 +47,7 @@ describe(DataSyncService.name, () => {
     const finalizeExitEventsCollector = mock<FinalizeExitEventsCollector>({
       collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
     })
-    const stateUpdateCollector = mock<StateUpdateCollector>({
+    const stateUpdater = mock<StateUpdater>({
       save: noop,
     })
 
@@ -56,7 +56,7 @@ describe(DataSyncService.name, () => {
       memoryHashEventCollector,
       pageCollector,
       stateTransitionFactCollector,
-      stateUpdateCollector,
+      stateUpdater,
       userRegistrationCollector,
       forcedEventsCollector,
       finalizeExitEventsCollector,
@@ -77,9 +77,7 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionFactCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
-      expect(stateUpdateCollector.save).toHaveBeenCalledExactlyWith([
-        [transitionFacts],
-      ])
+      expect(stateUpdater.save).toHaveBeenCalledExactlyWith([[transitionFacts]])
       expect(forcedEventsCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
@@ -99,7 +97,7 @@ describe(DataSyncService.name, () => {
       const userRegistrationCollector = mock<UserRegistrationCollector>({
         discardAfter: noop,
       })
-      const stateUpdateCollector = mock<StateUpdateCollector>({
+      const stateUpdater = mock<StateUpdater>({
         discardAfter: noop,
       })
       const forcedEventsCollector = mock<ForcedEventsCollector>()
@@ -110,7 +108,7 @@ describe(DataSyncService.name, () => {
         memoryHashEventCollector,
         pageCollector,
         stateTransitionFactCollector,
-        stateUpdateCollector,
+        stateUpdater,
         userRegistrationCollector,
         forcedEventsCollector,
         finalizeExitEventsCollector,
@@ -125,7 +123,7 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionFactCollector.discardAfter).toHaveBeenCalledWith([
         10,
       ])
-      expect(stateUpdateCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(stateUpdater.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })

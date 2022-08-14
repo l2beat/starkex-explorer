@@ -2,14 +2,12 @@ import { Hash256 } from '@explorer/types'
 import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
 import { expect } from 'earljs'
 
-import {
-  LOG_MEMORY_PAGE_HASHES,
-  MemoryHashEventCollector,
-} from '../../src/core/MemoryHashEventCollector'
-import { BlockRange } from '../../src/model'
-import { FactToPageRepository } from '../../src/peripherals/database/FactToPageRepository'
-import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../mock'
+import { LogMemoryPagesHashes } from '../../../src/core/collectors/events'
+import { MemoryHashEventCollector } from '../../../src/core/collectors/MemoryHashEventCollector'
+import { BlockRange } from '../../../src/model'
+import { FactToPageRepository } from '../../../src/peripherals/database/FactToPageRepository'
+import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
+import { mock } from '../../mock'
 
 describe(MemoryHashEventCollector.name, () => {
   it('fetches memory hash events and saves them to repository', async () => {
@@ -124,7 +122,7 @@ describe(MemoryHashEventCollector.name, () => {
         blockRange,
         {
           address: String(address),
-          topics: [LOG_MEMORY_PAGE_HASHES],
+          topics: [LogMemoryPagesHashes.topic],
         },
       ])
     }

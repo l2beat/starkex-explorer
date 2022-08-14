@@ -1,17 +1,15 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import {
-  LOG_STATE_TRANSITION_FACT,
-  StateTransitionFactCollector,
-} from '../../src/core/StateTransitionFactCollector'
-import { BlockRange } from '../../src/model'
+import { LogStateTransitionFact } from '../../../src/core/collectors/events'
+import { StateTransitionFactCollector } from '../../../src/core/collectors/StateTransitionFactCollector'
+import { BlockRange } from '../../../src/model'
 import type {
   StateTransitionFactRecord,
   StateTransitionFactRepository,
-} from '../../src/peripherals/database/StateTransitionFactsRepository'
-import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../mock'
+} from '../../../src/peripherals/database/StateTransitionFactsRepository'
+import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
+import { mock } from '../../mock'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 
@@ -90,7 +88,7 @@ describe(StateTransitionFactCollector.name, () => {
       blockRange,
       {
         address: PERPETUAL_ADDRESS.toString(),
-        topics: [LOG_STATE_TRANSITION_FACT],
+        topics: [LogStateTransitionFact.topic],
       },
     ])
     expect(transitionFactRepository.addMany).toHaveBeenCalledWith([

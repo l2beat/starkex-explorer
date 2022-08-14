@@ -1,35 +1,12 @@
 import { decodeAssetId, ForcedAction } from '@explorer/encoding'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
-import { utils } from 'ethers'
 
-import { BlockRange } from '../model/BlockRange'
-import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
-import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { getTransactionStatus } from './getForcedTransactionStatus'
-
-const PERPETUAL_ABI = new utils.Interface([
-  'event LogForcedWithdrawalRequest(uint256 starkKey, uint256 positionId, uint256 quantizedAmount)',
-  `event LogForcedTradeRequest(
-    uint256 starkKeyA,
-    uint256 starkKeyB,
-    uint256 positionIdA,
-    uint256 positionIdB,
-    uint256 collateralAssetId,
-    uint256 syntheticAssetId,
-    uint256 collateralAmount,
-    uint256 syntheticAmount,
-    bool isABuyingSynthetic,
-    uint256 nonce
-  )`,
-])
-
-const LogForcedWithdrawalRequest = PERPETUAL_ABI.getEventTopic(
-  'LogForcedWithdrawalRequest'
-)
-const LogForcedTradeRequest = PERPETUAL_ABI.getEventTopic(
-  'LogForcedTradeRequest'
-)
+import { BlockRange } from '../../model/BlockRange'
+import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
+import { TransactionStatusRepository } from '../../peripherals/database/TransactionStatusRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { getTransactionStatus } from '../getForcedTransactionStatus'
+import { LogForcedTradeRequest, LogForcedWithdrawalRequest } from './events'
 
 interface MinedTransaction {
   hash: Hash256
@@ -95,19 +72,31 @@ export class ForcedEventsCollector {
   ): Promise<MinedTransaction[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.perpetualAddress.toString(),
-      topics: [[LogForcedTradeRequest, LogForcedWithdrawalRequest]],
+      topics: [[LogForcedWithdrawalRequest.topic, LogForcedTradeRequest.topic]],
     })
     return Promise.all(
       logs.map(async (log) => {
-        const event = PERPETUAL_ABI.parseLog(log)
+        const event =
+          LogForcedWithdrawalRequest.safeParseLog(log) ??
+          LogForcedTradeRequest.parseLog(log)
+
         const block = await this.ethereumClient.getBlock(log.blockNumber)
         const blockNumber = log.blockNumber
         const hash = Hash256(log.transactionHash)
         const minedAt = Timestamp.fromSeconds(block.timestamp)
         const base = { hash, blockNumber, minedAt }
 
-        /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
         switch (event.name) {
+          case 'LogForcedWithdrawalRequest':
+            return {
+              ...base,
+              data: {
+                type: 'withdrawal',
+                starkKey: StarkKey.from(event.args.starkKey),
+                positionId: event.args.positionId.toBigInt(),
+                amount: event.args.quantizedAmount.toBigInt(),
+              },
+            }
           case 'LogForcedTradeRequest':
             return {
               ...base,
@@ -115,31 +104,18 @@ export class ForcedEventsCollector {
                 type: 'trade',
                 starkKeyA: StarkKey.from(event.args.starkKeyA),
                 starkKeyB: StarkKey.from(event.args.starkKeyB),
-                positionIdA: BigInt(event.args.positionIdA),
-                positionIdB: BigInt(event.args.positionIdB),
+                positionIdA: event.args.positionIdA.toBigInt(),
+                positionIdB: event.args.positionIdB.toBigInt(),
                 syntheticAssetId: decodeAssetId(
                   event.args.syntheticAssetId.toHexString().slice(2)
                 ),
                 isABuyingSynthetic: event.args.isABuyingSynthetic,
-                collateralAmount: BigInt(event.args.collateralAmount),
-                syntheticAmount: BigInt(event.args.syntheticAmount),
-                nonce: BigInt(event.args.nonce),
+                collateralAmount: event.args.collateralAmount.toBigInt(),
+                syntheticAmount: event.args.syntheticAmount.toBigInt(),
+                nonce: event.args.nonce.toBigInt(),
               },
             }
-          case 'LogForcedWithdrawalRequest':
-            return {
-              ...base,
-              data: {
-                type: 'withdrawal',
-                starkKey: StarkKey.from(event.args.starkKey),
-                positionId: BigInt(event.args.positionId),
-                amount: BigInt(event.args.quantizedAmount),
-              },
-            }
-          default:
-            throw new Error('Unknown event!')
         }
-        /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
       })
     )
   }
