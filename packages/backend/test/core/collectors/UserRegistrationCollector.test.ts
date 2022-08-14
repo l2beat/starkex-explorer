@@ -114,12 +114,7 @@ describe(UserRegistrationCollector.name, () => {
       expectedRegistrationEvents,
     ])
 
-    expect(registrations).toEqual(
-      expectedRegistrationEvents.map((e) => ({
-        starkKey: e.starkKey,
-        ethAddress: e.ethAddress,
-      }))
-    )
+    expect(registrations).toEqual(expectedRegistrationEvents)
   })
 
   it('discards all records from repository after given block', async () => {
