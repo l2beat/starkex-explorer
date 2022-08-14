@@ -2,7 +2,7 @@ import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
-  FactToPageRecord,
+  PageMappingRecord,
   PageMappingRepository,
 } from '../../../src/peripherals/database/PageMappingRepository'
 import { Logger } from '../../../src/tools/Logger'
@@ -15,7 +15,7 @@ describe(PageMappingRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    const record: Omit<FactToPageRecord, 'id'> = {
+    const record: Omit<PageMappingRecord, 'id'> = {
       blockNumber: 1,
       index: 0,
       stateTransitionHash: Hash256.fake(),
@@ -41,9 +41,9 @@ describe(PageMappingRepository.name, () => {
 
   it('adds multiple records and queries them', async () => {
     const records = [
-      dummyFactToPageRecord({ index: 0 }),
-      dummyFactToPageRecord({ index: 1 }),
-      dummyFactToPageRecord({ index: 2 }),
+      dummyPageMappingRecord({ index: 0 }),
+      dummyPageMappingRecord({ index: 1 }),
+      dummyPageMappingRecord({ index: 2 }),
     ]
 
     await repository.addMany(records)
@@ -54,8 +54,8 @@ describe(PageMappingRepository.name, () => {
 
   it('deletes all records', async () => {
     await repository.addMany([
-      dummyFactToPageRecord({ index: 0 }),
-      dummyFactToPageRecord({ index: 1 }),
+      dummyPageMappingRecord({ index: 0 }),
+      dummyPageMappingRecord({ index: 1 }),
     ])
 
     await repository.deleteAll()
@@ -66,7 +66,7 @@ describe(PageMappingRepository.name, () => {
 
   it('deletes all records after a block number', async () => {
     const records = Array.from({ length: 10 }).map((_, i) =>
-      dummyFactToPageRecord({ blockNumber: i })
+      dummyPageMappingRecord({ blockNumber: i })
     )
     await repository.addMany(records)
 
@@ -79,12 +79,12 @@ describe(PageMappingRepository.name, () => {
   })
 })
 
-function dummyFactToPageRecord({
+function dummyPageMappingRecord({
   blockNumber = 0,
   index = 0,
   pageHash = Hash256.fake(),
   stateTransitionHash = Hash256.fake(),
-}: Partial<FactToPageRecord>): Omit<FactToPageRecord, 'id'> {
+}: Partial<PageMappingRecord>): Omit<PageMappingRecord, 'id'> {
   return {
     blockNumber,
     index,

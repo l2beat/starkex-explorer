@@ -42,31 +42,31 @@ export class PageRepository extends BaseRepository {
 
   async getByStateTransitions(stateTransitions: Hash256[]) {
     interface Row {
-      fact_hash: string
+      state_transition_hash: string
       page_block: number
-      fact_block: number
+      page_mapping_block: number
       data: string
       index: number
     }
 
     const knex = await this.knex()
-    const rows = (await knex('fact_to_pages')
+    const rows = (await knex('page_mappings')
       .select(
-        'fact_hash',
-        'fact_to_pages.block_number as fact_block',
+        'state_transition_hash',
+        'page_mappings.block_number as page_mapping_block',
         'pages.block_number as page_block',
         'pages.data',
         'index'
       )
-      .join('pages', 'fact_to_pages.page_hash', 'pages.page_hash')
+      .join('pages', 'page_mappings.page_hash', 'pages.page_hash')
       .whereIn(
-        'fact_hash',
+        'state_transition_hash',
         stateTransitions.map((x) => x.toString())
       )) as Row[]
 
     const records = rows.map((row) => ({
-      stateTransition: Hash256(row.fact_hash),
-      stateTransitionBlock: row.fact_block,
+      stateTransition: Hash256(row.state_transition_hash),
+      pageMappingBlock: row.page_mapping_block,
       pageIndex: row.index,
       pageData: row.data,
       pageBlock: row.page_block,
@@ -81,11 +81,11 @@ export class PageRepository extends BaseRepository {
           `Missing pages for state transition: ${stateTransition.toString()}`
         )
       }
-      const maxStateTransitionBlock = Math.max(
-        ...relevant.map((x) => x.stateTransitionBlock)
+      const lastMappingBlock = Math.max(
+        ...relevant.map((x) => x.pageMappingBlock)
       )
       const allPages = relevant
-        .filter((x) => x.stateTransitionBlock === maxStateTransitionBlock)
+        .filter((x) => x.pageMappingBlock === lastMappingBlock)
         .sort((a, b) => {
           const indexDiff = a.pageIndex - b.pageIndex
           if (indexDiff === 0) {

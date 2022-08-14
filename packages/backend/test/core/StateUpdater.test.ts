@@ -99,7 +99,7 @@ describe(StateUpdater.name, () => {
   })
 
   describe(StateUpdater.prototype.save.name, () => {
-    it('throws if state transition facts are missing in database', async () => {
+    it('throws if pages are missing in database', async () => {
       const pageRepository = mock<PageRepository>({
         getByStateTransitions: async () => [],
       })

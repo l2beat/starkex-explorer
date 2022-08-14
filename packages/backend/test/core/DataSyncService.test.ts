@@ -30,12 +30,12 @@ describe(DataSyncService.name, () => {
       collect: async (_blockRange) => [],
     })
 
-    const transitionFacts: Omit<StateTransitionRecord, 'id'>[] = [
+    const stateTransitions: Omit<StateTransitionRecord, 'id'>[] = [
       { hash: Hash256.fake('abcd'), blockNumber: 1 },
     ]
 
     const stateTransitionCollector = mock<StateTransitionCollector>({
-      collect: async (_blockRange) => transitionFacts,
+      collect: async (_blockRange) => stateTransitions,
     })
 
     const userRegistrationCollector = mock<UserRegistrationCollector>({
@@ -77,7 +77,9 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
-      expect(stateUpdater.save).toHaveBeenCalledExactlyWith([[transitionFacts]])
+      expect(stateUpdater.save).toHaveBeenCalledExactlyWith([
+        [stateTransitions],
+      ])
       expect(forcedEventsCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])

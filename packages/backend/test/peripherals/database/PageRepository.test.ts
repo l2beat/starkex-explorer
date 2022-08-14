@@ -2,7 +2,7 @@ import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
-  FactToPageRecord,
+  PageMappingRecord,
   PageMappingRepository,
 } from '../../../src/peripherals/database/PageMappingRepository'
 import {
@@ -75,7 +75,7 @@ describe(PageRepository.name, () => {
 
     afterEach(() => pageMappingRepository.deleteAll())
 
-    it('gets pages for ordered by .index and fact hash position in array #1', async () => {
+    it('gets pages for ordered by .index and state transition hash position in array #1', async () => {
       await pageMappingRepository.addMany([
         dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa22'), 2),
         dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa13'), 3),
@@ -113,7 +113,7 @@ describe(PageRepository.name, () => {
       ])
     })
 
-    it('gets pages for ordered by .index and fact hash position in array #2', async () => {
+    it('gets pages for ordered by .index and state transition hash position in array #2', async () => {
       await pageMappingRepository.addMany([
         dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
         dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
@@ -204,7 +204,7 @@ function dummyPageMapping(
   stateTransitionHash: Hash256,
   pageHash: Hash256,
   index: number
-): Omit<FactToPageRecord, 'id'> {
+): Omit<PageMappingRecord, 'id'> {
   return {
     blockNumber,
     stateTransitionHash,

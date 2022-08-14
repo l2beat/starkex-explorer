@@ -13,6 +13,7 @@ describe(BlockRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
   const repository = new BlockRepository(database, Logger.SILENT)
 
+  before(() => repository.deleteAll())
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
