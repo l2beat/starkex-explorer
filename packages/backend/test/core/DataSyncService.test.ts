@@ -3,8 +3,8 @@ import { expect } from 'earljs'
 
 import { FinalizeExitEventsCollector } from '../../src/core/collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from '../../src/core/collectors/ForcedEventsCollector'
-import type { MemoryHashEventCollector } from '../../src/core/collectors/MemoryHashEventCollector'
 import type { PageCollector } from '../../src/core/collectors/PageCollector'
+import type { PageMappingCollector } from '../../src/core/collectors/PageMappingCollector'
 import { StateTransitionFactCollector } from '../../src/core/collectors/StateTransitionFactCollector'
 import { UserRegistrationCollector } from '../../src/core/collectors/UserRegistrationCollector'
 import type { VerifierCollector } from '../../src/core/collectors/VerifierCollector'
@@ -23,7 +23,7 @@ describe(DataSyncService.name, () => {
     const verifierCollector = mock<VerifierCollector>({
       collect: async (_blockRange) => verifierAddresses,
     })
-    const memoryHashEventCollector = mock<MemoryHashEventCollector>({
+    const pageMappingCollector = mock<PageMappingCollector>({
       collect: async (_blockRange, _verifiers) => [],
     })
     const pageCollector = mock<PageCollector>({
@@ -53,7 +53,7 @@ describe(DataSyncService.name, () => {
 
     const service = new DataSyncService(
       verifierCollector,
-      memoryHashEventCollector,
+      pageMappingCollector,
       pageCollector,
       stateTransitionFactCollector,
       stateUpdater,
@@ -70,7 +70,7 @@ describe(DataSyncService.name, () => {
       expect(verifierCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
-      expect(memoryHashEventCollector.collect).toHaveBeenCalledExactlyWith([
+      expect(pageMappingCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange, verifierAddresses],
       ])
       expect(pageCollector.collect).toHaveBeenCalledExactlyWith([[blockRange]])
@@ -87,7 +87,7 @@ describe(DataSyncService.name, () => {
   describe(DataSyncService.prototype.discardAfter.name, () => {
     it('discards data from block number', async () => {
       const verifierCollector = mock<VerifierCollector>({ discardAfter: noop })
-      const memoryHashEventCollector = mock<MemoryHashEventCollector>({
+      const pageMappingCollector = mock<PageMappingCollector>({
         discardAfter: noop,
       })
       const pageCollector = mock<PageCollector>({ discardAfter: noop })
@@ -105,7 +105,7 @@ describe(DataSyncService.name, () => {
 
       const dataSyncService = new DataSyncService(
         verifierCollector,
-        memoryHashEventCollector,
+        pageMappingCollector,
         pageCollector,
         stateTransitionFactCollector,
         stateUpdater,
@@ -118,7 +118,7 @@ describe(DataSyncService.name, () => {
       await dataSyncService.discardAfter(10)
 
       expect(verifierCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(memoryHashEventCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(pageMappingCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(pageCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(stateTransitionFactCollector.discardAfter).toHaveBeenCalledWith([
         10,

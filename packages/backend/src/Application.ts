@@ -14,8 +14,8 @@ import { Config } from './config'
 import { AccountService } from './core/AccountService'
 import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
-import { MemoryHashEventCollector } from './core/collectors/MemoryHashEventCollector'
 import { PageCollector } from './core/collectors/PageCollector'
+import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { StateTransitionFactCollector } from './core/collectors/StateTransitionFactCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
@@ -118,7 +118,7 @@ export class Application {
       config.contracts.proxy,
       config.contracts.verifiers
     )
-    const memoryHashEventCollector = new MemoryHashEventCollector(
+    const pageMappingCollector = new PageMappingCollector(
       ethereumClient,
       factToPageRepository
     )
@@ -161,7 +161,7 @@ export class Application {
 
     const dataSyncService = new DataSyncService(
       verifierCollector,
-      memoryHashEventCollector,
+      pageMappingCollector,
       pageCollector,
       stateTransitionFactCollector,
       stateUpdater,

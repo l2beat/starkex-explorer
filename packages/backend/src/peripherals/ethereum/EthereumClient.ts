@@ -1,22 +1,16 @@
 import { Hash256 } from '@explorer/types'
-import { ethers, providers } from 'ethers'
+import { providers } from 'ethers'
 
 import { BlockRange } from '../../model'
+import { HackFilter, HackJsonRpcProvider } from './HackJsonRpcProvider'
 import { BlockTag } from './types'
 
-export function isReverted(
-  receipt: ethers.providers.TransactionReceipt
-): boolean {
+export function isReverted(receipt: providers.TransactionReceipt): boolean {
   return receipt.status === 0
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Filter = providers.JsonRpcProvider['getLogs'] extends (arg: infer T) => any
-  ? T
-  : never
-
 export class EthereumClient {
-  private provider = new ethers.providers.JsonRpcProvider(this.rpcUrl)
+  private provider = new HackJsonRpcProvider(this.rpcUrl)
 
   constructor(
     private readonly rpcUrl: string,
@@ -35,11 +29,11 @@ export class EthereumClient {
     )
   }
 
-  async getLogs(filter: providers.Filter) {
+  async getLogs(filter: HackFilter) {
     return await this.provider.getLogs(filter)
   }
 
-  async getLogsInRange(blockRange: BlockRange, filter: providers.Filter) {
+  async getLogsInRange(blockRange: BlockRange, filter: HackFilter) {
     if (blockRange.isEmpty()) {
       return []
     }
@@ -50,7 +44,7 @@ export class EthereumClient {
       hashes = hashes.slice(-this.safeBlockDistance)
     }
 
-    const filters: Filter[] = []
+    const filters: HackFilter[] = []
     if (from !== to) {
       filters.push({ ...filter, fromBlock: from, toBlock: to - 1 })
     }
@@ -65,8 +59,8 @@ export class EthereumClient {
     return logs
   }
 
-  private async getManyLogs(filters: Filter[]) {
-    const batches: Filter[][] = []
+  private async getManyLogs(filters: HackFilter[]) {
+    const batches: HackFilter[][] = []
     while (filters.length > 0) {
       batches.push(filters.splice(0, 10))
     }
@@ -82,7 +76,7 @@ export class EthereumClient {
 
   async getTransaction(
     transactionHash: Hash256
-  ): Promise<ethers.providers.TransactionResponse | undefined> {
+  ): Promise<providers.TransactionResponse | undefined> {
     const tx = await this.provider.getTransaction(transactionHash.toString())
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!tx) {

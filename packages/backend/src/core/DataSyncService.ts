@@ -3,8 +3,8 @@ import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
-import { MemoryHashEventCollector } from './collectors/MemoryHashEventCollector'
 import { PageCollector } from './collectors/PageCollector'
+import { PageMappingCollector } from './collectors/PageMappingCollector'
 import { StateTransitionFactCollector } from './collectors/StateTransitionFactCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
@@ -13,7 +13,7 @@ import { StateUpdater } from './StateUpdater'
 export class DataSyncService {
   constructor(
     private readonly verifierCollector: VerifierCollector,
-    private readonly memoryHashEventCollector: MemoryHashEventCollector,
+    private readonly pageMappingCollector: PageMappingCollector,
     private readonly pageCollector: PageCollector,
     private readonly stateTransitionFactCollector: StateTransitionFactCollector,
     private readonly stateUpdater: StateUpdater,
@@ -27,7 +27,7 @@ export class DataSyncService {
 
   async sync(blockRange: BlockRange) {
     const verifiers = await this.verifierCollector.collect(blockRange)
-    const hashEvents = await this.memoryHashEventCollector.collect(
+    const hashEvents = await this.pageMappingCollector.collect(
       blockRange,
       verifiers
     )
@@ -59,7 +59,7 @@ export class DataSyncService {
 
   async discardAfter(blockNumber: BlockNumber) {
     await this.verifierCollector.discardAfter(blockNumber)
-    await this.memoryHashEventCollector.discardAfter(blockNumber)
+    await this.pageMappingCollector.discardAfter(blockNumber)
     await this.pageCollector.discardAfter(blockNumber)
     await this.stateTransitionFactCollector.discardAfter(blockNumber)
     await this.stateUpdater.discardAfter(blockNumber)
