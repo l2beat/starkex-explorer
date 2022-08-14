@@ -26,7 +26,7 @@ declare module 'knex/types/tables' {
     block_number: number
     state_transition_hash: string
     page_hash: string
-    index: number
+    page_index: number
   }
 
   interface PageRow {

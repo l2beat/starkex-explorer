@@ -46,7 +46,7 @@ export class PageRepository extends BaseRepository {
       page_block: number
       page_mapping_block: number
       data: string
-      index: number
+      page_index: number
     }
 
     const knex = await this.knex()
@@ -56,7 +56,7 @@ export class PageRepository extends BaseRepository {
         'page_mappings.block_number as page_mapping_block',
         'pages.block_number as page_block',
         'pages.data',
-        'index'
+        'page_index'
       )
       .join('pages', 'page_mappings.page_hash', 'pages.page_hash')
       .whereIn(
@@ -67,7 +67,7 @@ export class PageRepository extends BaseRepository {
     const records = rows.map((row) => ({
       stateTransition: Hash256(row.state_transition_hash),
       pageMappingBlock: row.page_mapping_block,
-      pageIndex: row.index,
+      pageIndex: row.page_index,
       pageData: row.data,
       pageBlock: row.page_block,
     }))

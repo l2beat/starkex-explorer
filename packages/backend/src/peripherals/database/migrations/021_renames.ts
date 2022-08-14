@@ -20,6 +20,7 @@ const tableRenames: [string, string][] = [
 
 const columnRenames: [string, string, string][] = [
   ['page_mappings', 'fact_hash', 'state_transition_hash'],
+  ['page_mappings', 'index', 'page_index'],
 ]
 
 const constraintRenames: [string, string, string][] = [

@@ -42,8 +42,8 @@ export class PageMappingCollector {
 
     await this.pageMappingRepository.addMany(
       events.flatMap((event) =>
-        event.pageHashes.map((pageHash, index) => ({
-          index,
+        event.pageHashes.map((pageHash, pageIndex) => ({
+          pageIndex,
           pageHash,
           stateTransitionHash: event.stateTransitionHash,
           blockNumber: event.blockNumber,

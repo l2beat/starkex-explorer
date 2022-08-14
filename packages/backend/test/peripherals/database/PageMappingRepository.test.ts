@@ -17,7 +17,7 @@ describe(PageMappingRepository.name, () => {
   it('adds single record and queries it', async () => {
     const record: Omit<PageMappingRecord, 'id'> = {
       blockNumber: 1,
-      index: 0,
+      pageIndex: 0,
       stateTransitionHash: Hash256.fake(),
       pageHash: Hash256.fake(),
     }
@@ -41,9 +41,9 @@ describe(PageMappingRepository.name, () => {
 
   it('adds multiple records and queries them', async () => {
     const records = [
-      dummyPageMappingRecord({ index: 0 }),
-      dummyPageMappingRecord({ index: 1 }),
-      dummyPageMappingRecord({ index: 2 }),
+      dummyPageMappingRecord({ pageIndex: 0 }),
+      dummyPageMappingRecord({ pageIndex: 1 }),
+      dummyPageMappingRecord({ pageIndex: 2 }),
     ]
 
     await repository.addMany(records)
@@ -54,8 +54,8 @@ describe(PageMappingRepository.name, () => {
 
   it('deletes all records', async () => {
     await repository.addMany([
-      dummyPageMappingRecord({ index: 0 }),
-      dummyPageMappingRecord({ index: 1 }),
+      dummyPageMappingRecord({ pageIndex: 0 }),
+      dummyPageMappingRecord({ pageIndex: 1 }),
     ])
 
     await repository.deleteAll()
@@ -81,13 +81,13 @@ describe(PageMappingRepository.name, () => {
 
 function dummyPageMappingRecord({
   blockNumber = 0,
-  index = 0,
+  pageIndex = 0,
   pageHash = Hash256.fake(),
   stateTransitionHash = Hash256.fake(),
 }: Partial<PageMappingRecord>): Omit<PageMappingRecord, 'id'> {
   return {
     blockNumber,
-    index,
+    pageIndex,
     pageHash,
     stateTransitionHash,
   }

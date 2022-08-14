@@ -10,7 +10,7 @@ export interface PageMappingRecord {
   blockNumber: number
   stateTransitionHash: Hash256
   pageHash: Hash256
-  index: number
+  pageIndex: number
 }
 
 export class PageMappingRepository extends BaseRepository {
@@ -60,7 +60,7 @@ function toRow(
     block_number: record.blockNumber,
     state_transition_hash: record.stateTransitionHash.toString(),
     page_hash: record.pageHash.toString(),
-    index: record.index,
+    page_index: record.pageIndex,
   }
 }
 
@@ -70,6 +70,6 @@ function toRecord(row: PageMappingRow): PageMappingRecord {
     blockNumber: row.block_number,
     stateTransitionHash: Hash256(row.state_transition_hash),
     pageHash: Hash256(row.page_hash),
-    index: row.index,
+    pageIndex: row.page_index,
   }
 }

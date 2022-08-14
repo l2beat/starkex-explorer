@@ -127,49 +127,49 @@ describe(PageMappingCollector.name, () => {
     expect(pageMappingRepository.addMany).toHaveBeenCalledWith([
       [
         {
-          index: 0,
+          pageIndex: 0,
           pageHash: expectedEvents[0]!.pageHashes[0]!,
           stateTransitionHash: expectedEvents[0]!.stateTransitionHash,
           blockNumber: expectedEvents[0]!.blockNumber,
         },
         {
-          index: 1,
+          pageIndex: 1,
           pageHash: expectedEvents[0]!.pageHashes[1]!,
           stateTransitionHash: expectedEvents[0]!.stateTransitionHash,
           blockNumber: expectedEvents[0]!.blockNumber,
         },
         {
-          index: 0,
+          pageIndex: 0,
           pageHash: expectedEvents[1]!.pageHashes[0]!,
           stateTransitionHash: expectedEvents[1]!.stateTransitionHash,
           blockNumber: expectedEvents[1]!.blockNumber,
         },
         {
-          index: 1,
+          pageIndex: 1,
           pageHash: expectedEvents[1]!.pageHashes[1]!,
           stateTransitionHash: expectedEvents[1]!.stateTransitionHash,
           blockNumber: expectedEvents[1]!.blockNumber,
         },
         {
-          index: 0,
+          pageIndex: 0,
           pageHash: expectedEvents[2]!.pageHashes[0]!,
           stateTransitionHash: expectedEvents[2]!.stateTransitionHash,
           blockNumber: expectedEvents[2]!.blockNumber,
         },
         {
-          index: 1,
+          pageIndex: 1,
           pageHash: expectedEvents[2]!.pageHashes[1]!,
           stateTransitionHash: expectedEvents[2]!.stateTransitionHash,
           blockNumber: expectedEvents[2]!.blockNumber,
         },
         {
-          index: 0,
+          pageIndex: 0,
           pageHash: expectedEvents[3]!.pageHashes[0]!,
           stateTransitionHash: expectedEvents[3]!.stateTransitionHash,
           blockNumber: expectedEvents[3]!.blockNumber,
         },
         {
-          index: 1,
+          pageIndex: 1,
           pageHash: expectedEvents[3]!.pageHashes[1]!,
           stateTransitionHash: expectedEvents[3]!.stateTransitionHash,
           blockNumber: expectedEvents[3]!.blockNumber,

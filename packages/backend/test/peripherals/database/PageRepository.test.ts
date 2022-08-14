@@ -203,12 +203,12 @@ function dummyPageMapping(
   blockNumber: number,
   stateTransitionHash: Hash256,
   pageHash: Hash256,
-  index: number
+  pageIndex: number
 ): Omit<PageMappingRecord, 'id'> {
   return {
     blockNumber,
     stateTransitionHash,
     pageHash,
-    index,
+    pageIndex,
   }
 }
