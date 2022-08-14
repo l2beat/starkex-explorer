@@ -26,7 +26,7 @@ export function PriceInput(props: TransactionFormProps) {
             id={FormId.SuggestedPriceView}
             className="font-mono text-grey-400"
           >
-            Suggested: {props.assets[0].priceUSDCents.toString()}
+            Suggested: {props.assets[0]?.priceUSDCents.toString() ?? 0}
           </span>
           <button
             id={FormId.SuggestedPriceButton}

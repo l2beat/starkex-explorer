@@ -133,8 +133,9 @@ export class StateUpdateRepository extends BaseRepository {
 
   async count() {
     const knex = await this.knex()
-    const row = await knex('state_updates').count()
-    return BigInt(row[0].count)
+    const [result] = await knex('state_updates').count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return BigInt(result!.count!)
   }
 
   async findByIdWithPositions(id: number) {

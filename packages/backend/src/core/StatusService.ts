@@ -9,8 +9,8 @@ export class StatusService {
 
   getStatus() {
     const result: Record<string, json> = {}
-    for (const name of Object.keys(this.reporters)) {
-      result[name] = this.reporters[name].getStatus()
+    for (const [name, reporter] of Object.entries(this.reporters)) {
+      result[name] = reporter.getStatus()
     }
     return result
   }
@@ -20,10 +20,10 @@ export class StatusService {
   }
 
   getReporterStatus(name: string) {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!this.reporters[name]) {
+    const reporter = this.reporters[name]
+    if (!reporter) {
       throw new Error(`Unknown reporter ${name}!`)
     }
-    return this.reporters[name].getStatus()
+    return reporter.getStatus()
   }
 }

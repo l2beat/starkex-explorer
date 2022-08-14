@@ -175,8 +175,12 @@ function randomBigInt(min: bigint, max: bigint) {
   return min + BigInt(Math.floor(Math.random() * Number(max - min)))
 }
 
-function randomChoice<T>(array: T[]): T {
-  return array[Math.floor(Math.random() * array.length)]
+function randomChoice<T>(items: readonly T[]) {
+  if (items.length === 0) {
+    throw new TypeError('Cannot choose from an empty array!')
+  }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return items[Math.floor(Math.random() * items.length)]!
 }
 
 function randomNextTimestamp(last: Timestamp) {

@@ -150,7 +150,7 @@ describe(RollupState.name, () => {
       })
 
       const [five, six, seven] = await rollup.positions.getLeaves([5n, 6n, 7n])
-      expect(five.getData()).toEqual({
+      expect(five?.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
         assets: [
@@ -158,7 +158,7 @@ describe(RollupState.name, () => {
           { assetId: AssetId('ETH-9'), balance: 55n, fundingIndex: -1n },
         ],
       })
-      expect(six.getData()).toEqual({
+      expect(six?.getData()).toEqual({
         starkKey: StarkKey.fake('6'),
         collateralBalance: 666n,
         assets: [
@@ -166,7 +166,7 @@ describe(RollupState.name, () => {
           { assetId: AssetId('ETH-9'), balance: 66n, fundingIndex: -2n },
         ],
       })
-      expect(seven.getData()).toEqual({
+      expect(seven?.getData()).toEqual({
         starkKey: StarkKey.fake('7'),
         collateralBalance: 777n,
         assets: [

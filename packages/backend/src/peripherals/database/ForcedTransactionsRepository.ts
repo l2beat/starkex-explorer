@@ -257,7 +257,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
 
   async countPendingByPositionId(positionId: bigint) {
     const knex = await this.knex()
-    const [{ count }] = await this.joinQuery(knex)
+    const [result] = await this.joinQuery(knex)
       .where(function () {
         void this.whereRaw("data->>'positionId' = ?", String(positionId))
           .orWhereRaw("data->>'positionIdA' = ?", String(positionId))
@@ -268,7 +268,8 @@ export class ForcedTransactionsRepository extends BaseRepository {
       .whereNull('exit_tx.forgotten_at')
       .count()
 
-    return Number(count)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
   }
 
   async getByPositionId(
@@ -465,8 +466,9 @@ export class ForcedTransactionsRepository extends BaseRepository {
 
   async countAll(): Promise<number> {
     const knex = await this.knex()
-    const result = await knex('forced_transactions').count()
-    const count = Number(result[0].count)
+    const [result] = await knex('forced_transactions').count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const count = Number(result!.count)
     this.logger.debug({ method: 'countAll', count })
     return count
   }

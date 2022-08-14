@@ -43,6 +43,7 @@ export class PolyglotMigrationSource
   }
 
   getMigrationName(migration: Record<string, string>): string {
-    return path.parse(migration.file).name
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return path.parse(migration.file!).name
   }
 }

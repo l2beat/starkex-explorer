@@ -46,7 +46,7 @@ export function AmountInput(props: TransactionFormProps) {
             id={FormId.AssetBalanceView}
             className="font-mono text-grey-400"
           >
-            Balance: {props.assets[0].balance.toString()}
+            Balance: {props.assets[0]?.balance.toString() ?? 0}
           </span>
           <button
             id={FormId.AssetMaxButton}

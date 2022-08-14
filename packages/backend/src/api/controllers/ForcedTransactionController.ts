@@ -162,11 +162,12 @@ export class ForcedTransactionController {
       position.prices
     )
 
+    const firstAsset = assets[0]
     if (
-      assets.length === 0 ||
+      !firstAsset ||
       (assets.length === 1 &&
-        assets[0].assetId === AssetId.USDC &&
-        assets[0].balance < 0n)
+        firstAsset.assetId === AssetId.USDC &&
+        firstAsset.balance < 0n)
     ) {
       return { type: 'redirect', url: '/' }
     }
@@ -178,7 +179,7 @@ export class ForcedTransactionController {
         perpetualAddress: this.perpetualAddress,
         positionId: position.positionId,
         starkKey: position.starkKey,
-        selectedAsset: assets[0].assetId,
+        selectedAsset: firstAsset.assetId,
         assets,
       }),
     }

@@ -24,9 +24,9 @@ export function colorRotate(hex: string, degrees: number) {
 
 export function hexToHSL(hex: string) {
   // Convert hex to RGB first
-  let r = parseInt(hex[1] + hex[2], 16)
-  let g = parseInt(hex[3] + hex[4], 16)
-  let b = parseInt(hex[5] + hex[6], 16)
+  let r = parseInt(hex.slice(1, 3), 16)
+  let g = parseInt(hex.slice(3, 5), 16)
+  let b = parseInt(hex.slice(5, 7), 16)
   // Then to HSL
   r /= 255
   g /= 255

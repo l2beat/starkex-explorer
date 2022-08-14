@@ -37,11 +37,6 @@ export class PositionController {
       this.forcedTradeOfferRepository.getByPositionId(positionId),
     ])
 
-    if (!history[0]) {
-      const content = 'Position not found'
-      return { type: 'not found', content }
-    }
-
     const historyWithAssets = history.map((update) => {
       const assets = toPositionAssetEntries(
         update.balances,
@@ -60,6 +55,10 @@ export class PositionController {
     })
 
     const current = historyWithAssets[0]
+    if (!current) {
+      const content = 'Position not found'
+      return { type: 'not found', content }
+    }
 
     const [ownerEvent] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(current.starkKey),
@@ -76,7 +75,6 @@ export class PositionController {
       assets: current.assets,
       history: historyWithAssets.map((update, i) => {
         const previousUpdate = historyWithAssets[i + 1]
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         const assetsUpdated = previousUpdate
           ? countUpdatedAssets(previousUpdate.balances, update.balances)
           : 0
@@ -114,11 +112,12 @@ export class PositionController {
       const content = 'Update not found'
       return { type: 'not found', content }
     }
-    const position = history[updateIndex]
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const position = history[updateIndex]!
     const previousPosition = history[updateIndex + 1]
     const assetChanges = position.balances.map((balance) => {
       const previousBalance =
-        previousPosition.balances.find((b) => b.assetId === balance.assetId)
+        previousPosition?.balances.find((b) => b.assetId === balance.assetId)
           ?.balance ?? 0n
       const currentBalance = balance.balance
       return {
@@ -134,7 +133,7 @@ export class PositionController {
       stateUpdateId,
       positionId,
       lastUpdateTimestamp: update.timestamp,
-      previousStarkKey: previousPosition.starkKey,
+      previousStarkKey: previousPosition?.starkKey,
       starkKey: position.starkKey,
       assetChanges,
       transactions: transactions

@@ -66,8 +66,11 @@ export class MerkleTree<T extends MerkleValue> {
   }
 
   async getLeaf(index: bigint): Promise<T> {
-    const leaves = await this.getLeaves([index])
-    return leaves[0]
+    const [leaf] = await this.getLeaves([index])
+    if (!leaf) {
+      throw new Error(`No leaf at index ${index}`)
+    }
+    return leaf
   }
 
   async getLeaves(indices: bigint[]): Promise<T[]> {
@@ -81,7 +84,10 @@ export class MerkleTree<T extends MerkleValue> {
       const leaves = await root.getLeaves(sorted, center, this.height)
       const map = new Map<bigint, T>()
       for (let i = 0; i < sorted.length; i++) {
-        map.set(sorted[i], leaves[i])
+        const [index, leaf] = [sorted[i], leaves[i]]
+        if (index !== undefined && leaf !== undefined) {
+          map.set(index, leaf)
+        }
       }
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return indices.map((x) => map.get(x)!)
@@ -111,7 +117,8 @@ export class MerkleTree<T extends MerkleValue> {
       if (updates.length !== 1) {
         throw new Error('Cannot replace leaf with multiple values')
       } else {
-        const newRoot = updates[0].value
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const newRoot = updates[0]!.value
         await this.storage.persist([newRoot])
         return new MerkleTree(this.storage, this.height, newRoot)
       }

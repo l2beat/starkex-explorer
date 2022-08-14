@@ -21,7 +21,7 @@ export function TableRow(props: TableRowProps) {
     >
       {props.cells.map((cell, col) => {
         const { fullWidth, numeric, monospace, className } =
-          props.columns[col] || {}
+          props.columns[col] ?? {}
         return (
           <td
             key={col}

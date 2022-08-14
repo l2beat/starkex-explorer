@@ -22,9 +22,14 @@ export function getInitialState(
   const hasBuy = props.assets.some(isBuyable)
   const hasSell = props.assets.some(isSellable)
 
+  const selectedAsset = props.assets[0]
+  if (!selectedAsset) {
+    throw new Error('Programmer error: No assets')
+  }
+
   const candidate: FormState = {
     props,
-    selectedAsset: props.assets[0],
+    selectedAsset,
     amountInputString: '',
     amountInputValue: 0n,
     amountInputError: false,
