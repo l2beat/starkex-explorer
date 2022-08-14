@@ -5,11 +5,11 @@ import { expect } from 'earljs'
 import {
   LOG_MEMORY_PAGE_HASHES,
   MemoryHashEventCollector,
-} from '../../src/core/MemoryHashEventCollector'
-import { BlockRange } from '../../src/model'
-import { FactToPageRepository } from '../../src/peripherals/database/FactToPageRepository'
-import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../mock'
+} from '../../../src/core/collectors/MemoryHashEventCollector'
+import { BlockRange } from '../../../src/model'
+import { FactToPageRepository } from '../../../src/peripherals/database/FactToPageRepository'
+import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
+import { mock } from '../../mock'
 
 describe(MemoryHashEventCollector.name, () => {
   it('fetches memory hash events and saves them to repository', async () => {

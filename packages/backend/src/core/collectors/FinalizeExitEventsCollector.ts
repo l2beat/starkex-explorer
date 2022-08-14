@@ -2,14 +2,14 @@ import { decodeAssetId } from '@explorer/encoding'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { utils } from 'ethers'
 
-import { BlockRange } from '../model/BlockRange'
+import { BlockRange } from '../../model/BlockRange'
 import {
   FinalizeExitAction,
   ForcedTransactionsRepository,
-} from '../peripherals/database/ForcedTransactionsRepository'
-import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { getTransactionStatus } from './getForcedTransactionStatus'
+} from '../../peripherals/database/ForcedTransactionsRepository'
+import { TransactionStatusRepository } from '../../peripherals/database/TransactionStatusRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { getTransactionStatus } from '../getForcedTransactionStatus'
 
 export const PERPETUAL_ABI = new utils.Interface([
   `event LogWithdrawalPerformed(

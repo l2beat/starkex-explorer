@@ -17,7 +17,7 @@ import { BigNumber, providers } from 'ethers'
 import {
   LogWithdrawalPerformed,
   PERPETUAL_ABI,
-} from '../src/core/FinalizeExitEventsCollector'
+} from '../src/core/collectors/FinalizeExitEventsCollector'
 import {
   Accepted,
   ForcedTradeOfferRecord,

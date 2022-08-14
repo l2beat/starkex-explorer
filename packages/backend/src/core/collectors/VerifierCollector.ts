@@ -3,13 +3,13 @@ import { utils } from 'ethers'
 import { AbiCoder } from 'ethers/lib/utils'
 import { partition } from 'lodash'
 
-import { BlockRange } from '../model/BlockRange'
+import { BlockRange } from '../../model/BlockRange'
 import {
   VerifierEventRecord,
   VerifierEventRepository,
-} from '../peripherals/database/VerifierEventRepository'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber } from '../peripherals/ethereum/types'
+} from '../../peripherals/database/VerifierEventRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { BlockNumber } from '../../peripherals/ethereum/types'
 
 const PROXY_ABI = new utils.Interface([
   'event ImplementationAdded(address indexed implementation, bytes initializer, bool finalize)',

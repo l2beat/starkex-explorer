@@ -1,13 +1,13 @@
 import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
 import { utils } from 'ethers'
 
-import { BlockRange } from '../model/BlockRange'
+import { BlockRange } from '../../model/BlockRange'
 import {
   StateTransitionFactRecord,
   StateTransitionFactRepository,
-} from '../peripherals/database/StateTransitionFactsRepository'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber } from '../peripherals/ethereum/types'
+} from '../../peripherals/database/StateTransitionFactsRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { BlockNumber } from '../../peripherals/ethereum/types'
 
 const PERPETUAL_ABI = new utils.Interface([
   'event LogStateTransitionFact(bytes32 stateTransitionFact)',

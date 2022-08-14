@@ -4,14 +4,14 @@ import { expect } from 'earljs'
 import {
   LOG_STATE_TRANSITION_FACT,
   StateTransitionFactCollector,
-} from '../../src/core/StateTransitionFactCollector'
-import { BlockRange } from '../../src/model'
+} from '../../../src/core/collectors/StateTransitionFactCollector'
+import { BlockRange } from '../../../src/model'
 import type {
   StateTransitionFactRecord,
   StateTransitionFactRepository,
-} from '../../src/peripherals/database/StateTransitionFactsRepository'
-import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../mock'
+} from '../../../src/peripherals/database/StateTransitionFactsRepository'
+import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
+import { mock } from '../../mock'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 

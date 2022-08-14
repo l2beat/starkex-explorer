@@ -1,10 +1,10 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { utils } from 'ethers'
 
-import { BlockRange } from '../model'
-import { FactToPageRepository } from '../peripherals/database/FactToPageRepository'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber } from '../peripherals/ethereum/types'
+import { BlockRange } from '../../model'
+import { FactToPageRepository } from '../../peripherals/database/FactToPageRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { BlockNumber } from '../../peripherals/ethereum/types'
 
 const GPS_VERIFIER_ABI = new utils.Interface([
   'event LogMemoryPagesHashes(bytes32 factHash, bytes32[] pagesHashes)',

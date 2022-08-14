@@ -1,18 +1,18 @@
 import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { ForcedEventsCollector } from '../../src/core/ForcedEventsCollector'
-import { BlockRange } from '../../src/model'
-import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
-import { TransactionStatusRepository } from '../../src/peripherals/database/TransactionStatusRepository'
-import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+import { ForcedEventsCollector } from '../../../src/core/collectors/ForcedEventsCollector'
+import { BlockRange } from '../../../src/model'
+import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import { TransactionStatusRepository } from '../../../src/peripherals/database/TransactionStatusRepository'
+import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
 import {
   fakeForcedUpdates,
   fakeInt,
   fakeTimestamp,
   fakeWithdrawal,
-} from '../fakes'
-import { mock } from '../mock'
+} from '../../fakes'
+import { mock } from '../../mock'
 
 const blockRange = new BlockRange([
   {

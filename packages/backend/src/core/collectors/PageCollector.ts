@@ -1,13 +1,13 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { BigNumber, utils } from 'ethers'
 
-import { BlockRange } from '../model'
+import { BlockRange } from '../../model'
 import {
   PageRecord,
   PageRepository,
-} from '../peripherals/database/PageRepository'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber } from '../peripherals/ethereum/types'
+} from '../../peripherals/database/PageRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { BlockNumber } from '../../peripherals/ethereum/types'
 
 const REGISTRY_ABI = new utils.Interface([
   'event LogMemoryPageFactContinuous(bytes32 factHash, uint256 memoryHash, uint256 prod)',

@@ -1,14 +1,14 @@
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
-import { FinalizeExitEventsCollector } from './FinalizeExitEventsCollector'
-import { ForcedEventsCollector } from './ForcedEventsCollector'
-import { MemoryHashEventCollector } from './MemoryHashEventCollector'
-import { PageCollector } from './PageCollector'
-import { StateTransitionFactCollector } from './StateTransitionFactCollector'
+import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
+import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
+import { MemoryHashEventCollector } from './collectors/MemoryHashEventCollector'
+import { PageCollector } from './collectors/PageCollector'
+import { StateTransitionFactCollector } from './collectors/StateTransitionFactCollector'
 import { StateUpdater } from './StateUpdater'
-import { UserRegistrationCollector } from './UserRegistrationCollector'
-import { VerifierCollector } from './VerifierCollector'
+import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { VerifierCollector } from './collectors/VerifierCollector'
 
 export class DataSyncService {
   constructor(

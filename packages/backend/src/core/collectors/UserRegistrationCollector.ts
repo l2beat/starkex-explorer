@@ -1,13 +1,13 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import { utils } from 'ethers'
 
-import { BlockRange } from '../model/BlockRange'
+import { BlockRange } from '../../model/BlockRange'
 import {
   UserRegistrationEventRecord,
   UserRegistrationEventRepository,
-} from '../peripherals/database/UserRegistrationEventRepository'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { BlockNumber } from '../peripherals/ethereum/types'
+} from '../../peripherals/database/UserRegistrationEventRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { BlockNumber } from '../../peripherals/ethereum/types'
 
 const PERPETUAL_ABI = new utils.Interface([
   'event LogUserRegistered(address ethKey, uint256 starkKey, address sender)',

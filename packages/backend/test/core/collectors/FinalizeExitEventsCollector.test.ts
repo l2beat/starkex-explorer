@@ -4,11 +4,11 @@ import { expect } from 'earljs'
 import {
   FinalizeExitEventsCollector,
   LogWithdrawalPerformed,
-} from '../../src/core/FinalizeExitEventsCollector'
-import { BlockRange } from '../../src/model'
-import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
-import { TransactionStatusRepository } from '../../src/peripherals/database/TransactionStatusRepository'
-import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+} from '../../../src/core/collectors/FinalizeExitEventsCollector'
+import { BlockRange } from '../../../src/model'
+import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import { TransactionStatusRepository } from '../../../src/peripherals/database/TransactionStatusRepository'
+import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
 import {
   fakeBlock,
   fakeExit,
@@ -16,8 +16,8 @@ import {
   fakeForcedUpdatesVerified,
   fakeInt,
   fakeTimestamp,
-} from '../fakes'
-import { mock } from '../mock'
+} from '../../fakes'
+import { mock } from '../../mock'
 
 const blockRange = new BlockRange([
   {
