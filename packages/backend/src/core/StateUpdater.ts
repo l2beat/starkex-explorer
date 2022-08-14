@@ -22,7 +22,7 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
 
 interface StateTransition {
   blockNumber: number
-  hash: Hash256
+  stateTransitionHash: Hash256
   pages: string[]
 }
 
@@ -43,7 +43,7 @@ export class StateUpdater {
     }
 
     const pageGroups = await this.pageRepository.getByStateTransitions(
-      stateTransitions.map((x) => x.hash)
+      stateTransitions.map((x) => x.stateTransitionHash)
     )
     const stateTransitionsWithPages = pageGroups.map((pages, i) => {
       const stateTransition = stateTransitions[i]
@@ -65,7 +65,7 @@ export class StateUpdater {
   }
 
   async processStateTransition(
-    { pages, hash, blockNumber }: StateTransition,
+    { pages, stateTransitionHash, blockNumber }: StateTransition,
     id: number
   ) {
     if (!this.rollupState) {
@@ -91,7 +91,7 @@ export class StateUpdater {
         stateUpdate: {
           id,
           blockNumber,
-          stateTransitionHash: hash,
+          stateTransitionHash,
           rootHash,
           timestamp,
         },

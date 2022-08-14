@@ -112,7 +112,9 @@ describe(StateUpdater.name, () => {
         Logger.SILENT
       )
       await expect(
-        stateUpdater.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
+        stateUpdater.save([
+          { stateTransitionHash: Hash256.fake('a'), blockNumber: 1 },
+        ])
       ).toBeRejected('Missing pages for state transitions in database')
     })
 
@@ -144,14 +146,14 @@ describe(StateUpdater.name, () => {
       stateUpdater.processStateTransition = processStateTransition
 
       await stateUpdater.save([
-        { blockNumber: 123, hash: Hash256.fake('123') },
-        { blockNumber: 456, hash: Hash256.fake('456') },
+        { blockNumber: 123, stateTransitionHash: Hash256.fake('123') },
+        { blockNumber: 456, stateTransitionHash: Hash256.fake('456') },
       ])
       expect(processStateTransition).toHaveBeenCalledExactlyWith([
         [
           {
             blockNumber: 123,
-            hash: Hash256.fake('123'),
+            stateTransitionHash: Hash256.fake('123'),
             pages: ['aa', 'ab', 'ac'],
           },
           567 + 1,
@@ -159,7 +161,7 @@ describe(StateUpdater.name, () => {
         [
           {
             blockNumber: 456,
-            hash: Hash256.fake('456'),
+            stateTransitionHash: Hash256.fake('456'),
             pages: ['ba', 'bb'],
           },
           567 + 2,
@@ -197,7 +199,7 @@ describe(StateUpdater.name, () => {
         collector.processStateTransition(
           {
             pages: fakePages,
-            hash: Hash256.fake('123'),
+            stateTransitionHash: Hash256.fake('123'),
             blockNumber: 1,
           },
 

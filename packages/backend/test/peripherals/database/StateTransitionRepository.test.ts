@@ -81,10 +81,10 @@ describe(StateTransitionRepository.name, () => {
 
 function dummyRecord({
   blockNumber = 0,
-  hash = Hash256.fake(),
+  stateTransitionHash = Hash256.fake(),
 }: Partial<Omit<StateTransitionRecord, 'id'>>): Omit<
   StateTransitionRecord,
   'id'
 > {
-  return { blockNumber, hash }
+  return { blockNumber, stateTransitionHash }
 }

@@ -59,25 +59,25 @@ describe(StateTransitionCollector.name, () => {
     const expectedRecords: Omit<StateTransitionRecord, 'id'>[] = [
       {
         blockNumber: 13986068,
-        hash: Hash256(
+        stateTransitionHash: Hash256(
           '0xf7a4d368103ca720efb0ba4873ca2e0b9dee88e385d14de8ac743cec81a048f2'
         ),
       },
       {
         blockNumber: 13986473,
-        hash: Hash256(
+        stateTransitionHash: Hash256(
           '0x32e69820f8b6742959585b306e6be0bb003b86d5473286369123f6760de86176'
         ),
       },
       {
         blockNumber: 13986918,
-        hash: Hash256(
+        stateTransitionHash: Hash256(
           '0x48d39c9b67d74937929a0b03845518e34c011c9b281ec9e058471c56ba8f1d80'
         ),
       },
       {
         blockNumber: 13987182,
-        hash: Hash256(
+        stateTransitionHash: Hash256(
           '0x6cd9ea43d47f77a502974d7c6e110e13dd5675af8c0d429b97b73c82eaeebc54'
         ),
       },

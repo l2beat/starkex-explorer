@@ -21,6 +21,8 @@ const tableRenames: [string, string][] = [
 const columnRenames: [string, string, string][] = [
   ['page_mappings', 'fact_hash', 'state_transition_hash'],
   ['page_mappings', 'index', 'page_index'],
+  ['state_updates', 'fact_hash', 'state_transition_hash'],
+  ['state_transitions', 'hash', 'state_transition_hash'],
 ]
 
 const constraintRenames: [string, string, string][] = [
@@ -37,7 +39,10 @@ const indexRenames: [string, string][] = [
     'state_transition_facts_block_number_index',
     'state_transitions_block_number_index',
   ],
-  ['state_transition_facts_hash_index', 'state_transitions_hash_index'],
+  [
+    'state_transition_facts_hash_index',
+    'state_transitions_state_transition_hash_index',
+  ],
   ['fact_to_pages_block_number_index', 'page_mappings_block_number_index'],
   ['fact_to_pages_page_hash_index', 'page_mappings_page_hash_index'],
 ]

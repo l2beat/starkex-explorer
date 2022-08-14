@@ -8,7 +8,7 @@ import { Database } from './shared/Database'
 export interface StateTransitionRecord {
   id: number
   blockNumber: number
-  hash: Hash256
+  stateTransitionHash: Hash256
 }
 
 export class StateTransitionRepository extends BaseRepository {
@@ -58,7 +58,7 @@ function toRow(
 ): Omit<StateTransitionRow, 'id'> {
   return {
     block_number: record.blockNumber,
-    hash: record.hash.toString(),
+    state_transition_hash: record.stateTransitionHash.toString(),
   }
 }
 
@@ -66,6 +66,6 @@ function toRecord(row: StateTransitionRow): StateTransitionRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,
-    hash: Hash256(row.hash),
+    stateTransitionHash: Hash256(row.state_transition_hash),
   }
 }

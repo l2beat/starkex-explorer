@@ -31,7 +31,7 @@ describe(DataSyncService.name, () => {
     })
 
     const stateTransitions: Omit<StateTransitionRecord, 'id'>[] = [
-      { hash: Hash256.fake('abcd'), blockNumber: 1 },
+      { stateTransitionHash: Hash256.fake('abcd'), blockNumber: 1 },
     ]
 
     const stateTransitionCollector = mock<StateTransitionCollector>({

@@ -41,7 +41,7 @@ declare module 'knex/types/tables' {
     /** surrogate key */
     id: number
     block_number: number
-    hash: string
+    state_transition_hash: string
   }
 
   interface BlockRow {
@@ -69,7 +69,7 @@ declare module 'knex/types/tables' {
   interface StateUpdateRow {
     id: number
     block_number: number
-    fact_hash: string
+    state_transition_hash: string
     root_hash: string
     timestamp: bigint
   }

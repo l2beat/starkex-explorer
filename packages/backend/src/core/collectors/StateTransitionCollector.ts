@@ -28,7 +28,7 @@ export class StateTransitionCollector {
       const event = LogStateTransitionFact.parseLog(log)
       return {
         blockNumber: log.blockNumber,
-        hash: Hash256(event.args.stateTransitionFact),
+        stateTransitionHash: Hash256(event.args.stateTransitionFact),
       }
     })
 
