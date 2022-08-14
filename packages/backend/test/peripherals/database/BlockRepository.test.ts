@@ -110,12 +110,6 @@ describe(BlockRepository.name, () => {
     }))
     await repository.addMany(blocks)
 
-    expect(await repository.getAllInRange(13, 17)).toEqual([
-      blocks[3],
-      blocks[4],
-      blocks[5],
-      blocks[6],
-      blocks[7],
-    ])
+    expect(await repository.getAllInRange(13, 17)).toEqual(blocks.slice(3, 8))
   })
 })

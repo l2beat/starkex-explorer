@@ -27,18 +27,17 @@ const ONE_HOUR = 60 * 60 * 1000
 
 const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
   Array.from({ length: count }).map((_, i) => {
-    const assets = [AssetId('LINK-7'), AssetId('MKR-9'), AssetId('BTC-10')]
-    const assetId = assets[Math.floor(Math.random() * assets.length)]
-
-    const types = ['exit', 'buy', 'sell'] as const
-    const type = types[Math.floor(Math.random() * types.length)]
-
-    const statuses = ['mined', 'verified'] as const
-    const status = statuses[Math.floor(Math.random() * statuses.length)]
+    const assetId = randomChoice([
+      AssetId('LINK-7'),
+      AssetId('MKR-9'),
+      AssetId('BTC-10'),
+    ])
+    const type = randomChoice(['exit', 'buy', 'sell'] as const)
+    const status = randomChoice(['mined', 'verified'] as const)
 
     const decimals = AssetId.decimals(assetId)
     const digits = Math.floor(Math.random() * decimals + 6)
-    const randomDigit = () => '0123456789'[Math.floor(Math.random() * 10)]
+    const randomDigit = () => randomChoice('0123456789'.split(''))
     const amount = Array.from({ length: digits }).map(randomDigit).join('')
 
     return {
@@ -51,6 +50,13 @@ const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
       positionId: BigInt(Math.floor(Math.random() * 10_000 + 1)),
     }
   })
+
+function randomChoice<T>(items: readonly T[]) {
+  if (items.length === 0) {
+    throw new TypeError('Cannot choose from an empty array!')
+  }
+  return items[Math.floor(Math.random() * items.length)]!
+}
 
 const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
   Array.from({ length: count }).map((_, i) => {

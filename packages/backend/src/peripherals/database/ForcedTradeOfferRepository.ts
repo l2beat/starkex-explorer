@@ -142,7 +142,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     const [result] = (await knex('forced_trade_offers')
       .insert(row)
       .returning('id')) as { id: number }[]
-    return result.id
+    return result!.id
   }
 
   async save(record: Record): Promise<boolean> {
@@ -173,11 +173,11 @@ export class ForcedTradeOfferRepository extends BaseRepository {
 
   async countInitial({ assetId, type }: InitialFilters = {}): Promise<number> {
     const knex = await this.knex()
-    const [{ count }] = await this.getInitialQuery(knex, {
+    const [result] = await this.getInitialQuery(knex, {
       assetId,
       type,
     }).count()
-    return Number(count)
+    return Number(result!.count)
   }
 
   async getInitial({
@@ -216,11 +216,11 @@ export class ForcedTradeOfferRepository extends BaseRepository {
 
   async countActiveByPositionId(positionId: bigint) {
     const knex = await this.knex()
-    const [{ count }] = await this.getByPositionIdQuery(knex, positionId)
+    const [result] = await this.getByPositionIdQuery(knex, positionId)
       .whereNull('cancelled_at')
       .whereNull('transaction_hash')
       .count()
-    return Number(count)
+    return Number(result!.count)
   }
 
   async getByPositionId(positionId: bigint) {

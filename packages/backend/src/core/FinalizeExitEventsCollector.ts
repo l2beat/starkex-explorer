@@ -51,7 +51,7 @@ export class FinalizeExitEventsCollector {
           Timestamp(0)
 
         if (i > 0) {
-          previousFinalizeMinedAt = array[i - 1].minedAt
+          previousFinalizeMinedAt = array[i - 1]?.minedAt ?? Timestamp(0)
         }
 
         return await this.processFinalizes(finalize, previousFinalizeMinedAt)

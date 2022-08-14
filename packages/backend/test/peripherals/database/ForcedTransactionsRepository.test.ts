@@ -203,7 +203,7 @@ describe(ForcedTransactionsRepository.name, () => {
     expect(latest).toEqual(expected)
 
     const offset = await repository.getLatest({ limit: 10, offset: 2 })
-    expect(offset).toEqual([expected[2]])
+    expect(offset).toEqual([expected[2]!])
   })
 
   it('returns transactions affecting position', async () => {
@@ -498,7 +498,7 @@ describe(ForcedTransactionsRepository.name, () => {
             : expectedMinedAt,
       },
     ])
-    expect(result[0].hash).toEqual(expectedExit.hash)
+    expect(result[0]?.hash).toEqual(expectedExit.hash)
   })
   it('finds exit by data for finalize', async () => {
     const starkKey = StarkKey.fake()
@@ -610,7 +610,7 @@ describe(ForcedTransactionsRepository.name, () => {
       Timestamp(0)
     )
 
-    expect(beforeFinalize[0].hash).toEqual(exit.hash)
+    expect(beforeFinalize[0]?.hash).toEqual(exit.hash)
     expect(afterFinalize).toEqual([])
   })
 

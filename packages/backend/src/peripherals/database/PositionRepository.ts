@@ -148,10 +148,10 @@ export class PositionRepository extends BaseRepository {
 
   async count() {
     const knex = await this.knex()
-    const [{ count }] = await knex('positions').countDistinct({
+    const [result] = await knex('positions').countDistinct({
       count: 'position_id',
     })
-    return count ? BigInt(count) : 0n
+    return BigInt(result!.count!)
   }
 }
 

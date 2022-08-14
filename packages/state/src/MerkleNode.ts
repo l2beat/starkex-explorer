@@ -136,7 +136,7 @@ export class MerkleNode<T extends MerkleValue> extends MerkleValue {
       if (child instanceof MerkleNode) {
         throw new Error('Tree structure corrupted')
       }
-      const value = updates[updates.length - 1].value
+      const value = updates[updates.length - 1]!.value
       return [value, [value]]
     }
     if (child instanceof MerkleNode) {

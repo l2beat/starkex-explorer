@@ -128,7 +128,7 @@ export class BlockDownloader {
         number: block.number,
         hash: Hash256(block.hash),
       }))
-      await this.blockRepository.deleteAfter(records[0].number - 1)
+      await this.blockRepository.deleteAfter(records[0]!.number - 1)
       await this.blockRepository.addMany(records)
       this.lastKnown = blockNumber
       return ['reorg', records] as const

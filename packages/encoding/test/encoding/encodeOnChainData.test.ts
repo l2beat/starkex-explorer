@@ -244,11 +244,15 @@ describe(encodeOnChainData.name, () => {
   describe(writePositionUpdate.name, () => {
     it(`is compatible with ${readPositionUpdate.name}`, () => {
       const writer = new ByteWriter()
-      writePositionUpdate(writer, data.positions[0])
+      const position = data.positions[0]
+      if (!position) {
+        throw new Error('Programmer error: misconfigured data')
+      }
+      writePositionUpdate(writer, position)
       const encoded = writer.getBytes()
       const reader = new ByteReader(encoded)
       const decoded = readPositionUpdate(reader)
-      expect(decoded).toEqual(data.positions[0])
+      expect(decoded).toEqual(position)
     })
   })
 })

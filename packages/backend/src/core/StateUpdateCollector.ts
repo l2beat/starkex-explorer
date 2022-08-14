@@ -45,10 +45,13 @@ export class StateUpdateCollector {
     const dbTransitions = await this.pageRepository.getByFactHashes(
       stateTransitionFacts.map((f) => f.hash)
     )
-    const stateTransitions = dbTransitions.map((x, i) => ({
-      ...x,
-      blockNumber: stateTransitionFacts[i].blockNumber,
-    }))
+    const stateTransitions = dbTransitions.map((x, i) => {
+      const blockNumber = stateTransitionFacts[i]?.blockNumber
+      if (blockNumber === undefined) {
+        throw new Error('Programmer error: state transition count mismatch')
+      }
+      return { ...x, blockNumber }
+    })
     if (dbTransitions.length !== stateTransitionFacts.length) {
       throw new Error('Missing state transition facts in database')
     }
