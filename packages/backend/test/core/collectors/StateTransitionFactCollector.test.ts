@@ -1,10 +1,8 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import {
-  LOG_STATE_TRANSITION_FACT,
-  StateTransitionFactCollector,
-} from '../../../src/core/collectors/StateTransitionFactCollector'
+import { LogStateTransitionFact } from '../../../src/core/collectors/events'
+import { StateTransitionFactCollector } from '../../../src/core/collectors/StateTransitionFactCollector'
 import { BlockRange } from '../../../src/model'
 import type {
   StateTransitionFactRecord,
@@ -90,7 +88,7 @@ describe(StateTransitionFactCollector.name, () => {
       blockRange,
       {
         address: PERPETUAL_ADDRESS.toString(),
-        topics: [LOG_STATE_TRANSITION_FACT],
+        topics: [LogStateTransitionFact.topic],
       },
     ])
     expect(transitionFactRepository.addMany).toHaveBeenCalledWith([

@@ -1,6 +1,5 @@
 import { decodeAssetId } from '@explorer/encoding'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
-import { utils } from 'ethers'
 
 import { BlockRange } from '../../model/BlockRange'
 import {
@@ -10,20 +9,7 @@ import {
 import { TransactionStatusRepository } from '../../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { getTransactionStatus } from '../getForcedTransactionStatus'
-
-export const PERPETUAL_ABI = new utils.Interface([
-  `event LogWithdrawalPerformed(
-    uint256 starkKey,
-    uint256 assetType,
-    uint256 nonQuantizedAmount,
-    uint256 quantizedAmount,
-    address recipient
-)`,
-])
-
-export const LogWithdrawalPerformed = PERPETUAL_ABI.getEventTopic(
-  'LogWithdrawalPerformed'
-)
+import { LogWithdrawalPerformed } from './events'
 
 interface MinedTransaction {
   hash: Hash256
@@ -120,10 +106,14 @@ export class FinalizeExitEventsCollector {
   private async getMinedFinalizes(
     blockRange: BlockRange
   ): Promise<MinedTransaction[]> {
-    const logs = await this.getLogs(blockRange)
+    const logs = await this.ethereumClient.getLogsInRange(blockRange, {
+      address: this.perpetualAddress.toString(),
+      topics: [[LogWithdrawalPerformed.topic]],
+    })
+
     return Promise.all(
       logs.map(async (log) => {
-        const event = PERPETUAL_ABI.parseLog(log)
+        const event = LogWithdrawalPerformed.parseLog(log)
         const blockNumber = log.blockNumber
         const block = await this.ethereumClient.getBlock(blockNumber)
         const hash = Hash256(log.transactionHash)
@@ -134,25 +124,16 @@ export class FinalizeExitEventsCollector {
           hash,
           minedAt,
           data: {
-            /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
             starkKey: StarkKey.from(event.args.starkKey),
             assetType: decodeAssetId(
               event.args.assetType.toHexString().slice(2)
             ),
-            nonQuantizedAmount: BigInt(event.args.nonQuantizedAmount),
-            quantizedAmount: BigInt(event.args.quantizedAmount),
+            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
+            quantizedAmount: event.args.quantizedAmount.toBigInt(),
             recipient: EthereumAddress(event.args.recipient),
-            /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
           },
         }
       })
     )
-  }
-
-  private async getLogs(blockRange: BlockRange) {
-    return await this.ethereumClient.getLogsInRange(blockRange, {
-      address: this.perpetualAddress.toString(),
-      topics: [[LogWithdrawalPerformed]],
-    })
   }
 }

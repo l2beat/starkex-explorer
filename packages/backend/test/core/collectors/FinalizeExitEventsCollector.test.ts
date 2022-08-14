@@ -1,10 +1,8 @@
 import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import {
-  FinalizeExitEventsCollector,
-  LogWithdrawalPerformed,
-} from '../../../src/core/collectors/FinalizeExitEventsCollector'
+import { LogWithdrawalPerformed } from '../../../src/core/collectors/events'
+import { FinalizeExitEventsCollector } from '../../../src/core/collectors/FinalizeExitEventsCollector'
 import { BlockRange } from '../../../src/model'
 import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
 import { TransactionStatusRepository } from '../../../src/peripherals/database/TransactionStatusRepository'
@@ -59,7 +57,7 @@ describe(FinalizeExitEventsCollector.name, () => {
           fakeFinalizeLog({
             blockNumber,
             transactionHash: finalizeHash.toString(),
-            topics: [LogWithdrawalPerformed],
+            topics: [LogWithdrawalPerformed.topic],
           }),
         ],
         getBlock: async () => fakeBlock({ timestamp, number: blockNumber }),
@@ -102,7 +100,7 @@ describe(FinalizeExitEventsCollector.name, () => {
           fakeFinalizeLog({
             blockNumber,
             transactionHash: finalizeHash.toString(),
-            topics: [LogWithdrawalPerformed],
+            topics: [LogWithdrawalPerformed.topic],
           }),
         ],
         getBlock: async () => fakeBlock({ timestamp, number: blockNumber }),
@@ -138,7 +136,7 @@ describe(FinalizeExitEventsCollector.name, () => {
           fakeFinalizeLog({
             blockNumber,
             transactionHash: finalizeHash.toString(),
-            topics: [LogWithdrawalPerformed],
+            topics: [LogWithdrawalPerformed.topic],
           }),
         ],
         getBlock: async () => fakeBlock({ timestamp, number: blockNumber }),

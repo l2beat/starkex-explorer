@@ -1,19 +1,21 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { utils } from 'ethers'
 
 import { BlockRange } from '../../model'
 import { FactToPageRepository } from '../../peripherals/database/FactToPageRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
+import { EthereumEvent } from './EthereumEvent'
 
-const GPS_VERIFIER_ABI = new utils.Interface([
-  'event LogMemoryPagesHashes(bytes32 factHash, bytes32[] pagesHashes)',
-])
+export interface MemoryHashEvent {
+  factHash: Hash256
+  pagesHashes: Hash256[]
+  blockNumber: BlockNumber
+}
 
-/** @internal exported only for tests */
-export const LOG_MEMORY_PAGE_HASHES = GPS_VERIFIER_ABI.getEventTopic(
-  'LogMemoryPagesHashes'
-)
+export const LogMemoryPagesHashes = EthereumEvent<
+  'LogMemoryPagesHashes',
+  { factHash: string; pagesHashes: string[] }
+>('event LogMemoryPagesHashes(bytes32 factHash, bytes32[] pagesHashes)')
 
 export class MemoryHashEventCollector {
   constructor(
@@ -56,23 +58,15 @@ export class MemoryHashEventCollector {
   ): Promise<MemoryHashEvent[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: verifierAddress.toString(),
-      topics: [LOG_MEMORY_PAGE_HASHES],
+      topics: [LogMemoryPagesHashes.topic],
     })
     return logs.map((log): MemoryHashEvent => {
-      const event = GPS_VERIFIER_ABI.parseLog(log)
+      const event = LogMemoryPagesHashes.parseLog(log)
       return {
         blockNumber: log.blockNumber,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         factHash: Hash256(event.args.factHash),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         pagesHashes: event.args.pagesHashes.map(Hash256),
       }
     })
   }
-}
-
-export interface MemoryHashEvent {
-  factHash: Hash256
-  pagesHashes: Hash256[]
-  blockNumber: BlockNumber
 }

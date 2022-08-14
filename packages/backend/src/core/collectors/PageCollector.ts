@@ -8,20 +8,12 @@ import {
 } from '../../peripherals/database/PageRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
-
-const REGISTRY_ABI = new utils.Interface([
-  'event LogMemoryPageFactContinuous(bytes32 factHash, uint256 memoryHash, uint256 prod)',
-])
+import { LogMemoryPageFactContinuous } from './events'
 
 /** @internal exported only for tests */
 export const PAGE_ABI = new utils.Interface([
   'function registerContinuousMemoryPage(uint256 startAddr, uint256[] values, uint256 z, uint256 alpha, uint256 prime)',
 ])
-
-/** @internal exported only for tests */
-export const LOG_MEMORY_PAGE_FACT_CONTINUOUS = REGISTRY_ABI.getEventTopic(
-  'LogMemoryPageFactContinuous'
-)
 
 export class PageCollector {
   constructor(
@@ -75,12 +67,11 @@ export class PageCollector {
   ): Promise<MemoryPageEvent[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.registryAddress.toString(),
-      topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
+      topics: [LogMemoryPageFactContinuous.topic],
     })
     return logs.map((log): MemoryPageEvent => {
-      const event = REGISTRY_ABI.parseLog(log)
+      const event = LogMemoryPageFactContinuous.parseLog(log)
       return {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         memoryHash: Hash256.from(event.args.memoryHash),
         transactionHash: Hash256(log.transactionHash),
       }

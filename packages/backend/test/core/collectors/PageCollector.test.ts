@@ -3,9 +3,9 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 import { BigNumber, BigNumberish } from 'ethers'
 
+import { LogMemoryPageFactContinuous } from '../../../src/core/collectors/events'
 import {
   bignumToPaddedString,
-  LOG_MEMORY_PAGE_FACT_CONTINUOUS,
   PAGE_ABI,
   PageCollector,
 } from '../../../src/core/collectors/PageCollector'
@@ -78,7 +78,7 @@ describe(PageCollector.name, () => {
       blockRange,
       {
         address: REGISTRY_ADDRESS.toString(),
-        topics: [LOG_MEMORY_PAGE_FACT_CONTINUOUS],
+        topics: [LogMemoryPageFactContinuous.topic],
       },
     ])
 

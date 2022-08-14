@@ -6,9 +6,9 @@ import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { MemoryHashEventCollector } from './collectors/MemoryHashEventCollector'
 import { PageCollector } from './collectors/PageCollector'
 import { StateTransitionFactCollector } from './collectors/StateTransitionFactCollector'
-import { StateUpdater } from './StateUpdater'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
+import { StateUpdater } from './StateUpdater'
 
 export class DataSyncService {
   constructor(

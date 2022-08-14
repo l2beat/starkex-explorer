@@ -1,5 +1,4 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
-import { utils } from 'ethers'
 
 import { BlockRange } from '../../model/BlockRange'
 import {
@@ -8,14 +7,7 @@ import {
 } from '../../peripherals/database/UserRegistrationEventRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
-
-const PERPETUAL_ABI = new utils.Interface([
-  'event LogUserRegistered(address ethKey, uint256 starkKey, address sender)',
-])
-
-/** @internal exported only for tests */
-export const LOG_USER_REGISTERED =
-  PERPETUAL_ABI.getEventTopic('LogUserRegistered')
+import { LogUserRegistered } from './events'
 
 export interface UserRegistration {
   ethAddress: EthereumAddress
@@ -43,15 +35,13 @@ export class UserRegistrationCollector {
   ): Promise<Omit<UserRegistrationEventRecord, 'id'>[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.perpetualAddress.toString(),
-      topics: [LOG_USER_REGISTERED],
+      topics: [LogUserRegistered.topic],
     })
     return logs.map((log) => {
-      const event = PERPETUAL_ABI.parseLog(log)
+      const event = LogUserRegistered.parseLog(log)
       return {
         blockNumber: log.blockNumber,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         ethAddress: EthereumAddress(event.args.ethKey),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         starkKey: StarkKey.from(event.args.starkKey),
       }
     })

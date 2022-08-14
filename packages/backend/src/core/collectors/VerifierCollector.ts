@@ -1,5 +1,4 @@
 import { EthereumAddress } from '@explorer/types'
-import { utils } from 'ethers'
 import { AbiCoder } from 'ethers/lib/utils'
 import { partition } from 'lodash'
 
@@ -10,14 +9,7 @@ import {
 } from '../../peripherals/database/VerifierEventRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
-
-const PROXY_ABI = new utils.Interface([
-  'event ImplementationAdded(address indexed implementation, bytes initializer, bool finalize)',
-  'event Upgraded(address indexed implementation)',
-])
-
-const Upgraded = PROXY_ABI.getEventTopic('Upgraded')
-const ImplementationAdded = PROXY_ABI.getEventTopic('ImplementationAdded')
+import { ImplementationAdded, Upgraded } from './events'
 
 export class VerifierCollector {
   constructor(
@@ -57,18 +49,20 @@ export class VerifierCollector {
   private async getEvents(blockRange: BlockRange) {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.proxyAddress.toString(),
-      topics: [[ImplementationAdded, Upgraded]],
+      topics: [[ImplementationAdded.topic, Upgraded.topic]],
     })
     return logs.map((log): Omit<VerifierEventRecord, 'id'> => {
-      const event = PROXY_ABI.parseLog(log)
-      /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+      const event =
+        ImplementationAdded.safeParseLog(log) ?? Upgraded.parseLog(log)
       return {
-        name: event.name as 'ImplementationAdded' | 'Upgraded',
+        name: event.name,
         blockNumber: log.blockNumber,
         implementation: event.args.implementation,
-        initializer: event.args.initializer,
+        initializer:
+          event.name === 'ImplementationAdded'
+            ? event.args.initializer
+            : undefined,
       }
-      /* eslint-enable @typescript-eslint/no-unsafe-assignment */
     })
   }
 }

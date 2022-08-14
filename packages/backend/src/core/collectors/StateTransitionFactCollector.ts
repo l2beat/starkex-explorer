@@ -1,5 +1,5 @@
+import { Hash256 } from '@explorer/types'
 import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
-import { utils } from 'ethers'
 
 import { BlockRange } from '../../model/BlockRange'
 import {
@@ -8,15 +8,7 @@ import {
 } from '../../peripherals/database/StateTransitionFactsRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
-
-const PERPETUAL_ABI = new utils.Interface([
-  'event LogStateTransitionFact(bytes32 stateTransitionFact)',
-])
-
-/** @internal exported only for tests */
-export const LOG_STATE_TRANSITION_FACT = PERPETUAL_ABI.getEventTopic(
-  'LogStateTransitionFact'
-)
+import { LogStateTransitionFact } from './events'
 
 export class StateTransitionFactCollector {
   constructor(
@@ -30,14 +22,13 @@ export class StateTransitionFactCollector {
   ): Promise<Omit<StateTransitionFactRecord, 'id'>[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.perpetualAddress.toString(),
-      topics: [LOG_STATE_TRANSITION_FACT],
+      topics: [LogStateTransitionFact.topic],
     })
     const records = logs.map((log): Omit<StateTransitionFactRecord, 'id'> => {
-      const event = PERPETUAL_ABI.parseLog(log)
+      const event = LogStateTransitionFact.parseLog(log)
       return {
         blockNumber: log.blockNumber,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        hash: event.args.stateTransitionFact,
+        hash: Hash256(event.args.stateTransitionFact),
       }
     })
 

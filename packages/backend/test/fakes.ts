@@ -14,10 +14,7 @@ import {
 import { fakeHexString } from '@explorer/types/src/fake'
 import { BigNumber, providers } from 'ethers'
 
-import {
-  LogWithdrawalPerformed,
-  PERPETUAL_ABI,
-} from '../src/core/collectors/FinalizeExitEventsCollector'
+import { LogWithdrawalPerformed } from '../src/core/collectors/events'
 import {
   Accepted,
   ForcedTradeOfferRecord,
@@ -221,8 +218,8 @@ export function fakeFinalizeLog(log?: Partial<providers.Log>): providers.Log {
     logIndex: fakeInt(10),
     address: EthereumAddress.fake().toString(),
     removed: false,
-    ...PERPETUAL_ABI.encodeEventLog(
-      PERPETUAL_ABI.getEvent(LogWithdrawalPerformed),
+    ...LogWithdrawalPerformed.abi.encodeEventLog(
+      LogWithdrawalPerformed.abi.getEvent(LogWithdrawalPerformed.topic),
       [
         StarkKey.fake().toString(),
         '0x' + encodeAssetId(AssetId.USDC),
