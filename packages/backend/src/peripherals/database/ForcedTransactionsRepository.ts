@@ -268,6 +268,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
       .whereNull('exit_tx.forgotten_at')
       .count()
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
   }
 
@@ -466,6 +467,7 @@ export class ForcedTransactionsRepository extends BaseRepository {
   async countAll(): Promise<number> {
     const knex = await this.knex()
     const [result] = await knex('forced_transactions').count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const count = Number(result!.count)
     this.logger.debug({ method: 'countAll', count })
     return count

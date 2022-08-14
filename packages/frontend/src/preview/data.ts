@@ -55,6 +55,7 @@ function randomChoice<T>(items: readonly T[]) {
   if (items.length === 0) {
     throw new TypeError('Cannot choose from an empty array!')
   }
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return items[Math.floor(Math.random() * items.length)]!
 }
 

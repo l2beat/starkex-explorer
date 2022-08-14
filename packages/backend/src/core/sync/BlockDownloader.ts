@@ -128,6 +128,7 @@ export class BlockDownloader {
         number: block.number,
         hash: Hash256(block.hash),
       }))
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       await this.blockRepository.deleteAfter(records[0]!.number - 1)
       await this.blockRepository.addMany(records)
       this.lastKnown = blockNumber

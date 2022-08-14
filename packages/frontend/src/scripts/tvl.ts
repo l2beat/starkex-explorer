@@ -40,14 +40,12 @@ function formatLargeNumber(value: number): string {
       return str.slice(0, 3) + withSpace(unit)
     }
   }
-  return (
-    str.slice(0, 1 - units.length * 3) + withSpace(units[units.length - 1]!)
-  )
+  return str.slice(0, 1 - units.length * 3) + withSpace(units[units.length - 1])
 }
 
-function withSpace(unit: string) {
+function withSpace(unit?: string) {
   if (unit) {
     return HAIR_SPACE + unit
   }
-  return unit
+  return ''
 }

@@ -39,7 +39,7 @@ export function TypeRadio(props: TypeRadioProps) {
     <div className="rounded-md bg-grey-200 flex cursor-pointer">
       {['buy', 'sell'].map((type) => {
         const checked = props.type === type
-        const label = type[0]!.toUpperCase() + type.slice(1)
+        const label = type.slice(0, 1).toUpperCase() + type.slice(1)
         return (
           <TypeButton
             id={type}

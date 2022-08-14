@@ -136,6 +136,7 @@ export class MerkleNode<T extends MerkleValue> extends MerkleValue {
       if (child instanceof MerkleNode) {
         throw new Error('Tree structure corrupted')
       }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const value = updates[updates.length - 1]!.value
       return [value, [value]]
     }

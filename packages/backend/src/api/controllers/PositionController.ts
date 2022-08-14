@@ -112,6 +112,7 @@ export class PositionController {
       const content = 'Update not found'
       return { type: 'not found', content }
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const position = history[updateIndex]!
     const previousPosition = history[updateIndex + 1]
     const assetChanges = position.balances.map((balance) => {

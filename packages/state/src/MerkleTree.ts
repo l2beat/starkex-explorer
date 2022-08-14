@@ -1,5 +1,4 @@
 import { PedersenHash } from '@explorer/types'
-import { zip } from 'lodash'
 
 import {
   IMerkleStorage,
@@ -118,6 +117,7 @@ export class MerkleTree<T extends MerkleValue> {
       if (updates.length !== 1) {
         throw new Error('Cannot replace leaf with multiple values')
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const newRoot = updates[0]!.value
         await this.storage.persist([newRoot])
         return new MerkleTree(this.storage, this.height, newRoot)

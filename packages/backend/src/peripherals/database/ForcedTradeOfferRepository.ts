@@ -142,6 +142,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     const [result] = (await knex('forced_trade_offers')
       .insert(row)
       .returning('id')) as { id: number }[]
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return result!.id
   }
 
@@ -177,6 +178,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
       assetId,
       type,
     }).count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
   }
 
@@ -220,6 +222,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
       .whereNull('cancelled_at')
       .whereNull('transaction_hash')
       .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
   }
 

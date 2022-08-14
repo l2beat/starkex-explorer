@@ -151,6 +151,7 @@ export class PositionRepository extends BaseRepository {
     const [result] = await knex('positions').countDistinct({
       count: 'position_id',
     })
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return BigInt(result!.count!)
   }
 }
