@@ -5,7 +5,7 @@ import { expect } from 'earljs'
 import { LogMemoryPagesHashes } from '../../../src/core/collectors/events'
 import { PageMappingCollector } from '../../../src/core/collectors/PageMappingCollector'
 import { BlockRange } from '../../../src/model'
-import { FactToPageRepository } from '../../../src/peripherals/database/FactToPageRepository'
+import { PageMappingRepository } from '../../../src/peripherals/database/PageMappingRepository'
 import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../../mock'
 
@@ -14,12 +14,12 @@ describe(PageMappingCollector.name, () => {
     const ethereumClient = mock<EthereumClient>({
       getLogsInRange: async () => testData().logs,
     })
-    const factToPageRepository = mock<FactToPageRepository>({
+    const pageMappingRepository = mock<PageMappingRepository>({
       addMany: async () => [],
     })
     const collector = new PageMappingCollector(
       ethereumClient,
-      factToPageRepository
+      pageMappingRepository
     )
 
     const verifierAddresses = [
@@ -58,7 +58,7 @@ describe(PageMappingCollector.name, () => {
     const expectedEvents = [
       {
         blockNumber: 11905858,
-        factHash: Hash256(
+        stateTransitionHash: Hash256(
           '0x4ac3c5b87c46c673c67db046ffef90c618297b6ba445c7560f8122c33e9a37ff'
         ),
         pageHashes: [
@@ -72,7 +72,7 @@ describe(PageMappingCollector.name, () => {
       },
       {
         blockNumber: 11905919,
-        factHash: Hash256(
+        stateTransitionHash: Hash256(
           '0x66f9d068861a54123cd952988a6ac4e933f5d28c4d28a9559f111efa1897d653'
         ),
         pageHashes: [
@@ -86,7 +86,7 @@ describe(PageMappingCollector.name, () => {
       },
       {
         blockNumber: 12050594,
-        factHash: Hash256(
+        stateTransitionHash: Hash256(
           '0x8921ae1e750e50195406973065a7064222ae8cb26761460e57e3091bedebbd89'
         ),
         pageHashes: [
@@ -100,7 +100,7 @@ describe(PageMappingCollector.name, () => {
       },
       {
         blockNumber: 12052850,
-        factHash: Hash256(
+        stateTransitionHash: Hash256(
           '0xedb0b161bb4b45d861dcb5bb57db15fbb92d581642b32a00d128e4893ac04dce'
         ),
         pageHashes: [
@@ -124,73 +124,73 @@ describe(PageMappingCollector.name, () => {
       },
     ])
 
-    expect(factToPageRepository.addMany).toHaveBeenCalledWith([
+    expect(pageMappingRepository.addMany).toHaveBeenCalledWith([
       [
         {
           index: 0,
           pageHash: expectedEvents[0]!.pageHashes[0]!,
-          factHash: expectedEvents[0]!.factHash,
+          stateTransitionHash: expectedEvents[0]!.stateTransitionHash,
           blockNumber: expectedEvents[0]!.blockNumber,
         },
         {
           index: 1,
           pageHash: expectedEvents[0]!.pageHashes[1]!,
-          factHash: expectedEvents[0]!.factHash,
+          stateTransitionHash: expectedEvents[0]!.stateTransitionHash,
           blockNumber: expectedEvents[0]!.blockNumber,
         },
         {
           index: 0,
           pageHash: expectedEvents[1]!.pageHashes[0]!,
-          factHash: expectedEvents[1]!.factHash,
+          stateTransitionHash: expectedEvents[1]!.stateTransitionHash,
           blockNumber: expectedEvents[1]!.blockNumber,
         },
         {
           index: 1,
           pageHash: expectedEvents[1]!.pageHashes[1]!,
-          factHash: expectedEvents[1]!.factHash,
+          stateTransitionHash: expectedEvents[1]!.stateTransitionHash,
           blockNumber: expectedEvents[1]!.blockNumber,
         },
         {
           index: 0,
           pageHash: expectedEvents[2]!.pageHashes[0]!,
-          factHash: expectedEvents[2]!.factHash,
+          stateTransitionHash: expectedEvents[2]!.stateTransitionHash,
           blockNumber: expectedEvents[2]!.blockNumber,
         },
         {
           index: 1,
           pageHash: expectedEvents[2]!.pageHashes[1]!,
-          factHash: expectedEvents[2]!.factHash,
+          stateTransitionHash: expectedEvents[2]!.stateTransitionHash,
           blockNumber: expectedEvents[2]!.blockNumber,
         },
         {
           index: 0,
           pageHash: expectedEvents[3]!.pageHashes[0]!,
-          factHash: expectedEvents[3]!.factHash,
+          stateTransitionHash: expectedEvents[3]!.stateTransitionHash,
           blockNumber: expectedEvents[3]!.blockNumber,
         },
         {
           index: 1,
           pageHash: expectedEvents[3]!.pageHashes[1]!,
-          factHash: expectedEvents[3]!.factHash,
+          stateTransitionHash: expectedEvents[3]!.stateTransitionHash,
           blockNumber: expectedEvents[3]!.blockNumber,
         },
       ],
     ])
   })
 
-  it('discards all records from factToPageRepository after given block', async () => {
-    const factToPageRepository = mock<FactToPageRepository>({
+  it('discards all records from pageMappingRepository after given block', async () => {
+    const pageMappingRepository = mock<PageMappingRepository>({
       deleteAllAfter: async () => 0,
     })
 
     const collector = new PageMappingCollector(
       mock<EthereumClient>(),
-      factToPageRepository
+      pageMappingRepository
     )
 
     await collector.discardAfter(123)
 
-    expect(factToPageRepository.deleteAllAfter).toHaveBeenCalledWith([123])
+    expect(pageMappingRepository.deleteAllAfter).toHaveBeenCalledWith([123])
   })
 })
 

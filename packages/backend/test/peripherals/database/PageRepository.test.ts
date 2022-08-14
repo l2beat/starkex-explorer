@@ -3,8 +3,8 @@ import { expect } from 'earljs'
 
 import {
   FactToPageRecord,
-  FactToPageRepository,
-} from '../../../src/peripherals/database/FactToPageRepository'
+  PageMappingRepository,
+} from '../../../src/peripherals/database/PageMappingRepository'
 import {
   PageRecord,
   PageRepository,
@@ -67,16 +67,16 @@ describe(PageRepository.name, () => {
     )
   })
 
-  describe(`with ${FactToPageRepository.name}`, () => {
-    const factToPageRepository = new FactToPageRepository(
+  describe(`with ${PageMappingRepository.name}`, () => {
+    const pageMappingRepository = new PageMappingRepository(
       database,
       Logger.SILENT
     )
 
-    afterEach(() => factToPageRepository.deleteAll())
+    afterEach(() => pageMappingRepository.deleteAll())
 
     it('gets pages for ordered by .index and fact hash position in array #1', async () => {
-      await factToPageRepository.addMany([
+      await pageMappingRepository.addMany([
         dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa22'), 2),
         dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa13'), 3),
         dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
@@ -114,7 +114,7 @@ describe(PageRepository.name, () => {
     })
 
     it('gets pages for ordered by .index and fact hash position in array #2', async () => {
-      await factToPageRepository.addMany([
+      await pageMappingRepository.addMany([
         dummyPageMapping(200, Hash256.fake('ff02'), Hash256.fake('aa20'), 0),
         dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 1),
         dummyPageMapping(300, Hash256.fake('ff03'), Hash256.fake('aa30'), 0),
@@ -146,7 +146,7 @@ describe(PageRepository.name, () => {
     })
 
     it('handles multiple mappings and pages', async () => {
-      await factToPageRepository.addMany([
+      await pageMappingRepository.addMany([
         dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa11'), 0),
         dummyPageMapping(100, Hash256.fake('ff01'), Hash256.fake('aa22'), 1),
         dummyPageMapping(200, Hash256.fake('ff01'), Hash256.fake('aa11'), 0),
@@ -201,13 +201,13 @@ function dummyPage(
 
 function dummyPageMapping(
   blockNumber: number,
-  factHash: Hash256,
+  stateTransitionHash: Hash256,
   pageHash: Hash256,
   index: number
 ): Omit<FactToPageRecord, 'id'> {
   return {
     blockNumber,
-    factHash,
+    stateTransitionHash,
     pageHash,
     index,
   }

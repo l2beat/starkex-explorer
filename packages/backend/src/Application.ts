@@ -27,10 +27,10 @@ import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
-import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
+import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
@@ -67,7 +67,7 @@ export class Application {
       database,
       logger
     )
-    const factToPageRepository = new FactToPageRepository(database, logger)
+    const pageMappingRepository = new PageMappingRepository(database, logger)
     const pageRepository = new PageRepository(database, logger)
     const stateTransitionRepository = new StateTransitionRepository(
       database,
@@ -120,7 +120,7 @@ export class Application {
     )
     const pageMappingCollector = new PageMappingCollector(
       ethereumClient,
-      factToPageRepository
+      pageMappingRepository
     )
     const pageCollector = new PageCollector(
       ethereumClient,

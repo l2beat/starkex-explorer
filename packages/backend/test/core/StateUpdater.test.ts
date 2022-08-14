@@ -113,7 +113,7 @@ describe(StateUpdater.name, () => {
       )
       await expect(
         stateUpdater.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
-      ).toBeRejected('Missing state transition facts in database')
+      ).toBeRejected('Missing pages for state transitions in database')
     })
 
     it('calls processStateTransition for every update', async () => {
@@ -129,7 +129,7 @@ describe(StateUpdater.name, () => {
           id: 567,
           timestamp: Timestamp(1),
           blockNumber: Math.random(),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
         }),
       })
       const stateUpdater = new StateUpdater(

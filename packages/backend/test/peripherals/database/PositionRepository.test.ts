@@ -28,7 +28,7 @@ describe(PositionRepository.name, () => {
     id,
     blockNumber: id * 1000,
     rootHash: PedersenHash.fake(),
-    factHash: Hash256.fake(),
+    stateTransitionHash: Hash256.fake(),
     timestamp: Timestamp(0),
   })
 
@@ -63,7 +63,7 @@ describe(PositionRepository.name, () => {
         id: 1,
         blockNumber: 1,
         rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
+        stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
       positions: [
@@ -82,7 +82,7 @@ describe(PositionRepository.name, () => {
         id: 2,
         blockNumber: 2,
         rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
+        stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
       positions: [
@@ -115,7 +115,7 @@ describe(PositionRepository.name, () => {
         id: 1,
         blockNumber: 1,
         rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
+        stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
       positions: [
@@ -134,7 +134,7 @@ describe(PositionRepository.name, () => {
         id: 2,
         blockNumber: 2,
         rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
+        stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
       positions: [
@@ -252,7 +252,7 @@ describe(PositionRepository.name, () => {
           id: 1,
           blockNumber: 1,
           rootHash: PedersenHash.fake(),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
         },
         positions: [
@@ -271,7 +271,7 @@ describe(PositionRepository.name, () => {
           id: 2,
           blockNumber: 2,
           rootHash: PedersenHash.fake(),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
         },
         positions: [

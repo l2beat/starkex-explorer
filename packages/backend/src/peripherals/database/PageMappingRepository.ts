@@ -8,12 +8,12 @@ import { Database } from './shared/Database'
 export interface FactToPageRecord {
   id: number
   blockNumber: number
-  factHash: Hash256
+  stateTransitionHash: Hash256
   pageHash: Hash256
   index: number
 }
 
-export class FactToPageRepository extends BaseRepository {
+export class PageMappingRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
@@ -58,7 +58,7 @@ function toRow(
 ): Omit<FactToPageRow, 'id'> {
   return {
     block_number: record.blockNumber,
-    fact_hash: record.factHash.toString(),
+    fact_hash: record.stateTransitionHash.toString(),
     page_hash: record.pageHash.toString(),
     index: record.index,
   }
@@ -68,7 +68,7 @@ function toRecord(row: FactToPageRow): FactToPageRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,
-    factHash: Hash256(row.fact_hash),
+    stateTransitionHash: Hash256(row.fact_hash),
     pageHash: Hash256(row.page_hash),
     index: row.index,
   }

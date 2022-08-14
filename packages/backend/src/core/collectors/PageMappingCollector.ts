@@ -1,13 +1,13 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
 import { BlockRange } from '../../model'
-import { FactToPageRepository } from '../../peripherals/database/FactToPageRepository'
+import { PageMappingRepository } from '../../peripherals/database/PageMappingRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
 import { EthereumEvent } from './EthereumEvent'
 
 export interface PageMappingEvent {
-  factHash: Hash256
+  stateTransitionHash: Hash256
   pageHashes: Hash256[]
   blockNumber: BlockNumber
 }
@@ -20,7 +20,7 @@ export const LogMemoryPagesHashes = EthereumEvent<
 export class PageMappingCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly factToPageRepository: FactToPageRepository
+    private readonly pageMappingRepository: PageMappingRepository
   ) {}
 
   async collect(
@@ -35,17 +35,17 @@ export class PageMappingCollector {
       const event = LogMemoryPagesHashes.parseLog(log)
       return {
         blockNumber: log.blockNumber,
-        factHash: Hash256(event.args.factHash),
+        stateTransitionHash: Hash256(event.args.factHash),
         pageHashes: event.args.pagesHashes.map(Hash256),
       }
     })
 
-    await this.factToPageRepository.addMany(
+    await this.pageMappingRepository.addMany(
       events.flatMap((event) =>
         event.pageHashes.map((pageHash, index) => ({
           index,
           pageHash,
-          factHash: event.factHash,
+          stateTransitionHash: event.stateTransitionHash,
           blockNumber: event.blockNumber,
         }))
       )
@@ -55,6 +55,6 @@ export class PageMappingCollector {
   }
 
   async discardAfter(lastToKeep: BlockNumber) {
-    await this.factToPageRepository.deleteAllAfter(lastToKeep)
+    await this.pageMappingRepository.deleteAllAfter(lastToKeep)
   }
 }

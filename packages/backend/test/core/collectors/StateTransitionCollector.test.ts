@@ -96,7 +96,7 @@ describe(StateTransitionCollector.name, () => {
     ])
   })
 
-  it('discards all records from factToPageRepository after given block', async () => {
+  it('discards all records from pageMappingRepository after given block', async () => {
     const stateTransitionRepository = mock<StateTransitionRepository>({
       deleteAfter: async () => 0,
     })

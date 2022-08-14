@@ -3,14 +3,14 @@ import { expect } from 'earljs'
 
 import {
   FactToPageRecord,
-  FactToPageRepository,
-} from '../../../src/peripherals/database/FactToPageRepository'
+  PageMappingRepository,
+} from '../../../src/peripherals/database/PageMappingRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './shared/setup'
 
-describe(FactToPageRepository.name, () => {
+describe(PageMappingRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
-  const repository = new FactToPageRepository(database, Logger.SILENT)
+  const repository = new PageMappingRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 
@@ -18,7 +18,7 @@ describe(FactToPageRepository.name, () => {
     const record: Omit<FactToPageRecord, 'id'> = {
       blockNumber: 1,
       index: 0,
-      factHash: Hash256.fake(),
+      stateTransitionHash: Hash256.fake(),
       pageHash: Hash256.fake(),
     }
 
@@ -83,12 +83,12 @@ function dummyFactToPageRecord({
   blockNumber = 0,
   index = 0,
   pageHash = Hash256.fake(),
-  factHash = Hash256.fake(),
+  stateTransitionHash = Hash256.fake(),
 }: Partial<FactToPageRecord>): Omit<FactToPageRecord, 'id'> {
   return {
     blockNumber,
     index,
     pageHash,
-    factHash,
+    stateTransitionHash,
   }
 }
