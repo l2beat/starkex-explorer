@@ -125,9 +125,7 @@ export class FinalizeExitEventsCollector {
           minedAt,
           data: {
             starkKey: StarkKey.from(event.args.starkKey),
-            assetType: decodeAssetId(
-              event.args.assetType.toHexString().slice(2)
-            ),
+            assetType: decodeAssetId(event.args.assetType),
             nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
             quantizedAmount: event.args.quantizedAmount.toBigInt(),
             recipient: EthereumAddress(event.args.recipient),

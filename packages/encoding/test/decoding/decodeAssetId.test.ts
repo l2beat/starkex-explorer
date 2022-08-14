@@ -22,4 +22,13 @@ describe('decodeAssetId', () => {
     const result = decodeAssetId(DYDX_INTERNAL_USDC_ID_ENCODED)
     expect(result).toEqual(AssetId.USDC)
   })
+
+  it('can decode BigNumbers', () => {
+    const bigNumber = {
+      toHexString() {
+        return '0x4254432d3130000000000000000000'
+      },
+    }
+    expect(decodeAssetId(bigNumber)).toEqual(AssetId('BTC-10'))
+  })
 })
