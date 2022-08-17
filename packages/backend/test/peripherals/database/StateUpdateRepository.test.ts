@@ -32,7 +32,7 @@ describe(StateUpdateRepository.name, () => {
         id: 10_000,
         blockNumber: 10_000,
         rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
+        stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
       positions: [
@@ -56,7 +56,7 @@ describe(StateUpdateRepository.name, () => {
         id: 1,
         blockNumber: 1,
         rootHash,
-        factHash: Hash256.fake(),
+        stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
       positions: [],
@@ -68,7 +68,7 @@ describe(StateUpdateRepository.name, () => {
         id: 2,
         blockNumber: 2,
         rootHash: PedersenHash.fake(),
-        factHash: Hash256.fake(),
+        stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
       },
       positions: [],
@@ -92,7 +92,7 @@ describe(StateUpdateRepository.name, () => {
       id: 10_002,
       blockNumber: 10_002,
       rootHash: PedersenHash.fake(),
-      factHash: Hash256.fake(),
+      stateTransitionHash: Hash256.fake(),
       timestamp: Timestamp(0),
     }
 
@@ -112,7 +112,7 @@ describe(StateUpdateRepository.name, () => {
           id: blockNumber,
           blockNumber,
           rootHash: PedersenHash.fake(),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
         },
         positions: [],
@@ -123,7 +123,7 @@ describe(StateUpdateRepository.name, () => {
       id: 30_004,
       blockNumber: 30_004,
       rootHash: PedersenHash.fake(),
-      factHash: Hash256.fake(),
+      stateTransitionHash: Hash256.fake(),
       timestamp: Timestamp(0),
     }
     await repository.add({ stateUpdate, positions: [], prices: [] })
@@ -140,7 +140,7 @@ describe(StateUpdateRepository.name, () => {
           id: blockNumber,
           blockNumber,
           rootHash: PedersenHash.fake(),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
         },
         positions: [
@@ -178,7 +178,7 @@ describe(StateUpdateRepository.name, () => {
           id: blockNumber,
           blockNumber,
           rootHash: PedersenHash.fake(blockNumber.toString()),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(blockNumber),
         },
         positions: Array.from({ length: blockNumber - 20_000 }).map((_, i) => ({
@@ -196,7 +196,7 @@ describe(StateUpdateRepository.name, () => {
         id: 20_005,
         blockNumber: 20_005,
         rootHash: PedersenHash.fake('20005'),
-        factHash: Hash256.fake(),
+        stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(20_005),
       },
       positions: [],
@@ -280,7 +280,7 @@ describe(StateUpdateRepository.name, () => {
             id: blockNumber,
             blockNumber,
             rootHash: PedersenHash.fake(blockNumber.toString()),
-            factHash: Hash256.fake(),
+            stateTransitionHash: Hash256.fake(),
             timestamp: Timestamp(blockNumber),
           },
           positions: Array.from({ length: blockNumber - 20_000 }).map(
@@ -300,7 +300,7 @@ describe(StateUpdateRepository.name, () => {
           id: 20_005,
           blockNumber: 20_005,
           rootHash: PedersenHash.fake('20005'),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(20_005),
         },
         positions: [
@@ -347,13 +347,13 @@ describe(StateUpdateRepository.name, () => {
     const blockNumber = 30_000
     const timestamp = Timestamp(Math.floor(Date.now() / 1000))
     const rootHash = PedersenHash.fake()
-    const factHash = Hash256.fake()
+    const stateTransitionHash = Hash256.fake()
     await repository.add({
       stateUpdate: {
         id: blockNumber,
         blockNumber,
         rootHash,
-        factHash,
+        stateTransitionHash,
         timestamp,
       },
       positions: Array.from({ length: 4 }).map((_, i) => ({
@@ -369,7 +369,7 @@ describe(StateUpdateRepository.name, () => {
 
     expect(actual).toEqual({
       id: blockNumber,
-      hash: factHash,
+      hash: stateTransitionHash,
       blockNumber,
       rootHash,
       timestamp,
@@ -392,7 +392,7 @@ describe(StateUpdateRepository.name, () => {
           id: blockNumber,
           blockNumber,
           rootHash: PedersenHash.fake(blockNumber.toString()),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(blockNumber),
         },
         positions: Array.from({ length: blockNumber - 40_000 }).map((_, i) => ({

@@ -20,13 +20,13 @@ declare module 'knex/types/tables' {
     initializer?: string
   }
 
-  interface FactToPageRow {
+  interface PageMappingRow {
     /** surrogate key */
     id: number
     block_number: number
-    fact_hash: string
+    state_transition_hash: string
     page_hash: string
-    index: number
+    page_index: number
   }
 
   interface PageRow {
@@ -37,11 +37,11 @@ declare module 'knex/types/tables' {
     data: string
   }
 
-  interface StateTransitionFactRow {
+  interface StateTransitionRow {
     /** surrogate key */
     id: number
     block_number: number
-    hash: string
+    state_transition_hash: string
   }
 
   interface BlockRow {
@@ -69,7 +69,7 @@ declare module 'knex/types/tables' {
   interface StateUpdateRow {
     id: number
     block_number: number
-    fact_hash: string
+    state_transition_hash: string
     root_hash: string
     timestamp: bigint
   }
@@ -151,9 +151,9 @@ declare module 'knex/types/tables' {
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
-    fact_to_pages: FactToPageRow
+    page_mappings: PageMappingRow
     pages: PageRow
-    state_transition_facts: StateTransitionFactRow
+    state_transitions: StateTransitionRow
     blocks: BlockRow
     merkle_nodes: MerkleNodeRow
     merkle_positions: MerklePositionsRow

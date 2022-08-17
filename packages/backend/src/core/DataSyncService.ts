@@ -3,9 +3,9 @@ import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
-import { MemoryHashEventCollector } from './collectors/MemoryHashEventCollector'
 import { PageCollector } from './collectors/PageCollector'
-import { StateTransitionFactCollector } from './collectors/StateTransitionFactCollector'
+import { PageMappingCollector } from './collectors/PageMappingCollector'
+import { StateTransitionCollector } from './collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
 import { StateUpdater } from './StateUpdater'
@@ -13,9 +13,9 @@ import { StateUpdater } from './StateUpdater'
 export class DataSyncService {
   constructor(
     private readonly verifierCollector: VerifierCollector,
-    private readonly memoryHashEventCollector: MemoryHashEventCollector,
+    private readonly pageMappingCollector: PageMappingCollector,
     private readonly pageCollector: PageCollector,
-    private readonly stateTransitionFactCollector: StateTransitionFactCollector,
+    private readonly stateTransitionCollector: StateTransitionCollector,
     private readonly stateUpdater: StateUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
@@ -27,14 +27,17 @@ export class DataSyncService {
 
   async sync(blockRange: BlockRange) {
     const verifiers = await this.verifierCollector.collect(blockRange)
-    const hashEvents = await this.memoryHashEventCollector.collect(
+
+    const pages = await this.pageCollector.collect(blockRange)
+    const pageMappings = await this.pageMappingCollector.collect(
       blockRange,
       verifiers
     )
-    const pageRecords = await this.pageCollector.collect(blockRange)
-    const stateTransitionFacts =
-      await this.stateTransitionFactCollector.collect(blockRange)
-    const userRegistrationEvents = await this.userRegistrationCollector.collect(
+    const stateTransitions = await this.stateTransitionCollector.collect(
+      blockRange
+    )
+
+    const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
     )
     const forcedEvents = await this.forcedEventsCollector.collect(blockRange)
@@ -46,22 +49,22 @@ export class DataSyncService {
       method: 'sync',
       blockRange: { from: blockRange.start, to: blockRange.end },
       verifiers: verifiers.length,
-      newHashEventsCount: hashEvents.length,
-      newPageRecords: pageRecords.length,
-      newStateTransitionFacts: stateTransitionFacts.length,
-      userRegistrationEvents: userRegistrationEvents.length,
+      pages: pages.length,
+      pageMappings: pageMappings.length,
+      stateTransitions: stateTransitions.length,
+      userRegistrations: userRegistrations.length,
       forcedEvents,
       finalizeExitEvents,
     })
 
-    await this.stateUpdater.save(stateTransitionFacts)
+    await this.stateUpdater.save(stateTransitions)
   }
 
   async discardAfter(blockNumber: BlockNumber) {
     await this.verifierCollector.discardAfter(blockNumber)
-    await this.memoryHashEventCollector.discardAfter(blockNumber)
+    await this.pageMappingCollector.discardAfter(blockNumber)
     await this.pageCollector.discardAfter(blockNumber)
-    await this.stateTransitionFactCollector.discardAfter(blockNumber)
+    await this.stateTransitionCollector.discardAfter(blockNumber)
     await this.stateUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }

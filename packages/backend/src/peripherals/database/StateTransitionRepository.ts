@@ -1,17 +1,17 @@
 import { Hash256 } from '@explorer/types'
-import { StateTransitionFactRow } from 'knex/types/tables'
+import { StateTransitionRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export interface StateTransitionFactRecord {
+export interface StateTransitionRecord {
   id: number
   blockNumber: number
-  hash: Hash256
+  stateTransitionHash: Hash256
 }
 
-export class StateTransitionFactRepository extends BaseRepository {
+export class StateTransitionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
@@ -25,18 +25,16 @@ export class StateTransitionFactRepository extends BaseRepository {
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async addMany(records: Omit<StateTransitionFactRecord, 'id'>[]) {
+  async addMany(records: Omit<StateTransitionRecord, 'id'>[]) {
     const rows = records.map(toRow)
     const knex = await this.knex()
-    const ids = await knex('state_transition_facts')
-      .insert(rows)
-      .returning('id')
+    const ids = await knex('state_transitions').insert(rows).returning('id')
     return ids.map((x) => x.id)
   }
 
   async getAll() {
     const knex = await this.knex()
-    const rows = await knex('state_transition_facts')
+    const rows = await knex('state_transitions')
       .select('*')
       .orderBy('block_number')
     return rows.map(toRecord)
@@ -44,30 +42,30 @@ export class StateTransitionFactRepository extends BaseRepository {
 
   async deleteAll() {
     const knex = await this.knex()
-    return knex('state_transition_facts').delete()
+    return knex('state_transitions').delete()
   }
 
   async deleteAfter(blockNumber: number) {
     const knex = await this.knex()
-    return knex('state_transition_facts')
+    return knex('state_transitions')
       .where('block_number', '>', blockNumber)
       .delete()
   }
 }
 
 function toRow(
-  record: Omit<StateTransitionFactRecord, 'id'>
-): Omit<StateTransitionFactRow, 'id'> {
+  record: Omit<StateTransitionRecord, 'id'>
+): Omit<StateTransitionRow, 'id'> {
   return {
     block_number: record.blockNumber,
-    hash: record.hash.toString(),
+    state_transition_hash: record.stateTransitionHash.toString(),
   }
 }
 
-function toRecord(row: StateTransitionFactRow): StateTransitionFactRecord {
+function toRecord(row: StateTransitionRow): StateTransitionRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,
-    hash: Hash256(row.hash),
+    stateTransitionHash: Hash256(row.state_transition_hash),
   }
 }

@@ -268,7 +268,7 @@ describe('FrontendRouter', () => {
           id: 0,
           blockNumber: 10_000,
           rootHash,
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
         },
         positions: [

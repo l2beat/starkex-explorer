@@ -63,9 +63,7 @@ async function main() {
       collateralAmount: args.amountCollateral.toBigInt(),
       syntheticAmount: args.amountSynthetic.toBigInt(),
       isABuyingSynthetic: args.aIsBuyingSynthetic,
-      syntheticAssetId: decodeAssetId(
-        args.syntheticAssetId.toHexString().slice(2)
-      ),
+      syntheticAssetId: decodeAssetId(args.syntheticAssetId),
       nonce: args.nonce.toBigInt(),
     })
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */

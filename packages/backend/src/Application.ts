@@ -14,9 +14,9 @@ import { Config } from './config'
 import { AccountService } from './core/AccountService'
 import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
-import { MemoryHashEventCollector } from './core/collectors/MemoryHashEventCollector'
 import { PageCollector } from './core/collectors/PageCollector'
-import { StateTransitionFactCollector } from './core/collectors/StateTransitionFactCollector'
+import { PageMappingCollector } from './core/collectors/PageMappingCollector'
+import { StateTransitionCollector } from './core/collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { DataSyncService } from './core/DataSyncService'
@@ -27,15 +27,15 @@ import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
-import { FactToPageRepository } from './peripherals/database/FactToPageRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
+import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
 import { Database } from './peripherals/database/shared/Database'
-import { StateTransitionFactRepository } from './peripherals/database/StateTransitionFactsRepository'
+import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { TransactionStatusRepository } from './peripherals/database/TransactionStatusRepository'
@@ -67,9 +67,9 @@ export class Application {
       database,
       logger
     )
-    const factToPageRepository = new FactToPageRepository(database, logger)
+    const pageMappingRepository = new PageMappingRepository(database, logger)
     const pageRepository = new PageRepository(database, logger)
-    const stateTransitionFactRepository = new StateTransitionFactRepository(
+    const stateTransitionRepository = new StateTransitionRepository(
       database,
       logger
     )
@@ -118,18 +118,18 @@ export class Application {
       config.contracts.proxy,
       config.contracts.verifiers
     )
-    const memoryHashEventCollector = new MemoryHashEventCollector(
+    const pageMappingCollector = new PageMappingCollector(
       ethereumClient,
-      factToPageRepository
+      pageMappingRepository
     )
     const pageCollector = new PageCollector(
       ethereumClient,
       pageRepository,
       config.contracts.registry
     )
-    const stateTransitionFactCollector = new StateTransitionFactCollector(
+    const stateTransitionCollector = new StateTransitionCollector(
       ethereumClient,
-      stateTransitionFactRepository,
+      stateTransitionRepository,
       config.contracts.perpetual
     )
     const stateUpdater = new StateUpdater(
@@ -161,9 +161,9 @@ export class Application {
 
     const dataSyncService = new DataSyncService(
       verifierCollector,
-      memoryHashEventCollector,
+      pageMappingCollector,
       pageCollector,
-      stateTransitionFactCollector,
+      stateTransitionCollector,
       stateUpdater,
       userRegistrationCollector,
       forcedEventsCollector,

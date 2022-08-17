@@ -47,12 +47,8 @@ export function decodeForcedTradeRequest(
       starkKeyB: StarkKey.from(decoded.starkKeyB),
       positionIdA: BigInt(decoded.positionIdA),
       positionIdB: BigInt(decoded.positionIdB),
-      collateralAssetId: decodeAssetId(
-        decoded.collateralAssetId.toHexString().slice(2)
-      ),
-      syntheticAssetId: decodeAssetId(
-        decoded.syntheticAssetId.toHexString().slice(2)
-      ),
+      collateralAssetId: decodeAssetId(decoded.collateralAssetId),
+      syntheticAssetId: decodeAssetId(decoded.syntheticAssetId),
       collateralAmount: BigInt(decoded.collateralAmount),
       syntheticAmount: BigInt(decoded.syntheticAmount),
       isABuyingSynthetic: Boolean(decoded.isABuyingSynthetic),

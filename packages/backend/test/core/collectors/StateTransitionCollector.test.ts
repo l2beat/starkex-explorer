@@ -2,28 +2,28 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { LogStateTransitionFact } from '../../../src/core/collectors/events'
-import { StateTransitionFactCollector } from '../../../src/core/collectors/StateTransitionFactCollector'
+import { StateTransitionCollector } from '../../../src/core/collectors/StateTransitionCollector'
 import { BlockRange } from '../../../src/model'
 import type {
-  StateTransitionFactRecord,
-  StateTransitionFactRepository,
-} from '../../../src/peripherals/database/StateTransitionFactsRepository'
+  StateTransitionRecord,
+  StateTransitionRepository,
+} from '../../../src/peripherals/database/StateTransitionRepository'
 import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
 import { mock } from '../../mock'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 
-describe(StateTransitionFactCollector.name, () => {
+describe(StateTransitionCollector.name, () => {
   it('parses logs, saves and returns records', async () => {
     const ethereumClient = mock<EthereumClient>({
       getLogsInRange: async () => testData().logs,
     })
-    const transitionFactRepository = mock<StateTransitionFactRepository>({
+    const stateTransitionRepository = mock<StateTransitionRepository>({
       addMany: async () => [],
     })
-    const stateTransitionFactCollector = new StateTransitionFactCollector(
+    const stateTransitionCollector = new StateTransitionCollector(
       ethereumClient,
-      transitionFactRepository,
+      stateTransitionRepository,
       PERPETUAL_ADDRESS
     )
 
@@ -54,30 +54,30 @@ describe(StateTransitionFactCollector.name, () => {
       },
     ])
 
-    const records = await stateTransitionFactCollector.collect(blockRange)
+    const records = await stateTransitionCollector.collect(blockRange)
 
-    const expectedRecords: Omit<StateTransitionFactRecord, 'id'>[] = [
+    const expectedRecords: Omit<StateTransitionRecord, 'id'>[] = [
       {
         blockNumber: 13986068,
-        hash: Hash256(
+        stateTransitionHash: Hash256(
           '0xf7a4d368103ca720efb0ba4873ca2e0b9dee88e385d14de8ac743cec81a048f2'
         ),
       },
       {
         blockNumber: 13986473,
-        hash: Hash256(
+        stateTransitionHash: Hash256(
           '0x32e69820f8b6742959585b306e6be0bb003b86d5473286369123f6760de86176'
         ),
       },
       {
         blockNumber: 13986918,
-        hash: Hash256(
+        stateTransitionHash: Hash256(
           '0x48d39c9b67d74937929a0b03845518e34c011c9b281ec9e058471c56ba8f1d80'
         ),
       },
       {
         blockNumber: 13987182,
-        hash: Hash256(
+        stateTransitionHash: Hash256(
           '0x6cd9ea43d47f77a502974d7c6e110e13dd5675af8c0d429b97b73c82eaeebc54'
         ),
       },
@@ -91,25 +91,25 @@ describe(StateTransitionFactCollector.name, () => {
         topics: [LogStateTransitionFact.topic],
       },
     ])
-    expect(transitionFactRepository.addMany).toHaveBeenCalledWith([
+    expect(stateTransitionRepository.addMany).toHaveBeenCalledWith([
       expectedRecords,
     ])
   })
 
-  it('discards all records from factToPageRepository after given block', async () => {
-    const transitionFactRepository = mock<StateTransitionFactRepository>({
+  it('discards all records from pageMappingRepository after given block', async () => {
+    const stateTransitionRepository = mock<StateTransitionRepository>({
       deleteAfter: async () => 0,
     })
 
-    const collector = new StateTransitionFactCollector(
+    const collector = new StateTransitionCollector(
       mock<EthereumClient>(),
-      transitionFactRepository,
+      stateTransitionRepository,
       PERPETUAL_ADDRESS
     )
 
     await collector.discardAfter(123)
 
-    expect(transitionFactRepository.deleteAfter).toHaveBeenCalledWith([123])
+    expect(stateTransitionRepository.deleteAfter).toHaveBeenCalledWith([123])
   })
 })
 

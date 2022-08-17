@@ -238,7 +238,7 @@ export function fakeStateUpdate(
   return {
     id: fakeInt(),
     blockNumber: fakeInt(),
-    factHash: Hash256.fake(),
+    stateTransitionHash: Hash256.fake(),
     rootHash: PedersenHash.fake(),
     timestamp: fakeTimestamp(),
     ...stateUpdate,

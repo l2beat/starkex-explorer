@@ -2,15 +2,15 @@ import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
-  StateTransitionFactRecord,
-  StateTransitionFactRepository,
-} from '../../../src/peripherals/database/StateTransitionFactsRepository'
+  StateTransitionRecord,
+  StateTransitionRepository,
+} from '../../../src/peripherals/database/StateTransitionRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './shared/setup'
 
-describe(StateTransitionFactRepository.name, () => {
+describe(StateTransitionRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
-  const repository = new StateTransitionFactRepository(database, Logger.SILENT)
+  const repository = new StateTransitionRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 
@@ -81,10 +81,10 @@ describe(StateTransitionFactRepository.name, () => {
 
 function dummyRecord({
   blockNumber = 0,
-  hash = Hash256.fake(),
-}: Partial<Omit<StateTransitionFactRecord, 'id'>>): Omit<
-  StateTransitionFactRecord,
+  stateTransitionHash = Hash256.fake(),
+}: Partial<Omit<StateTransitionRecord, 'id'>>): Omit<
+  StateTransitionRecord,
   'id'
 > {
-  return { blockNumber, hash }
+  return { blockNumber, stateTransitionHash }
 }

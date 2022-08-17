@@ -2,23 +2,23 @@ import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
-  FactToPageRecord,
-  FactToPageRepository,
-} from '../../../src/peripherals/database/FactToPageRepository'
+  PageMappingRecord,
+  PageMappingRepository,
+} from '../../../src/peripherals/database/PageMappingRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './shared/setup'
 
-describe(FactToPageRepository.name, () => {
+describe(PageMappingRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
-  const repository = new FactToPageRepository(database, Logger.SILENT)
+  const repository = new PageMappingRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    const record: Omit<FactToPageRecord, 'id'> = {
+    const record: Omit<PageMappingRecord, 'id'> = {
       blockNumber: 1,
-      index: 0,
-      factHash: Hash256.fake(),
+      pageIndex: 0,
+      stateTransitionHash: Hash256.fake(),
       pageHash: Hash256.fake(),
     }
 
@@ -41,9 +41,9 @@ describe(FactToPageRepository.name, () => {
 
   it('adds multiple records and queries them', async () => {
     const records = [
-      dummyFactToPageRecord({ index: 0 }),
-      dummyFactToPageRecord({ index: 1 }),
-      dummyFactToPageRecord({ index: 2 }),
+      dummyPageMappingRecord({ pageIndex: 0 }),
+      dummyPageMappingRecord({ pageIndex: 1 }),
+      dummyPageMappingRecord({ pageIndex: 2 }),
     ]
 
     await repository.addMany(records)
@@ -54,8 +54,8 @@ describe(FactToPageRepository.name, () => {
 
   it('deletes all records', async () => {
     await repository.addMany([
-      dummyFactToPageRecord({ index: 0 }),
-      dummyFactToPageRecord({ index: 1 }),
+      dummyPageMappingRecord({ pageIndex: 0 }),
+      dummyPageMappingRecord({ pageIndex: 1 }),
     ])
 
     await repository.deleteAll()
@@ -66,7 +66,7 @@ describe(FactToPageRepository.name, () => {
 
   it('deletes all records after a block number', async () => {
     const records = Array.from({ length: 10 }).map((_, i) =>
-      dummyFactToPageRecord({ blockNumber: i })
+      dummyPageMappingRecord({ blockNumber: i })
     )
     await repository.addMany(records)
 
@@ -79,16 +79,16 @@ describe(FactToPageRepository.name, () => {
   })
 })
 
-function dummyFactToPageRecord({
+function dummyPageMappingRecord({
   blockNumber = 0,
-  index = 0,
+  pageIndex = 0,
   pageHash = Hash256.fake(),
-  factHash = Hash256.fake(),
-}: Partial<FactToPageRecord>): Omit<FactToPageRecord, 'id'> {
+  stateTransitionHash = Hash256.fake(),
+}: Partial<PageMappingRecord>): Omit<PageMappingRecord, 'id'> {
   return {
     blockNumber,
-    index,
+    pageIndex,
     pageHash,
-    factHash,
+    stateTransitionHash,
   }
 }

@@ -106,9 +106,7 @@ export class ForcedEventsCollector {
                 starkKeyB: StarkKey.from(event.args.starkKeyB),
                 positionIdA: event.args.positionIdA.toBigInt(),
                 positionIdB: event.args.positionIdB.toBigInt(),
-                syntheticAssetId: decodeAssetId(
-                  event.args.syntheticAssetId.toHexString().slice(2)
-                ),
+                syntheticAssetId: decodeAssetId(event.args.syntheticAssetId),
                 isABuyingSynthetic: event.args.isABuyingSynthetic,
                 collateralAmount: event.args.collateralAmount.toBigInt(),
                 syntheticAmount: event.args.syntheticAmount.toBigInt(),

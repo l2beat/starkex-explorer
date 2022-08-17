@@ -14,7 +14,7 @@ import { Database } from './shared/Database'
 export interface StateUpdateRecord {
   id: number
   blockNumber: number
-  factHash: Hash256
+  stateTransitionHash: Hash256
   rootHash: PedersenHash
   timestamp: Timestamp
 }
@@ -162,7 +162,7 @@ export class StateUpdateRepository extends BaseRepository {
 
     return {
       id,
-      hash: Hash256(update.fact_hash),
+      hash: Hash256(update.state_transition_hash),
       rootHash: PedersenHash(update.root_hash),
       blockNumber: update.block_number,
       timestamp: Timestamp(update.timestamp),
@@ -194,7 +194,7 @@ function toStateUpdateRecord(row: StateUpdateRow): StateUpdateRecord {
   return {
     id: row.id,
     blockNumber: row.block_number,
-    factHash: Hash256(row.fact_hash),
+    stateTransitionHash: Hash256(row.state_transition_hash),
     rootHash: PedersenHash(row.root_hash),
     timestamp: Timestamp(row.timestamp),
   }
@@ -204,7 +204,7 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
   return {
     id: record.id,
     block_number: record.blockNumber,
-    fact_hash: record.factHash.toString(),
+    state_transition_hash: record.stateTransitionHash.toString(),
     root_hash: record.rootHash.toString(),
     timestamp: BigInt(Number(record.timestamp)),
   }

@@ -99,9 +99,9 @@ describe(StateUpdater.name, () => {
   })
 
   describe(StateUpdater.prototype.save.name, () => {
-    it('throws if state transition facts are missing in database', async () => {
+    it('throws if pages are missing in database', async () => {
       const pageRepository = mock<PageRepository>({
-        getByFactHashes: async () => [],
+        getByStateTransitions: async () => [],
       })
       const stateUpdater = new StateUpdater(
         pageRepository,
@@ -112,15 +112,17 @@ describe(StateUpdater.name, () => {
         Logger.SILENT
       )
       await expect(
-        stateUpdater.save([{ hash: Hash256.fake('a'), blockNumber: 1 }])
-      ).toBeRejected('Missing state transition facts in database')
+        stateUpdater.save([
+          { stateTransitionHash: Hash256.fake('a'), blockNumber: 1 },
+        ])
+      ).toBeRejected('Missing pages for state transitions in database')
     })
 
     it('calls processStateTransition for every update', async () => {
       const pageRepository = mock<PageRepository>({
-        getByFactHashes: async () => [
-          { factHash: Hash256.fake('a'), pages: ['aa', 'ab', 'ac'] },
-          { factHash: Hash256.fake('b'), pages: ['ba', 'bb'] },
+        getByStateTransitions: async () => [
+          ['aa', 'ab', 'ac'],
+          ['ba', 'bb'],
         ],
       })
       const stateUpdateRepository = mock<StateUpdateRepository>({
@@ -129,7 +131,7 @@ describe(StateUpdater.name, () => {
           id: 567,
           timestamp: Timestamp(1),
           blockNumber: Math.random(),
-          factHash: Hash256.fake(),
+          stateTransitionHash: Hash256.fake(),
         }),
       })
       const stateUpdater = new StateUpdater(
@@ -144,14 +146,14 @@ describe(StateUpdater.name, () => {
       stateUpdater.processStateTransition = processStateTransition
 
       await stateUpdater.save([
-        { blockNumber: 123, hash: Hash256.fake('123') },
-        { blockNumber: 456, hash: Hash256.fake('456') },
+        { blockNumber: 123, stateTransitionHash: Hash256.fake('123') },
+        { blockNumber: 456, stateTransitionHash: Hash256.fake('456') },
       ])
       expect(processStateTransition).toHaveBeenCalledExactlyWith([
         [
           {
             blockNumber: 123,
-            factHash: Hash256.fake('a'),
+            stateTransitionHash: Hash256.fake('123'),
             pages: ['aa', 'ab', 'ac'],
           },
           567 + 1,
@@ -159,7 +161,7 @@ describe(StateUpdater.name, () => {
         [
           {
             blockNumber: 456,
-            factHash: Hash256.fake('b'),
+            stateTransitionHash: Hash256.fake('456'),
             pages: ['ba', 'bb'],
           },
           567 + 2,
@@ -197,7 +199,7 @@ describe(StateUpdater.name, () => {
         collector.processStateTransition(
           {
             pages: fakePages,
-            factHash: Hash256.fake('123'),
+            stateTransitionHash: Hash256.fake('123'),
             blockNumber: 1,
           },
 
