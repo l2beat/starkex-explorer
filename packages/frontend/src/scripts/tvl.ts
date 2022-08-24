@@ -3,11 +3,10 @@ import { tvlElId } from '../pages/home/tvlElId'
 export function initTVLDisplay() {
   const tvlEl = document.querySelector('#' + tvlElId)
   if (tvlEl) {
-    fetch('https://l2beat.com/api/dydx.json')
+    fetch('https://api.l2beat.com/api/dydx')
       .then((res) => res.json())
       .then((res) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const tvl = Number(res.data?.[res.data?.length - 1]?.[1])
+        const tvl = Number(res)
         if (Number.isNaN(tvl)) {
           return
         }
