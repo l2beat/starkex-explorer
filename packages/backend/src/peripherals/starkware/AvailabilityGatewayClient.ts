@@ -3,6 +3,7 @@ import fetch from 'node-fetch'
 
 import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
 import { toPerpetualBatch } from './toPerpetualBatch'
+import { toSpotBatch } from './toSpotBatch'
 
 export interface AvailabilityGatewayOptions {
   url: string
@@ -30,8 +31,8 @@ export class AvailabilityGatewayClient {
 
   async getSpotBatch(batchId: number) {
     const data = await this.getBatch(batchId)
-    return SpotBatchResponse.parse(data)
-    // TODO: transform into domain types
+    const parsed = SpotBatchResponse.parse(data)
+    return toSpotBatch(parsed)
   }
 
   private async getBatch(batchId: number): Promise<unknown> {

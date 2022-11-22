@@ -14,11 +14,11 @@ describe(toPerpetualBatch.name, () => {
     const parsed = PerpetualBatchResponse.parse(EXAMPLE_PERPETUAL_BATCH)
     expect(toPerpetualBatch(parsed)).toEqual({
       previousBatchId: 1205,
-      orderRoot: PedersenHash(
-        '069a24e13bc5c49bfdff40f6f2e3277cb32503ed1e5a596959b88260faf61ee5'
-      ),
       positionRoot: PedersenHash(
         '00d766904591c4a3b7353f977e3b0be5c13dd1f1b028d6769828e4aa5861fd67'
+      ),
+      orderRoot: PedersenHash(
+        '069a24e13bc5c49bfdff40f6f2e3277cb32503ed1e5a596959b88260faf61ee5'
       ),
       positions: [
         {
