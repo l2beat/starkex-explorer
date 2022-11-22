@@ -1,7 +1,8 @@
 import { Agent } from 'https'
 import fetch from 'node-fetch'
 
-import { PerpetualBatchResponse, SpotBatchResponse } from './types'
+import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
+import { toPerpetualBatch } from './toPerpetualBatch'
 
 export interface AvailabilityGatewayOptions {
   url: string
@@ -23,8 +24,8 @@ export class AvailabilityGatewayClient {
 
   async getPerpetualBatch(batchId: number) {
     const data = await this.getBatch(batchId)
-    return PerpetualBatchResponse.parse(data)
-    // TODO: transform into domain types
+    const parsed = PerpetualBatchResponse.parse(data)
+    return toPerpetualBatch(parsed)
   }
 
   async getSpotBatch(batchId: number) {
