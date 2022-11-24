@@ -1,9 +1,8 @@
-import { decodeOnChainData, ForcedAction } from '@explorer/encoding'
+import { ForcedAction, OnChainData } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
-import { PageRepository } from '../peripherals/database/PageRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
@@ -20,15 +19,13 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
   '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
 )
 
-interface StateTransition {
-  blockNumber: number
-  stateTransitionHash: Hash256
-  pages: string[]
+export interface StateTransition {
+  stateTransitionRecord: StateTransitionRecord
+  onChainData: OnChainData
 }
 
 export class StateUpdater {
   constructor(
-    private readonly pageRepository: PageRepository,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly rollupStateRepository: RollupStateRepository,
     private readonly ethereumClient: EthereumClient,
@@ -37,54 +34,28 @@ export class StateUpdater {
     private rollupState?: RollupState
   ) {}
 
-  async save(stateTransitions: Omit<StateTransitionRecord, 'id'>[]) {
-    if (stateTransitions.length === 0) {
-      return
-    }
-
-    const pageGroups = await this.pageRepository.getByStateTransitions(
-      stateTransitions.map((x) => x.stateTransitionHash)
-    )
-    const stateTransitionsWithPages = pageGroups.map((pages, i) => {
-      const stateTransition = stateTransitions[i]
-      if (stateTransition === undefined) {
-        throw new Error('Programmer error: state transition count mismatch')
-      }
-      return { ...stateTransition, pages }
-    })
-    if (pageGroups.length !== stateTransitions.length) {
-      throw new Error('Missing pages for state transitions in database')
-    }
-
-    const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureRollupState(oldHash)
-
-    for (const [i, stateTransition] of stateTransitionsWithPages.entries()) {
-      await this.processStateTransition(stateTransition, id + i + 1)
-    }
-  }
-
-  async processStateTransition(
-    { pages, stateTransitionHash, blockNumber }: StateTransition,
-    id: number
-  ) {
+  async processStateTransition({
+    stateTransitionRecord,
+    onChainData,
+  }: StateTransition) {
     if (!this.rollupState) {
       return
     }
+    const { id, blockNumber, stateTransitionHash } = stateTransitionRecord
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
 
-    const decoded = decodeOnChainData(pages)
-
-    const [rollupState, newPositions] = await this.rollupState.update(decoded)
+    const [rollupState, newPositions] = await this.rollupState.update(
+      onChainData
+    )
     this.rollupState = rollupState
 
     const rootHash = await rollupState.positions.hash()
-    if (rootHash !== decoded.newState.positionRoot) {
+    if (rootHash !== onChainData.newState.positionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
     const transactionHashes = await this.extractTransactionHashes(
-      decoded.forcedActions
+      onChainData.forcedActions
     )
     await Promise.all([
       this.stateUpdateRepository.add({
@@ -103,7 +74,7 @@ export class StateUpdater {
             collateralBalance: value.collateralBalance,
           })
         ),
-        prices: decoded.newState.oraclePrices,
+        prices: onChainData.newState.oraclePrices,
         transactionHashes,
       }),
     ])
@@ -134,7 +105,7 @@ export class StateUpdater {
     await this.stateUpdateRepository.deleteAfter(blockNumber)
   }
 
-  private async readLastUpdate() {
+  async readLastUpdate() {
     const lastUpdate = await this.stateUpdateRepository.findLast()
     if (lastUpdate) {
       return { oldHash: lastUpdate.rootHash, id: lastUpdate.id }

@@ -20,6 +20,7 @@ import { StateTransitionCollector } from './core/collectors/StateTransitionColle
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { DataSyncService } from './core/DataSyncService'
+import { OnChainDataCollector } from './core/OnChainDataCollector'
 import { StateUpdater } from './core/StateUpdater'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
@@ -133,7 +134,6 @@ export class Application {
       config.contracts.perpetual
     )
     const stateUpdater = new StateUpdater(
-      pageRepository,
       stateUpdateRepository,
       rollupStateRepository,
       ethereumClient,
@@ -159,7 +159,7 @@ export class Application {
       config.contracts.perpetual
     )
 
-    const dataSyncService = new DataSyncService(
+    const onChainDataCollector = new OnChainDataCollector(
       verifierCollector,
       pageMappingCollector,
       pageCollector,
@@ -168,8 +168,15 @@ export class Application {
       userRegistrationCollector,
       forcedEventsCollector,
       finalizeExitEventsCollector,
+      pageRepository,
       logger
     )
+
+    const dataSyncService = new DataSyncService(
+      onChainDataCollector,
+      stateUpdater
+    )
+
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
       blockDownloader,
