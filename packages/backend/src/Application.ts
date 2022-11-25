@@ -279,6 +279,8 @@ export class Application {
       if (config.freshStart) await database.rollbackAll()
       await database.migrateToLatest()
 
+      await ethereumClient.assetChainId(config.starkex.blockchain.chainId)
+
       if (config.enableSync) {
         transactionStatusMonitor.start()
         await syncScheduler.start()
