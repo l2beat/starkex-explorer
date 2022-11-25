@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc",
     "test": "mocha",
+    "test:watch": "mocha --watch --watch-files src/**/*.ts,test/**/*.ts",
     "start": "node -r source-map-support/register build/src",
     "dev": "node -r esbuild-register src"
   },
