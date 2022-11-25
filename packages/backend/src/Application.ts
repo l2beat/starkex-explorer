@@ -16,6 +16,7 @@ import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEvent
 import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
+import { PerpetualValidiumUpdateCollector } from './core/collectors/PerpetualValidiumUpdateCollector'
 import { StateTransitionCollector } from './core/collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
@@ -26,6 +27,7 @@ import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { BlockRange } from './model'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
@@ -42,6 +44,7 @@ import { TransactionStatusRepository } from './peripherals/database/TransactionS
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
+import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
 
@@ -50,10 +53,6 @@ export class Application {
 
   constructor(config: Config) {
     // #region tools
-
-    if (config.starkex.dataAvailabilityMode === 'validium') {
-      throw new Error('Validium is not yet supported')
-    }
 
     const logger = new Logger({
       ...config.logger,
@@ -104,6 +103,35 @@ export class Application {
 
     // #endregion peripherals
     // #region core
+
+    if (config.starkex.dataAvailabilityMode === 'validium') {
+      const availabilityGatewayClient = new AvailabilityGatewayClient(
+        config.starkex.availabilityGateway
+      )
+
+      const perpetualValidiumUpdateCollector =
+        new PerpetualValidiumUpdateCollector(
+          ethereumClient,
+          availabilityGatewayClient,
+          config.starkex.contracts.perpetual
+        )
+
+      this.start = async () => {
+        logger.for(this).info('Starting')
+
+        if (config.freshStart) await database.rollbackAll()
+        await database.migrateToLatest()
+
+        await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
+
+        await perpetualValidiumUpdateCollector.collect(
+          new BlockRange([], 6934760, 6934760 + 50_000)
+        )
+
+        logger.for(this).info('Started')
+      }
+      return
+    }
 
     const blockDownloader = new BlockDownloader(
       ethereumClient,

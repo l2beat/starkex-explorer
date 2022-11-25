@@ -72,6 +72,11 @@ export const LogStateTransitionFact = EthereumEvent<
   { stateTransitionFact: string }
 >('event LogStateTransitionFact(bytes32 stateTransitionFact)')
 
+export const LogUpdateState = EthereumEvent<
+  'LogUpdateState',
+  { sequenceNumber: BigNumber; batchId: BigNumber }
+>('event LogUpdateState(uint256 sequenceNumber, uint256 batchId)')
+
 export const LogUserRegistered = EthereumEvent<
   'LogUserRegistered',
   { ethKey: string; starkKey: BigNumber; sender: string }
