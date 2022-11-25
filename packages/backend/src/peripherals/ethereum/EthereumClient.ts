@@ -22,7 +22,7 @@ export class EthereumClient {
     return network.chainId
   }
 
-  async assetChainId(expected: number) {
+  async assertChainId(expected: number) {
     const actual = await this.getChainId()
     if (actual !== expected) {
       throw new Error(`Expected chain id ${actual} to be ${expected}`)
