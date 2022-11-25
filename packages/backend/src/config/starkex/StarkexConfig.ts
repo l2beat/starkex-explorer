@@ -18,6 +18,12 @@ export interface PerpetualValidiumConfig {
   dataAvailabilityMode: 'validium'
   tradingMode: 'perpetual'
   blockchain: BlockchainConfig
+  availabilityGateway: {
+    url: string
+    serverCertificate: string
+    userCertificate: string
+    userKey: string
+  }
   contracts: {
     perpetual: EthereumAddress
   }
