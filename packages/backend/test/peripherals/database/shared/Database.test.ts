@@ -1,16 +1,14 @@
 import { expect } from 'earljs'
 
-import { getConfig } from '../../../../src/config'
 import { Database } from '../../../../src/peripherals/database/shared/Database'
-import { Logger } from '../../../../src/tools/Logger'
+import { getTestDatabase } from './setup'
 
 describe(Database.name, () => {
   it('can run and rollback all migrations', async function () {
-    const config = getConfig('test')
-    if (config.databaseConnection === 'xXTestDatabaseUrlXx') {
+    const { database, skip } = getTestDatabase()
+    if (skip) {
       this.skip()
     }
-    const database = new Database(config.databaseConnection, Logger.SILENT)
 
     await database.migrateToLatest()
     await database.rollbackAll()

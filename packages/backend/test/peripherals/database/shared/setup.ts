@@ -1,11 +1,8 @@
-import { getConfig } from '../../../../src/config'
 import { Database } from '../../../../src/peripherals/database/shared/Database'
 import { Logger } from '../../../../src/tools/Logger'
 
 export function setupDatabaseTestSuite() {
-  const config = getConfig('test')
-  const database = new Database(config.databaseConnection, Logger.SILENT)
-  const skip = config.databaseConnection === 'xXTestDatabaseUrlXx'
+  const { database, skip } = getTestDatabase()
 
   before(async function () {
     if (skip) {
@@ -20,4 +17,13 @@ export function setupDatabaseTestSuite() {
   })
 
   return { database }
+}
+
+export function getTestDatabase() {
+  const connection = process.env.TEST_DB_URL
+  const database = new Database(connection, Logger.SILENT)
+  return {
+    database,
+    skip: connection === undefined,
+  }
 }

@@ -1,7 +1,7 @@
-import { EthereumAddress } from '@explorer/types'
 import { Knex } from 'knex'
 
 import { LogLevel } from '../tools/Logger'
+import { StarkexConfig } from './starkex/StarkexConfig'
 
 export interface Config {
   name: string
@@ -12,19 +12,7 @@ export interface Config {
   port: number
   databaseConnection: string | Knex.StaticConnectionConfig
   enableSync: boolean
-  jsonRpcUrl: string
-  core: {
-    safeBlockDistance: number
-    syncBatchSize: number
-    minBlockNumber: number
-    maxBlockNumber?: number
-  }
-  contracts: {
-    perpetual: EthereumAddress
-    registry: EthereumAddress
-    proxy: EthereumAddress
-    verifiers: EthereumAddress[]
-  }
   freshStart: boolean
   forceHttps: boolean
+  starkex: StarkexConfig
 }
