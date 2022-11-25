@@ -17,6 +17,18 @@ export class EthereumClient {
     private readonly safeBlockDistance: number
   ) {}
 
+  async getChainId(): Promise<number> {
+    const network = await this.provider.getNetwork()
+    return network.chainId
+  }
+
+  async assertChainId(expected: number) {
+    const actual = await this.getChainId()
+    if (actual !== expected) {
+      throw new Error(`Expected chain id ${actual} to be ${expected}`)
+    }
+  }
+
   async getBlockNumber(): Promise<number> {
     return await this.provider.getBlockNumber()
   }
