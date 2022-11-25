@@ -98,7 +98,7 @@ describe(StateUpdater.name, () => {
     })
   })
 
-  describe(StateUpdater.prototype.save.name, () => {
+  describe(StateUpdater.prototype.processTransitionRecords.name, () => {
     it('throws if pages are missing in database', async () => {
       const pageRepository = mock<PageRepository>({
         getByStateTransitions: async () => [],
@@ -112,13 +112,14 @@ describe(StateUpdater.name, () => {
         Logger.SILENT
       )
       await expect(
-        stateUpdater.save([
+        stateUpdater.processTransitionRecords([
           { stateTransitionHash: Hash256.fake('a'), blockNumber: 1 },
         ])
       ).toBeRejected('Missing pages for state transitions in database')
     })
 
-    it('calls processStateTransition for every update', async () => {
+    // it('calls processStateTransition for every update', async () => {
+    it('returns correct StateTransition for every update', async () => {
       const pageRepository = mock<PageRepository>({
         getByStateTransitions: async () => [
           ['aa', 'ab', 'ac'],
@@ -142,30 +143,24 @@ describe(StateUpdater.name, () => {
         mock<ForcedTransactionsRepository>(),
         Logger.SILENT
       )
-      const processStateTransition = mockFn().resolvesTo(undefined)
-      stateUpdater.processStateTransition = processStateTransition
 
-      await stateUpdater.save([
+      const stateTransitions = await stateUpdater.processTransitionRecords([
         { blockNumber: 123, stateTransitionHash: Hash256.fake('123') },
         { blockNumber: 456, stateTransitionHash: Hash256.fake('456') },
       ])
-      expect(processStateTransition).toHaveBeenCalledExactlyWith([
-        [
-          {
-            blockNumber: 123,
-            stateTransitionHash: Hash256.fake('123'),
-            pages: ['aa', 'ab', 'ac'],
-          },
-          567 + 1,
-        ],
-        [
-          {
-            blockNumber: 456,
-            stateTransitionHash: Hash256.fake('456'),
-            pages: ['ba', 'bb'],
-          },
-          567 + 2,
-        ],
+      expect(stateTransitions).toEqual([
+        {
+          id: 567 + 1,
+          blockNumber: 123,
+          stateTransitionHash: Hash256.fake('123'),
+          pages: ['aa', 'ab', 'ac'],
+        },
+        {
+          id: 567 + 2,
+          blockNumber: 456,
+          stateTransitionHash: Hash256.fake('456'),
+          pages: ['ba', 'bb'],
+        },
       ])
     })
   })
@@ -198,12 +193,11 @@ describe(StateUpdater.name, () => {
       await expect(
         collector.processStateTransition(
           {
+            id: 1,
             pages: fakePages,
             stateTransitionHash: Hash256.fake('123'),
             blockNumber: 1,
           },
-
-          1
         )
       ).toBeRejected('State transition calculated incorrectly')
     })

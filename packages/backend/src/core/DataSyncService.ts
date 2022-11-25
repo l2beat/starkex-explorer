@@ -33,7 +33,7 @@ export class DataSyncService {
       blockRange,
       verifiers
     )
-    const stateTransitions = await this.stateTransitionCollector.collect(
+    const stateTransitionRecords = await this.stateTransitionCollector.collect(
       blockRange
     )
 
@@ -51,13 +51,18 @@ export class DataSyncService {
       verifiers: verifiers.length,
       pages: pages.length,
       pageMappings: pageMappings.length,
-      stateTransitions: stateTransitions.length,
+      stateTransitions: stateTransitionRecords.length,
       userRegistrations: userRegistrations.length,
       forcedEvents,
       finalizeExitEvents,
     })
 
-    await this.stateUpdater.save(stateTransitions)
+    const stateTransitions = await this.stateUpdater.processTransitionRecords(
+      stateTransitionRecords
+    )
+    for (const stateTransition of stateTransitions) {
+      await this.stateUpdater.processStateTransition(stateTransition)
+    }
   }
 
   async discardAfter(blockNumber: BlockNumber) {
