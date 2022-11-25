@@ -1,23 +1,15 @@
 import { EthereumAddress } from '@explorer/types'
-import { config as dotenv } from 'dotenv'
 
-import { LogLevel } from '../tools/Logger'
-import { Config } from './Config'
-import { getEnv } from './getEnv'
+import { getEnv } from '../getEnv'
+import { StarkexConfig } from './StarkexConfig'
 
-export function getLocalConfig(): Config {
-  dotenv()
+export function getDydxMainnetConfig(): StarkexConfig {
   return {
-    name: 'dYdXStateExplorer/Local',
-    logger: {
-      logLevel: getEnv.integer('LOG_LEVEL', LogLevel.INFO),
-      format: 'pretty',
-    },
-    port: getEnv.integer('PORT', 3000),
-    databaseConnection: getEnv('LOCAL_DB_URL'),
-    enableSync: true,
-    jsonRpcUrl: getEnv('LOCAL_JSON_RPC_URL'),
-    core: {
+    dataAvailabilityMode: 'rollup',
+    tradingMode: 'perpetual',
+    blockchain: {
+      chainId: 1,
+      jsonRpcUrl: getEnv('JSON_RPC_URL'),
       safeBlockDistance: 40,
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
       minBlockNumber: 11813207,
@@ -32,7 +24,5 @@ export function getLocalConfig(): Config {
         EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
       ],
     },
-    freshStart: getEnv.boolean('FRESH_START', false),
-    forceHttps: false,
   }
 }

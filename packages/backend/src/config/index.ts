@@ -1,7 +1,7 @@
 import { Config } from './Config'
-import { getLocalConfig } from './config.local'
-import { getProductionConfig } from './config.production'
-import { getTestnetConfig } from './config.testnet'
+import { getLocalConfig } from './environments/config.local'
+import { getProductionConfig } from './environments/config.production'
+import { getStagingConfig } from './environments/config.staging'
 
 export type { Config }
 
@@ -9,8 +9,8 @@ export function getConfig(env: string): Config {
   switch (env) {
     case 'local':
       return getLocalConfig()
-    case 'testnet':
-      return getTestnetConfig()
+    case 'staging':
+      return getStagingConfig()
     case 'production':
       return getProductionConfig()
   }

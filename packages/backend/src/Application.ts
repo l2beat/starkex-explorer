@@ -51,6 +51,10 @@ export class Application {
   constructor(config: Config) {
     // #region tools
 
+    if (config.starkex.dataAvailabilityMode === 'validium') {
+      throw new Error('Validium is not yet supported')
+    }
+
     const logger = new Logger({
       ...config.logger,
       reportError,
@@ -94,8 +98,8 @@ export class Application {
       logger
     )
     const ethereumClient = new EthereumClient(
-      config.jsonRpcUrl,
-      config.core.safeBlockDistance
+      config.starkex.blockchain.jsonRpcUrl,
+      config.starkex.blockchain.safeBlockDistance
     )
 
     // #endregion peripherals
@@ -105,7 +109,7 @@ export class Application {
       ethereumClient,
       blockRepository,
       logger,
-      config.core.safeBlockDistance
+      config.starkex.blockchain.safeBlockDistance
     )
 
     const statusService = new StatusService({
@@ -115,8 +119,8 @@ export class Application {
     const verifierCollector = new VerifierCollector(
       ethereumClient,
       verifierEventRepository,
-      config.contracts.proxy,
-      config.contracts.verifiers
+      config.starkex.contracts.proxy,
+      config.starkex.contracts.verifiers
     )
     const pageMappingCollector = new PageMappingCollector(
       ethereumClient,
@@ -125,12 +129,12 @@ export class Application {
     const pageCollector = new PageCollector(
       ethereumClient,
       pageRepository,
-      config.contracts.registry
+      config.starkex.contracts.registry
     )
     const stateTransitionCollector = new StateTransitionCollector(
       ethereumClient,
       stateTransitionRepository,
-      config.contracts.perpetual
+      config.starkex.contracts.perpetual
     )
     const stateUpdater = new StateUpdater(
       pageRepository,
@@ -143,20 +147,20 @@ export class Application {
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
       userRegistrationEventRepository,
-      config.contracts.perpetual
+      config.starkex.contracts.perpetual
     )
     const forcedEventsCollector = new ForcedEventsCollector(
       ethereumClient,
       forcedTransactionsRepository,
       transactionStatusRepository,
-      config.contracts.perpetual
+      config.starkex.contracts.perpetual
     )
 
     const finalizeExitEventsCollector = new FinalizeExitEventsCollector(
       ethereumClient,
       forcedTransactionsRepository,
       transactionStatusRepository,
-      config.contracts.perpetual
+      config.starkex.contracts.perpetual
     )
 
     const dataSyncService = new DataSyncService(
@@ -176,8 +180,8 @@ export class Application {
       dataSyncService,
       logger,
       {
-        earliestBlock: config.core.minBlockNumber,
-        maxBlockNumber: config.core.maxBlockNumber,
+        earliestBlock: config.starkex.blockchain.minBlockNumber,
+        maxBlockNumber: config.starkex.blockchain.maxBlockNumber,
       }
     )
     const transactionStatusService = new TransactionStatusService(
@@ -218,7 +222,7 @@ export class Application {
       positionRepository,
       forcedTransactionsRepository,
       forcedTradeOfferRepository,
-      config.contracts.perpetual
+      config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       accountService,
@@ -235,13 +239,13 @@ export class Application {
       forcedTradeOfferRepository,
       positionRepository,
       userRegistrationEventRepository,
-      config.contracts.perpetual
+      config.starkex.contracts.perpetual
     )
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
       forcedTransactionsRepository,
       forcedTradeOfferRepository,
-      config.contracts.perpetual
+      config.starkex.contracts.perpetual
     )
 
     const apiServer = new ApiServer(config.port, logger, {

@@ -1,23 +1,15 @@
 import { EthereumAddress } from '@explorer/types'
-import { config as dotenv } from 'dotenv'
 
-import { LogLevel } from '../tools/Logger'
-import { Config } from './Config'
-import { getEnv } from './getEnv'
+import { getEnv } from '../getEnv'
+import { StarkexConfig } from './StarkexConfig'
 
-export function getTestnetConfig(): Config {
-  dotenv()
+export function getDydxLocalConfig(): StarkexConfig {
   return {
-    name: 'dYdXStateExplorer/Testnet',
-    logger: {
-      logLevel: LogLevel.DEBUG,
-      format: 'pretty',
-    },
-    port: getEnv.integer('PORT', 3000),
-    databaseConnection: getEnv('LOCAL_DB_URL'),
-    enableSync: true,
-    jsonRpcUrl: 'http://127.0.0.1:8545',
-    core: {
+    dataAvailabilityMode: 'rollup',
+    tradingMode: 'perpetual',
+    blockchain: {
+      chainId: 1337,
+      jsonRpcUrl: 'http://127.0.0.1:8545',
       safeBlockDistance: 5,
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
       minBlockNumber: 0,
@@ -31,7 +23,5 @@ export function getTestnetConfig(): Config {
         EthereumAddress('0x6ebcf3c79b5bC9195F26dE459f57B6d2f0f27861'),
       ],
     },
-    freshStart: true,
-    forceHttps: false,
   }
 }
