@@ -1,4 +1,4 @@
-import { decodeOnChainData, ForcedAction } from '@explorer/encoding'
+import { ForcedAction, OnChainData } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
@@ -21,10 +21,8 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
 )
 
 export interface StateTransition {
-  id: number
-  blockNumber: number
-  stateTransitionHash: Hash256
-  pages: string[]
+  stateTransitionRecord: StateTransitionRecord
+  onChainData: OnChainData
 }
 
 export class StateUpdater {
@@ -38,9 +36,9 @@ export class StateUpdater {
     private rollupState?: RollupState
   ) {}
 
-  async processTransitionRecords(
+  async loadRequiredPages(
     stateTransitions: Omit<StateTransitionRecord, 'id'>[]
-  ): Promise<StateTransition[]> {
+  ): Promise<(StateTransitionRecord & { pages: string[] })[]> {
     if (stateTransitions.length === 0) {
       return []
     }
@@ -69,28 +67,28 @@ export class StateUpdater {
   }
 
   async processStateTransition({
-    id,
-    pages,
-    stateTransitionHash,
-    blockNumber,
+    stateTransitionRecord,
+    onChainData,
   }: StateTransition) {
     if (!this.rollupState) {
       return
     }
+
+    const { id, blockNumber, stateTransitionHash } = stateTransitionRecord
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
 
-    const decoded = decodeOnChainData(pages)
-
-    const [rollupState, newPositions] = await this.rollupState.update(decoded)
+    const [rollupState, newPositions] = await this.rollupState.update(
+      onChainData
+    )
     this.rollupState = rollupState
 
     const rootHash = await rollupState.positions.hash()
-    if (rootHash !== decoded.newState.positionRoot) {
+    if (rootHash !== onChainData.newState.positionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
     const transactionHashes = await this.extractTransactionHashes(
-      decoded.forcedActions
+      onChainData.forcedActions
     )
     await Promise.all([
       this.stateUpdateRepository.add({
@@ -109,7 +107,7 @@ export class StateUpdater {
             collateralBalance: value.collateralBalance,
           })
         ),
-        prices: decoded.newState.oraclePrices,
+        prices: onChainData.newState.oraclePrices,
         transactionHashes,
       }),
     ])
