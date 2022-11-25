@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "build",
     // This is needed because ganache is misbehaving
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "incremental": true
   }
 }

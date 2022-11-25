@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["es2020", "DOM"],
-    "outDir": "build"
+    "outDir": "build",
+    "incremental": true
   }
 }
