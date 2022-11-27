@@ -83,9 +83,7 @@ export class ValidiumDataSyncService {
       const batch = await this.availabilityGatewayClient.getPerpetualBatch(
         transition.batchId
       )
-      const positionUpdate = batch
-        ? this.convertToPositionUpdates(programOutput, batch)
-        : { funding: [], positions: [] }
+      const positionUpdate = this.convertToPositionUpdates(programOutput, batch)
 
       const onChainData = { ...programOutput, ...positionUpdate }
 
@@ -122,7 +120,7 @@ export class ValidiumDataSyncService {
 
   private convertToPositionUpdates(
     programOutput: StarkExProgramOutput,
-    batch: PerpetualBatch
+    batch: PerpetualBatch | undefined
   ): OnChainPositionsUpdate {
     const fundingTimestamp = programOutput.newState.timestamp
     const result: OnChainPositionsUpdate = {
@@ -132,16 +130,18 @@ export class ValidiumDataSyncService {
           indices: programOutput.newState.indices,
         },
       ],
-      positions: batch.positions.map((position) => ({
-        positionId: position.positionId,
-        starkKey: position.starkKey,
-        collateralBalance: position.collateralBalance,
-        fundingTimestamp: fundingTimestamp,
-        balances: position.assets.map((asset) => ({
-          assetId: asset.assetId,
-          balance: asset.balance,
-        })),
-      })),
+      positions: !batch
+        ? []
+        : batch.positions.map((position) => ({
+            positionId: position.positionId,
+            starkKey: position.starkKey,
+            collateralBalance: position.collateralBalance,
+            fundingTimestamp: fundingTimestamp,
+            balances: position.assets.map((asset) => ({
+              assetId: asset.assetId,
+              balance: asset.balance,
+            })),
+          })),
     }
     return result
   }
