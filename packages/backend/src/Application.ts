@@ -26,6 +26,7 @@ import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { ValidiumDataSyncService } from './core/ValidiumDataSyncService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
@@ -42,6 +43,7 @@ import { TransactionStatusRepository } from './peripherals/database/TransactionS
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
+import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
 
@@ -50,10 +52,6 @@ export class Application {
 
   constructor(config: Config) {
     // #region tools
-
-    if (config.starkex.dataAvailabilityMode === 'validium') {
-      throw new Error('Validium is not yet supported')
-    }
 
     const logger = new Logger({
       ...config.logger,
@@ -115,22 +113,6 @@ export class Application {
     const statusService = new StatusService({
       blockDownloader,
     })
-
-    const verifierCollector = new VerifierCollector(
-      ethereumClient,
-      verifierEventRepository,
-      config.starkex.contracts.proxy,
-      config.starkex.contracts.verifiers
-    )
-    const pageMappingCollector = new PageMappingCollector(
-      ethereumClient,
-      pageMappingRepository
-    )
-    const pageCollector = new PageCollector(
-      ethereumClient,
-      pageRepository,
-      config.starkex.contracts.registry
-    )
     const stateTransitionCollector = new StateTransitionCollector(
       ethereumClient,
       stateTransitionRepository,
@@ -163,17 +145,50 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
-    const dataSyncService = new DataSyncService(
-      verifierCollector,
-      pageMappingCollector,
-      pageCollector,
-      stateTransitionCollector,
-      stateUpdater,
-      userRegistrationCollector,
-      forcedEventsCollector,
-      finalizeExitEventsCollector,
-      logger
-    )
+    let dataSyncService
+
+    if (config.starkex.dataAvailabilityMode === 'validium') {
+      const availabilityGatewayClient = new AvailabilityGatewayClient(
+        config.starkex.availabilityGateway
+      )
+
+      dataSyncService = new ValidiumDataSyncService(
+        ethereumClient,
+        availabilityGatewayClient,
+        config.starkex.contracts.perpetual,
+        stateUpdater,
+        logger
+      )
+    } else {
+      const verifierCollector = new VerifierCollector(
+        ethereumClient,
+        verifierEventRepository,
+        config.starkex.contracts.proxy,
+        config.starkex.contracts.verifiers
+      )
+      const pageMappingCollector = new PageMappingCollector(
+        ethereumClient,
+        pageMappingRepository
+      )
+      const pageCollector = new PageCollector(
+        ethereumClient,
+        pageRepository,
+        config.starkex.contracts.registry
+      )
+
+      dataSyncService = new DataSyncService(
+        verifierCollector,
+        pageMappingCollector,
+        pageCollector,
+        stateTransitionCollector,
+        stateUpdater,
+        userRegistrationCollector,
+        forcedEventsCollector,
+        finalizeExitEventsCollector,
+        logger
+      )
+    }
+
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
       blockDownloader,
