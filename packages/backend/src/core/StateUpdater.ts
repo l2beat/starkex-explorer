@@ -1,4 +1,4 @@
-import { decodeOnChainData, ForcedAction } from '@explorer/encoding'
+import { ForcedAction, OnChainData } from '@explorer/encoding'
 import { RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
@@ -20,10 +20,9 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
   '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
 )
 
-interface StateTransition {
-  blockNumber: number
-  stateTransitionHash: Hash256
-  pages: string[]
+export interface StateTransition {
+  stateTransitionRecord: StateTransitionRecord
+  onChainData: OnChainData
 }
 
 export class StateUpdater {
@@ -37,9 +36,11 @@ export class StateUpdater {
     private rollupState?: RollupState
   ) {}
 
-  async save(stateTransitions: Omit<StateTransitionRecord, 'id'>[]) {
+  async loadRequiredPages(
+    stateTransitions: Omit<StateTransitionRecord, 'id'>[]
+  ): Promise<(StateTransitionRecord & { pages: string[] })[]> {
     if (stateTransitions.length === 0) {
-      return
+      return []
     }
 
     const pageGroups = await this.pageRepository.getByStateTransitions(
@@ -59,32 +60,35 @@ export class StateUpdater {
     const { oldHash, id } = await this.readLastUpdate()
     await this.ensureRollupState(oldHash)
 
-    for (const [i, stateTransition] of stateTransitionsWithPages.entries()) {
-      await this.processStateTransition(stateTransition, id + i + 1)
-    }
+    return stateTransitionsWithPages.map((transition, i) => ({
+      id: id + i + 1,
+      ...transition,
+    }))
   }
 
-  async processStateTransition(
-    { pages, stateTransitionHash, blockNumber }: StateTransition,
-    id: number
-  ) {
+  async processStateTransition({
+    stateTransitionRecord,
+    onChainData,
+  }: StateTransition) {
     if (!this.rollupState) {
       return
     }
+
+    const { id, blockNumber, stateTransitionHash } = stateTransitionRecord
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
 
-    const decoded = decodeOnChainData(pages)
-
-    const [rollupState, newPositions] = await this.rollupState.update(decoded)
+    const [rollupState, newPositions] = await this.rollupState.update(
+      onChainData
+    )
     this.rollupState = rollupState
 
     const rootHash = await rollupState.positions.hash()
-    if (rootHash !== decoded.newState.positionRoot) {
+    if (rootHash !== onChainData.newState.positionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
     const transactionHashes = await this.extractTransactionHashes(
-      decoded.forcedActions
+      onChainData.forcedActions
     )
     await Promise.all([
       this.stateUpdateRepository.add({
@@ -103,7 +107,7 @@ export class StateUpdater {
             collateralBalance: value.collateralBalance,
           })
         ),
-        prices: decoded.newState.oraclePrices,
+        prices: onChainData.newState.oraclePrices,
         transactionHashes,
       }),
     ])

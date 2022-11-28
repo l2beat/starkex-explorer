@@ -9,10 +9,11 @@ import { StateTransitionCollector } from '../../src/core/collectors/StateTransit
 import { UserRegistrationCollector } from '../../src/core/collectors/UserRegistrationCollector'
 import type { VerifierCollector } from '../../src/core/collectors/VerifierCollector'
 import { DataSyncService } from '../../src/core/DataSyncService'
-import { StateUpdater } from '../../src/core/StateUpdater'
+import { StateTransition, StateUpdater } from '../../src/core/StateUpdater'
 import { BlockRange } from '../../src/model'
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { Logger } from '../../src/tools/Logger'
+import { decodedFakePages, fakePages } from '../fakes'
 import { mock } from '../mock'
 
 const noop = async () => {}
@@ -30,12 +31,12 @@ describe(DataSyncService.name, () => {
       collect: async (_blockRange) => [],
     })
 
-    const stateTransitions: Omit<StateTransitionRecord, 'id'>[] = [
+    const stateTransitionsRecords: Omit<StateTransitionRecord, 'id'>[] = [
       { stateTransitionHash: Hash256.fake('abcd'), blockNumber: 1 },
     ]
 
     const stateTransitionCollector = mock<StateTransitionCollector>({
-      collect: async (_blockRange) => stateTransitions,
+      collect: async (_blockRange) => stateTransitionsRecords,
     })
 
     const userRegistrationCollector = mock<UserRegistrationCollector>({
@@ -47,9 +48,28 @@ describe(DataSyncService.name, () => {
     const finalizeExitEventsCollector = mock<FinalizeExitEventsCollector>({
       collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
     })
+
+    const stateTransitionRecordWithPages: StateTransitionRecord & {
+      pages: string[]
+    } = {
+      id: 23,
+      stateTransitionHash: Hash256.fake('abcd'),
+      blockNumber: 1,
+      pages: fakePages,
+    }
     const stateUpdater = mock<StateUpdater>({
-      save: noop,
+      loadRequiredPages: async () => [stateTransitionRecordWithPages],
+      processStateTransition: noop,
     })
+
+    const stateTransition: StateTransition = {
+      stateTransitionRecord: {
+        id: 23,
+        stateTransitionHash: Hash256.fake('abcd'),
+        blockNumber: 1,
+      },
+      onChainData: decodedFakePages,
+    }
 
     const service = new DataSyncService(
       verifierCollector,
@@ -77,11 +97,14 @@ describe(DataSyncService.name, () => {
       expect(stateTransitionCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
-      expect(stateUpdater.save).toHaveBeenCalledExactlyWith([
-        [stateTransitions],
-      ])
       expect(forcedEventsCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
+      ])
+      expect(stateUpdater.loadRequiredPages).toHaveBeenCalledExactlyWith([
+        [stateTransitionsRecords],
+      ])
+      expect(stateUpdater.processStateTransition).toHaveBeenCalledExactlyWith([
+        [stateTransition],
       ])
     })
   })

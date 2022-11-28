@@ -7,7 +7,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect } from 'earljs'
 
 import {
   ROLLUP_STATE_EMPTY_HASH,
@@ -19,7 +19,7 @@ import type { RollupStateRepository } from '../../src/peripherals/database/Rollu
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { Logger } from '../../src/tools/Logger'
-import { fakePages } from '../fakes'
+import { decodedFakePages } from '../fakes'
 import { mock } from '../mock'
 
 describe(StateUpdater.name, () => {
@@ -98,7 +98,7 @@ describe(StateUpdater.name, () => {
     })
   })
 
-  describe(StateUpdater.prototype.save.name, () => {
+  describe(StateUpdater.prototype.loadRequiredPages.name, () => {
     it('throws if pages are missing in database', async () => {
       const pageRepository = mock<PageRepository>({
         getByStateTransitions: async () => [],
@@ -112,13 +112,13 @@ describe(StateUpdater.name, () => {
         Logger.SILENT
       )
       await expect(
-        stateUpdater.save([
+        stateUpdater.loadRequiredPages([
           { stateTransitionHash: Hash256.fake('a'), blockNumber: 1 },
         ])
       ).toBeRejected('Missing pages for state transitions in database')
     })
 
-    it('calls processStateTransition for every update', async () => {
+    it('returns correct StateTransition for every update', async () => {
       const pageRepository = mock<PageRepository>({
         getByStateTransitions: async () => [
           ['aa', 'ab', 'ac'],
@@ -142,30 +142,24 @@ describe(StateUpdater.name, () => {
         mock<ForcedTransactionsRepository>(),
         Logger.SILENT
       )
-      const processStateTransition = mockFn().resolvesTo(undefined)
-      stateUpdater.processStateTransition = processStateTransition
 
-      await stateUpdater.save([
+      const stateTransitions = await stateUpdater.loadRequiredPages([
         { blockNumber: 123, stateTransitionHash: Hash256.fake('123') },
         { blockNumber: 456, stateTransitionHash: Hash256.fake('456') },
       ])
-      expect(processStateTransition).toHaveBeenCalledExactlyWith([
-        [
-          {
-            blockNumber: 123,
-            stateTransitionHash: Hash256.fake('123'),
-            pages: ['aa', 'ab', 'ac'],
-          },
-          567 + 1,
-        ],
-        [
-          {
-            blockNumber: 456,
-            stateTransitionHash: Hash256.fake('456'),
-            pages: ['ba', 'bb'],
-          },
-          567 + 2,
-        ],
+      expect(stateTransitions).toEqual([
+        {
+          id: 567 + 1,
+          blockNumber: 123,
+          stateTransitionHash: Hash256.fake('123'),
+          pages: ['aa', 'ab', 'ac'],
+        },
+        {
+          id: 567 + 2,
+          blockNumber: 456,
+          stateTransitionHash: Hash256.fake('456'),
+          pages: ['ba', 'bb'],
+        },
       ])
     })
   })
@@ -196,15 +190,14 @@ describe(StateUpdater.name, () => {
       )
 
       await expect(
-        collector.processStateTransition(
-          {
-            pages: fakePages,
+        collector.processStateTransition({
+          stateTransitionRecord: {
+            id: 1,
             stateTransitionHash: Hash256.fake('123'),
             blockNumber: 1,
           },
-
-          1
-        )
+          onChainData: decodedFakePages,
+        })
       ).toBeRejected('State transition calculated incorrectly')
     })
   })

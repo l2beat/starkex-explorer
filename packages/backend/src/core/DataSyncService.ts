@@ -1,3 +1,5 @@
+import { decodeOnChainData } from '@explorer/encoding'
+
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
@@ -8,7 +10,7 @@ import { PageMappingCollector } from './collectors/PageMappingCollector'
 import { StateTransitionCollector } from './collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
-import { StateUpdater } from './StateUpdater'
+import { StateTransition, StateUpdater } from './StateUpdater'
 
 export class DataSyncService {
   constructor(
@@ -33,7 +35,7 @@ export class DataSyncService {
       blockRange,
       verifiers
     )
-    const stateTransitions = await this.stateTransitionCollector.collect(
+    const stateTransitionRecords = await this.stateTransitionCollector.collect(
       blockRange
     )
 
@@ -51,13 +53,30 @@ export class DataSyncService {
       verifiers: verifiers.length,
       pages: pages.length,
       pageMappings: pageMappings.length,
-      stateTransitions: stateTransitions.length,
+      stateTransitions: stateTransitionRecords.length,
       userRegistrations: userRegistrations.length,
       forcedEvents,
       finalizeExitEvents,
     })
 
-    await this.stateUpdater.save(stateTransitions)
+    const recordsWithPages = await this.stateUpdater.loadRequiredPages(
+      stateTransitionRecords
+    )
+    const stateTransitions: StateTransition[] = recordsWithPages.map((r) => {
+      const onChainData = decodeOnChainData(r.pages)
+      return {
+        stateTransitionRecord: {
+          id: r.id,
+          blockNumber: r.blockNumber,
+          stateTransitionHash: r.stateTransitionHash,
+        },
+        onChainData,
+      }
+    })
+
+    for (const stateTransition of stateTransitions) {
+      await this.stateUpdater.processStateTransition(stateTransition)
+    }
   }
 
   async discardAfter(blockNumber: BlockNumber) {
