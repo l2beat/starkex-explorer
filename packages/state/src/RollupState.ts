@@ -21,6 +21,8 @@ export interface IRollupStateStorage {
 
 export type OnChainUpdate = Pick<OnChainData, 'positions' | 'funding'>
 
+type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
+
 export class RollupState {
   constructor(
     private readonly storage: IRollupStateStorage,
@@ -46,7 +48,10 @@ export class RollupState {
     )
   }
 
-  async update(onChainData: OnChainUpdate) {
+  async calculateUpdatedPositions(onChainData: OnChainUpdate): Promise<{
+    newPositions: { index: bigint; value: Position }[]
+    fundingByTimestamp: FundingByTimestamp
+  }> {
     const fundingByTimestamp = await this.getFundingByTimestamp(onChainData)
     const updatedPositionIds = onChainData.positions.map((x) => x.positionId)
 
@@ -100,24 +105,33 @@ export class RollupState {
         return { index: update.positionId, value: newPosition }
       }
     )
-
-    const positions = await this.positions.update(newPositions)
-    const [timestamp, funding] = [...fundingByTimestamp.entries()].reduce(
-      (a, b) => (a[0] > b[0] ? a : b)
-    )
-
-    await this.storage.setParameters(await positions.hash(), {
-      timestamp,
-      funding,
-    })
-
-    return [
-      new RollupState(this.storage, positions, timestamp, funding),
-      newPositions,
-    ] as const
+    return { newPositions, fundingByTimestamp }
   }
 
-  private async getFundingByTimestamp(onChainData: OnChainUpdate) {
+  async update(
+    newPositions: { index: bigint; value: Position }[],
+    fundingByTimestamp?: FundingByTimestamp
+  ) {
+    const positions = await this.positions.update(newPositions)
+
+    let timestamp, funding
+    if (fundingByTimestamp) {
+      ;[timestamp, funding] = [...fundingByTimestamp.entries()].reduce((a, b) =>
+        a[0] > b[0] ? a : b
+      )
+
+      await this.storage.setParameters(await positions.hash(), {
+        timestamp,
+        funding,
+      })
+    }
+
+    return new RollupState(this.storage, positions, timestamp, funding)
+  }
+
+  private async getFundingByTimestamp(
+    onChainData: OnChainUpdate
+  ): Promise<FundingByTimestamp> {
     const { timestamp, funding } = await this.getParameters()
     const fundingByTimestamp = new Map<
       Timestamp,

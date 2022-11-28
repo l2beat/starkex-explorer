@@ -78,8 +78,11 @@ export class StateUpdater {
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
 
-    const [rollupState, newPositions] = await this.rollupState.update(
-      onChainData
+    const { newPositions, fundingByTimestamp } =
+      await this.rollupState.calculateUpdatedPositions(onChainData)
+    const rollupState = await this.rollupState.update(
+      newPositions,
+      fundingByTimestamp
     )
     this.rollupState = rollupState
 
