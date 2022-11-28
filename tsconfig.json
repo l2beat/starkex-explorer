@@ -12,7 +12,6 @@
     "jsx": "react",
     "declaration": true,
     "declarationMap": true, // to fix code navigation issues: https://github.com/microsoft/vscode/issues/73201
-    "noUncheckedIndexedAccess": true,
-    "incremental": true
+    "noUncheckedIndexedAccess": true
   }
 }
