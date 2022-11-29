@@ -193,14 +193,14 @@ describe(StateUpdater.name, () => {
       )
 
       await expect(
-        collector.processOnChainStateTransition({
-          stateTransitionRecord: {
+        collector.processOnChainStateTransition(
+          {
             id: 1,
             stateTransitionHash: Hash256.fake('123'),
             blockNumber: 1,
           },
-          onChainData: decodedFakePages,
-        })
+          decodedFakePages
+        )
       ).toBeRejected('State transition calculated incorrectly')
     })
   })

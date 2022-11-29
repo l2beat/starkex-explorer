@@ -24,11 +24,6 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
   '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
 )
 
-export interface StateTransition {
-  stateTransitionRecord: StateTransitionRecord
-  onChainData: OnChainData
-}
-
 export class StateUpdater {
   constructor(
     private readonly pageRepository: PageRepository,
@@ -70,17 +65,18 @@ export class StateUpdater {
     }))
   }
 
-  async processOnChainStateTransition(stateTransition: StateTransition) {
+  async processOnChainStateTransition(
+    stateTransitionRecord: StateTransitionRecord,
+    onChainData: OnChainData
+  ) {
     if (!this.rollupState) {
       throw new Error('Rollup state not initialized')
     }
     const { newPositions, fundingByTimestamp } =
-      await this.rollupState.calculateUpdatedPositions(
-        stateTransition.onChainData
-      )
+      await this.rollupState.calculateUpdatedPositions(onChainData)
     return this.processStateTransition(
-      stateTransition.stateTransitionRecord,
-      stateTransition.onChainData,
+      stateTransitionRecord,
+      onChainData,
       newPositions,
       fundingByTimestamp
     )

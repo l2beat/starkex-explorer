@@ -10,7 +10,7 @@ import { PageMappingCollector } from './collectors/PageMappingCollector'
 import { StateTransitionCollector } from './collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
-import { StateTransition, StateUpdater } from './StateUpdater'
+import { StateUpdater } from './StateUpdater'
 
 export class DataSyncService {
   constructor(
@@ -62,20 +62,17 @@ export class DataSyncService {
     const recordsWithPages = await this.stateUpdater.loadRequiredPages(
       stateTransitionRecords
     )
-    const stateTransitions: StateTransition[] = recordsWithPages.map((r) => {
-      const onChainData = decodeOnChainData(r.pages)
-      return {
-        stateTransitionRecord: {
-          id: r.id,
-          blockNumber: r.blockNumber,
-          stateTransitionHash: r.stateTransitionHash,
-        },
-        onChainData,
-      }
-    })
 
-    for (const stateTransition of stateTransitions) {
-      await this.stateUpdater.processOnChainStateTransition(stateTransition)
+    for (const record of recordsWithPages) {
+      const onChainData = decodeOnChainData(record.pages)
+      await this.stateUpdater.processOnChainStateTransition(
+        {
+          id: record.id,
+          blockNumber: record.blockNumber,
+          stateTransitionHash: record.stateTransitionHash,
+        },
+        onChainData
+      )
     }
   }
 
