@@ -74,9 +74,7 @@ export class StateUpdateRepository extends BaseRepository {
 
   async findLast(): Promise<StateUpdateRecord | undefined> {
     const knex = await this.knex()
-    const row = await knex('state_updates')
-      .orderBy('block_number', 'desc')
-      .first()
+    const row = await knex('state_updates').orderBy('id', 'desc').first()
     return row && toStateUpdateRecord(row)
   }
 

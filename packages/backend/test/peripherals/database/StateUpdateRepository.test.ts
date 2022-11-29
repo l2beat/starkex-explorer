@@ -101,7 +101,7 @@ describe(StateUpdateRepository.name, () => {
     expect(await repository.getAll()).toEqual([stateUpdate])
   })
 
-  it('gets last state update by block number', async () => {
+  it('gets last state update by id', async () => {
     let last = await repository.findLast()
 
     expect(last).toEqual(undefined)
@@ -109,7 +109,7 @@ describe(StateUpdateRepository.name, () => {
     for (const blockNumber of [30_001, 30_002, 30_003]) {
       await repository.add({
         stateUpdate: {
-          id: blockNumber,
+          id: blockNumber * 1000,
           blockNumber,
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
@@ -120,7 +120,7 @@ describe(StateUpdateRepository.name, () => {
       })
     }
     const stateUpdate = {
-      id: 30_004,
+      id: 30_004_000,
       blockNumber: 30_004,
       rootHash: PedersenHash.fake(),
       stateTransitionHash: Hash256.fake(),
@@ -131,6 +131,39 @@ describe(StateUpdateRepository.name, () => {
     last = await repository.findLast()
 
     expect(last).toEqual(stateUpdate)
+  })
+
+  it('gets last state update by id even if block number is the same', async () => {
+    let last = await repository.findLast()
+    expect(last).toEqual(undefined)
+
+    await repository.add({
+      stateUpdate: {
+        id: 1000,
+        blockNumber: 123,
+        rootHash: PedersenHash.fake(),
+        stateTransitionHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [],
+      prices: [],
+    })
+
+    await repository.add({
+      stateUpdate: {
+        id: 1001,
+        blockNumber: 123,
+        rootHash: PedersenHash.fake(),
+        stateTransitionHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [],
+      prices: [],
+    })
+
+    last = await repository.findLast()
+
+    expect(last?.id).toEqual(1001)
   })
 
   it('deletes all state updates after block number', async () => {
