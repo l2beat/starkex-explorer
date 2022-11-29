@@ -162,6 +162,7 @@ describe(StateUpdateRepository.name, () => {
     })
 
     last = await repository.findLast()
+
     expect(last?.id).toEqual(1001)
   })
 
