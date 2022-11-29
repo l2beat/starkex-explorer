@@ -164,7 +164,7 @@ describe(StateUpdater.name, () => {
     })
   })
 
-  describe(StateUpdater.prototype.processStateTransition.name, () => {
+  describe(StateUpdater.prototype.processOnChainStateTransition.name, () => {
     xit('throws if calculated root hash does not match the one from verifier', async () => {
       const collector = new StateUpdater(
         mock<PageRepository>(),
