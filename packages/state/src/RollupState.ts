@@ -21,7 +21,7 @@ export interface IRollupStateStorage {
 
 export type OnChainUpdate = Pick<OnChainData, 'positions' | 'funding'>
 
-type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
+export type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
 
 export class RollupState {
   constructor(

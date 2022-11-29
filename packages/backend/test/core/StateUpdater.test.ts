@@ -183,16 +183,17 @@ describe(StateUpdater.name, () => {
             fundingByTimestamp:
               mock<Map<Timestamp, ReadonlyMap<AssetId, bigint>>>(),
           }),
-          update: async () => mock<RollupState>({
-            positions: mock<MerkleTree<Position>>({
-              hash: async () => PedersenHash.fake('1234'),
+          update: async () =>
+            mock<RollupState>({
+              positions: mock<MerkleTree<Position>>({
+                hash: async () => PedersenHash.fake('1234'),
+              }),
             }),
-          }),
         })
       )
 
       await expect(
-        collector.processStateTransition({
+        collector.processOnChainStateTransition({
           stateTransitionRecord: {
             id: 1,
             stateTransitionHash: Hash256.fake('123'),

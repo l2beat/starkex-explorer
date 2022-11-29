@@ -7,8 +7,7 @@ import {
 } from '@explorer/types'
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/program_output.cairo#L34-L49
-// https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
-export interface OnChainData {
+export interface StarkExProgramOutput {
   configurationHash: Hash256 // we use Hash256 here because we don't know if it is PedersenHash
   assetConfigHashes: AssetConfigHash[]
   oldState: State
@@ -17,9 +16,15 @@ export interface OnChainData {
   modifications: Modification[]
   forcedActions: ForcedAction[]
   conditions: PedersenHash[]
+}
+
+// https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
+export interface OnChainPositionsUpdate {
   funding: FundingEntry[]
   positions: PositionUpdate[]
 }
+
+export type OnChainData = StarkExProgramOutput & OnChainPositionsUpdate
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/definitions/general_config_hash.cairo#L9-L13
 export interface AssetConfigHash {

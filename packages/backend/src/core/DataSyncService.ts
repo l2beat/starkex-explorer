@@ -75,7 +75,7 @@ export class DataSyncService {
     })
 
     for (const stateTransition of stateTransitions) {
-      await this.stateUpdater.processStateTransition(stateTransition)
+      await this.stateUpdater.processOnChainStateTransition(stateTransition)
     }
   }
 

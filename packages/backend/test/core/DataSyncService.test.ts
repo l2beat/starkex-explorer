@@ -59,7 +59,7 @@ describe(DataSyncService.name, () => {
     }
     const stateUpdater = mock<StateUpdater>({
       loadRequiredPages: async () => [stateTransitionRecordWithPages],
-      processStateTransition: noop,
+      processOnChainStateTransition: noop,
     })
 
     const stateTransition: StateTransition = {
@@ -103,9 +103,9 @@ describe(DataSyncService.name, () => {
       expect(stateUpdater.loadRequiredPages).toHaveBeenCalledExactlyWith([
         [stateTransitionsRecords],
       ])
-      expect(stateUpdater.processStateTransition).toHaveBeenCalledExactlyWith([
-        [stateTransition],
-      ])
+      expect(
+        stateUpdater.processOnChainStateTransition
+      ).toHaveBeenCalledExactlyWith([[stateTransition]])
     })
   })
 
