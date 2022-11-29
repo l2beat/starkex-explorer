@@ -165,7 +165,7 @@ describe(StateUpdater.name, () => {
   })
 
   describe(StateUpdater.prototype.processOnChainStateTransition.name, () => {
-    xit('throws if calculated root hash does not match the one from verifier', async () => {
+    it('throws if calculated root hash does not match the one from verifier', async () => {
       const collector = new StateUpdater(
         mock<PageRepository>(),
         mock<StateUpdateRepository>(),
@@ -184,11 +184,11 @@ describe(StateUpdater.name, () => {
               mock<Map<Timestamp, ReadonlyMap<AssetId, bigint>>>(),
           }),
           update: async () =>
-            mock<RollupState>({
+            ({
               positions: mock<MerkleTree<Position>>({
                 hash: async () => PedersenHash.fake('1234'),
               }),
-            }),
+            } as unknown as RollupState),
         })
       )
 
