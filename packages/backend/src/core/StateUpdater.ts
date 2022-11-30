@@ -157,7 +157,7 @@ export class StateUpdater {
     await this.stateUpdateRepository.deleteAfter(blockNumber)
   }
 
-  private async readLastUpdate() {
+  async readLastUpdate() {
     const lastUpdate = await this.stateUpdateRepository.findLast()
     if (lastUpdate) {
       return { oldHash: lastUpdate.rootHash, id: lastUpdate.id }
