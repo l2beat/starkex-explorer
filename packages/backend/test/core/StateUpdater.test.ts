@@ -164,7 +164,7 @@ describe(StateUpdater.name, () => {
     })
   })
 
-  describe(StateUpdater.prototype.processStateTransition.name, () => {
+  describe(StateUpdater.prototype.processOnChainStateTransition.name, () => {
     it('throws if calculated root hash does not match the one from verifier', async () => {
       const collector = new StateUpdater(
         mock<PageRepository>(),
@@ -178,26 +178,29 @@ describe(StateUpdater.name, () => {
         mock<ForcedTransactionsRepository>(),
         Logger.SILENT,
         mock<RollupState>({
-          update: async () => [
-            mock<RollupState>({
+          calculateUpdatedPositions: async () => ({
+            newPositions: [{ index: 1n, value: mock<Position>() }],
+            fundingByTimestamp:
+              mock<Map<Timestamp, ReadonlyMap<AssetId, bigint>>>(),
+          }),
+          update: async () =>
+            ({
               positions: mock<MerkleTree<Position>>({
                 hash: async () => PedersenHash.fake('1234'),
               }),
-            }),
-            [{ index: 1n, value: mock<Position>() }],
-          ],
+            } as unknown as RollupState),
         })
       )
 
       await expect(
-        collector.processStateTransition({
-          stateTransitionRecord: {
+        collector.processOnChainStateTransition(
+          {
             id: 1,
             stateTransitionHash: Hash256.fake('123'),
             blockNumber: 1,
           },
-          onChainData: decodedFakePages,
-        })
+          decodedFakePages
+        )
       ).toBeRejected('State transition calculated incorrectly')
     })
   })

@@ -60,10 +60,15 @@ export class StateUpdater {
       throw new Error('Not initialized!')
     }
 
-    const [nextRollup] = await this.rollup.update({
-      funding: updateData.funding,
-      positions: updateData.positions,
-    })
+    const { newPositions, fundingByTimestamp } =
+      await this.rollup.calculateUpdatedPositions({
+        funding: updateData.funding,
+        positions: updateData.positions,
+      })
+    const nextRollup = await this.rollup.update(
+      newPositions,
+      fundingByTimestamp
+    )
     this.rollup = nextRollup
     const afterRoot = await this.rollup.positions.hash()
 

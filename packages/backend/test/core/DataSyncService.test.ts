@@ -9,7 +9,7 @@ import { StateTransitionCollector } from '../../src/core/collectors/StateTransit
 import { UserRegistrationCollector } from '../../src/core/collectors/UserRegistrationCollector'
 import type { VerifierCollector } from '../../src/core/collectors/VerifierCollector'
 import { DataSyncService } from '../../src/core/DataSyncService'
-import { StateTransition, StateUpdater } from '../../src/core/StateUpdater'
+import { StateUpdater } from '../../src/core/StateUpdater'
 import { BlockRange } from '../../src/model'
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { Logger } from '../../src/tools/Logger'
@@ -59,16 +59,13 @@ describe(DataSyncService.name, () => {
     }
     const stateUpdater = mock<StateUpdater>({
       loadRequiredPages: async () => [stateTransitionRecordWithPages],
-      processStateTransition: noop,
+      processOnChainStateTransition: noop,
     })
 
-    const stateTransition: StateTransition = {
-      stateTransitionRecord: {
-        id: 23,
-        stateTransitionHash: Hash256.fake('abcd'),
-        blockNumber: 1,
-      },
-      onChainData: decodedFakePages,
+    const stateTransitionRecord: StateTransitionRecord = {
+      id: 23,
+      stateTransitionHash: Hash256.fake('abcd'),
+      blockNumber: 1,
     }
 
     const service = new DataSyncService(
@@ -103,9 +100,9 @@ describe(DataSyncService.name, () => {
       expect(stateUpdater.loadRequiredPages).toHaveBeenCalledExactlyWith([
         [stateTransitionsRecords],
       ])
-      expect(stateUpdater.processStateTransition).toHaveBeenCalledExactlyWith([
-        [stateTransition],
-      ])
+      expect(
+        stateUpdater.processOnChainStateTransition
+      ).toHaveBeenCalledExactlyWith([[stateTransitionRecord, decodedFakePages]])
     })
   })
 

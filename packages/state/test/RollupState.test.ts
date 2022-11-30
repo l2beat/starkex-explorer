@@ -1,7 +1,6 @@
 import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { Position } from '../src'
 import { InMemoryRollupStorage } from '../src/InMemoryRollupStorage'
 import { RollupState } from '../src/RollupState'
 
@@ -22,20 +21,21 @@ describe(RollupState.name, () => {
     it('can update a single position', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
-      let newPositions: { index: bigint; value: Position }[] = []
 
-      ;[rollup, newPositions] = await rollup.update({
-        funding: [],
-        positions: [
-          {
-            positionId: 5n,
-            collateralBalance: 555n,
-            fundingTimestamp: Timestamp(0),
-            starkKey: StarkKey.fake('5'),
-            balances: [],
-          },
-        ],
-      })
+      const { newPositions, fundingByTimestamp } =
+        await rollup.calculateUpdatedPositions({
+          funding: [],
+          positions: [
+            {
+              positionId: 5n,
+              collateralBalance: 555n,
+              fundingTimestamp: Timestamp(0),
+              starkKey: StarkKey.fake('5'),
+              balances: [],
+            },
+          ],
+        })
+      rollup = await rollup.update(newPositions, fundingByTimestamp)
 
       const updated = await rollup.positions.getLeaf(5n)
       const data = updated.getData()
@@ -60,29 +60,31 @@ describe(RollupState.name, () => {
     it('can update a single position with assets', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
-      ;[rollup] = await rollup.update({
-        funding: [
-          {
-            timestamp: Timestamp(1001),
-            indices: [
-              { assetId: AssetId('BTC-10'), value: 1n },
-              { assetId: AssetId('ETH-9'), value: -1n },
-            ],
-          },
-        ],
-        positions: [
-          {
-            positionId: 5n,
-            collateralBalance: 555n,
-            fundingTimestamp: Timestamp(1001),
-            starkKey: StarkKey.fake('5'),
-            balances: [
-              { assetId: AssetId('BTC-10'), balance: 5n },
-              { assetId: AssetId('ETH-9'), balance: 55n },
-            ],
-          },
-        ],
-      })
+      const { newPositions, fundingByTimestamp } =
+        await rollup.calculateUpdatedPositions({
+          funding: [
+            {
+              timestamp: Timestamp(1001),
+              indices: [
+                { assetId: AssetId('BTC-10'), value: 1n },
+                { assetId: AssetId('ETH-9'), value: -1n },
+              ],
+            },
+          ],
+          positions: [
+            {
+              positionId: 5n,
+              collateralBalance: 555n,
+              fundingTimestamp: Timestamp(1001),
+              starkKey: StarkKey.fake('5'),
+              balances: [
+                { assetId: AssetId('BTC-10'), balance: 5n },
+                { assetId: AssetId('ETH-9'), balance: 55n },
+              ],
+            },
+          ],
+        })
+      rollup = await rollup.update(newPositions, fundingByTimestamp)
 
       const updated = await rollup.positions.getLeaf(5n)
       expect(updated.getData()).toEqual({
@@ -98,56 +100,58 @@ describe(RollupState.name, () => {
     it('can update a multiple positions with assets', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
-      ;[rollup] = await rollup.update({
-        funding: [
-          {
-            timestamp: Timestamp(1001),
-            indices: [
-              { assetId: AssetId('BTC-10'), value: 1n },
-              { assetId: AssetId('ETH-9'), value: -1n },
-            ],
-          },
-          {
-            timestamp: Timestamp(1002),
-            indices: [
-              { assetId: AssetId('BTC-10'), value: 2n },
-              { assetId: AssetId('ETH-9'), value: -2n },
-            ],
-          },
-        ],
-        positions: [
-          {
-            positionId: 5n,
-            collateralBalance: 555n,
-            fundingTimestamp: Timestamp(1001),
-            starkKey: StarkKey.fake('5'),
-            balances: [
-              { assetId: AssetId('BTC-10'), balance: 5n },
-              { assetId: AssetId('ETH-9'), balance: 55n },
-            ],
-          },
-          {
-            positionId: 6n,
-            collateralBalance: 666n,
-            fundingTimestamp: Timestamp(1002),
-            starkKey: StarkKey.fake('6'),
-            balances: [
-              { assetId: AssetId('BTC-10'), balance: 6n },
-              { assetId: AssetId('ETH-9'), balance: 66n },
-            ],
-          },
-          {
-            positionId: 7n,
-            collateralBalance: 777n,
-            fundingTimestamp: Timestamp(1002),
-            starkKey: StarkKey.fake('7'),
-            balances: [
-              { assetId: AssetId('BTC-10'), balance: 7n },
-              { assetId: AssetId('ETH-9'), balance: 77n },
-            ],
-          },
-        ],
-      })
+      const { newPositions, fundingByTimestamp } =
+        await rollup.calculateUpdatedPositions({
+          funding: [
+            {
+              timestamp: Timestamp(1001),
+              indices: [
+                { assetId: AssetId('BTC-10'), value: 1n },
+                { assetId: AssetId('ETH-9'), value: -1n },
+              ],
+            },
+            {
+              timestamp: Timestamp(1002),
+              indices: [
+                { assetId: AssetId('BTC-10'), value: 2n },
+                { assetId: AssetId('ETH-9'), value: -2n },
+              ],
+            },
+          ],
+          positions: [
+            {
+              positionId: 5n,
+              collateralBalance: 555n,
+              fundingTimestamp: Timestamp(1001),
+              starkKey: StarkKey.fake('5'),
+              balances: [
+                { assetId: AssetId('BTC-10'), balance: 5n },
+                { assetId: AssetId('ETH-9'), balance: 55n },
+              ],
+            },
+            {
+              positionId: 6n,
+              collateralBalance: 666n,
+              fundingTimestamp: Timestamp(1002),
+              starkKey: StarkKey.fake('6'),
+              balances: [
+                { assetId: AssetId('BTC-10'), balance: 6n },
+                { assetId: AssetId('ETH-9'), balance: 66n },
+              ],
+            },
+            {
+              positionId: 7n,
+              collateralBalance: 777n,
+              fundingTimestamp: Timestamp(1002),
+              starkKey: StarkKey.fake('7'),
+              balances: [
+                { assetId: AssetId('BTC-10'), balance: 7n },
+                { assetId: AssetId('ETH-9'), balance: 77n },
+              ],
+            },
+          ],
+        })
+      rollup = await rollup.update(newPositions, fundingByTimestamp)
 
       const [five, six, seven] = await rollup.positions.getLeaves([5n, 6n, 7n])
       expect(five?.getData()).toEqual({
@@ -180,25 +184,27 @@ describe(RollupState.name, () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
 
-      ;[rollup] = await rollup.update({
-        funding: [
-          {
-            timestamp: Timestamp(1001),
-            indices: [
-              { assetId: AssetId('BTC-10'), value: 1n },
-              { assetId: AssetId('ETH-9'), value: -1n },
-            ],
-          },
-          {
-            timestamp: Timestamp(1002),
-            indices: [
-              { assetId: AssetId('BTC-10'), value: 2n },
-              { assetId: AssetId('ETH-9'), value: -2n },
-            ],
-          },
-        ],
-        positions: [],
-      })
+      let { newPositions, fundingByTimestamp } =
+        await rollup.calculateUpdatedPositions({
+          funding: [
+            {
+              timestamp: Timestamp(1001),
+              indices: [
+                { assetId: AssetId('BTC-10'), value: 1n },
+                { assetId: AssetId('ETH-9'), value: -1n },
+              ],
+            },
+            {
+              timestamp: Timestamp(1002),
+              indices: [
+                { assetId: AssetId('BTC-10'), value: 2n },
+                { assetId: AssetId('ETH-9'), value: -2n },
+              ],
+            },
+          ],
+          positions: [],
+        })
+      rollup = await rollup.update(newPositions, fundingByTimestamp)
 
       const params = await storage.getParameters(await rollup.positions.hash())
       expect(params).toEqual({
@@ -208,21 +214,23 @@ describe(RollupState.name, () => {
           [AssetId('ETH-9'), -2n],
         ]),
       })
-      ;[rollup] = await rollup.update({
-        funding: [],
-        positions: [
-          {
-            positionId: 5n,
-            collateralBalance: 555n,
-            fundingTimestamp: Timestamp(1002),
-            starkKey: StarkKey.fake('5'),
-            balances: [
-              { assetId: AssetId('BTC-10'), balance: 5n },
-              { assetId: AssetId('ETH-9'), balance: 55n },
-            ],
-          },
-        ],
-      })
+      ;({ newPositions, fundingByTimestamp } =
+        await rollup.calculateUpdatedPositions({
+          funding: [],
+          positions: [
+            {
+              positionId: 5n,
+              collateralBalance: 555n,
+              fundingTimestamp: Timestamp(1002),
+              starkKey: StarkKey.fake('5'),
+              balances: [
+                { assetId: AssetId('BTC-10'), balance: 5n },
+                { assetId: AssetId('ETH-9'), balance: 55n },
+              ],
+            },
+          ],
+        }))
+      rollup = await rollup.update(newPositions, fundingByTimestamp)
 
       const position = await rollup.positions.getLeaf(5n)
       expect(position.getData()).toEqual({
@@ -239,58 +247,62 @@ describe(RollupState.name, () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
 
-      ;[rollup] = await rollup.update({
-        funding: [
-          {
-            timestamp: Timestamp(1001),
-            indices: [
-              { assetId: AssetId('BTC-10'), value: 1n },
-              { assetId: AssetId('ETH-9'), value: -1n },
-              { assetId: AssetId('UNI-9'), value: 11n },
-              { assetId: AssetId('MKR-9'), value: -11n },
-            ],
-          },
-        ],
-        positions: [
-          {
-            positionId: 5n,
-            collateralBalance: 555n,
-            fundingTimestamp: Timestamp(1001),
-            starkKey: StarkKey.fake('5'),
-            balances: [
-              { assetId: AssetId('BTC-10'), balance: 5n },
-              { assetId: AssetId('ETH-9'), balance: 55n },
-              { assetId: AssetId('UNI-9'), balance: 555n },
-            ],
-          },
-        ],
-      })
-      ;[rollup] = await rollup.update({
-        funding: [
-          {
-            timestamp: Timestamp(1002),
-            indices: [
-              { assetId: AssetId('BTC-10'), value: 2n },
-              { assetId: AssetId('ETH-9'), value: -2n },
-              { assetId: AssetId('UNI-9'), value: 22n },
-              { assetId: AssetId('MKR-9'), value: -22n },
-            ],
-          },
-        ],
-        positions: [
-          {
-            positionId: 5n,
-            collateralBalance: 555n,
-            fundingTimestamp: Timestamp(1002),
-            starkKey: StarkKey.fake('5'),
-            balances: [
-              { assetId: AssetId('ETH-9'), balance: 0n },
-              { assetId: AssetId('UNI-9'), balance: 20n },
-              { assetId: AssetId('MKR-9'), balance: 30n },
-            ],
-          },
-        ],
-      })
+      let { newPositions, fundingByTimestamp } =
+        await rollup.calculateUpdatedPositions({
+          funding: [
+            {
+              timestamp: Timestamp(1001),
+              indices: [
+                { assetId: AssetId('BTC-10'), value: 1n },
+                { assetId: AssetId('ETH-9'), value: -1n },
+                { assetId: AssetId('UNI-9'), value: 11n },
+                { assetId: AssetId('MKR-9'), value: -11n },
+              ],
+            },
+          ],
+          positions: [
+            {
+              positionId: 5n,
+              collateralBalance: 555n,
+              fundingTimestamp: Timestamp(1001),
+              starkKey: StarkKey.fake('5'),
+              balances: [
+                { assetId: AssetId('BTC-10'), balance: 5n },
+                { assetId: AssetId('ETH-9'), balance: 55n },
+                { assetId: AssetId('UNI-9'), balance: 555n },
+              ],
+            },
+          ],
+        })
+      rollup = await rollup.update(newPositions, fundingByTimestamp)
+      ;({ newPositions, fundingByTimestamp } =
+        await rollup.calculateUpdatedPositions({
+          funding: [
+            {
+              timestamp: Timestamp(1002),
+              indices: [
+                { assetId: AssetId('BTC-10'), value: 2n },
+                { assetId: AssetId('ETH-9'), value: -2n },
+                { assetId: AssetId('UNI-9'), value: 22n },
+                { assetId: AssetId('MKR-9'), value: -22n },
+              ],
+            },
+          ],
+          positions: [
+            {
+              positionId: 5n,
+              collateralBalance: 555n,
+              fundingTimestamp: Timestamp(1002),
+              starkKey: StarkKey.fake('5'),
+              balances: [
+                { assetId: AssetId('ETH-9'), balance: 0n },
+                { assetId: AssetId('UNI-9'), balance: 20n },
+                { assetId: AssetId('MKR-9'), balance: 30n },
+              ],
+            },
+          ],
+        }))
+      rollup = await rollup.update(newPositions, fundingByTimestamp)
 
       const updated = await rollup.positions.getLeaf(5n)
       expect(updated.getData()).toEqual({
@@ -309,7 +321,7 @@ describe(RollupState.name, () => {
       const rollup = await RollupState.empty(storage, 3n)
 
       await expect(
-        rollup.update({
+        rollup.calculateUpdatedPositions({
           funding: [],
           positions: [
             {
@@ -324,7 +336,7 @@ describe(RollupState.name, () => {
       ).toBeRejected(Error, 'Missing funding for timestamp: 1001000!')
 
       await expect(
-        rollup.update({
+        rollup.calculateUpdatedPositions({
           funding: [
             {
               timestamp: Timestamp.fromSeconds(1001),
@@ -349,29 +361,31 @@ describe(RollupState.name, () => {
     it('recovers positions and indices', async () => {
       const storage = new InMemoryRollupStorage()
       let rollup = await RollupState.empty(storage, 3n)
-      ;[rollup] = await rollup.update({
-        funding: [
-          {
-            timestamp: Timestamp(1001),
-            indices: [
-              { assetId: AssetId('BTC-10'), value: 1n },
-              { assetId: AssetId('ETH-9'), value: -1n },
-            ],
-          },
-        ],
-        positions: [
-          {
-            positionId: 5n,
-            collateralBalance: 555n,
-            fundingTimestamp: Timestamp(1001),
-            starkKey: StarkKey.fake('5'),
-            balances: [
-              { assetId: AssetId('BTC-10'), balance: 5n },
-              { assetId: AssetId('ETH-9'), balance: 55n },
-            ],
-          },
-        ],
-      })
+      const { newPositions, fundingByTimestamp } =
+        await rollup.calculateUpdatedPositions({
+          funding: [
+            {
+              timestamp: Timestamp(1001),
+              indices: [
+                { assetId: AssetId('BTC-10'), value: 1n },
+                { assetId: AssetId('ETH-9'), value: -1n },
+              ],
+            },
+          ],
+          positions: [
+            {
+              positionId: 5n,
+              collateralBalance: 555n,
+              fundingTimestamp: Timestamp(1001),
+              starkKey: StarkKey.fake('5'),
+              balances: [
+                { assetId: AssetId('BTC-10'), balance: 5n },
+                { assetId: AssetId('ETH-9'), balance: 55n },
+              ],
+            },
+          ],
+        })
+      rollup = await rollup.update(newPositions, fundingByTimestamp)
 
       const recovered = RollupState.recover(
         storage,
