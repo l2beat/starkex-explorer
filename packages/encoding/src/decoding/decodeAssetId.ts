@@ -1,6 +1,9 @@
 import { AssetId } from '@explorer/types'
 
-import { DYDX_INTERNAL_USDC_ID_ENCODED } from '../constants'
+import {
+  DYDX_INTERNAL_USDC_ID_ENCODED,
+  GAMMAX_GOERLI_INTERNAL_USDC_ID_ENCODED,
+} from '../constants'
 import { DecodingError } from './DecodingError'
 
 interface BigNumerLike {
@@ -11,7 +14,10 @@ export function decodeAssetId(value: string | BigNumerLike): AssetId {
   if (typeof value !== 'string') {
     return decodeAssetId(value.toHexString().slice(2))
   }
-  if (value === DYDX_INTERNAL_USDC_ID_ENCODED) {
+  if (
+    value === DYDX_INTERNAL_USDC_ID_ENCODED ||
+    value == GAMMAX_GOERLI_INTERNAL_USDC_ID_ENCODED
+  ) {
     return AssetId.USDC
   }
 
