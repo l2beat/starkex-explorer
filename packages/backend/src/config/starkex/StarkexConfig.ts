@@ -30,7 +30,7 @@ export interface PerpetualValidiumConfig {
 }
 
 export interface SpotVolitionConfig {
-  dataAvailabilityMode: 'volition'
+  dataAvailabilityMode: 'validium'
   tradingMode: 'spot'
   blockchain: BlockchainConfig
   availabilityGateway: {
@@ -41,9 +41,6 @@ export interface SpotVolitionConfig {
   }
   contracts: {
     perpetual: EthereumAddress
-    registry: EthereumAddress
-    proxy: EthereumAddress
-    verifiers: EthereumAddress[]
   }
 }
 

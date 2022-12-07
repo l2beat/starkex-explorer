@@ -5,7 +5,7 @@ import { StarkexConfig } from './StarkexConfig'
 
 export function getMyriaGoerliConfig(): StarkexConfig {
   return {
-    dataAvailabilityMode: 'volition',
+    dataAvailabilityMode: 'validium',
     tradingMode: 'spot',
     blockchain: {
       chainId: 5,
@@ -23,12 +23,6 @@ export function getMyriaGoerliConfig(): StarkexConfig {
     },
     contracts: {
         perpetual: EthereumAddress('0xF82C423a30E317f34f9b0997627F2F9c5d239Ad9'),
-        registry: EthereumAddress('0xA9b7e2DCA4B7bD8161204C6c8A4e2DB3750dFd2e'),
-        proxy: EthereumAddress('0x3071BE11F9e92A9eb28F305e1Fa033cD102714e7'),
-        verifiers: [
-          EthereumAddress('0xB1EDA32c467569fbDC8C3E041C81825D76b32b84'),
-          EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
-        ],
     },
   }
 }
