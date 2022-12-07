@@ -7,7 +7,7 @@ import {
   PositionUpdate,
   State,
 } from '@explorer/encoding'
-import { InMemoryRollupStorage, RollupState } from '@explorer/state'
+import { InMemoryMerkleStorage, Position, RollupState } from '@explorer/state'
 import {
   EthereumAddress,
   Hash256,
@@ -42,7 +42,7 @@ export class StateUpdater {
   constructor(private contracts: Contracts) {}
 
   async init() {
-    const storage = new InMemoryRollupStorage()
+    const storage = new InMemoryMerkleStorage<Position>()
     this.rollup = await RollupState.empty(storage)
     this.lastState.positionRoot = await this.rollup.positions.hash()
   }
@@ -60,15 +60,12 @@ export class StateUpdater {
       throw new Error('Not initialized!')
     }
 
-    const { newPositions, fundingByTimestamp } =
-      await this.rollup.calculateUpdatedPositions({
-        funding: updateData.funding,
-        positions: updateData.positions,
-      })
-    const nextRollup = await this.rollup.update(
-      newPositions,
-      fundingByTimestamp
-    )
+    const newPositions = await this.rollup.calculateUpdatedPositions({
+      oldState: this.lastState,
+      funding: updateData.funding,
+      positions: updateData.positions,
+    })
+    const nextRollup = await this.rollup.update(newPositions)
     this.rollup = nextRollup
     const afterRoot = await this.rollup.positions.hash()
 
