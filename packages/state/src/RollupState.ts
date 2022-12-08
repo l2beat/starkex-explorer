@@ -6,29 +6,22 @@ import { NodeOrLeaf } from './MerkleNode'
 import { MerkleTree } from './MerkleTree'
 import { Position } from './Position'
 
-export interface RollupParameters {
-  readonly timestamp: Timestamp
-  readonly funding: ReadonlyMap<AssetId, bigint>
-}
-
 export interface IRollupStateStorage {
-  getParameters(rootHash: PedersenHash): Promise<RollupParameters>
-  setParameters(rootHash: PedersenHash, values: RollupParameters): Promise<void>
-
   recover(hash: PedersenHash): Promise<NodeOrLeaf<Position>>
   persist(values: NodeOrLeaf<Position>[]): Promise<void>
 }
 
-export type OnChainUpdate = Pick<OnChainData, 'positions' | 'funding'>
+export type OnChainUpdate = Pick<
+  OnChainData,
+  'positions' | 'funding' | 'oldState'
+>
 
 export type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
 
 export class RollupState {
   constructor(
     private readonly storage: IRollupStateStorage,
-    public readonly positions: MerkleTree<Position>,
-    private timestamp?: Timestamp,
-    private funding?: ReadonlyMap<AssetId, bigint>
+    public readonly positions: MerkleTree<Position>
   ) {}
 
   static recover(
@@ -42,17 +35,14 @@ export class RollupState {
   static async empty(storage: IRollupStateStorage, height = 64n) {
     return new RollupState(
       storage,
-      await MerkleTree.create(storage, height, Position.EMPTY),
-      Timestamp(0),
-      new Map()
+      await MerkleTree.create(storage, height, Position.EMPTY)
     )
   }
 
-  async calculateUpdatedPositions(onChainData: OnChainUpdate): Promise<{
-    newPositions: { index: bigint; value: Position }[]
-    fundingByTimestamp: FundingByTimestamp
-  }> {
-    const fundingByTimestamp = await this.getFundingByTimestamp(onChainData)
+  async calculateUpdatedPositions(
+    onChainData: OnChainUpdate
+  ): Promise<{ index: bigint; value: Position }[]> {
+    const fundingByTimestamp = this.getFundingByTimestamp(onChainData)
     const updatedPositionIds = onChainData.positions.map((x) => x.positionId)
 
     const oldPositions = await this.positions.getLeaves(updatedPositionIds)
@@ -105,39 +95,26 @@ export class RollupState {
         return { index: update.positionId, value: newPosition }
       }
     )
-    return { newPositions, fundingByTimestamp }
+    return newPositions
   }
 
-  async update(
-    newPositions: { index: bigint; value: Position }[],
-    fundingByTimestamp?: FundingByTimestamp
-  ) {
+  async update(newPositions: { index: bigint; value: Position }[]) {
     const positions = await this.positions.update(newPositions)
-
-    let timestamp, funding
-    if (fundingByTimestamp) {
-      ;[timestamp, funding] = [...fundingByTimestamp.entries()].reduce((a, b) =>
-        a[0] > b[0] ? a : b
-      )
-
-      await this.storage.setParameters(await positions.hash(), {
-        timestamp,
-        funding,
-      })
-    }
-
-    return new RollupState(this.storage, positions, timestamp, funding)
+    return new RollupState(this.storage, positions)
   }
 
-  private async getFundingByTimestamp(
+  private getFundingByTimestamp(
     onChainData: OnChainUpdate
-  ): Promise<FundingByTimestamp> {
-    const { timestamp, funding } = await this.getParameters()
+  ): FundingByTimestamp {
     const fundingByTimestamp = new Map<
       Timestamp,
       ReadonlyMap<AssetId, bigint>
     >()
-    fundingByTimestamp.set(timestamp, funding)
+    const oldState = onChainData.oldState
+    fundingByTimestamp.set(
+      oldState.timestamp,
+      new Map(oldState.indices.map((i) => [i.assetId, i.value]))
+    )
     for (const { timestamp, indices } of onChainData.funding) {
       const funding = new Map<AssetId, bigint>()
       for (const { assetId, value } of indices) {
@@ -146,19 +123,5 @@ export class RollupState {
       fundingByTimestamp.set(timestamp, funding)
     }
     return fundingByTimestamp
-  }
-
-  async getParameters(): Promise<RollupParameters> {
-    if (this.timestamp === undefined || this.funding === undefined) {
-      const { timestamp, funding } = await this.storage.getParameters(
-        await this.positions.hash()
-      )
-      this.timestamp = timestamp
-      this.funding = funding
-    }
-    return {
-      timestamp: this.timestamp,
-      funding: this.funding,
-    }
   }
 }

@@ -1,5 +1,5 @@
 import { MerkleNode, Position } from '@explorer/state'
-import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { RollupStateRepository } from '../../../src/peripherals/database/RollupStateRepository'
@@ -88,30 +88,6 @@ describe(RollupStateRepository.name, () => {
         PedersenHash.fake('abc')
       )
       await repository.persist([position, position])
-    })
-  })
-
-  describe(repository.getParameters.name, () => {
-    it('throws when parameters for rootHash are missing from db', async () => {
-      const fakePedersen = PedersenHash.fake('111')
-      await expect(repository.getParameters(fakePedersen)).toBeRejected(
-        `Cannot find parameters for ${fakePedersen.toString()}`
-      )
-    })
-
-    it('gets parameters', async () => {
-      const rootHash = PedersenHash.fake('111')
-
-      const parameters = {
-        funding: new Map([[AssetId('ETH-9'), 123n]]),
-        timestamp: Timestamp.fromSeconds(123),
-      }
-
-      await repository.setParameters(rootHash, parameters)
-
-      const actual = await repository.getParameters(rootHash)
-
-      expect(actual).toEqual(parameters)
     })
   })
 })

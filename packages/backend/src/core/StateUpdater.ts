@@ -3,7 +3,7 @@ import {
   OnChainData,
   StarkExProgramOutput,
 } from '@explorer/encoding'
-import { FundingByTimestamp, Position, RollupState } from '@explorer/state'
+import { Position, RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
@@ -72,21 +72,20 @@ export class StateUpdater {
     if (!this.rollupState) {
       throw new Error('Rollup state not initialized')
     }
-    const { newPositions, fundingByTimestamp } =
-      await this.rollupState.calculateUpdatedPositions(onChainData)
+    const newPositions = await this.rollupState.calculateUpdatedPositions(
+      onChainData
+    )
     return this.processStateTransition(
       stateTransitionRecord,
       onChainData,
-      newPositions,
-      fundingByTimestamp
+      newPositions
     )
   }
 
   async processStateTransition(
     stateTransitionRecord: StateTransitionRecord,
     starkExProgramOutput: StarkExProgramOutput,
-    newPositions: { index: bigint; value: Position }[],
-    fundingByTimestamp?: FundingByTimestamp
+    newPositions: { index: bigint; value: Position }[]
   ) {
     if (!this.rollupState) {
       return
@@ -96,10 +95,7 @@ export class StateUpdater {
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
 
-    const rollupState = await this.rollupState.update(
-      newPositions,
-      fundingByTimestamp
-    )
+    const rollupState = await this.rollupState.update(newPositions)
     this.rollupState = rollupState
 
     const rootHash = await rollupState.positions.hash()
