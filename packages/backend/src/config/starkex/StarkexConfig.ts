@@ -1,6 +1,9 @@
 import { EthereumAddress } from '@explorer/types'
 
-export type StarkexConfig = PerpetualRollupConfig | PerpetualValidiumConfig
+export type StarkexConfig =
+  | PerpetualRollupConfig
+  | PerpetualValidiumConfig
+  | SpotValidiumConfig
 
 export interface PerpetualRollupConfig {
   dataAvailabilityMode: 'rollup'
@@ -17,6 +20,21 @@ export interface PerpetualRollupConfig {
 export interface PerpetualValidiumConfig {
   dataAvailabilityMode: 'validium'
   tradingMode: 'perpetual'
+  blockchain: BlockchainConfig
+  availabilityGateway: {
+    url: string
+    serverCertificate: string
+    userCertificate: string
+    userKey: string
+  }
+  contracts: {
+    perpetual: EthereumAddress
+  }
+}
+
+export interface SpotValidiumConfig {
+  dataAvailabilityMode: 'validium'
+  tradingMode: 'spot'
   blockchain: BlockchainConfig
   availabilityGateway: {
     url: string
