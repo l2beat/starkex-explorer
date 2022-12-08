@@ -12,7 +12,7 @@ export function getMyriaGoerliConfig(): StarkexConfig {
       jsonRpcUrl: getEnv('JSON_RPC_URL'),
       safeBlockDistance: 40,
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
-      minBlockNumber: 6934760,
+      minBlockNumber: 6948455,
       maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     availabilityGateway: {
@@ -22,7 +22,7 @@ export function getMyriaGoerliConfig(): StarkexConfig {
       userKey: getEnv('MYRIA_AG_USER_KEY'),
     },
     contracts: {
-        perpetual: EthereumAddress('0xF82C423a30E317f34f9b0997627F2F9c5d239Ad9'),
+      perpetual: EthereumAddress('0xF82C423a30E317f34f9b0997627F2F9c5d239Ad9'),
     },
   }
 }
