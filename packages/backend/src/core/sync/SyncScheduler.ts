@@ -4,6 +4,7 @@ import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
 import { DataSyncService } from '../DataSyncService'
 import { ValidiumDataSyncService } from '../ValidiumDataSyncService'
+import { ValidiumSpotDataSyncService } from '../ValidiumSpotDataSyncService'
 import { BlockDownloader } from './BlockDownloader'
 import {
   INITIAL_SYNC_STATE,
@@ -26,7 +27,10 @@ export class SyncScheduler {
   constructor(
     private readonly syncStatusRepository: SyncStatusRepository,
     private readonly blockDownloader: BlockDownloader,
-    private readonly dataSyncService: DataSyncService | ValidiumDataSyncService,
+    private readonly dataSyncService:
+      | DataSyncService
+      | ValidiumDataSyncService
+      | ValidiumSpotDataSyncService,
     private readonly logger: Logger,
     opts: SyncSchedulerOptions
   ) {

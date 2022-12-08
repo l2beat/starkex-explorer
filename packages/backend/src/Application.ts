@@ -27,6 +27,7 @@ import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
 import { ValidiumDataSyncService } from './core/ValidiumDataSyncService'
+import { ValidiumSpotDataSyncService } from './core/ValidiumSpotDataSyncService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
@@ -152,7 +153,12 @@ export class Application {
         config.starkex.availabilityGateway
       )
 
-      dataSyncService = new ValidiumDataSyncService(
+      const SyncServiceClass =
+        config.starkex.tradingMode === 'spot'
+          ? ValidiumSpotDataSyncService
+          : ValidiumDataSyncService
+
+      dataSyncService = new SyncServiceClass(
         ethereumClient,
         availabilityGatewayClient,
         config.starkex.contracts.perpetual,
