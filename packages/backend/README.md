@@ -36,13 +36,15 @@ Once you have everything, create a `.env` file with the following contents:
 ```
 LOCAL_DB_URL=postgresql://postgres:password@localhost:5432/local
 TEST_DB_URL=postgresql://postgres:password@localhost:5432/test
-LOCAL_JSON_RPC_URL=<PASTE_YOUR_ALCHEMY_URL_HERE>
+JSON_RPC_URL=<PASTE_YOUR_ALCHEMY_URL_HERE>
+STARKEX_INSTANCE=dydx-mainnet
 ```
 
 ## Environment variables
 
 You can configure the behavior of the app with the following environment variables:
 
+- `STARKEX_INSTANCE` - Mode in which the explorer is started (`dydx-mainnet | dydx-local | gammax-goerli`) If you want to start it in `gammax-goerli` mode you will also need to provide `GAMMAX_AG_SERVER_CERTIFICATE`, `GAMMAX_AG_USER_CERTIFICATE`, `GAMMAX_AG_USER_KEY` and `GAMMAX_AG_URL` environment variables
 - `DATABASE_URL` - Database url used in production deployment
 - `LOCAL_DB_URL` - Database url used in `yarn start`
 - `TEST_DB_URL` - Database url used in `yarn test`

@@ -178,11 +178,9 @@ describe(StateUpdater.name, () => {
         mock<ForcedTransactionsRepository>(),
         Logger.SILENT,
         mock<RollupState>({
-          calculateUpdatedPositions: async () => ({
-            newPositions: [{ index: 1n, value: mock<Position>() }],
-            fundingByTimestamp:
-              mock<Map<Timestamp, ReadonlyMap<AssetId, bigint>>>(),
-          }),
+          calculateUpdatedPositions: async () => [
+            { index: 1n, value: mock<Position>() },
+          ],
           update: async () =>
             ({
               positions: mock<MerkleTree<Position>>({

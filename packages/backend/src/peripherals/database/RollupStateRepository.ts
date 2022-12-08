@@ -3,9 +3,8 @@ import {
   MerkleNode,
   NodeOrLeaf,
   Position,
-  RollupParameters,
 } from '@explorer/state'
-import { AssetId, PedersenHash, Timestamp } from '@explorer/types'
+import { PedersenHash } from '@explorer/types'
 import { partition } from 'lodash'
 
 import { Logger } from '../../tools/Logger'
@@ -21,38 +20,11 @@ export class RollupStateRepository
 
     /* eslint-disable @typescript-eslint/unbound-method */
 
-    this.getParameters = this.wrapAny(this.getParameters)
-    this.setParameters = this.wrapAny(this.setParameters)
     this.persist = this.wrapAny(this.persist)
     this.recover = this.wrapAny(this.recover)
     this.deleteAll = this.wrapDelete(this.deleteAll)
 
     /* eslint-enable @typescript-eslint/unbound-method */
-  }
-
-  async getParameters(rootHash: PedersenHash): Promise<RollupParameters> {
-    const knex = await this.knex()
-    const result = await knex('rollup_parameters')
-      .first('funding', 'timestamp')
-      .where('root_hash', rootHash.toString())
-    if (!result) {
-      throw new Error(`Cannot find parameters for ${rootHash.toString()}`)
-    }
-    return parametersFromRow(result)
-  }
-
-  async setParameters(
-    rootHash: PedersenHash,
-    values: RollupParameters
-  ): Promise<void> {
-    const knex = await this.knex()
-    await knex('rollup_parameters')
-      .insert({
-        root_hash: rootHash.toString(),
-        ...parametersToRow(values),
-      })
-      .onConflict('root_hash')
-      .merge()
   }
 
   async persist(values: NodeOrLeaf<Position>[]): Promise<void> {
@@ -135,28 +107,5 @@ export class RollupStateRepository
       knex('rollup_parameters').delete(),
     ])
     return a + b + c
-  }
-}
-
-function parametersToRow(parameters: RollupParameters) {
-  return {
-    timestamp: BigInt(Number(parameters.timestamp)),
-    funding: Object.fromEntries(
-      [...parameters.funding.entries()].map(([k, v]) => [
-        k.toString(),
-        v.toString(),
-      ])
-    ),
-  }
-}
-
-function parametersFromRow(
-  row: ReturnType<typeof parametersToRow>
-): RollupParameters {
-  return {
-    timestamp: Timestamp(row.timestamp),
-    funding: new Map(
-      Object.entries(row.funding).map(([k, v]) => [AssetId(k), BigInt(v)])
-    ),
   }
 }
