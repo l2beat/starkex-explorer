@@ -44,7 +44,7 @@ STARKEX_INSTANCE=dydx-mainnet
 
 You can configure the behavior of the app with the following environment variables:
 
-- `STARKEX_INSTANCE` - Mode in which the explorer is started (`dydx-mainnet | dydx-local | gammax-goerli`) If you want to start it in `gammax-goerli` mode you will also need to provide `GAMMAX_AG_SERVER_CERTIFICATE`, `GAMMAX_AG_USER_CERTIFICATE`, `GAMMAX_AG_USER_KEY` and `GAMMAX_AG_URL` environment variables
+- `STARKEX_INSTANCE` - Mode in which the explorer is started (`dydx-mainnet | dydx-local | gammax-goerli | myria-goerli`) If you want to start it in `gammax-goerli` mode you will also need to provide `GAMMAX_AG_SERVER_CERTIFICATE`, `GAMMAX_AG_USER_CERTIFICATE`, `GAMMAX_AG_USER_KEY` and `GAMMAX_AG_URL` environment variables. Replace `GAMMAX` with `MYRIA` for `myria-goerli` environment variables
 - `DATABASE_URL` - Database url used in production deployment
 - `LOCAL_DB_URL` - Database url used in `yarn start`
 - `TEST_DB_URL` - Database url used in `yarn test`
