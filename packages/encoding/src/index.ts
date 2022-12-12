@@ -1,4 +1,5 @@
 export { decodeAssetId } from './decoding/decodeAssetId'
+export { decodeDexOutput } from './decoding/decodeDexOutput'
 export { decodeFirstPage } from './decoding/decodeFirstPage'
 export { decodeOnChainData } from './decoding/decodeOnChainData'
 export { DecodingError } from './decoding/DecodingError'
