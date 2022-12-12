@@ -7,7 +7,11 @@ import {
   PositionUpdate,
   State,
 } from '@explorer/encoding'
-import { InMemoryMerkleStorage, PositionLeaf, RollupState } from '@explorer/state'
+import {
+  InMemoryMerkleStorage,
+  PositionLeaf,
+  RollupState,
+} from '@explorer/state'
 import {
   EthereumAddress,
   Hash256,
