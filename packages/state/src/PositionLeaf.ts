@@ -12,8 +12,8 @@ export interface PositionAsset {
   readonly fundingIndex: bigint
 }
 
-export class Position extends MerkleValue {
-  static EMPTY = new Position(StarkKey.ZERO, 0n, [])
+export class PositionLeaf extends MerkleValue {
+  static EMPTY = new PositionLeaf(StarkKey.ZERO, 0n, [])
 
   constructor(
     public readonly starkKey: StarkKey,
@@ -50,10 +50,10 @@ export class Position extends MerkleValue {
   }
 
   static fromJSON(
-    data: ReturnType<typeof Position.prototype.toJSON>,
+    data: ReturnType<typeof PositionLeaf.prototype.toJSON>,
     knownHash?: PedersenHash
   ) {
-    return new Position(
+    return new PositionLeaf(
       data.starkKey,
       BigInt(data.collateralBalance),
       data.assets.map((x) => ({

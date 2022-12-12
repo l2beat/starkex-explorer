@@ -3,7 +3,7 @@ import {
   OnChainData,
   StarkExProgramOutput,
 } from '@explorer/encoding'
-import { Position, RollupState } from '@explorer/state'
+import { PositionLeaf, RollupState } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
@@ -85,7 +85,7 @@ export class StateUpdater {
   async processStateTransition(
     stateTransitionRecord: StateTransitionRecord,
     starkExProgramOutput: StarkExProgramOutput,
-    newPositions: { index: bigint; value: Position }[]
+    newPositionLeaves: { index: bigint; value: PositionLeaf }[]
   ) {
     if (!this.rollupState) {
       return
@@ -95,10 +95,10 @@ export class StateUpdater {
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
 
-    const rollupState = await this.rollupState.update(newPositions)
+    const rollupState = await this.rollupState.update(newPositionLeaves)
     this.rollupState = rollupState
 
-    const rootHash = await rollupState.positions.hash()
+    const rootHash = await rollupState.positionLeaves.hash()
     if (rootHash !== starkExProgramOutput.newState.positionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
@@ -114,7 +114,7 @@ export class StateUpdater {
           rootHash,
           timestamp,
         },
-        positions: newPositions.map(
+        positions: newPositionLeaves.map(
           ({ value, index }): PositionRecord => ({
             positionId: index,
             starkKey: value.starkKey,
@@ -174,7 +174,7 @@ export class StateUpdater {
           oldHash
         )
       }
-    } else if ((await this.rollupState.positions.hash()) !== oldHash) {
+    } else if ((await this.rollupState.positionLeaves.hash()) !== oldHash) {
       this.rollupState = RollupState.recover(
         this.rollupStateRepository,
         oldHash

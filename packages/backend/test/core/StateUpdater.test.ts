@@ -1,5 +1,5 @@
 import { Block } from '@ethersproject/providers'
-import { MerkleTree, Position, RollupState } from '@explorer/state'
+import { MerkleTree, PositionLeaf, RollupState } from '@explorer/state'
 import {
   AssetId,
   Hash256,
@@ -45,7 +45,7 @@ describe(StateUpdater.name, () => {
       const rollupStateEmptyHashForHeight3 = PedersenHash(
         '048c477cdb37576ddff3c3fe5c1c7559778d6cbade51e5a6c1fe71e6bdb1d4db'
       )
-      expect(await rollupState.positions.hash()).toEqual(
+      expect(await rollupState.positionLeaves.hash()).toEqual(
         rollupStateEmptyHashForHeight3
       )
       expect(rollupStateRepository.persist.calls.length).toEqual(1)
@@ -62,7 +62,7 @@ describe(StateUpdater.name, () => {
       )
       const hash = PedersenHash.fake()
       const rollupState = await stateUpdater.ensureRollupState(hash)
-      expect(await rollupState.positions.hash()).toEqual(hash)
+      expect(await rollupState.positionLeaves.hash()).toEqual(hash)
     })
 
     it('resets state after reorg', async () => {
@@ -78,8 +78,8 @@ describe(StateUpdater.name, () => {
       const hashB = PedersenHash.fake('b')
       const rollupStateA = await stateUpdater.ensureRollupState(hashA)
       const rollupStateB = await stateUpdater.ensureRollupState(hashB)
-      expect(await rollupStateA.positions.hash()).toEqual(hashA)
-      expect(await rollupStateB.positions.hash()).toEqual(hashB)
+      expect(await rollupStateA.positionLeaves.hash()).toEqual(hashA)
+      expect(await rollupStateB.positionLeaves.hash()).toEqual(hashB)
     })
 
     it('leaves state intact before a subsequent state transition', async () => {
@@ -179,11 +179,11 @@ describe(StateUpdater.name, () => {
         Logger.SILENT,
         mock<RollupState>({
           calculateUpdatedPositions: async () => [
-            { index: 1n, value: mock<Position>() },
+            { index: 1n, value: mock<PositionLeaf>() },
           ],
           update: async () =>
             ({
-              positions: mock<MerkleTree<Position>>({
+              positionLeaves: mock<MerkleTree<PositionLeaf>>({
                 hash: async () => PedersenHash.fake('1234'),
               }),
             } as unknown as RollupState),

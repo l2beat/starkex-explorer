@@ -4,11 +4,11 @@ import { zip } from 'lodash'
 
 import { NodeOrLeaf } from './MerkleNode'
 import { MerkleTree } from './MerkleTree'
-import { Position } from './Position'
+import { PositionLeaf } from './PositionLeaf'
 
 export interface IRollupStateStorage {
-  recover(hash: PedersenHash): Promise<NodeOrLeaf<Position>>
-  persist(values: NodeOrLeaf<Position>[]): Promise<void>
+  recover(hash: PedersenHash): Promise<NodeOrLeaf<PositionLeaf>>
+  persist(values: NodeOrLeaf<PositionLeaf>[]): Promise<void>
 }
 
 export type OnChainUpdate = Pick<
@@ -21,7 +21,7 @@ export type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
 export class RollupState {
   constructor(
     private readonly storage: IRollupStateStorage,
-    public readonly positions: MerkleTree<Position>
+    public readonly positionLeaves: MerkleTree<PositionLeaf>
   ) {}
 
   static recover(
@@ -35,17 +35,17 @@ export class RollupState {
   static async empty(storage: IRollupStateStorage, height = 64n) {
     return new RollupState(
       storage,
-      await MerkleTree.create(storage, height, Position.EMPTY)
+      await MerkleTree.create(storage, height, PositionLeaf.EMPTY)
     )
   }
 
   async calculateUpdatedPositions(
     onChainData: OnChainUpdate
-  ): Promise<{ index: bigint; value: Position }[]> {
+  ): Promise<{ index: bigint; value: PositionLeaf }[]> {
     const fundingByTimestamp = this.getFundingByTimestamp(onChainData)
     const updatedPositionIds = onChainData.positions.map((x) => x.positionId)
 
-    const oldPositions = await this.positions.getLeaves(updatedPositionIds)
+    const oldPositions = await this.positionLeaves.getLeaves(updatedPositionIds)
     const newPositions = zip(oldPositions, onChainData.positions).map(
       ([oldPosition, update]) => {
         if (!oldPosition || !update) {
@@ -87,19 +87,19 @@ export class RollupState {
           return { ...x, fundingIndex }
         })
 
-        const newPosition = new Position(
+        const newPositionLeaf = new PositionLeaf(
           update.starkKey,
           update.collateralBalance,
           newPositionAssets
         )
-        return { index: update.positionId, value: newPosition }
+        return { index: update.positionId, value: newPositionLeaf }
       }
     )
     return newPositions
   }
 
-  async update(newPositions: { index: bigint; value: Position }[]) {
-    const positions = await this.positions.update(newPositions)
+  async update(newPositions: { index: bigint; value: PositionLeaf }[]) {
+    const positions = await this.positionLeaves.update(newPositions)
     return new RollupState(this.storage, positions)
   }
 
