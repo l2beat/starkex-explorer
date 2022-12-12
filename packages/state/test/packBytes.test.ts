@@ -17,6 +17,8 @@ describe(packBytes.name, () => {
       { bytes: 8, value: 9223372036854775807n },
       { bytes: 8, value: 9223372036854775863n },
     ])
-    expect(packed).toEqual('004554482d39000000000000000000007fffffffffffffff8000000000000037')
+    expect(packed).toEqual(
+      '004554482d39000000000000000000007fffffffffffffff8000000000000037'
+    )
   })
 })

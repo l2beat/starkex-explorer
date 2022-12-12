@@ -166,7 +166,11 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const [five, six, seven] = await rollup.positionLeaves.getLeaves([5n, 6n, 7n])
+      const [five, six, seven] = await rollup.positionLeaves.getLeaves([
+        5n,
+        6n,
+        7n,
+      ])
       expect(five?.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,

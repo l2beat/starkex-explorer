@@ -121,7 +121,10 @@ describe(MerkleTree.name, () => {
         { index: 7n, value: positionLeafB },
       ])
 
-      expect(await tree.getLeaves([2n, 7n])).toEqual([positionLeafA, positionLeafB])
+      expect(await tree.getLeaves([2n, 7n])).toEqual([
+        positionLeafA,
+        positionLeafB,
+      ])
     })
 
     it('does not change the original tree', async () => {
@@ -223,13 +226,19 @@ describe(MerkleTree.name, () => {
       const storage = new InMemoryMerkleStorage()
       let tree = await MerkleTree.create(storage, 3n, PositionLeaf.EMPTY)
 
-      const positionLeafA = new PositionLeaf(StarkKey('1'.padStart(64, '0')), 2n, [
-        { assetId: AssetId('BTC-10'), balance: 3n, fundingIndex: 4n },
-      ])
-      const positionLeafB = new PositionLeaf(StarkKey('1'.padStart(64, '0')), 2n, [
-        { assetId: AssetId('ETH-9'), balance: 3n, fundingIndex: 4n },
-        { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 6n },
-      ])
+      const positionLeafA = new PositionLeaf(
+        StarkKey('1'.padStart(64, '0')),
+        2n,
+        [{ assetId: AssetId('BTC-10'), balance: 3n, fundingIndex: 4n }]
+      )
+      const positionLeafB = new PositionLeaf(
+        StarkKey('1'.padStart(64, '0')),
+        2n,
+        [
+          { assetId: AssetId('ETH-9'), balance: 3n, fundingIndex: 4n },
+          { assetId: AssetId('BTC-10'), balance: 5n, fundingIndex: 6n },
+        ]
+      )
 
       tree = await tree.update([
         { index: 2n, value: positionLeafA },
