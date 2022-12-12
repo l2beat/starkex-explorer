@@ -30,7 +30,7 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
 
   reader.assertEnd()
 
-  const returnObject = {
+  return {
     configCode,
     initialValidiumVaultRoot,
     finalValidiumVaultRoot,
@@ -47,7 +47,4 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
     nL1VaultUpdates,
     nL1OrderMessages,
   }
-
-  console.log(returnObject)
-  return returnObject
 }
