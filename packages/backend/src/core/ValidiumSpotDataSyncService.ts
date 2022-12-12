@@ -1,4 +1,4 @@
-import { decodeFirstPage, StarkExProgramOutput } from '@explorer/encoding'
+import { decodeDexOutput, StarkExDexOutput } from '@explorer/encoding'
 import { Position } from '@explorer/state'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { BigNumber, utils } from 'ethers'
@@ -70,9 +70,8 @@ export class ValidiumSpotDataSyncService {
     await this.stateUpdater.ensureRollupState(oldHash)
 
     for (const [i, transition] of validiumStateTransition.entries()) {
-      const programOutput = await this.getProgramOutput(
-        transition.transactionHash
-      )
+      const dexOutput = await this.getDexOutput(transition.transactionHash)
+
       const batch = await this.availabilityGatewayClient.getPerpetualBatch(
         transition.batchId
       )
@@ -84,7 +83,7 @@ export class ValidiumSpotDataSyncService {
           blockNumber: transition.blockNumber,
           stateTransitionHash: transition.stateTransitionFact,
         },
-        programOutput,
+        dexOutput,
         newPositions
       )
     }
@@ -149,22 +148,22 @@ export class ValidiumSpotDataSyncService {
     }))
   }
 
-  private async getProgramOutput(
+  private async getDexOutput(
     transactionHash: Hash256
-  ): Promise<StarkExProgramOutput> {
+  ): Promise<StarkExDexOutput> {
     const tx = await this.ethereumClient.getTransaction(transactionHash)
     if (!tx) {
       throw new Error('Invalid transaction')
     }
     const abi = new utils.Interface([
-      'function updateState(uint256[] calldata programOutput, uint256[] calldata applicationData)',
+      'function updateState(uint256[] calldata publicInput, uint256[] calldata applicationData)',
     ])
     const decoded = abi.decodeFunctionData('updateState', tx.data)
-    const programOutputValues = decoded.programOutput as BigNumber[]
-    const hexData = programOutputValues
+    const dexOutputValues = decoded.publicInput as BigNumber[]
+    const hexData = dexOutputValues
       .map((x) => x.toHexString().slice(2).padStart(64, '0'))
       .join('')
-    return decodeFirstPage(hexData)
+    return decodeDexOutput(hexData)
   }
 
   async discardAfter(blockNumber: BlockNumber) {
