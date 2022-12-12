@@ -3,6 +3,7 @@ import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 
 import { MerkleValue } from './MerkleValue'
+import { packBytes } from './packBytes'
 
 const MIN_INT_64 = -(2n ** 63n)
 
@@ -84,15 +85,4 @@ function packAsset(asset: PositionAsset) {
     { bytes: 8, value: asset.fundingIndex - MIN_INT_64 },
     { bytes: 8, value: asset.balance - MIN_INT_64 },
   ])
-}
-
-function packBytes(
-  values: { bytes: number; value: string | bigint | number }[]
-) {
-  return values
-    .map(({ bytes, value }) => {
-      const string = typeof value === 'string' ? value : value.toString(16)
-      return string.padStart(bytes * 2, '0')
-    })
-    .join('')
 }
