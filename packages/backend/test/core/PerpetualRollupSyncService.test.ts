@@ -5,7 +5,7 @@ import { FinalizeExitEventsCollector } from '../../src/core/collectors/FinalizeE
 import { ForcedEventsCollector } from '../../src/core/collectors/ForcedEventsCollector'
 import type { PageCollector } from '../../src/core/collectors/PageCollector'
 import type { PageMappingCollector } from '../../src/core/collectors/PageMappingCollector'
-import { StateTransitionCollector } from '../../src/core/collectors/StateTransitionCollector'
+import { PerpetualRollupStateTransitionCollector } from '../../src/core/collectors/PerpetualRollupStateTransitionCollector'
 import { UserRegistrationCollector } from '../../src/core/collectors/UserRegistrationCollector'
 import type { VerifierCollector } from '../../src/core/collectors/VerifierCollector'
 import { PerpetualRollupSyncService } from '../../src/core/PerpetualRollupSyncService'
@@ -35,9 +35,10 @@ describe(PerpetualRollupSyncService.name, () => {
       { stateTransitionHash: Hash256.fake('abcd'), blockNumber: 1 },
     ]
 
-    const stateTransitionCollector = mock<StateTransitionCollector>({
-      collect: async (_blockRange) => stateTransitionsRecords,
-    })
+    const stateTransitionCollector =
+      mock<PerpetualRollupStateTransitionCollector>({
+        collect: async (_blockRange) => stateTransitionsRecords,
+      })
 
     const userRegistrationCollector = mock<UserRegistrationCollector>({
       collect: async () => [],
@@ -113,9 +114,10 @@ describe(PerpetualRollupSyncService.name, () => {
         discardAfter: noop,
       })
       const pageCollector = mock<PageCollector>({ discardAfter: noop })
-      const stateTransitionCollector = mock<StateTransitionCollector>({
-        discardAfter: noop,
-      })
+      const stateTransitionCollector =
+        mock<PerpetualRollupStateTransitionCollector>({
+          discardAfter: noop,
+        })
       const userRegistrationCollector = mock<UserRegistrationCollector>({
         discardAfter: noop,
       })

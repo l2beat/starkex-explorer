@@ -2,7 +2,7 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { LogStateTransitionFact } from '../../../src/core/collectors/events'
-import { StateTransitionCollector } from '../../../src/core/collectors/StateTransitionCollector'
+import { PerpetualRollupStateTransitionCollector } from '../../../src/core/collectors/PerpetualRollupStateTransitionCollector'
 import { BlockRange } from '../../../src/model'
 import type {
   StateTransitionRecord,
@@ -13,7 +13,7 @@ import { mock } from '../../mock'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 
-describe(StateTransitionCollector.name, () => {
+describe(PerpetualRollupStateTransitionCollector.name, () => {
   it('parses logs, saves and returns records', async () => {
     const ethereumClient = mock<EthereumClient>({
       getLogsInRange: async () => testData().logs,
@@ -21,11 +21,12 @@ describe(StateTransitionCollector.name, () => {
     const stateTransitionRepository = mock<StateTransitionRepository>({
       addMany: async () => [],
     })
-    const stateTransitionCollector = new StateTransitionCollector(
-      ethereumClient,
-      stateTransitionRepository,
-      PERPETUAL_ADDRESS
-    )
+    const stateTransitionCollector =
+      new PerpetualRollupStateTransitionCollector(
+        ethereumClient,
+        stateTransitionRepository,
+        PERPETUAL_ADDRESS
+      )
 
     const blockRange = new BlockRange([
       {
@@ -101,7 +102,7 @@ describe(StateTransitionCollector.name, () => {
       deleteAfter: async () => 0,
     })
 
-    const collector = new StateTransitionCollector(
+    const collector = new PerpetualRollupStateTransitionCollector(
       mock<EthereumClient>(),
       stateTransitionRepository,
       PERPETUAL_ADDRESS

@@ -16,7 +16,9 @@ import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEvent
 import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
-import { StateTransitionCollector } from './core/collectors/StateTransitionCollector'
+import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
+import { PerpetualValidiumStateTransitionCollector } from './core/collectors/PerpetualValidiumStateTransitionCollector'
+import { ProgramOutputCollector } from './core/collectors/ProgramOutputCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
@@ -114,11 +116,6 @@ export class Application {
     const statusService = new StatusService({
       blockDownloader,
     })
-    const stateTransitionCollector = new StateTransitionCollector(
-      ethereumClient,
-      stateTransitionRepository,
-      config.starkex.contracts.perpetual
-    )
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
       userRegistrationEventRepository,
@@ -144,6 +141,13 @@ export class Application {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
         config.starkex.availabilityGateway
       )
+      const validiumStateTransitionCollector =
+        new PerpetualValidiumStateTransitionCollector(
+          ethereumClient,
+          stateTransitionRepository,
+          config.starkex.contracts.perpetual
+        )
+      const programOutputCollector = new ProgramOutputCollector(ethereumClient)
       const perpetualValidiumUpdater = new PerpetualValidiumUpdater(
         stateUpdateRepository,
         rollupStateRepository,
@@ -152,13 +156,13 @@ export class Application {
         logger
       )
       syncService = new PerpetualValidiumSyncService(
-        ethereumClient,
         availabilityGatewayClient,
-        config.starkex.contracts.perpetual,
-        perpetualValidiumUpdater,
+        validiumStateTransitionCollector,
         userRegistrationCollector,
         forcedEventsCollector,
         finalizeExitEventsCollector,
+        programOutputCollector,
+        perpetualValidiumUpdater,
         logger
       )
     } else {
@@ -177,6 +181,12 @@ export class Application {
         pageRepository,
         config.starkex.contracts.registry
       )
+      const stateTransitionCollector =
+        new PerpetualRollupStateTransitionCollector(
+          ethereumClient,
+          stateTransitionRepository,
+          config.starkex.contracts.perpetual
+        )
       const perpetualRollupUpdater = new PerpetualRollupUpdater(
         pageRepository,
         stateUpdateRepository,

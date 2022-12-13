@@ -7,7 +7,7 @@ import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsColl
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { PageCollector } from './collectors/PageCollector'
 import { PageMappingCollector } from './collectors/PageMappingCollector'
-import { StateTransitionCollector } from './collectors/StateTransitionCollector'
+import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualRollupStateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
@@ -17,7 +17,7 @@ export class PerpetualRollupSyncService {
     private readonly verifierCollector: VerifierCollector,
     private readonly pageMappingCollector: PageMappingCollector,
     private readonly pageCollector: PageCollector,
-    private readonly stateTransitionCollector: StateTransitionCollector,
+    private readonly stateTransitionCollector: PerpetualRollupStateTransitionCollector,
     private readonly stateUpdater: PerpetualRollupUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,

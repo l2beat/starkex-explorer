@@ -13,7 +13,7 @@ import { StateUpdater } from './StateUpdater'
 export interface ValidiumStateTransition {
   blockNumber: number
   transactionHash: Hash256
-  stateTransitionFact: Hash256
+  stateTransitionHash: Hash256
   sequenceNumber: number
   batchId: number
 }
@@ -60,7 +60,7 @@ export class PerpetualValidiumUpdater extends StateUpdater {
       {
         id: id + 1,
         blockNumber: transition.blockNumber,
-        stateTransitionHash: transition.stateTransitionFact,
+        stateTransitionHash: transition.stateTransitionHash,
       },
       programOutput,
       newPositions
