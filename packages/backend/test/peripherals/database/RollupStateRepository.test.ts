@@ -25,7 +25,7 @@ describe(RollupStateRepository.name, () => {
       expect(recovered).toEqual(node)
     })
 
-    it('persists and recover a Position', async () => {
+    it('persists and recover a PositionLeaf', async () => {
       const positionLeaf = new PositionLeaf(
         StarkKey.fake('deadbeef'),
         123n,

@@ -48,7 +48,7 @@ export class StateUpdater {
   async init() {
     const storage = new InMemoryMerkleStorage<PositionLeaf>()
     this.rollup = await RollupState.empty(storage)
-    this.lastState.positionRoot = await this.rollup.positionLeaves.hash()
+    this.lastState.positionRoot = await this.rollup.positionTree.hash()
   }
 
   async registerUser(address: EthereumAddress, starkKey: StarkKey) {
@@ -71,7 +71,7 @@ export class StateUpdater {
     })
     const nextRollup = await this.rollup.update(newPositions)
     this.rollup = nextRollup
-    const afterRoot = await this.rollup.positionLeaves.hash()
+    const afterRoot = await this.rollup.positionTree.hash()
 
     const oldState = this.lastState
     const newState: State = {

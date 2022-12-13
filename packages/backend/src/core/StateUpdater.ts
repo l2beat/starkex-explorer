@@ -98,7 +98,7 @@ export class StateUpdater {
     const rollupState = await this.rollupState.update(newPositionLeaves)
     this.rollupState = rollupState
 
-    const rootHash = await rollupState.positionLeaves.hash()
+    const rootHash = await rollupState.positionTree.hash()
     if (rootHash !== starkExProgramOutput.newState.positionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
@@ -174,7 +174,7 @@ export class StateUpdater {
           oldHash
         )
       }
-    } else if ((await this.rollupState.positionLeaves.hash()) !== oldHash) {
+    } else if ((await this.rollupState.positionTree.hash()) !== oldHash) {
       this.rollupState = RollupState.recover(
         this.rollupStateRepository,
         oldHash

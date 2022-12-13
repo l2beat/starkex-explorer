@@ -21,7 +21,7 @@ export type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
 export class RollupState {
   constructor(
     private readonly storage: IRollupStateStorage,
-    public readonly positionLeaves: MerkleTree<PositionLeaf>
+    public readonly positionTree: MerkleTree<PositionLeaf>
   ) {}
 
   static recover(
@@ -45,7 +45,7 @@ export class RollupState {
     const fundingByTimestamp = this.getFundingByTimestamp(onChainData)
     const updatedPositionIds = onChainData.positions.map((x) => x.positionId)
 
-    const oldPositions = await this.positionLeaves.getLeaves(updatedPositionIds)
+    const oldPositions = await this.positionTree.getLeaves(updatedPositionIds)
     const newPositions = zip(oldPositions, onChainData.positions).map(
       ([oldPosition, update]) => {
         if (!oldPosition || !update) {
@@ -99,7 +99,7 @@ export class RollupState {
   }
 
   async update(newPositions: { index: bigint; value: PositionLeaf }[]) {
-    const positions = await this.positionLeaves.update(newPositions)
+    const positions = await this.positionTree.update(newPositions)
     return new RollupState(this.storage, positions)
   }
 

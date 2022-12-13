@@ -22,7 +22,7 @@ describe(RollupState.name, () => {
     it('has a specific root hash', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
       const empty = await RollupState.empty(storage)
-      expect(await empty.positionLeaves.hash()).toEqual(
+      expect(await empty.positionTree.hash()).toEqual(
         PedersenHash(
           '052ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
         )
@@ -50,7 +50,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const updated = await rollup.positionLeaves.getLeaf(5n)
+      const updated = await rollup.positionTree.getLeaf(5n)
       const data = updated.getData()
       expect(data).toEqual({
         starkKey: StarkKey.fake('5'),
@@ -99,7 +99,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const updated = await rollup.positionLeaves.getLeaf(5n)
+      const updated = await rollup.positionTree.getLeaf(5n)
       expect(updated.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
@@ -166,7 +166,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const [five, six, seven] = await rollup.positionLeaves.getLeaves([
+      const [five, six, seven] = await rollup.positionTree.getLeaves([
         5n,
         6n,
         7n,
@@ -226,7 +226,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const position = await rollup.positionLeaves.getLeaf(5n)
+      const position = await rollup.positionTree.getLeaf(5n)
       expect(position.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
@@ -298,7 +298,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const updated = await rollup.positionLeaves.getLeaf(5n)
+      const updated = await rollup.positionTree.getLeaf(5n)
       expect(updated.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
@@ -385,11 +385,11 @@ describe(RollupState.name, () => {
 
       const recovered = RollupState.recover(
         storage,
-        await rollup.positionLeaves.hash(),
+        await rollup.positionTree.hash(),
         3n
       )
 
-      const position = await recovered.positionLeaves.getLeaf(5n)
+      const position = await recovered.positionTree.getLeaf(5n)
       expect(position.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,

@@ -45,7 +45,7 @@ describe(StateUpdater.name, () => {
       const rollupStateEmptyHashForHeight3 = PedersenHash(
         '048c477cdb37576ddff3c3fe5c1c7559778d6cbade51e5a6c1fe71e6bdb1d4db'
       )
-      expect(await rollupState.positionLeaves.hash()).toEqual(
+      expect(await rollupState.positionTree.hash()).toEqual(
         rollupStateEmptyHashForHeight3
       )
       expect(rollupStateRepository.persist.calls.length).toEqual(1)
@@ -62,7 +62,7 @@ describe(StateUpdater.name, () => {
       )
       const hash = PedersenHash.fake()
       const rollupState = await stateUpdater.ensureRollupState(hash)
-      expect(await rollupState.positionLeaves.hash()).toEqual(hash)
+      expect(await rollupState.positionTree.hash()).toEqual(hash)
     })
 
     it('resets state after reorg', async () => {
@@ -78,8 +78,8 @@ describe(StateUpdater.name, () => {
       const hashB = PedersenHash.fake('b')
       const rollupStateA = await stateUpdater.ensureRollupState(hashA)
       const rollupStateB = await stateUpdater.ensureRollupState(hashB)
-      expect(await rollupStateA.positionLeaves.hash()).toEqual(hashA)
-      expect(await rollupStateB.positionLeaves.hash()).toEqual(hashB)
+      expect(await rollupStateA.positionTree.hash()).toEqual(hashA)
+      expect(await rollupStateB.positionTree.hash()).toEqual(hashB)
     })
 
     it('leaves state intact before a subsequent state transition', async () => {
@@ -183,7 +183,7 @@ describe(StateUpdater.name, () => {
           ],
           update: async () =>
             ({
-              positionLeaves: mock<MerkleTree<PositionLeaf>>({
+              positionTree: mock<MerkleTree<PositionLeaf>>({
                 hash: async () => PedersenHash.fake('1234'),
               }),
             } as unknown as RollupState),
