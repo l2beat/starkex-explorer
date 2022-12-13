@@ -1,5 +1,5 @@
 import { decodeFirstPage, StarkExProgramOutput } from '@explorer/encoding'
-import { Position } from '@explorer/state'
+import { PositionLeaf } from '@explorer/state'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { BigNumber, utils } from 'ethers'
 
@@ -76,7 +76,7 @@ export class ValidiumDataSyncService {
       const batch = await this.availabilityGatewayClient.getPerpetualBatch(
         transition.batchId
       )
-      const newPositions = this.buildNewPositions(batch)
+      const newPositions = this.buildNewPositionLeaves(batch)
 
       await this.stateUpdater.processStateTransition(
         {
@@ -133,15 +133,15 @@ export class ValidiumDataSyncService {
     return validiumStateTransitions
   }
 
-  buildNewPositions(
+  buildNewPositionLeaves(
     batch: PerpetualBatch | undefined
-  ): { index: bigint; value: Position }[] {
+  ): { index: bigint; value: PositionLeaf }[] {
     if (!batch) {
       return []
     }
     return batch.positions.map((position) => ({
       index: position.positionId,
-      value: new Position(
+      value: new PositionLeaf(
         position.starkKey,
         position.collateralBalance,
         position.assets

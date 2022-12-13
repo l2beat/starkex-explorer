@@ -1,4 +1,4 @@
-import { Position } from '@explorer/state'
+import { PositionLeaf } from '@explorer/state'
 import { json } from '@explorer/types'
 
 import { Nullable } from '../../../utils/Nullable'
@@ -57,7 +57,7 @@ declare module 'knex/types/tables' {
 
   interface MerklePositionsRow {
     hash: string
-    data: ReturnType<typeof Position.prototype.toJSON>
+    data: ReturnType<typeof PositionLeaf.prototype.toJSON>
   }
 
   interface RollupParametersRow {

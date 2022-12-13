@@ -2,7 +2,7 @@ import {
   IRollupStateStorage,
   MerkleNode,
   NodeOrLeaf,
-  Position,
+  PositionLeaf,
 } from '@explorer/state'
 import { PedersenHash } from '@explorer/types'
 import { partition } from 'lodash'
@@ -27,10 +27,10 @@ export class RollupStateRepository
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async persist(values: NodeOrLeaf<Position>[]): Promise<void> {
+  async persist(values: NodeOrLeaf<PositionLeaf>[]): Promise<void> {
     const [nodes, positions] = partition(
       values,
-      (x): x is MerkleNode<Position> => x instanceof MerkleNode
+      (x): x is MerkleNode<PositionLeaf> => x instanceof MerkleNode
     )
 
     const [nodeRows, positionRows] = await Promise.all([
@@ -75,7 +75,7 @@ export class RollupStateRepository
     await Promise.all(queries)
   }
 
-  async recover(hash: PedersenHash): Promise<NodeOrLeaf<Position>> {
+  async recover(hash: PedersenHash): Promise<NodeOrLeaf<PositionLeaf>> {
     const knex = await this.knex()
     const [node, position] = await Promise.all([
       knex('merkle_nodes')
@@ -93,7 +93,7 @@ export class RollupStateRepository
         PedersenHash(node.hash)
       )
     } else if (position) {
-      return Position.fromJSON(position.data, PedersenHash(position.hash))
+      return PositionLeaf.fromJSON(position.data, PedersenHash(position.hash))
     } else {
       throw new Error(`Cannot find node or position: ${hash.toString()}`)
     }
