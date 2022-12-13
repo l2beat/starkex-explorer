@@ -18,7 +18,7 @@ export class VaultLeaf extends MerkleValue {
 
   // https://github.com/starkware-libs/starkex-for-spot-trading/blob/master/src/starkware/cairo/dex/vault_update.cairo#L33
   // Computes the hash h(key_token_hash, amount), where key_token_hash := h(stark_key, token_id)
-  // For python implementation, see: 
+  // For python implementation, see:
   // https://github.com/starkware-libs/starkex-resources/blob/master/stark_ex_objects/starkware/objects/state.py#L76
   async calculateHash() {
     const key_token_hash = await pedersen(
