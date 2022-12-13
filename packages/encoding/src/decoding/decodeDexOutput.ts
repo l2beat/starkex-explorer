@@ -22,12 +22,6 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
   const l1VaultUpdateCount = reader.readNumber(32)
   const l1OrderMessageCount = reader.readNumber(32)
 
-  if (!reader.isAtEnd()) {
-    // https://github.com/starkware-libs/starkex-contracts/blob/75c3a2a8dfff70604d851fc6b1a2bc8bc1a3964b/scalable-dex/contracts/src/components/OnchainDataFactTreeEncoder.sol#L12
-    // When reading calldata from updateState two new values are appended
-    reader.skip(64)
-  }
-
   reader.assertEnd()
 
   return {
