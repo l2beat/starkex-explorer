@@ -17,10 +17,10 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
   const validiumVaultTreeHeight = reader.readNumber(32)
   const rollupVaultTreeHeight = reader.readNumber(32)
   const orderTreeHeight = reader.readNumber(32)
-  const modificationsCount = reader.readNumber(32)
-  const conditionalTransfersCount = reader.readNumber(32)
-  const L1VaultUpdatesCount = reader.readNumber(32)
-  const L1OrderMessagesCount = reader.readNumber(32)
+  const modificationCount = reader.readNumber(32)
+  const conditionalTransferCount = reader.readNumber(32)
+  const l1VaultUpdateCount = reader.readNumber(32)
+  const l1OrderMessageCount = reader.readNumber(32)
 
   if (!reader.isAtEnd()) {
     // https://github.com/starkware-libs/starkex-contracts/blob/75c3a2a8dfff70604d851fc6b1a2bc8bc1a3964b/scalable-dex/contracts/src/components/OnchainDataFactTreeEncoder.sol#L12
@@ -42,9 +42,9 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
     validiumVaultTreeHeight,
     rollupVaultTreeHeight,
     orderTreeHeight,
-    modificationsCount,
-    conditionalTransfersCount,
-    L1VaultUpdatesCount,
-    L1OrderMessagesCount,
+    modificationCount,
+    conditionalTransferCount,
+    l1VaultUpdateCount,
+    l1OrderMessageCount,
   }
 }

@@ -31,10 +31,10 @@ export interface StarkExDexOutput {
   validiumVaultTreeHeight: number
   rollupVaultTreeHeight: number
   orderTreeHeight: number
-  modificationsCount: number
-  conditionalTransfersCount: number
-  L1VaultUpdatesCount: number
-  L1OrderMessagesCount: number
+  modificationCount: number
+  conditionalTransferCount: number
+  l1VaultUpdateCount: number
+  l1OrderMessageCount: number
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64

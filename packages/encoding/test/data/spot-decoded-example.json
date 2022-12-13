@@ -10,8 +10,8 @@
   "validiumVaultTreeHeight": 31,
   "rollupVaultTreeHeight": 31,
   "orderTreeHeight": 251,
-  "modificationsCount": 0,
-  "conditionalTransfersCount": 0,
-  "L1VaultUpdatesCount": 0,
-  "L1OrderMessagesCount": 0
+  "modificationCount": 0,
+  "conditionalTransferCount": 0,
+  "l1VaultUpdateCount": 0,
+  "l1OrderMessageCount": 0
 }
