@@ -35,6 +35,8 @@ export interface StarkExDexOutput {
   conditionalTransferCount: number
   l1VaultUpdateCount: number
   l1OrderMessageCount: number
+  onChainDataHash: bigint
+  onChainDataSize: bigint
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
