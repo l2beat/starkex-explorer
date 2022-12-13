@@ -19,14 +19,15 @@ import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { StateTransitionCollector } from './core/collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
-import { DataSyncService } from './core/DataSyncService'
-import { StateUpdater } from './core/StateUpdater'
+import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
+import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
+import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
+import { PerpetualValidiumUpdater } from './core/PerpetualValidiumUpdater'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
-import { ValidiumDataSyncService } from './core/ValidiumDataSyncService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
@@ -118,14 +119,6 @@ export class Application {
       stateTransitionRepository,
       config.starkex.contracts.perpetual
     )
-    const stateUpdater = new StateUpdater(
-      pageRepository,
-      stateUpdateRepository,
-      rollupStateRepository,
-      ethereumClient,
-      forcedTransactionsRepository,
-      logger
-    )
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
       userRegistrationEventRepository,
@@ -145,18 +138,24 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
-    let dataSyncService
+    let syncService
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
         config.starkex.availabilityGateway
       )
-
-      dataSyncService = new ValidiumDataSyncService(
+      const perpetualValidiumUpdater = new PerpetualValidiumUpdater(
+        stateUpdateRepository,
+        rollupStateRepository,
+        ethereumClient,
+        forcedTransactionsRepository,
+        logger
+      )
+      syncService = new PerpetualValidiumSyncService(
         ethereumClient,
         availabilityGatewayClient,
         config.starkex.contracts.perpetual,
-        stateUpdater,
+        perpetualValidiumUpdater,
         userRegistrationCollector,
         forcedEventsCollector,
         finalizeExitEventsCollector,
@@ -178,13 +177,20 @@ export class Application {
         pageRepository,
         config.starkex.contracts.registry
       )
-
-      dataSyncService = new DataSyncService(
+      const perpetualRollupUpdater = new PerpetualRollupUpdater(
+        pageRepository,
+        stateUpdateRepository,
+        rollupStateRepository,
+        ethereumClient,
+        forcedTransactionsRepository,
+        logger
+      )
+      syncService = new PerpetualRollupSyncService(
         verifierCollector,
         pageMappingCollector,
         pageCollector,
         stateTransitionCollector,
-        stateUpdater,
+        perpetualRollupUpdater,
         userRegistrationCollector,
         forcedEventsCollector,
         finalizeExitEventsCollector,
@@ -195,7 +201,7 @@ export class Application {
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
       blockDownloader,
-      dataSyncService,
+      syncService,
       logger,
       {
         earliestBlock: config.starkex.blockchain.minBlockNumber,

@@ -1,5 +1,4 @@
 import { decodeFirstPage, StarkExProgramOutput } from '@explorer/encoding'
-import { PositionLeaf } from '@explorer/state'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { BigNumber, utils } from 'ethers'
 
@@ -7,28 +6,22 @@ import { BlockRange } from '../model'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
-import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatch'
 import { Logger } from '../tools/Logger'
 import { LogStateTransitionFact, LogUpdateState } from './collectors/events'
 import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
-import { StateUpdater } from './StateUpdater'
+import {
+  PerpetualValidiumUpdater,
+  ValidiumStateTransition,
+} from './PerpetualValidiumUpdater'
 
-interface ValidiumStateTransition {
-  blockNumber: number
-  transactionHash: Hash256
-  stateTransitionFact: Hash256
-  sequenceNumber: number
-  batchId: number
-}
-
-export class ValidiumDataSyncService {
+export class PerpetualValidiumSyncService {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
     private readonly perpetual: EthereumAddress,
-    private readonly stateUpdater: StateUpdater,
+    private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
@@ -60,32 +53,18 @@ export class ValidiumDataSyncService {
       finalizeExitEvents,
     })
 
-    await this.processValidiumStateTransitions(stateTransitions)
-  }
-
-  private async processValidiumStateTransitions(
-    validiumStateTransition: ValidiumStateTransition[]
-  ) {
-    const { oldHash, id } = await this.stateUpdater.readLastUpdate()
-    await this.stateUpdater.ensureRollupState(oldHash)
-
-    for (const [i, transition] of validiumStateTransition.entries()) {
-      const programOutput = await this.getProgramOutput(
-        transition.transactionHash
-      )
-      const batch = await this.availabilityGatewayClient.getPerpetualBatch(
-        transition.batchId
-      )
-      const newPositions = this.buildNewPositionLeaves(batch)
-
-      await this.stateUpdater.processStateTransition(
-        {
-          id: id + i + 1,
-          blockNumber: transition.blockNumber,
-          stateTransitionHash: transition.stateTransitionFact,
-        },
+    for (const transition of stateTransitions) {
+      const [programOutput, batch] = await Promise.all([
+        this.getProgramOutput(transition.transactionHash),
+        this.availabilityGatewayClient.getPerpetualBatch(transition.batchId),
+      ])
+      if (!batch) {
+        throw new Error(`Unable to download batch ${transition.batchId}`)
+      }
+      await this.perpetualValidiumUpdater.processValidiumStateTransition(
+        transition,
         programOutput,
-        newPositions
+        batch
       )
     }
   }
@@ -133,22 +112,6 @@ export class ValidiumDataSyncService {
     return validiumStateTransitions
   }
 
-  buildNewPositionLeaves(
-    batch: PerpetualBatch | undefined
-  ): { index: bigint; value: PositionLeaf }[] {
-    if (!batch) {
-      return []
-    }
-    return batch.positions.map((position) => ({
-      index: position.positionId,
-      value: new PositionLeaf(
-        position.starkKey,
-        position.collateralBalance,
-        position.assets
-      ),
-    }))
-  }
-
   private async getProgramOutput(
     transactionHash: Hash256
   ): Promise<StarkExProgramOutput> {
@@ -168,7 +131,7 @@ export class ValidiumDataSyncService {
   }
 
   async discardAfter(blockNumber: BlockNumber) {
-    await this.stateUpdater.discardAfter(blockNumber)
+    await this.perpetualValidiumUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }
 }

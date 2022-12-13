@@ -10,15 +10,15 @@ import { PageMappingCollector } from './collectors/PageMappingCollector'
 import { StateTransitionCollector } from './collectors/StateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
-import { StateUpdater } from './StateUpdater'
+import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 
-export class DataSyncService {
+export class PerpetualRollupSyncService {
   constructor(
     private readonly verifierCollector: VerifierCollector,
     private readonly pageMappingCollector: PageMappingCollector,
     private readonly pageCollector: PageCollector,
     private readonly stateTransitionCollector: StateTransitionCollector,
-    private readonly stateUpdater: StateUpdater,
+    private readonly stateUpdater: PerpetualRollupUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,

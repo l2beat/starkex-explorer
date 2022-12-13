@@ -2,7 +2,7 @@ import { Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 import waitForExpect from 'wait-for-expect'
 
-import { DataSyncService } from '../../../src/core/DataSyncService'
+import { PerpetualRollupSyncService } from '../../../src/core/PerpetualRollupSyncService'
 import { BlockDownloader } from '../../../src/core/sync/BlockDownloader'
 import { SyncScheduler } from '../../../src/core/sync/SyncScheduler'
 import { Block } from '../../../src/core/sync/syncSchedulerReducer'
@@ -27,7 +27,7 @@ describe(SyncScheduler.name, () => {
         onNewBlock: () => () => {},
         onReorg: () => () => {},
       })
-      const dataSyncService = mock<DataSyncService>({
+      const dataSyncService = mock<PerpetualRollupSyncService>({
         discardAfter: async () => {},
       })
       const syncScheduler = new SyncScheduler(
@@ -55,7 +55,7 @@ describe(SyncScheduler.name, () => {
         onNewBlock: () => () => {},
         onReorg: () => () => {},
       })
-      const dataSyncService = mock<DataSyncService>({
+      const dataSyncService = mock<PerpetualRollupSyncService>({
         discardAfter: async () => {},
       })
       const syncScheduler = new SyncScheduler(
@@ -90,7 +90,7 @@ describe(SyncScheduler.name, () => {
         setLastSynced: async () => {},
       })
       const blockDownloader = mock<BlockDownloader>()
-      const dataSyncService = mock<DataSyncService>({
+      const dataSyncService = mock<PerpetualRollupSyncService>({
         sync: async () => {},
         discardAfter: async () => {},
       })
@@ -124,7 +124,7 @@ describe(SyncScheduler.name, () => {
         setLastSynced: async () => {},
       })
       const blockDownloader = mock<BlockDownloader>()
-      const dataSyncService = mock<DataSyncService>({
+      const dataSyncService = mock<PerpetualRollupSyncService>({
         sync: mockFn().rejectsWith(new Error('oops')),
         discardAfter: async () => {},
       })
@@ -160,7 +160,7 @@ describe(SyncScheduler.name, () => {
         setLastSynced: async () => {},
       })
       const blockDownloader = mock<BlockDownloader>()
-      const dataSyncService = mock<DataSyncService>({
+      const dataSyncService = mock<PerpetualRollupSyncService>({
         sync: async () => {},
         discardAfter: async () => {},
       })
@@ -202,7 +202,7 @@ describe(SyncScheduler.name, () => {
         setLastSynced: async () => {},
       })
       const blockDownloader = mock<BlockDownloader>()
-      const dataSyncService = mock<DataSyncService>({
+      const dataSyncService = mock<PerpetualRollupSyncService>({
         sync: async () => {},
         discardAfter: mockFn().rejectsWith(new Error('oops')),
       })
@@ -239,7 +239,7 @@ describe(SyncScheduler.name, () => {
   describe(SyncScheduler.prototype.handleSync.name, () => {
     it('triggers data sync only if block range is inside the limit', async () => {
       const maxBlockNumber = 10
-      const dataSyncService = mock<DataSyncService>({
+      const dataSyncService = mock<PerpetualRollupSyncService>({
         discardAfter: async () => {},
         sync: async () => {},
       })
