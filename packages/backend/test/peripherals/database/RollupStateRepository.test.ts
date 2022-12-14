@@ -1,4 +1,4 @@
-import { MerkleNode, Position } from '@explorer/state'
+import { MerkleNode, PositionLeaf } from '@explorer/state'
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
@@ -25,16 +25,16 @@ describe(RollupStateRepository.name, () => {
       expect(recovered).toEqual(node)
     })
 
-    it('persists and recover a Position', async () => {
-      const position = new Position(
+    it('persists and recover a PositionLeaf', async () => {
+      const positionLeaf = new PositionLeaf(
         StarkKey.fake('deadbeef'),
         123n,
         [{ assetId: AssetId('ETH-9'), balance: 456n, fundingIndex: 789n }],
         PedersenHash.fake('abc')
       )
-      await repository.persist([position])
+      await repository.persist([positionLeaf])
       const recovered = await repository.recover(PedersenHash.fake('abc'))
-      expect(recovered).toEqual(position)
+      expect(recovered).toEqual(positionLeaf)
     })
 
     it('persists and recover multiple merkle nodes', async () => {
@@ -81,13 +81,13 @@ describe(RollupStateRepository.name, () => {
     })
 
     it('persists the same position multiple times in one update', async () => {
-      const position = new Position(
+      const positionLeaf = new PositionLeaf(
         StarkKey.fake('deadbeef'),
         123n,
         [{ assetId: AssetId('ETH-9'), balance: 456n, fundingIndex: 789n }],
         PedersenHash.fake('abc')
       )
-      await repository.persist([position, position])
+      await repository.persist([positionLeaf, positionLeaf])
     })
   })
 })
