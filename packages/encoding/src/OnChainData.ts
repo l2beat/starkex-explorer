@@ -35,7 +35,7 @@ export interface StarkExDexOutput {
   conditionalTransferCount: number
   l1VaultUpdateCount: number
   l1OrderMessageCount: number
-  onChainDataHash: bigint
+  onChainDataHash: Hash256
   onChainDataSize: bigint
 }
 

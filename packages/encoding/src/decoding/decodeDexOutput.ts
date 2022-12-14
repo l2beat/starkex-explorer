@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/types'
+import { Hash256, PedersenHash } from '@explorer/types'
 
 import { StarkExDexOutput } from '../OnChainData'
 import { ByteReader } from './ByteReader'
@@ -21,7 +21,7 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
   const conditionalTransferCount = reader.readNumber(32)
   const l1VaultUpdateCount = reader.readNumber(32)
   const l1OrderMessageCount = reader.readNumber(32)
-  const onChainDataHash = reader.readBigInt(32)
+  const onChainDataHash = Hash256(reader.readHex(32))
   const onChainDataSize = reader.readBigInt(32)
 
   reader.assertEnd()
