@@ -18,6 +18,27 @@ export interface StarkExProgramOutput {
   conditions: PedersenHash[]
 }
 
+// https://github.com/starkware-libs/starkex-for-spot-trading/blob/607f0b4ce507e1d95cd018d206a2797f6ba4aab4/src/starkware/cairo/dex/main.cairo#L21-L37
+export interface StarkExDexOutput {
+  configCode: bigint
+  initialValidiumVaultRoot: PedersenHash
+  finalValidiumVaultRoot: PedersenHash
+  initialRollupVaultRoot: PedersenHash
+  finalRollupVaultRoot: PedersenHash
+  initialOrderRoot: PedersenHash
+  finalOrderRoot: PedersenHash
+  globalExpirationTimestamp: number
+  validiumVaultTreeHeight: number
+  rollupVaultTreeHeight: number
+  orderTreeHeight: number
+  modificationCount: number
+  conditionalTransferCount: number
+  l1VaultUpdateCount: number
+  l1OrderMessageCount: number
+  onChainDataHash: Hash256
+  onChainDataSize: bigint
+}
+
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
 export interface OnChainPositionsUpdate {
   funding: FundingEntry[]
