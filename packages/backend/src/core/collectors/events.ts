@@ -77,6 +77,19 @@ export const LogUpdateState = EthereumEvent<
   { sequenceNumber: BigNumber; batchId: BigNumber }
 >('event LogUpdateState(uint256 sequenceNumber, uint256 batchId)')
 
+export const LogRootUpdate = EthereumEvent<
+  'LogRootUpdate',
+  {
+    sequenceNumber: BigNumber
+    batchId: BigNumber
+    validiumVaultRoot: BigNumber
+    rollupVaultRoot: BigNumber
+    orderRoot: BigNumber
+  }
+>(
+  'event LogRootUpdate(uint256 sequenceNumber, uint256 batchId, uint256 validiumVaultRoot, uint256 rollupVaultRoot, uint256 orderRoot)'
+)
+
 export const LogUserRegistered = EthereumEvent<
   'LogUserRegistered',
   { ethKey: string; starkKey: BigNumber; sender: string }
