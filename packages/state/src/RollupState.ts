@@ -51,13 +51,20 @@ export class RollupState {
         if (!oldPosition || !update) {
           throw new Error('Invalid update count')
         }
-        const funding =
-          update.fundingTimestamp !== Timestamp(0)
-            ? fundingByTimestamp.get(update.fundingTimestamp)
-            : new Map<AssetId, bigint>()
+        // This is a special case for state update 11506, position 263516
+        // This position had it's timestamp set to zero, which according to
+        // our understading shouldn't be possible. We have determined
+        // experimentally that using data from old funding results in a correct
+        // position tree hash
+        const timestamp =
+          update.fundingTimestamp === Timestamp(0)
+            ? onChainData.oldState.timestamp
+            : update.fundingTimestamp
+
+        const funding = fundingByTimestamp.get(timestamp)
         if (!funding) {
           throw new Error(
-            `Missing funding for timestamp: ${update.fundingTimestamp.toString()}!`
+            `Missing funding for timestamp: ${timestamp.toString()}!`
           )
         }
         const updatedAssets = new Set(update.balances.map((x) => x.assetId))
