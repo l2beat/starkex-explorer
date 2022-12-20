@@ -1,5 +1,10 @@
-import { ForcedAction, StarkExProgramOutput } from '@explorer/encoding'
-import { PositionLeaf, RollupState } from '@explorer/state'
+import { ForcedAction, OraclePrice } from '@explorer/encoding'
+import {
+  PositionLeaf,
+  RollupState,
+  SpotState,
+  VaultLeaf,
+} from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
@@ -24,32 +29,36 @@ export class StateUpdater {
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
     protected readonly emptyStateHash: PedersenHash,
-    protected rollupState?: RollupState
+    protected rollupState?: RollupState | SpotState
   ) {}
 
   async processStateTransition(
     stateTransitionRecord: StateTransitionRecord,
-    starkExProgramOutput: StarkExProgramOutput,
-    newPositionLeaves: { index: bigint; value: PositionLeaf }[]
+    expectedPositionRoot: PedersenHash,
+    forcedActions: ForcedAction[],
+    oraclePrices: OraclePrice[],
+    newPositionLeaves: { index: bigint; value: PositionLeaf }[],
+    newVaultLeaves: { index: bigint; value: VaultLeaf }[]
   ) {
     if (!this.rollupState) {
       return
     }
 
+    if (this.rollupState instanceof RollupState) {
+      this.rollupState = await this.rollupState.update(newPositionLeaves)
+    } else {
+      this.rollupState = await this.rollupState.update(newVaultLeaves)
+    }
+
+    const rootHash = await this.rollupState.positionTree.hash()
+    if (rootHash !== expectedPositionRoot) {
+      throw new Error('State transition calculated incorrectly')
+    }
+    const transactionHashes = await this.extractTransactionHashes(forcedActions)
     const { id, blockNumber, stateTransitionHash } = stateTransitionRecord
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
 
-    const rollupState = await this.rollupState.update(newPositionLeaves)
-    this.rollupState = rollupState
-
-    const rootHash = await rollupState.positionTree.hash()
-    if (rootHash !== starkExProgramOutput.newState.positionRoot) {
-      throw new Error('State transition calculated incorrectly')
-    }
-    const transactionHashes = await this.extractTransactionHashes(
-      starkExProgramOutput.forcedActions
-    )
     await Promise.all([
       this.stateUpdateRepository.add({
         stateUpdate: {
@@ -67,7 +76,7 @@ export class StateUpdater {
             collateralBalance: value.collateralBalance,
           })
         ),
-        prices: starkExProgramOutput.newState.oraclePrices,
+        prices: oraclePrices,
         transactionHashes,
       }),
     ])
@@ -116,13 +125,15 @@ export class StateUpdater {
       } else {
         this.rollupState = RollupState.recover(
           this.rollupStateRepository,
-          oldHash
+          oldHash,
+          height
         )
       }
     } else if ((await this.rollupState.positionTree.hash()) !== oldHash) {
       this.rollupState = RollupState.recover(
         this.rollupStateRepository,
-        oldHash
+        oldHash,
+        height
       )
     }
     return this.rollupState

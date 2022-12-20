@@ -189,7 +189,10 @@ describe(StateUpdater.name, () => {
             stateTransitionHash: Hash256.fake('123'),
             blockNumber: 1,
           },
-          decodedFakePages,
+          decodedFakePages.newState.positionRoot,
+          decodedFakePages.forcedActions,
+          decodedFakePages.newState.oraclePrices,
+          [],
           []
         )
       ).toBeRejected('State transition calculated incorrectly')

@@ -7,7 +7,7 @@ import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsColl
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/SpotValidiumStateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
-import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
+import { SpotValidiumUpdater } from './SpotValidiumUpdater'
 
 export class SpotValidiumSyncService {
   constructor(
@@ -17,7 +17,7 @@ export class SpotValidiumSyncService {
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
     private readonly dexOutputCollector: DexOutputCollector,
-    private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
+    private readonly spotValidiumUpdater: SpotValidiumUpdater,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -54,7 +54,7 @@ export class SpotValidiumSyncService {
       if (!batch) {
         throw new Error(`Unable to download batch ${transition.batchId}`)
       }
-      await this.perpetualValidiumUpdater.processValidiumStateTransition(
+      await this.spotValidiumUpdater.processSpotValidiumStateTransition(
         transition,
         dexOutput,
         batch
@@ -64,7 +64,7 @@ export class SpotValidiumSyncService {
 
   async discardAfter(blockNumber: BlockNumber) {
     await this.stateTransitionCollector.discardAfter(blockNumber)
-    await this.perpetualValidiumUpdater.discardAfter(blockNumber)
+    await this.spotValidiumUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }
 }

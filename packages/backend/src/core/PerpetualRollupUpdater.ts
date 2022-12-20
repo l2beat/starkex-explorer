@@ -82,8 +82,11 @@ export class PerpetualRollupUpdater extends StateUpdater {
     )
     return this.processStateTransition(
       stateTransitionRecord,
-      onChainData,
-      newPositions
+      onChainData.newState.positionRoot,
+      onChainData.forcedActions,
+      onChainData.newState.oraclePrices,
+      newPositions,
+      []
     )
   }
 }

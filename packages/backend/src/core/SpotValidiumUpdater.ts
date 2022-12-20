@@ -1,12 +1,12 @@
-import { StarkExProgramOutput } from '@explorer/encoding'
-import { PositionLeaf, RollupState } from '@explorer/state'
+import { StarkExDexOutput } from '@explorer/encoding'
+import { SpotState, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatch'
+import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
 import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
 
@@ -18,43 +18,39 @@ export interface ValidiumStateTransition {
   batchId: number
 }
 
-/**
- * @internal
- * Same as `await RollupState.empty().then(empty => empty.positions.hash())`
- */
 export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
-  '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
+  '0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c'
 )
 
-export class PerpetualValidiumUpdater extends StateUpdater {
+export class SpotValidiumUpdater extends StateUpdater {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: RollupStateRepository,
+    protected readonly spotStateRepository: RollupStateRepository,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected rollupState?: RollupState
+    protected spotState?: SpotState
   ) {
     super(
       stateUpdateRepository,
-      rollupStateRepository,
+      spotStateRepository,
       ethereumClient,
       forcedTransactionsRepository,
       logger,
       ROLLUP_STATE_EMPTY_HASH,
-      rollupState
+      spotState
     )
   }
 
-  async processValidiumStateTransition(
+  async processSpotValidiumStateTransition(
     transition: ValidiumStateTransition,
-    programOutput: StarkExProgramOutput,
-    batch: PerpetualBatch
+    dexOutput: StarkExDexOutput,
+    batch: SpotBatch
   ) {
     const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureRollupState(oldHash)
+    await this.ensureRollupState(oldHash, 31n)
 
-    const newPositions = this.buildNewPositionLeaves(batch)
+    const newVaults = this.buildNewVaultLeaves(batch)
 
     await this.processStateTransition(
       {
@@ -62,24 +58,18 @@ export class PerpetualValidiumUpdater extends StateUpdater {
         blockNumber: transition.blockNumber,
         stateTransitionHash: transition.stateTransitionHash,
       },
-      programOutput.newState.positionRoot,
-      programOutput.forcedActions,
-      programOutput.newState.oraclePrices,
-      newPositions,
-      []
+      dexOutput.finalValidiumVaultRoot,
+      [], // TODO: add forced actions,
+      [],
+      [],
+      newVaults
     )
   }
 
-  buildNewPositionLeaves(
-    batch: PerpetualBatch
-  ): { index: bigint; value: PositionLeaf }[] {
-    return batch.positions.map((position) => ({
-      index: position.positionId,
-      value: new PositionLeaf(
-        position.starkKey,
-        position.collateralBalance,
-        position.assets
-      ),
+  buildNewVaultLeaves(batch: SpotBatch): { index: bigint; value: VaultLeaf }[] {
+    return batch.vaults.map((vault) => ({
+      index: vault.vaultId,
+      value: new VaultLeaf(vault.starkKey, vault.balance, vault.token),
     }))
   }
 }

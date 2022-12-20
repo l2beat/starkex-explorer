@@ -1,6 +1,18 @@
-import { OnChainData, StarkExProgramOutput } from '@explorer/encoding'
-import { PositionLeaf, RollupState } from '@explorer/state'
-import { Hash256, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import {
+  ForcedAction,
+  OnChainData,
+  OraclePrice,
+  StarkExProgramOutput,
+  State,
+} from '@explorer/encoding'
+import { PositionLeaf, RollupState, VaultLeaf } from '@explorer/state'
+import {
+  AssetId,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import { PerpetualRollupUpdater } from '../../src/core/PerpetualRollupUpdater'
@@ -110,8 +122,11 @@ describe(PerpetualRollupUpdater.name, () => {
           mockFn<
             [
               StateTransitionRecord,
-              StarkExProgramOutput,
-              { index: bigint; value: PositionLeaf }[]
+              PedersenHash,
+              ForcedAction[],
+              OraclePrice[],
+              { index: bigint; value: PositionLeaf }[],
+              { index: bigint; value: VaultLeaf }[]
             ]
           >()
         mockProcessStateTransition.returns(Promise.resolve())
@@ -122,12 +137,29 @@ describe(PerpetualRollupUpdater.name, () => {
           stateTransitionHash: Hash256.fake('123'),
           blockNumber: 1,
         }
-        const mockOnChainData = mock<OnChainData>()
+        const testForcedActions: ForcedAction[] = [
+          {
+            type: 'withdrawal',
+            starkKey: StarkKey.fake('876'),
+            positionId: 4n,
+            amount: 55n,
+          },
+        ]
+        const mockOnChainData = mock<OnChainData>({
+          newState: mock<State>({
+            positionRoot: PedersenHash.fake('987'),
+            oraclePrices: [{ assetId: AssetId('BTC-9'), price: 5n }],
+          }),
+          forcedActions: testForcedActions,
+        })
         await updater.processOnChainStateTransition(update, mockOnChainData)
         expect(mockProcessStateTransition).toHaveBeenCalledWith([
           update,
-          mockOnChainData,
+          PedersenHash.fake('987'),
+          testForcedActions,
+          [{ assetId: AssetId('BTC-9'), price: 5n }],
           updatedPositions,
+          [],
         ])
       })
     }
