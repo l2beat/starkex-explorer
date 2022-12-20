@@ -38,7 +38,7 @@ export class PerpetualValidiumSyncService {
     )
 
     this.logger.info({
-      method: 'validium sync',
+      method: 'perpetual validium sync',
       blockRange: { from: blockRange.start, to: blockRange.end },
       stateTransitions: stateTransitions.length,
       userRegistrations: userRegistrations.length,

@@ -33,7 +33,7 @@ export class PerpetualValidiumUpdater extends StateUpdater {
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected rollupState?: RollupState
+    protected state?: RollupState
   ) {
     super(
       stateUpdateRepository,
@@ -42,7 +42,7 @@ export class PerpetualValidiumUpdater extends StateUpdater {
       forcedTransactionsRepository,
       logger,
       ROLLUP_STATE_EMPTY_HASH,
-      rollupState
+      state
     )
   }
 

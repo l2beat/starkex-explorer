@@ -27,7 +27,7 @@ export class PerpetualRollupUpdater extends StateUpdater {
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected rollupState?: RollupState
+    protected state?: RollupState
   ) {
     super(
       stateUpdateRepository,
@@ -36,7 +36,7 @@ export class PerpetualRollupUpdater extends StateUpdater {
       forcedTransactionsRepository,
       logger,
       ROLLUP_STATE_EMPTY_HASH,
-      rollupState
+      state
     )
   }
 
@@ -74,12 +74,10 @@ export class PerpetualRollupUpdater extends StateUpdater {
     stateTransitionRecord: StateTransitionRecord,
     onChainData: OnChainData
   ) {
-    if (!this.rollupState) {
+    if (!this.state) {
       throw new Error('Rollup state not initialized')
     }
-    const newPositions = await this.rollupState.calculateUpdatedPositions(
-      onChainData
-    )
+    const newPositions = await this.state.calculateUpdatedPositions(onChainData)
     return this.processStateTransition(
       stateTransitionRecord,
       onChainData.newState.positionRoot,

@@ -2,7 +2,6 @@ import {
   ForcedAction,
   OnChainData,
   OraclePrice,
-  StarkExProgramOutput,
   State,
 } from '@explorer/encoding'
 import { PositionLeaf, RollupState, VaultLeaf } from '@explorer/state'

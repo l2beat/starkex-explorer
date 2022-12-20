@@ -10,6 +10,7 @@ import {
 } from './PositionRepository'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
+import { toVaultRow, VaultRecord } from './VaultRepository'
 
 export interface StateUpdateRecord {
   id: number
@@ -49,6 +50,7 @@ export class StateUpdateRepository extends BaseRepository {
     positions,
     prices,
     transactionHashes,
+    vaults, // TODO: add test coverage for vaults
   }: StateUpdateBundle) {
     const knex = await this.knex()
     await knex.transaction(async (trx) => {
@@ -57,6 +59,11 @@ export class StateUpdateRepository extends BaseRepository {
       if (positions.length > 0)
         await trx('positions').insert(
           positions.map((pos) => toPositionRow(pos, stateUpdate.id))
+        )
+
+      if (vaults && vaults.length > 0)
+        await trx('vaults').insert(
+          vaults.map((vault) => toVaultRow(vault, stateUpdate.id))
         )
 
       if (prices.length > 0)
@@ -186,6 +193,7 @@ export interface StateUpdateBundle {
   positions: PositionRecord[]
   prices: OraclePrice[]
   transactionHashes?: Hash256[]
+  vaults?: VaultRecord[]
 }
 
 function toStateUpdateRecord(row: StateUpdateRow): StateUpdateRecord {

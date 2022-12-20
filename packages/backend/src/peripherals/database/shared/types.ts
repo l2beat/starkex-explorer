@@ -1,4 +1,4 @@
-import { PositionLeaf } from '@explorer/state'
+import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { json } from '@explorer/types'
 
 import { Nullable } from '../../../utils/Nullable'
@@ -60,6 +60,11 @@ declare module 'knex/types/tables' {
     data: ReturnType<typeof PositionLeaf.prototype.toJSON>
   }
 
+  interface MerkleVaultRow {
+    hash: string
+    data: ReturnType<typeof VaultLeaf.prototype.toJSON>
+  }
+
   interface RollupParametersRow {
     root_hash: string
     timestamp: bigint
@@ -89,6 +94,14 @@ declare module 'knex/types/tables' {
     stark_key: string
     collateral_balance: bigint
     balances: JsonB<AssetBalanceJson[]>
+  }
+
+  interface VaultRow {
+    state_update_id: number
+    vault_id: bigint
+    stark_key: string
+    token: string
+    balance: bigint
   }
 
   interface AssetBalanceJson {
@@ -156,7 +169,7 @@ declare module 'knex/types/tables' {
     state_transitions: StateTransitionRow
     blocks: BlockRow
     merkle_nodes: MerkleNodeRow
-    merkle_positions: MerklePositionsRow
+    merkle_positions: MerklePositionsRow | MerkleVaultRow
     rollup_parameters: RollupParametersRow
     position_updates: PositionUpdateRow
     state_updates: StateUpdateRow
@@ -167,6 +180,7 @@ declare module 'knex/types/tables' {
     transaction_status: TransactionStatusRow
     user_registration_events: UserRegistrationEventRow
     forced_trade_offers: ForcedTradeOfferRow
+    vaults: VaultRow
   }
 }
 

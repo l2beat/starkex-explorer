@@ -1,4 +1,9 @@
-import { EthereumAddress, Hash256, PedersenHash, StarkKey } from '@explorer/types'
+import {
+  EthereumAddress,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+} from '@explorer/types'
 
 import { StarkExDexOutput } from '../OnChainData'
 import { ByteReader } from './ByteReader'
@@ -26,8 +31,9 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
   for (let i = 0; i < modificationCount; i++) {
     const starkKey = StarkKey(reader.readHex(32))
     const assetId = reader.readBigInt(32)
-    const difference = (reader.readBigInt(32) & ((1n << 64n) - 1n)) - (1n << 63n)
-    modifications.push({starkKey, assetId, difference})
+    const difference =
+      (reader.readBigInt(32) & ((1n << 64n) - 1n)) - (1n << 63n)
+    modifications.push({ starkKey, assetId, difference })
   }
 
   const conditionalTransfers = []
@@ -36,19 +42,22 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
   }
 
   const l1VaultUpdates = []
+  // TODO: This looks like a bug in the contract. It should be l1VaultUpdateCount.
   for (let i = 0; i < conditionalTransferCount; i++) {
     const address = EthereumAddress(reader.readHex(32))
     const assetId = reader.readBigInt(32)
-    const difference = (reader.readBigInt(32) & ((1n << 64n) - 1n)) - (1n << 63n)
-    l1VaultUpdates.push({address, assetId, difference})
+    const difference =
+      (reader.readBigInt(32) & ((1n << 64n) - 1n)) - (1n << 63n)
+    l1VaultUpdates.push({ address, assetId, difference })
   }
 
   const l1OrderMessages = []
+  // TODO: This looks like a bug in the contract. It should be l1OrderMessageCount.
   for (let i = 0; i < conditionalTransferCount; i++) {
     const sender = EthereumAddress(reader.readHex(32))
     const blobCount = reader.readNumber(32)
-    const orderHash = Hash256(reader.readHex(blobCount*32))
-    l1OrderMessages.push({sender, orderHash})
+    const orderHash = Hash256(reader.readHex(blobCount * 32))
+    l1OrderMessages.push({ sender, orderHash })
   }
 
   const onChainDataHash = Hash256(reader.readHex(32))

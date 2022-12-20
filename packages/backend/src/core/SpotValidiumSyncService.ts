@@ -27,23 +27,23 @@ export class SpotValidiumSyncService {
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
     )
-    const forcedEvents = await this.forcedEventsCollector.collect(blockRange)
-
-    const finalizeExitEvents = await this.finalizeExitEventsCollector.collect(
-      blockRange
-    )
+    // TODO: fix forced events
+    // const forcedEvents = await this.forcedEventsCollector.collect(blockRange)
+    // const finalizeExitEvents = await this.finalizeExitEventsCollector.collect(
+    //   blockRange
+    // )
 
     const stateTransitions = await this.stateTransitionCollector.collect(
       blockRange
     )
 
     this.logger.info({
-      method: 'validium sync',
+      method: 'spot validium sync',
       blockRange: { from: blockRange.start, to: blockRange.end },
       stateTransitions: stateTransitions.length,
       userRegistrations: userRegistrations.length,
-      forcedEvents,
-      finalizeExitEvents,
+      // forcedEvents,
+      // finalizeExitEvents,
     })
 
     for (const transition of stateTransitions) {

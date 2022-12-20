@@ -3,7 +3,7 @@ import { SpotState, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
-import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
+import { SpotStateRepository } from '../peripherals/database/SpotStateRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
@@ -25,11 +25,11 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
 export class SpotValidiumUpdater extends StateUpdater {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly spotStateRepository: RollupStateRepository,
+    protected readonly spotStateRepository: SpotStateRepository,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected spotState?: SpotState
+    protected state?: SpotState
   ) {
     super(
       stateUpdateRepository,
@@ -38,7 +38,7 @@ export class SpotValidiumUpdater extends StateUpdater {
       forcedTransactionsRepository,
       logger,
       ROLLUP_STATE_EMPTY_HASH,
-      spotState
+      state
     )
   }
 
@@ -48,7 +48,7 @@ export class SpotValidiumUpdater extends StateUpdater {
     batch: SpotBatch
   ) {
     const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureRollupState(oldHash, 31n)
+    await this.ensureSpotState(oldHash, 31n)
 
     const newVaults = this.buildNewVaultLeaves(batch)
 

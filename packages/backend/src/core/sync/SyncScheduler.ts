@@ -4,6 +4,7 @@ import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
 import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
 import { PerpetualValidiumSyncService } from '../PerpetualValidiumSyncService'
+import { SpotValidiumSyncService } from '../SpotValidiumSyncService'
 import { BlockDownloader } from './BlockDownloader'
 import {
   INITIAL_SYNC_STATE,
@@ -28,7 +29,8 @@ export class SyncScheduler {
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService:
       | PerpetualRollupSyncService
-      | PerpetualValidiumSyncService,
+      | PerpetualValidiumSyncService
+      | SpotValidiumSyncService,
     private readonly logger: Logger,
     opts: SyncSchedulerOptions
   ) {

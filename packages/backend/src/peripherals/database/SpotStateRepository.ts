@@ -1,8 +1,8 @@
 import {
-  IRollupStateStorage,
+  ISpotStateStorage,
   MerkleNode,
   NodeOrLeaf,
-  PositionLeaf,
+  VaultLeaf,
 } from '@explorer/state'
 import { PedersenHash } from '@explorer/types'
 import { partition } from 'lodash'
@@ -11,9 +11,9 @@ import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export class RollupStateRepository
+export class SpotStateRepository
   extends BaseRepository
-  implements IRollupStateStorage
+  implements ISpotStateStorage
 {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
@@ -27,10 +27,10 @@ export class RollupStateRepository
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async persist(values: NodeOrLeaf<PositionLeaf>[]): Promise<void> {
+  async persist(values: NodeOrLeaf<VaultLeaf>[]): Promise<void> {
     const [nodes, positions] = partition(
       values,
-      (x): x is MerkleNode<PositionLeaf> => x instanceof MerkleNode
+      (x): x is MerkleNode<VaultLeaf> => x instanceof MerkleNode
     )
 
     const [nodeRows, positionRows] = await Promise.all([
@@ -75,7 +75,7 @@ export class RollupStateRepository
     await Promise.all(queries)
   }
 
-  async recover(hash: PedersenHash): Promise<NodeOrLeaf<PositionLeaf>> {
+  async recover(hash: PedersenHash): Promise<NodeOrLeaf<VaultLeaf>> {
     const knex = await this.knex()
     const [node, position] = await Promise.all([
       knex('merkle_nodes')
@@ -94,8 +94,8 @@ export class RollupStateRepository
       )
     } else if (position) {
       // TODO: Fix this type cast
-      return PositionLeaf.fromJSON(
-        position.data as ReturnType<typeof PositionLeaf.prototype.toJSON>,
+      return VaultLeaf.fromJSON(
+        position.data as ReturnType<typeof VaultLeaf.prototype.toJSON>,
         PedersenHash(position.hash)
       )
     } else {

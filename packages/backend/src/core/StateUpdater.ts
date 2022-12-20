@@ -1,5 +1,7 @@
 import { ForcedAction, OraclePrice } from '@explorer/encoding'
 import {
+  IRollupStateStorage,
+  ISpotStateStorage,
   PositionLeaf,
   RollupState,
   SpotState,
@@ -10,6 +12,7 @@ import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
+import { SpotStateRepository } from '../peripherals/database/SpotStateRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
@@ -24,12 +27,14 @@ import { Logger } from '../tools/Logger'
 export class StateUpdater {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: RollupStateRepository,
+    protected readonly rollupStateRepository:
+      | RollupStateRepository
+      | SpotStateRepository,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
     protected readonly emptyStateHash: PedersenHash,
-    protected rollupState?: RollupState | SpotState
+    protected state?: RollupState | SpotState
   ) {}
 
   async processStateTransition(
@@ -40,17 +45,17 @@ export class StateUpdater {
     newPositionLeaves: { index: bigint; value: PositionLeaf }[],
     newVaultLeaves: { index: bigint; value: VaultLeaf }[]
   ) {
-    if (!this.rollupState) {
+    if (!this.state) {
       return
     }
 
-    if (this.rollupState instanceof RollupState) {
-      this.rollupState = await this.rollupState.update(newPositionLeaves)
+    if (this.state instanceof RollupState) {
+      this.state = await this.state.update(newPositionLeaves)
     } else {
-      this.rollupState = await this.rollupState.update(newVaultLeaves)
+      this.state = await this.state.update(newVaultLeaves)
     }
 
-    const rootHash = await this.rollupState.positionTree.hash()
+    const rootHash = await this.state.positionTree.hash()
     if (rootHash !== expectedPositionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
@@ -76,6 +81,12 @@ export class StateUpdater {
             collateralBalance: value.collateralBalance,
           })
         ),
+        vaults: newVaultLeaves.map(({ value, index }) => ({
+          vaultId: index,
+          starkKey: value.starkKey,
+          token: value.token,
+          balance: value.balance,
+        })),
         prices: oraclePrices,
         transactionHashes,
       }),
@@ -115,27 +126,52 @@ export class StateUpdater {
     return { oldHash: this.emptyStateHash, id: 0 }
   }
 
-  async ensureRollupState(oldHash: PedersenHash, height?: bigint) {
-    if (!this.rollupState) {
+  // TODO: there should be one method for both spot and rollup states
+  async ensureSpotState(oldHash: PedersenHash, height: bigint) {
+    if (!this.state) {
       if (oldHash === this.emptyStateHash) {
-        this.rollupState = await RollupState.empty(
-          this.rollupStateRepository,
+        this.state = await SpotState.empty(
+          this.rollupStateRepository as ISpotStateStorage,
           height
         )
       } else {
-        this.rollupState = RollupState.recover(
-          this.rollupStateRepository,
+        this.state = SpotState.recover(
+          this.rollupStateRepository as ISpotStateStorage,
           oldHash,
           height
         )
       }
-    } else if ((await this.rollupState.positionTree.hash()) !== oldHash) {
-      this.rollupState = RollupState.recover(
-        this.rollupStateRepository,
+    } else if ((await this.state.positionTree.hash()) !== oldHash) {
+      this.state = SpotState.recover(
+        this.rollupStateRepository as ISpotStateStorage,
         oldHash,
         height
       )
     }
-    return this.rollupState
+    return this.state
+  }
+
+  async ensureRollupState(oldHash: PedersenHash, height?: bigint) {
+    if (!this.state) {
+      if (oldHash === this.emptyStateHash) {
+        this.state = await RollupState.empty(
+          this.rollupStateRepository as IRollupStateStorage,
+          height
+        )
+      } else {
+        this.state = RollupState.recover(
+          this.rollupStateRepository as IRollupStateStorage,
+          oldHash,
+          height
+        )
+      }
+    } else if ((await this.state.positionTree.hash()) !== oldHash) {
+      this.state = RollupState.recover(
+        this.rollupStateRepository as IRollupStateStorage,
+        oldHash,
+        height
+      )
+    }
+    return this.state
   }
 }
