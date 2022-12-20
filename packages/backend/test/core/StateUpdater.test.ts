@@ -1,3 +1,5 @@
+import { Block } from '@ethersproject/providers'
+import { MerkleTree, PositionLeaf, RollupState } from '@explorer/state'
 import { AssetId, Hash256, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
@@ -7,6 +9,7 @@ import type { RollupStateRepository } from '../../src/peripherals/database/Rollu
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { Logger } from '../../src/tools/Logger'
+import { decodedFakePages } from '../fakes'
 import { mock } from '../mock'
 
 const EMPTY_STATE_HASH = PedersenHash(
@@ -153,6 +156,43 @@ describe(StateUpdater.name, () => {
       ).toBeRejected(
         'Forced action included in state update does not have a matching mined transaction'
       )
+    })
+  })
+
+  describe(StateUpdater.prototype.processStateTransition.name, () => {
+    it('throws if calculated root hash does not match the one from verifier', async () => {
+      const stateUpdater = new StateUpdater(
+        mock<StateUpdateRepository>(),
+        mock<RollupStateRepository>(),
+        mock<EthereumClient>({
+          getBlock: async () => {
+            return { timestamp: 1 } as unknown as Block
+          },
+        }),
+        mock<ForcedTransactionsRepository>(),
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        mock<RollupState>({
+          update: async () =>
+            ({
+              positionTree: mock<MerkleTree<PositionLeaf>>({
+                hash: async () => PedersenHash.fake('1234'),
+              }),
+            } as unknown as RollupState),
+        })
+      )
+
+      await expect(
+        stateUpdater.processStateTransition(
+          {
+            id: 1,
+            stateTransitionHash: Hash256.fake('123'),
+            blockNumber: 1,
+          },
+          decodedFakePages,
+          []
+        )
+      ).toBeRejected('State transition calculated incorrectly')
     })
   })
 })

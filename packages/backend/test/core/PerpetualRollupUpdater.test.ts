@@ -1,16 +1,16 @@
-import { Block } from '@ethersproject/providers'
-import { MerkleTree, PositionLeaf, RollupState } from '@explorer/state'
-import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { expect } from 'earljs'
+import { OnChainData, StarkExProgramOutput } from '@explorer/encoding'
+import { PositionLeaf, RollupState } from '@explorer/state'
+import { Hash256, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import { expect, mockFn } from 'earljs'
 
 import { PerpetualRollupUpdater } from '../../src/core/PerpetualRollupUpdater'
 import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
-import type { PageRepository } from '../../src/peripherals/database/PageRepository'
+import { PageRepository } from '../../src/peripherals/database/PageRepository'
 import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
+import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { Logger } from '../../src/tools/Logger'
-import { decodedFakePages } from '../fakes'
 import { mock } from '../mock'
 
 describe(PerpetualRollupUpdater.name, () => {
@@ -83,41 +83,52 @@ describe(PerpetualRollupUpdater.name, () => {
   describe(
     PerpetualRollupUpdater.prototype.processOnChainStateTransition.name,
     () => {
-      it('throws if calculated root hash does not match the one from verifier', async () => {
-        const collector = new PerpetualRollupUpdater(
+      it('calls processStateTransition with updated positions', async () => {
+        const updatedPositions = [
+          {
+            index: 5n,
+            value: mock<PositionLeaf>({
+              assets: [],
+              collateralBalance: 555n,
+              starkKey: StarkKey.fake(),
+            }),
+          },
+        ]
+        const updater = new PerpetualRollupUpdater(
           mock<PageRepository>(),
           mock<StateUpdateRepository>(),
           mock<RollupStateRepository>(),
-          mock<EthereumClient>({
-            getBlock: async () => {
-              return { timestamp: 1 } as unknown as Block
-            },
-          }),
+          mock<EthereumClient>(),
           mock<ForcedTransactionsRepository>(),
           Logger.SILENT,
           mock<RollupState>({
-            calculateUpdatedPositions: async () => [
-              { index: 1n, value: mock<PositionLeaf>() },
-            ],
-            update: async () =>
-              ({
-                positionTree: mock<MerkleTree<PositionLeaf>>({
-                  hash: async () => PedersenHash.fake('1234'),
-                }),
-              } as unknown as RollupState),
+            calculateUpdatedPositions: async () => updatedPositions,
           })
         )
 
-        await expect(
-          collector.processOnChainStateTransition(
-            {
-              id: 1,
-              stateTransitionHash: Hash256.fake('123'),
-              blockNumber: 1,
-            },
-            decodedFakePages
-          )
-        ).toBeRejected('State transition calculated incorrectly')
+        const mockProcessStateTransition =
+          mockFn<
+            [
+              StateTransitionRecord,
+              StarkExProgramOutput,
+              { index: bigint; value: PositionLeaf }[]
+            ]
+          >()
+        mockProcessStateTransition.returns(Promise.resolve())
+        updater.processStateTransition = mockProcessStateTransition
+
+        const update = {
+          id: 1,
+          stateTransitionHash: Hash256.fake('123'),
+          blockNumber: 1,
+        }
+        const mockOnChainData = mock<OnChainData>()
+        await updater.processOnChainStateTransition(update, mockOnChainData)
+        expect(mockProcessStateTransition).toHaveBeenCalledWith([
+          update,
+          mockOnChainData,
+          updatedPositions,
+        ])
       })
     }
   )
