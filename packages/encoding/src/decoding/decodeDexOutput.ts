@@ -5,7 +5,12 @@ import {
   StarkKey,
 } from '@explorer/types'
 
-import { OrderMessage, SpotModification, StarkExDexOutput, VaultUpdate } from '../OnChainData'
+import {
+  OrderMessage,
+  SpotModification,
+  StarkExDexOutput,
+  VaultUpdate,
+} from '../OnChainData'
 import { ByteReader } from './ByteReader'
 
 export function decodeDexOutput(data: string): StarkExDexOutput {
