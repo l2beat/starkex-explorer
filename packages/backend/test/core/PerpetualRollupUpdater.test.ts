@@ -4,7 +4,7 @@ import {
   OraclePrice,
   State,
 } from '@explorer/encoding'
-import { PositionLeaf, RollupState, VaultLeaf } from '@explorer/state'
+import { PositionLeaf, RollupState } from '@explorer/state'
 import {
   AssetId,
   Hash256,
@@ -33,7 +33,7 @@ describe(PerpetualRollupUpdater.name, () => {
       const stateUpdater = new PerpetualRollupUpdater(
         pageRepository,
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository>(),
+        mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionsRepository>(),
         Logger.SILENT
@@ -64,7 +64,7 @@ describe(PerpetualRollupUpdater.name, () => {
       const stateUpdater = new PerpetualRollupUpdater(
         pageRepository,
         stateUpdateRepository,
-        mock<RollupStateRepository>(),
+        mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionsRepository>(),
         Logger.SILENT
@@ -108,11 +108,11 @@ describe(PerpetualRollupUpdater.name, () => {
         const updater = new PerpetualRollupUpdater(
           mock<PageRepository>(),
           mock<StateUpdateRepository>(),
-          mock<RollupStateRepository>(),
+          mock<RollupStateRepository<PositionLeaf>>(),
           mock<EthereumClient>(),
           mock<ForcedTransactionsRepository>(),
           Logger.SILENT,
-          mock<RollupState>({
+          mock<RollupState<PositionLeaf>>({
             calculateUpdatedPositions: async () => updatedPositions,
           })
         )
@@ -124,8 +124,7 @@ describe(PerpetualRollupUpdater.name, () => {
               PedersenHash,
               ForcedAction[],
               OraclePrice[],
-              { index: bigint; value: PositionLeaf }[],
-              { index: bigint; value: VaultLeaf }[]
+              { index: bigint; value: PositionLeaf }[]
             ]
           >()
         mockProcessStateTransition.returns(Promise.resolve())
@@ -158,7 +157,6 @@ describe(PerpetualRollupUpdater.name, () => {
           testForcedActions,
           [{ assetId: AssetId('BTC-9'), price: 5n }],
           updatedPositions,
-          [],
         ])
       })
     }

@@ -40,7 +40,7 @@ export class VaultLeaf extends MerkleValue {
     }
   }
 
-  static fromJSON(
+  fromJSON(
     data: ReturnType<typeof VaultLeaf.prototype.toJSON>,
     knownHash?: PedersenHash
   ) {

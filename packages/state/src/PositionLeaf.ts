@@ -50,7 +50,7 @@ export class PositionLeaf extends MerkleValue {
     }
   }
 
-  static fromJSON(
+  public fromJSON(
     data: ReturnType<typeof PositionLeaf.prototype.toJSON>,
     knownHash?: PedersenHash
   ) {

@@ -8,7 +8,11 @@ import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(RollupStateRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
-  const repository = new RollupStateRepository(database, Logger.SILENT)
+  const repository = new RollupStateRepository(
+    database,
+    Logger.SILENT,
+    PositionLeaf.EMPTY
+  )
 
   afterEach(() => repository.deleteAll())
 

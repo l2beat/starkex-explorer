@@ -5,10 +5,11 @@ import { zip } from 'lodash'
 import { NodeOrLeaf } from './MerkleNode'
 import { MerkleTree } from './MerkleTree'
 import { PositionLeaf } from './PositionLeaf'
+import { VaultLeaf } from './VaultLeaf'
 
-export interface IRollupStateStorage {
-  recover(hash: PedersenHash): Promise<NodeOrLeaf<PositionLeaf>>
-  persist(values: NodeOrLeaf<PositionLeaf>[]): Promise<void>
+export interface IRollupStateStorage<T extends PositionLeaf | VaultLeaf> {
+  recover(hash: PedersenHash): Promise<NodeOrLeaf<T>>
+  persist(values: NodeOrLeaf<T>[]): Promise<void>
 }
 
 export type OnChainUpdate = Pick<
@@ -18,25 +19,34 @@ export type OnChainUpdate = Pick<
 
 export type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
 
-export class RollupState {
+export class RollupState<T extends PositionLeaf | VaultLeaf> {
   constructor(
-    private readonly storage: IRollupStateStorage,
-    public readonly positionTree: MerkleTree<PositionLeaf>
+    private readonly storage: IRollupStateStorage<T>,
+    public readonly stateTree: MerkleTree<T>
   ) {}
 
-  static recover(
-    storage: IRollupStateStorage,
+  static recover<T extends PositionLeaf | VaultLeaf>(
+    storage: IRollupStateStorage<T>,
     rootHash: PedersenHash,
     height = 64n
   ) {
     return new RollupState(storage, new MerkleTree(storage, height, rootHash))
   }
 
-  static async empty(storage: IRollupStateStorage, height = 64n) {
+  static async empty<T extends PositionLeaf | VaultLeaf>(
+    storage: IRollupStateStorage<T>,
+    height: bigint,
+    emptyLeaf: T
+  ) {
     return new RollupState(
       storage,
-      await MerkleTree.create(storage, height, PositionLeaf.EMPTY)
+      await MerkleTree.create(storage, height, emptyLeaf)
     )
+  }
+
+  async update(newPositions: { index: bigint; value: T }[]) {
+    const positions = await this.stateTree.update(newPositions)
+    return new RollupState(this.storage, positions)
   }
 
   async calculateUpdatedPositions(
@@ -45,7 +55,10 @@ export class RollupState {
     const fundingByTimestamp = this.getFundingByTimestamp(onChainData)
     const updatedPositionIds = onChainData.positions.map((x) => x.positionId)
 
-    const oldPositions = await this.positionTree.getLeaves(updatedPositionIds)
+    // TODO: fix
+    const tree = this.stateTree as MerkleTree<PositionLeaf>
+    // const oldPositions = await this.positionTree.getLeaves(updatedPositionIds)
+    const oldPositions = await tree.getLeaves(updatedPositionIds)
     const newPositions = zip(oldPositions, onChainData.positions).map(
       ([oldPosition, update]) => {
         if (!oldPosition || !update) {
@@ -103,11 +116,6 @@ export class RollupState {
       }
     )
     return newPositions
-  }
-
-  async update(newPositions: { index: bigint; value: PositionLeaf }[]) {
-    const positions = await this.positionTree.update(newPositions)
-    return new RollupState(this.storage, positions)
   }
 
   private getFundingByTimestamp(

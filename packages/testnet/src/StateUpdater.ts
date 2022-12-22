@@ -31,7 +31,7 @@ export interface UpdateData {
 }
 
 export class StateUpdater {
-  rollup?: RollupState
+  rollup?: RollupState<PositionLeaf>
   lastState: State = {
     indices: [],
     oraclePrices: [],
@@ -47,8 +47,8 @@ export class StateUpdater {
 
   async init() {
     const storage = new InMemoryMerkleStorage<PositionLeaf>()
-    this.rollup = await RollupState.empty(storage)
-    this.lastState.positionRoot = await this.rollup.positionTree.hash()
+    this.rollup = await RollupState.empty(storage, 64n, PositionLeaf.EMPTY)
+    this.lastState.positionRoot = await this.rollup.stateTree.hash()
   }
 
   async registerUser(address: EthereumAddress, starkKey: StarkKey) {
@@ -71,7 +71,7 @@ export class StateUpdater {
     })
     const nextRollup = await this.rollup.update(newPositions)
     this.rollup = nextRollup
-    const afterRoot = await this.rollup.positionTree.hash()
+    const afterRoot = await this.rollup.stateTree.hash()
 
     const oldState = this.lastState
     const newState: State = {

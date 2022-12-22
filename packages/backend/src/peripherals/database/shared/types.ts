@@ -57,12 +57,9 @@ declare module 'knex/types/tables' {
 
   interface MerklePositionsRow {
     hash: string
-    data: ReturnType<typeof PositionLeaf.prototype.toJSON>
-  }
-
-  interface MerkleVaultRow {
-    hash: string
-    data: ReturnType<typeof VaultLeaf.prototype.toJSON>
+    data:
+      | ReturnType<typeof PositionLeaf.prototype.toJSON>
+      | ReturnType<typeof VaultLeaf.prototype.toJSON>
   }
 
   interface RollupParametersRow {
@@ -169,7 +166,7 @@ declare module 'knex/types/tables' {
     state_transitions: StateTransitionRow
     blocks: BlockRow
     merkle_nodes: MerkleNodeRow
-    merkle_positions: MerklePositionsRow | MerkleVaultRow
+    merkle_positions: MerklePositionsRow
     rollup_parameters: RollupParametersRow
     position_updates: PositionUpdateRow
     state_updates: StateUpdateRow

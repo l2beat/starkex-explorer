@@ -26,14 +26,16 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
   '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
 )
 
-export class PerpetualValidiumUpdater extends StateUpdater {
+const positionTreeHeight = 64n
+
+export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: RollupStateRepository,
+    protected readonly rollupStateRepository: RollupStateRepository<PositionLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected state?: RollupState
+    protected state?: RollupState<PositionLeaf>
   ) {
     super(
       stateUpdateRepository,
@@ -42,6 +44,7 @@ export class PerpetualValidiumUpdater extends StateUpdater {
       forcedTransactionsRepository,
       logger,
       ROLLUP_STATE_EMPTY_HASH,
+      PositionLeaf.EMPTY,
       state
     )
   }
@@ -52,7 +55,7 @@ export class PerpetualValidiumUpdater extends StateUpdater {
     batch: PerpetualBatch
   ) {
     const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureRollupState(oldHash)
+    await this.ensureState(oldHash, positionTreeHeight)
 
     const newPositions = this.buildNewPositionLeaves(batch)
 
@@ -65,8 +68,7 @@ export class PerpetualValidiumUpdater extends StateUpdater {
       programOutput.newState.positionRoot,
       programOutput.forcedActions,
       programOutput.newState.oraclePrices,
-      newPositions,
-      []
+      newPositions
     )
   }
 

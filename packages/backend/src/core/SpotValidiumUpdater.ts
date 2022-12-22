@@ -1,9 +1,9 @@
 import { StarkExDexOutput } from '@explorer/encoding'
-import { SpotState, VaultLeaf } from '@explorer/state'
+import { RollupState, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
-import { SpotStateRepository } from '../peripherals/database/SpotStateRepository'
+import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
@@ -18,18 +18,20 @@ export interface ValidiumStateTransition {
   batchId: number
 }
 
-export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
+export const EMPTY_STATE_HASH = PedersenHash(
   '0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c'
 )
 
-export class SpotValidiumUpdater extends StateUpdater {
+const vaultTreeHeight = 31n
+
+export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly spotStateRepository: SpotStateRepository,
+    protected readonly spotStateRepository: RollupStateRepository<VaultLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected state?: SpotState
+    protected state?: RollupState<VaultLeaf>
   ) {
     super(
       stateUpdateRepository,
@@ -37,7 +39,8 @@ export class SpotValidiumUpdater extends StateUpdater {
       ethereumClient,
       forcedTransactionsRepository,
       logger,
-      ROLLUP_STATE_EMPTY_HASH,
+      EMPTY_STATE_HASH,
+      VaultLeaf.EMPTY,
       state
     )
   }
@@ -48,7 +51,7 @@ export class SpotValidiumUpdater extends StateUpdater {
     batch: SpotBatch
   ) {
     const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureSpotState(oldHash, 31n)
+    await this.ensureState(oldHash, vaultTreeHeight)
 
     const newVaults = this.buildNewVaultLeaves(batch)
 
@@ -60,8 +63,7 @@ export class SpotValidiumUpdater extends StateUpdater {
       },
       dexOutput.finalValidiumVaultRoot,
       [], // TODO: add forced actions,
-      [],
-      [],
+      [], // There are no oracle prices for Spot
       newVaults
     )
   }
