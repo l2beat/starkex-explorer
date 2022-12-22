@@ -5,7 +5,7 @@ import {
   StarkKey,
 } from '@explorer/types'
 
-import { StarkExDexOutput } from '../OnChainData'
+import { OrderMessage, SpotModification, StarkExDexOutput, VaultUpdate } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 
 export function decodeDexOutput(data: string): StarkExDexOutput {
@@ -27,7 +27,7 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
   const l1VaultUpdateCount = reader.readNumber(32)
   const l1OrderMessageCount = reader.readNumber(32)
 
-  const modifications = []
+  const modifications: SpotModification[] = []
   for (let i = 0; i < modificationCount; i++) {
     const starkKey = StarkKey(reader.readHex(32))
     const assetId = reader.readBigInt(32)
@@ -36,14 +36,13 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
     modifications.push({ starkKey, assetId, difference })
   }
 
-  const conditionalTransfers = []
+  const conditionalTransfers: Hash256[] = []
   for (let i = 0; i < conditionalTransferCount; i++) {
     conditionalTransfers.push(Hash256(reader.readHex(32)))
   }
 
-  const l1VaultUpdates = []
-  // TODO: This looks like a bug in the contract. It should be l1VaultUpdateCount.
-  for (let i = 0; i < conditionalTransferCount; i++) {
+  const l1VaultUpdates: VaultUpdate[] = []
+  for (let i = 0; i < l1VaultUpdateCount; i++) {
     const address = EthereumAddress(reader.readHex(32))
     const assetId = reader.readBigInt(32)
     const difference =
@@ -51,9 +50,8 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
     l1VaultUpdates.push({ address, assetId, difference })
   }
 
-  const l1OrderMessages = []
-  // TODO: This looks like a bug in the contract. It should be l1OrderMessageCount.
-  for (let i = 0; i < conditionalTransferCount; i++) {
+  const l1OrderMessages: OrderMessage[] = []
+  for (let i = 0; i < l1OrderMessageCount; i++) {
     const sender = EthereumAddress(reader.readHex(32))
     const blobCount = reader.readNumber(32)
     const orderHash = Hash256(reader.readHex(blobCount * 32))
@@ -77,10 +75,10 @@ export function decodeDexOutput(data: string): StarkExDexOutput {
     validiumVaultTreeHeight,
     rollupVaultTreeHeight,
     orderTreeHeight,
-    modificationCount,
-    conditionalTransferCount,
-    l1VaultUpdateCount,
-    l1OrderMessageCount,
+    modifications,
+    conditionalTransfers,
+    l1VaultUpdates,
+    l1OrderMessages,
     onChainDataHash,
     onChainDataSize,
   }

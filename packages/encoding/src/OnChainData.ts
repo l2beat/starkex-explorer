@@ -1,5 +1,6 @@
 import {
   AssetId,
+  EthereumAddress,
   Hash256,
   PedersenHash,
   StarkKey,
@@ -31,12 +32,18 @@ export interface StarkExDexOutput {
   validiumVaultTreeHeight: number
   rollupVaultTreeHeight: number
   orderTreeHeight: number
-  modificationCount: number
-  conditionalTransferCount: number
-  l1VaultUpdateCount: number
-  l1OrderMessageCount: number
+  modifications: SpotModification[]
+  conditionalTransfers: Hash256[]
+  l1VaultUpdates: VaultUpdate[]
+  l1OrderMessages: OrderMessage[]
   onChainDataHash: Hash256
   onChainDataSize: bigint
+}
+
+export interface SpotModification {
+  starkKey: StarkKey
+  assetId: bigint
+  difference: bigint
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
@@ -122,6 +129,17 @@ export interface PositionUpdate {
   collateralBalance: bigint
   fundingTimestamp: Timestamp
   balances: AssetBalance[]
+}
+
+export interface VaultUpdate {
+  address: EthereumAddress
+  assetId: bigint
+  difference: bigint
+}
+
+export interface OrderMessage {
+  sender: EthereumAddress
+  orderHash: Hash256
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/position/serialize_change.cairo#L8-L18
