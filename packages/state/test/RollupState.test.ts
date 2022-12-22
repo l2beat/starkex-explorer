@@ -2,7 +2,7 @@ import { State } from '@explorer/encoding'
 import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { PositionLeaf } from '../src'
+import { PositionLeaf, VaultLeaf } from '../src'
 import { InMemoryMerkleStorage } from '../src/InMemoryMerkleStorage'
 import { RollupState } from '../src/RollupState'
 
@@ -19,12 +19,22 @@ const emptyState: State = {
 
 describe(RollupState.name, () => {
   describe(RollupState.empty.name, () => {
-    it('has a specific root hash', async () => {
+    it('has a specific root hash for height 64 and position leaf', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
-      const empty = await RollupState.empty(storage)
-      expect(await empty.positionTree.hash()).toEqual(
+      const empty = await RollupState.empty(storage, 64n, PositionLeaf.EMPTY)
+      expect(await empty.stateTree.hash()).toEqual(
         PedersenHash(
           '052ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
+        )
+      )
+    })
+
+    it('has a specific root hash', async () => {
+      const storage = new InMemoryMerkleStorage<VaultLeaf>()
+      const empty = await RollupState.empty(storage, 31n, VaultLeaf.EMPTY)
+      expect(await empty.stateTree.hash()).toEqual(
+        PedersenHash(
+          '0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c'
         )
       )
     })
@@ -33,7 +43,7 @@ describe(RollupState.name, () => {
   describe(RollupState.prototype.update.name, () => {
     it('can update a single position', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
-      let rollup = await RollupState.empty(storage, 3n)
+      let rollup = await RollupState.empty(storage, 3n, PositionLeaf.EMPTY)
 
       const newPositions = await rollup.calculateUpdatedPositions({
         oldState: emptyState,
@@ -50,7 +60,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const updated = await rollup.positionTree.getLeaf(5n)
+      const updated = await rollup.stateTree.getLeaf(5n)
       const data = updated.getData()
       expect(data).toEqual({
         starkKey: StarkKey.fake('5'),
@@ -72,7 +82,7 @@ describe(RollupState.name, () => {
 
     it('can update a single position with assets', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
-      let rollup = await RollupState.empty(storage, 3n)
+      let rollup = await RollupState.empty(storage, 3n, PositionLeaf.EMPTY)
       const newPositions = await rollup.calculateUpdatedPositions({
         oldState: emptyState,
         funding: [
@@ -99,7 +109,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const updated = await rollup.positionTree.getLeaf(5n)
+      const updated = await rollup.stateTree.getLeaf(5n)
       expect(updated.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
@@ -112,7 +122,7 @@ describe(RollupState.name, () => {
 
     it('can update a multiple positions with assets', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
-      let rollup = await RollupState.empty(storage, 3n)
+      let rollup = await RollupState.empty(storage, 3n, PositionLeaf.EMPTY)
       const newPositions = await rollup.calculateUpdatedPositions({
         oldState: emptyState,
         funding: [
@@ -166,11 +176,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const [five, six, seven] = await rollup.positionTree.getLeaves([
-        5n,
-        6n,
-        7n,
-      ])
+      const [five, six, seven] = await rollup.stateTree.getLeaves([5n, 6n, 7n])
       expect(five?.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
@@ -199,7 +205,7 @@ describe(RollupState.name, () => {
 
     it('reads funding data from ProgramOutput.oldState', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
-      let rollup = await RollupState.empty(storage, 3n)
+      let rollup = await RollupState.empty(storage, 3n, PositionLeaf.EMPTY)
 
       const newPositions = await rollup.calculateUpdatedPositions({
         oldState: {
@@ -226,7 +232,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const position = await rollup.positionTree.getLeaf(5n)
+      const position = await rollup.stateTree.getLeaf(5n)
       expect(position.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
@@ -239,7 +245,7 @@ describe(RollupState.name, () => {
 
     it('correctly handles asset updates', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
-      let rollup = await RollupState.empty(storage, 3n)
+      let rollup = await RollupState.empty(storage, 3n, PositionLeaf.EMPTY)
 
       let newPositions = await rollup.calculateUpdatedPositions({
         oldState: emptyState,
@@ -298,7 +304,7 @@ describe(RollupState.name, () => {
       })
       rollup = await rollup.update(newPositions)
 
-      const updated = await rollup.positionTree.getLeaf(5n)
+      const updated = await rollup.stateTree.getLeaf(5n)
       expect(updated.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,
@@ -312,7 +318,7 @@ describe(RollupState.name, () => {
 
     it('fails for missing funding', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
-      const rollup = await RollupState.empty(storage, 3n)
+      const rollup = await RollupState.empty(storage, 3n, PositionLeaf.EMPTY)
 
       await expect(
         rollup.calculateUpdatedPositions({
@@ -356,7 +362,7 @@ describe(RollupState.name, () => {
   describe(RollupState.recover.name, () => {
     it('recovers positions and indices', async () => {
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
-      let rollup = await RollupState.empty(storage, 3n)
+      let rollup = await RollupState.empty(storage, 3n, PositionLeaf.EMPTY)
       const newPositions = await rollup.calculateUpdatedPositions({
         oldState: emptyState,
         funding: [
@@ -385,11 +391,11 @@ describe(RollupState.name, () => {
 
       const recovered = RollupState.recover(
         storage,
-        await rollup.positionTree.hash(),
+        await rollup.stateTree.hash(),
         3n
       )
 
-      const position = await recovered.positionTree.getLeaf(5n)
+      const position = await recovered.stateTree.getLeaf(5n)
       expect(position.getData()).toEqual({
         starkKey: StarkKey.fake('5'),
         collateralBalance: 555n,

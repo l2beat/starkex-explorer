@@ -1,40 +1,26 @@
 import { ForcedAction, OraclePrice } from '@explorer/encoding'
-import {
-  IRollupStateStorage,
-  ISpotStateStorage,
-  PositionLeaf,
-  RollupState,
-  SpotState,
-  VaultLeaf,
-} from '@explorer/state'
+import { PositionLeaf, RollupState, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
-import { SpotStateRepository } from '../peripherals/database/SpotStateRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 
-/**
- * @internal
- * Same as `await RollupState.empty().then(empty => empty.positions.hash())`
- */
-
-export class StateUpdater {
+export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository:
-      | RollupStateRepository
-      | SpotStateRepository,
+    protected readonly rollupStateRepository: RollupStateRepository<T>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
     protected readonly emptyStateHash: PedersenHash,
-    protected state?: RollupState | SpotState
+    protected readonly emptyLeaf: T,
+    protected state?: RollupState<T>
   ) {}
 
   async processStateTransition(
@@ -42,20 +28,15 @@ export class StateUpdater {
     expectedPositionRoot: PedersenHash,
     forcedActions: ForcedAction[],
     oraclePrices: OraclePrice[],
-    newPositionLeaves: { index: bigint; value: PositionLeaf }[],
-    newVaultLeaves: { index: bigint; value: VaultLeaf }[]
+    newLeaves: { index: bigint; value: T }[]
   ) {
     if (!this.state) {
       return
     }
 
-    if (this.state instanceof RollupState) {
-      this.state = await this.state.update(newPositionLeaves)
-    } else {
-      this.state = await this.state.update(newVaultLeaves)
-    }
+    this.state = await this.state.update(newLeaves)
 
-    const rootHash = await this.state.positionTree.hash()
+    const rootHash = await this.state.stateTree.hash()
     if (rootHash !== expectedPositionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
@@ -73,25 +54,44 @@ export class StateUpdater {
           rootHash,
           timestamp,
         },
-        positions: newPositionLeaves.map(
-          ({ value, index }): PositionRecord => ({
-            positionId: index,
-            starkKey: value.starkKey,
-            balances: value.assets,
-            collateralBalance: value.collateralBalance,
-          })
-        ),
-        vaults: newVaultLeaves.map(({ value, index }) => ({
-          vaultId: index,
-          starkKey: value.starkKey,
-          token: value.token,
-          balance: value.balance,
-        })),
+        positions: this.getPositionUpdates(newLeaves),
+        vaults: this.getVaultUpdates(newLeaves),
         prices: oraclePrices,
         transactionHashes,
       }),
     ])
     this.logger.info('State updated', { id, blockNumber })
+  }
+
+  getPositionUpdates(newLeaves: { index: bigint; value: T }[]) {
+    if (!(this.emptyLeaf instanceof PositionLeaf)) {
+      return []
+    }
+    const newPositionLeaves = newLeaves as {
+      index: bigint
+      value: PositionLeaf
+    }[]
+    return newPositionLeaves.map(
+      ({ value, index }): PositionRecord => ({
+        positionId: index,
+        starkKey: value.starkKey,
+        balances: value.assets,
+        collateralBalance: value.collateralBalance,
+      })
+    )
+  }
+
+  getVaultUpdates(newLeaves: { index: bigint; value: T }[]) {
+    if (!(this.emptyLeaf instanceof VaultLeaf)) {
+      return []
+    }
+    const newVaultLeaves = newLeaves as { index: bigint; value: VaultLeaf }[]
+    return newVaultLeaves.map(({ value, index }) => ({
+      vaultId: index,
+      starkKey: value.starkKey,
+      token: value.token,
+      balance: value.balance,
+    }))
   }
 
   async extractTransactionHashes(
@@ -126,48 +126,24 @@ export class StateUpdater {
     return { oldHash: this.emptyStateHash, id: 0 }
   }
 
-  // TODO: there should be one method for both spot and rollup states
-  async ensureSpotState(oldHash: PedersenHash, height: bigint) {
-    if (!this.state) {
-      if (oldHash === this.emptyStateHash) {
-        this.state = await SpotState.empty(
-          this.rollupStateRepository as ISpotStateStorage,
-          height
-        )
-      } else {
-        this.state = SpotState.recover(
-          this.rollupStateRepository as ISpotStateStorage,
-          oldHash,
-          height
-        )
-      }
-    } else if ((await this.state.positionTree.hash()) !== oldHash) {
-      this.state = SpotState.recover(
-        this.rollupStateRepository as ISpotStateStorage,
-        oldHash,
-        height
-      )
-    }
-    return this.state
-  }
-
-  async ensureRollupState(oldHash: PedersenHash, height?: bigint) {
+  async ensureState(oldHash: PedersenHash, height: bigint) {
     if (!this.state) {
       if (oldHash === this.emptyStateHash) {
         this.state = await RollupState.empty(
-          this.rollupStateRepository as IRollupStateStorage,
-          height
+          this.rollupStateRepository,
+          height,
+          this.emptyLeaf
         )
       } else {
         this.state = RollupState.recover(
-          this.rollupStateRepository as IRollupStateStorage,
+          this.rollupStateRepository,
           oldHash,
           height
         )
       }
-    } else if ((await this.state.positionTree.hash()) !== oldHash) {
+    } else if ((await this.state.stateTree.hash()) !== oldHash) {
       this.state = RollupState.recover(
-        this.rollupStateRepository as IRollupStateStorage,
+        this.rollupStateRepository,
         oldHash,
         height
       )

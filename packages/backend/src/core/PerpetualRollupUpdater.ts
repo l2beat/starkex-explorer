@@ -1,5 +1,5 @@
 import { OnChainData } from '@explorer/encoding'
-import { RollupState } from '@explorer/state'
+import { PositionLeaf, RollupState } from '@explorer/state'
 import { PedersenHash } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
@@ -19,15 +19,17 @@ export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
   '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
 )
 
-export class PerpetualRollupUpdater extends StateUpdater {
+const positionTreeHeight = 64n
+
+export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
   constructor(
     private readonly pageRepository: PageRepository,
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: RollupStateRepository,
+    protected readonly rollupStateRepository: RollupStateRepository<PositionLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected state?: RollupState
+    protected state?: RollupState<PositionLeaf>
   ) {
     super(
       stateUpdateRepository,
@@ -36,6 +38,7 @@ export class PerpetualRollupUpdater extends StateUpdater {
       forcedTransactionsRepository,
       logger,
       ROLLUP_STATE_EMPTY_HASH,
+      PositionLeaf.EMPTY,
       state
     )
   }
@@ -62,7 +65,7 @@ export class PerpetualRollupUpdater extends StateUpdater {
     }
 
     const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureRollupState(oldHash)
+    await this.ensureState(oldHash, positionTreeHeight)
 
     return stateTransitionsWithPages.map((transition, i) => ({
       id: id + i + 1,
@@ -83,8 +86,7 @@ export class PerpetualRollupUpdater extends StateUpdater {
       onChainData.newState.positionRoot,
       onChainData.forcedActions,
       onChainData.newState.oraclePrices,
-      newPositions,
-      []
+      newPositions
     )
   }
 }

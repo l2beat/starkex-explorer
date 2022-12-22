@@ -41,7 +41,7 @@ describe(VaultLeaf.name, () => {
     const json = vaultLeaf.toJSON()
     const transformed = JSON.parse(JSON.stringify(json))
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const recovered = VaultLeaf.fromJSON(transformed)
+    const recovered = VaultLeaf.EMPTY.fromJSON(transformed)
     expect(recovered).toEqual(vaultLeaf)
   })
 })

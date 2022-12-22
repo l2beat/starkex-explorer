@@ -1,8 +1,8 @@
 import {
-  IRollupStateStorage,
   MerkleNode,
   NodeOrLeaf,
   PositionLeaf,
+  VaultLeaf,
 } from '@explorer/state'
 import { PedersenHash } from '@explorer/types'
 import { partition } from 'lodash'
@@ -11,15 +11,14 @@ import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export class RollupStateRepository
-  extends BaseRepository
-  implements IRollupStateStorage
-{
-  constructor(database: Database, logger: Logger) {
+export class RollupStateRepository<
+  T extends PositionLeaf | VaultLeaf
+> extends BaseRepository {
+  // implements IRollupStateStorage
+  constructor(database: Database, logger: Logger, readonly emptyLeaf: T) {
     super(database, logger)
 
     /* eslint-disable @typescript-eslint/unbound-method */
-
     this.persist = this.wrapAny(this.persist)
     this.recover = this.wrapAny(this.recover)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -27,10 +26,10 @@ export class RollupStateRepository
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async persist(values: NodeOrLeaf<PositionLeaf>[]): Promise<void> {
+  async persist(values: NodeOrLeaf<T>[]): Promise<void> {
     const [nodes, positions] = partition(
       values,
-      (x): x is MerkleNode<PositionLeaf> => x instanceof MerkleNode
+      (x): x is MerkleNode<T> => x instanceof MerkleNode
     )
 
     const [nodeRows, positionRows] = await Promise.all([
@@ -75,7 +74,7 @@ export class RollupStateRepository
     await Promise.all(queries)
   }
 
-  async recover(hash: PedersenHash): Promise<NodeOrLeaf<PositionLeaf>> {
+  async recover(hash: PedersenHash): Promise<NodeOrLeaf<T>> {
     const knex = await this.knex()
     const [node, position] = await Promise.all([
       knex('merkle_nodes')
@@ -93,11 +92,14 @@ export class RollupStateRepository
         PedersenHash(node.hash)
       )
     } else if (position) {
-      // TODO: Fix this type cast
-      return PositionLeaf.fromJSON(
-        position.data as ReturnType<typeof PositionLeaf.prototype.toJSON>,
-        PedersenHash(position.hash)
-      )
+      // TODO: find a way to get rid of this type convers
+      return this.emptyLeaf.fromJSON(
+        position.data as unknown as ReturnType<
+          typeof PositionLeaf.prototype.toJSON
+        > &
+          ReturnType<typeof VaultLeaf.prototype.toJSON>,
+        hash
+      ) as unknown as NodeOrLeaf<T>
     } else {
       throw new Error(`Cannot find node or position: ${hash.toString()}`)
     }

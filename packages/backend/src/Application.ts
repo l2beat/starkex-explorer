@@ -1,3 +1,5 @@
+import { PositionLeaf, VaultLeaf } from '@explorer/state'
+
 import { ApiServer } from './api/ApiServer'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
@@ -43,7 +45,6 @@ import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
 import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
 import { Database } from './peripherals/database/shared/Database'
-import { SpotStateRepository } from './peripherals/database/SpotStateRepository'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
@@ -158,7 +159,8 @@ export class Application {
         )
         const rollupStateRepository = new RollupStateRepository(
           database,
-          logger
+          logger,
+          PositionLeaf.EMPTY
         )
         const perpetualValidiumUpdater = new PerpetualValidiumUpdater(
           stateUpdateRepository,
@@ -185,7 +187,11 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         const dexOutputCollector = new DexOutputCollector(ethereumClient)
-        const spotStateRepository = new SpotStateRepository(database, logger)
+        const spotStateRepository = new RollupStateRepository(
+          database,
+          logger,
+          VaultLeaf.EMPTY
+        )
         const spotValidiumUpdater = new SpotValidiumUpdater(
           stateUpdateRepository,
           spotStateRepository,
@@ -226,7 +232,11 @@ export class Application {
           stateTransitionRepository,
           config.starkex.contracts.perpetual
         )
-      const rollupStateRepository = new RollupStateRepository(database, logger)
+      const rollupStateRepository = new RollupStateRepository(
+        database,
+        logger,
+        PositionLeaf.EMPTY
+      )
       const perpetualRollupUpdater = new PerpetualRollupUpdater(
         pageRepository,
         stateUpdateRepository,

@@ -47,7 +47,7 @@ describe(PositionLeaf.name, () => {
     const json = positionLeaf.toJSON()
     const transformed = JSON.parse(JSON.stringify(json))
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const recovered = PositionLeaf.fromJSON(transformed)
+    const recovered = PositionLeaf.EMPTY.fromJSON(transformed)
     expect(recovered).toEqual(positionLeaf)
   })
 })
