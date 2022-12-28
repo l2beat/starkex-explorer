@@ -1,9 +1,8 @@
 import { StarkExProgramOutput } from '@explorer/encoding'
-import { PositionLeaf, RollupState } from '@explorer/state'
+import { IMerkleStorage, MerkleTree, PositionLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
-import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatch'
@@ -31,11 +30,11 @@ const positionTreeHeight = 64n
 export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: RollupStateRepository<PositionLeaf>,
+    protected readonly rollupStateRepository: IMerkleStorage<PositionLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected state?: RollupState<PositionLeaf>
+    public stateTree?: MerkleTree<PositionLeaf>
   ) {
     super(
       stateUpdateRepository,
@@ -45,7 +44,7 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
       logger,
       ROLLUP_STATE_EMPTY_HASH,
       PositionLeaf.EMPTY,
-      state
+      stateTree
     )
   }
 
@@ -55,7 +54,7 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
     batch: PerpetualBatch
   ) {
     const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureState(oldHash, positionTreeHeight)
+    await this.ensureStateTree(oldHash, positionTreeHeight)
 
     const newPositions = this.buildNewPositionLeaves(batch)
 

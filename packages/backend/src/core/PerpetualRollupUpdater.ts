@@ -1,10 +1,14 @@
 import { OnChainData } from '@explorer/encoding'
-import { PositionLeaf, RollupState } from '@explorer/state'
+import {
+  calculateUpdatedPositions,
+  IMerkleStorage,
+  MerkleTree,
+  PositionLeaf,
+} from '@explorer/state'
 import { PedersenHash } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
-import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
@@ -25,11 +29,11 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
   constructor(
     private readonly pageRepository: PageRepository,
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: RollupStateRepository<PositionLeaf>,
+    protected readonly rollupStateRepository: IMerkleStorage<PositionLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected state?: RollupState<PositionLeaf>
+    public stateTree?: MerkleTree<PositionLeaf>
   ) {
     super(
       stateUpdateRepository,
@@ -39,7 +43,7 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
       logger,
       ROLLUP_STATE_EMPTY_HASH,
       PositionLeaf.EMPTY,
-      state
+      stateTree
     )
   }
 
@@ -65,7 +69,7 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
     }
 
     const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureState(oldHash, positionTreeHeight)
+    await this.ensureStateTree(oldHash, positionTreeHeight)
 
     return stateTransitionsWithPages.map((transition, i) => ({
       id: id + i + 1,
@@ -77,10 +81,13 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
     stateTransitionRecord: StateTransitionRecord,
     onChainData: OnChainData
   ) {
-    if (!this.state) {
-      throw new Error('Rollup state not initialized')
+    if (!this.stateTree) {
+      throw new Error('State tree not initialized')
     }
-    const newPositions = await this.state.calculateUpdatedPositions(onChainData)
+    const newPositions = await calculateUpdatedPositions(
+      this.stateTree,
+      onChainData
+    )
     return this.processStateTransition(
       stateTransitionRecord,
       onChainData.newState.positionRoot,

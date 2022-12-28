@@ -4,7 +4,11 @@ import {
   OraclePrice,
   State,
 } from '@explorer/encoding'
-import { PositionLeaf, RollupState } from '@explorer/state'
+import {
+  InMemoryMerkleStorage,
+  MerkleTree,
+  PositionLeaf,
+} from '@explorer/state'
 import {
   AssetId,
   Hash256,
@@ -23,6 +27,17 @@ import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdat
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
+
+const emptyState: State = {
+  positionRoot: PedersenHash.ZERO,
+  positionHeight: 0,
+  orderRoot: PedersenHash.ZERO,
+  orderHeight: 0,
+  indices: [],
+  timestamp: Timestamp(0),
+  oraclePrices: [],
+  systemTime: Timestamp(0),
+}
 
 describe(PerpetualRollupUpdater.name, () => {
   describe(PerpetualRollupUpdater.prototype.loadRequiredPages.name, () => {
@@ -95,26 +110,21 @@ describe(PerpetualRollupUpdater.name, () => {
     PerpetualRollupUpdater.prototype.processOnChainStateTransition.name,
     () => {
       it('calls processStateTransition with updated positions', async () => {
-        const updatedPositions = [
-          {
-            index: 5n,
-            value: mock<PositionLeaf>({
-              assets: [],
-              collateralBalance: 555n,
-              starkKey: StarkKey.fake(),
-            }),
-          },
-        ]
+        const storage = new InMemoryMerkleStorage<PositionLeaf>()
+        const stateTree = await MerkleTree.create(
+          storage,
+          3n,
+          PositionLeaf.EMPTY
+        )
+
         const updater = new PerpetualRollupUpdater(
           mock<PageRepository>(),
           mock<StateUpdateRepository>(),
-          mock<RollupStateRepository<PositionLeaf>>(),
+          storage,
           mock<EthereumClient>(),
           mock<ForcedTransactionsRepository>(),
           Logger.SILENT,
-          mock<RollupState<PositionLeaf>>({
-            calculateUpdatedPositions: async () => updatedPositions,
-          })
+          stateTree
         )
 
         const mockProcessStateTransition =
@@ -144,18 +154,35 @@ describe(PerpetualRollupUpdater.name, () => {
           },
         ]
         const mockOnChainData = mock<OnChainData>({
+          oldState: emptyState,
           newState: mock<State>({
             positionRoot: PedersenHash.fake('987'),
             oraclePrices: [{ assetId: AssetId('BTC-9'), price: 5n }],
           }),
           forcedActions: testForcedActions,
+          funding: [],
+          positions: [
+            {
+              positionId: 5n,
+              collateralBalance: 555n,
+              fundingTimestamp: Timestamp(0),
+              starkKey: StarkKey.fake('5'),
+              balances: [],
+            },
+          ],
         })
+        const updatedPositions = [
+          {
+            index: 5n,
+            value: new PositionLeaf(StarkKey.fake('5'), 555n, []),
+          },
+        ]
         await updater.processOnChainStateTransition(update, mockOnChainData)
         expect(mockProcessStateTransition).toHaveBeenCalledWith([
           update,
           PedersenHash.fake('987'),
           testForcedActions,
-          [{ assetId: AssetId('BTC-9'), price: 5n }],
+          mockOnChainData.newState.oraclePrices,
           updatedPositions,
         ])
       })

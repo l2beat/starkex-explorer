@@ -1,10 +1,14 @@
 import { ForcedAction, OraclePrice } from '@explorer/encoding'
-import { PositionLeaf, RollupState, VaultLeaf } from '@explorer/state'
+import {
+  IMerkleStorage,
+  MerkleTree,
+  PositionLeaf,
+  VaultLeaf,
+} from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
-import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
@@ -14,13 +18,13 @@ import { Logger } from '../tools/Logger'
 export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: RollupStateRepository<T>,
+    protected readonly rollupStateRepository: IMerkleStorage<T>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
     protected readonly emptyStateHash: PedersenHash,
     protected readonly emptyLeaf: T,
-    protected state?: RollupState<T>
+    public stateTree?: MerkleTree<T>
   ) {}
 
   async processStateTransition(
@@ -30,13 +34,13 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     oraclePrices: OraclePrice[],
     newLeaves: { index: bigint; value: T }[]
   ) {
-    if (!this.state) {
-      return
+    if (!this.stateTree) {
+      throw new Error('State tree not initialized')
     }
 
-    this.state = await this.state.update(newLeaves)
+    this.stateTree = await this.stateTree.update(newLeaves)
 
-    const rootHash = await this.state.stateTree.hash()
+    const rootHash = await this.stateTree.hash()
     if (rootHash !== expectedPositionRoot) {
       throw new Error('State transition calculated incorrectly')
     }
@@ -126,28 +130,24 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     return { oldHash: this.emptyStateHash, id: 0 }
   }
 
-  async ensureState(oldHash: PedersenHash, height: bigint) {
-    if (!this.state) {
-      if (oldHash === this.emptyStateHash) {
-        this.state = await RollupState.empty(
+  async ensureStateTree(hash: PedersenHash, height: bigint) {
+    if (!this.stateTree) {
+      if (hash === this.emptyStateHash) {
+        this.stateTree = await MerkleTree.create(
           this.rollupStateRepository,
           height,
           this.emptyLeaf
         )
       } else {
-        this.state = RollupState.recover(
+        this.stateTree = new MerkleTree(
           this.rollupStateRepository,
-          oldHash,
-          height
+          height,
+          hash
         )
       }
-    } else if ((await this.state.stateTree.hash()) !== oldHash) {
-      this.state = RollupState.recover(
-        this.rollupStateRepository,
-        oldHash,
-        height
-      )
+    } else if ((await this.stateTree.hash()) !== hash) {
+      this.stateTree = new MerkleTree(this.rollupStateRepository, height, hash)
     }
-    return this.state
+    return this.stateTree
   }
 }

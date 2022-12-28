@@ -1,9 +1,8 @@
 import { StarkExDexOutput } from '@explorer/encoding'
-import { RollupState, VaultLeaf } from '@explorer/state'
+import { IMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
 import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
-import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
@@ -27,11 +26,11 @@ const vaultTreeHeight = 31n
 export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly spotStateRepository: RollupStateRepository<VaultLeaf>,
+    protected readonly spotStateRepository: IMerkleStorage<VaultLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
-    protected state?: RollupState<VaultLeaf>
+    public stateTree?: MerkleTree<VaultLeaf>
   ) {
     super(
       stateUpdateRepository,
@@ -41,7 +40,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
       logger,
       EMPTY_STATE_HASH,
       VaultLeaf.EMPTY,
-      state
+      stateTree
     )
   }
 
@@ -51,7 +50,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
     batch: SpotBatch
   ) {
     const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureState(oldHash, vaultTreeHeight)
+    await this.ensureStateTree(oldHash, vaultTreeHeight)
 
     const newVaults = this.buildNewVaultLeaves(batch)
 

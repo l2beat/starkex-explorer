@@ -8,9 +8,10 @@ import {
   State,
 } from '@explorer/encoding'
 import {
+  calculateUpdatedPositions,
   InMemoryMerkleStorage,
+  MerkleTree,
   PositionLeaf,
-  RollupState,
 } from '@explorer/state'
 import {
   EthereumAddress,
@@ -31,7 +32,7 @@ export interface UpdateData {
 }
 
 export class StateUpdater {
-  rollup?: RollupState<PositionLeaf>
+  stateTree?: MerkleTree<PositionLeaf>
   lastState: State = {
     indices: [],
     oraclePrices: [],
@@ -47,8 +48,8 @@ export class StateUpdater {
 
   async init() {
     const storage = new InMemoryMerkleStorage<PositionLeaf>()
-    this.rollup = await RollupState.empty(storage, 64n, PositionLeaf.EMPTY)
-    this.lastState.positionRoot = await this.rollup.stateTree.hash()
+    this.stateTree = await MerkleTree.create(storage, 64n, PositionLeaf.EMPTY)
+    this.lastState.positionRoot = await this.stateTree.hash()
   }
 
   async registerUser(address: EthereumAddress, starkKey: StarkKey) {
@@ -60,18 +61,18 @@ export class StateUpdater {
   }
 
   async update(updateData: UpdateData) {
-    if (!this.rollup) {
+    if (!this.stateTree) {
       throw new Error('Not initialized!')
     }
 
-    const newPositions = await this.rollup.calculateUpdatedPositions({
+    const newPositions = await calculateUpdatedPositions(this.stateTree, {
       oldState: this.lastState,
       funding: updateData.funding,
       positions: updateData.positions,
     })
-    const nextRollup = await this.rollup.update(newPositions)
-    this.rollup = nextRollup
-    const afterRoot = await this.rollup.stateTree.hash()
+    const nextStateTree = await this.stateTree.update(newPositions)
+    this.stateTree = nextStateTree
+    const afterRoot = await this.stateTree.hash()
 
     const oldState = this.lastState
     const newState: State = {

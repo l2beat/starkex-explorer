@@ -1,6 +1,7 @@
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
+import { VaultLeaf } from '../src'
 import { InMemoryMerkleStorage } from '../src/InMemoryMerkleStorage'
 import { MerkleTree } from '../src/MerkleTree'
 import { MerkleValue } from '../src/MerkleValue'
@@ -8,6 +9,26 @@ import { PositionLeaf } from '../src/PositionLeaf'
 
 describe(MerkleTree.name, () => {
   describe(MerkleTree.create.name, () => {
+    it('has a specific root hash for height 64 and position leaf', async () => {
+      const storage = new InMemoryMerkleStorage<PositionLeaf>()
+      const empty = await MerkleTree.create(storage, 64n, PositionLeaf.EMPTY)
+      expect(await empty.hash()).toEqual(
+        PedersenHash(
+          '052ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
+        )
+      )
+    })
+
+    it('has a specific root hash', async () => {
+      const storage = new InMemoryMerkleStorage<VaultLeaf>()
+      const empty = await MerkleTree.create(storage, 31n, VaultLeaf.EMPTY)
+      expect(await empty.hash()).toEqual(
+        PedersenHash(
+          '0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c'
+        )
+      )
+    })
+
     it('can create a tree of height 0', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 0n, PositionLeaf.EMPTY)
