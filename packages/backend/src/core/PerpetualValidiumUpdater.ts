@@ -52,7 +52,7 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
     const { oldHash, id } = await this.readLastUpdate()
     await this.ensureStateTree(oldHash, positionTreeHeight)
 
-    const newPositions = this.buildNewPositionLeaves(batch)
+    const newPositions = buildNewPositionLeaves(batch)
 
     await this.processStateTransition(
       {
@@ -66,17 +66,17 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
       newPositions
     )
   }
+}
 
-  buildNewPositionLeaves(
-    batch: PerpetualBatch
-  ): { index: bigint; value: PositionLeaf }[] {
-    return batch.positions.map((position) => ({
-      index: position.positionId,
-      value: new PositionLeaf(
-        position.starkKey,
-        position.collateralBalance,
-        position.assets
-      ),
-    }))
-  }
+function buildNewPositionLeaves(
+  batch: PerpetualBatch
+): { index: bigint; value: PositionLeaf }[] {
+  return batch.positions.map((position) => ({
+    index: position.positionId,
+    value: new PositionLeaf(
+      position.starkKey,
+      position.collateralBalance,
+      position.assets
+    ),
+  }))
 }
