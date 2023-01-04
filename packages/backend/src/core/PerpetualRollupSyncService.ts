@@ -17,8 +17,8 @@ export class PerpetualRollupSyncService {
     private readonly verifierCollector: VerifierCollector,
     private readonly pageMappingCollector: PageMappingCollector,
     private readonly pageCollector: PageCollector,
-    private readonly stateTransitionCollector: PerpetualRollupStateTransitionCollector,
-    private readonly stateUpdater: PerpetualRollupUpdater,
+    private readonly perpetualRollupStateTransitionCollector: PerpetualRollupStateTransitionCollector,
+    private readonly perpetualRollupUpdater: PerpetualRollupUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
@@ -35,9 +35,8 @@ export class PerpetualRollupSyncService {
       blockRange,
       verifiers
     )
-    const stateTransitionRecords = await this.stateTransitionCollector.collect(
-      blockRange
-    )
+    const stateTransitionRecords =
+      await this.perpetualRollupStateTransitionCollector.collect(blockRange)
 
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
@@ -59,13 +58,14 @@ export class PerpetualRollupSyncService {
       finalizeExitEvents,
     })
 
-    const recordsWithPages = await this.stateUpdater.loadRequiredPages(
-      stateTransitionRecords
-    )
+    const recordsWithPages =
+      await this.perpetualRollupUpdater.loadRequiredPages(
+        stateTransitionRecords
+      )
 
     for (const record of recordsWithPages) {
       const onChainData = decodeOnChainData(record.pages)
-      await this.stateUpdater.processOnChainStateTransition(
+      await this.perpetualRollupUpdater.processOnChainStateTransition(
         {
           id: record.id,
           blockNumber: record.blockNumber,
@@ -80,8 +80,8 @@ export class PerpetualRollupSyncService {
     await this.verifierCollector.discardAfter(blockNumber)
     await this.pageMappingCollector.discardAfter(blockNumber)
     await this.pageCollector.discardAfter(blockNumber)
-    await this.stateTransitionCollector.discardAfter(blockNumber)
-    await this.stateUpdater.discardAfter(blockNumber)
+    await this.perpetualRollupStateTransitionCollector.discardAfter(blockNumber)
+    await this.perpetualRollupUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }
 }
