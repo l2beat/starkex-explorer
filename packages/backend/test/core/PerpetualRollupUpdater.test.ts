@@ -19,6 +19,7 @@ import {
 import { expect, mockFn } from 'earljs'
 
 import { PerpetualRollupUpdater } from '../../src/core/PerpetualRollupUpdater'
+import { EMPTY_STATE_HASH } from '../../src/core/PerpetualValidiumUpdater'
 import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
 import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
@@ -40,6 +41,19 @@ const emptyState: State = {
 }
 
 describe(PerpetualRollupUpdater.name, () => {
+  it('has empty state hash correcly calculated', async () => {
+    const rollupStateRepository = mock<RollupStateRepository<PositionLeaf>>({
+      persist: async () => {},
+    })
+    const emptyTree = await MerkleTree.create(
+      rollupStateRepository,
+      64n,
+      PositionLeaf.EMPTY
+    )
+    const emptyHash = await emptyTree.hash()
+    expect(emptyHash.toString()).toEqual(EMPTY_STATE_HASH.toString())
+  })
+
   describe(PerpetualRollupUpdater.prototype.loadRequiredPages.name, () => {
     it('throws if pages are missing in database', async () => {
       const pageRepository = mock<PageRepository>({

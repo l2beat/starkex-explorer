@@ -17,11 +17,7 @@ export interface ValidiumStateTransition {
   batchId: number
 }
 
-/**
- * @internal
- * Same as `await RollupState.empty().then(empty => empty.positions.hash())`
- */
-export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
+export const EMPTY_STATE_HASH = PedersenHash(
   '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
 )
 
@@ -30,7 +26,7 @@ const positionTreeHeight = 64n
 export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: IMerkleStorage<PositionLeaf>,
+    protected readonly merkleStorage: IMerkleStorage<PositionLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
@@ -38,11 +34,11 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
   ) {
     super(
       stateUpdateRepository,
-      rollupStateRepository,
+      merkleStorage,
       ethereumClient,
       forcedTransactionsRepository,
       logger,
-      ROLLUP_STATE_EMPTY_HASH,
+      EMPTY_STATE_HASH,
       PositionLeaf.EMPTY,
       stateTree
     )

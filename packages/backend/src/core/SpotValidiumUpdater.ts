@@ -26,7 +26,7 @@ const vaultTreeHeight = 31n
 export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly spotStateRepository: IMerkleStorage<VaultLeaf>,
+    protected readonly merkleStorage: IMerkleStorage<VaultLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
@@ -34,7 +34,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
   ) {
     super(
       stateUpdateRepository,
-      spotStateRepository,
+      merkleStorage,
       ethereumClient,
       forcedTransactionsRepository,
       logger,

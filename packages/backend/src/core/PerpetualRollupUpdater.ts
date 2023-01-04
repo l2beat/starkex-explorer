@@ -15,11 +15,7 @@ import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
 
-/**
- * @internal
- * Same as `await RollupState.empty().then(empty => empty.positions.hash())`
- */
-export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
+export const EMPTY_STATE_HASH = PedersenHash(
   '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
 )
 
@@ -29,7 +25,7 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
   constructor(
     private readonly pageRepository: PageRepository,
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: IMerkleStorage<PositionLeaf>,
+    protected readonly merkleStorage: IMerkleStorage<PositionLeaf>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
@@ -37,11 +33,11 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
   ) {
     super(
       stateUpdateRepository,
-      rollupStateRepository,
+      merkleStorage,
       ethereumClient,
       forcedTransactionsRepository,
       logger,
-      ROLLUP_STATE_EMPTY_HASH,
+      EMPTY_STATE_HASH,
       PositionLeaf.EMPTY,
       stateTree
     )

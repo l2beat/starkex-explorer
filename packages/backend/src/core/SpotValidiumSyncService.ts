@@ -12,7 +12,7 @@ import { SpotValidiumUpdater } from './SpotValidiumUpdater'
 export class SpotValidiumSyncService {
   constructor(
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
-    private readonly stateTransitionCollector: SpotValidiumStateTransitionCollector,
+    private readonly spotValidiumStateTransitionCollector: SpotValidiumStateTransitionCollector,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
@@ -33,9 +33,8 @@ export class SpotValidiumSyncService {
     //   blockRange
     // )
 
-    const stateTransitions = await this.stateTransitionCollector.collect(
-      blockRange
-    )
+    const stateTransitions =
+      await this.spotValidiumStateTransitionCollector.collect(blockRange)
 
     this.logger.info({
       method: 'spot validium sync',
@@ -63,7 +62,7 @@ export class SpotValidiumSyncService {
   }
 
   async discardAfter(blockNumber: BlockNumber) {
-    await this.stateTransitionCollector.discardAfter(blockNumber)
+    await this.spotValidiumStateTransitionCollector.discardAfter(blockNumber)
     await this.spotValidiumUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }

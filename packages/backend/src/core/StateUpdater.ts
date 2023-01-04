@@ -18,7 +18,7 @@ import { Logger } from '../tools/Logger'
 export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
-    protected readonly rollupStateRepository: IMerkleStorage<T>,
+    protected readonly merkleStorage: IMerkleStorage<T>,
     protected readonly ethereumClient: EthereumClient,
     protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
     protected readonly logger: Logger,
@@ -134,19 +134,15 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     if (!this.stateTree) {
       if (hash === this.emptyStateHash) {
         this.stateTree = await MerkleTree.create(
-          this.rollupStateRepository,
+          this.merkleStorage,
           height,
           this.emptyLeaf
         )
       } else {
-        this.stateTree = new MerkleTree(
-          this.rollupStateRepository,
-          height,
-          hash
-        )
+        this.stateTree = new MerkleTree(this.merkleStorage, height, hash)
       }
     } else if ((await this.stateTree.hash()) !== hash) {
-      this.stateTree = new MerkleTree(this.rollupStateRepository, height, hash)
+      this.stateTree = new MerkleTree(this.merkleStorage, height, hash)
     }
     return this.stateTree
   }
