@@ -8,8 +8,8 @@ import { EthereumAddress } from '@explorer/types'
 import { AccountService } from '../../core/AccountService'
 import {
   ForcedTransactionRecord,
-  ForcedTransactionsRepository,
-} from '../../peripherals/database/ForcedTransactionsRepository'
+  ForcedTransactionRepository,
+} from '../../peripherals/database/ForcedTransactionRepository'
 import { PositionWithPricesRecord } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
@@ -21,7 +21,7 @@ export class StateUpdateController {
   constructor(
     private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,
-    private forcedTransactionsRepository: ForcedTransactionsRepository
+    private forcedTransactionRepository: ForcedTransactionRepository
   ) {}
 
   async getStateUpdatesPage(
@@ -54,7 +54,7 @@ export class StateUpdateController {
     const [account, stateUpdate, transactions] = await Promise.all([
       this.accountService.getAccount(address),
       this.stateUpdateRepository.findByIdWithPositions(id),
-      this.forcedTransactionsRepository.getIncludedInStateUpdate(id),
+      this.forcedTransactionRepository.getIncludedInStateUpdate(id),
     ])
 
     if (!stateUpdate) {

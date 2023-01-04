@@ -7,7 +7,7 @@ import {
 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../../src/peripherals/database/ForcedTransactionRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
@@ -285,20 +285,20 @@ describe(StateUpdateRepository.name, () => {
     const blockNumber4 = fakeInt()
 
     beforeEach(async () => {
-      const forcedTransactionsRepository = new ForcedTransactionsRepository(
+      const forcedTransactionRepository = new ForcedTransactionRepository(
         database,
         new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
       )
 
-      await forcedTransactionsRepository.add(tx1, sentAt1)
-      await forcedTransactionsRepository.add(tx2, sentAt2)
-      await forcedTransactionsRepository.add(
+      await forcedTransactionRepository.add(tx1, sentAt1)
+      await forcedTransactionRepository.add(tx2, sentAt2)
+      await forcedTransactionRepository.add(
         tx3,
         sentAt3,
         minedAt3,
         blockNumber3
       )
-      await forcedTransactionsRepository.add(
+      await forcedTransactionRepository.add(
         tx4,
         sentAt4,
         minedAt4,

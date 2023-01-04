@@ -20,7 +20,7 @@ import { expect, mockFn } from 'earljs'
 
 import { PerpetualRollupUpdater } from '../../src/core/PerpetualRollupUpdater'
 import { EMPTY_STATE_HASH } from '../../src/core/PerpetualValidiumUpdater'
-import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
 import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
@@ -64,7 +64,7 @@ describe(PerpetualRollupUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
+        mock<ForcedTransactionRepository>(),
         Logger.SILENT
       )
       await expect(
@@ -95,7 +95,7 @@ describe(PerpetualRollupUpdater.name, () => {
         stateUpdateRepository,
         mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
+        mock<ForcedTransactionRepository>(),
         Logger.SILENT
       )
 
@@ -136,7 +136,7 @@ describe(PerpetualRollupUpdater.name, () => {
           mock<StateUpdateRepository>(),
           storage,
           mock<EthereumClient>(),
-          mock<ForcedTransactionsRepository>(),
+          mock<ForcedTransactionRepository>(),
           Logger.SILENT,
           stateTree
         )

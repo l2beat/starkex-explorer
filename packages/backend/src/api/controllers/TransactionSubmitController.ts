@@ -10,7 +10,7 @@ import {
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { sleep } from '../../tools/sleep'
 import { ControllerResult } from './ControllerResult'
@@ -18,7 +18,7 @@ import { ControllerResult } from './ControllerResult'
 export class TransactionSubmitController {
   constructor(
     private ethereumClient: EthereumClient,
-    private forcedTransactionsRepository: ForcedTransactionsRepository,
+    private forcedTransactionRepository: ForcedTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress
   ) {}
@@ -36,7 +36,7 @@ export class TransactionSubmitController {
       return { type: 'bad request', content: `Invalid transaction` }
     }
     const sentAt = Timestamp(Date.now())
-    await this.forcedTransactionsRepository.add(
+    await this.forcedTransactionRepository.add(
       {
         data: {
           type: 'withdrawal',
@@ -67,7 +67,7 @@ export class TransactionSubmitController {
       return { type: 'bad request', content: `Invalid transaction` }
     }
     const sentAt = Timestamp(Date.now())
-    await this.forcedTransactionsRepository.saveFinalize(
+    await this.forcedTransactionRepository.saveFinalize(
       exitHash,
       finalizeHash,
       sentAt
@@ -107,7 +107,7 @@ export class TransactionSubmitController {
       return { type: 'bad request', content: `Invalid transaction` }
     }
     const sentAt = Timestamp(Date.now())
-    await this.forcedTransactionsRepository.add(
+    await this.forcedTransactionRepository.add(
       {
         data: {
           type: 'trade',

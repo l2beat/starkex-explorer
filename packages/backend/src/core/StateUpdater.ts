@@ -7,7 +7,7 @@ import {
 } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
-import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
@@ -20,7 +20,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     protected readonly stateUpdateRepository: StateUpdateRepository,
     protected readonly merkleStorage: IMerkleStorage<T>,
     protected readonly ethereumClient: EthereumClient,
-    protected readonly forcedTransactionsRepository: ForcedTransactionsRepository,
+    protected readonly forcedTransactionRepository: ForcedTransactionRepository,
     protected readonly logger: Logger,
     protected readonly emptyStateHash: PedersenHash,
     protected readonly emptyLeaf: T,
@@ -102,7 +102,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     forcedActions: ForcedAction[]
   ): Promise<Hash256[]> {
     const hashes =
-      await this.forcedTransactionsRepository.getTransactionHashesByData(
+      await this.forcedTransactionRepository.getTransactionHashesByData(
         forcedActions
       )
     const filteredHashes = hashes.filter(

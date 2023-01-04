@@ -3,7 +3,7 @@ import { expect } from 'earljs'
 
 import { ForcedEventsCollector } from '../../../src/core/collectors/ForcedEventsCollector'
 import { BlockRange } from '../../../src/model'
-import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../../src/peripherals/database/ForcedTransactionRepository'
 import { TransactionStatusRepository } from '../../../src/peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
 import {
@@ -32,7 +32,7 @@ describe(ForcedEventsCollector.name, () => {
       const data = fakeWithdrawal()
       const blockNumber = fakeInt()
       const minedAt = fakeTimestamp()
-      const forcedRepo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionRepository>({
         findByHash: async () => undefined,
         add: async () => hash,
       })
@@ -64,7 +64,7 @@ describe(ForcedEventsCollector.name, () => {
       const blockNumber = fakeInt()
       const minedAt = Timestamp(2)
       const sentAt = Timestamp(1)
-      const forcedRepo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionRepository>({
         findByHash: async () => ({
           data,
           hash,
@@ -103,7 +103,7 @@ describe(ForcedEventsCollector.name, () => {
       const blockNumber = fakeInt()
       const minedAt = Timestamp(2)
       const sentAt = Timestamp(1)
-      const forcedRepo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionRepository>({
         findByHash: async () => ({
           data,
           hash,

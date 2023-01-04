@@ -3,7 +3,7 @@ import { expect } from 'earljs'
 
 import { AccountService } from '../../src/core/AccountService'
 import { ForcedTradeOfferRepository } from '../../src/peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../../src/peripherals/database/PositionRepository'
 import { mock } from '../mock'
 
@@ -12,7 +12,7 @@ describe(AccountService.name, () => {
     const accountService = new AccountService(
       mock<PositionRepository>(),
       mock<ForcedTradeOfferRepository>(),
-      mock<ForcedTransactionsRepository>()
+      mock<ForcedTransactionRepository>()
     )
     const result = await accountService.getAccount(undefined)
     expect(result).toEqual(undefined)
@@ -24,7 +24,7 @@ describe(AccountService.name, () => {
         findIdByEthereumAddress: async () => undefined,
       }),
       mock<ForcedTradeOfferRepository>(),
-      mock<ForcedTransactionsRepository>()
+      mock<ForcedTransactionRepository>()
     )
     const address = EthereumAddress.fake()
     const result = await accountService.getAccount(address)
@@ -41,7 +41,7 @@ describe(AccountService.name, () => {
       mock<ForcedTradeOfferRepository>({
         countActiveByPositionId: async () => 0,
       }),
-      mock<ForcedTransactionsRepository>({
+      mock<ForcedTransactionRepository>({
         countPendingByPositionId: async () => 0,
       })
     )
@@ -62,7 +62,7 @@ describe(AccountService.name, () => {
       mock<ForcedTradeOfferRepository>({
         countActiveByPositionId: async () => 1,
       }),
-      mock<ForcedTransactionsRepository>({
+      mock<ForcedTransactionRepository>({
         countPendingByPositionId: async () => 0,
       })
     )

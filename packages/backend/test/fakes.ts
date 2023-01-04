@@ -25,7 +25,7 @@ import {
   FinalizeUpdates,
   ForcedTransactionRecord,
   Updates,
-} from '../src/peripherals/database/ForcedTransactionsRepository'
+} from '../src/peripherals/database/ForcedTransactionRepository'
 import { StateUpdateRecord } from '../src/peripherals/database/StateUpdateRepository'
 import { Record as TransactionStatusRecord } from '../src/peripherals/database/TransactionStatusRepository'
 

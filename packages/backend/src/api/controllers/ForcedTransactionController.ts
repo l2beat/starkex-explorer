@@ -11,8 +11,8 @@ import { getTransactionStatus } from '../../core/getForcedTransactionStatus'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   ForcedTransactionRecord,
-  ForcedTransactionsRepository,
-} from '../../peripherals/database/ForcedTransactionsRepository'
+  ForcedTransactionRepository,
+} from '../../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
@@ -26,7 +26,7 @@ export class ForcedTransactionController {
     private accountService: AccountService,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private positionRepository: PositionRepository,
-    private forcedTransactionsRepository: ForcedTransactionsRepository,
+    private forcedTransactionRepository: ForcedTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress
   ) {}
@@ -40,8 +40,8 @@ export class ForcedTransactionController {
     const offset = (page - 1) * perPage
     const [account, transactions, total] = await Promise.all([
       this.accountService.getAccount(address),
-      this.forcedTransactionsRepository.getLatest({ limit, offset }),
-      this.forcedTransactionsRepository.countAll(),
+      this.forcedTransactionRepository.getLatest({ limit, offset }),
+      this.forcedTransactionRepository.countAll(),
     ])
 
     const content = renderForcedTransactionsIndexPage({
@@ -119,7 +119,7 @@ export class ForcedTransactionController {
   ): Promise<ControllerResult> {
     const [account, transaction] = await Promise.all([
       this.accountService.getAccount(address),
-      this.forcedTransactionsRepository.findByHash(transactionHash),
+      this.forcedTransactionRepository.findByHash(transactionHash),
     ])
     if (!transaction) {
       const content = 'Could not find transaction for that hash'

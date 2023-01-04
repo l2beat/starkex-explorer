@@ -7,9 +7,10 @@ import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsColl
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/SpotValidiumStateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { IDataSyncService } from './DataSyncService'
 import { SpotValidiumUpdater } from './SpotValidiumUpdater'
 
-export class SpotValidiumSyncService {
+export class SpotValidiumSyncService implements IDataSyncService {
   constructor(
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
     private readonly spotValidiumStateTransitionCollector: SpotValidiumStateTransitionCollector,

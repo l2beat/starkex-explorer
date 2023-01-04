@@ -38,7 +38,7 @@ import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from './peripherals/database/ForcedTransactionRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
@@ -91,7 +91,7 @@ export class Application {
       database,
       logger
     )
-    const forcedTransactionsRepository = new ForcedTransactionsRepository(
+    const forcedTransactionRepository = new ForcedTransactionRepository(
       database,
       logger
     )
@@ -128,14 +128,14 @@ export class Application {
     )
     const forcedEventsCollector = new ForcedEventsCollector(
       ethereumClient,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       transactionStatusRepository,
       config.starkex.contracts.perpetual
     )
 
     const finalizeExitEventsCollector = new FinalizeExitEventsCollector(
       ethereumClient,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       transactionStatusRepository,
       config.starkex.contracts.perpetual
     )
@@ -166,7 +166,7 @@ export class Application {
           stateUpdateRepository,
           rollupStateRepository,
           ethereumClient,
-          forcedTransactionsRepository,
+          forcedTransactionRepository,
           logger
         )
         syncService = new PerpetualValidiumSyncService(
@@ -196,7 +196,7 @@ export class Application {
           stateUpdateRepository,
           spotStateRepository,
           ethereumClient,
-          forcedTransactionsRepository,
+          forcedTransactionRepository,
           logger
         )
         syncService = new SpotValidiumSyncService(
@@ -242,7 +242,7 @@ export class Application {
         stateUpdateRepository,
         rollupStateRepository,
         ethereumClient,
-        forcedTransactionsRepository,
+        forcedTransactionRepository,
         logger
       )
       syncService = new PerpetualRollupSyncService(
@@ -279,7 +279,7 @@ export class Application {
     const accountService = new AccountService(
       positionRepository,
       forcedTradeOfferRepository,
-      forcedTransactionsRepository
+      forcedTransactionRepository
     )
 
     // #endregion core
@@ -290,28 +290,28 @@ export class Application {
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       forcedTradeOfferRepository
     )
     const homeController = new HomeController(
       accountService,
       stateUpdateRepository,
       positionRepository,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       forcedTradeOfferRepository
     )
     const forcedTransactionController = new ForcedTransactionController(
       accountService,
       userRegistrationEventRepository,
       positionRepository,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       accountService,
       stateUpdateRepository,
-      forcedTransactionsRepository
+      forcedTransactionRepository
     )
     const searchController = new SearchController(
       stateUpdateRepository,
@@ -327,7 +327,7 @@ export class Application {
     )
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )

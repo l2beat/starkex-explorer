@@ -2,9 +2,7 @@ import { BlockRange } from '../../model'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
-import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
-import { PerpetualValidiumSyncService } from '../PerpetualValidiumSyncService'
-import { SpotValidiumSyncService } from '../SpotValidiumSyncService'
+import { IDataSyncService } from '../DataSyncService'
 import { BlockDownloader } from './BlockDownloader'
 import {
   INITIAL_SYNC_STATE,
@@ -27,10 +25,7 @@ export class SyncScheduler {
   constructor(
     private readonly syncStatusRepository: SyncStatusRepository,
     private readonly blockDownloader: BlockDownloader,
-    private readonly dataSyncService:
-      | PerpetualRollupSyncService
-      | PerpetualValidiumSyncService
-      | SpotValidiumSyncService,
+    private readonly dataSyncService: IDataSyncService,
     private readonly logger: Logger,
     opts: SyncSchedulerOptions
   ) {

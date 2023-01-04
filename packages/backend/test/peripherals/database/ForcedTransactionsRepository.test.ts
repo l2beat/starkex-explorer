@@ -1,7 +1,7 @@
 import { Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../../src/peripherals/database/ForcedTransactionRepository'
 import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
 import { Logger } from '../../../src/tools/Logger'
 import {
@@ -18,9 +18,9 @@ import {
 import { setupDatabaseTestSuite } from './shared/setup'
 
 const MAX_TIME = 2 ** 32 - 1
-describe(ForcedTransactionsRepository.name, () => {
+describe(ForcedTransactionRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
-  const repository = new ForcedTransactionsRepository(database, Logger.SILENT)
+  const repository = new ForcedTransactionRepository(database, Logger.SILENT)
 
   beforeEach(() => repository.deleteAll())
 

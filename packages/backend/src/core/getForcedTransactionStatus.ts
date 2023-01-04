@@ -1,6 +1,6 @@
 import { TransactionStatus } from '@explorer/frontend'
 
-import { ForcedTransactionRecord } from '../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRecord } from '../peripherals/database/ForcedTransactionRepository'
 
 export function getTransactionStatus(
   transaction: ForcedTransactionRecord

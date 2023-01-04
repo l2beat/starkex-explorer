@@ -3,7 +3,7 @@ import { EthereumAddress } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
@@ -16,7 +16,7 @@ export class HomeController {
     private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
-    private forcedTransactionsRepository: ForcedTransactionsRepository,
+    private forcedTransactionRepository: ForcedTransactionRepository,
     private forcedTradeOffersRepository: ForcedTradeOfferRepository
   ) {}
 
@@ -36,7 +36,7 @@ export class HomeController {
     ] = await Promise.all([
       this.accountService.getAccount(address),
       this.stateUpdateRepository.getPaginated({ offset, limit }),
-      this.forcedTransactionsRepository.getLatest({ limit, offset }),
+      this.forcedTransactionRepository.getLatest({ limit, offset }),
       this.forcedTradeOffersRepository.getInitial({ limit, offset }),
       this.stateUpdateRepository.count(),
       this.positionRepository.count(),

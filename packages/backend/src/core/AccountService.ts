@@ -1,14 +1,14 @@
 import { EthereumAddress } from '@explorer/types'
 
 import { ForcedTradeOfferRepository } from '../peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../peripherals/database/PositionRepository'
 
 export class AccountService {
   constructor(
     private readonly positionRepository: PositionRepository,
     private readonly offerRepository: ForcedTradeOfferRepository,
-    private readonly transactionRepository: ForcedTransactionsRepository
+    private readonly transactionRepository: ForcedTransactionRepository
   ) {}
 
   async getAccount(address?: EthereumAddress) {

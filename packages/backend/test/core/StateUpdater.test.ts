@@ -3,7 +3,7 @@ import { AssetId, Hash256, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { StateUpdater } from '../../src/core/StateUpdater'
-import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
 import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
@@ -25,7 +25,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         rollupStateRepository,
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
+        mock<ForcedTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -47,7 +47,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
+        mock<ForcedTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -62,7 +62,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
+        mock<ForcedTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -80,7 +80,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
+        mock<ForcedTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -102,7 +102,7 @@ describe(StateUpdater.name, () => {
         stateUpdateRepository,
         mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
+        mock<ForcedTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -120,7 +120,7 @@ describe(StateUpdater.name, () => {
 
   describe(StateUpdater.prototype.extractTransactionHashes.name, () => {
     it('throws if forced transaction missing in database', async () => {
-      const forcedTransactionsRepository = mock<ForcedTransactionsRepository>({
+      const forcedTransactionRepository = mock<ForcedTransactionRepository>({
         getTransactionHashesByData: async () => [Hash256.fake(), undefined],
       })
 
@@ -128,7 +128,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        forcedTransactionsRepository,
+        forcedTransactionRepository,
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -167,7 +167,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<RollupStateRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
+        mock<ForcedTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY,

@@ -7,9 +7,10 @@ import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { PerpetualValidiumStateTransitionCollector } from './collectors/PerpetualValidiumStateTransitionCollector'
 import { ProgramOutputCollector } from './collectors/ProgramOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { IDataSyncService } from './DataSyncService'
 import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
 
-export class PerpetualValidiumSyncService {
+export class PerpetualValidiumSyncService implements IDataSyncService {
   constructor(
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
     private readonly perpetualValidiumStateTransitionCollector: PerpetualValidiumStateTransitionCollector,

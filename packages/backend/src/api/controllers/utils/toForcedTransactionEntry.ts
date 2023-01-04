@@ -2,7 +2,7 @@ import { ForcedTransactionEntry } from '@explorer/frontend'
 import { AssetId } from '@explorer/types'
 
 import { getTransactionStatus } from '../../../core/getForcedTransactionStatus'
-import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionRepository'
 
 export function toForcedTransactionEntry(
   transaction: ForcedTransactionRecord
