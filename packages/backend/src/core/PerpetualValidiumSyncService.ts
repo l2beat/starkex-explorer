@@ -12,7 +12,7 @@ import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
 export class PerpetualValidiumSyncService {
   constructor(
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
-    private readonly stateTransitionCollector: PerpetualValidiumStateTransitionCollector,
+    private readonly perpetualValidiumStateTransitionCollector: PerpetualValidiumStateTransitionCollector,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
@@ -33,9 +33,8 @@ export class PerpetualValidiumSyncService {
       blockRange
     )
 
-    const stateTransitions = await this.stateTransitionCollector.collect(
-      blockRange
-    )
+    const stateTransitions =
+      await this.perpetualValidiumStateTransitionCollector.collect(blockRange)
 
     this.logger.info({
       method: 'perpetual validium sync',
@@ -63,7 +62,9 @@ export class PerpetualValidiumSyncService {
   }
 
   async discardAfter(blockNumber: BlockNumber) {
-    await this.stateTransitionCollector.discardAfter(blockNumber)
+    await this.perpetualValidiumStateTransitionCollector.discardAfter(
+      blockNumber
+    )
     await this.perpetualValidiumUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }
