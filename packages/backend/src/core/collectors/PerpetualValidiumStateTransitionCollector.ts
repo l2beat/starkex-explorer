@@ -36,9 +36,9 @@ export class PerpetualValidiumStateTransitionCollector {
 
     const validiumStateTransitions = []
     const records: Omit<StateTransitionRecord, 'id'>[] = []
-    for (let i = 0; i < parsed.length / 2; i++) {
-      const stateTransitionFact = parsed[i * 2]
-      const updateState = parsed[i * 2 + 1]
+    for (let i = 0; i < parsed.length; i += 2) {
+      const stateTransitionFact = parsed[i]
+      const updateState = parsed[i + 1]
       if (
         stateTransitionFact?.name !== 'LogStateTransitionFact' ||
         updateState?.name !== 'LogUpdateState' ||
