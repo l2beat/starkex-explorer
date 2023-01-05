@@ -20,10 +20,12 @@ import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
-import { PerpetualValidiumStateTransitionCollector } from './core/collectors/PerpetualValidiumStateTransitionCollector'
 import { ProgramOutputCollector } from './core/collectors/ProgramOutputCollector'
-import { SpotValidiumStateTransitionCollector } from './core/collectors/SpotValidiumStateTransitionCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
+import {
+  PerpetualValidiumStateTransitionCollector,
+  SpotValidiumStateTransitionCollector,
+} from './core/collectors/ValidiumStateTransitionCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'

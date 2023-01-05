@@ -4,9 +4,9 @@ import { AvailabilityGatewayClient } from '../peripherals/starkware/Availability
 import { Logger } from '../tools/Logger'
 import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
-import { PerpetualValidiumStateTransitionCollector } from './collectors/PerpetualValidiumStateTransitionCollector'
 import { ProgramOutputCollector } from './collectors/ProgramOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { IDataSyncService } from './DataSyncService'
 import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
 
