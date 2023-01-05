@@ -22,7 +22,7 @@ import { PerpetualRollupUpdater } from '../../src/core/PerpetualRollupUpdater'
 import { EMPTY_STATE_HASH } from '../../src/core/PerpetualValidiumUpdater'
 import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
 import { PageRepository } from '../../src/peripherals/database/PageRepository'
-import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
+import type { MerkleTreeRepository } from '../../src/peripherals/database/MerkleTreeRepository'
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
@@ -42,7 +42,7 @@ const emptyState: State = {
 
 describe(PerpetualRollupUpdater.name, () => {
   it('has empty state hash correcly calculated', async () => {
-    const rollupStateRepository = mock<RollupStateRepository<PositionLeaf>>({
+    const rollupStateRepository = mock<MerkleTreeRepository<PositionLeaf>>({
       persist: async () => {},
     })
     const emptyTree = await MerkleTree.create(
@@ -62,7 +62,7 @@ describe(PerpetualRollupUpdater.name, () => {
       const stateUpdater = new PerpetualRollupUpdater(
         pageRepository,
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository<PositionLeaf>>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionRepository>(),
         Logger.SILENT
@@ -93,7 +93,7 @@ describe(PerpetualRollupUpdater.name, () => {
       const stateUpdater = new PerpetualRollupUpdater(
         pageRepository,
         stateUpdateRepository,
-        mock<RollupStateRepository<PositionLeaf>>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionRepository>(),
         Logger.SILENT

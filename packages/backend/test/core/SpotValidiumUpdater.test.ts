@@ -5,12 +5,12 @@ import {
   EMPTY_STATE_HASH,
   SpotValidiumUpdater,
 } from '../../src/core/SpotValidiumUpdater'
-import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
+import type { MerkleTreeRepository } from '../../src/peripherals/database/MerkleTreeRepository'
 import { mock } from '../mock'
 
 describe(SpotValidiumUpdater.name, () => {
   it('has empty state hash correcly calculated', async () => {
-    const rollupStateRepository = mock<RollupStateRepository<VaultLeaf>>({
+    const rollupStateRepository = mock<MerkleTreeRepository<VaultLeaf>>({
       persist: async () => {},
     })
     const emptyTree = await MerkleTree.create(

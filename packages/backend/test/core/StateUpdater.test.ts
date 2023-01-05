@@ -4,7 +4,7 @@ import { expect } from 'earljs'
 
 import { StateUpdater } from '../../src/core/StateUpdater'
 import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
-import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
+import type { MerkleTreeRepository } from '../../src/peripherals/database/MerkleTreeRepository'
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
@@ -18,7 +18,7 @@ const EMPTY_STATE_HASH = PedersenHash(
 describe(StateUpdater.name, () => {
   describe(StateUpdater.prototype.ensureStateTree.name, () => {
     it('sets state tree before an initial state transition', async () => {
-      const rollupStateRepository = mock<RollupStateRepository<PositionLeaf>>({
+      const rollupStateRepository = mock<MerkleTreeRepository<PositionLeaf>>({
         persist: async () => {},
       })
       const stateUpdater = new StateUpdater(
@@ -45,7 +45,7 @@ describe(StateUpdater.name, () => {
     it('sets state tree after restart', async () => {
       const stateUpdater = new StateUpdater(
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository<PositionLeaf>>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionRepository>(),
         Logger.SILENT,
@@ -60,7 +60,7 @@ describe(StateUpdater.name, () => {
     it('resets state tree after reorg', async () => {
       const stateUpdater = new StateUpdater(
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository<PositionLeaf>>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionRepository>(),
         Logger.SILENT,
@@ -78,7 +78,7 @@ describe(StateUpdater.name, () => {
     it('leaves state intact before a subsequent state transition', async () => {
       const stateUpdater = new StateUpdater(
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository<PositionLeaf>>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionRepository>(),
         Logger.SILENT,
@@ -100,7 +100,7 @@ describe(StateUpdater.name, () => {
 
       const stateUpdater = new StateUpdater(
         stateUpdateRepository,
-        mock<RollupStateRepository<PositionLeaf>>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionRepository>(),
         Logger.SILENT,
@@ -126,7 +126,7 @@ describe(StateUpdater.name, () => {
 
       const stateUpdater = new StateUpdater(
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository<PositionLeaf>>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         forcedTransactionRepository,
         Logger.SILENT,
@@ -165,7 +165,7 @@ describe(StateUpdater.name, () => {
     it('throws if calculated root hash does not match the one from verifier', async () => {
       const stateUpdater = new StateUpdater(
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository<PositionLeaf>>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
         mock<ForcedTransactionRepository>(),
         Logger.SILENT,

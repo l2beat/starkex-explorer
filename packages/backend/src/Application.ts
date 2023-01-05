@@ -43,7 +43,7 @@ import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
-import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
+import { MerkleTreeRepository } from './peripherals/database/MerkleTreeRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
@@ -157,7 +157,7 @@ export class Application {
         const programOutputCollector = new ProgramOutputCollector(
           ethereumClient
         )
-        const rollupStateRepository = new RollupStateRepository(
+        const rollupStateRepository = new MerkleTreeRepository(
           database,
           logger,
           PositionLeaf.EMPTY
@@ -187,7 +187,7 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         const dexOutputCollector = new DexOutputCollector(ethereumClient)
-        const spotStateRepository = new RollupStateRepository(
+        const spotStateRepository = new MerkleTreeRepository(
           database,
           logger,
           VaultLeaf.EMPTY
@@ -232,7 +232,7 @@ export class Application {
           stateTransitionRepository,
           config.starkex.contracts.perpetual
         )
-      const rollupStateRepository = new RollupStateRepository(
+      const rollupStateRepository = new MerkleTreeRepository(
         database,
         logger,
         PositionLeaf.EMPTY

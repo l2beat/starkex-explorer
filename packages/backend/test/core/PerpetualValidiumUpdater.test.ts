@@ -5,12 +5,12 @@ import {
   EMPTY_STATE_HASH,
   PerpetualValidiumUpdater,
 } from '../../src/core/PerpetualValidiumUpdater'
-import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
+import type { MerkleTreeRepository } from '../../src/peripherals/database/MerkleTreeRepository'
 import { mock } from '../mock'
 
 describe(PerpetualValidiumUpdater.name, () => {
   it('has empty state hash correcly calculated', async () => {
-    const rollupStateRepository = mock<RollupStateRepository<PositionLeaf>>({
+    const rollupStateRepository = mock<MerkleTreeRepository<PositionLeaf>>({
       persist: async () => {},
     })
     const emptyTree = await MerkleTree.create(

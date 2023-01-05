@@ -1,4 +1,5 @@
 import {
+  IMerkleStorage,
   MerkleNode,
   NodeOrLeaf,
   PositionLeaf,
@@ -11,10 +12,10 @@ import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export class RollupStateRepository<
-  T extends PositionLeaf | VaultLeaf
-> extends BaseRepository {
-  // implements IRollupStateStorage
+export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
+  extends BaseRepository
+  implements IMerkleStorage<T>
+{
   constructor(database: Database, logger: Logger, readonly emptyLeaf: T) {
     super(database, logger)
 
