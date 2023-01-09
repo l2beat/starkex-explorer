@@ -46,6 +46,7 @@ export class ValidiumStateTransitionCollector<T extends StateUpdateEvent> {
         throw new Error('Unexpected state transition fact event')
       }
       if (
+        // Typescript doesn't allow to use this.stateUpdateEvent.name here
         updateState?.name !== 'LogRootUpdate' &&
         updateState?.name !== 'LogUpdateState'
       ) {
