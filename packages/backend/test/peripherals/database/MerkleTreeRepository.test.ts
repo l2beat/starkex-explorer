@@ -11,7 +11,7 @@ describe(MerkleTreeRepository.name, () => {
   const repository = new MerkleTreeRepository(
     database,
     Logger.SILENT,
-    PositionLeaf.EMPTY
+    PositionLeaf
   )
 
   afterEach(() => repository.deleteAll())
