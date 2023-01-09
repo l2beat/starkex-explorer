@@ -1,6 +1,12 @@
 import { pedersen } from '@explorer/crypto'
 import { encodeAssetId, OnChainData } from '@explorer/encoding'
-import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  json,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { zip } from 'lodash'
 
 import { MerkleTree } from './MerkleTree'
@@ -59,14 +65,14 @@ export class PositionLeaf extends MerkleValue {
     }
   }
 
-  public fromJSON(
-    data: ReturnType<typeof PositionLeaf.prototype.toJSON>,
-    knownHash?: PedersenHash
-  ) {
+  static fromJSON(data: json, knownHash?: PedersenHash) {
+    const cast = data as unknown as ReturnType<
+      typeof PositionLeaf.prototype.toJSON
+    >
     return new PositionLeaf(
-      data.starkKey,
-      BigInt(data.collateralBalance),
-      data.assets.map((x) => ({
+      StarkKey(cast.starkKey),
+      BigInt(cast.collateralBalance),
+      cast.assets.map((x) => ({
         assetId: AssetId(x.assetId),
         balance: BigInt(x.balance),
         fundingIndex: BigInt(x.fundingIndex),
@@ -77,7 +83,7 @@ export class PositionLeaf extends MerkleValue {
 
   toJSON() {
     return {
-      starkKey: this.starkKey,
+      starkKey: this.starkKey.toString(),
       collateralBalance: this.collateralBalance.toString(),
       assets: this.assets.map((x) => ({
         assetId: x.assetId.toString(),

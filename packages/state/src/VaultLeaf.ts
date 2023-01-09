@@ -1,5 +1,5 @@
 import { pedersen } from '@explorer/crypto'
-import { PedersenHash, StarkKey } from '@explorer/types'
+import { json, PedersenHash, StarkKey } from '@explorer/types'
 
 import { MerkleValue } from './MerkleValue'
 import { packBytes } from './packBytes'
@@ -40,23 +40,23 @@ export class VaultLeaf extends MerkleValue {
     }
   }
 
-  fromJSON(
-    data: ReturnType<typeof VaultLeaf.prototype.toJSON>,
-    knownHash?: PedersenHash
-  ) {
+  static fromJSON(data: json, knownHash?: PedersenHash) {
+    const cast = data as unknown as ReturnType<
+      typeof VaultLeaf.prototype.toJSON
+    >
     return new VaultLeaf(
-      data.starkKey,
-      BigInt(data.balance),
-      data.token,
+      StarkKey(cast.starkKey),
+      BigInt(cast.balance),
+      PedersenHash(cast.token),
       knownHash
     )
   }
 
   toJSON() {
     return {
-      starkKey: this.starkKey,
+      starkKey: this.starkKey.toString(),
       balance: this.balance.toString(),
-      token: this.token,
+      token: this.token.toString(),
     }
   }
 }

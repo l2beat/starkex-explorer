@@ -162,7 +162,7 @@ export class Application {
         const rollupStateRepository = new MerkleTreeRepository(
           database,
           logger,
-          PositionLeaf.EMPTY
+          PositionLeaf
         )
         const perpetualValidiumUpdater = new PerpetualValidiumUpdater(
           stateUpdateRepository,
@@ -192,7 +192,7 @@ export class Application {
         const spotStateRepository = new MerkleTreeRepository(
           database,
           logger,
-          VaultLeaf.EMPTY
+          VaultLeaf
         )
         const spotValidiumUpdater = new SpotValidiumUpdater(
           stateUpdateRepository,
@@ -237,7 +237,7 @@ export class Application {
       const rollupStateRepository = new MerkleTreeRepository(
         database,
         logger,
-        PositionLeaf.EMPTY
+        PositionLeaf
       )
       const perpetualRollupUpdater = new PerpetualRollupUpdater(
         pageRepository,
