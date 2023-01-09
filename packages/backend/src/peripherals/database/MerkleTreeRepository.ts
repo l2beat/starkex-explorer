@@ -14,7 +14,7 @@ import { Database } from './shared/Database'
 type MerkleLeaf = MerkleValue & { toJSON(): json }
 interface MerkleLeafClass<T extends MerkleLeaf> {
   EMPTY: T
-  fromJSON(json: json): T
+  fromJSON(json: json, hash: PedersenHash): T
 }
 
 export class MerkleTreeRepository<T extends MerkleLeaf>
@@ -102,7 +102,7 @@ export class MerkleTreeRepository<T extends MerkleLeaf>
         PedersenHash(node.hash)
       )
     } else if (leaf) {
-      return this.Leaf.fromJSON(leaf.data)
+      return this.Leaf.fromJSON(leaf.data, hash)
     } else {
       throw new Error(`Cannot find node or leaf: ${hash.toString()}`)
     }
