@@ -5,6 +5,7 @@ import { BlockRange } from '../../model'
 import { PageRepository } from '../../peripherals/database/PageRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
+import { toHexData } from '../../utils/toHexData'
 import { LogMemoryPageFactContinuous } from './events'
 
 export interface PageEvent {
@@ -52,9 +53,7 @@ export class PageCollector {
       tx.data
     ) as [BigNumber, BigNumber[], BigNumber, BigNumber, BigNumber]
 
-    return decoded[1]
-      .map((x) => x.toHexString().substring(2).padStart(64, '0'))
-      .join('')
+    return toHexData(decoded[1])
   }
 
   async discardAfter(lastToKeep: BlockNumber) {

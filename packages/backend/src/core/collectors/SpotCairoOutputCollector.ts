@@ -3,6 +3,7 @@ import { Hash256 } from '@explorer/types'
 import { BigNumber, utils } from 'ethers'
 
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { toHexData } from '../../utils/toHexData'
 
 const ABI = new utils.Interface([
   'function updateState(uint256[] calldata publicInput, uint256[] calldata applicationData)',
@@ -18,9 +19,7 @@ export class SpotCairoOutputCollector {
     }
     const decoded = ABI.decodeFunctionData('updateState', tx.data)
     const dexOutputValues = decoded.publicInput as BigNumber[]
-    const hexData = dexOutputValues
-      .map((x) => x.toHexString().slice(2).padStart(64, '0'))
-      .join('')
+    const hexData = toHexData(dexOutputValues)
     return decodeSpotCairoOutput(hexData)
   }
 }
