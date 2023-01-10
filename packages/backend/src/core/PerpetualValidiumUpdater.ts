@@ -1,4 +1,4 @@
-import { StarkExProgramOutput } from '@explorer/encoding'
+import { PerpetualCairoOutput } from '@explorer/encoding'
 import { IMerkleStorage, MerkleTree, PositionLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
@@ -46,7 +46,7 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
 
   async processValidiumStateTransition(
     transition: ValidiumStateTransition,
-    programOutput: StarkExProgramOutput,
+    perpetualCairoOutput: PerpetualCairoOutput,
     batch: PerpetualBatch
   ) {
     const { oldHash, id } = await this.readLastUpdate()
@@ -60,9 +60,9 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
         blockNumber: transition.blockNumber,
         stateTransitionHash: transition.stateTransitionHash,
       },
-      programOutput.newState.positionRoot,
-      programOutput.forcedActions,
-      programOutput.newState.oraclePrices,
+      perpetualCairoOutput.newState.positionRoot,
+      perpetualCairoOutput.forcedActions,
+      perpetualCairoOutput.newState.oraclePrices,
       newPositions
     )
   }

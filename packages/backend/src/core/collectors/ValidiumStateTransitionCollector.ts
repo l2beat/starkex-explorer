@@ -46,6 +46,7 @@ export class ValidiumStateTransitionCollector<T extends StateUpdateEvent> {
         throw new Error('Unexpected state transition fact event')
       }
       if (
+        // Typescript doesn't allow to use this.stateUpdateEvent.name here
         updateState?.name !== 'LogRootUpdate' &&
         updateState?.name !== 'LogUpdateState'
       ) {
@@ -83,36 +84,24 @@ export class ValidiumStateTransitionCollector<T extends StateUpdateEvent> {
   }
 }
 
+type ConstructorArgs = ConstructorParameters<
+  typeof ValidiumStateTransitionCollector
+> extends [...infer T, unknown]
+  ? T
+  : never
+
 export class SpotValidiumStateTransitionCollector extends ValidiumStateTransitionCollector<
-  typeof LogRootUpdate
+  typeof LogUpdateState
 > {
-  constructor(
-    protected readonly ethereumClient: EthereumClient,
-    protected readonly stateTransitionRepository: StateTransitionRepository,
-    protected readonly starkExAddress: EthereumAddress
-  ) {
-    super(
-      ethereumClient,
-      stateTransitionRepository,
-      starkExAddress,
-      LogRootUpdate
-    )
+  constructor(...p: ConstructorArgs) {
+    super(...p, LogUpdateState)
   }
 }
 
 export class PerpetualValidiumStateTransitionCollector extends ValidiumStateTransitionCollector<
   typeof LogUpdateState
 > {
-  constructor(
-    protected readonly ethereumClient: EthereumClient,
-    protected readonly stateTransitionRepository: StateTransitionRepository,
-    protected readonly starkExAddress: EthereumAddress
-  ) {
-    super(
-      ethereumClient,
-      stateTransitionRepository,
-      starkExAddress,
-      LogUpdateState
-    )
+  constructor(...p: ConstructorArgs) {
+    super(...p, LogUpdateState)
   }
 }

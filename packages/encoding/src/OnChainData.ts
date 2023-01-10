@@ -8,7 +8,7 @@ import {
 } from '@explorer/types'
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/program_output.cairo#L34-L49
-export interface StarkExProgramOutput {
+export interface PerpetualCairoOutput {
   configurationHash: Hash256 // we use Hash256 here because we don't know if it is PedersenHash
   assetConfigHashes: AssetConfigHash[]
   oldState: State
@@ -20,7 +20,7 @@ export interface StarkExProgramOutput {
 }
 
 // https://github.com/starkware-libs/starkex-for-spot-trading/blob/607f0b4ce507e1d95cd018d206a2797f6ba4aab4/src/starkware/cairo/dex/main.cairo#L21-L37
-export interface StarkExDexOutput {
+export interface SpotCairoOutput {
   configCode: bigint
   initialValidiumVaultRoot: PedersenHash
   finalValidiumVaultRoot: PedersenHash
@@ -52,7 +52,7 @@ export interface OnChainPositionsUpdate {
   positions: PositionUpdate[]
 }
 
-export type OnChainData = StarkExProgramOutput & OnChainPositionsUpdate
+export type OnChainData = PerpetualCairoOutput & OnChainPositionsUpdate
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/definitions/general_config_hash.cairo#L9-L13
 export interface AssetConfigHash {

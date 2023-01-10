@@ -14,13 +14,13 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
-import { DexOutputCollector } from './core/collectors/DexOutputCollector'
 import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
+import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
 import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
-import { ProgramOutputCollector } from './core/collectors/ProgramOutputCollector'
+import { SpotCairoOutputCollector } from './core/collectors/SpotCairoOutputCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import {
   PerpetualValidiumStateTransitionCollector,
@@ -156,13 +156,13 @@ export class Application {
             stateTransitionRepository,
             config.starkex.contracts.perpetual
           )
-        const programOutputCollector = new ProgramOutputCollector(
+        const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
           ethereumClient
         )
         const rollupStateRepository = new MerkleTreeRepository(
           database,
           logger,
-          PositionLeaf.EMPTY
+          PositionLeaf
         )
         const perpetualValidiumUpdater = new PerpetualValidiumUpdater(
           stateUpdateRepository,
@@ -177,7 +177,7 @@ export class Application {
           userRegistrationCollector,
           forcedEventsCollector,
           finalizeExitEventsCollector,
-          programOutputCollector,
+          perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           logger
         )
@@ -188,11 +188,13 @@ export class Application {
             stateTransitionRepository,
             config.starkex.contracts.perpetual
           )
-        const dexOutputCollector = new DexOutputCollector(ethereumClient)
+        const spotCairoOutputCollector = new SpotCairoOutputCollector(
+          ethereumClient
+        )
         const spotStateRepository = new MerkleTreeRepository(
           database,
           logger,
-          VaultLeaf.EMPTY
+          VaultLeaf
         )
         const spotValidiumUpdater = new SpotValidiumUpdater(
           stateUpdateRepository,
@@ -207,7 +209,7 @@ export class Application {
           userRegistrationCollector,
           forcedEventsCollector,
           finalizeExitEventsCollector,
-          dexOutputCollector,
+          spotCairoOutputCollector,
           spotValidiumUpdater,
           logger
         )
@@ -237,7 +239,7 @@ export class Application {
       const rollupStateRepository = new MerkleTreeRepository(
         database,
         logger,
-        PositionLeaf.EMPTY
+        PositionLeaf
       )
       const perpetualRollupUpdater = new PerpetualRollupUpdater(
         pageRepository,

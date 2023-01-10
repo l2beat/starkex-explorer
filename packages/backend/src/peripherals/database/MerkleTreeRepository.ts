@@ -1,22 +1,31 @@
 import {
   IMerkleStorage,
   MerkleNode,
+  MerkleValue,
   NodeOrLeaf,
-  PositionLeaf,
-  VaultLeaf,
 } from '@explorer/state'
-import { PedersenHash } from '@explorer/types'
+import { json, PedersenHash } from '@explorer/types'
 import { partition } from 'lodash'
 
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
+type MerkleLeaf = MerkleValue & { toJSON(): json }
+interface MerkleLeafClass<T extends MerkleLeaf> {
+  EMPTY: T
+  fromJSON(json: json, hash: PedersenHash): T
+}
+
+export class MerkleTreeRepository<T extends MerkleLeaf>
   extends BaseRepository
   implements IMerkleStorage<T>
 {
-  constructor(database: Database, logger: Logger, readonly emptyLeaf: T) {
+  constructor(
+    database: Database,
+    logger: Logger,
+    readonly Leaf: MerkleLeafClass<T>
+  ) {
     super(database, logger)
 
     /* eslint-disable @typescript-eslint/unbound-method */
@@ -28,12 +37,12 @@ export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
   }
 
   async persist(values: NodeOrLeaf<T>[]): Promise<void> {
-    const [nodes, positions] = partition(
+    const [nodes, leaves] = partition(
       values,
       (x): x is MerkleNode<T> => x instanceof MerkleNode
     )
 
-    const [nodeRows, positionRows] = await Promise.all([
+    const [nodeRows, leafRows] = await Promise.all([
       Promise.all(
         nodes.map(async (x) => ({
           hash: (await x.hash()).toString(),
@@ -42,7 +51,7 @@ export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
         }))
       ),
       Promise.all(
-        positions.map(async (x) => ({
+        leaves.map(async (x) => ({
           hash: (await x.hash()).toString(),
           data: x.toJSON(),
         }))
@@ -52,7 +61,7 @@ export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
     const filteredNodeRows = nodeRows.filter(
       (x, i, a) => a.findIndex((y) => x.hash === y.hash) === i
     )
-    const filteredPositionRows = positionRows.filter(
+    const filteredLeafRows = leafRows.filter(
       (x, i, a) => a.findIndex((y) => x.hash === y.hash) === i
     )
 
@@ -63,10 +72,10 @@ export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
         knex('merkle_nodes').insert(filteredNodeRows).onConflict('hash').merge()
       )
     }
-    if (filteredPositionRows.length > 0) {
+    if (filteredLeafRows.length > 0) {
       queries.push(
-        knex('merkle_positions')
-          .insert(filteredPositionRows)
+        knex('merkle_leaves')
+          .insert(filteredLeafRows)
           .onConflict('hash')
           .merge()
       )
@@ -77,11 +86,11 @@ export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
 
   async recover(hash: PedersenHash): Promise<NodeOrLeaf<T>> {
     const knex = await this.knex()
-    const [node, position] = await Promise.all([
+    const [node, leaf] = await Promise.all([
       knex('merkle_nodes')
         .first('hash', 'left_hash', 'right_hash')
         .where('hash', hash.toString()),
-      knex('merkle_positions')
+      knex('merkle_leaves')
         .first('hash', 'data')
         .where('hash', hash.toString()),
     ])
@@ -92,17 +101,10 @@ export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
         PedersenHash(node.right_hash),
         PedersenHash(node.hash)
       )
-    } else if (position) {
-      // TODO: find a way to get rid of this type convers
-      return this.emptyLeaf.fromJSON(
-        position.data as unknown as ReturnType<
-          typeof PositionLeaf.prototype.toJSON
-        > &
-          ReturnType<typeof VaultLeaf.prototype.toJSON>,
-        hash
-      ) as unknown as NodeOrLeaf<T>
+    } else if (leaf) {
+      return this.Leaf.fromJSON(leaf.data, hash)
     } else {
-      throw new Error(`Cannot find node or position: ${hash.toString()}`)
+      throw new Error(`Cannot find node or leaf: ${hash.toString()}`)
     }
   }
 
@@ -110,7 +112,7 @@ export class MerkleTreeRepository<T extends PositionLeaf | VaultLeaf>
     const knex = await this.knex()
     const [a, b, c] = await Promise.all([
       knex('merkle_nodes').delete(),
-      knex('merkle_positions').delete(),
+      knex('merkle_leaves').delete(),
       knex('rollup_parameters').delete(),
     ])
     return a + b + c
