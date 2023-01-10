@@ -31,7 +31,7 @@ describe(SpotValidiumUpdater.name, () => {
   })
 
   describe(SpotValidiumUpdater.prototype.buildNewVaultLeaves.name, () => {
-    it('correctly maps SpotBatch to vault', () => {
+    it('correctly maps SpotBatch to updated vault leaves', () => {
       const updater = new SpotValidiumUpdater(
         mock<StateUpdateRepository>({}),
         mock<InMemoryMerkleStorage<VaultLeaf>>(),
