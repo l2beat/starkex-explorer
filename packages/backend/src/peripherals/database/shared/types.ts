@@ -54,7 +54,7 @@ declare module 'knex/types/tables' {
     right_hash: string
   }
 
-  interface MerklePositionsRow {
+  interface MerkleLeavesRow {
     hash: string
     data: json
   }
@@ -163,7 +163,7 @@ declare module 'knex/types/tables' {
     state_transitions: StateTransitionRow
     blocks: BlockRow
     merkle_nodes: MerkleNodeRow
-    merkle_positions: MerklePositionsRow
+    merkle_leaves: MerkleLeavesRow
     rollup_parameters: RollupParametersRow
     position_updates: PositionUpdateRow
     state_updates: StateUpdateRow

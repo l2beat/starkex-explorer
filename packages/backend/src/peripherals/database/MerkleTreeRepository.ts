@@ -74,7 +74,7 @@ export class MerkleTreeRepository<T extends MerkleLeaf>
     }
     if (filteredLeafRows.length > 0) {
       queries.push(
-        knex('merkle_positions')
+        knex('merkle_leaves')
           .insert(filteredLeafRows)
           .onConflict('hash')
           .merge()
@@ -90,7 +90,7 @@ export class MerkleTreeRepository<T extends MerkleLeaf>
       knex('merkle_nodes')
         .first('hash', 'left_hash', 'right_hash')
         .where('hash', hash.toString()),
-      knex('merkle_positions')
+      knex('merkle_leaves')
         .first('hash', 'data')
         .where('hash', hash.toString()),
     ])
@@ -112,7 +112,7 @@ export class MerkleTreeRepository<T extends MerkleLeaf>
     const knex = await this.knex()
     const [a, b, c] = await Promise.all([
       knex('merkle_nodes').delete(),
-      knex('merkle_positions').delete(),
+      knex('merkle_leaves').delete(),
       knex('rollup_parameters').delete(),
     ])
     return a + b + c
