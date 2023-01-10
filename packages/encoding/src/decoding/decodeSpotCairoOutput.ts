@@ -7,13 +7,13 @@ import {
 
 import {
   OrderMessage,
+  SpotCairoOutput,
   SpotModification,
-  StarkExDexOutput,
   VaultUpdate,
 } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 
-export function decodeDexOutput(data: string): StarkExDexOutput {
+export function decodeSpotCairoOutput(data: string): SpotCairoOutput {
   const reader = new ByteReader(data)
 
   const configCode = reader.readBigInt(32)

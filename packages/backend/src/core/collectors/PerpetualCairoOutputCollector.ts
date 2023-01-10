@@ -1,4 +1,7 @@
-import { decodePerpetualCairoOutput, PerpetualCairoOutput } from '@explorer/encoding'
+import {
+  decodePerpetualCairoOutput,
+  PerpetualCairoOutput,
+} from '@explorer/encoding'
 import { Hash256 } from '@explorer/types'
 import { BigNumber, utils } from 'ethers'
 

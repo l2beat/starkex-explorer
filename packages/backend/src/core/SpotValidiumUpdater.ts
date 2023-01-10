@@ -1,4 +1,4 @@
-import { StarkExDexOutput } from '@explorer/encoding'
+import { SpotCairoOutput } from '@explorer/encoding'
 import { IMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
@@ -46,7 +46,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
 
   async processSpotValidiumStateTransition(
     transition: ValidiumStateTransition,
-    dexOutput: StarkExDexOutput,
+    spotCairoOutput: SpotCairoOutput,
     batch: SpotBatch
   ) {
     const { oldHash, id } = await this.readLastUpdate()
@@ -60,7 +60,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
         blockNumber: transition.blockNumber,
         stateTransitionHash: transition.stateTransitionHash,
       },
-      dexOutput.finalValidiumVaultRoot,
+      spotCairoOutput.finalValidiumVaultRoot,
       [], // TODO: add forced actions,
       [], // There are no oracle prices for Spot
       newVaults

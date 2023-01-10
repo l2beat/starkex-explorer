@@ -1,7 +1,7 @@
 export { decodeAssetId } from './decoding/decodeAssetId'
-export { decodeDexOutput } from './decoding/decodeDexOutput'
 export { decodeOnChainData } from './decoding/decodeOnChainData'
 export { decodePerpetualCairoOutput } from './decoding/decodePerpetualCairoOutput'
+export { decodeSpotCairoOutput } from './decoding/decodeSpotCairoOutput'
 export { DecodingError } from './decoding/DecodingError'
 export { encodeAssetId } from './encoding/encodeAssetId'
 export { encodeOnChainData } from './encoding/encodeOnChainData'

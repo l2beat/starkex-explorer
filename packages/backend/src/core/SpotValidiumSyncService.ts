@@ -2,9 +2,9 @@ import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { Logger } from '../tools/Logger'
-import { DexOutputCollector } from './collectors/DexOutputCollector'
 import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
+import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { IDataSyncService } from './DataSyncService'
@@ -17,7 +17,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
-    private readonly dexOutputCollector: DexOutputCollector,
+    private readonly spotCairoOutputCollector: SpotCairoOutputCollector,
     private readonly spotValidiumUpdater: SpotValidiumUpdater,
     private readonly logger: Logger
   ) {
@@ -47,8 +47,8 @@ export class SpotValidiumSyncService implements IDataSyncService {
     })
 
     for (const transition of stateTransitions) {
-      const [dexOutput, batch] = await Promise.all([
-        this.dexOutputCollector.collect(transition.transactionHash),
+      const [spotCairoOutput, batch] = await Promise.all([
+        this.spotCairoOutputCollector.collect(transition.transactionHash),
         this.availabilityGatewayClient.getSpotBatch(transition.batchId),
       ])
       if (!batch) {
@@ -56,7 +56,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
       }
       await this.spotValidiumUpdater.processSpotValidiumStateTransition(
         transition,
-        dexOutput,
+        spotCairoOutput,
         batch
       )
     }
