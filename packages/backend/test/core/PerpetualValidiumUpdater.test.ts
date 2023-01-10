@@ -1,6 +1,21 @@
-import { AssetConfigHash, ForcedAction, OraclePrice, State } from '@explorer/encoding'
-import { InMemoryMerkleStorage, MerkleTree, PositionLeaf } from '@explorer/state'
-import { AssetId, Hash256, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetConfigHash,
+  ForcedAction,
+  OraclePrice,
+  State,
+} from '@explorer/encoding'
+import {
+  InMemoryMerkleStorage,
+  MerkleTree,
+  PositionLeaf,
+} from '@explorer/state'
+import {
+  AssetId,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import {
@@ -59,7 +74,7 @@ describe(PerpetualValidiumUpdater.name, () => {
           Logger.SILENT,
           stateTree
         )
-        
+
         const mockProcessStateTransition =
           mockFn<
             [
@@ -74,16 +89,17 @@ describe(PerpetualValidiumUpdater.name, () => {
         updater.processStateTransition = mockProcessStateTransition
 
         const mockReadLastupdate = mockFn()
-        mockReadLastupdate.returns(Promise.resolve({oldHash: PedersenHash.fake('321'), id: 1}))
+        mockReadLastupdate.returns(
+          Promise.resolve({ oldHash: PedersenHash.fake('321'), id: 1 })
+        )
         updater.readLastUpdate = mockReadLastupdate
-        
-        
+
         const transition = {
           blockNumber: 1,
           transactionHash: Hash256.fake('123'),
           stateTransitionHash: Hash256.fake('456'),
           sequenceNumber: 12,
-          batchId: 13
+          batchId: 13,
         }
         const testForcedActions: ForcedAction[] = [
           {
@@ -104,7 +120,7 @@ describe(PerpetualValidiumUpdater.name, () => {
           minimumExpirationTimestamp: 123n,
           modifications: [],
           forcedActions: testForcedActions,
-          conditions: mock<PedersenHash[]>()
+          conditions: mock<PedersenHash[]>(),
         }
         const testPerpetualBatch = {
           previousBatchId: 12,
@@ -115,10 +131,10 @@ describe(PerpetualValidiumUpdater.name, () => {
               positionId: 5n,
               starkKey: StarkKey.fake('5'),
               collateralBalance: 555n,
-              assets: []
-            }
+              assets: [],
+            },
           ],
-          orders: []
+          orders: [],
         }
         const updatedPositions = [
           {
@@ -132,13 +148,17 @@ describe(PerpetualValidiumUpdater.name, () => {
           stateTransitionHash: transition.stateTransitionHash,
         }
 
-        await updater.processValidiumStateTransition(transition, mockProgramOutput, testPerpetualBatch)
+        await updater.processValidiumStateTransition(
+          transition,
+          mockProgramOutput,
+          testPerpetualBatch
+        )
         expect(mockProcessStateTransition).toHaveBeenCalledWith([
           update,
           mockProgramOutput.newState.positionRoot,
           testForcedActions,
           mockProgramOutput.newState.oraclePrices,
-          updatedPositions
+          updatedPositions,
         ])
       })
     }
