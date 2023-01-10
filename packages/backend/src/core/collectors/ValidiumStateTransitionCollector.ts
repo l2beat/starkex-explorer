@@ -91,10 +91,10 @@ type ConstructorArgs = ConstructorParameters<
   : never
 
 export class SpotValidiumStateTransitionCollector extends ValidiumStateTransitionCollector<
-  typeof LogUpdateState
+  typeof LogRootUpdate
 > {
   constructor(...p: ConstructorArgs) {
-    super(...p, LogUpdateState)
+    super(...p, LogRootUpdate)
   }
 }
 
