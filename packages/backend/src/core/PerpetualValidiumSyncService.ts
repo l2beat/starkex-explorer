@@ -4,7 +4,7 @@ import { AvailabilityGatewayClient } from '../peripherals/starkware/Availability
 import { Logger } from '../tools/Logger'
 import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
-import { ProgramOutputCollector } from './collectors/ProgramOutputCollector'
+import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { IDataSyncService } from './DataSyncService'
@@ -17,7 +17,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
-    private readonly programOutputCollector: ProgramOutputCollector,
+    private readonly perpetualCairoOutputCollector: PerpetualCairoOutputCollector,
     private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
     private readonly logger: Logger
   ) {
@@ -47,8 +47,8 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     })
 
     for (const transition of stateTransitions) {
-      const [programOutput, batch] = await Promise.all([
-        this.programOutputCollector.collect(transition.transactionHash),
+      const [perpetualCairoOutput, batch] = await Promise.all([
+        this.perpetualCairoOutputCollector.collect(transition.transactionHash),
         this.availabilityGatewayClient.getPerpetualBatch(transition.batchId),
       ])
       if (!batch) {
@@ -56,7 +56,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
       }
       await this.perpetualValidiumUpdater.processValidiumStateTransition(
         transition,
-        programOutput,
+        perpetualCairoOutput,
         batch
       )
     }

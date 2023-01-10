@@ -180,7 +180,7 @@ describe(calculateUpdatedPositions.name, () => {
     })
   })
 
-  it('reads funding data from ProgramOutput.oldState', async () => {
+  it('reads funding data from PerpetualCairoOutput.oldState', async () => {
     const storage = new InMemoryMerkleStorage<PositionLeaf>()
     let stateTree = await MerkleTree.create(storage, 3n, PositionLeaf.EMPTY)
 

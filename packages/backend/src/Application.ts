@@ -19,8 +19,8 @@ import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEvent
 import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
+import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
 import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
-import { ProgramOutputCollector } from './core/collectors/ProgramOutputCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import {
   PerpetualValidiumStateTransitionCollector,
@@ -156,7 +156,7 @@ export class Application {
             stateTransitionRepository,
             config.starkex.contracts.perpetual
           )
-        const programOutputCollector = new ProgramOutputCollector(
+        const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
           ethereumClient
         )
         const rollupStateRepository = new MerkleTreeRepository(
@@ -177,7 +177,7 @@ export class Application {
           userRegistrationCollector,
           forcedEventsCollector,
           finalizeExitEventsCollector,
-          programOutputCollector,
+          perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           logger
         )
