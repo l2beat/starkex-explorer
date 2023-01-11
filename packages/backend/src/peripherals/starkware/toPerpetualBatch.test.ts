@@ -1,9 +1,9 @@
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { PerpetualBatchResponse } from '../../../src/peripherals/starkware/schema'
-import { toPerpetualBatch } from '../../../src/peripherals/starkware/toPerpetualBatch'
-import { EXAMPLE_PERPETUAL_BATCH } from './data'
+import { EXAMPLE_PERPETUAL_BATCH } from '../../test/starkwareData'
+import { PerpetualBatchResponse } from './schema'
+import { toPerpetualBatch } from './toPerpetualBatch'
 
 describe(toPerpetualBatch.name, () => {
   it('transforms a null update batch', () => {

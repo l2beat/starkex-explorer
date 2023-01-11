@@ -2,9 +2,9 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 import { providers } from 'ethers'
 
-import { BlockRange } from '../../../src/model'
-import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../../src/test/mock'
+import { BlockRange } from '../../model'
+import { mock } from '../../test/mock'
+import { EthereumClient } from './EthereumClient'
 
 describe(EthereumClient.name, () => {
   describe(EthereumClient.prototype.getLogsInRange.name, () => {

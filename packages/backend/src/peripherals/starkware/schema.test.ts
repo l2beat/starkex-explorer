@@ -1,10 +1,10 @@
 import { expect } from 'earljs'
 
 import {
-  PerpetualBatchResponse,
-  SpotBatchResponse,
-} from '../../../src/peripherals/starkware/schema'
-import { EXAMPLE_PERPETUAL_BATCH, EXAMPLE_SPOT_BATCH } from './data'
+  EXAMPLE_PERPETUAL_BATCH,
+  EXAMPLE_SPOT_BATCH,
+} from '../../test/starkwareData'
+import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
 
 describe('PerpetualBatchResponse', () => {
   it('can parse real data', () => {

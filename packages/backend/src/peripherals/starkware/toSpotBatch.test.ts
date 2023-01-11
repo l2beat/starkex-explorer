@@ -1,9 +1,9 @@
 import { PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { SpotBatchResponse } from '../../../src/peripherals/starkware/schema'
-import { toSpotBatch } from '../../../src/peripherals/starkware/toSpotBatch'
-import { EXAMPLE_SPOT_BATCH } from './data'
+import { EXAMPLE_SPOT_BATCH } from '../../test/starkwareData'
+import { SpotBatchResponse } from './schema'
+import { toSpotBatch } from './toSpotBatch'
 
 describe(toSpotBatch.name, () => {
   it('transforms a null update batch', () => {
