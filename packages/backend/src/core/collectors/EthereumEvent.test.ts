@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 import { BigNumber } from 'ethers'
 
-import { EthereumEvent } from '../../../src/core/collectors/EthereumEvent'
+import { EthereumEvent } from './EthereumEvent'
 
 const TRANSFER_TOPIC =
   '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'

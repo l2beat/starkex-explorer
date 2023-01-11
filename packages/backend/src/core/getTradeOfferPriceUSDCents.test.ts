@@ -1,7 +1,7 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { getTradeOfferPriceUSDCents } from '../../src/core/getTradeOfferPriceUSDCents'
+import { getTradeOfferPriceUSDCents } from './getTradeOfferPriceUSDCents'
 
 describe(getTradeOfferPriceUSDCents.name, () => {
   const cases = [

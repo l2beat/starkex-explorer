@@ -2,12 +2,12 @@ import { Hash256 } from '@explorer/types'
 import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
 import { expect } from 'earljs'
 
-import { LogMemoryPagesHashes } from '../../../src/core/collectors/events'
-import { PageMappingCollector } from '../../../src/core/collectors/PageMappingCollector'
-import { BlockRange } from '../../../src/model'
-import { PageMappingRepository } from '../../../src/peripherals/database/PageMappingRepository'
-import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../../src/test/mock'
+import { BlockRange } from '../../model'
+import { PageMappingRepository } from '../../peripherals/database/PageMappingRepository'
+import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { mock } from '../../test/mock'
+import { LogMemoryPagesHashes } from './events'
+import { PageMappingCollector } from './PageMappingCollector'
 
 describe(PageMappingCollector.name, () => {
   it('fetches memory hash events and saves them to repository', async () => {

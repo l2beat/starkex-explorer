@@ -2,14 +2,14 @@ import { Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 import { providers } from 'ethers'
 
-import { BlockDownloader } from '../../../src/core/sync/BlockDownloader'
 import {
   BlockRecord,
   BlockRepository,
-} from '../../../src/peripherals/database/BlockRepository'
-import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../../src/test/mock'
-import { Logger } from '../../../src/tools/Logger'
+} from '../../peripherals/database/BlockRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { mock } from '../../test/mock'
+import { Logger } from '../../tools/Logger'
+import { BlockDownloader } from './BlockDownloader'
 
 describe(BlockDownloader.name, () => {
   describe(BlockDownloader.prototype.start.name, () => {

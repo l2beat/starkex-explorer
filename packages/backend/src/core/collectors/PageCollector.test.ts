@@ -3,16 +3,12 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 import { providers } from 'ethers'
 
-import { LogMemoryPageFactContinuous } from '../../../src/core/collectors/events'
-import {
-  PAGE_TRANSACTION_ABI,
-  PageCollector,
-  PageEvent,
-} from '../../../src/core/collectors/PageCollector'
-import { BlockRange } from '../../../src/model'
-import { PageRepository } from '../../../src/peripherals/database/PageRepository'
-import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../../src/test/mock'
+import { BlockRange } from '../../model'
+import { PageRepository } from '../../peripherals/database/PageRepository'
+import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { mock } from '../../test/mock'
+import { LogMemoryPageFactContinuous } from './events'
+import { PAGE_TRANSACTION_ABI, PageCollector, PageEvent } from './PageCollector'
 
 const REGISTRY_ADDRESS = EthereumAddress.fake('b00b135')
 

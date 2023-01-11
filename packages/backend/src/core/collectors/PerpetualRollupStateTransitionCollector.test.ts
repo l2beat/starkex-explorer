@@ -1,15 +1,15 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { LogStateTransitionFact } from '../../../src/core/collectors/events'
-import { PerpetualRollupStateTransitionCollector } from '../../../src/core/collectors/PerpetualRollupStateTransitionCollector'
-import { BlockRange } from '../../../src/model'
+import { BlockRange } from '../../model'
 import type {
   StateTransitionRecord,
   StateTransitionRepository,
-} from '../../../src/peripherals/database/StateTransitionRepository'
-import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../../src/test/mock'
+} from '../../peripherals/database/StateTransitionRepository'
+import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { mock } from '../../test/mock'
+import { LogStateTransitionFact } from './events'
+import { PerpetualRollupStateTransitionCollector } from './PerpetualRollupStateTransitionCollector'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 

@@ -3,18 +3,15 @@ import { InMemoryMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash, StarkKey } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
-import {
-  EMPTY_STATE_HASH,
-  SpotValidiumUpdater,
-} from '../../src/core/SpotValidiumUpdater'
-import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
-import type { MerkleTreeRepository } from '../../src/peripherals/database/MerkleTreeRepository'
-import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
-import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
-import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { SpotBatch } from '../../src/peripherals/starkware/toSpotBatch'
-import { mock } from '../../src/test/mock'
-import { Logger } from '../../src/tools/Logger'
+import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
+import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
+import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
+import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
+import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
+import { mock } from '../test/mock'
+import { Logger } from '../tools/Logger'
+import { EMPTY_STATE_HASH, SpotValidiumUpdater } from './SpotValidiumUpdater'
 
 describe(SpotValidiumUpdater.name, () => {
   it('has empty state hash correctly calculated', async () => {

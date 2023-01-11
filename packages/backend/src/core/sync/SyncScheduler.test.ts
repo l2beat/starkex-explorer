@@ -2,14 +2,14 @@ import { Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 import waitForExpect from 'wait-for-expect'
 
-import { PerpetualRollupSyncService } from '../../../src/core/PerpetualRollupSyncService'
-import { BlockDownloader } from '../../../src/core/sync/BlockDownloader'
-import { SyncScheduler } from '../../../src/core/sync/SyncScheduler'
-import { Block } from '../../../src/core/sync/syncSchedulerReducer'
-import { BlockRange } from '../../../src/model'
-import { SyncStatusRepository } from '../../../src/peripherals/database/SyncStatusRepository'
-import { mock } from '../../../src/test/mock'
-import { Logger } from '../../../src/tools/Logger'
+import { BlockRange } from '../../model'
+import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
+import { mock } from '../../test/mock'
+import { Logger } from '../../tools/Logger'
+import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
+import { BlockDownloader } from './BlockDownloader'
+import { SyncScheduler } from './SyncScheduler'
+import { Block } from './syncSchedulerReducer'
 
 describe(SyncScheduler.name, () => {
   const block = (number: number): Block => ({

@@ -2,15 +2,15 @@ import { Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 import { ethers } from 'ethers'
 
+import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
+import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
+import { fakeSentTransaction } from '../test/fakes'
+import { mock } from '../test/mock'
+import { Logger } from '../tools/Logger'
 import {
   applyCheckResult,
   TransactionStatusService,
-} from '../../src/core/TransactionStatusService'
-import { TransactionStatusRepository } from '../../src/peripherals/database/TransactionStatusRepository'
-import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
-import { fakeSentTransaction } from '../../src/test/fakes'
-import { mock } from '../../src/test/mock'
-import { Logger } from '../../src/tools/Logger'
+} from './TransactionStatusService'
 
 describe(TransactionStatusService.name, () => {
   describe(applyCheckResult.name, () => {

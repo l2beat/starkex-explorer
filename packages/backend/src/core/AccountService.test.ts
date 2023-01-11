@@ -1,11 +1,11 @@
 import { EthereumAddress } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { AccountService } from '../../src/core/AccountService'
-import { ForcedTradeOfferRepository } from '../../src/peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
-import { PositionRepository } from '../../src/peripherals/database/PositionRepository'
-import { mock } from '../../src/test/mock'
+import { ForcedTradeOfferRepository } from '../peripherals/database/ForcedTradeOfferRepository'
+import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
+import { PositionRepository } from '../peripherals/database/PositionRepository'
+import { mock } from '../test/mock'
+import { AccountService } from './AccountService'
 
 describe(AccountService.name, () => {
   it('returns undefined for undefined', async () => {

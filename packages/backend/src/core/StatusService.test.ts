@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { StatusService } from '../../src/core/StatusService'
+import { StatusService } from './StatusService'
 
 describe('StatusService', () => {
   it('returns the aggregate status', () => {

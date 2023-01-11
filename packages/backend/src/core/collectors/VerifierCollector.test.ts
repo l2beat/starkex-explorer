@@ -1,14 +1,14 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
-import { VerifierCollector } from '../../../src/core/collectors/VerifierCollector'
-import { BlockRange } from '../../../src/model'
+import { BlockRange } from '../../model'
 import {
   VerifierEventRecord,
   VerifierEventRepository,
-} from '../../../src/peripherals/database/VerifierEventRepository'
-import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../../src/test/mock'
+} from '../../peripherals/database/VerifierEventRepository'
+import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { mock } from '../../test/mock'
+import { VerifierCollector } from './VerifierCollector'
 
 const PROXY_ADDRESS = EthereumAddress.fake('1234')
 const VERIFIER_ADDRESSES = [

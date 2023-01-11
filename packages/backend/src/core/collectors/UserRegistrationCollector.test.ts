@@ -1,11 +1,11 @@
 import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { UserRegistrationCollector } from '../../../src/core/collectors/UserRegistrationCollector'
-import { BlockRange } from '../../../src/model'
-import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
-import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../../src/test/mock'
+import { BlockRange } from '../../model'
+import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { mock } from '../../test/mock'
+import { UserRegistrationCollector } from './UserRegistrationCollector'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 
