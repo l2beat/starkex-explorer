@@ -1,205 +1,94 @@
-import { Block } from '@ethersproject/providers'
-import { MerkleTree, PositionLeaf, RollupState } from '@explorer/state'
-import {
-  AssetId,
-  Hash256,
-  PedersenHash,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { MerkleTree, PositionLeaf } from '@explorer/state'
+import { AssetId, Hash256, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import {
-  ROLLUP_STATE_EMPTY_HASH,
-  StateUpdater,
-} from '../../src/core/StateUpdater'
-import { ForcedTransactionsRepository } from '../../src/peripherals/database/ForcedTransactionsRepository'
-import type { PageRepository } from '../../src/peripherals/database/PageRepository'
-import type { RollupStateRepository } from '../../src/peripherals/database/RollupStateRepository'
+import { StateUpdater } from '../../src/core/StateUpdater'
+import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
+import type { MerkleTreeRepository } from '../../src/peripherals/database/MerkleTreeRepository'
+import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { Logger } from '../../src/tools/Logger'
-import { decodedFakePages } from '../fakes'
 import { mock } from '../mock'
 
+const EMPTY_STATE_HASH = PedersenHash(
+  '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
+)
+
 describe(StateUpdater.name, () => {
-  describe(StateUpdater.prototype.ensureRollupState.name, () => {
-    it('sets state before an initial state transition', async () => {
-      const rollupStateRepository = mock<RollupStateRepository>({
+  describe(StateUpdater.prototype.ensureStateTree.name, () => {
+    it('sets state tree before an initial state transition', async () => {
+      const rollupStateRepository = mock<MerkleTreeRepository<PositionLeaf>>({
         persist: async () => {},
       })
       const stateUpdater = new StateUpdater(
-        mock<PageRepository>(),
         mock<StateUpdateRepository>(),
         rollupStateRepository,
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
-        Logger.SILENT
+        mock<ForcedTransactionRepository>(),
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        PositionLeaf.EMPTY
       )
-      // ROLLUP_STATE_EMPTY_HASH is for tree of height 64 and  recalculating this hash
+      // EMPTY_STATE_HASH is for tree of height 64 and  recalculating this hash
       // in tests on slower machines (e.g. CI) makes test flakey async-wise.
-      const rollupState = await stateUpdater.ensureRollupState(
-        ROLLUP_STATE_EMPTY_HASH,
-        3n
-      )
+      await stateUpdater.ensureStateTree(EMPTY_STATE_HASH, 3n)
       const rollupStateEmptyHashForHeight3 = PedersenHash(
         '048c477cdb37576ddff3c3fe5c1c7559778d6cbade51e5a6c1fe71e6bdb1d4db'
       )
-      expect(await rollupState.positionTree.hash()).toEqual(
+      expect(await stateUpdater.stateTree?.hash()).toEqual(
         rollupStateEmptyHashForHeight3
       )
       expect(rollupStateRepository.persist.calls.length).toEqual(1)
     })
 
-    it('sets state after restart', async () => {
+    it('sets state tree after restart', async () => {
       const stateUpdater = new StateUpdater(
-        mock<PageRepository>(),
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
-        Logger.SILENT
+        mock<ForcedTransactionRepository>(),
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        PositionLeaf.EMPTY
       )
       const hash = PedersenHash.fake()
-      const rollupState = await stateUpdater.ensureRollupState(hash)
-      expect(await rollupState.positionTree.hash()).toEqual(hash)
+      await stateUpdater.ensureStateTree(hash, 64n)
+      expect(await stateUpdater.stateTree?.hash()).toEqual(hash)
     })
 
-    it('resets state after reorg', async () => {
+    it('resets state tree after reorg', async () => {
       const stateUpdater = new StateUpdater(
-        mock<PageRepository>(),
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
-        Logger.SILENT
+        mock<ForcedTransactionRepository>(),
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        PositionLeaf.EMPTY
       )
       const hashA = PedersenHash.fake('a')
       const hashB = PedersenHash.fake('b')
-      const rollupStateA = await stateUpdater.ensureRollupState(hashA)
-      const rollupStateB = await stateUpdater.ensureRollupState(hashB)
-      expect(await rollupStateA.positionTree.hash()).toEqual(hashA)
-      expect(await rollupStateB.positionTree.hash()).toEqual(hashB)
+      await stateUpdater.ensureStateTree(hashA, 64n)
+      expect(await stateUpdater.stateTree?.hash()).toEqual(hashA)
+      await stateUpdater.ensureStateTree(hashB, 64n)
+      expect(await stateUpdater.stateTree?.hash()).toEqual(hashB)
     })
 
     it('leaves state intact before a subsequent state transition', async () => {
       const stateUpdater = new StateUpdater(
-        mock<PageRepository>(),
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
-        Logger.SILENT
+        mock<ForcedTransactionRepository>(),
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        PositionLeaf.EMPTY
       )
       const hash = PedersenHash.fake()
-      const rollupStateA = await stateUpdater.ensureRollupState(hash)
-      const rollupStateB = await stateUpdater.ensureRollupState(hash)
+      const rollupStateA = await stateUpdater.ensureStateTree(hash, 64n)
+      const rollupStateB = await stateUpdater.ensureStateTree(hash, 64n)
       expect(rollupStateA).toReferentiallyEqual(rollupStateB)
-    })
-  })
-
-  describe(StateUpdater.prototype.loadRequiredPages.name, () => {
-    it('throws if pages are missing in database', async () => {
-      const pageRepository = mock<PageRepository>({
-        getByStateTransitions: async () => [],
-      })
-      const stateUpdater = new StateUpdater(
-        pageRepository,
-        mock<StateUpdateRepository>(),
-        mock<RollupStateRepository>(),
-        mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
-        Logger.SILENT
-      )
-      await expect(
-        stateUpdater.loadRequiredPages([
-          { stateTransitionHash: Hash256.fake('a'), blockNumber: 1 },
-        ])
-      ).toBeRejected('Missing pages for state transitions in database')
-    })
-
-    it('returns correct StateTransition for every update', async () => {
-      const pageRepository = mock<PageRepository>({
-        getByStateTransitions: async () => [
-          ['aa', 'ab', 'ac'],
-          ['ba', 'bb'],
-        ],
-      })
-      const stateUpdateRepository = mock<StateUpdateRepository>({
-        findLast: async () => ({
-          rootHash: PedersenHash.fake('1234'),
-          id: 567,
-          timestamp: Timestamp(1),
-          blockNumber: Math.random(),
-          stateTransitionHash: Hash256.fake(),
-        }),
-      })
-      const stateUpdater = new StateUpdater(
-        pageRepository,
-        stateUpdateRepository,
-        mock<RollupStateRepository>(),
-        mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
-        Logger.SILENT
-      )
-
-      const stateTransitions = await stateUpdater.loadRequiredPages([
-        { blockNumber: 123, stateTransitionHash: Hash256.fake('123') },
-        { blockNumber: 456, stateTransitionHash: Hash256.fake('456') },
-      ])
-      expect(stateTransitions).toEqual([
-        {
-          id: 567 + 1,
-          blockNumber: 123,
-          stateTransitionHash: Hash256.fake('123'),
-          pages: ['aa', 'ab', 'ac'],
-        },
-        {
-          id: 567 + 2,
-          blockNumber: 456,
-          stateTransitionHash: Hash256.fake('456'),
-          pages: ['ba', 'bb'],
-        },
-      ])
-    })
-  })
-
-  describe(StateUpdater.prototype.processOnChainStateTransition.name, () => {
-    it('throws if calculated root hash does not match the one from verifier', async () => {
-      const collector = new StateUpdater(
-        mock<PageRepository>(),
-        mock<StateUpdateRepository>(),
-        mock<RollupStateRepository>(),
-        mock<EthereumClient>({
-          getBlock: async () => {
-            return { timestamp: 1 } as unknown as Block
-          },
-        }),
-        mock<ForcedTransactionsRepository>(),
-        Logger.SILENT,
-        mock<RollupState>({
-          calculateUpdatedPositions: async () => [
-            { index: 1n, value: mock<PositionLeaf>() },
-          ],
-          update: async () =>
-            ({
-              positionTree: mock<MerkleTree<PositionLeaf>>({
-                hash: async () => PedersenHash.fake('1234'),
-              }),
-            } as unknown as RollupState),
-        })
-      )
-
-      await expect(
-        collector.processOnChainStateTransition(
-          {
-            id: 1,
-            stateTransitionHash: Hash256.fake('123'),
-            blockNumber: 1,
-          },
-          decodedFakePages
-        )
-      ).toBeRejected('State transition calculated incorrectly')
     })
   })
 
@@ -210,12 +99,13 @@ describe(StateUpdater.name, () => {
       })
 
       const stateUpdater = new StateUpdater(
-        mock<PageRepository>(),
         stateUpdateRepository,
-        mock<RollupStateRepository>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionsRepository>(),
-        Logger.SILENT
+        mock<ForcedTransactionRepository>(),
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        PositionLeaf.EMPTY
       )
 
       await stateUpdater.discardAfter(20)
@@ -230,17 +120,18 @@ describe(StateUpdater.name, () => {
 
   describe(StateUpdater.prototype.extractTransactionHashes.name, () => {
     it('throws if forced transaction missing in database', async () => {
-      const forcedTransactionsRepository = mock<ForcedTransactionsRepository>({
+      const forcedTransactionRepository = mock<ForcedTransactionRepository>({
         getTransactionHashesByData: async () => [Hash256.fake(), undefined],
       })
 
       const stateUpdater = new StateUpdater(
-        mock<PageRepository>(),
         mock<StateUpdateRepository>(),
-        mock<RollupStateRepository>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        forcedTransactionsRepository,
-        Logger.SILENT
+        forcedTransactionRepository,
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        PositionLeaf.EMPTY
       )
 
       await expect(
@@ -267,6 +158,36 @@ describe(StateUpdater.name, () => {
       ).toBeRejected(
         'Forced action included in state update does not have a matching mined transaction'
       )
+    })
+  })
+
+  describe(StateUpdater.prototype.processStateTransition.name, () => {
+    it('throws if calculated root hash does not match the one from verifier', async () => {
+      const stateUpdater = new StateUpdater(
+        mock<StateUpdateRepository>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
+        mock<EthereumClient>(),
+        mock<ForcedTransactionRepository>(),
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        PositionLeaf.EMPTY,
+        mock<MerkleTree<PositionLeaf>>({
+          update: async () =>
+            ({
+              hash: async () => PedersenHash.fake('1234'),
+            } as unknown as MerkleTree<PositionLeaf>),
+        })
+      )
+
+      await expect(
+        stateUpdater.processStateTransition(
+          mock<StateTransitionRecord>(),
+          PedersenHash.fake('987'),
+          [],
+          [],
+          []
+        )
+      ).toBeRejected('State transition calculated incorrectly')
     })
   })
 })

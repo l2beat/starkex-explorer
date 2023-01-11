@@ -1,6 +1,6 @@
 import { Timestamp } from '@explorer/types'
 
-import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionRepository'
 
 interface Event {
   timestamp: Timestamp

@@ -2,17 +2,21 @@ import { MerkleNode, PositionLeaf } from '@explorer/state'
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { RollupStateRepository } from '../../../src/peripherals/database/RollupStateRepository'
+import { MerkleTreeRepository } from '../../../src/peripherals/database/MerkleTreeRepository'
 import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './shared/setup'
 
-describe(RollupStateRepository.name, () => {
+describe(MerkleTreeRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
-  const repository = new RollupStateRepository(database, Logger.SILENT)
+  const repository = new MerkleTreeRepository(
+    database,
+    Logger.SILENT,
+    PositionLeaf
+  )
 
   afterEach(() => repository.deleteAll())
 
-  describe(RollupStateRepository.prototype.persist.name, () => {
+  describe(MerkleTreeRepository.prototype.persist.name, () => {
     it('persists and recover a merkle node', async () => {
       const node = new MerkleNode(
         repository,

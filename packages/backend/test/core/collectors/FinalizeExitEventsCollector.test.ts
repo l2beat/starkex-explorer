@@ -4,7 +4,7 @@ import { expect } from 'earljs'
 import { LogWithdrawalPerformed } from '../../../src/core/collectors/events'
 import { FinalizeExitEventsCollector } from '../../../src/core/collectors/FinalizeExitEventsCollector'
 import { BlockRange } from '../../../src/model'
-import { ForcedTransactionsRepository } from '../../../src/peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../../src/peripherals/database/ForcedTransactionRepository'
 import { TransactionStatusRepository } from '../../../src/peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
 import {
@@ -38,7 +38,7 @@ describe(FinalizeExitEventsCollector.name, () => {
       const minedAt = Timestamp.fromSeconds(timestamp)
       const sentAt = fakeTimestamp()
 
-      const forcedRepo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionRepository>({
         findByFinalizeHash: async () =>
           fakeExit({
             hash: exitHash,
@@ -89,7 +89,7 @@ describe(FinalizeExitEventsCollector.name, () => {
       const timestamp = fakeInt()
       const minedAt = Timestamp.fromSeconds(timestamp)
 
-      const forcedRepo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionRepository>({
         findByFinalizeHash: async () => undefined,
         getWithdrawalsForFinalize: async () => [fakeExit({ hash: exitHash })],
         saveFinalize: async () => true,
@@ -125,7 +125,7 @@ describe(FinalizeExitEventsCollector.name, () => {
       const blockNumber = fakeInt()
       const timestamp = fakeInt()
 
-      const forcedRepo = mock<ForcedTransactionsRepository>({
+      const forcedRepo = mock<ForcedTransactionRepository>({
         findByFinalizeHash: async () => undefined,
         getWithdrawalsForFinalize: async () => [],
         saveFinalize: async () => true,

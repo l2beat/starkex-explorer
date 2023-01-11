@@ -156,7 +156,7 @@ function toRecord(row: Row): ForcedTransactionRecord {
   }
 }
 
-export class ForcedTransactionsRepository extends BaseRepository {
+export class ForcedTransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 

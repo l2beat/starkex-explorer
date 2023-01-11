@@ -26,7 +26,6 @@ export class PositionRepository extends BaseRepository {
 
     this.findById = this.wrapFind(this.findById)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
-    this.findById = this.wrapFind(this.findById)
     this.findIdByStarkKey = this.wrapFind(this.findIdByStarkKey)
     this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
     this.getPreviousStates = this.wrapGet(this.getPreviousStates)

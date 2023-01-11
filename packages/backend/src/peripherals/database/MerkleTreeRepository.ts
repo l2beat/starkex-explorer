@@ -1,25 +1,34 @@
 import {
-  IRollupStateStorage,
+  IMerkleStorage,
   MerkleNode,
+  MerkleValue,
   NodeOrLeaf,
-  PositionLeaf,
 } from '@explorer/state'
-import { PedersenHash } from '@explorer/types'
+import { json, PedersenHash } from '@explorer/types'
 import { partition } from 'lodash'
 
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export class RollupStateRepository
+type MerkleLeaf = MerkleValue & { toJSON(): json }
+interface MerkleLeafClass<T extends MerkleLeaf> {
+  EMPTY: T
+  fromJSON(json: json, hash: PedersenHash): T
+}
+
+export class MerkleTreeRepository<T extends MerkleLeaf>
   extends BaseRepository
-  implements IRollupStateStorage
+  implements IMerkleStorage<T>
 {
-  constructor(database: Database, logger: Logger) {
+  constructor(
+    database: Database,
+    logger: Logger,
+    readonly Leaf: MerkleLeafClass<T>
+  ) {
     super(database, logger)
 
     /* eslint-disable @typescript-eslint/unbound-method */
-
     this.persist = this.wrapAny(this.persist)
     this.recover = this.wrapAny(this.recover)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -27,13 +36,13 @@ export class RollupStateRepository
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async persist(values: NodeOrLeaf<PositionLeaf>[]): Promise<void> {
-    const [nodes, positions] = partition(
+  async persist(values: NodeOrLeaf<T>[]): Promise<void> {
+    const [nodes, leaves] = partition(
       values,
-      (x): x is MerkleNode<PositionLeaf> => x instanceof MerkleNode
+      (x): x is MerkleNode<T> => x instanceof MerkleNode
     )
 
-    const [nodeRows, positionRows] = await Promise.all([
+    const [nodeRows, leafRows] = await Promise.all([
       Promise.all(
         nodes.map(async (x) => ({
           hash: (await x.hash()).toString(),
@@ -42,7 +51,7 @@ export class RollupStateRepository
         }))
       ),
       Promise.all(
-        positions.map(async (x) => ({
+        leaves.map(async (x) => ({
           hash: (await x.hash()).toString(),
           data: x.toJSON(),
         }))
@@ -52,7 +61,7 @@ export class RollupStateRepository
     const filteredNodeRows = nodeRows.filter(
       (x, i, a) => a.findIndex((y) => x.hash === y.hash) === i
     )
-    const filteredPositionRows = positionRows.filter(
+    const filteredLeafRows = leafRows.filter(
       (x, i, a) => a.findIndex((y) => x.hash === y.hash) === i
     )
 
@@ -63,10 +72,10 @@ export class RollupStateRepository
         knex('merkle_nodes').insert(filteredNodeRows).onConflict('hash').merge()
       )
     }
-    if (filteredPositionRows.length > 0) {
+    if (filteredLeafRows.length > 0) {
       queries.push(
-        knex('merkle_positions')
-          .insert(filteredPositionRows)
+        knex('merkle_leaves')
+          .insert(filteredLeafRows)
           .onConflict('hash')
           .merge()
       )
@@ -75,13 +84,13 @@ export class RollupStateRepository
     await Promise.all(queries)
   }
 
-  async recover(hash: PedersenHash): Promise<NodeOrLeaf<PositionLeaf>> {
+  async recover(hash: PedersenHash): Promise<NodeOrLeaf<T>> {
     const knex = await this.knex()
-    const [node, position] = await Promise.all([
+    const [node, leaf] = await Promise.all([
       knex('merkle_nodes')
         .first('hash', 'left_hash', 'right_hash')
         .where('hash', hash.toString()),
-      knex('merkle_positions')
+      knex('merkle_leaves')
         .first('hash', 'data')
         .where('hash', hash.toString()),
     ])
@@ -92,10 +101,10 @@ export class RollupStateRepository
         PedersenHash(node.right_hash),
         PedersenHash(node.hash)
       )
-    } else if (position) {
-      return PositionLeaf.fromJSON(position.data, PedersenHash(position.hash))
+    } else if (leaf) {
+      return this.Leaf.fromJSON(leaf.data, hash)
     } else {
-      throw new Error(`Cannot find node or position: ${hash.toString()}`)
+      throw new Error(`Cannot find node or leaf: ${hash.toString()}`)
     }
   }
 
@@ -103,7 +112,7 @@ export class RollupStateRepository
     const knex = await this.knex()
     const [a, b, c] = await Promise.all([
       knex('merkle_nodes').delete(),
-      knex('merkle_positions').delete(),
+      knex('merkle_leaves').delete(),
       knex('rollup_parameters').delete(),
     ])
     return a + b + c

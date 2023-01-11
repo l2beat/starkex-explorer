@@ -1,110 +1,54 @@
+import { ForcedAction, OraclePrice } from '@explorer/encoding'
 import {
-  ForcedAction,
-  OnChainData,
-  StarkExProgramOutput,
-} from '@explorer/encoding'
-import { PositionLeaf, RollupState } from '@explorer/state'
+  IMerkleStorage,
+  MerkleTree,
+  PositionLeaf,
+  VaultLeaf,
+} from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
-import { ForcedTransactionsRepository } from '../peripherals/database/ForcedTransactionsRepository'
-import { PageRepository } from '../peripherals/database/PageRepository'
+import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
-import { RollupStateRepository } from '../peripherals/database/RollupStateRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 
-/**
- * @internal
- * Same as `await RollupState.empty().then(empty => empty.positions.hash())`
- */
-export const ROLLUP_STATE_EMPTY_HASH = PedersenHash(
-  '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'
-)
-
-export class StateUpdater {
+export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
   constructor(
-    private readonly pageRepository: PageRepository,
-    private readonly stateUpdateRepository: StateUpdateRepository,
-    private readonly rollupStateRepository: RollupStateRepository,
-    private readonly ethereumClient: EthereumClient,
-    private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
-    private readonly logger: Logger,
-    private rollupState?: RollupState
+    protected readonly stateUpdateRepository: StateUpdateRepository,
+    protected readonly merkleStorage: IMerkleStorage<T>,
+    protected readonly ethereumClient: EthereumClient,
+    protected readonly forcedTransactionRepository: ForcedTransactionRepository,
+    protected readonly logger: Logger,
+    protected readonly emptyStateHash: PedersenHash,
+    protected readonly emptyLeaf: T,
+    public stateTree?: MerkleTree<T>
   ) {}
-
-  async loadRequiredPages(
-    stateTransitions: Omit<StateTransitionRecord, 'id'>[]
-  ): Promise<(StateTransitionRecord & { pages: string[] })[]> {
-    if (stateTransitions.length === 0) {
-      return []
-    }
-
-    const pageGroups = await this.pageRepository.getByStateTransitions(
-      stateTransitions.map((x) => x.stateTransitionHash)
-    )
-    const stateTransitionsWithPages = pageGroups.map((pages, i) => {
-      const stateTransition = stateTransitions[i]
-      if (stateTransition === undefined) {
-        throw new Error('Programmer error: state transition count mismatch')
-      }
-      return { ...stateTransition, pages }
-    })
-    if (pageGroups.length !== stateTransitions.length) {
-      throw new Error('Missing pages for state transitions in database')
-    }
-
-    const { oldHash, id } = await this.readLastUpdate()
-    await this.ensureRollupState(oldHash)
-
-    return stateTransitionsWithPages.map((transition, i) => ({
-      id: id + i + 1,
-      ...transition,
-    }))
-  }
-
-  async processOnChainStateTransition(
-    stateTransitionRecord: StateTransitionRecord,
-    onChainData: OnChainData
-  ) {
-    if (!this.rollupState) {
-      throw new Error('Rollup state not initialized')
-    }
-    const newPositions = await this.rollupState.calculateUpdatedPositions(
-      onChainData
-    )
-    return this.processStateTransition(
-      stateTransitionRecord,
-      onChainData,
-      newPositions
-    )
-  }
 
   async processStateTransition(
     stateTransitionRecord: StateTransitionRecord,
-    starkExProgramOutput: StarkExProgramOutput,
-    newPositionLeaves: { index: bigint; value: PositionLeaf }[]
+    expectedPositionRoot: PedersenHash,
+    forcedActions: ForcedAction[],
+    oraclePrices: OraclePrice[],
+    newLeaves: { index: bigint; value: T }[]
   ) {
-    if (!this.rollupState) {
-      return
+    if (!this.stateTree) {
+      throw new Error('State tree not initialized')
     }
 
+    this.stateTree = await this.stateTree.update(newLeaves)
+
+    const rootHash = await this.stateTree.hash()
+    if (rootHash !== expectedPositionRoot) {
+      throw new Error('State transition calculated incorrectly')
+    }
+    const transactionHashes = await this.extractTransactionHashes(forcedActions)
     const { id, blockNumber, stateTransitionHash } = stateTransitionRecord
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
 
-    const rollupState = await this.rollupState.update(newPositionLeaves)
-    this.rollupState = rollupState
-
-    const rootHash = await rollupState.positionTree.hash()
-    if (rootHash !== starkExProgramOutput.newState.positionRoot) {
-      throw new Error('State transition calculated incorrectly')
-    }
-    const transactionHashes = await this.extractTransactionHashes(
-      starkExProgramOutput.forcedActions
-    )
     await Promise.all([
       this.stateUpdateRepository.add({
         stateUpdate: {
@@ -114,26 +58,51 @@ export class StateUpdater {
           rootHash,
           timestamp,
         },
-        positions: newPositionLeaves.map(
-          ({ value, index }): PositionRecord => ({
-            positionId: index,
-            starkKey: value.starkKey,
-            balances: value.assets,
-            collateralBalance: value.collateralBalance,
-          })
-        ),
-        prices: starkExProgramOutput.newState.oraclePrices,
+        positions: this.getPositionUpdates(newLeaves),
+        vaults: this.getVaultUpdates(newLeaves),
+        prices: oraclePrices,
         transactionHashes,
       }),
     ])
     this.logger.info('State updated', { id, blockNumber })
   }
 
+  getPositionUpdates(newLeaves: { index: bigint; value: T }[]) {
+    if (!(this.emptyLeaf instanceof PositionLeaf)) {
+      return []
+    }
+    const newPositionLeaves = newLeaves as {
+      index: bigint
+      value: PositionLeaf
+    }[]
+    return newPositionLeaves.map(
+      ({ value, index }): PositionRecord => ({
+        positionId: index,
+        starkKey: value.starkKey,
+        balances: value.assets,
+        collateralBalance: value.collateralBalance,
+      })
+    )
+  }
+
+  getVaultUpdates(newLeaves: { index: bigint; value: T }[]) {
+    if (!(this.emptyLeaf instanceof VaultLeaf)) {
+      return []
+    }
+    const newVaultLeaves = newLeaves as { index: bigint; value: VaultLeaf }[]
+    return newVaultLeaves.map(({ value, index }) => ({
+      vaultId: index,
+      starkKey: value.starkKey,
+      token: value.token,
+      balance: value.balance,
+    }))
+  }
+
   async extractTransactionHashes(
     forcedActions: ForcedAction[]
   ): Promise<Hash256[]> {
     const hashes =
-      await this.forcedTransactionsRepository.getTransactionHashesByData(
+      await this.forcedTransactionRepository.getTransactionHashesByData(
         forcedActions
       )
     const filteredHashes = hashes.filter(
@@ -158,28 +127,23 @@ export class StateUpdater {
     if (lastUpdate) {
       return { oldHash: lastUpdate.rootHash, id: lastUpdate.id }
     }
-    return { oldHash: ROLLUP_STATE_EMPTY_HASH, id: 0 }
+    return { oldHash: this.emptyStateHash, id: 0 }
   }
 
-  async ensureRollupState(oldHash: PedersenHash, height?: bigint) {
-    if (!this.rollupState) {
-      if (oldHash === ROLLUP_STATE_EMPTY_HASH) {
-        this.rollupState = await RollupState.empty(
-          this.rollupStateRepository,
-          height
+  async ensureStateTree(hash: PedersenHash, height: bigint) {
+    if (!this.stateTree) {
+      if (hash === this.emptyStateHash) {
+        this.stateTree = await MerkleTree.create(
+          this.merkleStorage,
+          height,
+          this.emptyLeaf
         )
       } else {
-        this.rollupState = RollupState.recover(
-          this.rollupStateRepository,
-          oldHash
-        )
+        this.stateTree = new MerkleTree(this.merkleStorage, height, hash)
       }
-    } else if ((await this.rollupState.positionTree.hash()) !== oldHash) {
-      this.rollupState = RollupState.recover(
-        this.rollupStateRepository,
-        oldHash
-      )
+    } else if ((await this.stateTree.hash()) !== hash) {
+      this.stateTree = new MerkleTree(this.merkleStorage, height, hash)
     }
-    return this.rollupState
+    return this.stateTree
   }
 }

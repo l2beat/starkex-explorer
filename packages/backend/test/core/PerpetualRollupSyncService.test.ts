@@ -5,11 +5,11 @@ import { FinalizeExitEventsCollector } from '../../src/core/collectors/FinalizeE
 import { ForcedEventsCollector } from '../../src/core/collectors/ForcedEventsCollector'
 import type { PageCollector } from '../../src/core/collectors/PageCollector'
 import type { PageMappingCollector } from '../../src/core/collectors/PageMappingCollector'
-import { StateTransitionCollector } from '../../src/core/collectors/StateTransitionCollector'
+import { PerpetualRollupStateTransitionCollector } from '../../src/core/collectors/PerpetualRollupStateTransitionCollector'
 import { UserRegistrationCollector } from '../../src/core/collectors/UserRegistrationCollector'
 import type { VerifierCollector } from '../../src/core/collectors/VerifierCollector'
-import { DataSyncService } from '../../src/core/DataSyncService'
-import { StateUpdater } from '../../src/core/StateUpdater'
+import { PerpetualRollupSyncService } from '../../src/core/PerpetualRollupSyncService'
+import { PerpetualRollupUpdater } from '../../src/core/PerpetualRollupUpdater'
 import { BlockRange } from '../../src/model'
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { Logger } from '../../src/tools/Logger'
@@ -18,8 +18,8 @@ import { mock } from '../mock'
 
 const noop = async () => {}
 
-describe(DataSyncService.name, () => {
-  describe(DataSyncService.prototype.sync.name, () => {
+describe(PerpetualRollupSyncService.name, () => {
+  describe(PerpetualRollupSyncService.prototype.sync.name, () => {
     const verifierAddresses = [EthereumAddress.fake('123')]
     const verifierCollector = mock<VerifierCollector>({
       collect: async (_blockRange) => verifierAddresses,
@@ -35,9 +35,10 @@ describe(DataSyncService.name, () => {
       { stateTransitionHash: Hash256.fake('abcd'), blockNumber: 1 },
     ]
 
-    const stateTransitionCollector = mock<StateTransitionCollector>({
-      collect: async (_blockRange) => stateTransitionsRecords,
-    })
+    const stateTransitionCollector =
+      mock<PerpetualRollupStateTransitionCollector>({
+        collect: async (_blockRange) => stateTransitionsRecords,
+      })
 
     const userRegistrationCollector = mock<UserRegistrationCollector>({
       collect: async () => [],
@@ -57,7 +58,7 @@ describe(DataSyncService.name, () => {
       blockNumber: 1,
       pages: fakePages,
     }
-    const stateUpdater = mock<StateUpdater>({
+    const perpetualRollupUpdater = mock<PerpetualRollupUpdater>({
       loadRequiredPages: async () => [stateTransitionRecordWithPages],
       processOnChainStateTransition: noop,
     })
@@ -68,12 +69,12 @@ describe(DataSyncService.name, () => {
       blockNumber: 1,
     }
 
-    const service = new DataSyncService(
+    const service = new PerpetualRollupSyncService(
       verifierCollector,
       pageMappingCollector,
       pageCollector,
       stateTransitionCollector,
-      stateUpdater,
+      perpetualRollupUpdater,
       userRegistrationCollector,
       forcedEventsCollector,
       finalizeExitEventsCollector,
@@ -97,40 +98,41 @@ describe(DataSyncService.name, () => {
       expect(forcedEventsCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
-      expect(stateUpdater.loadRequiredPages).toHaveBeenCalledExactlyWith([
-        [stateTransitionsRecords],
-      ])
       expect(
-        stateUpdater.processOnChainStateTransition
+        perpetualRollupUpdater.loadRequiredPages
+      ).toHaveBeenCalledExactlyWith([[stateTransitionsRecords]])
+      expect(
+        perpetualRollupUpdater.processOnChainStateTransition
       ).toHaveBeenCalledExactlyWith([[stateTransitionRecord, decodedFakePages]])
     })
   })
 
-  describe(DataSyncService.prototype.discardAfter.name, () => {
+  describe(PerpetualRollupSyncService.prototype.discardAfter.name, () => {
     it('discards data from block number', async () => {
       const verifierCollector = mock<VerifierCollector>({ discardAfter: noop })
       const pageMappingCollector = mock<PageMappingCollector>({
         discardAfter: noop,
       })
       const pageCollector = mock<PageCollector>({ discardAfter: noop })
-      const stateTransitionCollector = mock<StateTransitionCollector>({
-        discardAfter: noop,
-      })
+      const stateTransitionCollector =
+        mock<PerpetualRollupStateTransitionCollector>({
+          discardAfter: noop,
+        })
       const userRegistrationCollector = mock<UserRegistrationCollector>({
         discardAfter: noop,
       })
-      const stateUpdater = mock<StateUpdater>({
+      const perpetualRollupUpdater = mock<PerpetualRollupUpdater>({
         discardAfter: noop,
       })
       const forcedEventsCollector = mock<ForcedEventsCollector>()
       const finalizeExitEventsCollector = mock<FinalizeExitEventsCollector>()
 
-      const dataSyncService = new DataSyncService(
+      const dataSyncService = new PerpetualRollupSyncService(
         verifierCollector,
         pageMappingCollector,
         pageCollector,
         stateTransitionCollector,
-        stateUpdater,
+        perpetualRollupUpdater,
         userRegistrationCollector,
         forcedEventsCollector,
         finalizeExitEventsCollector,
@@ -143,7 +145,7 @@ describe(DataSyncService.name, () => {
       expect(pageMappingCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(pageCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(stateTransitionCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(stateUpdater.discardAfter).toHaveBeenCalledWith([10])
+      expect(perpetualRollupUpdater.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })

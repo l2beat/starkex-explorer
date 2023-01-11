@@ -1,19 +1,25 @@
 {
   "configCode": 1,
-  "initialValidiumVaultRoot": "01115187af5d5ed73220a9089c071a2340845c376630d03b95e697c615d58f2f",
-  "finalValidiumVaultRoot": "0134349237de8689782347aa0d6caa8e404ad18cf067bf87b13fc6f77c5c1327",
+  "initialValidiumVaultRoot": "0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c",
+  "finalValidiumVaultRoot": "0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c",
   "initialRollupVaultRoot": "0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c",
   "finalRollupVaultRoot": "0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c",
-  "initialOrderRoot": "032eeab75bc82fb3c00e51e5a89d48ebc7eae98f250a5209f487d17a40dfe94e",
-  "finalOrderRoot": "073c20a8b7f0de5c6330ce8854455ed08fde7b5bef5a2987fcda9a4c782fa112",
+  "initialOrderRoot": "0000000000000000000000000000000000000000000000000000000000000000",
+  "finalOrderRoot": "0000000000000000000000000000000000000000000000000000000000000000",
   "globalExpirationTimestamp": 4194303,
   "validiumVaultTreeHeight": 31,
   "rollupVaultTreeHeight": 31,
   "orderTreeHeight": 251,
-  "modificationCount": 0,
-  "conditionalTransferCount": 0,
-  "l1VaultUpdateCount": 0,
-  "l1OrderMessageCount": 0,
-  "onChainDataHash": "0xef5c4a60a6f110c820eed0e70f1be4f17fe2504c967e1ca58a850728258dffac",
+  "modifications": [
+    {
+      "starkKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "assetId": 0,
+      "difference": 0
+    }
+  ],
+  "conditionalTransfers": [],
+  "l1VaultUpdates": [],
+  "l1OrderMessages": [],
+  "onChainDataHash": "0x18791d5b125488091fc489ccf213ae88feda27e2a656ddb8dc6e5e0e1637b7b5",
   "onChainDataSize": 2
 }

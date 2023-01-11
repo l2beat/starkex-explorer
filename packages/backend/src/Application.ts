@@ -1,3 +1,5 @@
+import { PositionLeaf, VaultLeaf } from '@explorer/state'
+
 import { ApiServer } from './api/ApiServer'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
@@ -16,25 +18,34 @@ import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEvent
 import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
-import { StateTransitionCollector } from './core/collectors/StateTransitionCollector'
+import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
+import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
+import { SpotCairoOutputCollector } from './core/collectors/SpotCairoOutputCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
+import {
+  PerpetualValidiumStateTransitionCollector,
+  SpotValidiumStateTransitionCollector,
+} from './core/collectors/ValidiumStateTransitionCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
-import { DataSyncService } from './core/DataSyncService'
-import { StateUpdater } from './core/StateUpdater'
+import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
+import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
+import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
+import { PerpetualValidiumUpdater } from './core/PerpetualValidiumUpdater'
+import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
+import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
-import { ValidiumDataSyncService } from './core/ValidiumDataSyncService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionsRepository } from './peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from './peripherals/database/ForcedTransactionRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
+import { MerkleTreeRepository } from './peripherals/database/MerkleTreeRepository'
 import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
-import { RollupStateRepository } from './peripherals/database/RollupStateRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
@@ -76,14 +87,13 @@ export class Application {
       logger
     )
     const blockRepository = new BlockRepository(database, logger)
-    const rollupStateRepository = new RollupStateRepository(database, logger)
     const stateUpdateRepository = new StateUpdateRepository(database, logger)
     const positionRepository = new PositionRepository(database, logger)
     const userRegistrationEventRepository = new UserRegistrationEventRepository(
       database,
       logger
     )
-    const forcedTransactionsRepository = new ForcedTransactionsRepository(
+    const forcedTransactionRepository = new ForcedTransactionRepository(
       database,
       logger
     )
@@ -113,19 +123,6 @@ export class Application {
     const statusService = new StatusService({
       blockDownloader,
     })
-    const stateTransitionCollector = new StateTransitionCollector(
-      ethereumClient,
-      stateTransitionRepository,
-      config.starkex.contracts.perpetual
-    )
-    const stateUpdater = new StateUpdater(
-      pageRepository,
-      stateUpdateRepository,
-      rollupStateRepository,
-      ethereumClient,
-      forcedTransactionsRepository,
-      logger
-    )
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
       userRegistrationEventRepository,
@@ -133,35 +130,90 @@ export class Application {
     )
     const forcedEventsCollector = new ForcedEventsCollector(
       ethereumClient,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       transactionStatusRepository,
       config.starkex.contracts.perpetual
     )
 
     const finalizeExitEventsCollector = new FinalizeExitEventsCollector(
       ethereumClient,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       transactionStatusRepository,
       config.starkex.contracts.perpetual
     )
 
-    let dataSyncService
+    let syncService
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
         config.starkex.availabilityGateway
       )
 
-      dataSyncService = new ValidiumDataSyncService(
-        ethereumClient,
-        availabilityGatewayClient,
-        config.starkex.contracts.perpetual,
-        stateUpdater,
-        userRegistrationCollector,
-        forcedEventsCollector,
-        finalizeExitEventsCollector,
-        logger
-      )
+      if (config.starkex.tradingMode === 'perpetual') {
+        const perpetualValidiumStateTransitionCollector =
+          new PerpetualValidiumStateTransitionCollector(
+            ethereumClient,
+            stateTransitionRepository,
+            config.starkex.contracts.perpetual
+          )
+        const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
+          ethereumClient
+        )
+        const rollupStateRepository = new MerkleTreeRepository(
+          database,
+          logger,
+          PositionLeaf
+        )
+        const perpetualValidiumUpdater = new PerpetualValidiumUpdater(
+          stateUpdateRepository,
+          rollupStateRepository,
+          ethereumClient,
+          forcedTransactionRepository,
+          logger
+        )
+        syncService = new PerpetualValidiumSyncService(
+          availabilityGatewayClient,
+          perpetualValidiumStateTransitionCollector,
+          userRegistrationCollector,
+          forcedEventsCollector,
+          finalizeExitEventsCollector,
+          perpetualCairoOutputCollector,
+          perpetualValidiumUpdater,
+          logger
+        )
+      } else {
+        const spotValidiumStateTransitionCollector =
+          new SpotValidiumStateTransitionCollector(
+            ethereumClient,
+            stateTransitionRepository,
+            config.starkex.contracts.perpetual
+          )
+        const spotCairoOutputCollector = new SpotCairoOutputCollector(
+          ethereumClient
+        )
+        const spotStateRepository = new MerkleTreeRepository(
+          database,
+          logger,
+          VaultLeaf
+        )
+        const spotValidiumUpdater = new SpotValidiumUpdater(
+          stateUpdateRepository,
+          spotStateRepository,
+          ethereumClient,
+          forcedTransactionRepository,
+          logger
+        )
+        syncService = new SpotValidiumSyncService(
+          availabilityGatewayClient,
+          spotValidiumStateTransitionCollector,
+          userRegistrationCollector,
+          forcedEventsCollector,
+          finalizeExitEventsCollector,
+          spotCairoOutputCollector,
+          spotValidiumUpdater,
+          logger
+        )
+      }
     } else {
       const verifierCollector = new VerifierCollector(
         ethereumClient,
@@ -178,13 +230,31 @@ export class Application {
         pageRepository,
         config.starkex.contracts.registry
       )
-
-      dataSyncService = new DataSyncService(
+      const stateTransitionCollector =
+        new PerpetualRollupStateTransitionCollector(
+          ethereumClient,
+          stateTransitionRepository,
+          config.starkex.contracts.perpetual
+        )
+      const rollupStateRepository = new MerkleTreeRepository(
+        database,
+        logger,
+        PositionLeaf
+      )
+      const perpetualRollupUpdater = new PerpetualRollupUpdater(
+        pageRepository,
+        stateUpdateRepository,
+        rollupStateRepository,
+        ethereumClient,
+        forcedTransactionRepository,
+        logger
+      )
+      syncService = new PerpetualRollupSyncService(
         verifierCollector,
         pageMappingCollector,
         pageCollector,
         stateTransitionCollector,
-        stateUpdater,
+        perpetualRollupUpdater,
         userRegistrationCollector,
         forcedEventsCollector,
         finalizeExitEventsCollector,
@@ -195,7 +265,7 @@ export class Application {
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
       blockDownloader,
-      dataSyncService,
+      syncService,
       logger,
       {
         earliestBlock: config.starkex.blockchain.minBlockNumber,
@@ -213,7 +283,7 @@ export class Application {
     const accountService = new AccountService(
       positionRepository,
       forcedTradeOfferRepository,
-      forcedTransactionsRepository
+      forcedTransactionRepository
     )
 
     // #endregion core
@@ -224,28 +294,28 @@ export class Application {
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       forcedTradeOfferRepository
     )
     const homeController = new HomeController(
       accountService,
       stateUpdateRepository,
       positionRepository,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       forcedTradeOfferRepository
     )
     const forcedTransactionController = new ForcedTransactionController(
       accountService,
       userRegistrationEventRepository,
       positionRepository,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       accountService,
       stateUpdateRepository,
-      forcedTransactionsRepository
+      forcedTransactionRepository
     )
     const searchController = new SearchController(
       stateUpdateRepository,
@@ -261,7 +331,7 @@ export class Application {
     )
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
-      forcedTransactionsRepository,
+      forcedTransactionRepository,
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )

@@ -7,7 +7,7 @@ import { EthereumAddress } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
@@ -22,7 +22,7 @@ export class PositionController {
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private forcedTransactionsRepository: ForcedTransactionsRepository,
+    private forcedTransactionRepository: ForcedTransactionRepository,
     private forcedTradeOfferRepository: ForcedTradeOfferRepository
   ) {}
 
@@ -33,7 +33,7 @@ export class PositionController {
     const [account, history, transactions, offers] = await Promise.all([
       this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
-      this.forcedTransactionsRepository.getByPositionId(positionId),
+      this.forcedTransactionRepository.getByPositionId(positionId),
       this.forcedTradeOfferRepository.getByPositionId(positionId),
     ])
 
@@ -103,7 +103,7 @@ export class PositionController {
       this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.stateUpdateRepository.findByIdWithPositions(stateUpdateId),
-      this.forcedTransactionsRepository.getIncludedInStateUpdate(stateUpdateId),
+      this.forcedTransactionRepository.getIncludedInStateUpdate(stateUpdateId),
     ])
     const updateIndex = history.findIndex(
       (p) => p.stateUpdateId === stateUpdateId

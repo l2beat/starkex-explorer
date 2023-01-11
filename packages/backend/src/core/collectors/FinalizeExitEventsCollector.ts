@@ -4,8 +4,8 @@ import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { BlockRange } from '../../model/BlockRange'
 import {
   FinalizeExitAction,
-  ForcedTransactionsRepository,
-} from '../../peripherals/database/ForcedTransactionsRepository'
+  ForcedTransactionRepository,
+} from '../../peripherals/database/ForcedTransactionRepository'
 import { TransactionStatusRepository } from '../../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { getTransactionStatus } from '../getForcedTransactionStatus'
@@ -21,7 +21,7 @@ interface MinedTransaction {
 export class FinalizeExitEventsCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
+    private readonly forcedTransactionRepository: ForcedTransactionRepository,
     private readonly transactionStatusRepository: TransactionStatusRepository,
     private readonly perpetualAddress: EthereumAddress
   ) {}
@@ -33,7 +33,7 @@ export class FinalizeExitEventsCollector {
     const results = await Promise.all(
       minedFinalizes.map(async (finalize, i, array) => {
         let previousFinalizeMinedAt =
-          (await this.forcedTransactionsRepository.findLatestFinalize()) ??
+          (await this.forcedTransactionRepository.findLatestFinalize()) ??
           Timestamp(0)
 
         if (i > 0) {
@@ -55,7 +55,7 @@ export class FinalizeExitEventsCollector {
     previousWithdrawMinedAt: Timestamp
   ) {
     const connectedExit =
-      await this.forcedTransactionsRepository.findByFinalizeHash(hash)
+      await this.forcedTransactionRepository.findByFinalizeHash(hash)
 
     if (
       connectedExit &&
@@ -77,7 +77,7 @@ export class FinalizeExitEventsCollector {
     }
 
     const disconnectedExits =
-      await this.forcedTransactionsRepository.getWithdrawalsForFinalize(
+      await this.forcedTransactionRepository.getWithdrawalsForFinalize(
         data.starkKey,
         minedAt,
         previousWithdrawMinedAt
@@ -90,7 +90,7 @@ export class FinalizeExitEventsCollector {
 
     await Promise.all(
       disconnectedExits.map((exit) =>
-        this.forcedTransactionsRepository.saveFinalize(
+        this.forcedTransactionRepository.saveFinalize(
           exit.hash,
           hash,
           null,

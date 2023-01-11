@@ -1,5 +1,5 @@
 import { OnChainData } from '../OnChainData'
-import { decodeFirstPage } from './decodeFirstPage'
+import { decodePerpetualCairoOutput } from './decodePerpetualCairoOutput'
 import { decodeUpdates } from './decodeUpdates'
 import { DecodingError } from './DecodingError'
 
@@ -8,7 +8,7 @@ export function decodeOnChainData(pages: string[]): OnChainData {
   if (!first) {
     throw new DecodingError('Missing first page of data')
   }
-  const firstPage = decodeFirstPage(first)
+  const perpetualCairoOutput = decodePerpetualCairoOutput(first)
   const updates = decodeUpdates(rest.join(''))
-  return { ...firstPage, ...updates }
+  return { ...perpetualCairoOutput, ...updates }
 }

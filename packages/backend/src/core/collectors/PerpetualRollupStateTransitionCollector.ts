@@ -10,7 +10,7 @@ import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
 import { LogStateTransitionFact } from './events'
 
-export class StateTransitionCollector {
+export class PerpetualRollupStateTransitionCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly stateTransitionRepository: StateTransitionRepository,

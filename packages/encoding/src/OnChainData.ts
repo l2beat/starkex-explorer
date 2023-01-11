@@ -1,5 +1,6 @@
 import {
   AssetId,
+  EthereumAddress,
   Hash256,
   PedersenHash,
   StarkKey,
@@ -7,7 +8,7 @@ import {
 } from '@explorer/types'
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/program_output.cairo#L34-L49
-export interface StarkExProgramOutput {
+export interface PerpetualCairoOutput {
   configurationHash: Hash256 // we use Hash256 here because we don't know if it is PedersenHash
   assetConfigHashes: AssetConfigHash[]
   oldState: State
@@ -19,7 +20,7 @@ export interface StarkExProgramOutput {
 }
 
 // https://github.com/starkware-libs/starkex-for-spot-trading/blob/607f0b4ce507e1d95cd018d206a2797f6ba4aab4/src/starkware/cairo/dex/main.cairo#L21-L37
-export interface StarkExDexOutput {
+export interface SpotCairoOutput {
   configCode: bigint
   initialValidiumVaultRoot: PedersenHash
   finalValidiumVaultRoot: PedersenHash
@@ -31,12 +32,18 @@ export interface StarkExDexOutput {
   validiumVaultTreeHeight: number
   rollupVaultTreeHeight: number
   orderTreeHeight: number
-  modificationCount: number
-  conditionalTransferCount: number
-  l1VaultUpdateCount: number
-  l1OrderMessageCount: number
+  modifications: SpotModification[]
+  conditionalTransfers: Hash256[]
+  l1VaultUpdates: VaultUpdate[]
+  l1OrderMessages: OrderMessage[]
   onChainDataHash: Hash256
   onChainDataSize: bigint
+}
+
+export interface SpotModification {
+  starkKey: StarkKey
+  assetId: bigint
+  difference: bigint
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
@@ -45,7 +52,7 @@ export interface OnChainPositionsUpdate {
   positions: PositionUpdate[]
 }
 
-export type OnChainData = StarkExProgramOutput & OnChainPositionsUpdate
+export type OnChainData = PerpetualCairoOutput & OnChainPositionsUpdate
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/definitions/general_config_hash.cairo#L9-L13
 export interface AssetConfigHash {
@@ -122,6 +129,17 @@ export interface PositionUpdate {
   collateralBalance: bigint
   fundingTimestamp: Timestamp
   balances: AssetBalance[]
+}
+
+export interface VaultUpdate {
+  address: EthereumAddress
+  assetId: bigint
+  difference: bigint
+}
+
+export interface OrderMessage {
+  sender: EthereumAddress
+  orderHash: Hash256
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/position/serialize_change.cairo#L8-L18

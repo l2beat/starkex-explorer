@@ -7,7 +7,7 @@ import { readForcedActions } from './readForcedActions'
 import { readModifications } from './readModifications'
 import { readState } from './readState'
 
-export function decodeFirstPage(data: string) {
+export function decodePerpetualCairoOutput(data: string) {
   const reader = new ByteReader(data)
 
   const configurationHash = Hash256(reader.readHex(32))

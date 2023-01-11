@@ -2,7 +2,7 @@ import { decodeAssetId, ForcedAction } from '@explorer/encoding'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 
 import { BlockRange } from '../../model/BlockRange'
-import { ForcedTransactionsRepository } from '../../peripherals/database/ForcedTransactionsRepository'
+import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
 import { TransactionStatusRepository } from '../../peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { getTransactionStatus } from '../getForcedTransactionStatus'
@@ -18,7 +18,7 @@ interface MinedTransaction {
 export class ForcedEventsCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly forcedTransactionsRepository: ForcedTransactionsRepository,
+    private readonly forcedTransactionRepository: ForcedTransactionRepository,
     private readonly transactionStatusRepository: TransactionStatusRepository,
     private readonly perpetualAddress: EthereumAddress,
     readonly _getMinedTransactions?: (
@@ -36,11 +36,11 @@ export class ForcedEventsCollector {
     const transactions = await this.getMinedTransactions(blockRange)
     const results = await Promise.all(
       transactions.map(async ({ hash, data, minedAt, blockNumber }) => {
-        const transaction = await this.forcedTransactionsRepository.findByHash(
+        const transaction = await this.forcedTransactionRepository.findByHash(
           hash
         )
         if (!transaction) {
-          await this.forcedTransactionsRepository.add(
+          await this.forcedTransactionRepository.add(
             { hash, data },
             null,
             minedAt,

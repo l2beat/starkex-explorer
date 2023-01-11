@@ -7,18 +7,19 @@ import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsColl
 import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { PageCollector } from './collectors/PageCollector'
 import { PageMappingCollector } from './collectors/PageMappingCollector'
-import { StateTransitionCollector } from './collectors/StateTransitionCollector'
+import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualRollupStateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
-import { StateUpdater } from './StateUpdater'
+import { IDataSyncService } from './IDataSyncService'
+import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 
-export class DataSyncService {
+export class PerpetualRollupSyncService implements IDataSyncService {
   constructor(
     private readonly verifierCollector: VerifierCollector,
     private readonly pageMappingCollector: PageMappingCollector,
     private readonly pageCollector: PageCollector,
-    private readonly stateTransitionCollector: StateTransitionCollector,
-    private readonly stateUpdater: StateUpdater,
+    private readonly perpetualRollupStateTransitionCollector: PerpetualRollupStateTransitionCollector,
+    private readonly perpetualRollupUpdater: PerpetualRollupUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly forcedEventsCollector: ForcedEventsCollector,
     private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
@@ -35,9 +36,8 @@ export class DataSyncService {
       blockRange,
       verifiers
     )
-    const stateTransitionRecords = await this.stateTransitionCollector.collect(
-      blockRange
-    )
+    const stateTransitionRecords =
+      await this.perpetualRollupStateTransitionCollector.collect(blockRange)
 
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
@@ -59,13 +59,14 @@ export class DataSyncService {
       finalizeExitEvents,
     })
 
-    const recordsWithPages = await this.stateUpdater.loadRequiredPages(
-      stateTransitionRecords
-    )
+    const recordsWithPages =
+      await this.perpetualRollupUpdater.loadRequiredPages(
+        stateTransitionRecords
+      )
 
     for (const record of recordsWithPages) {
       const onChainData = decodeOnChainData(record.pages)
-      await this.stateUpdater.processOnChainStateTransition(
+      await this.perpetualRollupUpdater.processOnChainStateTransition(
         {
           id: record.id,
           blockNumber: record.blockNumber,
@@ -80,8 +81,8 @@ export class DataSyncService {
     await this.verifierCollector.discardAfter(blockNumber)
     await this.pageMappingCollector.discardAfter(blockNumber)
     await this.pageCollector.discardAfter(blockNumber)
-    await this.stateTransitionCollector.discardAfter(blockNumber)
-    await this.stateUpdater.discardAfter(blockNumber)
+    await this.perpetualRollupStateTransitionCollector.discardAfter(blockNumber)
+    await this.perpetualRollupUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
   }
 }
