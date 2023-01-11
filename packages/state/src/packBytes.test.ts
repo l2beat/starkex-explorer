@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { packBytes } from '../src/packBytes'
+import { packBytes } from './packBytes'
 
 describe(packBytes.name, () => {
   it('correctly packs scenario 1', () => {

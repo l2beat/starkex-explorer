@@ -1,11 +1,11 @@
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { VaultLeaf } from '../src'
-import { InMemoryMerkleStorage } from '../src/InMemoryMerkleStorage'
-import { MerkleTree } from '../src/MerkleTree'
-import { MerkleValue } from '../src/MerkleValue'
-import { PositionLeaf } from '../src/PositionLeaf'
+import { InMemoryMerkleStorage } from './InMemoryMerkleStorage'
+import { MerkleTree } from './MerkleTree'
+import { MerkleValue } from './MerkleValue'
+import { PositionLeaf } from './PositionLeaf'
+import { VaultLeaf } from './VaultLeaf'
 
 describe(MerkleTree.name, () => {
   describe(MerkleTree.create.name, () => {

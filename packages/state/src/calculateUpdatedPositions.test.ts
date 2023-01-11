@@ -2,9 +2,10 @@ import { State } from '@explorer/encoding'
 import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { InMemoryMerkleStorage, MerkleTree } from '../src'
-import { calculateUpdatedPositions } from '../src/calculateUpdatedPositions'
-import { PositionLeaf } from '../src/PositionLeaf'
+import { calculateUpdatedPositions } from './calculateUpdatedPositions'
+import { InMemoryMerkleStorage } from './InMemoryMerkleStorage'
+import { MerkleTree } from './MerkleTree'
+import { PositionLeaf } from './PositionLeaf'
 
 const emptyState: State = {
   positionRoot: PedersenHash.ZERO,

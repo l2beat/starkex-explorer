@@ -1,7 +1,7 @@
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { PositionLeaf } from '../src/PositionLeaf'
+import { PositionLeaf } from './PositionLeaf'
 
 describe(PositionLeaf.name, () => {
   it('has a correct empty hash', async () => {
