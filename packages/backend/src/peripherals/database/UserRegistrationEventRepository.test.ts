@@ -1,9 +1,9 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+import { setupDatabaseTestSuite } from '../../test/database'
+import { Logger } from '../../tools/Logger'
+import { UserRegistrationEventRepository } from './UserRegistrationEventRepository'
 
 describe(UserRegistrationEventRepository.name, () => {
   const { database } = setupDatabaseTestSuite()

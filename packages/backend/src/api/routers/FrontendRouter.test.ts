@@ -8,10 +8,10 @@ import {
 } from '@explorer/types'
 import { SuperAgentTest } from 'supertest'
 
-import { setupDatabaseTestSuite } from '../../../test/peripherals/database/shared/setup'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { setupDatabaseTestSuite } from '../../test/database'
 import { mock } from '../../test/mock'
 import { createTestApiServer } from '../../test/TestApiServer'
 import { Logger } from '../../tools/Logger'

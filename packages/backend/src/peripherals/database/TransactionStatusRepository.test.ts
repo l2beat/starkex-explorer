@@ -1,9 +1,9 @@
 import { expect } from 'earljs'
 
-import { TransactionStatusRepository } from '../../../src/peripherals/database/TransactionStatusRepository'
-import { fakeSentTransaction, fakeTimestamp } from '../../../src/test/fakes'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+import { setupDatabaseTestSuite } from '../../test/database'
+import { fakeSentTransaction, fakeTimestamp } from '../../test/fakes'
+import { Logger } from '../../tools/Logger'
+import { TransactionStatusRepository } from './TransactionStatusRepository'
 
 describe(TransactionStatusRepository.name, () => {
   const { database } = setupDatabaseTestSuite()

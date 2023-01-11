@@ -2,12 +2,9 @@ import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 import { range } from 'lodash'
 
-import {
-  BlockRecord,
-  BlockRepository,
-} from '../../../src/peripherals/database/BlockRepository'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+import { setupDatabaseTestSuite } from '../../test/database'
+import { Logger } from '../../tools/Logger'
+import { BlockRecord, BlockRepository } from './BlockRepository'
 
 describe(BlockRepository.name, () => {
   const { database } = setupDatabaseTestSuite()

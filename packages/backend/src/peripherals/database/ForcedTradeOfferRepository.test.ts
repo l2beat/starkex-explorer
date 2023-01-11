@@ -1,16 +1,16 @@
 import { AssetId, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
+import { setupDatabaseTestSuite } from '../../test/database'
 import {
   fakeAccepted,
   fakeBigInt,
   fakeInitialOffer,
   fakeOffer,
   fakeTimestamp,
-} from '../../../src/test/fakes'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+} from '../../test/fakes'
+import { Logger } from '../../tools/Logger'
+import { ForcedTradeOfferRepository } from './ForcedTradeOfferRepository'
 
 describe(ForcedTradeOfferRepository.name, () => {
   const { database } = setupDatabaseTestSuite()

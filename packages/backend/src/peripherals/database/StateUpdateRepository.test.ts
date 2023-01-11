@@ -7,14 +7,14 @@ import {
 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { ForcedTransactionRepository } from '../../../src/peripherals/database/ForcedTransactionRepository'
+import { setupDatabaseTestSuite } from '../../test/database'
+import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../test/fakes'
+import { Logger, LogLevel } from '../../tools/Logger'
+import { ForcedTransactionRepository } from './ForcedTransactionRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
-} from '../../../src/peripherals/database/StateUpdateRepository'
-import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../../src/test/fakes'
-import { Logger, LogLevel } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+} from './StateUpdateRepository'
 
 describe(StateUpdateRepository.name, () => {
   const { database } = setupDatabaseTestSuite()

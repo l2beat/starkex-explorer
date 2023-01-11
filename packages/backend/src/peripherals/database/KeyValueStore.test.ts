@@ -1,8 +1,8 @@
 import { expect } from 'earljs'
 
-import { KeyValueStore } from '../../../src/peripherals/database/KeyValueStore'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+import { setupDatabaseTestSuite } from '../../test/database'
+import { Logger } from '../../tools/Logger'
+import { KeyValueStore } from './KeyValueStore'
 
 describe(KeyValueStore.name, () => {
   const { database } = setupDatabaseTestSuite()

@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 
-import { Database } from '../../../../src/peripherals/database/shared/Database'
-import { getTestDatabase } from './setup'
+import { getTestDatabase } from '../../../test/database'
+import { Database } from './Database'
 
 describe(Database.name, () => {
   it('can run and rollback all migrations', async function () {

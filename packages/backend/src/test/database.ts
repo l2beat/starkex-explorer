@@ -1,5 +1,5 @@
-import { Database } from '../../../../src/peripherals/database/shared/Database'
-import { Logger } from '../../../../src/tools/Logger'
+import { Database } from '../peripherals/database/shared/Database'
+import { Logger } from '../tools/Logger'
 
 export function setupDatabaseTestSuite() {
   const { database, skip } = getTestDatabase()

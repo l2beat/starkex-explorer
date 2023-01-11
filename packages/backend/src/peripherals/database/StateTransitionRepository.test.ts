@@ -1,12 +1,12 @@
 import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
+import { setupDatabaseTestSuite } from '../../test/database'
+import { Logger } from '../../tools/Logger'
 import {
   StateTransitionRecord,
   StateTransitionRepository,
-} from '../../../src/peripherals/database/StateTransitionRepository'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+} from './StateTransitionRepository'
 
 describe(StateTransitionRepository.name, () => {
   const { database } = setupDatabaseTestSuite()

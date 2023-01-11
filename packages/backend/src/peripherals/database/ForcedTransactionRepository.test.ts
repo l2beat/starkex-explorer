@@ -1,8 +1,7 @@
 import { Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { ForcedTransactionRepository } from '../../../src/peripherals/database/ForcedTransactionRepository'
-import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
+import { setupDatabaseTestSuite } from '../../test/database'
 import {
   fakeBigInt,
   fakeExit,
@@ -13,9 +12,10 @@ import {
   fakeTimestamp,
   fakeTrade,
   fakeWithdrawal,
-} from '../../../src/test/fakes'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+} from '../../test/fakes'
+import { Logger } from '../../tools/Logger'
+import { ForcedTransactionRepository } from './ForcedTransactionRepository'
+import { StateUpdateRepository } from './StateUpdateRepository'
 
 const MAX_TIME = 2 ** 32 - 1
 describe(ForcedTransactionRepository.name, () => {

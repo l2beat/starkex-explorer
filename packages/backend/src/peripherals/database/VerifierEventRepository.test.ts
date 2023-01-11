@@ -1,11 +1,11 @@
 import { expect } from 'earljs'
 
+import { setupDatabaseTestSuite } from '../../test/database'
+import { Logger } from '../../tools/Logger'
 import {
   VerifierEventRecord,
   VerifierEventRepository,
-} from '../../../src/peripherals/database/VerifierEventRepository'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+} from './VerifierEventRepository'
 
 describe(VerifierEventRepository.name, () => {
   const { database } = setupDatabaseTestSuite()

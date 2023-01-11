@@ -8,11 +8,11 @@ import {
 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
-import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
-import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
-import { Logger, LogLevel } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+import { setupDatabaseTestSuite } from '../../test/database'
+import { Logger, LogLevel } from '../../tools/Logger'
+import { PositionRepository } from './PositionRepository'
+import { StateUpdateRepository } from './StateUpdateRepository'
+import { UserRegistrationEventRepository } from './UserRegistrationEventRepository'
 
 describe(PositionRepository.name, () => {
   const { database } = setupDatabaseTestSuite()

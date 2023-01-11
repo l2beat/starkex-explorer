@@ -2,9 +2,9 @@ import { MerkleNode, PositionLeaf } from '@explorer/state'
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { MerkleTreeRepository } from '../../../src/peripherals/database/MerkleTreeRepository'
-import { Logger } from '../../../src/tools/Logger'
-import { setupDatabaseTestSuite } from './shared/setup'
+import { setupDatabaseTestSuite } from '../../test/database'
+import { Logger } from '../../tools/Logger'
+import { MerkleTreeRepository } from './MerkleTreeRepository'
 
 describe(MerkleTreeRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
