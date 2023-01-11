@@ -1,11 +1,11 @@
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { MIN_INT } from '../../src/constants'
-import { decodeUpdates } from '../../src/decoding/decodeUpdates'
-import { DecodingError } from '../../src/decoding/DecodingError'
-import { ByteWriter } from '../../src/encoding/ByteWriter'
-import { encodeAssetId } from '../../src/encoding/encodeAssetId'
+import { MIN_INT } from '../constants'
+import { ByteWriter } from '../encoding/ByteWriter'
+import { encodeAssetId } from '../encoding/encodeAssetId'
+import { decodeUpdates } from './decodeUpdates'
+import { DecodingError } from './DecodingError'
 
 describe('decodeUpdates', () => {
   it('fails for empty data', () => {

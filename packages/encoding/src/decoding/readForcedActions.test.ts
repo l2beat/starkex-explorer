@@ -1,10 +1,11 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError, encodeAssetId } from '../../src'
-import { readForcedActions } from '../../src/decoding/readForcedActions'
-import { ByteWriter } from '../../src/encoding/ByteWriter'
-import { readToDecode } from './readToDecode'
+import { ByteWriter } from '../encoding/ByteWriter'
+import { encodeAssetId } from '../encoding/encodeAssetId'
+import { readToDecode } from '../test/readToDecode'
+import { DecodingError } from './DecodingError'
+import { readForcedActions } from './readForcedActions'
 
 describe(readForcedActions.name, () => {
   const decode = readToDecode(readForcedActions)

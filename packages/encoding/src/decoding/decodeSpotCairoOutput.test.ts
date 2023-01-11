@@ -1,8 +1,8 @@
 import { expect } from 'earljs'
 
-import { decodeSpotCairoOutput } from '../../src'
-import DECODED_EXAMPLE from '../data/spot-decoded-example.json'
-import ENCODED_EXAMPLE from '../data/spot-encoded-example.json'
+import DECODED_EXAMPLE from '../test/data/spot-decoded-example.json'
+import ENCODED_EXAMPLE from '../test/data/spot-encoded-example.json'
+import { decodeSpotCairoOutput } from './decodeSpotCairoOutput'
 
 describe('decodeOnChainSpotData', () => {
   it('decodes the example data', () => {

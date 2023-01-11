@@ -1,12 +1,12 @@
 import { AssetId, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError } from '../../src'
-import { MIN_INT } from '../../src/constants'
-import { readFundingEntries } from '../../src/decoding/readFundingEntries'
-import { ByteWriter } from '../../src/encoding/ByteWriter'
-import { encodeAssetId } from '../../src/encoding/encodeAssetId'
-import { readToDecode } from './readToDecode'
+import { MIN_INT } from '../constants'
+import { ByteWriter } from '../encoding/ByteWriter'
+import { encodeAssetId } from '../encoding/encodeAssetId'
+import { readToDecode } from '../test/readToDecode'
+import { DecodingError } from './DecodingError'
+import { readFundingEntries } from './readFundingEntries'
 
 describe('readFundingEntries', () => {
   const decode = readToDecode(readFundingEntries)

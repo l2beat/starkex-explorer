@@ -1,12 +1,12 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError } from '../../src'
-import { MIN_INT } from '../../src/constants'
-import { readFundingIndices } from '../../src/decoding/readFundingIndices'
-import { ByteWriter } from '../../src/encoding/ByteWriter'
-import { encodeAssetId } from '../../src/encoding/encodeAssetId'
-import { readToDecode } from './readToDecode'
+import { MIN_INT } from '../constants'
+import { ByteWriter } from '../encoding/ByteWriter'
+import { encodeAssetId } from '../encoding/encodeAssetId'
+import { readToDecode } from '../test/readToDecode'
+import { DecodingError } from './DecodingError'
+import { readFundingIndices } from './readFundingIndices'
 
 describe('readFundingIndices', () => {
   const decode = readToDecode(readFundingIndices)

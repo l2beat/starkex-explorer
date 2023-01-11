@@ -1,11 +1,11 @@
 import { AssetId, PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError } from '../../src'
-import { readAssetConfigHashes } from '../../src/decoding/readAssetConfigHashes'
-import { ByteWriter } from '../../src/encoding/ByteWriter'
-import { encodeAssetId } from '../../src/encoding/encodeAssetId'
-import { readToDecode } from './readToDecode'
+import { ByteWriter } from '../encoding/ByteWriter'
+import { encodeAssetId } from '../encoding/encodeAssetId'
+import { readToDecode } from '../test/readToDecode'
+import { DecodingError } from './DecodingError'
+import { readAssetConfigHashes } from './readAssetConfigHashes'
 
 describe(readAssetConfigHashes.name, () => {
   const decode = readToDecode(readAssetConfigHashes)

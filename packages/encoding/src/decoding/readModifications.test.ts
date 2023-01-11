@@ -1,10 +1,10 @@
 import { StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { DecodingError } from '../../src'
-import { readModifications } from '../../src/decoding/readModifications'
-import { ByteWriter } from '../../src/encoding/ByteWriter'
-import { readToDecode } from './readToDecode'
+import { ByteWriter } from '../encoding/ByteWriter'
+import { readToDecode } from '../test/readToDecode'
+import { DecodingError } from './DecodingError'
+import { readModifications } from './readModifications'
 
 describe(readModifications.name, () => {
   const decode = readToDecode(readModifications)

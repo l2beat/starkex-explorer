@@ -1,10 +1,10 @@
 import { expect } from 'earljs'
 
-import { decodeOnChainData } from '../../src'
-import DECODED_EXAMPLE from '../data/decoded-example.json'
-import DECODED_FORCED from '../data/decoded-forced.json'
-import ENCODED_EXAMPLE from '../data/encoded-example.json'
-import ENCODED_FORCED from '../data/encoded-forced.json'
+import DECODED_EXAMPLE from '../test/data/decoded-example.json'
+import DECODED_FORCED from '../test/data/decoded-forced.json'
+import ENCODED_EXAMPLE from '../test/data/encoded-example.json'
+import ENCODED_FORCED from '../test/data/encoded-forced.json'
+import { decodeOnChainData } from './decodeOnChainData'
 
 describe('decodeOnChainData', () => {
   it('decodes the example data', () => {
