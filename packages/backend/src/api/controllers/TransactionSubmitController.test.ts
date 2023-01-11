@@ -13,11 +13,11 @@ import {
 import { expect } from 'earljs'
 import { providers } from 'ethers'
 
-import { fakeAccepted, fakeInitialOffer, fakeOffer } from '../../../test/fakes'
-import { mock } from '../../../test/mock'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { fakeAccepted, fakeInitialOffer, fakeOffer } from '../../test/fakes'
+import { mock } from '../../test/mock'
 import { TransactionSubmitController } from './TransactionSubmitController'
 
 describe(TransactionSubmitController.name, () => {

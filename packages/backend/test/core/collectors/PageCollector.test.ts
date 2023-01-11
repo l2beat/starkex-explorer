@@ -12,7 +12,7 @@ import {
 import { BlockRange } from '../../../src/model'
 import { PageRepository } from '../../../src/peripherals/database/PageRepository'
 import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../mock'
+import { mock } from '../../../src/test/mock'
 
 const REGISTRY_ADDRESS = EthereumAddress.fake('b00b135')
 

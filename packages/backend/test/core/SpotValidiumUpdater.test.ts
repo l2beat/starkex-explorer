@@ -13,8 +13,8 @@ import { StateTransitionRecord } from '../../src/peripherals/database/StateTrans
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../../src/peripherals/starkware/toSpotBatch'
+import { mock } from '../../src/test/mock'
 import { Logger } from '../../src/tools/Logger'
-import { mock } from '../mock'
 
 describe(SpotValidiumUpdater.name, () => {
   it('has empty state hash correctly calculated', async () => {

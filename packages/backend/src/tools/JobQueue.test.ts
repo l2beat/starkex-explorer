@@ -1,8 +1,8 @@
 import { expect } from 'earljs'
 import waitForExpect from 'wait-for-expect'
 
-import { JobQueue } from '../../src/tools/JobQueue'
-import { Logger } from '../../src/tools/Logger'
+import { JobQueue } from './JobQueue'
+import { Logger } from './Logger'
 
 describe(JobQueue.name, () => {
   const sleep = (ms: number) =>

@@ -1,7 +1,7 @@
 import { AssetId, Hash256, StarkKey } from '@explorer/types'
 
-import { fakeBigInt, fakeBoolean, fakeInt } from '../../../test/fakes'
-import { mock } from '../../../test/mock'
+import { fakeBigInt, fakeBoolean, fakeInt } from '../../test/fakes'
+import { mock } from '../../test/mock'
 import { createTestApiServer } from '../../test/TestApiServer'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { TransactionSubmitController } from '../controllers/TransactionSubmitController'

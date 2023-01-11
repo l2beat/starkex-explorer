@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { getBatches } from '../../src/tools/getBatches'
+import { getBatches } from './getBatches'
 
 describe(getBatches.name, () => {
   it('works', () => {

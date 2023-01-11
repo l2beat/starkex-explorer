@@ -5,7 +5,7 @@ import { AccountService } from '../../src/core/AccountService'
 import { ForcedTradeOfferRepository } from '../../src/peripherals/database/ForcedTradeOfferRepository'
 import { ForcedTransactionRepository } from '../../src/peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../../src/peripherals/database/PositionRepository'
-import { mock } from '../mock'
+import { mock } from '../../src/test/mock'
 
 describe(AccountService.name, () => {
   it('returns undefined for undefined', async () => {

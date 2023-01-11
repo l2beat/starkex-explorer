@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 import { Context } from 'koa'
 
-import { mock } from '../../../test/mock'
+import { mock } from '../../test/mock'
 import {
   ControllerBadRequestResult,
   ControllerCreatedResult,

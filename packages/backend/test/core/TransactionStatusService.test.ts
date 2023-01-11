@@ -8,9 +8,9 @@ import {
 } from '../../src/core/TransactionStatusService'
 import { TransactionStatusRepository } from '../../src/peripherals/database/TransactionStatusRepository'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+import { fakeSentTransaction } from '../../src/test/fakes'
+import { mock } from '../../src/test/mock'
 import { Logger } from '../../src/tools/Logger'
-import { fakeSentTransaction } from '../fakes'
-import { mock } from '../mock'
 
 describe(TransactionStatusService.name, () => {
   describe(applyCheckResult.name, () => {

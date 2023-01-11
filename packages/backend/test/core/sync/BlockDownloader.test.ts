@@ -8,8 +8,8 @@ import {
   BlockRepository,
 } from '../../../src/peripherals/database/BlockRepository'
 import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
+import { mock } from '../../../src/test/mock'
 import { Logger } from '../../../src/tools/Logger'
-import { mock } from '../../mock'
 
 describe(BlockDownloader.name, () => {
   describe(BlockDownloader.prototype.start.name, () => {

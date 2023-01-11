@@ -7,7 +7,7 @@ import { PageMappingCollector } from '../../../src/core/collectors/PageMappingCo
 import { BlockRange } from '../../../src/model'
 import { PageMappingRepository } from '../../../src/peripherals/database/PageMappingRepository'
 import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../mock'
+import { mock } from '../../../src/test/mock'
 
 describe(PageMappingCollector.name, () => {
   it('fetches memory hash events and saves them to repository', async () => {

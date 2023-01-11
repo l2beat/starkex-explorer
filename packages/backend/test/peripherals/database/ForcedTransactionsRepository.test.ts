@@ -3,7 +3,6 @@ import { expect } from 'earljs'
 
 import { ForcedTransactionRepository } from '../../../src/peripherals/database/ForcedTransactionRepository'
 import { StateUpdateRepository } from '../../../src/peripherals/database/StateUpdateRepository'
-import { Logger } from '../../../src/tools/Logger'
 import {
   fakeBigInt,
   fakeExit,
@@ -14,7 +13,8 @@ import {
   fakeTimestamp,
   fakeTrade,
   fakeWithdrawal,
-} from '../../fakes'
+} from '../../../src/test/fakes'
+import { Logger } from '../../../src/tools/Logger'
 import { setupDatabaseTestSuite } from './shared/setup'
 
 const MAX_TIME = 2 ** 32 - 1

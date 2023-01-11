@@ -12,9 +12,9 @@ import { PerpetualRollupSyncService } from '../../src/core/PerpetualRollupSyncSe
 import { PerpetualRollupUpdater } from '../../src/core/PerpetualRollupUpdater'
 import { BlockRange } from '../../src/model'
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
+import { decodedFakePages, fakePages } from '../../src/test/fakes'
+import { mock } from '../../src/test/mock'
 import { Logger } from '../../src/tools/Logger'
-import { decodedFakePages, fakePages } from '../fakes'
-import { mock } from '../mock'
 
 const noop = async () => {}
 

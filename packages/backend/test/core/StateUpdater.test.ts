@@ -8,8 +8,8 @@ import type { MerkleTreeRepository } from '../../src/peripherals/database/Merkle
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import type { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+import { mock } from '../../src/test/mock'
 import { Logger } from '../../src/tools/Logger'
-import { mock } from '../mock'
 
 const EMPTY_STATE_HASH = PedersenHash(
   '52ddcbdd431a044cf838a71d194248640210b316d7b1a568997ecad9dec9626'

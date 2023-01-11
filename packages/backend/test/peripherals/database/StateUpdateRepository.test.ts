@@ -12,8 +12,8 @@ import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../../src/peripherals/database/StateUpdateRepository'
+import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../../src/test/fakes'
 import { Logger, LogLevel } from '../../../src/tools/Logger'
-import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../fakes'
 import { setupDatabaseTestSuite } from './shared/setup'
 
 describe(StateUpdateRepository.name, () => {

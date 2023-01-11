@@ -9,7 +9,7 @@ import type {
   StateTransitionRepository,
 } from '../../../src/peripherals/database/StateTransitionRepository'
 import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../mock'
+import { mock } from '../../../src/test/mock'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 

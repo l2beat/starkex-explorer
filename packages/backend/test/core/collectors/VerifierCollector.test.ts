@@ -8,7 +8,7 @@ import {
   VerifierEventRepository,
 } from '../../../src/peripherals/database/VerifierEventRepository'
 import type { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../mock'
+import { mock } from '../../../src/test/mock'
 
 const PROXY_ADDRESS = EthereumAddress.fake('1234')
 const VERIFIER_ADDRESSES = [

@@ -4,7 +4,7 @@ import { providers } from 'ethers'
 
 import { BlockRange } from '../../../src/model'
 import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { mock } from '../../mock'
+import { mock } from '../../../src/test/mock'
 
 describe(EthereumClient.name, () => {
   describe(EthereumClient.prototype.getLogsInRange.name, () => {

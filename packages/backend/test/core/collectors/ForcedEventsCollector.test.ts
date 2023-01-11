@@ -11,8 +11,8 @@ import {
   fakeInt,
   fakeTimestamp,
   fakeWithdrawal,
-} from '../../fakes'
-import { mock } from '../../mock'
+} from '../../../src/test/fakes'
+import { mock } from '../../../src/test/mock'
 
 const blockRange = new BlockRange([
   {

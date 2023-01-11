@@ -2,8 +2,8 @@ import { expect } from 'earljs'
 
 import { KeyValueStore } from '../../../src/peripherals/database/KeyValueStore'
 import { SyncStatusRepository } from '../../../src/peripherals/database/SyncStatusRepository'
+import { mock } from '../../../src/test/mock'
 import { Logger } from '../../../src/tools/Logger'
-import { mock } from '../../mock'
 
 describe(SyncStatusRepository.name, () => {
   it('writes value to store', async () => {

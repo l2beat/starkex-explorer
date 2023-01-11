@@ -15,19 +15,19 @@ import {
 import { fakeHexString } from '@explorer/types/src/fake'
 import { BigNumber, providers } from 'ethers'
 
-import { LogWithdrawalPerformed } from '../src/core/collectors/events'
+import { LogWithdrawalPerformed } from '../core/collectors/events'
 import {
   Accepted,
   ForcedTradeOfferRecord,
-} from '../src/peripherals/database/ForcedTradeOfferRepository'
+} from '../peripherals/database/ForcedTradeOfferRepository'
 import {
   FinalizeExitAction,
   FinalizeUpdates,
   ForcedTransactionRecord,
   Updates,
-} from '../src/peripherals/database/ForcedTransactionRepository'
-import { StateUpdateRecord } from '../src/peripherals/database/StateUpdateRepository'
-import { Record as TransactionStatusRecord } from '../src/peripherals/database/TransactionStatusRepository'
+} from '../peripherals/database/ForcedTransactionRepository'
+import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
+import { Record as TransactionStatusRecord } from '../peripherals/database/TransactionStatusRepository'
 
 const MAX_SAFE_POSTGRES_INT = 2 ** 31 - 1
 export function fakeInt(max = MAX_SAFE_POSTGRES_INT): number {

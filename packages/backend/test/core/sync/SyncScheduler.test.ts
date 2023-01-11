@@ -8,8 +8,8 @@ import { SyncScheduler } from '../../../src/core/sync/SyncScheduler'
 import { Block } from '../../../src/core/sync/syncSchedulerReducer'
 import { BlockRange } from '../../../src/model'
 import { SyncStatusRepository } from '../../../src/peripherals/database/SyncStatusRepository'
+import { mock } from '../../../src/test/mock'
 import { Logger } from '../../../src/tools/Logger'
-import { mock } from '../../mock'
 
 describe(SyncScheduler.name, () => {
   const block = (number: number): Block => ({

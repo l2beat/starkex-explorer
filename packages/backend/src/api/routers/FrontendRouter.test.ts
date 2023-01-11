@@ -8,11 +8,11 @@ import {
 } from '@explorer/types'
 import { SuperAgentTest } from 'supertest'
 
-import { mock } from '../../../test/mock'
 import { setupDatabaseTestSuite } from '../../../test/peripherals/database/shared/setup'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { mock } from '../../test/mock'
 import { createTestApiServer } from '../../test/TestApiServer'
 import { Logger } from '../../tools/Logger'
 import { ControllerSuccessResult } from '../controllers/ControllerResult'

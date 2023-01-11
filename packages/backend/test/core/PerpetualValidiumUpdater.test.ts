@@ -27,8 +27,8 @@ import type { MerkleTreeRepository } from '../../src/peripherals/database/Merkle
 import { StateTransitionRecord } from '../../src/peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../../src/peripherals/database/StateUpdateRepository'
 import { EthereumClient } from '../../src/peripherals/ethereum/EthereumClient'
+import { mock } from '../../src/test/mock'
 import { Logger } from '../../src/tools/Logger'
-import { mock } from '../mock'
 
 const emptyState: State = {
   positionRoot: PedersenHash.ZERO,
