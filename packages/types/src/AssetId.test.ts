@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { AssetId } from '../src'
+import { AssetId } from './AssetId'
 
 describe(AssetId.name, () => {
   it('throws for long strings', () => {

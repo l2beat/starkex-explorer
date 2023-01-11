@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { PedersenHash } from '../src'
+import { PedersenHash } from './PedersenHash'
 
 describe(PedersenHash.name, () => {
   it('supports 0x prefixed strings', () => {

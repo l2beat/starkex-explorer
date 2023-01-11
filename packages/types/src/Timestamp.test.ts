@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { Timestamp } from '../src'
+import { Timestamp } from './Timestamp'
 
 describe(Timestamp.name, () => {
   it('throws if not an integer', () => {

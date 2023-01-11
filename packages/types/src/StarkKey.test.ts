@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 import { BigNumber } from 'ethers'
 
-import { StarkKey } from '../src'
+import { StarkKey } from './StarkKey'
 
 describe(StarkKey.name, () => {
   it('accepts a valid key', () => {
