@@ -1,7 +1,7 @@
 import { PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { pedersen, terminateWorkerPool } from '../src/pedersen'
+import { pedersen, terminateWorkerPool } from './pedersen'
 
 describe(pedersen.name, () => {
   it('hashes values asynchronously', async () => {

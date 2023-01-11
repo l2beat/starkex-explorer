@@ -2,8 +2,8 @@
   "name": "@explorer/crypto",
   "version": "0.1.0",
   "private": true,
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "sideEffects": false,
   "engines": {
     "node": "^16.0.0",
@@ -12,10 +12,12 @@
   "scripts": {
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "lint": "eslint --ext .ts --max-warnings 0 src test",
+    "lint": "eslint --ext .ts --max-warnings 0 src",
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
+    "prebuild": "yarn clean",
     "build": "tsc",
+    "clean": "rm -rf build",
     "test": "mocha"
   },
   "dependencies": {

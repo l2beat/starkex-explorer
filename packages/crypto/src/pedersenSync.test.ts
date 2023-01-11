@@ -1,7 +1,7 @@
 import { PedersenHash } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { pedersenSync } from '../src'
+import { pedersenSync } from './pedersenSync'
 
 describe(pedersenSync.name, () => {
   it('hashes sample values', () => {
