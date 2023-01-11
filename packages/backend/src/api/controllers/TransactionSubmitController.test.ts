@@ -13,12 +13,12 @@ import {
 import { expect } from 'earljs'
 import { providers } from 'ethers'
 
-import { TransactionSubmitController } from '../../../src/api/controllers/TransactionSubmitController'
-import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionRepository } from '../../../src/peripherals/database/ForcedTransactionRepository'
-import { EthereumClient } from '../../../src/peripherals/ethereum/EthereumClient'
-import { fakeAccepted, fakeInitialOffer, fakeOffer } from '../../fakes'
-import { mock } from '../../mock'
+import { fakeAccepted, fakeInitialOffer, fakeOffer } from '../../../test/fakes'
+import { mock } from '../../../test/mock'
+import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
+import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
+import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { TransactionSubmitController } from './TransactionSubmitController'
 
 describe(TransactionSubmitController.name, () => {
   describe(TransactionSubmitController.prototype.submitForcedExit.name, () => {

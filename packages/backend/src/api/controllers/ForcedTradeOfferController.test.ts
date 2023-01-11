@@ -3,14 +3,14 @@ import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 import { Wallet } from 'ethers'
 
-import { ForcedTradeOfferController } from '../../../src/api/controllers/ForcedTradeOfferController'
-import { AccountService } from '../../../src/core/AccountService'
-import { ForcedTradeOfferRepository } from '../../../src/peripherals/database/ForcedTradeOfferRepository'
-import { PositionRepository } from '../../../src/peripherals/database/PositionRepository'
-import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
-import { fakeAccepted, fakeOffer } from '../../fakes'
-import { mock } from '../../mock'
-import * as tradeMock from '../../../src/api/controllers/utils/ForcedTradeOfferMockData'
+import { fakeAccepted, fakeOffer } from '../../../test/fakes'
+import { mock } from '../../../test/mock'
+import { AccountService } from '../../core/AccountService'
+import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
+import { PositionRepository } from '../../peripherals/database/PositionRepository'
+import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { ForcedTradeOfferController } from './ForcedTradeOfferController'
+import * as tradeMock from './utils/ForcedTradeOfferMockData'
 
 describe(ForcedTradeOfferController.name, () => {
   const stateUpdateId = 1

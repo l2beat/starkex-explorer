@@ -1,6 +1,6 @@
-import { createStatusRouter } from '../../../src/api/routers/StatusRouter'
-import { StatusService } from '../../../src/core/StatusService'
-import { createTestApiServer } from '../TestApiServer'
+import { StatusService } from '../../core/StatusService'
+import { createTestApiServer } from '../../test/TestApiServer'
+import { createStatusRouter } from './StatusRouter'
 
 describe('StatusRouter', () => {
   it('/status returns aggregate status', async () => {

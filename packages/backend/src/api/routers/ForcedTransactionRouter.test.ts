@@ -1,11 +1,11 @@
 import { AssetId, Hash256, StarkKey } from '@explorer/types'
 
-import { ForcedTradeOfferController } from '../../../src/api/controllers/ForcedTradeOfferController'
-import { TransactionSubmitController } from '../../../src/api/controllers/TransactionSubmitController'
-import { createForcedTransactionRouter } from '../../../src/api/routers/ForcedTransactionRouter'
-import { fakeBigInt, fakeBoolean, fakeInt } from '../../fakes'
-import { mock } from '../../mock'
-import { createTestApiServer } from '../TestApiServer'
+import { fakeBigInt, fakeBoolean, fakeInt } from '../../../test/fakes'
+import { mock } from '../../../test/mock'
+import { createTestApiServer } from '../../test/TestApiServer'
+import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
+import { TransactionSubmitController } from '../controllers/TransactionSubmitController'
+import { createForcedTransactionRouter } from './ForcedTransactionRouter'
 
 const signature = '0x12345'
 const initialData = {

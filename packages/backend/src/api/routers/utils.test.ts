@@ -1,15 +1,15 @@
 import { expect } from 'earljs'
 import { Context } from 'koa'
 
+import { mock } from '../../../test/mock'
 import {
   ControllerBadRequestResult,
   ControllerCreatedResult,
   ControllerNotFoundResult,
   ControllerRedirectResult,
   ControllerSuccessResult,
-} from '../../../src/api/controllers/ControllerResult'
-import { applyControllerResult } from '../../../src/api/routers/utils'
-import { mock } from '../../mock'
+} from '../controllers/ControllerResult'
+import { applyControllerResult } from './utils'
 
 const SUCCESS_RESULT: ControllerSuccessResult = {
   type: 'success',
