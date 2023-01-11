@@ -10,7 +10,7 @@ import { PageMappingCollector } from './collectors/PageMappingCollector'
 import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualRollupStateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
-import { IDataSyncService } from './DataSyncService'
+import { IDataSyncService } from './IDataSyncService'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 
 export class PerpetualRollupSyncService implements IDataSyncService {

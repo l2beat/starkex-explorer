@@ -2,7 +2,7 @@ import { BlockRange } from '../../model'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
-import { IDataSyncService } from '../DataSyncService'
+import { IDataSyncService } from '../IDataSyncService'
 import { BlockDownloader } from './BlockDownloader'
 import {
   INITIAL_SYNC_STATE,

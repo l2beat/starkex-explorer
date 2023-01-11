@@ -7,7 +7,7 @@ import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
-import { IDataSyncService } from './DataSyncService'
+import { IDataSyncService } from './IDataSyncService'
 import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
 
 export class PerpetualValidiumSyncService implements IDataSyncService {

@@ -7,7 +7,7 @@ import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
-import { IDataSyncService } from './DataSyncService'
+import { IDataSyncService } from './IDataSyncService'
 import { SpotValidiumUpdater } from './SpotValidiumUpdater'
 
 export class SpotValidiumSyncService implements IDataSyncService {
