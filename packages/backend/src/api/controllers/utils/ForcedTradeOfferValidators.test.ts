@@ -7,8 +7,8 @@ import {
   validateAcceptSignature,
   validateCreateSignature,
   validateSyntheticBalance,
-} from '../../../../src/api/controllers/utils/ForcedTradeOfferValidators'
-import { fakeBigInt } from '../../../fakes'
+} from './ForcedTradeOfferValidators'
+import { fakeBigInt } from '../../../../test/fakes'
 import { accepted, addressB, offer } from './ForcedTradeOfferMockData'
 
 describe(validateCreateSignature.name, () => {

@@ -10,7 +10,7 @@ import { PositionRepository } from '../../../src/peripherals/database/PositionRe
 import { UserRegistrationEventRepository } from '../../../src/peripherals/database/UserRegistrationEventRepository'
 import { fakeAccepted, fakeOffer } from '../../fakes'
 import { mock } from '../../mock'
-import * as tradeMock from './utils/ForcedTradeOfferMockData'
+import * as tradeMock from '../../../src/api/controllers/utils/ForcedTradeOfferMockData'
 
 describe(ForcedTradeOfferController.name, () => {
   const stateUpdateId = 1
