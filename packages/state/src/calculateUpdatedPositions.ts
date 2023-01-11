@@ -1,12 +1,13 @@
-import { Timestamp } from '@explorer/types'
+import { OnChainData } from '@explorer/encoding'
+import { AssetId, Timestamp } from '@explorer/types'
 import { zip } from 'lodash'
 
 import { MerkleTree } from './MerkleTree'
-import {
-  getFundingByTimestamp,
-  OnChainUpdate,
-  PositionLeaf,
-} from './PositionLeaf'
+import { PositionLeaf } from './PositionLeaf'
+
+type OnChainUpdate = Pick<OnChainData, 'positions' | 'funding' | 'oldState'>
+
+type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
 
 export async function calculateUpdatedPositions(
   stateTree: MerkleTree<PositionLeaf>,
@@ -71,4 +72,21 @@ export async function calculateUpdatedPositions(
     }
   )
   return newPositions
+}
+
+function getFundingByTimestamp(onChainData: OnChainUpdate): FundingByTimestamp {
+  const fundingByTimestamp = new Map<Timestamp, ReadonlyMap<AssetId, bigint>>()
+  const oldState = onChainData.oldState
+  fundingByTimestamp.set(
+    oldState.timestamp,
+    new Map(oldState.indices.map((i) => [i.assetId, i.value]))
+  )
+  for (const { timestamp, indices } of onChainData.funding) {
+    const funding = new Map<AssetId, bigint>()
+    for (const { assetId, value } of indices) {
+      funding.set(assetId, value)
+    }
+    fundingByTimestamp.set(timestamp, funding)
+  }
+  return fundingByTimestamp
 }

@@ -1,12 +1,6 @@
 import { pedersen } from '@explorer/crypto'
-import { encodeAssetId, OnChainData } from '@explorer/encoding'
-import {
-  AssetId,
-  json,
-  PedersenHash,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { encodeAssetId } from '@explorer/encoding'
+import { AssetId, json, PedersenHash, StarkKey } from '@explorer/types'
 
 import { MerkleValue } from './MerkleValue'
 import { packBytes } from './packBytes'
@@ -18,13 +12,6 @@ export interface PositionAsset {
   readonly balance: bigint
   readonly fundingIndex: bigint
 }
-
-export type OnChainUpdate = Pick<
-  OnChainData,
-  'positions' | 'funding' | 'oldState'
->
-
-export type FundingByTimestamp = Map<Timestamp, ReadonlyMap<AssetId, bigint>>
 
 export class PositionLeaf extends MerkleValue {
   static EMPTY = new PositionLeaf(StarkKey.ZERO, 0n, [])
@@ -98,23 +85,4 @@ function packAsset(asset: PositionAsset) {
     { bytes: 8, value: asset.fundingIndex - MIN_INT_64 },
     { bytes: 8, value: asset.balance - MIN_INT_64 },
   ])
-}
-
-export function getFundingByTimestamp(
-  onChainData: OnChainUpdate
-): FundingByTimestamp {
-  const fundingByTimestamp = new Map<Timestamp, ReadonlyMap<AssetId, bigint>>()
-  const oldState = onChainData.oldState
-  fundingByTimestamp.set(
-    oldState.timestamp,
-    new Map(oldState.indices.map((i) => [i.assetId, i.value]))
-  )
-  for (const { timestamp, indices } of onChainData.funding) {
-    const funding = new Map<AssetId, bigint>()
-    for (const { assetId, value } of indices) {
-      funding.set(assetId, value)
-    }
-    fundingByTimestamp.set(timestamp, funding)
-  }
-  return fundingByTimestamp
 }
