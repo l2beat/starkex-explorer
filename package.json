@@ -19,6 +19,7 @@
     "typecheck": "wsrun -ecsm typecheck",
     "test": "wsrun -ecsm test",
     "build": "wsrun -ecsm build",
+    "clean": "wsrun -ecsm clean",
     "start": "cd packages/backend && yarn start"
   },
   "devDependencies": {
