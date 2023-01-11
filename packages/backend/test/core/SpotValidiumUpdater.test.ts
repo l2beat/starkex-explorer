@@ -17,7 +17,7 @@ import { Logger } from '../../src/tools/Logger'
 import { mock } from '../mock'
 
 describe(SpotValidiumUpdater.name, () => {
-  it('has empty state hash correcly calculated', async () => {
+  it('has empty state hash correctly calculated', async () => {
     const rollupStateRepository = mock<MerkleTreeRepository<VaultLeaf>>({
       persist: async () => {},
     })
