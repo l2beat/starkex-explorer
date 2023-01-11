@@ -1,6 +1,7 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earljs'
-import { formatCurrency } from '../../../src/pages/formatting'
+
+import { formatCurrency } from './formatCurrency'
 
 describe(formatCurrency.name, () => {
   const cases: [bigint, AssetId | 'USD', string][] = [
@@ -17,7 +18,7 @@ describe(formatCurrency.name, () => {
   ]
 
   for (const [value, asset, expected] of cases) {
-    it(`formats ${value} of ${asset} as ${expected}`, () => {
+    it(`formats ${value} of ${asset.toString()} as ${expected}`, () => {
       const result = formatCurrency(value, asset)
       expect(result).toEqual(expected)
     })

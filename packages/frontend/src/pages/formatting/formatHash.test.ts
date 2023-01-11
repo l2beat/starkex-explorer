@@ -1,6 +1,7 @@
-import { expect } from 'earljs'
 import { Hash256, PedersenHash, StarkKey } from '@explorer/types'
-import { formatHashLong, formatHashShort } from '../../../src/pages/formatting'
+import { expect } from 'earljs'
+
+import { formatHashLong, formatHashShort } from './formatHash'
 
 describe(formatHashLong.name, () => {
   it('formats a PedersenHash', () => {

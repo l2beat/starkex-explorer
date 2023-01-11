@@ -1,10 +1,8 @@
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
-import {
-  getInitialState,
-  nextFormState,
-} from '../../../src/scripts/transaction/state'
-import { FormAction } from '../../../src/scripts/transaction/types'
+
+import { getInitialState, nextFormState } from './state'
+import { FormAction } from './types'
 
 describe(nextFormState.name, () => {
   const INITIAL_STATE = getInitialState(
