@@ -1,7 +1,7 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { CreateOfferBody, serializeCreateOfferBody } from '../src'
+import { CreateOfferBody, serializeCreateOfferBody } from './CreateOfferBody'
 
 describe('CreateOfferBody', () => {
   it('can be serialized and deserialized', () => {

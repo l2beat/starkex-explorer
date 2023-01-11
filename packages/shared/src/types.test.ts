@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { stringAsBigInt, stringAsInt } from '../src'
+import { stringAsBigInt, stringAsInt } from './types'
 
 describe(stringAsInt.name, () => {
   describe('parses correct input', () => {

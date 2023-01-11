@@ -2,7 +2,7 @@ import { recoverAddress } from '@ethersproject/transactions'
 import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { toSignableAcceptOffer } from '../src'
+import { toSignableAcceptOffer } from './toSignableAcceptOffer'
 
 // Mock data taken from real transaction:https://etherscan.io/tx/0x9b2dce5538d0c8c08511c9383be9b67da6f952b367baff0c8bdb5f66c9395634
 

@@ -1,7 +1,7 @@
 import { StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { AcceptOfferBody, serializeAcceptOfferBody } from '../src'
+import { AcceptOfferBody, serializeAcceptOfferBody } from './AcceptOfferBody'
 
 describe('AcceptOfferBody', () => {
   it('can be serialized and deserialized', () => {

@@ -1,6 +1,6 @@
 import { expect } from 'earljs'
 
-import { toSignableCancelOffer } from '../src'
+import { toSignableCancelOffer } from './toSignableCancelOffer'
 
 describe(toSignableCancelOffer.name, () => {
   it('works properly', () => {

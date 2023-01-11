@@ -1,7 +1,10 @@
 import { StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { decodeFinalizeExitRequest, encodeFinalizeExitRequest } from '../src'
+import {
+  decodeFinalizeExitRequest,
+  encodeFinalizeExitRequest,
+} from './FinalizeExitData'
 
 // https://etherscan.io/tx/0xb7c13b9f8f9b521669791ef068b03fc8f0744523023ef67fb56484789b338bcc
 const exampleData =

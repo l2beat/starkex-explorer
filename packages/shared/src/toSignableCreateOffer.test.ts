@@ -1,7 +1,7 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { toSignableCreateOffer } from '../src'
+import { toSignableCreateOffer } from './toSignableCreateOffer'
 
 const offer = {
   starkKeyA: StarkKey.fake(),
