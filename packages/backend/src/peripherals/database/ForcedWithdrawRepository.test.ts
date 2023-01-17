@@ -14,27 +14,27 @@ describe(ForcedWithdrawRepository.name, () => {
 
   afterEach(() => repository.deleteAll())
 
-  describe('status history', () => {
-    const record: ForcedWithdrawTransactionRecord = {
-      hash: Hash256.fake(),
-      starkKey: StarkKey.fake(),
-      amount: 1n,
-      positionId: 2n,
-    }
+  const fakeRecord = (
+    n: number,
+    positionId = 1n,
+    starkKey = StarkKey.fake()
+  ): ForcedWithdrawTransactionRecord => ({
+    hash: Hash256.fake(n.toString().repeat(10)),
+    starkKey,
+    amount: 1n,
+    positionId,
+  })
 
-    const sentTimestamp = Timestamp.now()
-    const forgottenTimestamp = Timestamp(Number(sentTimestamp) + 1000)
-    const revertedTimestamp = Timestamp(Number(forgottenTimestamp) + 1000)
-    const minedTimestamp = Timestamp(Number(revertedTimestamp) + 1000)
-    const includedTimestamp = Timestamp(Number(minedTimestamp) + 1000)
+  describe('status history', () => {
+    const record = fakeRecord(1)
 
     it('adds single record and queries it', async () => {
-      await repository.addSent({ ...record, timestamp: sentTimestamp })
+      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
 
       const result = await repository.findByTransactionHash(record.hash)
       expect(result).toEqual({
         ...record,
-        history: [{ status: 'sent', timestamp: sentTimestamp }],
+        history: [{ status: 'sent', timestamp: Timestamp(1001) }],
       })
     })
 
@@ -44,15 +44,15 @@ describe(ForcedWithdrawRepository.name, () => {
     })
 
     it('can track a regular flow', async () => {
-      await repository.addSent({ ...record, timestamp: sentTimestamp })
+      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
       await repository.addMined({
         ...record,
-        timestamp: minedTimestamp,
+        timestamp: Timestamp(1002),
         blockNumber: 123,
       })
       await repository.addIncluded({
         hash: record.hash,
-        timestamp: includedTimestamp,
+        timestamp: Timestamp(1003),
         blockNumber: 456,
         stateUpdateId: 100,
       })
@@ -61,11 +61,11 @@ describe(ForcedWithdrawRepository.name, () => {
       expect(result).toEqual({
         ...record,
         history: [
-          { status: 'sent', timestamp: sentTimestamp },
-          { status: 'mined', timestamp: minedTimestamp, blockNumber: 123 },
+          { status: 'sent', timestamp: Timestamp(1001) },
+          { status: 'mined', timestamp: Timestamp(1002), blockNumber: 123 },
           {
             status: 'included',
-            timestamp: includedTimestamp,
+            timestamp: Timestamp(1003),
             blockNumber: 456,
             stateUpdateId: 100,
           },
@@ -74,27 +74,27 @@ describe(ForcedWithdrawRepository.name, () => {
     })
 
     it('can track a forgotten flow', async () => {
-      await repository.addSent({ ...record, timestamp: sentTimestamp })
+      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
       await repository.addForgotten({
         hash: record.hash,
-        timestamp: forgottenTimestamp,
+        timestamp: Timestamp(1002),
       })
 
       const result = await repository.findByTransactionHash(record.hash)
       expect(result).toEqual({
         ...record,
         history: [
-          { status: 'sent', timestamp: sentTimestamp },
-          { status: 'forgotten', timestamp: forgottenTimestamp },
+          { status: 'sent', timestamp: Timestamp(1001) },
+          { status: 'forgotten', timestamp: Timestamp(1002) },
         ],
       })
     })
 
     it('can track a reverted flow', async () => {
-      await repository.addSent({ ...record, timestamp: sentTimestamp })
+      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
       await repository.addReverted({
         hash: record.hash,
-        timestamp: revertedTimestamp,
+        timestamp: Timestamp(1002),
         blockNumber: 123,
       })
 
@@ -102,10 +102,10 @@ describe(ForcedWithdrawRepository.name, () => {
       expect(result).toEqual({
         ...record,
         history: [
-          { status: 'sent', timestamp: sentTimestamp },
+          { status: 'sent', timestamp: Timestamp(1001) },
           {
             status: 'reverted',
-            timestamp: revertedTimestamp,
+            timestamp: Timestamp(1002),
             blockNumber: 123,
           },
         ],
@@ -115,37 +115,37 @@ describe(ForcedWithdrawRepository.name, () => {
     it('orders events by timestamp', async () => {
       await repository.addIncluded({
         hash: record.hash,
-        timestamp: includedTimestamp,
+        timestamp: Timestamp(1004),
         blockNumber: 789,
         stateUpdateId: 100,
       })
       await repository.addReverted({
         hash: record.hash,
-        timestamp: revertedTimestamp,
+        timestamp: Timestamp(1002),
         blockNumber: 123,
       })
       await repository.addMined({
         ...record,
         hash: record.hash,
-        timestamp: minedTimestamp,
+        timestamp: Timestamp(1003),
         blockNumber: 456,
       })
-      await repository.addSent({ ...record, timestamp: sentTimestamp })
+      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
 
       const result = await repository.findByTransactionHash(record.hash)
       expect(result).toEqual({
         ...record,
         history: [
-          { status: 'sent', timestamp: sentTimestamp },
+          { status: 'sent', timestamp: Timestamp(1001) },
           {
             status: 'reverted',
-            timestamp: revertedTimestamp,
+            timestamp: Timestamp(1002),
             blockNumber: 123,
           },
-          { status: 'mined', timestamp: minedTimestamp, blockNumber: 456 },
+          { status: 'mined', timestamp: Timestamp(1003), blockNumber: 456 },
           {
             status: 'included',
-            timestamp: includedTimestamp,
+            timestamp: Timestamp(1004),
             blockNumber: 789,
             stateUpdateId: 100,
           },
@@ -154,9 +154,9 @@ describe(ForcedWithdrawRepository.name, () => {
     })
 
     it('prevents adding the same status twice', async () => {
-      await repository.addSent({ ...record, timestamp: sentTimestamp })
+      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
       await expect(
-        repository.addSent({ ...record, timestamp: sentTimestamp })
+        repository.addSent({ ...record, timestamp: Timestamp(1001) })
       ).toBeRejected()
     })
   })
@@ -168,44 +168,31 @@ describe(ForcedWithdrawRepository.name, () => {
     })
 
     it('returns only mined and not included transactions', async () => {
-      const fakeRecord = (n: number): ForcedWithdrawTransactionRecord => ({
-        hash: Hash256.fake(n.toString().repeat(10)),
-        starkKey: StarkKey.fake(),
-        amount: 1n,
-        positionId: 2n,
-      })
       const record1 = fakeRecord(1)
       const record2 = fakeRecord(2)
       const record3 = fakeRecord(3)
       const record4 = fakeRecord(4)
 
-      const sentTimestamp1 = Timestamp.now()
-      const sentTimestamp2 = Timestamp(Number(sentTimestamp1) + 1000)
-      const minedTimestamp2 = Timestamp(Number(sentTimestamp2) + 1000)
-      const minedTimestamp3 = Timestamp(Number(minedTimestamp2) + 1000)
-      const minedTimestamp4 = Timestamp(Number(minedTimestamp3) + 1000)
-      const includedTimestamp4 = Timestamp(Number(minedTimestamp4) + 1000)
-
-      await repository.addSent({ ...record1, timestamp: sentTimestamp1 })
-      await repository.addSent({ ...record2, timestamp: sentTimestamp2 })
+      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
+      await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
       await repository.addMined({
         ...record2,
-        timestamp: minedTimestamp2,
+        timestamp: Timestamp(2002),
         blockNumber: 123,
       })
       await repository.addMined({
         ...record3,
-        timestamp: minedTimestamp3,
+        timestamp: Timestamp(3002),
         blockNumber: 456,
       })
       await repository.addMined({
         ...record4,
-        timestamp: minedTimestamp4,
+        timestamp: Timestamp(4002),
         blockNumber: 789,
       })
       await repository.addIncluded({
         hash: record4.hash,
-        timestamp: includedTimestamp4,
+        timestamp: Timestamp(4003),
         blockNumber: 1234,
         stateUpdateId: 1,
       })
@@ -215,14 +202,14 @@ describe(ForcedWithdrawRepository.name, () => {
         {
           ...record2,
           history: [
-            { status: 'sent', timestamp: sentTimestamp2 },
-            { status: 'mined', timestamp: minedTimestamp2, blockNumber: 123 },
+            { status: 'sent', timestamp: Timestamp(2001) },
+            { status: 'mined', timestamp: Timestamp(2002), blockNumber: 123 },
           ],
         },
         {
           ...record3,
           history: [
-            { status: 'mined', timestamp: minedTimestamp3, blockNumber: 456 },
+            { status: 'mined', timestamp: Timestamp(3002), blockNumber: 456 },
           ],
         },
       ])
@@ -236,41 +223,186 @@ describe(ForcedWithdrawRepository.name, () => {
     })
 
     it('returns transactions that only have a sent status', async () => {
-      const fakeRecord = (n: number): ForcedWithdrawTransactionRecord => ({
-        hash: Hash256.fake(n.toString().repeat(10)),
-        starkKey: StarkKey.fake(),
-        amount: 1n,
-        positionId: 2n,
-      })
       const record1 = fakeRecord(1)
       const record2 = fakeRecord(2)
       const record3 = fakeRecord(3)
       const record4 = fakeRecord(4)
 
-      const sentTimestamp1 = Timestamp.now()
-      const sentTimestamp2 = Timestamp(Number(sentTimestamp1) + 1000)
-      const sentTimestamp3 = Timestamp(Number(sentTimestamp2) + 1000)
-      const minedTimestamp3 = Timestamp(Number(sentTimestamp3) + 1000)
-      const minedTimestamp4 = Timestamp(Number(minedTimestamp3) + 1000)
-
-      await repository.addSent({ ...record1, timestamp: sentTimestamp1 })
-      await repository.addSent({ ...record2, timestamp: sentTimestamp2 })
-      await repository.addSent({ ...record3, timestamp: sentTimestamp3 })
+      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
+      await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
+      await repository.addSent({ ...record3, timestamp: Timestamp(3001) })
       await repository.addMined({
         ...record3,
-        timestamp: minedTimestamp3,
+        timestamp: Timestamp(3002),
         blockNumber: 123,
       })
       await repository.addMined({
         ...record4,
-        timestamp: minedTimestamp4,
+        timestamp: Timestamp(4002),
         blockNumber: 456,
       })
 
       const result = await repository.getJustSentHashes()
+      expect(result).toEqual([record1.hash, record2.hash])
+    })
+  })
+
+  describe(ForcedWithdrawRepository.prototype.getByPositionId.name, () => {
+    it('returns empty array if there are no transactions', async () => {
+      const result = await repository.getByPositionId(1n)
+      expect(result).toEqual([])
+    })
+
+    it('returns transactions that have the given position id', async () => {
+      const record1 = fakeRecord(1, 100n)
+      const record2 = fakeRecord(2, 200n)
+      const record3 = fakeRecord(3, 200n)
+
+      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
+      await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
+      await repository.addSent({ ...record3, timestamp: Timestamp(3001) })
+      await repository.addMined({
+        ...record3,
+        timestamp: Timestamp(3002),
+        blockNumber: 123,
+      })
+
+      const result = await repository.getByPositionId(200n)
       expect(result).toEqual([
-        record1.hash,
-        record2.hash,
+        {
+          ...record2,
+          history: [{ status: 'sent', timestamp: Timestamp(2001) }],
+        },
+        {
+          ...record3,
+          history: [
+            { status: 'sent', timestamp: Timestamp(3001) },
+            { status: 'mined', timestamp: Timestamp(3002), blockNumber: 123 },
+          ],
+        },
+      ])
+    })
+  })
+
+  describe(ForcedWithdrawRepository.prototype.getByStarkKey.name, () => {
+    it('returns empty array if there are no transactions', async () => {
+      const result = await repository.getByStarkKey(StarkKey.fake())
+      expect(result).toEqual([])
+    })
+
+    it('returns transactions that have the given stark key id', async () => {
+      const starkKeyA = StarkKey.fake('aaa')
+      const starkKeyB = StarkKey.fake('bbb')
+      const record1 = fakeRecord(1, 1n, starkKeyA)
+      const record2 = fakeRecord(2, 2n, starkKeyB)
+      const record3 = fakeRecord(3, 3n, starkKeyB)
+
+      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
+      await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
+      await repository.addSent({ ...record3, timestamp: Timestamp(3001) })
+      await repository.addMined({
+        ...record3,
+        timestamp: Timestamp(3002),
+        blockNumber: 123,
+      })
+
+      const result = await repository.getByStarkKey(starkKeyB)
+      expect(result).toEqual([
+        {
+          ...record2,
+          history: [{ status: 'sent', timestamp: Timestamp(2001) }],
+        },
+        {
+          ...record3,
+          history: [
+            { status: 'sent', timestamp: Timestamp(3001) },
+            { status: 'mined', timestamp: Timestamp(3002), blockNumber: 123 },
+          ],
+        },
+      ])
+    })
+  })
+
+  describe(ForcedWithdrawRepository.prototype.getByStateUpdateId.name, () => {
+    it('returns empty array if there are no transactions', async () => {
+      const result = await repository.getByStateUpdateId(1)
+      expect(result).toEqual([])
+    })
+
+    it('returns transactions that have the given stark key id', async () => {
+      const record1 = fakeRecord(1)
+      const record2 = fakeRecord(2)
+      const record3 = fakeRecord(3)
+      const record4 = fakeRecord(4)
+
+      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
+      await repository.addMined({
+        ...record1,
+        timestamp: Timestamp(1002),
+        blockNumber: 102,
+      })
+      await repository.addMined({
+        ...record2,
+        timestamp: Timestamp(2002),
+        blockNumber: 202,
+      })
+      await repository.addIncluded({
+        hash: record2.hash,
+        timestamp: Timestamp(2003),
+        blockNumber: 203,
+        stateUpdateId: 1234,
+      })
+      await repository.addSent({ ...record3, timestamp: Timestamp(3001) })
+      await repository.addMined({
+        ...record3,
+        timestamp: Timestamp(3002),
+        blockNumber: 302,
+      })
+      await repository.addIncluded({
+        hash: record3.hash,
+        timestamp: Timestamp(3003),
+        blockNumber: 303,
+        stateUpdateId: 1234,
+      })
+      await repository.addMined({
+        ...record4,
+        timestamp: Timestamp(4002),
+        blockNumber: 402,
+      })
+      await repository.addIncluded({
+        hash: record4.hash,
+        timestamp: Timestamp(4003),
+        blockNumber: 403,
+        stateUpdateId: 5678,
+      })
+
+      const result = await repository.getByStateUpdateId(1234)
+      expect(result).toEqual([
+        {
+          ...record2,
+          history: [
+            { status: 'mined', timestamp: Timestamp(2002), blockNumber: 202 },
+            {
+              status: 'included',
+              timestamp: Timestamp(2003),
+              blockNumber: 203,
+              stateUpdateId: 1234,
+            },
+          ],
+        },
+        {
+          ...record3,
+          history: [
+            { status: 'sent', timestamp: Timestamp(3001) },
+            { status: 'mined', timestamp: Timestamp(3002), blockNumber: 302 },
+            {
+              status: 'included',
+              timestamp: Timestamp(3003),
+              blockNumber: 303,
+              stateUpdateId: 1234,
+            },
+          ],
+        },
       ])
     })
   })

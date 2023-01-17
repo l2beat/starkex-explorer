@@ -5,6 +5,7 @@ import {
 } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
+import { compareByHistory } from '../../utils/compareByHistory'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -68,9 +69,9 @@ export class ForcedWithdrawRepository extends BaseRepository {
     this.addForgotten = this.wrapAdd(this.addForgotten)
     this.addIncluded = this.wrapAdd(this.addIncluded)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
-    // this.getByPositionId = this.wrapGet(this.getByPositionId)
-    // this.getByStarkKey = this.wrapGet(this.getByStarkKey)
-    // this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
+    this.getByPositionId = this.wrapGet(this.getByPositionId)
+    this.getByStarkKey = this.wrapGet(this.getByStarkKey)
+    this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
     this.getMinedNotIncluded = this.wrapGet(this.getMinedNotIncluded)
     this.getJustSentHashes = this.wrapGet(this.getJustSentHashes)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -179,6 +180,53 @@ export class ForcedWithdrawRepository extends BaseRepository {
     return result
   }
 
+  async getByPositionId(
+    positionId: bigint
+  ): Promise<ForcedWithdrawTransactionWithHistory[]> {
+    const knex = await this.knex()
+    const rows = await knex('forced_withdraw_transactions').where(
+      'position_id',
+      positionId
+    )
+    const records = rows.map(toRecord)
+    const results = await this.recordsWithHistories(records)
+    return results.sort(compareByHistory)
+  }
+
+  async getByStarkKey(
+    starkKey: StarkKey
+  ): Promise<ForcedWithdrawTransactionWithHistory[]> {
+    const knex = await this.knex()
+    const rows = await knex('forced_withdraw_transactions').where(
+      'stark_key',
+      starkKey.toString()
+    )
+    const records = rows.map(toRecord)
+    const results = await this.recordsWithHistories(records)
+    return results.sort(compareByHistory)
+  }
+
+  async getByStateUpdateId(
+    stateUpdateId: number
+  ): Promise<ForcedWithdrawTransactionWithHistory[]> {
+    const knex = await this.knex()
+    const rows = await knex('forced_withdraw_statuses')
+      .where({
+        status: 'included',
+        state_update_id: stateUpdateId,
+      })
+      .join(
+        'forced_withdraw_transactions',
+        'forced_withdraw_statuses.hash',
+        '=',
+        'forced_withdraw_transactions.hash'
+      )
+      .select('forced_withdraw_transactions.*')
+    const records = rows.map(toRecord)
+    const results = await this.recordsWithHistories(records)
+    return results.sort(compareByHistory)
+  }
+
   async getMinedNotIncluded(): Promise<ForcedWithdrawTransactionWithHistory[]> {
     const knex = await this.knex()
     const { rows } = (await knex.raw(`
@@ -226,12 +274,14 @@ export class ForcedWithdrawRepository extends BaseRepository {
         records.map((x) => x.hash.toString())
       )
       .orderBy('timestamp', 'asc')
-    return records.map((record) => ({
-      ...record,
-      history: rows
-        .filter((x) => x.hash === record.hash.toString())
-        .map(toHistoryRow),
-    }))
+    return records
+      .map((record) => ({
+        ...record,
+        history: rows
+          .filter((x) => x.hash === record.hash.toString())
+          .map(toHistoryRow),
+      }))
+      .filter((x) => x.history.length > 0)
   }
 
   async deleteAll() {
