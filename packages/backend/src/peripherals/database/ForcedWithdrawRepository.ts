@@ -72,7 +72,7 @@ export class ForcedWithdrawRepository extends BaseRepository {
     // this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     // this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
     this.getMinedNotIncluded = this.wrapGet(this.getMinedNotIncluded)
-    // this.getJustSentHashes = this.wrapGet(this.getJustSentHashes)
+    this.getJustSentHashes = this.wrapGet(this.getJustSentHashes)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
 
@@ -196,6 +196,21 @@ export class ForcedWithdrawRepository extends BaseRepository {
     const records = rows.map(toRecord)
     const results = await this.recordsWithHistories(records)
     return results
+  }
+
+  async getJustSentHashes(): Promise<Hash256[]> {
+    const knex = await this.knex()
+    const { rows } = (await knex.raw(`
+      SELECT a.hash FROM forced_withdraw_statuses a
+      WHERE a.status = 'sent'
+      AND NOT EXISTS (
+        SELECT 1 FROM forced_withdraw_statuses b
+        WHERE b.hash = a.hash
+        AND b.status != 'sent'
+      )
+      ORDER BY a.timestamp ASC
+    `)) as unknown as { rows: { hash: string }[] }
+    return rows.map((row) => Hash256(row.hash))
   }
 
   private async recordsWithHistories(

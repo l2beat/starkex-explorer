@@ -228,4 +228,50 @@ describe(ForcedWithdrawRepository.name, () => {
       ])
     })
   })
+
+  describe(ForcedWithdrawRepository.prototype.getJustSentHashes.name, () => {
+    it('returns empty array if there are no sent transactions', async () => {
+      const result = await repository.getJustSentHashes()
+      expect(result).toEqual([])
+    })
+
+    it('returns transactions that only have a sent status', async () => {
+      const fakeRecord = (n: number): ForcedWithdrawTransactionRecord => ({
+        hash: Hash256.fake(n.toString().repeat(10)),
+        starkKey: StarkKey.fake(),
+        amount: 1n,
+        positionId: 2n,
+      })
+      const record1 = fakeRecord(1)
+      const record2 = fakeRecord(2)
+      const record3 = fakeRecord(3)
+      const record4 = fakeRecord(4)
+
+      const sentTimestamp1 = Timestamp.now()
+      const sentTimestamp2 = Timestamp(Number(sentTimestamp1) + 1000)
+      const sentTimestamp3 = Timestamp(Number(sentTimestamp2) + 1000)
+      const minedTimestamp3 = Timestamp(Number(sentTimestamp3) + 1000)
+      const minedTimestamp4 = Timestamp(Number(minedTimestamp3) + 1000)
+
+      await repository.addSent({ ...record1, timestamp: sentTimestamp1 })
+      await repository.addSent({ ...record2, timestamp: sentTimestamp2 })
+      await repository.addSent({ ...record3, timestamp: sentTimestamp3 })
+      await repository.addMined({
+        ...record3,
+        timestamp: minedTimestamp3,
+        blockNumber: 123,
+      })
+      await repository.addMined({
+        ...record4,
+        timestamp: minedTimestamp4,
+        blockNumber: 456,
+      })
+
+      const result = await repository.getJustSentHashes()
+      expect(result).toEqual([
+        record1.hash,
+        record2.hash,
+      ])
+    })
+  })
 })
