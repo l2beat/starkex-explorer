@@ -1,5 +1,6 @@
 import { Hash256 } from '@explorer/types'
 
+import { PerpetualCairoOutput } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 import { readAssetConfigHashes } from './readAssetConfigHashes'
 import { readConditions } from './readConditions'
@@ -7,7 +8,7 @@ import { readForcedActions } from './readForcedActions'
 import { readModifications } from './readModifications'
 import { readState } from './readState'
 
-export function decodePerpetualCairoOutput(data: string) {
+export function decodePerpetualCairoOutput(data: string): PerpetualCairoOutput {
   const reader = new ByteReader(data)
 
   const configurationHash = Hash256(reader.readHex(32))
@@ -21,15 +22,7 @@ export function decodePerpetualCairoOutput(data: string) {
   const forcedActions = readForcedActions(reader)
   const conditions = readConditions(reader)
 
-  if (!reader.isAtEnd()) {
-    // https://github.com/starkware-libs/starkex-contracts/blob/75c3a2a8dfff70604d851fc6b1a2bc8bc1a3964b/scalable-dex/contracts/src/components/OnchainDataFactTreeEncoder.sol#L12
-    // When reading calldata from updateState two new values are appended
-    reader.skip(64)
-  }
-
-  reader.assertEnd()
-
-  return {
+  const validiumObject = {
     configurationHash,
     assetConfigHashes,
     oldState,
@@ -39,4 +32,22 @@ export function decodePerpetualCairoOutput(data: string) {
     forcedActions,
     conditions,
   }
+
+  if (!reader.isAtEnd()) {
+    // https://github.com/starkware-libs/starkex-contracts/blob/75c3a2a8dfff70604d851fc6b1a2bc8bc1a3964b/scalable-dex/contracts/src/components/OnchainDataFactTreeEncoder.sol#L12
+    // When reading calldata from updateState two new values are appended
+    const onChainDataHash = Hash256(reader.readHex(32))
+    const onChainDataSize = reader.readBigInt(32)
+    reader.assertEnd()
+
+    return {
+      ...validiumObject,
+      onChainDataHash,
+      onChainDataSize,
+    }
+  }
+
+  reader.assertEnd()
+
+  return validiumObject
 }

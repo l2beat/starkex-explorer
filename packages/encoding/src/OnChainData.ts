@@ -17,6 +17,8 @@ export interface PerpetualCairoOutput {
   modifications: Modification[]
   forcedActions: ForcedAction[]
   conditions: PedersenHash[]
+  onChainDataHash?: Hash256
+  onChainDataSize?: bigint
 }
 
 // https://github.com/starkware-libs/starkex-for-spot-trading/blob/607f0b4ce507e1d95cd018d206a2797f6ba4aab4/src/starkware/cairo/dex/main.cairo#L21-L37
