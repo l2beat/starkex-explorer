@@ -406,4 +406,45 @@ describe(ForcedWithdrawRepository.name, () => {
       ])
     })
   })
+
+  describe(ForcedWithdrawRepository.prototype.deleteAfter.name, () => {
+    it('removes only some transactions', async () => {
+      const record1 = fakeRecord(1)
+      const record2 = fakeRecord(2)
+      const record3 = fakeRecord(3)
+
+      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
+      await repository.addMined({
+        ...record1,
+        timestamp: Timestamp(1002),
+        blockNumber: 421,
+      })
+      await repository.addMined({
+        ...record2,
+        timestamp: Timestamp(2001),
+        blockNumber: 421,
+      })
+      await repository.addMined({
+        ...record3,
+        timestamp: Timestamp(3002),
+        blockNumber: 420,
+      })
+
+      await repository.deleteAfter(420)
+
+      expect(await repository.findByTransactionHash(record1.hash)).toEqual({
+        ...record1,
+        history: [{ status: 'sent', timestamp: Timestamp(1001) }],
+      })
+      expect(await repository.findByTransactionHash(record2.hash)).toEqual(
+        undefined
+      )
+      expect(await repository.findByTransactionHash(record3.hash)).toEqual({
+        ...record3,
+        history: [
+          { status: 'mined', timestamp: Timestamp(3002), blockNumber: 420 },
+        ],
+      })
+    })
+  })
 })
