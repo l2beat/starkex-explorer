@@ -68,12 +68,11 @@ export class ForcedWithdrawRepository extends BaseRepository {
     this.addForgotten = this.wrapAdd(this.addForgotten)
     this.addIncluded = this.wrapAdd(this.addIncluded)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
-    // this.getLatest = this.wrapGet(this.getLatest)
     // this.getByPositionId = this.wrapGet(this.getByPositionId)
     // this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     // this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
-    // this.getPending = this.wrapGet(this.getPending)
-    // this.getMinedNotFinalized = this.wrapGet(this.getMinedNotFinalized)
+    this.getMinedNotIncluded = this.wrapGet(this.getMinedNotIncluded)
+    // this.getJustSentHashes = this.wrapGet(this.getJustSentHashes)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
 
@@ -180,12 +179,37 @@ export class ForcedWithdrawRepository extends BaseRepository {
     return result
   }
 
+  async getMinedNotIncluded(): Promise<ForcedWithdrawTransactionWithHistory[]> {
+    const knex = await this.knex()
+    const { rows } = (await knex.raw(`
+      SELECT t.* FROM forced_withdraw_statuses a
+      JOIN forced_withdraw_transactions t
+      ON t.hash = a.hash
+      WHERE a.status = 'mined'
+      AND NOT EXISTS (
+        SELECT 1 FROM forced_withdraw_statuses b
+        WHERE b.hash = a.hash
+        AND b.status = 'included'
+      )
+      ORDER BY a.timestamp ASC
+    `)) as unknown as { rows: ForcedWithdrawTransactionRow[] }
+    const records = rows.map(toRecord)
+    const results = await this.recordsWithHistories(records)
+    return results
+  }
+
   private async recordsWithHistories(
     records: ForcedWithdrawTransactionRecord[]
   ): Promise<ForcedWithdrawTransactionWithHistory[]> {
+    if (records.length === 0) {
+      return []
+    }
     const knex = await this.knex()
     const rows = await knex('forced_withdraw_statuses')
-      .whereIn('hash', [records.map((x) => x.hash.toString())])
+      .whereIn(
+        'hash',
+        records.map((x) => x.hash.toString())
+      )
       .orderBy('timestamp', 'asc')
     return records.map((record) => ({
       ...record,

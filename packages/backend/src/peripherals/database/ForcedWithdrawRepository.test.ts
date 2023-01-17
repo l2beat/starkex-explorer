@@ -160,4 +160,72 @@ describe(ForcedWithdrawRepository.name, () => {
       ).toBeRejected()
     })
   })
+
+  describe(ForcedWithdrawRepository.prototype.getMinedNotIncluded.name, () => {
+    it('returns empty array if there are no mined transactions', async () => {
+      const result = await repository.getMinedNotIncluded()
+      expect(result).toEqual([])
+    })
+
+    it('returns only mined and not included transactions', async () => {
+      const fakeRecord = (n: number): ForcedWithdrawTransactionRecord => ({
+        hash: Hash256.fake(n.toString().repeat(10)),
+        starkKey: StarkKey.fake(),
+        amount: 1n,
+        positionId: 2n,
+      })
+      const record1 = fakeRecord(1)
+      const record2 = fakeRecord(2)
+      const record3 = fakeRecord(3)
+      const record4 = fakeRecord(4)
+
+      const sentTimestamp1 = Timestamp.now()
+      const sentTimestamp2 = Timestamp(Number(sentTimestamp1) + 1000)
+      const minedTimestamp2 = Timestamp(Number(sentTimestamp2) + 1000)
+      const minedTimestamp3 = Timestamp(Number(minedTimestamp2) + 1000)
+      const minedTimestamp4 = Timestamp(Number(minedTimestamp3) + 1000)
+      const includedTimestamp4 = Timestamp(Number(minedTimestamp4) + 1000)
+
+      await repository.addSent({ ...record1, timestamp: sentTimestamp1 })
+      await repository.addSent({ ...record2, timestamp: sentTimestamp2 })
+      await repository.addMined({
+        ...record2,
+        timestamp: minedTimestamp2,
+        blockNumber: 123,
+      })
+      await repository.addMined({
+        ...record3,
+        timestamp: minedTimestamp3,
+        blockNumber: 456,
+      })
+      await repository.addMined({
+        ...record4,
+        timestamp: minedTimestamp4,
+        blockNumber: 789,
+      })
+      await repository.addIncluded({
+        hash: record4.hash,
+        timestamp: includedTimestamp4,
+        blockNumber: 1234,
+        stateUpdateId: 1,
+      })
+
+      const result = await repository.getMinedNotIncluded()
+      expect(result).toEqual([
+        {
+          ...record2,
+          history: [
+            { status: 'sent', timestamp: sentTimestamp2 },
+            { status: 'mined', timestamp: minedTimestamp2, blockNumber: 123 },
+          ],
+        },
+        {
+          ...record3,
+          history: [
+            { status: 'mined', timestamp: minedTimestamp3, blockNumber: 456 },
+          ],
+        },
+      ])
+    })
+  })
 })
