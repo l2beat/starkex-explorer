@@ -183,7 +183,7 @@ declare module 'knex/types/tables' {
 
   interface ForcedTradeStatusRow {
     hash: string
-    status: string
+    status: 'sent' | 'forgotten' | 'reverted' | 'mined' | 'included'
     timestamp: bigint
     block_number: Nullable<number>
     offer_id: Nullable<number>
