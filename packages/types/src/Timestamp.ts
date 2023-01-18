@@ -10,6 +10,10 @@ export function Timestamp(milliseconds: number | bigint) {
   return numberMilliseconds as unknown as Timestamp
 }
 
+Timestamp.now = function now() {
+  return Timestamp(Date.now())
+}
+
 Timestamp.fromSeconds = function fromSeconds(seconds: number | bigint) {
   return Timestamp(Number(seconds) * 1000)
 }

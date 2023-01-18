@@ -2,8 +2,6 @@ import { json } from '@explorer/types'
 
 import { Nullable } from '../../../utils/Nullable'
 
-export {}
-
 declare module 'knex/types/tables' {
   interface KeyValueRow {
     key: string
@@ -155,6 +153,59 @@ declare module 'knex/types/tables' {
     cancelled_at: Nullable<bigint>
   }
 
+  interface ForcedWithdrawTransactionRow {
+    hash: string
+    stark_key: string
+    amount: bigint
+    position_id: bigint
+  }
+
+  interface ForcedWithdrawStatusRow {
+    hash: string
+    status: 'sent' | 'forgotten' | 'reverted' | 'mined' | 'included'
+    timestamp: bigint
+    block_number: Nullable<number>
+    state_update_id: Nullable<number>
+  }
+
+  interface ForcedTradeTransactionRow {
+    hash: string
+    stark_key_a: string
+    stark_key_b: string
+    position_id_a: bigint
+    position_id_b: bigint
+    collateral_amount: bigint
+    synthetic_amount: bigint
+    is_a_buying_synthetic: boolean
+    synthetic_asset_id: string
+    nonce: bigint
+  }
+
+  interface ForcedTradeStatusRow {
+    hash: string
+    status: string
+    timestamp: bigint
+    block_number: Nullable<number>
+    offer_id: Nullable<number>
+    state_update_id: Nullable<number>
+  }
+
+  interface WithdrawTransactionRow {
+    hash: string
+    stark_key: string
+    asset_type: string
+  }
+
+  interface WithdrawStatusRow {
+    hash: string
+    status: string
+    timestamp: bigint
+    block_number: Nullable<number>
+    quantized_amount: Nullable<bigint>
+    non_quantized_amount: Nullable<bigint>
+    recipient_address: Nullable<string>
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -175,6 +226,12 @@ declare module 'knex/types/tables' {
     user_registration_events: UserRegistrationEventRow
     forced_trade_offers: ForcedTradeOfferRow
     vaults: VaultRow
+    forced_withdraw_transactions: ForcedWithdrawTransactionRow
+    forced_withdraw_statuses: ForcedWithdrawStatusRow
+    forced_trade_transactions: ForcedTradeTransactionRow
+    forced_trade_statuses: ForcedTradeStatusRow
+    withdraw_transactions: WithdrawTransactionRow
+    withdraw_statuses: WithdrawStatusRow
   }
 }
 
