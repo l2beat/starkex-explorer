@@ -42,7 +42,10 @@ const emptyState: State = {
 }
 
 describe(PerpetualValidiumUpdater.name, () => {
-  it('has empty state hash correctly calculated', async () => {
+  it('has empty state hash correctly calculated', async function () {
+    // calculating hashes is slow :(
+    this.timeout(5000)
+
     const rollupStateRepository = mock<MerkleTreeRepository<PositionLeaf>>({
       persist: async () => {},
     })

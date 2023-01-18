@@ -14,7 +14,10 @@ import { Logger } from '../tools/Logger'
 import { EMPTY_STATE_HASH, SpotValidiumUpdater } from './SpotValidiumUpdater'
 
 describe(SpotValidiumUpdater.name, () => {
-  it('has empty state hash correctly calculated', async () => {
+  it('has empty state hash correctly calculated', async function () {
+    // calculating hashes is slow :(
+    this.timeout(5000)
+
     const rollupStateRepository = mock<MerkleTreeRepository<VaultLeaf>>({
       persist: async () => {},
     })

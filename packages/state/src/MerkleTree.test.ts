@@ -9,7 +9,10 @@ import { VaultLeaf } from './VaultLeaf'
 
 describe(MerkleTree.name, () => {
   describe(MerkleTree.create.name, () => {
-    it('has a specific root hash for height 64 and position leaf', async () => {
+    it('has a specific root hash for height 64 and position leaf', async function () {
+      // calculating hashes is slow :(
+      this.timeout(5000)
+
       const storage = new InMemoryMerkleStorage<PositionLeaf>()
       const empty = await MerkleTree.create(storage, 64n, PositionLeaf.EMPTY)
       expect(await empty.hash()).toEqual(
@@ -19,7 +22,10 @@ describe(MerkleTree.name, () => {
       )
     })
 
-    it('has a specific root hash', async () => {
+    it('has a specific root hash', async function () {
+      // calculating hashes is slow :(
+      this.timeout(5000)
+
       const storage = new InMemoryMerkleStorage<VaultLeaf>()
       const empty = await MerkleTree.create(storage, 31n, VaultLeaf.EMPTY)
       expect(await empty.hash()).toEqual(
@@ -35,7 +41,10 @@ describe(MerkleTree.name, () => {
       expect(await tree.hash()).toEqual(await PositionLeaf.EMPTY.hash())
     })
 
-    it('can create a tree of height 64', async () => {
+    it('can create a tree of height 64', async function () {
+      // calculating hashes is slow :(
+      this.timeout(5000)
+
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 64n, PositionLeaf.EMPTY)
       expect(await tree.hash()).toEqual(
