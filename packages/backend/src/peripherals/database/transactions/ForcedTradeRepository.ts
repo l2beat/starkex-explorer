@@ -37,6 +37,7 @@ export type ForcedTradeStatus =
 export interface SentStatus {
   status: 'sent'
   timestamp: Timestamp
+  offerId: number
 }
 
 export interface MinedStatus {
@@ -88,7 +89,10 @@ export class ForcedTradeRepository extends BaseRepository {
   }
 
   async addSent(
-    record: ForcedTradeTransactionRecord & { timestamp: Timestamp }
+    record: ForcedTradeTransactionRecord & {
+      timestamp: Timestamp
+      offerId: number
+    }
   ): Promise<Hash256> {
     const knex = await this.knex()
     await knex.transaction(async (trx) => {
@@ -100,6 +104,7 @@ export class ForcedTradeRepository extends BaseRepository {
         hash: record.hash.toString(),
         status: 'sent',
         timestamp: BigInt(record.timestamp.toString()),
+        offer_id: record.offerId,
       })
     })
     return record.hash
@@ -341,9 +346,13 @@ function toRow(
 function toHistoryRow(row: ForcedTradeStatusRow): ForcedTradeStatus {
   switch (row.status) {
     case 'sent':
+      if (row.offer_id == null) {
+        throw new Error('Corrupt database: offer_id is null')
+      }
       return {
         status: 'sent',
         timestamp: Timestamp(row.timestamp),
+        offerId: row.offer_id,
       }
     case 'mined':
       if (row.block_number == null) {

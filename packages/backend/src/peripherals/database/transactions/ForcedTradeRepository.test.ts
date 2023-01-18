@@ -35,12 +35,16 @@ describe(ForcedTradeRepository.name, () => {
     const record = fakeRecord(1)
 
     it('adds single record and queries it', async () => {
-      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
+      await repository.addSent({
+        ...record,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
 
       const result = await repository.findByTransactionHash(record.hash)
       expect(result).toEqual({
         ...record,
-        history: [{ status: 'sent', timestamp: Timestamp(1001) }],
+        history: [{ status: 'sent', timestamp: Timestamp(1001), offerId: 1 }],
       })
     })
 
@@ -50,7 +54,11 @@ describe(ForcedTradeRepository.name, () => {
     })
 
     it('can track a regular flow', async () => {
-      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
+      await repository.addSent({
+        ...record,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
       await repository.addMined({
         ...record,
         timestamp: Timestamp(1002),
@@ -67,7 +75,7 @@ describe(ForcedTradeRepository.name, () => {
       expect(result).toEqual({
         ...record,
         history: [
-          { status: 'sent', timestamp: Timestamp(1001) },
+          { status: 'sent', timestamp: Timestamp(1001), offerId: 1 },
           { status: 'mined', timestamp: Timestamp(1002), blockNumber: 123 },
           {
             status: 'included',
@@ -80,7 +88,11 @@ describe(ForcedTradeRepository.name, () => {
     })
 
     it('can track a forgotten flow', async () => {
-      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
+      await repository.addSent({
+        ...record,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
       await repository.addForgotten({
         hash: record.hash,
         timestamp: Timestamp(1002),
@@ -90,14 +102,18 @@ describe(ForcedTradeRepository.name, () => {
       expect(result).toEqual({
         ...record,
         history: [
-          { status: 'sent', timestamp: Timestamp(1001) },
+          { status: 'sent', timestamp: Timestamp(1001), offerId: 1 },
           { status: 'forgotten', timestamp: Timestamp(1002) },
         ],
       })
     })
 
     it('can track a reverted flow', async () => {
-      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
+      await repository.addSent({
+        ...record,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
       await repository.addReverted({
         hash: record.hash,
         timestamp: Timestamp(1002),
@@ -108,7 +124,7 @@ describe(ForcedTradeRepository.name, () => {
       expect(result).toEqual({
         ...record,
         history: [
-          { status: 'sent', timestamp: Timestamp(1001) },
+          { status: 'sent', timestamp: Timestamp(1001), offerId: 1 },
           {
             status: 'reverted',
             timestamp: Timestamp(1002),
@@ -136,13 +152,17 @@ describe(ForcedTradeRepository.name, () => {
         timestamp: Timestamp(1003),
         blockNumber: 456,
       })
-      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
+      await repository.addSent({
+        ...record,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
 
       const result = await repository.findByTransactionHash(record.hash)
       expect(result).toEqual({
         ...record,
         history: [
-          { status: 'sent', timestamp: Timestamp(1001) },
+          { status: 'sent', timestamp: Timestamp(1001), offerId: 1 },
           {
             status: 'reverted',
             timestamp: Timestamp(1002),
@@ -160,9 +180,17 @@ describe(ForcedTradeRepository.name, () => {
     })
 
     it('prevents adding the same status twice', async () => {
-      await repository.addSent({ ...record, timestamp: Timestamp(1001) })
+      await repository.addSent({
+        ...record,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
       await expect(
-        repository.addSent({ ...record, timestamp: Timestamp(1001) })
+        repository.addSent({
+          ...record,
+          timestamp: Timestamp(1001),
+          offerId: 1,
+        })
       ).toBeRejected()
     })
   })
@@ -179,8 +207,16 @@ describe(ForcedTradeRepository.name, () => {
       const record3 = fakeRecord(3)
       const record4 = fakeRecord(4)
 
-      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
-      await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
+      await repository.addSent({
+        ...record1,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
+      await repository.addSent({
+        ...record2,
+        timestamp: Timestamp(2001),
+        offerId: 2,
+      })
       await repository.addMined({
         ...record2,
         timestamp: Timestamp(2002),
@@ -208,7 +244,7 @@ describe(ForcedTradeRepository.name, () => {
         {
           ...record2,
           history: [
-            { status: 'sent', timestamp: Timestamp(2001) },
+            { status: 'sent', timestamp: Timestamp(2001), offerId: 2 },
             { status: 'mined', timestamp: Timestamp(2002), blockNumber: 123 },
           ],
         },
@@ -234,9 +270,21 @@ describe(ForcedTradeRepository.name, () => {
       const record3 = fakeRecord(3)
       const record4 = fakeRecord(4)
 
-      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
-      await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
-      await repository.addSent({ ...record3, timestamp: Timestamp(3001) })
+      await repository.addSent({
+        ...record1,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
+      await repository.addSent({
+        ...record2,
+        timestamp: Timestamp(2001),
+        offerId: 2,
+      })
+      await repository.addSent({
+        ...record3,
+        timestamp: Timestamp(3001),
+        offerId: 3,
+      })
       await repository.addMined({
         ...record3,
         timestamp: Timestamp(3002),
@@ -264,9 +312,21 @@ describe(ForcedTradeRepository.name, () => {
       const record2 = fakeRecord(2, { positionIdA: 200n, positionIdB: 999n })
       const record3 = fakeRecord(3, { positionIdA: 999n, positionIdB: 200n })
 
-      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
-      await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
-      await repository.addSent({ ...record3, timestamp: Timestamp(3001) })
+      await repository.addSent({
+        ...record1,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
+      await repository.addSent({
+        ...record2,
+        timestamp: Timestamp(2001),
+        offerId: 2,
+      })
+      await repository.addSent({
+        ...record3,
+        timestamp: Timestamp(3001),
+        offerId: 3,
+      })
       await repository.addMined({
         ...record3,
         timestamp: Timestamp(3002),
@@ -277,12 +337,12 @@ describe(ForcedTradeRepository.name, () => {
       expect(result).toEqual([
         {
           ...record2,
-          history: [{ status: 'sent', timestamp: Timestamp(2001) }],
+          history: [{ status: 'sent', timestamp: Timestamp(2001), offerId: 2 }],
         },
         {
           ...record3,
           history: [
-            { status: 'sent', timestamp: Timestamp(3001) },
+            { status: 'sent', timestamp: Timestamp(3001), offerId: 3 },
             { status: 'mined', timestamp: Timestamp(3002), blockNumber: 123 },
           ],
         },
@@ -310,9 +370,21 @@ describe(ForcedTradeRepository.name, () => {
         starkKeyB: StarkKey.fake('123'),
       })
 
-      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
-      await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
-      await repository.addSent({ ...record3, timestamp: Timestamp(3001) })
+      await repository.addSent({
+        ...record1,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
+      await repository.addSent({
+        ...record2,
+        timestamp: Timestamp(2001),
+        offerId: 2,
+      })
+      await repository.addSent({
+        ...record3,
+        timestamp: Timestamp(3001),
+        offerId: 3,
+      })
       await repository.addMined({
         ...record3,
         timestamp: Timestamp(3002),
@@ -323,12 +395,12 @@ describe(ForcedTradeRepository.name, () => {
       expect(result).toEqual([
         {
           ...record2,
-          history: [{ status: 'sent', timestamp: Timestamp(2001) }],
+          history: [{ status: 'sent', timestamp: Timestamp(2001), offerId: 2 }],
         },
         {
           ...record3,
           history: [
-            { status: 'sent', timestamp: Timestamp(3001) },
+            { status: 'sent', timestamp: Timestamp(3001), offerId: 3 },
             { status: 'mined', timestamp: Timestamp(3002), blockNumber: 123 },
           ],
         },
@@ -348,7 +420,11 @@ describe(ForcedTradeRepository.name, () => {
       const record3 = fakeRecord(3)
       const record4 = fakeRecord(4)
 
-      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
+      await repository.addSent({
+        ...record1,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
       await repository.addMined({
         ...record1,
         timestamp: Timestamp(1002),
@@ -365,7 +441,11 @@ describe(ForcedTradeRepository.name, () => {
         blockNumber: 203,
         stateUpdateId: 1234,
       })
-      await repository.addSent({ ...record3, timestamp: Timestamp(3001) })
+      await repository.addSent({
+        ...record3,
+        timestamp: Timestamp(3001),
+        offerId: 3,
+      })
       await repository.addMined({
         ...record3,
         timestamp: Timestamp(3002),
@@ -406,7 +486,7 @@ describe(ForcedTradeRepository.name, () => {
         {
           ...record3,
           history: [
-            { status: 'sent', timestamp: Timestamp(3001) },
+            { status: 'sent', timestamp: Timestamp(3001), offerId: 3 },
             { status: 'mined', timestamp: Timestamp(3002), blockNumber: 302 },
             {
               status: 'included',
@@ -426,7 +506,11 @@ describe(ForcedTradeRepository.name, () => {
       const record2 = fakeRecord(2)
       const record3 = fakeRecord(3)
 
-      await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
+      await repository.addSent({
+        ...record1,
+        timestamp: Timestamp(1001),
+        offerId: 1,
+      })
       await repository.addMined({
         ...record1,
         timestamp: Timestamp(1002),
@@ -447,7 +531,7 @@ describe(ForcedTradeRepository.name, () => {
 
       expect(await repository.findByTransactionHash(record1.hash)).toEqual({
         ...record1,
-        history: [{ status: 'sent', timestamp: Timestamp(1001) }],
+        history: [{ status: 'sent', timestamp: Timestamp(1001), offerId: 1 }],
       })
       expect(await repository.findByTransactionHash(record2.hash)).toEqual(
         undefined
