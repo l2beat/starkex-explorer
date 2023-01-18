@@ -311,13 +311,13 @@ function toRecord(
 }
 
 function toRow(
-  row: ForcedWithdrawTransactionRecord
+  record: ForcedWithdrawTransactionRecord
 ): ForcedWithdrawTransactionRow {
   return {
-    hash: row.hash.toString(),
-    stark_key: row.starkKey.toString(),
-    amount: row.amount,
-    position_id: row.positionId,
+    hash: record.hash.toString(),
+    stark_key: record.starkKey.toString(),
+    amount: record.amount,
+    position_id: record.positionId,
   }
 }
 
