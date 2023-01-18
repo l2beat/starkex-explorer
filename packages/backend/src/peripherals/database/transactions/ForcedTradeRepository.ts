@@ -76,7 +76,7 @@ export class ForcedTradeRepository extends BaseRepository {
     this.addForgotten = this.wrapAdd(this.addForgotten)
     this.addIncluded = this.wrapAdd(this.addIncluded)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
-    // this.findByOfferId = this.wrapFind(this.findByOfferId)
+    this.findByOfferId = this.wrapFind(this.findByOfferId)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
     this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
@@ -184,6 +184,32 @@ export class ForcedTradeRepository extends BaseRepository {
     const row = await knex('forced_trade_transactions')
       .where('hash', hash.toString())
       .first()
+    if (!row) {
+      return undefined
+    }
+    const record = toRecord(row)
+    const [result] = await this.recordsWithHistories([record])
+    return result
+  }
+
+  async findByOfferId(
+    offerId: number
+  ): Promise<ForcedTradeTransactionWithHistory | undefined> {
+    const knex = await this.knex()
+    const row: ForcedTradeTransactionRow | undefined = await knex(
+      'forced_trade_statuses'
+    )
+      .where({
+        status: 'sent',
+        offer_id: offerId,
+      })
+      .join(
+        'forced_trade_transactions',
+        'forced_trade_statuses.hash',
+        '=',
+        'forced_trade_transactions.hash'
+      )
+      .first('forced_trade_transactions.*')
     if (!row) {
       return undefined
     }

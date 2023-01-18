@@ -195,6 +195,31 @@ describe(ForcedTradeRepository.name, () => {
     })
   })
 
+  describe(ForcedTradeRepository.prototype.findByOfferId.name, () => {
+    it('returns undefined if there is no such offer', async () => {
+      const record1 = fakeRecord(1)
+      await repository.addSent({
+        ...record1,
+        timestamp: Timestamp(1001),
+        offerId: 123,
+      })
+      expect(await repository.findByOfferId(456)).toEqual(undefined)
+    })
+
+    it('returns the record with the offer', async () => {
+      const record1 = fakeRecord(1)
+      await repository.addSent({
+        ...record1,
+        timestamp: Timestamp(1001),
+        offerId: 123,
+      })
+      expect(await repository.findByOfferId(123)).toEqual({
+        ...record1,
+        history: [{ status: 'sent', timestamp: Timestamp(1001), offerId: 123 }],
+      })
+    })
+  })
+
   describe(ForcedTradeRepository.prototype.getMinedNotIncluded.name, () => {
     it('returns empty array if there are no mined transactions', async () => {
       const result = await repository.getMinedNotIncluded()
