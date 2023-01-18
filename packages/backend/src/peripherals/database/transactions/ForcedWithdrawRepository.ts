@@ -4,10 +4,10 @@ import {
   ForcedWithdrawTransactionRow,
 } from 'knex/types/tables'
 
-import { Logger } from '../../tools/Logger'
-import { compareByHistory } from '../../utils/compareByHistory'
-import { BaseRepository } from './shared/BaseRepository'
-import { Database } from './shared/Database'
+import { Logger } from '../../../tools/Logger'
+import { compareByHistory } from '../../../utils/compareByHistory'
+import { BaseRepository } from '../shared/BaseRepository'
+import { Database } from '../shared/Database'
 
 export interface ForcedWithdrawTransactionRecord {
   hash: Hash256
