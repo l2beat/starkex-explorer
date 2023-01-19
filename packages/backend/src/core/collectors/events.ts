@@ -90,6 +90,48 @@ export const LogRootUpdate = EthereumEvent<
   'event LogRootUpdate(uint256 sequenceNumber, uint256 batchId, uint256 validiumVaultRoot, uint256 rollupVaultRoot, uint256 orderRoot)'
 )
 
+export const LogDeposit = EthereumEvent<
+  'LogDeposit',
+  {
+    depositorEthKey: string
+    starkKey: BigNumber
+    vaultId: BigNumber
+    assetType: BigNumber
+    nonQuantizedAmount: BigNumber
+    quantizedAmount: BigNumber
+  }
+>(`event LogDeposit(
+  address depositorEthKey,
+  uint256 starkKey,
+  uint256 vaultId,
+  uint256 assetType,
+  uint256 nonQuantizedAmount,
+  uint256 quantizedAmount
+)`)
+
+export const LogDepositWithTokenId = EthereumEvent<
+  'LogDepositWithTokenId',
+  {
+    depositorEthKey: string
+    starkKey: BigNumber
+    vaultId: BigNumber
+    assetType: BigNumber
+    tokenId: BigNumber
+    assetId: BigNumber
+    nonQuantizedAmount: BigNumber
+    quantizedAmount: BigNumber
+  }
+>(`event LogDepositWithTokenId(
+  address depositorEthKey,
+  uint256 starkKey,
+  uint256 vaultId,
+  uint256 assetType,
+  uint256 tokenId,
+  uint256 assetId,
+  uint256 nonQuantizedAmount,
+  uint256 quantizedAmount
+)`)
+
 export const LogUserRegistered = EthereumEvent<
   'LogUserRegistered',
   { ethKey: string; starkKey: BigNumber; sender: string }
