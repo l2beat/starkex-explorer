@@ -12,6 +12,7 @@ should create a new migration file that fixes the issue.
 */
 
 import { Knex } from 'knex'
+
 import * as migration24 from './024_transactions_refactor'
 
 export async function up(knex: Knex) {

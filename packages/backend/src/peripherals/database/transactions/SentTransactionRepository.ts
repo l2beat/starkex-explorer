@@ -4,9 +4,9 @@ import { Logger } from '../../../tools/Logger'
 import { BaseRepository } from '../shared/BaseRepository'
 import { Database } from '../shared/Database'
 import {
-  SentTransactionData,
-  encodeSentTransactionData,
   decodeSentTransactionData,
+  encodeSentTransactionData,
+  SentTransactionData,
 } from './SentTransaction'
 
 export interface SentTransactionRecord {

@@ -1,4 +1,5 @@
 import { json } from '@explorer/types'
+
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 
 declare module 'knex/types/tables' {

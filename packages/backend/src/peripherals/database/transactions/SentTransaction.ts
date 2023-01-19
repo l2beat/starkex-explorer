@@ -10,11 +10,11 @@ interface Encoded<T> {
   data: ToJSON<T>
 }
 
-export type SentTransactionData = ForcedTrade | ForcedWithdrawal
+export type SentTransactionData = ForcedTradeData | ForcedWithdrawalData
 
 export type SentTransactionJSON = ToJSON<SentTransactionData>
 
-export interface ForcedWithdrawal {
+export interface ForcedWithdrawalData {
   type: 'ForcedWithdrawal'
   starkKey: StarkKey
   positionId: bigint
@@ -22,7 +22,7 @@ export interface ForcedWithdrawal {
   premiumCost: boolean
 }
 
-export interface ForcedTrade {
+export interface ForcedTradeData {
   type: 'ForcedTrade'
   starkKeyA: StarkKey
   starkKeyB: StarkKey
@@ -63,8 +63,8 @@ export function decodeSentTransactionData(
 }
 
 function encodeForcedWithdrawal(
-  values: ForcedWithdrawal
-): Encoded<ForcedWithdrawal> {
+  values: ForcedWithdrawalData
+): Encoded<ForcedWithdrawalData> {
   return {
     starkKey: values.starkKey,
     vaultOrPositionId: values.positionId,
@@ -78,8 +78,8 @@ function encodeForcedWithdrawal(
 }
 
 function decodeForcedWithdrawal(
-  values: ToJSON<ForcedWithdrawal>
-): ForcedWithdrawal {
+  values: ToJSON<ForcedWithdrawalData>
+): ForcedWithdrawalData {
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
@@ -88,7 +88,7 @@ function decodeForcedWithdrawal(
   }
 }
 
-function encodeForcedTrade(values: ForcedTrade): Encoded<ForcedTrade> {
+function encodeForcedTrade(values: ForcedTradeData): Encoded<ForcedTradeData> {
   return {
     starkKey: values.starkKeyA,
     vaultOrPositionId: values.positionIdA,
@@ -106,7 +106,7 @@ function encodeForcedTrade(values: ForcedTrade): Encoded<ForcedTrade> {
   }
 }
 
-function decodeForcedTrade(values: ToJSON<ForcedTrade>): ForcedTrade {
+function decodeForcedTrade(values: ToJSON<ForcedTradeData>): ForcedTradeData {
   return {
     ...values,
     starkKeyA: StarkKey(values.starkKeyA),
