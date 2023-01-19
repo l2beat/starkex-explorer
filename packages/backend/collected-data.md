@@ -179,7 +179,6 @@ event LogNftWithdrawalPerformed(
 
 ### withdrawAndMint
 
-
 Note: _Works for MINTABLE_ERC20 and MINTABLE_ERC721_
 Note: _Spot only_
 
