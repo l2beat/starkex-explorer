@@ -8,28 +8,28 @@ import {
   ForcedTradeTransactionRecord,
 } from './ForcedTradeRepository'
 
+export const fakeRecord = (
+  n: number,
+  overrides?: Partial<ForcedTradeTransactionRecord>
+): ForcedTradeTransactionRecord => ({
+  hash: Hash256.fake(n.toString().repeat(10)),
+  positionIdA: 1n,
+  positionIdB: 2n,
+  starkKeyA: StarkKey.fake(),
+  starkKeyB: StarkKey.fake(),
+  collateralAmount: 1234n,
+  syntheticAmount: 5678n,
+  syntheticAssetId: AssetId('ABC-4'),
+  isABuyingSynthetic: true,
+  nonce: 123n,
+  ...overrides,
+})
+
 describe(ForcedTradeRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
   const repository = new ForcedTradeRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
-
-  const fakeRecord = (
-    n: number,
-    overrides?: Partial<ForcedTradeTransactionRecord>
-  ): ForcedTradeTransactionRecord => ({
-    hash: Hash256.fake(n.toString().repeat(10)),
-    positionIdA: 1n,
-    positionIdB: 2n,
-    starkKeyA: StarkKey.fake(),
-    starkKeyB: StarkKey.fake(),
-    collateralAmount: 1234n,
-    syntheticAmount: 5678n,
-    syntheticAssetId: AssetId('ABC-4'),
-    isABuyingSynthetic: true,
-    nonce: 123n,
-    ...overrides,
-  })
 
   describe('status history', () => {
     const record = fakeRecord(1)

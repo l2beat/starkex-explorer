@@ -8,22 +8,22 @@ import {
   ForcedWithdrawTransactionRecord,
 } from './ForcedWithdrawRepository'
 
+export const fakeRecord = (
+  n: number,
+  overrides?: Partial<ForcedWithdrawTransactionRecord>
+): ForcedWithdrawTransactionRecord => ({
+  hash: Hash256.fake(n.toString().repeat(10)),
+  starkKey: StarkKey.fake(),
+  amount: 1n,
+  positionId: 2n,
+  ...overrides,
+})
+
 describe(ForcedWithdrawRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
   const repository = new ForcedWithdrawRepository(database, Logger.SILENT)
 
   afterEach(() => repository.deleteAll())
-
-  const fakeRecord = (
-    n: number,
-    positionId = 1n,
-    starkKey = StarkKey.fake()
-  ): ForcedWithdrawTransactionRecord => ({
-    hash: Hash256.fake(n.toString().repeat(10)),
-    starkKey,
-    amount: 1n,
-    positionId,
-  })
 
   describe('status history', () => {
     const record = fakeRecord(1)
@@ -254,9 +254,9 @@ describe(ForcedWithdrawRepository.name, () => {
     })
 
     it('returns transactions that have the given position id', async () => {
-      const record1 = fakeRecord(1, 100n)
-      const record2 = fakeRecord(2, 200n)
-      const record3 = fakeRecord(3, 200n)
+      const record1 = fakeRecord(1, { positionId: 100n })
+      const record2 = fakeRecord(2, { positionId: 200n })
+      const record3 = fakeRecord(3, { positionId: 200n })
 
       await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
       await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
@@ -293,9 +293,9 @@ describe(ForcedWithdrawRepository.name, () => {
     it('returns transactions that have the given stark key id', async () => {
       const starkKeyA = StarkKey.fake('aaa')
       const starkKeyB = StarkKey.fake('bbb')
-      const record1 = fakeRecord(1, 1n, starkKeyA)
-      const record2 = fakeRecord(2, 2n, starkKeyB)
-      const record3 = fakeRecord(3, 3n, starkKeyB)
+      const record1 = fakeRecord(1, { starkKey: starkKeyA })
+      const record2 = fakeRecord(2, { starkKey: starkKeyB })
+      const record3 = fakeRecord(3, { starkKey: starkKeyB })
 
       await repository.addSent({ ...record1, timestamp: Timestamp(1001) })
       await repository.addSent({ ...record2, timestamp: Timestamp(2001) })
