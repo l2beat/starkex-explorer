@@ -134,5 +134,45 @@ describe(CombinedForcedRepository.name, () => {
         },
       ])
     })
+
+    it('supports the limit parameter', async () => {
+      const records = new Array({ length: 20 }).map((_, i) =>
+        fakeWithdrawRecord(i + 1)
+      )
+      for (const [i, record] of records.entries()) {
+        await forcedWithdrawRepository.addSent({
+          ...record,
+          timestamp: Timestamp(1000 + i + 1),
+        })
+      }
+      const results = await repository.getPaginated({ limit: 10, offset: 0 })
+      const hashes = results.map((x) => x.hash)
+
+      const last10HashesReversed = records
+        .slice(-10)
+        .map((x) => x.hash)
+        .reverse()
+      expect(hashes).toEqual(last10HashesReversed)
+    })
+
+    it('supports the offset parameter', async () => {
+      const records = new Array({ length: 20 }).map((_, i) =>
+        fakeWithdrawRecord(i + 1)
+      )
+      for (const [i, record] of records.entries()) {
+        await forcedWithdrawRepository.addSent({
+          ...record,
+          timestamp: Timestamp(1000 + i + 1),
+        })
+      }
+      const results = await repository.getPaginated({ limit: 10, offset: 5 })
+      const hashes = results.map((x) => x.hash)
+
+      const hashes5to15Reversed = records
+        .slice(-15, -5)
+        .map((x) => x.hash)
+        .reverse()
+      expect(hashes).toEqual(hashes5to15Reversed)
+    })
   })
 })
