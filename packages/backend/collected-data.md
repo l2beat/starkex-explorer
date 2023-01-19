@@ -199,6 +199,7 @@ event LogMintWithdrawalPerformed(
 ### Perpetual verifyEscape and escape
 
 Note: _Perpetual only_
+Note: _Submitted to EscapeVerifier not StarkExchange_
 
 https://github.com/starkware-libs/starkex-contracts/blob/210bd5f6bcb6977211677821fe925140859a0f6e/scalable-dex/contracts/src/perpetual/components/PerpetualEscapeVerifier.sol#L200
 
@@ -223,6 +224,7 @@ function escape(uint256 starkKey, uint256 positionId, uint256 quantizedAmount)
 ### Spot verifyEscape and escape
 
 Note: _Spot only_
+Note: _Submitted to EscapeVerifier not StarkExchange_
 
 No events are present for this `verifyEscape`.
 
