@@ -27,10 +27,8 @@ describe(CombinedForcedRepository.name, () => {
   })
 
   describe(CombinedForcedRepository.prototype.getPaginated.name, () => {
-    it('returns forced withdraw records', async () => {
+    it('returns combined forced withdraw and trade records', async () => {
       const record1 = fakeWithdrawRecord(1)
-      const record2 = fakeWithdrawRecord(2)
-
       await forcedWithdrawRepository.addSent({
         ...record1,
         timestamp: Timestamp(1001),
@@ -40,63 +38,8 @@ describe(CombinedForcedRepository.name, () => {
         timestamp: Timestamp(1002),
         blockNumber: 1234,
       })
-      await forcedWithdrawRepository.addSent({
-        ...record2,
-        timestamp: Timestamp(2001),
-      })
-      await forcedWithdrawRepository.addMined({
-        ...record2,
-        timestamp: Timestamp(2002),
-        blockNumber: 5678,
-      })
-      await forcedWithdrawRepository.addIncluded({
-        hash: record2.hash,
-        timestamp: Timestamp(2003),
-        blockNumber: 9012,
-        stateUpdateId: 1,
-      })
 
-      const results = await repository.getPaginated({ limit: 10, offset: 0 })
-      expect(results).toEqual([
-        {
-          hash: record2.hash,
-          timestamp: Timestamp(2003),
-          type: 'withdraw',
-          status: 'included',
-          isABuying: false,
-          positionIdA: record2.positionId,
-          positionIdB: undefined,
-          amount: record2.amount,
-          assetId: undefined,
-        },
-        {
-          hash: record1.hash,
-          timestamp: Timestamp(1002),
-          type: 'withdraw',
-          status: 'mined',
-          isABuying: false,
-          positionIdA: record1.positionId,
-          positionIdB: undefined,
-          amount: record1.amount,
-          assetId: undefined,
-        },
-      ])
-    })
-
-    it('returns forced trade records', async () => {
-      const record1 = fakeTradeRecord(1, { isABuyingSynthetic: true })
       const record2 = fakeTradeRecord(2, { isABuyingSynthetic: false })
-
-      await forcedTradeRepository.addSent({
-        ...record1,
-        timestamp: Timestamp(1001),
-        offerId: 1,
-      })
-      await forcedTradeRepository.addMined({
-        ...record1,
-        timestamp: Timestamp(1002),
-        blockNumber: 1234,
-      })
       await forcedTradeRepository.addSent({
         ...record2,
         timestamp: Timestamp(2001),
@@ -114,8 +57,59 @@ describe(CombinedForcedRepository.name, () => {
         stateUpdateId: 1,
       })
 
+      const record3 = fakeWithdrawRecord(2)
+      await forcedWithdrawRepository.addSent({
+        ...record3,
+        timestamp: Timestamp(3001),
+      })
+      await forcedWithdrawRepository.addMined({
+        ...record3,
+        timestamp: Timestamp(3002),
+        blockNumber: 5678,
+      })
+      await forcedWithdrawRepository.addIncluded({
+        hash: record3.hash,
+        timestamp: Timestamp(3003),
+        blockNumber: 9012,
+        stateUpdateId: 1,
+      })
+
+      const record4 = fakeTradeRecord(1, { isABuyingSynthetic: true })
+      await forcedTradeRepository.addSent({
+        ...record4,
+        timestamp: Timestamp(4001),
+        offerId: 1,
+      })
+      await forcedTradeRepository.addMined({
+        ...record4,
+        timestamp: Timestamp(4002),
+        blockNumber: 1234,
+      })
+
       const results = await repository.getPaginated({ limit: 10, offset: 0 })
       expect(results).toEqual([
+        {
+          hash: record4.hash,
+          timestamp: Timestamp(4002),
+          type: 'trade',
+          status: 'mined',
+          isABuying: record4.isABuyingSynthetic,
+          positionIdA: record4.positionIdA,
+          positionIdB: record4.positionIdB,
+          amount: record4.syntheticAmount,
+          assetId: record4.syntheticAssetId,
+        },
+        {
+          hash: record3.hash,
+          timestamp: Timestamp(3003),
+          type: 'withdraw',
+          status: 'included',
+          isABuying: false,
+          positionIdA: record3.positionId,
+          positionIdB: undefined,
+          amount: record3.amount,
+          assetId: undefined,
+        },
         {
           hash: record2.hash,
           timestamp: Timestamp(2003),
@@ -130,13 +124,13 @@ describe(CombinedForcedRepository.name, () => {
         {
           hash: record1.hash,
           timestamp: Timestamp(1002),
-          type: 'trade',
+          type: 'withdraw',
           status: 'mined',
-          isABuying: record1.isABuyingSynthetic,
-          positionIdA: record1.positionIdA,
-          positionIdB: record1.positionIdB,
-          amount: record1.syntheticAmount,
-          assetId: record1.syntheticAssetId,
+          isABuying: false,
+          positionIdA: record1.positionId,
+          positionIdB: undefined,
+          amount: record1.amount,
+          assetId: undefined,
         },
       ])
     })
