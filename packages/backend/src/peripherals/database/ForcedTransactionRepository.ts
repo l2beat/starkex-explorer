@@ -12,7 +12,6 @@ import { ForcedTransactionRow, TransactionStatusRow } from 'knex/types/tables'
 import { MD5 as hashData } from 'object-hash'
 
 import { Logger } from '../../tools/Logger'
-import { Nullable } from '../../utils/Nullable'
 import { toSerializableJson } from '../../utils/toSerializableJson'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
@@ -26,10 +25,10 @@ export interface FinalizeExitAction {
 }
 
 export interface TransactionUpdates {
-  sentAt: Nullable<Timestamp>
-  minedAt: Nullable<Timestamp>
-  revertedAt: Nullable<Timestamp>
-  forgottenAt: Nullable<Timestamp>
+  sentAt: Timestamp | null
+  minedAt: Timestamp | null
+  revertedAt: Timestamp | null
+  forgottenAt: Timestamp | null
 }
 
 export interface FinalizeUpdates extends TransactionUpdates {
@@ -375,7 +374,7 @@ export class ForcedTransactionRepository extends BaseRepository {
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
       offerId?: number
     },
-    sentAt: Nullable<Timestamp>,
+    sentAt: Timestamp | null,
     minedAt: Timestamp,
     blockNumber: number
   ): Promise<Hash256>
@@ -384,7 +383,7 @@ export class ForcedTransactionRepository extends BaseRepository {
     transaction: Omit<ForcedTransactionRecord, 'lastUpdateAt' | 'updates'> & {
       offerId?: number
     },
-    sentAt: Nullable<Timestamp>,
+    sentAt: Timestamp | null,
     minedAt?: Timestamp,
     blockNumber?: number
   ): Promise<Hash256> {
@@ -426,7 +425,7 @@ export class ForcedTransactionRepository extends BaseRepository {
   async saveFinalize(
     exitHash: Hash256,
     finalizeHash: Hash256,
-    sentAt: Nullable<Timestamp>,
+    sentAt: Timestamp | null,
     minedAt: Timestamp,
     blockNumber: number
   ): Promise<boolean>

@@ -18,11 +18,10 @@ export async function up(knex: Knex) {
   await migration24.down(knex)
 
   await knex.schema.createTable('sent_transactions', (table) => {
-    table.bigIncrements('id').primary() // surrogate key
+    table.string('transaction_hash').primary()
     table.string('type').notNullable().index()
-    table.string('transaction_hash').notNullable().index()
     table.string('stark_key').notNullable().index()
-    table.bigInteger('vault_or_position').index()
+    table.bigInteger('vault_or_position_id').index()
     table.json('data').notNullable()
     table.bigInteger('sent_timestamp').notNullable().index()
     table.bigInteger('mined_timestamp').index()
@@ -34,7 +33,7 @@ export async function up(knex: Knex) {
     table.string('type').notNullable().index()
     table.string('transaction_hash').notNullable().index()
     table.string('stark_key').notNullable().index()
-    table.bigInteger('vault_or_position').index()
+    table.bigInteger('vault_or_position_id').index()
     table.json('data').notNullable()
     table.integer('block_number').notNullable()
     table.bigInteger('timestamp').notNullable().index()

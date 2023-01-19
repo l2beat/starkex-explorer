@@ -1,6 +1,5 @@
 import { json } from '@explorer/types'
-
-import { Nullable } from '../../../utils/Nullable'
+import { SentTransactionJSON } from '../transactions/SentTransaction'
 
 declare module 'knex/types/tables' {
   interface KeyValueRow {
@@ -120,16 +119,16 @@ declare module 'knex/types/tables' {
     type: string
     data: json
     data_hash: string
-    state_update_id: Nullable<number>
+    state_update_id: number | null
   }
 
   interface TransactionStatusRow {
     hash: string
-    sent_at: Nullable<bigint>
-    mined_at: Nullable<bigint>
-    reverted_at: Nullable<bigint>
-    forgotten_at: Nullable<bigint>
-    block_number: Nullable<number>
+    sent_at: bigint | null
+    mined_at: bigint | null
+    reverted_at: bigint | null
+    forgotten_at: bigint | null
+    block_number: number | null
     not_found_retries: number
   }
 
@@ -142,15 +141,44 @@ declare module 'knex/types/tables' {
     collateral_amount: bigint
     synthetic_amount: bigint
     is_a_buying_synthetic: boolean
-    accepted_at: Nullable<bigint>
-    stark_key_b: Nullable<string>
-    position_id_b: Nullable<bigint>
-    submission_expiration_time: Nullable<bigint>
-    nonce: Nullable<bigint>
-    premium_cost: Nullable<boolean>
-    signature: Nullable<string>
-    transaction_hash: Nullable<string>
-    cancelled_at: Nullable<bigint>
+    accepted_at: bigint | null
+    stark_key_b: string | null
+    position_id_b: bigint | null
+    submission_expiration_time: bigint | null
+    nonce: bigint | null
+    premium_cost: boolean | null
+    signature: string | null
+    transaction_hash: string | null
+    cancelled_at: bigint | null
+  }
+
+  interface SentTransactionRow {
+    transaction_hash: string
+    type: string
+    stark_key: string
+    vault_or_position_id: bigint
+    data: SentTransactionJSON
+    sent_timestamp: bigint
+    mined_timestamp: bigint | null
+    reverted: boolean
+  }
+
+  interface UserEventRow {
+    id: bigint // surrogate key
+    type: string
+    transaction_hash: string
+    stark_key: string
+    vault_or_position_id: bigint | null
+    data: json // cannot be an array
+    block_number: number
+    timestamp: bigint
+  }
+
+  interface IncludedForcedRequestRow {
+    transaction_hash: string
+    block_number: number
+    timestamp: bigint
+    state_update_id: number
   }
 
   interface Tables {
@@ -172,6 +200,9 @@ declare module 'knex/types/tables' {
     transaction_status: TransactionStatusRow
     forced_trade_offers: ForcedTradeOfferRow
     vaults: VaultRow
+    sent_transactions: SentTransactionRow
+    user_events: UserEventRow
+    included_forced_requests: IncludedForcedRequestRow
   }
 }
 
