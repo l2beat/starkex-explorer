@@ -36,6 +36,7 @@ export class CombinedForcedRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.getPaginated = this.wrapGet(this.getPaginated)
+    this.getByPositionId = this.wrapGet(this.getByPositionId)
 
     /* eslint-enable @typescript-eslint/unbound-method */
   }
@@ -47,6 +48,20 @@ export class CombinedForcedRepository extends BaseRepository {
       .orderBy('timestamp', 'desc')
       .limit(options.limit)
       .offset(options.offset)
+    return rows.map(toRecord)
+  }
+
+  async getByPositionId(positionId: bigint) {
+    const value = positionId as unknown as Knex.Value
+    const knex = await this.knex()
+    const rows = await withdrawSubQuery(knex)
+      .where('wt.position_id', value)
+      .unionAll(
+        tradeSubQuery(knex)
+          .where('tt.position_id_a', value)
+          .orWhere('tt.position_id_b', value)
+      )
+      .orderBy('timestamp', 'desc')
     return rows.map(toRecord)
   }
 }

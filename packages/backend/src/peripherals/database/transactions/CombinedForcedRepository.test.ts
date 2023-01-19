@@ -175,4 +175,45 @@ describe(CombinedForcedRepository.name, () => {
       expect(hashes).toEqual(hashes5to15Reversed)
     })
   })
+
+  describe(CombinedForcedRepository.prototype.getByPositionId.name, () => {
+    it('returns records for this position id', async () => {
+      const record1 = fakeWithdrawRecord(1, { positionId: 1n })
+      const record2 = fakeWithdrawRecord(2, { positionId: 2n })
+      const record3 = fakeTradeRecord(3, { positionIdA: 1n, positionIdB: 3n })
+      const record4 = fakeTradeRecord(4, { positionIdA: 3n, positionIdB: 1n })
+      const record5 = fakeTradeRecord(5, { positionIdA: 2n, positionIdB: 3n })
+
+      await forcedWithdrawRepository.addSent({
+        ...record1,
+        timestamp: Timestamp(1000),
+      })
+      await forcedWithdrawRepository.addSent({
+        ...record2,
+        timestamp: Timestamp(2000),
+      })
+      await forcedTradeRepository.addSent({
+        ...record3,
+        timestamp: Timestamp(3000),
+        offerId: 1,
+      })
+      await forcedTradeRepository.addSent({
+        ...record4,
+        timestamp: Timestamp(4000),
+        offerId: 1,
+      })
+      await forcedTradeRepository.addSent({
+        ...record5,
+        timestamp: Timestamp(5000),
+        offerId: 1,
+      })
+
+      const results = await repository.getByPositionId(1n)
+      expect(results.map((x) => x.hash)).toEqual([
+        record4.hash,
+        record3.hash,
+        record1.hash,
+      ])
+    })
+  })
 })
