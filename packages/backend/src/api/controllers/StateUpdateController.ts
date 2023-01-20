@@ -6,12 +6,12 @@ import {
 import { EthereumAddress } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
-import {
-  ForcedTransactionRecord,
-  ForcedTransactionRepository,
-} from '../../peripherals/database/ForcedTransactionRepository'
 import { PositionWithPricesRecord } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
@@ -21,7 +21,7 @@ export class StateUpdateController {
   constructor(
     private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,
-    private forcedTransactionRepository: ForcedTransactionRepository
+    private userTransactionRepository: UserTransactionRepository
   ) {}
 
   async getStateUpdatesPage(
@@ -54,7 +54,10 @@ export class StateUpdateController {
     const [account, stateUpdate, transactions] = await Promise.all([
       this.accountService.getAccount(address),
       this.stateUpdateRepository.findByIdWithPositions(id),
-      this.forcedTransactionRepository.getIncludedInStateUpdate(id),
+      this.userTransactionRepository.getByStateUpdateId(id, [
+        'ForcedTrade',
+        'ForcedWithdrawal',
+      ]),
     ])
 
     if (!stateUpdate) {
@@ -82,7 +85,7 @@ export class StateUpdateController {
 
 export function toPositionUpdateEntry(
   position: PositionWithPricesRecord,
-  transactions: ForcedTransactionRecord[]
+  transactions: UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>[]
 ): PositionUpdateEntry {
   const assets = toPositionAssetEntries(
     position.balances,
@@ -95,7 +98,7 @@ export function toPositionUpdateEntry(
   )
 
   const forcedTransactions = transactions.filter((tx) => {
-    if (tx.data.type === 'withdrawal') {
+    if (tx.data.type === 'ForcedWithdrawal') {
       return tx.data.positionId === position.positionId
     } else {
       return (

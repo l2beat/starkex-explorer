@@ -53,6 +53,7 @@ export class UserTransactionRepository extends BaseRepository {
     this.addIncluded = this.wrapAdd(this.addIncluded)
     this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
+    this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
     this.getByStateUpdateIdAndPositionId = this.wrapGet(
       this.getByStateUpdateIdAndPositionId
     )
@@ -125,6 +126,21 @@ export class UserTransactionRepository extends BaseRepository {
     let query = queryWithIncluded(knex)
       .where('vault_or_position_id_a', positionId as unknown as Knex.Value)
       .orWhere('vault_or_position_id_b', positionId as unknown as Knex.Value)
+    if (types) {
+      query = query.whereIn('type', types)
+    }
+    return toRecords<T>(await query)
+  }
+
+  async getByStateUpdateId<T extends UserTransactionData['type']>(
+    stateUpdateId: number,
+    types?: T[]
+  ): Promise<UserTransactionRecord<T>[]> {
+    const knex = await this.knex()
+    let query = queryWithIncluded(knex).where(
+      'included_state_update_id',
+      stateUpdateId
+    )
     if (types) {
       query = query.whereIn('type', types)
     }

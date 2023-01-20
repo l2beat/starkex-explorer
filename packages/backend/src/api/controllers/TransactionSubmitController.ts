@@ -4,13 +4,13 @@ import {
   decodeForcedWithdrawalRequest,
   ForcedTradeRequest,
 } from '@explorer/shared'
-import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 
 import {
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
+import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { sleep } from '../../tools/sleep'
 import { ControllerResult } from './ControllerResult'
@@ -18,7 +18,7 @@ import { ControllerResult } from './ControllerResult'
 export class TransactionSubmitController {
   constructor(
     private ethereumClient: EthereumClient,
-    private forcedTransactionRepository: ForcedTransactionRepository,
+    private sentTransactionRepository: SentTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress
   ) {}
@@ -36,18 +36,17 @@ export class TransactionSubmitController {
       return { type: 'bad request', content: `Invalid transaction` }
     }
     const sentAt = Timestamp(Date.now())
-    await this.forcedTransactionRepository.add(
-      {
-        data: {
-          type: 'withdrawal',
-          amount: data.quantizedAmount,
-          positionId: data.positionId,
-          starkKey: data.starkKey,
-        },
-        hash,
+    await this.sentTransactionRepository.add({
+      transactionHash: hash,
+      timestamp: sentAt,
+      data: {
+        type: 'ForcedWithdrawal',
+        quantizedAmount: data.quantizedAmount,
+        positionId: data.positionId,
+        starkKey: data.starkKey,
+        premiumCost: data.premiumCost,
       },
-      sentAt
-    )
+    })
     return { type: 'created', content: { id: hash } }
   }
 
@@ -67,11 +66,15 @@ export class TransactionSubmitController {
       return { type: 'bad request', content: `Invalid transaction` }
     }
     const sentAt = Timestamp(Date.now())
-    await this.forcedTransactionRepository.saveFinalize(
-      exitHash,
-      finalizeHash,
-      sentAt
-    )
+    await this.sentTransactionRepository.add({
+      transactionHash: finalizeHash,
+      timestamp: sentAt,
+      data: {
+        type: 'Withdraw',
+        starkKey: data.starkKey,
+        assetType: data.assetType,
+      },
+    })
     return { type: 'success', content: finalizeHash.toString() }
   }
 
@@ -107,25 +110,27 @@ export class TransactionSubmitController {
       return { type: 'bad request', content: `Invalid transaction` }
     }
     const sentAt = Timestamp(Date.now())
-    await this.forcedTransactionRepository.add(
-      {
-        data: {
-          type: 'trade',
-          starkKeyA: data.starkKeyA,
-          starkKeyB: data.starkKeyB,
-          positionIdA: data.positionIdA,
-          positionIdB: data.positionIdB,
-          syntheticAssetId: data.syntheticAssetId,
-          collateralAmount: data.collateralAmount,
-          isABuyingSynthetic: data.isABuyingSynthetic,
-          nonce: data.nonce,
-          syntheticAmount: data.syntheticAmount,
-        },
-        hash,
+    await this.sentTransactionRepository.add({
+      transactionHash: hash,
+      timestamp: sentAt,
+      data: {
+        type: 'ForcedTrade',
+        starkKeyA: data.starkKeyA,
+        starkKeyB: data.starkKeyB,
+        positionIdA: data.positionIdA,
+        positionIdB: data.positionIdB,
+        collateralAmount: data.collateralAmount,
+        collateralAssetId: AssetId.USDC,
+        syntheticAmount: data.syntheticAmount,
+        syntheticAssetId: data.syntheticAssetId,
+        isABuyingSynthetic: data.isABuyingSynthetic,
+        submissionExpirationTime: Timestamp(data.submissionExpirationTime),
+        nonce: data.nonce,
+        signatureB: data.signature,
+        premiumCost: data.premiumCost,
         offerId,
       },
-      sentAt
-    )
+    })
     return { type: 'created', content: { id: hash } }
   }
 

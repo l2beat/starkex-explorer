@@ -297,14 +297,14 @@ export class Application {
       accountService,
       userRegistrationEventRepository,
       positionRepository,
-      forcedTransactionRepository,
+      userTransactionRepository,
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       accountService,
       stateUpdateRepository,
-      forcedTransactionRepository
+      userTransactionRepository
     )
     const searchController = new SearchController(
       stateUpdateRepository,
@@ -320,7 +320,7 @@ export class Application {
     )
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
-      forcedTransactionRepository,
+      sentTransactionRepository,
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
