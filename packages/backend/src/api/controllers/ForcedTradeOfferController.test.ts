@@ -380,7 +380,7 @@ describe(ForcedTradeOfferController.name, () => {
             createdAt: Timestamp(Date.now()),
             ...tradeMock.offer,
           }),
-          save: async () => true,
+          update: async () => 1,
         }),
         mock<PositionRepository>({
           findById: async (id) => {
@@ -536,7 +536,7 @@ describe(ForcedTradeOfferController.name, () => {
         mockAccountService,
         mock<ForcedTradeOfferRepository>({
           findById: async () => accepted,
-          save: async () => true,
+          update: async () => 1,
         }),
         mock<PositionRepository>(),
         mock<UserRegistrationEventRepository>({

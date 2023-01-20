@@ -206,7 +206,7 @@ export class ForcedTradeOfferController {
       return { type: 'bad request', content: 'Invalid signature.' }
     }
 
-    await this.offerRepository.save({
+    await this.offerRepository.update({
       ...offer,
       accepted: {
         ...accepted,
@@ -254,7 +254,7 @@ export class ForcedTradeOfferController {
       }
     }
 
-    await this.offerRepository.save({
+    await this.offerRepository.update({
       ...offer,
       cancelledAt: Timestamp(Date.now()),
     })

@@ -131,7 +131,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.save = this.wrapSave(this.save)
+    this.update = this.wrapUpdate(this.update)
 
     /* eslint-enable @typescript-eslint/unbound-method */
   }
@@ -146,13 +146,13 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return result!.id
   }
 
-  async save(record: Record): Promise<boolean> {
+  async update(record: Record): Promise<number> {
     const row = toRow(record)
     const knex = await this.knex()
     const updates = await knex('forced_trade_offers')
       .update(row)
       .where('id', '=', row.id)
-    return !!updates
+    return updates
   }
 
   private getInitialQuery(knex: Knex, { assetId, type }: InitialFilters = {}) {

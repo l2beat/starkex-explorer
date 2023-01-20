@@ -33,8 +33,8 @@ describe(ForcedTradeOfferRepository.name, () => {
       id,
       accepted: fakeAccepted(),
     }
-    const updated = await repository.save(accepted)
-    expect(updated).toEqual(true)
+    const updated = await repository.update(accepted)
+    expect(updated).toEqual(1)
 
     const actual = await repository.findById(id)
 
@@ -52,8 +52,8 @@ describe(ForcedTradeOfferRepository.name, () => {
         transactionHash: Hash256.fake(),
       },
     }
-    const updated = await repository.save(submitted)
-    expect(updated).toEqual(true)
+    const updated = await repository.update(submitted)
+    expect(updated).toEqual(1)
 
     const actual = await repository.findById(id)
 
@@ -93,7 +93,7 @@ describe(ForcedTradeOfferRepository.name, () => {
       createdAt: Timestamp(5),
     })
     const id5 = await repository.add(initial)
-    await repository.save({ ...initial, id: id5, accepted: fakeAccepted() })
+    await repository.update({ ...initial, id: id5, accepted: fakeAccepted() })
 
     return { id1, id2, id3, id4, id5 }
   }
@@ -182,11 +182,11 @@ describe(ForcedTradeOfferRepository.name, () => {
     const accepted = fakeAccepted({ positionIdB: positionId })
     await repository.add(offer1)
     await repository.add(offer2)
-    await repository.save({ ...offer2, accepted })
+    await repository.update({ ...offer2, accepted })
 
     expect(await repository.countActiveByPositionId(positionId)).toEqual(2)
 
-    await repository.save({ ...offer1, cancelledAt: fakeTimestamp() })
+    await repository.update({ ...offer1, cancelledAt: fakeTimestamp() })
 
     expect(await repository.countActiveByPositionId(positionId)).toEqual(1)
   })
