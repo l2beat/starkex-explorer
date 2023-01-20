@@ -31,11 +31,13 @@ export async function up(knex: Knex) {
   })
 
   await knex.schema.createTable('user_events', (table) => {
-    table.bigIncrements('id').primary() // surrogate key
+    table.increments('id').primary() // surrogate key
     table.string('type').notNullable().index()
     table.string('transaction_hash').notNullable().index()
-    table.string('stark_key').notNullable().index()
-    table.bigInteger('vault_or_position_id').index()
+    table.string('stark_key_a').notNullable().index()
+    table.string('stark_key_b').index()
+    table.bigInteger('vault_or_position_id_a').index()
+    table.bigInteger('vault_or_position_id_b').index()
     table.json('data').notNullable()
     table.integer('block_number').notNullable()
     table.bigInteger('timestamp').notNullable().index()

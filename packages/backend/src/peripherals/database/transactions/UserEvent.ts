@@ -7,14 +7,16 @@ type ToJSON<T> = {
 }
 
 interface Encoded<T> {
-  starkKey: StarkKey
-  vaultOrPositionId: bigint
+  starkKeyA: StarkKey
+  starkKeyB?: StarkKey
+  vaultOrPositionIdA?: bigint
+  vaultOrPositionIdB?: bigint
   data: ToJSON<T>
 }
 
-export type SentTransactionData = ForcedTradeData | ForcedWithdrawalData
+export type UserEventData = ForcedTradeData | ForcedWithdrawalData
 
-export type SentTransactionJSON = ToJSON<SentTransactionData>
+export type UserEventJSON = ToJSON<UserEventData>
 
 export interface ForcedWithdrawalData {
   type: 'ForcedWithdrawal'
@@ -39,12 +41,11 @@ export interface ForcedTradeData {
   nonce: bigint
   signatureB: string
   premiumCost: boolean
-  offerId: number
 }
 
-export function encodeSentTransactionData(
-  values: SentTransactionData
-): Encoded<SentTransactionData> {
+export function encodeUserEventData(
+  values: UserEventData
+): Encoded<UserEventData> {
   switch (values.type) {
     case 'ForcedWithdrawal':
       return encodeForcedWithdrawal(values)
@@ -53,9 +54,9 @@ export function encodeSentTransactionData(
   }
 }
 
-export function decodeSentTransactionData(
-  values: ToJSON<SentTransactionData>
-): SentTransactionData {
+export function decodeUserEventData(
+  values: ToJSON<UserEventData>
+): UserEventData {
   switch (values.type) {
     case 'ForcedWithdrawal':
       return decodeForcedWithdrawal(values)
@@ -68,8 +69,8 @@ function encodeForcedWithdrawal(
   values: ForcedWithdrawalData
 ): Encoded<ForcedWithdrawalData> {
   return {
-    starkKey: values.starkKey,
-    vaultOrPositionId: values.positionId,
+    starkKeyA: values.starkKey,
+    vaultOrPositionIdA: values.positionId,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
@@ -92,8 +93,10 @@ function decodeForcedWithdrawal(
 
 function encodeForcedTrade(values: ForcedTradeData): Encoded<ForcedTradeData> {
   return {
-    starkKey: values.starkKeyA,
-    vaultOrPositionId: values.positionIdA,
+    starkKeyA: values.starkKeyA,
+    starkKeyB: values.starkKeyB,
+    vaultOrPositionIdA: values.positionIdA,
+    vaultOrPositionIdB: values.positionIdB,
     data: {
       ...values,
       starkKeyA: values.starkKeyA.toString(),

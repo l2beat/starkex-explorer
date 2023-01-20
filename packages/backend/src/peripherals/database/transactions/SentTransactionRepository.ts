@@ -42,29 +42,29 @@ export class SentTransactionRepository extends BaseRepository {
   }
 
   async add(record: {
-    hash: Hash256
+    transactionHash: Hash256
     timestamp: Timestamp
     data: SentTransactionData
   }) {
     const knex = await this.knex()
     const encoded = encodeSentTransactionData(record.data)
     await knex('sent_transactions').insert({
-      transaction_hash: record.hash.toString(),
+      transaction_hash: record.transactionHash.toString(),
       type: encoded.data.type,
       stark_key: encoded.starkKey.toString(),
       sent_timestamp: BigInt(record.timestamp.toString()),
       data: encoded.data,
     })
-    return record.hash
+    return record.transactionHash
   }
 
   async updateMined(
-    hash: Hash256,
+    transactionHash: Hash256,
     mined: NonNullable<SentTransactionRecord['mined']>
   ): Promise<number> {
     const knex = await this.knex()
     const rows = await knex('sent_transactions')
-      .where('transaction_hash', hash.toString())
+      .where('transaction_hash', transactionHash.toString())
       .update({
         mined_timestamp: BigInt(mined.timestamp.toString()),
         mined_block_number: mined.blockNumber,

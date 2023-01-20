@@ -1,6 +1,7 @@
 import { json } from '@explorer/types'
 
 import { SentTransactionJSON } from '../transactions/SentTransaction'
+import { UserEventJSON } from '../transactions/UserEvent'
 
 declare module 'knex/types/tables' {
   interface KeyValueRow {
@@ -166,12 +167,14 @@ declare module 'knex/types/tables' {
   }
 
   interface UserEventRow {
-    id: bigint // surrogate key
+    id: number // surrogate key
     type: string
     transaction_hash: string
-    stark_key: string
-    vault_or_position_id: bigint | null
-    data: json // cannot be an array
+    stark_key_a: string
+    stark_key_b: string | null
+    vault_or_position_id_a: bigint | null
+    vault_or_position_id_b: bigint | null
+    data: UserEventJSON
     block_number: number
     timestamp: bigint
   }
