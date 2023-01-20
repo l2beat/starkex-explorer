@@ -2,8 +2,8 @@ import { EthereumAddress } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { ForcedTradeOfferRepository } from '../peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../peripherals/database/PositionRepository'
+import { SentTransactionRepository } from '../peripherals/database/transactions/SentTransactionRepository'
 import { mock } from '../test/mock'
 import { AccountService } from './AccountService'
 
@@ -12,7 +12,7 @@ describe(AccountService.name, () => {
     const accountService = new AccountService(
       mock<PositionRepository>(),
       mock<ForcedTradeOfferRepository>(),
-      mock<ForcedTransactionRepository>()
+      mock<SentTransactionRepository>()
     )
     const result = await accountService.getAccount(undefined)
     expect(result).toEqual(undefined)
@@ -24,7 +24,7 @@ describe(AccountService.name, () => {
         findIdByEthereumAddress: async () => undefined,
       }),
       mock<ForcedTradeOfferRepository>(),
-      mock<ForcedTransactionRepository>()
+      mock<SentTransactionRepository>()
     )
     const address = EthereumAddress.fake()
     const result = await accountService.getAccount(address)
@@ -41,8 +41,8 @@ describe(AccountService.name, () => {
       mock<ForcedTradeOfferRepository>({
         countActiveByPositionId: async () => 0,
       }),
-      mock<ForcedTransactionRepository>({
-        countPendingByPositionId: async () => 0,
+      mock<SentTransactionRepository>({
+        countNotMinedByPositionId: async () => 0,
       })
     )
     const address = EthereumAddress.fake()
@@ -62,8 +62,8 @@ describe(AccountService.name, () => {
       mock<ForcedTradeOfferRepository>({
         countActiveByPositionId: async () => 1,
       }),
-      mock<ForcedTransactionRepository>({
-        countPendingByPositionId: async () => 0,
+      mock<SentTransactionRepository>({
+        countNotMinedByPositionId: async () => 0,
       })
     )
     const address = EthereumAddress.fake()

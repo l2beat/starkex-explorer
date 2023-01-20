@@ -6,7 +6,6 @@ import { StateTransitionRecord } from '../peripherals/database/StateTransitionRe
 import { decodedFakePages, fakePages } from '../test/fakes'
 import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
-import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
 import type { PageCollector } from './collectors/PageCollector'
 import type { PageMappingCollector } from './collectors/PageMappingCollector'
 import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualRollupStateTransitionCollector'
@@ -44,10 +43,7 @@ describe(PerpetualRollupSyncService.name, () => {
       collect: async () => [],
     })
     const userTransactionCollector = mock<UserTransactionCollector>({
-      collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
-    })
-    const finalizeExitEventsCollector = mock<FinalizeExitEventsCollector>({
-      collect: async () => ({ added: 0, ignored: 0, updated: 0 }),
+      collect: async () => [],
     })
 
     const stateTransitionRecordWithPages: StateTransitionRecord & {
@@ -77,7 +73,6 @@ describe(PerpetualRollupSyncService.name, () => {
       perpetualRollupUpdater,
       userRegistrationCollector,
       userTransactionCollector,
-      finalizeExitEventsCollector,
       Logger.SILENT
     )
 
@@ -125,7 +120,6 @@ describe(PerpetualRollupSyncService.name, () => {
         discardAfter: noop,
       })
       const userTransactionCollector = mock<UserTransactionCollector>()
-      const finalizeExitEventsCollector = mock<FinalizeExitEventsCollector>()
 
       const dataSyncService = new PerpetualRollupSyncService(
         verifierCollector,
@@ -135,7 +129,6 @@ describe(PerpetualRollupSyncService.name, () => {
         perpetualRollupUpdater,
         userRegistrationCollector,
         userTransactionCollector,
-        finalizeExitEventsCollector,
         Logger.SILENT
       )
 

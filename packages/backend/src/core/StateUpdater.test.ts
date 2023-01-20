@@ -1,11 +1,11 @@
 import { MerkleTree, PositionLeaf } from '@explorer/state'
-import { AssetId, Hash256, PedersenHash, StarkKey } from '@explorer/types'
+import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import type { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
@@ -25,7 +25,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         rollupStateRepository,
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -47,7 +47,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -62,7 +62,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -80,7 +80,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -102,7 +102,7 @@ describe(StateUpdater.name, () => {
         stateUpdateRepository,
         mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -120,15 +120,15 @@ describe(StateUpdater.name, () => {
 
   describe(StateUpdater.prototype.extractTransactionHashes.name, () => {
     it('throws if forced transaction missing in database', async () => {
-      const forcedTransactionRepository = mock<ForcedTransactionRepository>({
-        getTransactionHashesByData: async () => [Hash256.fake(), undefined],
+      const UserTransactionRepository = mock<UserTransactionRepository>({
+        getNotIncluded: async () => [],
       })
 
       const stateUpdater = new StateUpdater(
         mock<StateUpdateRepository>(),
         mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        forcedTransactionRepository,
+        UserTransactionRepository,
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY
@@ -167,7 +167,7 @@ describe(StateUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT,
         EMPTY_STATE_HASH,
         PositionLeaf.EMPTY,

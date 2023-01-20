@@ -3,10 +3,10 @@ import { InMemoryMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash, StarkKey } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
 import { mock } from '../test/mock'
@@ -36,7 +36,7 @@ describe(SpotValidiumUpdater.name, () => {
         mock<StateUpdateRepository>({}),
         mock<InMemoryMerkleStorage<VaultLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT,
         mock<MerkleTree<VaultLeaf>>()
       )
@@ -91,7 +91,7 @@ describe(SpotValidiumUpdater.name, () => {
           }),
           storage,
           mock<EthereumClient>(),
-          mock<ForcedTransactionRepository>(),
+          mock<UserTransactionRepository>(),
           Logger.SILENT,
           stateTree
         )

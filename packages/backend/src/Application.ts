@@ -298,6 +298,7 @@ export class Application {
       userRegistrationEventRepository,
       positionRepository,
       userTransactionRepository,
+      sentTransactionRepository,
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
