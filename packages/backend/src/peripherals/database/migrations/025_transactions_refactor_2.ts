@@ -30,7 +30,7 @@ export async function up(knex: Knex) {
     table.boolean('reverted').notNullable()
   })
 
-  await knex.schema.createTable('user_events', (table) => {
+  await knex.schema.createTable('user_transactions', (table) => {
     table.increments('id').primary() // surrogate key
     table.string('type').notNullable().index()
     table.string('transaction_hash').notNullable().index()
@@ -54,6 +54,6 @@ export async function up(knex: Knex) {
 export async function down(knex: Knex) {
   await migration24.up(knex)
   await knex.schema.dropTable('sent_transactions')
-  await knex.schema.dropTable('user_events')
+  await knex.schema.dropTable('user_transactions')
   await knex.schema.dropTable('included_forced_requests')
 }

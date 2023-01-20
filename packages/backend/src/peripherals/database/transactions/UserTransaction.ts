@@ -14,9 +14,9 @@ interface Encoded<T> {
   data: ToJSON<T>
 }
 
-export type UserEventData = ForcedTradeData | ForcedWithdrawalData
+export type UserTransactionData = ForcedTradeData | ForcedWithdrawalData
 
-export type UserEventJSON = ToJSON<UserEventData>
+export type UserTransactionJSON = ToJSON<UserTransactionData>
 
 export interface ForcedWithdrawalData {
   type: 'ForcedWithdrawal'
@@ -43,9 +43,9 @@ export interface ForcedTradeData {
   premiumCost: boolean
 }
 
-export function encodeUserEventData(
-  values: UserEventData
-): Encoded<UserEventData> {
+export function encodeUserTransactionData(
+  values: UserTransactionData
+): Encoded<UserTransactionData> {
   switch (values.type) {
     case 'ForcedWithdrawal':
       return encodeForcedWithdrawal(values)
@@ -54,9 +54,9 @@ export function encodeUserEventData(
   }
 }
 
-export function decodeUserEventData(
-  values: ToJSON<UserEventData>
-): UserEventData {
+export function decodeUserTransactionData(
+  values: ToJSON<UserTransactionData>
+): UserTransactionData {
   switch (values.type) {
     case 'ForcedWithdrawal':
       return decodeForcedWithdrawal(values)

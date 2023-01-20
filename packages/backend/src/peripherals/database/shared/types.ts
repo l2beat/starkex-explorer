@@ -1,7 +1,7 @@
 import { json } from '@explorer/types'
 
 import { SentTransactionJSON } from '../transactions/SentTransaction'
-import { UserEventJSON } from '../transactions/UserEvent'
+import { UserTransactionJSON } from '../transactions/UserTransaction'
 
 declare module 'knex/types/tables' {
   interface KeyValueRow {
@@ -166,7 +166,7 @@ declare module 'knex/types/tables' {
     reverted: boolean
   }
 
-  interface UserEventRow {
+  interface UserTransactionRow {
     id: number // surrogate key
     type: string
     transaction_hash: string
@@ -174,7 +174,7 @@ declare module 'knex/types/tables' {
     stark_key_b: string | null
     vault_or_position_id_a: bigint | null
     vault_or_position_id_b: bigint | null
-    data: UserEventJSON
+    data: UserTransactionJSON
     block_number: number
     timestamp: bigint
   }
@@ -206,7 +206,7 @@ declare module 'knex/types/tables' {
     forced_trade_offers: ForcedTradeOfferRow
     vaults: VaultRow
     sent_transactions: SentTransactionRow
-    user_events: UserEventRow
+    user_transactions: UserTransactionRow
     included_forced_requests: IncludedForcedRequestRow
   }
 }
