@@ -139,10 +139,7 @@ export class UserTransactionRepository extends BaseRepository {
     types?: T[]
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
-    let query = queryWithIncluded(knex).where(
-      'included_state_update_id',
-      stateUpdateId
-    )
+    let query = queryWithIncluded(knex).where('state_update_id', stateUpdateId)
     if (types) {
       query = query.whereIn('type', types)
     }
@@ -174,6 +171,7 @@ export class UserTransactionRepository extends BaseRepository {
     let query = queryWithIncluded(knex)
       .limit(options.limit)
       .offset(options.offset)
+      .orderBy('timestamp', 'desc')
     if (options.types) {
       query = query.whereIn('type', options.types)
     }
@@ -246,18 +244,18 @@ export class UserTransactionRepository extends BaseRepository {
 }
 
 function queryWithIncluded(knex: Knex) {
-  return knex('user_transactions ut')
+  return knex('user_transactions')
     .select<RowWithIncluded[]>(
-      'ut.*',
-      'it.block_number as included_block_number',
-      'it.timestamp as included_timestamp',
-      'it.state_update_id as included_state_update_id'
+      'user_transactions.*',
+      'included_forced_requests.block_number as included_block_number',
+      'included_forced_requests.timestamp as included_timestamp',
+      'included_forced_requests.state_update_id as included_state_update_id'
     )
     .leftJoin(
-      'included_forced_requests it',
-      'ut.transaction_hash',
+      'included_forced_requests',
+      'user_transactions.transaction_hash',
       '=',
-      'it.transaction_hash'
+      'included_forced_requests.transaction_hash'
     )
 }
 
