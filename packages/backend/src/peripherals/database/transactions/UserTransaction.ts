@@ -1,10 +1,6 @@
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
-type ToJSON<T> = {
-  [K in keyof T]: T[K] extends bigint | StarkKey | Timestamp | AssetId
-    ? string
-    : T[K]
-}
+import { ToJSON } from './ToJSON'
 
 interface Encoded<T> {
   starkKeyA: StarkKey
@@ -14,7 +10,10 @@ interface Encoded<T> {
   data: ToJSON<T>
 }
 
-export type UserTransactionData = ForcedTradeData | ForcedWithdrawalData
+export type UserTransactionData =
+  | ForcedTradeData
+  | ForcedWithdrawalData
+  | WithdrawData
 
 export type UserTransactionJSON = ToJSON<UserTransactionData>
 
@@ -43,6 +42,15 @@ export interface ForcedTradeData {
   premiumCost: boolean
 }
 
+export interface WithdrawData {
+  type: 'Withdraw'
+  starkKey: StarkKey
+  assetType: string
+  nonQuantizedAmount: bigint
+  quantizedAmount: bigint
+  recipient: EthereumAddress
+}
+
 export function encodeUserTransactionData(
   values: UserTransactionData
 ): Encoded<UserTransactionData> {
@@ -51,6 +59,8 @@ export function encodeUserTransactionData(
       return encodeForcedWithdrawal(values)
     case 'ForcedTrade':
       return encodeForcedTrade(values)
+    case 'Withdraw':
+      return encodeWithdraw(values)
   }
 }
 
@@ -62,6 +72,8 @@ export function decodeUserTransactionData(
       return decodeForcedWithdrawal(values)
     case 'ForcedTrade':
       return decodeForcedTrade(values)
+    case 'Withdraw':
+      return decodeWithdraw(values)
   }
 }
 
@@ -128,5 +140,28 @@ function decodeForcedTrade(values: ToJSON<ForcedTradeData>): ForcedTradeData {
       Number(values.submissionExpirationTime)
     ),
     nonce: BigInt(values.nonce),
+  }
+}
+
+function encodeWithdraw(values: WithdrawData): Encoded<WithdrawData> {
+  return {
+    starkKeyA: values.starkKey,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      nonQuantizedAmount: values.nonQuantizedAmount.toString(),
+      quantizedAmount: values.quantizedAmount.toString(),
+      recipient: values.recipient.toString(),
+    },
+  }
+}
+
+function decodeWithdraw(values: ToJSON<WithdrawData>): WithdrawData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
+    quantizedAmount: BigInt(values.quantizedAmount),
+    recipient: EthereumAddress(values.recipient),
   }
 }

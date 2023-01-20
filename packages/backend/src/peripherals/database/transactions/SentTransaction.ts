@@ -1,10 +1,6 @@
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
-type ToJSON<T> = {
-  [K in keyof T]: T[K] extends bigint | StarkKey | Timestamp | AssetId
-    ? string
-    : T[K]
-}
+import { ToJSON } from './ToJSON'
 
 interface Encoded<T> {
   starkKey: StarkKey
@@ -12,7 +8,10 @@ interface Encoded<T> {
   data: ToJSON<T>
 }
 
-export type SentTransactionData = ForcedTradeData | ForcedWithdrawalData
+export type SentTransactionData =
+  | ForcedTradeData
+  | ForcedWithdrawalData
+  | WithdrawData
 
 export type SentTransactionJSON = ToJSON<SentTransactionData>
 
@@ -42,6 +41,12 @@ export interface ForcedTradeData {
   offerId: number
 }
 
+export interface WithdrawData {
+  type: 'Withdraw'
+  starkKey: StarkKey
+  assetType: string
+}
+
 export function encodeSentTransactionData(
   values: SentTransactionData
 ): Encoded<SentTransactionData> {
@@ -50,6 +55,8 @@ export function encodeSentTransactionData(
       return encodeForcedWithdrawal(values)
     case 'ForcedTrade':
       return encodeForcedTrade(values)
+    case 'Withdraw':
+      return encodeWithdraw(values)
   }
 }
 
@@ -61,6 +68,8 @@ export function decodeSentTransactionData(
       return decodeForcedWithdrawal(values)
     case 'ForcedTrade':
       return decodeForcedTrade(values)
+    case 'Withdraw':
+      return decodeWithdraw(values)
   }
 }
 
@@ -125,5 +134,23 @@ function decodeForcedTrade(values: ToJSON<ForcedTradeData>): ForcedTradeData {
       Number(values.submissionExpirationTime)
     ),
     nonce: BigInt(values.nonce),
+  }
+}
+
+function encodeWithdraw(values: WithdrawData): Encoded<WithdrawData> {
+  return {
+    starkKey: values.starkKey,
+    vaultOrPositionId: BigInt(0),
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+    },
+  }
+}
+
+function decodeWithdraw(values: ToJSON<WithdrawData>): WithdrawData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
   }
 }
