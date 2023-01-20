@@ -161,6 +161,7 @@ declare module 'knex/types/tables' {
     data: SentTransactionJSON
     sent_timestamp: bigint
     mined_timestamp: bigint | null
+    mined_block_number: number | null
     reverted: boolean
   }
 

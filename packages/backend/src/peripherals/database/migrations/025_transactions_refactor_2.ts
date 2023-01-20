@@ -26,6 +26,7 @@ export async function up(knex: Knex) {
     table.json('data').notNullable()
     table.bigInteger('sent_timestamp').notNullable().index()
     table.bigInteger('mined_timestamp').index()
+    table.integer('mined_block_number')
     table.boolean('reverted').notNullable()
   })
 

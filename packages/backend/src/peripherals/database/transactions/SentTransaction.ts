@@ -37,7 +37,7 @@ export interface ForcedTradeData {
   nonce: bigint
   signatureB: string
   premiumCost: boolean
-  offerId?: number
+  offerId: number
 }
 
 export function encodeSentTransactionData(
