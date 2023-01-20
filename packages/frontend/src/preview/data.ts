@@ -285,7 +285,6 @@ export const FORCED_TRANSACTION_DETAILS_PROPS: ForcedTransactionDetailsProps = {
       transactionHash: Hash256.fake(),
       value: 12345n,
       stateUpdateId: 1,
-      status: 'finalized',
     },
     finalizeForm: {
       transactionHash: Hash256.fake(),

@@ -53,6 +53,7 @@ export class SentTransactionRepository extends BaseRepository {
       type: encoded.data.type,
       stark_key: encoded.starkKey.toString(),
       sent_timestamp: BigInt(record.timestamp.toString()),
+      reverted: false,
       data: encoded.data,
     })
     return record.transactionHash
@@ -120,6 +121,21 @@ export class SentTransactionRepository extends BaseRepository {
       return undefined
     }
     return toRecord(row)
+  }
+
+  async findFirstWithdrawByStarkKeyAfter(
+    starkKey: StarkKey,
+    timestamp: Timestamp
+  ): Promise<SentTransactionRecord | undefined> {
+    const knex = await this.knex()
+    const result = await knex('sent_transactions')
+      .where('type', 'Withdraw')
+      .where('stark_key', starkKey.toString())
+      .where('sent_timestamp', '>', BigInt(timestamp.toString()))
+      .where('reverted', false)
+      .orderBy('sent_timestamp', 'asc')
+      .first()
+    return result ? toRecord(result) : undefined
   }
 
   async deleteByTransactionHash(hash: Hash256) {

@@ -1,55 +1,64 @@
 import { Timestamp } from '@explorer/types'
 
-import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionRepository'
+import { SentTransactionRecord } from '../../../peripherals/database/transactions/SentTransactionRepository'
+import { UserTransactionRecord } from '../../../peripherals/database/transactions/UserTransactionRepository'
 
 interface Event {
   timestamp: Timestamp
   text: string
 }
 
-export function toForcedTransactionHistory({
-  updates,
-}: ForcedTransactionRecord) {
+export function toForcedTransactionHistory(
+  sentTransaction: SentTransactionRecord | undefined,
+  transaction:
+    | UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>
+    | undefined,
+  sentWithdrawal: SentTransactionRecord | undefined
+) {
   const history: Event[] = []
-  if (updates.sentAt) {
-    history.push({ text: 'transaction sent', timestamp: updates.sentAt })
+  if (sentTransaction) {
+    history.push({
+      text: 'transaction sent',
+      timestamp: sentTransaction.sentTimestamp,
+    })
   }
-  if (updates.revertedAt) {
+  if (sentTransaction?.mined?.reverted) {
     history.push({
       text: 'transaction reverted',
-      timestamp: updates.revertedAt,
+      timestamp: sentTransaction.mined.timestamp,
     })
     return history
   }
-  if (updates.minedAt) {
+  if (transaction) {
     history.push({
       text: 'transaction mined (waiting for inclusion in state update)',
-      timestamp: updates.minedAt,
+      timestamp: transaction.timestamp,
     })
   }
-  if (updates.verified) {
+  if (transaction?.included) {
     history.push({
-      text: `exit included in state update #${updates.verified.stateUpdateId}`,
-      timestamp: updates.verified.at,
+      text: `exit included in state update #${transaction.included.stateUpdateId}`,
+      timestamp: transaction.included.timestamp,
     })
   }
-  if (updates.finalized?.sentAt) {
+  if (sentWithdrawal) {
     history.push({
       text: 'finalize transaction sent',
-      timestamp: updates.finalized.sentAt,
+      timestamp: sentWithdrawal.sentTimestamp,
     })
   }
-  if (updates.finalized?.revertedAt) {
-    history.push({
-      text: 'finalize transaction reverted',
-      timestamp: updates.finalized.revertedAt,
-    })
-  }
-  if (updates.finalized?.minedAt) {
-    history.push({
-      text: 'finalize transaction mined',
-      timestamp: updates.finalized.minedAt,
-    })
+  if (sentWithdrawal?.mined) {
+    if (sentWithdrawal.mined.reverted) {
+      history.push({
+        text: 'finalize transaction reverted',
+        timestamp: sentWithdrawal.mined.timestamp,
+      })
+    } else {
+      history.push({
+        text: 'finalize transaction mined',
+        timestamp: sentWithdrawal.mined.timestamp,
+      })
+    }
   }
   return history
 }

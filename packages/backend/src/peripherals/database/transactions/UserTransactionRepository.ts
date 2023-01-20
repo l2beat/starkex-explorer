@@ -95,13 +95,15 @@ export class UserTransactionRepository extends BaseRepository {
 
   async addManyIncluded(records: IncludedForcedRequestRecord[]) {
     const knex = await this.knex()
-    await knex('included_forced_requests').insert(records.map(record => ({
-      transaction_hash: record.transactionHash.toString(),
-      block_number: record.blockNumber,
-      timestamp: BigInt(record.timestamp.toString()),
-      state_update_id: record.stateUpdateId,
-    })))
-    return records.map(x => x.transactionHash)
+    await knex('included_forced_requests').insert(
+      records.map((record) => ({
+        transaction_hash: record.transactionHash.toString(),
+        block_number: record.blockNumber,
+        timestamp: BigInt(record.timestamp.toString()),
+        state_update_id: record.stateUpdateId,
+      }))
+    )
+    return records.map((x) => x.transactionHash)
   }
 
   async getByStarkKey<T extends UserTransactionData['type']>(
@@ -209,13 +211,18 @@ export class UserTransactionRepository extends BaseRepository {
     return result ? toRecord(result) : undefined
   }
 
-  async findByTransactionHash(
-    transactionHash: Hash256
-  ): Promise<UserTransactionRecord | undefined> {
+  async findByTransactionHash<T extends UserTransactionData['type']>(
+    transactionHash: Hash256,
+    types?: T[]
+  ): Promise<UserTransactionRecord<T> | undefined> {
     const knex = await this.knex()
-    const result = await queryWithIncluded(knex)
+    let query = queryWithIncluded(knex)
       .where('transaction_hash', transactionHash.toString())
       .first()
+    if (types) {
+      query = query.whereIn('type', types)
+    }
+    const result = await query
     return result ? toRecord(result) : undefined
   }
 
@@ -257,11 +264,13 @@ function queryWithIncluded(knex: Knex) {
 function toRecords<T extends UserTransactionData['type']>(
   rows: RowWithIncluded[]
 ) {
-  return rows.map(toRecord) as unknown as UserTransactionRecord<T>[]
+  return rows.map((row) => toRecord<T>(row))
 }
 
-function toRecord(row: RowWithIncluded): UserTransactionRecord {
-  return {
+function toRecord<T extends UserTransactionData['type']>(
+  row: RowWithIncluded
+): UserTransactionRecord<T> {
+  const record: UserTransactionRecord = {
     id: row.id,
     transactionHash: Hash256(row.transaction_hash),
     starkKeyA: StarkKey(row.stark_key_a),
@@ -282,4 +291,5 @@ function toRecord(row: RowWithIncluded): UserTransactionRecord {
           }
         : undefined,
   }
+  return record as unknown as UserTransactionRecord<T>
 }

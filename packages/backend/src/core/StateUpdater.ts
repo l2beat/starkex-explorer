@@ -132,7 +132,9 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
         if (transaction) {
           return transaction.transactionHash
         }
-      } else if (action.type === 'withdrawal') {
+      }
+
+      if (action.type === 'withdrawal') {
         const transaction = notIncluded.find(
           (tx) =>
             tx.data.type === 'ForcedWithdrawal' &&
