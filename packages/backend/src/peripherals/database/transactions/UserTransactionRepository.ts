@@ -1,4 +1,5 @@
 import { Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Knex } from 'knex'
 import { UserTransactionRow } from 'knex/types/tables'
 
 import { Logger } from '../../../tools/Logger'
@@ -21,7 +22,25 @@ export interface UserTransactionRecord<
   vaultOrPositionIdB?: bigint
   blockNumber: number
   timestamp: Timestamp
+  included?: {
+    blockNumber: number
+    timestamp: Timestamp
+    stateUpdateId: number
+  }
   data: Extract<UserTransactionData, { type: T }>
+}
+
+export interface IncludedForcedRequestRecord {
+  transactionHash: Hash256
+  blockNumber: number
+  timestamp: Timestamp
+  stateUpdateId: number
+}
+
+interface RowWithIncluded extends UserTransactionRow {
+  included_block_number: number | null
+  included_timestamp: bigint | null
+  included_state_update_id: number | null
 }
 
 export class UserTransactionRepository extends BaseRepository {
@@ -31,6 +50,7 @@ export class UserTransactionRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.add = this.wrapAdd(this.add)
+    this.addIncluded = this.wrapAdd(this.addIncluded)
     this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
     this.getPaginated = this.wrapGet(this.getPaginated)
@@ -68,12 +88,23 @@ export class UserTransactionRepository extends BaseRepository {
     return results[0]!.id
   }
 
+  async addIncluded(record: IncludedForcedRequestRecord) {
+    const knex = await this.knex()
+    await knex('included_forced_requests').insert({
+      transaction_hash: record.transactionHash.toString(),
+      block_number: record.blockNumber,
+      timestamp: BigInt(record.timestamp.toString()),
+      state_update_id: record.stateUpdateId,
+    })
+    return record.transactionHash
+  }
+
   async getByStarkKey<T extends UserTransactionData['type']>(
     starkKey: StarkKey,
     types?: T[]
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
-    let query = knex('user_transactions')
+    let query = queryWithIncluded(knex)
       .where('stark_key_a', starkKey.toString())
       .orWhere('stark_key_b', starkKey.toString())
     if (types) {
@@ -87,9 +118,9 @@ export class UserTransactionRepository extends BaseRepository {
     types?: T[]
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
-    let query = knex('user_transactions')
-      .where('vault_or_position_id_a', positionId)
-      .orWhere('vault_or_position_id_b', positionId)
+    let query = queryWithIncluded(knex)
+      .where('vault_or_position_id_a', positionId as unknown as Knex.Value)
+      .orWhere('vault_or_position_id_b', positionId as unknown as Knex.Value)
     if (types) {
       query = query.whereIn('type', types)
     }
@@ -102,7 +133,7 @@ export class UserTransactionRepository extends BaseRepository {
     types?: T[]
   }): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
-    let query = knex('user_transactions')
+    let query = queryWithIncluded(knex)
       .limit(options.limit)
       .offset(options.offset)
     if (options.types) {
@@ -115,15 +146,10 @@ export class UserTransactionRepository extends BaseRepository {
     types?: T[]
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
-    let query = knex('user_transactions')
-      .select<UserTransactionRow[]>('user_transactions.*')
-      .leftJoin(
-        'included_forced_requests',
-        'user_transactions.transaction_hash',
-        '=',
-        'included_forced_requests.transaction_hash'
-      )
-      .where('included_forced_requests.transaction_hash', null)
+    let query = queryWithIncluded(knex).where(
+      'included_forced_requests.transaction_hash',
+      null
+    )
     if (types) {
       query = query.whereIn('type', types)
     }
@@ -132,7 +158,7 @@ export class UserTransactionRepository extends BaseRepository {
 
   async findById(id: number): Promise<UserTransactionRecord | undefined> {
     const knex = await this.knex()
-    const result = await knex('user_transactions').where('id', id).first()
+    const result = await queryWithIncluded(knex).where('id', id).first()
     return result ? toRecord(result) : undefined
   }
 
@@ -140,7 +166,7 @@ export class UserTransactionRepository extends BaseRepository {
     hash: Hash256
   ): Promise<UserTransactionRecord | undefined> {
     const knex = await this.knex()
-    const result = await knex('user_transactions')
+    const result = await queryWithIncluded(knex)
       .where('transaction_hash', hash.toString())
       .first()
     return result ? toRecord(result) : undefined
@@ -148,24 +174,46 @@ export class UserTransactionRepository extends BaseRepository {
 
   async deleteAfter(blockNumber: number): Promise<number> {
     const knex = await this.knex()
-    return knex('user_transactions')
+    const a = await knex('user_transactions')
       .where('block_number', '>', blockNumber)
       .delete()
+    const b = await knex('included_forced_requests')
+      .where('block_number', '>', blockNumber)
+      .delete()
+    return a + b
   }
 
   async deleteAll(): Promise<number> {
     const knex = await this.knex()
-    return knex('user_transactions').delete()
+    const a = await knex('user_transactions').delete()
+    const b = await knex('included_forced_requests').delete()
+    return a + b
   }
 }
 
+function queryWithIncluded(knex: Knex) {
+  return knex('user_transactions ut')
+    .select<RowWithIncluded[]>(
+      'ut.*',
+      'it.block_number as included_block_number',
+      'it.timestamp as included_timestamp',
+      'it.state_update_id as included_state_update_id'
+    )
+    .leftJoin(
+      'included_forced_requests it',
+      'ut.transaction_hash',
+      '=',
+      'it.transaction_hash'
+    )
+}
+
 function toRecords<T extends UserTransactionData['type']>(
-  rows: UserTransactionRow[]
+  rows: RowWithIncluded[]
 ) {
   return rows.map(toRecord) as unknown as UserTransactionRecord<T>[]
 }
 
-function toRecord(row: UserTransactionRow): UserTransactionRecord {
+function toRecord(row: RowWithIncluded): UserTransactionRecord {
   return {
     id: row.id,
     transactionHash: Hash256(row.transaction_hash),
@@ -176,5 +224,15 @@ function toRecord(row: UserTransactionRow): UserTransactionRecord {
     blockNumber: row.block_number,
     timestamp: Timestamp(Number(row.timestamp)),
     data: decodeUserTransactionData(row.data),
+    included:
+      row.included_block_number != null &&
+      row.included_timestamp != null &&
+      row.included_state_update_id != null
+        ? {
+            blockNumber: row.included_block_number,
+            timestamp: Timestamp(Number(row.included_timestamp)),
+            stateUpdateId: row.included_state_update_id,
+          }
+        : undefined,
   }
 }
