@@ -50,7 +50,7 @@ export class UserTransactionRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.add = this.wrapAdd(this.add)
-    this.addIncluded = this.wrapAdd(this.addIncluded)
+    this.addManyIncluded = this.wrapAddMany(this.addManyIncluded)
     this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
     this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
@@ -93,15 +93,15 @@ export class UserTransactionRepository extends BaseRepository {
     return results[0]!.id
   }
 
-  async addIncluded(record: IncludedForcedRequestRecord) {
+  async addManyIncluded(records: IncludedForcedRequestRecord[]) {
     const knex = await this.knex()
-    await knex('included_forced_requests').insert({
+    await knex('included_forced_requests').insert(records.map(record => ({
       transaction_hash: record.transactionHash.toString(),
       block_number: record.blockNumber,
       timestamp: BigInt(record.timestamp.toString()),
       state_update_id: record.stateUpdateId,
-    })
-    return record.transactionHash
+    })))
+    return records.map(x => x.transactionHash)
   }
 
   async getByStarkKey<T extends UserTransactionData['type']>(

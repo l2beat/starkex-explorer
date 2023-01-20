@@ -63,6 +63,14 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
         prices: oraclePrices,
         transactionHashes,
       }),
+      this.userTransactionRepository.addManyIncluded(
+        transactionHashes.map((transactionHash) => ({
+          transactionHash,
+          blockNumber,
+          timestamp,
+          stateUpdateId: id,
+        }))
+      ),
     ])
     this.logger.info('State updated', { id, blockNumber })
   }
@@ -101,21 +109,46 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
   async extractTransactionHashes(
     forcedActions: ForcedAction[]
   ): Promise<Hash256[]> {
-    const hashes =
-      await this.forcedTransactionRepository.getTransactionHashesByData(
-        forcedActions
-      )
-    const filteredHashes = hashes.filter(
-      (h): h is Exclude<typeof h, undefined> => h !== undefined
-    )
+    const notIncluded = await this.userTransactionRepository.getNotIncluded([
+      'ForcedTrade',
+      'ForcedWithdrawal',
+    ])
 
-    if (filteredHashes.length !== forcedActions.length) {
+    return forcedActions.map((action) => {
+      if (action.type === 'trade') {
+        const transaction = notIncluded.find(
+          (tx) =>
+            tx.data.type === 'ForcedTrade' &&
+            tx.data.starkKeyA === action.starkKeyA &&
+            tx.data.starkKeyB === action.starkKeyB &&
+            tx.data.positionIdA === action.positionIdA &&
+            tx.data.positionIdB === action.positionIdB &&
+            tx.data.collateralAmount === action.collateralAmount &&
+            tx.data.syntheticAssetId === action.syntheticAssetId &&
+            tx.data.syntheticAmount === action.syntheticAmount &&
+            tx.data.nonce === action.nonce &&
+            tx.data.isABuyingSynthetic === action.isABuyingSynthetic
+        )
+        if (transaction) {
+          return transaction.transactionHash
+        }
+      } else if (action.type === 'withdrawal') {
+        const transaction = notIncluded.find(
+          (tx) =>
+            tx.data.type === 'ForcedWithdrawal' &&
+            tx.data.positionId === action.positionId &&
+            tx.data.starkKey === action.starkKey &&
+            tx.data.quantizedAmount === action.amount
+        )
+        if (transaction) {
+          return transaction.transactionHash
+        }
+      }
+
       throw new Error(
         'Forced action included in state update does not have a matching mined transaction'
       )
-    }
-
-    return filteredHashes
+    })
   }
 
   async discardAfter(blockNumber: BlockNumber) {
