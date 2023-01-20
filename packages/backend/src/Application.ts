@@ -14,14 +14,13 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
-import { FinalizeExitEventsCollector } from './core/collectors/FinalizeExitEventsCollector'
-import { ForcedEventsCollector } from './core/collectors/ForcedEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
 import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
 import { SpotCairoOutputCollector } from './core/collectors/SpotCairoOutputCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
+import { UserTransactionCollector } from './core/collectors/UserTransactionCollector'
 import {
   PerpetualValidiumStateTransitionCollector,
   SpotValidiumStateTransitionCollector,
@@ -40,7 +39,6 @@ import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionRepository } from './peripherals/database/ForcedTransactionRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
 import { MerkleTreeRepository } from './peripherals/database/MerkleTreeRepository'
 import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
@@ -50,7 +48,8 @@ import { Database } from './peripherals/database/shared/Database'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
-import { TransactionStatusRepository } from './peripherals/database/TransactionStatusRepository'
+import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
+import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
@@ -93,18 +92,19 @@ export class Application {
       database,
       logger
     )
-    const forcedTransactionRepository = new ForcedTransactionRepository(
-      database,
-      logger
-    )
     const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
       database,
       logger
     )
-    const transactionStatusRepository = new TransactionStatusRepository(
+    const sentTransactionRepository = new SentTransactionRepository(
       database,
       logger
     )
+    const userTransactionRepository = new UserTransactionRepository(
+      database,
+      logger
+    )
+
     const ethereumClient = new EthereumClient(
       config.starkex.blockchain.jsonRpcUrl,
       config.starkex.blockchain.safeBlockDistance
@@ -128,17 +128,9 @@ export class Application {
       userRegistrationEventRepository,
       config.starkex.contracts.perpetual
     )
-    const forcedEventsCollector = new ForcedEventsCollector(
+    const userTransactionCollector = new UserTransactionCollector(
       ethereumClient,
-      forcedTransactionRepository,
-      transactionStatusRepository,
-      config.starkex.contracts.perpetual
-    )
-
-    const finalizeExitEventsCollector = new FinalizeExitEventsCollector(
-      ethereumClient,
-      forcedTransactionRepository,
-      transactionStatusRepository,
+      userTransactionRepository,
       config.starkex.contracts.perpetual
     )
 
@@ -168,15 +160,14 @@ export class Application {
           stateUpdateRepository,
           rollupStateRepository,
           ethereumClient,
-          forcedTransactionRepository,
+          userTransactionRepository,
           logger
         )
         syncService = new PerpetualValidiumSyncService(
           availabilityGatewayClient,
           perpetualValidiumStateTransitionCollector,
           userRegistrationCollector,
-          forcedEventsCollector,
-          finalizeExitEventsCollector,
+          userTransactionCollector,
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           logger
@@ -200,15 +191,14 @@ export class Application {
           stateUpdateRepository,
           spotStateRepository,
           ethereumClient,
-          forcedTransactionRepository,
+          userTransactionRepository,
           logger
         )
         syncService = new SpotValidiumSyncService(
           availabilityGatewayClient,
           spotValidiumStateTransitionCollector,
           userRegistrationCollector,
-          forcedEventsCollector,
-          finalizeExitEventsCollector,
+          userTransactionCollector,
           spotCairoOutputCollector,
           spotValidiumUpdater,
           logger
@@ -246,7 +236,7 @@ export class Application {
         stateUpdateRepository,
         rollupStateRepository,
         ethereumClient,
-        forcedTransactionRepository,
+        userTransactionRepository,
         logger
       )
       syncService = new PerpetualRollupSyncService(
@@ -256,8 +246,7 @@ export class Application {
         stateTransitionCollector,
         perpetualRollupUpdater,
         userRegistrationCollector,
-        forcedEventsCollector,
-        finalizeExitEventsCollector,
+        userTransactionCollector,
         logger
       )
     }
@@ -273,7 +262,7 @@ export class Application {
       }
     )
     const transactionStatusService = new TransactionStatusService(
-      transactionStatusRepository,
+      sentTransactionRepository,
       ethereumClient,
       logger
     )
@@ -283,7 +272,7 @@ export class Application {
     const accountService = new AccountService(
       positionRepository,
       forcedTradeOfferRepository,
-      forcedTransactionRepository
+      sentTransactionRepository
     )
 
     // #endregion core
@@ -294,14 +283,14 @@ export class Application {
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository,
-      forcedTransactionRepository,
+      userTransactionRepository,
       forcedTradeOfferRepository
     )
     const homeController = new HomeController(
       accountService,
       stateUpdateRepository,
       positionRepository,
-      forcedTransactionRepository,
+      userTransactionRepository,
       forcedTradeOfferRepository
     )
     const forcedTransactionController = new ForcedTransactionController(

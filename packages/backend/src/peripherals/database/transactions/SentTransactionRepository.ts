@@ -99,6 +99,16 @@ export class SentTransactionRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
+  async countNotMinedByPositionId(positionId: bigint): Promise<number> {
+    const knex = await this.knex()
+    const [result] = await knex('sent_transactions')
+      .where('vault_or_position_id', positionId)
+      .where('mined_timestamp', null)
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
   async findByTransactionHash(
     hash: Hash256
   ): Promise<SentTransactionRecord | undefined> {

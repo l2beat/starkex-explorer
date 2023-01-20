@@ -2,10 +2,9 @@ import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { Logger } from '../tools/Logger'
-import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
-import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { IDataSyncService } from './IDataSyncService'
 import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
@@ -15,8 +14,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
     private readonly perpetualValidiumStateTransitionCollector: PerpetualValidiumStateTransitionCollector,
     private readonly userRegistrationCollector: UserRegistrationCollector,
-    private readonly forcedEventsCollector: ForcedEventsCollector,
-    private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
+    private readonly userTransactionCollector: UserTransactionCollector,
     private readonly perpetualCairoOutputCollector: PerpetualCairoOutputCollector,
     private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
     private readonly logger: Logger
@@ -28,11 +26,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
     )
-    const forcedEvents = await this.forcedEventsCollector.collect(blockRange)
-
-    const finalizeExitEvents = await this.finalizeExitEventsCollector.collect(
-      blockRange
-    )
+    await this.userTransactionCollector.collect(blockRange)
 
     const stateTransitions =
       await this.perpetualValidiumStateTransitionCollector.collect(blockRange)
@@ -42,8 +36,6 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
       blockRange: { from: blockRange.start, to: blockRange.end },
       stateTransitions: stateTransitions.length,
       userRegistrations: userRegistrations.length,
-      forcedEvents,
-      finalizeExitEvents,
     })
 
     for (const transition of stateTransitions) {
@@ -68,5 +60,6 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     )
     await this.perpetualValidiumUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
+    await this.userTransactionCollector.discardAfter(blockNumber)
   }
 }

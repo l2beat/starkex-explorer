@@ -5,10 +5,6 @@ import { BlockRange } from '../../model'
 import { HackFilter, HackJsonRpcProvider } from './HackJsonRpcProvider'
 import { BlockTag } from './types'
 
-export function isReverted(receipt: providers.TransactionReceipt): boolean {
-  return receipt.status === 0
-}
-
 export class EthereumClient {
   private provider = new HackJsonRpcProvider(this.rpcUrl)
 
@@ -97,7 +93,9 @@ export class EthereumClient {
     return tx
   }
 
-  async getTransactionReceipt(transactionHash: Hash256) {
+  async getTransactionReceipt(
+    transactionHash: Hash256
+  ): Promise<providers.TransactionReceipt> {
     return await this.provider.getTransactionReceipt(transactionHash.toString())
   }
 

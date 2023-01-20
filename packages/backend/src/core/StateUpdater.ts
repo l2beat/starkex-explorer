@@ -7,10 +7,10 @@ import {
 } from '@explorer/state'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
@@ -20,7 +20,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     protected readonly stateUpdateRepository: StateUpdateRepository,
     protected readonly merkleStorage: IMerkleStorage<T>,
     protected readonly ethereumClient: EthereumClient,
-    protected readonly forcedTransactionRepository: ForcedTransactionRepository,
+    protected readonly userTransactionRepository: UserTransactionRepository,
     protected readonly logger: Logger,
     protected readonly emptyStateHash: PedersenHash,
     protected readonly emptyLeaf: T,

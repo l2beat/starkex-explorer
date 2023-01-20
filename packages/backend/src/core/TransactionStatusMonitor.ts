@@ -20,7 +20,7 @@ export class TransactionStatusMonitor {
         return
       }
       try {
-        await this.transactionStatusService.syncTransactions()
+        await this.transactionStatusService.checkPendingTransactions()
       } finally {
         this.scheduleNextCheck()
       }

@@ -3,12 +3,11 @@ import { decodeOnChainData } from '@explorer/encoding'
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
-import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
-import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { PageCollector } from './collectors/PageCollector'
 import { PageMappingCollector } from './collectors/PageMappingCollector'
 import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualRollupStateTransitionCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
 import { IDataSyncService } from './IDataSyncService'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
@@ -21,8 +20,7 @@ export class PerpetualRollupSyncService implements IDataSyncService {
     private readonly perpetualRollupStateTransitionCollector: PerpetualRollupStateTransitionCollector,
     private readonly perpetualRollupUpdater: PerpetualRollupUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
-    private readonly forcedEventsCollector: ForcedEventsCollector,
-    private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
+    private readonly userTransactionCollector: UserTransactionCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -42,10 +40,7 @@ export class PerpetualRollupSyncService implements IDataSyncService {
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
     )
-    const forcedEvents = await this.forcedEventsCollector.collect(blockRange)
-    const finalizeExitEvents = await this.finalizeExitEventsCollector.collect(
-      blockRange
-    )
+    await this.userTransactionCollector.collect(blockRange)
 
     this.logger.info({
       method: 'sync',
@@ -55,8 +50,6 @@ export class PerpetualRollupSyncService implements IDataSyncService {
       pageMappings: pageMappings.length,
       stateTransitions: stateTransitionRecords.length,
       userRegistrations: userRegistrations.length,
-      forcedEvents,
-      finalizeExitEvents,
     })
 
     const recordsWithPages =
@@ -84,5 +77,6 @@ export class PerpetualRollupSyncService implements IDataSyncService {
     await this.perpetualRollupStateTransitionCollector.discardAfter(blockNumber)
     await this.perpetualRollupUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
+    await this.userTransactionCollector.discardAfter(blockNumber)
   }
 }

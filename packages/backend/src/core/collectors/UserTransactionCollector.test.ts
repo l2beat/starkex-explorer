@@ -12,7 +12,7 @@ import {
   fakeWithdrawal,
 } from '../../test/fakes'
 import { mock } from '../../test/mock'
-import { ForcedEventsCollector } from './ForcedEventsCollector'
+import { UserTransactionCollector } from './UserTransactionCollector'
 
 const blockRange = new BlockRange([
   {
@@ -25,8 +25,8 @@ const blockRange = new BlockRange([
   },
 ])
 
-describe(ForcedEventsCollector.name, () => {
-  describe(ForcedEventsCollector.prototype.collect.name, () => {
+describe(UserTransactionCollector.name, () => {
+  describe(UserTransactionCollector.prototype.collect.name, () => {
     it('adds new transaction', async () => {
       const hash = Hash256.fake()
       const data = fakeWithdrawal()
@@ -37,7 +37,7 @@ describe(ForcedEventsCollector.name, () => {
         add: async () => hash,
       })
       const statusRepo = mock<TransactionStatusRepository>({})
-      const collector = new ForcedEventsCollector(
+      const collector = new UserTransactionCollector(
         mock<EthereumClient>({}),
         forcedRepo,
         statusRepo,
@@ -76,7 +76,7 @@ describe(ForcedEventsCollector.name, () => {
         updateIfWaitingToBeMined: async () => true,
       })
 
-      const collector = new ForcedEventsCollector(
+      const collector = new UserTransactionCollector(
         mock<EthereumClient>({}),
         forcedRepo,
         statusRepo,
@@ -115,7 +115,7 @@ describe(ForcedEventsCollector.name, () => {
       const statusRepo = mock<TransactionStatusRepository>({
         updateIfWaitingToBeMined: async () => true,
       })
-      const collector = new ForcedEventsCollector(
+      const collector = new UserTransactionCollector(
         mock<EthereumClient>({}),
         forcedRepo,
         statusRepo,

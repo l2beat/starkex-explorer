@@ -7,13 +7,12 @@ import {
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
-import { getTransactionStatus } from '../../core/getForcedTransactionStatus'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
-import {
-  ForcedTransactionRecord,
-  ForcedTransactionRepository,
-} from '../../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
@@ -26,7 +25,7 @@ export class ForcedTransactionController {
     private accountService: AccountService,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private positionRepository: PositionRepository,
-    private forcedTransactionRepository: ForcedTransactionRepository,
+    private userTransactionRepository: UserTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress
   ) {}
@@ -40,8 +39,15 @@ export class ForcedTransactionController {
     const offset = (page - 1) * perPage
     const [account, transactions, total] = await Promise.all([
       this.accountService.getAccount(address),
-      this.forcedTransactionRepository.getLatest({ limit, offset }),
-      this.forcedTransactionRepository.countAll(),
+      this.userTransactionRepository.getPaginated({
+        limit,
+        offset,
+        types: ['ForcedTrade', 'ForcedWithdrawal'],
+      }),
+      this.userTransactionRepository.countAll([
+        'ForcedTrade',
+        'ForcedWithdrawal',
+      ]),
     ])
 
     const content = renderForcedTransactionsIndexPage({
@@ -54,24 +60,23 @@ export class ForcedTransactionController {
   }
 
   private async toForcedTransaction(
-    transaction: ForcedTransactionRecord,
+    transaction: UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>,
     address?: EthereumAddress
   ): Promise<ForcedTransaction> {
-    if (transaction.data.type === 'withdrawal') {
+    if (transaction.data.type === 'ForcedWithdrawal') {
       const user = await this.userRegistrationEventRepository.findByStarkKey(
         transaction.data.starkKey
       )
-      const status = getTransactionStatus(transaction)
       return {
         type: 'exit',
         data: {
           ethereumAddress: user?.ethAddress,
           starkKey: transaction.data.starkKey,
           positionId: transaction.data.positionId,
-          transactionHash: transaction.hash,
-          value: transaction.data.amount,
-          stateUpdateId: transaction.updates.verified?.stateUpdateId,
-          status,
+          transactionHash: transaction.transactionHash,
+          value: transaction.data.quantizedAmount,
+          stateUpdateId: transaction.included?.stateUpdateId,
+          status: transaction.included ? 'verified' : 'mined',
           finalizeHash: transaction.updates.finalized?.hash,
         },
         finalizeForm:
@@ -107,8 +112,8 @@ export class ForcedTransactionController {
         syntheticAmount: transaction.data.syntheticAmount,
         collateralAmount: transaction.data.collateralAmount,
         syntheticAssetId: transaction.data.syntheticAssetId,
-        transactionHash: transaction.hash,
-        stateUpdateId: transaction.updates.verified?.stateUpdateId,
+        transactionHash: transaction.transactionHash,
+        stateUpdateId: transaction.included?.stateUpdateId,
       },
     }
   }
@@ -119,13 +124,15 @@ export class ForcedTransactionController {
   ): Promise<ControllerResult> {
     const [account, transaction] = await Promise.all([
       this.accountService.getAccount(address),
-      this.forcedTransactionRepository.findByHash(transactionHash),
+      this.userTransactionRepository.findByTransactionHash(transactionHash),
     ])
     if (!transaction) {
       const content = 'Could not find transaction for that hash'
       return { type: 'not found', content }
     }
-    const offer = await this.offersRepository.findByHash(transaction.hash)
+    const offer = await this.offersRepository.findByHash(
+      transaction.transactionHash
+    )
     const offerHistory = offer ? toForcedTradeOfferHistory(offer) : []
 
     const content = renderForcedTransactionDetailsPage({

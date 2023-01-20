@@ -1,4 +1,4 @@
-import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { ToJSON } from './ToJSON'
 
@@ -22,7 +22,6 @@ export interface ForcedWithdrawalData {
   starkKey: StarkKey
   positionId: bigint
   quantizedAmount: bigint
-  premiumCost: boolean
 }
 
 export interface ForcedTradeData {
@@ -36,10 +35,7 @@ export interface ForcedTradeData {
   syntheticAmount: bigint
   syntheticAssetId: AssetId
   isABuyingSynthetic: boolean
-  submissionExpirationTime: Timestamp
   nonce: bigint
-  signatureB: string
-  premiumCost: boolean
 }
 
 export interface WithdrawData {
@@ -119,7 +115,6 @@ function encodeForcedTrade(values: ForcedTradeData): Encoded<ForcedTradeData> {
       collateralAssetId: values.collateralAssetId.toString(),
       syntheticAmount: values.syntheticAmount.toString(),
       syntheticAssetId: values.syntheticAssetId.toString(),
-      submissionExpirationTime: values.submissionExpirationTime.toString(),
       nonce: values.nonce.toString(),
     },
   }
@@ -136,9 +131,6 @@ function decodeForcedTrade(values: ToJSON<ForcedTradeData>): ForcedTradeData {
     collateralAssetId: AssetId(values.collateralAssetId),
     syntheticAmount: BigInt(values.syntheticAmount),
     syntheticAssetId: AssetId(values.syntheticAssetId),
-    submissionExpirationTime: Timestamp(
-      Number(values.submissionExpirationTime)
-    ),
     nonce: BigInt(values.nonce),
   }
 }
