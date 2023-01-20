@@ -119,7 +119,9 @@ describe(PerpetualRollupSyncService.name, () => {
       const perpetualRollupUpdater = mock<PerpetualRollupUpdater>({
         discardAfter: noop,
       })
-      const userTransactionCollector = mock<UserTransactionCollector>()
+      const userTransactionCollector = mock<UserTransactionCollector>({
+        discardAfter: noop,
+      })
 
       const dataSyncService = new PerpetualRollupSyncService(
         verifierCollector,
@@ -139,6 +141,8 @@ describe(PerpetualRollupSyncService.name, () => {
       expect(pageCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(stateTransitionCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(perpetualRollupUpdater.discardAfter).toHaveBeenCalledWith([10])
+      expect(userRegistrationCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(userTransactionCollector.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })

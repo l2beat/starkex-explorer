@@ -412,7 +412,7 @@ describe(TransactionSubmitController.name, () => {
         const finalizeHash = Hash256.fake()
 
         const repository = mock<SentTransactionRepository>({
-          updateMined: async () => 1,
+          add: async (record) => record.transactionHash,
         })
         const controller = new TransactionSubmitController(
           mock<EthereumClient>({
