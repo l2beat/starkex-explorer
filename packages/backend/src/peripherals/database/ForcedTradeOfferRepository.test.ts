@@ -64,16 +64,16 @@ describe(ForcedTradeOfferRepository.name, () => {
     const initial = fakeInitialOffer({ id: undefined })
     const submitted = {
       ...initial,
-      accepted: fakeAccepted()
+      accepted: fakeAccepted(),
     }
     const id = await repository.add(submitted)
-    
+
     const before = await repository.findById(id)
     expect(before?.accepted?.transactionHash).toEqual(undefined)
-    
+
     const hash = Hash256.fake()
     await repository.updateTransactionHash(id, hash)
-    
+
     const after = await repository.findById(id)
     expect(after?.accepted?.transactionHash).toEqual(hash)
   })

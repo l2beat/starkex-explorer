@@ -23,13 +23,13 @@ export class TransactionSubmitController {
     private perpetualAddress: EthereumAddress
   ) {}
 
-  async submitForcedExit(hash: Hash256): Promise<ControllerResult> {
-    const sentAt = Timestamp.now()
-    const tx = await this.getTransaction(hash)
+  async submitForcedExit(transactionHash: Hash256): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const tx = await this.getTransaction(transactionHash)
     if (!tx) {
       return {
         type: 'bad request',
-        content: `Transaction ${hash.toString()} not found`,
+        content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
     const data = decodeForcedWithdrawalRequest(tx.data)
@@ -37,8 +37,8 @@ export class TransactionSubmitController {
       return { type: 'bad request', content: `Invalid transaction` }
     }
     await this.sentTransactionRepository.add({
-      transactionHash: hash,
-      timestamp: sentAt,
+      transactionHash,
+      timestamp,
       data: {
         type: 'ForcedWithdrawal',
         quantizedAmount: data.quantizedAmount,
@@ -47,41 +47,39 @@ export class TransactionSubmitController {
         premiumCost: data.premiumCost,
       },
     })
-    return { type: 'created', content: { id: hash } }
+    return { type: 'created', content: { id: transactionHash } }
   }
 
-  async finalizeForcedExit(
-    exitHash: Hash256,
-    finalizeHash: Hash256
-  ): Promise<ControllerResult> {
-    const tx = await this.getTransaction(finalizeHash)
+  async submitWithdrawal(transactionHash: Hash256): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const tx = await this.getTransaction(transactionHash)
     if (!tx) {
       return {
         type: 'bad request',
-        content: `Transaction ${finalizeHash.toString()} not found`,
+        content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
     const data = decodeFinalizeExitRequest(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
-    const sentAt = Timestamp.now()
     await this.sentTransactionRepository.add({
-      transactionHash: finalizeHash,
-      timestamp: sentAt,
+      transactionHash,
+      timestamp,
       data: {
         type: 'Withdraw',
         starkKey: data.starkKey,
         assetType: data.assetType,
       },
     })
-    return { type: 'success', content: finalizeHash.toString() }
+    return { type: 'created', content: { id: transactionHash } }
   }
 
   async submitForcedTrade(
-    hash: Hash256,
+    transactionHash: Hash256,
     offerId: number
   ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
     const offer = await this.offersRepository.findById(offerId)
     if (!offer) {
       return { type: 'not found', content: `Offer ${offerId} not found` }
@@ -93,11 +91,11 @@ export class TransactionSubmitController {
     ) {
       return { type: 'bad request', content: `Offer cannot be finalized` }
     }
-    const tx = await this.getTransaction(hash)
+    const tx = await this.getTransaction(transactionHash)
     if (!tx) {
       return {
         type: 'bad request',
-        content: `Transaction ${hash.toString()} not found`,
+        content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
     const data = decodeForcedTradeRequest(tx.data)
@@ -109,10 +107,11 @@ export class TransactionSubmitController {
     ) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
-    const sentAt = Timestamp.now()
+    // TODO: cross repository transaction
+    await this.offersRepository.updateTransactionHash(offerId, transactionHash)
     await this.sentTransactionRepository.add({
-      transactionHash: hash,
-      timestamp: sentAt,
+      transactionHash,
+      timestamp,
       data: {
         type: 'ForcedTrade',
         starkKeyA: data.starkKeyA,
@@ -131,7 +130,7 @@ export class TransactionSubmitController {
         offerId,
       },
     })
-    return { type: 'created', content: { id: hash } }
+    return { type: 'created', content: { id: transactionHash } }
   }
 
   private async getTransaction(hash: Hash256) {
