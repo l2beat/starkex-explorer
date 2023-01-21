@@ -35,7 +35,6 @@ import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
-import { TransactionStatusMonitor } from './core/TransactionStatusMonitor'
 import { TransactionStatusService } from './core/TransactionStatusService'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
@@ -266,9 +265,6 @@ export class Application {
       ethereumClient,
       logger
     )
-    const transactionStatusMonitor = new TransactionStatusMonitor(
-      transactionStatusService
-    )
     const accountService = new AccountService(
       positionRepository,
       forcedTradeOfferRepository,
@@ -360,7 +356,7 @@ export class Application {
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
       if (config.enableSync) {
-        transactionStatusMonitor.start()
+        transactionStatusService.start()
         await syncScheduler.start()
         await blockDownloader.start()
       }
