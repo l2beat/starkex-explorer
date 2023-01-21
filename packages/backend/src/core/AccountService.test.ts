@@ -74,4 +74,25 @@ describe(AccountService.name, () => {
       positionId: 123n,
     })
   })
+
+  it('returns has updates when pending transactions exist', async () => {
+    const accountService = new AccountService(
+      mock<PositionRepository>({
+        findIdByEthereumAddress: async () => 123n,
+      }),
+      mock<ForcedTradeOfferRepository>({
+        countActiveByPositionId: async () => 0,
+      }),
+      mock<SentTransactionRepository>({
+        countNotMinedByPositionId: async () => 1,
+      })
+    )
+    const address = EthereumAddress.fake()
+    const result = await accountService.getAccount(address)
+    expect(result).toEqual({
+      address,
+      hasUpdates: true,
+      positionId: 123n,
+    })
+  })
 })
