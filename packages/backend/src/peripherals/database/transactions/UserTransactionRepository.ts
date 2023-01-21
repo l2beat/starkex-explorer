@@ -219,7 +219,7 @@ export class UserTransactionRepository extends BaseRepository {
   ): Promise<UserTransactionRecord<T> | undefined> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex)
-      .where('transaction_hash', transactionHash.toString())
+      .where('user_transactions.transaction_hash', transactionHash.toString())
       .first()
     if (types) {
       query = query.whereIn('type', types)
