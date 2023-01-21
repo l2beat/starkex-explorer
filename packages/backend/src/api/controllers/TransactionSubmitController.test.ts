@@ -24,14 +24,14 @@ describe(TransactionSubmitController.name, () => {
   describe(TransactionSubmitController.prototype.submitForcedExit.name, () => {
     it('handles nonexistent transaction', async () => {
       const controller = new TransactionSubmitController(
-        mock<EthereumClient>(),
+        mock<EthereumClient>({
+          getTransaction: async () => undefined,
+        }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake()
+        EthereumAddress.fake(),
+        false
       )
-
-      // @ts-expect-error access private member
-      controller.getTransaction = async () => undefined
 
       const hash = Hash256.fake()
       const result = await controller.submitForcedExit(hash)
@@ -205,14 +205,14 @@ describe(TransactionSubmitController.name, () => {
     it('handles nonexistent transaction', async () => {
       const offer = fakeOffer()
       const controller = new TransactionSubmitController(
-        mock<EthereumClient>(),
+        mock<EthereumClient>({
+          getTransaction: async () => undefined,
+        }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake()
+        EthereumAddress.fake(),
+        false
       )
-
-      // @ts-expect-error access private member
-      controller.getTransaction = async () => undefined
 
       const hash = Hash256.fake()
       const result = await controller.submitForcedTrade(hash, offer.id)
@@ -331,17 +331,18 @@ describe(TransactionSubmitController.name, () => {
       })
     })
   })
+
   describe(TransactionSubmitController.prototype.submitWithdrawal.name, () => {
     it('handles nonexistent transaction', async () => {
       const controller = new TransactionSubmitController(
-        mock<EthereumClient>(),
+        mock<EthereumClient>({
+          getTransaction: async () => undefined,
+        }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake()
+        EthereumAddress.fake(),
+        false
       )
-
-      // @ts-expect-error acccess private member
-      controller.getTransaction = async () => undefined
 
       const finalizeHash = Hash256.fake()
       const result = await controller.submitWithdrawal(finalizeHash)

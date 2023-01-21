@@ -20,7 +20,8 @@ export class TransactionSubmitController {
     private ethereumClient: EthereumClient,
     private sentTransactionRepository: SentTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
-    private perpetualAddress: EthereumAddress
+    private perpetualAddress: EthereumAddress,
+    private retryTransactions = true
   ) {}
 
   async submitForcedExit(transactionHash: Hash256): Promise<ControllerResult> {
@@ -134,6 +135,9 @@ export class TransactionSubmitController {
   }
 
   private async getTransaction(hash: Hash256) {
+    if (!this.retryTransactions) {
+      return this.ethereumClient.getTransaction(hash)
+    }
     for (const ms of [0, 1000, 4000]) {
       if (ms) {
         await sleep(ms)
