@@ -104,8 +104,139 @@ describe(UserTransactionRepository.name, () => {
     })
   })
 
-  it.skip(UserTransactionRepository.prototype.getNotIncluded.name)
-  it.skip(UserTransactionRepository.prototype.countAll.name)
+  describe(UserTransactionRepository.prototype.getNotIncluded.name, () => {
+    it('returns the transactions that have not been included', async () => {
+      const transactionHash = Hash256.fake()
+      await repository.add({
+        transactionHash,
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal(),
+      })
+      await repository.addManyIncluded([
+        {
+          transactionHash,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          stateUpdateId: 123,
+        },
+      ])
+
+      const id1 = await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(456000),
+        data: fakeForcedWithdrawal(),
+      })
+
+      const id2 = await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 789,
+        timestamp: Timestamp(789000),
+        data: fakeForcedTrade(),
+      })
+
+      const result = await repository.getNotIncluded()
+      expect(result.map((x) => x.id)).toEqual([id1, id2])
+    })
+
+    it('accepts an optional type parameter', async () => {
+      const transactionHash = Hash256.fake()
+      await repository.add({
+        transactionHash,
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal(),
+      })
+      await repository.addManyIncluded([
+        {
+          transactionHash,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          stateUpdateId: 123,
+        },
+      ])
+
+      const id1 = await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(456000),
+        data: fakeForcedWithdrawal(),
+      })
+
+      const id2 = await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 789,
+        timestamp: Timestamp(789000),
+        data: fakeForcedTrade(),
+      })
+
+      const result1 = await repository.getNotIncluded([
+        'ForcedTrade',
+        'ForcedWithdrawal',
+      ])
+      expect(result1.map((x) => x.id)).toEqual([id1, id2])
+
+      const result2 = await repository.getNotIncluded(['ForcedWithdrawal'])
+      expect(result2.map((x) => x.id)).toEqual([id1])
+
+      const result3 = await repository.getNotIncluded(['ForcedTrade'])
+      expect(result3.map((x) => x.id)).toEqual([id2])
+    })
+  })
+
+  describe(UserTransactionRepository.prototype.countAll.name, () => {
+    it('returns 0 for an empty database', async () => {
+      expect(await repository.countAll()).toEqual(0)
+    })
+
+    it('returns the number of transactions', async () => {
+      const transactionHash = Hash256.fake()
+      await repository.add({
+        transactionHash,
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal(),
+      })
+      await repository.addManyIncluded([
+        {
+          transactionHash,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          stateUpdateId: 123,
+        },
+      ])
+
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal(),
+      })
+
+      expect(await repository.countAll()).toEqual(2)
+    })
+
+    it('accepts an optional type parameter', async () => {
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal(),
+      })
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(123000),
+        data: fakeForcedTrade(),
+      })
+
+      expect(await repository.countAll(['ForcedTrade'])).toEqual(1)
+      expect(
+        await repository.countAll(['ForcedTrade', 'ForcedWithdrawal'])
+      ).toEqual(2)
+    })
+  })
 
   describe(UserTransactionRepository.prototype.findById.name, () => {
     it('returns undefined for an unknown id', async () => {

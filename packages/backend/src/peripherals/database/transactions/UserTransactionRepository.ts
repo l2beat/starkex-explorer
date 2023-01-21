@@ -186,10 +186,9 @@ export class UserTransactionRepository extends BaseRepository {
     types?: T[]
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
-    let query = queryWithIncluded(knex).where(
-      'included_forced_requests.transaction_hash',
-      null
-    )
+    let query = queryWithIncluded(knex)
+      .where('included_forced_requests.transaction_hash', null)
+      .orderBy('timestamp', 'asc')
     if (types) {
       query = query.whereIn('type', types)
     }
