@@ -332,7 +332,7 @@ describe(ForcedTradeOfferController.name, () => {
           findById: async () => ({
             ...tradeMock.offer,
             id,
-            createdAt: Timestamp(Date.now()),
+            createdAt: Timestamp.now(),
           }),
         }),
         mock<PositionRepository>({
@@ -377,7 +377,7 @@ describe(ForcedTradeOfferController.name, () => {
           add: async () => id,
           findById: async () => ({
             id,
-            createdAt: Timestamp(Date.now()),
+            createdAt: Timestamp.now(),
             ...tradeMock.offer,
           }),
           update: async () => 1,
@@ -452,7 +452,7 @@ describe(ForcedTradeOfferController.name, () => {
         mock<ForcedTradeOfferRepository>({
           findById: async () => ({
             ...initial,
-            cancelledAt: Timestamp(Date.now()),
+            cancelledAt: Timestamp.now(),
           }),
         }),
         mock<PositionRepository>(),

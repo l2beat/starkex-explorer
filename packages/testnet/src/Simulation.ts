@@ -23,7 +23,7 @@ export function getPrice(assetId: AssetId, priceUSDCents: bigint) {
 export class Simulation {
   private prices: OraclePrice[] = []
   private oldPositions: PositionUpdate[] = []
-  private lastFundingTimestamp = Timestamp(Date.now())
+  private lastFundingTimestamp = Timestamp.now()
   private newFunding: FundingEntry[] = [
     { indices: [], timestamp: this.lastFundingTimestamp },
   ]

@@ -109,7 +109,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   hash: Hash256.fake(),
   rootHash: PedersenHash.fake(),
   blockNumber: Math.floor(Math.random() * 100),
-  timestamp: Timestamp(Date.now()),
+  timestamp: Timestamp.now(),
   positions: Array.from({ length: 57 }).map((_, i) => ({
     starkKey: StarkKey.fake(),
     positionId: BigInt(i + 1),
@@ -125,7 +125,7 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
   positionId: 123n,
   starkKey: StarkKey.fake(),
   ethAddress: EthereumAddress.fake(),
-  lastUpdateTimestamp: Timestamp(Date.now()),
+  lastUpdateTimestamp: Timestamp.now(),
   stateUpdateId: 1,
   ownedByYou: false,
   assets: [
@@ -220,7 +220,7 @@ export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
   positionId: 123n,
   starkKey: StarkKey.fake(),
   previousStarkKey: StarkKey.fake(),
-  lastUpdateTimestamp: Timestamp(Date.now()),
+  lastUpdateTimestamp: Timestamp.now(),
   assetChanges: [
     {
       assetId: AssetId('ETH-9'),

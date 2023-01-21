@@ -165,7 +165,7 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('blocks cancelled offer', async () => {
-      const offer = fakeOffer({ cancelledAt: Timestamp(Date.now()) })
+      const offer = fakeOffer({ cancelledAt: Timestamp.now() })
       const controller = new TransactionSubmitController(
         mock<EthereumClient>(),
         mock<SentTransactionRepository>(),

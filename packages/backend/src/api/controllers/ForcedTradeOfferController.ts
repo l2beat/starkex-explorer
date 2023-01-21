@@ -161,7 +161,7 @@ export class ForcedTradeOfferController {
     }
 
     const id = await this.offerRepository.add({
-      createdAt: Timestamp(Date.now()),
+      createdAt: Timestamp.now(),
       ...offer,
     })
 
@@ -210,7 +210,7 @@ export class ForcedTradeOfferController {
       ...offer,
       accepted: {
         ...accepted,
-        at: Timestamp(Date.now()),
+        at: Timestamp.now(),
       },
     })
 
@@ -256,7 +256,7 @@ export class ForcedTradeOfferController {
 
     await this.offerRepository.update({
       ...offer,
-      cancelledAt: Timestamp(Date.now()),
+      cancelledAt: Timestamp.now(),
     })
 
     return { type: 'success', content: 'Offer cancelled.' }

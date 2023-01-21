@@ -24,6 +24,7 @@ export class TransactionSubmitController {
   ) {}
 
   async submitForcedExit(hash: Hash256): Promise<ControllerResult> {
+    const sentAt = Timestamp.now()
     const tx = await this.getTransaction(hash)
     if (!tx) {
       return {
@@ -35,7 +36,6 @@ export class TransactionSubmitController {
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
-    const sentAt = Timestamp(Date.now())
     await this.sentTransactionRepository.add({
       transactionHash: hash,
       timestamp: sentAt,
@@ -65,7 +65,7 @@ export class TransactionSubmitController {
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
-    const sentAt = Timestamp(Date.now())
+    const sentAt = Timestamp.now()
     await this.sentTransactionRepository.add({
       transactionHash: finalizeHash,
       timestamp: sentAt,
@@ -109,7 +109,7 @@ export class TransactionSubmitController {
     ) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
-    const sentAt = Timestamp(Date.now())
+    const sentAt = Timestamp.now()
     await this.sentTransactionRepository.add({
       transactionHash: hash,
       timestamp: sentAt,
