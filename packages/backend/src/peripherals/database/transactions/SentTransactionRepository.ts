@@ -35,6 +35,9 @@ export class SentTransactionRepository extends BaseRepository {
     this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
+    this.findFirstWithdrawByStarkKeyAfter = this.wrapFind(
+      this.findFirstWithdrawByStarkKeyAfter
+    )
     this.deleteByTransactionHash = this.wrapDelete(this.deleteByTransactionHash)
     this.deleteAll = this.wrapDelete(this.deleteAll)
 
