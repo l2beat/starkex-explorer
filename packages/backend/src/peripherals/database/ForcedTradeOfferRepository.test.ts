@@ -60,6 +60,24 @@ describe(ForcedTradeOfferRepository.name, () => {
     expect(actual).toEqual(submitted)
   })
 
+  it('updates the transaction hash', async () => {
+    const initial = fakeInitialOffer({ id: undefined })
+    const submitted = {
+      ...initial,
+      accepted: fakeAccepted()
+    }
+    const id = await repository.add(submitted)
+    
+    const before = await repository.findById(id)
+    expect(before?.accepted?.transactionHash).toEqual(undefined)
+    
+    const hash = Hash256.fake()
+    await repository.updateTransactionHash(id, hash)
+    
+    const after = await repository.findById(id)
+    expect(after?.accepted?.transactionHash).toEqual(hash)
+  })
+
   async function seedInitialOffers() {
     const id1 = await repository.add(
       fakeInitialOffer({

@@ -125,13 +125,14 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.add = this.wrapAdd(this.add)
+    this.update = this.wrapUpdate(this.update)
+    this.updateTransactionHash = this.wrapUpdate(this.updateTransactionHash)
     this.findById = this.wrapFind(this.findById)
     this.countInitial = this.wrapAny(this.countInitial)
     this.getInitial = this.wrapGet(this.getInitial)
     this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.update = this.wrapUpdate(this.update)
 
     /* eslint-enable @typescript-eslint/unbound-method */
   }
@@ -152,6 +153,17 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     const updates = await knex('forced_trade_offers')
       .update(row)
       .where('id', '=', row.id)
+    return updates
+  }
+
+  async updateTransactionHash(
+    id: number,
+    transactionHash: Hash256
+  ): Promise<number> {
+    const knex = await this.knex()
+    const updates = await knex('forced_trade_offers')
+      .update({ transaction_hash: transactionHash.toString() })
+      .andWhere({ id })
     return updates
   }
 
