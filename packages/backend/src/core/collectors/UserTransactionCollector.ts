@@ -1,5 +1,11 @@
 import { decodeAssetId } from '@explorer/encoding'
-import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 
 import { BlockRange } from '../../model/BlockRange'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
@@ -76,7 +82,8 @@ export class UserTransactionCollector {
                 positionIdA: event.args.positionIdA.toBigInt(),
                 positionIdB: event.args.positionIdB.toBigInt(),
                 collateralAmount: event.args.collateralAmount.toBigInt(),
-                collateralAssetId: decodeAssetId(event.args.collateralAssetId),
+                // TODO: respect system native asset type
+                collateralAssetId: AssetId.USDC,
                 syntheticAmount: event.args.syntheticAmount.toBigInt(),
                 syntheticAssetId: decodeAssetId(event.args.syntheticAssetId),
                 isABuyingSynthetic: event.args.isABuyingSynthetic,

@@ -43,6 +43,10 @@ interface RowWithIncluded extends UserTransactionRow {
   included_state_update_id: number | null
 }
 
+export type UserTransactionAddRecord = Parameters<
+  UserTransactionRepository['add']
+>['0']
+
 export class UserTransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
