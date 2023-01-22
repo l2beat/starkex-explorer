@@ -45,6 +45,7 @@ describe(UserTransactionRepository.name, () => {
 
   describe(UserTransactionRepository.prototype.getByStarkKey.name, () => {
     const starkKey = StarkKey.fake()
+    const starkKeyB = StarkKey.fake()
     let id1: number
     let id2: number
 
@@ -59,7 +60,7 @@ describe(UserTransactionRepository.name, () => {
         transactionHash: Hash256.fake(),
         blockNumber: 456,
         timestamp: Timestamp(456000),
-        data: fakeForcedTrade({ starkKeyA: starkKey }),
+        data: fakeForcedTrade({ starkKeyA: starkKey, starkKeyB }),
       })
       await repository.add({
         transactionHash: Hash256.fake(),
@@ -72,6 +73,11 @@ describe(UserTransactionRepository.name, () => {
     it('returns the transactions for the given stark key', async () => {
       const records = await repository.getByStarkKey(starkKey)
       expect(records.map((x) => x.id)).toEqual([id2, id1])
+    })
+
+    it('can query for stark key b', async () => {
+      const records = await repository.getByStarkKey(starkKeyB)
+      expect(records.map((x) => x.id)).toEqual([id2])
     })
 
     it('accepts an optional types parameter', async () => {
@@ -93,6 +99,7 @@ describe(UserTransactionRepository.name, () => {
 
   describe(UserTransactionRepository.prototype.getByPositionId.name, () => {
     const positionId = 1234n
+    const positionIdB = 5678n
     let id1: number
     let id2: number
 
@@ -107,7 +114,7 @@ describe(UserTransactionRepository.name, () => {
         transactionHash: Hash256.fake(),
         blockNumber: 456,
         timestamp: Timestamp(456000),
-        data: fakeForcedTrade({ positionIdA: positionId }),
+        data: fakeForcedTrade({ positionIdA: positionId, positionIdB }),
       })
       await repository.add({
         transactionHash: Hash256.fake(),
@@ -120,6 +127,11 @@ describe(UserTransactionRepository.name, () => {
     it('returns the transactions for the given position id', async () => {
       const records = await repository.getByPositionId(positionId)
       expect(records.map((x) => x.id)).toEqual([id2, id1])
+    })
+
+    it('can query for position id b', async () => {
+      const records = await repository.getByPositionId(positionIdB)
+      expect(records.map((x) => x.id)).toEqual([id2])
     })
 
     it('accepts an optional types parameter', async () => {
@@ -218,8 +230,117 @@ describe(UserTransactionRepository.name, () => {
     })
   })
 
-  it.skip(
-    UserTransactionRepository.prototype.getByStateUpdateIdAndPositionId.name
+  describe(
+    UserTransactionRepository.prototype.getByStateUpdateIdAndPositionId.name,
+    () => {
+      const positionId = 1234n
+      const positionIdB = 5678n
+      let id1: number
+      let id2: number
+
+      beforeEach(async () => {
+        const transactionHash1 = Hash256.fake()
+        id1 = await repository.add({
+          transactionHash: transactionHash1,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal({ positionId }),
+        })
+        const transactionHash2 = Hash256.fake()
+        id2 = await repository.add({
+          transactionHash: transactionHash2,
+          blockNumber: 456,
+          timestamp: Timestamp(456000),
+          data: fakeForcedTrade({ positionIdA: positionId, positionIdB }),
+        })
+        const transactionHash3 = Hash256.fake()
+        await repository.add({
+          transactionHash: transactionHash3,
+          blockNumber: 789,
+          timestamp: Timestamp(789000),
+          data: fakeForcedWithdrawal(),
+        })
+        const transactionHash4 = Hash256.fake()
+        await repository.add({
+          transactionHash: transactionHash4,
+          blockNumber: 888,
+          timestamp: Timestamp(888000),
+          data: fakeForcedWithdrawal(),
+        })
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 999,
+          timestamp: Timestamp(999000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        await repository.addManyIncluded([
+          {
+            transactionHash: transactionHash1,
+            blockNumber: 123,
+            timestamp: Timestamp(123000),
+            stateUpdateId: 1,
+          },
+          {
+            transactionHash: transactionHash2,
+            blockNumber: 456,
+            timestamp: Timestamp(456000),
+            stateUpdateId: 1,
+          },
+          {
+            transactionHash: transactionHash3,
+            blockNumber: 789,
+            timestamp: Timestamp(789000),
+            stateUpdateId: 1,
+          },
+          {
+            transactionHash: transactionHash4,
+            blockNumber: 888,
+            timestamp: Timestamp(888000),
+            stateUpdateId: 2,
+          },
+        ])
+      })
+
+      it('returns the specified transactions', async () => {
+        const records = await repository.getByStateUpdateIdAndPositionId(
+          1,
+          positionId
+        )
+        expect(records.map((x) => x.id)).toEqual([id2, id1])
+      })
+
+      it('can query for position id b', async () => {
+        const records = await repository.getByStateUpdateIdAndPositionId(
+          1,
+          positionIdB
+        )
+        expect(records.map((x) => x.id)).toEqual([id2])
+      })
+
+      it('accepts an optional types parameter', async () => {
+        const records1 = await repository.getByStateUpdateIdAndPositionId(
+          1,
+          positionId,
+          ['ForcedTrade', 'ForcedWithdrawal']
+        )
+        expect(records1.map((x) => x.id)).toEqual([id2, id1])
+
+        const records2 = await repository.getByStateUpdateIdAndPositionId(
+          1,
+          positionId,
+          ['ForcedTrade']
+        )
+        expect(records2.map((x) => x.id)).toEqual([id2])
+
+        const records3 = await repository.getByStateUpdateIdAndPositionId(
+          1,
+          positionId,
+          ['ForcedWithdrawal']
+        )
+        expect(records3.map((x) => x.id)).toEqual([id1])
+      })
+    }
   )
 
   describe(UserTransactionRepository.prototype.getPaginated.name, () => {

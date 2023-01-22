@@ -166,9 +166,10 @@ export class UserTransactionRepository extends BaseRepository {
       query = query.whereIn('type', types)
     }
     query = query
+      .where('state_update_id', stateUpdateId)
       .where('vault_or_position_id_a', positionId as unknown as Knex.Value)
       .orWhere('vault_or_position_id_b', positionId as unknown as Knex.Value)
-      .where('included_state_update_id', stateUpdateId)
+      .orderBy('timestamp', 'desc')
     return toRecords<T>(await query)
   }
 
