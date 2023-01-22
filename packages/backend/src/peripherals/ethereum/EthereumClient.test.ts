@@ -22,7 +22,7 @@ describe(EthereumClient.name, () => {
       await ethereumClient.getLogsInRange(blockRange, filter)
 
       expect(getLogs).toHaveBeenCalledExactlyWith([
-        [{ ...filter, fromBlock: 5, toBlock: 9 }],
+        [{ ...filter, fromBlock: 5, toBlock: 9, topics: undefined }],
       ])
     })
 
@@ -44,7 +44,7 @@ describe(EthereumClient.name, () => {
       await ethereumClient.getLogsInRange(blockRange, filter)
 
       expect(getLogs).toHaveBeenCalledExactlyWith([
-        [{ ...filter, fromBlock: 5, toBlock: 7 }],
+        [{ ...filter, fromBlock: 5, toBlock: 7, topics: undefined }],
         [{ ...filter, blockHash: Hash256.fake('8').toString() }],
         [{ ...filter, blockHash: Hash256.fake('9').toString() }],
       ])
@@ -83,7 +83,14 @@ describe(EthereumClient.name, () => {
       await ethereumClient.getLogsInRange(blockRange, filter)
 
       expect(getLogs).toHaveBeenCalledExactlyWith([
-        [{ ...filter, fromBlock: 1000, toBlock: 1499 - SAFE_BLOCK_DISTANCE }],
+        [
+          {
+            ...filter,
+            fromBlock: 1000,
+            toBlock: 1499 - SAFE_BLOCK_DISTANCE,
+            topics: undefined,
+          },
+        ],
         ...Array.from({ length: SAFE_BLOCK_DISTANCE }).map((v, i) => [
           {
             ...filter,

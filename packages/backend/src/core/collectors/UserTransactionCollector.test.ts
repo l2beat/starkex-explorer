@@ -53,9 +53,9 @@ describe(UserTransactionCollector.name, () => {
         }
         return [fullLog as providers.Log]
       },
-      async getBlock(blockNumber) {
+      async getBlockTimestamp(blockNumber) {
         expect(blockNumber).toEqual(150)
-        return { timestamp: 1234 } as providers.Block
+        return 1234
       },
     })
 
@@ -115,9 +115,9 @@ describe(UserTransactionCollector.name, () => {
         }
         return [fullLog as providers.Log]
       },
-      async getBlock(blockNumber) {
+      async getBlockTimestamp(blockNumber) {
         expect(blockNumber).toEqual(150)
-        return { timestamp: 1234 } as providers.Block
+        return 1234
       },
     })
 
@@ -190,9 +190,9 @@ describe(UserTransactionCollector.name, () => {
         }
         return [fullLog as providers.Log]
       },
-      async getBlock(blockNumber) {
+      async getBlockTimestamp(blockNumber) {
         expect(blockNumber).toEqual(150)
-        return { timestamp: 1234 } as providers.Block
+        return 1234
       },
     })
 
@@ -249,9 +249,9 @@ describe(UserTransactionCollector.name, () => {
           return fullLog as providers.Log
         })
       },
-      async getBlock(blockNumber) {
+      async getBlockTimestamp(blockNumber) {
         expect(blockNumber).toEqual(150)
-        return { timestamp: 1234 } as providers.Block
+        return 1234
       },
     })
 

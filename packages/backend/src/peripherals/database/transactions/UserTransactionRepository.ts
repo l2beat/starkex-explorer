@@ -116,11 +116,13 @@ export class UserTransactionRepository extends BaseRepository {
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex)
-      .where('stark_key_a', starkKey.toString())
-      .orWhere('stark_key_b', starkKey.toString())
     if (types) {
       query = query.whereIn('type', types)
     }
+    query = query
+      .where('stark_key_a', starkKey.toString())
+      .orWhere('stark_key_b', starkKey.toString())
+      .orderBy('timestamp', 'desc')
     return toRecords<T>(await query)
   }
 
@@ -130,11 +132,13 @@ export class UserTransactionRepository extends BaseRepository {
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex)
-      .where('vault_or_position_id_a', positionId as unknown as Knex.Value)
-      .orWhere('vault_or_position_id_b', positionId as unknown as Knex.Value)
     if (types) {
       query = query.whereIn('type', types)
     }
+    query = query
+      .where('vault_or_position_id_a', positionId as unknown as Knex.Value)
+      .orWhere('vault_or_position_id_b', positionId as unknown as Knex.Value)
+      .orderBy('timestamp', 'desc')
     return toRecords<T>(await query)
   }
 
@@ -147,6 +151,7 @@ export class UserTransactionRepository extends BaseRepository {
     if (types) {
       query = query.whereIn('type', types)
     }
+    query = query.orderBy('timestamp', 'desc')
     return toRecords<T>(await query)
   }
 
@@ -157,12 +162,13 @@ export class UserTransactionRepository extends BaseRepository {
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex)
-      .where('vault_or_position_id_a', positionId as unknown as Knex.Value)
-      .orWhere('vault_or_position_id_b', positionId as unknown as Knex.Value)
-      .where('included_state_update_id', stateUpdateId)
     if (types) {
       query = query.whereIn('type', types)
     }
+    query = query
+      .where('vault_or_position_id_a', positionId as unknown as Knex.Value)
+      .orWhere('vault_or_position_id_b', positionId as unknown as Knex.Value)
+      .where('included_state_update_id', stateUpdateId)
     return toRecords<T>(await query)
   }
 

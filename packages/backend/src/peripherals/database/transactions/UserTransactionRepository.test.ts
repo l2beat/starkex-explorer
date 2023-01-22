@@ -17,7 +17,7 @@ describe(UserTransactionRepository.name, () => {
   ): ForcedWithdrawalData {
     return {
       type: 'ForcedWithdrawal',
-      positionId: 1234n,
+      positionId: 1n,
       starkKey: StarkKey.fake(),
       quantizedAmount: 123n,
       ...override,
@@ -29,8 +29,8 @@ describe(UserTransactionRepository.name, () => {
   ): ForcedTradeData {
     return {
       type: 'ForcedTrade',
-      positionIdA: 1234n,
-      positionIdB: 1234n,
+      positionIdA: 1n,
+      positionIdB: 1n,
       starkKeyA: StarkKey.fake(),
       starkKeyB: StarkKey.fake(),
       collateralAmount: 123n,
@@ -43,9 +43,181 @@ describe(UserTransactionRepository.name, () => {
     }
   }
 
-  it.skip(UserTransactionRepository.prototype.getByStarkKey.name)
-  it.skip(UserTransactionRepository.prototype.getByPositionId.name)
-  it.skip(UserTransactionRepository.prototype.getByStateUpdateId.name)
+  describe(UserTransactionRepository.prototype.getByStarkKey.name, () => {
+    const starkKey = StarkKey.fake()
+    let id1: number
+    let id2: number
+
+    beforeEach(async () => {
+      id1 = await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal({ starkKey }),
+      })
+      id2 = await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(456000),
+        data: fakeForcedTrade({ starkKeyA: starkKey }),
+      })
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 789,
+        timestamp: Timestamp(789000),
+        data: fakeForcedWithdrawal(),
+      })
+    })
+
+    it('returns the transactions for the given stark key', async () => {
+      const records = await repository.getByStarkKey(starkKey)
+      expect(records.map((x) => x.id)).toEqual([id2, id1])
+    })
+
+    it('accepts an optional types parameter', async () => {
+      const records1 = await repository.getByStarkKey(starkKey, [
+        'ForcedTrade',
+        'ForcedWithdrawal',
+      ])
+      expect(records1.map((x) => x.id)).toEqual([id2, id1])
+
+      const records2 = await repository.getByStarkKey(starkKey, ['ForcedTrade'])
+      expect(records2.map((x) => x.id)).toEqual([id2])
+
+      const records3 = await repository.getByStarkKey(starkKey, [
+        'ForcedWithdrawal',
+      ])
+      expect(records3.map((x) => x.id)).toEqual([id1])
+    })
+  })
+
+  describe(UserTransactionRepository.prototype.getByPositionId.name, () => {
+    const positionId = 1234n
+    let id1: number
+    let id2: number
+
+    beforeEach(async () => {
+      id1 = await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal({ positionId }),
+      })
+      id2 = await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(456000),
+        data: fakeForcedTrade({ positionIdA: positionId }),
+      })
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 789,
+        timestamp: Timestamp(789000),
+        data: fakeForcedWithdrawal(),
+      })
+    })
+
+    it('returns the transactions for the given position id', async () => {
+      const records = await repository.getByPositionId(positionId)
+      expect(records.map((x) => x.id)).toEqual([id2, id1])
+    })
+
+    it('accepts an optional types parameter', async () => {
+      const records1 = await repository.getByPositionId(positionId, [
+        'ForcedTrade',
+        'ForcedWithdrawal',
+      ])
+      expect(records1.map((x) => x.id)).toEqual([id2, id1])
+
+      const records2 = await repository.getByPositionId(positionId, [
+        'ForcedTrade',
+      ])
+      expect(records2.map((x) => x.id)).toEqual([id2])
+
+      const records3 = await repository.getByPositionId(positionId, [
+        'ForcedWithdrawal',
+      ])
+      expect(records3.map((x) => x.id)).toEqual([id1])
+    })
+  })
+
+  describe(UserTransactionRepository.prototype.getByStateUpdateId.name, () => {
+    let id1: number
+    let id2: number
+
+    beforeEach(async () => {
+      const transactionHash1 = Hash256.fake()
+      id1 = await repository.add({
+        transactionHash: transactionHash1,
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal(),
+      })
+      const transactionHash2 = Hash256.fake()
+      id2 = await repository.add({
+        transactionHash: transactionHash2,
+        blockNumber: 456,
+        timestamp: Timestamp(456000),
+        data: fakeForcedTrade(),
+      })
+      const transactionHash3 = Hash256.fake()
+      await repository.add({
+        transactionHash: transactionHash3,
+        blockNumber: 789,
+        timestamp: Timestamp(789000),
+        data: fakeForcedWithdrawal(),
+      })
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 999,
+        timestamp: Timestamp(999000),
+        data: fakeForcedWithdrawal(),
+      })
+
+      await repository.addManyIncluded([
+        {
+          transactionHash: transactionHash1,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          stateUpdateId: 1,
+        },
+        {
+          transactionHash: transactionHash2,
+          blockNumber: 456,
+          timestamp: Timestamp(456000),
+          stateUpdateId: 1,
+        },
+        {
+          transactionHash: transactionHash3,
+          blockNumber: 789,
+          timestamp: Timestamp(789000),
+          stateUpdateId: 2,
+        },
+      ])
+    })
+
+    it('returns the transactions for the given state update id', async () => {
+      const records = await repository.getByStateUpdateId(1)
+      expect(records.map((x) => x.id)).toEqual([id2, id1])
+    })
+
+    it('accepts an optional types parameter', async () => {
+      const records1 = await repository.getByStateUpdateId(1, [
+        'ForcedTrade',
+        'ForcedWithdrawal',
+      ])
+      expect(records1.map((x) => x.id)).toEqual([id2, id1])
+
+      const records2 = await repository.getByStateUpdateId(1, ['ForcedTrade'])
+      expect(records2.map((x) => x.id)).toEqual([id2])
+
+      const records3 = await repository.getByStateUpdateId(1, [
+        'ForcedWithdrawal',
+      ])
+      expect(records3.map((x) => x.id)).toEqual([id1])
+    })
+  })
+
   it.skip(
     UserTransactionRepository.prototype.getByStateUpdateIdAndPositionId.name
   )
@@ -63,8 +235,8 @@ describe(UserTransactionRepository.name, () => {
           })
         )
       }
-      const data = await repository.getPaginated({ limit: 5, offset: 0 })
-      expect(data.map((x) => x.id)).toEqual(ids.slice(0, 5))
+      const records = await repository.getPaginated({ limit: 5, offset: 0 })
+      expect(records.map((x) => x.id)).toEqual(ids.slice(0, 5))
     })
 
     it('respects the offset parameter', async () => {
@@ -79,8 +251,8 @@ describe(UserTransactionRepository.name, () => {
           })
         )
       }
-      const data = await repository.getPaginated({ limit: 5, offset: 2 })
-      expect(data.map((x) => x.id)).toEqual(ids.slice(2, 5 + 2))
+      const records = await repository.getPaginated({ limit: 5, offset: 2 })
+      expect(records.map((x) => x.id)).toEqual(ids.slice(2, 5 + 2))
     })
 
     it('respects the type parameter', async () => {
@@ -95,17 +267,27 @@ describe(UserTransactionRepository.name, () => {
           })
         )
       }
-      const data = await repository.getPaginated({
+      const records1 = await repository.getPaginated({
         limit: 5,
         offset: 0,
         types: ['ForcedWithdrawal'],
       })
-      expect(data.map((x) => x.id)).toEqual(ids.slice(10, 15))
+      expect(records1.map((x) => x.id)).toEqual(ids.slice(10, 15))
+
+      const records2 = await repository.getPaginated({
+        limit: 5,
+        offset: 0,
+        types: ['ForcedTrade'],
+      })
+      expect(records2.map((x) => x.id)).toEqual(ids.slice(0, 5))
     })
   })
 
   describe(UserTransactionRepository.prototype.getNotIncluded.name, () => {
-    it('returns the transactions that have not been included', async () => {
+    let id1: number
+    let id2: number
+
+    beforeEach(async () => {
       const transactionHash = Hash256.fake()
       await repository.add({
         transactionHash,
@@ -122,55 +304,27 @@ describe(UserTransactionRepository.name, () => {
         },
       ])
 
-      const id1 = await repository.add({
+      id1 = await repository.add({
         transactionHash: Hash256.fake(),
         blockNumber: 456,
         timestamp: Timestamp(456000),
         data: fakeForcedWithdrawal(),
       })
 
-      const id2 = await repository.add({
+      id2 = await repository.add({
         transactionHash: Hash256.fake(),
         blockNumber: 789,
         timestamp: Timestamp(789000),
         data: fakeForcedTrade(),
       })
+    })
 
+    it('returns the transactions that have not been included', async () => {
       const result = await repository.getNotIncluded()
       expect(result.map((x) => x.id)).toEqual([id1, id2])
     })
 
     it('accepts an optional type parameter', async () => {
-      const transactionHash = Hash256.fake()
-      await repository.add({
-        transactionHash,
-        blockNumber: 123,
-        timestamp: Timestamp(123000),
-        data: fakeForcedWithdrawal(),
-      })
-      await repository.addManyIncluded([
-        {
-          transactionHash,
-          blockNumber: 123,
-          timestamp: Timestamp(123000),
-          stateUpdateId: 123,
-        },
-      ])
-
-      const id1 = await repository.add({
-        transactionHash: Hash256.fake(),
-        blockNumber: 456,
-        timestamp: Timestamp(456000),
-        data: fakeForcedWithdrawal(),
-      })
-
-      const id2 = await repository.add({
-        transactionHash: Hash256.fake(),
-        blockNumber: 789,
-        timestamp: Timestamp(789000),
-        data: fakeForcedTrade(),
-      })
-
       const result1 = await repository.getNotIncluded([
         'ForcedTrade',
         'ForcedWithdrawal',
@@ -258,8 +412,8 @@ describe(UserTransactionRepository.name, () => {
         },
       })
 
-      const data = await repository.findById(id)
-      expect(data).toEqual({
+      const record = await repository.findById(id)
+      expect(record).toEqual({
         id,
         blockNumber: 123,
         starkKeyA: starkKey,
@@ -302,8 +456,8 @@ describe(UserTransactionRepository.name, () => {
         },
       ])
 
-      const data = await repository.findById(id)
-      expect(data).toEqual({
+      const record = await repository.findById(id)
+      expect(record).toEqual({
         id,
         blockNumber: 123,
         starkKeyA: starkKey,
@@ -345,8 +499,8 @@ describe(UserTransactionRepository.name, () => {
           data: fakeForcedWithdrawal(),
         })
 
-        const data = await repository.findByTransactionHash(transactionHash)
-        expect(data?.id).toEqual(id)
+        const record = await repository.findByTransactionHash(transactionHash)
+        expect(record?.id).toEqual(id)
       })
 
       it('supports a type parameter', async () => {
