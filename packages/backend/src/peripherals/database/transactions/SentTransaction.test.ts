@@ -1,32 +1,33 @@
-import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
-  decodeUserTransactionData,
-  encodeUserTransactionData,
+  decodeSentTransactionData,
+  encodeSentTransactionData,
   ForcedTradeData,
   ForcedWithdrawalData,
   WithdrawData,
-} from './UserTransaction'
+} from './SentTransaction'
 
-describe(encodeUserTransactionData.name, () => {
+describe(encodeSentTransactionData.name, () => {
   it('can encode a ForcedWithdrawal', () => {
     const data: ForcedWithdrawalData = {
       type: 'ForcedWithdrawal',
       positionId: 1234n,
       quantizedAmount: 5000n,
       starkKey: StarkKey.fake(),
+      premiumCost: false,
     }
-    const encoded = encodeUserTransactionData(data)
+    const encoded = encodeSentTransactionData(data)
 
     expect(encoded).toEqual({
-      starkKeyA: data.starkKey,
-      vaultOrPositionIdA: data.positionId,
+      starkKey: data.starkKey,
+      vaultOrPositionId: data.positionId,
       data: expect.anything(),
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeUserTransactionData(encoded.data)
+    const decoded = decodeSentTransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
 
@@ -43,19 +44,21 @@ describe(encodeUserTransactionData.name, () => {
       syntheticAssetId: AssetId('ETH-9'),
       isABuyingSynthetic: true,
       nonce: 123456789n,
+      submissionExpirationTime: Timestamp.now(),
+      signatureB: '0x1234',
+      offerId: 420,
+      premiumCost: false,
     }
-    const encoded = encodeUserTransactionData(data)
+    const encoded = encodeSentTransactionData(data)
 
     expect(encoded).toEqual({
-      starkKeyA: data.starkKeyA,
-      starkKeyB: data.starkKeyB,
-      vaultOrPositionIdA: data.positionIdA,
-      vaultOrPositionIdB: data.positionIdB,
+      starkKey: data.starkKeyA,
+      vaultOrPositionId: data.positionIdA,
       data: expect.anything(),
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeUserTransactionData(encoded.data)
+    const decoded = decodeSentTransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
 
@@ -64,19 +67,17 @@ describe(encodeUserTransactionData.name, () => {
       type: 'Withdraw',
       starkKey: StarkKey.fake(),
       assetType: '0x1234',
-      nonQuantizedAmount: 10000n,
-      quantizedAmount: 5000n,
-      recipient: EthereumAddress.fake(),
     }
-    const encoded = encodeUserTransactionData(data)
+    const encoded = encodeSentTransactionData(data)
 
     expect(encoded).toEqual({
-      starkKeyA: data.starkKey,
+      starkKey: data.starkKey,
+      vaultOrPositionId: undefined,
       data: expect.anything(),
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeUserTransactionData(encoded.data)
+    const decoded = decodeSentTransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
 })
