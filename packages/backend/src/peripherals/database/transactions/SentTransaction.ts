@@ -4,7 +4,7 @@ import { ToJSON } from './ToJSON'
 
 interface Encoded<T> {
   starkKey: StarkKey
-  vaultOrPositionId: bigint
+  vaultOrPositionId: bigint | undefined
   data: ToJSON<T>
 }
 
@@ -140,7 +140,7 @@ function decodeForcedTrade(values: ToJSON<ForcedTradeData>): ForcedTradeData {
 function encodeWithdraw(values: WithdrawData): Encoded<WithdrawData> {
   return {
     starkKey: values.starkKey,
-    vaultOrPositionId: BigInt(0),
+    vaultOrPositionId: undefined,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),

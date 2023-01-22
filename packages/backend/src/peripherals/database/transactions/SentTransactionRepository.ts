@@ -13,7 +13,7 @@ import {
 export interface SentTransactionRecord {
   transactionHash: Hash256
   starkKey: StarkKey
-  vaultOrPositionId: bigint
+  vaultOrPositionId: bigint | undefined
   data: SentTransactionData
   sentTimestamp: Timestamp
   mined?: {
@@ -55,6 +55,7 @@ export class SentTransactionRepository extends BaseRepository {
       transaction_hash: record.transactionHash.toString(),
       type: encoded.data.type,
       stark_key: encoded.starkKey.toString(),
+      vault_or_position_id: encoded.vaultOrPositionId,
       sent_timestamp: BigInt(record.timestamp.toString()),
       reverted: false,
       data: encoded.data,
@@ -166,7 +167,10 @@ function toRecord(row: SentTransactionRow): SentTransactionRecord {
   return {
     transactionHash: Hash256(row.transaction_hash),
     starkKey: StarkKey(row.stark_key),
-    vaultOrPositionId: BigInt(row.vault_or_position_id),
+    vaultOrPositionId:
+      row.vault_or_position_id !== null
+        ? BigInt(row.vault_or_position_id)
+        : undefined,
     data: decodeSentTransactionData(row.data),
     sentTimestamp: Timestamp(row.sent_timestamp),
     mined,

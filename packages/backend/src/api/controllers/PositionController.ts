@@ -184,7 +184,9 @@ function toTransactionHistory(
   for (const sentTransaction of sentTransactions) {
     if (
       sentTransaction.data.type === 'Withdraw' ||
-      sentTransaction.mined?.reverted === false
+      userTransactions.some(
+        (x) => x.transactionHash === sentTransaction.transactionHash
+      )
     ) {
       continue
     }
@@ -213,7 +215,8 @@ function toTransactionHistory(
     })
   }
   const userEntries = userTransactions.map(toForcedTransactionEntry)
-  return [...sentEntries, ...userEntries].sort(
+  const result = [...sentEntries, ...userEntries].sort(
     (a, b) => Number(b.lastUpdate) - Number(a.lastUpdate)
   )
+  return result
 }

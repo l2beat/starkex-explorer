@@ -158,7 +158,7 @@ declare module 'knex/types/tables' {
     transaction_hash: string
     type: string
     stark_key: string
-    vault_or_position_id: bigint
+    vault_or_position_id: bigint | null
     data: SentTransactionJSON
     sent_timestamp: bigint
     mined_timestamp: bigint | null
