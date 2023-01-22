@@ -26,6 +26,7 @@ import {
   SpotValidiumStateTransitionCollector,
 } from './core/collectors/ValidiumStateTransitionCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
+import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
 import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
@@ -44,6 +45,7 @@ import { PageMappingRepository } from './peripherals/database/PageMappingReposit
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
 import { Database } from './peripherals/database/shared/Database'
+import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
@@ -74,6 +76,11 @@ export class Application {
 
     const kvStore = new KeyValueStore(database, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
+    const softwareMigrationRepository = new SoftwareMigrationRepository(
+      kvStore,
+      logger
+    )
+
     const verifierEventRepository = new VerifierEventRepository(
       database,
       logger
@@ -271,6 +278,17 @@ export class Application {
       sentTransactionRepository
     )
 
+    const userTransactionMigrator = new UserTransactionMigrator(
+      database,
+      softwareMigrationRepository,
+      syncStatusRepository,
+      userTransactionRepository,
+      sentTransactionRepository,
+      userTransactionCollector,
+      ethereumClient,
+      logger
+    )
+
     // #endregion core
     // #region api
 
@@ -279,6 +297,7 @@ export class Application {
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository,
+      sentTransactionRepository,
       userTransactionRepository,
       forcedTradeOfferRepository
     )
@@ -354,6 +373,8 @@ export class Application {
       await database.migrateToLatest()
 
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
+
+      await userTransactionMigrator.migrate()
 
       if (config.enableSync) {
         transactionStatusService.start()

@@ -37,6 +37,11 @@ export class EthereumClient {
     )
   }
 
+  async getBlockTimestamp(blockNumber: number): Promise<number> {
+    const block = await this.getBlock(blockNumber)
+    return block.timestamp
+  }
+
   async getLogs(filter: HackFilter) {
     return await this.provider.getLogs(filter)
   }
@@ -75,11 +80,64 @@ export class EthereumClient {
     const logs: providers.Log[] = []
     for (const batch of batches) {
       const nestedLogs = await Promise.all(
-        batch.map((filter) => this.provider.getLogs(filter))
+        batch.map((filter) => {
+          if (
+            'fromBlock' in filter &&
+            typeof filter.address === 'string' &&
+            typeof filter.fromBlock === 'number' &&
+            typeof filter.toBlock === 'number'
+          ) {
+            return this.getAllLogs(
+              filter.address,
+              filter.topics,
+              filter.fromBlock,
+              filter.toBlock
+            )
+          }
+          return this.provider.getLogs(filter)
+        })
       )
       logs.push(...nestedLogs.flat())
     }
     return logs
+  }
+
+  async getAllLogs(
+    address: string,
+    topics: (string | string[] | null)[] | undefined,
+    fromBlock: number,
+    toBlock: number
+  ): Promise<providers.Log[]> {
+    if (fromBlock === toBlock) {
+      return await this.provider.getLogs({
+        address: address.toString(),
+        topics,
+        fromBlock,
+        toBlock,
+      })
+    }
+    try {
+      return await this.provider.getLogs({
+        address: address.toString(),
+        topics,
+        fromBlock,
+        toBlock,
+      })
+    } catch (e) {
+      if (
+        e instanceof Error &&
+        e.message.includes('Log response size exceeded')
+      ) {
+        const midPoint = fromBlock + Math.floor((toBlock - fromBlock) / 2)
+        const [a, b] = await Promise.all([
+          this.getAllLogs(address, topics, fromBlock, midPoint),
+          this.getAllLogs(address, topics, midPoint + 1, toBlock),
+        ])
+        return a.concat(b)
+      } else {
+        throw e
+      }
+    }
   }
 
   async getTransaction(

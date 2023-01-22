@@ -143,14 +143,14 @@ export class SentTransactionRepository extends BaseRepository {
 
   async deleteByTransactionHash(hash: Hash256) {
     const knex = await this.knex()
-    return knex('state_transitions')
+    return knex('sent_transactions')
       .where('transaction_hash', hash.toString())
       .delete()
   }
 
   async deleteAll() {
     const knex = await this.knex()
-    return knex('state_transitions').delete()
+    return knex('sent_transactions').delete()
   }
 }
 
