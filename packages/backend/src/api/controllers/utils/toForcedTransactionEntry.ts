@@ -15,7 +15,8 @@ export function toForcedTransactionEntry(
         : 'sell',
     status: record.included ? 'verified' : 'mined',
     hash: record.transactionHash,
-    lastUpdate: record.included?.timestamp ?? record.timestamp,
+    // TODO: change the name of this field to reflect the fact that it no longer is the latest update
+    lastUpdate: record.timestamp,
     amount:
       record.data.type === 'ForcedTrade'
         ? record.data.syntheticAmount
