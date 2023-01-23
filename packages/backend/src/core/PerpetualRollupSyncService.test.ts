@@ -43,7 +43,7 @@ describe(PerpetualRollupSyncService.name, () => {
       collect: async () => [],
     })
     const userTransactionCollector = mock<UserTransactionCollector>({
-      collect: async () => [],
+      collect: async () => {},
     })
 
     const stateTransitionRecordWithPages: StateTransitionRecord & {
