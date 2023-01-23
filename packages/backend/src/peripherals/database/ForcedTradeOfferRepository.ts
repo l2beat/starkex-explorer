@@ -163,7 +163,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     const knex = await this.knex()
     const updates = await knex('forced_trade_offers')
       .update({ transaction_hash: transactionHash.toString() })
-      .andWhere({ id })
+      .where({ id })
     return updates
   }
 
