@@ -83,24 +83,23 @@ export class SentTransactionRepository extends BaseRepository {
     const rows = await knex('sent_transactions')
       .select('transaction_hash')
       .where('mined_timestamp', null)
+      .orderBy('sent_timestamp', 'desc')
     return rows.map((x) => Hash256(x.transaction_hash))
   }
 
   async getByStarkKey(starkKey: StarkKey): Promise<SentTransactionRecord[]> {
     const knex = await this.knex()
-    const rows = await knex('sent_transactions').where(
-      'stark_key',
-      starkKey.toString()
-    )
+    const rows = await knex('sent_transactions')
+      .where('stark_key', starkKey.toString())
+      .orderBy('sent_timestamp', 'desc')
     return rows.map(toRecord)
   }
 
   async getByPositionId(positionId: bigint): Promise<SentTransactionRecord[]> {
     const knex = await this.knex()
-    const rows = await knex('sent_transactions').where(
-      'vault_or_position_id',
-      positionId
-    )
+    const rows = await knex('sent_transactions')
+      .where('vault_or_position_id', positionId)
+      .orderBy('sent_timestamp', 'desc')
     return rows.map(toRecord)
   }
 
