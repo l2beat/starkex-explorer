@@ -141,7 +141,10 @@ export class ForcedTransactionController {
           finalizeHash: sentWithdrawal?.transactionHash,
         },
         finalizeForm:
-          user && address && !sentWithdrawal
+          user &&
+          address &&
+          minedTransaction?.included?.stateUpdateId !== undefined &&
+          !sentWithdrawal
             ? {
                 address,
                 transactionHash: transaction.transactionHash,
