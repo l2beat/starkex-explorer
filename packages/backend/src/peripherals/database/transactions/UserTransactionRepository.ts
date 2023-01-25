@@ -234,6 +234,27 @@ export class UserTransactionRepository extends BaseRepository {
     return result ? toRecord(result) : undefined
   }
 
+  async findFirstWithdrawByStarkKeyAfter(
+    starkKey: StarkKey,
+    timestamp: Timestamp
+  ): Promise<UserTransactionRecord<'Withdraw'> | undefined> {
+    const knex = await this.knex()
+    const result = await knex('user_transactions')
+      .where('type', 'Withdraw')
+      .where('stark_key_a', starkKey.toString())
+      .where('timestamp', '>', BigInt(timestamp.toString()))
+      .orderBy('timestamp', 'asc')
+      .first()
+    return result
+      ? toRecord({
+          ...result,
+          included_block_number: null,
+          included_state_update_id: null,
+          included_timestamp: null,
+        })
+      : undefined
+  }
+
   async deleteAfter(blockNumber: number): Promise<number> {
     const knex = await this.knex()
     const a = await knex('user_transactions')

@@ -1,9 +1,19 @@
-import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect } from 'earljs'
 
 import { setupDatabaseTestSuite } from '../../../test/database'
 import { Logger } from '../../../tools/Logger'
-import { ForcedTradeData, ForcedWithdrawalData } from './UserTransaction'
+import {
+  ForcedTradeData,
+  ForcedWithdrawalData,
+  WithdrawData,
+} from './UserTransaction'
 import { UserTransactionRepository } from './UserTransactionRepository'
 
 describe(UserTransactionRepository.name, () => {
@@ -39,6 +49,18 @@ describe(UserTransactionRepository.name, () => {
       syntheticAssetId: AssetId('ETH-9'),
       isABuyingSynthetic: true,
       nonce: 123n,
+      ...override,
+    }
+  }
+
+  function fakeWithdraw(override?: Partial<WithdrawData>): WithdrawData {
+    return {
+      type: 'Withdraw',
+      assetType: '0x1234',
+      nonQuantizedAmount: 123n,
+      quantizedAmount: 123n,
+      recipient: EthereumAddress.fake(),
+      starkKey: StarkKey.fake(),
       ...override,
     }
   }
@@ -643,6 +665,38 @@ describe(UserTransactionRepository.name, () => {
           'Withdraw',
         ])
         expect(second).toEqual(undefined)
+      })
+    }
+  )
+
+  describe(
+    UserTransactionRepository.prototype.findFirstWithdrawByStarkKeyAfter.name,
+    () => {
+      it('returns the first withdraw after the given timestamp', async () => {
+        await repository.add({
+          transactionHash: Hash256.fake('111'),
+          blockNumber: 111,
+          timestamp: Timestamp(111),
+          data: fakeWithdraw({ starkKey: StarkKey.fake('aaa') }),
+        })
+
+        const first = await repository.findFirstWithdrawByStarkKeyAfter(
+          StarkKey.fake('aaa'),
+          Timestamp(0)
+        )
+        expect(first?.transactionHash).toEqual(Hash256.fake('111'))
+
+        const second = await repository.findFirstWithdrawByStarkKeyAfter(
+          StarkKey.fake('aaa'),
+          Timestamp(222)
+        )
+        expect(second).toEqual(undefined)
+
+        const third = await repository.findFirstWithdrawByStarkKeyAfter(
+          StarkKey.fake('bbb'),
+          Timestamp(0)
+        )
+        expect(third).toEqual(undefined)
       })
     }
   )
