@@ -2,8 +2,8 @@ import { SpotCairoOutput } from '@explorer/encoding'
 import { IMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
 import { Logger } from '../tools/Logger'
@@ -28,7 +28,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
     protected readonly stateUpdateRepository: StateUpdateRepository,
     protected readonly merkleStorage: IMerkleStorage<VaultLeaf>,
     protected readonly ethereumClient: EthereumClient,
-    protected readonly forcedTransactionRepository: ForcedTransactionRepository,
+    protected readonly userTransactionRepository: UserTransactionRepository,
     protected readonly logger: Logger,
     public stateTree?: MerkleTree<VaultLeaf>
   ) {
@@ -36,7 +36,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
       stateUpdateRepository,
       merkleStorage,
       ethereumClient,
-      forcedTransactionRepository,
+      userTransactionRepository,
       logger,
       EMPTY_STATE_HASH,
       VaultLeaf.EMPTY,

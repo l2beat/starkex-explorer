@@ -18,11 +18,11 @@ import {
 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import type { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
@@ -67,7 +67,7 @@ describe(PerpetualRollupUpdater.name, () => {
         mock<StateUpdateRepository>(),
         mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT
       )
       await expect(
@@ -98,7 +98,7 @@ describe(PerpetualRollupUpdater.name, () => {
         stateUpdateRepository,
         mock<MerkleTreeRepository<PositionLeaf>>(),
         mock<EthereumClient>(),
-        mock<ForcedTransactionRepository>(),
+        mock<UserTransactionRepository>(),
         Logger.SILENT
       )
 
@@ -139,7 +139,7 @@ describe(PerpetualRollupUpdater.name, () => {
           mock<StateUpdateRepository>(),
           storage,
           mock<EthereumClient>(),
-          mock<ForcedTransactionRepository>(),
+          mock<UserTransactionRepository>(),
           Logger.SILENT,
           stateTree
         )

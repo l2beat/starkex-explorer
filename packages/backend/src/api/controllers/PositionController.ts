@@ -1,15 +1,23 @@
 import {
+  ForcedTransactionEntry,
   renderNotFoundPage,
   renderPositionAtUpdatePage,
   renderPositionDetailsPage,
 } from '@explorer/frontend'
-import { EthereumAddress } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import {
+  SentTransactionRecord,
+  SentTransactionRepository,
+} from '../../peripherals/database/transactions/SentTransactionRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { countUpdatedAssets } from './utils/countUpdatedAssets'
@@ -22,7 +30,8 @@ export class PositionController {
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private forcedTransactionRepository: ForcedTransactionRepository,
+    private sentTransactionRepository: SentTransactionRepository,
+    private userTransactionRepository: UserTransactionRepository,
     private forcedTradeOfferRepository: ForcedTradeOfferRepository
   ) {}
 
@@ -30,12 +39,17 @@ export class PositionController {
     positionId: bigint,
     address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    const [account, history, transactions, offers] = await Promise.all([
-      this.accountService.getAccount(address),
-      this.positionRepository.getHistoryById(positionId),
-      this.forcedTransactionRepository.getByPositionId(positionId),
-      this.forcedTradeOfferRepository.getByPositionId(positionId),
-    ])
+    const [account, history, sentTransactions, userTransactions, offers] =
+      await Promise.all([
+        this.accountService.getAccount(address),
+        this.positionRepository.getHistoryById(positionId),
+        this.sentTransactionRepository.getByPositionId(positionId),
+        this.userTransactionRepository.getByPositionId(positionId, [
+          'ForcedTrade',
+          'ForcedWithdrawal',
+        ]),
+        this.forcedTradeOfferRepository.getByPositionId(positionId),
+      ])
 
     const historyWithAssets = history.map((update) => {
       const assets = toPositionAssetEntries(
@@ -84,7 +98,7 @@ export class PositionController {
           assetsUpdated,
         }
       }),
-      transactions: transactions.map(toForcedTransactionEntry),
+      transactions: toTransactionHistory(sentTransactions, userTransactions),
       offers: offers.map((offer) => ({
         ...offer,
         type: offer.isABuyingSynthetic ? 'buy' : 'sell',
@@ -103,7 +117,11 @@ export class PositionController {
       this.accountService.getAccount(address),
       this.positionRepository.getHistoryById(positionId),
       this.stateUpdateRepository.findByIdWithPositions(stateUpdateId),
-      this.forcedTransactionRepository.getIncludedInStateUpdate(stateUpdateId),
+      this.userTransactionRepository.getByStateUpdateIdAndPositionId(
+        stateUpdateId,
+        positionId,
+        ['ForcedTrade', 'ForcedWithdrawal']
+      ),
     ])
     const updateIndex = history.findIndex(
       (p) => p.stateUpdateId === stateUpdateId
@@ -136,13 +154,7 @@ export class PositionController {
       previousStarkKey: previousPosition?.starkKey,
       starkKey: position.starkKey,
       assetChanges,
-      transactions: transactions
-        .filter((t) => {
-          return t.data.type === 'trade'
-            ? [t.data.positionIdA, t.data.positionIdB].includes(positionId)
-            : t.data.positionId === positionId
-        })
-        .map(toForcedTransactionEntry),
+      transactions: transactions.map(toForcedTransactionEntry),
     })
     return { type: 'success', content }
   }
@@ -162,4 +174,49 @@ export class PositionController {
       }),
     }
   }
+}
+
+function toTransactionHistory(
+  sentTransactions: SentTransactionRecord[],
+  userTransactions: UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>[]
+) {
+  const sentEntries: ForcedTransactionEntry[] = []
+  for (const sentTransaction of sentTransactions) {
+    if (
+      sentTransaction.data.type === 'Withdraw' ||
+      userTransactions.some(
+        (x) => x.transactionHash === sentTransaction.transactionHash
+      )
+    ) {
+      continue
+    }
+    sentEntries.push({
+      type:
+        sentTransaction.data.type === 'ForcedWithdrawal'
+          ? 'exit'
+          : sentTransaction.data.isABuyingSynthetic
+          ? 'buy'
+          : 'sell',
+      status: sentTransaction.mined?.reverted ? 'reverted' : 'sent',
+      hash: sentTransaction.transactionHash,
+      lastUpdate: sentTransaction.sentTimestamp,
+      amount:
+        sentTransaction.data.type === 'ForcedTrade'
+          ? sentTransaction.data.syntheticAmount
+          : sentTransaction.data.quantizedAmount,
+      assetId:
+        sentTransaction.data.type === 'ForcedTrade'
+          ? sentTransaction.data.syntheticAssetId
+          : AssetId.USDC,
+      positionId:
+        sentTransaction.data.type === 'ForcedTrade'
+          ? sentTransaction.data.positionIdA
+          : sentTransaction.data.positionId,
+    })
+  }
+  const userEntries = userTransactions.map(toForcedTransactionEntry)
+  const result = [...sentEntries, ...userEntries].sort(
+    (a, b) => Number(b.lastUpdate) - Number(a.lastUpdate)
+  )
+  return result
 }

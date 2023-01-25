@@ -135,15 +135,15 @@ describe('ForcedTransactionRouter', () => {
         await createServer(
           mock<ForcedTradeOfferController>(),
           mock<TransactionSubmitController>({
-            finalizeForcedExit: async () => ({
-              type: 'success',
-              content: finalizeHash.toString(),
+            submitWithdrawal: async () => ({
+              type: 'created',
+              content: { id: finalizeHash },
             }),
           })
         )
           .post('/forced/exits/finalize')
           .send({ exitHash, finalizeHash })
-          .expect(200)
+          .expect(201)
       })
     })
 

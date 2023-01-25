@@ -1,33 +1,33 @@
 import { ForcedTransactionEntry } from '@explorer/frontend'
 import { AssetId } from '@explorer/types'
 
-import { getTransactionStatus } from '../../../core/getForcedTransactionStatus'
-import { ForcedTransactionRecord } from '../../../peripherals/database/ForcedTransactionRepository'
+import { UserTransactionRecord } from '../../../peripherals/database/transactions/UserTransactionRepository'
 
 export function toForcedTransactionEntry(
-  transaction: ForcedTransactionRecord
+  record: UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>
 ): ForcedTransactionEntry {
   return {
     type:
-      transaction.data.type === 'withdrawal'
+      record.data.type === 'ForcedWithdrawal'
         ? 'exit'
-        : transaction.data.isABuyingSynthetic
+        : record.data.isABuyingSynthetic
         ? 'buy'
         : 'sell',
-    status: getTransactionStatus(transaction),
-    hash: transaction.hash,
-    lastUpdate: transaction.lastUpdateAt,
+    status: record.included ? 'verified' : 'mined',
+    hash: record.transactionHash,
+    // TODO: change the name of this field to reflect the fact that it no longer is the latest update
+    lastUpdate: record.timestamp,
     amount:
-      transaction.data.type === 'trade'
-        ? transaction.data.syntheticAmount
-        : transaction.data.amount,
+      record.data.type === 'ForcedTrade'
+        ? record.data.syntheticAmount
+        : record.data.quantizedAmount,
     assetId:
-      transaction.data.type === 'trade'
-        ? transaction.data.syntheticAssetId
+      record.data.type === 'ForcedTrade'
+        ? record.data.syntheticAssetId
         : AssetId.USDC,
     positionId:
-      transaction.data.type === 'trade'
-        ? transaction.data.positionIdA
-        : transaction.data.positionId,
+      record.data.type === 'ForcedTrade'
+        ? record.data.positionIdA
+        : record.data.positionId,
   }
 }

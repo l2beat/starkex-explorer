@@ -2,8 +2,8 @@ import { PerpetualCairoOutput } from '@explorer/encoding'
 import { IMerkleStorage, MerkleTree, PositionLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatch'
 import { Logger } from '../tools/Logger'
@@ -28,7 +28,7 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
     protected readonly stateUpdateRepository: StateUpdateRepository,
     protected readonly merkleStorage: IMerkleStorage<PositionLeaf>,
     protected readonly ethereumClient: EthereumClient,
-    protected readonly forcedTransactionRepository: ForcedTransactionRepository,
+    protected readonly userTransactionRepository: UserTransactionRepository,
     protected readonly logger: Logger,
     public stateTree?: MerkleTree<PositionLeaf>
   ) {
@@ -36,7 +36,7 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
       stateUpdateRepository,
       merkleStorage,
       ethereumClient,
-      forcedTransactionRepository,
+      userTransactionRepository,
       logger,
       EMPTY_STATE_HASH,
       PositionLeaf.EMPTY,

@@ -2,10 +2,9 @@ import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { Logger } from '../tools/Logger'
-import { FinalizeExitEventsCollector } from './collectors/FinalizeExitEventsCollector'
-import { ForcedEventsCollector } from './collectors/ForcedEventsCollector'
 import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { IDataSyncService } from './IDataSyncService'
 import { SpotValidiumUpdater } from './SpotValidiumUpdater'
@@ -15,8 +14,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
     private readonly spotValidiumStateTransitionCollector: SpotValidiumStateTransitionCollector,
     private readonly userRegistrationCollector: UserRegistrationCollector,
-    private readonly forcedEventsCollector: ForcedEventsCollector,
-    private readonly finalizeExitEventsCollector: FinalizeExitEventsCollector,
+    private readonly userTransactionCollector: UserTransactionCollector,
     private readonly spotCairoOutputCollector: SpotCairoOutputCollector,
     private readonly spotValidiumUpdater: SpotValidiumUpdater,
     private readonly logger: Logger
@@ -29,10 +27,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
       blockRange
     )
     // TODO: fix forced events
-    // const forcedEvents = await this.forcedEventsCollector.collect(blockRange)
-    // const finalizeExitEvents = await this.finalizeExitEventsCollector.collect(
-    //   blockRange
-    // )
+    // await this.userTransactionCollector.collect(blockRange)
 
     const stateTransitions =
       await this.spotValidiumStateTransitionCollector.collect(blockRange)
@@ -42,8 +37,6 @@ export class SpotValidiumSyncService implements IDataSyncService {
       blockRange: { from: blockRange.start, to: blockRange.end },
       stateTransitions: stateTransitions.length,
       userRegistrations: userRegistrations.length,
-      // forcedEvents,
-      // finalizeExitEvents,
     })
 
     for (const transition of stateTransitions) {
@@ -66,5 +59,6 @@ export class SpotValidiumSyncService implements IDataSyncService {
     await this.spotValidiumStateTransitionCollector.discardAfter(blockNumber)
     await this.spotValidiumUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
+    await this.userTransactionCollector.discardAfter(blockNumber)
   }
 }

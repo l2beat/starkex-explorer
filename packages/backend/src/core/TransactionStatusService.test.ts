@@ -1,138 +1,117 @@
 import { Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
-import { ethers } from 'ethers'
+import { providers } from 'ethers'
 
-import { TransactionStatusRepository } from '../peripherals/database/TransactionStatusRepository'
+import { SentTransactionRepository } from '../peripherals/database/transactions/SentTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { fakeSentTransaction } from '../test/fakes'
 import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
-import {
-  applyCheckResult,
-  TransactionStatusService,
-} from './TransactionStatusService'
+import { TransactionStatusService } from './TransactionStatusService'
 
 describe(TransactionStatusService.name, () => {
-  describe(applyCheckResult.name, () => {
-    it('handles mined', async () => {
-      const transaction = fakeSentTransaction()
-      const minedAt = Timestamp(+transaction.sentAt + 1)
-      const blockNumber = 1
-      const result = applyCheckResult(transaction, {
-        status: 'mined',
-        minedAt,
-        blockNumber,
-      })
-      expect(result).toEqual({
-        ...transaction,
-        mined: {
-          at: minedAt,
-          blockNumber,
-        },
-      })
+  it('marks a transaction as mined', async () => {
+    const hash = Hash256.fake()
+    let updated = false
+    const sentTransactionRepository = mock<SentTransactionRepository>({
+      async updateMined(_hash, mined) {
+        updated = true
+        expect(_hash).toEqual(hash)
+        expect(mined).toEqual({
+          blockNumber: 10,
+          timestamp: Timestamp(1234000),
+          reverted: false,
+        })
+        return 1
+      },
     })
-
-    it('handles reverted', async () => {
-      const transaction = fakeSentTransaction()
-      const nowMillis = +transaction.sentAt + 1
-      const result = applyCheckResult(
-        transaction,
-        {
-          status: 'reverted',
-        },
-        () => nowMillis
-      )
-      expect(result).toEqual({
-        ...transaction,
-        revertedAt: Timestamp(nowMillis),
-      })
+    const ethereumClient = mock<EthereumClient>({
+      async getTransaction(_hash) {
+        expect(_hash).toEqual(hash)
+        return {} as providers.TransactionResponse
+      },
+      async getTransactionReceipt(_hash) {
+        expect(_hash).toEqual(hash)
+        return { blockNumber: 10, status: 1 } as providers.TransactionReceipt
+      },
+      async getBlock(_blockNumber) {
+        expect(_blockNumber).toEqual(10)
+        return { timestamp: 1234 } as providers.Block
+      },
     })
-
-    it('handles initial not found', async () => {
-      const transaction = fakeSentTransaction({ notFoundRetries: 1 })
-      const result = applyCheckResult(transaction, {
-        status: 'not found',
-      })
-      expect(result).toEqual({
-        ...transaction,
-        notFoundRetries: 0,
-      })
-    })
-
-    it('handles forgotten', async () => {
-      const transaction = fakeSentTransaction({ notFoundRetries: 0 })
-      const nowMillis = +transaction.sentAt + 1
-      const result = applyCheckResult(
-        transaction,
-        {
-          status: 'not found',
-        },
-        () => nowMillis
-      )
-      expect(result).toEqual({
-        ...transaction,
-        forgottenAt: Timestamp(nowMillis),
-      })
-    })
+    const service = new TransactionStatusService(
+      sentTransactionRepository,
+      ethereumClient,
+      Logger.SILENT
+    )
+    await service.checkTransaction(hash)
+    expect(updated).toEqual(true)
   })
 
-  describe(TransactionStatusService.prototype.checkTransaction.name, () => {
-    it('returns not found', async () => {
-      const service = new TransactionStatusService(
-        mock<TransactionStatusRepository>(),
-        mock<EthereumClient>({ getTransaction: async () => undefined }),
-        Logger.SILENT
-      )
-      const result = await service.checkTransaction(Hash256.fake())
-      expect(result).toEqual({
-        status: 'not found',
-      })
+  it('marks a transaction as reverted', async () => {
+    const hash = Hash256.fake()
+    let updated = false
+    const sentTransactionRepository = mock<SentTransactionRepository>({
+      async updateMined(_hash, mined) {
+        updated = true
+        expect(_hash).toEqual(hash)
+        expect(mined).toEqual({
+          blockNumber: 10,
+          timestamp: Timestamp(1234000),
+          reverted: true,
+        })
+        return 1
+      },
     })
-    it('returns reverted', async () => {
-      const service = new TransactionStatusService(
-        mock<TransactionStatusRepository>({}),
-        mock<EthereumClient>({
-          getTransaction: async () => {
-            return {} as ethers.providers.TransactionResponse
-          },
-          getTransactionReceipt: async () => {
-            return { status: 0 } as ethers.providers.TransactionReceipt
-          },
-        }),
-        Logger.SILENT
-      )
-      const result = await service.checkTransaction(Hash256.fake())
-      expect(result).toEqual({
-        status: 'reverted',
-      })
+    const ethereumClient = mock<EthereumClient>({
+      async getTransaction(_hash) {
+        expect(_hash).toEqual(hash)
+        return {} as providers.TransactionResponse
+      },
+      async getTransactionReceipt(_hash) {
+        expect(_hash).toEqual(hash)
+        return { blockNumber: 10, status: 0 } as providers.TransactionReceipt
+      },
+      async getBlock(_blockNumber) {
+        expect(_blockNumber).toEqual(10)
+        return { timestamp: 1234 } as providers.Block
+      },
     })
-    it('returns mined', async () => {
-      const blockNumber = 1
-      const timestampInSeconds = 1
-      const service = new TransactionStatusService(
-        mock<TransactionStatusRepository>({}),
-        mock<EthereumClient>({
-          getTransaction: async () => {
-            return {} as ethers.providers.TransactionResponse
-          },
-          getTransactionReceipt: async () => {
-            return {
-              status: 1,
-              blockNumber,
-            } as ethers.providers.TransactionReceipt
-          },
-          getBlock: async () => {
-            return { timestamp: timestampInSeconds } as ethers.providers.Block
-          },
-        }),
-        Logger.SILENT
-      )
-      const result = await service.checkTransaction(Hash256.fake())
-      expect(result).toEqual({
-        status: 'mined',
-        minedAt: Timestamp.fromSeconds(timestampInSeconds),
-        blockNumber,
-      })
+    const service = new TransactionStatusService(
+      sentTransactionRepository,
+      ethereumClient,
+      Logger.SILENT
+    )
+    await service.checkTransaction(hash)
+    expect(updated).toEqual(true)
+  })
+
+  it('removes a transaction after a specified number of checks', async () => {
+    const hash = Hash256.fake()
+    let removed = false
+    const sentTransactionRepository = mock<SentTransactionRepository>({
+      async deleteByTransactionHash(_hash) {
+        removed = true
+        expect(_hash).toEqual(hash)
+        return 1
+      },
     })
+    const ethereumClient = mock<EthereumClient>({
+      async getTransaction(_hash) {
+        expect(_hash).toEqual(hash)
+        return undefined
+      },
+    })
+    const service = new TransactionStatusService(
+      sentTransactionRepository,
+      ethereumClient,
+      Logger.SILENT,
+      { maxMissingBeforeDelete: 3 }
+    )
+
+    await service.checkTransaction(hash)
+    await service.checkTransaction(hash)
+    expect(removed).toEqual(false)
+    await service.checkTransaction(hash)
+    expect(removed).toEqual(true)
   })
 })
