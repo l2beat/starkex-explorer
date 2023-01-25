@@ -5,19 +5,20 @@ import { providers } from 'ethers'
 import { BlockRange } from '../../model'
 import { mock } from '../../test/mock'
 import { EthereumClient } from './EthereumClient'
+import { HackJsonRpcProvider } from './HackJsonRpcProvider'
 
 describe(EthereumClient.name, () => {
+  const SAFE_BLOCK_DISTANCE = 40
+
   describe(EthereumClient.prototype.getLogsInRange.name, () => {
     const filter = { address: EthereumAddress.fake().toString() }
-    const SAFE_BLOCK_DISTANCE = 40
 
     it('works for a block range without hashes', async () => {
       const blockRange = new BlockRange([], 5, 10)
 
-      const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
       const getLogs = mockFn().resolvesTo([])
-      // @ts-expect-error acccess private member
-      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
+      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
@@ -36,10 +37,9 @@ describe(EthereumClient.name, () => {
         10
       )
 
-      const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
       const getLogs = mockFn().resolvesTo([])
-      // @ts-expect-error acccess private member
-      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
+      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
@@ -55,10 +55,9 @@ describe(EthereumClient.name, () => {
         { number: 8, hash: Hash256.fake('8') },
       ])
 
-      const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
       const getLogs = mockFn().resolvesTo([])
-      // @ts-expect-error acccess private member
-      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
+      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
@@ -75,10 +74,9 @@ describe(EthereumClient.name, () => {
         }))
       )
 
-      const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
       const getLogs = mockFn().resolvesTo([])
-      // @ts-expect-error acccess private member
-      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
+      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
@@ -115,7 +113,7 @@ describe(EthereumClient.name, () => {
           hash: Hash256.fake('deadbeef'),
         },
       ])
-      const ethereumClient = new EthereumClient('', SAFE_BLOCK_DISTANCE)
+
       const log: providers.Log = {
         blockNumber: 12000000,
         blockHash: Hash256.fake().toString(),
@@ -127,13 +125,126 @@ describe(EthereumClient.name, () => {
         transactionHash: Hash256.fake().toString(),
         logIndex: 0,
       }
+
       const getLogs = mockFn().resolvesTo([]).resolvesToOnce([log])
-      // @ts-expect-error acccess private member
-      ethereumClient.provider = mock<providers.JsonRpcProvider>({ getLogs })
+      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await expect(
         ethereumClient.getLogsInRange(blockRange, filter)
       ).toBeRejected('all logs must be from the block range')
+    })
+  })
+
+  describe(EthereumClient.prototype.getAllLogs.name, () => {
+    it('divides on two calls', async () => {
+      const provider = mock<HackJsonRpcProvider>({
+        getLogs: mockFn()
+          .throwsOnce(new Error('Log response size exceeded'))
+          .returnsOnce([])
+          .returnsOnce([]),
+      })
+
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
+
+      const address = EthereumAddress.fake()
+      const topic = 'aaaa'
+      await ethereumClient.getAllLogs(address.toString(), [topic], 1000, 2000)
+
+      expect(provider.getLogs).toHaveBeenCalledExactlyWith([
+        [
+          {
+            address: address.toString(),
+            topics: [topic],
+            fromBlock: 1000,
+            toBlock: 2000,
+          },
+        ],
+        [
+          {
+            address: address.toString(),
+            topics: [topic],
+            fromBlock: 1000,
+            toBlock: 1500,
+          },
+        ],
+        [
+          {
+            address: address.toString(),
+            topics: [topic],
+            fromBlock: 1501,
+            toBlock: 2000,
+          },
+        ],
+      ])
+    })
+
+    it('correctly divides range of two', async () => {
+      const provider = mock<HackJsonRpcProvider>({
+        getLogs: mockFn()
+          .throwsOnce(new Error('Log response size exceeded'))
+          .returnsOnce([])
+          .returnsOnce([]),
+      })
+
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
+
+      const address = EthereumAddress.fake()
+      const topic = 'aaaa'
+      await ethereumClient.getAllLogs(address.toString(), [topic], 1, 2)
+
+      expect(provider.getLogs).toHaveBeenCalledExactlyWith([
+        [
+          {
+            address: address.toString(),
+            topics: [topic],
+            fromBlock: 1,
+            toBlock: 2,
+          },
+        ],
+        [
+          {
+            address: address.toString(),
+            topics: [topic],
+            fromBlock: 1,
+            toBlock: 1,
+          },
+        ],
+        [
+          {
+            address: address.toString(),
+            topics: [topic],
+            fromBlock: 2,
+            toBlock: 2,
+          },
+        ],
+      ])
+    })
+
+    it('fromBlock === toBlock', async () => {
+      const provider = mock<HackJsonRpcProvider>({
+        getLogs: mockFn().throwsOnce(new Error('Log response size exceeded')),
+      })
+
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
+
+      const address = EthereumAddress.fake()
+      const topic = 'aaaa'
+
+      await expect(
+        ethereumClient.getAllLogs(address.toString(), [topic], 1, 1)
+      ).toBeRejected()
+
+      expect(provider.getLogs).toHaveBeenCalledExactlyWith([
+        [
+          {
+            address: address.toString(),
+            topics: [topic],
+            fromBlock: 1,
+            toBlock: 1,
+          },
+        ],
+      ])
     })
   })
 })

@@ -6,12 +6,17 @@ import { HackFilter, HackJsonRpcProvider } from './HackJsonRpcProvider'
 import { BlockTag } from './types'
 
 export class EthereumClient {
-  private provider = new HackJsonRpcProvider(this.rpcUrl)
+  private provider: HackJsonRpcProvider
 
   constructor(
-    private readonly rpcUrl: string,
+    rpcUrlOrProvider: string | HackJsonRpcProvider,
     private readonly safeBlockDistance: number
-  ) {}
+  ) {
+    this.provider =
+      typeof rpcUrlOrProvider === 'string'
+        ? new HackJsonRpcProvider(rpcUrlOrProvider)
+        : rpcUrlOrProvider
+  }
 
   async getChainId(): Promise<number> {
     const network = await this.provider.getNetwork()
