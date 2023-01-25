@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit",
     "prebuild": "yarn clean",
     "build": "tsc",
+    "postbuild": "cp src/core/migrations/blockTimestamps.json build/core/migrations/blockTimestamps.json",
     "clean": "rm -rf build",
     "test": "mocha",
     "test:watch": "mocha --watch --watch-files src/**/*.ts,test/**/*.ts",
