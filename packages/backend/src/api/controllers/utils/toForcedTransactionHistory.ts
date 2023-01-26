@@ -1,4 +1,4 @@
-import { Timestamp } from '@explorer/types'
+import { Hash256, Timestamp } from '@explorer/types'
 
 import { SentTransactionRecord } from '../../../peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRecord } from '../../../peripherals/database/transactions/UserTransactionRepository'
@@ -8,12 +8,19 @@ interface Event {
   text: string
 }
 
+export interface FinalizeTransaction {
+  transactionHash: Hash256
+  reverted: boolean
+  sentTimestamp: Timestamp | undefined
+  minedTimestamp: Timestamp | undefined
+}
+
 export function toForcedTransactionHistory(
   sentTransaction: SentTransactionRecord | undefined,
   transaction:
     | UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>
     | undefined,
-  sentWithdrawal: SentTransactionRecord | undefined
+  finalize: FinalizeTransaction | undefined
 ) {
   const history: Event[] = []
   if (sentTransaction) {
@@ -41,22 +48,22 @@ export function toForcedTransactionHistory(
       timestamp: transaction.included.timestamp,
     })
   }
-  if (sentWithdrawal) {
+  if (finalize?.sentTimestamp) {
     history.push({
       text: 'finalize transaction sent',
-      timestamp: sentWithdrawal.sentTimestamp,
+      timestamp: finalize.sentTimestamp,
     })
   }
-  if (sentWithdrawal?.mined) {
-    if (sentWithdrawal.mined.reverted) {
+  if (finalize?.minedTimestamp) {
+    if (finalize.reverted) {
       history.push({
         text: 'finalize transaction reverted',
-        timestamp: sentWithdrawal.mined.timestamp,
+        timestamp: finalize.minedTimestamp,
       })
     } else {
       history.push({
         text: 'finalize transaction mined',
-        timestamp: sentWithdrawal.mined.timestamp,
+        timestamp: finalize.minedTimestamp,
       })
     }
   }
