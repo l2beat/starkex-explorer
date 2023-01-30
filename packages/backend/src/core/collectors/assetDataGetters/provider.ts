@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
 
-import { getEnv } from "../../../config/getEnv";
-
-export const provider = new ethers.providers.JsonRpcProvider(getEnv('JSON_RPC_URL'));
+// TODO: Figure out a way to pass the address from the config or replace it with a better provider approach
+export const provider = new ethers.providers.JsonRpcProvider("https://eth-goerli.g.alchemy.com/v2/quRHg-_JObQhAZDhuX1C22LvsByvxJtJ");
