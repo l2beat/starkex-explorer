@@ -90,6 +90,17 @@ export const LogRootUpdate = EthereumEvent<
   'event LogRootUpdate(uint256 sequenceNumber, uint256 batchId, uint256 validiumVaultRoot, uint256 rollupVaultRoot, uint256 orderRoot)'
 )
 
+export const LogTokenRegistered = EthereumEvent<
+  'LogTokenRegistered',
+  {
+    assetType: BigNumber
+    assetInfo: string
+    quantum: BigNumber
+  }
+  >(
+    'event LogTokenRegistered(uint256 assetType, bytes assetInfo, uint256 quantum)'
+  )
+
 export const LogDeposit = EthereumEvent<
   'LogDeposit',
   {
