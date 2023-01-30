@@ -186,6 +186,24 @@ declare module 'knex/types/tables' {
     state_update_id: number
   }
 
+  interface TokenRegistrationRow {
+    asset_type: string
+    address: string
+    type: string
+  }
+
+  interface TokenRow {
+    type: string
+    address: string
+    name: string
+    symbol: string
+    assetId: string
+    tokenId: string
+    quantum: number
+    decimals: number
+    uri: string
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -208,6 +226,8 @@ declare module 'knex/types/tables' {
     sent_transactions: SentTransactionRow
     user_transactions: UserTransactionRow
     included_forced_requests: IncludedForcedRequestRow
+    token_registrations: TokenRegistrationRow
+    tokens: TokenRow
   }
 }
 
