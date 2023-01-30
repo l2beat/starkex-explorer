@@ -6,8 +6,8 @@ import { BaseRepository } from "./shared/BaseRepository";
 import { Database } from "./shared/Database";
 
 export interface TokenRegistrationRecord {
-    assetType: EthereumAddress
-    address: string
+    assetType: string
+    address: EthereumAddress
     type: string
 }
 
@@ -19,14 +19,44 @@ export class TokenRegistrationRepository extends BaseRepository {
 
     async add(record: TokenRegistrationRecord) {
         const knex = await this.knex()
-        await knex('token_registrations').insert(this.toRow(record))
+        await knex('token_registrations').insert(toRow(record))
+        return record.assetType
     }
 
-    async toRow(record: TokenRegistrationRecord) {
-
+    async getAll(): Promise<TokenRegistrationRecord[]> {
+        const knex = await this.knex()
+        const rows = await knex('token_registrations').select('*')
+        return rows.map(toRecord)
     }
 
-    async toRecord(row: TokenRegistrationRow) {
-        
+    async findByAssetType(assetType: string) {
+        const knex = await this.knex()
+        const row = await knex('token_registrations').where('asset_type', assetType).first()
+
+        if(!row) {
+            return undefined
+        }
+
+        return toRecord(row)
+    }
+}
+
+function toRow(record: TokenRegistrationRecord): TokenRegistrationRow {
+    const {assetType, address, type} = record
+
+    return {
+        asset_type: assetType,
+        address: address.toString(),
+        type
+    }
+}
+
+function toRecord(row: TokenRegistrationRow): TokenRegistrationRecord {
+    const {asset_type, address, type} = row
+
+    return {
+        assetType: asset_type,
+        address: EthereumAddress(address),
+        type
     }
 }
