@@ -3,6 +3,7 @@ import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { Logger } from '../tools/Logger'
 import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'
+import { TokenRegistrationCollector } from './collectors/TokenRegistrationCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
@@ -17,6 +18,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     private readonly userTransactionCollector: UserTransactionCollector,
     private readonly spotCairoOutputCollector: SpotCairoOutputCollector,
     private readonly spotValidiumUpdater: SpotValidiumUpdater,
+    private readonly tokenRegistrationCollector: TokenRegistrationCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -29,6 +31,8 @@ export class SpotValidiumSyncService implements IDataSyncService {
     // TODO: fix forced events
     // await this.userTransactionCollector.collect(blockRange)
 
+    const tokenRegistrations = await this.tokenRegistrationCollector.collect(blockRange)
+
     const stateTransitions =
       await this.spotValidiumStateTransitionCollector.collect(blockRange)
 
@@ -37,6 +41,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
       blockRange: { from: blockRange.start, to: blockRange.end },
       stateTransitions: stateTransitions.length,
       userRegistrations: userRegistrations.length,
+      tokenRegistrations: tokenRegistrations.length
     })
 
     for (const transition of stateTransitions) {

@@ -19,6 +19,7 @@ import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
 import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
 import { SpotCairoOutputCollector } from './core/collectors/SpotCairoOutputCollector'
+import { TokenRegistrationCollector } from './core/collectors/TokenRegistrationCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './core/collectors/UserTransactionCollector'
 import {
@@ -200,6 +201,9 @@ export class Application {
           userTransactionRepository,
           logger
         )
+        
+        const tokenRegistrationCollector = new TokenRegistrationCollector(ethereumClient, config.starkex.contracts.perpetual)
+
         syncService = new SpotValidiumSyncService(
           availabilityGatewayClient,
           spotValidiumStateTransitionCollector,
@@ -207,6 +211,7 @@ export class Application {
           userTransactionCollector,
           spotCairoOutputCollector,
           spotValidiumUpdater,
+          tokenRegistrationCollector,
           logger
         )
       }
