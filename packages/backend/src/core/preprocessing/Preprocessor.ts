@@ -91,97 +91,99 @@ export class Preprocessor {
     // console.log(positions)
     console.log(lastPreprocessedId)
 
-    await this.preprocessedAssetHistoryRepository.runInTransaction(async (trx) => {
-      // BEGIN TRANSACTION:
+    await this.preprocessedAssetHistoryRepository.runInTransaction(
+      async (trx) => {
+        // BEGIN TRANSACTION:
 
-      for (const position of positions) {
-        let updates: {
-          token: string
-          balance: bigint
-          prev_balance?: bigint
-          prev_history_id?: number
-        }[] = []
-        let starkKey = StarkKey.ZERO
+        for (const position of positions) {
+          let updates: {
+            token: string
+            balance: bigint
+            prev_balance?: bigint
+            prev_history_id?: number
+          }[] = []
+          let starkKey = StarkKey.ZERO
 
-        // This is a special case where the position is closed.
-        // Due to stark key being zero we need to find it by position ID
-        // in current (non-updated) state and fetch active assets
-        // and set their balance to zero.
-        if (position.starkKey === StarkKey.ZERO) {
-          if (position.balances.length !== 0) {
-            throw new Error(
-              'Closed position (with StarkKey.ZERO) should not have listed balances'
-            )
-          }
-          const curUserAssets =
-            await this.preprocessedAssetHistoryRepository.clearCurrentByPositionOrVaultId(
-              position.positionId,
-              trx
-            )
-          for (const curUserAsset of curUserAssets) {
-            updates.push({
-              token: curUserAsset.token,
-              balance: 0n,
-              prev_balance: curUserAsset.balance,
-              prev_history_id: curUserAsset.id,
-            })
-          }
-          if (curUserAssets[0] !== undefined) {
-            starkKey = StarkKey(curUserAssets[0].stark_key)
-          }
-        } else {
-          starkKey = position.starkKey
-          // USDC (collateral), TODO: make this configurable
-          updates = position.balances.map((assetBalance) => ({
-            token: assetBalance.assetId.toString(),
-            balance: assetBalance.balance,
-          }))
-          updates.push({
-            token: 'USDC',
-            balance: position.collateralBalance,
-          })
-        }
-
-        for (const update of updates) {
-          if (
-            update.prev_balance === undefined ||
-            update.prev_history_id === undefined
-          ) {
-            const curCollateralRow =
-              await this.preprocessedAssetHistoryRepository.clearCurrentByStarkKeyAndTokenId(
-                position.starkKey,
-                update.token,
+          // This is a special case where the position is closed.
+          // Due to stark key being zero we need to find it by position ID
+          // in current (non-updated) state and fetch active assets
+          // and set their balance to zero.
+          if (position.starkKey === StarkKey.ZERO) {
+            if (position.balances.length !== 0) {
+              throw new Error(
+                'Closed position (with StarkKey.ZERO) should not have listed balances'
+              )
+            }
+            const curUserAssets =
+              await this.preprocessedAssetHistoryRepository.clearCurrentByPositionOrVaultId(
+                position.positionId,
                 trx
               )
-            update.prev_balance = curCollateralRow?.balance ?? 0n
-            update.prev_history_id = curCollateralRow?.id
-          }
-          if (starkKey === StarkKey.ZERO) {
-            throw new Error('Stark key should not be zero')
-          }
-          if (update.balance !== update.prev_balance) {
-            const newRow: Omit<PreprocessedAssetHistoryRow, 'id'> = {
-              state_update_id: stateUpdate.id,
-              block_number: stateUpdate.blockNumber,
-              stark_key: starkKey.toString(),
-              position_or_vault_id: position.positionId,
-              token: update.token,
-              token_is_perp: update.token !== 'USDC', // TODO: find better way to do this
-              balance: update.balance,
-              prev_balance: update.prev_balance,
-              is_current: true,
-              prev_history_id: update.prev_history_id ?? null,
+            for (const curUserAsset of curUserAssets) {
+              updates.push({
+                token: curUserAsset.token,
+                balance: 0n,
+                prev_balance: curUserAsset.balance,
+                prev_history_id: curUserAsset.id,
+              })
             }
-            await this.preprocessedAssetHistoryRepository.add(newRow, trx)
+            if (curUserAssets[0] !== undefined) {
+              starkKey = StarkKey(curUserAssets[0].stark_key)
+            }
+          } else {
+            starkKey = position.starkKey
+            // USDC (collateral), TODO: make this configurable
+            updates = position.balances.map((assetBalance) => ({
+              token: assetBalance.assetId.toString(),
+              balance: assetBalance.balance,
+            }))
+            updates.push({
+              token: 'USDC',
+              balance: position.collateralBalance,
+            })
+          }
+
+          for (const update of updates) {
+            if (
+              update.prev_balance === undefined ||
+              update.prev_history_id === undefined
+            ) {
+              const curCollateralRow =
+                await this.preprocessedAssetHistoryRepository.clearCurrentByStarkKeyAndTokenId(
+                  position.starkKey,
+                  update.token,
+                  trx
+                )
+              update.prev_balance = curCollateralRow?.balance ?? 0n
+              update.prev_history_id = curCollateralRow?.id
+            }
+            if (starkKey === StarkKey.ZERO) {
+              throw new Error('Stark key should not be zero')
+            }
+            if (update.balance !== update.prev_balance) {
+              const newRow: Omit<PreprocessedAssetHistoryRow, 'id'> = {
+                state_update_id: stateUpdate.id,
+                block_number: stateUpdate.blockNumber,
+                stark_key: starkKey.toString(),
+                position_or_vault_id: position.positionId,
+                token: update.token,
+                token_is_perp: update.token !== 'USDC', // TODO: find better way to do this
+                balance: update.balance,
+                prev_balance: update.prev_balance,
+                is_current: true,
+                prev_history_id: update.prev_history_id ?? null,
+              }
+              await this.preprocessedAssetHistoryRepository.add(newRow, trx)
+            }
           }
         }
-      }
 
-      await this.preprocessingStatusRepository.setLastPreprocessedStateUpdate(
-        lastPreprocessedId,
-        trx
-      )
-      // END TRANSACTION
-    })
+        await this.preprocessingStatusRepository.setLastPreprocessedStateUpdate(
+          lastPreprocessedId,
+          trx
+        )
+        // END TRANSACTION
+      }
+    )
   }
 }
