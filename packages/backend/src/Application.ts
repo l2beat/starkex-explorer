@@ -31,6 +31,8 @@ import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
 import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
 import { PerpetualValidiumUpdater } from './core/PerpetualValidiumUpdater'
+import { PreprocessingStatusRepository } from './core/preprocessing/PreprocessingStatusRepository'
+import { Preprocessor } from './core/preprocessing/Preprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
 import { StatusService } from './core/StatusService'
@@ -44,6 +46,7 @@ import { MerkleTreeRepository } from './peripherals/database/MerkleTreeRepositor
 import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
+import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
@@ -77,6 +80,10 @@ export class Application {
     const kvStore = new KeyValueStore(database, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
     const softwareMigrationRepository = new SoftwareMigrationRepository(
+      kvStore,
+      logger
+    )
+    const preprocessingStatusRepository = new PreprocessingStatusRepository(
       kvStore,
       logger
     )
@@ -289,6 +296,18 @@ export class Application {
       logger
     )
 
+    const preprocessedAssetHistoryRepository =
+      new PreprocessedAssetHistoryRepository(database, logger)
+
+    const preprocessor = new Preprocessor(
+      database,
+      preprocessingStatusRepository,
+      preprocessedAssetHistoryRepository,
+      stateUpdateRepository,
+      positionRepository,
+      logger
+    )
+
     // #endregion core
     // #region api
 
@@ -376,6 +395,8 @@ export class Application {
 
       await userTransactionMigrator.migrate()
 
+      await preprocessor.sync()
+
       if (config.enableSync) {
         transactionStatusService.start()
         await syncScheduler.start()
@@ -383,6 +404,11 @@ export class Application {
       }
 
       logger.for(this).info('Started')
+      // TODO remove
+      logger.for(this).info('AA: dev with knex')
+      const knex = await database.getKnex()
+      // await knex.migrate.down({ name: '026_preprocessing_tables' })
+      logger.for(this).info('AA: done')
     }
 
     // #endregion start

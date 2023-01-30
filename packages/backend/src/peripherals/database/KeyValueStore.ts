@@ -1,3 +1,4 @@
+import { Knex } from 'knex'
 import { KeyValueRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -24,15 +25,18 @@ export class KeyValueStore extends BaseRepository {
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async findByKey(key: string): Promise<string | undefined> {
-    const knex = await this.knex()
+  async findByKey(
+    key: string,
+    trx?: Knex.Transaction
+  ): Promise<string | undefined> {
+    const knex = await this.knex(trx)
     const row = await knex('key_values').select('value').where({ key }).first()
     return row?.value
   }
 
-  async addOrUpdate(record: KeyValueRecord) {
+  async addOrUpdate(record: KeyValueRecord, trx?: Knex.Transaction) {
     const primaryKey: keyof KeyValueRow = 'key'
-    const knex = await this.knex()
+    const knex = await this.knex(trx)
     await knex('key_values').insert(record).onConflict([primaryKey]).merge()
     return record.key
   }

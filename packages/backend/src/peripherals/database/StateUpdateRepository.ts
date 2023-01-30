@@ -85,6 +85,12 @@ export class StateUpdateRepository extends BaseRepository {
     return row && toStateUpdateRecord(row)
   }
 
+  async findById(id: number): Promise<StateUpdateRecord | undefined> {
+    const knex = await this.knex()
+    const row = await knex('state_updates').where('id', id).first()
+    return row && toStateUpdateRecord(row)
+  }
+
   async findIdByRootHash(hash: PedersenHash): Promise<number | undefined> {
     const knex = await this.knex()
     const row = await knex('state_updates')

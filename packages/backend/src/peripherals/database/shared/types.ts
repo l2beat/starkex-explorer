@@ -186,6 +186,20 @@ declare module 'knex/types/tables' {
     state_update_id: number
   }
 
+  interface PreprocessedAssetHistoryRow {
+    id: number
+    state_update_id: number
+    block_number: number
+    stark_key: string
+    position_or_vault_id: bigint
+    token: string
+    token_is_perp: boolean
+    balance: bigint
+    prev_balance: bigint
+    is_current: boolean
+    prev_history_id: number | null
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -208,6 +222,7 @@ declare module 'knex/types/tables' {
     sent_transactions: SentTransactionRow
     user_transactions: UserTransactionRow
     included_forced_requests: IncludedForcedRequestRow
+    preprocessed_asset_history: PreprocessedAssetHistoryRow
   }
 }
 

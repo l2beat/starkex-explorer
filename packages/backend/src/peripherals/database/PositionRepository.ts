@@ -44,6 +44,13 @@ export class PositionRepository extends BaseRepository {
     if (row) return toPositionRecord(row)
   }
 
+  async findByStateUpdateId(stateUpdateId: number) {
+    const knex = await this.knex()
+    const rows = await knex('positions').where('state_update_id', stateUpdateId)
+
+    return rows.map((r) => toPositionRecord(r))
+  }
+
   async getHistoryById(positionId: bigint) {
     const knex = await this.knex()
     const rows = await knex('positions')

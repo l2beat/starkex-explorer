@@ -1,3 +1,5 @@
+import { Knex } from 'knex'
+
 import { Logger } from '../../../tools/Logger'
 import { Database } from './Database'
 
@@ -19,6 +21,8 @@ type DeleteMethod<A extends unknown[]> = (...args: A) => Promise<number>
 
 type UpdateMethod<A extends unknown[]> = (...args: A) => Promise<number>
 
+type UpdateReturningMethod<A extends unknown[], T> = (...args: A) => Promise<T>
+
 export class BaseRepository {
   constructor(
     protected readonly database: Database,
@@ -27,8 +31,15 @@ export class BaseRepository {
     this.logger = logger.for(this)
   }
 
-  protected knex() {
-    return this.database.getKnex()
+  protected knex(trx?: Knex.Transaction) {
+    return this.database.getKnex(trx)
+  }
+
+  async runInTransaction(
+    fun: (trx: Knex.Transaction) => Promise<void>
+  ): Promise<void> {
+    const knex = await this.knex()
+    await knex.transaction(fun)
   }
 
   protected wrapAny<A extends unknown[], R>(
@@ -99,6 +110,14 @@ export class BaseRepository {
   ): UpdateMethod<A> {
     return this.wrap(method, (updated) =>
       this.logger.debug({ method: method.name, updated })
+    )
+  }
+
+  protected wrapUpdateReturning<A extends unknown[], T>(
+    method: UpdateReturningMethod<A, T>
+  ): UpdateReturningMethod<A, T> {
+    return this.wrap(method, (updated) =>
+      this.logger.debug({ method: method.name, count: updated ? 1 : 0 })
     )
   }
 
