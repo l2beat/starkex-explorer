@@ -201,8 +201,11 @@ export class Application {
           userTransactionRepository,
           logger
         )
-        
-        const tokenRegistrationCollector = new TokenRegistrationCollector(ethereumClient, config.starkex.contracts.perpetual)
+
+        const tokenRegistrationCollector = new TokenRegistrationCollector(
+          ethereumClient,
+          config.starkex.contracts.perpetual
+        )
 
         syncService = new SpotValidiumSyncService(
           availabilityGatewayClient,

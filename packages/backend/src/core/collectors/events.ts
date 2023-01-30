@@ -97,9 +97,9 @@ export const LogTokenRegistered = EthereumEvent<
     assetInfo: string
     quantum: BigNumber
   }
-  >(
-    'event LogTokenRegistered(uint256 assetType, bytes assetInfo, uint256 quantum)'
-  )
+>(
+  'event LogTokenRegistered(uint256 assetType, bytes assetInfo, uint256 quantum)'
+)
 
 export const LogDeposit = EthereumEvent<
   'LogDeposit',

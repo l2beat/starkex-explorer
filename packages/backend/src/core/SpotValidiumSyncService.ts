@@ -31,7 +31,9 @@ export class SpotValidiumSyncService implements IDataSyncService {
     // TODO: fix forced events
     // await this.userTransactionCollector.collect(blockRange)
 
-    const tokenRegistrations = await this.tokenRegistrationCollector.collect(blockRange)
+    const tokenRegistrations = await this.tokenRegistrationCollector.collect(
+      blockRange
+    )
 
     const stateTransitions =
       await this.spotValidiumStateTransitionCollector.collect(blockRange)
@@ -41,7 +43,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
       blockRange: { from: blockRange.start, to: blockRange.end },
       stateTransitions: stateTransitions.length,
       userRegistrations: userRegistrations.length,
-      tokenRegistrations: tokenRegistrations.length
+      tokenRegistrations: tokenRegistrations.length,
     })
 
     for (const transition of stateTransitions) {
