@@ -7,18 +7,24 @@ import {
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
-import { getTransactionStatus } from '../../core/getForcedTransactionStatus'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
-import {
-  ForcedTransactionRecord,
-  ForcedTransactionRepository,
-} from '../../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
+import {
+  SentTransactionRecord,
+  SentTransactionRepository,
+} from '../../peripherals/database/transactions/SentTransactionRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
-import { toForcedTransactionHistory } from './utils/toForcedTransactionHistory'
+import {
+  FinalizeTransaction,
+  toForcedTransactionHistory,
+} from './utils/toForcedTransactionHistory'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 
 export class ForcedTransactionController {
@@ -26,7 +32,8 @@ export class ForcedTransactionController {
     private accountService: AccountService,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private positionRepository: PositionRepository,
-    private forcedTransactionRepository: ForcedTransactionRepository,
+    private userTransactionRepository: UserTransactionRepository,
+    private sentTransactionRepository: SentTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress
   ) {}
@@ -40,8 +47,15 @@ export class ForcedTransactionController {
     const offset = (page - 1) * perPage
     const [account, transactions, total] = await Promise.all([
       this.accountService.getAccount(address),
-      this.forcedTransactionRepository.getLatest({ limit, offset }),
-      this.forcedTransactionRepository.countAll(),
+      this.userTransactionRepository.getPaginated({
+        limit,
+        offset,
+        types: ['ForcedTrade', 'ForcedWithdrawal'],
+      }),
+      this.userTransactionRepository.countAll([
+        'ForcedTrade',
+        'ForcedWithdrawal',
+      ]),
     ])
 
     const content = renderForcedTransactionsIndexPage({
@@ -53,90 +67,158 @@ export class ForcedTransactionController {
     return { type: 'success', content }
   }
 
+  async getForcedTransactionDetailsPage(
+    transactionHash: Hash256,
+    address: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
+    const [account, transaction, sentTransaction] = await Promise.all([
+      this.accountService.getAccount(address),
+      this.userTransactionRepository.findByTransactionHash(transactionHash, [
+        'ForcedTrade',
+        'ForcedWithdrawal',
+      ]),
+      this.sentTransactionRepository.findByTransactionHash(transactionHash),
+    ])
+    if (
+      !transaction &&
+      (!sentTransaction ||
+        (sentTransaction.data.type !== 'ForcedTrade' &&
+          sentTransaction.data.type !== 'ForcedWithdrawal'))
+    ) {
+      const content = 'Could not find transaction for that hash'
+      return { type: 'not found', content }
+    }
+
+    const [offer, finalize] = await Promise.all([
+      this.offersRepository.findByHash(transactionHash),
+      this.findFinalizeTransaction(transaction),
+    ])
+    const offerHistory = offer ? toForcedTradeOfferHistory(offer) : []
+
+    const content = renderForcedTransactionDetailsPage({
+      account,
+      history: offerHistory.concat(
+        toForcedTransactionHistory(sentTransaction, transaction, finalize)
+      ),
+      transaction: await this.toForcedTransaction(
+        sentTransaction,
+        transaction,
+        finalize,
+        account?.address
+      ),
+    })
+    return { type: 'success', content }
+  }
+
   private async toForcedTransaction(
-    transaction: ForcedTransactionRecord,
-    address?: EthereumAddress
+    sentTransaction: SentTransactionRecord | undefined,
+    minedTransaction:
+      | UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>
+      | undefined,
+    finalize: FinalizeTransaction | undefined,
+    address: EthereumAddress | undefined
   ): Promise<ForcedTransaction> {
-    if (transaction.data.type === 'withdrawal') {
+    if (!minedTransaction && !sentTransaction) {
+      throw new Error('foo')
+    }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const transaction = minedTransaction ?? sentTransaction!
+    if (transaction.data.type === 'ForcedWithdrawal') {
       const user = await this.userRegistrationEventRepository.findByStarkKey(
         transaction.data.starkKey
       )
-      const status = getTransactionStatus(transaction)
       return {
         type: 'exit',
         data: {
           ethereumAddress: user?.ethAddress,
           starkKey: transaction.data.starkKey,
           positionId: transaction.data.positionId,
-          transactionHash: transaction.hash,
-          value: transaction.data.amount,
-          stateUpdateId: transaction.updates.verified?.stateUpdateId,
-          status,
-          finalizeHash: transaction.updates.finalized?.hash,
+          transactionHash: transaction.transactionHash,
+          value: transaction.data.quantizedAmount,
+          stateUpdateId: minedTransaction?.included?.stateUpdateId,
+          finalizeHash: finalize?.transactionHash,
         },
         finalizeForm:
           user &&
           address &&
-          (status === 'verified' ||
-            status === 'finalize reverted' ||
-            status === 'finalize forgotten')
+          minedTransaction?.included?.stateUpdateId !== undefined &&
+          !finalize
             ? {
                 address,
-                transactionHash: transaction.hash,
+                transactionHash: transaction.transactionHash,
                 perpetualAddress: this.perpetualAddress,
                 starkKey: transaction.data.starkKey,
               }
             : undefined,
       }
     }
-    const [userA, userB] = await Promise.all([
-      this.userRegistrationEventRepository.findByStarkKey(
-        transaction.data.starkKeyA
-      ),
-      this.userRegistrationEventRepository.findByStarkKey(
-        transaction.data.starkKeyB
-      ),
-    ])
-    return {
-      type: transaction.data.isABuyingSynthetic ? 'buy' : 'sell',
-      data: {
-        positionIdA: transaction.data.positionIdA,
-        positionIdB: transaction.data.positionIdB,
-        addressA: userA?.ethAddress,
-        addressB: userB?.ethAddress,
-        syntheticAmount: transaction.data.syntheticAmount,
-        collateralAmount: transaction.data.collateralAmount,
-        syntheticAssetId: transaction.data.syntheticAssetId,
-        transactionHash: transaction.hash,
-        stateUpdateId: transaction.updates.verified?.stateUpdateId,
-      },
+    if (transaction.data.type === 'ForcedTrade') {
+      const [userA, userB] = await Promise.all([
+        this.userRegistrationEventRepository.findByStarkKey(
+          transaction.data.starkKeyA
+        ),
+        this.userRegistrationEventRepository.findByStarkKey(
+          transaction.data.starkKeyB
+        ),
+      ])
+      return {
+        type: transaction.data.isABuyingSynthetic ? 'buy' : 'sell',
+        data: {
+          positionIdA: transaction.data.positionIdA,
+          positionIdB: transaction.data.positionIdB,
+          addressA: userA?.ethAddress,
+          addressB: userB?.ethAddress,
+          syntheticAmount: transaction.data.syntheticAmount,
+          collateralAmount: transaction.data.collateralAmount,
+          syntheticAssetId: transaction.data.syntheticAssetId,
+          transactionHash: transaction.transactionHash,
+          stateUpdateId: minedTransaction?.included?.stateUpdateId,
+        },
+      }
     }
+    throw new Error(`Unsupported transaction type ${transaction.data.type}`)
   }
 
-  async getForcedTransactionDetailsPage(
-    transactionHash: Hash256,
-    address: EthereumAddress | undefined
-  ): Promise<ControllerResult> {
-    const [account, transaction] = await Promise.all([
-      this.accountService.getAccount(address),
-      this.forcedTransactionRepository.findByHash(transactionHash),
-    ])
-    if (!transaction) {
-      const content = 'Could not find transaction for that hash'
-      return { type: 'not found', content }
+  private async findFinalizeTransaction(
+    transaction:
+      | UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>
+      | undefined
+  ): Promise<FinalizeTransaction | undefined> {
+    if (
+      transaction?.data.type !== 'ForcedWithdrawal' ||
+      !transaction.included
+    ) {
+      return undefined
     }
-    const offer = await this.offersRepository.findByHash(transaction.hash)
-    const offerHistory = offer ? toForcedTradeOfferHistory(offer) : []
-
-    const content = renderForcedTransactionDetailsPage({
-      account,
-      history: offerHistory.concat(toForcedTransactionHistory(transaction)),
-      transaction: await this.toForcedTransaction(
-        transaction,
-        account?.address
+    const [sentWithdraw, minedWithdraw] = await Promise.all([
+      this.sentTransactionRepository.findFirstWithdrawByStarkKeyAfter(
+        transaction.data.starkKey,
+        transaction.included.timestamp
       ),
-    })
-    return { type: 'success', content }
+      this.userTransactionRepository.findFirstWithdrawByStarkKeyAfter(
+        transaction.data.starkKey,
+        transaction.included.timestamp
+      ),
+    ])
+    if (minedWithdraw) {
+      const sent = await this.sentTransactionRepository.findByTransactionHash(
+        minedWithdraw.transactionHash
+      )
+      return {
+        transactionHash: minedWithdraw.transactionHash,
+        reverted: false,
+        sentTimestamp: sent?.sentTimestamp,
+        minedTimestamp: minedWithdraw.timestamp,
+      }
+    }
+    if (sentWithdraw) {
+      return {
+        transactionHash: sentWithdraw.transactionHash,
+        reverted: sentWithdraw.mined?.reverted ?? false,
+        sentTimestamp: sentWithdraw.sentTimestamp,
+        minedTimestamp: sentWithdraw.mined?.timestamp,
+      }
+    }
   }
 
   async getTransactionFormPage(

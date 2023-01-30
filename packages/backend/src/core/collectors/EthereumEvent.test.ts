@@ -3,9 +3,6 @@ import { BigNumber } from 'ethers'
 
 import { EthereumEvent } from './EthereumEvent'
 
-const TRANSFER_TOPIC =
-  '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
-
 describe(EthereumEvent.name, () => {
   const TransferEvent = EthereumEvent<
     'Transfer',
@@ -13,16 +10,17 @@ describe(EthereumEvent.name, () => {
   >('event Transfer(address indexed from, address indexed to, uint value)')
 
   it('parses logs', () => {
-    expect(TransferEvent.topic).toEqual(TRANSFER_TOPIC)
+    expect(TransferEvent.topic).toEqual(
+      '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
+    )
 
-    const event = TransferEvent.parseLog({
-      topics: [
-        TRANSFER_TOPIC,
-        '0x000000000000000000000000d8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
-        '0x00000000000000000000000041626BA92c0C2a1aD38fC83920300434082B1870',
-      ],
-      data: '0x000000000000000000000000000000000000000000000000000000000000a455',
-    })
+    const encoded = TransferEvent.encodeLog([
+      '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045',
+      '0x41626BA92c0C2a1aD38fC83920300434082B1870',
+      BigNumber.from(42069),
+    ])
+
+    const event = TransferEvent.parseLog(encoded)
 
     expect(event.name).toEqual('Transfer')
     expect(event.args.from).toEqual(

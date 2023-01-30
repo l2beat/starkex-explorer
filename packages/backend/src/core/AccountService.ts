@@ -1,14 +1,14 @@
 import { EthereumAddress } from '@explorer/types'
 
 import { ForcedTradeOfferRepository } from '../peripherals/database/ForcedTradeOfferRepository'
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { PositionRepository } from '../peripherals/database/PositionRepository'
+import { SentTransactionRepository } from '../peripherals/database/transactions/SentTransactionRepository'
 
 export class AccountService {
   constructor(
     private readonly positionRepository: PositionRepository,
     private readonly offerRepository: ForcedTradeOfferRepository,
-    private readonly transactionRepository: ForcedTransactionRepository
+    private readonly sentTransactionRepository: SentTransactionRepository
   ) {}
 
   async getAccount(address?: EthereumAddress) {
@@ -25,7 +25,7 @@ export class AccountService {
 
     const activeCount = await this.offerRepository.countActiveByPositionId(id)
     const pendingCount =
-      await this.transactionRepository.countPendingByPositionId(id)
+      await this.sentTransactionRepository.countNotMinedByPositionId(id)
     return {
       address,
       positionId: id,

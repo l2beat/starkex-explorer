@@ -7,10 +7,10 @@ import {
 } from '@explorer/state'
 import { PedersenHash } from '@explorer/types'
 
-import { ForcedTransactionRepository } from '../peripherals/database/ForcedTransactionRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
@@ -27,7 +27,7 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
     protected readonly stateUpdateRepository: StateUpdateRepository,
     protected readonly merkleStorage: IMerkleStorage<PositionLeaf>,
     protected readonly ethereumClient: EthereumClient,
-    protected readonly forcedTransactionRepository: ForcedTransactionRepository,
+    protected readonly userTransactionRepository: UserTransactionRepository,
     protected readonly logger: Logger,
     public stateTree?: MerkleTree<PositionLeaf>
   ) {
@@ -35,7 +35,7 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
       stateUpdateRepository,
       merkleStorage,
       ethereumClient,
-      forcedTransactionRepository,
+      userTransactionRepository,
       logger,
       EMPTY_STATE_HASH,
       PositionLeaf.EMPTY,

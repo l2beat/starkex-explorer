@@ -17,7 +17,7 @@ type FindMethod<A extends unknown[], T> = (...args: A) => Promise<T | undefined>
 
 type DeleteMethod<A extends unknown[]> = (...args: A) => Promise<number>
 
-type SaveMethod<T> = (record: T) => Promise<boolean>
+type UpdateMethod<A extends unknown[]> = (...args: A) => Promise<number>
 
 export class BaseRepository {
   constructor(
@@ -94,7 +94,9 @@ export class BaseRepository {
     )
   }
 
-  protected wrapSave<T>(method: SaveMethod<T>): SaveMethod<T> {
+  protected wrapUpdate<A extends unknown[]>(
+    method: UpdateMethod<A>
+  ): UpdateMethod<A> {
     return this.wrap(method, (updated) =>
       this.logger.debug({ method: method.name, updated })
     )

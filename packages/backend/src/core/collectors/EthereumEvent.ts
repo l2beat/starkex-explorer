@@ -12,12 +12,17 @@ export function EthereumEvent<N extends string, A extends object>(
   return {
     topic,
     abi: parser,
+    name: name as N,
     parseLog(log: { topics: string[]; data: string }) {
       const parsed = parser.parseLog(log)
       return {
         name: parsed.name as N,
         args: parsed.args as A,
       }
+    },
+    encodeLog(args: A[keyof A][]) {
+      const fragment = parser.getEvent(name)
+      return parser.encodeEventLog(fragment, args)
     },
     safeParseLog(log: { topics: string[]; data: string }) {
       try {

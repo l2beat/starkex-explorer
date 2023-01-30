@@ -40,8 +40,8 @@ export class StateUpdater {
     orderRoot: PedersenHash.fake(),
     positionHeight: 64,
     positionRoot: PedersenHash.fake(),
-    timestamp: Timestamp(Date.now()),
-    systemTime: Timestamp(Date.now()),
+    timestamp: Timestamp.now(),
+    systemTime: Timestamp.now(),
   }
 
   constructor(private contracts: Contracts) {}
@@ -82,8 +82,8 @@ export class StateUpdater {
       orderRoot: PedersenHash.fake(),
       positionHeight: 64,
       positionRoot: afterRoot,
-      timestamp: Timestamp(Date.now()),
-      systemTime: Timestamp(Date.now()),
+      timestamp: Timestamp.now(),
+      systemTime: Timestamp.now(),
     }
     this.lastState = newState
 

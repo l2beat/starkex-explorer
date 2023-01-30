@@ -1,6 +1,7 @@
 import { json } from '@explorer/types'
 
-import { Nullable } from '../../../utils/Nullable'
+import { SentTransactionJSON } from '../transactions/SentTransaction'
+import { UserTransactionJSON } from '../transactions/UserTransaction'
 
 declare module 'knex/types/tables' {
   interface KeyValueRow {
@@ -120,16 +121,16 @@ declare module 'knex/types/tables' {
     type: string
     data: json
     data_hash: string
-    state_update_id: Nullable<number>
+    state_update_id: number | null
   }
 
   interface TransactionStatusRow {
     hash: string
-    sent_at: Nullable<bigint>
-    mined_at: Nullable<bigint>
-    reverted_at: Nullable<bigint>
-    forgotten_at: Nullable<bigint>
-    block_number: Nullable<number>
+    sent_at: bigint | null
+    mined_at: bigint | null
+    reverted_at: bigint | null
+    forgotten_at: bigint | null
+    block_number: number | null
     not_found_retries: number
   }
 
@@ -142,68 +143,47 @@ declare module 'knex/types/tables' {
     collateral_amount: bigint
     synthetic_amount: bigint
     is_a_buying_synthetic: boolean
-    accepted_at: Nullable<bigint>
-    stark_key_b: Nullable<string>
-    position_id_b: Nullable<bigint>
-    submission_expiration_time: Nullable<bigint>
-    nonce: Nullable<bigint>
-    premium_cost: Nullable<boolean>
-    signature: Nullable<string>
-    transaction_hash: Nullable<string>
-    cancelled_at: Nullable<bigint>
+    accepted_at: bigint | null
+    stark_key_b: string | null
+    position_id_b: bigint | null
+    submission_expiration_time: bigint | null
+    nonce: bigint | null
+    premium_cost: boolean | null
+    signature: string | null
+    transaction_hash: string | null
+    cancelled_at: bigint | null
   }
 
-  interface ForcedWithdrawTransactionRow {
-    hash: string
+  interface SentTransactionRow {
+    transaction_hash: string
+    type: string
     stark_key: string
-    amount: bigint
-    position_id: bigint
+    vault_or_position_id: bigint | null
+    data: SentTransactionJSON
+    sent_timestamp: bigint
+    mined_timestamp: bigint | null
+    mined_block_number: number | null
+    reverted: boolean
   }
 
-  interface ForcedWithdrawStatusRow {
-    hash: string
-    status: 'sent' | 'forgotten' | 'reverted' | 'mined' | 'included'
-    timestamp: bigint
-    block_number: Nullable<number>
-    state_update_id: Nullable<number>
-  }
-
-  interface ForcedTradeTransactionRow {
-    hash: string
+  interface UserTransactionRow {
+    id: number // surrogate key
+    type: string
+    transaction_hash: string
     stark_key_a: string
-    stark_key_b: string
-    position_id_a: bigint
-    position_id_b: bigint
-    collateral_amount: bigint
-    synthetic_amount: bigint
-    is_a_buying_synthetic: boolean
-    synthetic_asset_id: string
-    nonce: bigint
-  }
-
-  interface ForcedTradeStatusRow {
-    hash: string
-    status: string
+    stark_key_b: string | null
+    vault_or_position_id_a: bigint | null
+    vault_or_position_id_b: bigint | null
+    data: UserTransactionJSON
+    block_number: number
     timestamp: bigint
-    block_number: Nullable<number>
-    offer_id: Nullable<number>
-    state_update_id: Nullable<number>
   }
 
-  interface WithdrawTransactionRow {
-    hash: string
-    stark_key: string
-    asset_type: string
-  }
-
-  interface WithdrawStatusRow {
-    hash: string
-    status: string
+  interface IncludedForcedRequestRow {
+    transaction_hash: string
+    block_number: number
     timestamp: bigint
-    block_number: Nullable<number>
-    quantized_amount: Nullable<bigint>
-    non_quantized_amount: Nullable<bigint>
-    recipient_address: Nullable<string>
+    state_update_id: number
   }
 
   interface Tables {
@@ -220,18 +200,14 @@ declare module 'knex/types/tables' {
     state_updates: StateUpdateRow
     positions: PositionRow
     prices: PriceRow
-    user_registration_evens: UserRegistrationEventRow
+    user_registration_events: UserRegistrationEventRow
     forced_transactions: ForcedTransactionRow
     transaction_status: TransactionStatusRow
-    user_registration_events: UserRegistrationEventRow
     forced_trade_offers: ForcedTradeOfferRow
     vaults: VaultRow
-    forced_withdraw_transactions: ForcedWithdrawTransactionRow
-    forced_withdraw_statuses: ForcedWithdrawStatusRow
-    forced_trade_transactions: ForcedTradeTransactionRow
-    forced_trade_statuses: ForcedTradeStatusRow
-    withdraw_transactions: WithdrawTransactionRow
-    withdraw_statuses: WithdrawStatusRow
+    sent_transactions: SentTransactionRow
+    user_transactions: UserTransactionRow
+    included_forced_requests: IncludedForcedRequestRow
   }
 }
 

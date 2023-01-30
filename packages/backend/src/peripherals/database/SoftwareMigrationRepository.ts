@@ -1,7 +1,7 @@
 import { Logger } from '../../tools/Logger'
 import type { KeyValueStore } from './KeyValueStore'
 
-export class SyncStatusRepository {
+export class SoftwareMigrationRepository {
   constructor(
     private readonly store: KeyValueStore,
     private readonly logger: Logger
@@ -9,21 +9,22 @@ export class SyncStatusRepository {
     this.logger = this.logger.for(this)
   }
 
-  async getLastSynced(): Promise<number | undefined> {
-    const valueInDb = await this.store.findByKey('lastBlockNumberSynced')
+  async getMigrationNumber(): Promise<number> {
+    const valueInDb = await this.store.findByKey('softwareMigrationNumber')
     if (valueInDb) {
       const result = Number(valueInDb)
       if (!isNaN(result)) {
         return result
       }
     }
+    return 0
   }
 
-  async setLastSynced(blockNumber: number): Promise<void> {
+  async setMigrationNumber(number: number): Promise<void> {
     await this.store.addOrUpdate({
-      key: 'lastBlockNumberSynced',
-      value: String(blockNumber),
+      key: 'softwareMigrationNumber',
+      value: String(number),
     })
-    this.logger.info({ method: this.setLastSynced.name, blockNumber })
+    this.logger.debug({ method: this.setMigrationNumber.name, number })
   }
 }

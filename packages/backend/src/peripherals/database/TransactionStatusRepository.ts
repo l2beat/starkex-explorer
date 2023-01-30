@@ -2,17 +2,16 @@ import { Hash256, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 
 import { Logger } from '../../tools/Logger'
-import { Nullable } from '../../utils/Nullable'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 interface Row {
   hash: string
-  sent_at: Nullable<bigint>
-  mined_at: Nullable<bigint>
-  reverted_at: Nullable<bigint>
-  forgotten_at: Nullable<bigint>
-  block_number: Nullable<number>
+  sent_at: bigint | null
+  mined_at: bigint | null
+  reverted_at: bigint | null
+  forgotten_at: bigint | null
+  block_number: number | null
   not_found_retries: number
 }
 
@@ -20,13 +19,13 @@ export const NOT_FOUND_RETRIES = 5
 
 export interface Record {
   hash: Hash256
-  sentAt: Nullable<Timestamp>
+  sentAt: Timestamp | null
   mined?: {
     at: Timestamp
     blockNumber: number
   }
-  forgottenAt: Nullable<Timestamp>
-  revertedAt: Nullable<Timestamp>
+  forgottenAt: Timestamp | null
+  revertedAt: Timestamp | null
   notFoundRetries: number
 }
 
@@ -48,8 +47,8 @@ function toRecord(row: Row): Record {
 }
 
 function timestampToBigInt(
-  timestamp?: Nullable<Timestamp>
-): Nullable<bigint> | undefined {
+  timestamp?: Timestamp | null
+): bigint | null | undefined {
   return timestamp === undefined || timestamp === null
     ? timestamp
     : BigInt(timestamp.toString())

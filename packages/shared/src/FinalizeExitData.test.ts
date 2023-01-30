@@ -22,6 +22,10 @@ describe(encodeFinalizeExitRequest.name, () => {
 
 describe(decodeFinalizeExitRequest.name, () => {
   it('encodes an example tx', () => {
-    expect(decodeFinalizeExitRequest(exampleData)).toEqual(starkKey)
+    expect(decodeFinalizeExitRequest(exampleData)).toEqual({
+      starkKey,
+      assetType:
+        '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d',
+    })
   })
 })

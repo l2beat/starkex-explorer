@@ -104,14 +104,14 @@ export function createForcedTransactionRouter(
       z.object({
         request: z.object({
           body: z.object({
+            // TODO: stop requiring this. Update frontend
             exitHash: stringAs(Hash256),
             finalizeHash: stringAs(Hash256),
           }),
         }),
       }),
       async (ctx) => {
-        const result = await transactionSubmitController.finalizeForcedExit(
-          ctx.request.body.exitHash,
+        const result = await transactionSubmitController.submitWithdrawal(
           ctx.request.body.finalizeHash
         )
         applyControllerResult(ctx, result)

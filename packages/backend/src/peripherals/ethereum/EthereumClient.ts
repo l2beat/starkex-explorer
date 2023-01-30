@@ -5,17 +5,18 @@ import { BlockRange } from '../../model'
 import { HackFilter, HackJsonRpcProvider } from './HackJsonRpcProvider'
 import { BlockTag } from './types'
 
-export function isReverted(receipt: providers.TransactionReceipt): boolean {
-  return receipt.status === 0
-}
-
 export class EthereumClient {
-  private provider = new HackJsonRpcProvider(this.rpcUrl)
+  private provider: HackJsonRpcProvider
 
   constructor(
-    private readonly rpcUrl: string,
+    rpcUrlOrProvider: string | HackJsonRpcProvider,
     private readonly safeBlockDistance: number
-  ) {}
+  ) {
+    this.provider =
+      typeof rpcUrlOrProvider === 'string'
+        ? new HackJsonRpcProvider(rpcUrlOrProvider)
+        : rpcUrlOrProvider
+  }
 
   async getChainId(): Promise<number> {
     const network = await this.provider.getNetwork()
@@ -39,6 +40,11 @@ export class EthereumClient {
         ? blockTagOrHash
         : blockTagOrHash.toString()
     )
+  }
+
+  async getBlockTimestamp(blockNumber: number): Promise<number> {
+    const block = await this.getBlock(blockNumber)
+    return block.timestamp
   }
 
   async getLogs(filter: HackFilter) {
@@ -79,11 +85,64 @@ export class EthereumClient {
     const logs: providers.Log[] = []
     for (const batch of batches) {
       const nestedLogs = await Promise.all(
-        batch.map((filter) => this.provider.getLogs(filter))
+        batch.map((filter) => {
+          if (
+            'fromBlock' in filter &&
+            typeof filter.address === 'string' &&
+            typeof filter.fromBlock === 'number' &&
+            typeof filter.toBlock === 'number'
+          ) {
+            return this.getAllLogs(
+              filter.address,
+              filter.topics,
+              filter.fromBlock,
+              filter.toBlock
+            )
+          }
+          return this.provider.getLogs(filter)
+        })
       )
       logs.push(...nestedLogs.flat())
     }
     return logs
+  }
+
+  async getAllLogs(
+    address: string,
+    topics: (string | string[] | null)[] | undefined,
+    fromBlock: number,
+    toBlock: number
+  ): Promise<providers.Log[]> {
+    if (fromBlock === toBlock) {
+      return await this.provider.getLogs({
+        address: address.toString(),
+        topics,
+        fromBlock,
+        toBlock,
+      })
+    }
+    try {
+      return await this.provider.getLogs({
+        address: address.toString(),
+        topics,
+        fromBlock,
+        toBlock,
+      })
+    } catch (e) {
+      if (
+        e instanceof Error &&
+        e.message.includes('Log response size exceeded')
+      ) {
+        const midPoint = fromBlock + Math.floor((toBlock - fromBlock) / 2)
+        const [a, b] = await Promise.all([
+          this.getAllLogs(address, topics, fromBlock, midPoint),
+          this.getAllLogs(address, topics, midPoint + 1, toBlock),
+        ])
+        return a.concat(b)
+      } else {
+        throw e
+      }
+    }
   }
 
   async getTransaction(
@@ -97,7 +156,9 @@ export class EthereumClient {
     return tx
   }
 
-  async getTransactionReceipt(transactionHash: Hash256) {
+  async getTransactionReceipt(
+    transactionHash: Hash256
+  ): Promise<providers.TransactionReceipt> {
     return await this.provider.getTransactionReceipt(transactionHash.toString())
   }
 
