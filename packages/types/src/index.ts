@@ -1,4 +1,5 @@
 export * from './AssetId'
+export * from './ERCType'
 export * from './EthereumAddress'
 export * from './Hash256'
 export * from './json'
