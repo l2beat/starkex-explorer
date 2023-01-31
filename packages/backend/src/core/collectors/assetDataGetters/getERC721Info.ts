@@ -5,7 +5,7 @@ import { provider } from './provider'
 
 export const getERC721Info = async (
   address: EthereumAddress,
-  tokenId: bigint
+  tokenId?: bigint
 ) => {
   const abi = [
     'function name() external view returns (string _name)',
@@ -21,6 +21,17 @@ export const getERC721Info = async (
   const name: string = await contract.name()
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const symbol: string = await contract.symbol()
+
+  const base = {
+    name, 
+    symbol,
+    contract_error: null
+  }
+  
+  if(!tokenId) {
+    return base
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const uri: string = await contract.tokenURI(tokenId)
 
@@ -28,5 +39,6 @@ export const getERC721Info = async (
     name,
     symbol,
     uri,
+    contract_error: null
   }
 }
