@@ -327,5 +327,21 @@ describe(Preprocessor.name, () => {
         mockKnexTransaction,
       ])
     })
+
+    it('throws when there are no preprocessings to roll back', async () => {
+      const mockKnexTransaction = mock<Knex.Transaction>()
+      const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
+        findLast: async () => undefined,
+        runInTransaction: async (fn) => fn(mockKnexTransaction),
+      })
+      const preprocessor = new Preprocessor(
+        preprocessedRepo,
+        mock<StateUpdateRepository>(),
+        Logger.SILENT
+      )
+      await expect(preprocessor.rollbackOneStateUpdate()).toBeRejected(
+        'Preprocessing rollback was requested, but there is nothing to roll back'
+      )
+    })
   })
 })

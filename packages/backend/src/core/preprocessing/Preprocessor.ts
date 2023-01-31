@@ -126,7 +126,9 @@ export class Preprocessor {
           await this.preprocessedStateUpdateRepository.findLast(trx)
 
         if (lastProcessedStateUpdate === undefined) {
-          return
+          throw new Error(
+            'Preprocessing rollback was requested, but there is nothing to roll back'
+          )
         }
 
         this.logger.info(
