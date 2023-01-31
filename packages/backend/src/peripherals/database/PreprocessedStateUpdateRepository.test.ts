@@ -3,7 +3,7 @@ import { expect } from 'earljs'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger, LogLevel } from '../../tools/Logger'
-import { PreprocessedStateUpdateRepository, } from './PreprocessedStateUpdateRepository'
+import { PreprocessedStateUpdateRepository } from './PreprocessedStateUpdateRepository'
 
 describe(PreprocessedStateUpdateRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
@@ -21,7 +21,6 @@ describe(PreprocessedStateUpdateRepository.name, () => {
       stateTransitionHash: Hash256.fake(),
     })
   })
-
 
   it('gets last state update by id', async () => {
     let last = await repository.findLast()

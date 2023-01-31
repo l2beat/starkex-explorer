@@ -2,7 +2,7 @@ import { PreprocessedStateUpdateRepository } from '../../peripherals/database/Pr
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { Logger } from '../../tools/Logger'
 
-type SyncDirection = 'forward' | 'backward' | 'not-needed'
+export type SyncDirection = 'forward' | 'backward' | 'not-needed'
 
 export class Preprocessor {
   constructor(

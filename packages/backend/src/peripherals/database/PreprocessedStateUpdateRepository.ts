@@ -37,8 +37,9 @@ export class PreprocessedStateUpdateRepository extends BaseRepository {
     trx?: Knex.Transaction
   ): Promise<number> {
     const knex = await this.knex(trx)
-    await knex('preprocessed_state_updates')
-      .insert(toPreprocessedStateUpdateRow(row))
+    await knex('preprocessed_state_updates').insert(
+      toPreprocessedStateUpdateRow(row)
+    )
     return row.stateUpdateId
   }
 
@@ -62,6 +63,6 @@ function toPreprocessedStateUpdateRow(
 ): PreprocessedStateUpdateRow {
   return {
     state_update_id: record.stateUpdateId,
-    state_transition_hash: record.stateTransitionHash.toString()
+    state_transition_hash: record.stateTransitionHash.toString(),
   }
 }
