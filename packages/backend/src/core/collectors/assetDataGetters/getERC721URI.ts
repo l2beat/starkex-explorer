@@ -20,6 +20,6 @@ export const getERC721URI = async (
 
   return {
     uri,
-    contract_error: null,
+    contractError: null,
   }
 }

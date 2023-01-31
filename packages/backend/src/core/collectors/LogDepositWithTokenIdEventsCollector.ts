@@ -2,6 +2,7 @@ import { EthereumAddress } from '@explorer/types'
 
 import { BlockRange } from '../../model'
 import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
+import { TokenRepository } from '../../peripherals/database/TokenRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { getERC721URI } from './assetDataGetters/getERC721URI'
 import { getERC1155Info } from './assetDataGetters/getERC1155Info'
@@ -11,7 +12,8 @@ export class LogDepositWithTokenIdEventsCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly contractAddress: EthereumAddress,
-    private readonly tokenRegistrationRepository: TokenRegistrationRepository
+    private readonly tokenRegistrationRepository: TokenRegistrationRepository,
+    private readonly tokenRepository: TokenRepository
   ) {}
 
   async collect(blockRange: BlockRange) {
@@ -20,7 +22,7 @@ export class LogDepositWithTokenIdEventsCollector {
       topics: [LogDepositWithTokenId.topic],
     })
 
-    const events = logs.map(async (log) => {
+    const events = await Promise.all(logs.map(async (log) => {
       const event = LogDepositWithTokenId.parseLog(log)
 
       const assetTypeHash = event.args.assetType.toString()
@@ -56,8 +58,17 @@ export class LogDepositWithTokenIdEventsCollector {
             ...base,
             ...(await getERC1155Info(address, tokenId.toBigInt())),
           }
+        // TODO: Fix the switch so we don't have to define a default value
+        default:
+          return {
+            ...base,
+            uri: null,
+            contractError: null
+          }
       }
-    })
+    }))
+
+    await this.tokenRepository.addMany(events)
 
     return events
   }

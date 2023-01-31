@@ -17,8 +17,7 @@ export const getERC1155Info = async (
   const uri: string = await contract.uri(tokenId)
 
   return {
-    name: 'Unknown ERC-1155 token',
-    symbol: '?',
     uri,
+    contractError: null
   }
 }

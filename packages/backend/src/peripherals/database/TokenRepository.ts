@@ -7,8 +7,8 @@ import { Database } from './shared/Database'
 export interface TokenRecord {
   assetTypeHash: string
   assetHash: string
-  tokenId: string
-  uri: string
+  tokenId: string | null
+  uri: string | null
   contractError: string | null
 }
 

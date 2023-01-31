@@ -38,6 +38,9 @@ export class TokenRegistrationCollector {
       }
     })
 
+    // TODO: pass TokenRegistrationRepository here
+    // this.tokenRegistrationRepository.addMany(events)
+
     return events
   }
 }
