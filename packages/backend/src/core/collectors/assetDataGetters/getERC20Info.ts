@@ -12,6 +12,8 @@ export const getERC20Info = async (address: EthereumAddress) => {
 
   const contract = new ethers.Contract(address.toString(), abi, provider)
 
+  //TODO: Do something about the unsafe calls and assignments
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
   const name: string = await contract.name()
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
