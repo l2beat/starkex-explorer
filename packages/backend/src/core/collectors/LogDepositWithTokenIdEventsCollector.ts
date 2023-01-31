@@ -3,7 +3,7 @@ import { EthereumAddress } from '@explorer/types'
 import { BlockRange } from '../../model'
 import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { getERC721Info } from './assetDataGetters/getERC721Info'
+import { getERC721URI } from './assetDataGetters/getERC721URI'
 import { getERC1155Info } from './assetDataGetters/getERC1155Info'
 import { LogDepositWithTokenId } from './events'
 
@@ -23,9 +23,11 @@ export class LogDepositWithTokenIdEventsCollector {
     const events = logs.map(async (log) => {
       const event = LogDepositWithTokenId.parseLog(log)
 
+      const assetTypeHash = event.args.assetType.toString()
+
       const registeredToken =
         await this.tokenRegistrationRepository.findByAssetType(
-          event.args.assetType.toString()
+          assetTypeHash
         )
 
       if (!registeredToken) {
@@ -34,22 +36,20 @@ export class LogDepositWithTokenIdEventsCollector {
 
       const address = registeredToken.address
       const tokenId = event.args.tokenId
+      const assetHash = event.args.assetId.toString()
 
       const base = {
-        type: registeredToken.type,
-        address,
-        quantum: 1,
-        decimals: 0,
-        assetId: event.args.assetId.toString(),
+        assetTypeHash,
+        assetHash,
         tokenId: tokenId.toString(),
       }
 
-      switch (registeredToken.type) {
+      switch (registeredToken.type.toString()) {
         case 'ERC-721':
         case 'MINTABLE_ERC-721':
           return {
             ...base,
-            ...(await getERC721Info(address, tokenId.toBigInt())),
+            ...(await getERC721URI(address, tokenId.toBigInt())),
           }
         case 'ERC-1155':
           return {
