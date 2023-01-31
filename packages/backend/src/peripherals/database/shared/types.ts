@@ -187,21 +187,23 @@ declare module 'knex/types/tables' {
   }
 
   interface TokenRegistrationRow {
-    asset_type: string
+    asset_type_hash: string
     address: string
     type: string
+    name: string | null
+    symbol: string | null
+    quantum: string
+    decimals: number | null
+    contract_error: string | null
   }
 
   interface TokenRow {
-    type: string
-    address: string
-    name: string
-    symbol: string
-    assetId: string
-    tokenId: string
-    quantum: number
-    decimals: number
+    asset_type_hash: string
+    // name: TODO: string Figure out how to get name for EIC-1155 standard
+    asset_hash: string
+    token_id: string
     uri: string
+    contract_error: string | null
   }
 
   interface Tables {

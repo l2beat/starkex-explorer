@@ -27,7 +27,6 @@ export const getERC721Info = async (
   return {
     name,
     symbol,
-    decimals: 0,
     uri,
   }
 }

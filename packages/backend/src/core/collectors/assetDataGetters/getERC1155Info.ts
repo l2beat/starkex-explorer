@@ -16,12 +16,9 @@ export const getERC1155Info = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
   const uri: string = await contract.uri(tokenId)
 
-  // Only the uri available here but it needs the tokenId which we don't have a this point. Can we call uri without? What do we want to do?
-
   return {
-    name: 'Unknown NFT token',
+    name: 'Unknown ERC-1155 token',
     symbol: '?',
-    decimals: 0,
     uri,
   }
 }

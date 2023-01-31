@@ -23,7 +23,6 @@ export class LogDepositWithTokenIdEventsCollector {
     const events = logs.map(async (log) => {
       const event = LogDepositWithTokenId.parseLog(log)
 
-      // Should we store assetType as bigint or string?
       const registeredToken =
         await this.tokenRegistrationRepository.findByAssetType(
           event.args.assetType.toString()
@@ -40,6 +39,7 @@ export class LogDepositWithTokenIdEventsCollector {
         type: registeredToken.type,
         address,
         quantum: 1,
+        decimals: 0,
         assetId: event.args.assetId.toString(),
         tokenId: tokenId.toString(),
       }
