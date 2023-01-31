@@ -21,12 +21,11 @@ export class TokenRegistrationRepository extends BaseRepository {
     super(database, logger)
 
     /* eslint-disable @typescript-eslint/unbound-method */
-    
+
     this.add = this.wrapAdd(this.add)
     this.addMany = this.wrapAddMany(this.addMany)
     this.findByAssetType = this.wrapFind(this.findByAssetType)
     this.getAll = this.wrapGet(this.getAll)
-
   }
 
   async add(record: TokenRegistrationRecord) {
@@ -38,8 +37,10 @@ export class TokenRegistrationRepository extends BaseRepository {
   async addMany(records: TokenRegistrationRecord[]) {
     const knex = await this.knex()
     const rows = records.map(toRow)
-    const hashes = await knex('token_registrations').insert(rows).returning('asset_type_hash')
-    return hashes.map(x => x.asset_type_hash)
+    const hashes = await knex('token_registrations')
+      .insert(rows)
+      .returning('asset_type_hash')
+    return hashes.map((x) => x.asset_type_hash)
   }
 
   async getAll(): Promise<TokenRegistrationRecord[]> {
@@ -70,7 +71,7 @@ function toRow(record: TokenRegistrationRecord): TokenRegistrationRow {
     address: address.toString(),
     type: type.toString(),
     contract_error: contractError,
-    ...rest
+    ...rest,
   }
 }
 
@@ -82,6 +83,6 @@ function toRecord(row: TokenRegistrationRow): TokenRegistrationRecord {
     address: EthereumAddress(address),
     type: ERCType(type),
     contractError: contract_error,
-    ...rest
+    ...rest,
   }
 }

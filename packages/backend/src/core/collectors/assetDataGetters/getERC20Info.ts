@@ -25,6 +25,6 @@ export const getERC20Info = async (address: EthereumAddress) => {
     name,
     symbol,
     decimals,
-    contractError: null
+    contractError: null,
   }
 }

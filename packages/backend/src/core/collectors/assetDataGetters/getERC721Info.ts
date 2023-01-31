@@ -23,12 +23,12 @@ export const getERC721Info = async (
   const symbol: string = await contract.symbol()
 
   const base = {
-    name, 
+    name,
     symbol,
-    contract_error: null
+    contract_error: null,
   }
-  
-  if(!tokenId) {
+
+  if (!tokenId) {
     return base
   }
 
@@ -39,6 +39,6 @@ export const getERC721Info = async (
     name,
     symbol,
     uri,
-    contract_error: null
+    contract_error: null,
   }
 }

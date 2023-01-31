@@ -1,3 +1,3 @@
 export interface SpotAssetId extends String {
-    _SpotAssetIdBrand: string
+  _SpotAssetIdBrand: string
 }

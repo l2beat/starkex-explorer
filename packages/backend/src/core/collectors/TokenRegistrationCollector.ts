@@ -38,13 +38,14 @@ export class TokenRegistrationCollector {
       }
     })
 
-    
-
     return events
   }
 }
 
-const getAssetData = async (assetSelector: string, address: EthereumAddress) => {
+const getAssetData = async (
+  assetSelector: string,
+  address: EthereumAddress
+) => {
   switch (assetSelector) {
     case '0x8322fff2':
       return {
@@ -61,7 +62,13 @@ const getAssetData = async (assetSelector: string, address: EthereumAddress) => 
     case '0x02571792':
       return { type: 'ERC-721', ...(await getERC721Info(address)) }
     case '0x3348691d':
-      return { type: 'ERC-1155', name: null, symbol: null, decimals: null, contract_error: null }
+      return {
+        type: 'ERC-1155',
+        name: null,
+        symbol: null,
+        decimals: null,
+        contract_error: null,
+      }
     case '0xb8b86672':
       return { type: 'MINTABLE_ERC-721', ...(await getERC721Info(address)) }
   }
