@@ -19,6 +19,7 @@ export class PreprocessedStateUpdateRepository extends BaseRepository {
     this.add = this.wrapAdd(this.add)
     this.findLast = this.wrapFind(this.findLast)
     this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
@@ -43,9 +44,16 @@ export class PreprocessedStateUpdateRepository extends BaseRepository {
     return row.stateUpdateId
   }
 
-  async deleteAll() {
-    const knex = await this.knex()
+  async deleteAll(trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
     return knex('preprocessed_state_updates').delete()
+  }
+
+  async deleteByStateUpdateId(stateUpdateId: number, trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    return knex('preprocessed_state_updates')
+      .where('state_update_id', stateUpdateId)
+      .delete()
   }
 }
 

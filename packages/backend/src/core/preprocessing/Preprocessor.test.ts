@@ -1,5 +1,6 @@
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
+import { Knex } from 'knex'
 
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import {
@@ -10,7 +11,9 @@ import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { Preprocessor, SyncDirection } from './Preprocessor'
 
-const generateFakePosition = (state_update_id: number): StateUpdateRecord => ({
+const generateFakeStateUpdate = (
+  state_update_id: number
+): StateUpdateRecord => ({
   id: state_update_id,
   blockNumber: 10_000 + state_update_id,
   rootHash: PedersenHash.fake(),
@@ -59,7 +62,6 @@ describe(Preprocessor.name, () => {
         findLast: async () => undefined,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
-        // findLast: async () => ({ stateUpdateId: 3, stateTransitionHash: Hash256.fake()}),
         findLast: async () => undefined,
       })
       const preprocessor = new Preprocessor(
@@ -93,9 +95,9 @@ describe(Preprocessor.name, () => {
     })
 
     it('returns forward when there are state updates but preprocessing has no entries', async () => {
-      const fakePosition = generateFakePosition(3)
+      const fakeStateUpdate = generateFakeStateUpdate(3)
       const stateUpdateRepo = mock<StateUpdateRepository>({
-        findLast: async () => fakePosition,
+        findLast: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => undefined,
@@ -111,13 +113,13 @@ describe(Preprocessor.name, () => {
     })
 
     it('returns backward when state update id is before preprocessing', async () => {
-      const fakePosition = generateFakePosition(2)
+      const fakeStateUpdate = generateFakeStateUpdate(2)
       const stateUpdateRepo = mock<StateUpdateRepository>({
-        findLast: async () => fakePosition,
+        findLast: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
-          stateUpdateId: fakePosition.id + 1,
+          stateUpdateId: fakeStateUpdate.id + 1,
           stateTransitionHash: Hash256.fake(),
         }),
       })
@@ -132,14 +134,14 @@ describe(Preprocessor.name, () => {
     })
 
     it("throws when the are more state updates but can't find preprocessed id", async () => {
-      const fakePosition = generateFakePosition(10)
+      const fakeStateUpdate = generateFakeStateUpdate(10)
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async () => undefined,
-        findLast: async () => fakePosition,
+        findLast: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
-          stateUpdateId: fakePosition.id - 1,
+          stateUpdateId: fakeStateUpdate.id - 1,
           stateTransitionHash: Hash256.fake(),
         }),
       })
@@ -154,15 +156,15 @@ describe(Preprocessor.name, () => {
     })
 
     it('returns not-needed when last state update ids and transition hashes match', async () => {
-      const fakePosition = generateFakePosition(10)
+      const fakeStateUpdate = generateFakeStateUpdate(10)
       const stateUpdateRepo = mock<StateUpdateRepository>({
-        findById: async (id: number) => ({ [10]: fakePosition }[id]),
-        findLast: async () => fakePosition,
+        findById: async (id: number) => ({ [10]: fakeStateUpdate }[id]),
+        findLast: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
-          stateUpdateId: fakePosition.id,
-          stateTransitionHash: fakePosition.stateTransitionHash,
+          stateUpdateId: fakeStateUpdate.id,
+          stateTransitionHash: fakeStateUpdate.stateTransitionHash,
         }),
       })
       const preprocessor = new Preprocessor(
@@ -177,14 +179,14 @@ describe(Preprocessor.name, () => {
 
     // This can happen when there was a reorg and then a few more state updates were added
     it('returns backward when last state update ids match but transition hash is mismatched', async () => {
-      const fakePosition = generateFakePosition(10)
+      const fakeStateUpdate = generateFakeStateUpdate(10)
       const stateUpdateRepo = mock<StateUpdateRepository>({
-        findById: async (id: number) => ({ [10]: fakePosition }[id]),
-        findLast: async () => fakePosition,
+        findById: async (id: number) => ({ [10]: fakeStateUpdate }[id]),
+        findLast: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
-          stateUpdateId: fakePosition.id,
+          stateUpdateId: fakeStateUpdate.id,
           stateTransitionHash: Hash256.fake(),
         }),
       })
@@ -200,11 +202,11 @@ describe(Preprocessor.name, () => {
 
     // This can happen when there was a reorg and then a few more state updates were added
     it('returns backward when state is ahead of preprocessing but current transition hash is mismatched', async () => {
-      const fakePosition5 = generateFakePosition(5)
-      const fakePosition10 = generateFakePosition(10)
+      const fakeStateUpdate5 = generateFakeStateUpdate(5)
+      const fakeStateUpdate10 = generateFakeStateUpdate(10)
       const stateUpdateRepo = mock<StateUpdateRepository>({
-        findById: async (id: number) => ({ [5]: fakePosition5 }[id]),
-        findLast: async () => fakePosition10,
+        findById: async (id: number) => ({ [5]: fakeStateUpdate5 }[id]),
+        findLast: async () => fakeStateUpdate10,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
@@ -223,16 +225,16 @@ describe(Preprocessor.name, () => {
     })
 
     it('returns forward when state is ahead and current transition hash matches', async () => {
-      const fakePosition5 = generateFakePosition(5)
-      const fakePosition10 = generateFakePosition(10)
+      const fakeStateUpdate5 = generateFakeStateUpdate(5)
+      const fakeStateUpdate10 = generateFakeStateUpdate(10)
       const stateUpdateRepo = mock<StateUpdateRepository>({
-        findById: async (id: number) => ({ [5]: fakePosition5 }[id]),
-        findLast: async () => fakePosition10,
+        findById: async (id: number) => ({ [5]: fakeStateUpdate5 }[id]),
+        findLast: async () => fakeStateUpdate10,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
           stateUpdateId: 5,
-          stateTransitionHash: fakePosition5.stateTransitionHash,
+          stateTransitionHash: fakeStateUpdate5.stateTransitionHash,
         }),
       })
       const preprocessor = new Preprocessor(
@@ -243,6 +245,63 @@ describe(Preprocessor.name, () => {
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'forward'
       )
+    })
+  })
+
+  describe(Preprocessor.prototype.processNextStateUpdate.name, () => {
+    it('correctly updates preprocessedStateUpdateRepository in SQL transaction', async () => {
+      const fakeStateUpdate1 = generateFakeStateUpdate(1)
+      const fakeStateUpdate2 = generateFakeStateUpdate(2)
+      const mockKnexTransaction = mock<Knex.Transaction>()
+      const stateUpdateRepo = mock<StateUpdateRepository>({
+        findById: async (id: number) => ({ [2]: fakeStateUpdate2 }[id]),
+      })
+      const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
+        findLast: async () => ({
+          stateUpdateId: fakeStateUpdate1.id,
+          stateTransitionHash: fakeStateUpdate1.stateTransitionHash,
+        }),
+        add: async () => 0,
+        runInTransaction: async (fn) => fn(mockKnexTransaction),
+      })
+      const preprocessor = new Preprocessor(
+        preprocessedRepo,
+        stateUpdateRepo,
+        Logger.SILENT
+      )
+      await preprocessor.processNextStateUpdate()
+      expect(preprocessedRepo.add).toHaveBeenCalledWith([
+        {
+          stateUpdateId: fakeStateUpdate2.id,
+          stateTransitionHash: fakeStateUpdate2.stateTransitionHash,
+        },
+        mockKnexTransaction,
+      ])
+    })
+  })
+
+  describe(Preprocessor.prototype.rollbackOneStateUpdate.name, () => {
+    it('correctly updates preprocessedStateUpdateRepository in SQL transaction', async () => {
+      const fakeStateUpdate = generateFakeStateUpdate(2)
+      const mockKnexTransaction = mock<Knex.Transaction>()
+      const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
+        findLast: async () => ({
+          stateUpdateId: fakeStateUpdate.id,
+          stateTransitionHash: fakeStateUpdate.stateTransitionHash,
+        }),
+        runInTransaction: async (fn) => fn(mockKnexTransaction),
+        deleteByStateUpdateId: async () => 1,
+      })
+      const preprocessor = new Preprocessor(
+        preprocessedRepo,
+        mock<StateUpdateRepository>(),
+        Logger.SILENT
+      )
+      await preprocessor.rollbackOneStateUpdate()
+      expect(preprocessedRepo.deleteByStateUpdateId).toHaveBeenCalledWith([
+        fakeStateUpdate.id,
+        mockKnexTransaction,
+      ])
     })
   })
 })

@@ -33,6 +33,13 @@ export class BaseRepository {
     return this.database.getKnex(trx)
   }
 
+  async runInTransaction(
+    fun: (trx: Knex.Transaction) => Promise<void>
+  ): Promise<void> {
+    const knex = await this.knex()
+    await knex.transaction(fun)
+  }
+
   protected wrapAny<A extends unknown[], R>(
     method: AnyMethod<A, R>
   ): AnyMethod<A, R> {

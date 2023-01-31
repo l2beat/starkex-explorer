@@ -14,7 +14,8 @@ export class Preprocessor {
   }
 
   async sync() {
-    let direction
+    let direction: SyncDirection
+
     do {
       direction = await this.calculateRequiredSyncDirection()
       if (direction === 'forward') {
@@ -57,15 +58,15 @@ export class Preprocessor {
       return 'backward'
     }
 
-    const actualStateUpdate = await this.stateUpdateRepository.findById(
+    const correspondingStateUpdate = await this.stateUpdateRepository.findById(
       lastProcessedStateUpdate.stateUpdateId
     )
-    if (actualStateUpdate === undefined) {
+    if (correspondingStateUpdate === undefined) {
       throw new Error('Missing expected state update during Preprocessor sync')
     }
 
     if (
-      actualStateUpdate.stateTransitionHash !==
+      correspondingStateUpdate.stateTransitionHash !==
       lastProcessedStateUpdate.stateTransitionHash
     ) {
       // Reorg happened
@@ -81,6 +82,61 @@ export class Preprocessor {
     return 'not-needed'
   }
 
-  async processNextStateUpdate() {}
-  async rollbackOneStateUpdate() {}
+  async processNextStateUpdate() {
+    await this.preprocessedStateUpdateRepository.runInTransaction(
+      async (trx) => {
+        // BEGIN TRANSACTION
+
+        const lastProcessedStateUpdate =
+          await this.preprocessedStateUpdateRepository.findLast(trx)
+        const nextStateUpdate = await this.stateUpdateRepository.findById(
+          (lastProcessedStateUpdate?.stateUpdateId ?? 0) + 1,
+          trx
+        )
+        if (nextStateUpdate === undefined) {
+          return
+        }
+
+        this.logger.info(`Preprocessing state update ${nextStateUpdate.id}`)
+        // TODO: call .processNextStateUpdate on all needed preprocessors here
+
+        await this.preprocessedStateUpdateRepository.add(
+          {
+            stateUpdateId: nextStateUpdate.id,
+            stateTransitionHash: nextStateUpdate.stateTransitionHash,
+          },
+          trx
+        )
+
+        // END TRANSACTION
+      }
+    )
+  }
+
+  async rollbackOneStateUpdate() {
+    await this.preprocessedStateUpdateRepository.runInTransaction(
+      async (trx) => {
+        // BEGIN TRANSACTION
+
+        const lastProcessedStateUpdate =
+          await this.preprocessedStateUpdateRepository.findLast(trx)
+
+        if (lastProcessedStateUpdate === undefined) {
+          return
+        }
+
+        this.logger.info(
+          `Rolling back preprocessing of state update ${lastProcessedStateUpdate.stateUpdateId}`
+        )
+        // TODO: call .rollbackOneStateUpdate on all needed preprocessors here
+
+        await this.preprocessedStateUpdateRepository.deleteByStateUpdateId(
+          lastProcessedStateUpdate.stateUpdateId,
+          trx
+        )
+
+        // END TRANSACTION
+      }
+    )
+  }
 }

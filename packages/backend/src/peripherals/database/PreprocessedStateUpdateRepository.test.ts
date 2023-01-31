@@ -43,4 +43,17 @@ describe(PreprocessedStateUpdateRepository.name, () => {
 
     expect(last).toEqual(stateUpdate)
   })
+
+  it('removes by state update id', async () => {
+    for (const blockNumber of [30_001, 30_002, 30_003]) {
+      await repository.add({
+        stateUpdateId: blockNumber * 1000,
+        stateTransitionHash: Hash256.fake(),
+      })
+    }
+
+    await repository.deleteByStateUpdateId(30_003_000)
+
+    expect((await repository.findLast())?.stateUpdateId).toEqual(30_002_000)
+  })
 })
