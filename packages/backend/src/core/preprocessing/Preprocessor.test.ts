@@ -278,6 +278,30 @@ describe(Preprocessor.name, () => {
         mockKnexTransaction,
       ])
     })
+
+    it('throws when next state update is missing', async () => {
+      const fakeStateUpdate2 = generateFakeStateUpdate(2)
+      const mockKnexTransaction = mock<Knex.Transaction>()
+      const stateUpdateRepo = mock<StateUpdateRepository>({
+        findById: async (id: number) => ({ [2]: fakeStateUpdate2 }[id]),
+      })
+      const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
+        findLast: async () => ({
+          stateUpdateId: fakeStateUpdate2.id,
+          stateTransitionHash: fakeStateUpdate2.stateTransitionHash,
+        }),
+        add: async () => 0,
+        runInTransaction: async (fn) => fn(mockKnexTransaction),
+      })
+      const preprocessor = new Preprocessor(
+        preprocessedRepo,
+        stateUpdateRepo,
+        Logger.SILENT
+      )
+      await expect(preprocessor.processNextStateUpdate()).toBeRejected(
+        'Preprocessing was requested, but next state update (3) is missing'
+      )
+    })
   })
 
   describe(Preprocessor.prototype.rollbackOneStateUpdate.name, () => {

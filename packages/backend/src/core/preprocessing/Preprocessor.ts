@@ -89,12 +89,16 @@ export class Preprocessor {
 
         const lastProcessedStateUpdate =
           await this.preprocessedStateUpdateRepository.findLast(trx)
+        const nextStateUpdateId =
+          (lastProcessedStateUpdate?.stateUpdateId ?? 0) + 1
         const nextStateUpdate = await this.stateUpdateRepository.findById(
-          (lastProcessedStateUpdate?.stateUpdateId ?? 0) + 1,
+          nextStateUpdateId,
           trx
         )
         if (nextStateUpdate === undefined) {
-          return
+          throw new Error(
+            `Preprocessing was requested, but next state update (${nextStateUpdateId}) is missing`
+          )
         }
 
         this.logger.info(`Preprocessing state update ${nextStateUpdate.id}`)
