@@ -3,6 +3,7 @@ import { EthereumAddress, Hash256 } from '@explorer/types'
 import { BlockRange } from '../../model'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { getERC20Info } from './assetDataGetters/getERC20Info'
+import { getERC721Info } from './assetDataGetters/getERC721Info'
 import { LogTokenRegistered } from './events'
 
 export interface TokenRegistration {
@@ -27,38 +28,41 @@ export class TokenRegistrationCollector {
 
       const address = EthereumAddress(`0x${event.args.assetInfo.substring(34)}`)
       const quantum = event.args.quantum.toNumber()
-      const assetType = event.args.assetType.toString() // true only for ERC-20 and ETH
-
-      const getAssetData = async (assetSelector: string) => {
-        switch (assetSelector) {
-          case '0x8322fff2':
-            return {
-              type: 'ETH',
-              name: 'Ethereum',
-              symbol: 'ETH',
-              decimals: 18,
-            }
-          case '0xf47261b0':
-            return { type: 'ERC-20', ...(await getERC20Info(address)) }
-          case '0x68646e2d':
-            return { type: 'MINTABLE_ERC-20', ...(await getERC20Info(address)) }
-          case '0x02571792':
-            return { type: 'ERC-721', address, assetType }
-          case '0x3348691d':
-            return { type: 'ERC-1155', address, assetType }
-          case '0xb8b86672':
-            return { type: 'MINTABLE_ERC-721', address, assetType }
-        }
-      }
+      const assetType = event.args.assetType.toString()
 
       return {
-        assetType,
+        asset_type_hash: assetType,
         address,
         quantum,
-        ...(await getAssetData(event.args.assetInfo.substring(0, 10))),
+        ...(await getAssetData(event.args.assetInfo.substring(0, 10), address)),
       }
     })
 
+    
+
     return events
+  }
+}
+
+const getAssetData = async (assetSelector: string, address: EthereumAddress) => {
+  switch (assetSelector) {
+    case '0x8322fff2':
+      return {
+        type: 'ETH',
+        name: 'Ethereum',
+        symbol: 'ETH',
+        decimals: 18,
+        contract_error: null,
+      }
+    case '0xf47261b0':
+      return { type: 'ERC-20', ...(await getERC20Info(address)) }
+    case '0x68646e2d':
+      return { type: 'MINTABLE_ERC-20', ...(await getERC20Info(address)) }
+    case '0x02571792':
+      return { type: 'ERC-721', ...(await getERC721Info(address)) }
+    case '0x3348691d':
+      return { type: 'ERC-1155', name: null, symbol: null, decimals: null, contract_error: null }
+    case '0xb8b86672':
+      return { type: 'MINTABLE_ERC-721', ...(await getERC721Info(address)) }
   }
 }

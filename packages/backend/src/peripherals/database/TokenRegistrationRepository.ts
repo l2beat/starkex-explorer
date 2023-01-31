@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { ERCType, EthereumAddress } from '@explorer/types'
 import { TokenRegistrationRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -6,21 +6,40 @@ import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface TokenRegistrationRecord {
-  assetType: string
+  assetTypeHash: string
   address: EthereumAddress
-  type: string
+  type: ERCType
+  name: string | null
+  symbol: string | null
+  quantum: string
+  decimals: number | null
+  contractError: string | null
 }
 
 export class TokenRegistrationRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
-    console.log("It's not a useless constructor")
+
+    /* eslint-disable @typescript-eslint/unbound-method */
+    
+    this.add = this.wrapAdd(this.add)
+    this.addMany = this.wrapAddMany(this.addMany)
+    this.findByAssetType = this.wrapFind(this.findByAssetType)
+    this.getAll = this.wrapGet(this.getAll)
+
   }
 
   async add(record: TokenRegistrationRecord) {
     const knex = await this.knex()
     await knex('token_registrations').insert(toRow(record))
-    return record.assetType
+    return record.assetTypeHash
+  }
+
+  async addMany(records: TokenRegistrationRecord[]) {
+    const knex = await this.knex()
+    const rows = records.map(toRow)
+    const hashes = await knex('token_registrations').insert(rows).returning('asset_type_hash')
+    return hashes.map(x => x.asset_type_hash)
   }
 
   async getAll(): Promise<TokenRegistrationRecord[]> {
@@ -44,21 +63,25 @@ export class TokenRegistrationRepository extends BaseRepository {
 }
 
 function toRow(record: TokenRegistrationRecord): TokenRegistrationRow {
-  const { assetType, address, type } = record
+  const { assetTypeHash, address, contractError, type, ...rest } = record
 
   return {
-    asset_type: assetType,
+    asset_type_hash: assetTypeHash,
     address: address.toString(),
-    type,
+    type: type.toString(),
+    contract_error: contractError,
+    ...rest
   }
 }
 
 function toRecord(row: TokenRegistrationRow): TokenRegistrationRecord {
-  const { asset_type, address, type } = row
+  const { asset_type_hash, address, contract_error, type, ...rest } = row
 
   return {
-    assetType: asset_type,
+    assetTypeHash: asset_type_hash,
     address: EthereumAddress(address),
-    type,
+    type: ERCType(type),
+    contractError: contract_error,
+    ...rest
   }
 }
