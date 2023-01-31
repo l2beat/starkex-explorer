@@ -3,9 +3,7 @@ import { ethers } from 'ethers'
 
 import { provider } from './provider'
 
-export const getERC721Info = async (
-  address: EthereumAddress,
-) => {
+export const getERC721Info = async (address: EthereumAddress) => {
   const abi = [
     'function name() external view returns (string _name)',
     'function symbol() external view returns (string _symbol)',

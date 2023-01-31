@@ -18,6 +18,6 @@ export const getERC1155Info = async (
 
   return {
     uri,
-    contractError: null
+    contractError: null,
   }
 }
