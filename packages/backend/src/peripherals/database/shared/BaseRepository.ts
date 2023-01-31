@@ -1,3 +1,5 @@
+import { Knex } from 'knex'
+
 import { Logger } from '../../../tools/Logger'
 import { Database } from './Database'
 
@@ -27,8 +29,8 @@ export class BaseRepository {
     this.logger = logger.for(this)
   }
 
-  protected knex() {
-    return this.database.getKnex()
+  protected knex(trx?: Knex.Transaction) {
+    return this.database.getKnex(trx)
   }
 
   protected wrapAny<A extends unknown[], R>(

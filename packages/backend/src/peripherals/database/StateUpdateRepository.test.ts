@@ -133,6 +133,40 @@ describe(StateUpdateRepository.name, () => {
     expect(last).toEqual(stateUpdate)
   })
 
+  it('find state update by id', async () => {
+    let last = await repository.findById(30_002)
+    expect(last).toEqual(undefined)
+
+    const stateUpdate1 = {
+      id: 30_001_000,
+      blockNumber: 30_001,
+      rootHash: PedersenHash.fake(),
+      stateTransitionHash: Hash256.fake(),
+      timestamp: Timestamp(0),
+    }
+    const stateUpdate2 = {
+      id: 30_002_000,
+      blockNumber: 30_002,
+      rootHash: PedersenHash.fake(),
+      stateTransitionHash: Hash256.fake(),
+      timestamp: Timestamp(0),
+    }
+    await repository.add({
+      stateUpdate: stateUpdate1,
+      positions: [],
+      prices: [],
+    })
+    await repository.add({
+      stateUpdate: stateUpdate2,
+      positions: [],
+      prices: [],
+    })
+
+    last = await repository.findById(30_001_000)
+
+    expect(last).toEqual(stateUpdate1)
+  })
+
   it('gets last state update by id even if block number is the same', async () => {
     let last = await repository.findLast()
     expect(last).toEqual(undefined)

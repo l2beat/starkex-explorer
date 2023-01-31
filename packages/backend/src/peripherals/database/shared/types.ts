@@ -186,6 +186,11 @@ declare module 'knex/types/tables' {
     state_update_id: number
   }
 
+  interface PreprocessedStateUpdateRow {
+    state_update_id: number
+    state_transition_hash: string
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -208,6 +213,7 @@ declare module 'knex/types/tables' {
     sent_transactions: SentTransactionRow
     user_transactions: UserTransactionRow
     included_forced_requests: IncludedForcedRequestRow
+    preprocessed_state_updates: PreprocessedStateUpdateRow
   }
 }
 
