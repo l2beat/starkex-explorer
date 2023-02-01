@@ -155,13 +155,12 @@ export class Application {
       tokenRegistrationRepository,
       tokenRepository
     )
-    const _ =
-      new LogDepositWithTokenIdEventsCollector(
-        ethereumClient,
-        config.starkex.contracts.perpetual,
-        tokenRegistrationRepository,
-        tokenRepository
-      )
+    const _ = new LogDepositWithTokenIdEventsCollector(
+      ethereumClient,
+      config.starkex.contracts.perpetual,
+      tokenRegistrationRepository,
+      tokenRepository
+    )
 
     let syncService
 
