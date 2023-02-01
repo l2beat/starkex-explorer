@@ -22,6 +22,7 @@ export class TokenRepository extends BaseRepository {
     this.add = this.wrapAdd(this.add)
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
   async add(record: TokenRecord) {
@@ -43,6 +44,11 @@ export class TokenRepository extends BaseRepository {
     const knex = await this.knex()
     const rows = await knex('tokens').select('*')
     return rows.map(toRecord)
+  }
+
+  async deleteAll() {
+    const knex = await this.knex()
+    return knex('tokens').delete()
   }
 }
 

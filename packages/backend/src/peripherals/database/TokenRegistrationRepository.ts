@@ -49,10 +49,10 @@ export class TokenRegistrationRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async findByAssetType(assetType: string) {
+  async findByAssetType(assetTypeHash: string) {
     const knex = await this.knex()
     const row = await knex('token_registrations')
-      .where('asset_type', assetType)
+      .where('asset_type_hash', assetTypeHash)
       .first()
 
     if (!row) {
@@ -60,6 +60,11 @@ export class TokenRegistrationRepository extends BaseRepository {
     }
 
     return toRecord(row)
+  }
+
+  async deleteAll() {
+    const knex = await this.knex()
+    return knex('token_registrations').delete()
   }
 }
 
