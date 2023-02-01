@@ -26,7 +26,10 @@ describe(SyncStatusRepository.name, () => {
 
     const actual = await repository.getLastSynced()
     expect(actual).toEqual(20)
-    expect(store.findByKey).toHaveBeenCalledWith(['lastBlockNumberSynced', undefined])
+    expect(store.findByKey).toHaveBeenCalledWith([
+      'lastBlockNumberSynced',
+      undefined,
+    ])
   })
 
   it('returns undefined when store is empty', async () => {
