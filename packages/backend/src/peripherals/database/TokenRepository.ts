@@ -1,3 +1,4 @@
+import { SpotAssetId } from '@explorer/types'
 import { TokenRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -6,7 +7,7 @@ import { Database } from './shared/Database'
 
 export interface TokenRecord {
   assetTypeHash: string
-  assetHash: string
+  assetHash: SpotAssetId
   tokenId: string | null
   uri: string | null
   contractError: string | null
@@ -50,7 +51,7 @@ function toRow(record: TokenRecord): TokenRow {
 
   return {
     asset_type_hash: assetTypeHash,
-    asset_hash: assetHash,
+    asset_hash: assetHash.toString(),
     token_id: tokenId,
     uri,
     contract_error: contractError,
@@ -62,7 +63,7 @@ function toRecord(row: TokenRow): TokenRecord {
 
   return {
     assetTypeHash: asset_type_hash,
-    assetHash: asset_hash,
+    assetHash: SpotAssetId(asset_hash),
     tokenId: token_id,
     uri,
     contractError: contract_error,

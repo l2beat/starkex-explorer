@@ -1,4 +1,4 @@
-import { ERCType, EthereumAddress, Hash256 } from '@explorer/types'
+import { ERCType, EthereumAddress, Hash256, SpotAssetId } from '@explorer/types'
 
 import { BlockRange } from '../../model'
 import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
@@ -45,7 +45,7 @@ export class TokenRegistrationCollector {
         const pushToTokens = () => {
           tokens.push({
             assetTypeHash: assetType,
-            assetHash: assetType,
+            assetHash: SpotAssetId(assetType),
             tokenId: null,
             uri: null,
             contractError: null,
