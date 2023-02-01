@@ -14,7 +14,7 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
-import { LogDepositWithTokenIdEventsCollector } from './core/collectors/LogDepositWithTokenIdEventsCollector'
+import { DepositWithTokenIdCollector } from './core/collectors/DepositWithTokenIdCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
@@ -155,7 +155,7 @@ export class Application {
       tokenRegistrationRepository,
       tokenRepository
     )
-    const _ = new LogDepositWithTokenIdEventsCollector(
+    const _ = new DepositWithTokenIdCollector(
       ethereumClient,
       config.starkex.contracts.perpetual,
       tokenRegistrationRepository,

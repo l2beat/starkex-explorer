@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { EthereumAddress, SpotAssetId } from '@explorer/types'
 
 import { BlockRange } from '../../model'
 import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
@@ -8,7 +8,7 @@ import { getERC721URI } from './assetDataGetters/getERC721URI'
 import { getERC1155Info } from './assetDataGetters/getERC1155Info'
 import { LogDepositWithTokenId } from './events'
 
-export class LogDepositWithTokenIdEventsCollector {
+export class DepositWithTokenIdCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly contractAddress: EthereumAddress,
@@ -41,7 +41,7 @@ export class LogDepositWithTokenIdEventsCollector {
 
         const base = {
           assetTypeHash,
-          assetHash,
+          assetHash: SpotAssetId(assetHash),
           tokenId: tokenId.toString(),
         }
 
