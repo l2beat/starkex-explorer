@@ -1,5 +1,6 @@
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { Logger } from '../../tools/Logger'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
@@ -7,6 +8,7 @@ export type SyncDirection = 'forward' | 'backward' | 'stop'
 export class Preprocessor {
   constructor(
     private preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
+    private syncStatusRepository: SyncStatusRepository,
     private stateUpdateRepository: StateUpdateRepository,
     private logger: Logger
   ) {
@@ -37,14 +39,14 @@ export class Preprocessor {
   // function moves backward until it finds a "common" state update, with the
   // same id and state transition hash. Then it moves forward.
   async calculateRequiredSyncDirection(): Promise<SyncDirection> {
-    const lastStateUpdate = await this.stateUpdateRepository.findLast()
+    const lastStateUpdateId = await this.syncStatusRepository.getLastSynced()
     const lastProcessedStateUpdate =
       await this.preprocessedStateUpdateRepository.findLast()
 
     // 1. Handle simple cases of empty state updates and empty preprocessed
     // state updates.
 
-    if (lastStateUpdate === undefined) {
+    if (lastStateUpdateId === undefined) {
       return lastProcessedStateUpdate === undefined ? 'stop' : 'backward'
     }
     if (lastProcessedStateUpdate === undefined) {
@@ -54,7 +56,7 @@ export class Preprocessor {
     // 2. Move back when current id is behind or there's hash mismatch,
     // (due to reorg), or throw on missing state update.
 
-    if (lastStateUpdate.id < lastProcessedStateUpdate.stateUpdateId) {
+    if (lastStateUpdateId < lastProcessedStateUpdate.stateUpdateId) {
       return 'backward'
     }
 
@@ -75,7 +77,7 @@ export class Preprocessor {
 
     // 3. If all is ok and we're behind, move forward
 
-    if (lastStateUpdate.id > lastProcessedStateUpdate.stateUpdateId) {
+    if (lastStateUpdateId > lastProcessedStateUpdate.stateUpdateId) {
       return 'forward'
     }
 

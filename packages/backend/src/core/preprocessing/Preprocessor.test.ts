@@ -7,6 +7,7 @@ import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
+import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { Preprocessor, SyncDirection } from './Preprocessor'
@@ -26,6 +27,7 @@ describe(Preprocessor.name, () => {
     it('correctly moves forward and backward', async () => {
       const preprocessor = new Preprocessor(
         mock<PreprocessedStateUpdateRepository>(),
+        mock<SyncStatusRepository>(),
         mock<StateUpdateRepository>(),
         Logger.SILENT
       )
@@ -58,6 +60,9 @@ describe(Preprocessor.name, () => {
 
   describe(Preprocessor.prototype.calculateRequiredSyncDirection.name, () => {
     it('returns not-needed when everything is empty', async () => {
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => undefined,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findLast: async () => undefined,
       })
@@ -66,6 +71,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -75,6 +81,9 @@ describe(Preprocessor.name, () => {
     })
 
     it('returns backward when there are no state updates but preprocessing has entries', async () => {
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => undefined,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findLast: async () => undefined,
       })
@@ -86,6 +95,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -96,6 +106,9 @@ describe(Preprocessor.name, () => {
 
     it('returns forward when there are state updates but preprocessing has no entries', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(3)
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => fakeStateUpdate.id,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findLast: async () => fakeStateUpdate,
       })
@@ -104,6 +117,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -114,6 +128,9 @@ describe(Preprocessor.name, () => {
 
     it('returns backward when state update id is before preprocessing', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(2)
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => fakeStateUpdate.id,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findLast: async () => fakeStateUpdate,
       })
@@ -125,6 +142,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -135,6 +153,9 @@ describe(Preprocessor.name, () => {
 
     it("throws when the are more state updates but can't find preprocessed id", async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => fakeStateUpdate.id,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async () => undefined,
         findLast: async () => fakeStateUpdate,
@@ -147,6 +168,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -157,6 +179,9 @@ describe(Preprocessor.name, () => {
 
     it('returns not-needed when last state update ids and transition hashes match', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => fakeStateUpdate.id,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async (id: number) => ({ [10]: fakeStateUpdate }[id]),
         findLast: async () => fakeStateUpdate,
@@ -169,6 +194,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -180,6 +206,9 @@ describe(Preprocessor.name, () => {
     // This can happen when there was a reorg and then a few more state updates were added
     it('returns backward when last state update ids match but transition hash is mismatched', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => fakeStateUpdate.id,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async (id: number) => ({ [10]: fakeStateUpdate }[id]),
         findLast: async () => fakeStateUpdate,
@@ -192,6 +221,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -204,6 +234,9 @@ describe(Preprocessor.name, () => {
     it('returns backward when state is ahead of preprocessing but current transition hash is mismatched', async () => {
       const fakeStateUpdate5 = generateFakeStateUpdate(5)
       const fakeStateUpdate10 = generateFakeStateUpdate(10)
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => fakeStateUpdate10.id,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async (id: number) => ({ [5]: fakeStateUpdate5 }[id]),
         findLast: async () => fakeStateUpdate10,
@@ -216,6 +249,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -227,6 +261,9 @@ describe(Preprocessor.name, () => {
     it('returns forward when state is ahead and current transition hash matches', async () => {
       const fakeStateUpdate5 = generateFakeStateUpdate(5)
       const fakeStateUpdate10 = generateFakeStateUpdate(10)
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => fakeStateUpdate10.id,
+      })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async (id: number) => ({ [5]: fakeStateUpdate5 }[id]),
         findLast: async () => fakeStateUpdate10,
@@ -239,6 +276,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        syncStatusRepo,
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -266,6 +304,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        mock<SyncStatusRepository>(),
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -295,6 +334,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        mock<SyncStatusRepository>(),
         stateUpdateRepo,
         Logger.SILENT
       )
@@ -318,6 +358,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        mock<SyncStatusRepository>(),
         mock<StateUpdateRepository>(),
         Logger.SILENT
       )
@@ -336,6 +377,7 @@ describe(Preprocessor.name, () => {
       })
       const preprocessor = new Preprocessor(
         preprocessedRepo,
+        mock<SyncStatusRepository>(),
         mock<StateUpdateRepository>(),
         Logger.SILENT
       )
