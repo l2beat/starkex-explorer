@@ -155,7 +155,7 @@ export class Application {
       tokenRegistrationRepository,
       tokenRepository
     )
-    const depositWithTokenIdCollector =
+    const _ =
       new LogDepositWithTokenIdEventsCollector(
         ethereumClient,
         config.starkex.contracts.perpetual,
