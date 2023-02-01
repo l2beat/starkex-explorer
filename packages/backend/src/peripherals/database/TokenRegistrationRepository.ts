@@ -11,7 +11,7 @@ export interface TokenRegistrationRecord {
   type: ERCType
   name: string | null
   symbol: string | null
-  quantum: string
+  quantum: number
   decimals: number | null
   contractError: string | null
 }

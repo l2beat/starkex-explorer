@@ -14,6 +14,7 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
+import { LogDepositWithTokenIdEventsCollector } from './core/collectors/LogDepositWithTokenIdEventsCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
@@ -50,6 +51,8 @@ import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigr
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
+import { TokenRegistrationRepository } from './peripherals/database/TokenRegistrationRepository'
+import { TokenRepository } from './peripherals/database/TokenRepository'
 import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
@@ -111,6 +114,11 @@ export class Application {
       database,
       logger
     )
+    const tokenRegistrationRepository = new TokenRegistrationRepository(
+      database,
+      logger
+    )
+    const tokenRepository = new TokenRepository(database, logger)
 
     const ethereumClient = new EthereumClient(
       config.starkex.blockchain.jsonRpcUrl,
@@ -140,6 +148,20 @@ export class Application {
       userTransactionRepository,
       config.starkex.contracts.perpetual
     )
+
+    const tokenRegistrationCollector = new TokenRegistrationCollector(
+      ethereumClient,
+      config.starkex.contracts.perpetual,
+      tokenRegistrationRepository,
+      tokenRepository
+    )
+    const depositWithTokenIdCollector =
+      new LogDepositWithTokenIdEventsCollector(
+        ethereumClient,
+        config.starkex.contracts.perpetual,
+        tokenRegistrationRepository,
+        tokenRepository
+      )
 
     let syncService
 
@@ -200,11 +222,6 @@ export class Application {
           ethereumClient,
           userTransactionRepository,
           logger
-        )
-
-        const tokenRegistrationCollector = new TokenRegistrationCollector(
-          ethereumClient,
-          config.starkex.contracts.perpetual
         )
 
         syncService = new SpotValidiumSyncService(

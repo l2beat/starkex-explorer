@@ -1,6 +1,11 @@
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { ERCType, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { BlockRange } from '../../model'
+import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
+import {
+  TokenRecord,
+  TokenRepository,
+} from '../../peripherals/database/TokenRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { getERC20Info } from './assetDataGetters/getERC20Info'
 import { getERC721Info } from './assetDataGetters/getERC721Info'
@@ -14,7 +19,9 @@ export interface TokenRegistration {
 export class TokenRegistrationCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
-    private readonly contractAddress: EthereumAddress
+    private readonly contractAddress: EthereumAddress,
+    private readonly tokenRegistrationRepository: TokenRegistrationRepository,
+    private readonly tokenRepository: TokenRepository
   ) {}
 
   async collect(blockRange: BlockRange) {
@@ -23,56 +30,95 @@ export class TokenRegistrationCollector {
       topics: [LogTokenRegistered.topic],
     })
 
-    const events = logs.map(async (log) => {
-      const event = LogTokenRegistered.parseLog(log)
+    const tokens: TokenRecord[] = []
 
-      const address = EthereumAddress(`0x${event.args.assetInfo.substring(34)}`)
-      const quantum = event.args.quantum.toNumber()
-      const assetType = event.args.assetType.toString()
+    const events = await Promise.all(
+      logs.map(async (log) => {
+        const event = LogTokenRegistered.parseLog(log)
 
-      return {
-        asset_type_hash: assetType,
-        address,
-        quantum,
-        ...(await getAssetData(event.args.assetInfo.substring(0, 10), address)),
-      }
-    })
+        const address = EthereumAddress(
+          `0x${event.args.assetInfo.substring(34)}`
+        )
+        const quantum = event.args.quantum.toNumber()
+        const assetType = event.args.assetType.toString()
 
-    // TODO: pass TokenRegistrationRepository here
-    // this.tokenRegistrationRepository.addMany(events)
+        const pushToTokens = () => {
+          tokens.push({
+            assetTypeHash: assetType,
+            assetHash: assetType,
+            tokenId: null,
+            uri: null,
+            contractError: null,
+          })
+        }
+
+        const getAssetData = async (assetSelector: string) => {
+          switch (assetSelector) {
+            case '0x8322fff2':
+              pushToTokens()
+              return {
+                type: ERCType('ETH'),
+                name: 'Ethereum',
+                symbol: 'ETH',
+                decimals: 18,
+                contractError: null,
+              }
+            case '0xf47261b0':
+              pushToTokens()
+              return {
+                type: ERCType('ERC-20'),
+                ...(await getERC20Info(address)),
+              }
+            case '0x68646e2d':
+              pushToTokens()
+              return {
+                type: ERCType('MINTABLE_ERC-20'),
+                ...(await getERC20Info(address)),
+              }
+            case '0x02571792':
+              return {
+                type: ERCType('ERC-721'),
+                decimals: null,
+                ...(await getERC721Info(address)),
+              }
+            case '0x3348691d':
+              return {
+                type: ERCType('ERC-1155'),
+                name: null,
+                symbol: null,
+                decimals: null,
+                contractError: null,
+              }
+            case '0xb8b86672':
+              return {
+                type: ERCType('MINTABLE_ERC-721'),
+                decimals: null,
+                ...(await getERC721Info(address)),
+              }
+            // TODO: Figure out a way to get rid of the default case
+            default:
+              return {
+                type: ERCType('ERC-20'),
+                name: null,
+                symbol: null,
+                decimals: null,
+                contractError: null,
+              }
+          }
+        }
+
+        return {
+          assetTypeHash: assetType,
+          address,
+          quantum,
+          ...(await getAssetData(event.args.assetInfo.substring(0, 10))),
+        }
+      })
+    )
+
+    await this.tokenRegistrationRepository.addMany(events)
+    await this.tokenRepository.addMany(tokens)
 
     return events
-  }
-}
-
-const getAssetData = async (
-  assetSelector: string,
-  address: EthereumAddress
-) => {
-  switch (assetSelector) {
-    case '0x8322fff2':
-      return {
-        type: 'ETH',
-        name: 'Ethereum',
-        symbol: 'ETH',
-        decimals: 18,
-        contract_error: null,
-      }
-    case '0xf47261b0':
-      return { type: 'ERC-20', ...(await getERC20Info(address)) }
-    case '0x68646e2d':
-      return { type: 'MINTABLE_ERC-20', ...(await getERC20Info(address)) }
-    case '0x02571792':
-      return { type: 'ERC-721', ...(await getERC721Info(address)) }
-    case '0x3348691d':
-      return {
-        type: 'ERC-1155',
-        name: null,
-        symbol: null,
-        decimals: null,
-        contract_error: null,
-      }
-    case '0xb8b86672':
-      return { type: 'MINTABLE_ERC-721', ...(await getERC721Info(address)) }
   }
 }

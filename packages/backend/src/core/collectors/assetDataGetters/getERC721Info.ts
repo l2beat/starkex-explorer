@@ -21,6 +21,6 @@ export const getERC721Info = async (address: EthereumAddress) => {
   return {
     name,
     symbol,
-    contract_error: null,
+    contractError: null,
   }
 }
