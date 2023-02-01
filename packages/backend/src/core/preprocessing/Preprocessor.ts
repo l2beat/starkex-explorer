@@ -2,7 +2,7 @@ import { PreprocessedStateUpdateRepository } from '../../peripherals/database/Pr
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { Logger } from '../../tools/Logger'
 
-export type SyncDirection = 'forward' | 'backward' | 'not-needed'
+export type SyncDirection = 'forward' | 'backward' | 'stop'
 
 export class Preprocessor {
   constructor(
@@ -23,7 +23,7 @@ export class Preprocessor {
       } else if (direction === 'backward') {
         await this.rollbackOneStateUpdate()
       }
-    } while (direction !== 'not-needed')
+    } while (direction !== 'stop')
   }
 
   // Preprocessor can move only one state-update forward or backward. This
@@ -45,7 +45,7 @@ export class Preprocessor {
     // state updates.
 
     if (lastStateUpdate === undefined) {
-      return lastProcessedStateUpdate === undefined ? 'not-needed' : 'backward'
+      return lastProcessedStateUpdate === undefined ? 'stop' : 'backward'
     }
     if (lastProcessedStateUpdate === undefined) {
       return 'forward'
@@ -79,7 +79,7 @@ export class Preprocessor {
       return 'forward'
     }
 
-    return 'not-needed'
+    return 'stop'
   }
 
   async processNextStateUpdate() {

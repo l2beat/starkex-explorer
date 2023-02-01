@@ -40,7 +40,7 @@ describe(Preprocessor.name, () => {
       ]
       let index = 0
       preprocessor.calculateRequiredSyncDirection = async () => {
-        return directions[index++] ?? 'not-needed'
+        return directions[index++] ?? 'stop'
       }
 
       const actualCalls: SyncDirection[] = []
@@ -70,7 +70,7 @@ describe(Preprocessor.name, () => {
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
-        'not-needed'
+        'stop'
       )
     })
 
@@ -173,7 +173,7 @@ describe(Preprocessor.name, () => {
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
-        'not-needed'
+        'stop'
       )
     })
 
