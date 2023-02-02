@@ -3,13 +3,22 @@ import { expect } from 'earljs'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
+import { TokenRegistrationRepository } from './TokenRegistrationRepository'
+import { dummyTokenRegistration } from './TokenRegistrationRepository.test'
 import { TokenRecord, TokenRepository } from './TokenRepository'
 
 describe(TokenRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
-  const repository = new TokenRepository(database, Logger.SILENT)
+  const tokenRegistrationRepository = new TokenRegistrationRepository(
+    database,
+    Logger.SILENT
+  )
+  const tokenRepository = new TokenRepository(database, Logger.SILENT)
 
-  afterEach(() => repository.deleteAll())
+  afterEach(async () => {
+    await tokenRepository.deleteAll()
+    await tokenRegistrationRepository.deleteAll()
+  })
 
   it('adds single record and queries it', async () => {
     const record: TokenRecord = {
@@ -20,9 +29,13 @@ describe(TokenRepository.name, () => {
       contractError: null,
     }
 
-    await repository.addMany([record])
+    await tokenRegistrationRepository.add(
+      dummyTokenRegistration(record.assetTypeHash)
+    )
 
-    const actual = await repository.getAll()
+    await tokenRepository.addMany([record])
+
+    const actual = await tokenRepository.getAll()
 
     expect(actual).toEqual([record])
   })
@@ -34,18 +47,28 @@ describe(TokenRepository.name, () => {
       dummyToken('12', '13'),
     ]
 
-    await repository.addMany(records)
-    const actual = await repository.getAll()
+    await tokenRegistrationRepository.addMany(
+      records.map((record) => dummyTokenRegistration(record.assetTypeHash))
+    )
+
+    await tokenRepository.addMany(records)
+    const actual = await tokenRepository.getAll()
 
     expect(actual).toEqual(records)
   })
 
   it('deletes all records', async () => {
-    await repository.addMany([dummyToken('1', '2'), dummyToken('2', '3')])
+    const records = [dummyToken('1', '2'), dummyToken('2', '3')]
 
-    await repository.deleteAll()
+    await tokenRegistrationRepository.addMany(
+      records.map((record) => dummyTokenRegistration(record.assetTypeHash))
+    )
 
-    const actual = await repository.getAll()
+    await tokenRepository.addMany(records)
+
+    await tokenRepository.deleteAll()
+
+    const actual = await tokenRepository.getAll()
     expect(actual).toEqual([])
   })
 })
