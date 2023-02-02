@@ -44,7 +44,7 @@ export class TokenRegistrationCollector {
           assetSelector === ETH_ASSET_SELECTOR
             ? EthereumAddress.fake()
             : EthereumAddress(`0x${event.args.assetInfo.substring(34)}`)
-        const quantum = event.args.quantum.toNumber()
+        const quantum = event.args.quantum
         const assetType = event.args.assetType.toString()
 
         const pushToTokens = () => {

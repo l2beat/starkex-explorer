@@ -20,7 +20,7 @@ export async function up(knex: Knex) {
     table.string('type').notNullable()
     table.string('name')
     table.string('symbol')
-    table.integer('quantum').notNullable()
+    table.string('quantum').notNullable()
     table.integer('decimals')
     table.string('contract_error')
   })

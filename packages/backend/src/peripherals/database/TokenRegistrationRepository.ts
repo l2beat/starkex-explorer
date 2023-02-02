@@ -1,4 +1,5 @@
 import { ERCType, EthereumAddress } from '@explorer/types'
+import { BigNumber } from 'ethers'
 import { TokenRegistrationRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -11,7 +12,7 @@ export interface TokenRegistrationRecord {
   type: ERCType
   name: string | null
   symbol: string | null
-  quantum: number
+  quantum: BigNumber
   decimals: number | null
   contractError: string | null
 }
@@ -69,24 +70,26 @@ export class TokenRegistrationRepository extends BaseRepository {
 }
 
 function toRow(record: TokenRegistrationRecord): TokenRegistrationRow {
-  const { assetTypeHash, address, contractError, type, ...rest } = record
+  const { assetTypeHash, address, contractError, type, quantum, ...rest } = record
 
   return {
     asset_type_hash: assetTypeHash,
     address: address.toString(),
     type: type.toString(),
+    quantum: quantum.toString(),
     contract_error: contractError,
     ...rest,
   }
 }
 
 function toRecord(row: TokenRegistrationRow): TokenRegistrationRecord {
-  const { asset_type_hash, address, contract_error, type, ...rest } = row
+  const { asset_type_hash, address, contract_error, type, quantum, ...rest } = row
 
   return {
     assetTypeHash: asset_type_hash,
     address: EthereumAddress(address),
     type: ERCType(type),
+    quantum: BigNumber.from(quantum),
     contractError: contract_error,
     ...rest,
   }

@@ -192,7 +192,7 @@ declare module 'knex/types/tables' {
     type: string
     name: string | null
     symbol: string | null
-    quantum: number
+    quantum: string
     decimals: number | null
     contract_error: string | null
   }

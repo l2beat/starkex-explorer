@@ -1,5 +1,6 @@
 import { ERCType, EthereumAddress } from '@explorer/types'
 import { expect } from 'earljs'
+import { BigNumber } from 'ethers'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
@@ -21,7 +22,7 @@ describe(TokenRegistrationRepository.name, () => {
       type: ERCType('ERC-20'),
       name: null,
       symbol: null,
-      quantum: 1,
+      quantum: BigNumber.from(1),
       decimals: null,
       contractError: null,
     }
@@ -65,7 +66,7 @@ function dummyTokenRegistration(
   type = ERCType('ERC-20'),
   name = null,
   symbol = null,
-  quantum = 1,
+  quantum = BigNumber.from(1),
   decimals = null,
   contractError = null
 ): TokenRegistrationRecord {
