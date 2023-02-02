@@ -70,7 +70,8 @@ export class TokenRegistrationRepository extends BaseRepository {
 }
 
 function toRow(record: TokenRegistrationRecord): TokenRegistrationRow {
-  const { assetTypeHash, address, contractError, type, quantum, ...rest } = record
+  const { assetTypeHash, address, contractError, type, quantum, ...rest } =
+    record
 
   return {
     asset_type_hash: assetTypeHash,
@@ -83,7 +84,8 @@ function toRow(record: TokenRegistrationRecord): TokenRegistrationRow {
 }
 
 function toRecord(row: TokenRegistrationRow): TokenRegistrationRecord {
-  const { asset_type_hash, address, contract_error, type, quantum, ...rest } = row
+  const { asset_type_hash, address, contract_error, type, quantum, ...rest } =
+    row
 
   return {
     assetTypeHash: asset_type_hash,

@@ -12,8 +12,8 @@ export async function contractMethodWrapper<T>(
 
   try {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-    value = arg ? await contract[method](arg): await contract[method]()
-  } catch(error) {
+    value = arg ? await contract[method](arg) : await contract[method]()
+  } catch (error) {
     //TODO: Log this error with Logger
     console.log(error)
     contractError = method
