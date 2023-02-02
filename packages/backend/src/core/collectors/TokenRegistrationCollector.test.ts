@@ -1,6 +1,6 @@
 import { ERCType, EthereumAddress } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
-import { BigNumber } from 'ethers'
+import { BigNumber, Contract } from 'ethers'
 
 import { BlockRange } from '../../model'
 import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
@@ -24,7 +24,9 @@ describe(TokenRegistrationCollector.name, () => {
       const mockGetLogsInRange = mockFn<[BlockRange, HackFilter]>()
       mockGetLogsInRange.returns(logs)
 
-      const mockEthereumClient = mock<EthereumClient>()
+      const mockEthereumClient = mock<EthereumClient>({
+        getContract,
+      })
       const contractAddress = EthereumAddress.fake()
 
       mockEthereumClient.getLogsInRange = mockGetLogsInRange
@@ -52,6 +54,36 @@ describe(TokenRegistrationCollector.name, () => {
     })
   })
 })
+
+const getContract = (address: string) => {
+  switch (address) {
+    case '0xd02A8A926864A1efe5eC2F8c9C8883f7D07bB471':
+      return mock<Contract>({
+        name: () => 'MyriaNFT',
+        symbol: () => 'MyriaNFTSymb',
+      })
+    case '0x58A07373A7a519c55E00380859016fa04De0389C':
+      return mock<Contract>({
+        name: () => 'MyriaNFT',
+        symbol: () => 'MyriaNFTSymb',
+      })
+    case '0x2682Da74B6D1B12B2f57bEd9A16FF692eA76a764':
+      return mock<Contract>({
+        name: () => 'ThangNv',
+        symbol: () => 'Myria',
+      })
+    case '0x8B9f59eb018A3A6486567A6386840f22cCADdA7b':
+      return mock<Contract>({
+        name: () => 'QA',
+        symbol: () => 'Myria',
+      })
+    default:
+      return mock<Contract>({
+        name: () => 'MyriaNFT',
+        symbol: () => 'MyriaNFTSymb',
+      })
+  }
+}
 
 const logs = [
   {
