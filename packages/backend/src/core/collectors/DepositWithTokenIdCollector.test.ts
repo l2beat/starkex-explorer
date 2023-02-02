@@ -52,6 +52,6 @@ describe(DepositWithTokenIdCollector.name, () => {
   })
 })
 
-const logs = []
+const _ = []
 
 const expectedAssetsWitkTokenId: never[] = []
