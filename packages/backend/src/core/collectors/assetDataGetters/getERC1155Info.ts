@@ -14,10 +14,14 @@ export const getERC1155Info = async (
 
   const contract = new ethers.Contract(address.toString(), abi, provider)
 
-  const {value: uri, contractError} = await contractMethodWrapper<string>(contract, 'uri', tokenId)
+  const { value: uri, contractError } = await contractMethodWrapper<string>(
+    contract,
+    'uri',
+    tokenId
+  )
 
   return {
     uri,
-    contractError
+    contractError,
   }
 }

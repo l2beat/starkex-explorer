@@ -14,8 +14,11 @@ export const getERC721Info = async (address: EthereumAddress) => {
 
   //TODO: Handle multiple contract errors
 
-  const {value: name} = await contractMethodWrapper<string>(contract, 'name')
-  const {value: symbol} = await contractMethodWrapper<string>(contract, 'symbol')
+  const { value: name } = await contractMethodWrapper<string>(contract, 'name')
+  const { value: symbol } = await contractMethodWrapper<string>(
+    contract,
+    'symbol'
+  )
 
   return {
     name,

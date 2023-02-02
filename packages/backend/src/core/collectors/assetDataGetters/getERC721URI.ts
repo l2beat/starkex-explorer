@@ -14,7 +14,11 @@ export const getERC721URI = async (
 
   const contract = new ethers.Contract(address.toString(), abi, provider)
 
-  const {value: uri, contractError} = await contractMethodWrapper<string>(contract, 'tokenURI', tokenId)
+  const { value: uri, contractError } = await contractMethodWrapper<string>(
+    contract,
+    'tokenURI',
+    tokenId
+  )
 
   return {
     uri,

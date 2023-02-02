@@ -16,10 +16,14 @@ export const getERC20Info = async (address: EthereumAddress) => {
   //TODO: Handle multiple contract errors
 
   // let contractError = null
-  
-  const {value: name} = await contractMethodWrapper<string>(contract, 'name')
-  const {value: symbol} = await contractMethodWrapper<string>(contract, 'symbol')
-  const {value: decimals, contractError} = await contractMethodWrapper<number>(contract, 'decimals')
+
+  const { value: name } = await contractMethodWrapper<string>(contract, 'name')
+  const { value: symbol } = await contractMethodWrapper<string>(
+    contract,
+    'symbol'
+  )
+  const { value: decimals, contractError } =
+    await contractMethodWrapper<number>(contract, 'decimals')
 
   return {
     name,

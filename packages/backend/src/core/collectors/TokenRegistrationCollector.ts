@@ -40,9 +40,10 @@ export class TokenRegistrationCollector {
 
         const assetSelector = event.args.assetInfo.substring(0, 10)
         // TODO: Maybe there is a better way to handle ETH token registration although it's a one time event
-        const address = assetSelector === ETH_ASSET_SELECTOR ? EthereumAddress.fake(): EthereumAddress(
-          `0x${event.args.assetInfo.substring(34)}`
-        )
+        const address =
+          assetSelector === ETH_ASSET_SELECTOR
+            ? EthereumAddress.fake()
+            : EthereumAddress(`0x${event.args.assetInfo.substring(34)}`)
         const quantum = event.args.quantum.toNumber()
         const assetType = event.args.assetType.toString()
 

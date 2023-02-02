@@ -25,7 +25,12 @@ export async function up(knex: Knex) {
     table.string('contract_error')
   })
   await knex.schema.createTable('tokens', (table) => {
-    table.string('asset_type_hash').primary().references('asset_type_hash').inTable('token_registrations').onDelete('CASCADE')
+    table
+      .string('asset_type_hash')
+      .primary()
+      .references('asset_type_hash')
+      .inTable('token_registrations')
+      .onDelete('CASCADE')
     table.string('asset_hash').notNullable()
     table.string('token_id')
     table.string('uri')
