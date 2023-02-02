@@ -1,3 +1,5 @@
+import { Knex } from 'knex'
+
 import { Logger } from '../../tools/Logger'
 import type { KeyValueStore } from './KeyValueStore'
 
@@ -9,8 +11,8 @@ export class SyncStatusRepository {
     this.logger = this.logger.for(this)
   }
 
-  async getLastSynced(): Promise<number | undefined> {
-    const valueInDb = await this.store.findByKey('lastBlockNumberSynced')
+  async getLastSynced(trx?: Knex.Transaction): Promise<number | undefined> {
+    const valueInDb = await this.store.findByKey('lastBlockNumberSynced', trx)
     if (valueInDb) {
       const result = Number(valueInDb)
       if (!isNaN(result)) {

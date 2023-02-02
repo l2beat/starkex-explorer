@@ -205,6 +205,10 @@ declare module 'knex/types/tables' {
     uri: string | null
     contract_error: string | null
   }
+  interface PreprocessedStateUpdateRow {
+    state_update_id: number
+    state_transition_hash: string
+  }
 
   interface Tables {
     key_values: KeyValueRow
@@ -230,6 +234,7 @@ declare module 'knex/types/tables' {
     included_forced_requests: IncludedForcedRequestRow
     token_registrations: TokenRegistrationRow
     tokens: TokenRow
+    preprocessed_state_updates: PreprocessedStateUpdateRow
   }
 }
 

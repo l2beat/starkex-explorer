@@ -1,5 +1,6 @@
 import { OraclePrice } from '@explorer/encoding'
 import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { Knex } from 'knex'
 import { PriceRow, StateUpdateRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -34,6 +35,7 @@ export class StateUpdateRepository extends BaseRepository {
 
     this.add = this.wrapAdd(this.add)
     this.findLast = this.wrapFind(this.findLast)
+    this.findById = this.wrapFind(this.findById)
     this.findIdByRootHash = this.wrapFind(this.findIdByRootHash)
     this.getAll = this.wrapGet(this.getAll)
     this.getPaginated = this.wrapGet(this.getPaginated)
@@ -82,6 +84,15 @@ export class StateUpdateRepository extends BaseRepository {
   async findLast(): Promise<StateUpdateRecord | undefined> {
     const knex = await this.knex()
     const row = await knex('state_updates').orderBy('id', 'desc').first()
+    return row && toStateUpdateRecord(row)
+  }
+
+  async findById(
+    id: number,
+    trx?: Knex.Transaction
+  ): Promise<StateUpdateRecord | undefined> {
+    const knex = await this.knex(trx)
+    const row = await knex('state_updates').where('id', id).first()
     return row && toStateUpdateRecord(row)
   }
 
