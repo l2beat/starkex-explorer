@@ -72,19 +72,19 @@ export class TokenRegistrationCollector {
               pushToTokens()
               return {
                 type: ERCType('ERC-20'),
-                ...(await getERC20Info(address)),
+                ...(await getERC20Info(this.ethereumClient, address)),
               }
             case '0x68646e2d':
               pushToTokens()
               return {
                 type: ERCType('MINTABLE_ERC-20'),
-                ...(await getERC20Info(address)),
+                ...(await getERC20Info(this.ethereumClient, address)),
               }
             case '0x02571792':
               return {
                 type: ERCType('ERC-721'),
                 decimals: null,
-                ...(await getERC721Info(address)),
+                ...(await getERC721Info(this.ethereumClient, address)),
               }
             case '0x3348691d':
               return {
@@ -98,7 +98,7 @@ export class TokenRegistrationCollector {
               return {
                 type: ERCType('MINTABLE_ERC-721'),
                 decimals: null,
-                ...(await getERC721Info(address)),
+                ...(await getERC721Info(this.ethereumClient, address)),
               }
             // TODO: Figure out a way to get rid of the default case
             default:

@@ -1,16 +1,18 @@
 import { EthereumAddress } from '@explorer/types'
-import { ethers } from 'ethers'
 
+import { EthereumClient } from '../../../peripherals/ethereum/EthereumClient'
 import { contractMethodWrapper } from './contractMethodWrapper'
-import { provider } from './provider'
 
-export const getERC721Info = async (address: EthereumAddress) => {
+export const getERC721Info = async (
+  ethereumClient: EthereumClient,
+  address: EthereumAddress
+) => {
   const abi = [
     'function name() external view returns (string _name)',
     'function symbol() external view returns (string _symbol)',
   ]
 
-  const contract = new ethers.Contract(address.toString(), abi, provider)
+  const contract = ethereumClient.getContract(address.toString(), abi)
 
   //TODO: Handle multiple contract errors
 

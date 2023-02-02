@@ -1,10 +1,10 @@
 import { EthereumAddress } from '@explorer/types'
-import { ethers } from 'ethers'
 
+import { EthereumClient } from '../../../peripherals/ethereum/EthereumClient'
 import { contractMethodWrapper } from './contractMethodWrapper'
-import { provider } from './provider'
 
 export const getERC721URI = async (
+  ethereumClient: EthereumClient,
   address: EthereumAddress,
   tokenId: bigint
 ) => {
@@ -12,7 +12,7 @@ export const getERC721URI = async (
     'function tokenURI(uint256 _tokenId) external view returns (string)',
   ]
 
-  const contract = new ethers.Contract(address.toString(), abi, provider)
+  const contract = ethereumClient.getContract(address.toString(), abi)
 
   const { value: uri, contractError } = await contractMethodWrapper<string>(
     contract,

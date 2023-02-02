@@ -50,12 +50,20 @@ export class DepositWithTokenIdCollector {
           case 'MINTABLE_ERC-721':
             return {
               ...base,
-              ...(await getERC721URI(address, tokenId.toBigInt())),
+              ...(await getERC721URI(
+                this.ethereumClient,
+                address,
+                tokenId.toBigInt()
+              )),
             }
           case 'ERC-1155':
             return {
               ...base,
-              ...(await getERC1155Info(address, tokenId.toBigInt())),
+              ...(await getERC1155Info(
+                this.ethereumClient,
+                address,
+                tokenId.toBigInt()
+              )),
             }
           // TODO: Fix the switch so we don't have to define a default value
           default:

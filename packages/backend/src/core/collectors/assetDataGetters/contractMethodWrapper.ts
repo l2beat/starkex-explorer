@@ -15,7 +15,9 @@ export async function contractMethodWrapper<T>(
     value = arg ? await contract[method](arg) : await contract[method]()
   } catch (error) {
     //TODO: Log this error with Logger
-    console.log(error)
+    console.log(
+      `The following method: ${method} does not exist on the contract: ${contract.address}`
+    )
     contractError = method
   }
 
