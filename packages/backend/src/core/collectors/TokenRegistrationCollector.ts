@@ -16,6 +16,8 @@ export interface TokenRegistration {
   assetId: Hash256
 }
 
+const ETH_ASSET_SELECTOR = '0x8322fff2'
+
 export class TokenRegistrationCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
@@ -36,7 +38,9 @@ export class TokenRegistrationCollector {
       logs.map(async (log) => {
         const event = LogTokenRegistered.parseLog(log)
 
-        const address = EthereumAddress(
+        const assetSelector = event.args.assetInfo.substring(0, 10)
+        // TODO: Maybe there is a better way to handle ETH token registration although it's a one time event
+        const address = assetSelector === ETH_ASSET_SELECTOR ? EthereumAddress.fake(): EthereumAddress(
           `0x${event.args.assetInfo.substring(34)}`
         )
         const quantum = event.args.quantum.toNumber()
@@ -54,7 +58,7 @@ export class TokenRegistrationCollector {
 
         const getAssetData = async (assetSelector: string) => {
           switch (assetSelector) {
-            case '0x8322fff2':
+            case ETH_ASSET_SELECTOR:
               pushToTokens()
               return {
                 type: ERCType('ETH'),
@@ -111,7 +115,7 @@ export class TokenRegistrationCollector {
           assetTypeHash: assetType,
           address,
           quantum,
-          ...(await getAssetData(event.args.assetInfo.substring(0, 10))),
+          ...(await getAssetData(assetSelector)),
         }
       })
     )
