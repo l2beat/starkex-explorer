@@ -155,7 +155,7 @@ export class Application {
       tokenRegistrationRepository,
       tokenRepository
     )
-    const _ = new DepositWithTokenIdCollector(
+    const depositWithTokenIdCollector = new DepositWithTokenIdCollector(
       ethereumClient,
       config.starkex.contracts.perpetual,
       tokenRegistrationRepository,
@@ -231,6 +231,7 @@ export class Application {
           spotCairoOutputCollector,
           spotValidiumUpdater,
           tokenRegistrationCollector,
+          depositWithTokenIdCollector,
           logger
         )
       }
