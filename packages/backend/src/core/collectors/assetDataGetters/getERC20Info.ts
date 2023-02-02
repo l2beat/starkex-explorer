@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 
 import { provider } from './provider'
 
-export const getERC20Info = async (address: EthereumAddress) => {
+export const getERC20Info = async (address: EthereumAddress, mintable = false) => {
   const abi = [
     'function name() public view returns (string)',
     'function symbol() public view returns (string)',
@@ -19,7 +19,7 @@ export const getERC20Info = async (address: EthereumAddress) => {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const symbol: string = await contract.symbol()
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-  const decimals: number = await contract.decimals()
+  const decimals: number | null = mintable ? null: await contract.decimals()
 
   return {
     name,
