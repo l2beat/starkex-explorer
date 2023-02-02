@@ -36,7 +36,9 @@ export class SpotValidiumSyncService implements IDataSyncService {
     const tokenRegistrations = await this.tokenRegistrationCollector.collect(
       blockRange
     )
-    const depositsWithTokenId = await this.depositWithTokenIdCollector.collect(blockRange)
+    const depositsWithTokenId = await this.depositWithTokenIdCollector.collect(
+      blockRange
+    )
 
     const stateTransitions =
       await this.spotValidiumStateTransitionCollector.collect(blockRange)
@@ -47,7 +49,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
       stateTransitions: stateTransitions.length,
       userRegistrations: userRegistrations.length,
       tokenRegistrations: tokenRegistrations.length,
-      depositsWithTokenId: depositsWithTokenId.length
+      depositsWithTokenId: depositsWithTokenId.length,
     })
 
     for (const transition of stateTransitions) {

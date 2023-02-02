@@ -3,7 +3,7 @@ export interface SpotAssetId extends String {
 }
 
 export function SpotAssetId(value: string) {
-  if(value.length > 34) {
+  if (value.length > 34) {
     throw new TypeError('Invalid SpotAssetId')
   }
 

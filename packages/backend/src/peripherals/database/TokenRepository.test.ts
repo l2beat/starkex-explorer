@@ -17,20 +17,22 @@ describe(TokenRepository.name, () => {
       assetHash: SpotAssetId(''),
       tokenId: null,
       uri: null,
-      contractError: null
+      contractError: null,
     }
 
     await repository.addMany([record])
 
     const actual = await repository.getAll()
 
-    expect(actual).toEqual([
-      record
-    ])
+    expect(actual).toEqual([record])
   })
 
   it('adds multiple records and queries them', async () => {
-    const records = [dummyToken('10', '11'), dummyToken('11', '12'), dummyToken('12', '13')]
+    const records = [
+      dummyToken('10', '11'),
+      dummyToken('11', '12'),
+      dummyToken('12', '13'),
+    ]
 
     await repository.addMany(records)
     const actual = await repository.getAll()
@@ -60,6 +62,6 @@ function dummyToken(
     assetHash: SpotAssetId(assetHash),
     tokenId,
     uri,
-    contractError
+    contractError,
   }
 }

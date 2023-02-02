@@ -3,7 +3,10 @@ import { expect } from 'earljs'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
-import { TokenRegistrationRecord, TokenRegistrationRepository } from './TokenRegistrationRepository'
+import {
+  TokenRegistrationRecord,
+  TokenRegistrationRepository,
+} from './TokenRegistrationRepository'
 
 describe(TokenRegistrationRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
@@ -16,24 +19,26 @@ describe(TokenRegistrationRepository.name, () => {
       assetTypeHash: '',
       address: EthereumAddress.fake(),
       type: ERCType('ERC-20'),
-      name : null,
+      name: null,
       symbol: null,
       quantum: 1,
       decimals: null,
-      contractError: null
+      contractError: null,
     }
 
     await repository.addMany([record])
 
     const actual = await repository.getAll()
 
-    expect(actual).toEqual([
-      record
-    ])
+    expect(actual).toEqual([record])
   })
 
   it('adds multiple records and queries them', async () => {
-    const records = [dummyTokenRegistration('10'), dummyTokenRegistration('11'), dummyTokenRegistration('12')]
+    const records = [
+      dummyTokenRegistration('10'),
+      dummyTokenRegistration('11'),
+      dummyTokenRegistration('12'),
+    ]
 
     await repository.addMany(records)
     const actual = await repository.getAll()
@@ -42,7 +47,10 @@ describe(TokenRegistrationRepository.name, () => {
   })
 
   it('deletes all records', async () => {
-    await repository.addMany([dummyTokenRegistration('1'), dummyTokenRegistration('2')])
+    await repository.addMany([
+      dummyTokenRegistration('1'),
+      dummyTokenRegistration('2'),
+    ])
 
     await repository.deleteAll()
 
@@ -69,6 +77,6 @@ function dummyTokenRegistration(
     symbol,
     quantum,
     decimals,
-    contractError
+    contractError,
   }
 }
