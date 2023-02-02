@@ -1,9 +1,10 @@
 import { EthereumAddress } from '@explorer/types'
 import { ethers } from 'ethers'
 
+import { contractMethodWrapper } from './contractMethodWrapper'
 import { provider } from './provider'
 
-export const getERC20Info = async (address: EthereumAddress, mintable = false) => {
+export const getERC20Info = async (address: EthereumAddress) => {
   const abi = [
     'function name() public view returns (string)',
     'function symbol() public view returns (string)',
@@ -12,19 +13,18 @@ export const getERC20Info = async (address: EthereumAddress, mintable = false) =
 
   const contract = new ethers.Contract(address.toString(), abi, provider)
 
-  //TODO: Do something about the unsafe calls and assignments
+  //TODO: Handle multiple contract errors
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
-  const name: string = await contract.name()
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-  const symbol: string = await contract.symbol()
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-  const decimals: number | null = mintable ? null: await contract.decimals()
+  // let contractError = null
+  
+  const {value: name} = await contractMethodWrapper<string>(contract, 'name')
+  const {value: symbol} = await contractMethodWrapper<string>(contract, 'symbol')
+  const {value: decimals, contractError} = await contractMethodWrapper<number>(contract, 'decimals')
 
   return {
     name,
     symbol,
     decimals,
-    contractError: null,
+    contractError,
   }
 }

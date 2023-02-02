@@ -77,7 +77,7 @@ export class TokenRegistrationCollector {
               pushToTokens()
               return {
                 type: ERCType('MINTABLE_ERC-20'),
-                ...(await getERC20Info(address, true)),
+                ...(await getERC20Info(address)),
               }
             case '0x02571792':
               return {

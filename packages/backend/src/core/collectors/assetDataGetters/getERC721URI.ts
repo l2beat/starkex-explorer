@@ -1,6 +1,7 @@
 import { EthereumAddress } from '@explorer/types'
 import { ethers } from 'ethers'
 
+import { contractMethodWrapper } from './contractMethodWrapper'
 import { provider } from './provider'
 
 export const getERC721URI = async (
@@ -13,13 +14,10 @@ export const getERC721URI = async (
 
   const contract = new ethers.Contract(address.toString(), abi, provider)
 
-  //TODO: Do something about the unsafe calls and assignments
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-  const uri: string = await contract.tokenURI(tokenId)
+  const {value: uri, contractError} = await contractMethodWrapper<string>(contract, 'tokenURI', tokenId)
 
   return {
     uri,
-    contractError: null,
+    contractError,
   }
 }
