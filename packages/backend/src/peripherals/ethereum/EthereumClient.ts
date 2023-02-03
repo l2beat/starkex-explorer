@@ -1,4 +1,4 @@
-import { Hash256 } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { providers } from 'ethers'
 
 import { BlockRange } from '../../model'
@@ -160,6 +160,10 @@ export class EthereumClient {
     transactionHash: Hash256
   ): Promise<providers.TransactionReceipt> {
     return await this.provider.getTransactionReceipt(transactionHash.toString())
+  }
+
+  async call(address: EthereumAddress, data: string): Promise<string> {
+    return await this.provider.call({ to: address.toString(), data })
   }
 
   onBlock(handler: (block: providers.Block | number) => void) {
