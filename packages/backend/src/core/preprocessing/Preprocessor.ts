@@ -2,6 +2,7 @@ import { PreprocessedStateUpdateRepository } from '../../peripherals/database/Pr
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { Logger } from '../../tools/Logger'
+import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
 
@@ -10,6 +11,7 @@ export class Preprocessor {
     private preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
     private syncStatusRepository: SyncStatusRepository,
     private stateUpdateRepository: StateUpdateRepository,
+    private perpetualHistoryPreprocessor: PerpetualHistoryPreprocessor,
     private logger: Logger
   ) {
     this.logger = this.logger.for(this)
@@ -21,10 +23,11 @@ export class Preprocessor {
     do {
       direction = await this.calculateRequiredSyncDirection()
       if (direction === 'forward') {
-        await this.processNextStateUpdate()
+        await this.preprocessNextStateUpdate()
       } else if (direction === 'backward') {
         await this.rollbackOneStateUpdate()
       }
+      // process.exit(1)
     } while (direction !== 'stop')
   }
 
@@ -84,7 +87,7 @@ export class Preprocessor {
     return 'stop'
   }
 
-  async processNextStateUpdate() {
+  async preprocessNextStateUpdate() {
     await this.preprocessedStateUpdateRepository.runInTransaction(
       async (trx) => {
         // BEGIN TRANSACTION
@@ -104,7 +107,10 @@ export class Preprocessor {
         }
 
         this.logger.info(`Preprocessing state update ${nextStateUpdate.id}`)
-        // TODO: call .processNextStateUpdate on all needed preprocessors here
+        await this.perpetualHistoryPreprocessor.preprocessNextStateUpdate(
+          trx,
+          nextStateUpdate
+        )
 
         await this.preprocessedStateUpdateRepository.add(
           {
@@ -136,7 +142,7 @@ export class Preprocessor {
         this.logger.info(
           `Rolling back preprocessing of state update ${lastProcessedStateUpdate.stateUpdateId}`
         )
-        // TODO: call .rollbackOneStateUpdate on all needed preprocessors here
+        await this.perpetualHistoryPreprocessor.rollbackOneStateUpdate(trx)
 
         await this.preprocessedStateUpdateRepository.deleteByStateUpdateId(
           lastProcessedStateUpdate.stateUpdateId,

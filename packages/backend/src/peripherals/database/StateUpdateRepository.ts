@@ -110,6 +110,17 @@ export class StateUpdateRepository extends BaseRepository {
     return rows.map(toStateUpdateRecord)
   }
 
+  async getPricesByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const rows = await knex('prices')
+      .select(['asset_id', 'price'])
+      .where('state_update_id', stateUpdateId)
+    return rows
+  }
+
   async getPaginated({ offset, limit }: { offset: number; limit: number }) {
     interface Row {
       id: number
