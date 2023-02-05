@@ -11,19 +11,19 @@ interface ERC20Info {
 }
 
 interface ERC721Info {
-    name: string | null
+  name: string | null
   symbol: string | null
   contractError: unknown[]
 }
 
 interface ERC721URI {
-    uri: string | null
-    contractError: unknown[]
+  uri: string | null
+  contractError: unknown[]
 }
 
 interface ERC1155URI {
-    uri: string | null
-    contractError: unknown[]
+  uri: string | null
+  contractError: unknown[]
 }
 
 export class TokenInspector {
@@ -73,7 +73,10 @@ export class TokenInspector {
     }
   }
 
-  async getERC721URI(address: EthereumAddress, tokenId: bigint): Promise<ERC721URI> {
+  async getERC721URI(
+    address: EthereumAddress,
+    tokenId: bigint
+  ): Promise<ERC721URI> {
     const [uri, e] = await this.call<string>(
       address,
       'tokenURI',
@@ -83,11 +86,14 @@ export class TokenInspector {
 
     return {
       uri,
-      contractError: e === undefined ? []: [e],
+      contractError: e === undefined ? [] : [e],
     }
   }
 
-  async getERC1155URI(address: EthereumAddress, tokenId: bigint): Promise<ERC1155URI> {
+  async getERC1155URI(
+    address: EthereumAddress,
+    tokenId: bigint
+  ): Promise<ERC1155URI> {
     const [uri, e] = await this.call<string>(
       address,
       'uri',
@@ -97,7 +103,7 @@ export class TokenInspector {
 
     return {
       uri,
-      contractError: e === undefined ? []: [e],
+      contractError: e === undefined ? [] : [e],
     }
   }
 
