@@ -22,7 +22,7 @@ export async function up(knex: Knex) {
     table.string('symbol')
     table.string('quantum').notNullable()
     table.integer('decimals')
-    table.string('contract_error')
+    table.json('contract_error').notNullable()
   })
   await knex.schema.createTable('tokens', (table) => {
     table
@@ -34,7 +34,7 @@ export async function up(knex: Knex) {
     table.string('asset_hash').notNullable()
     table.string('token_id')
     table.string('uri')
-    table.string('contract_error')
+    table.json('contract_error').notNullable()
   })
 }
 

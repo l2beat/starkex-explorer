@@ -194,7 +194,7 @@ declare module 'knex/types/tables' {
     symbol: string | null
     quantum: string
     decimals: number | null
-    contract_error: string | null
+    contract_error: json
   }
 
   interface TokenRow {
@@ -203,7 +203,7 @@ declare module 'knex/types/tables' {
     asset_hash: string
     token_id: string | null
     uri: string | null
-    contract_error: string | null
+    contract_error: json
   }
   interface PreprocessedStateUpdateRow {
     state_update_id: number

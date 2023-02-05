@@ -2,6 +2,7 @@ import { SpotAssetId } from '@explorer/types'
 import { TokenRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
+import { toSerializableJson } from '../../utils/toSerializableJson'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -10,7 +11,7 @@ export interface TokenRecord {
   assetHash: SpotAssetId
   tokenId: string | null
   uri: string | null
-  contractError: string | null
+  contractError: unknown[]
 }
 
 export class TokenRepository extends BaseRepository {
@@ -60,7 +61,7 @@ function toRow(record: TokenRecord): TokenRow {
     asset_hash: assetHash.toString(),
     token_id: tokenId,
     uri,
-    contract_error: contractError,
+    contract_error: toSerializableJson(contractError),
   }
 }
 
@@ -72,6 +73,6 @@ function toRecord(row: TokenRow): TokenRecord {
     assetHash: SpotAssetId(asset_hash),
     tokenId: token_id,
     uri,
-    contractError: contract_error,
+    contractError: Array(contract_error),
   }
 }

@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers'
 import { TokenRegistrationRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
+import { toSerializableJson } from '../../utils/toSerializableJson'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -14,7 +15,7 @@ export interface TokenRegistrationRecord {
   symbol: string | null
   quantum: BigNumber
   decimals: number | null
-  contractError: string | null
+  contractError: unknown[]
 }
 
 export class TokenRegistrationRepository extends BaseRepository {
@@ -78,7 +79,7 @@ function toRow(record: TokenRegistrationRecord): TokenRegistrationRow {
     address: address.toString(),
     type: type.toString(),
     quantum: quantum.toString(),
-    contract_error: contractError,
+    contract_error: toSerializableJson(contractError),
     ...rest,
   }
 }
@@ -92,7 +93,7 @@ function toRecord(row: TokenRegistrationRow): TokenRegistrationRecord {
     address: EthereumAddress(address),
     type: ERCType(type),
     quantum: BigNumber.from(quantum),
-    contractError: contract_error,
+    contractError: Array(contract_error),
     ...rest,
   }
 }
