@@ -58,6 +58,7 @@ import { UserTransactionRepository } from './peripherals/database/transactions/U
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
+import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
@@ -125,6 +126,8 @@ export class Application {
       config.starkex.blockchain.safeBlockDistance
     )
 
+    const tokenInspector = new TokenInspector(ethereumClient)
+
     // #endregion peripherals
     // #region core
 
@@ -153,13 +156,15 @@ export class Application {
       ethereumClient,
       config.starkex.contracts.perpetual,
       tokenRegistrationRepository,
-      tokenRepository
+      tokenRepository,
+      tokenInspector
     )
     const depositWithTokenIdCollector = new DepositWithTokenIdCollector(
       ethereumClient,
       config.starkex.contracts.perpetual,
       tokenRegistrationRepository,
-      tokenRepository
+      tokenRepository,
+      tokenInspector
     )
 
     let syncService

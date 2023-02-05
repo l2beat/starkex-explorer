@@ -1,4 +1,4 @@
-import { Hash256 } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { ethers, providers } from 'ethers'
 
 import { BlockRange } from '../../model'
@@ -164,6 +164,10 @@ export class EthereumClient {
 
   getContract(address: string, abi: string[]) {
     return new ethers.Contract(address, abi, this.provider)
+  }
+
+  async call(address: EthereumAddress, data: string): Promise<string> {
+    return await this.provider.call({ to: address.toString(), data })
   }
 
   onBlock(handler: (block: providers.Block | number) => void) {

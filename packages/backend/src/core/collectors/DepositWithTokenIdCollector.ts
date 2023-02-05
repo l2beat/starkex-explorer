@@ -4,8 +4,7 @@ import { BlockRange } from '../../model'
 import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
 import { TokenRepository } from '../../peripherals/database/TokenRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { getERC721URI } from './assetDataGetters/getERC721URI'
-import { getERC1155Info } from './assetDataGetters/getERC1155Info'
+import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
 import { LogDepositWithTokenId } from './events'
 
 export class DepositWithTokenIdCollector {
@@ -13,7 +12,8 @@ export class DepositWithTokenIdCollector {
     private readonly ethereumClient: EthereumClient,
     private readonly contractAddress: EthereumAddress,
     private readonly tokenRegistrationRepository: TokenRegistrationRepository,
-    private readonly tokenRepository: TokenRepository
+    private readonly tokenRepository: TokenRepository,
+    private readonly tokenInspector: TokenInspector
   ) {}
 
   async collect(blockRange: BlockRange) {
@@ -50,8 +50,7 @@ export class DepositWithTokenIdCollector {
           case 'MINTABLE_ERC-721':
             return {
               ...base,
-              ...(await getERC721URI(
-                this.ethereumClient,
+              ...(await this.tokenInspector.getERC721URI(
                 address,
                 tokenId.toBigInt()
               )),
@@ -59,8 +58,7 @@ export class DepositWithTokenIdCollector {
           case 'ERC-1155':
             return {
               ...base,
-              ...(await getERC1155Info(
-                this.ethereumClient,
+              ...(await this.tokenInspector.getERC1155URI(
                 address,
                 tokenId.toBigInt()
               )),
@@ -70,7 +68,7 @@ export class DepositWithTokenIdCollector {
             return {
               ...base,
               uri: null,
-              contractError: null,
+              contractError: [],
             }
         }
       })

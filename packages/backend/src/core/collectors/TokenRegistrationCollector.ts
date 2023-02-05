@@ -7,8 +7,7 @@ import {
   TokenRepository,
 } from '../../peripherals/database/TokenRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { getERC20Info } from './assetDataGetters/getERC20Info'
-import { getERC721Info } from './assetDataGetters/getERC721Info'
+import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
 import { LogTokenRegistered } from './events'
 
 export interface TokenRegistration {
@@ -23,7 +22,8 @@ export class TokenRegistrationCollector {
     private readonly ethereumClient: EthereumClient,
     private readonly contractAddress: EthereumAddress,
     private readonly tokenRegistrationRepository: TokenRegistrationRepository,
-    private readonly tokenRepository: TokenRepository
+    private readonly tokenRepository: TokenRepository,
+    private readonly tokenInspector: TokenInspector
   ) {}
 
   async collect(blockRange: BlockRange) {
@@ -53,7 +53,7 @@ export class TokenRegistrationCollector {
             assetHash: SpotAssetId(assetType),
             tokenId: null,
             uri: null,
-            contractError: null,
+            contractError: [],
           })
         }
 
@@ -66,25 +66,25 @@ export class TokenRegistrationCollector {
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
-                contractError: null,
+                contractError: [],
               }
             case '0xf47261b0':
               pushToTokens()
               return {
                 type: ERCType('ERC-20'),
-                ...(await getERC20Info(this.ethereumClient, address)),
+                ...(await this.tokenInspector.inspectERC20(address)),
               }
             case '0x68646e2d':
               pushToTokens()
               return {
                 type: ERCType('MINTABLE_ERC-20'),
-                ...(await getERC20Info(this.ethereumClient, address)),
+                ...(await this.tokenInspector.inspectERC20(address)),
               }
             case '0x02571792':
               return {
                 type: ERCType('ERC-721'),
                 decimals: null,
-                ...(await getERC721Info(this.ethereumClient, address)),
+                ...(await this.tokenInspector.inspectERC721(address)),
               }
             case '0x3348691d':
               return {
@@ -92,13 +92,13 @@ export class TokenRegistrationCollector {
                 name: null,
                 symbol: null,
                 decimals: null,
-                contractError: null,
+                contractError: [],
               }
             case '0xb8b86672':
               return {
                 type: ERCType('MINTABLE_ERC-721'),
                 decimals: null,
-                ...(await getERC721Info(this.ethereumClient, address)),
+                ...(await this.tokenInspector.inspectERC721(address)),
               }
             // TODO: Figure out a way to get rid of the default case
             default:
@@ -107,7 +107,7 @@ export class TokenRegistrationCollector {
                 name: null,
                 symbol: null,
                 decimals: null,
-                contractError: null,
+                contractError: [],
               }
           }
         }
