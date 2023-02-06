@@ -62,7 +62,7 @@ export class TokenRegistrationCollector {
             case ETH_ASSET_SELECTOR:
               pushToTokens()
               return {
-                type: ERCType('ETH'),
+                type: 'ETH' as ERCType,
                 name: 'Ethereum',
                 symbol: 'ETH',
                 decimals: 18,
@@ -71,24 +71,24 @@ export class TokenRegistrationCollector {
             case '0xf47261b0':
               pushToTokens()
               return {
-                type: ERCType('ERC-20'),
+                type: 'ERC-20' as ERCType,
                 ...(await this.tokenInspector.inspectERC20(address)),
               }
             case '0x68646e2d':
               pushToTokens()
               return {
-                type: ERCType('MINTABLE_ERC-20'),
+                type: 'MINTABLE_ERC-20' as ERCType,
                 ...(await this.tokenInspector.inspectERC20(address)),
               }
             case '0x02571792':
               return {
-                type: ERCType('ERC-721'),
+                type: 'ERC-721' as ERCType,
                 decimals: null,
                 ...(await this.tokenInspector.inspectERC721(address)),
               }
             case '0x3348691d':
               return {
-                type: ERCType('ERC-1155'),
+                type: 'ERC-1155' as ERCType,
                 name: null,
                 symbol: null,
                 decimals: null,
@@ -96,14 +96,14 @@ export class TokenRegistrationCollector {
               }
             case '0xb8b86672':
               return {
-                type: ERCType('MINTABLE_ERC-721'),
+                type: 'MINTABLE_ERC-721' as ERCType,
                 decimals: null,
                 ...(await this.tokenInspector.inspectERC721(address)),
               }
             // TODO: Figure out a way to get rid of the default case
             default:
               return {
-                type: ERCType('ERC-20'),
+                type: 'ERC-20' as ERCType,
                 name: null,
                 symbol: null,
                 decimals: null,

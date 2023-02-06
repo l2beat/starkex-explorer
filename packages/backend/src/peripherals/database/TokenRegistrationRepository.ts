@@ -84,7 +84,7 @@ function toRecord(row: TokenRegistrationRow): TokenRegistrationRecord {
   return {
     assetTypeHash: asset_type_hash,
     address: EthereumAddress(address),
-    type: ERCType(type),
+    type: type as ERCType,
     quantum: BigNumber.from(quantum),
     contractError: Array(contract_error),
     ...rest,

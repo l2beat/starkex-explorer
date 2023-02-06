@@ -56,7 +56,7 @@ describe(TokenRegistrationRepository.name, () => {
 export function dummyTokenRegistration(
   assetTypeHash: string,
   address = EthereumAddress.fake(),
-  type = ERCType('ERC-20'),
+  type = 'ERC-20' as ERCType,
   name = null,
   symbol = null,
   quantum = BigNumber.from(1),
