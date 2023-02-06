@@ -22,7 +22,7 @@ describe(TokenRegistrationRepository.name, () => {
 
     const actual = await repository.getAll()
 
-    expect(actual).toEqual([{...record, contractError: [{}]}])
+    expect(actual).toEqual([{ ...record, contractError: [{}] }])
   })
 
   it('adds multiple records and queries them', async () => {
@@ -34,6 +34,8 @@ describe(TokenRegistrationRepository.name, () => {
 
     await repository.addMany(records)
     const actual = await repository.getAll()
+
+    records.forEach((record) => (record.contractError = [{}]))
 
     expect(actual).toEqual(records)
   })

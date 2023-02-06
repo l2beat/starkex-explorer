@@ -6,6 +6,7 @@ import { TokenRegistrationRepository } from '../../peripherals/database/TokenReg
 import { TokenRepository } from '../../peripherals/database/TokenRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { HackFilter } from '../../peripherals/ethereum/HackJsonRpcProvider'
+import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
 import { mock } from '../../test/mock'
 import { DepositWithTokenIdCollector } from './DepositWithTokenIdCollector'
 import { LogDepositWithTokenId } from './events'
@@ -24,6 +25,7 @@ describe(DepositWithTokenIdCollector.name, () => {
       mockGetLogsInRange.returns([])
 
       const mockEthereumClient = mock<EthereumClient>()
+      const mockTokenInspector = mock<TokenInspector>()
       const contractAddress = EthereumAddress.fake()
 
       mockEthereumClient.getLogsInRange = mockGetLogsInRange
@@ -32,7 +34,8 @@ describe(DepositWithTokenIdCollector.name, () => {
         mockEthereumClient,
         contractAddress,
         tokenRegistrationRepository,
-        tokenRepository
+        tokenRepository,
+        mockTokenInspector
       )
 
       const mockBlockRange = mock<BlockRange>()

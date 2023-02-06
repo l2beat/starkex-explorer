@@ -1,12 +1,13 @@
 import { ERCType, EthereumAddress } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
-import { BigNumber, Contract } from 'ethers'
+import { BigNumber } from 'ethers'
 
 import { BlockRange } from '../../model'
 import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
 import { TokenRepository } from '../../peripherals/database/TokenRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { HackFilter } from '../../peripherals/ethereum/HackJsonRpcProvider'
+import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
 import { mock } from '../../test/mock'
 import { LogTokenRegistered } from './events'
 import { TokenRegistrationCollector } from './TokenRegistrationCollector'
@@ -24,9 +25,8 @@ describe(TokenRegistrationCollector.name, () => {
       const mockGetLogsInRange = mockFn<[BlockRange, HackFilter]>()
       mockGetLogsInRange.returns(logs)
 
-      const mockEthereumClient = mock<EthereumClient>({
-        getContract,
-      })
+      const mockEthereumClient = mock<EthereumClient>()
+      const mockTokenInspector = mock<TokenInspector>({ inspectERC721 })
       const contractAddress = EthereumAddress.fake()
 
       mockEthereumClient.getLogsInRange = mockGetLogsInRange
@@ -35,7 +35,8 @@ describe(TokenRegistrationCollector.name, () => {
         mockEthereumClient,
         contractAddress,
         tokenRegistrationRepository,
-        tokenRepository
+        tokenRepository,
+        mockTokenInspector
       )
 
       const mockBlockRange = mock<BlockRange>()
@@ -55,32 +56,37 @@ describe(TokenRegistrationCollector.name, () => {
   })
 })
 
-const getContract = (address: string) => {
-  switch (address) {
+const inspectERC721 = (address: EthereumAddress) => {
+  switch (address.toString()) {
     case '0xd02A8A926864A1efe5eC2F8c9C8883f7D07bB471':
-      return mock<Contract>({
-        name: () => 'MyriaNFT',
-        symbol: () => 'MyriaNFTSymb',
+      return Promise.resolve({
+        name: 'MyriaNFT',
+        symbol: 'MyriaNFTSymb',
+        contractError: [],
       })
     case '0x58A07373A7a519c55E00380859016fa04De0389C':
-      return mock<Contract>({
-        name: () => 'MyriaNFT',
-        symbol: () => 'MyriaNFTSymb',
+      return Promise.resolve({
+        name: 'MyriaNFT',
+        symbol: 'MyriaNFTSymb',
+        contractError: [],
       })
     case '0x2682Da74B6D1B12B2f57bEd9A16FF692eA76a764':
-      return mock<Contract>({
-        name: () => 'ThangNv',
-        symbol: () => 'Myria',
+      return Promise.resolve({
+        name: 'ThangNv',
+        symbol: 'Myria',
+        contractError: [],
       })
     case '0x8B9f59eb018A3A6486567A6386840f22cCADdA7b':
-      return mock<Contract>({
-        name: () => 'QA',
-        symbol: () => 'Myria',
+      return Promise.resolve({
+        name: 'QA',
+        symbol: 'Myria',
+        contractError: [],
       })
     default:
-      return mock<Contract>({
-        name: () => 'MyriaNFT',
-        symbol: () => 'MyriaNFTSymb',
+      return Promise.resolve({
+        name: 'MyriaNFT',
+        symbol: 'MyriaNFTSymb',
+        contractError: [],
       })
   }
 }
@@ -158,7 +164,7 @@ const expectedRegistrations = [
     decimals: null,
     name: 'MyriaNFT',
     symbol: 'MyriaNFTSymb',
-    contractError: null,
+    contractError: [],
   },
   {
     assetTypeHash:
@@ -169,7 +175,7 @@ const expectedRegistrations = [
     decimals: null,
     name: 'MyriaNFT',
     symbol: 'MyriaNFTSymb',
-    contractError: null,
+    contractError: [],
   },
   {
     assetTypeHash:
@@ -180,7 +186,7 @@ const expectedRegistrations = [
     decimals: null,
     name: 'ThangNv',
     symbol: 'Myria',
-    contractError: null,
+    contractError: [],
   },
   {
     assetTypeHash:
@@ -191,6 +197,6 @@ const expectedRegistrations = [
     decimals: null,
     name: 'QA',
     symbol: 'Myria',
-    contractError: null,
+    contractError: [],
   },
 ]

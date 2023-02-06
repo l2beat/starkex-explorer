@@ -23,15 +23,15 @@ describe(TokenRepository.name, () => {
   it('adds single record and queries it', async () => {
     const record: TokenRecord = dummyToken('1', '2')
 
-    await tokenRegistrationRepository.addMany(
-      [dummyTokenRegistration(record.assetTypeHash)]
-    )
+    await tokenRegistrationRepository.addMany([
+      dummyTokenRegistration(record.assetTypeHash),
+    ])
 
     await tokenRepository.addMany([record])
 
     const actual = await tokenRepository.getAll()
 
-    expect(actual).toEqual([{...record, contractError: [{}]}])
+    expect(actual).toEqual([{ ...record, contractError: [{}] }])
   })
 
   it('adds multiple records and queries them', async () => {
@@ -48,7 +48,7 @@ describe(TokenRepository.name, () => {
     await tokenRepository.addMany(records)
     const actual = await tokenRepository.getAll()
 
-    records.forEach(record => record.contractError = [{}])
+    records.forEach((record) => (record.contractError = [{}]))
 
     expect(actual).toEqual(records)
   })
