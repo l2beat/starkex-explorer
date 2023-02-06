@@ -21,23 +21,17 @@ describe(TokenRepository.name, () => {
   })
 
   it('adds single record and queries it', async () => {
-    const record: TokenRecord = {
-      assetTypeHash: '',
-      assetHash: SpotAssetId(''),
-      tokenId: null,
-      uri: null,
-      contractError: null,
-    }
+    const record: TokenRecord = dummyToken('1', '2')
 
-    await tokenRegistrationRepository.add(
-      dummyTokenRegistration(record.assetTypeHash)
+    await tokenRegistrationRepository.addMany(
+      [dummyTokenRegistration(record.assetTypeHash)]
     )
 
     await tokenRepository.addMany([record])
 
     const actual = await tokenRepository.getAll()
 
-    expect(actual).toEqual([record])
+    expect(actual).toEqual([{...record, contractError: [{}]}])
   })
 
   it('adds multiple records and queries them', async () => {
@@ -53,6 +47,8 @@ describe(TokenRepository.name, () => {
 
     await tokenRepository.addMany(records)
     const actual = await tokenRepository.getAll()
+
+    records.forEach(record => record.contractError = [{}])
 
     expect(actual).toEqual(records)
   })
@@ -78,7 +74,7 @@ function dummyToken(
   assetHash: string,
   tokenId = null,
   uri = null,
-  contractError = null
+  contractError = []
 ): TokenRecord {
   return {
     assetTypeHash,

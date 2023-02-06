@@ -20,16 +20,9 @@ export class TokenRepository extends BaseRepository {
 
     /* eslint-disable @typescript-eslint/unbound-method */
 
-    this.add = this.wrapAdd(this.add)
     this.addMany = this.wrapAddMany(this.addMany)
     this.getAll = this.wrapGet(this.getAll)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-  }
-
-  async add(record: TokenRecord) {
-    const knex = await this.knex()
-    await knex('tokens').insert(toRow(record))
-    return record.assetTypeHash
   }
 
   async addMany(records: TokenRecord[]) {

@@ -16,22 +16,13 @@ describe(TokenRegistrationRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   it('adds single record and queries it', async () => {
-    const record: TokenRegistrationRecord = {
-      assetTypeHash: '',
-      address: EthereumAddress.fake(),
-      type: ERCType('ERC-20'),
-      name: null,
-      symbol: null,
-      quantum: BigNumber.from(1),
-      decimals: null,
-      contractError: null,
-    }
+    const record: TokenRegistrationRecord = dummyTokenRegistration('1')
 
     await repository.addMany([record])
 
     const actual = await repository.getAll()
 
-    expect(actual).toEqual([record])
+    expect(actual).toEqual([{...record, contractError: [{}]}])
   })
 
   it('adds multiple records and queries them', async () => {
@@ -68,7 +59,7 @@ export function dummyTokenRegistration(
   symbol = null,
   quantum = BigNumber.from(1),
   decimals = null,
-  contractError = null
+  contractError = []
 ): TokenRegistrationRecord {
   return {
     assetTypeHash,
