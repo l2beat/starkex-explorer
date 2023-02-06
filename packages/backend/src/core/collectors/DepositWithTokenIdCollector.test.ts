@@ -11,6 +11,8 @@ import { mock } from '../../test/mock'
 import { DepositWithTokenIdCollector } from './DepositWithTokenIdCollector'
 import { LogDepositWithTokenId } from './events'
 
+//TODO: Add proper tests. Right now we don't have any events in the testnet
+
 describe(DepositWithTokenIdCollector.name, () => {
   describe(DepositWithTokenIdCollector.prototype.collect.name, () => {
     it('collects asset data properly', async () => {
