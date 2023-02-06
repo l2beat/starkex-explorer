@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { ethers, providers } from 'ethers'
+import { providers } from 'ethers'
 
 import { BlockRange } from '../../model'
 import { HackFilter, HackJsonRpcProvider } from './HackJsonRpcProvider'
@@ -160,10 +160,6 @@ export class EthereumClient {
     transactionHash: Hash256
   ): Promise<providers.TransactionReceipt> {
     return await this.provider.getTransactionReceipt(transactionHash.toString())
-  }
-
-  getContract(address: string, abi: string[]) {
-    return new ethers.Contract(address, abi, this.provider)
   }
 
   async call(address: EthereumAddress, data: string): Promise<string> {

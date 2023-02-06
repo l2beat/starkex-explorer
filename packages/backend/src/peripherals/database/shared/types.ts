@@ -199,7 +199,7 @@ declare module 'knex/types/tables' {
 
   interface TokenRow {
     asset_type_hash: string
-    // name: TODO: string Figure out how to get name for EIC-1155 standard
+    // name: TODO: string Figure out how to get name for ERC-1155 standard
     asset_hash: string
     token_id: string | null
     uri: string | null

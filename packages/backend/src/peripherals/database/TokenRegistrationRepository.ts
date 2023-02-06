@@ -26,6 +26,7 @@ export class TokenRegistrationRepository extends BaseRepository {
     this.addMany = this.wrapAddMany(this.addMany)
     this.findByAssetType = this.wrapFind(this.findByAssetType)
     this.getAll = this.wrapGet(this.getAll)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
   }
 
   async addMany(records: TokenRegistrationRecord[]) {
