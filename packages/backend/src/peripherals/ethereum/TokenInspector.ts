@@ -4,25 +4,25 @@ import { utils } from 'ethers'
 import { EthereumClient } from './EthereumClient'
 
 interface ERC20Info {
-  name?: string 
-  symbol?: string 
-  decimals?: number 
+  name?: string
+  symbol?: string
+  decimals?: number
   contractError: unknown[]
 }
 
 interface ERC721Info {
-  name?: string 
-  symbol?: string 
+  name?: string
+  symbol?: string
   contractError: unknown[]
 }
 
 interface ERC721URI {
-  uri?: string 
+  uri?: string
   contractError: unknown[]
 }
 
 interface ERC1155URI {
-  uri?: string 
+  uri?: string
   contractError: unknown[]
 }
 

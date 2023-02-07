@@ -185,7 +185,7 @@ declare module 'knex/types/tables' {
     timestamp: bigint
     state_update_id: number
   }
-  
+
   interface AssetRegistrationRow {
     asset_type_hash: string
     type: string

@@ -54,7 +54,6 @@ export class AssetRegistrationCollector {
       }
     }
 
-
     await this.assetRepository.addManyRegistrations(registrations)
     await this.assetRepository.addManyDetails(details)
 
@@ -76,7 +75,10 @@ export class AssetRegistrationCollector {
             assetHash: AssetHash(assetTypeHash.toString()),
             assetTypeHash,
             type: 'ETH',
+            name: 'Ethereum',
+            symbol: 'ETH',
             quantum,
+            contractError: [],
           },
         ]
       }

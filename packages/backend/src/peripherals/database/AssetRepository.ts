@@ -1,5 +1,5 @@
 import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
-import { AssetDetailsRow } from 'knex/types/tables'
+import { AssetDetailsRow, AssetRegistrationRow } from 'knex/types/tables'
 
 import { AssetDetails, AssetType } from '../../model/AssetDetails'
 import { Logger } from '../../tools/Logger'
@@ -38,12 +38,21 @@ export class AssetRepository extends BaseRepository {
   async addManyDetails(records: AssetDetails[]): Promise<AssetHash[]> {
     const knex = await this.knex()
     const rows = records.map(toAssetDetailsRow)
-    const hashes = await knex('asset_details').insert(rows).returning('asset_hash')
+    const hashes = await knex('asset_details')
+      .insert(rows)
+      .returning('asset_hash')
     return hashes.map((x) => AssetHash(x.asset_hash))
   }
 
-  async addManyRegistrations(record: AssetRegistrationRecord[]): Promise<Hash256[]> {
-    throw new Error('Not implemented')
+  async addManyRegistrations(
+    record: AssetRegistrationRecord[]
+  ): Promise<Hash256[]> {
+    const knex = await this.knex()
+    const rows = record.map(toAssetRegistrationRow)
+    const hashes = await knex('asset_registrations')
+      .insert(rows)
+      .returning('asset_type_hash')
+    return hashes.map((x) => Hash256(x.asset_type_hash))
   }
 
   async findDetailsByAssetHash(
@@ -94,7 +103,7 @@ function toAssetDetailsRow(record: AssetDetails): AssetDetailsRow {
         address: record.address.toString(),
         decimals: record.decimals ?? null,
         name: record.name ?? null,
-        symbol: record.symbol ??  null,
+        symbol: record.symbol ?? null,
         token_id: null,
         uri: null,
         minting_blob: null,
@@ -132,7 +141,7 @@ function toAssetDetailsRow(record: AssetDetails): AssetDetailsRow {
         uri: record.uri ?? null,
         minting_blob: record.mintingBlob,
         ...base,
-    }
+      }
     case 'MINTABLE_ERC20':
       return {
         address: record.address.toString(),
@@ -144,5 +153,18 @@ function toAssetDetailsRow(record: AssetDetails): AssetDetailsRow {
         minting_blob: record.mintingBlob,
         ...base,
       }
-  }  
+  }
+}
+
+function toAssetRegistrationRow(record: AssetRegistrationRecord): AssetRegistrationRow {
+  return {
+    asset_type_hash: record.assetTypeHash.toString(),
+    type: record.type,
+    quantum: record.quantum.toString(),
+    address: record.address?.toString() ?? null,
+    name: record.name ?? null,
+    symbol: record.symbol ?? null,
+    decimals: record.decimals ?? null,
+    contract_error: toSerializableJson(record.contractError),
+  }
 }
