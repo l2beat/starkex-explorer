@@ -185,26 +185,33 @@ declare module 'knex/types/tables' {
     timestamp: bigint
     state_update_id: number
   }
-
-  interface TokenRegistrationRow {
+  
+  interface AssetRegistrationRow {
     asset_type_hash: string
-    address: string
     type: string
+    quantum: string
+    address: string | null
     name: string | null
     symbol: string | null
-    quantum: string
     decimals: number | null
     contract_error: json
   }
 
-  interface TokenRow {
-    asset_type_hash: string
-    // name: TODO: string Figure out how to get name for ERC-1155 standard
+  interface AssetDetailsRow {
     asset_hash: string
+    asset_type_hash: string
+    type: string
+    quantum: string
+    address: string | null
+    name: string | null
+    symbol: string | null
+    decimals: number | null
     token_id: string | null
     uri: string | null
+    minting_blob: string | null
     contract_error: json
   }
+
   interface PreprocessedStateUpdateRow {
     state_update_id: number
     state_transition_hash: string
@@ -232,8 +239,8 @@ declare module 'knex/types/tables' {
     sent_transactions: SentTransactionRow
     user_transactions: UserTransactionRow
     included_forced_requests: IncludedForcedRequestRow
-    token_registrations: TokenRegistrationRow
-    tokens: TokenRow
+    asset_registrations: AssetRegistrationRow
+    asset_details: AssetDetailsRow
     preprocessed_state_updates: PreprocessedStateUpdateRow
   }
 }

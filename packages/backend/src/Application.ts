@@ -20,7 +20,7 @@ import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
 import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
 import { SpotCairoOutputCollector } from './core/collectors/SpotCairoOutputCollector'
-import { TokenRegistrationCollector } from './core/collectors/TokenRegistrationCollector'
+import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './core/collectors/UserTransactionCollector'
 import {
@@ -152,7 +152,7 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
-    const tokenRegistrationCollector = new TokenRegistrationCollector(
+    const tokenRegistrationCollector = new AssetRegistrationCollector(
       ethereumClient,
       config.starkex.contracts.perpetual,
       tokenRegistrationRepository,

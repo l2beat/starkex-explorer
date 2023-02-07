@@ -4,25 +4,25 @@ import { utils } from 'ethers'
 import { EthereumClient } from './EthereumClient'
 
 interface ERC20Info {
-  name: string | null
-  symbol: string | null
-  decimals: number | null
+  name?: string 
+  symbol?: string 
+  decimals?: number 
   contractError: unknown[]
 }
 
 interface ERC721Info {
-  name: string | null
-  symbol: string | null
+  name?: string 
+  symbol?: string 
   contractError: unknown[]
 }
 
 interface ERC721URI {
-  uri: string | null
+  uri?: string 
   contractError: unknown[]
 }
 
 interface ERC1155URI {
-  uri: string | null
+  uri?: string 
   contractError: unknown[]
 }
 
@@ -112,7 +112,7 @@ export class TokenInspector {
     name: string,
     abi: string,
     args: unknown[] = []
-  ): Promise<[T | null, unknown]> {
+  ): Promise<[T | undefined, unknown]> {
     const coder = new utils.Interface([abi])
     const encoded = coder.encodeFunctionData(name, args)
 
@@ -123,13 +123,13 @@ export class TokenInspector {
         const decodedName = coder.decodeFunctionResult(name, result)
         return [decodedName[0] as T, undefined]
       } catch (e) {
-        return [null, e]
+        return [undefined, e]
       }
     } catch (e) {
       if (!isRevert(e)) {
         throw e
       } else {
-        return [null, e]
+        return [undefined, e]
       }
     }
   }

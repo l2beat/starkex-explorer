@@ -10,10 +10,10 @@ import { HackFilter } from '../../peripherals/ethereum/HackJsonRpcProvider'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
 import { mock } from '../../test/mock'
 import { LogTokenRegistered } from './events'
-import { TokenRegistrationCollector } from './TokenRegistrationCollector'
+import { AssetRegistrationCollector } from './AssetRegistrationCollector'
 
-describe(TokenRegistrationCollector.name, () => {
-  describe(TokenRegistrationCollector.prototype.collect.name, () => {
+describe(AssetRegistrationCollector.name, () => {
+  describe(AssetRegistrationCollector.prototype.collect.name, () => {
     it('collects asset data properly', async () => {
       const tokenRegistrationRepository = mock<TokenRegistrationRepository>({
         addMany: async () => [],
@@ -31,7 +31,7 @@ describe(TokenRegistrationCollector.name, () => {
 
       mockEthereumClient.getLogsInRange = mockGetLogsInRange
 
-      const collector = new TokenRegistrationCollector(
+      const collector = new AssetRegistrationCollector(
         mockEthereumClient,
         contractAddress,
         tokenRegistrationRepository,

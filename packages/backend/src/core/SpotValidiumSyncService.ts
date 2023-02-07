@@ -4,7 +4,7 @@ import { AvailabilityGatewayClient } from '../peripherals/starkware/Availability
 import { Logger } from '../tools/Logger'
 import { DepositWithTokenIdCollector } from './collectors/DepositWithTokenIdCollector'
 import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'
-import { TokenRegistrationCollector } from './collectors/TokenRegistrationCollector'
+import { AssetRegistrationCollector } from './collectors/AssetRegistrationCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
@@ -19,7 +19,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     private readonly userTransactionCollector: UserTransactionCollector,
     private readonly spotCairoOutputCollector: SpotCairoOutputCollector,
     private readonly spotValidiumUpdater: SpotValidiumUpdater,
-    private readonly tokenRegistrationCollector: TokenRegistrationCollector,
+    private readonly tokenRegistrationCollector: AssetRegistrationCollector,
     private readonly depositWithTokenIdCollector: DepositWithTokenIdCollector,
     private readonly logger: Logger
   ) {
