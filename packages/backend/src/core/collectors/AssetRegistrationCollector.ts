@@ -48,9 +48,7 @@ export class AssetRegistrationCollector {
     const registrations: AssetRegistrationRecord[] = []
     const details: AssetDetails[] = []
     for (const [registration, detail] of results) {
-      if (registration) {
-        registrations.push(registration)
-      }
+      registrations.push(registration)
       if (detail) {
         details.push(detail)
       }
