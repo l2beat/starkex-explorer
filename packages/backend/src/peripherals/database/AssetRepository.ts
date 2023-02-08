@@ -3,7 +3,6 @@ import { AssetDetailsRow, AssetRegistrationRow } from 'knex/types/tables'
 
 import { AssetDetails, AssetType } from '../../model/AssetDetails'
 import { Logger } from '../../tools/Logger'
-import { toSerializableJson } from '../../utils/toSerializableJson'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -93,7 +92,7 @@ function toAssetDetailsRow(record: AssetDetails): AssetDetailsRow {
     asset_type_hash: assetTypeHash.toString(),
     type,
     quantum: quantum.toString(),
-    contract_error: toSerializableJson(contractError),
+    contract_error: JSON.stringify(contractError),
   }
 
   switch (type) {
@@ -175,7 +174,7 @@ function toAssetRegistrationRow(record: AssetRegistrationRecord): AssetRegistrat
     name: record.name ?? null,
     symbol: record.symbol ?? null,
     decimals: record.decimals ?? null,
-    contract_error: toSerializableJson(record.contractError),
+    contract_error: JSON.stringify(record.contractError),
   }
 }
 
