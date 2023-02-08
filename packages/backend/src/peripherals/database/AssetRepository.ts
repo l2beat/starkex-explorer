@@ -203,7 +203,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       quantum: BigInt(quantum),
       name: 'Ethereum',
       symbol: 'ETH',
-      contractError: Array(contract_error),
+      contractError: contract_error as unknown[],
     } 
   }
 
@@ -219,7 +219,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
         name: name ?? undefined,
         symbol: symbol ?? undefined,
         uri: uri ?? undefined,
-        contractError: Array(contract_error),
+        contractError: contract_error as unknown[],
       }
     }
     return {
@@ -232,7 +232,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       name: name ?? undefined,
       symbol: symbol ?? undefined,
       uri: uri ?? undefined,
-      contractError: Array(contract_error),
+      contractError: contract_error as unknown[],
     }
   }
 
@@ -250,7 +250,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
         symbol: symbol ?? undefined,
         decimals: decimals ?? undefined,
         mintingBlob: minting_blob,
-        contractError: Array(contract_error),
+        contractError: contract_error as unknown[],
       }
     }
     return {
@@ -263,7 +263,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       symbol: symbol ?? undefined,
       uri: uri ?? undefined,
       mintingBlob: minting_blob,
-      contractError: Array(contract_error),
+      contractError: contract_error as unknown[],
     }
   }
 
@@ -276,7 +276,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
     name: name ?? undefined,
     symbol: symbol ?? undefined,
     decimals: decimals ?? undefined,
-    contractError: Array(contract_error),
+    contractError: contract_error as unknown[],
   }
 }
 
@@ -289,6 +289,6 @@ function toAssetRegistrationRecord(row: AssetRegistrationRow): AssetRegistration
     name: row.name ?? undefined,
     symbol: row.symbol ?? undefined,
     decimals: row.decimals ?? undefined,
-    contractError: Array(row.contract_error),
+    contractError: row.contract_error as unknown[], // Does this make sense?
   }
 }
