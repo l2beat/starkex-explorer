@@ -2,9 +2,9 @@ import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { Logger } from '../tools/Logger'
+import { AssetRegistrationCollector } from './collectors/AssetRegistrationCollector'
 import { DepositWithTokenIdCollector } from './collectors/DepositWithTokenIdCollector'
 import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'
-import { AssetRegistrationCollector } from './collectors/AssetRegistrationCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
@@ -19,7 +19,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     private readonly userTransactionCollector: UserTransactionCollector,
     private readonly spotCairoOutputCollector: SpotCairoOutputCollector,
     private readonly spotValidiumUpdater: SpotValidiumUpdater,
-    private readonly tokenRegistrationCollector: AssetRegistrationCollector,
+    private readonly assetRegistrationCollector: AssetRegistrationCollector,
     private readonly depositWithTokenIdCollector: DepositWithTokenIdCollector,
     private readonly logger: Logger
   ) {
@@ -33,7 +33,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     // TODO: fix forced events
     // await this.userTransactionCollector.collect(blockRange)
 
-    const tokenRegistrations = await this.tokenRegistrationCollector.collect(
+    const assetRegistrations = await this.assetRegistrationCollector.collect(
       blockRange
     )
     const depositsWithTokenId = await this.depositWithTokenIdCollector.collect(
@@ -48,7 +48,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
       blockRange: { from: blockRange.start, to: blockRange.end },
       stateTransitions: stateTransitions.length,
       userRegistrations: userRegistrations.length,
-      tokenRegistrations: tokenRegistrations.length,
+      assetRegistrations,
       depositsWithTokenId: depositsWithTokenId.length,
     })
 
