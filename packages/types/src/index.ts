@@ -1,3 +1,4 @@
+export * from './AssetHash'
 export * from './AssetId'
 export * from './EthereumAddress'
 export * from './Hash256'

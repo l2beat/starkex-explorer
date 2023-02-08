@@ -1,5 +1,8 @@
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
-import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import {
+  StateUpdateRecord,
+  StateUpdateRepository,
+} from '../../peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { Logger } from '../../tools/Logger'
 import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
@@ -31,6 +34,16 @@ export class Preprocessor {
     } while (direction !== 'stop')
   }
 
+  async getLastSyncedStateUpdate(): Promise<StateUpdateRecord | undefined> {
+    const lastSyncedBlock = await this.syncStatusRepository.getLastSynced()
+    if (lastSyncedBlock === undefined) {
+      return
+    }
+    return await this.stateUpdateRepository.findLastUntilBlockNumber(
+      lastSyncedBlock
+    )
+  }
+
   // Preprocessor can move only one state-update forward or backward. This
   // function returns the required direction of the next move.
   //
@@ -42,14 +55,14 @@ export class Preprocessor {
   // function moves backward until it finds a "common" state update, with the
   // same id and state transition hash. Then it moves forward.
   async calculateRequiredSyncDirection(): Promise<SyncDirection> {
-    const lastStateUpdateId = await this.syncStatusRepository.getLastSynced()
+    const lastStateUpdate = await this.getLastSyncedStateUpdate()
     const lastProcessedStateUpdate =
       await this.preprocessedStateUpdateRepository.findLast()
 
     // 1. Handle simple cases of empty state updates and empty preprocessed
     // state updates.
 
-    if (lastStateUpdateId === undefined) {
+    if (lastStateUpdate === undefined) {
       return lastProcessedStateUpdate === undefined ? 'stop' : 'backward'
     }
     if (lastProcessedStateUpdate === undefined) {
@@ -59,7 +72,7 @@ export class Preprocessor {
     // 2. Move back when current id is behind or there's hash mismatch,
     // (due to reorg), or throw on missing state update.
 
-    if (lastStateUpdateId < lastProcessedStateUpdate.stateUpdateId) {
+    if (lastStateUpdate.id < lastProcessedStateUpdate.stateUpdateId) {
       return 'backward'
     }
 
@@ -80,7 +93,7 @@ export class Preprocessor {
 
     // 3. If all is ok and we're behind, move forward
 
-    if (lastStateUpdateId > lastProcessedStateUpdate.stateUpdateId) {
+    if (lastStateUpdate.id > lastProcessedStateUpdate.stateUpdateId) {
       return 'forward'
     }
 

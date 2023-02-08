@@ -186,6 +186,32 @@ declare module 'knex/types/tables' {
     state_update_id: number
   }
 
+  interface AssetRegistrationRow {
+    asset_type_hash: string
+    type: string
+    quantum: string
+    address: string | null
+    name: string | null
+    symbol: string | null
+    decimals: number | null
+    contract_error: json
+  }
+
+  interface AssetDetailsRow {
+    asset_hash: string
+    asset_type_hash: string
+    type: string
+    quantum: string
+    address: string | null
+    name: string | null
+    symbol: string | null
+    decimals: number | null
+    token_id: string | null
+    uri: string | null
+    minting_blob: string | null
+    contract_error: json
+  }
+
   interface PreprocessedStateUpdateRow {
     state_update_id: number
     state_transition_hash: string
@@ -230,6 +256,8 @@ declare module 'knex/types/tables' {
     sent_transactions: SentTransactionRow
     user_transactions: UserTransactionRow
     included_forced_requests: IncludedForcedRequestRow
+    asset_registrations: AssetRegistrationRow
+    asset_details: AssetDetailsRow
     preprocessed_state_updates: PreprocessedStateUpdateRow
     preprocessed_asset_history: PreprocessedAssetHistoryRow
   }
