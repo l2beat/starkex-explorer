@@ -14,6 +14,8 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
+import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
+import { DepositWithTokenIdCollector } from './core/collectors/DepositWithTokenIdCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
@@ -37,6 +39,7 @@ import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
@@ -54,6 +57,7 @@ import { UserTransactionRepository } from './peripherals/database/transactions/U
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
+import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
@@ -110,11 +114,14 @@ export class Application {
       database,
       logger
     )
+    const assetRepository = new AssetRepository(database, logger)
 
     const ethereumClient = new EthereumClient(
       config.starkex.blockchain.jsonRpcUrl,
       config.starkex.blockchain.safeBlockDistance
     )
+
+    const tokenInspector = new TokenInspector(ethereumClient)
 
     // #endregion peripherals
     // #region core
@@ -138,6 +145,19 @@ export class Application {
       ethereumClient,
       userTransactionRepository,
       config.starkex.contracts.perpetual
+    )
+
+    const tokenRegistrationCollector = new AssetRegistrationCollector(
+      ethereumClient,
+      config.starkex.contracts.perpetual,
+      assetRepository,
+      tokenInspector
+    )
+    const depositWithTokenIdCollector = new DepositWithTokenIdCollector(
+      ethereumClient,
+      config.starkex.contracts.perpetual,
+      assetRepository,
+      tokenInspector
     )
 
     let syncService
@@ -200,6 +220,7 @@ export class Application {
           userTransactionRepository,
           logger
         )
+
         syncService = new SpotValidiumSyncService(
           availabilityGatewayClient,
           spotValidiumStateTransitionCollector,
@@ -207,6 +228,8 @@ export class Application {
           userTransactionCollector,
           spotCairoOutputCollector,
           spotValidiumUpdater,
+          tokenRegistrationCollector,
+          depositWithTokenIdCollector,
           logger
         )
       }
