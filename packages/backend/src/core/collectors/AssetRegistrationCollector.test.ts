@@ -1,29 +1,26 @@
-import { ERCType, EthereumAddress } from '@explorer/types'
+import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 import { BigNumber } from 'ethers'
 
 import { BlockRange } from '../../model'
-import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
-import { TokenRepository } from '../../peripherals/database/TokenRepository'
+import { AssetRegistrationRecord, AssetRepository } from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { HackFilter } from '../../peripherals/ethereum/HackJsonRpcProvider'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
 import { mock } from '../../test/mock'
-import { LogTokenRegistered } from './events'
 import { AssetRegistrationCollector } from './AssetRegistrationCollector'
+import { LogTokenRegistered } from './events'
 
 describe(AssetRegistrationCollector.name, () => {
   describe(AssetRegistrationCollector.prototype.collect.name, () => {
     it('collects asset data properly', async () => {
-      const tokenRegistrationRepository = mock<TokenRegistrationRepository>({
-        addMany: async () => [],
-      })
-      const tokenRepository = mock<TokenRepository>({
-        addMany: async () => [],
+      const assetRepository = mock<AssetRepository>({
+        addManyRegistrations: async () => [],
+        addManyDetails: async () => [],
       })
 
       const mockGetLogsInRange = mockFn<[BlockRange, HackFilter]>()
-      mockGetLogsInRange.returns(logs)
+      mockGetLogsInRange.returns(Promise.resolve(logs))
 
       const mockEthereumClient = mock<EthereumClient>()
       const mockTokenInspector = mock<TokenInspector>({ inspectERC721 })
@@ -34,14 +31,13 @@ describe(AssetRegistrationCollector.name, () => {
       const collector = new AssetRegistrationCollector(
         mockEthereumClient,
         contractAddress,
-        tokenRegistrationRepository,
-        tokenRepository,
+        assetRepository,
         mockTokenInspector
       )
 
       const mockBlockRange = mock<BlockRange>()
 
-      const actualRegistrations = await collector.collect(mockBlockRange)
+      const actualRegistrationsCount = await collector.collect(mockBlockRange)
 
       expect(mockEthereumClient.getLogsInRange).toHaveBeenCalledWith([
         mockBlockRange,
@@ -51,7 +47,8 @@ describe(AssetRegistrationCollector.name, () => {
         },
       ])
 
-      expect(actualRegistrations).toEqual(expectedRegistrations)
+      expect(assetRepository.addManyRegistrations).toHaveBeenCalledWith([expectedRegistrations])
+      expect(actualRegistrationsCount).toEqual(expectedRegistrations.length)
     })
   })
 })
@@ -154,47 +151,47 @@ const logs = [
   },
 ]
 
-const expectedRegistrations = [
+const expectedRegistrations: AssetRegistrationRecord[] = [
   {
     assetTypeHash:
-      '395462755788972160729939577683135559676285060777562998674961596667455525528',
+      Hash256.from(BigNumber.from('395462755788972160729939577683135559676285060777562998674961596667455525528')),
     address: EthereumAddress('0xd02A8A926864A1efe5eC2F8c9C8883f7D07bB471'),
-    quantum: BigNumber.from(1),
-    type: 'MINTABLE_ERC-721' as ERCType,
-    decimals: null,
+    quantum: BigNumber.from(1).toBigInt(),
+    type: 'MINTABLE_ERC721',
+    decimals: undefined,
     name: 'MyriaNFT',
     symbol: 'MyriaNFTSymb',
     contractError: [],
   },
   {
     assetTypeHash:
-      '1652465222767998105503059181114991553434372817454395374606707395630983981654',
+      Hash256.from(BigNumber.from('1652465222767998105503059181114991553434372817454395374606707395630983981654')),
     address: EthereumAddress('0x58A07373A7a519c55E00380859016fa04De0389C'),
-    quantum: BigNumber.from(1),
-    type: 'MINTABLE_ERC-721' as ERCType,
-    decimals: null,
+    quantum: BigNumber.from(1).toBigInt(),
+    type: 'MINTABLE_ERC721',
+    decimals: undefined,
     name: 'MyriaNFT',
     symbol: 'MyriaNFTSymb',
     contractError: [],
   },
   {
     assetTypeHash:
-      '1727679741333866338593640246949654840813891965024044849102687714219146492163',
+      Hash256.from(BigNumber.from('1727679741333866338593640246949654840813891965024044849102687714219146492163')),
     address: EthereumAddress('0x2682Da74B6D1B12B2f57bEd9A16FF692eA76a764'),
-    quantum: BigNumber.from(1),
-    type: 'MINTABLE_ERC-721' as ERCType,
-    decimals: null,
+    quantum: BigNumber.from(1).toBigInt(),
+    type: 'MINTABLE_ERC721',
+    decimals: undefined,
     name: 'ThangNv',
     symbol: 'Myria',
     contractError: [],
   },
   {
     assetTypeHash:
-      '819699508121163634638867493810194564998637738546813278417243317074555237559',
+      Hash256.from(BigNumber.from('819699508121163634638867493810194564998637738546813278417243317074555237559')),
     address: EthereumAddress('0x8B9f59eb018A3A6486567A6386840f22cCADdA7b'),
-    quantum: BigNumber.from(1),
-    type: 'MINTABLE_ERC-721' as ERCType,
-    decimals: null,
+    quantum: BigNumber.from(1).toBigInt(),
+    type: 'MINTABLE_ERC721',
+    decimals: undefined,
     name: 'QA',
     symbol: 'Myria',
     contractError: [],

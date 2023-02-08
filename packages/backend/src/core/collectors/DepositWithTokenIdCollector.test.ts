@@ -2,8 +2,7 @@ import { EthereumAddress } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import { BlockRange } from '../../model'
-import { TokenRegistrationRepository } from '../../peripherals/database/TokenRegistrationRepository'
-import { TokenRepository } from '../../peripherals/database/TokenRepository'
+import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { HackFilter } from '../../peripherals/ethereum/HackJsonRpcProvider'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
@@ -16,11 +15,8 @@ import { LogDepositWithTokenId } from './events'
 describe(DepositWithTokenIdCollector.name, () => {
   describe(DepositWithTokenIdCollector.prototype.collect.name, () => {
     it('collects asset data properly', async () => {
-      const tokenRegistrationRepository = mock<TokenRegistrationRepository>({
-        addMany: async () => [],
-      })
-      const tokenRepository = mock<TokenRepository>({
-        addMany: async () => [],
+      const assetRepository = mock<AssetRepository>({
+        addManyDetails: async () => []
       })
 
       const mockGetLogsInRange = mockFn<[BlockRange, HackFilter]>()
@@ -35,8 +31,7 @@ describe(DepositWithTokenIdCollector.name, () => {
       const collector = new DepositWithTokenIdCollector(
         mockEthereumClient,
         contractAddress,
-        tokenRegistrationRepository,
-        tokenRepository,
+        assetRepository,
         mockTokenInspector
       )
 
