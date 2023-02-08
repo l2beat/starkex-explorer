@@ -96,7 +96,7 @@ function toAssetDetailsRow(record: AssetDetails): AssetDetailsRow {
     decimals: 'decimals' in record ? record.decimals ?? null : null,
     token_id: 'tokenId' in record ? record.tokenId.toString() : null,
     uri: 'uri' in record ? record.uri ?? null : null,
-    minting_blob: 'mintingBlob' in record ? record.mintingBlob ?? null : null,
+    minting_blob: 'mintingBlob' in record ? record.mintingBlob : null,
     contract_error: JSON.stringify(record.contractError),
   }
 }
