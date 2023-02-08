@@ -14,13 +14,13 @@ import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
+import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
 import { DepositWithTokenIdCollector } from './core/collectors/DepositWithTokenIdCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
 import { PerpetualRollupStateTransitionCollector } from './core/collectors/PerpetualRollupStateTransitionCollector'
 import { SpotCairoOutputCollector } from './core/collectors/SpotCairoOutputCollector'
-import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
 import { UserRegistrationCollector } from './core/collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './core/collectors/UserTransactionCollector'
 import {
@@ -39,6 +39,7 @@ import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
@@ -51,8 +52,6 @@ import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigr
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
-import { TokenRegistrationRepository } from './peripherals/database/TokenRegistrationRepository'
-import { TokenRepository } from './peripherals/database/TokenRepository'
 import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
@@ -115,11 +114,7 @@ export class Application {
       database,
       logger
     )
-    const tokenRegistrationRepository = new TokenRegistrationRepository(
-      database,
-      logger
-    )
-    const tokenRepository = new TokenRepository(database, logger)
+    const assetRepository = new AssetRepository(database, logger)
 
     const ethereumClient = new EthereumClient(
       config.starkex.blockchain.jsonRpcUrl,
@@ -155,15 +150,13 @@ export class Application {
     const tokenRegistrationCollector = new AssetRegistrationCollector(
       ethereumClient,
       config.starkex.contracts.perpetual,
-      tokenRegistrationRepository,
-      tokenRepository,
+      assetRepository,
       tokenInspector
     )
     const depositWithTokenIdCollector = new DepositWithTokenIdCollector(
       ethereumClient,
       config.starkex.contracts.perpetual,
-      tokenRegistrationRepository,
-      tokenRepository,
+      assetRepository,
       tokenInspector
     )
 
