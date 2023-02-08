@@ -1,7 +1,11 @@
 import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { BlockRange } from '../../model'
-import { ERC721Details, ERC1155Details, MintableERC721Details } from '../../model/AssetDetails'
+import {
+  ERC721Details,
+  ERC1155Details,
+  MintableERC721Details,
+} from '../../model/AssetDetails'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
@@ -28,7 +32,9 @@ export class DepositWithTokenIdCollector {
         const assetTypeHash = Hash256(event.args.assetType.toString())
 
         const registeredToken =
-          await this.assetRepository.findRegistrationByAssetTypeHash(assetTypeHash)
+          await this.assetRepository.findRegistrationByAssetTypeHash(
+            assetTypeHash
+          )
 
         if (!registeredToken) {
           throw new Error('This token has never been registered D:')
@@ -36,9 +42,10 @@ export class DepositWithTokenIdCollector {
 
         const tokenId = event.args.tokenId.toBigInt()
         const assetHash = AssetHash(event.args.assetId.toString())
-        const {type, quantum, address, name, symbol, decimals} = registeredToken
+        const { type, quantum, address, name, symbol, decimals } =
+          registeredToken
 
-        if(!address) {
+        if (!address) {
           throw new Error('Something went wrong with the registration')
         }
 
@@ -47,31 +54,25 @@ export class DepositWithTokenIdCollector {
             return {
               assetHash,
               assetTypeHash,
-              type: "ERC721",
+              type: 'ERC721',
               quantum,
               address,
               name,
               symbol,
               tokenId,
-              ...(await this.tokenInspector.getERC721URI(
-                address,
-                tokenId
-              )),
+              ...(await this.tokenInspector.getERC721URI(address, tokenId)),
             } as ERC721Details // Is this conversion necessary?
           case 'MINTABLE_ERC721': //Will this type even appear here?
             return {
               assetHash,
               assetTypeHash,
-              type: "MINTABLE_ERC721",
+              type: 'MINTABLE_ERC721',
               quantum,
               address,
               name,
               symbol,
               mintingBlob: '',
-              ...(await this.tokenInspector.getERC721URI(
-                address,
-                tokenId
-              )),
+              ...(await this.tokenInspector.getERC721URI(address, tokenId)),
             } as MintableERC721Details
           case 'ERC1155':
             return {
@@ -83,11 +84,8 @@ export class DepositWithTokenIdCollector {
               name,
               symbol,
               decimals,
-              type: "ERC1155",
-              ...(await this.tokenInspector.getERC1155URI(
-                address,
-                tokenId
-              )),
+              type: 'ERC1155',
+              ...(await this.tokenInspector.getERC1155URI(address, tokenId)),
             } as ERC1155Details
           default:
             throw new Error('Unknown token type')

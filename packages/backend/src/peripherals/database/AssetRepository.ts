@@ -165,7 +165,9 @@ function toAssetDetailsRow(record: AssetDetails): AssetDetailsRow {
   }
 }
 
-function toAssetRegistrationRow(record: AssetRegistrationRecord): AssetRegistrationRow {
+function toAssetRegistrationRow(
+  record: AssetRegistrationRecord
+): AssetRegistrationRow {
   return {
     asset_type_hash: record.assetTypeHash.toString(),
     type: record.type,
@@ -195,7 +197,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
     contract_error,
   } = row
 
-  if(!address) {
+  if (!address) {
     return {
       assetHash: AssetHash(asset_hash),
       assetTypeHash: Hash256(asset_type_hash),
@@ -204,11 +206,11 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       name: 'Ethereum',
       symbol: 'ETH',
       contractError: contract_error as unknown[],
-    } 
+    }
   }
 
   if (token_id) {
-    if(type === 'ERC721') {
+    if (type === 'ERC721') {
       return {
         assetHash: AssetHash(asset_hash),
         assetTypeHash: Hash256(asset_type_hash),
@@ -236,10 +238,8 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
     }
   }
 
-  
-
   if (minting_blob) {
-    if(type === 'MINTABLE_ERC20') {
+    if (type === 'MINTABLE_ERC20') {
       return {
         assetHash: AssetHash(asset_hash),
         assetTypeHash: Hash256(asset_type_hash),
@@ -280,7 +280,9 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
   }
 }
 
-function toAssetRegistrationRecord(row: AssetRegistrationRow): AssetRegistrationRecord {
+function toAssetRegistrationRecord(
+  row: AssetRegistrationRow
+): AssetRegistrationRecord {
   return {
     assetTypeHash: Hash256(row.asset_type_hash),
     type: row.type as AssetType,

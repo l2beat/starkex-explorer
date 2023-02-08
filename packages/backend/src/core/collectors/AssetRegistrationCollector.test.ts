@@ -3,7 +3,10 @@ import { expect, mockFn } from 'earljs'
 import { BigNumber } from 'ethers'
 
 import { BlockRange } from '../../model'
-import { AssetRegistrationRecord, AssetRepository } from '../../peripherals/database/AssetRepository'
+import {
+  AssetRegistrationRecord,
+  AssetRepository,
+} from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { HackFilter } from '../../peripherals/ethereum/HackJsonRpcProvider'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
@@ -47,7 +50,9 @@ describe(AssetRegistrationCollector.name, () => {
         },
       ])
 
-      expect(assetRepository.addManyRegistrations).toHaveBeenCalledWith([expectedRegistrations])
+      expect(assetRepository.addManyRegistrations).toHaveBeenCalledWith([
+        expectedRegistrations,
+      ])
       expect(actualRegistrationsCount).toEqual(expectedRegistrations.length)
     })
   })
@@ -153,8 +158,11 @@ const logs = [
 
 const expectedRegistrations: AssetRegistrationRecord[] = [
   {
-    assetTypeHash:
-      Hash256.from(BigNumber.from('395462755788972160729939577683135559676285060777562998674961596667455525528')),
+    assetTypeHash: Hash256.from(
+      BigNumber.from(
+        '395462755788972160729939577683135559676285060777562998674961596667455525528'
+      )
+    ),
     address: EthereumAddress('0xd02A8A926864A1efe5eC2F8c9C8883f7D07bB471'),
     quantum: BigNumber.from(1).toBigInt(),
     type: 'MINTABLE_ERC721',
@@ -164,8 +172,11 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     contractError: [],
   },
   {
-    assetTypeHash:
-      Hash256.from(BigNumber.from('1652465222767998105503059181114991553434372817454395374606707395630983981654')),
+    assetTypeHash: Hash256.from(
+      BigNumber.from(
+        '1652465222767998105503059181114991553434372817454395374606707395630983981654'
+      )
+    ),
     address: EthereumAddress('0x58A07373A7a519c55E00380859016fa04De0389C'),
     quantum: BigNumber.from(1).toBigInt(),
     type: 'MINTABLE_ERC721',
@@ -175,8 +186,11 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     contractError: [],
   },
   {
-    assetTypeHash:
-      Hash256.from(BigNumber.from('1727679741333866338593640246949654840813891965024044849102687714219146492163')),
+    assetTypeHash: Hash256.from(
+      BigNumber.from(
+        '1727679741333866338593640246949654840813891965024044849102687714219146492163'
+      )
+    ),
     address: EthereumAddress('0x2682Da74B6D1B12B2f57bEd9A16FF692eA76a764'),
     quantum: BigNumber.from(1).toBigInt(),
     type: 'MINTABLE_ERC721',
@@ -186,8 +200,11 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     contractError: [],
   },
   {
-    assetTypeHash:
-      Hash256.from(BigNumber.from('819699508121163634638867493810194564998637738546813278417243317074555237559')),
+    assetTypeHash: Hash256.from(
+      BigNumber.from(
+        '819699508121163634638867493810194564998637738546813278417243317074555237559'
+      )
+    ),
     address: EthereumAddress('0x8B9f59eb018A3A6486567A6386840f22cCADdA7b'),
     quantum: BigNumber.from(1).toBigInt(),
     type: 'MINTABLE_ERC721',

@@ -16,7 +16,7 @@ describe(DepositWithTokenIdCollector.name, () => {
   describe(DepositWithTokenIdCollector.prototype.collect.name, () => {
     it('collects asset data properly', async () => {
       const assetRepository = mock<AssetRepository>({
-        addManyDetails: async () => []
+        addManyDetails: async () => [],
       })
 
       const mockGetLogsInRange = mockFn<[BlockRange, HackFilter]>()

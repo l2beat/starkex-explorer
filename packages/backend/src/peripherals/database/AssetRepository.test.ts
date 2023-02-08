@@ -5,7 +5,7 @@ import { BigNumber } from 'ethers'
 import { AssetDetails, AssetType } from '../../model/AssetDetails'
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
-import { AssetRegistrationRecord,AssetRepository } from './AssetRepository'
+import { AssetRegistrationRecord, AssetRepository } from './AssetRepository'
 
 describe(AssetRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
@@ -20,7 +20,9 @@ describe(AssetRepository.name, () => {
 
     await assetRepository.addManyDetails([record])
 
-    const actual = await assetRepository.findDetailsByAssetHash(record.assetHash)
+    const actual = await assetRepository.findDetailsByAssetHash(
+      record.assetHash
+    )
 
     expect(actual).toEqual(record)
   })
@@ -33,7 +35,12 @@ describe(AssetRepository.name, () => {
     ]
 
     await assetRepository.addManyDetails(records)
-    const actual = await Promise.all(records.map(async (record) => await assetRepository.findDetailsByAssetHash(record.assetHash)))
+    const actual = await Promise.all(
+      records.map(
+        async (record) =>
+          await assetRepository.findDetailsByAssetHash(record.assetHash)
+      )
+    )
 
     expect(actual).toEqual(records)
   })
@@ -43,7 +50,9 @@ describe(AssetRepository.name, () => {
 
     await assetRepository.addManyRegistrations([record])
 
-    const actual = await assetRepository.findRegistrationByAssetTypeHash(record.assetTypeHash)
+    const actual = await assetRepository.findRegistrationByAssetTypeHash(
+      record.assetTypeHash
+    )
 
     expect(actual).toEqual(record)
   })
@@ -56,8 +65,15 @@ describe(AssetRepository.name, () => {
     ]
 
     await assetRepository.addManyRegistrations(records)
-  
-    const actual = await Promise.all(records.map(async (record) => await assetRepository.findRegistrationByAssetTypeHash(record.assetTypeHash)))
+
+    const actual = await Promise.all(
+      records.map(
+        async (record) =>
+          await assetRepository.findRegistrationByAssetTypeHash(
+            record.assetTypeHash
+          )
+      )
+    )
 
     expect(actual).toEqual(records)
   })
@@ -118,4 +134,3 @@ export function dummyAssetRegistration(
     contractError,
   }
 }
-
