@@ -116,7 +116,7 @@ function dummyAsset(
 export function dummyAssetRegistration(
   assetTypeHash: string,
   address = EthereumAddress.fake(),
-  type = 'ERC-20' as AssetType,
+  type = 'ERC20' as AssetType,
   name = undefined,
   symbol = undefined,
   quantum = BigNumber.from(1).toBigInt(),

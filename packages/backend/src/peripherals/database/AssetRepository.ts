@@ -85,83 +85,19 @@ export class AssetRepository extends BaseRepository {
 }
 
 function toAssetDetailsRow(record: AssetDetails): AssetDetailsRow {
-  const { assetHash, assetTypeHash, type, quantum, contractError } = record
-
-  const base = {
-    asset_hash: assetHash.toString(),
-    asset_type_hash: assetTypeHash.toString(),
-    type,
-    quantum: quantum.toString(),
-    contract_error: JSON.stringify(contractError),
-  }
-
-  switch (type) {
-    case 'ETH':
-      return {
-        address: null,
-        decimals: null,
-        token_id: null,
-        uri: null,
-        minting_blob: null,
-        name: record.name,
-        symbol: record.symbol,
-        ...base,
-      }
-    case 'ERC20':
-      return {
-        address: record.address.toString(),
-        decimals: record.decimals ?? null,
-        name: record.name ?? null,
-        symbol: record.symbol ?? null,
-        token_id: null,
-        uri: null,
-        minting_blob: null,
-        ...base,
-      }
-    case 'ERC721':
-      return {
-        address: record.address.toString(),
-        decimals: null,
-        name: record.name ?? null,
-        symbol: record.symbol ?? null,
-        token_id: record.tokenId.toString(),
-        uri: record.uri ?? null,
-        minting_blob: null,
-        ...base,
-      }
-    case 'ERC1155':
-      return {
-        address: record.address.toString(),
-        decimals: null,
-        name: record.name ?? null,
-        symbol: record.symbol ?? null,
-        token_id: record.tokenId.toString(),
-        uri: record.uri ?? null,
-        minting_blob: null,
-        ...base,
-      }
-    case 'MINTABLE_ERC721':
-      return {
-        address: record.address.toString(),
-        decimals: null,
-        name: record.name ?? null,
-        symbol: record.symbol ?? null,
-        token_id: null,
-        uri: record.uri ?? null,
-        minting_blob: record.mintingBlob,
-        ...base,
-      }
-    case 'MINTABLE_ERC20':
-      return {
-        address: record.address.toString(),
-        decimals: record.decimals ?? null,
-        name: record.name ?? null,
-        symbol: record.symbol ?? null,
-        token_id: null,
-        uri: null,
-        minting_blob: record.mintingBlob,
-        ...base,
-      }
+  return {
+    asset_hash: record.assetHash.toString(),
+    asset_type_hash: record.assetTypeHash.toString(),
+    type: record.type,
+    quantum: record.quantum.toString(),
+    address: 'address' in record ? record.address.toString() : null,
+    name: record.name ?? null,
+    symbol: record.symbol ?? null,
+    decimals: 'decimals' in record ? record.decimals ?? null : null,
+    token_id: 'tokenId' in record ? record.tokenId.toString() : null,
+    uri: 'uri' in record ? record.uri ?? null : null,
+    minting_blob: 'mintingBlob' in record ? record.mintingBlob ?? null : null,
+    contract_error: JSON.stringify(record.contractError),
   }
 }
 
@@ -181,102 +117,116 @@ function toAssetRegistrationRow(
 }
 
 function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
-  // I am not sure about this function, it is a bit messy
-  const {
-    asset_hash,
-    asset_type_hash,
-    type,
-    quantum,
-    address,
-    name,
-    symbol,
-    decimals,
-    token_id,
-    uri,
-    minting_blob,
-    contract_error,
-  } = row
-
-  if (!address) {
-    return {
-      assetHash: AssetHash(asset_hash),
-      assetTypeHash: Hash256(asset_type_hash),
-      type: 'ETH',
-      quantum: BigInt(quantum),
-      name: 'Ethereum',
-      symbol: 'ETH',
-      contractError: contract_error as unknown[],
-    }
-  }
-
-  if (token_id) {
-    if (type === 'ERC721') {
+  switch (row.type) {
+    case 'ETH': {
       return {
-        assetHash: AssetHash(asset_hash),
-        assetTypeHash: Hash256(asset_type_hash),
+        assetHash: AssetHash(row.asset_hash),
+        assetTypeHash: Hash256(row.asset_type_hash),
+        type: 'ETH',
+        quantum: BigInt(row.quantum),
+        name: 'Ethereum',
+        symbol: 'ETH',
+        contractError: row.contract_error as unknown[],
+      }
+    }
+    case 'ERC20': {
+      if (!row.address) {
+        throw new Error('invalid row: missing address')
+      }
+      return {
+        assetHash: AssetHash(row.asset_hash),
+        assetTypeHash: Hash256(row.asset_type_hash),
+        type: 'ERC20',
+        quantum: BigInt(row.quantum),
+        address: EthereumAddress(row.address),
+        name: row.name ?? undefined,
+        symbol: row.symbol ?? undefined,
+        decimals: row.decimals ?? undefined,
+        contractError: row.contract_error as unknown[],
+      }
+    }
+    case 'ERC721': {
+      if (!row.address) {
+        throw new Error('invalid row: missing address')
+      }
+      if (!row.token_id) {
+        throw new Error('invalid row: missing token_id')
+      }
+      return {
+        assetHash: AssetHash(row.asset_hash),
+        assetTypeHash: Hash256(row.asset_type_hash),
         type: 'ERC721',
-        quantum: BigInt(quantum),
-        address: EthereumAddress(address),
-        tokenId: BigInt(token_id),
-        name: name ?? undefined,
-        symbol: symbol ?? undefined,
-        uri: uri ?? undefined,
-        contractError: contract_error as unknown[],
+        quantum: BigInt(row.quantum),
+        address: EthereumAddress(row.address),
+        tokenId: BigInt(row.token_id),
+        name: row.name ?? undefined,
+        symbol: row.symbol ?? undefined,
+        uri: row.uri ?? undefined,
+        contractError: row.contract_error as unknown[],
       }
     }
-    return {
-      assetHash: AssetHash(asset_hash),
-      assetTypeHash: Hash256(asset_type_hash),
-      type: 'ERC1155',
-      quantum: BigInt(quantum),
-      address: EthereumAddress(address),
-      tokenId: BigInt(token_id),
-      name: name ?? undefined,
-      symbol: symbol ?? undefined,
-      uri: uri ?? undefined,
-      contractError: contract_error as unknown[],
-    }
-  }
-
-  if (minting_blob) {
-    if (type === 'MINTABLE_ERC20') {
+    case 'ERC1155': {
+      if (!row.address) {
+        throw new Error('invalid row: missing address')
+      }
+      if (!row.token_id) {
+        throw new Error('invalid row: missing token_id')
+      }
       return {
-        assetHash: AssetHash(asset_hash),
-        assetTypeHash: Hash256(asset_type_hash),
-        type: 'MINTABLE_ERC20',
-        quantum: BigInt(quantum),
-        address: EthereumAddress(address),
-        name: name ?? undefined,
-        symbol: symbol ?? undefined,
-        decimals: decimals ?? undefined,
-        mintingBlob: minting_blob,
-        contractError: contract_error as unknown[],
+        assetHash: AssetHash(row.asset_hash),
+        assetTypeHash: Hash256(row.asset_type_hash),
+        type: 'ERC1155',
+        quantum: BigInt(row.quantum),
+        address: EthereumAddress(row.address),
+        tokenId: BigInt(row.token_id),
+        name: row.name ?? undefined,
+        symbol: row.symbol ?? undefined,
+        uri: row.uri ?? undefined,
+        contractError: row.contract_error as unknown[],
       }
     }
-    return {
-      assetHash: AssetHash(asset_hash),
-      assetTypeHash: Hash256(asset_type_hash),
-      type: 'MINTABLE_ERC721',
-      quantum: BigInt(quantum),
-      address: EthereumAddress(address),
-      name: name ?? undefined,
-      symbol: symbol ?? undefined,
-      uri: uri ?? undefined,
-      mintingBlob: minting_blob,
-      contractError: contract_error as unknown[],
+    case 'MINTABLE_ERC20': {
+      if (!row.address) {
+        throw new Error('invalid row: missing address')
+      }
+      if (!row.minting_blob) {
+        throw new Error('invalid row: missing minting_blob')
+      }
+      return {
+        assetHash: AssetHash(row.asset_hash),
+        assetTypeHash: Hash256(row.asset_type_hash),
+        type: 'MINTABLE_ERC20',
+        quantum: BigInt(row.quantum),
+        address: EthereumAddress(row.address),
+        name: row.name ?? undefined,
+        symbol: row.symbol ?? undefined,
+        decimals: row.decimals ?? undefined,
+        mintingBlob: row.minting_blob,
+        contractError: row.contract_error as unknown[],
+      }
     }
-  }
-
-  return {
-    assetHash: AssetHash(asset_hash),
-    assetTypeHash: Hash256(asset_type_hash),
-    type: 'ERC20',
-    quantum: BigInt(quantum),
-    address: EthereumAddress(address),
-    name: name ?? undefined,
-    symbol: symbol ?? undefined,
-    decimals: decimals ?? undefined,
-    contractError: contract_error as unknown[],
+    case 'MINTABLE_ERC721': {
+      if (!row.address) {
+        throw new Error('invalid row: missing address')
+      }
+      if (!row.minting_blob) {
+        throw new Error('invalid row: missing minting_blob')
+      }
+      return {
+        assetHash: AssetHash(row.asset_hash),
+        assetTypeHash: Hash256(row.asset_type_hash),
+        type: 'MINTABLE_ERC721',
+        quantum: BigInt(row.quantum),
+        address: EthereumAddress(row.address),
+        name: row.name ?? undefined,
+        symbol: row.symbol ?? undefined,
+        uri: row.uri ?? undefined,
+        mintingBlob: row.minting_blob,
+        contractError: row.contract_error as unknown[],
+      }
+    }
+    default:
+      throw new Error(`invalid row: unknown asset type: ${row.type}`)
   }
 }
 
