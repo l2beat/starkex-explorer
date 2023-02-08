@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect } from 'earljs'
 import { BigNumber } from 'ethers'
 
 import { BlockRange } from '../../model'
@@ -8,7 +8,6 @@ import {
   AssetRepository,
 } from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { HackFilter } from '../../peripherals/ethereum/HackJsonRpcProvider'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
 import { mock } from '../../test/mock'
 import { AssetRegistrationCollector } from './AssetRegistrationCollector'
@@ -22,28 +21,26 @@ describe(AssetRegistrationCollector.name, () => {
         addManyDetails: async () => [],
       })
 
-      const mockGetLogsInRange = mockFn<[BlockRange, HackFilter]>()
-      mockGetLogsInRange.returns(Promise.resolve(logs))
-
-      const mockEthereumClient = mock<EthereumClient>()
-      const mockTokenInspector = mock<TokenInspector>({ inspectERC721 })
+      const ethereumClient = mock<EthereumClient>({
+        async getLogsInRange() {
+          return logs
+        },
+      })
+      const tokenInspector = mock<TokenInspector>({ inspectERC721 })
       const contractAddress = EthereumAddress.fake()
 
-      mockEthereumClient.getLogsInRange = mockGetLogsInRange
-
       const collector = new AssetRegistrationCollector(
-        mockEthereumClient,
+        ethereumClient,
         contractAddress,
         assetRepository,
-        mockTokenInspector
+        tokenInspector
       )
 
-      const mockBlockRange = mock<BlockRange>()
+      const blockRange = new BlockRange([])
+      const actualRegistrationsCount = await collector.collect(blockRange)
 
-      const actualRegistrationsCount = await collector.collect(mockBlockRange)
-
-      expect(mockEthereumClient.getLogsInRange).toHaveBeenCalledWith([
-        mockBlockRange,
+      expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
+        blockRange,
         {
           address: contractAddress.toString(),
           topics: [LogTokenRegistered.topic],
@@ -166,7 +163,6 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     address: EthereumAddress('0xd02A8A926864A1efe5eC2F8c9C8883f7D07bB471'),
     quantum: BigNumber.from(1).toBigInt(),
     type: 'MINTABLE_ERC721',
-    decimals: undefined,
     name: 'MyriaNFT',
     symbol: 'MyriaNFTSymb',
     contractError: [],
@@ -180,7 +176,6 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     address: EthereumAddress('0x58A07373A7a519c55E00380859016fa04De0389C'),
     quantum: BigNumber.from(1).toBigInt(),
     type: 'MINTABLE_ERC721',
-    decimals: undefined,
     name: 'MyriaNFT',
     symbol: 'MyriaNFTSymb',
     contractError: [],
@@ -194,7 +189,6 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     address: EthereumAddress('0x2682Da74B6D1B12B2f57bEd9A16FF692eA76a764'),
     quantum: BigNumber.from(1).toBigInt(),
     type: 'MINTABLE_ERC721',
-    decimals: undefined,
     name: 'ThangNv',
     symbol: 'Myria',
     contractError: [],
@@ -208,7 +202,6 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     address: EthereumAddress('0x8B9f59eb018A3A6486567A6386840f22cCADdA7b'),
     quantum: BigNumber.from(1).toBigInt(),
     type: 'MINTABLE_ERC721',
-    decimals: undefined,
     name: 'QA',
     symbol: 'Myria',
     contractError: [],
