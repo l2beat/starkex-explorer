@@ -39,7 +39,8 @@ module.exports = {
       },
       purple: {
         100: '#5F5CFF',
-      }
+      },
+      'dydx-brand-color': '#5F5CFF'
     },
   },
   plugins: [],

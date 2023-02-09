@@ -20,7 +20,7 @@ export function Home(props: HomeProps) {
       account={props.account}
       withoutSearch
     >
-      {/* <AssetsTable assets={[{icon: 'Icon', name: 'Bitcoin', symbol: 'BTC', balance: 1 as unknown as bigint, value: 2 as unknown as bigint, vaultId: 17, action: "CLOSE"}]} /> */}
+      <AssetsTable assets={[{icon: 'Icon', name: 'Bitcoin', symbol: 'BTC', balance: 1 as unknown as bigint, value: 2 as unknown as bigint, vaultId: 17, action: "CLOSE"}]} />
       <SearchBar className="drop-shadow-lg mb-8" />
       <div className="mb-8 flex flex-col md:flex-row gap-x-4 gap-y-1 items-center">
         <Stat title="Total Value Locked" value="-" valueId={tvlElId} />
