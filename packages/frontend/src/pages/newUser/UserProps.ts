@@ -2,7 +2,7 @@ import { Timestamp } from "@explorer/types"
 
 import { AccountDetails } from "../common/AccountDetails"
 
-export interface HomeProps {
+export interface UserProps {
     readonly account: AccountDetails | undefined
     readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
     readonly offersToAccept: readonly OfferEntry[]
@@ -10,7 +10,7 @@ export interface HomeProps {
     readonly totalAssets: bigint
     readonly balanceChanges: readonly BalanceChangeEntry[]
     readonly totalBalanceChanges: bigint
-    readonly etehereumTransactions: readonly EthereumTransactionEntry[]
+    readonly ethereumTransactions: readonly EthereumTransactionEntry[]
     readonly totalEthereumTransactions: bigint
     readonly offers: readonly OfferEntry[]
     readonly totalOffers: bigint
@@ -26,7 +26,7 @@ export interface AssetEntry {
     readonly icon: string
     readonly name: string
     readonly symbol: string
-    readonly amount: bigint
+    readonly balance: bigint
     readonly value: bigint
     readonly vaultId: number
     readonly action: "WITHDRAW" | "CLOSE"
