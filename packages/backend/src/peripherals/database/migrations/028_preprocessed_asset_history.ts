@@ -25,7 +25,7 @@ export async function up(knex: Knex) {
     table.boolean('token_is_perp').notNullable()
     table.bigInteger('balance').notNullable()
     table.bigInteger('prev_balance').notNullable()
-    table.bigInteger('price').notNullable()
+    table.bigInteger('price') // price can be null for spot tokens
     table.bigInteger('prev_price')
     table.boolean('is_current').notNullable()
     table.integer('prev_history_id')
@@ -39,7 +39,7 @@ export async function up(knex: Knex) {
     table.index(['stark_key', 'balance', 'token'], undefined, {
       predicate: knex.whereRaw('is_current = true'),
     })
-    // Index for efficiently finding stark key by current position or vault id
+    // Index for efficiently finding records by current position or vault id
     // - this happens when a position is deleted and stark key is ZERO.
     table.index(['position_or_vault_id'], undefined, {
       predicate: knex.whereRaw('is_current = true AND balance != 0'),
@@ -47,6 +47,10 @@ export async function up(knex: Knex) {
     // Index for efficiently querying history of given use,
     // *ordered* by timestamp descending.
     table.index(['stark_key', 'timestamp'])
+    // Index used on rollback to find the previous state update id
+    table.index(['state_update_id'], undefined, {
+      predicate: knex.whereRaw('is_current = true'),
+    })
   })
 }
 

@@ -5,7 +5,7 @@ import {
 } from '../../peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { Logger } from '../../tools/Logger'
-import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
+import { HistoryPreprocessor } from './HistoryPreprocessor'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
 
@@ -14,7 +14,7 @@ export class Preprocessor {
     private preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
     private syncStatusRepository: SyncStatusRepository,
     private stateUpdateRepository: StateUpdateRepository,
-    private perpetualHistoryPreprocessor: PerpetualHistoryPreprocessor,
+    private historyPreprocessor: HistoryPreprocessor,
     private logger: Logger
   ) {
     this.logger = this.logger.for(this)
@@ -120,7 +120,7 @@ export class Preprocessor {
         }
 
         this.logger.info(`Preprocessing state update ${nextStateUpdate.id}`)
-        await this.perpetualHistoryPreprocessor.preprocessNextStateUpdate(
+        await this.historyPreprocessor.preprocessNextStateUpdate(
           trx,
           nextStateUpdate
         )
@@ -155,7 +155,10 @@ export class Preprocessor {
         this.logger.info(
           `Rolling back preprocessing of state update ${lastProcessedStateUpdate.stateUpdateId}`
         )
-        await this.perpetualHistoryPreprocessor.rollbackOneStateUpdate(trx)
+        await this.historyPreprocessor.rollbackOneStateUpdate(
+          trx,
+          lastProcessedStateUpdate
+        )
 
         await this.preprocessedStateUpdateRepository.deleteByStateUpdateId(
           lastProcessedStateUpdate.stateUpdateId,

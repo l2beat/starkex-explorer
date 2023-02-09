@@ -228,7 +228,7 @@ declare module 'knex/types/tables' {
     token_is_perp: boolean
     balance: bigint
     prev_balance: bigint
-    price: bigint
+    price: bigint | null
     prev_price: bigint | null
     is_current: boolean
     prev_history_id: number | null

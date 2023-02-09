@@ -1,25 +1,28 @@
-import { StarkKey } from '@explorer/types'
+import { AssetId, StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
-import { PreprocessedAssetHistoryRow } from 'knex/types/tables'
 
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
-import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import {
+  PreprocessedAssetHistoryRecord,
+  PreprocessedAssetHistoryRepository,
+} from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
 import { Logger } from '../../tools/Logger'
+import { HistoryPreprocessor } from './HistoryPreprocessor'
 
-const COLLATERAL_TOKEN = 'USDC'
+const COLLATERAL_TOKEN = AssetId('COLLATERAL-0')
 
-export class PerpetualHistoryPreprocessor {
+export class PerpetualHistoryPreprocessor extends HistoryPreprocessor {
   constructor(
-    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
-    private logger: Logger
+    protected logger: Logger
   ) {
-    this.logger = this.logger.for(this)
+    super(preprocessedAssetHistoryRepository, logger)
   }
 
   async preprocessNextStateUpdate(
@@ -38,88 +41,70 @@ export class PerpetualHistoryPreprocessor {
     prices.forEach((p) => {
       tokenPriceMap[p.asset_id.toString()] = p.price
     })
-    tokenPriceMap[COLLATERAL_TOKEN] = 1n
+    tokenPriceMap[COLLATERAL_TOKEN.toString()] = 1n
 
     for (const position of positions) {
-      const currentUserRecords =
-        position.starkKey === StarkKey.ZERO
-          ? await this.preprocessedAssetHistoryRepository.getCurrentNonEmptyByStarkKey(
-              position.starkKey,
-              trx
-            )
-          : await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndTokenIds(
-              position.starkKey,
-              position.balances.map((b) => b.assetId.toString()),
-              trx
-            )
-
-      const tokenMap: Record<string, PreprocessedAssetHistoryRow> = {}
-      currentUserRecords.forEach((r) => {
-        if (tokenMap[r.token] !== undefined) {
-          console.log(r.token, position.starkKey)
-          process.exit(1)
-        }
-        tokenMap[r.token] = r
-      })
-
-      const updatedAssets =
-        position.starkKey === StarkKey.ZERO
-          ? [
-              { assetId: COLLATERAL_TOKEN, balance: 0n },
-              ...currentUserRecords.map((r) => ({
-                assetId: r.token,
-                balance: 0n,
-              })),
-            ]
-          : [
-              {
-                assetId: COLLATERAL_TOKEN,
-                balance: position.collateralBalance,
-              },
-              ...position.balances,
-            ]
-
-      const newRecords: Omit<PreprocessedAssetHistoryRow, 'id'>[] = []
-
-      updatedAssets.forEach((asset) => {
-        const currentRecord = tokenMap[asset.assetId.toString()]
-        const currentPrice = tokenPriceMap[asset.assetId.toString()]
-        if (currentPrice === undefined) {
-          throw new Error('Error')
-        }
-        if (currentRecord?.balance !== asset.balance) {
-          newRecords.push({
-            state_update_id: stateUpdate.id,
-            block_number: stateUpdate.blockNumber,
-            timestamp: BigInt(Number(stateUpdate.timestamp)),
-            stark_key: position.starkKey.toString(),
-            position_or_vault_id: position.positionId,
-            token: asset.assetId.toString(),
-            token_is_perp: false, // TODO: fix
-            balance: asset.balance,
-            prev_balance: currentRecord?.balance ?? 0n,
-            price: currentPrice,
-            prev_price: currentRecord?.price ?? null,
-            prev_history_id: currentRecord?.id ?? null,
-            is_current: true,
-          })
-        }
-      })
-
-      if (newRecords.length > 0) {
-        await this.preprocessedAssetHistoryRepository.unsetCurrentByStarkKeyAndTokenIds(
-          position.starkKey,
-          newRecords.map((r) => r.token),
-          trx
+      if (position.starkKey === StarkKey.ZERO) {
+        await this.closePositionOrVault(
+          trx,
+          position.positionId,
+          stateUpdate,
+          tokenPriceMap
         )
-        // Using loop because this call doesn't respect transaction(!!!!):
-        // await this.preprocessedAssetHistoryRepository.addMany(newRecords, trx)
-        for (const record of newRecords) {
-          await this.preprocessedAssetHistoryRepository.add(record, trx)
-        }
+      } else {
+        const currentUserRecords =
+          await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndTokenIds(
+            position.starkKey,
+            [COLLATERAL_TOKEN, ...position.balances.map((b) => b.assetId)],
+            trx
+          )
+
+        const tokenMap: Record<string, PreprocessedAssetHistoryRecord> = {}
+        currentUserRecords.forEach((r) => {
+          if (tokenMap[r.token.toString()] !== undefined) {
+            console.log(r.token, position.starkKey)
+            process.exit(1)
+          }
+          tokenMap[r.token.toString()] = r
+        })
+
+        const updatedAssets = [
+          {
+            assetId: COLLATERAL_TOKEN,
+            balance: position.collateralBalance,
+          },
+          ...position.balances,
+        ]
+
+        const newRecords: Omit<PreprocessedAssetHistoryRecord, 'historyId'>[] =
+          []
+
+        updatedAssets.forEach((asset) => {
+          const currentRecord = tokenMap[asset.assetId.toString()]
+          const currentPrice = tokenPriceMap[asset.assetId.toString()]
+          if (currentPrice === undefined) {
+            throw new Error(`Missing price for ${asset.assetId.toString()}`)
+          }
+          if (currentRecord?.balance !== asset.balance) {
+            newRecords.push({
+              stateUpdateId: stateUpdate.id,
+              blockNumber: stateUpdate.blockNumber,
+              timestamp: BigInt(Number(stateUpdate.timestamp)),
+              starkKey: position.starkKey,
+              positionOrVaultId: position.positionId,
+              token: asset.assetId,
+              tokenIsPerp: false, // TODO: fix
+              balance: asset.balance,
+              prevBalance: currentRecord?.balance ?? 0n,
+              price: currentPrice,
+              prevPrice: currentRecord?.price,
+              prevHistoryId: currentRecord?.historyId,
+              isCurrent: true,
+            })
+          }
+        })
+        await this.addNewRecordsAndMakeThemCurrent(trx, newRecords)
       }
     }
   }
-
-  async rollbackOneStateUpdate(trx: Knex.Transaction) {}
 }
