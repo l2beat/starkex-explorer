@@ -93,7 +93,7 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor {
               starkKey: position.starkKey,
               positionOrVaultId: position.positionId,
               token: asset.assetId,
-              tokenIsPerp: false, // TODO: fix
+              tokenIsPerp: asset.assetId !== COLLATERAL_TOKEN,
               balance: asset.balance,
               prevBalance: currentRecord?.balance ?? 0n,
               price: currentPrice,
