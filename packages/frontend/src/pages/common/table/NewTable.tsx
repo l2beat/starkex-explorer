@@ -11,6 +11,7 @@ interface TableProps {
     id?: string
     pageSize?: number
     columns: Column[]
+    fullBackground?: boolean
     rows: Row[]
     className?: string
     noRowsText: string
@@ -24,24 +25,23 @@ export function NewTable(props: TableProps) {
             <p className='text-white text-2xl font-semibold'>{props.title}</p>
             {props.pageSize && <p className='text-grey-500 font-medium text-sm'>{`You're viewing ${props.rows.length < props.pageSize ? props.rows.length: props.pageSize} out of ${props.rows.length} ${props.title.toLowerCase()}`}</p>}
         </div>
-        <div className={cx('overflow-x-auto w-full px-6 pt-3 bg-blue-900 rounded-lg', props.className)}>
-            <table id={props.id} className="w-full whitespace-nowrap">
-                <thead>
+        <div className={cx('overflow-x-auto w-full pt-3  rounded-lg', {'bg-blue-900 px-6 pb-8': props.fullBackground}, props.className)}>
+            <table id={props.id} cellPadding="0" cellSpacing="0" className="w-full whitespace-nowrap" style={{borderSpacing: 0}}>
+                <thead className='bg-blue-900'>
                     <tr>
                         {props.columns.map((column, i) => (
                         <th
                             scope="col"
                             key={i}
                             className={cx(
-                            'pb-0.5 first:pl-12 last:pr-12 font-medium p-0',
+                            'pb-0.5 first:pl-6 last:pr-6 font-medium p-0 first:rounded-l-action-button last:rounded-r-action-button border-0 border-none',
                             column.textAlignClass ??
                                 (column.numeric ? 'text-right' : 'text-left'),
-                            !column.fullWidth && 'w-0',
                             column.className
                             )}
                         >
                             <div className="py-0.5 text-xs text-grey-500">
-                            {column.header}
+                                {column.header}
                             </div>
                         </th>
                         ))}
@@ -57,6 +57,7 @@ export function NewTable(props: TableProps) {
                             columns={props.columns}
                             i={i}
                             key={i}
+                            className={!props.fullBackground ? 'first:pl-6 last:pr-6': undefined}
                         />
                         ))
                     ) : (
