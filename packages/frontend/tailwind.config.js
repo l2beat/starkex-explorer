@@ -25,6 +25,7 @@ module.exports = {
       white: '#FAFAFA',
       background: '#0c0c0e',
       blue: {
+        50: 'rgba(102, 172, 255, 0.2)',
         100: '#3067BB',
         200: '#5196FF',
         300: '#3366cc',
@@ -33,6 +34,7 @@ module.exports = {
       },
       orange: {
         100: '#9C4D03',
+        300: '#F7931A'
       },
       red: {
         100: '#f43636',

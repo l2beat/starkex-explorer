@@ -10,6 +10,7 @@ import { AssetsTable } from '../newUser/AssetsTable'
 import { BalanceChangesTable } from '../newUser/BalanceChangesTable'
 import { EthereumTransactionsTable } from '../newUser/EthereumTransactionsTable'
 import { OffersTable } from '../newUser/OffersTable'
+import { UserProfile } from '../newUser/UserProfile'
 import { ForcedTradeOffersTable } from '../offers/ForcedTradeOffersTable'
 import { StateUpdatesTable } from '../state-updates/StateUpdatesTable'
 import { FreezeButton } from './FreezeButton'
@@ -25,6 +26,7 @@ export function Home(props: HomeProps) {
       account={props.account}
       withoutSearch
     >
+      <UserProfile ethereumAddress={props.account?.address} />
       <ActionsTable withdrawableAssets={[{icon: 'Icon', symbol: 'BTC', amount: 5 as unknown as bigint}]} offersToAccept={[{timestamp: Timestamp.now(), asset: 'BTC', assetIcon: '', amount: 3 as unknown as bigint, price: 17 as unknown as bigint, status: 'CREATED', type: 'BUY'}]} />
       <AssetsTable assets={[{icon: 'Icon', name: 'Bitcoin', symbol: 'BTC', balance: 1 as unknown as bigint, value: 2 as unknown as bigint, vaultId: 17, action: "CLOSE"}]} />
       <BalanceChangesTable balanceChanges={[{timestamp: Timestamp.now(), stateUpdateId: 27, asset: 'BTC', assetIcon: 'I', newBalance: 1 as unknown as bigint, change: 2 as unknown as bigint, vaultId: 17}]} />
