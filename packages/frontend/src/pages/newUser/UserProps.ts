@@ -4,8 +4,8 @@ import { AccountDetails } from "../common/AccountDetails"
 
 export interface UserProps {
     readonly account: AccountDetails | undefined
-    readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
-    readonly offersToAccept: readonly OfferEntry[]
+    readonly withdrawableAssets: readonly WithdrawableAssetEntry[] // Does ths make sense?
+    readonly offersToAccept: readonly OfferEntry[] // We could also pass a simpler object here
     readonly assets: readonly AssetEntry[]
     readonly totalAssets: bigint
     readonly balanceChanges: readonly BalanceChangeEntry[]

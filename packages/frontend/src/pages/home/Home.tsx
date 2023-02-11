@@ -5,6 +5,7 @@ import { SectionHeadingWithLink } from '../common/header/SectionHeadingWithLink'
 import { Page } from '../common/page/Page'
 import { SearchBar } from '../common/SearchBar'
 import { ForcedTransactionsTable } from '../forced-transactions/ForcedTransactionsTable'
+import { ActionsTable } from '../newUser/ActionsTable'
 import { AssetsTable } from '../newUser/AssetsTable'
 import { BalanceChangesTable } from '../newUser/BalanceChangesTable'
 import { EthereumTransactionsTable } from '../newUser/EthereumTransactionsTable'
@@ -24,6 +25,7 @@ export function Home(props: HomeProps) {
       account={props.account}
       withoutSearch
     >
+      <ActionsTable withdrawableAssets={[{icon: 'Icon', symbol: 'BTC', amount: 5 as unknown as bigint}]} offersToAccept={[{timestamp: Timestamp.now(), asset: 'BTC', assetIcon: '', amount: 3 as unknown as bigint, price: 17 as unknown as bigint, status: 'CREATED', type: 'BUY'}]} />
       <AssetsTable assets={[{icon: 'Icon', name: 'Bitcoin', symbol: 'BTC', balance: 1 as unknown as bigint, value: 2 as unknown as bigint, vaultId: 17, action: "CLOSE"}]} />
       <BalanceChangesTable balanceChanges={[{timestamp: Timestamp.now(), stateUpdateId: 27, asset: 'BTC', assetIcon: 'I', newBalance: 1 as unknown as bigint, change: 2 as unknown as bigint, vaultId: 17}]} />
       <EthereumTransactionsTable ethereumTransactions={[{timestamp: Timestamp.now(), hash: '0x63427846783fjhsgdgfuyt2', asset: 'BTC', amount: 1 as unknown as bigint, assetIcon: '', status: 'MINED (2/3)', type: 'Forced sell'}]} />
