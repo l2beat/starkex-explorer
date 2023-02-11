@@ -8,6 +8,7 @@ import { ForcedTransactionsTable } from '../forced-transactions/ForcedTransactio
 import { AssetsTable } from '../newUser/AssetsTable'
 import { BalanceChangesTable } from '../newUser/BalanceChangesTable'
 import { EthereumTransactionsTable } from '../newUser/EthereumTransactionsTable'
+import { OffersTable } from '../newUser/OffersTable'
 import { ForcedTradeOffersTable } from '../offers/ForcedTradeOffersTable'
 import { StateUpdatesTable } from '../state-updates/StateUpdatesTable'
 import { FreezeButton } from './FreezeButton'
@@ -26,6 +27,7 @@ export function Home(props: HomeProps) {
       <AssetsTable assets={[{icon: 'Icon', name: 'Bitcoin', symbol: 'BTC', balance: 1 as unknown as bigint, value: 2 as unknown as bigint, vaultId: 17, action: "CLOSE"}]} />
       <BalanceChangesTable balanceChanges={[{timestamp: Timestamp.now(), stateUpdateId: 27, asset: 'BTC', assetIcon: 'I', newBalance: 1 as unknown as bigint, change: 2 as unknown as bigint, vaultId: 17}]} />
       <EthereumTransactionsTable ethereumTransactions={[{timestamp: Timestamp.now(), hash: '0x63427846783fjhsgdgfuyt2', asset: 'BTC', amount: 1 as unknown as bigint, assetIcon: '', status: 'MINED (2/3)', type: 'Forced sell'}]} />
+      <OffersTable offers={[{timestamp: Timestamp.now(), asset: 'BTC', assetIcon: '', amount: 3 as unknown as bigint, price: 17 as unknown as bigint, status: 'CREATED', type: 'BUY'}]} />
       <SearchBar className="drop-shadow-lg mb-8" />
       <div className="mb-8 flex flex-col md:flex-row gap-x-4 gap-y-1 items-center">
         <Stat title="Total Value Locked" value="-" valueId={tvlElId} />

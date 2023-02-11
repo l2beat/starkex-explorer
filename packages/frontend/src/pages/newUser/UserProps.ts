@@ -39,8 +39,7 @@ export interface OfferEntry {
     readonly amount: bigint
     readonly price: bigint
     readonly status: "CREATED" | "ACCEPTED" | "SENT" | "CANCELLED" | "EXPIRED"
-    readonly action: "BUY" | "SELL"
-
+    readonly type: "BUY" | "SELL"
 }
 
 export interface BalanceChangeEntry {
