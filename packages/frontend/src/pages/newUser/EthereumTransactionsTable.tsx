@@ -1,7 +1,7 @@
 import React from "react";
 
 import { NewTable } from "../common/table";
-import { EthereumTransactionStatus } from "./EthereumTransactionStatus";
+import { Status } from "./Status";
 import { EthereumTransactionEntry } from "./UserProps";
 
 export interface EthereumTransactionsTableProps {
@@ -20,7 +20,7 @@ export function EthereumTransactionsTable({ethereumTransactions}: EthereumTransa
                     <a href={`etherscan link`} className='text-blue-300 underline'>{transaction.hash.substring(0, 7)}...</a>,
                     transaction.asset,
                     transaction.amount.toString(),
-                    <EthereumTransactionStatus status={transaction.status} />,
+                    <Status status={transaction.status} />,
                     transaction.type
                 ]
             }
