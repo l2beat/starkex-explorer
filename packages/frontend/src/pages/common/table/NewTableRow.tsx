@@ -7,6 +7,7 @@ export interface TableRowProps extends Row {
   i: number
   columns: Column[]
   hidden?: boolean
+  className?: string
 }
 
 export function NewTableRow(props: TableRowProps) {
@@ -14,7 +15,6 @@ export function NewTableRow(props: TableRowProps) {
     <tr
       className={cx(
         'my-4 whitespace-nowrap',
-        props.i % 2 !== 0 && 'bg-grey-200',
         props.hidden && 'hidden'
       )}
     >
@@ -31,7 +31,8 @@ export function NewTableRow(props: TableRowProps) {
               numeric ? 'text-right' : 'text-left',
               fullWidth ? 'wide:max-w-[10px] truncate' : 'w-0',
               props.link && 'cursor-pointer',
-              className
+              className,
+              props.className
             )}
           >
             {props.link ? (
