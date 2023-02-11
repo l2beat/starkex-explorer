@@ -18,7 +18,7 @@ export function BalanceChangesTable({balanceChanges}: BalanceChangesTableProps) 
                 link,
                 cells: [
                     `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`,
-                    balanceChange.stateUpdateId,
+                    <a href={`/stateUpdates/${balanceChange.stateUpdateId}`} className='text-blue-300 underline'>#{balanceChange.stateUpdateId}</a>,
                     balanceChange.asset,
                     balanceChange.newBalance.toString(),
                     <p className={cx("", {"text-red-100": !positiveChange}, {"text-green-100": positiveChange})}>{`${positiveChange ? '+': '-'} ${balanceChange.change.toString()} ${balanceChange.asset}`}</p>,
