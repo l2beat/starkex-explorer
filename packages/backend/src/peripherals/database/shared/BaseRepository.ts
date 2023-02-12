@@ -5,13 +5,25 @@ import { Database } from './Database'
 
 type AnyMethod<A extends unknown[], R> = (...args: A) => Promise<R>
 
-type AddMethod<T, R> = (record: T) => Promise<R>
+type AddMethod<T, R, A extends unknown[]> = (
+  record: T,
+  ...args: A
+) => Promise<R>
 
-type AddManyMethod<T, R> = (records: T[]) => Promise<R[] | number>
+type AddManyMethod<T, R, A extends unknown[]> = (
+  records: T[],
+  ...args: A
+) => Promise<R[] | number>
 
-type AddManyMethodWithIds<T, R> = (records: T[]) => Promise<R[]>
+type AddManyMethodWithIds<T, R, A extends unknown[]> = (
+  records: T[],
+  ...args: A
+) => Promise<R[]>
 
-type AddManyMethodWithCount<T> = (records: T[]) => Promise<number>
+type AddManyMethodWithCount<T, A extends unknown[]> = (
+  records: T[],
+  ...args: A
+) => Promise<number>
 
 type GetMethod<A extends unknown[], T> = (...args: A) => Promise<T[]>
 
@@ -47,29 +59,31 @@ export class BaseRepository {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  protected wrapAdd<T, R extends number | string | String | Number>(
-    method: AddMethod<T, R>
-  ): AddMethod<T, R> {
+  protected wrapAdd<
+    T,
+    R extends number | string | String | Number,
+    A extends unknown[]
+  >(method: AddMethod<T, R, A>): AddMethod<T, R, A> {
     return this.wrap(method, (id) =>
       this.logger.debug({ method: method.name, id: id.valueOf() })
     )
   }
 
-  protected wrapAddMany<T, R>(
-    method: AddManyMethodWithIds<T, R>
-  ): AddManyMethodWithIds<T, R>
-  protected wrapAddMany<T>(
-    method: AddManyMethodWithCount<T>
-  ): AddManyMethodWithCount<T>
-  protected wrapAddMany<T, R>(
-    method: AddManyMethod<T, R>
-  ): AddManyMethod<T, R> {
-    const fn = async (records: T[]) => {
+  protected wrapAddMany<T, R, A extends unknown[]>(
+    method: AddManyMethodWithIds<T, R, A>
+  ): AddManyMethodWithIds<T, R, A>
+  protected wrapAddMany<T, A extends unknown[]>(
+    method: AddManyMethodWithCount<T, A>
+  ): AddManyMethodWithCount<T, A>
+  protected wrapAddMany<T, R, A extends unknown[]>(
+    method: AddManyMethod<T, R, A>
+  ): AddManyMethod<T, R, A> {
+    const fn = async (records: T[], ...args: A) => {
       if (records.length === 0) {
         this.logger.debug({ method: method.name, count: 0 })
         return []
       }
-      const idsOrCount = await method.call(this, records)
+      const idsOrCount = await method.call(this, records, ...args)
       const count =
         typeof idsOrCount === 'number' ? idsOrCount : idsOrCount.length
       this.logger.debug({ method: method.name, count })
