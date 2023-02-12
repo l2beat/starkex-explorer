@@ -13,7 +13,7 @@ export function FreezeButton({ active }: FreezeButtonProps) {
   return (
     <button
       className={cx(
-        'rounded-md w-[25%] h-[50px] hidden md:block',
+        'hidden h-[50px] w-[25%] rounded-md md:block',
         active ? activeClasses : inactiveClasses
       )}
       disabled={!active}

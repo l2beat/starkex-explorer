@@ -11,10 +11,10 @@ interface AssetSelectProps {
 
 export function AssetSelect({ assetId, assetIds = [] }: AssetSelectProps) {
   return (
-    <div className="flex bg-grey-300 gap-2 items-center rounded-md relative px-3 py-0">
+    <div className="relative flex items-center gap-2 rounded-md bg-grey-300 px-3 py-0">
       {assetId ? (
         <>
-          <AssetIcon className="w-4 h-4" assetId={assetId} />
+          <AssetIcon className="h-4 w-4" assetId={assetId} />
           <span>{AssetId.symbol(assetId)}</span>
         </>
       ) : (
@@ -26,7 +26,7 @@ export function AssetSelect({ assetId, assetIds = [] }: AssetSelectProps) {
       <select
         id="assetId"
         name={AssetIdSelectName}
-        className="absolute top-0 left-0 w-full h-full opacity-0 bg-white appearance-none cursor-pointer"
+        className="absolute top-0 left-0 h-full w-full cursor-pointer appearance-none bg-white opacity-0"
         defaultValue={assetId?.toString() ?? DisabledOptionValue}
       >
         {assetIds.map((id) => (

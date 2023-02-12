@@ -43,7 +43,7 @@ export function Page({
       />
       <body>
         <Navbar searchBar={!withoutSearch} account={account} />
-        <main className="px-2 wide:px-4 max-w-[900px] mx-auto pt-8 wide:pt-20 pb-20">
+        <main className="mx-auto max-w-[900px] px-2 pt-8 pb-20 wide:px-4 wide:pt-20">
           {children}
         </main>
         <Footer />

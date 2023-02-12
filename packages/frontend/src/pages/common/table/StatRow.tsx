@@ -19,7 +19,7 @@ export function StatRow({ even, title, content, fontRegular }: StatRowProps) {
       </th>
       <td
         className={classNames(
-          'max-w-[560px] p-1.5 overflow-x-hidden text-ellipsis',
+          'max-w-[560px] overflow-x-hidden text-ellipsis p-1.5',
           !fontRegular && 'font-mono'
         )}
       >

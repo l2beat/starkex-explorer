@@ -17,14 +17,14 @@ export function ForcedHistory({ events }: ForcedHistoryProps) {
   return (
     <>
       <SectionHeading>History</SectionHeading>
-      <div className="w-full overflow-x-auto mb-8">
-        <table className="whitespace-nowrap w-full">
+      <div className="mb-8 w-full overflow-x-auto">
+        <table className="w-full whitespace-nowrap">
           {events.map((event, i) => (
-            <tr className="bg-grey-200 border-2 border-grey-100" key={i}>
-              <th className="font-normal text-left w-[268px] py-2 px-1.5">
+            <tr className="border-2 border-grey-100 bg-grey-200" key={i}>
+              <th className="w-[268px] py-2 px-1.5 text-left font-normal">
                 {formatAbsoluteTime(event.timestamp)}
               </th>
-              <td className="font-normal first-letter:capitalize py-2 px-1.5">
+              <td className="py-2 px-1.5 font-normal first-letter:capitalize">
                 {event.text}
               </td>
             </tr>

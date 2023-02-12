@@ -13,8 +13,8 @@ export interface NavbarProps {
 
 export function Navbar({ account, searchBar = true }: NavbarProps) {
   return (
-    <div className="flex justify-between items-center px-2 wide:px-4 py-2.5 border-b-[1px] border-grey-300 flex-wrap gap-y-2">
-      <a className="flex justify-center items-center" href="/">
+    <div className="flex flex-wrap items-center justify-between gap-y-2 border-b-[1px] border-grey-300 px-2 py-2.5 wide:px-4">
+      <a className="flex items-center justify-center" href="/">
         <span className="pr-2 sm:pr-4">
           <L2beatExplorerLogo className="h-[30px] sm:h-[36px]" />
         </span>
@@ -22,12 +22,12 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4">
         {searchBar && (
-          <SearchBar className="hidden lg:flex w-auto min-w-[500px]" />
+          <SearchBar className="hidden w-auto min-w-[500px] lg:flex" />
         )}
         {!account && (
           <button
             id="connect-with-metamask"
-            className="bg-grey-300 px-4 rounded-md h-[32px] lg:h-[44px]"
+            className="h-[32px] rounded-md bg-grey-300 px-4 lg:h-[44px]"
           >
             Connect
           </button>
@@ -35,7 +35,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
         {account && (
           <a
             href={`/positions/${account.positionId ?? 'not-found'}`}
-            className="bg-grey-300 px-4 rounded-md h-[32px] lg:h-[44px] align-middle flex items-center justify-center gap-2 relative"
+            className="relative flex h-[32px] items-center justify-center gap-2 rounded-md bg-grey-300 px-4 align-middle lg:h-[44px]"
           >
             <JazzIcon
               className="hidden lg:block"
@@ -54,7 +54,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
               </span>
             </span>
             {account.hasUpdates && (
-              <div className="rounded-full bg-blue-200 h-4 w-4 absolute right-0 top-0 translate-x-1/3 translate-y-[-33%]" />
+              <div className="absolute right-0 top-0 h-4 w-4 translate-x-1/3 translate-y-[-33%] rounded-full bg-blue-200" />
             )}
           </a>
         )}

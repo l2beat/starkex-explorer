@@ -15,13 +15,13 @@ export function PriceInput(props: TransactionFormProps) {
           type="text"
           autoComplete="off"
           placeholder="0.00"
-          className="font-mono text-2xl leading-none bg-grey-100 rounded-md pl-2 pt-2 pr-[80px] pb-10 w-full"
+          className="w-full rounded-md bg-grey-100 pl-2 pt-2 pr-[80px] pb-10 font-mono text-2xl leading-none"
         />
-        <div className="absolute top-2 right-2 py-0.5 flex gap-2 items-center">
-          <AssetIcon className="w-4 h-4" assetId={AssetId.USDC} />
+        <div className="absolute top-2 right-2 flex items-center gap-2 py-0.5">
+          <AssetIcon className="h-4 w-4" assetId={AssetId.USDC} />
           <span>USDC</span>
         </div>
-        <div className="absolute bottom-2 right-2 w-full flex items-center justify-end gap-2">
+        <div className="absolute bottom-2 right-2 flex w-full items-center justify-end gap-2">
           <span
             id={FormId.SuggestedPriceView}
             className="font-mono text-grey-400"
@@ -31,7 +31,7 @@ export function PriceInput(props: TransactionFormProps) {
           <button
             id={FormId.SuggestedPriceButton}
             type="button"
-            className="uppercase bg-grey-300 px-2 py-0.5 text-xs rounded-md"
+            className="rounded-md bg-grey-300 px-2 py-0.5 text-xs uppercase"
           >
             Use
           </button>

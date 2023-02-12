@@ -30,14 +30,14 @@ export function TableRow(props: TableRowProps) {
               'first-letter:capitalize',
               (numeric || monospace) && 'font-mono',
               numeric ? 'text-right' : 'text-left',
-              fullWidth ? 'wide:max-w-[10px] truncate' : 'w-0',
+              fullWidth ? 'truncate wide:max-w-[10px]' : 'w-0',
               props.link && 'cursor-pointer',
               className
             )}
           >
             {props.link ? (
               <a
-                className="px-1.5 py-0.5 block w-full truncate first-letter:capitalize"
+                className="block w-full truncate px-1.5 py-0.5 first-letter:capitalize"
                 href={props.link}
               >
                 {cell}

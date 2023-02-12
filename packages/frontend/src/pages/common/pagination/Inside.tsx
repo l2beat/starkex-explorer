@@ -17,7 +17,7 @@ function FirstPage() {
     <>
       <span className="hidden wide:block">First</span>
       <FirstPageIcon
-        className="block wide:hidden my-1"
+        className="my-1 block wide:hidden"
         width={14}
         height={12}
       />
@@ -37,7 +37,7 @@ function LastPage() {
   return (
     <>
       <span className="hidden wide:block">Last</span>
-      <LastPageIcon className="block wide:hidden my-1" width={14} height={12} />
+      <LastPageIcon className="my-1 block wide:hidden" width={14} height={12} />
     </>
   )
 }

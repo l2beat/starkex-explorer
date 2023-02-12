@@ -8,11 +8,11 @@ export function PositionIdView(props: PositionIdViewProps) {
   return (
     <div className="flex flex-col gap-1">
       <div>Position</div>
-      <div className="bg-grey-100 rounded-md p-2 gap-2 flex items-center">
-        <span className="text-2xl leading-none font-mono">
+      <div className="flex items-center gap-2 rounded-md bg-grey-100 p-2">
+        <span className="font-mono text-2xl leading-none">
           {props.positionId.toString()}
         </span>
-        <span className="px-2 rounded-full bg-blue-100">Owned by you</span>
+        <span className="rounded-full bg-blue-100 px-2">Owned by you</span>
       </div>
     </div>
   )
