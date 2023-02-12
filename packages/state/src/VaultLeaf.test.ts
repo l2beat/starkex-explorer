@@ -1,9 +1,9 @@
-import { PedersenHash, StarkKey } from '@explorer/types'
+import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { VaultLeaf } from './VaultLeaf'
 
-const tokenA = PedersenHash(
+const tokenA = AssetHash(
   '0xd5b742d29ab21fdb06ac5c7c460550131c0b30cbc4c911985174c0ea4a92ec'
 )
 

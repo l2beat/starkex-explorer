@@ -7,14 +7,20 @@ export interface AssetHash extends String {
 }
 
 export function AssetHash(value: string) {
-  if (!value.startsWith('0x')) {
-    value = '0x' + value
+  if (value.startsWith('0x')) {
+    value = value.slice(2)
   }
-  if (!/^0x[a-f\d]{64}$/i.test(value)) {
-    throw new TypeError('Invalid AssetHash')
+  if (!/^[\da-fA-F]+$/.test(value)) {
+    throw new TypeError('AssetHash must be a hex string')
   }
+  if (value.length > 64) {
+    throw new TypeError('AssetHash too large')
+  }
+  value = '0x' + value.padStart(64, '0')
   return value.toLowerCase() as unknown as AssetHash
 }
+
+AssetHash.ZERO = AssetHash('0'.repeat(64))
 
 AssetHash.from = function from(value: BigNumber | bigint) {
   if (typeof value !== 'bigint') {
