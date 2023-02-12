@@ -93,7 +93,7 @@ declare module 'knex/types/tables' {
     state_update_id: number
     vault_id: bigint
     stark_key: string
-    token: string
+    asset_hash: string
     balance: bigint
   }
 

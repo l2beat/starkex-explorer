@@ -70,7 +70,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
   buildNewVaultLeaves(batch: SpotBatch): { index: bigint; value: VaultLeaf }[] {
     return batch.vaults.map((vault) => ({
       index: vault.vaultId,
-      value: new VaultLeaf(vault.starkKey, vault.balance, vault.token),
+      value: new VaultLeaf(vault.starkKey, vault.balance, vault.assetHash),
     }))
   }
 }
