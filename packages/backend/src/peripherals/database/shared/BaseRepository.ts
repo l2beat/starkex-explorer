@@ -58,9 +58,9 @@ export class BaseRepository {
     return this.wrap(method, () => this.logger.debug({ method: method.name }))
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
   protected wrapAdd<
     T,
+    // eslint-disable-next-line @typescript-eslint/ban-types
     R extends number | string | String | Number,
     A extends unknown[]
   >(method: AddMethod<T, R, A>): AddMethod<T, R, A> {
