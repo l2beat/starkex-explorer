@@ -1,7 +1,10 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 
-import { PositionRepository } from '../../peripherals/database/PositionRepository'
+import {
+  PositionRecord,
+  PositionRepository,
+} from '../../peripherals/database/PositionRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -33,15 +36,10 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
       stateUpdate.id,
       trx
     )
-    const prices = await this.stateUpdateRepository.getPricesByStateUpdateId(
-      stateUpdate.id,
-      trx
+    const assetPriceMap = await this.getAssetPricesForStateUpdate(
+      trx,
+      stateUpdate.id
     )
-    const assetPriceMap: Record<string, bigint> = {}
-    prices.forEach((p) => {
-      assetPriceMap[p.asset_id.toString()] = p.price
-    })
-    assetPriceMap[COLLATERAL_TOKEN.toString()] = 1n
 
     for (const position of positions) {
       if (position.starkKey === StarkKey.ZERO) {
@@ -52,59 +50,90 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
           assetPriceMap
         )
       } else {
-        const currentUserRecords =
-          await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndAssets(
-            position.starkKey,
-            [COLLATERAL_TOKEN, ...position.balances.map((b) => b.assetId)],
-            trx
-          )
-
-        const assetMap: Record<string, PreprocessedAssetHistoryRecord> = {}
-        currentUserRecords.forEach((r) => {
-          // TODO: remove this temporary sanity check
-          if (assetMap[r.assetHashOrId.toString()] !== undefined) {
-            console.log(r.assetHashOrId, position.starkKey)
-            process.exit(1)
-          }
-          assetMap[r.assetHashOrId.toString()] = r
-        })
-
-        const updatedAssets = [
-          {
-            assetId: COLLATERAL_TOKEN,
-            balance: position.collateralBalance,
-          },
-          ...position.balances,
-        ]
-
-        const newRecords: Omit<PreprocessedAssetHistoryRecord, 'historyId'>[] =
-          []
-
-        updatedAssets.forEach((asset) => {
-          const currentRecord = assetMap[asset.assetId.toString()]
-          const currentPrice = assetPriceMap[asset.assetId.toString()]
-          if (currentPrice === undefined) {
-            throw new Error(`Missing price for ${asset.assetId.toString()}`)
-          }
-          if (currentRecord?.balance !== asset.balance) {
-            newRecords.push({
-              stateUpdateId: stateUpdate.id,
-              blockNumber: stateUpdate.blockNumber,
-              timestamp: BigInt(Number(stateUpdate.timestamp)),
-              starkKey: position.starkKey,
-              positionOrVaultId: position.positionId,
-              assetHashOrId: asset.assetId,
-              balance: asset.balance,
-              prevBalance: currentRecord?.balance ?? 0n,
-              price: currentPrice,
-              prevPrice: currentRecord?.price,
-              prevHistoryId: currentRecord?.historyId,
-              isCurrent: true,
-            })
-          }
-        })
-        await this.addNewRecordsAndMakeThemCurrent(trx, newRecords)
+        await this.preprocessSinglePosition(
+          trx,
+          position,
+          stateUpdate,
+          assetPriceMap
+        )
       }
     }
+  }
+
+  async preprocessSinglePosition(
+    trx: Knex.Transaction,
+    position: PositionRecord & { stateUpdateId: number },
+    stateUpdate: StateUpdateRecord,
+    assetPriceMap: Record<string, bigint>
+  ) {
+    if (position.starkKey === StarkKey.ZERO) {
+      throw new Error('Cannot preprocess position with StarkKey.ZERO')
+    }
+
+    const currentUserRecords =
+      await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndAssets(
+        position.starkKey,
+        [COLLATERAL_TOKEN, ...position.balances.map((b) => b.assetId)],
+        trx
+      )
+
+    const assetMap: Record<string, PreprocessedAssetHistoryRecord> = {}
+    currentUserRecords.forEach((r) => {
+      assetMap[r.assetHashOrId.toString()] = r
+    })
+
+    const updatedAssets = [
+      {
+        assetId: COLLATERAL_TOKEN,
+        balance: position.collateralBalance,
+      },
+      ...position.balances,
+    ]
+
+    const newRecords: Omit<
+      PreprocessedAssetHistoryRecord,
+      'historyId' | 'isCurrent'
+    >[] = []
+
+    updatedAssets.forEach((asset) => {
+      const currentRecord = assetMap[asset.assetId.toString()]
+      const currentPrice = assetPriceMap[asset.assetId.toString()]
+      if (currentPrice === undefined) {
+        throw new Error(`Missing price for ${asset.assetId.toString()}`)
+      }
+      if (currentRecord?.balance !== asset.balance) {
+        newRecords.push({
+          stateUpdateId: stateUpdate.id,
+          blockNumber: stateUpdate.blockNumber,
+          timestamp: BigInt(Number(stateUpdate.timestamp)),
+          starkKey: position.starkKey,
+          positionOrVaultId: position.positionId,
+          assetHashOrId: asset.assetId,
+          balance: asset.balance,
+          prevBalance: currentRecord?.balance ?? 0n,
+          price: currentPrice,
+          prevPrice: currentRecord?.price,
+          prevHistoryId: currentRecord?.historyId,
+        })
+      }
+    })
+    await this.addNewRecordsAndMakeThemCurrent(trx, newRecords)
+  }
+
+  async getAssetPricesForStateUpdate(
+    trx: Knex.Transaction,
+    stateUpdateId: number
+  ) {
+    const prices = await this.stateUpdateRepository.getPricesByStateUpdateId(
+      stateUpdateId,
+      trx
+    )
+    const assetPriceMap: Record<string, bigint> = {
+      [COLLATERAL_TOKEN.toString()]: 1n,
+    }
+    prices.forEach((p) => {
+      assetPriceMap[p.asset_id.toString()] = p.price
+    })
+    return assetPriceMap
   }
 }

@@ -1,4 +1,4 @@
-import { AssetHash, AssetId, StarkKey } from '@explorer/types'
+import { AssetHash, StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 
 import {
@@ -45,7 +45,10 @@ export class SpotHistoryPreprocessor extends HistoryPreprocessor<AssetHash> {
         )[0]
 
         if (currentRecord?.balance !== vault.balance) {
-          const newRecord: Omit<PreprocessedAssetHistoryRecord, 'historyId'> = {
+          const newRecord: Omit<
+            PreprocessedAssetHistoryRecord,
+            'historyId' | 'isCurrent'
+          > = {
             stateUpdateId: stateUpdate.id,
             blockNumber: stateUpdate.blockNumber,
             timestamp: BigInt(Number(stateUpdate.timestamp)),
@@ -55,7 +58,6 @@ export class SpotHistoryPreprocessor extends HistoryPreprocessor<AssetHash> {
             balance: vault.balance,
             prevBalance: currentRecord?.balance ?? 0n,
             prevHistoryId: currentRecord?.historyId,
-            isCurrent: true,
           }
           await this.addNewRecordsAndMakeThemCurrent(trx, [newRecord])
         }

@@ -29,7 +29,7 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
     trx: Knex.Transaction,
     positionId: bigint,
     stateUpdate: StateUpdateRecord,
-    tokenPrices: Record<string, bigint>
+    assetPrices: Record<string, bigint>
   ) {
     const recordsToClose =
       await this.preprocessedAssetHistoryRepository.getCurrentNonEmptyByPositionOrVaultId(
@@ -39,31 +39,35 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
 
     if (recordsToClose[0] !== undefined) {
       const starkKey = recordsToClose[0].starkKey
-      const newRecords: Omit<PreprocessedAssetHistoryRecord, 'historyId'>[] =
-        recordsToClose.map((record) => ({
-          stateUpdateId: stateUpdate.id,
-          blockNumber: stateUpdate.blockNumber,
-          timestamp: BigInt(Number(stateUpdate.timestamp)),
-          starkKey: starkKey,
-          positionOrVaultId: positionId,
-          assetHashOrId: record.assetHashOrId,
-          balance: 0n,
-          prevBalance: record.balance,
-          price: tokenPrices[record.assetHashOrId.toString()],
-          prevPrice: record.price,
-          prevHistoryId: record.historyId,
-          isCurrent: true,
-        }))
+      const newRecords: Omit<
+        PreprocessedAssetHistoryRecord,
+        'historyId' | 'isCurrent'
+      >[] = recordsToClose.map((record) => ({
+        stateUpdateId: stateUpdate.id,
+        blockNumber: stateUpdate.blockNumber,
+        timestamp: BigInt(Number(stateUpdate.timestamp)),
+        starkKey: starkKey,
+        positionOrVaultId: positionId,
+        assetHashOrId: record.assetHashOrId,
+        balance: 0n,
+        prevBalance: record.balance,
+        price: assetPrices[record.assetHashOrId.toString()],
+        prevPrice: record.price,
+        prevHistoryId: record.historyId,
+      }))
       await this.addNewRecordsAndMakeThemCurrent(trx, newRecords)
     }
   }
 
   async addNewRecordsAndMakeThemCurrent(
     trx: Knex.Transaction,
-    newRecords: Omit<PreprocessedAssetHistoryRecord, 'historyId'>[]
+    newRecords: Omit<
+      PreprocessedAssetHistoryRecord,
+      'historyId' | 'isCurrent'
+    >[]
   ) {
     // NOTICE:
-    // Using loop because this call:
+    // We're using a for loop here, because this call:
     // await this.preprocessedAssetHistoryRepository.addMany(newRecords, trx)
     // doesn't respect transaction(!!!!):
 
@@ -73,7 +77,9 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
         record.assetHashOrId,
         trx
       )
-      await this.preprocessedAssetHistoryRepository.add(record, trx)
+      const recordAsCurrent: Omit<PreprocessedAssetHistoryRecord, 'historyId'> =
+        { ...record, isCurrent: true }
+      await this.preprocessedAssetHistoryRepository.add(recordAsCurrent, trx)
     }
   }
 
