@@ -36,11 +36,15 @@ describe(AssetHash.name, () => {
   })
 
   it('fixes short non-prefixed strings', () => {
-    expect(AssetHash('123abc').toString()).toEqual('0x0000000000000000000000000000000000000000000000000000000000123abc')
+    expect(AssetHash('123abc').toString()).toEqual(
+      '0x0000000000000000000000000000000000000000000000000000000000123abc'
+    )
   })
-  
+
   it('fixes short prefixed strings', () => {
-    expect(AssetHash('0x123abc').toString()).toEqual('0x0000000000000000000000000000000000000000000000000000000000123abc')
+    expect(AssetHash('0x123abc').toString()).toEqual(
+      '0x0000000000000000000000000000000000000000000000000000000000123abc'
+    )
   })
 
   it('throws for long hex strings', () => {
