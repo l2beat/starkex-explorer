@@ -5,7 +5,6 @@ import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import { PreprocessedStateUpdateRecord } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { Logger } from '../../tools/Logger'
 
@@ -85,11 +84,12 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
 
   async rollbackOneStateUpdate(
     trx: Knex.Transaction,
-    lastProcessedStateUpdate: PreprocessedStateUpdateRecord
+    lastProcessedStateUpdateId: number
   ) {
     const recordsToRollback =
       await this.preprocessedAssetHistoryRepository.getPrevHistoryIdOfCurrentWithStateUpdateId(
-        lastProcessedStateUpdate.stateUpdateId
+        lastProcessedStateUpdateId,
+        trx
       )
 
     for (const record of recordsToRollback) {

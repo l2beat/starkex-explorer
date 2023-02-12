@@ -159,7 +159,7 @@ export class Preprocessor<T extends AssetHash | AssetId> {
         )
         await this.historyPreprocessor.rollbackOneStateUpdate(
           trx,
-          lastProcessedStateUpdate
+          lastProcessedStateUpdate.stateUpdateId
         )
 
         await this.preprocessedStateUpdateRepository.deleteByStateUpdateId(

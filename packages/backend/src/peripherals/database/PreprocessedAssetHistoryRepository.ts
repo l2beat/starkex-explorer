@@ -62,7 +62,7 @@ export class PreprocessedAssetHistoryRepository<
 
   async add(
     row: Omit<PreprocessedAssetHistoryRecord, 'historyId'>,
-    trx?: Knex.Transaction
+    trx: Knex.Transaction
   ): Promise<number> {
     const knex = await this.knex(trx)
     await knex('preprocessed_asset_history').insert(
@@ -73,7 +73,7 @@ export class PreprocessedAssetHistoryRepository<
 
   async addMany(
     rows: Omit<PreprocessedAssetHistoryRow, 'id'>[],
-    trx?: Knex.Transaction
+    trx: Knex.Transaction
   ) {
     throw new Error(
       "This method doesn't respect trascation! Don't use until reviewed!"
@@ -85,14 +85,14 @@ export class PreprocessedAssetHistoryRepository<
     return ids.map((x) => x.id)
   }
 
-  async deleteByHistoryId(historyId: number, trx?: Knex.Transaction) {
+  async deleteByHistoryId(historyId: number, trx: Knex.Transaction) {
     const knex = await this.knex(trx)
     return knex('preprocessed_asset_history').where('id', historyId).delete()
   }
 
   async getCurrentNonEmptyByStarkKey(
     starkKey: StarkKey,
-    trx?: Knex.Transaction
+    trx: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history')
@@ -108,7 +108,7 @@ export class PreprocessedAssetHistoryRepository<
 
   async getCurrentNonEmptyByPositionOrVaultId(
     positionOrVaultId: bigint,
-    trx?: Knex.Transaction
+    trx: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history')
@@ -125,7 +125,7 @@ export class PreprocessedAssetHistoryRepository<
   async getCurrentByStarkKeyAndAssets(
     starkKey: StarkKey,
     assets: (AssetHash | AssetId)[],
-    trx?: Knex.Transaction
+    trx: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history')
@@ -144,7 +144,7 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async setCurrentByHistoryId(historyId: number, trx?: Knex.Transaction) {
+  async setCurrentByHistoryId(historyId: number, trx: Knex.Transaction) {
     const knex = await this.knex(trx)
     const updates = await knex('preprocessed_asset_history')
       .update('is_current', true)
@@ -171,7 +171,7 @@ export class PreprocessedAssetHistoryRepository<
 
   async getPrevHistoryIdOfCurrentWithStateUpdateId(
     stateUpdateId: number,
-    trx?: Knex.Transaction
+    trx: Knex.Transaction
   ): Promise<
     Pick<PreprocessedAssetHistoryRecord, 'historyId' | 'prevHistoryId'>[]
   > {
