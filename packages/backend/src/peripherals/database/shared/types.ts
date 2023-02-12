@@ -224,8 +224,7 @@ declare module 'knex/types/tables' {
     timestamp: bigint
     stark_key: string
     position_or_vault_id: bigint
-    token: string
-    token_is_perp: boolean
+    asset_hash_or_id: string
     balance: bigint
     prev_balance: bigint
     price: bigint | null

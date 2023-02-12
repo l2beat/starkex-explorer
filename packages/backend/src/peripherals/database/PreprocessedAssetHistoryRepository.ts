@@ -1,4 +1,4 @@
-import { AssetId, StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 import { PreprocessedAssetHistoryRow } from 'knex/types/tables'
 
@@ -13,8 +13,7 @@ export interface PreprocessedAssetHistoryRecord {
   timestamp: bigint
   starkKey: StarkKey
   positionOrVaultId: bigint
-  token: AssetId
-  tokenIsPerp: boolean
+  assetHashOrId: AssetHash | AssetId
   balance: bigint
   prevBalance: bigint
   price?: bigint
@@ -23,17 +22,26 @@ export interface PreprocessedAssetHistoryRecord {
   prevHistoryId?: number
 }
 
-export class PreprocessedAssetHistoryRepository extends BaseRepository {
-  constructor(database: Database, logger: Logger) {
+export class PreprocessedAssetHistoryRepository<
+  T extends AssetHash | AssetId
+> extends BaseRepository {
+  private toAssetType: (value: string) => T
+
+  constructor(
+    database: Database,
+    toAssetType: (value: string) => T,
+    logger: Logger
+  ) {
     super(database, logger)
+    this.toAssetType = toAssetType
 
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.add = this.wrapAdd(this.add)
     this.addMany = this.wrapAddMany(this.addMany)
     this.deleteByHistoryId = this.wrapDelete(this.deleteByHistoryId)
-    this.getCurrentByStarkKeyAndTokenIds = this.wrapGet(
-      this.getCurrentByStarkKeyAndTokenIds
+    this.getCurrentByStarkKeyAndAssets = this.wrapGet(
+      this.getCurrentByStarkKeyAndAssets
     )
     this.getCurrentNonEmptyByStarkKey = this.wrapGet(
       this.getCurrentNonEmptyByStarkKey
@@ -42,12 +50,9 @@ export class PreprocessedAssetHistoryRepository extends BaseRepository {
       this.getCurrentNonEmptyByPositionOrVaultId
     )
     this.setCurrentByHistoryId = this.wrapUpdate(this.setCurrentByHistoryId)
-    this.unsetCurrentByStarkKeyAndTokenId = this.wrapUpdate(
-      this.unsetCurrentByStarkKeyAndTokenId
+    this.unsetCurrentByStarkKeyAndAsset = this.wrapUpdate(
+      this.unsetCurrentByStarkKeyAndAsset
     )
-    // this.unsetCurrentByStarkKeyAndTokenIds = this.wrapUpdate(
-    //   this.unsetCurrentByStarkKeyAndTokenIds
-    // )
     this.getPrevHistoryIdOfCurrentWithStateUpdateId = this.wrapGet(
       this.getPrevHistoryIdOfCurrentWithStateUpdateId
     )
@@ -96,7 +101,9 @@ export class PreprocessedAssetHistoryRepository extends BaseRepository {
         is_current: true,
       })
       .andWhere('balance', '!=', 0)
-    return rows.map(toPreprocessedAssetHistoryRecord)
+    return rows.map((r) =>
+      toPreprocessedAssetHistoryRecord(r, this.toAssetType)
+    )
   }
 
   async getCurrentNonEmptyByPositionOrVaultId(
@@ -110,12 +117,14 @@ export class PreprocessedAssetHistoryRepository extends BaseRepository {
         is_current: true,
       })
       .andWhere('balance', '!=', 0)
-    return rows.map(toPreprocessedAssetHistoryRecord)
+    return rows.map((r) =>
+      toPreprocessedAssetHistoryRecord(r, this.toAssetType)
+    )
   }
 
-  async getCurrentByStarkKeyAndTokenIds(
+  async getCurrentByStarkKeyAndAssets(
     starkKey: StarkKey,
-    tokenIds: AssetId[],
+    assets: (AssetHash | AssetId)[],
     trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
@@ -125,12 +134,14 @@ export class PreprocessedAssetHistoryRepository extends BaseRepository {
         is_current: true,
       })
       .whereIn(
-        'token',
-        tokenIds.map((x) => x.toString())
+        'asset_hash_or_id',
+        assets.map((x) => x.toString())
       )
       .andWhere('balance', '!=', 0)
 
-    return rows.map(toPreprocessedAssetHistoryRecord)
+    return rows.map((r) =>
+      toPreprocessedAssetHistoryRecord(r, this.toAssetType)
+    )
   }
 
   async setCurrentByHistoryId(historyId: number, trx?: Knex.Transaction) {
@@ -141,9 +152,9 @@ export class PreprocessedAssetHistoryRepository extends BaseRepository {
     return updates
   }
 
-  async unsetCurrentByStarkKeyAndTokenId(
+  async unsetCurrentByStarkKeyAndAsset(
     starkKey: StarkKey,
-    tokenId: AssetId,
+    asset: AssetHash | AssetId,
     trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
@@ -152,28 +163,11 @@ export class PreprocessedAssetHistoryRepository extends BaseRepository {
       .where({
         stark_key: starkKey.toString(),
         is_current: true,
-        token: tokenId.toString(),
+        asset_hash_or_id: asset.toString(),
       })
 
     return updates
   }
-
-  // async unsetCurrentByStarkKeyAndTokenIds(
-  //   starkKey: StarkKey,
-  //   tokenIds: AssetId[],
-  //   trx?: Knex.Transaction
-  // ) {
-  //   const knex = await this.knex(trx)
-  //   const updates = await knex('preprocessed_asset_history')
-  //     .update('is_current', false)
-  //     .where({
-  //       stark_key: starkKey.toString(),
-  //       is_current: true,
-  //     })
-  //     .whereIn('token', tokenIds)
-
-  //   return updates
-  // }
 
   async getPrevHistoryIdOfCurrentWithStateUpdateId(
     stateUpdateId: number,
@@ -196,8 +190,9 @@ export class PreprocessedAssetHistoryRepository extends BaseRepository {
   }
 }
 
-function toPreprocessedAssetHistoryRecord(
-  row: PreprocessedAssetHistoryRow
+function toPreprocessedAssetHistoryRecord<T extends AssetHash | AssetId>(
+  row: PreprocessedAssetHistoryRow,
+  toAssetType: (x: string) => T
 ): PreprocessedAssetHistoryRecord {
   return {
     historyId: row.id,
@@ -206,8 +201,7 @@ function toPreprocessedAssetHistoryRecord(
     timestamp: BigInt(row.timestamp),
     starkKey: StarkKey(row.stark_key),
     positionOrVaultId: row.position_or_vault_id,
-    token: AssetId(row.token),
-    tokenIsPerp: row.token_is_perp,
+    assetHashOrId: toAssetType(row.asset_hash_or_id),
     balance: row.balance,
     prevBalance: row.prev_balance,
     price: row.price ?? undefined,
@@ -226,8 +220,7 @@ function toPreprocessedAssetHistoryRow(
     timestamp: record.timestamp,
     stark_key: record.starkKey.toString(),
     position_or_vault_id: record.positionOrVaultId,
-    token: record.token.toString(),
-    token_is_perp: record.tokenIsPerp,
+    asset_hash_or_id: record.assetHashOrId.toString(),
     balance: record.balance,
     prev_balance: record.prevBalance,
     price: record.price ?? null,

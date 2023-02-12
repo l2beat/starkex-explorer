@@ -1,3 +1,4 @@
+import { AssetHash, AssetId } from '@explorer/types'
 import { Knex } from 'knex'
 
 import {
@@ -8,9 +9,9 @@ import { PreprocessedStateUpdateRecord } from '../../peripherals/database/Prepro
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { Logger } from '../../tools/Logger'
 
-export abstract class HistoryPreprocessor {
+export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
   constructor(
-    protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<T>,
     protected logger: Logger
   ) {
     this.logger = this.logger.for(this)
@@ -45,11 +46,10 @@ export abstract class HistoryPreprocessor {
           timestamp: BigInt(Number(stateUpdate.timestamp)),
           starkKey: starkKey,
           positionOrVaultId: positionId,
-          token: record.token,
-          tokenIsPerp: false, // TODO: fix
+          assetHashOrId: record.assetHashOrId,
           balance: 0n,
           prevBalance: record.balance,
-          price: tokenPrices[record.token.toString()],
+          price: tokenPrices[record.assetHashOrId.toString()],
           prevPrice: record.price,
           prevHistoryId: record.historyId,
           isCurrent: true,
@@ -68,9 +68,9 @@ export abstract class HistoryPreprocessor {
     // doesn't respect transaction(!!!!):
 
     for (const record of newRecords) {
-      await this.preprocessedAssetHistoryRepository.unsetCurrentByStarkKeyAndTokenId(
+      await this.preprocessedAssetHistoryRepository.unsetCurrentByStarkKeyAndAsset(
         record.starkKey,
-        record.token,
+        record.assetHashOrId,
         trx
       )
       await this.preprocessedAssetHistoryRepository.add(record, trx)

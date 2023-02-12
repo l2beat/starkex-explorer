@@ -1,4 +1,4 @@
-import { StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 
 import {
@@ -13,9 +13,9 @@ import { VaultRepository } from '../../peripherals/database/VaultRepository'
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 
-export class SpotHistoryPreprocessor extends HistoryPreprocessor {
+export class SpotHistoryPreprocessor extends HistoryPreprocessor<AssetHash> {
   constructor(
-    protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<AssetHash>,
     private stateUpdateRepository: StateUpdateRepository,
     private vaultRepository: VaultRepository,
     protected logger: Logger
@@ -37,22 +37,21 @@ export class SpotHistoryPreprocessor extends HistoryPreprocessor {
         await this.closePositionOrVault(trx, vault.vaultId, stateUpdate, {})
       } else {
         const currentRecord = (
-          await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndTokenIds(
+          await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndAssets(
             vault.starkKey,
-            [vault.token],
+            [vault.assetHash],
             trx
           )
         )[0]
 
         if (currentRecord?.balance !== vault.balance) {
-          const newRecord: PreprocessedAssetHistoryRecord = {
+          const newRecord: Omit<PreprocessedAssetHistoryRecord, 'historyId'> = {
             stateUpdateId: stateUpdate.id,
             blockNumber: stateUpdate.blockNumber,
             timestamp: BigInt(Number(stateUpdate.timestamp)),
             starkKey: vault.starkKey,
             positionOrVaultId: vault.vaultId,
-            token: vault.token,
-            tokenIsPerp: false,
+            assetHashOrId: vault.assetHash,
             balance: vault.balance,
             prevBalance: currentRecord?.balance ?? 0n,
             prevHistoryId: currentRecord?.historyId,

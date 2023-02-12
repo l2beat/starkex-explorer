@@ -1,3 +1,5 @@
+import { AssetHash, AssetId } from '@explorer/types'
+
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import {
   StateUpdateRecord,
@@ -9,12 +11,12 @@ import { HistoryPreprocessor } from './HistoryPreprocessor'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
 
-export class Preprocessor {
+export class Preprocessor<T extends AssetHash | AssetId> {
   constructor(
     private preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
     private syncStatusRepository: SyncStatusRepository,
     private stateUpdateRepository: StateUpdateRepository,
-    private historyPreprocessor: HistoryPreprocessor,
+    private historyPreprocessor: HistoryPreprocessor<T>,
     private logger: Logger
   ) {
     this.logger = this.logger.for(this)

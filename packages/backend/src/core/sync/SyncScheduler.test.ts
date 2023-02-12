@@ -1,4 +1,4 @@
-import { Hash256 } from '@explorer/types'
+import { AssetId, Hash256 } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 import waitForExpect from 'wait-for-expect'
 
@@ -7,6 +7,7 @@ import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepos
 import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
+import { Preprocessor } from '../preprocessing/Preprocessor'
 import { BlockDownloader } from './BlockDownloader'
 import { SyncScheduler } from './SyncScheduler'
 import { Block } from './syncSchedulerReducer'
@@ -30,10 +31,14 @@ describe(SyncScheduler.name, () => {
       const dataSyncService = mock<PerpetualRollupSyncService>({
         discardAfter: async () => {},
       })
+      const preprocessor = mock<Preprocessor<AssetId>>({
+        sync: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
+        preprocessor,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -44,6 +49,7 @@ describe(SyncScheduler.name, () => {
       expect(blockDownloader.getKnownBlocks).toHaveBeenCalledWith([1_000_000])
       expect(blockDownloader.onNewBlock.calls.length).toEqual(1)
       expect(blockDownloader.onReorg.calls.length).toEqual(1)
+      expect(preprocessor.sync).toHaveBeenCalledWith([])
     })
 
     it('starts from the middle', async () => {
@@ -58,10 +64,14 @@ describe(SyncScheduler.name, () => {
       const dataSyncService = mock<PerpetualRollupSyncService>({
         discardAfter: async () => {},
       })
+      const preprocessor = mock<Preprocessor<AssetId>>({
+        sync: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
+        preprocessor,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -81,6 +91,7 @@ describe(SyncScheduler.name, () => {
           knownBlocks: [block(2_000_100), block(2_000_101)],
         },
       ])
+      expect(preprocessor.sync).toHaveBeenCalledWith([])
     })
   })
 
@@ -94,10 +105,14 @@ describe(SyncScheduler.name, () => {
         sync: async () => {},
         discardAfter: async () => {},
       })
+      const preprocessor = mock<Preprocessor<AssetId>>({
+        sync: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
+        preprocessor,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -116,6 +131,7 @@ describe(SyncScheduler.name, () => {
         expect(syncStatusRepository.setLastSynced).toHaveBeenCalledWith([
           1_000_002,
         ])
+        expect(preprocessor.sync).toHaveBeenCalledWith([])
       })
     })
 
@@ -128,10 +144,14 @@ describe(SyncScheduler.name, () => {
         sync: mockFn().rejectsWith(new Error('oops')),
         discardAfter: async () => {},
       })
+      const preprocessor = mock<Preprocessor<AssetId>>({
+        sync: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
+        preprocessor,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -164,10 +184,14 @@ describe(SyncScheduler.name, () => {
         sync: async () => {},
         discardAfter: async () => {},
       })
+      const preprocessor = mock<Preprocessor<AssetId>>({
+        sync: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
+        preprocessor,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -194,6 +218,7 @@ describe(SyncScheduler.name, () => {
           [999_999],
           [1_000_001],
         ])
+        expect(preprocessor.sync).toHaveBeenCalledWith([])
       })
     })
 
@@ -206,10 +231,14 @@ describe(SyncScheduler.name, () => {
         sync: async () => {},
         discardAfter: mockFn().rejectsWith(new Error('oops')),
       })
+      const preprocessor = mock<Preprocessor<AssetId>>({
+        sync: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
+        preprocessor,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -229,6 +258,7 @@ describe(SyncScheduler.name, () => {
           999_999,
         ])
         expect(dataSyncService.discardAfter).toHaveBeenCalledWith([999_999])
+        expect(preprocessor.sync).toHaveBeenCalledWith([])
       })
 
       // allow the jobQueue to finish
@@ -246,10 +276,14 @@ describe(SyncScheduler.name, () => {
       const syncStatusRepository = mock<SyncStatusRepository>({
         setLastSynced: async () => {},
       })
+      const preprocessor = mock<Preprocessor<AssetId>>({
+        sync: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         mock<BlockDownloader>(),
         dataSyncService,
+        preprocessor,
         Logger.SILENT,
         { earliestBlock: 1, maxBlockNumber }
       )
@@ -262,6 +296,7 @@ describe(SyncScheduler.name, () => {
         expect(dataSyncService.discardAfter.calls.length).toEqual(1)
         expect(dataSyncService.sync.calls.length).toEqual(1)
         expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
+        expect(preprocessor.sync).toHaveBeenCalledWith([])
       })
 
       await syncScheduler.handleSync(
@@ -272,6 +307,7 @@ describe(SyncScheduler.name, () => {
         expect(dataSyncService.discardAfter.calls.length).toEqual(1)
         expect(dataSyncService.sync.calls.length).toEqual(1)
         expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
+        expect(preprocessor.sync).toHaveBeenCalledWith([])
       })
     })
   })

@@ -15,9 +15,9 @@ import { HistoryPreprocessor } from './HistoryPreprocessor'
 
 const COLLATERAL_TOKEN = AssetId('COLLATERAL-0')
 
-export class PerpetualHistoryPreprocessor extends HistoryPreprocessor {
+export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
   constructor(
-    protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<AssetId>,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
     protected logger: Logger
@@ -37,11 +37,11 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor {
       stateUpdate.id,
       trx
     )
-    const tokenPriceMap: Record<string, bigint> = {}
+    const assetPriceMap: Record<string, bigint> = {}
     prices.forEach((p) => {
-      tokenPriceMap[p.asset_id.toString()] = p.price
+      assetPriceMap[p.asset_id.toString()] = p.price
     })
-    tokenPriceMap[COLLATERAL_TOKEN.toString()] = 1n
+    assetPriceMap[COLLATERAL_TOKEN.toString()] = 1n
 
     for (const position of positions) {
       if (position.starkKey === StarkKey.ZERO) {
@@ -49,23 +49,24 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor {
           trx,
           position.positionId,
           stateUpdate,
-          tokenPriceMap
+          assetPriceMap
         )
       } else {
         const currentUserRecords =
-          await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndTokenIds(
+          await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndAssets(
             position.starkKey,
             [COLLATERAL_TOKEN, ...position.balances.map((b) => b.assetId)],
             trx
           )
 
-        const tokenMap: Record<string, PreprocessedAssetHistoryRecord> = {}
+        const assetMap: Record<string, PreprocessedAssetHistoryRecord> = {}
         currentUserRecords.forEach((r) => {
-          if (tokenMap[r.token.toString()] !== undefined) {
-            console.log(r.token, position.starkKey)
+          // TODO: remove this temporary sanity check
+          if (assetMap[r.assetHashOrId.toString()] !== undefined) {
+            console.log(r.assetHashOrId, position.starkKey)
             process.exit(1)
           }
-          tokenMap[r.token.toString()] = r
+          assetMap[r.assetHashOrId.toString()] = r
         })
 
         const updatedAssets = [
@@ -80,8 +81,8 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor {
           []
 
         updatedAssets.forEach((asset) => {
-          const currentRecord = tokenMap[asset.assetId.toString()]
-          const currentPrice = tokenPriceMap[asset.assetId.toString()]
+          const currentRecord = assetMap[asset.assetId.toString()]
+          const currentPrice = assetPriceMap[asset.assetId.toString()]
           if (currentPrice === undefined) {
             throw new Error(`Missing price for ${asset.assetId.toString()}`)
           }
@@ -92,8 +93,7 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor {
               timestamp: BigInt(Number(stateUpdate.timestamp)),
               starkKey: position.starkKey,
               positionOrVaultId: position.positionId,
-              token: asset.assetId,
-              tokenIsPerp: asset.assetId !== COLLATERAL_TOKEN,
+              assetHashOrId: asset.assetId,
               balance: asset.balance,
               prevBalance: currentRecord?.balance ?? 0n,
               price: currentPrice,

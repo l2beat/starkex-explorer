@@ -21,8 +21,7 @@ export async function up(knex: Knex) {
     table.bigInteger('timestamp').notNullable()
     table.string('stark_key').notNullable()
     table.bigInteger('position_or_vault_id').notNullable()
-    table.string('token').notNullable()
-    table.boolean('token_is_perp').notNullable()
+    table.string('asset_hash_or_id').notNullable()
     table.bigInteger('balance').notNullable()
     table.bigInteger('prev_balance').notNullable()
     table.bigInteger('price') // price can be null for spot tokens
@@ -36,7 +35,7 @@ export async function up(knex: Knex) {
     // Index for efficiently querying the current state of an account
     // (i.e. current snapshot represented by is_current=true)
     // 'balance' is included due to frequent 'balance != 0' queries
-    table.index(['stark_key', 'balance', 'token'], undefined, {
+    table.index(['stark_key', 'balance', 'asset_hash_or_id'], undefined, {
       predicate: knex.whereRaw('is_current = true'),
     })
     // Index for efficiently finding records by current position or vault id
