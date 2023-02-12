@@ -51,7 +51,7 @@ export class SpotHistoryPreprocessor extends HistoryPreprocessor<AssetHash> {
           > = {
             stateUpdateId: stateUpdate.id,
             blockNumber: stateUpdate.blockNumber,
-            timestamp: BigInt(Number(stateUpdate.timestamp)),
+            timestamp: stateUpdate.timestamp,
             starkKey: vault.starkKey,
             positionOrVaultId: vault.vaultId,
             assetHashOrId: vault.assetHash,

@@ -45,7 +45,7 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
       >[] = recordsToClose.map((record) => ({
         stateUpdateId: stateUpdate.id,
         blockNumber: stateUpdate.blockNumber,
-        timestamp: BigInt(Number(stateUpdate.timestamp)),
+        timestamp: stateUpdate.timestamp,
         starkKey: starkKey,
         positionOrVaultId: positionId,
         assetHashOrId: record.assetHashOrId,

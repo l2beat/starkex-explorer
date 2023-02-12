@@ -1,4 +1,4 @@
-import { AssetHash, AssetId, StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { PreprocessedAssetHistoryRow } from 'knex/types/tables'
 
@@ -10,7 +10,7 @@ export interface PreprocessedAssetHistoryRecord {
   historyId: number
   stateUpdateId: number
   blockNumber: number
-  timestamp: bigint
+  timestamp: Timestamp
   starkKey: StarkKey
   positionOrVaultId: bigint
   assetHashOrId: AssetHash | AssetId
@@ -198,7 +198,7 @@ function toPreprocessedAssetHistoryRecord<T extends AssetHash | AssetId>(
     historyId: row.id,
     stateUpdateId: row.state_update_id,
     blockNumber: row.block_number,
-    timestamp: BigInt(row.timestamp),
+    timestamp: Timestamp(row.timestamp),
     starkKey: StarkKey(row.stark_key),
     positionOrVaultId: row.position_or_vault_id,
     assetHashOrId: toAssetType(row.asset_hash_or_id),
@@ -217,7 +217,7 @@ function toPreprocessedAssetHistoryRow(
   return {
     state_update_id: record.stateUpdateId,
     block_number: record.blockNumber,
-    timestamp: record.timestamp,
+    timestamp: BigInt(record.timestamp.toString()),
     stark_key: record.starkKey.toString(),
     position_or_vault_id: record.positionOrVaultId,
     asset_hash_or_id: record.assetHashOrId.toString(),

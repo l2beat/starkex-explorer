@@ -105,7 +105,7 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
         newRecords.push({
           stateUpdateId: stateUpdate.id,
           blockNumber: stateUpdate.blockNumber,
-          timestamp: BigInt(Number(stateUpdate.timestamp)),
+          timestamp: stateUpdate.timestamp,
           starkKey: position.starkKey,
           positionOrVaultId: position.positionId,
           assetHashOrId: asset.assetId,
