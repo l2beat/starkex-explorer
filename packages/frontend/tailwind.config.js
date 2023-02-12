@@ -12,7 +12,7 @@ module.exports = {
       },
       borderRadius: {
         'action-button': '0.25rem',
-      }
+      },
     },
     colors: {
       grey: {
@@ -20,7 +20,7 @@ module.exports = {
         200: '#2D2D3A',
         300: '#374354',
         400: '#838F9F',
-        500: '#70737D'
+        500: '#70737D',
       },
       white: '#FAFAFA',
       background: '#0c0c0e',
@@ -34,16 +34,16 @@ module.exports = {
       },
       orange: {
         100: '#9C4D03',
-        300: '#F7931A'
+        300: '#F7931A',
       },
       red: {
         100: '#f43636',
         200: '#ff394a',
-        300: '#e10013'
+        300: '#e10013',
       },
       green: {
         100: '#06d888',
-        500: '#5eff5a'
+        500: '#5eff5a',
       },
       yellow: {
         100: '#cb9800',
@@ -51,7 +51,7 @@ module.exports = {
       purple: {
         100: '#5F5CFF',
       },
-      'dydx-brand-color': '#5F5CFF'
+      'dydx-brand-color': '#5F5CFF',
     },
   },
   plugins: [],

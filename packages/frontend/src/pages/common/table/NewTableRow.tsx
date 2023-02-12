@@ -12,12 +12,7 @@ export interface TableRowProps extends Row {
 
 export function NewTableRow(props: TableRowProps) {
   return (
-    <tr
-      className={cx(
-        'my-4 whitespace-nowrap',
-        props.hidden && 'hidden'
-      )}
-    >
+    <tr className={cx('my-4 whitespace-nowrap', props.hidden && 'hidden')}>
       {props.cells.map((cell, col) => {
         const { fullWidth, numeric, monospace, className } =
           props.columns[col] ?? {}
