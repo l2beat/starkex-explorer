@@ -10,7 +10,7 @@ export interface TableRowProps extends Row {
   className?: string
 }
 
-export function NewTableRow(props: TableRowProps) {
+export function TableRow(props: TableRowProps) {
   return (
     <tr className={cx('my-4 whitespace-nowrap', props.hidden && 'hidden')}>
       {props.cells.map((cell, col) => {

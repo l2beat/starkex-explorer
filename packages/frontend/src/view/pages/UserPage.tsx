@@ -15,7 +15,9 @@ import {
 } from '../components/user/EthereumTransactionsTable'
 import { OfferEntry, OffersTable } from '../components/user/OffersTable'
 import { UserProfile } from '../components/user/UserProfile'
+// eslint-disable-next-line no-restricted-imports
 import { AccountDetails } from '../old/common/AccountDetails'
+// eslint-disable-next-line no-restricted-imports
 import { Page } from '../old/common/page/Page'
 import { reactToHtml } from '../reactToHtml'
 
@@ -39,6 +41,7 @@ export function renderUserPage(props: UserPageProps) {
 
 function UserPage(props: UserPageProps) {
   return (
+    // TODO: Stop using old page
     <Page path="/newUser" description="User page" account={props.account}>
       <UserProfile ethereumAddress={props.account?.address} />
       <ActionsTable

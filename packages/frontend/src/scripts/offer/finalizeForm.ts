@@ -6,6 +6,7 @@ import {
 } from '@explorer/shared'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
+// eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/finalize-form/attributes'
 import { getAttribute } from './getAttribute'
 

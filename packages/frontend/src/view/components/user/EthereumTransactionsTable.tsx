@@ -1,7 +1,7 @@
 import { Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { NewTable } from '../common/table/NewTable'
+import { Table } from '../common/table/Table'
 import { Status, StatusType } from './Status'
 
 export interface EthereumTransactionsTableProps {
@@ -32,7 +32,7 @@ export function EthereumTransactionsTable({
   ethereumTransactions,
 }: EthereumTransactionsTableProps) {
   return (
-    <NewTable
+    <Table
       pageSize={6}
       id="test"
       title="Ethereum transactions"

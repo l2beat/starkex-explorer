@@ -1,6 +1,7 @@
 import { serializeCancelOfferBody } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
+// eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/cancel-form/attributes'
 import { getAttribute } from './getAttribute'
 import { signCancel } from './sign'

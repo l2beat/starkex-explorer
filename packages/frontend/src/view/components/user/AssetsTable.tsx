@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Button } from '../common/Button'
-import { NewTable } from '../common/table/NewTable'
+import { Table } from '../common/table/Table'
 
 export interface AssetsTableProps {
   readonly assets: readonly AssetEntry[]
@@ -19,7 +19,7 @@ export interface AssetEntry {
 
 export function AssetsTable({ assets }: AssetsTableProps) {
   return (
-    <NewTable
+    <Table
       fullBackground
       pageSize={6}
       id="test"

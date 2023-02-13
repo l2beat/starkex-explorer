@@ -2,8 +2,8 @@ import cx from 'classnames'
 import React from 'react'
 
 import { Button } from '../Button'
-import { NewTableRow } from './NewTableRow'
 import { NoRowsMessage } from './NoRowsMessage'
+import { TableRow } from './TableRow'
 import { Column, Row } from './types'
 
 interface TableProps {
@@ -17,7 +17,7 @@ interface TableProps {
   noRowsText: string
 }
 
-export function NewTable(props: TableProps) {
+export function Table(props: TableProps) {
   const pageSize = props.pageSize ?? props.rows.length
   return (
     <div className="mb-8 pb-7">
@@ -68,7 +68,7 @@ export function NewTable(props: TableProps) {
           <tbody>
             {props.rows.length > 0 ? (
               props.rows.map(({ cells, link }, i) => (
-                <NewTableRow
+                <TableRow
                   hidden={i >= pageSize}
                   cells={cells}
                   link={link}

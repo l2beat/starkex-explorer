@@ -2,7 +2,7 @@ import { Timestamp } from '@explorer/types'
 import cx from 'classnames'
 import React from 'react'
 
-import { NewTable } from '../common/table/NewTable'
+import { Table } from '../common/table/Table'
 
 export interface BalanceChangesTableProps {
   readonly balanceChanges: readonly BalanceChangeEntry[]
@@ -21,7 +21,7 @@ export function BalanceChangesTable({
   balanceChanges,
 }: BalanceChangesTableProps) {
   return (
-    <NewTable
+    <Table
       pageSize={6}
       id="test"
       title="Balance changes"
