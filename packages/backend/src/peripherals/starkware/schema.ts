@@ -4,6 +4,7 @@ const UnsignedIntAsString = z.string().regex(/^([1-9]\d*|0)$/)
 const SignedIntAsString = z.string().regex(/^(-?[1-9]\d*|0)$/)
 const PedersenHash = z.string().regex(/^0[a-f\d]{63}$/)
 const PedersenHash0x = z.string().regex(/^0x[a-f\d]{0,63}$/)
+const AssetHash0x = z.string().regex(/^0x[a-f\d]{0,63}$/)
 const AssetId = z.string().regex(/^0x[a-f\d]{30}$/)
 
 // https://github.com/starkware-libs/starkex-data-availability-committee/blob/7d72f8e05d6d9ccda5b99444f313a7248ca479b5/src/services/perpetual/public/business_logic/state_objects.py
@@ -54,7 +55,7 @@ export const SpotBatchResponse = z.strictObject({
         // vault_id
         UnsignedIntAsString,
         z.strictObject({
-          token: PedersenHash0x,
+          token: AssetHash0x,
           balance: UnsignedIntAsString,
           stark_key: PedersenHash0x,
         })

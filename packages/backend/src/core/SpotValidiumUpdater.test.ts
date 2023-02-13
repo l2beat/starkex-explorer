@@ -1,6 +1,6 @@
 import { ForcedAction, OraclePrice, SpotCairoOutput } from '@explorer/encoding'
 import { InMemoryMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
-import { Hash256, PedersenHash, StarkKey } from '@explorer/types'
+import { AssetHash, Hash256, PedersenHash, StarkKey } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
@@ -43,13 +43,13 @@ describe(SpotValidiumUpdater.name, () => {
       const newVaultA = {
         vaultId: 5n,
         starkKey: StarkKey.fake('5'),
-        token: PedersenHash.fake('678'),
+        assetHash: AssetHash.fake('678'),
         balance: 555n,
       }
       const newVaultB = {
         vaultId: 2n,
         starkKey: StarkKey.fake('88'),
-        token: PedersenHash.fake('54321'),
+        assetHash: AssetHash.fake('54321'),
         balance: 10999n,
       }
       const mockSpotBatch = mock<SpotBatch>({
@@ -63,7 +63,7 @@ describe(SpotValidiumUpdater.name, () => {
           value: new VaultLeaf(
             newVaultA.starkKey,
             newVaultA.balance,
-            newVaultA.token
+            newVaultA.assetHash
           ),
         },
         {
@@ -71,7 +71,7 @@ describe(SpotValidiumUpdater.name, () => {
           value: new VaultLeaf(
             newVaultB.starkKey,
             newVaultB.balance,
-            newVaultB.token
+            newVaultB.assetHash
           ),
         },
       ])
@@ -122,7 +122,7 @@ describe(SpotValidiumUpdater.name, () => {
         const newVault = {
           vaultId: 5n,
           starkKey: StarkKey.fake('5'),
-          token: PedersenHash.fake('678'),
+          assetHash: AssetHash.fake('678'),
           balance: 555n,
         }
         const mockSpotBatch = mock<SpotBatch>({
@@ -149,7 +149,7 @@ describe(SpotValidiumUpdater.name, () => {
               value: new VaultLeaf(
                 newVault.starkKey,
                 newVault.balance,
-                newVault.token
+                newVault.assetHash
               ),
             },
           ],
