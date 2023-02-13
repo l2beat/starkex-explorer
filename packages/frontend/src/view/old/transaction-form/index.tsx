@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { reactToHtml } from '../reactToHtml'
+import { reactToHtml } from '../../reactToHtml'
 import { TransactionForm } from './TransactionForm'
 import { TransactionFormProps } from './TransactionFormProps'
 

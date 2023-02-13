@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["src/pages"],
+  "include": ["src/view"],
   "compilerOptions": {
-    "outDir": "build/pages"
+    "outDir": "build/view"
   }
 }

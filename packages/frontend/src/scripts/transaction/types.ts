@@ -1,7 +1,7 @@
 import { AssetId } from '@explorer/types'
 
-import { PositionAssetEntry } from '../../pages'
-import { TransactionFormProps } from '../../pages/transaction-form'
+import { PositionAssetEntry } from '../../view'
+import { TransactionFormProps } from '../../view/old/transaction-form'
 
 export interface FormState {
   props: TransactionFormProps

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { reactToHtml } from '../reactToHtml'
+import { reactToHtml } from '../../reactToHtml'
 import { NotFound } from './NotFound'
 import { NotFoundProps } from './NotFoundProps'
 

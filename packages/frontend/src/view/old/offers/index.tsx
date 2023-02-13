@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { reactToHtml } from '../reactToHtml'
+import { reactToHtml } from '../../reactToHtml'
 import { ForcedTradeOfferDetails } from './ForcedTradeOfferDetails'
 import { ForcedTradeOfferDetailsProps } from './ForcedTradeOfferDetailsProps'
 import { ForcedTradeOffersIndex } from './ForcedTradeOffersIndex'

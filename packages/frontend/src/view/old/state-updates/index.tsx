@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { reactToHtml } from '../reactToHtml'
+import { reactToHtml } from '../../reactToHtml'
 import { StateUpdateDetails } from './StateUpdateDetails'
 import { StateUpdateDetailsProps } from './StateUpdateDetailsProps'
 import { StateUpdatesIndex } from './StateUpdatesIndex'

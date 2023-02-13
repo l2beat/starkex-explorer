@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { reactToHtml } from '../reactToHtml'
+import { reactToHtml } from '../../reactToHtml'
 import { PositionAtUpdate } from './PositionAtUpdate'
 import { PositionAtUpdateProps } from './PositionAtUpdateProps'
 import { PositionDetails } from './PositionDetails'

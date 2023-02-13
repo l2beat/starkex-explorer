@@ -1,6 +1,6 @@
 import { AssetId } from '@explorer/types'
 
-import { TransactionFormProps } from '../../pages/transaction-form'
+import { TransactionFormProps } from '../../view/old/transaction-form'
 import { FormAction, FormState } from './types'
 import {
   formatCurrencyInput,

@@ -16,7 +16,7 @@ import {
   renderStateUpdateDetailsPage,
   renderStateUpdatesIndexPage,
   renderTransactionForm,
-} from '../pages'
+} from '../view'
 import * as DATA from './data'
 
 const app = new Koa()

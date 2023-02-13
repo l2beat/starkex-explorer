@@ -28,7 +28,7 @@ export function Page({
   title,
   baseUrl = 'https://dydx.l2beat.com',
   path,
-  stylesheets = ['/styles/main.css'],
+  stylesheets = ['/styles/main.old.css'],
   scripts = ['/scripts/main.js'],
   children,
 }: Props) {
