@@ -27,8 +27,8 @@ export function WarningIcon(props: React.SVGProps<SVGSVGElement>) {
           y2="15"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FFDA1C" />
-          <stop offset="1" stop-color="#F7931A" />
+          <stop stopColor="#FFDA1C" />
+          <stop offset="1" stopColor="#F7931A" />
         </linearGradient>
         <radialGradient
           id="paint1_radial_511_4725"
@@ -38,9 +38,9 @@ export function WarningIcon(props: React.SVGProps<SVGSVGElement>) {
           gradientUnits="userSpaceOnUse"
           gradientTransform="translate(5.39754 4.15145) scale(10.0153 10.0634)"
         >
-          <stop stop-color="#4B4B4B" />
-          <stop offset="0.531" stop-color="#393939" />
-          <stop offset="1" stop-color="#252525" />
+          <stop stopColor="#4B4B4B" />
+          <stop offset="0.531" stopColor="#393939" />
+          <stop offset="1" stopColor="#252525" />
         </radialGradient>
       </defs>
     </svg>
