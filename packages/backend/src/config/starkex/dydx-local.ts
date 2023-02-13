@@ -23,6 +23,9 @@ export function getDydxLocalConfig(): StarkexConfig {
         EthereumAddress('0x6ebcf3c79b5bC9195F26dE459f57B6d2f0f27861'),
       ],
     },
-    collateralAssetId: AssetId('USDC-6'),
+    collateralAsset: {
+      assetId: AssetId('USDC-6'),
+      price: 1_000_000n,
+    },
   }
 }

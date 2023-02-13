@@ -320,7 +320,7 @@ export class Application {
         new PreprocessedAssetHistoryRepository(database, AssetId, logger)
 
       const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
-        config.starkex.collateralAssetId,
+        config.starkex.collateralAsset,
         preprocessedAssetHistoryRepository,
         stateUpdateRepository,
         positionRepository,

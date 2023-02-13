@@ -24,6 +24,9 @@ export function getGammaxGoerliConfig(): StarkexConfig {
       userCertificate: getEnv('GAMMAX_AG_USER_CERTIFICATE'),
       userKey: getEnv('GAMMAX_AG_USER_KEY'),
     },
-    collateralAssetId: AssetId('COLLATERAL-0'),
+    collateralAsset: {
+      assetId: AssetId('COLLATERAL-1'),
+      price: 1n,
+    },
   }
 }

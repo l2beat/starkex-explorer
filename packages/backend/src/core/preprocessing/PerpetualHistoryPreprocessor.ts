@@ -18,7 +18,7 @@ import { HistoryPreprocessor } from './HistoryPreprocessor'
 
 export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
   constructor(
-    private readonly collateralAssetId: AssetId,
+    private readonly collateralAsset: { assetId: AssetId; price: bigint },
     protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<AssetId>,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
@@ -72,7 +72,10 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
     const currentUserRecords =
       await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndAssets(
         position.starkKey,
-        [this.collateralAssetId, ...position.balances.map((b) => b.assetId)],
+        [
+          this.collateralAsset.assetId,
+          ...position.balances.map((b) => b.assetId),
+        ],
         trx
       )
 
@@ -83,7 +86,7 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
 
     const updatedAssets = [
       {
-        assetId: this.collateralAssetId,
+        assetId: this.collateralAsset.assetId,
         balance: position.collateralBalance,
       },
       ...position.balances,
@@ -128,7 +131,7 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
       trx
     )
     const assetPriceMap: Record<string, bigint> = {
-      [this.collateralAssetId.toString()]: 1n,
+      [this.collateralAsset.assetId.toString()]: this.collateralAsset.price,
     }
     prices.forEach((p) => {
       assetPriceMap[p.assetId.toString()] = p.price
