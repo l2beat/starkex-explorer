@@ -2,34 +2,37 @@
 module.exports = {
   content: ['./src/**/*.{html,ts,tsx}'],
   theme: {
+    fontFamily: {
+      inter: ['Inter', 'sans-serif'],
+    },
     colors: {
-      white: '#FFFFFF', // White
+      white: '#FFFFFF',
       amber: {
-        500: '#F7931A', // Orange 1
+        500: '#F7931A',
       },
       zinc: {
-        500: '#70737D', // Gray 1
+        500: '#70737D',
       },
       gray: {
-        600: '#575B64', // Gray 2
-        800: '#222531', // Elements background base
+        600: '#575B64',
+        800: '#222531',
       },
       slate: {
-        800: '#2F3341', // Elements background base 2 Gunmetal
+        800: '#2F3341',
       },
       neutral: {
-        900: '#0C0C0E', // Background
+        900: '#0C0C0E',
       },
       blue: {
-        500: '#3E97FF', // Blue 1
-        600: '#2969E9', // Blue 1 - TEXT
+        500: '#3E97FF',
+        600: '#2969E9',
       },
       red: {
-        500: '#FF394A', // Red 1 - TEXT
-        600: '#E10013', // Red 1
+        500: '#FF394A',
+        600: '#E10013',
       },
       cyan: {
-        600: '#1595B1', // Blue 2
+        600: '#1595B1',
       },
       emerald: {
         400: '#06D888', // Green (positive)
@@ -41,5 +44,6 @@ module.exports = {
       brand: '#5F5CFF', // Brand Color
     },
   },
+
   plugins: [],
 }

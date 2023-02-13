@@ -29,7 +29,7 @@ function buildStyles() {
       `tailwindcss -i ./src/styles/style.css -o ./build/static/styles/main.css`
     ),
     exec(
-      `tailwindcss -c ./tailwind.old.config.js -i ./src/styles/style.css -o ./build/static/styles/main.old.css`
+      `tailwindcss -c ./tailwind.old.config.js -i ./src/styles/style.old.css -o ./build/static/styles/main.old.css`
     ),
   ])
 }
