@@ -101,7 +101,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     return newVaultLeaves.map(({ value, index }) => ({
       vaultId: index,
       starkKey: value.starkKey,
-      token: value.token,
+      assetHash: value.assetHash,
       balance: value.balance,
     }))
   }
