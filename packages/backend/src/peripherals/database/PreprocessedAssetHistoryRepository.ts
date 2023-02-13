@@ -56,6 +56,7 @@ export class PreprocessedAssetHistoryRepository<
     this.getPrevHistoryIdOfCurrentWithStateUpdateId = this.wrapGet(
       this.getPrevHistoryIdOfCurrentWithStateUpdateId
     )
+    this.deleteAll = this.wrapDelete(this.deleteAll)
 
     /* eslint-enable @typescript-eslint/unbound-method */
   }
@@ -65,10 +66,11 @@ export class PreprocessedAssetHistoryRepository<
     trx: Knex.Transaction
   ): Promise<number> {
     const knex = await this.knex(trx)
-    await knex('preprocessed_asset_history').insert(
-      toPreprocessedAssetHistoryRow(row)
-    )
-    return row.stateUpdateId
+    const results = await knex('preprocessed_asset_history')
+      .insert(toPreprocessedAssetHistoryRow(row))
+      .returning('id')
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return results[0]!.id
   }
 
   async addMany(
@@ -188,6 +190,11 @@ export class PreprocessedAssetHistoryRepository<
       historyId: row.id,
       prevHistoryId: row.prev_history_id ?? undefined,
     }))
+  }
+
+  async deleteAll(trx: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    return knex('preprocessed_asset_history').delete()
   }
 }
 
