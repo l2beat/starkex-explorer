@@ -29,7 +29,7 @@ router.get('/', (ctx) => {
   ctx.body = renderHomePage(data)
 })
 router.get('/user', (ctx) => {
-  const data = { ...DATA.USER_PROPS}
+  const data = { ...DATA.USER_PROPS }
   data.account = getAccount(ctx)
   ctx.body = renderUserPage(data)
 })

@@ -167,7 +167,7 @@ export const USER_PROPS: UserProps = {
       type: 'BUY',
     },
   ],
-  totalOffers: 1 as unknown as bigint
+  totalOffers: 1 as unknown as bigint,
 }
 
 export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
