@@ -36,7 +36,7 @@ interface TypeRadioProps {
 
 export function TypeRadio(props: TypeRadioProps) {
   return (
-    <div className="flex cursor-pointer rounded-md bg-gray-200">
+    <div className="bg-gray-200 flex cursor-pointer rounded-md">
       {['buy', 'sell'].map((type) => {
         const checked = props.type === type
         const label = type.slice(0, 1).toUpperCase() + type.slice(1)
