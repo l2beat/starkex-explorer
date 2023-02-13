@@ -6,28 +6,32 @@ import { AssetHash } from './AssetHash'
 describe(AssetHash.name, () => {
   it('accepts a valid hash', () => {
     const hash = AssetHash(
-      '0xabcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0x0bcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
     )
     expect(hash.toString()).toEqual(
-      '0xabcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0x0bcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
     )
   })
 
   it('prepends 0x', () => {
     const hash = AssetHash(
-      'abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      'abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd123'
     )
     expect(hash.toString()).toEqual(
-      '0xabcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0x0abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd123'
     )
+  })
+
+  it('throws when most significant byte is not 0', () => {
+    expect(() => AssetHash('0x1' + '0'.repeat(63))).toThrow(TypeError)
   })
 
   it('transforms to lowercase', () => {
     const hash = AssetHash(
-      '0xABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234'
+      '0x0ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD1234ABCD123'
     )
     expect(hash.toString()).toEqual(
-      '0xabcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234'
+      '0x0abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd1234abcd123'
     )
   })
 

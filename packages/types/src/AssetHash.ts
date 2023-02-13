@@ -17,6 +17,11 @@ export function AssetHash(value: string) {
     throw new TypeError('AssetHash too large')
   }
   value = '0x' + value.padStart(64, '0')
+  if (!value.startsWith('0x0')) {
+    // This is necessary for AssetHash to be compatible with
+    // PedersenHash (in VaultLeaf)
+    throw new TypeError('Full AssetHash must start with 0x0')
+  }
   return value.toLowerCase() as unknown as AssetHash
 }
 
