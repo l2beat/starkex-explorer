@@ -17,6 +17,7 @@ import {
   renderStateUpdatesIndexPage,
   renderTransactionForm,
 } from '../pages'
+import { renderUserPage } from '../pages/newUser'
 import * as DATA from './data'
 
 const app = new Koa()
@@ -26,6 +27,11 @@ router.get('/', (ctx) => {
   const data = { ...DATA.HOME_PROPS }
   data.account = getAccount(ctx)
   ctx.body = renderHomePage(data)
+})
+router.get('/user', (ctx) => {
+  const data = { ...DATA.USER_PROPS}
+  data.account = getAccount(ctx)
+  ctx.body = renderUserPage(data)
 })
 router.get('/state-updates', (ctx) => {
   const data = { ...DATA.STATE_CHANGES_INDEX_PROPS }
