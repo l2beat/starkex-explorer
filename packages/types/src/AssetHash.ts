@@ -36,8 +36,8 @@ AssetHash.from = function from(value: BigNumber | bigint) {
 
 AssetHash.fake = function fake(start?: string) {
   if (!start) {
-    return AssetHash(fakeHexString(64))
+    return AssetHash('0' + fakeHexString(63))
   } else {
-    return AssetHash(start.padEnd(64, '0'))
+    return AssetHash('0' + start.padEnd(63, '0'))
   }
 }

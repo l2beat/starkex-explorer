@@ -1,4 +1,4 @@
-import { tvlElId } from '../pages/home/tvlElId'
+import { tvlElId } from '../view/old/home/tvlElId'
 
 export function initTVLDisplay() {
   const tvlEl = document.querySelector('#' + tvlElId)

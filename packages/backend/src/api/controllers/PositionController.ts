@@ -1,8 +1,8 @@
 import {
   ForcedTransactionEntry,
-  renderNotFoundPage,
-  renderPositionAtUpdatePage,
-  renderPositionDetailsPage,
+  renderOldNotFoundPage,
+  renderOldPositionAtUpdatePage,
+  renderOldPositionDetailsPage,
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress } from '@explorer/types'
 
@@ -78,7 +78,7 @@ export class PositionController {
       this.userRegistrationEventRepository.findByStarkKey(current.starkKey),
     ])
 
-    const content = renderPositionDetailsPage({
+    const content = renderOldPositionDetailsPage({
       account,
       positionId,
       starkKey: current.starkKey,
@@ -146,7 +146,7 @@ export class PositionController {
       }
     })
 
-    const content = renderPositionAtUpdatePage({
+    const content = renderOldPositionAtUpdatePage({
       account,
       stateUpdateId,
       positionId,
@@ -165,7 +165,7 @@ export class PositionController {
     const account = await this.accountService.getAccount(address)
     return {
       type: 'not found',
-      content: renderNotFoundPage({
+      content: renderOldNotFoundPage({
         path: '/positions/not-found',
         account,
         text: address

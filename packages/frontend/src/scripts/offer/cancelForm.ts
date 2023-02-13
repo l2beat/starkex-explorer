@@ -1,7 +1,7 @@
 import { serializeCancelOfferBody } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
-import { FormClass } from '../../pages/offers/cancel-form/attributes'
+import { FormClass } from '../../view/old/offers/cancel-form/attributes'
 import { getAttribute } from './getAttribute'
 import { signCancel } from './sign'
 
