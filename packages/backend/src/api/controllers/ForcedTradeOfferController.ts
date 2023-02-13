@@ -1,6 +1,6 @@
 import {
-  renderForcedTradeOfferDetailsPage,
-  renderForcedTradeOffersIndexPage,
+  renderOldForcedTradeOfferDetailsPage,
+  renderOldForcedTradeOffersIndexPage,
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
@@ -60,7 +60,7 @@ export class ForcedTradeOfferController {
       this.offerRepository.getInitialAssetIds(),
     ])
 
-    const content = renderForcedTradeOffersIndexPage({
+    const content = renderOldForcedTradeOffersIndexPage({
       account,
       offers: offers.map(toForcedTradeOfferEntry),
       total,
@@ -117,7 +117,7 @@ export class ForcedTradeOfferController {
           }
         : undefined
 
-    const content = renderForcedTradeOfferDetailsPage({
+    const content = renderOldForcedTradeOfferDetailsPage({
       account,
       history: toForcedTradeOfferHistory(offer),
       offer: {

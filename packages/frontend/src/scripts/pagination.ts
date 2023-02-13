@@ -1,5 +1,5 @@
-import { ServerFormAttributes } from '../pages/common/pagination/attributes'
-import { styles } from '../pages/common/pagination/styles'
+import { ServerFormAttributes } from '../view/old/common/pagination/attributes'
+import { styles } from '../view/old/common/pagination/styles'
 
 export function initPagination() {
   initServerPagination()
