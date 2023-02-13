@@ -1,7 +1,7 @@
 import { encodeFinalizeExitRequest } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
-import { FormClass } from '../../pages/forced-transactions/finalize-form'
+import { FormClass } from '../../view/old/forced-transactions/finalize-form'
 import { getAttribute } from '../offer/getAttribute'
 
 export function initFinalizeExitForm() {

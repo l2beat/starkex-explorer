@@ -1,7 +1,7 @@
 import {
   PositionUpdateEntry,
-  renderStateUpdateDetailsPage,
-  renderStateUpdatesIndexPage,
+  renderOldStateUpdateDetailsPage,
+  renderOldStateUpdatesIndexPage,
 } from '@explorer/frontend'
 import { EthereumAddress } from '@explorer/types'
 
@@ -38,7 +38,7 @@ export class StateUpdateController {
     ])
     const total = await this.stateUpdateRepository.count()
 
-    const content = renderStateUpdatesIndexPage({
+    const content = renderOldStateUpdatesIndexPage({
       account,
       stateUpdates: stateUpdates.map(toStateUpdateEntry),
       total: Number(total),
@@ -69,7 +69,7 @@ export class StateUpdateController {
       toPositionUpdateEntry(position, transactions)
     )
 
-    const content = renderStateUpdateDetailsPage({
+    const content = renderOldStateUpdateDetailsPage({
       account,
       id: stateUpdate.id,
       hash: stateUpdate.hash,

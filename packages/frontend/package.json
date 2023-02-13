@@ -2,8 +2,8 @@
   "name": "@explorer/frontend",
   "version": "0.1.0",
   "private": true,
-  "main": "build/pages/index.js",
-  "types": "build/pages/index.d.ts",
+  "main": "build/view/index.js",
+  "types": "build/view/index.d.ts",
   "engines": {
     "node": "^16.0.0",
     "yarn": ">=1.22.0"

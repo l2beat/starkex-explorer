@@ -24,9 +24,14 @@ function watchScripts() {
 }
 
 function buildStyles() {
-  return exec(
-    `tailwindcss -i ./src/styles/style.css -o ./build/static/styles/main.css`
-  )
+  return Promise.all([
+    exec(
+      `tailwindcss -i ./src/styles/style.css -o ./build/static/styles/main.css`
+    ),
+    exec(
+      `tailwindcss -c ./tailwind.old.config.js -i ./src/styles/style.css -o ./build/static/styles/main.old.css`
+    ),
+  ])
 }
 
 function watchStyles() {
@@ -41,8 +46,8 @@ function watchStatic() {
   return gulp.watch('src/static/**/*', copyStatic)
 }
 
-function buildPages() {
-  return exec(`tsc -p tsconfig.pages.json`)
+function buildTypescript() {
+  return exec(`tsc -p tsconfig.build.json`)
 }
 
 async function hashStaticFiles() {
@@ -61,7 +66,7 @@ function startPreview() {
 
 const build = gulp.series(
   clean,
-  gulp.parallel(buildScripts, buildStyles, buildPages, copyStatic),
+  gulp.parallel(buildScripts, buildStyles, buildTypescript, copyStatic),
   hashStaticFiles
 )
 

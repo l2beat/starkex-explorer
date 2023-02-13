@@ -6,7 +6,7 @@ import {
 } from '@explorer/shared'
 import { EthereumAddress, Hash256 } from '@explorer/types'
 
-import { FormClass } from '../../pages/offers/finalize-form/attributes'
+import { FormClass } from '../../view/old/offers/finalize-form/attributes'
 import { getAttribute } from './getAttribute'
 
 export function initFinalizeForm() {

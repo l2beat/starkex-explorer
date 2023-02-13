@@ -1,6 +1,6 @@
 import { AssetId } from '@explorer/types'
 
-import { PositionAssetEntry } from '../../pages'
+import { PositionAssetEntry } from '../../view'
 
 export function getAsset(
   selected: AssetId,

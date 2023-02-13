@@ -17,11 +17,11 @@ import {
   PositionDetailsProps,
   StateUpdateDetailsProps,
   StateUpdatesIndexProps,
-} from '../pages'
-import { ForcedTransactionEntry } from '../pages/forced-transactions/ForcedTransactionsIndexProps'
-import { NotFoundProps } from '../pages/not-found/NotFoundProps'
-import { ForcedTradeOffersIndexProps } from '../pages/offers/ForcedTradeOffersIndexProps'
-import { TransactionFormProps } from '../pages/transaction-form'
+} from '../view'
+import { ForcedTransactionEntry } from '../view/old/forced-transactions/ForcedTransactionsIndexProps'
+import { NotFoundProps } from '../view/old/not-found/NotFoundProps'
+import { ForcedTradeOffersIndexProps } from '../view/old/offers/ForcedTradeOffersIndexProps'
+import { TransactionFormProps } from '../view/old/transaction-form'
 
 const ONE_HOUR = 60 * 60 * 1000
 
