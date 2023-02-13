@@ -137,7 +137,8 @@ export class PreprocessedAssetHistoryRepository<
         'asset_hash_or_id',
         assets.map((x) => x.toString())
       )
-      .andWhere('balance', '!=', 0)
+    // Don't filter out balance === 0
+    // We still need such records the get prevHistoryId
 
     return rows.map((r) =>
       toPreprocessedAssetHistoryRecord(r, this.toAssetType)
