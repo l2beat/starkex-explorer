@@ -22,7 +22,7 @@ import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
 
-const mockStateUpdate: StateUpdateRecord = {
+const stateUpdate: StateUpdateRecord = {
   id: 200,
   blockNumber: 1_000,
   stateTransitionHash: Hash256.fake(),
@@ -30,7 +30,7 @@ const mockStateUpdate: StateUpdateRecord = {
   timestamp: Timestamp(1_000_000_000),
 }
 
-const mockPosition1: PositionRecord & { stateUpdateId: number } = {
+const position1: PositionRecord & { stateUpdateId: number } = {
   stateUpdateId: 2000,
   positionId: 10_001n,
   starkKey: StarkKey.fake(),
@@ -47,7 +47,7 @@ const mockPosition1: PositionRecord & { stateUpdateId: number } = {
   ],
 }
 
-const mockZeroPosition: PositionRecord & { stateUpdateId: number } = {
+const closingPosition: PositionRecord & { stateUpdateId: number } = {
   stateUpdateId: 2000,
   positionId: 10_002n,
   starkKey: StarkKey(
@@ -57,7 +57,7 @@ const mockZeroPosition: PositionRecord & { stateUpdateId: number } = {
   balances: [],
 }
 
-const mockPosition2: PositionRecord & { stateUpdateId: number } = {
+const position2: PositionRecord & { stateUpdateId: number } = {
   stateUpdateId: 2000,
   positionId: 10_003n,
   starkKey: StarkKey.fake(),
@@ -119,9 +119,9 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         const trx = mock<Knex.Transaction>()
         const positionRepository = mock<PositionRepository>({
           getByStateUpdateId: async () => [
-            mockPosition1,
-            mockZeroPosition,
-            mockPosition2,
+            position1,
+            closingPosition,
+            position2,
           ],
         })
         const stateUpdateRepository = mock<StateUpdateRepository>({
@@ -149,7 +149,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
 
         await perpetualHistoryPreprocessor.preprocessNextStateUpdate(
           trx,
-          mockStateUpdate
+          stateUpdate
         )
         const expectedPriceMap = {
           'BTC-10': 456789n,
@@ -157,11 +157,11 @@ describe(PerpetualHistoryPreprocessor.name, () => {
           'USDC-6': 1_000_000n,
         }
         expect(mockClosePositionOrVault).toHaveBeenCalledExactlyWith([
-          [trx, 10_002n, mockStateUpdate, expectedPriceMap],
+          [trx, 10_002n, stateUpdate, expectedPriceMap],
         ])
         expect(mockPreprocessSinglePosition).toHaveBeenCalledExactlyWith([
-          [trx, mockPosition1, mockStateUpdate, expectedPriceMap],
-          [trx, mockPosition2, mockStateUpdate, expectedPriceMap],
+          [trx, position1, stateUpdate, expectedPriceMap],
+          [trx, position2, stateUpdate, expectedPriceMap],
         ])
       })
     }
@@ -181,8 +181,8 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         await expect(
           perpetualHistoryPreprocessor.preprocessSinglePosition(
             mock<Knex.Transaction>(),
-            mockZeroPosition,
-            mockStateUpdate,
+            closingPosition,
+            stateUpdate,
             {}
           )
         ).toBeRejected('Cannot preprocess position with StarkKey.ZERO')
@@ -199,8 +199,8 @@ describe(PerpetualHistoryPreprocessor.name, () => {
               stateUpdateId: 1900,
               blockNumber: 1_000_000,
               timestamp: Timestamp(900_000_000n),
-              starkKey: mockPosition1.starkKey,
-              positionOrVaultId: mockPosition1.positionId,
+              starkKey: position1.starkKey,
+              positionOrVaultId: position1.positionId,
               assetHashOrId: mockCollateralAsset.assetId,
               balance: 100_000_000n,
               prevBalance: 900_000_000n,
@@ -214,8 +214,8 @@ describe(PerpetualHistoryPreprocessor.name, () => {
               stateUpdateId: 1940,
               blockNumber: 9000_000,
               timestamp: Timestamp(900_000_000n),
-              starkKey: mockPosition1.starkKey,
-              positionOrVaultId: mockPosition1.positionId,
+              starkKey: position1.starkKey,
+              positionOrVaultId: position1.positionId,
               assetHashOrId: AssetId('BTC-10'),
               balance: 0n,
               prevBalance: 700_000n,
@@ -241,8 +241,8 @@ describe(PerpetualHistoryPreprocessor.name, () => {
 
         await perpetualHistoryPreprocessor.preprocessSinglePosition(
           trx,
-          mockPosition1,
-          mockStateUpdate,
+          position1,
+          stateUpdate,
           {
             'BTC-10': 456789n,
             'ETH-9': 123n,
@@ -254,7 +254,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
           preprocessedRepository.getCurrentByStarkKeyAndAssets
         ).toHaveBeenCalledExactlyWith([
           [
-            mockPosition1.starkKey,
+            position1.starkKey,
             [AssetId.USDC, AssetId('ETH-9'), AssetId('BTC-10')],
             trx,
           ],
@@ -268,44 +268,44 @@ describe(PerpetualHistoryPreprocessor.name, () => {
                 // There was a history entry for this record:
                 {
                   assetHashOrId: mockCollateralAsset.assetId,
-                  balance: mockPosition1.collateralBalance,
-                  blockNumber: mockStateUpdate.blockNumber,
-                  positionOrVaultId: mockPosition1.positionId,
+                  balance: position1.collateralBalance,
+                  blockNumber: stateUpdate.blockNumber,
+                  positionOrVaultId: position1.positionId,
                   prevBalance: 100_000_000n,
                   prevHistoryId: 100,
                   prevPrice: 1_000_000n,
                   price: mockCollateralAsset.price,
-                  starkKey: mockPosition1.starkKey,
-                  stateUpdateId: mockStateUpdate.id,
-                  timestamp: mockStateUpdate.timestamp,
+                  starkKey: position1.starkKey,
+                  stateUpdateId: stateUpdate.id,
+                  timestamp: stateUpdate.timestamp,
                 },
                 // There was no history entry for this record:
                 {
                   assetHashOrId: AssetId('ETH-9'),
                   balance: 47198000000n,
-                  blockNumber: mockStateUpdate.blockNumber,
-                  positionOrVaultId: mockPosition1.positionId,
+                  blockNumber: stateUpdate.blockNumber,
+                  positionOrVaultId: position1.positionId,
                   prevBalance: 0n,
                   prevHistoryId: undefined,
                   prevPrice: undefined,
                   price: 123n,
-                  starkKey: mockPosition1.starkKey,
-                  stateUpdateId: mockStateUpdate.id,
-                  timestamp: mockStateUpdate.timestamp,
+                  starkKey: position1.starkKey,
+                  stateUpdateId: stateUpdate.id,
+                  timestamp: stateUpdate.timestamp,
                 },
                 // There was a history entry for this record with no balance:
                 {
                   assetHashOrId: AssetId('BTC-10'),
                   balance: -40000000000n,
-                  blockNumber: mockStateUpdate.blockNumber,
-                  positionOrVaultId: mockPosition1.positionId,
+                  blockNumber: stateUpdate.blockNumber,
+                  positionOrVaultId: position1.positionId,
                   prevBalance: 0n,
                   prevHistoryId: 80,
                   prevPrice: 345_678n,
                   price: 456_789n,
-                  starkKey: mockPosition1.starkKey,
-                  stateUpdateId: mockStateUpdate.id,
-                  timestamp: mockStateUpdate.timestamp,
+                  starkKey: position1.starkKey,
+                  stateUpdateId: stateUpdate.id,
+                  timestamp: stateUpdate.timestamp,
                 },
               ],
             ],

@@ -5,10 +5,7 @@ import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import {
-  StateUpdateRecord,
-  StateUpdateRepository,
-} from '../../peripherals/database/StateUpdateRepository'
+import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { VaultRepository } from '../../peripherals/database/VaultRepository'
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
@@ -16,7 +13,6 @@ import { HistoryPreprocessor } from './HistoryPreprocessor'
 export class SpotHistoryPreprocessor extends HistoryPreprocessor<AssetHash> {
   constructor(
     protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<AssetHash>,
-    private stateUpdateRepository: StateUpdateRepository,
     private vaultRepository: VaultRepository,
     protected logger: Logger
   ) {

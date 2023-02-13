@@ -343,7 +343,6 @@ export class Application {
 
       const spotHistoryPreprocessor = new SpotHistoryPreprocessor(
         preprocessedAssetHistoryRepository,
-        stateUpdateRepository,
         vaultRepository,
         logger
       )
