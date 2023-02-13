@@ -15,9 +15,9 @@ export function AmountInput(props: TransactionFormProps) {
           type="text"
           autoComplete="off"
           placeholder="0.00"
-          className="w-full rounded-md bg-gray-100 pl-2 pt-2 pr-[120px] pb-10 font-mono text-2xl leading-none"
+          className="bg-gray-100 font-mono w-full rounded-md pl-2 pt-2 pr-[120px] pb-10 text-2xl leading-none"
         />
-        <div className="absolute top-2 right-2 flex items-center gap-2 rounded-md bg-gray-300 px-3 py-0.5">
+        <div className="bg-gray-300 absolute top-2 right-2 flex items-center gap-2 rounded-md px-3 py-0.5">
           <AssetIcon
             id={FormId.AssetIconView}
             className="h-4 w-4"
@@ -51,7 +51,7 @@ export function AmountInput(props: TransactionFormProps) {
           <button
             id={FormId.AssetMaxButton}
             type="button"
-            className="rounded-md bg-gray-300 px-2 py-0.5 text-xs uppercase"
+            className="bg-gray-300 rounded-md px-2 py-0.5 text-xs uppercase"
           >
             Max
           </button>
@@ -59,7 +59,7 @@ export function AmountInput(props: TransactionFormProps) {
       </div>
       <div
         id={FormId.AmountErrorView}
-        className="hidden font-medium text-red-100"
+        className="text-red-100 hidden font-medium"
       >
         Amount too large
       </div>

@@ -16,17 +16,17 @@ export function TransactionForm(props: TransactionFormProps) {
   const propsJson = serializeTransactionFormProps(props)
   return (
     <>
-      <div className="wide:px-4 flex items-center justify-center bg-yellow-100 px-2 py-1 text-gray-100">
+      <div className="wide:px-4 bg-yellow-100 text-gray-100 flex items-center justify-center px-2 py-1">
         <span>
           <strong>WARNING:</strong> The Forced Exit is missing some
           functionality temporarily. We are working on fixing it.
         </span>
       </div>
       <Page title="" path="/" description="" account={props.account}>
-        <div className="mx-auto mb-4 flex w-min rounded-md bg-gray-200 drop-shadow-lg">
+        <div className="bg-gray-200 mx-auto mb-4 flex w-min rounded-md drop-shadow-lg">
           <button
             id={FormId.ExitButton}
-            className="w-[91px] rounded-md bg-gray-300 py-1.5"
+            className="bg-gray-300 w-[91px] rounded-md py-1.5"
           >
             Exit
           </button>
@@ -39,7 +39,7 @@ export function TransactionForm(props: TransactionFormProps) {
         </div>
         <form
           id={FormId.Form}
-          className="mx-auto hidden max-w-[500px] flex-col gap-2.5 rounded-md bg-gray-200 p-4 drop-shadow-lg"
+          className="bg-gray-200 mx-auto hidden max-w-[500px] flex-col gap-2.5 rounded-md p-4 drop-shadow-lg"
           data-props={propsJson}
         >
           <div id={FormId.FormTitle} className="text-lg font-medium">
@@ -53,7 +53,7 @@ export function TransactionForm(props: TransactionFormProps) {
           <button
             id={FormId.SubmitButton}
             type="button"
-            className="block w-full rounded-md bg-blue-100 py-2 text-lg font-bold"
+            className="bg-blue-100 block w-full rounded-md py-2 text-lg font-bold"
           >
             Forced exit
           </button>
