@@ -14,7 +14,7 @@ export function NotFound(props: NotFoundProps) {
     >
       <div className="text-center">
         <h1 className="text-2xl">{props.text}</h1>
-        <div className="text-[40vw] font-bold text-grey-300 sm:text-[250px]">
+        <div className="text-[40vw] font-bold text-gray-300 sm:text-[250px]">
           404
         </div>
       </div>

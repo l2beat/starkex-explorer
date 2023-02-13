@@ -20,7 +20,7 @@ export function ForcedHistory({ events }: ForcedHistoryProps) {
       <div className="mb-8 w-full overflow-x-auto">
         <table className="w-full whitespace-nowrap">
           {events.map((event, i) => (
-            <tr className="border-2 border-grey-100 bg-grey-200" key={i}>
+            <tr className="border-2 border-gray-100 bg-gray-200" key={i}>
               <th className="w-[268px] py-2 px-1.5 text-left font-normal">
                 {formatAbsoluteTime(event.timestamp)}
               </th>

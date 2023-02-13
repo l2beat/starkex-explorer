@@ -14,7 +14,7 @@ export function TotalInput() {
           type="text"
           autoComplete="off"
           placeholder="0.00"
-          className="w-full rounded-md bg-grey-100 py-2 pl-2 pr-[80px] font-mono text-2xl leading-none"
+          className="w-full rounded-md bg-gray-100 py-2 pl-2 pr-[80px] font-mono text-2xl leading-none"
         />
         <div className="absolute top-2 right-2 flex items-center gap-2 py-0.5">
           <AssetIcon className="h-4 w-4" assetId={AssetId.USDC} />

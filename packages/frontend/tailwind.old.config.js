@@ -12,7 +12,7 @@ module.exports = {
       },
     },
     colors: {
-      grey: {
+      gray: {
         100: '#20252F',
         200: '#2D2D3A',
         300: '#374354',

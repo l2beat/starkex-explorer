@@ -10,7 +10,7 @@ export interface StatRowProps {
 
 export function StatRow({ even, title, content, fontRegular }: StatRowProps) {
   return (
-    <tr className={classNames(even && ' bg-grey-200')}>
+    <tr className={classNames(even && ' bg-gray-200')}>
       <th
         className="p-1.5 text-right font-bold first-letter:capitalize"
         scope="row"

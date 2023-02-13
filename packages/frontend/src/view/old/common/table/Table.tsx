@@ -23,7 +23,7 @@ export function Table(props: TableProps) {
                   column.className
                 )}
               >
-                <div className="py0.5 rounded-[3px] bg-grey-300 px-1.5">
+                <div className="py0.5 rounded-[3px] bg-gray-300 px-1.5">
                   {column.header}
                 </div>
               </th>

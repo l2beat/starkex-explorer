@@ -10,9 +10,9 @@ export interface PageTextProps {
 export function PageText({ current, total }: PageTextProps) {
   return (
     <span className={styles.pagesText}>
-      <span className="hidden wide:inline">Page </span>
+      <span className="wide:inline hidden">Page </span>
       <span data-current>{current}</span>
-      <span className="hidden wide:inline"> out</span>
+      <span className="wide:inline hidden"> out</span>
       {' of '}
       <span data-total>{total}</span>
     </span>

@@ -10,7 +10,7 @@ export function NoRowsMessage({ text, colSpan }: NoRowsMessageProps) {
     <tr>
       <td
         colSpan={colSpan}
-        className="bg-grey-200 pt-4 pb-4 text-center first-letter:capitalize"
+        className="bg-gray-200 pt-4 pb-4 text-center first-letter:capitalize"
       >
         {text}
       </td>

@@ -131,8 +131,8 @@ export function initTransactionForm() {
         !newState.canSubmit
       )
       ui.submitButton.classList.toggle('bg-blue-100', newState.canSubmit)
-      ui.submitButton.classList.toggle('bg-grey-300', !newState.canSubmit)
-      ui.submitButton.classList.toggle('text-grey-400', !newState.canSubmit)
+      ui.submitButton.classList.toggle('bg-gray-300', !newState.canSubmit)
+      ui.submitButton.classList.toggle('text-gray-400', !newState.canSubmit)
     }
 
     if (!state || state.exitButtonVisible !== newState.exitButtonVisible) {
@@ -140,7 +140,7 @@ export function initTransactionForm() {
     }
 
     if (!state || state.exitButtonSelected !== newState.exitButtonSelected) {
-      ui.exitButton.classList.toggle('bg-grey-300', newState.exitButtonSelected)
+      ui.exitButton.classList.toggle('bg-gray-300', newState.exitButtonSelected)
       if (newState.exitButtonSelected) {
         ui.formTitle.innerText = 'Forced exit'
         ui.submitButton.innerText = 'Submit forced exit'
@@ -152,7 +152,7 @@ export function initTransactionForm() {
     }
 
     if (!state || state.buyButtonSelected !== newState.buyButtonSelected) {
-      ui.buyButton.classList.toggle('bg-grey-300', newState.buyButtonSelected)
+      ui.buyButton.classList.toggle('bg-gray-300', newState.buyButtonSelected)
       if (newState.buyButtonSelected) {
         ui.formTitle.innerText = 'Forced buy'
         ui.submitButton.innerText = 'Create forced buy offer'
@@ -164,7 +164,7 @@ export function initTransactionForm() {
     }
 
     if (!state || state.sellButtonSelected !== newState.sellButtonSelected) {
-      ui.sellButton.classList.toggle('bg-grey-300', newState.sellButtonSelected)
+      ui.sellButton.classList.toggle('bg-gray-300', newState.sellButtonSelected)
       if (newState.sellButtonSelected) {
         ui.formTitle.innerText = 'Forced sell'
         ui.submitButton.innerText = 'Create forced sell offer'

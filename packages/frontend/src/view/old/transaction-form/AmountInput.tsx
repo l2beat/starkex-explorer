@@ -15,9 +15,9 @@ export function AmountInput(props: TransactionFormProps) {
           type="text"
           autoComplete="off"
           placeholder="0.00"
-          className="w-full rounded-md bg-grey-100 pl-2 pt-2 pr-[120px] pb-10 font-mono text-2xl leading-none"
+          className="w-full rounded-md bg-gray-100 pl-2 pt-2 pr-[120px] pb-10 font-mono text-2xl leading-none"
         />
-        <div className="absolute top-2 right-2 flex items-center gap-2 rounded-md bg-grey-300 px-3 py-0.5">
+        <div className="absolute top-2 right-2 flex items-center gap-2 rounded-md bg-gray-300 px-3 py-0.5">
           <AssetIcon
             id={FormId.AssetIconView}
             className="h-4 w-4"
@@ -44,14 +44,14 @@ export function AmountInput(props: TransactionFormProps) {
         <div className="absolute bottom-2 right-2 flex w-full items-center justify-end gap-2">
           <span
             id={FormId.AssetBalanceView}
-            className="font-mono text-grey-400"
+            className="font-mono text-gray-400"
           >
             Balance: {props.assets[0]?.balance.toString() ?? 0}
           </span>
           <button
             id={FormId.AssetMaxButton}
             type="button"
-            className="rounded-md bg-grey-300 px-2 py-0.5 text-xs uppercase"
+            className="rounded-md bg-gray-300 px-2 py-0.5 text-xs uppercase"
           >
             Max
           </button>

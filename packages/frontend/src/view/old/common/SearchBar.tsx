@@ -9,17 +9,17 @@ export function SearchBar({ className = '' }) {
       method="GET"
       action="/search"
       className={cx(
-        'flex h-11 w-full rounded-md bg-grey-200 drop-shadow-lg',
+        'flex h-11 w-full rounded-md bg-gray-200 drop-shadow-lg',
         className
       )}
     >
       <input
-        className="w-full rounded-l-md bg-grey-200 p-4 outline-0 placeholder:text-grey-400"
+        className="w-full rounded-l-md bg-gray-200 p-4 outline-0 placeholder:text-gray-400"
         type="text"
         placeholder="Search by hash, Stark key or Ethereum address…"
         name="query"
       />
-      <button className="flex w-12 items-center justify-center rounded-r-md bg-grey-300">
+      <button className="flex w-12 items-center justify-center rounded-r-md bg-gray-300">
         <SearchIcon width={16} height={16} />
       </button>
     </form>

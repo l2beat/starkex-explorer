@@ -13,7 +13,7 @@ export interface NavbarProps {
 
 export function Navbar({ account, searchBar = true }: NavbarProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-y-2 border-b-[1px] border-grey-300 px-2 py-2.5 wide:px-4">
+    <div className="wide:px-4 flex flex-wrap items-center justify-between gap-y-2 border-b-[1px] border-gray-300 px-2 py-2.5">
       <a className="flex items-center justify-center" href="/">
         <span className="pr-2 sm:pr-4">
           <L2beatExplorerLogo className="h-[30px] sm:h-[36px]" />
@@ -27,7 +27,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
         {!account && (
           <button
             id="connect-with-metamask"
-            className="h-[32px] rounded-md bg-grey-300 px-4 lg:h-[44px]"
+            className="h-[32px] rounded-md bg-gray-300 px-4 lg:h-[44px]"
           >
             Connect
           </button>
@@ -35,7 +35,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
         {account && (
           <a
             href={`/positions/${account.positionId ?? 'not-found'}`}
-            className="relative flex h-[32px] items-center justify-center gap-2 rounded-md bg-grey-300 px-4 align-middle lg:h-[44px]"
+            className="relative flex h-[32px] items-center justify-center gap-2 rounded-md bg-gray-300 px-4 align-middle lg:h-[44px]"
           >
             <JazzIcon
               className="hidden lg:block"

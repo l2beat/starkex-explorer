@@ -11,7 +11,7 @@ interface AssetSelectProps {
 
 export function AssetSelect({ assetId, assetIds = [] }: AssetSelectProps) {
   return (
-    <div className="relative flex items-center gap-2 rounded-md bg-grey-300 px-3 py-0">
+    <div className="relative flex items-center gap-2 rounded-md bg-gray-300 px-3 py-0">
       {assetId ? (
         <>
           <AssetIcon className="h-4 w-4" assetId={assetId} />

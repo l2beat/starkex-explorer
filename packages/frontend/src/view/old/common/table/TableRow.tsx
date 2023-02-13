@@ -15,7 +15,7 @@ export function TableRow(props: TableRowProps) {
       className={cx(
         'my-4 whitespace-nowrap',
         props.link && 'hover:bg-blue-100',
-        props.i % 2 !== 0 && 'bg-grey-200',
+        props.i % 2 !== 0 && 'bg-gray-200',
         props.hidden && 'hidden'
       )}
     >
@@ -30,7 +30,7 @@ export function TableRow(props: TableRowProps) {
               'first-letter:capitalize',
               (numeric || monospace) && 'font-mono',
               numeric ? 'text-right' : 'text-left',
-              fullWidth ? 'truncate wide:max-w-[10px]' : 'w-0',
+              fullWidth ? 'wide:max-w-[10px] truncate' : 'w-0',
               props.link && 'cursor-pointer',
               className
             )}
