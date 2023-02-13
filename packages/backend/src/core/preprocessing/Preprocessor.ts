@@ -17,12 +17,17 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private syncStatusRepository: SyncStatusRepository,
     private stateUpdateRepository: StateUpdateRepository,
     private historyPreprocessor: HistoryPreprocessor<T>,
-    private logger: Logger
+    private logger: Logger,
+    private isEnabled: boolean = true
   ) {
     this.logger = this.logger.for(this)
   }
 
   async sync() {
+    if (!this.isEnabled) {
+      this.logger.info('Preprocessor is disabled, skipping sync')
+      return
+    }
     let direction: SyncDirection
 
     do {

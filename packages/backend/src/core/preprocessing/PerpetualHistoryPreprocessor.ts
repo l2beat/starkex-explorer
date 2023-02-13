@@ -16,10 +16,9 @@ import {
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 
-const COLLATERAL_TOKEN = AssetId('COLLATERAL-0')
-
 export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
   constructor(
+    private readonly collateralAssetId: AssetId,
     protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<AssetId>,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
@@ -73,7 +72,7 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
     const currentUserRecords =
       await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndAssets(
         position.starkKey,
-        [COLLATERAL_TOKEN, ...position.balances.map((b) => b.assetId)],
+        [this.collateralAssetId, ...position.balances.map((b) => b.assetId)],
         trx
       )
 
@@ -84,7 +83,7 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
 
     const updatedAssets = [
       {
-        assetId: COLLATERAL_TOKEN,
+        assetId: this.collateralAssetId,
         balance: position.collateralBalance,
       },
       ...position.balances,
@@ -129,10 +128,10 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
       trx
     )
     const assetPriceMap: Record<string, bigint> = {
-      [COLLATERAL_TOKEN.toString()]: 1n,
+      [this.collateralAssetId.toString()]: 1n,
     }
     prices.forEach((p) => {
-      assetPriceMap[p.asset_id.toString()] = p.price
+      assetPriceMap[p.assetId.toString()] = p.price
     })
     return assetPriceMap
   }

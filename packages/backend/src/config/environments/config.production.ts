@@ -16,6 +16,7 @@ export function getProductionConfig(): Config {
       ssl: { rejectUnauthorized: false },
     },
     enableSync: true,
+    enablePreprocessing: false,
     freshStart: false,
     forceHttps: true,
     starkex: getStarkexConfig(getEnv('STARKEX_INSTANCE')),

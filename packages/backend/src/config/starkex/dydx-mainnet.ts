@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 
 import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
@@ -24,5 +24,6 @@ export function getDydxMainnetConfig(): StarkexConfig {
         EthereumAddress('0x894c4a12548FB18EaA48cF34f9Cd874Fc08b7FC3'),
       ],
     },
+    collateralAssetId: AssetId('USDC-6'),
   }
 }

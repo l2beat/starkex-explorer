@@ -313,12 +313,14 @@ export class Application {
       new PreprocessedStateUpdateRepository(database, logger)
 
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
+    const isPreprocessorEnabled = config.enablePreprocessing
 
     if (config.starkex.tradingMode === 'perpetual') {
       const preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetId, logger)
 
       const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
+        config.starkex.collateralAssetId,
         preprocessedAssetHistoryRepository,
         stateUpdateRepository,
         positionRepository,
@@ -330,7 +332,8 @@ export class Application {
         syncStatusRepository,
         stateUpdateRepository,
         perpetualHistoryPreprocessor,
-        logger
+        logger,
+        isPreprocessorEnabled
       )
     } else {
       const preprocessedAssetHistoryRepository =
@@ -350,7 +353,8 @@ export class Application {
         syncStatusRepository,
         stateUpdateRepository,
         spotHistoryPreprocessor,
-        logger
+        logger,
+        isPreprocessorEnabled
       )
     }
 

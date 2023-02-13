@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 
 export type StarkexConfig =
   | PerpetualRollupConfig
@@ -15,6 +15,7 @@ export interface PerpetualRollupConfig {
     proxy: EthereumAddress
     verifiers: EthereumAddress[]
   }
+  collateralAssetId: AssetId
 }
 
 export interface PerpetualValidiumConfig {
@@ -30,6 +31,7 @@ export interface PerpetualValidiumConfig {
   contracts: {
     perpetual: EthereumAddress
   }
+  collateralAssetId: AssetId
 }
 
 export interface SpotValidiumConfig {

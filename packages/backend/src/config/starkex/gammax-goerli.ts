@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 
 import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
@@ -24,5 +24,6 @@ export function getGammaxGoerliConfig(): StarkexConfig {
       userCertificate: getEnv('GAMMAX_AG_USER_CERTIFICATE'),
       userKey: getEnv('GAMMAX_AG_USER_KEY'),
     },
+    collateralAssetId: AssetId('COLLATERAL-0'),
   }
 }
