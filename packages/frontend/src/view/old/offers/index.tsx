@@ -9,13 +9,13 @@ import { ForcedTradeOffersIndexProps } from './ForcedTradeOffersIndexProps'
 export * from './ForcedTradeOfferDetailsProps'
 export * from './ForcedTradeOffersIndexProps'
 
-export function renderForcedTradeOffersIndexPage(
+export function renderOldForcedTradeOffersIndexPage(
   props: ForcedTradeOffersIndexProps
 ) {
   return reactToHtml(<ForcedTradeOffersIndex {...props} />)
 }
 
-export function renderForcedTradeOfferDetailsPage(
+export function renderOldForcedTradeOfferDetailsPage(
   props: ForcedTradeOfferDetailsProps
 ) {
   return reactToHtml(<ForcedTradeOfferDetails {...props} />)

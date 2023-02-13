@@ -6,6 +6,6 @@ import { HomeProps } from './HomeProps'
 
 export * from './HomeProps'
 
-export function renderHomePage(props: HomeProps) {
+export function renderOldHomePage(props: HomeProps) {
   return reactToHtml(<Home {...props} />)
 }

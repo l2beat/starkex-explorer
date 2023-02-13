@@ -9,10 +9,12 @@ import { StateUpdatesIndexProps } from './StateUpdatesIndexProps'
 export * from './StateUpdateDetailsProps'
 export * from './StateUpdatesIndexProps'
 
-export function renderStateUpdateDetailsPage(props: StateUpdateDetailsProps) {
+export function renderOldStateUpdateDetailsPage(
+  props: StateUpdateDetailsProps
+) {
   return reactToHtml(<StateUpdateDetails {...props} />)
 }
 
-export function renderStateUpdatesIndexPage(props: StateUpdatesIndexProps) {
+export function renderOldStateUpdatesIndexPage(props: StateUpdatesIndexProps) {
   return reactToHtml(<StateUpdatesIndex {...props} />)
 }

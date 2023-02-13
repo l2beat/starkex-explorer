@@ -6,6 +6,6 @@ import { NotFoundProps } from './NotFoundProps'
 
 export * from './NotFoundProps'
 
-export function renderNotFoundPage(props: NotFoundProps) {
+export function renderOldNotFoundPage(props: NotFoundProps) {
   return reactToHtml(<NotFound {...props} />)
 }

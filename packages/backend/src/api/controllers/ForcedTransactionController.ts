@@ -1,7 +1,7 @@
 import {
   ForcedTransaction,
-  renderForcedTransactionDetailsPage,
-  renderForcedTransactionsIndexPage,
+  renderOldForcedTransactionDetailsPage,
+  renderOldForcedTransactionsIndexPage,
   renderTransactionForm,
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
@@ -58,7 +58,7 @@ export class ForcedTransactionController {
       ]),
     ])
 
-    const content = renderForcedTransactionsIndexPage({
+    const content = renderOldForcedTransactionsIndexPage({
       account,
       transactions: transactions.map(toForcedTransactionEntry),
       total,
@@ -95,7 +95,7 @@ export class ForcedTransactionController {
     ])
     const offerHistory = offer ? toForcedTradeOfferHistory(offer) : []
 
-    const content = renderForcedTransactionDetailsPage({
+    const content = renderOldForcedTransactionDetailsPage({
       account,
       history: offerHistory.concat(
         toForcedTransactionHistory(sentTransaction, transaction, finalize)

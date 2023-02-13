@@ -9,13 +9,13 @@ import { ForcedTransactionsIndexProps } from './ForcedTransactionsIndexProps'
 export * from './ForcedTransactionDetailsProps'
 export * from './ForcedTransactionsIndexProps'
 
-export function renderForcedTransactionsIndexPage(
+export function renderOldForcedTransactionsIndexPage(
   props: ForcedTransactionsIndexProps
 ) {
   return reactToHtml(<ForcedTransactionsIndex {...props} />)
 }
 
-export function renderForcedTransactionDetailsPage(
+export function renderOldForcedTransactionDetailsPage(
   props: ForcedTransactionDetailsProps
 ) {
   return reactToHtml(<ForcedTransactionDetails {...props} />)

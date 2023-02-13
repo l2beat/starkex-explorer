@@ -9,10 +9,10 @@ import { PositionDetailsProps } from './PositionDetailsProps'
 export * from './PositionAtUpdateProps'
 export * from './PositionDetailsProps'
 
-export function renderPositionDetailsPage(props: PositionDetailsProps) {
+export function renderOldPositionDetailsPage(props: PositionDetailsProps) {
   return reactToHtml(<PositionDetails {...props} />)
 }
 
-export function renderPositionAtUpdatePage(props: PositionAtUpdateProps) {
+export function renderOldPositionAtUpdatePage(props: PositionAtUpdateProps) {
   return reactToHtml(<PositionAtUpdate {...props} />)
 }
