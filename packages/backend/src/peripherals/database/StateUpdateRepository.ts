@@ -35,6 +35,7 @@ export class StateUpdateRepository extends BaseRepository {
 
     this.add = this.wrapAdd(this.add)
     this.findLast = this.wrapFind(this.findLast)
+    this.findLastUntilBlockNumber = this.wrapFind(this.findLastUntilBlockNumber)
     this.findById = this.wrapFind(this.findById)
     this.findIdByRootHash = this.wrapFind(this.findIdByRootHash)
     this.getAll = this.wrapGet(this.getAll)
@@ -84,6 +85,17 @@ export class StateUpdateRepository extends BaseRepository {
   async findLast(): Promise<StateUpdateRecord | undefined> {
     const knex = await this.knex()
     const row = await knex('state_updates').orderBy('id', 'desc').first()
+    return row && toStateUpdateRecord(row)
+  }
+
+  async findLastUntilBlockNumber(
+    blockNumber: number
+  ): Promise<StateUpdateRecord | undefined> {
+    const knex = await this.knex()
+    const row = await knex('state_updates')
+      .where('block_number', '<=', blockNumber)
+      .orderBy('id', 'desc')
+      .first()
     return row && toStateUpdateRecord(row)
   }
 

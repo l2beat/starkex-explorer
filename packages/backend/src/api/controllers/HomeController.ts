@@ -1,4 +1,4 @@
-import { renderHomePage } from '@explorer/frontend'
+import { renderOldHomePage } from '@explorer/frontend'
 import { EthereumAddress } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
@@ -46,7 +46,7 @@ export class HomeController {
       this.positionRepository.count(),
     ])
 
-    const content = renderHomePage({
+    const content = renderOldHomePage({
       account,
       stateUpdates: stateUpdates.map(toStateUpdateEntry),
       forcedTransactions: transactions.map(toForcedTransactionEntry),

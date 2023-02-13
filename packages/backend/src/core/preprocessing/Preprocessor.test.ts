@@ -58,13 +58,46 @@ describe(Preprocessor.name, () => {
     })
   })
 
+  describe(Preprocessor.prototype.getLastSyncedStateUpdate.name, () => {
+    it('handles sync status returning undefined', async () => {
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => undefined,
+      })
+      const preprocessor = new Preprocessor(
+        mock<PreprocessedStateUpdateRepository>(),
+        syncStatusRepo,
+        mock<StateUpdateRepository>(),
+        Logger.SILENT
+      )
+      expect(await preprocessor.getLastSyncedStateUpdate()).toEqual(undefined)
+    })
+
+    it('calls state update repository for correct block', async () => {
+      const fakeStateUpdate = generateFakeStateUpdate(3)
+      const syncStatusRepo = mock<SyncStatusRepository>({
+        getLastSynced: async () => fakeStateUpdate.blockNumber,
+      })
+      const stateUpdateRepo = mock<StateUpdateRepository>({
+        findLastUntilBlockNumber: async () => fakeStateUpdate,
+      })
+      const preprocessor = new Preprocessor(
+        mock<PreprocessedStateUpdateRepository>(),
+        syncStatusRepo,
+        stateUpdateRepo,
+        Logger.SILENT
+      )
+      const lastStateUpdate = await preprocessor.getLastSyncedStateUpdate()
+      expect(lastStateUpdate).toEqual(fakeStateUpdate)
+      expect(stateUpdateRepo.findLastUntilBlockNumber).toHaveBeenCalledWith([
+        fakeStateUpdate.blockNumber,
+      ])
+    })
+  })
+
   describe(Preprocessor.prototype.calculateRequiredSyncDirection.name, () => {
     it('returns not-needed when everything is empty', async () => {
       const syncStatusRepo = mock<SyncStatusRepository>({
         getLastSynced: async () => undefined,
-      })
-      const stateUpdateRepo = mock<StateUpdateRepository>({
-        findLast: async () => undefined,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => undefined,
@@ -72,7 +105,7 @@ describe(Preprocessor.name, () => {
       const preprocessor = new Preprocessor(
         preprocessedRepo,
         syncStatusRepo,
-        stateUpdateRepo,
+        mock<StateUpdateRepository>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -84,9 +117,6 @@ describe(Preprocessor.name, () => {
       const syncStatusRepo = mock<SyncStatusRepository>({
         getLastSynced: async () => undefined,
       })
-      const stateUpdateRepo = mock<StateUpdateRepository>({
-        findLast: async () => undefined,
-      })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
           stateUpdateId: 3,
@@ -96,7 +126,7 @@ describe(Preprocessor.name, () => {
       const preprocessor = new Preprocessor(
         preprocessedRepo,
         syncStatusRepo,
-        stateUpdateRepo,
+        mock<StateUpdateRepository>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -107,10 +137,10 @@ describe(Preprocessor.name, () => {
     it('returns forward when there are state updates but preprocessing has no entries', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(3)
       const syncStatusRepo = mock<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.id,
+        getLastSynced: async () => fakeStateUpdate.blockNumber,
       })
       const stateUpdateRepo = mock<StateUpdateRepository>({
-        findLast: async () => fakeStateUpdate,
+        findLastUntilBlockNumber: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => undefined,
@@ -129,10 +159,10 @@ describe(Preprocessor.name, () => {
     it('returns backward when state update id is before preprocessing', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(2)
       const syncStatusRepo = mock<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.id,
+        getLastSynced: async () => fakeStateUpdate.blockNumber,
       })
       const stateUpdateRepo = mock<StateUpdateRepository>({
-        findLast: async () => fakeStateUpdate,
+        findLastUntilBlockNumber: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
@@ -154,11 +184,11 @@ describe(Preprocessor.name, () => {
     it("throws when the are more state updates but can't find preprocessed id", async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
       const syncStatusRepo = mock<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.id,
+        getLastSynced: async () => fakeStateUpdate.blockNumber,
       })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async () => undefined,
-        findLast: async () => fakeStateUpdate,
+        findLastUntilBlockNumber: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
@@ -180,11 +210,11 @@ describe(Preprocessor.name, () => {
     it('returns not-needed when last state update ids and transition hashes match', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
       const syncStatusRepo = mock<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.id,
+        getLastSynced: async () => fakeStateUpdate.blockNumber,
       })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async (id: number) => ({ [10]: fakeStateUpdate }[id]),
-        findLast: async () => fakeStateUpdate,
+        findLastUntilBlockNumber: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
@@ -207,11 +237,11 @@ describe(Preprocessor.name, () => {
     it('returns backward when last state update ids match but transition hash is mismatched', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
       const syncStatusRepo = mock<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.id,
+        getLastSynced: async () => fakeStateUpdate.blockNumber,
       })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async (id: number) => ({ [10]: fakeStateUpdate }[id]),
-        findLast: async () => fakeStateUpdate,
+        findLastUntilBlockNumber: async () => fakeStateUpdate,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
@@ -235,11 +265,11 @@ describe(Preprocessor.name, () => {
       const fakeStateUpdate5 = generateFakeStateUpdate(5)
       const fakeStateUpdate10 = generateFakeStateUpdate(10)
       const syncStatusRepo = mock<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate10.id,
+        getLastSynced: async () => fakeStateUpdate10.blockNumber,
       })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async (id: number) => ({ [5]: fakeStateUpdate5 }[id]),
-        findLast: async () => fakeStateUpdate10,
+        findLastUntilBlockNumber: async () => fakeStateUpdate10,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
@@ -262,11 +292,11 @@ describe(Preprocessor.name, () => {
       const fakeStateUpdate5 = generateFakeStateUpdate(5)
       const fakeStateUpdate10 = generateFakeStateUpdate(10)
       const syncStatusRepo = mock<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate10.id,
+        getLastSynced: async () => fakeStateUpdate10.blockNumber,
       })
       const stateUpdateRepo = mock<StateUpdateRepository>({
         findById: async (id: number) => ({ [5]: fakeStateUpdate5 }[id]),
-        findLast: async () => fakeStateUpdate10,
+        findLastUntilBlockNumber: async () => fakeStateUpdate10,
       })
       const preprocessedRepo = mock<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
