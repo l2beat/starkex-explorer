@@ -16,30 +16,30 @@ export function TransactionForm(props: TransactionFormProps) {
   const propsJson = serializeTransactionFormProps(props)
   return (
     <>
-      <div className="flex justify-center items-center px-2 wide:px-4 py-1 bg-yellow-100 text-grey-100">
+      <div className="flex items-center justify-center bg-yellow-100 px-2 py-1 text-grey-100 wide:px-4">
         <span>
           <strong>WARNING:</strong> The Forced Exit is missing some
           functionality temporarily. We are working on fixing it.
         </span>
       </div>
       <Page title="" path="/" description="" account={props.account}>
-        <div className="w-min mx-auto flex bg-grey-200 drop-shadow-lg rounded-md mb-4">
+        <div className="mx-auto mb-4 flex w-min rounded-md bg-grey-200 drop-shadow-lg">
           <button
             id={FormId.ExitButton}
-            className="w-[91px] py-1.5 rounded-md bg-grey-300"
+            className="w-[91px] rounded-md bg-grey-300 py-1.5"
           >
             Exit
           </button>
-          <button id={FormId.BuyButton} className="w-[91px] py-1.5 rounded-md">
+          <button id={FormId.BuyButton} className="w-[91px] rounded-md py-1.5">
             Buy
           </button>
-          <button id={FormId.SellButton} className="w-[91px] py-1.5 rounded-md">
+          <button id={FormId.SellButton} className="w-[91px] rounded-md py-1.5">
             Sell
           </button>
         </div>
         <form
           id={FormId.Form}
-          className="hidden max-w-[500px] mx-auto bg-grey-200 drop-shadow-lg rounded-md p-4 flex-col gap-2.5"
+          className="mx-auto hidden max-w-[500px] flex-col gap-2.5 rounded-md bg-grey-200 p-4 drop-shadow-lg"
           data-props={propsJson}
         >
           <div id={FormId.FormTitle} className="text-lg font-medium">
@@ -53,7 +53,7 @@ export function TransactionForm(props: TransactionFormProps) {
           <button
             id={FormId.SubmitButton}
             type="button"
-            className="bg-blue-100 w-full block text-lg font-bold py-2 rounded-md"
+            className="block w-full rounded-md bg-blue-100 py-2 text-lg font-bold"
           >
             Forced exit
           </button>

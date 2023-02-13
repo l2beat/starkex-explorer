@@ -10,8 +10,8 @@ export interface StatsTableProps {
 
 export function StatsTable({ rows, className }: StatsTableProps) {
   return (
-    <div className={cx('w-full overflow-x-auto mb-8', className)}>
-      <table className="whitespace-nowrap w-full">
+    <div className={cx('mb-8 w-full overflow-x-auto', className)}>
+      <table className="w-full whitespace-nowrap">
         <tbody>
           {rows.map((stat, i) => (
             <StatRow key={i} {...stat} even={i % 2 === 0} />

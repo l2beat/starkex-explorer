@@ -10,8 +10,8 @@ import { SimpleLink } from '../SimpleLink'
 
 export function Footer() {
   return (
-    <footer className="px-2 wide:px-4 max-w-[900px] mx-auto mb-12">
-      <div className="flex justify-between pb-3 mb-3 border-b-[1px] border-grey-300 flex-wrap gap-y-3">
+    <footer className="mx-auto mb-12 max-w-[900px] px-2 wide:px-4">
+      <div className="mb-3 flex flex-wrap justify-between gap-y-3 border-b-[1px] border-grey-300 pb-3">
         <SimpleLink href="https://l2beat.com/donate">Donate</SimpleLink>
         <div className="flex gap-3">
           <SimpleLink href="https://twitter.com/l2beatcom">
@@ -25,8 +25,8 @@ export function Footer() {
           </SimpleLink>
         </div>
       </div>
-      <div className="flex justify-between flex-wrap gap-y-3">
-        <div className="flex items-center text-sm flex-wrap">
+      <div className="flex flex-wrap justify-between gap-y-3">
+        <div className="flex flex-wrap items-center text-sm">
           Built by <L2beatLogo height={18} width={44} className="mx-1" /> team
           and funded by <DydxLogo height={14} width={45} className="mx-1" /> and{' '}
           <StarkWareLogo height={18} width={98} className="ml-1" />

@@ -8,10 +8,10 @@ interface StatProps {
 
 export function Stat({ title, value, valueId }: StatProps) {
   return (
-    <div className="py-1 md:py-2 px-2 md:px-4 bg-grey-300 rounded-sm md:rounded-md flex md:block w-full md:w-[25%] items-center">
+    <div className="flex w-full items-center rounded-sm bg-grey-300 py-1 px-2 md:block md:w-[25%] md:rounded-md md:py-2 md:px-4">
       <div className="w-full md:mb-2">{title}</div>
       <div
-        className="font-sans font-bold text-2xl w-full text-right"
+        className="w-full text-right font-sans text-2xl font-bold"
         id={valueId}
       >
         {value}

@@ -15,7 +15,7 @@ function TypeButton({ id, value, checked, label }: TypeButtonProps) {
   return (
     <div className={cx(checked && 'bg-grey-300', 'rounded-md')}>
       <input
-        className="appearance-none absolute"
+        className="absolute appearance-none"
         type="radio"
         id={id}
         name={TypeRadioName}
@@ -36,7 +36,7 @@ interface TypeRadioProps {
 
 export function TypeRadio(props: TypeRadioProps) {
   return (
-    <div className="rounded-md bg-grey-200 flex cursor-pointer">
+    <div className="flex cursor-pointer rounded-md bg-grey-200">
       {['buy', 'sell'].map((type) => {
         const checked = props.type === type
         const label = type.slice(0, 1).toUpperCase() + type.slice(1)

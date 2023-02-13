@@ -14,10 +14,10 @@ export function TotalInput() {
           type="text"
           autoComplete="off"
           placeholder="0.00"
-          className="font-mono text-2xl leading-none bg-grey-100 rounded-md pl-2 py-2 pr-[80px] w-full"
+          className="w-full rounded-md bg-grey-100 py-2 pl-2 pr-[80px] font-mono text-2xl leading-none"
         />
-        <div className="absolute top-2 right-2 py-0.5 flex gap-2 items-center">
-          <AssetIcon className="w-4 h-4" assetId={AssetId.USDC} />
+        <div className="absolute top-2 right-2 flex items-center gap-2 py-0.5">
+          <AssetIcon className="h-4 w-4" assetId={AssetId.USDC} />
           <span>USDC</span>
         </div>
       </div>

@@ -15,8 +15,8 @@ export function SectionHeadingWithLink({
   children,
 }: SectionHeadingWithLinkProps) {
   return (
-    <div className="flex items-baseline mb-1.5">
-      <SectionHeading className="flex-1 !mb-0">{children}</SectionHeading>
+    <div className="mb-1.5 flex items-baseline">
+      <SectionHeading className="!mb-0 flex-1">{children}</SectionHeading>
       <SimpleLink className="float-right" href={linkUrl}>
         {linkText}
       </SimpleLink>

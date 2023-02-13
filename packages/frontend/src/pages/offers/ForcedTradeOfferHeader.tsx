@@ -10,7 +10,7 @@ interface ForcedTradeOfferHeaderProps {
 
 export function ForcedTradeOfferHeader(props: ForcedTradeOfferHeaderProps) {
   return (
-    <div className="mb-8 truncate flex justify-between content-center">
+    <div className="mb-8 flex content-center justify-between truncate">
       <PageHeading className="!mb-0">
         Forced {props.type} {props.offerId}
       </PageHeading>

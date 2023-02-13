@@ -7,7 +7,7 @@ import { TableProps } from './types'
 
 export function Table(props: TableProps) {
   return (
-    <div className={cx('overflow-x-auto w-full mb-8', props.className)}>
+    <div className={cx('mb-8 w-full overflow-x-auto', props.className)}>
       <table id={props.id} className="w-full whitespace-nowrap">
         <thead>
           <tr>
@@ -16,14 +16,14 @@ export function Table(props: TableProps) {
                 scope="col"
                 key={i}
                 className={cx(
-                  'p-px pb-0.5 first:pl-0 last:pr-0 font-medium',
+                  'p-px pb-0.5 font-medium first:pl-0 last:pr-0',
                   column.textAlignClass ??
                     (column.numeric ? 'text-right' : 'text-left'),
                   !column.fullWidth && 'w-0',
                   column.className
                 )}
               >
-                <div className="px-1.5 py0.5 bg-grey-300 rounded-[3px]">
+                <div className="py0.5 rounded-[3px] bg-grey-300 px-1.5">
                   {column.header}
                 </div>
               </th>

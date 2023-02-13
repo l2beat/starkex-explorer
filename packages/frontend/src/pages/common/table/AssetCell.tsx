@@ -10,7 +10,7 @@ export interface AssetCellProps {
 export function AssetCell({ assetId }: AssetCellProps) {
   const symbol = AssetId.symbol(assetId)
   return (
-    <div className="flex gap-x-1 items-center w-max">
+    <div className="flex w-max items-center gap-x-1">
       <AssetIcon assetId={assetId} width="16" height="16" />
       {symbol}
     </div>

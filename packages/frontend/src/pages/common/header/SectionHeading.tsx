@@ -15,9 +15,9 @@ export function SectionHeading({
   return (
     <h2
       className={cx(
-        'mb-1.5 font-medium text-lg text-left',
+        'mb-1.5 text-left text-lg font-medium',
         active &&
-          'after:ml-1 after:inline-block after:w-4 after:h-4 after:bg-blue-200 after:rounded-full',
+          'after:ml-1 after:inline-block after:h-4 after:w-4 after:rounded-full after:bg-blue-200',
         className
       )}
     >

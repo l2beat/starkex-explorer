@@ -19,8 +19,8 @@ export function Home(props: HomeProps) {
       account={props.account}
       withoutSearch
     >
-      <SearchBar className="drop-shadow-lg mb-8" />
-      <div className="mb-8 flex flex-col md:flex-row gap-x-4 gap-y-1 items-center">
+      <SearchBar className="mb-8 drop-shadow-lg" />
+      <div className="mb-8 flex flex-col items-center gap-x-4 gap-y-1 md:flex-row">
         <Stat title="Total Value Locked" value="-" valueId={tvlElId} />
         <Stat title="State updates" value={props.totalUpdates.toString()} />
         <Stat
