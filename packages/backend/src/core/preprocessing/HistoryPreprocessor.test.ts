@@ -238,9 +238,10 @@ describe(HistoryPreprocessor.name, () => {
           { historyId: 10, prevHistoryId: 9 },
           { historyId: 100, prevHistoryId: 90 },
           { historyId: 1000, prevHistoryId: 900 },
+          { historyId: 10000, prevHistoryId: undefined },
         ],
         deleteByHistoryId: async () => 1,
-        setCurrentByHistoryId: async () => 1,
+        setAsCurrentByHistoryId: async () => 1,
       })
       const preprocessor = new NonAbstractHistoryPreprocessor(
         historyRepo,
@@ -256,8 +257,9 @@ describe(HistoryPreprocessor.name, () => {
         [10, trx],
         [100, trx],
         [1000, trx],
+        [10000, trx],
       ])
-      expect(historyRepo.setCurrentByHistoryId).toHaveBeenCalledExactlyWith([
+      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenCalledExactlyWith([
         [9, trx],
         [90, trx],
         [900, trx],

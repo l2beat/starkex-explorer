@@ -39,6 +39,7 @@ export class PreprocessedAssetHistoryRepository<
 
     this.add = this.wrapAdd(this.add)
     this.addMany = this.wrapAddMany(this.addMany)
+    this.findById = this.wrapFind(this.findById)
     this.deleteByHistoryId = this.wrapDelete(this.deleteByHistoryId)
     this.getCurrentByStarkKeyAndAssets = this.wrapGet(
       this.getCurrentByStarkKeyAndAssets
@@ -49,7 +50,7 @@ export class PreprocessedAssetHistoryRepository<
     this.getCurrentNonEmptyByPositionOrVaultId = this.wrapGet(
       this.getCurrentNonEmptyByPositionOrVaultId
     )
-    this.setCurrentByHistoryId = this.wrapUpdate(this.setCurrentByHistoryId)
+    this.setAsCurrentByHistoryId = this.wrapUpdate(this.setAsCurrentByHistoryId)
     this.unsetCurrentByStarkKeyAndAsset = this.wrapUpdate(
       this.unsetCurrentByStarkKeyAndAsset
     )
@@ -85,6 +86,15 @@ export class PreprocessedAssetHistoryRepository<
       .insert(rows)
       .returning('id')
     return ids.map((x) => x.id)
+  }
+
+  async findById(
+    id: number,
+    trx: Knex.Transaction
+  ): Promise<PreprocessedAssetHistoryRecord | undefined> {
+    const knex = await this.knex(trx)
+    const row = await knex('preprocessed_asset_history').where('id', id).first()
+    return row && toPreprocessedAssetHistoryRecord(row, this.toAssetType)
   }
 
   async deleteByHistoryId(historyId: number, trx: Knex.Transaction) {
@@ -147,7 +157,7 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async setCurrentByHistoryId(historyId: number, trx: Knex.Transaction) {
+  async setAsCurrentByHistoryId(historyId: number, trx: Knex.Transaction) {
     const knex = await this.knex(trx)
     const updates = await knex('preprocessed_asset_history')
       .update('is_current', true)

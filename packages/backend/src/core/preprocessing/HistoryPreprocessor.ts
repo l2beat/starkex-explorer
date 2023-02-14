@@ -98,7 +98,7 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
         trx
       )
       if (record.prevHistoryId !== undefined) {
-        await this.preprocessedAssetHistoryRepository.setCurrentByHistoryId(
+        await this.preprocessedAssetHistoryRepository.setAsCurrentByHistoryId(
           record.prevHistoryId,
           trx
         )
