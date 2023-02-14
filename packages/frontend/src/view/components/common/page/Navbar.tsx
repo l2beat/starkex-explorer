@@ -1,5 +1,6 @@
 import { AccountDetails } from '@explorer/shared'
 import React from 'react'
+
 import { JazzIcon } from '../../../assets/icons/jazz/JazzIcon'
 import { DydxLogo } from '../../../assets/logos/DydxLogo'
 import { L2BeatMinimalLogo } from '../../../assets/logos/L2BeatMinimalLogo'

@@ -1,6 +1,6 @@
 import React from 'react'
-import { L2BeatLogo } from '../../../assets/logos/L2BeatLogo'
 
+import { L2BeatLogo } from '../../../assets/logos/L2BeatLogo'
 import { StarkWareLogo } from '../../../assets/logos/StarkWareLogo'
 
 export function Footer() {
