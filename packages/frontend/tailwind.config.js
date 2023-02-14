@@ -20,7 +20,6 @@ module.exports = {
         800: '#222531',
       },
       slate: {
-        400: '#8D8CBD',
         800: '#2F3341',
       },
       neutral: {

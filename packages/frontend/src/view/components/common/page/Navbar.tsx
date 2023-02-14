@@ -23,7 +23,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
           <DydxLogo className="h-[26px] sm:h-[32px]" />
         </div>
-        <span className="py-1 pl-2 uppercase text-slate-400 sm:pl-4">
+        <span className="py-1 pl-2 uppercase text-zinc-500 sm:pl-4">
           Explorer
         </span>
       </a>
