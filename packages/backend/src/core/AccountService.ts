@@ -1,3 +1,4 @@
+import { AccountDetails } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 import { ForcedTradeOfferRepository } from '../peripherals/database/ForcedTradeOfferRepository'
@@ -11,7 +12,9 @@ export class AccountService {
     private readonly sentTransactionRepository: SentTransactionRepository
   ) {}
 
-  async getAccount(address?: EthereumAddress) {
+  async getAccount(
+    address?: EthereumAddress
+  ): Promise<AccountDetails | undefined> {
     if (!address) {
       return undefined
     }

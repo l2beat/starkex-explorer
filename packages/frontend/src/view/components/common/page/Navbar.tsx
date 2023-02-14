@@ -1,5 +1,5 @@
+import { AccountDetails } from '@explorer/shared'
 import React from 'react'
-import { AccountDetails } from '../../../old/common/AccountDetails'
 import { Button } from '../Button'
 import { DydxIcon } from '../icons/DydxIcon'
 import { JazzIcon } from '../icons/jazzicon/JazzIcon'

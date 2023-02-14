@@ -1,5 +1,5 @@
+import { AccountDetails } from '@explorer/shared'
 import React, { ReactNode } from 'react'
-import { AccountDetails } from '../../../old/common/AccountDetails'
 
 import { Footer } from './Footer'
 import { Head } from './Head'
