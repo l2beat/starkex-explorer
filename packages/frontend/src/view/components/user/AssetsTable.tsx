@@ -45,7 +45,7 @@ export function AssetsTable({ assets }: AssetsTableProps) {
             asset.name,
             asset.balance.toString(),
             asset.vaultId,
-            <Button variant="ACTION">{asset.action}</Button>,
+            <Button>{asset.action}</Button>,
           ],
         }
       })}

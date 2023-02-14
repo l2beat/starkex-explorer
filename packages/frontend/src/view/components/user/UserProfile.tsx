@@ -12,12 +12,12 @@ interface UserProfileProps {
 
 export function UserProfile({ ethereumAddress, starkKey }: UserProfileProps) {
   return (
-    <div className="mb-6 flex w-full flex-col rounded-lg bg-blue-900 p-6">
-      <p className="text-sm font-semibold text-grey-500">Ethereum address</p>
+    <div className="mb-6 flex w-full flex-col rounded-lg bg-gray-800 p-6">
+      <p className="text-sm font-semibold text-zinc-500">Ethereum address</p>
       <p className="mt-3 text-base font-semibold text-white">
         {ethereumAddress?.toString()}
       </p>
-      <p className="mt-6 text-sm font-semibold text-grey-500">Stark key</p>
+      <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
       {starkKey ? (
         <p className="mt-3 text-base font-semibold text-white">
           {starkKey.toString()}
@@ -27,11 +27,11 @@ export function UserProfile({ ethereumAddress, starkKey }: UserProfileProps) {
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center">
               <WarningIcon />
-              <p className="ml-2 text-base font-semibold text-orange-300">
+              <p className="ml-2 text-base font-semibold text-amber-500">
                 UNKNOWN
               </p>
             </div>
-            <Button variant="ACTION">Register</Button>
+            <Button>Register</Button>
           </div>
           <div className="mt-5 flex items-center justify-center rounded bg-blue-50 py-2">
             <InfoIcon />

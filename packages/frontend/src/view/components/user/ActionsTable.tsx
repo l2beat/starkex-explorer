@@ -18,8 +18,8 @@ export interface WithdrawableAssetEntry {
 
 export function ActionsTable(props: ActionsTableProps) {
   return (
-    <div className="mb-12 flex w-full flex-col rounded-lg border border-solid border-dydx-brand-color bg-blue-900 p-6">
-      <p className="text-sm font-semibold text-grey-500">Withdrawable assets</p>
+    <div className="mb-12 flex w-full flex-col rounded-lg border border-solid border-brand bg-gray-800 p-6">
+      <p className="text-sm font-semibold text-zinc-500">Withdrawable assets</p>
       {props.withdrawableAssets.map((asset) => (
         <div className="mt-3 flex items-center justify-between">
           <div className="flex">
@@ -28,16 +28,16 @@ export function ActionsTable(props: ActionsTableProps) {
               {asset.symbol}
             </p>
           </div>
-          <p className="text-base text-grey-500">
+          <p className="text-base text-zinc-500">
             Finalize the withdrawal of{' '}
             <strong className="text-white">
               {asset.amount.toString()} {asset.symbol}
             </strong>
           </p>
-          <Button variant="ACTION">Withdraw now</Button>
+          <Button>Withdraw now</Button>
         </div>
       ))}
-      <p className="mt-6 text-sm font-semibold text-grey-500">
+      <p className="mt-6 text-sm font-semibold text-zinc-500">
         Offers to accept
       </p>
       {props.offersToAccept.map((offer) => {
@@ -50,13 +50,13 @@ export function ActionsTable(props: ActionsTableProps) {
                 {offer.asset}
               </p>
             </div>
-            <p className="text-base text-grey-500">
+            <p className="text-base text-zinc-500">
               Finalize the offer{' '}
               <strong className="text-white">{offer.amount.toString()}</strong>{' '}
               in exchange for{' '}
               <strong className="text-white">{totalPrice.toString()}</strong>
             </p>
-            <Button variant="ACTION">Accept & sell</Button>
+            <Button>Accept & sell</Button>
           </div>
         )
       })}

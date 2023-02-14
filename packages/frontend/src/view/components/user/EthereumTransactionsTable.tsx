@@ -2,7 +2,7 @@ import { Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Table } from '../common/table/Table'
-import { Status, StatusType } from './Status'
+import { StatusBadge, StatusType } from './StatusBadge'
 
 export interface EthereumTransactionsTableProps {
   readonly ethereumTransactions: readonly EthereumTransactionEntry[]
@@ -57,9 +57,9 @@ export function EthereumTransactionsTable({
             </a>,
             transaction.asset,
             transaction.amount.toString(),
-            <Status type={toStatusType(transaction.status)}>
+            <StatusBadge type={toStatusType(transaction.status)}>
               {transaction.status}
-            </Status>,
+            </StatusBadge>,
             transaction.type,
           ],
         }

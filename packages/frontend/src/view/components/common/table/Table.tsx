@@ -24,7 +24,7 @@ export function Table(props: TableProps) {
       <div className="flex items-center justify-between pb-5">
         <p className="text-2xl font-semibold text-white">{props.title}</p>
         {props.pageSize && (
-          <p className="text-sm font-medium text-grey-500">{`You're viewing ${
+          <p className="text-sm font-medium text-zinc-500">{`You're viewing ${
             props.rows.length < props.pageSize
               ? props.rows.length
               : props.pageSize
@@ -34,7 +34,7 @@ export function Table(props: TableProps) {
       <div
         className={cx(
           'w-full overflow-x-auto rounded-lg  pt-3',
-          { 'bg-blue-900 px-6 pb-8': props.fullBackground },
+          { 'bg-gray-800 px-6 pb-8': props.fullBackground },
           props.className
         )}
       >
@@ -45,7 +45,7 @@ export function Table(props: TableProps) {
           className="w-full whitespace-nowrap"
           style={{ borderSpacing: 0 }}
         >
-          <thead className="bg-blue-900">
+          <thead className="bg-gray-800">
             <tr>
               {props.columns.map((column, i) => (
                 <th
@@ -58,7 +58,7 @@ export function Table(props: TableProps) {
                     column.className
                   )}
                 >
-                  <div className="py-0.5 text-xs text-grey-500">
+                  <div className="py-0.5 text-xs text-zinc-500">
                     {column.header}
                   </div>
                 </th>
@@ -91,7 +91,7 @@ export function Table(props: TableProps) {
       </div>
       {props.rows.length > pageSize && (
         <div className="flex items-center justify-center pt-3">
-          <Button variant="VIEW_ALL">
+          <Button variant="OUTLINED">
             View all {props.title.toLowerCase()}
           </Button>
         </div>

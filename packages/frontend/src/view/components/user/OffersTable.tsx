@@ -2,7 +2,7 @@ import { Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Table } from '../common/table/Table'
-import { Status, StatusType } from './Status'
+import { StatusBadge, StatusType } from './StatusBadge'
 
 export interface OffersTableProps {
   readonly offers: readonly OfferEntry[]
@@ -46,7 +46,9 @@ export function OffersTable({ offers }: OffersTableProps) {
             offer.amount.toString(),
             `$${offer.price.toString()}`,
             `$${totalPrice.toString()}`,
-            <Status type={toStatusType(offer.status)}>{offer.status}</Status>,
+            <StatusBadge type={toStatusType(offer.status)}>
+              {offer.status}
+            </StatusBadge>,
             offer.type,
           ],
         }

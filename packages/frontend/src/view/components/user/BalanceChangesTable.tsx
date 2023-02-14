@@ -54,12 +54,12 @@ export function BalanceChangesTable({
               className={cx(
                 '',
                 { 'text-red-100': !positiveChange },
-                { 'text-green-100': positiveChange }
+                { 'text-emerald-400': positiveChange }
               )}
             >{`${
               positiveChange ? '+' : '-'
             } ${balanceChange.change.toString()} ${balanceChange.asset}`}</p>,
-            <p className="text-grey-500">#{balanceChange.vaultId}</p>,
+            <p className="text-zinc-500">#{balanceChange.vaultId}</p>,
           ],
         }
       })}

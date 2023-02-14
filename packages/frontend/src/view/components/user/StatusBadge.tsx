@@ -3,12 +3,12 @@ import React, { ReactNode } from 'react'
 
 export type StatusType = 'BEGIN' | 'MIDDLE' | 'END' | 'ERROR' | 'CANCEL'
 
-export interface StatusProps {
+export interface StatusBadgeProps {
   type: StatusType
   children: ReactNode
 }
 
-export function Status({ type, children }: StatusProps) {
+export function StatusBadge({ type, children }: StatusBadgeProps) {
   return (
     <div
       className={cx(
@@ -16,8 +16,8 @@ export function Status({ type, children }: StatusProps) {
         type === 'BEGIN' && 'bg-blue-400',
         type === 'MIDDLE' && 'bg-gradient-to-r from-blue-400 to-green-500',
         type === 'END' && 'bg-green-500',
-        type === 'ERROR' && 'bg-red-300 text-white',
-        type === 'CANCEL' && 'bg-grey-500 text-white'
+        type === 'ERROR' && 'bg-red-600 text-white',
+        type === 'CANCEL' && 'bg-zinc-500 text-white'
       )}
     >
       {children}
