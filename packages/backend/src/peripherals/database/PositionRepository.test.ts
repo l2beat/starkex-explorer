@@ -107,6 +107,74 @@ describe(PositionRepository.name, () => {
     })
   })
 
+  it('gets positions by state update id', async () => {
+    await stateUpdateRepository.add({
+      stateUpdate: {
+        id: 1,
+        blockNumber: 1,
+        rootHash: PedersenHash.fake(),
+        stateTransitionHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          starkKey: StarkKey.fake('1'),
+          positionId: 1n,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('ETH-9'), price: 20n }],
+    })
+
+    await stateUpdateRepository.add({
+      stateUpdate: {
+        id: 2,
+        blockNumber: 2,
+        rootHash: PedersenHash.fake(),
+        stateTransitionHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          starkKey: StarkKey.fake('1'),
+          positionId: 10n,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        },
+        {
+          starkKey: StarkKey.fake('2'),
+          positionId: 20n,
+          collateralBalance: 1000n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 80n }],
+        },
+      ],
+      prices: [
+        { assetId: AssetId('ETH-9'), price: 20n },
+        { assetId: AssetId('BTC-10'), price: 40n },
+      ],
+    })
+
+    const positions = await positionRepository.getByStateUpdateId(2)
+
+    expect(positions).toEqual([
+      {
+        starkKey: StarkKey.fake('1'),
+        positionId: 10n,
+        collateralBalance: 0n,
+        balances: [{ assetId: AssetId('BTC-10'), balance: 40n }],
+        stateUpdateId: 2,
+      },
+      {
+        starkKey: StarkKey.fake('2'),
+        positionId: 20n,
+        collateralBalance: 1000n,
+        balances: [{ assetId: AssetId('ETH-9'), balance: 80n }],
+        stateUpdateId: 2,
+      },
+    ])
+  })
+
   it('finds history by id', async () => {
     const positionId = 12345n
 
