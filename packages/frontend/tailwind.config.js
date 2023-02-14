@@ -12,12 +12,14 @@ module.exports = {
       },
       zinc: {
         500: '#70737D',
+        800: '#272A31',
       },
       gray: {
         600: '#575B64',
         800: '#222531',
       },
       slate: {
+        400: '#8D8CBD',
         800: '#2F3341',
       },
       neutral: {
@@ -35,13 +37,13 @@ module.exports = {
         600: '#1595B1',
       },
       emerald: {
-        400: '#06D888', // Green (positive)
-        500: '#0CAF75', // Green 2
+        400: '#06D888',
+        500: '#0CAF75',
       },
       yellow: {
-        300: '#FFEF5A', // Yellow 1
+        300: '#FFEF5A',
       },
-      brand: '#5F5CFF', // Brand Color
+      brand: '#5F5CFF',
     },
   },
 

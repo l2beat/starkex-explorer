@@ -1,4 +1,10 @@
 /* inter-regular - latin */
+body > div {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 @font-face {
   font-family: 'Inter';
   font-style: normal;
