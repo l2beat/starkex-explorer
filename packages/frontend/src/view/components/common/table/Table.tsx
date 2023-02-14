@@ -52,7 +52,7 @@ export function Table(props: TableProps) {
                   scope="col"
                   key={i}
                   className={cx(
-                    'border-0 border-none p-0 pb-0.5 font-medium first:rounded-l-action-button first:pl-6 last:rounded-r-action-button last:pr-6',
+                    'first:rounded-l-action-button last:rounded-r-action-button border-0 border-none p-0 pb-0.5 font-medium first:pl-6 last:pr-6',
                     column.textAlignClass ??
                       (column.numeric ? 'text-right' : 'text-left'),
                     column.className
