@@ -14,7 +14,7 @@ export function FancyList({ items, className }: FancyListProps) {
           return (
             <div key={index} className="group relative pb-6 pl-4">
               <div className="absolute -left-[13px] mt-2 h-full w-0.5 bg-zinc-500 group-last:hidden " />
-              <Index index={index} className="absolute -left-6" />
+              <Index index={index} />
               <span>{item}</span>
             </div>
           )
@@ -32,7 +32,7 @@ function Index({ index, className }: IndexProps) {
   return (
     <span
       className={cx(
-        'h-[24px] w-[24px] shrink-0 rounded-lg text-center',
+        'absolute -left-6 h-6 w-6 shrink-0 rounded-lg text-center',
         index === 0 ? 'bg-brand' : 'bg-zinc-500',
         className
       )}
