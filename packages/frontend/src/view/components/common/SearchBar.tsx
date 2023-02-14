@@ -1,6 +1,6 @@
 import cx from 'classnames'
 import React from 'react'
-import { SearchIcon } from './icons/SearchIcon'
+import { SearchIcon } from '../../assets/icons/SearchIcon'
 
 export function SearchBar({ className = '' }) {
   return (

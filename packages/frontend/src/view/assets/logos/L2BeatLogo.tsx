@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function L2BeatIcon(props: React.SVGProps<SVGSVGElement>) {
+export function L2BeatLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       height="100"

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function DydxIcon(props: React.SVGProps<SVGSVGElement>) {
+export function DydxLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="26"

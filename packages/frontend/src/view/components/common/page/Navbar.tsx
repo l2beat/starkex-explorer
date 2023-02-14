@@ -1,9 +1,9 @@
 import { AccountDetails } from '@explorer/shared'
 import React from 'react'
+import { JazzIcon } from '../../../assets/icons/jazz/JazzIcon'
+import { DydxLogo } from '../../../assets/logos/DydxLogo'
+import { L2BeatMinimalLogo } from '../../../assets/logos/L2BeatMinimalLogo'
 import { Button } from '../Button'
-import { DydxIcon } from '../icons/DydxIcon'
-import { JazzIcon } from '../icons/jazzicon/JazzIcon'
-import { L2BeatMinimalIcon } from '../icons/L2BeatMinimalIcon'
 import { SearchBar } from '../SearchBar'
 
 export interface NavbarProps {
@@ -19,8 +19,8 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
         href="/"
       >
         <div className="flex gap-2 sm:gap-4">
-          <L2BeatMinimalIcon className="h-[30px] sm:h-[36px]" />
-          <DydxIcon className="h-[26px] sm:h-[32px]" />
+          <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
+          <DydxLogo className="h-[26px] sm:h-[32px]" />
         </div>
         <span className="py-1 pl-2 uppercase text-slate-400 sm:pl-4">
           Explorer

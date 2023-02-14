@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function L2BeatMinimalIcon(props: React.SVGProps<SVGSVGElement>) {
+export function L2BeatMinimalLogo(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
       width="30"
