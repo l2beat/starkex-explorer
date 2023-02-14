@@ -15,7 +15,7 @@ export function PriceInput(props: TransactionFormProps) {
           type="text"
           autoComplete="off"
           placeholder="0.00"
-          className="bg-gray-100 w-full rounded-md pl-2 pt-2 pr-[80px] pb-10 font-mono text-2xl leading-none"
+          className="bg-gray-100 font-mono w-full rounded-md pl-2 pt-2 pr-[80px] pb-10 text-2xl leading-none"
         />
         <div className="absolute top-2 right-2 flex items-center gap-2 py-0.5">
           <AssetIcon className="h-4 w-4" assetId={AssetId.USDC} />

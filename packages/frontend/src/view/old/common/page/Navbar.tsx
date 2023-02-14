@@ -13,7 +13,7 @@ export interface NavbarProps {
 
 export function Navbar({ account, searchBar = true }: NavbarProps) {
   return (
-    <div className="border-gray-300 flex flex-wrap items-center justify-between gap-y-2 border-b-[1px] px-2 py-2.5 wide:px-4">
+    <div className="wide:px-4 border-gray-300 flex flex-wrap items-center justify-between gap-y-2 border-b-[1px] px-2 py-2.5">
       <a className="flex items-center justify-center" href="/">
         <span className="pr-2 sm:pr-4">
           <L2beatExplorerLogo className="h-[30px] sm:h-[36px]" />
@@ -54,7 +54,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
               </span>
             </span>
             {account.hasUpdates && (
-              <div className="absolute right-0 top-0 h-4 w-4 translate-x-1/3 translate-y-[-33%] rounded-full bg-blue-200" />
+              <div className="bg-blue-200 absolute right-0 top-0 h-4 w-4 translate-x-1/3 translate-y-[-33%] rounded-full" />
             )}
           </a>
         )}

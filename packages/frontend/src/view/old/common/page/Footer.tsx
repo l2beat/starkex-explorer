@@ -10,7 +10,7 @@ import { SimpleLink } from '../SimpleLink'
 
 export function Footer() {
   return (
-    <footer className="mx-auto mb-12 max-w-[900px] px-2 wide:px-4">
+    <footer className="wide:px-4 mx-auto mb-12 max-w-[900px] px-2">
       <div className="border-gray-300 mb-3 flex flex-wrap justify-between gap-y-3 border-b-[1px] pb-3">
         <SimpleLink href="https://l2beat.com/donate">Donate</SimpleLink>
         <div className="flex gap-3">

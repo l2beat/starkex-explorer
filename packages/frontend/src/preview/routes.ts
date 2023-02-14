@@ -9,12 +9,8 @@ import * as DATA from './data'
 export const router = new Router()
 
 router.get('/', (ctx) => {
-  ctx.body = renderHomePage({ title: 'foo' })
-})
-router.get('/user', (ctx) => {
-  const data = { ...DATA.USER_PROPS }
-  data.account = getAccount(ctx)
-  ctx.body = renderUserPage(data)
+  const account = getAccount(ctx)
+  ctx.body = renderHomePage({ title: 'foo', account })
 })
 
 function getAccount(ctx: Koa.Context) {

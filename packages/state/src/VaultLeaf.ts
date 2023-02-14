@@ -1,16 +1,16 @@
 import { pedersen } from '@explorer/crypto'
-import { json, PedersenHash, StarkKey } from '@explorer/types'
+import { AssetHash, json, PedersenHash, StarkKey } from '@explorer/types'
 
 import { MerkleValue } from './MerkleValue'
 import { packBytes } from './packBytes'
 
 export class VaultLeaf extends MerkleValue {
-  static EMPTY = new VaultLeaf(StarkKey.ZERO, 0n, PedersenHash.ZERO)
+  static EMPTY = new VaultLeaf(StarkKey.ZERO, 0n, AssetHash.ZERO)
 
   constructor(
     public readonly starkKey: StarkKey,
     public readonly balance: bigint,
-    public readonly token: PedersenHash,
+    public readonly assetHash: AssetHash,
     protected knownHash?: PedersenHash
   ) {
     super()
@@ -22,8 +22,8 @@ export class VaultLeaf extends MerkleValue {
   // https://github.com/starkware-libs/starkex-resources/blob/master/stark_ex_objects/starkware/objects/state.py#L76
   async calculateHash() {
     const key_token_hash = await pedersen(
-      PedersenHash(this.starkKey.substring(2)),
-      this.token
+      PedersenHash(this.starkKey.toString()),
+      PedersenHash(this.assetHash.toString())
     )
     const hash = await pedersen(
       key_token_hash,
@@ -36,7 +36,7 @@ export class VaultLeaf extends MerkleValue {
     return {
       starkKey: this.starkKey,
       balance: this.balance,
-      token: this.token,
+      token: this.assetHash,
     }
   }
 
@@ -47,7 +47,7 @@ export class VaultLeaf extends MerkleValue {
     return new VaultLeaf(
       StarkKey(cast.starkKey),
       BigInt(cast.balance),
-      PedersenHash(cast.token),
+      AssetHash(cast.assetHash),
       knownHash
     )
   }
@@ -56,7 +56,7 @@ export class VaultLeaf extends MerkleValue {
     return {
       starkKey: this.starkKey.toString(),
       balance: this.balance.toString(),
-      token: this.token.toString(),
+      assetHash: this.assetHash.toString(),
     }
   }
 }

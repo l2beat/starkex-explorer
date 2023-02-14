@@ -16,7 +16,7 @@ export function TransactionForm(props: TransactionFormProps) {
   const propsJson = serializeTransactionFormProps(props)
   return (
     <>
-      <div className="bg-yellow-100 text-gray-100 flex items-center justify-center px-2 py-1 wide:px-4">
+      <div className="wide:px-4 bg-yellow-100 text-gray-100 flex items-center justify-center px-2 py-1">
         <span>
           <strong>WARNING:</strong> The Forced Exit is missing some
           functionality temporarily. We are working on fixing it.
@@ -53,7 +53,7 @@ export function TransactionForm(props: TransactionFormProps) {
           <button
             id={FormId.SubmitButton}
             type="button"
-            className="block w-full rounded-md bg-blue-100 py-2 text-lg font-bold"
+            className="bg-blue-100 block w-full rounded-md py-2 text-lg font-bold"
           >
             Forced exit
           </button>

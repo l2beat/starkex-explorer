@@ -12,7 +12,7 @@ export function PositionIdView(props: PositionIdViewProps) {
         <span className="font-mono text-2xl leading-none">
           {props.positionId.toString()}
         </span>
-        <span className="rounded-full bg-blue-100 px-2">Owned by you</span>
+        <span className="bg-blue-100 rounded-full px-2">Owned by you</span>
       </div>
     </div>
   )

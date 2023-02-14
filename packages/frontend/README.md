@@ -8,6 +8,7 @@
 
 ```tsx
 import React from 'react'
+import { ExampleComponent } from '../components/ExampleComponent'
 import { reactToHtml } from '../reactToHtml'
 
 export interface HomePageProps {
@@ -21,8 +22,15 @@ export function renderHomePage(props: HomePageProps) {
 function HomePage(props: HomePageProps) {
   return (
     <div>
-      <h1>Home Page: {props.title}</h1>
+      <ExampleComponent>Home Page: {props.title}</ExampleComponent>
     </div>
   )
 }
 ```
+
+#### Styling
+
+For a better sync between code and Figma, we are using the following convention:
+
+1. Designer is using this [website](https://find-nearest-tailwind-colour.netlify.app/) to convert HEX colors to tailwind color names, so you already know which color to use.
+2. If you have found color that does not have tailwind-like name on Figma, notify the designer about it and add the color to our config using the [website](https://find-nearest-tailwind-colour.netlify.app/).

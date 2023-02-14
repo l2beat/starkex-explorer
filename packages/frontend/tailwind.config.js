@@ -2,20 +2,27 @@
 module.exports = {
   content: ['./src/**/*.{html,ts,tsx}'],
   theme: {
-    extend: {
-      fontFamily: {
-        sans: ['Fira Sans', 'sans-serif'],
-        mono: ['Fira Mono', 'mono'],
-      },
-      screens: {
-        wide: '900px',
-      },
+    fontFamily: {
+      inter: ['Inter', 'sans-serif'],
     },
     colors: {
+      transparent: 'transparent',
+      white: '#FFFFFF',
+      amber: {
+        500: '#F7931A',
+      },
       zinc: {
         500: '#70737D',
+        800: '#272A31',
       },
-      white: '#FFFFFF',
+      gray: {
+        600: '#575B64',
+        800: '#222531',
+      },
+      slate: {
+        400: '#8D8CBD',
+        800: '#2F3341',
+      },
       neutral: {
         900: '#0C0C0E',
       },
@@ -25,25 +32,30 @@ module.exports = {
         200: '#5196FF',
         300: '#3366cc',
         400: '#3e8fef',
-      },
-      gray: {
-        800: '#222531',
-      },
-      amber: {
-        500: '#F7931A',
+        500: '#3E97FF',
+        600: '#2969E9',
       },
       red: {
         100: '#f43636',
-        600: '#e10013',
+        500: '#FF394A',
+        600: '#E10013',
       },
       green: {
         500: '#5eff5a',
       },
       emerald: {
-        400: '#06d888',
+        400: '#06D888',
+        500: '#0CAF75',
+      },
+      cyan: {
+        600: '#1595B1',
+      },
+      yellow: {
+        300: '#FFEF5A',
       },
       brand: '#5F5CFF',
     },
   },
+
   plugins: [],
 }
