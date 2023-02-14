@@ -13,7 +13,7 @@ export interface NavbarProps {
 
 export function Navbar({ account, searchBar = true }: NavbarProps) {
   return (
-    <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b-[1px] border-zinc-800 px-6 py-2.5">
+    <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
       <a
         className="flex items-center justify-center gap-2 divide-x sm:gap-4"
         href="/"

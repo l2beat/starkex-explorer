@@ -8,18 +8,22 @@ export function SearchBar({ className = '' }) {
       method="GET"
       action="/search"
       className={cx(
-        'bg-transparent border-grey-500 flex h-11 w-full rounded-lg border drop-shadow-lg',
+        'group flex h-11 w-full rounded-lg border border-gray-600 bg-transparent drop-shadow-lg focus-within:border-brand',
         className
       )}
     >
       <input
-        className="bg-black placeholder:text-grey-500 w-full rounded-l-lg p-4 outline-0"
+        className="w-full rounded-l-lg bg-transparent p-4 outline-0 placeholder:text-gray-600 "
         type="text"
         placeholder="Search by Hash, Id, Public Key or Address"
         name="query"
       />
-      <button className="bg-transparent flex w-12 items-center justify-center rounded-r-lg">
-        <SearchIcon width={20} height={20} className="fill-grey-500" />
+      <button className=" flex w-12 items-center justify-center rounded-r-lg bg-transparent">
+        <SearchIcon
+          width={20}
+          height={20}
+          className="fill-gray-600 group-focus-within:fill-white"
+        />
       </button>
     </form>
   )

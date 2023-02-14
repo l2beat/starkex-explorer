@@ -6,6 +6,7 @@ module.exports = {
       inter: ['Inter', 'sans-serif'],
     },
     colors: {
+      transparent: 'transparent',
       white: '#FFFFFF',
       amber: {
         500: '#F7931A',
