@@ -13,11 +13,8 @@ export function FancyList({ items, className }: FancyListProps) {
         {items.map((item, index) => {
           return (
             <div key={index} className="group relative pb-6 pl-4">
-              <div className="absolute -left-[13px] mt-2 h-[100%] group-last:hidden">
-                <div className="h-full w-[2px] bg-zinc-500 " />
-              </div>
+              <div className="absolute -left-[13px] mt-2 h-full w-0.5 bg-zinc-500 group-last:hidden " />
               <Index index={index} className="absolute -left-6" />
-
               <span>{item}</span>
             </div>
           )
