@@ -9,7 +9,8 @@ type ButtonVariant = 'primary' | 'outline'
 
 const classNameMap: Record<ButtonVariant, string> = {
   primary: 'bg-brand text-white',
-  outline: 'bg-transparent border border-brand text-white hover:bg-opacity-20',
+  outline:
+    'bg-transparent border border-brand text-white hover:bg-brand hover:bg-opacity-10',
 }
 
 export function Button({
