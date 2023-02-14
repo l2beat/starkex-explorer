@@ -26,7 +26,7 @@ export function ForcedTransactionDetails({
       <ForcedTransactionHeader title={title}>
         {transaction.type === 'exit' && transaction.finalizeForm && (
           <FinalizeExitForm {...transaction.finalizeForm}>
-            <button className="bg-blue-100 rounded-md px-4 py-2 text-base text-white">
+            <button className="rounded-md bg-blue-100 px-4 py-2 text-base text-white">
               Finalize
             </button>
           </FinalizeExitForm>

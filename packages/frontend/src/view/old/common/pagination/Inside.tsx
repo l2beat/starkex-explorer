@@ -15,9 +15,9 @@ export const Inside = {
 function FirstPage() {
   return (
     <>
-      <span className="hidden wide:block">First</span>
+      <span className="wide:block hidden">First</span>
       <FirstPageIcon
-        className="my-1 block wide:hidden"
+        className="wide:hidden my-1 block"
         width={14}
         height={12}
       />
@@ -36,8 +36,8 @@ function Next() {
 function LastPage() {
   return (
     <>
-      <span className="hidden wide:block">Last</span>
-      <LastPageIcon className="my-1 block wide:hidden" width={14} height={12} />
+      <span className="wide:block hidden">Last</span>
+      <LastPageIcon className="wide:hidden my-1 block" width={14} height={12} />
     </>
   )
 }

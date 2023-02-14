@@ -59,7 +59,7 @@ export function AmountInput(props: TransactionFormProps) {
       </div>
       <div
         id={FormId.AmountErrorView}
-        className="text-red-100 hidden font-medium"
+        className="hidden font-medium text-red-100"
       >
         Amount too large
       </div>

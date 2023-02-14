@@ -53,7 +53,7 @@ export function TransactionForm(props: TransactionFormProps) {
           <button
             id={FormId.SubmitButton}
             type="button"
-            className="bg-blue-100 block w-full rounded-md py-2 text-lg font-bold"
+            className="block w-full rounded-md bg-blue-100 py-2 text-lg font-bold"
           >
             Forced exit
           </button>

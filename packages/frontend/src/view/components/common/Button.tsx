@@ -8,8 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantMap: Record<ButtonVariant, string> = {
-  CONTAINED:
-    'mx-auto w-32 rounded bg-brand py-2 text-sm',
+  CONTAINED: 'mx-auto w-32 rounded bg-brand py-2 text-sm',
   OUTLINED:
     'rounded-lg border border-solid border-brand py-3 px-8 text-base hover:bg-opacity-20',
 }

@@ -21,7 +21,10 @@ export function ActionsTable(props: ActionsTableProps) {
     <div className="mb-12 flex w-full flex-col rounded-lg border border-solid border-brand bg-gray-800 p-6">
       <p className="text-sm font-semibold text-zinc-500">Withdrawable assets</p>
       {props.withdrawableAssets.map((asset) => (
-        <div className="mt-3 flex items-center justify-between">
+        <div
+          className="mt-3 flex items-center justify-between"
+          key={asset.symbol}
+        >
           <div className="flex">
             <p>Icon</p>
             <p className="ml-3 text-base font-bold text-white">
@@ -43,7 +46,10 @@ export function ActionsTable(props: ActionsTableProps) {
       {props.offersToAccept.map((offer) => {
         const totalPrice = offer.amount * offer.price
         return (
-          <div className="mt-3 flex items-center justify-between">
+          <div
+            className="mt-3 flex items-center justify-between"
+            key={offer.timestamp.toString()}
+          >
             <div className="flex">
               <p>Icon</p>
               <p className="ml-3 text-base font-bold text-white">
