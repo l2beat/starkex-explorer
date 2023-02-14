@@ -11,7 +11,7 @@ export function Footer() {
         funded by
         <StarkWareLogo height={18} width={98} className="ml-1" />
       </span>
-      <span className="text-zinc-500">@Copyright 2023 L2BEAT</span>
+      <span className="text-zinc-500">Copyright 2023 L2BEAT</span>
     </footer>
   )
 }
