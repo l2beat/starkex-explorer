@@ -1,4 +1,4 @@
-import { PedersenHash, StarkKey } from '@explorer/types'
+import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
 
 import { SpotBatchResponse } from './schema'
 
@@ -13,7 +13,7 @@ export interface SpotBatch {
 export interface SpotBatchVault {
   vaultId: bigint
   starkKey: StarkKey
-  token: PedersenHash
+  assetHash: AssetHash
   balance: bigint
 }
 
@@ -36,7 +36,7 @@ export function toSpotBatch(
     vaults: Object.entries(response.update.vaults).map(([vaultId, vault]) => ({
       vaultId: BigInt(vaultId),
       starkKey: StarkKey.from(BigInt(vault.stark_key)),
-      token: PedersenHash(vault.token),
+      assetHash: AssetHash(vault.token),
       balance: BigInt(vault.balance),
     })),
     orders: Object.entries(response.update.orders).map(([orderId, order]) => ({

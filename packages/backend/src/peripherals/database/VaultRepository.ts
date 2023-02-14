@@ -1,4 +1,4 @@
-import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
+import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
 import { VaultRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -8,7 +8,7 @@ import { Database } from './shared/Database'
 export interface VaultRecord {
   vaultId: bigint
   starkKey: StarkKey
-  token: PedersenHash
+  assetHash: AssetHash
   balance: bigint
 }
 
@@ -103,7 +103,7 @@ export function toVaultRecord(
   return {
     stateUpdateId: row.state_update_id,
     vaultId: BigInt(row.vault_id),
-    token: PedersenHash(row.token),
+    assetHash: AssetHash(row.asset_hash),
     starkKey: StarkKey(row.stark_key),
     balance: BigInt(row.balance),
   }
@@ -117,7 +117,7 @@ export function toVaultRow(
     state_update_id: stateUpdateId,
     vault_id: record.vaultId,
     stark_key: record.starkKey.toString(),
-    token: record.token.toString(),
+    asset_hash: record.assetHash.toString(),
     balance: record.balance,
   }
 }
