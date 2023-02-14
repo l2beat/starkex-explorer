@@ -12,7 +12,7 @@ export function Footer() {
         <StarkWareLogo height={18} width={98} className="ml-1" />
       </span>
       <span className="text-zinc-500">
-        Copyright ${new Date().getFullYear()} L2BEAT
+        Copyright {new Date().getFullYear()} L2BEAT
       </span>
     </footer>
   )
