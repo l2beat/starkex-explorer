@@ -8,6 +8,7 @@
 
 ```tsx
 import React from 'react'
+import { ExampleComponent } from '../components/ExampleComponent'
 import { reactToHtml } from '../reactToHtml'
 
 export interface HomePageProps {
@@ -21,7 +22,7 @@ export function renderHomePage(props: HomePageProps) {
 function HomePage(props: HomePageProps) {
   return (
     <div>
-      <h1>Home Page: {props.title}</h1>
+      <ExampleComponent>Home Page: {props.title}</ExampleComponent>
     </div>
   )
 }
