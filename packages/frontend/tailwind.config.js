@@ -3,7 +3,7 @@ module.exports = {
   content: ['./src/**/*.{html,ts,tsx}'],
   theme: {
     fontFamily: {
-      inter: ['Inter', 'sans-serif'],
+      sans: ['Inter', 'sans-serif'],
     },
     colors: {
       transparent: 'transparent',
