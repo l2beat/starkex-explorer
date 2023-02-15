@@ -1,4 +1,5 @@
 import { initCountdownTimer } from './countdownTimer'
+import { initImageFallback } from './imageFallback'
 import { initMetamask } from './metamask'
 import { initAcceptOfferForm } from './offer/acceptForm'
 import { initCancelOfferForm } from './offer/cancelForm'
@@ -19,3 +20,4 @@ initCancelOfferForm()
 initFinalizeForm()
 initFinalizeExitForm()
 initCountdownTimer()
+initImageFallback()
