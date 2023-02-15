@@ -52,7 +52,7 @@ export function BalanceChangesTable({
             balanceChange.newBalance.toString(),
             <p
               className={cx(
-                'font-medium text-sm',
+                'text-sm font-medium',
                 { 'text-red-100': !positiveChange },
                 { 'text-emerald-400': positiveChange }
               )}
