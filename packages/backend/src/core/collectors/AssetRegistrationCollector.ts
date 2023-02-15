@@ -1,7 +1,7 @@
 import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
 
 import { BlockRange } from '../../model'
-import { AssetDetails } from '../../model/AssetDetails'
+import { AssetDetails } from '@explorer/shared'
 import {
   AssetRegistrationRecord,
   AssetRepository,

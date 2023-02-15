@@ -5,7 +5,7 @@ import {
   ERC721Details,
   ERC1155Details,
   MintableERC721Details,
-} from '../../model/AssetDetails'
+} from '@explorer/shared'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'

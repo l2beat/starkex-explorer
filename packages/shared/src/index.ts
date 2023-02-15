@@ -1,6 +1,7 @@
 export * from './AcceptedData'
 export * from './AcceptOfferBody'
 export * from './AccountDetails'
+export * from './AssetDetails'
 export * from './CancelOfferBody'
 export * from './CreateOfferBody'
 export * from './CreateOfferData'

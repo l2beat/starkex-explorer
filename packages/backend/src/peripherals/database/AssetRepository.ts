@@ -1,7 +1,7 @@
 import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
 import { AssetDetailsRow, AssetRegistrationRow } from 'knex/types/tables'
 
-import { AssetDetails, AssetType } from '../../model/AssetDetails'
+import { AssetDetails, AssetType } from '@explorer/shared'
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
