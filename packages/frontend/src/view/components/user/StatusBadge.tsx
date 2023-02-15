@@ -14,8 +14,8 @@ export function StatusBadge({ type, children }: StatusBadgeProps) {
       className={cx(
         'w-max rounded-full px-2 py-1 text-xs font-bold',
         type === 'BEGIN' && 'bg-blue-400',
-        type === 'MIDDLE' && 'bg-gradient-to-r from-blue-400 to-green-500',
-        type === 'END' && 'bg-green-500',
+        type === 'MIDDLE' && 'bg-gradient-to-r from-blue-400 to-green-400',
+        type === 'END' && 'bg-green-400',
         type === 'ERROR' && 'bg-red-600 text-white',
         type === 'CANCEL' && 'bg-zinc-500 text-white'
       )}

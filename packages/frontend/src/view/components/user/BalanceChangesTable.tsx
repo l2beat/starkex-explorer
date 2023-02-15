@@ -53,7 +53,7 @@ export function BalanceChangesTable({
             <p
               className={cx(
                 'text-sm font-medium',
-                { 'text-red-100': !positiveChange },
+                { 'text-red-400': !positiveChange },
                 { 'text-emerald-400': positiveChange }
               )}
             >{`${

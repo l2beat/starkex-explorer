@@ -14,7 +14,7 @@ export function TableRow(props: TableRowProps) {
     <tr
       className={cx(
         'my-4 whitespace-nowrap',
-        props.link && 'hover:bg-blue-100',
+        props.link && 'hover:bg-blue-700',
         props.i % 2 !== 0 && 'bg-gray-200',
         props.hidden && 'hidden'
       )}
