@@ -5,6 +5,7 @@ import {
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
+// eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/accept-form/attributes'
 import { getAttribute } from './getAttribute'
 import { signAccepted } from './sign'
