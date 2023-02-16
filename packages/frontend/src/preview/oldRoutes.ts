@@ -16,7 +16,7 @@ import {
   renderOldStateUpdatesIndexPage,
   renderTransactionForm,
 } from '../view'
-import * as DATA from './data'
+import * as DATA from './oldData'
 
 export const router = new Router()
 

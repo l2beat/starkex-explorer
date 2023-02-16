@@ -22,21 +22,21 @@ export function ForcedTradeOfferDetails(props: ForcedTradeOfferDetailsProps) {
         <div className="flex gap-x-2">
           {props.acceptForm && (
             <AcceptOfferForm {...props.acceptForm}>
-              <button className="bg-blue-100 rounded-md px-4 py-2 text-base text-white">
+              <button className="rounded-md bg-blue-700 px-4 py-2 text-base text-white">
                 Accept &amp; {props.offer.type === 'buy' ? 'sell' : 'buy'}
               </button>
             </AcceptOfferForm>
           )}
           {props.cancelForm && (
             <CancelOfferForm {...props.cancelForm}>
-              <button className="bg-blue-100 rounded-md px-4 py-2 text-base text-white">
+              <button className="rounded-md bg-blue-700 px-4 py-2 text-base text-white">
                 Cancel
               </button>
             </CancelOfferForm>
           )}
           {props.finalizeForm && (
             <FinalizeOfferForm {...props.finalizeForm}>
-              <button className="bg-blue-100 rounded-md px-4 py-2 text-base text-white">
+              <button className="rounded-md bg-blue-700 px-4 py-2 text-base text-white">
                 Finalize
               </button>
             </FinalizeOfferForm>

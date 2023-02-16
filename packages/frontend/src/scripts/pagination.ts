@@ -1,4 +1,6 @@
+// eslint-disable-next-line no-restricted-imports
 import { ServerFormAttributes } from '../view/old/common/pagination/attributes'
+// eslint-disable-next-line no-restricted-imports
 import { styles } from '../view/old/common/pagination/styles'
 
 export function initPagination() {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { tvlElId } from '../view/old/home/tvlElId'
 
 export function initTVLDisplay() {
