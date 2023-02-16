@@ -1,11 +1,11 @@
 import { expect } from 'earljs'
 
-import { keyPairFromData } from './keys'
+import { starkKeyPairFromData } from './keys'
 
-describe(keyPairFromData.name, () => {
+describe(starkKeyPairFromData.name, () => {
   it('correctly calculates the keys', () => {
     const data = '0x12345678'
-    const pair = keyPairFromData(data)
+    const pair = starkKeyPairFromData(data)
 
     // Derived using:
     // const x = require('@dydxprotocol/starkex-lib')

@@ -1,5 +1,6 @@
 import { EthereumAddress } from '@explorer/types'
-import { keyPairFromData } from './keys'
+
+import { starkKeyPairFromData } from './keys'
 
 const DYDX_MESSAGE =
   '{"types":{"EIP712Domain":[{"name":"name","type":"string"},{"name":"version","type":"string"},{"name":"chainId","type":"uint256"}],"dYdX":[{"type":"string","name":"action"},{"type":"string","name":"onlySignOn"}]},"domain":{"name":"dYdX","version":"1.0","chainId":1},"primaryType":"dYdX","message":{"action":"dYdX STARK Key","onlySignOn":"https://trade.dydx.exchange"}}'
@@ -16,7 +17,7 @@ export async function recoverKeysDydx(account: EthereumAddress) {
   })
 
   const TYPED_DATA_V4_SUFFIX = '00'
-  return keyPairFromData((result as string) + TYPED_DATA_V4_SUFFIX)
+  return starkKeyPairFromData((result as string) + TYPED_DATA_V4_SUFFIX)
 }
 
 const DYDX_LEGACY_MESSAGE =
@@ -35,5 +36,5 @@ export async function recoverKeysDydxLegacy(account: EthereumAddress) {
   })
 
   const PERSONAL_SIGN_SUFFIX = '03'
-  return keyPairFromData((result as string) + PERSONAL_SIGN_SUFFIX)
+  return starkKeyPairFromData((result as string) + PERSONAL_SIGN_SUFFIX)
 }

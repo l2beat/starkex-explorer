@@ -1,41 +1,26 @@
-// Follows the same logic as https://github.com/dydxprotocol/starkex-lib
-
 import { keccak256 } from '@ethersproject/keccak256'
-import { curves, ec as EllipticCurve } from 'elliptic'
-import { sha256 } from 'hash.js'
+import { ec as EllipticCurve } from 'elliptic'
 
-export interface SimpleKeyPair {
+import { EC_ORDER_INT, starkEc } from './curve'
+
+export interface StarkKeyPair {
   publicKey: string
   publicKeyYCoordinate: string
   privateKey: string
 }
 
-export function keyPairFromData(hexData: string): SimpleKeyPair {
+// Follows the same logic as https://github.com/dydxprotocol/starkex-lib
+export function starkKeyPairFromData(hexData: string): StarkKeyPair {
   const hashedData = keccak256(hexData)
   const privateKey = BigInt(hashedData) / 2n ** 5n
   const normalized = normalizeHex32(privateKey.toString(16))
+
   const keyPair = starkEc.keyFromPrivate(normalized)
+
   return toSimpleKeyPair(keyPair)
 }
 
-const starkEc = new EllipticCurve(
-  new curves.PresetCurve({
-    type: 'short',
-    prime: null,
-    p: '800000000000011000000000000000000000000000000000000000000000001',
-    a: '000000000000000000000000000000000000000000000000000000000000001',
-    b: '6f21413efbe40de150e596d72f7a8c5609ad26c15c915c1f4cdfcb99cee9e89',
-    n: '800000000000010ffffffffffffffffb781126dcae7b2321e66a241adc64d2f',
-    hash: sha256,
-    gRed: false,
-    g: [
-      '1ef15c18599971b7beced415a40f0c7deacfd9b0d1819e03d723d8bc943cfca',
-      '05668060aa49730b7be4801df46ec62de53ecd11abe43a32873000c36e8dc1f',
-    ],
-  })
-)
-
-function toSimpleKeyPair(keyPair: EllipticCurve.KeyPair): SimpleKeyPair {
+function toSimpleKeyPair(keyPair: EllipticCurve.KeyPair): StarkKeyPair {
   const privateKey = keyPair.getPrivate()
   const publicKey = keyPair.getPublic()
   const [x, y] = [publicKey.getX(), publicKey.getY()]
@@ -52,4 +37,36 @@ function normalizeHex32(hex: string): string {
 
 function stripHexPrefix(hex: string): string {
   return hex.startsWith('0x') ? hex.slice(2) : hex
+}
+
+export function signStarkMessage(pair: StarkKeyPair, hexMessage: string) {
+  const keyPair = starkEc.keyFromPrivate(pair.privateKey)
+
+  const hashed = keccak256(hexMessage)
+  const onCurve = BigInt(hashed) % EC_ORDER_INT
+
+  const { r, s } = keyPair.sign(adjustHashLength(onCurve.toString(16)))
+  const rHex = r.toString(16).padStart(64, '0')
+  const sHex = s.toString(16).padStart(64, '0')
+  const yHex = pair.publicKeyYCoordinate.padStart(64, '0')
+
+  return {
+    r: '0x' + rHex,
+    s: '0x' + sHex,
+    y: '0x' + yHex,
+    rsy: '0x' + rHex + sHex + yHex,
+  }
+}
+
+// From: https://github.com/starkware-libs/starkware-crypto-utils/blob/d3a1e655105afd66ebc07f88a179a3042407cc7b/src/js/signature.js#L500
+function adjustHashLength(msgHash: string) {
+  // strip leading zeroes
+  msgHash = BigInt('0x' + msgHash).toString(16)
+  if (msgHash.length <= 62) {
+    return msgHash
+  }
+  if (msgHash.length !== 63) {
+    throw new Error('Invalid msgHash length')
+  }
+  return msgHash + '0'
 }
