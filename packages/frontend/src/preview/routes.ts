@@ -22,21 +22,24 @@ router.get('/', (ctx) => {
 router.get('/forced/new/:page', (ctx) => {
   if (ctx.params.page) {
     switch (ctx.params.page) {
-      case 'withdraw':
+      case 'withdraw': {
         const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
         withdrawData.account = getAccount(ctx) ?? withdrawData.account
         ctx.body = renderForcedWithdrawPage(withdrawData)
         break
-      case 'sell':
+      }
+      case 'sell': {
         const sellData = { ...DATA.FORCED_SELL_FORM_PROPS }
         sellData.account = getAccount(ctx) ?? sellData.account
         ctx.body = renderForcedTradePage(sellData)
         break
-      case 'buy':
+      }
+      case 'buy': {
         const buyData = { ...DATA.FORCED_BUY_FORM_PROPS }
         buyData.account = getAccount(ctx) ?? buyData.account
         ctx.body = renderForcedTradePage(buyData)
         break
+      }
     }
   }
 })

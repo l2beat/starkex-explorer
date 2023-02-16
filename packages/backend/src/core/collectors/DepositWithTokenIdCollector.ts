@@ -1,11 +1,11 @@
-import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
-
-import { BlockRange } from '../../model'
 import {
   ERC721Details,
   ERC1155Details,
   MintableERC721Details,
 } from '@explorer/shared'
+import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
+
+import { BlockRange } from '../../model'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
