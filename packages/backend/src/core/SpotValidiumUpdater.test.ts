@@ -118,6 +118,7 @@ describe(SpotValidiumUpdater.name, () => {
         }
         const mockSpotCairoOutput = mock<SpotCairoOutput>({
           finalValidiumVaultRoot: PedersenHash.fake('987'),
+          modifications: [],
         })
         const newVault = {
           vaultId: 5n,

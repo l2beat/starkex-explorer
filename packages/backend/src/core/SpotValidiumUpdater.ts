@@ -61,7 +61,9 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
         stateTransitionHash: transition.stateTransitionHash,
       },
       spotCairoOutput.finalValidiumVaultRoot,
-      [], // TODO: add forced actions,
+      spotCairoOutput.modifications.filter(
+        (modification) => modification.type === 'fullWithdrawal'
+      ),
       [], // There are no oracle prices for Spot
       newVaults
     )

@@ -1,4 +1,5 @@
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -42,10 +43,13 @@ export interface SpotCairoOutput {
   onChainDataSize: bigint
 }
 
+// https://github.com/starkware-libs/starkex-for-spot-trading/blob/master/src/starkware/cairo/dex/execute_modification.cairo#L13
 export interface SpotModification {
+  type: 'fullWithdrawal' | 'regularWithdrawal'
   starkKey: StarkKey
-  assetId: bigint
-  difference: bigint
+  assetHash: AssetHash
+  vauldId: bigint
+  balanceDifference: bigint
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
