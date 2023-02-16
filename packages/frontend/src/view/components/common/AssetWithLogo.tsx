@@ -1,10 +1,11 @@
 import cx from 'classnames'
 import React from 'react'
-import { AssetInfo } from '../../../static/utils/assetUtils'
+
+import { AssetInfo } from '../../../utils/assetUtils'
 
 interface AssetWithLogoProps {
-  type?: 'full' | 'regular' | 'small'
   assetInfo: AssetInfo
+  type?: 'full' | 'regular' | 'small'
   className?: string
 }
 
@@ -18,17 +19,17 @@ export function AssetWithLogo({
       <img
         src={assetInfo.imageUrl}
         className={cx(
-          type === 'small'
-            ? 'h-[20px] w-[20px] rounded-full'
-            : 'h-[32px] w-[32px] rounded-full'
+          'rounded-full',
+          type === 'small' && 'h-[20px] w-[20px]',
+          type === 'regular' && 'h-6 w-6',
+          type === 'full' && 'h-8 w-8'
         )}
         data-fallback="/images/unknown-asset.svg"
       />
       <span
         className={cx(
-          type === 'small'
-            ? 'ml-2 text-sm font-medium'
-            : 'ml-2 text-lg font-semibold'
+          'ml-2',
+          type === 'small' ? 'text-sm font-medium' : 'text-lg font-semibold'
         )}
       >
         {type === 'full' ? (

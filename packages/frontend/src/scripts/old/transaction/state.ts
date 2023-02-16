@@ -1,6 +1,6 @@
 import { AssetId } from '@explorer/types'
 
-import { TransactionFormProps } from '../../view/old/transaction-form'
+import { TransactionFormProps } from '../../../view/old/transaction-form'
 import { FormAction, FormState } from './types'
 import {
   formatCurrencyInput,
@@ -190,6 +190,7 @@ function stateFromAmountAndPrice(
   priceInputString: string,
   priceInputValue: bigint
 ): FormState {
+
   if (amountInputString === '' || priceInputString === '') {
     return withChecks({
       ...state,

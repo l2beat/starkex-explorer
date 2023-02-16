@@ -1,4 +1,4 @@
-import cx from 'classNames'
+import cx from 'classnames'
 import React from 'react'
 
 interface FancyListProps {
