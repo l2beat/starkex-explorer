@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports
 import { FormId } from '../../../view/old/transaction-form/ids'
 
 export function getFormElements() {

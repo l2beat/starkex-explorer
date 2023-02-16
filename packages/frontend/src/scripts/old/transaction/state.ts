@@ -1,5 +1,6 @@
 import { AssetId } from '@explorer/types'
 
+// eslint-disable-next-line no-restricted-imports
 import { TransactionFormProps } from '../../../view/old/transaction-form'
 import { FormAction, FormState } from './types'
 import {
@@ -190,7 +191,6 @@ function stateFromAmountAndPrice(
   priceInputString: string,
   priceInputValue: bigint
 ): FormState {
-
   if (amountInputString === '' || priceInputString === '') {
     return withChecks({
       ...state,

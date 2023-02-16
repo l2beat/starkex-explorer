@@ -39,6 +39,8 @@ export class AssetRepository extends BaseRepository {
     const rows = records.map(toAssetDetailsRow)
     const hashes = await knex('asset_details')
       .insert(rows)
+      .onConflict('asset_hash')
+      .merge()
       .returning('asset_hash')
     return hashes.map((x) => AssetHash(x.asset_hash))
   }
@@ -50,6 +52,8 @@ export class AssetRepository extends BaseRepository {
     const rows = record.map(toAssetRegistrationRow)
     const hashes = await knex('asset_registrations')
       .insert(rows)
+      .onConflict('asset_type_hash')
+      .merge()
       .returning('asset_type_hash')
     return hashes.map((x) => Hash256(x.asset_type_hash))
   }

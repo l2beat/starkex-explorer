@@ -1,8 +1,11 @@
 import { AssetId } from '@explorer/types'
 
+// eslint-disable-next-line no-restricted-imports
 import { getAssetImageUrl } from '../../../view/old/common/icons/getAssetImageUrl'
-import { TransactionFormProps } from '../../../view/old/transaction-form'
+// eslint-disable-next-line no-restricted-imports
 import { FormId } from '../../../view/old/transaction-form/ids'
+// eslint-disable-next-line no-restricted-imports
+import { TransactionFormProps } from '../../../view/old/transaction-form/TransactionFormProps'
 import { getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
@@ -107,7 +110,7 @@ export function initTransactionForm() {
     if (!state || state.amountInputError !== newState.amountInputError) {
       ui.amountErrorView.classList.toggle('hidden', !newState.amountInputError)
       ui.assetAmountInput.classList.toggle(
-        'text-red-100',
+        'text-red-400',
         newState.amountInputError
       )
     }
@@ -130,7 +133,7 @@ export function initTransactionForm() {
         'cursor-not-allowed',
         !newState.canSubmit
       )
-      ui.submitButton.classList.toggle('bg-blue-100', newState.canSubmit)
+      ui.submitButton.classList.toggle('bg-blue-700', newState.canSubmit)
       ui.submitButton.classList.toggle('bg-gray-300', !newState.canSubmit)
       ui.submitButton.classList.toggle('text-gray-400', !newState.canSubmit)
     }

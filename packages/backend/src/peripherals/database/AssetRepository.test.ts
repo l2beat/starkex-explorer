@@ -27,6 +27,23 @@ describe(AssetRepository.name, () => {
     expect(actual).toEqual(record)
   })
 
+  it('merges single record on conflict', async () => {
+    const record: AssetDetails = dummyAsset('1', '2')
+    record.quantum = 11n
+
+    const recordUpdated: AssetDetails = {
+      ...record,
+      quantum: 22n,
+    }
+
+    await assetRepository.addManyDetails([record])
+    await assetRepository.addManyDetails([recordUpdated])
+    const actual = await assetRepository.findDetailsByAssetHash(
+      record.assetHash
+    )
+    expect(actual).toEqual(recordUpdated)
+  })
+
   it('adds multiple records and queries them', async () => {
     const records = [
       dummyAsset('10', '11'),
@@ -55,6 +72,23 @@ describe(AssetRepository.name, () => {
     )
 
     expect(actual).toEqual(record)
+  })
+
+  it('merges single record on conflict', async () => {
+    const record: AssetRegistrationRecord = dummyAssetRegistration('1')
+    record.quantum = 11n
+    const recordUpdated: AssetRegistrationRecord = {
+      ...record,
+      quantum: 22n,
+    }
+
+    await assetRepository.addManyRegistrations([record])
+    await assetRepository.addManyRegistrations([recordUpdated])
+
+    const actual = await assetRepository.findRegistrationByAssetTypeHash(
+      record.assetTypeHash
+    )
+    expect(actual).toEqual(recordUpdated)
   })
 
   it('adds multiple records and queries them', async () => {
@@ -119,7 +153,7 @@ export function dummyAssetRegistration(
   type = 'ERC20' as AssetType,
   name = undefined,
   symbol = undefined,
-  quantum = BigNumber.from(1).toBigInt(),
+  quantum = 1n,
   decimals = undefined,
   contractError = []
 ): AssetRegistrationRecord {

@@ -44,7 +44,7 @@ export function AmountInput(props: TransactionFormProps) {
         <div className="absolute bottom-2 right-2 flex w-full items-center justify-end gap-2">
           <span
             id={FormId.AssetBalanceView}
-            className="font-mono text-gray-400"
+            className="text-gray-400 font-mono"
           >
             Balance: {props.assets[0]?.balance.toString() ?? 0}
           </span>
@@ -59,7 +59,7 @@ export function AmountInput(props: TransactionFormProps) {
       </div>
       <div
         id={FormId.AmountErrorView}
-        className="text-red-100 hidden font-medium"
+        className="hidden font-medium text-red-400"
       >
         Amount too large
       </div>

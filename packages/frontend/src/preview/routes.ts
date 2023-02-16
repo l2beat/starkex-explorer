@@ -3,7 +3,11 @@ import { EthereumAddress } from '@explorer/types'
 import Router from '@koa/router'
 import Koa from 'koa'
 
-import { renderForcedWithdrawPage, renderHomePage } from '../view'
+import {
+  renderForcedWithdrawPage,
+  renderHomePage,
+  renderUserPage,
+} from '../view'
 import { renderForcedTradePage } from '../view/pages/forcedactions/ForcedTradePage'
 import * as DATA from './data'
 
@@ -15,7 +19,7 @@ router.get('/', (ctx) => {
 })
 
 router.get('/forced/new/:page', (ctx) => {
-  const data = { ...DATA.TRANSACTION_FORM_PROPS }
+  const data = { ...DATA.FORCED_ACTION_FORM_PROPS }
   data.account = getAccount(ctx) ?? data.account
   if (ctx.params.page) {
     switch (ctx.params.page) {
@@ -27,6 +31,11 @@ router.get('/forced/new/:page', (ctx) => {
         break
     }
   }
+})
+
+router.get('/user', (ctx) => {
+  const account = getAccount(ctx)
+  ctx.body = renderUserPage({ ...DATA.USER_PROPS, account })
 })
 
 function getAccount(ctx: Koa.Context) {
