@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { EthereumAddress } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 import Router from '@koa/router'
 import Koa from 'koa'
 
@@ -18,19 +18,48 @@ router.get('/', (ctx) => {
   ctx.body = renderHomePage({ title: 'foo', account })
 })
 
+//This is a route for an easier access to the specific forced actions page
 router.get('/forced/new/:page', (ctx) => {
-  const data = { ...DATA.FORCED_ACTION_FORM_PROPS }
-  data.account = getAccount(ctx) ?? data.account
   if (ctx.params.page) {
     switch (ctx.params.page) {
       case 'withdraw':
-        ctx.body = renderForcedWithdrawPage(data)
+        const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
+        withdrawData.account = getAccount(ctx) ?? withdrawData.account
+        ctx.body = renderForcedWithdrawPage(withdrawData)
         break
-      case 'trade':
-        ctx.body = renderForcedTradePage(data)
+      case 'sell':
+        const sellData = { ...DATA.FORCED_SELL_FORM_PROPS }
+        sellData.account = getAccount(ctx) ?? sellData.account
+        ctx.body = renderForcedTradePage(sellData)
+        break
+      case 'buy':
+        const buyData = { ...DATA.FORCED_BUY_FORM_PROPS }
+        buyData.account = getAccount(ctx) ?? buyData.account
+        ctx.body = renderForcedTradePage(buyData)
         break
     }
   }
+})
+
+router.get('/forced/new/:positionId/:assetId', (ctx) => {
+  if (!ctx.params.positionId || !ctx.params.assetId) {
+    return
+  }
+  const data = { ...DATA.FORCED_ACTION_FORM_PROPS }
+  const positionId = ctx.params.positionId
+  const assetId = AssetId(ctx.params.assetId)
+  if (data.assets.find((asset) => asset.assetId === assetId) === undefined) {
+    return
+  }
+  data.account = getAccount(ctx) ?? data.account
+  data.selectedAsset = assetId
+  data.positionId = BigInt(positionId)
+  if (data.selectedAsset === AssetId.USDC) {
+    ctx.body = renderForcedWithdrawPage(data)
+    return
+  }
+
+  ctx.body = renderForcedTradePage(data)
 })
 
 router.get('/user', (ctx) => {

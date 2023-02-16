@@ -35,7 +35,7 @@ function ForcedTradePage(props: ForcedActionFormProps) {
   const isBuying = selectedAssetBalance < 0
   const label = isBuying ? 'buy' : 'sell'
   const propsJson = serializeForcedActionsFormProps(props)
-
+  
   return (
     <Page path="/forced" description="Description" account={props.account}>
       <div className="my-auto flex gap-12">
