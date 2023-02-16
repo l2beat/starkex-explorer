@@ -8,7 +8,7 @@ import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'
 
 export function PriceInput(props: ForcedActionFormProps) {
-  const assetInfo = assetToInfo(props.selectedAsset)
+  const usdcInfo = assetToInfo(AssetId.USDC)
   const assetDetails = props.assets.find(
     (asset) => asset.assetId === props.selectedAsset
   )
@@ -39,7 +39,7 @@ export function PriceInput(props: ForcedActionFormProps) {
         <label htmlFor="balance" className="text-sm text-zinc-500">
           Market price: {priceFormatted}
         </label>
-        <AssetWithLogo assetInfo={assetInfo} />
+        <AssetWithLogo assetInfo={usdcInfo} />
       </div>
     </div>
   )
