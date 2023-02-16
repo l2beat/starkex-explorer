@@ -10,7 +10,6 @@ import { ForcedActionCard } from '../../components/forcedaction/ForcedActionCard
 import { AmountInput } from '../../components/forcedaction/form/AmountInput'
 import { PriceInput } from '../../components/forcedaction/form/PriceInput'
 import { TotalInput } from '../../components/forcedaction/form/TotalInput'
-
 import { FormId } from '../../old/transaction-form/ids'
 import { reactToHtml } from '../../reactToHtml'
 import {
