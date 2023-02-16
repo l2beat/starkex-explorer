@@ -64,7 +64,7 @@ function ActionButton({ assetId, balance }: ActionButtonProps) {
   return (
     <a
       href={`/forced/new?assetId=${assetId.toString()}`}
-      className="bg-blue-100 rounded px-3 py-0.5"
+      className="rounded bg-blue-700 px-3 py-0.5"
     >
       {assetId === AssetId.USDC ? 'Exit' : balance < 0n ? 'Buy' : 'Sell'}
     </a>

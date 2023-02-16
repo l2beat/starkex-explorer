@@ -7,18 +7,12 @@ export interface TableRowProps extends Row {
   i: number
   columns: Column[]
   hidden?: boolean
+  className?: string
 }
 
 export function TableRow(props: TableRowProps) {
   return (
-    <tr
-      className={cx(
-        'my-4 whitespace-nowrap',
-        props.link && 'hover:bg-blue-700',
-        props.i % 2 !== 0 && 'bg-gray-200',
-        props.hidden && 'hidden'
-      )}
-    >
+    <tr className={cx('my-4 whitespace-nowrap', props.hidden && 'hidden')}>
       {props.cells.map((cell, col) => {
         const { fullWidth, numeric, monospace, className } =
           props.columns[col] ?? {}
@@ -32,12 +26,13 @@ export function TableRow(props: TableRowProps) {
               numeric ? 'text-right' : 'text-left',
               fullWidth ? 'wide:max-w-[10px] truncate' : 'w-0',
               props.link && 'cursor-pointer',
-              className
+              className,
+              props.className
             )}
           >
             {props.link ? (
               <a
-                className="block w-full truncate px-1.5 py-0.5 first-letter:capitalize"
+                className="block w-full truncate py-0.5 first-letter:capitalize"
                 href={props.link}
               >
                 {cell}

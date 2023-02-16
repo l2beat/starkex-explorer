@@ -3,13 +3,19 @@ import { EthereumAddress } from '@explorer/types'
 import Router from '@koa/router'
 import Koa from 'koa'
 
-import { renderHomePage } from '../view'
+import { renderHomePage, renderUserPage } from '../view'
+import { USER_PROPS } from './data'
 
 export const router = new Router()
 
 router.get('/', (ctx) => {
   const account = getAccount(ctx)
   ctx.body = renderHomePage({ title: 'foo', account })
+})
+
+router.get('/user', (ctx) => {
+  const account = getAccount(ctx)
+  ctx.body = renderUserPage({ ...USER_PROPS, account })
 })
 
 function getAccount(ctx: Koa.Context) {
