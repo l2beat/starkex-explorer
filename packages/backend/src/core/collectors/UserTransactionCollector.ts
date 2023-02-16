@@ -36,7 +36,7 @@ export class UserTransactionCollector {
           LogWithdrawalPerformed.topic,
           LogForcedWithdrawalRequest.topic,
           LogForcedTradeRequest.topic,
-          LogFullWithdrawalRequest.topic
+          LogFullWithdrawalRequest.topic,
         ],
       ],
     })
@@ -100,7 +100,7 @@ export class UserTransactionCollector {
           data: {
             type: 'FullWithdrawal',
             starkKey: StarkKey.from(event.args.starkKey),
-            vaultId: event.args.vaultId.toBigInt()
+            vaultId: event.args.vaultId.toBigInt(),
           },
         })
       case 'LogForcedTradeRequest':
