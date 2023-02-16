@@ -48,7 +48,8 @@ function assetHashToInfo(
     }
   }
   if (assetDetails.type === 'ETH') {
-    const ethInfo = perpetualsInfo['ETH']!
+    //eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const ethInfo = perpetualsInfo.ETH!
     return {
       ...ethInfo,
       imageUrl: getDydxImageUrl(ethInfo.symbol),
@@ -66,157 +67,46 @@ function getTrustWalletImageUrl(address: string) {
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${address}/logo.png`
 }
 
-export function getDydxImageUrl(symbol: string) {
+function getDydxImageUrl(symbol: string) {
   return `https://trade.dydx.exchange/currencies/${symbol.toLowerCase()}.svg`
 }
 
 const perpetualsInfo: Record<string, Omit<AssetInfo, 'imageUrl'>> = {
-  ETH: {
-    name: 'Ethereum',
-    symbol: 'ETH',
-  },
-  USDC: {
-    name: 'USD Coin',
-    symbol: 'USDC',
-  },
-  BTC: {
-    name: 'Bitcoin',
-    symbol: 'BTC',
-  },
-  ADA: {
-    name: 'Cardano',
-    symbol: 'ADA',
-  },
-  BCH: {
-    name: 'Bitcoin Cash',
-    symbol: 'BCH',
-  },
-  DOGE: {
-    name: 'Dogecoin',
-    symbol: 'DOGE',
-  },
-  DOT: {
-    name: 'Polkadot',
-    symbol: 'DOT',
-  },
-  LTC: {
-    name: 'Litecoin',
-    symbol: 'LTC',
-  },
-  LINK: {
-    name: 'Chainlink',
-    symbol: 'LINK',
-  },
-  UNI: {
-    name: 'Uniswap',
-    symbol: 'UNI',
-  },
-  SOL: {
-    name: 'Solana',
-    symbol: 'SOL',
-  },
-  MATIC: {
-    name: 'Polygon',
-    symbol: 'MATIC',
-  },
-  XMR: {
-    name: 'Monero',
-    symbol: 'XMR',
-  },
-  EOS: {
-    name: 'EOS',
-    symbol: 'EOS',
-  },
-  AAVE: {
-    name: 'Aave',
-    symbol: 'AAVE',
-  },
-  ATOM: {
-    name: 'Cosmos',
-    symbol: 'ATOM',
-  },
-  MKR: {
-    name: 'Maker',
-    symbol: 'MKR',
-  },
-  COMP: {
-    name: 'Compound',
-    symbol: 'COMP',
-  },
-  AVAX: {
-    name: 'Avalanche',
-    symbol: 'AVAX',
-  },
-  SNX: {
-    name: 'Synthetix',
-    symbol: 'SNX',
-  },
-  SUSHI: {
-    name: 'Sushi',
-    symbol: 'SUSHI',
-  },
-  YFI: {
-    name: 'Yearn',
-    symbol: 'YFI',
-  },
-  UMA: {
-    name: 'UMA',
-    symbol: 'UMA',
-  },
-  CRV: {
-    name: 'Curve',
-    symbol: 'CRV',
-  },
-  '1INCH': {
-    name: '1inch',
-    symbol: '1INCH',
-  },
-  ZEC: {
-    name: 'Zcash',
-    symbol: 'ZEC',
-  },
-  ALGO: {
-    name: 'Algorand',
-    symbol: 'ALGO',
-  },
-  ZRX: {
-    name: '0x',
-    symbol: 'ZRX',
-  },
-  ENJ: {
-    name: 'Enjin',
-    symbol: 'ENJ',
-  },
-  XLM: {
-    name: 'Stellar',
-    symbol: 'XLM',
-  },
-  ETC: {
-    name: 'Ethereum Classic',
-    symbol: 'ETC',
-  },
-  NEAR: {
-    name: 'Near',
-    symbol: 'NEAR',
-  },
-  RUNE: {
-    name: 'Rune',
-    symbol: 'RUNE',
-  },
-  CELO: {
-    name: 'Celo',
-    symbol: 'CELO',
-  },
-  ICP: {
-    name: 'Internet Computer',
-    symbol: 'ICP',
-  },
-  TRX: {
-    name: 'Tron',
-    symbol: 'TRX',
-  },
-  XTZ: {
-    name: 'Tezos',
-    symbol: 'XTZ',
-  },
+  ETH: { name: 'Ethereum', symbol: 'ETH' },
+  USDC: { name: 'USD Coin', symbol: 'USDC' },
+  BTC: { name: 'Bitcoin', symbol: 'BTC' },
+  ADA: { name: 'Cardano', symbol: 'ADA' },
+  BCH: { name: 'Bitcoin Cash', symbol: 'BCH' },
+  DOGE: { name: 'Dogecoin', symbol: 'DOGE' },
+  DOT: { name: 'Polkadot', symbol: 'DOT' },
+  LTC: { name: 'Litecoin', symbol: 'LTC' },
+  LINK: { name: 'Chainlink', symbol: 'LINK' },
+  UNI: { name: 'Uniswap', symbol: 'UNI' },
+  SOL: { name: 'Solana', symbol: 'SOL' },
+  MATIC: { name: 'Polygon', symbol: 'MATIC' },
+  XMR: { name: 'Monero', symbol: 'XMR' },
+  EOS: { name: 'EOS', symbol: 'EOS' },
+  AAVE: { name: 'Aave', symbol: 'AAVE' },
+  ATOM: { name: 'Cosmos', symbol: 'ATOM' },
+  MKR: { name: 'Maker', symbol: 'MKR' },
+  COMP: { name: 'Compound', symbol: 'COMP' },
+  AVAX: { name: 'Avalanche', symbol: 'AVAX' },
+  SNX: { name: 'Synthetix', symbol: 'SNX' },
+  SUSHI: { name: 'Sushi', symbol: 'SUSHI' },
+  YFI: { name: 'Yearn', symbol: 'YFI' },
+  UMA: { name: 'UMA', symbol: 'UMA' },
+  CRV: { name: 'Curve', symbol: 'CRV' },
+  '1INCH': { name: '1inch', symbol: '1INCH' },
+  ZEC: { name: 'Zcash', symbol: 'ZEC' },
+  ALGO: { name: 'Algorand', symbol: 'ALGO' },
+  ZRX: { name: '0x', symbol: 'ZRX' },
+  ENJ: { name: 'Enjin', symbol: 'ENJ' },
+  XLM: { name: 'Stellar', symbol: 'XLM' },
+  ETC: { name: 'Ethereum Classic', symbol: 'ETC' },
+  NEAR: { name: 'Near', symbol: 'NEAR' },
+  RUNE: { name: 'Rune', symbol: 'RUNE' },
+  CELO: { name: 'Celo', symbol: 'CELO' },
+  ICP: { name: 'Internet Computer', symbol: 'ICP' },
+  TRX: { name: 'Tron', symbol: 'TRX' },
+  XTZ: { name: 'Tezos', symbol: 'XTZ' },
 }
