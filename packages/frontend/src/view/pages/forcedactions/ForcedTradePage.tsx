@@ -8,9 +8,9 @@ import { Link } from '../../components/common/Link'
 import { Page } from '../../components/common/page/Page'
 import { ForcedActionCard } from '../../components/forcedaction/ForcedActionCard'
 import { AmountInput } from '../../components/forcedaction/form/AmountInput'
+import { FormId } from '../../components/forcedaction/form/ids'
 import { PriceInput } from '../../components/forcedaction/form/PriceInput'
 import { TotalInput } from '../../components/forcedaction/form/TotalInput'
-import { FormId } from '../../old/transaction-form/ids'
 import { reactToHtml } from '../../reactToHtml'
 import {
   ForcedActionFormProps,
@@ -53,7 +53,7 @@ function ForcedTradePage(props: ForcedActionFormProps) {
             data-props={propsJson}
           >
             <div className="flex items-end justify-between">
-              <span className="text-2xl font-semibold" id={FormId.FormTitle}>
+              <span className="text-2xl font-semibold">
                 Forced {label} offer
               </span>
               <span>

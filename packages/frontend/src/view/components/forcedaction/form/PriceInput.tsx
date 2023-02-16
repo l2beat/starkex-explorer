@@ -3,11 +3,11 @@ import React from 'react'
 
 import { assetToInfo } from '../../../../utils/assetUtils'
 import { formatCurrencyInput } from '../../../../utils/formatUtils'
-import { TransactionFormProps } from '../../../old/transaction-form'
+import { ForcedActionFormProps } from '../../../pages/forcedactions/ForcedActionFormProps'
 import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'
 
-export function PriceInput(props: TransactionFormProps) {
+export function PriceInput(props: ForcedActionFormProps) {
   const assetInfo = assetToInfo(props.selectedAsset)
   const assetDetails = props.assets.find(
     (asset) => asset.assetId === props.selectedAsset

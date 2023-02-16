@@ -2,11 +2,11 @@ import React from 'react'
 
 import { assetToInfo } from '../../../../utils/assetUtils'
 import { formatCurrencyInput } from '../../../../utils/formatUtils'
-import { TransactionFormProps } from '../../../old/transaction-form'
+import { ForcedActionFormProps } from '../../../pages/forcedactions/ForcedActionFormProps'
 import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'
 
-export function AmountInput(props: TransactionFormProps) {
+export function AmountInput(props: ForcedActionFormProps) {
   const assetInfo = assetToInfo(props.selectedAsset)
   const balance = props.assets[0]?.balance
   const sign = balance && balance < 0 ? '-' : ''
