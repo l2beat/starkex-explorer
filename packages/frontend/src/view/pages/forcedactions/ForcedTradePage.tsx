@@ -80,7 +80,7 @@ function ForcedTradePage(props: ForcedActionFormProps) {
               <Button className="w-full" id={FormId.SubmitButton}>
                 Create {label} offer
               </Button>
-              <Button className="w-full" variant="outline">
+              <Button className="w-full" variant="outlined">
                 Back to assets
               </Button>
             </div>

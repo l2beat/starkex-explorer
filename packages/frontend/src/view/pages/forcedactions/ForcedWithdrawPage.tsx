@@ -69,7 +69,7 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
                 Prepare for withdrawal
               </Button>
               <Link href="/forced">
-                <Button className="w-full" variant="outline" type="button">
+                <Button className="w-full" variant="outlined" type="button">
                   Back to assets
                 </Button>
               </Link>

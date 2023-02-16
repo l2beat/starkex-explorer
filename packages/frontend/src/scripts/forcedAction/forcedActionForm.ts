@@ -88,10 +88,6 @@ export function initForcedActionForm() {
       } else {
         submitButton.removeAttribute('disabled')
       }
-      submitButton.classList.toggle('cursor-not-allowed', !newState.canSubmit)
-      submitButton.classList.toggle('bg-blue-100', newState.canSubmit)
-      submitButton.classList.toggle('bg-gray-300', !newState.canSubmit)
-      submitButton.classList.toggle('text-gray-400', !newState.canSubmit)
     }
 
     state = newState

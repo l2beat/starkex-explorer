@@ -1,33 +1,33 @@
 import cx from 'classnames'
 import React from 'react'
 
-type ButtonVariant = 'CONTAINED' | 'OUTLINED'
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   readonly variant?: ButtonVariant
 }
 
+type ButtonVariant = 'contained' | 'outlined'
+
 const classNameMap: Record<ButtonVariant, string> = {
-  CONTAINED: 'mx-auto w-32 rounded bg-brand py-2 text-sm',
-  OUTLINED:
-    'rounded-lg border border-solid border-brand py-3 px-8 text-base hover:bg-opacity-20',
+  contained: 'bg-brand',
+  outlined:
+    'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20',
 }
 
 export function Button({
-  onClick,
+  variant = 'contained',
   className,
-  variant = 'CONTAINED',
   children,
+  disabled,
   ...rest
 }: ButtonProps) {
   return (
     <button
-      onClick={onClick}
       className={cx(
-        '!m-0 cursor-pointer font-semibold text-white',
+        'mx-auto min-w-[150px] rounded-lg px-10 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed',
         classNameMap[variant],
         className
       )}
+      disabled={disabled}
       {...rest}
     >
       {children}
