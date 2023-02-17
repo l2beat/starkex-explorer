@@ -17,7 +17,7 @@ export function TotalInput() {
           type="text"
           autoComplete="off"
           placeholder="0.00"
-          className="w-full rounded-md bg-transparent text-2xl leading-none"
+          className="w-full rounded-md bg-transparent text-2xl leading-none outline-none"
         />
       </div>
       <div className="flex flex-col">
