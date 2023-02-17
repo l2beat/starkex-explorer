@@ -87,9 +87,11 @@ function ForcedTradePage(props: ForcedActionFormProps) {
               <Button className="w-full" id={FormId.SubmitButton}>
                 Create {label} offer
               </Button>
-              <Button className="w-full" variant="outlined">
-                Back to assets
-              </Button>
+              <Link href={`/user/${props.starkKey}`}>
+                <Button className="w-full" variant="outlined" type="button">
+                  Back to assets
+                </Button>
+              </Link>
             </div>
           </form>
         </Card>

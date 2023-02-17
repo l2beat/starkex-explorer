@@ -76,7 +76,7 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
               <Button className="w-full" id={FormId.SubmitButton}>
                 Prepare for withdrawal
               </Button>
-              <Link href="/forced">
+              <Link href={`/user/${props.starkKey}`}>
                 <Button className="w-full" variant="outlined" type="button">
                   Back to assets
                 </Button>
