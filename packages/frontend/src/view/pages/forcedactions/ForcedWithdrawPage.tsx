@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Button } from '../../components/common/Button'
 import { Card } from '../../components/common/Card'
-import { FancyList } from '../../components/common/FancyList'
 import { Link } from '../../components/common/Link'
+import { OrderedList } from '../../components/common/OrderedList'
 import { Page } from '../../components/common/page/Page'
 import { ForcedActionCard } from '../../components/forcedaction/ForcedActionCard'
 import { AmountInput } from '../../components/forcedaction/form/AmountInput'
@@ -42,7 +42,7 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
           <span className="mt-6 text-sm font-semibold text-zinc-500">
             The withdrawal process consists of three steps:
           </span>
-          <FancyList items={instructions} className="mt-3 max-w-[438px]" />
+          <OrderedList items={instructions} className="mt-3 max-w-[438px]" />
         </div>
         <Card className="h-min w-[480px]">
           <form

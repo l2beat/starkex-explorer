@@ -6,7 +6,7 @@ interface FancyListProps {
   readonly className?: string
 }
 
-export function FancyList({ items, className }: FancyListProps) {
+export function OrderedList({ items, className }: FancyListProps) {
   return (
     <div className={cx('ml-6', className)}>
       {items.map((item, index) => {
@@ -24,15 +24,13 @@ export function FancyList({ items, className }: FancyListProps) {
 
 interface IndexProps {
   readonly index: number
-  readonly className?: string
 }
-function Index({ index, className }: IndexProps) {
+function Index({ index }: IndexProps) {
   return (
     <span
       className={cx(
         'absolute -left-6 h-6 w-6 shrink-0 rounded-lg text-center',
-        index === 0 ? 'bg-brand' : 'bg-zinc-500',
-        className
+        index === 0 ? 'bg-brand' : 'bg-zinc-500'
       )}
     >
       {index + 1}
