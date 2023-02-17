@@ -61,12 +61,12 @@ export class PreprocessedAssetHistoryRepository<
   }
 
   async add(
-    row: Omit<PreprocessedAssetHistoryRecord, 'historyId'>,
+    record: Omit<PreprocessedAssetHistoryRecord, 'historyId'>,
     trx: Knex.Transaction
   ): Promise<number> {
     const knex = await this.knex(trx)
     const results = await knex('preprocessed_asset_history')
-      .insert(toPreprocessedAssetHistoryRow(row))
+      .insert(toPreprocessedAssetHistoryRow(record))
       .returning('id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return results[0]!.id
