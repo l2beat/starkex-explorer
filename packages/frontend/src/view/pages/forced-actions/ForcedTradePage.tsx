@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { ArrowDownIcon } from '../../assets/icons/ArrowIcon'
-import { Button } from '../../components/common/Button'
+import { Button, LinkButton } from '../../components/common/Button'
 import { Card } from '../../components/common/Card'
 import { Link } from '../../components/common/Link'
 import { OrderedList } from '../../components/common/OrderedList'
@@ -87,11 +87,13 @@ function ForcedTradePage(props: ForcedActionFormProps) {
               <Button className="w-full" id={FormId.SubmitButton}>
                 Create {label} offer
               </Button>
-              <Link href={`/user/${props.starkKey}`}>
-                <Button className="w-full" variant="outlined" type="button">
-                  Back to assets
-                </Button>
-              </Link>
+              <LinkButton
+                className="w-full"
+                variant="outlined"
+                href={`/user/${props.starkKey}`}
+              >
+                Back to assets
+              </LinkButton>
             </div>
           </form>
         </Card>

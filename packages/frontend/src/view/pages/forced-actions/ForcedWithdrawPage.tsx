@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button } from '../../components/common/Button'
+import { Button, LinkButton } from '../../components/common/Button'
 import { Card } from '../../components/common/Card'
 import { Link } from '../../components/common/Link'
 import { OrderedList } from '../../components/common/OrderedList'
@@ -76,11 +76,13 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
               <Button className="w-full" id={FormId.SubmitButton}>
                 Prepare for withdrawal
               </Button>
-              <Link href={`/user/${props.starkKey}`}>
-                <Button className="w-full" variant="outlined" type="button">
-                  Back to assets
-                </Button>
-              </Link>
+              <LinkButton
+                className="w-full"
+                variant="outlined"
+                href={`/user/${props.starkKey}`}
+              >
+                Back to assets
+              </LinkButton>
             </div>
           </form>
         </Card>
