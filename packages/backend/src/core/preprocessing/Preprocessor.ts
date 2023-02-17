@@ -127,17 +127,17 @@ export class Preprocessor<T extends AssetHash | AssetId> {
         }
 
         this.logger.info(`Preprocessing state update ${nextStateUpdate.id}`)
-        await this.historyPreprocessor.preprocessNextStateUpdate(
-          trx,
-          nextStateUpdate
-        )
-
         await this.preprocessedStateUpdateRepository.add(
           {
             stateUpdateId: nextStateUpdate.id,
             stateTransitionHash: nextStateUpdate.stateTransitionHash,
           },
           trx
+        )
+
+        await this.historyPreprocessor.preprocessNextStateUpdate(
+          trx,
+          nextStateUpdate
         )
 
         // END TRANSACTION
