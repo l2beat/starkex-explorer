@@ -21,7 +21,11 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
       You can only withdraw USDC, so to fully exit all funds you should first
       get rid of your synthetic assets by using the close functionality.
       (Perpetual only) This is achieved through a mechanism called forced
-      withdrawals, <Link href="https://google.com">link to docs</Link>.
+      withdrawals,{' '}
+      <Link href="https://docs.starkware.co/starkex/perpetual/perpetual-trading-forced-withdrawal-and-forced-trade.html#forced_withdrawal">
+        link to docs
+      </Link>
+      .
     </>,
     'After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of [system name] to process your request.',
     <>
@@ -59,7 +63,7 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
               <span>
                 <span className="text-sm text-zinc-500">Position</span>{' '}
                 <span className="font-semibold">
-                  {props.positionId.toString()}
+                  #{props.positionId.toString()}
                 </span>
               </span>
             </div>

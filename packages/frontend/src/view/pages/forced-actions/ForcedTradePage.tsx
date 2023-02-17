@@ -26,7 +26,10 @@ function ForcedTradePage(props: ForcedActionFormProps) {
         Once the offer is accepted you can submit a trade request.
       </span>{' '}
       This is achieved through a mechanism called forced trades,{' '}
-      <Link href="https://google.com">link to docs</Link>.
+      <Link href="https://docs.starkware.co/starkex/perpetual/perpetual-trading-forced-withdrawal-and-forced-trade.html#forced_withdrawal">
+        link to docs
+      </Link>
+      .
     </>,
     'After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the operators of [system name] to process your request. Once this is done the trade will be executed and the funds will be transferred between you and the counterparty.',
   ]
@@ -62,7 +65,7 @@ function ForcedTradePage(props: ForcedActionFormProps) {
               </span>
               <span>
                 <span className="text-sm text-zinc-500">Position</span>{' '}
-                <span className="font-semibold">11273</span>
+                <span className="font-semibold">#11273</span>
               </span>
             </div>
             <div className="flex flex-col gap-2">
