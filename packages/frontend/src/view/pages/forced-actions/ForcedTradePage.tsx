@@ -51,7 +51,7 @@ function ForcedTradePage(props: ForcedActionFormProps) {
           <span className="mt-6 text-sm font-semibold text-zinc-500">
             The trade process consists of four steps:
           </span>
-          <OrderedList items={instructions} className="mt-3 max-w-[438px]" />
+          <OrderedList items={instructions} className="mt-3 max-w-md" />
         </div>
         <Card className="h-min w-[480px]">
           <form
