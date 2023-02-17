@@ -31,7 +31,7 @@ const stateUpdate: StateUpdateRecord = {
 }
 
 const position1: PositionRecord & { stateUpdateId: number } = {
-  stateUpdateId: 2000,
+  stateUpdateId: 2_000,
   positionId: 10_001n,
   starkKey: StarkKey.fake(),
   collateralBalance: -144210511600n,
@@ -48,7 +48,7 @@ const position1: PositionRecord & { stateUpdateId: number } = {
 }
 
 const closingPosition: PositionRecord & { stateUpdateId: number } = {
-  stateUpdateId: 2000,
+  stateUpdateId: 2_000,
   positionId: 10_002n,
   starkKey: StarkKey(
     '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -58,18 +58,18 @@ const closingPosition: PositionRecord & { stateUpdateId: number } = {
 }
 
 const position2: PositionRecord & { stateUpdateId: number } = {
-  stateUpdateId: 2000,
+  stateUpdateId: 2_000,
   positionId: 10_003n,
   starkKey: StarkKey.fake(),
   collateralBalance: -74841147102n,
   balances: [
     {
       assetId: AssetId('ETH-9'),
-      balance: 28000000000n,
+      balance: 28_000_000_000n,
     },
     {
       assetId: AssetId('BTC-10'),
-      balance: 25000000000n,
+      balance: 25_000_000_000n,
     },
   ],
 }
@@ -212,7 +212,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
             {
               historyId: 80,
               stateUpdateId: 1940,
-              blockNumber: 9000_000,
+              blockNumber: 9_000_000,
               timestamp: Timestamp(900_000_000n),
               starkKey: position1.starkKey,
               positionOrVaultId: position1.positionId,
@@ -282,7 +282,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
                 // There was no history entry for this record:
                 {
                   assetHashOrId: AssetId('ETH-9'),
-                  balance: 47198000000n,
+                  balance: 47_198_000_000n,
                   blockNumber: stateUpdate.blockNumber,
                   positionOrVaultId: position1.positionId,
                   prevBalance: 0n,
@@ -296,7 +296,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
                 // There was a history entry for this record with no balance:
                 {
                   assetHashOrId: AssetId('BTC-10'),
-                  balance: -40000000000n,
+                  balance: -40_000_000_000n,
                   blockNumber: stateUpdate.blockNumber,
                   positionOrVaultId: position1.positionId,
                   prevBalance: 0n,
