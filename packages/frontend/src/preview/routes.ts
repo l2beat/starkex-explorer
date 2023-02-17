@@ -18,32 +18,6 @@ router.get('/', (ctx) => {
   ctx.body = renderHomePage({ title: 'foo', account })
 })
 
-//This is a route for an easier access to the specific forced actions page
-router.get('/forced/new/:page', (ctx) => {
-  if (ctx.params.page) {
-    switch (ctx.params.page) {
-      case 'withdraw': {
-        const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
-        withdrawData.account = getAccount(ctx) ?? withdrawData.account
-        ctx.body = renderForcedWithdrawPage(withdrawData)
-        break
-      }
-      case 'sell': {
-        const sellData = { ...DATA.FORCED_SELL_FORM_PROPS }
-        sellData.account = getAccount(ctx) ?? sellData.account
-        ctx.body = renderForcedTradePage(sellData)
-        break
-      }
-      case 'buy': {
-        const buyData = { ...DATA.FORCED_BUY_FORM_PROPS }
-        buyData.account = getAccount(ctx) ?? buyData.account
-        ctx.body = renderForcedTradePage(buyData)
-        break
-      }
-    }
-  }
-})
-
 router.get('/forced/new/:positionId/:assetId', (ctx) => {
   if (!ctx.params.positionId || !ctx.params.assetId) {
     return
@@ -68,6 +42,25 @@ router.get('/forced/new/:positionId/:assetId', (ctx) => {
 router.get('/user', (ctx) => {
   const account = getAccount(ctx)
   ctx.body = renderUserPage({ ...DATA.USER_PROPS, account })
+})
+
+//DEV ROUTES
+router.get('/dev/forced/new/withdraw', (ctx) => {
+  const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
+  withdrawData.account = getAccount(ctx) ?? withdrawData.account
+  ctx.body = renderForcedWithdrawPage(withdrawData)
+})
+
+router.get('/dev/forced/new/sell', (ctx) => {
+  const sellData = { ...DATA.FORCED_SELL_FORM_PROPS }
+  sellData.account = getAccount(ctx) ?? sellData.account
+  ctx.body = renderForcedTradePage(sellData)
+})
+
+router.get('/dev/forced/new/buy', (ctx) => {
+  const buyData = { ...DATA.FORCED_BUY_FORM_PROPS }
+  buyData.account = getAccount(ctx) ?? buyData.account
+  ctx.body = renderForcedTradePage(buyData)
 })
 
 function getAccount(ctx: Koa.Context) {
