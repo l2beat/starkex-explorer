@@ -8,7 +8,9 @@ import { FormId } from './ids'
 
 export function AmountInput(props: ForcedActionFormProps) {
   const assetInfo = assetToInfo(props.selectedAsset)
-  const balance = props.assets[0]?.balance
+  const balance = props.assets.find(
+    (asset) => asset.assetId === props.selectedAsset
+  )?.balance
   const sign = balance && balance < 0 ? '-' : ''
   const formattedBalance = formatCurrencyInput(balance, props.selectedAsset)
 
