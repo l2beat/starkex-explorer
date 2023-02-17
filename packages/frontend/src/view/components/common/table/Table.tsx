@@ -91,7 +91,7 @@ export function Table(props: TableProps) {
       </div>
       {props.rows.length > pageSize && (
         <div className="flex items-center justify-center pt-3">
-          <Button variant="OUTLINED">
+          <Button variant="outlined">
             View all {props.title.toLowerCase()}
           </Button>
         </div>

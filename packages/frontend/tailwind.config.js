@@ -3,7 +3,7 @@ module.exports = {
   content: ['./src/**/*.{html,ts,tsx}'],
   theme: {
     fontFamily: {
-      inter: ['Inter', 'sans-serif'],
+      sans: ['Inter', 'sans-serif'],
     },
     colors: {
       transparent: 'transparent',
@@ -20,7 +20,6 @@ module.exports = {
         800: '#222531',
       },
       slate: {
-        400: '#8D8CBD',
         800: '#2F3341',
       },
       neutral: {

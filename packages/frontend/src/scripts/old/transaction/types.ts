@@ -1,8 +1,8 @@
 import { AssetId } from '@explorer/types'
 
-import { PositionAssetEntry } from '../../view'
+import { PositionAssetEntry } from '../../../view'
 // eslint-disable-next-line no-restricted-imports
-import { TransactionFormProps } from '../../view/old/transaction-form'
+import { TransactionFormProps } from '../../../view/old/transaction-form'
 
 export interface FormState {
   props: TransactionFormProps
