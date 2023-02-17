@@ -1,4 +1,10 @@
-import { AssetId } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+} from '@explorer/types'
 
 export function formatCurrencyInput(
   value: bigint | undefined,
@@ -18,4 +24,18 @@ export function formatCurrencyInput(
     return integerPart + fractionPart
   }
   return '0.00'
+}
+
+export function formatHashLong(
+  hash: PedersenHash | StarkKey | Hash256 | AssetHash | string
+) {
+  const digits = hash.startsWith('0x') ? hash.slice(2) : hash.toString()
+  return '0x' + digits.toUpperCase()
+}
+
+export function formatHashShort(
+  hash: PedersenHash | StarkKey | Hash256 | AssetHash | string
+) {
+  const longHash = formatHashLong(hash)
+  return `${longHash.slice(0, 10)}…${longHash.slice(-8)}`
 }
