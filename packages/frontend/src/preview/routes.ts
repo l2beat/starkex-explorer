@@ -8,7 +8,7 @@ import {
   renderHomePage,
   renderUserPage,
 } from '../view'
-import { renderForcedTradePage } from '../view/pages/forcedactions/ForcedTradePage'
+import { renderForcedTradePage } from '../view/pages/forced-actions/ForcedTradePage'
 import * as DATA from './data'
 
 export const router = new Router()

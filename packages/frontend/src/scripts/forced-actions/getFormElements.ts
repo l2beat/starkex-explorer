@@ -1,4 +1,4 @@
-import { FormId } from '../../view/components/forcedaction/form/ids'
+import { FormId } from '../../view/components/forced-actions/form/ids'
 
 export type FormElements = ReturnType<typeof getFormElements>
 

@@ -1,26 +1,27 @@
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { assetToInfo } from '../../../../utils/assetUtils'
 import { formatCurrencyInput } from '../../../../utils/formatUtils'
-import { ForcedActionFormProps } from '../../../pages/forcedactions/ForcedActionFormProps'
+import { ForcedActionFormProps } from '../../../pages/forced-actions/ForcedActionFormProps'
 import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'
 
-export function AmountInput(props: ForcedActionFormProps) {
-  const assetInfo = assetToInfo(props.selectedAsset)
-  const balance = props.assets.find(
+export function PriceInput(props: ForcedActionFormProps) {
+  const usdcInfo = assetToInfo(AssetId.USDC)
+  const assetDetails = props.assets.find(
     (asset) => asset.assetId === props.selectedAsset
-  )?.balance
-  const sign = balance && balance < 0 ? '-' : ''
-  const formattedBalance = formatCurrencyInput(balance, props.selectedAsset)
+  )
+  const price = (assetDetails?.priceUSDCents ?? 0n) * 10000n
+  const priceFormatted = formatCurrencyInput(price, AssetId.USDC)
 
   return (
     <div className="flex gap-2">
       <div className="flex flex-1 flex-col">
-        <span className="text-sm text-zinc-500">Amount</span>
+        <span className="text-sm text-zinc-500">Price</span>
         <div>
           <input
-            id={FormId.AmountInput}
+            id={FormId.PriceInput}
             type="text"
             autoComplete="off"
             placeholder="0.00"
@@ -29,17 +30,16 @@ export function AmountInput(props: ForcedActionFormProps) {
         </div>
         <div
           id={FormId.AmountErrorView}
-          className="hidden text-sm font-medium text-red-500"
+          className="hidden font-medium text-red-500"
         >
           Amount too large
         </div>
       </div>
       <div className="flex flex-col items-end">
         <span className="text-sm text-zinc-500">
-          Balance: {sign}
-          {formattedBalance}
+          Market price: {priceFormatted}
         </span>
-        <AssetWithLogo assetInfo={assetInfo} />
+        <AssetWithLogo assetInfo={usdcInfo} />
       </div>
     </div>
   )

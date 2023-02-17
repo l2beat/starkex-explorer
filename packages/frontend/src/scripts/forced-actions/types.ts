@@ -1,5 +1,5 @@
 import { PositionAssetEntry } from '../../view'
-import { ForcedActionFormProps } from '../../view/pages/forcedactions/ForcedActionFormProps'
+import { ForcedActionFormProps } from '../../view/pages/forced-actions/ForcedActionFormProps'
 
 export interface FormState {
   props: ForcedActionFormProps

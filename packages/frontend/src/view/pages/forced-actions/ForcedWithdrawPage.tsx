@@ -5,9 +5,9 @@ import { Card } from '../../components/common/Card'
 import { Link } from '../../components/common/Link'
 import { OrderedList } from '../../components/common/OrderedList'
 import { Page } from '../../components/common/page/Page'
-import { ForcedActionCard } from '../../components/forcedaction/ForcedActionCard'
-import { AmountInput } from '../../components/forcedaction/form/AmountInput'
-import { FormId } from '../../components/forcedaction/form/ids'
+import { ForcedActionCard } from '../../components/forced-actions/ForcedActionCard'
+import { AmountInput } from '../../components/forced-actions/form/AmountInput'
+import { FormId } from '../../components/forced-actions/form/ids'
 import { reactToHtml } from '../../reactToHtml'
 import {
   ForcedActionFormProps,

@@ -1,6 +1,6 @@
 import { USE_NEW_DESIGN } from '../utils/constants'
 import { initCountdownTimer } from './countdownTimer'
-import { initForcedActionForm } from './forcedAction/forcedActionForm'
+import { initForcedActionForm } from './forced-actions/forcedActionForm'
 import { initImageFallback } from './imageFallback'
 import { initMetamask } from './metamask'
 import { initAcceptOfferForm } from './offer/acceptForm'

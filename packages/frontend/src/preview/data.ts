@@ -1,7 +1,7 @@
 import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
 import { UserPageProps } from '../view'
-import { ForcedActionFormProps } from '../view/pages/forcedactions/ForcedActionFormProps'
+import { ForcedActionFormProps } from '../view/pages/forced-actions/ForcedActionFormProps'
 
 export const USER_PROPS: UserPageProps = {
   account: undefined,
