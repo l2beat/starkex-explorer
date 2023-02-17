@@ -1,6 +1,7 @@
 import { AssetId, StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import {
   PositionRecord,
   PositionRepository,
@@ -18,7 +19,7 @@ import { HistoryPreprocessor } from './HistoryPreprocessor'
 
 export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
   constructor(
-    private readonly collateralAsset: { assetId: AssetId; price: bigint },
+    private readonly collateralAsset: CollateralAsset,
     protected preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<AssetId>,
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,

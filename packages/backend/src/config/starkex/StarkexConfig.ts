@@ -15,10 +15,7 @@ export interface PerpetualRollupConfig {
     proxy: EthereumAddress
     verifiers: EthereumAddress[]
   }
-  collateralAsset: {
-    assetId: AssetId
-    price: bigint
-  }
+  collateralAsset: CollateralAsset
 }
 
 export interface PerpetualValidiumConfig {
@@ -34,10 +31,7 @@ export interface PerpetualValidiumConfig {
   contracts: {
     perpetual: EthereumAddress
   }
-  collateralAsset: {
-    assetId: AssetId
-    price: bigint
-  }
+  collateralAsset: CollateralAsset
 }
 
 export interface SpotValidiumConfig {
@@ -62,4 +56,9 @@ export interface BlockchainConfig {
   syncBatchSize: number
   minBlockNumber: number
   maxBlockNumber: number
+}
+
+export interface CollateralAsset {
+  assetId: AssetId
+  price: bigint
 }
