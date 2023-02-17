@@ -79,7 +79,7 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
               <LinkButton
                 className="w-full"
                 variant="outlined"
-                href={`/user/${props.starkKey}`}
+                href={`/user/${props.starkKey.toString()}`}
               >
                 Back to assets
               </LinkButton>
