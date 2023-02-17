@@ -33,7 +33,11 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
   const propsJson = serializeForcedActionsFormProps(props)
 
   return (
-    <Page path="/forced" description="Description" account={props.account}>
+    <Page
+      path="/forced/new/:positionId/:assetId"
+      description="Page that allows user withdrawal of USDC"
+      account={props.account}
+    >
       <div className="my-auto flex gap-12">
         <div className="flex flex-col">
           <span className="text-2xl font-semibold">

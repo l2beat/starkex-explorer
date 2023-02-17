@@ -37,7 +37,11 @@ function ForcedTradePage(props: ForcedActionFormProps) {
   const propsJson = serializeForcedActionsFormProps(props)
 
   return (
-    <Page path="/forced" description="Description" account={props.account}>
+    <Page
+      path="/forced/new/:positionId/:assetId"
+      description="Page that allows user to buy or sell assets"
+      account={props.account}
+    >
       <div className="my-auto flex gap-12">
         <div className="flex flex-col">
           <span className="text-2xl font-semibold">Begin trade process</span>
