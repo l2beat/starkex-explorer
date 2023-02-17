@@ -44,18 +44,16 @@ export class PreprocessedAssetHistoryRepository<
     this.getCurrentByStarkKeyAndAssets = this.wrapGet(
       this.getCurrentByStarkKeyAndAssets
     )
-    this.getCurrentNonEmptyByStarkKey = this.wrapGet(
-      this.getCurrentNonEmptyByStarkKey
-    )
-    this.getCurrentNonEmptyByPositionOrVaultId = this.wrapGet(
-      this.getCurrentNonEmptyByPositionOrVaultId
+    this.getCurrentByStarkKey = this.wrapGet(this.getCurrentByStarkKey)
+    this.getCurrentByPositionOrVaultId = this.wrapGet(
+      this.getCurrentByPositionOrVaultId
     )
     this.setAsCurrentByHistoryId = this.wrapUpdate(this.setAsCurrentByHistoryId)
     this.unsetCurrentByStarkKeyAndAsset = this.wrapUpdate(
       this.unsetCurrentByStarkKeyAndAsset
     )
-    this.getPrevHistoryIdOfCurrentWithStateUpdateId = this.wrapGet(
-      this.getPrevHistoryIdOfCurrentWithStateUpdateId
+    this.getPrevHistoryByStateUpdateId = this.wrapGet(
+      this.getPrevHistoryByStateUpdateId
     )
     this.deleteAll = this.wrapDelete(this.deleteAll)
 
@@ -102,33 +100,26 @@ export class PreprocessedAssetHistoryRepository<
     return knex('preprocessed_asset_history').where('id', historyId).delete()
   }
 
-  async getCurrentNonEmptyByStarkKey(
-    starkKey: StarkKey,
-    trx: Knex.Transaction
-  ) {
+  async getCurrentByStarkKey(starkKey: StarkKey, trx: Knex.Transaction) {
     const knex = await this.knex(trx)
-    const rows = await knex('preprocessed_asset_history')
-      .where({
-        stark_key: starkKey.toString(),
-        is_current: true,
-      })
-      .andWhere('balance', '!=', 0)
+    const rows = await knex('preprocessed_asset_history').where({
+      stark_key: starkKey.toString(),
+      is_current: true,
+    })
     return rows.map((r) =>
       toPreprocessedAssetHistoryRecord(r, this.toAssetType)
     )
   }
 
-  async getCurrentNonEmptyByPositionOrVaultId(
+  async getCurrentByPositionOrVaultId(
     positionOrVaultId: bigint,
     trx: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
-    const rows = await knex('preprocessed_asset_history')
-      .where({
-        position_or_vault_id: positionOrVaultId,
-        is_current: true,
-      })
-      .andWhere('balance', '!=', 0)
+    const rows = await knex('preprocessed_asset_history').where({
+      position_or_vault_id: positionOrVaultId,
+      is_current: true,
+    })
     return rows.map((r) =>
       toPreprocessedAssetHistoryRecord(r, this.toAssetType)
     )
@@ -182,7 +173,7 @@ export class PreprocessedAssetHistoryRepository<
     return updates
   }
 
-  async getPrevHistoryIdOfCurrentWithStateUpdateId(
+  async getPrevHistoryByStateUpdateId(
     stateUpdateId: number,
     trx: Knex.Transaction
   ): Promise<
@@ -191,10 +182,7 @@ export class PreprocessedAssetHistoryRepository<
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history')
       .select('id', 'prev_history_id')
-      .where({
-        state_update_id: stateUpdateId,
-        is_current: true,
-      })
+      .where('state_update_id', stateUpdateId)
 
     return rows.map((row) => ({
       historyId: row.id,

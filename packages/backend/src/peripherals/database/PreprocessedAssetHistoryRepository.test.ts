@@ -1,4 +1,4 @@
-import { AssetHash, StarkKey, Timestamp } from '@explorer/types'
+import { AssetHash, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 import { Knex } from 'knex'
 
@@ -8,6 +8,7 @@ import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from './PreprocessedAssetHistoryRepository'
+import { PreprocessedStateUpdateRepository } from './PreprocessedStateUpdateRepository'
 
 const genericRecord: Omit<PreprocessedAssetHistoryRecord, 'historyId'> = {
   stateUpdateId: 1900,
@@ -33,10 +34,36 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     AssetHash,
     new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
   )
+  const preprocessedStateUpdateRepository =
+    new PreprocessedStateUpdateRepository(database, Logger.SILENT)
 
   beforeEach(async () => {
     const knex = await database.getKnex()
     trx = await knex.transaction()
+    // adding records to preprocessed_asset_history table
+    // to satisfy foreign key constraint of state_update_id
+    await preprocessedStateUpdateRepository.deleteAll(trx)
+    await preprocessedStateUpdateRepository.add(
+      {
+        stateUpdateId: 1900,
+        stateTransitionHash: Hash256.fake('1900'),
+      },
+      trx
+    )
+    await preprocessedStateUpdateRepository.add(
+      {
+        stateUpdateId: 100,
+        stateTransitionHash: Hash256.fake('1900'),
+      },
+      trx
+    )
+    await preprocessedStateUpdateRepository.add(
+      {
+        stateUpdateId: 200,
+        stateTransitionHash: Hash256.fake('1900'),
+      },
+      trx
+    )
     await repository.deleteAll(trx)
   })
 
@@ -55,13 +82,14 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     expect(recordAfterDelete).toEqual(undefined)
   })
 
-  it('gets current non-empty records by stark key', async () => {
+  it('gets current records by stark key', async () => {
     const starkKey = StarkKey.fake('1')
 
     // This record should be returned (balance > 0, isCurrent = true)
     await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
         starkKey,
         positionOrVaultId: 100n,
         balance: 100_000_000n,
@@ -73,6 +101,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
         starkKey,
         positionOrVaultId: 101n,
         balance: 200_000_000n,
@@ -80,14 +109,15 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       },
       trx
     )
-    // This records should be ignored (balance = 0, isCurrent = true)
+    // This records should be ignored (balance = 0, isCurrent = false)
     await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('3'),
         starkKey,
         positionOrVaultId: 102n,
         balance: 0n,
-        isCurrent: true,
+        isCurrent: false,
       },
       trx
     )
@@ -95,6 +125,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('4'),
         starkKey,
         positionOrVaultId: 103n,
         balance: 200_000_000n,
@@ -106,6 +137,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('5'),
         starkKey: StarkKey.fake('2'),
         positionOrVaultId: 104n,
         balance: 300_000_000n,
@@ -114,7 +146,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
 
-    const records = await repository.getCurrentNonEmptyByStarkKey(starkKey, trx)
+    const records = await repository.getCurrentByStarkKey(starkKey, trx)
     expect(records.map((r) => r.positionOrVaultId).sort()).toEqual([100n, 101n])
   })
 
@@ -124,6 +156,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const historyId1 = await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
         starkKey,
         balance: 100_000_000n,
         isCurrent: true,
@@ -133,26 +166,28 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const historyId2 = await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
         starkKey,
         balance: 200_000_000n,
         isCurrent: true,
       },
       trx
     )
-    let records = await repository.getCurrentNonEmptyByStarkKey(starkKey, trx)
+    let records = await repository.getCurrentByStarkKey(starkKey, trx)
     expect(records.length).toEqual(2)
 
     await repository.deleteByHistoryId(historyId1, trx)
 
-    records = await repository.getCurrentNonEmptyByStarkKey(starkKey, trx)
+    records = await repository.getCurrentByStarkKey(starkKey, trx)
     expect(records.length).toEqual(1)
     expect(records[0]?.historyId).toEqual(historyId2)
   })
 
-  it('gets current non-empty records by position or vault id', async () => {
-    const id = await repository.add(
+  it('gets current records by position or vault id', async () => {
+    const id1 = await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
         positionOrVaultId: 100n,
         balance: 100_000_000n,
         isCurrent: true,
@@ -162,19 +197,21 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
         positionOrVaultId: 101n, // different position so should not be returned
         balance: 200_000_000n,
         isCurrent: true,
       },
       trx
     )
-    // ignored because balance == 0
+    // ignored because isCurrent = false (and balance = 0)
     await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('3'),
         positionOrVaultId: 100n,
         balance: 0n,
-        isCurrent: true,
+        isCurrent: false,
       },
       trx
     )
@@ -182,6 +219,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('4'),
         positionOrVaultId: 100n,
         balance: 200_000_000n,
         isCurrent: false,
@@ -189,18 +227,16 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
 
-    const records = await repository.getCurrentNonEmptyByPositionOrVaultId(
-      100n,
-      trx
-    )
-    expect(records.map((r) => r.historyId)).toEqual([id])
+    const records = await repository.getCurrentByPositionOrVaultId(100n, trx)
+    expect(records.map((r) => r.historyId)).toEqual([id1])
   })
 
-  it('gets current (even empty) records by stark key and asset hashes', async () => {
+  it('gets current records by stark key and asset hashes', async () => {
     const starkKey = StarkKey.fake('a')
     const assetHash1 = AssetHash.fake('1')
     const assetHash2 = AssetHash.fake('2')
     const assetHash3 = AssetHash.fake('3')
+    const assetHash4 = AssetHash.fake('4')
 
     await repository.add(
       {
@@ -224,14 +260,15 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       },
       trx
     )
+    // This records should be ignored (isCurrent = false)
     await repository.add(
       {
         ...genericRecord,
         starkKey,
-        assetHashOrId: assetHash2,
+        assetHashOrId: assetHash3,
         positionOrVaultId: 102n,
-        balance: 0n, // This record should be returned (even when balance = 0)
-        isCurrent: true,
+        balance: 0n,
+        isCurrent: false,
       },
       trx
     )
@@ -264,7 +301,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       {
         ...genericRecord,
         starkKey: StarkKey.fake('2'),
-        assetHashOrId: assetHash3,
+        assetHashOrId: assetHash4,
         positionOrVaultId: 105n,
         balance: 300_000_000n,
         isCurrent: true,
@@ -274,20 +311,17 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
 
     const records = await repository.getCurrentByStarkKeyAndAssets(
       starkKey,
-      [assetHash1, assetHash2, assetHash3],
+      [assetHash1, assetHash2, assetHash3, assetHash4],
       trx
     )
-    expect(records.map((r) => r.positionOrVaultId).sort()).toEqual([
-      100n,
-      101n,
-      102n,
-    ])
+    expect(records.map((r) => r.positionOrVaultId).sort()).toEqual([100n, 101n])
   })
 
   it('sets isCurrent to true by history id', async () => {
     const id1 = await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
         isCurrent: false,
       },
       trx
@@ -295,6 +329,8 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const id2 = await repository.add(
       {
         ...genericRecord,
+        starkKey: StarkKey.fake('002fa'),
+        assetHashOrId: AssetHash.fake('2'),
         isCurrent: false,
       },
       trx
@@ -327,7 +363,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const id2 = await repository.add(
       {
         ...genericRecord,
-        assetHashOrId: assetHash2,
+        assetHashOrId: assetHash2, // different asset
         starkKey,
         positionOrVaultId: 101n,
         balance: 200_000_000n,
@@ -338,21 +374,10 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const id3 = await repository.add(
       {
         ...genericRecord,
-        starkKey,
-        assetHashOrId: assetHash2,
-        positionOrVaultId: 102n,
-        balance: 0n,
-        isCurrent: true,
-      },
-      trx
-    )
-    const id4 = await repository.add(
-      {
-        ...genericRecord,
         starkKey: StarkKey.fake('000fa'), // different stark key
         assetHashOrId: assetHash2, // same asset
         positionOrVaultId: 102n,
-        balance: 0n,
+        balance: 300_000_000n,
         isCurrent: true,
       },
       trx
@@ -363,17 +388,16 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const record1 = await repository.findByHistoryId(id1, trx)
     const record2 = await repository.findByHistoryId(id2, trx)
     const record3 = await repository.findByHistoryId(id3, trx)
-    const record4 = await repository.findByHistoryId(id4, trx)
     expect(record1?.isCurrent).toEqual(true)
     expect(record2?.isCurrent).toEqual(false)
-    expect(record3?.isCurrent).toEqual(false)
-    expect(record4?.isCurrent).toEqual(true)
+    expect(record3?.isCurrent).toEqual(true)
   })
 
   it('returns prevHistoryId of all records from a given state update', async () => {
     const id1 = await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
         stateUpdateId: 100,
         isCurrent: true,
         prevHistoryId: 100,
@@ -383,6 +407,9 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const id2 = await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
+        positionOrVaultId: 501n,
+        starkKey: StarkKey.fake('a1'),
         stateUpdateId: 100,
         isCurrent: true,
         prevHistoryId: 101,
@@ -392,39 +419,51 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const id3 = await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
+        positionOrVaultId: 502n,
+        starkKey: StarkKey.fake('a2'),
         stateUpdateId: 100,
         isCurrent: true,
-        prevHistoryId: undefined, // should still be returned because id is used
+        prevHistoryId: undefined, // should be returned, prevHistoryId is irrelevant
       },
       trx
     )
-    await repository.add(
+    const id4 = await repository.add(
       {
         ...genericRecord,
+        assetHashOrId: AssetHash.fake('3'),
+        positionOrVaultId: 503n,
+        starkKey: StarkKey.fake('a3'),
         stateUpdateId: 100,
-        isCurrent: false, // record should be ignored
-        prevHistoryId: 102,
-      },
-      trx
-    )
-    await repository.add(
-      {
-        ...genericRecord,
-        stateUpdateId: 200, // different id, ignored
-        isCurrent: true,
+        isCurrent: false, // record should still be returned
         prevHistoryId: 103,
       },
       trx
     )
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('4'),
+        positionOrVaultId: 504n,
+        starkKey: StarkKey.fake('a4'),
+        stateUpdateId: 200, // different state update id, ignored
+        isCurrent: true,
+        prevHistoryId: 104,
+      },
+      trx
+    )
 
-    const prevHistoryIds =
-      await repository.getPrevHistoryIdOfCurrentWithStateUpdateId(100, trx)
+    const prevHistoryIds = await repository.getPrevHistoryByStateUpdateId(
+      100,
+      trx
+    )
     expect(prevHistoryIds.map((r) => r.historyId).sort()).toEqual(
-      [id1, id2, id3].sort()
+      [id1, id2, id3, id4].sort()
     )
     expect(prevHistoryIds.map((r) => r.prevHistoryId).sort()).toEqual([
       100,
       101,
+      103,
       undefined,
     ])
   })

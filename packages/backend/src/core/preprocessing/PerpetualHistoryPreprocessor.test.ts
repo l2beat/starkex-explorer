@@ -217,7 +217,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
               starkKey: position1.starkKey,
               positionOrVaultId: position1.positionId,
               assetHashOrId: AssetId('BTC-10'),
-              balance: 0n,
+              balance: 600_000n,
               prevBalance: 700_000n,
               price: 345_678n,
               prevPrice: undefined,
@@ -234,10 +234,10 @@ describe(PerpetualHistoryPreprocessor.name, () => {
           mock<PositionRepository>(),
           Logger.SILENT
         )
-        const mockAddNewRecordsAndMakeThemCurrent =
+        const mockAddNewRecordsAndUpdateIsCurrent =
           mockFn().resolvesTo(undefined)
-        perpetualHistoryPreprocessor.addNewRecordsAndMakeThemCurrent =
-          mockAddNewRecordsAndMakeThemCurrent
+        perpetualHistoryPreprocessor.addNewRecordsAndUpdateIsCurrent =
+          mockAddNewRecordsAndUpdateIsCurrent
 
         await perpetualHistoryPreprocessor.preprocessSinglePosition(
           trx,
@@ -260,7 +260,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
           ],
         ])
 
-        expect(mockAddNewRecordsAndMakeThemCurrent).toHaveBeenCalledExactlyWith(
+        expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenCalledExactlyWith(
           [
             [
               trx,
@@ -293,13 +293,13 @@ describe(PerpetualHistoryPreprocessor.name, () => {
                   stateUpdateId: stateUpdate.id,
                   timestamp: stateUpdate.timestamp,
                 },
-                // There was a history entry for this record with no balance:
+                // There was a history entry for this record:
                 {
                   assetHashOrId: AssetId('BTC-10'),
                   balance: -40_000_000_000n,
                   blockNumber: stateUpdate.blockNumber,
                   positionOrVaultId: position1.positionId,
-                  prevBalance: 0n,
+                  prevBalance: 600_000n,
                   prevHistoryId: 80,
                   prevPrice: 345_678n,
                   price: 456_789n,

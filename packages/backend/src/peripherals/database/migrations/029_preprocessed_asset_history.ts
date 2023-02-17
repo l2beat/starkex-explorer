@@ -16,7 +16,11 @@ import { Knex } from 'knex'
 export async function up(knex: Knex) {
   await knex.schema.createTable('preprocessed_asset_history', (table) => {
     table.increments('id').primary()
-    table.integer('state_update_id').notNullable()
+    table
+      .integer('state_update_id')
+      .notNullable()
+      .references('state_update_id')
+      .inTable('preprocessed_state_updates')
     table.integer('block_number').notNullable()
     table.bigInteger('timestamp').notNullable()
     table.string('stark_key').notNullable()
@@ -28,28 +32,29 @@ export async function up(knex: Knex) {
     table.bigInteger('prev_price')
     table.boolean('is_current').notNullable()
     table.integer('prev_history_id')
-    // TODO: removing self-referential FK for now, because it's slowing queries significantly
     // .references('id')
     // .inTable('preprocessed_asset_history')
+    // ^^ Not self-referencing, because it makes queries much slower
+    // and testing difficult.
 
     // Index for efficiently querying the current state of an account
     // (i.e. current snapshot represented by is_current=true)
-    // 'balance' is included due to frequent 'balance != 0' queries
-    table.index(['stark_key', 'balance', 'asset_hash_or_id'], undefined, {
+    // It also adds a unique constraint, as we don't expect to
+    // have the same asset in multiple vaults/positions
+    // for the same user at the same time.
+    table.unique(['stark_key', 'asset_hash_or_id'], {
       predicate: knex.whereRaw('is_current = true'),
     })
     // Index for efficiently finding records by current position or vault id
-    // - this happens when a position is deleted and stark key is ZERO.
+    // - this is needed when a position is deleted and stark key is ZERO.
     table.index(['position_or_vault_id'], undefined, {
-      predicate: knex.whereRaw('is_current = true AND balance != 0'),
+      predicate: knex.whereRaw('is_current = true'),
     })
-    // Index for efficiently querying history of given use,
+    // Index for efficiently querying history of a given user,
     // *ordered* by timestamp descending.
     table.index(['stark_key', 'timestamp'])
     // Index used on rollback to find the previous state update id
-    table.index(['state_update_id'], undefined, {
-      predicate: knex.whereRaw('is_current = true'),
-    })
+    table.index(['state_update_id'])
   })
 }
 

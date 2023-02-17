@@ -55,7 +55,7 @@ export class SpotHistoryPreprocessor extends HistoryPreprocessor<AssetHash> {
             prevBalance: currentRecord?.balance ?? 0n,
             prevHistoryId: currentRecord?.historyId,
           }
-          await this.addNewRecordsAndMakeThemCurrent(trx, [newRecord])
+          await this.addNewRecordsAndUpdateIsCurrent(trx, [newRecord])
         }
       }
     }

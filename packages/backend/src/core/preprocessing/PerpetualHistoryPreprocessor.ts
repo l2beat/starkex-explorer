@@ -120,7 +120,7 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
         })
       }
     })
-    await this.addNewRecordsAndMakeThemCurrent(trx, newRecords)
+    await this.addNewRecordsAndUpdateIsCurrent(trx, newRecords)
   }
 
   async getAssetPricesForStateUpdate(

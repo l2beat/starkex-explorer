@@ -31,7 +31,7 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
     assetPrices: Record<string, bigint>
   ) {
     const recordsToClose =
-      await this.preprocessedAssetHistoryRepository.getCurrentNonEmptyByPositionOrVaultId(
+      await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
         positionId,
         trx
       )
@@ -54,30 +54,34 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
         prevPrice: record.price,
         prevHistoryId: record.historyId,
       }))
-      await this.addNewRecordsAndMakeThemCurrent(trx, newRecords)
+      await this.addNewRecordsAndUpdateIsCurrent(trx, newRecords)
     }
   }
 
-  async addNewRecordsAndMakeThemCurrent(
+  async addNewRecordsAndUpdateIsCurrent(
     trx: Knex.Transaction,
     newRecords: Omit<
       PreprocessedAssetHistoryRecord,
       'historyId' | 'isCurrent'
     >[]
   ) {
-    // NOTICE:
-    // We're using a for loop here, because this call:
-    // await this.preprocessedAssetHistoryRepository.addMany(newRecords, trx)
-    // doesn't respect transaction(!!!!):
-
     for (const record of newRecords) {
       await this.preprocessedAssetHistoryRepository.unsetCurrentByStarkKeyAndAsset(
         record.starkKey,
         record.assetHashOrId,
         trx
       )
+
+      // We want to set isCurrent to false for records that bring asset balance
+      // down to 0. We have no guarantee that when the user deposits
+      // the same asset again in the future, it will come to the same vault.
+      // So we don't want then to connect prevHistoryId to the current closed
+      // record.
       const recordAsCurrent: Omit<PreprocessedAssetHistoryRecord, 'historyId'> =
-        { ...record, isCurrent: true }
+        {
+          ...record,
+          isCurrent: record.balance !== 0n,
+        }
       await this.preprocessedAssetHistoryRepository.add(recordAsCurrent, trx)
     }
   }
@@ -87,7 +91,9 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
     lastProcessedStateUpdateId: number
   ) {
     const recordsToRollback =
-      await this.preprocessedAssetHistoryRepository.getPrevHistoryIdOfCurrentWithStateUpdateId(
+      // We need to fetch all records for stateUpdateId, even those that
+      // have isCurrent = false (this can happen when balance is set to 0).
+      await this.preprocessedAssetHistoryRepository.getPrevHistoryByStateUpdateId(
         lastProcessedStateUpdateId,
         trx
       )
@@ -98,6 +104,9 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
         trx
       )
       if (record.prevHistoryId !== undefined) {
+        // Notice that when rolling back a closed vault (with balance 0 and
+        // isCurrent=false) this call will "resurrect" the previous non-empty
+        // record and mark it as current, which is exactly what we want.
         await this.preprocessedAssetHistoryRepository.setAsCurrentByHistoryId(
           record.prevHistoryId,
           trx

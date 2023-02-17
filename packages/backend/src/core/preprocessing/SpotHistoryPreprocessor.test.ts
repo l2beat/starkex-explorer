@@ -102,10 +102,10 @@ describe(SpotHistoryPreprocessor.name, () => {
         )
         const mockClosePositionOrVault = mockFn().resolvesTo(undefined)
         spotHistoryPreprocessor.closePositionOrVault = mockClosePositionOrVault
-        const mockAddNewRecordsAndMakeThemCurrent =
+        const mockAddNewRecordsAndUpdateIsCurrent =
           mockFn().resolvesTo(undefined)
-        spotHistoryPreprocessor.addNewRecordsAndMakeThemCurrent =
-          mockAddNewRecordsAndMakeThemCurrent
+        spotHistoryPreprocessor.addNewRecordsAndUpdateIsCurrent =
+          mockAddNewRecordsAndUpdateIsCurrent
 
         await spotHistoryPreprocessor.preprocessNextStateUpdate(
           trx,
@@ -115,7 +115,7 @@ describe(SpotHistoryPreprocessor.name, () => {
         expect(mockClosePositionOrVault).toHaveBeenCalledExactlyWith([
           [trx, closingVault.vaultId, stateUpdate, {}],
         ])
-        expect(mockAddNewRecordsAndMakeThemCurrent).toHaveBeenCalledExactlyWith(
+        expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenCalledExactlyWith(
           [
             [
               trx,
