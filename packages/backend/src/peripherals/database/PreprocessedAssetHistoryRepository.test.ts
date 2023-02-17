@@ -47,11 +47,11 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
   it('adds, finds and deletes asset history record', async () => {
     const id = await repository.add(genericRecord, trx)
 
-    const record = await repository.findById(id, trx)
+    const record = await repository.findByHistoryId(id, trx)
     expect(record).toEqual({ ...genericRecord, historyId: id })
 
     await repository.deleteByHistoryId(id, trx)
-    const recordAfterDelete = await repository.findById(id, trx)
+    const recordAfterDelete = await repository.findByHistoryId(id, trx)
     expect(recordAfterDelete).toEqual(undefined)
   })
 
@@ -302,8 +302,8 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
 
     await repository.setAsCurrentByHistoryId(id1, trx)
 
-    const record1 = await repository.findById(id1, trx)
-    const record2 = await repository.findById(id2, trx)
+    const record1 = await repository.findByHistoryId(id1, trx)
+    const record2 = await repository.findByHistoryId(id2, trx)
     expect(record1?.isCurrent).toEqual(true)
     expect(record2?.isCurrent).toEqual(false)
   })
@@ -360,10 +360,10 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
 
     await repository.unsetCurrentByStarkKeyAndAsset(starkKey, assetHash2, trx)
 
-    const record1 = await repository.findById(id1, trx)
-    const record2 = await repository.findById(id2, trx)
-    const record3 = await repository.findById(id3, trx)
-    const record4 = await repository.findById(id4, trx)
+    const record1 = await repository.findByHistoryId(id1, trx)
+    const record2 = await repository.findByHistoryId(id2, trx)
+    const record3 = await repository.findByHistoryId(id3, trx)
+    const record4 = await repository.findByHistoryId(id4, trx)
     expect(record1?.isCurrent).toEqual(true)
     expect(record2?.isCurrent).toEqual(false)
     expect(record3?.isCurrent).toEqual(false)

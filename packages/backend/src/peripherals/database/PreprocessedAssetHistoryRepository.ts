@@ -39,7 +39,7 @@ export class PreprocessedAssetHistoryRepository<
 
     this.add = this.wrapAdd(this.add)
     this.addMany = this.wrapAddMany(this.addMany)
-    this.findById = this.wrapFind(this.findById)
+    this.findByHistoryId = this.wrapFind(this.findByHistoryId)
     this.deleteByHistoryId = this.wrapDelete(this.deleteByHistoryId)
     this.getCurrentByStarkKeyAndAssets = this.wrapGet(
       this.getCurrentByStarkKeyAndAssets
@@ -79,7 +79,7 @@ export class PreprocessedAssetHistoryRepository<
     trx: Knex.Transaction
   ) {
     throw new Error(
-      "This method doesn't respect trascation! Don't use until reviewed!"
+      "This method doesn't respect transaction! Don't use until reviewed!"
     )
     const knex = await this.knex(trx)
     const ids = await knex('preprocessed_asset_history')
@@ -88,7 +88,7 @@ export class PreprocessedAssetHistoryRepository<
     return ids.map((x) => x.id)
   }
 
-  async findById(
+  async findByHistoryId(
     id: number,
     trx: Knex.Transaction
   ): Promise<PreprocessedAssetHistoryRecord | undefined> {
