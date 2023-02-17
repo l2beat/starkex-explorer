@@ -21,13 +21,13 @@ function ForcedTradePage(props: ForcedActionFormProps) {
   const instructions = [
     'You create a trade offer using this form. This is fully off-chain and does not require any gas fees.',
     'The trade offer will now be visible to all users of the system. You should seek out another user to accept the offer and become a counterparty to the trade. Accepting the offer is also fully off-chain and does not require any gas fees.',
-    <span>
+    <>
       <span className="text-yellow-300">
         Once the offer is accepted you can submit a trade request.
       </span>{' '}
       This is achieved through a mechanism called forced trades,{' '}
       <Link href="https://google.com">link to docs</Link>.
-    </span>,
+    </>,
     'After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the operators of [system name] to process your request. Once this is done the trade will be executed and the funds will be transferred between you and the counterparty.',
   ]
   const selectedAssetBalance =

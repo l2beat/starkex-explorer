@@ -16,19 +16,19 @@ import {
 
 function ForcedWithdrawPage(props: ForcedActionFormProps) {
   const instructions = [
-    <span>
+    <>
       Using this form you request a withdrawal of your funds. (Perpetual only)
       You can only withdraw USDC, so to fully exit all funds you should first
       get rid of your synthetic assets by using the close functionality.
       (Perpetual only) This is achieved through a mechanism called forced
       withdrawals, <Link href="https://google.com">link to docs</Link>.
-    </span>,
+    </>,
     'After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of [system name] to process your request.',
-    <span>
+    <>
       Once your request has been processed the status will change to{' '}
       <span className="text-yellow-300">’processed’</span> and you will be able
       to withdraw your funds by submitting a withdrawal transaction.
-    </span>,
+    </>,
   ]
   const propsJson = serializeForcedActionsFormProps(props)
 
