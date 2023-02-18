@@ -10,7 +10,7 @@ export function randomTimestamp(): Timestamp {
 }
 
 export function randomId(): string {
-  return Math.floor(Math.random() * 12_000).toString()
+  return Math.floor(Math.random() * 12_000 + 1).toString()
 }
 
 export function randomInt(min: number, max: number) {

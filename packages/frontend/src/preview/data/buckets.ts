@@ -45,3 +45,12 @@ export const amountBucket = new Bucket([
   25_683_230_000_000n,
   94_521_020n,
 ])
+
+export const changeBucket = new Bucket([
+  32_000_000_000_000n,
+  500_000_000n,
+  -7_123_456_789n,
+  -25_683_230_000_000n,
+  -94_521_020n,
+  0n,
+])

@@ -2,28 +2,43 @@ import { AssetId } from '@explorer/types'
 
 import { Asset } from '../assets'
 
-export function formatAmount(asset: Asset, amount: bigint, prefix?: string) {
+export interface FormatOptions {
+  prefix?: string
+  suffix?: string
+  signed?: boolean
+}
+
+export function formatAmount(
+  asset: Asset,
+  amount: bigint,
+  options?: FormatOptions
+) {
   if (AssetId.check(asset.hashOrId)) {
-    return formatWithDecimals(amount, AssetId.decimals(asset.hashOrId), prefix)
+    return formatWithDecimals(amount, AssetId.decimals(asset.hashOrId), options)
   } else if (asset.details) {
-    return formatWithQuantum(amount, asset.details.quantum, prefix)
+    return formatWithQuantum(amount, asset.details.quantum, options)
   } else {
-    return formatWithDecimals(amount, 0, prefix)
+    return formatWithDecimals(amount, 0, options)
   }
 }
 
 export function formatWithDecimals(
   amount: bigint,
   decimals: number,
-  prefix = ''
+  options?: FormatOptions
 ): string {
   if (amount < 0n) {
-    return '-' + formatWithDecimals(-amount, decimals, prefix)
+    return (
+      '-' + formatWithDecimals(-amount, decimals, { ...options, signed: false })
+    )
   }
   const one = 10n ** BigInt(decimals)
   const intPart = formatInt(amount / one)
   const fractionPart = formatFraction(amount % one, decimals)
-  return `${prefix}${intPart}${fractionPart}`
+
+  const core = `${intPart}${fractionPart}`
+  const sign = options?.signed && amount > 0n ? '+' : ''
+  return `${options?.prefix ?? ''}${sign}${core}${options?.suffix ?? ''}`
 }
 
 export function formatInt(int: bigint | number) {
@@ -42,13 +57,13 @@ function formatFraction(fraction: bigint, decimals: number): string {
 export function formatWithQuantum(
   amount: bigint,
   quantum: bigint,
-  prefix?: string
+  options?: FormatOptions
 ): string {
   const decimals = quantumToDecimals(quantum)
   if (decimals) {
-    return formatWithDecimals(amount, decimals, prefix)
+    return formatWithDecimals(amount, decimals, options)
   }
-  return formatWithDecimals((amount * 1000n) / quantum, 3, prefix)
+  return formatWithDecimals((amount * 1000n) / quantum, 3, options)
 }
 
 export function quantumToDecimals(quantum: bigint) {

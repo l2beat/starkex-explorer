@@ -26,12 +26,12 @@ export function TableWithPagination(props: TableWithPaginationProps) {
         <p className="text-sm font-medium text-zinc-500">
           {props.visible !== 0 ? (
             <>
-              You are viewing {start}-{end} out of {total}{' '}
+              You're viewing {start}-{end} out of {total}{' '}
               {props.entryShortNamePlural}
             </>
           ) : (
             <>
-              You are viewing 0 out of {total} {props.entryShortNamePlural}
+              You're viewing 0 out of {total} {props.entryShortNamePlural}
             </>
           )}
         </p>

@@ -19,7 +19,7 @@ export function TablePreview(props: TablePreviewProps) {
       <div className="mb-5 flex items-baseline justify-between">
         <h2 className="text-xl font-semibold">{props.title}</h2>
         <p className="text-sm font-medium text-zinc-500">
-          You are viewing {formatInt(props.visible)} out of{' '}
+          You're viewing {formatInt(props.visible)} out of{' '}
           <a className="text-blue-600 underline" href={props.link}>
             {formatInt(props.total)}
           </a>{' '}

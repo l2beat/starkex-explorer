@@ -8,6 +8,7 @@ import {
   renderHomeForcedTransactionPage,
   renderHomeOfferPage,
   renderHomePage,
+  renderUserPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
 import { renderForcedTradePage } from '../view/pages/forced-actions/ForcedTradePage'
@@ -19,6 +20,7 @@ import {
   randomHomeOfferEntry,
   randomHomeStateUpdateEntry,
 } from './data/home'
+import { randomUserBalanceChangeEntry } from './data/user'
 import { repeat } from './data/utils'
 
 export const router = new Router()
@@ -48,11 +50,11 @@ const routes: Route[] = [
         user,
         tutorials: [],
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
-        stateUpdateTotal: 5123,
+        totalStateUpdate: 5123,
         forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
-        forcedTransactionTotal: 68,
+        totalForcedTransaction: 68,
         offers: repeat(6, randomHomeOfferEntry),
-        offerTotal: 7,
+        totalOffers: 7,
       })
     },
   },
@@ -132,7 +134,25 @@ const routes: Route[] = [
   {
     path: '/user/someone',
     description: 'Someone else’s user page.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderUserPage({
+        user,
+        type: 'PERPETUAL',
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        withdrawableAssets: [],
+        offersToAccept: [],
+        assets: [],
+        totalAssets: 0,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        ethereumTransactions: [],
+        totalEthereumTransactions: 0,
+        offers: [],
+        totalOffers: 0,
+      })
+    },
   },
   {
     path: '/user/me/unknown',

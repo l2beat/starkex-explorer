@@ -27,11 +27,11 @@ export interface HomePageProps {
   // TODO: statistics
   tutorials: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
-  stateUpdateTotal: number
+  totalStateUpdate: number
   forcedTransactions: HomeForcedTransactionEntry[]
-  forcedTransactionTotal: number
+  totalForcedTransaction: number
   offers: HomeOfferEntry[]
-  offerTotal: number
+  totalOffers: number
 }
 
 export interface HomeTutorialEntry {
@@ -56,14 +56,14 @@ function HomePage(props: HomePageProps) {
         <TablePreview
           {...STATE_UPDATE_TABLE_PROPS}
           visible={props.stateUpdates.length}
-          total={props.stateUpdateTotal}
+          total={props.totalStateUpdate}
         >
           <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
         </TablePreview>
         <TablePreview
           {...FORCED_TRANSACTION_TABLE_PROPS}
           visible={props.forcedTransactions.length}
-          total={props.forcedTransactionTotal}
+          total={props.totalForcedTransaction}
         >
           <HomeForcedTransactionTable
             forcedTransactions={props.forcedTransactions}
@@ -72,7 +72,7 @@ function HomePage(props: HomePageProps) {
         <TablePreview
           {...OFFER_TABLE_PROPS}
           visible={props.offers.length}
-          total={props.offerTotal}
+          total={props.totalOffers}
         >
           <HomeOfferTable offers={props.offers} />
         </TablePreview>
