@@ -40,7 +40,7 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
     <Page
       path="/forced/new/:positionId/:assetId"
       description="Page that allows user withdrawal of USDC"
-      account={props.account}
+      user={props.user}
     >
       <div className="my-auto flex gap-12">
         <div className="flex flex-col">

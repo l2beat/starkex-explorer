@@ -9,5 +9,5 @@ export * from './old/transaction-form'
 /* eslint-enable no-restricted-imports */
 export * from './pages/forced-actions/ForcedTradePage'
 export * from './pages/forced-actions/ForcedWithdrawPage'
-export * from './pages/HomePage'
-export * from './pages/UserPage'
+export * from './pages/home/HomePage'
+export * from './pages/user/UserPage'

@@ -1,12 +1,11 @@
-import { AccountDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
-import { Page } from '../components/common/page/Page'
-import { reactToHtml } from '../reactToHtml'
+import { Page } from '../../components/common/page/Page'
+import { reactToHtml } from '../../reactToHtml'
 
 export interface HomePageProps {
-  title: string
-  account: AccountDetails | undefined
+  user: UserDetails | undefined
 }
 
 export function renderHomePage(props: HomePageProps) {
@@ -18,10 +17,10 @@ function HomePage(props: HomePageProps) {
     <Page
       path="/"
       description="This explorer allows you to view everything happening on dYdX from the perspective of the Ethereum blockchain. Browse positions, forced transaction and submit your own forced trades and withdrawals."
-      account={props.account}
+      user={props.user}
       withoutSearch
     >
-      <h1>Home Page: {props.title}</h1>
+      <h1>Home Page</h1>
     </Page>
   )
 }

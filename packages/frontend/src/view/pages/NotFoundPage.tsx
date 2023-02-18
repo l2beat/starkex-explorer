@@ -14,12 +14,7 @@ export function renderNotFoundPage(props: NotFoundPageProps) {
 
 function NotFoundPage(props: NotFoundPageProps) {
   return (
-    <Page
-      path="/"
-      description="Not found."
-      account={props.account}
-      withoutSearch
-    >
+    <Page path="/" description="Not found." user={props.account} withoutSearch>
       <h1>Not found</h1>
     </Page>
   )

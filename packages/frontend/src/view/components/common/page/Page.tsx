@@ -1,4 +1,4 @@
-import { AccountDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
 import { Footer } from './Footer'
@@ -6,7 +6,7 @@ import { Head } from './Head'
 import { Navbar } from './Navbar'
 
 interface Props {
-  account: AccountDetails | undefined
+  user: UserDetails | undefined
   withoutSearch?: boolean
   description: string
   image?: string
@@ -19,33 +19,24 @@ interface Props {
   children: ReactNode
 }
 
-export function Page({
-  account,
-  withoutSearch,
-  description,
-  image = '/images/meta-image.png',
-  baseTitle = 'L2BEAT dYdX Explorer',
-  title,
-  baseUrl = 'https://dydx.l2beat.com',
-  path,
-  stylesheets = ['/styles/main.css'],
-  scripts = ['/scripts/main.js'],
-  children,
-}: Props) {
+export function Page(props: Props) {
   return (
     <html lang="en" className="h-full bg-neutral-900 text-white">
       <Head
-        description={description}
-        image={image}
-        title={combineTitle(baseTitle, title)}
-        url={combineUrl(baseUrl, path)}
-        stylesheets={stylesheets}
+        description={props.description}
+        image={props.image ?? '/images/meta-image.png'}
+        title={combineTitle(
+          props.baseTitle ?? 'L2BEAT dYdX Explorer',
+          props.title
+        )}
+        url={combineUrl(props.baseUrl ?? 'https://dydx.l2beat.com', props.path)}
+        stylesheets={props.stylesheets ?? ['/styles/main.css']}
       />
       <body className="flex h-full flex-col">
-        <Navbar searchBar={!withoutSearch} account={account} />
-        <main className="mx-auto flex-1 p-16">{children}</main>
+        <Navbar searchBar={!props.withoutSearch} user={props.user} />
+        <main className="mx-auto flex-1 p-16">{props.children}</main>
         <Footer />
-        {scripts.map((src, i) => (
+        {(props.scripts ?? ['/scripts/main.js']).map((src, i) => (
           <script key={i} src={src} />
         ))}
       </body>

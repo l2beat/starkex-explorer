@@ -3,23 +3,23 @@ import React from 'react'
 import {
   ActionsTable,
   WithdrawableAssetEntry,
-} from '../../view/components/user/ActionsTable'
-import { AssetEntry, AssetsTable } from '../components/user/AssetsTable'
+} from '../../components/user/ActionsTable'
+import { AssetEntry, AssetsTable } from '../../components/user/AssetsTable'
 import {
   BalanceChangeEntry,
   BalanceChangesTable,
-} from '../components/user/BalanceChangesTable'
+} from '../../components/user/BalanceChangesTable'
 import {
   EthereumTransactionEntry,
   EthereumTransactionsTable,
-} from '../components/user/EthereumTransactionsTable'
-import { OfferEntry, OffersTable } from '../components/user/OffersTable'
-import { UserProfile } from '../components/user/UserProfile'
+} from '../../components/user/EthereumTransactionsTable'
+import { OfferEntry, OffersTable } from '../../components/user/OffersTable'
+import { UserProfile } from '../../components/user/UserProfile'
 // eslint-disable-next-line no-restricted-imports
-import { AccountDetails } from '../old/common/AccountDetails'
+import { AccountDetails } from '../../old/common/AccountDetails'
 // eslint-disable-next-line no-restricted-imports
-import { Page } from '../old/common/page/Page'
-import { reactToHtml } from '../reactToHtml'
+import { Page } from '../../old/common/page/Page'
+import { reactToHtml } from '../../reactToHtml'
 
 export interface UserPageProps {
   readonly account: AccountDetails | undefined

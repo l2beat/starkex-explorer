@@ -70,7 +70,7 @@ export const USER_PROPS: UserPageProps = {
 }
 
 export const FORCED_ACTION_FORM_PROPS: ForcedActionFormProps = {
-  account: {
+  user: {
     address: EthereumAddress.fake(),
     positionId: 123n,
     hasUpdates: false,
@@ -116,7 +116,7 @@ export const FORCED_ACTION_FORM_PROPS: ForcedActionFormProps = {
 }
 
 export const FORCED_WITHDRAW_FORM_PROPS: ForcedActionFormProps = {
-  account: {
+  user: {
     address: EthereumAddress.fake(),
     positionId: 123n,
     hasUpdates: false,
@@ -138,7 +138,7 @@ export const FORCED_WITHDRAW_FORM_PROPS: ForcedActionFormProps = {
 }
 
 export const FORCED_SELL_FORM_PROPS: ForcedActionFormProps = {
-  account: {
+  user: {
     address: EthereumAddress.fake(),
     positionId: 123n,
     hasUpdates: false,
@@ -166,7 +166,7 @@ export const FORCED_SELL_FORM_PROPS: ForcedActionFormProps = {
 }
 
 export const FORCED_BUY_FORM_PROPS: ForcedActionFormProps = {
-  account: {
+  user: {
     address: EthereumAddress.fake(),
     positionId: 123n,
     hasUpdates: false,
