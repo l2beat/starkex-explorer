@@ -14,12 +14,12 @@ export function UserProfile({ ethereumAddress, starkKey }: UserProfileProps) {
   return (
     <div className="mb-6 flex w-full flex-col rounded-lg bg-gray-800 p-6">
       <p className="text-sm font-semibold text-zinc-500">Ethereum address</p>
-      <p className="mt-3 text-base font-semibold text-white">
+      <p className="text-base mt-3 font-semibold text-white">
         {ethereumAddress?.toString()}
       </p>
       <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
       {starkKey ? (
-        <p className="mt-3 text-base font-semibold text-white">
+        <p className="text-base mt-3 font-semibold text-white">
           {starkKey.toString()}
         </p>
       ) : (
@@ -27,7 +27,7 @@ export function UserProfile({ ethereumAddress, starkKey }: UserProfileProps) {
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center">
               <WarningIcon />
-              <p className="ml-2 text-base font-semibold text-amber-500">
+              <p className="text-base ml-2 font-semibold text-amber-500">
                 UNKNOWN
               </p>
             </div>

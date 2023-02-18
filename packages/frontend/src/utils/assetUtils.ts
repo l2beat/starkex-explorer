@@ -3,6 +3,11 @@ import { AssetHash, AssetId } from '@explorer/types'
 
 import { formatHashShort } from './formatUtils'
 
+export interface Asset {
+  hashOrId: AssetHash | AssetId
+  details?: AssetDetails
+}
+
 export interface AssetInfo {
   name: string
   symbol: string
@@ -10,13 +15,10 @@ export interface AssetInfo {
   imageUrl: string
 }
 
-export function assetToInfo(
-  asset: AssetId | AssetHash,
-  assetDetails?: AssetDetails
-): AssetInfo {
-  return AssetId.check(asset)
-    ? assetIdToInfo(asset)
-    : assetHashToInfo(asset, assetDetails)
+export function assetToInfo(asset: Asset): AssetInfo {
+  return AssetId.check(asset.hashOrId)
+    ? assetIdToInfo(asset.hashOrId)
+    : assetHashToInfo(asset.hashOrId, asset.details)
 }
 
 function assetIdToInfo(assetId: AssetId): AssetInfo {

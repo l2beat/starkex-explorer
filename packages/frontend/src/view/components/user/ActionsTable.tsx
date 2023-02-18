@@ -27,7 +27,7 @@ export function ActionsTable(props: ActionsTableProps) {
         >
           <div className="flex">
             <p>Icon</p>
-            <p className="ml-3 text-base font-bold text-white">
+            <p className="text-base ml-3 font-bold text-white">
               {asset.symbol}
             </p>
           </div>
@@ -52,7 +52,7 @@ export function ActionsTable(props: ActionsTableProps) {
           >
             <div className="flex">
               <p>Icon</p>
-              <p className="ml-3 text-base font-bold text-white">
+              <p className="text-base ml-3 font-bold text-white">
                 {offer.asset}
               </p>
             </div>

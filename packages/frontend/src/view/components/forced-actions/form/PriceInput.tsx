@@ -8,7 +8,7 @@ import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'
 
 export function PriceInput(props: ForcedActionFormProps) {
-  const usdcInfo = assetToInfo(AssetId.USDC)
+  const usdcInfo = assetToInfo({ hashOrId: AssetId.USDC })
   const assetDetails = props.assets.find(
     (asset) => asset.assetId === props.selectedAsset
   )
@@ -25,7 +25,7 @@ export function PriceInput(props: ForcedActionFormProps) {
             type="text"
             autoComplete="off"
             placeholder="0.00"
-            className="w-full rounded-md bg-transparent text-2xl leading-none outline-none"
+            className="text-2xl w-full rounded-md bg-transparent leading-none outline-none"
           />
         </div>
         <div

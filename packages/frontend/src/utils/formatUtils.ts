@@ -4,6 +4,7 @@ import {
   Hash256,
   PedersenHash,
   StarkKey,
+  Timestamp,
 } from '@explorer/types'
 
 export function formatCurrencyInput(
@@ -38,4 +39,10 @@ export function formatHashShort(
 ) {
   const longHash = formatHashLong(hash)
   return `${longHash.slice(0, 10)}…${longHash.slice(-8)}`
+}
+
+export function formatTimestamp(timestamp: Timestamp): string {
+  const date = new Date(Number(timestamp))
+  const iso = date.toISOString()
+  return `${iso.slice(0, 10)} ${iso.slice(11, 19)}`
 }

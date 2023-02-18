@@ -33,10 +33,6 @@ export function EthereumTransactionsTable({
 }: EthereumTransactionsTableProps) {
   return (
     <Table
-      pageSize={6}
-      id="test"
-      title="Ethereum transactions"
-      noRowsText="You have no ethereum transactions"
       columns={[
         { header: 'TIME' },
         { header: 'HASH' },

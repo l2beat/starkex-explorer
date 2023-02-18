@@ -20,19 +20,13 @@ export interface AssetEntry {
 export function AssetsTable({ assets }: AssetsTableProps) {
   return (
     <Table
-      fullBackground
-      pageSize={6}
-      id="test"
-      title="Assets"
-      noRowsText="You have no assets"
       columns={[
-        { header: '', className: '!w-9', textAlignClass: 'text-right' },
+        { header: '', className: '!w-9' },
         { header: 'NAME' },
         { header: 'BALANCE/ID' },
         { header: 'VAULT' },
         {
           header: 'ACTION',
-          textAlignClass: 'text-left',
           className: '!w-[130px]',
         },
       ]}

@@ -8,6 +8,7 @@ import { renderDevPage } from '../view/pages/DevPage'
 import { renderForcedTradePage } from '../view/pages/forced-actions/ForcedTradePage'
 import { renderNotFoundPage } from '../view/pages/NotFoundPage'
 import * as DATA from './data'
+import { randomHomeProps } from './data/home'
 
 export const router = new Router()
 
@@ -32,8 +33,7 @@ const routes: Route[] = [
     description: 'The home page.',
     render: (ctx) => {
       const user = getUser(ctx)
-      // @ts-ignore TODO: add home props
-      ctx.body = renderHomePage({ user })
+      ctx.body = renderHomePage(randomHomeProps(user))
     },
   },
   {

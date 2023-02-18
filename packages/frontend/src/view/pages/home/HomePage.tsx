@@ -1,10 +1,14 @@
 import { UserDetails } from '@explorer/shared'
+import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
+import { Asset } from '../../../utils/assetUtils'
 import { Page } from '../../components/common/page/Page'
+import {
+  HomeStateUpdateEntry,
+  HomeStateUpdateTable,
+} from '../../components/home/HomeStateUpdateTable'
 import { reactToHtml } from '../../reactToHtml'
-import { Hash256, Timestamp } from '@explorer/types'
-import { Asset } from '../types'
 
 export interface HomePageProps {
   user: UserDetails | undefined
@@ -22,14 +26,6 @@ export interface HomeTutorialEntry {
   title: string
   imageUrl: string
   href: string
-}
-
-export interface HomeStateUpdateEntry {
-  timestamp: Timestamp
-  id: string
-  hash: Hash256
-  updateCount: number
-  forcedTransactionCount: number
 }
 
 export interface HomeForcedTransactionEntry {
@@ -64,6 +60,7 @@ function HomePage(props: HomePageProps) {
       withoutSearch
     >
       <h1>Home Page</h1>
+      <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
     </Page>
   )
 }

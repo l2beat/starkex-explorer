@@ -6,36 +6,38 @@ import { Column, Row } from './types'
 export interface TableRowProps extends Row {
   i: number
   columns: Column[]
-  hidden?: boolean
-  className?: string
 }
 
 export function TableRow(props: TableRowProps) {
   return (
-    <tr className={cx('my-4 whitespace-nowrap', props.hidden && 'hidden')}>
+    <tr className="h-10 whitespace-nowrap text-sm font-medium">
       {props.cells.map((cell, col) => {
-        const { fullWidth, numeric, monospace, className } =
-          props.columns[col] ?? {}
+        const { numeric, monospace, className } = props.columns[col] ?? {}
+
         return (
           <td
             key={col}
             className={cx(
-              !props.link && 'px-1.5 py-0.5',
-              'first-letter:capitalize',
+              !props.link && 'px-2.5',
+              !props.link && col === 0 && 'pl-5',
+              !props.link && col === props.cells.length - 1 && 'pr-5',
               (numeric || monospace) && 'font-mono',
-              numeric ? 'text-right' : 'text-left',
-              fullWidth ? 'wide:max-w-[10px] truncate' : 'w-0',
+              numeric && 'text-right',
               props.link && 'cursor-pointer',
-              className,
-              props.className
+              !props.link && className
             )}
           >
             {props.link ? (
               <a
-                className="block w-full truncate py-0.5 first-letter:capitalize"
+                className={cx(
+                  'flex h-10 items-center px-2.5',
+                  col === 0 && 'pl-5',
+                  col === props.cells.length - 1 && 'pr-5',
+                  className
+                )}
                 href={props.link}
               >
-                {cell}
+                <span className="w-full">{cell}</span>
               </a>
             ) : (
               cell

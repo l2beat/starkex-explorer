@@ -22,10 +22,6 @@ export function BalanceChangesTable({
 }: BalanceChangesTableProps) {
   return (
     <Table
-      pageSize={6}
-      id="test"
-      title="Balance changes"
-      noRowsText="You have no balanceChanges"
       columns={[
         { header: 'TIME' },
         { header: 'STATE UPDATE ID' },

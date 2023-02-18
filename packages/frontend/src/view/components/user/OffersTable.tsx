@@ -21,10 +21,6 @@ export interface OfferEntry {
 export function OffersTable({ offers }: OffersTableProps) {
   return (
     <Table
-      pageSize={6}
-      id="test"
-      title="Offers"
-      noRowsText="You have no offers"
       columns={[
         { header: 'TIME' },
         { header: 'ASSET' },

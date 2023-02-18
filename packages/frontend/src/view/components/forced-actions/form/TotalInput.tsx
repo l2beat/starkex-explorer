@@ -6,7 +6,7 @@ import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'
 
 export function TotalInput() {
-  const usdcInfo = assetToInfo(AssetId.USDC)
+  const usdcInfo = assetToInfo({ hashOrId: AssetId.USDC })
 
   return (
     <div className="flex gap-2">
@@ -17,7 +17,7 @@ export function TotalInput() {
           type="text"
           autoComplete="off"
           placeholder="0.00"
-          className="w-full rounded-md bg-transparent text-2xl leading-none outline-none"
+          className="text-2xl w-full rounded-md bg-transparent leading-none outline-none"
         />
       </div>
       <div className="flex flex-col">

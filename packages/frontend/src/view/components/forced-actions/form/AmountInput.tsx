@@ -7,7 +7,7 @@ import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'
 
 export function AmountInput(props: ForcedActionFormProps) {
-  const assetInfo = assetToInfo(props.selectedAsset)
+  const assetInfo = assetToInfo({ hashOrId: props.selectedAsset })
   const balance = props.assets.find(
     (asset) => asset.assetId === props.selectedAsset
   )?.balance
@@ -24,7 +24,7 @@ export function AmountInput(props: ForcedActionFormProps) {
             type="text"
             autoComplete="off"
             placeholder="0.00"
-            className="w-full rounded-md bg-transparent text-2xl leading-none outline-none"
+            className="text-2xl w-full rounded-md bg-transparent leading-none outline-none"
           />
         </div>
         <div
