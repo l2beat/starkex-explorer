@@ -71,21 +71,13 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
     }
 
     const currentUserRecords =
-      await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyAndAssets(
+      await this.preprocessedAssetHistoryRepository.getCurrentByStarkKey(
         position.starkKey,
-        [
-          this.collateralAsset.assetId,
-          ...position.balances.map((b) => b.assetId),
-        ],
         trx
       )
 
-    const assetMap: Record<string, PreprocessedAssetHistoryRecord> = {}
-    currentUserRecords.forEach((r) => {
-      assetMap[r.assetHashOrId.toString()] = r
-    })
-
-    const updatedAssets = [
+    // Add the collateral asset to the list of assets to update.
+    const updatedAssets: { assetId: AssetId; balance: bigint }[] = [
       {
         assetId: this.collateralAsset.assetId,
         balance: position.collateralBalance,
@@ -93,10 +85,27 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
       ...position.balances,
     ]
 
+    // If current history asset is not in the position, it means that it was closed,
+    // so we need to the same and set balance to 0.
+    currentUserRecords.forEach((r) => {
+      if (!updatedAssets.find((u) => u.assetId === r.assetHashOrId)) {
+        updatedAssets.push({
+          assetId: r.assetHashOrId,
+          balance: 0n,
+        })
+      }
+    })
+
     const newRecords: Omit<
-      PreprocessedAssetHistoryRecord,
+      PreprocessedAssetHistoryRecord<AssetId>,
       'historyId' | 'isCurrent'
     >[] = []
+
+    // Map the current records by assetId for easier access.
+    const assetMap: Record<string, PreprocessedAssetHistoryRecord<AssetId>> = {}
+    currentUserRecords.forEach((r) => {
+      assetMap[r.assetHashOrId.toString()] = r
+    })
 
     updatedAssets.forEach((asset) => {
       const currentRecord = assetMap[asset.assetId.toString()]

@@ -6,14 +6,14 @@ import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export interface PreprocessedAssetHistoryRecord {
+export interface PreprocessedAssetHistoryRecord<T extends AssetHash | AssetId> {
   historyId: number
   stateUpdateId: number
   blockNumber: number
   timestamp: Timestamp
   starkKey: StarkKey
   positionOrVaultId: bigint
-  assetHashOrId: AssetHash | AssetId
+  assetHashOrId: T
   balance: bigint
   prevBalance: bigint
   price?: bigint
@@ -41,8 +41,8 @@ export class PreprocessedAssetHistoryRepository<
     this.addMany = this.wrapAddMany(this.addMany)
     this.findByHistoryId = this.wrapFind(this.findByHistoryId)
     this.deleteByHistoryId = this.wrapDelete(this.deleteByHistoryId)
-    this.getCurrentByStarkKeyAndAssets = this.wrapGet(
-      this.getCurrentByStarkKeyAndAssets
+    this.findCurrentByStarkKeyAndAsset = this.wrapFind(
+      this.findCurrentByStarkKeyAndAsset
     )
     this.getCurrentByStarkKey = this.wrapGet(this.getCurrentByStarkKey)
     this.getCurrentByPositionOrVaultId = this.wrapGet(
@@ -61,7 +61,7 @@ export class PreprocessedAssetHistoryRepository<
   }
 
   async add(
-    record: Omit<PreprocessedAssetHistoryRecord, 'historyId'>,
+    record: Omit<PreprocessedAssetHistoryRecord<T>, 'historyId'>,
     trx: Knex.Transaction
   ): Promise<number> {
     const knex = await this.knex(trx)
@@ -89,7 +89,7 @@ export class PreprocessedAssetHistoryRepository<
   async findByHistoryId(
     id: number,
     trx: Knex.Transaction
-  ): Promise<PreprocessedAssetHistoryRecord | undefined> {
+  ): Promise<PreprocessedAssetHistoryRecord<T> | undefined> {
     const knex = await this.knex(trx)
     const row = await knex('preprocessed_asset_history').where('id', id).first()
     return row && toPreprocessedAssetHistoryRecord(row, this.toAssetType)
@@ -125,27 +125,21 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getCurrentByStarkKeyAndAssets(
+  async findCurrentByStarkKeyAndAsset(
     starkKey: StarkKey,
-    assets: (AssetHash | AssetId)[],
+    asset: AssetHash | AssetId,
     trx: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
-    const rows = await knex('preprocessed_asset_history')
+    const row = await knex('preprocessed_asset_history')
       .where({
         stark_key: starkKey.toString(),
+        asset_hash_or_id: asset.toString(),
         is_current: true,
       })
-      .whereIn(
-        'asset_hash_or_id',
-        assets.map((x) => x.toString())
-      )
-    // Don't filter out balance === 0
-    // We still need such records the get prevHistoryId
+      .first()
 
-    return rows.map((r) =>
-      toPreprocessedAssetHistoryRecord(r, this.toAssetType)
-    )
+    return row && toPreprocessedAssetHistoryRecord(row, this.toAssetType)
   }
 
   async setAsCurrentByHistoryId(historyId: number, trx: Knex.Transaction) {
@@ -177,7 +171,7 @@ export class PreprocessedAssetHistoryRepository<
     stateUpdateId: number,
     trx: Knex.Transaction
   ): Promise<
-    Pick<PreprocessedAssetHistoryRecord, 'historyId' | 'prevHistoryId'>[]
+    Pick<PreprocessedAssetHistoryRecord<T>, 'historyId' | 'prevHistoryId'>[]
   > {
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history')
@@ -199,7 +193,7 @@ export class PreprocessedAssetHistoryRepository<
 function toPreprocessedAssetHistoryRecord<T extends AssetHash | AssetId>(
   row: PreprocessedAssetHistoryRow,
   toAssetType: (x: string) => T
-): PreprocessedAssetHistoryRecord {
+): PreprocessedAssetHistoryRecord<T> {
   return {
     historyId: row.id,
     stateUpdateId: row.state_update_id,
@@ -218,7 +212,7 @@ function toPreprocessedAssetHistoryRecord<T extends AssetHash | AssetId>(
 }
 
 function toPreprocessedAssetHistoryRow(
-  record: Omit<PreprocessedAssetHistoryRecord, 'historyId'>
+  record: Omit<PreprocessedAssetHistoryRecord<AssetHash | AssetId>, 'historyId'>
 ): Omit<PreprocessedAssetHistoryRow, 'id'> {
   return {
     state_update_id: record.stateUpdateId,

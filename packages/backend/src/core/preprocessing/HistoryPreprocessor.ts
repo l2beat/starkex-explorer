@@ -39,7 +39,7 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
     if (recordsToClose[0] !== undefined) {
       const starkKey = recordsToClose[0].starkKey
       const newRecords: Omit<
-        PreprocessedAssetHistoryRecord,
+        PreprocessedAssetHistoryRecord<T>,
         'historyId' | 'isCurrent'
       >[] = recordsToClose.map((record) => ({
         stateUpdateId: stateUpdate.id,
@@ -61,7 +61,7 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
   async addNewRecordsAndUpdateIsCurrent(
     trx: Knex.Transaction,
     newRecords: Omit<
-      PreprocessedAssetHistoryRecord,
+      PreprocessedAssetHistoryRecord<T>,
       'historyId' | 'isCurrent'
     >[]
   ) {
@@ -77,11 +77,13 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
       // the same asset again in the future, it will come to the same vault.
       // So we don't want then to connect prevHistoryId to the current closed
       // record.
-      const recordAsCurrent: Omit<PreprocessedAssetHistoryRecord, 'historyId'> =
-        {
-          ...record,
-          isCurrent: record.balance !== 0n,
-        }
+      const recordAsCurrent: Omit<
+        PreprocessedAssetHistoryRecord<T>,
+        'historyId'
+      > = {
+        ...record,
+        isCurrent: record.balance !== 0n,
+      }
       await this.preprocessedAssetHistoryRepository.add(recordAsCurrent, trx)
     }
   }

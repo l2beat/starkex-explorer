@@ -64,33 +64,26 @@ describe(SpotHistoryPreprocessor.name, () => {
         const preprocessedRepository = mock<
           PreprocessedAssetHistoryRepository<AssetHash>
         >({
-          getCurrentByStarkKeyAndAssets: async (
+          findCurrentByStarkKeyAndAsset: async (
             starkKey: StarkKey,
-            assets: AssetHash[]
+            asset: AssetHash
           ) => {
-            if (assets.length !== 1) {
-              throw new Error('Expected call for one asset only')
-            }
-            if (assets[0] == vault1.assetHash) {
-              return [
-                {
-                  historyId: 10,
-                  stateUpdateId: 10,
-                  blockNumber: 500,
-                  timestamp: Timestamp(900_000_000),
-                  starkKey,
-                  positionOrVaultId: vault1.vaultId,
-                  assetHashOrId: vault1.assetHash,
-                  balance: 500_000n,
-                  prevBalance: 100_000n,
-                  price: undefined,
-                  prevPrice: undefined,
-                  isCurrent: true,
-                  prevHistoryId: 5,
-                },
-              ]
-            } else {
-              return []
+            if (asset === vault1.assetHash) {
+              return {
+                historyId: 10,
+                stateUpdateId: 10,
+                blockNumber: 500,
+                timestamp: Timestamp(900_000_000),
+                starkKey,
+                positionOrVaultId: vault1.vaultId,
+                assetHashOrId: vault1.assetHash,
+                balance: 500_000n,
+                prevBalance: 100_000n,
+                price: undefined,
+                prevPrice: undefined,
+                isCurrent: true,
+                prevHistoryId: 5,
+              }
             }
           },
         })

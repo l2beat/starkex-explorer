@@ -37,7 +37,6 @@ export class Preprocessor<T extends AssetHash | AssetId> {
       } else if (direction === 'backward') {
         await this.rollbackOneStateUpdate()
       }
-      // process.exit(1)
     } while (direction !== 'stop')
   }
 

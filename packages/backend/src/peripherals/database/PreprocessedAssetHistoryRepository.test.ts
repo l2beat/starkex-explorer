@@ -10,7 +10,10 @@ import {
 } from './PreprocessedAssetHistoryRepository'
 import { PreprocessedStateUpdateRepository } from './PreprocessedStateUpdateRepository'
 
-const genericRecord: Omit<PreprocessedAssetHistoryRecord, 'historyId'> = {
+const genericRecord: Omit<
+  PreprocessedAssetHistoryRecord<AssetHash>,
+  'historyId'
+> = {
   stateUpdateId: 1900,
   blockNumber: 1_000_000,
   timestamp: Timestamp(900_000_000n),
@@ -231,17 +234,14 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     expect(records.map((r) => r.historyId)).toEqual([id1])
   })
 
-  it('gets current records by stark key and asset hashes', async () => {
+  it('gets current record by stark key and asset hash when record isCurrent', async () => {
     const starkKey = StarkKey.fake('a')
-    const assetHash1 = AssetHash.fake('1')
-    const assetHash2 = AssetHash.fake('2')
-    const assetHash3 = AssetHash.fake('3')
-    const assetHash4 = AssetHash.fake('4')
+    const assetHash = AssetHash.fake('1')
 
     await repository.add(
       {
         ...genericRecord,
-        assetHashOrId: assetHash1,
+        assetHashOrId: assetHash,
         starkKey,
         positionOrVaultId: 100n,
         balance: 100_000_000n,
@@ -249,29 +249,31 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       },
       trx
     )
+    // This record should be ignored (different starkKey)
     await repository.add(
       {
         ...genericRecord,
-        assetHashOrId: assetHash2,
-        starkKey,
-        positionOrVaultId: 101n,
-        balance: 200_000_000n,
+        starkKey: StarkKey.fake('2'),
+        assetHashOrId: assetHash,
+        positionOrVaultId: 105n,
+        balance: 300_000_000n,
         isCurrent: true,
       },
       trx
     )
-    // This records should be ignored (isCurrent = false)
-    await repository.add(
-      {
-        ...genericRecord,
-        starkKey,
-        assetHashOrId: assetHash3,
-        positionOrVaultId: 102n,
-        balance: 0n,
-        isCurrent: false,
-      },
+
+    const record = await repository.findCurrentByStarkKeyAndAsset(
+      starkKey,
+      assetHash,
       trx
     )
+    expect(record?.positionOrVaultId).toEqual(100n)
+  })
+
+  it('skips record by stark key and asset hash when record isCurrent=false', async () => {
+    const starkKey = StarkKey.fake('a')
+    const assetHash = AssetHash.fake('1')
+
     // This records should be ignored (assetHash not requested)
     await repository.add(
       {
@@ -289,32 +291,20 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       {
         ...genericRecord,
         starkKey,
-        assetHashOrId: assetHash3,
+        assetHashOrId: assetHash,
         positionOrVaultId: 104n,
         balance: 200_000_000n,
         isCurrent: false,
       },
       trx
     )
-    // This record should be ignored (different starkKey)
-    await repository.add(
-      {
-        ...genericRecord,
-        starkKey: StarkKey.fake('2'),
-        assetHashOrId: assetHash4,
-        positionOrVaultId: 105n,
-        balance: 300_000_000n,
-        isCurrent: true,
-      },
-      trx
-    )
 
-    const records = await repository.getCurrentByStarkKeyAndAssets(
+    const records = await repository.findCurrentByStarkKeyAndAsset(
       starkKey,
-      [assetHash1, assetHash2, assetHash3, assetHash4],
+      assetHash,
       trx
     )
-    expect(records.map((r) => r.positionOrVaultId).sort()).toEqual([100n, 101n])
+    expect(records).toEqual(undefined)
   })
 
   it('sets isCurrent to true by history id', async () => {
