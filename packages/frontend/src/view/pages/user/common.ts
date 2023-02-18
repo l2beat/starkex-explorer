@@ -7,7 +7,7 @@ export const getBalanceChangeTableProps = (starkKey: StarkKey) => ({
   link: `/user/${starkKey.toString()}/balance-changes`,
 })
 
-export const getEthereumTransactionTableProps = (starkKey: StarkKey) => ({
+export const getTransactionTableProps = (starkKey: StarkKey) => ({
   title: 'Ethereum transactions',
   entryShortNamePlural: 'transactions',
   entryLongNamePlural: 'ethereum transactions',

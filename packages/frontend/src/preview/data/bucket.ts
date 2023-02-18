@@ -2,7 +2,7 @@ export class Bucket<T> {
   private items: T[] = []
   private picked: T[] = []
 
-  constructor(items: T[] = []) {
+  constructor(items: readonly T[] = []) {
     this.items = [...items]
   }
 

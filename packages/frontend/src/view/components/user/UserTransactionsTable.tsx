@@ -1,4 +1,4 @@
-import { Hash256, Timestamp } from '@explorer/types'
+import { Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
@@ -8,35 +8,41 @@ import { AssetWithLogo } from '../common/AssetWithLogo'
 import { StatusBadge, StatusType } from '../common/StatusBadge'
 import { Table } from '../common/table/Table'
 
-export interface HomeForcedTransactionEntry {
+export interface UserTransactionsTableProps {
+  transactions: UserTransactionEntry[]
+  starkKey: StarkKey
+}
+
+export interface UserTransactionEntry {
   timestamp: Timestamp
   hash: Hash256
   asset: Asset
   amount: bigint
-  status: 'MINED' | 'INCLUDED'
-  type: 'WITHDRAW' | 'BUY' | 'SELL'
+  status:
+    | 'SENT (1/3)'
+    | 'MINED (2/3)'
+    | 'INCLUDED (3/3)'
+    | 'SENT (1/2)'
+    | 'MINED (2/2)'
+    | 'REVERTED'
+  type: 'Forced withdraw' | 'Forced buy' | 'Forced sell' | 'Withdraw'
 }
 
-export interface HomeForcedTransactionTableProps {
-  forcedTransactions: HomeForcedTransactionEntry[]
-}
-
-export function HomeForcedTransactionTable(
-  props: HomeForcedTransactionTableProps
-) {
+export function UserTransactionsTable(props: UserTransactionsTableProps) {
   return (
     <Table
       columns={[
-        { header: 'Time' },
-        { header: 'Hash' },
-        { header: 'Asset' },
-        { header: 'Amount', numeric: true },
-        { header: 'Status' },
-        { header: 'Type' },
+        { header: 'TIME' },
+        { header: 'HASH' },
+        { header: 'ASSET' },
+        { header: 'AMOUNT' },
+        { header: 'STATUS' },
+        { header: 'TYPE' },
       ]}
-      rows={props.forcedTransactions.map((transaction) => {
+      rows={props.transactions.map((transaction) => {
+        const link = `/user/${props.starkKey.toString()}/transactions/${transaction.hash.toString()}`
         return {
-          link: `/forced-transactions/${transaction.hash.toString()}`,
+          link,
           cells: [
             formatTimestamp(transaction.timestamp),
             // TODO: fix truncate and underline
@@ -51,9 +57,7 @@ export function HomeForcedTransactionTable(
             <StatusBadge type={toStatusType(transaction.status)}>
               {transaction.status}
             </StatusBadge>,
-            <span className="capitalize">
-              {transaction.type.toLowerCase()}
-            </span>,
+            transaction.type,
           ],
         }
       })}
@@ -61,13 +65,17 @@ export function HomeForcedTransactionTable(
   )
 }
 
-function toStatusType(
-  status: HomeForcedTransactionEntry['status']
-): StatusType {
+function toStatusType(status: UserTransactionEntry['status']): StatusType {
   switch (status) {
-    case 'MINED':
+    case 'SENT (1/3)':
+    case 'SENT (1/2)':
       return 'BEGIN'
-    case 'INCLUDED':
+    case 'MINED (2/3)':
+      return 'MIDDLE'
+    case 'INCLUDED (3/3)':
+    case 'MINED (2/2)':
       return 'END'
+    case 'REVERTED':
+      return 'ERROR'
   }
 }

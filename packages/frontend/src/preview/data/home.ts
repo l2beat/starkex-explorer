@@ -23,10 +23,10 @@ const transactionStatusBucket = new Bucket<'MINED' | 'INCLUDED'>()
 transactionStatusBucket.add('MINED', 2)
 transactionStatusBucket.add('INCLUDED', 4)
 
-const transactionTypeBucket = new Bucket<'BUY' | 'SELL' | 'WITHDRAWAL'>()
+const transactionTypeBucket = new Bucket<'BUY' | 'SELL' | 'WITHDRAW'>()
 transactionTypeBucket.add('BUY', 2)
 transactionTypeBucket.add('SELL', 2)
-transactionTypeBucket.add('WITHDRAWAL', 4)
+transactionTypeBucket.add('WITHDRAW', 4)
 
 export function randomHomeForcedTransactionEntry(): HomeForcedTransactionEntry {
   return {

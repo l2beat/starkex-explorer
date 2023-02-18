@@ -11,6 +11,7 @@ export type { HomeForcedTransactionEntry } from './components/home/HomeForcedTra
 export type { HomeOfferEntry } from './components/home/HomeOfferTable'
 export type { HomeStateUpdateEntry } from './components/home/HomeStateUpdateTable'
 export type { UserBalanceChangeEntry } from './components/user/UserBalanceChangeTable'
+export type { UserTransactionEntry } from './components/user/UserTransactionsTable'
 export * from './pages/forced-actions/ForcedTradePage'
 export * from './pages/forced-actions/ForcedWithdrawPage'
 export * from './pages/home/HomeForcedTransactionPage'

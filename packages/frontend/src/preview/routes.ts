@@ -20,7 +20,10 @@ import {
   randomHomeOfferEntry,
   randomHomeStateUpdateEntry,
 } from './data/home'
-import { randomUserBalanceChangeEntry } from './data/user'
+import {
+  randomUserBalanceChangeEntry,
+  randomUserTransactionEntry,
+} from './data/user'
 import { repeat } from './data/utils'
 
 export const router = new Router()
@@ -147,8 +150,8 @@ const routes: Route[] = [
         totalAssets: 0,
         balanceChanges: repeat(10, randomUserBalanceChangeEntry),
         totalBalanceChanges: 3367,
-        ethereumTransactions: [],
-        totalEthereumTransactions: 0,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
         offers: [],
         totalOffers: 0,
       })

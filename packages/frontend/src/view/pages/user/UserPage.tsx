@@ -9,21 +9,21 @@ import {
   WithdrawableAssetEntry,
 } from '../../components/user/ActionsTable'
 import { AssetEntry, AssetsTable } from '../../components/user/AssetsTable'
-import {
-  EthereumTransactionEntry,
-  EthereumTransactionsTable,
-} from '../../components/user/EthereumTransactionsTable'
 import { OfferEntry, OffersTable } from '../../components/user/OffersTable'
 import {
   UserBalanceChangeEntry,
   UserBalanceChangeTable,
 } from '../../components/user/UserBalanceChangeTable'
 import { UserProfile } from '../../components/user/UserProfile'
+import {
+  UserTransactionEntry,
+  UserTransactionsTable,
+} from '../../components/user/UserTransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
   getBalanceChangeTableProps,
-  getEthereumTransactionTableProps,
   getOfferTableProps,
+  getTransactionTableProps,
 } from './common'
 
 export interface UserPageProps {
@@ -37,8 +37,8 @@ export interface UserPageProps {
   totalAssets: number
   balanceChanges: UserBalanceChangeEntry[]
   totalBalanceChanges: number
-  ethereumTransactions: EthereumTransactionEntry[]
-  totalEthereumTransactions: number
+  transactions: UserTransactionEntry[]
+  totalTransactions: number
   offers: OfferEntry[]
   totalOffers: number
 }
@@ -76,12 +76,13 @@ function UserPage(props: UserPageProps) {
           />
         </TablePreview>
         <TablePreview
-          {...getEthereumTransactionTableProps(props.starkKey)}
-          visible={props.ethereumTransactions.length}
-          total={props.totalEthereumTransactions}
+          {...getTransactionTableProps(props.starkKey)}
+          visible={props.transactions.length}
+          total={props.totalTransactions}
         >
-          <EthereumTransactionsTable
-            ethereumTransactions={props.ethereumTransactions}
+          <UserTransactionsTable
+            starkKey={props.starkKey}
+            transactions={props.transactions}
           />
         </TablePreview>
         <TablePreview
