@@ -1,15 +1,15 @@
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import { LinkButton } from '../Button'
 
 export interface TablePreviewProps {
-  title: string
+  title: ReactNode
   link: string
   entryShortNamePlural: string
   entryLongNamePlural: string
-  visibleEntries: number
-  totalEntries: number
-  children: React.ReactNode
+  visible: number
+  total: number
+  children: ReactNode
 }
 
 export function TablePreview(props: TablePreviewProps) {
@@ -18,9 +18,9 @@ export function TablePreview(props: TablePreviewProps) {
       <div className="mb-5 flex items-baseline justify-between">
         <h2 className="text-xl font-semibold">{props.title}</h2>
         <p className="text-sm font-medium text-zinc-500">
-          You are viewing {props.visibleEntries} out of{' '}
+          You are viewing {props.visible} out of{' '}
           <a className="text-blue-600 underline" href={props.link}>
-            {props.totalEntries}
+            {props.total}
           </a>{' '}
           {props.entryShortNamePlural}
         </p>

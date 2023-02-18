@@ -1,28 +1,13 @@
-import { UserDetails } from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
 import {
   HomeForcedTransactionEntry,
   HomeOfferEntry,
-  HomePageProps,
   HomeStateUpdateEntry,
 } from '../../view'
 import { Bucket } from './bucket'
 import { amountBucket, assetBucket } from './buckets'
-import { randomId, randomInt, randomTimestamp, repeat } from './utils'
-
-export function randomHomeProps(user: UserDetails | undefined): HomePageProps {
-  return {
-    user,
-    tutorials: [],
-    stateUpdates: repeat(6, randomHomeStateUpdateEntry),
-    stateUpdateCount: 5123,
-    forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
-    forcedTransactionCount: 68,
-    offers: repeat(6, randomHomeOfferEntry),
-    offerCount: 7,
-  }
-}
+import { randomId, randomInt, randomTimestamp } from './utils'
 
 export function randomHomeStateUpdateEntry(): HomeStateUpdateEntry {
   return {

@@ -16,17 +16,22 @@ import {
   HomeStateUpdateTable,
 } from '../../components/home/HomeStateUpdateTable'
 import { reactToHtml } from '../../reactToHtml'
+import {
+  FORCED_TRANSACTION_TABLE_PROPS,
+  OFFER_TABLE_PROPS,
+  STATE_UPDATE_TABLE_PROPS,
+} from './common'
 
 export interface HomePageProps {
   user: UserDetails | undefined
   // TODO: statistics
   tutorials: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
-  stateUpdateCount: number
+  stateUpdateTotal: number
   forcedTransactions: HomeForcedTransactionEntry[]
-  forcedTransactionCount: number
+  forcedTransactionTotal: number
   offers: HomeOfferEntry[]
-  offerCount: number
+  offerTotal: number
 }
 
 export interface HomeTutorialEntry {
@@ -49,34 +54,25 @@ function HomePage(props: HomePageProps) {
     >
       <div className="flex max-w-[760px] flex-col gap-y-12">
         <TablePreview
-          title="Latest state updates"
-          entryShortNamePlural="updates"
-          entryLongNamePlural="state updates"
-          visibleEntries={props.stateUpdates.length}
-          totalEntries={props.stateUpdateCount}
-          link="/state-updates"
+          {...STATE_UPDATE_TABLE_PROPS}
+          visible={props.stateUpdates.length}
+          total={props.stateUpdateTotal}
         >
           <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
         </TablePreview>
         <TablePreview
-          title="Latest forced transactions"
-          entryShortNamePlural="transactions"
-          entryLongNamePlural="forced transactions"
-          visibleEntries={props.forcedTransactions.length}
-          totalEntries={props.forcedTransactionCount}
-          link="/forced-transactions"
+          {...FORCED_TRANSACTION_TABLE_PROPS}
+          visible={props.forcedTransactions.length}
+          total={props.forcedTransactionTotal}
         >
           <HomeForcedTransactionTable
             forcedTransactions={props.forcedTransactions}
           />
         </TablePreview>
         <TablePreview
-          title="Available trade offers"
-          entryShortNamePlural="offers"
-          entryLongNamePlural="trade offers"
-          visibleEntries={props.offers.length}
-          totalEntries={props.offerCount}
-          link="/offers"
+          {...OFFER_TABLE_PROPS}
+          visible={props.offers.length}
+          total={props.offerTotal}
         >
           <HomeOfferTable offers={props.offers} />
         </TablePreview>

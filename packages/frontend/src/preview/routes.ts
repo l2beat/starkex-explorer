@@ -3,12 +3,23 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import Koa from 'koa'
 
-import { renderForcedWithdrawPage, renderHomePage } from '../view'
+import {
+  renderForcedWithdrawPage,
+  renderHomeForcedTransactionPage,
+  renderHomeOfferPage,
+  renderHomePage,
+} from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
 import { renderForcedTradePage } from '../view/pages/forced-actions/ForcedTradePage'
+import { renderHomeStateUpdatePage } from '../view/pages/home/HomeStateUpdatePage'
 import { renderNotFoundPage } from '../view/pages/NotFoundPage'
 import * as DATA from './data'
-import { randomHomeProps } from './data/home'
+import {
+  randomHomeForcedTransactionEntry,
+  randomHomeOfferEntry,
+  randomHomeStateUpdateEntry,
+} from './data/home'
+import { repeat } from './data/utils'
 
 export const router = new Router()
 
@@ -33,26 +44,68 @@ const routes: Route[] = [
     description: 'The home page.',
     render: (ctx) => {
       const user = getUser(ctx)
-      ctx.body = renderHomePage(randomHomeProps(user))
+      ctx.body = renderHomePage({
+        user,
+        tutorials: [],
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        stateUpdateTotal: 5123,
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        forcedTransactionTotal: 68,
+        offers: repeat(6, randomHomeOfferEntry),
+        offerTotal: 7,
+      })
     },
   },
   {
-    path: '/home/state-updates',
+    path: '/state-updates',
     description:
       'State update list accessible from home page. Supports pagination.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 5123
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderHomeStateUpdatePage({
+        user,
+        stateUpdates: repeat(visible, randomHomeStateUpdateEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   {
-    path: '/home/forced-transactions',
+    path: '/forced-transactions',
     description:
       'Forced transaction list accessible from home page. Supports pagination.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 68
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderHomeForcedTransactionPage({
+        user,
+        forcedTransactions: repeat(visible, randomHomeForcedTransactionEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   {
-    path: '/home/available-trades',
+    path: '/offers',
     description: 'Offer list accessible from home page. Supports pagination.',
     breakAfter: true,
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 68
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderHomeOfferPage({
+        user,
+        offers: repeat(visible, randomHomeOfferEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   // #endregion
   // #region State update
@@ -264,6 +317,22 @@ for (const route of routes) {
 function notFound(ctx: Koa.Context) {
   const account = getUser(ctx)
   ctx.body = renderNotFoundPage({ account })
+}
+
+function getPagination(ctx: Koa.Context, total: number) {
+  const page = ctx.query.page ? parseInt(ctx.query.page as string, 10) : 1
+  const perPage = ctx.query.perPage
+    ? parseInt(ctx.query.perPage as string, 10)
+    : 50
+  const limit = Math.min(Math.max(perPage, 10), 200)
+  const offset = Math.max(page - 1, 0) * limit
+  if (offset > total) {
+    return { limit, offset: 0, visible: 0 }
+  } else if (offset + limit > total) {
+    return { limit, offset, visible: total - offset }
+  } else {
+    return { limit, offset, visible: limit }
+  }
 }
 
 function getUser(ctx: Koa.Context) {
