@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
-import { formatInt } from '../../../../utils/formatting/formatAmount'
 
+import { formatInt } from '../../../../utils/formatting/formatAmount'
 import { LinkButton } from '../Button'
 
 export interface TablePreviewProps {

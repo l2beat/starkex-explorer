@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react'
+
 import { formatInt } from '../../../../utils/formatting/formatAmount'
+import { TablePagination } from './TablePagination'
 
 export interface TableWithPaginationProps {
   title: ReactNode
@@ -40,6 +42,14 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           There are no {props.entryLongNamePlural} to view.
         </div>
       )}
+      <div className="mt-6">
+        <TablePagination
+          limit={props.limit}
+          offset={props.offset}
+          total={props.total}
+          link={props.link}
+        />
+      </div>
     </section>
   )
 }
