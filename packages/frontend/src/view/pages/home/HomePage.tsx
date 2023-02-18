@@ -2,7 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { Asset } from '../../../utils/assetUtils'
+import { Asset } from '../../../utils/assets'
 import { Page } from '../../components/common/page/Page'
 import { TablePreview } from '../../components/common/table/TablePreview'
 import { HomeForcedTransactionTable } from '../../components/home/HomeForcedTransactionTable'
@@ -61,7 +61,6 @@ function HomePage(props: HomePageProps) {
       user={props.user}
       withoutSearch
     >
-      <h1>Home Page</h1>
       <div className="flex max-w-[760px] flex-col gap-y-12">
         <TablePreview
           title="Latest state updates"

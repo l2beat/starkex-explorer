@@ -1,6 +1,6 @@
 import { AssetHash, AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 
-import { Asset } from '../../utils/assetUtils'
+import { Asset } from '../../utils/assets'
 import { Bucket } from './bucket'
 
 export const assetBucket = new Bucket<Asset>()

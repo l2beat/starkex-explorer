@@ -1,8 +1,9 @@
 import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { Asset, assetToInfo } from '../../../utils/assetUtils'
-import { formatTimestamp } from '../../../utils/formatUtils'
+import { Asset, assetToInfo } from '../../../utils/assets'
+import { formatAmount } from '../../../utils/formatting/formatAmount'
+import { formatTimestamp } from '../../../utils/formatting/formatTimestamp'
 import { AssetWithLogo } from '../common/AssetWithLogo'
 import { StatusBadge, StatusType } from '../common/StatusBadge'
 import { Table } from '../common/table/Table'
@@ -46,7 +47,7 @@ export function HomeForcedTransactionTable(
               type="small"
               assetInfo={assetToInfo(transaction.asset)}
             />,
-            transaction.amount.toString(), // TODO: format
+            formatAmount(transaction.asset, transaction.amount),
             <StatusBadge type={toStatusType(transaction.status)}>
               {transaction.status}
             </StatusBadge>,

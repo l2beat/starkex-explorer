@@ -29,7 +29,7 @@ export function randomHomeStateUpdateEntry(): HomeStateUpdateEntry {
     timestamp: randomTimestamp(),
     id: randomId(),
     hash: Hash256.fake(),
-    updateCount: randomInt(20, 256),
+    updateCount: randomInt(20, 1256),
     forcedTransactionCount: randomInt(0, 10),
   }
 }

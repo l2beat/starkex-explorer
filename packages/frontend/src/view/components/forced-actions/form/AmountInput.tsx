@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { assetToInfo } from '../../../../utils/assetUtils'
-import { formatCurrencyInput } from '../../../../utils/formatUtils'
+import { assetToInfo } from '../../../../utils/assets'
+import { formatCurrencyInput } from '../../../../utils/formatting/formatCurrencyInput'
 import { ForcedActionFormProps } from '../../../pages/forced-actions/ForcedActionFormProps'
 import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'

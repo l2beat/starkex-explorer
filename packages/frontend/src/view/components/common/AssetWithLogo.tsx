@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 
-import { AssetInfo } from '../../../utils/assetUtils'
+import { AssetInfo } from '../../../utils/assets'
 
 interface AssetWithLogoProps {
   assetInfo: AssetInfo

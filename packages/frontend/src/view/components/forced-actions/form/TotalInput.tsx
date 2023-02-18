@@ -1,7 +1,7 @@
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
-import { assetToInfo } from '../../../../utils/assetUtils'
+import { assetToInfo } from '../../../../utils/assets'
 import { AssetWithLogo } from '../../common/AssetWithLogo'
 import { FormId } from './ids'
 

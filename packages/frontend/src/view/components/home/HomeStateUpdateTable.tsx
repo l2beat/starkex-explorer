@@ -1,7 +1,8 @@
 import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { formatTimestamp } from '../../../utils/formatUtils'
+import { formatInt } from '../../../utils/formatting/formatAmount'
+import { formatTimestamp } from '../../../utils/formatting/formatTimestamp'
 import { Table } from '../common/table/Table'
 
 export interface HomeStateUpdateEntry {
@@ -35,9 +36,11 @@ export function HomeStateUpdateTable(props: HomeStateUpdateTableProps) {
             <span className="block max-w-[300px] truncate">
               {stateUpdate.hash}
             </span>,
-            stateUpdate.updateCount > 0 ? stateUpdate.updateCount : '-',
+            stateUpdate.updateCount > 0
+              ? formatInt(stateUpdate.updateCount)
+              : '-',
             stateUpdate.forcedTransactionCount > 0
-              ? stateUpdate.forcedTransactionCount
+              ? formatInt(stateUpdate.forcedTransactionCount)
               : '-',
           ],
         }
