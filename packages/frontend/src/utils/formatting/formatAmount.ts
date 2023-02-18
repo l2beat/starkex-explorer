@@ -2,57 +2,53 @@ import { AssetId } from '@explorer/types'
 
 import { Asset } from '../assets'
 
-export function formatAmount(asset: Asset, amount: bigint) {
+export function formatAmount(asset: Asset, amount: bigint, prefix?: string) {
   if (AssetId.check(asset.hashOrId)) {
-    return formatWithDecimals(amount, AssetId.decimals(asset.hashOrId))
+    return formatWithDecimals(amount, AssetId.decimals(asset.hashOrId), prefix)
   } else if (asset.details) {
-    return formatWithQuantum(amount, asset.details.quantum)
+    return formatWithQuantum(amount, asset.details.quantum, prefix)
   } else {
-    return formatWithDecimals(amount, 0)
+    return formatWithDecimals(amount, 0, prefix)
   }
 }
 
-export function formatWithDecimals(amount: bigint, decimals: number): string {
+export function formatWithDecimals(
+  amount: bigint,
+  decimals: number,
+  prefix = ''
+): string {
   if (amount < 0n) {
-    return '-' + formatWithDecimals(-amount, decimals)
+    return '-' + formatWithDecimals(-amount, decimals, prefix)
   }
   const one = 10n ** BigInt(decimals)
   const intPart = formatInt(amount / one)
   const fractionPart = formatFraction(amount % one, decimals)
-  return `${intPart}${fractionPart}`
+  return `${prefix}${intPart}${fractionPart}`
 }
 
 export function formatInt(int: bigint | number) {
-  const groups: string[] = []
-  const stringified = int.toString()
-  for (let i = 0; i < stringified.length; i += 3) {
-    groups.unshift(
-      stringified.slice(
-        Math.max(stringified.length - i - 3, 0),
-        stringified.length - i
-      )
-    )
+  let str = int.toString()
+  for (let i = str.length - 3; i > 0; i -= 3) {
+    str = str.slice(0, i) + ',' + str.slice(i)
   }
-  return groups.join()
+  return str
 }
 
 function formatFraction(fraction: bigint, decimals: number): string {
-  if (fraction === 0n) {
-    return ''
-  }
-  const fractionPart = fraction
-    .toString()
-    .padStart(decimals, '0')
-    .replace(/0+$/, '')
-  return `.${fractionPart}`
+  if (fraction === 0n) return ''
+  return '.' + fraction.toString().padStart(decimals, '0').replace(/0+$/, '')
 }
 
-export function formatWithQuantum(amount: bigint, quantum: bigint): string {
+export function formatWithQuantum(
+  amount: bigint,
+  quantum: bigint,
+  prefix?: string
+): string {
   const decimals = quantumToDecimals(quantum)
   if (decimals) {
-    return formatWithDecimals(amount, decimals)
+    return formatWithDecimals(amount, decimals, prefix)
   }
-  return formatWithDecimals((amount * 1000n) / quantum, 3)
+  return formatWithDecimals((amount * 1000n) / quantum, 3, prefix)
 }
 
 export function quantumToDecimals(quantum: bigint) {

@@ -12,6 +12,7 @@ describe(formatWithDecimals.name, () => {
     [123n, 4, '0.0123'],
     [123456n, 4, '12.3456'],
     [123456789n, 4, '12,345.6789'],
+    [12345678900n, 4, '1,234,567.89'],
     [123n, 0, '123'],
     [1234n, 0, '1,234'],
     [12345n, 0, '12,345'],
@@ -29,6 +30,14 @@ describe(formatWithDecimals.name, () => {
       expect(formatWithDecimals(amount, decimals)).toEqual(expected)
     })
   }
+
+  it('supports prefix for positive numbers', () => {
+    expect(formatWithDecimals(123456789n, 4, '$')).toEqual('$12,345.6789')
+  })
+
+  it('supports prefix for negative numbers', () => {
+    expect(formatWithDecimals(-123456789n, 4, '$')).toEqual('-$12,345.6789')
+  })
 })
 
 describe(quantumToDecimals.name, () => {

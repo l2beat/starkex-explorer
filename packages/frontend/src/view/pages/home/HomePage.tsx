@@ -1,11 +1,16 @@
 import { UserDetails } from '@explorer/shared'
-import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { Asset } from '../../../utils/assets'
 import { Page } from '../../components/common/page/Page'
 import { TablePreview } from '../../components/common/table/TablePreview'
-import { HomeForcedTransactionTable } from '../../components/home/HomeForcedTransactionTable'
+import {
+  HomeForcedTransactionEntry,
+  HomeForcedTransactionTable,
+} from '../../components/home/HomeForcedTransactionTable'
+import {
+  HomeOfferEntry,
+  HomeOfferTable,
+} from '../../components/home/HomeOfferTable'
 import {
   HomeStateUpdateEntry,
   HomeStateUpdateTable,
@@ -28,25 +33,6 @@ export interface HomeTutorialEntry {
   title: string
   imageUrl: string
   href: string
-}
-
-export interface HomeForcedTransactionEntry {
-  timestamp: Timestamp
-  hash: Hash256
-  asset: Asset
-  amount: bigint
-  status: 'MINED' | 'INCLUDED'
-  type: 'WITHDRAWAL' | 'BUY' | 'SELL'
-}
-
-export interface HomeOfferEntry {
-  timestamp: Timestamp
-  id: string
-  asset: Asset
-  amount: bigint
-  price: bigint
-  totalPrice: bigint
-  type: 'BUY' | 'SELL'
 }
 
 export function renderHomePage(props: HomePageProps) {
@@ -92,7 +78,7 @@ function HomePage(props: HomePageProps) {
           totalEntries={props.offerCount}
           link="/offers"
         >
-          <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
+          <HomeOfferTable offers={props.offers} />
         </TablePreview>
       </div>
     </Page>

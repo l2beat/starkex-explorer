@@ -7,6 +7,8 @@ export * from './old/positions'
 export * from './old/state-updates'
 export * from './old/transaction-form'
 /* eslint-enable no-restricted-imports */
+export type { HomeForcedTransactionEntry } from './components/home/HomeForcedTransactionTable'
+export type { HomeOfferEntry } from './components/home/HomeOfferTable'
 export type { HomeStateUpdateEntry } from './components/home/HomeStateUpdateTable'
 export * from './pages/forced-actions/ForcedTradePage'
 export * from './pages/forced-actions/ForcedWithdrawPage'
