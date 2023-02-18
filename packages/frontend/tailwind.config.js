@@ -61,6 +61,7 @@ module.exports = {
       yellow: {
         300: '#FFEF5A',
       },
+      black: '#060606',
       brand: '#5F5CFF',
     },
   },

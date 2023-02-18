@@ -5,6 +5,7 @@ import React from 'react'
 import { Asset } from '../../../utils/assetUtils'
 import { Page } from '../../components/common/page/Page'
 import { TablePreview } from '../../components/common/table/TablePreview'
+import { HomeForcedTransactionTable } from '../../components/home/HomeForcedTransactionTable'
 import {
   HomeStateUpdateEntry,
   HomeStateUpdateTable,
@@ -80,7 +81,9 @@ function HomePage(props: HomePageProps) {
           totalEntries={props.forcedTransactionCount}
           link="/forced-transactions"
         >
-          <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
+          <HomeForcedTransactionTable
+            forcedTransactions={props.forcedTransactions}
+          />
         </TablePreview>
         <TablePreview
           title="Available trade offers"

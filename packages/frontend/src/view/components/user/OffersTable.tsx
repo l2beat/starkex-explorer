@@ -1,8 +1,8 @@
 import { Timestamp } from '@explorer/types'
 import React from 'react'
 
+import { StatusBadge, StatusType } from '../common/StatusBadge'
 import { Table } from '../common/table/Table'
-import { StatusBadge, StatusType } from './StatusBadge'
 
 export interface OffersTableProps {
   readonly offers: readonly OfferEntry[]

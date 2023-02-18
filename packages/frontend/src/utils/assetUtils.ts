@@ -1,8 +1,6 @@
 import { AssetDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
-import { formatHashShort } from './formatUtils'
-
 export interface Asset {
   hashOrId: AssetHash | AssetId
   details?: AssetDetails
@@ -46,7 +44,7 @@ function assetHashToInfo(
   if (!assetDetails) {
     return {
       name: 'Unknown',
-      symbol: formatHashShort(assetHash),
+      symbol: assetHash.toString(),
       isUnknownHash: true,
       imageUrl: '/images/unknown-asset.svg',
     }
@@ -61,8 +59,7 @@ function assetHashToInfo(
   }
   return {
     name: assetDetails.name ?? assetDetails.symbol ?? 'Unknown',
-    symbol:
-      assetDetails.symbol ?? assetDetails.name ?? formatHashShort(assetHash),
+    symbol: assetDetails.symbol ?? assetDetails.name ?? assetHash.toString(),
     isUnknownHash: !assetDetails.symbol && !assetDetails.name,
     imageUrl: getTrustWalletImageUrl(assetDetails.address.toString()),
   }

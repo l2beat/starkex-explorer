@@ -32,15 +32,20 @@ export function AssetWithLogo({
           type === 'small' ? 'text-sm font-medium' : 'text-lg font-semibold'
         )}
       >
-        {type === 'full' ? (
+        {type === 'full' && (
           <div>
             <div>{assetInfo.name}</div>
             <div className="text-xs text-zinc-500 ">{assetInfo.symbol}</div>
           </div>
-        ) : assetInfo.isUnknownHash ? (
-          `${assetInfo.name} (${assetInfo.symbol})`
-        ) : (
-          assetInfo.symbol
+        )}
+        {type === 'regular' &&
+          (assetInfo.isUnknownHash
+            ? `${assetInfo.name} (${assetInfo.symbol})`
+            : assetInfo.symbol)}
+        {type === 'small' && (
+          <span className="inline-block max-w-[8ch] truncate">
+            {assetInfo.symbol}
+          </span>
         )}
       </span>
     </div>
