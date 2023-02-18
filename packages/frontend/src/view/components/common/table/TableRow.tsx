@@ -10,7 +10,7 @@ export interface TableRowProps extends Row {
 
 export function TableRow(props: TableRowProps) {
   return (
-    <tr className="h-10 whitespace-nowrap text-sm font-medium">
+    <tr className="h-10 whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium">
       {props.cells.map((cell, col) => {
         const { numeric, monospace, className } = props.columns[col] ?? {}
 
@@ -30,7 +30,7 @@ export function TableRow(props: TableRowProps) {
             {props.link ? (
               <a
                 className={cx(
-                  'flex h-10 items-center px-2.5',
+                  'flex h-[39px] items-center px-2.5',
                   col === 0 && 'pl-5',
                   col === props.cells.length - 1 && 'pr-5',
                   className
