@@ -51,7 +51,9 @@ export function HomeForcedTransactionTable(
             <StatusBadge type={toStatusType(transaction.status)}>
               {transaction.status}
             </StatusBadge>,
-            `Forced ${transaction.type.toLowerCase()}`,
+            <span className="capitalize">
+              {transaction.type.toLowerCase()}
+            </span>,
           ],
         }
       })}
