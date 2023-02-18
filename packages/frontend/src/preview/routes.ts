@@ -32,6 +32,7 @@ const routes: Route[] = [
     description: 'The home page.',
     render: (ctx) => {
       const user = getUser(ctx)
+      // @ts-ignore TODO: add home props
       ctx.body = renderHomePage({ user })
     },
   },
