@@ -6,7 +6,7 @@ export interface Row {
 }
 
 export interface Column {
-  header: string
+  header: ReactNode
   numeric?: boolean
   monospace?: boolean
   className?: string

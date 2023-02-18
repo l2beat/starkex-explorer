@@ -43,7 +43,7 @@ export function HomeOfferTable(props: HomeOfferTableProps) {
             <span className="text-blue-600 underline">#{offer.id}</span>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(offer.asset)} />,
             formatAmount(offer.asset, offer.amount),
-            formatWithDecimals(offer.totalPrice, 6, '$'),
+            formatWithDecimals(offer.totalPrice, 6, { prefix: '$' }),
             <span className="capitalize">{offer.type.toLowerCase()}</span>,
           ],
         }

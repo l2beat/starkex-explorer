@@ -21,6 +21,7 @@ import {
   randomHomeStateUpdateEntry,
 } from './data/home'
 import {
+  randomUserAssetEntry,
   randomUserBalanceChangeEntry,
   randomUserTransactionEntry,
 } from './data/user'
@@ -146,8 +147,8 @@ const routes: Route[] = [
         ethereumAddress: EthereumAddress.fake(),
         withdrawableAssets: [],
         offersToAccept: [],
-        assets: [],
-        totalAssets: 0,
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 7,
         balanceChanges: repeat(10, randomUserBalanceChangeEntry),
         totalBalanceChanges: 3367,
         transactions: repeat(10, randomUserTransactionEntry),

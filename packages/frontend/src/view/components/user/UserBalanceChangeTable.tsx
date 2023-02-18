@@ -47,7 +47,7 @@ export function UserBalanceChangeTable(props: UserBalanceChangeTableProps) {
             </a>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(entry.asset)} />,
             formatAmount(entry.asset, entry.balance),
-            <p
+            <span
               className={cx(
                 'text-sm font-medium',
                 change.startsWith('-') && 'text-red-400',
@@ -56,8 +56,8 @@ export function UserBalanceChangeTable(props: UserBalanceChangeTableProps) {
               )}
             >
               {change}
-            </p>,
-            <p className="text-zinc-500">#{entry.vaultOrPositionId}</p>,
+            </span>,
+            <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
           ],
         }
       })}

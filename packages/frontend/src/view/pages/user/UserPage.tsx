@@ -8,8 +8,11 @@ import {
   ActionsTable,
   WithdrawableAssetEntry,
 } from '../../components/user/ActionsTable'
-import { AssetEntry, AssetsTable } from '../../components/user/AssetsTable'
 import { OfferEntry, OffersTable } from '../../components/user/OffersTable'
+import {
+  UserAssetEntry,
+  UserAssetTable,
+} from '../../components/user/UserAssetTable'
 import {
   UserBalanceChangeEntry,
   UserBalanceChangeTable,
@@ -18,9 +21,10 @@ import { UserProfile } from '../../components/user/UserProfile'
 import {
   UserTransactionEntry,
   UserTransactionsTable,
-} from '../../components/user/UserTransactionsTable'
+} from '../../components/user/UserTransactionTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
+  getAssetsTableProps,
   getBalanceChangeTableProps,
   getOfferTableProps,
   getTransactionTableProps,
@@ -33,7 +37,7 @@ export interface UserPageProps {
   type: 'SPOT' | 'PERPETUAL'
   withdrawableAssets: WithdrawableAssetEntry[] // Does ths make sense?
   offersToAccept: OfferEntry[] // We could also pass a simpler object here
-  assets: AssetEntry[]
+  assets: UserAssetEntry[]
   totalAssets: number
   balanceChanges: UserBalanceChangeEntry[]
   totalBalanceChanges: number
@@ -63,7 +67,17 @@ function UserPage(props: UserPageProps) {
           withdrawableAssets={props.withdrawableAssets}
           offersToAccept={props.offersToAccept}
         />
-        <AssetsTable assets={props.assets} />
+        <TablePreview
+          {...getAssetsTableProps(props.starkKey)}
+          visible={props.assets.length}
+          total={props.totalAssets}
+        >
+          <UserAssetTable
+            type={props.type}
+            starkKey={props.starkKey}
+            assets={props.assets}
+          />
+        </TablePreview>
         <TablePreview
           {...getBalanceChangeTableProps(props.starkKey)}
           visible={props.balanceChanges.length}

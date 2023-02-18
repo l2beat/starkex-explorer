@@ -1,5 +1,12 @@
 import { StarkKey } from '@explorer/types'
 
+export const getAssetsTableProps = (starkKey: StarkKey) => ({
+  title: 'Assets',
+  entryShortNamePlural: 'assets',
+  entryLongNamePlural: 'assets',
+  link: `/user/${starkKey.toString()}/assets`,
+})
+
 export const getBalanceChangeTableProps = (starkKey: StarkKey) => ({
   title: 'Balance changes',
   entryShortNamePlural: 'changes',
