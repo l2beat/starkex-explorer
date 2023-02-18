@@ -4,6 +4,7 @@ import React from 'react'
 
 import { Asset } from '../../../utils/assetUtils'
 import { Page } from '../../components/common/page/Page'
+import { TablePreview } from '../../components/common/table/TablePreview'
 import {
   HomeStateUpdateEntry,
   HomeStateUpdateTable,
@@ -60,7 +61,38 @@ function HomePage(props: HomePageProps) {
       withoutSearch
     >
       <h1>Home Page</h1>
-      <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
+      <div className="flex max-w-[760px] flex-col gap-y-12">
+        <TablePreview
+          title="Latest state updates"
+          entryShortNamePlural="updates"
+          entryLongNamePlural="state updates"
+          visibleEntries={props.stateUpdates.length}
+          totalEntries={props.stateUpdateCount}
+          link="/state-updates"
+        >
+          <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
+        </TablePreview>
+        <TablePreview
+          title="Latest forced transactions"
+          entryShortNamePlural="transactions"
+          entryLongNamePlural="forced transactions"
+          visibleEntries={props.forcedTransactions.length}
+          totalEntries={props.forcedTransactionCount}
+          link="/forced-transactions"
+        >
+          <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
+        </TablePreview>
+        <TablePreview
+          title="Available trade offers"
+          entryShortNamePlural="offers"
+          entryLongNamePlural="trade offers"
+          visibleEntries={props.offers.length}
+          totalEntries={props.offerCount}
+          link="/offers"
+        >
+          <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
+        </TablePreview>
+      </div>
     </Page>
   )
 }

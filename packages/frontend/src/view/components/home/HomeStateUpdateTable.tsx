@@ -32,7 +32,7 @@ export function HomeStateUpdateTable(props: HomeStateUpdateTableProps) {
           cells: [
             formatTimestamp(stateUpdate.timestamp),
             <span className="text-blue-600 underline">#{stateUpdate.id}</span>,
-            <span className="block max-w-[400px] truncate">
+            <span className="block max-w-[300px] truncate">
               {stateUpdate.hash}
             </span>,
             stateUpdate.updateCount > 0 ? stateUpdate.updateCount : '-',
