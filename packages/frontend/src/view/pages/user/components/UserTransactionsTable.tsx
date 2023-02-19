@@ -43,9 +43,10 @@ export function UserTransactionsTable(props: UserTransactionsTableProps) {
           link: `/transactions/${transaction.hash.toString()}`,
           cells: [
             <TimeCell timestamp={transaction.timestamp} />,
-            // TODO: fix truncate and underline
-            <span className="block max-w-[80px] truncate text-blue-600 underline">
-              {transaction.hash}
+            <span className="fake-underline text-blue-600">
+              <span className="inline-block max-w-[80px] truncate">
+                {transaction.hash}
+              </span>
             </span>,
             <AssetWithLogo
               type="small"
