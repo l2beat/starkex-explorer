@@ -1,8 +1,8 @@
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
-import { assetToInfo } from '../../../../utils/assets'
-import { AssetWithLogo } from '../../common/AssetWithLogo'
+import { assetToInfo } from '../../../../../utils/assets'
+import { AssetWithLogo } from '../../../../components/AssetWithLogo'
 import { FormId } from './ids'
 
 export function TotalInput() {

@@ -1,8 +1,8 @@
 import cx from 'classnames'
 import React from 'react'
 
-import { PaginationLeftIcon } from '../../../assets/icons/PaginationLeftIcon'
-import { PaginationRightIcon } from '../../../assets/icons/PaginationRightIcon'
+import { PaginationLeftIcon } from '../../assets/icons/PaginationLeftIcon'
+import { PaginationRightIcon } from '../../assets/icons/PaginationRightIcon'
 
 export interface TablePaginationProps {
   limit: number

@@ -1,14 +1,14 @@
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { Asset, assetToInfo } from '../../../utils/assets'
+import { Asset, assetToInfo } from '../../../../utils/assets'
 import {
   formatAmount,
   formatWithDecimals,
-} from '../../../utils/formatting/formatAmount'
-import { AssetWithLogo } from '../common/AssetWithLogo'
-import { Button } from '../common/Button'
-import { Table } from '../common/table/Table'
+} from '../../../../utils/formatting/formatAmount'
+import { AssetWithLogo } from '../../../components/AssetWithLogo'
+import { Button } from '../../../components/Button'
+import { Table } from '../../../components/table/Table'
 
 export interface UserAssetsTableProps {
   assets: UserAssetEntry[]

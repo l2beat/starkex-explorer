@@ -1,14 +1,14 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
-import { Page } from '../../components/common/page/Page'
-import { TableWithPagination } from '../../components/common/table/TableWithPagination'
+import { Page } from '../../components/page/Page'
+import { TableWithPagination } from '../../components/table/TableWithPagination'
+import { reactToHtml } from '../../reactToHtml'
+import { STATE_UPDATE_TABLE_PROPS } from './common'
 import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
-} from '../../components/home/HomeStateUpdatesTable'
-import { reactToHtml } from '../../reactToHtml'
-import { STATE_UPDATE_TABLE_PROPS } from './common'
+} from './components/HomeStateUpdatesTable'
 
 export interface HomeStateUpdatesPageProps {
   user: UserDetails | undefined

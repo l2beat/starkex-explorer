@@ -2,14 +2,14 @@ import { UserDetails } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { Page } from '../../components/common/page/Page'
-import { TableWithPagination } from '../../components/common/table/TableWithPagination'
+import { Page } from '../../components/page/Page'
+import { TableWithPagination } from '../../components/table/TableWithPagination'
+import { reactToHtml } from '../../reactToHtml'
+import { getTransactionTableProps } from './common'
 import {
   UserTransactionEntry,
   UserTransactionsTable,
-} from '../../components/user/UserTransactionsTable'
-import { reactToHtml } from '../../reactToHtml'
-import { getTransactionTableProps } from './common'
+} from './components/UserTransactionsTable'
 
 export interface UserTransactionsPageProps {
   user: UserDetails | undefined

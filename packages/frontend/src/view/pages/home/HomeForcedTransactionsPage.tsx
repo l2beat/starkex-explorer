@@ -1,14 +1,14 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
-import { Page } from '../../components/common/page/Page'
-import { TableWithPagination } from '../../components/common/table/TableWithPagination'
+import { Page } from '../../components/page/Page'
+import { TableWithPagination } from '../../components/table/TableWithPagination'
+import { reactToHtml } from '../../reactToHtml'
+import { OFFER_TABLE_PROPS } from './common'
 import {
   HomeForcedTransactionEntry,
   HomeForcedTransactionsTable,
-} from '../../components/home/HomeForcedTransactionsTable'
-import { reactToHtml } from '../../reactToHtml'
-import { OFFER_TABLE_PROPS } from './common'
+} from './components/HomeForcedTransactionsTable'
 
 export interface HomeForcedTransactionsPageProps {
   user: UserDetails | undefined

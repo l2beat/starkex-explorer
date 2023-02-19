@@ -1,26 +1,23 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
-import { Page } from '../../components/common/page/Page'
-import { TablePreview } from '../../components/common/table/TablePreview'
-import {
-  HomeForcedTransactionEntry,
-  HomeForcedTransactionsTable,
-} from '../../components/home/HomeForcedTransactionsTable'
-import {
-  HomeOfferEntry,
-  HomeOffersTable,
-} from '../../components/home/HomeOffersTable'
-import {
-  HomeStateUpdateEntry,
-  HomeStateUpdatesTable,
-} from '../../components/home/HomeStateUpdatesTable'
+import { Page } from '../../components/page/Page'
+import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
 import {
   FORCED_TRANSACTION_TABLE_PROPS,
   OFFER_TABLE_PROPS,
   STATE_UPDATE_TABLE_PROPS,
 } from './common'
+import {
+  HomeForcedTransactionEntry,
+  HomeForcedTransactionsTable,
+} from './components/HomeForcedTransactionsTable'
+import { HomeOfferEntry, HomeOffersTable } from './components/HomeOffersTable'
+import {
+  HomeStateUpdateEntry,
+  HomeStateUpdatesTable,
+} from './components/HomeStateUpdatesTable'
 
 export interface HomePageProps {
   user: UserDetails | undefined

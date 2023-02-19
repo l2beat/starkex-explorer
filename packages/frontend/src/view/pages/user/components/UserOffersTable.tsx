@@ -1,15 +1,15 @@
 import { Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { Asset, assetToInfo } from '../../../utils/assets'
+import { Asset, assetToInfo } from '../../../../utils/assets'
 import {
   formatAmount,
   formatWithDecimals,
-} from '../../../utils/formatting/formatAmount'
-import { formatTimestamp } from '../../../utils/formatting/formatTimestamp'
-import { AssetWithLogo } from '../common/AssetWithLogo'
-import { StatusBadge, StatusType } from '../common/StatusBadge'
-import { Table } from '../common/table/Table'
+} from '../../../../utils/formatting/formatAmount'
+import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
+import { AssetWithLogo } from '../../../components/AssetWithLogo'
+import { StatusBadge, StatusType } from '../../../components/StatusBadge'
+import { Table } from '../../../components/table/Table'
 
 export interface UserOffersTableProps {
   offers: UserOfferEntry[]

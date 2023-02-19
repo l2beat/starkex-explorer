@@ -1,7 +1,7 @@
 import { AccountDetails } from '@explorer/shared'
 import React from 'react'
 
-import { Page } from '../components/common/page/Page'
+import { Page } from '../components/page/Page'
 import { reactToHtml } from '../reactToHtml'
 
 export interface NotFoundPageProps {

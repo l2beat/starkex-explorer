@@ -2,14 +2,11 @@ import { UserDetails } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { Page } from '../../components/common/page/Page'
-import { TableWithPagination } from '../../components/common/table/TableWithPagination'
-import {
-  UserOfferEntry,
-  UserOffersTable,
-} from '../../components/user/UserOffersTable'
+import { Page } from '../../components/page/Page'
+import { TableWithPagination } from '../../components/table/TableWithPagination'
 import { reactToHtml } from '../../reactToHtml'
 import { getOfferTableProps } from './common'
+import { UserOfferEntry, UserOffersTable } from './components/UserOffersTable'
 
 export interface UserOffersPageProps {
   user: UserDetails | undefined

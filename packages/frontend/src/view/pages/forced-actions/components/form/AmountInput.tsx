@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { assetToInfo } from '../../../../utils/assets'
-import { formatCurrencyInput } from '../../../../utils/formatting/formatCurrencyInput'
-import { ForcedActionFormProps } from '../../../pages/forced-actions/ForcedActionFormProps'
-import { AssetWithLogo } from '../../common/AssetWithLogo'
+import { assetToInfo } from '../../../../../utils/assets'
+import { formatCurrencyInput } from '../../../../../utils/formatting/formatCurrencyInput'
+import { AssetWithLogo } from '../../../../components/AssetWithLogo'
+import { ForcedActionFormProps } from '../../ForcedActionFormProps'
 import { FormId } from './ids'
 
 export function AmountInput(props: ForcedActionFormProps) {

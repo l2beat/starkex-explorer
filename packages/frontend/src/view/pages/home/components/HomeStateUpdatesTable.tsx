@@ -1,9 +1,9 @@
 import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { formatInt } from '../../../utils/formatting/formatAmount'
-import { formatTimestamp } from '../../../utils/formatting/formatTimestamp'
-import { Table } from '../common/table/Table'
+import { formatInt } from '../../../../utils/formatting/formatAmount'
+import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
+import { Table } from '../../../components/table/Table'
 
 export interface HomeStateUpdateEntry {
   timestamp: Timestamp

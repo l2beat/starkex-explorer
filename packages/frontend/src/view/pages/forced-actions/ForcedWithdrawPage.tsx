@@ -1,14 +1,14 @@
 import React from 'react'
 
-import { Button, LinkButton } from '../../components/common/Button'
-import { Card } from '../../components/common/Card'
-import { Link } from '../../components/common/Link'
-import { OrderedList } from '../../components/common/OrderedList'
-import { Page } from '../../components/common/page/Page'
-import { ForcedActionCard } from '../../components/forced-actions/ForcedActionCard'
-import { AmountInput } from '../../components/forced-actions/form/AmountInput'
-import { FormId } from '../../components/forced-actions/form/ids'
+import { Button, LinkButton } from '../../components/Button'
+import { Card } from '../../components/Card'
+import { Link } from '../../components/Link'
+import { OrderedList } from '../../components/OrderedList'
+import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
+import { ForcedActionCard } from './components/ForcedActionCard'
+import { AmountInput } from './components/form/AmountInput'
+import { FormId } from './components/form/ids'
 import {
   ForcedActionFormProps,
   serializeForcedActionsFormProps,

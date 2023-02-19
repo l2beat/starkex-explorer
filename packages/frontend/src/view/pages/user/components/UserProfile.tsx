@@ -1,9 +1,9 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { InfoIcon } from '../../components/common/icons/InfoIcon'
-import { WarningIcon } from '../../components/common/icons/WarningIcon'
-import { Button } from '../common/Button'
+import { Button } from '../../../components/Button'
+import { InfoIcon } from '../../../components/icons/InfoIcon'
+import { WarningIcon } from '../../../components/icons/WarningIcon'
 
 interface UserProfileProps {
   ethereumAddress?: EthereumAddress

@@ -2,29 +2,8 @@ import { UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { Page } from '../../components/common/page/Page'
-import { TablePreview } from '../../components/common/table/TablePreview'
-import {
-  ActionsTable,
-  WithdrawableAssetEntry,
-} from '../../components/user/ActionsTable'
-import {
-  UserAssetEntry,
-  UserAssetsTable,
-} from '../../components/user/UserAssetTable'
-import {
-  UserBalanceChangeEntry,
-  UserBalanceChangesTable,
-} from '../../components/user/UserBalanceChangesTable'
-import {
-  UserOfferEntry,
-  UserOffersTable,
-} from '../../components/user/UserOffersTable'
-import { UserProfile } from '../../components/user/UserProfile'
-import {
-  UserTransactionEntry,
-  UserTransactionsTable,
-} from '../../components/user/UserTransactionsTable'
+import { Page } from '../../components/page/Page'
+import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
 import {
   getAssetsTableProps,
@@ -32,6 +11,18 @@ import {
   getOfferTableProps,
   getTransactionTableProps,
 } from './common'
+import { ActionsTable, WithdrawableAssetEntry } from './components/ActionsTable'
+import { UserAssetEntry, UserAssetsTable } from './components/UserAssetTable'
+import {
+  UserBalanceChangeEntry,
+  UserBalanceChangesTable,
+} from './components/UserBalanceChangesTable'
+import { UserOfferEntry, UserOffersTable } from './components/UserOffersTable'
+import { UserProfile } from './components/UserProfile'
+import {
+  UserTransactionEntry,
+  UserTransactionsTable,
+} from './components/UserTransactionsTable'
 
 export interface UserPageProps {
   user: UserDetails | undefined

@@ -2,11 +2,11 @@ import { Timestamp } from '@explorer/types'
 import cx from 'classnames'
 import React from 'react'
 
-import { Asset, assetToInfo } from '../../../utils/assets'
-import { formatAmount } from '../../../utils/formatting/formatAmount'
-import { formatTimestamp } from '../../../utils/formatting/formatTimestamp'
-import { AssetWithLogo } from '../common/AssetWithLogo'
-import { Table } from '../common/table/Table'
+import { Asset, assetToInfo } from '../../../../utils/assets'
+import { formatAmount } from '../../../../utils/formatting/formatAmount'
+import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
+import { AssetWithLogo } from '../../../components/AssetWithLogo'
+import { Table } from '../../../components/table/Table'
 
 export interface UserBalanceChangesTableProps {
   balanceChanges: UserBalanceChangeEntry[]

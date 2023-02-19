@@ -2,14 +2,14 @@ import { UserDetails } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { Page } from '../../components/common/page/Page'
-import { TableWithPagination } from '../../components/common/table/TableWithPagination'
+import { Page } from '../../components/page/Page'
+import { TableWithPagination } from '../../components/table/TableWithPagination'
+import { reactToHtml } from '../../reactToHtml'
+import { getBalanceChangeTableProps } from './common'
 import {
   UserBalanceChangeEntry,
   UserBalanceChangesTable,
-} from '../../components/user/UserBalanceChangesTable'
-import { reactToHtml } from '../../reactToHtml'
-import { getBalanceChangeTableProps } from './common'
+} from './components/UserBalanceChangesTable'
 
 export interface UserBalanceChangesPageProps {
   user: UserDetails | undefined

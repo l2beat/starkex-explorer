@@ -1,14 +1,11 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
-import { Page } from '../../components/common/page/Page'
-import { TableWithPagination } from '../../components/common/table/TableWithPagination'
-import {
-  HomeOfferEntry,
-  HomeOffersTable,
-} from '../../components/home/HomeOffersTable'
+import { Page } from '../../components/page/Page'
+import { TableWithPagination } from '../../components/table/TableWithPagination'
 import { reactToHtml } from '../../reactToHtml'
 import { OFFER_TABLE_PROPS } from './common'
+import { HomeOfferEntry, HomeOffersTable } from './components/HomeOffersTable'
 
 export interface HomeOffersPageProps {
   user: UserDetails | undefined
