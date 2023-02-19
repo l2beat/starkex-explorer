@@ -15,7 +15,7 @@
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "prebuild": "yarn clean",
-    "build": "tsc",
+    "build": "swc --no-swcrc --source-maps --no-swcrc src -d build",
     "postbuild": "cp src/core/migrations/blockTimestamps.json build/core/migrations/blockTimestamps.json",
     "clean": "rm -rf build",
     "test": "mocha",

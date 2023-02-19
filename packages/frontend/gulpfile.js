@@ -4,6 +4,7 @@ const child_process = require('child_process')
 const path = require('path')
 const fs = require('fs')
 const { addHashes } = require('./scripts/hashStaticFiles')
+const { executionAsyncId } = require('async_hooks')
 
 async function clean() {
   await del('build')
@@ -47,7 +48,8 @@ function watchStatic() {
 }
 
 function buildTypescript() {
-  return exec(`tsc -p tsconfig.build.json`)
+  return exec('swc --no-swcrc --source-maps --no-swcrc src -d build')
+  // return exec(`tsc -p tsconfig.build.json`)
 }
 
 async function hashStaticFiles() {

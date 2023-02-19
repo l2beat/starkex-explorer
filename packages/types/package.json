@@ -16,7 +16,7 @@
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
     "prebuild": "yarn clean",
-    "build": "tsc",
+    "build": "swc --no-swcrc --source-maps --no-swcrc src -d build",
     "clean": "rm -rf build",
     "test": "mocha"
   },
