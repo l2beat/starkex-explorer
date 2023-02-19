@@ -20,7 +20,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
   const end = formatInt(props.offset + props.visible)
   const total = formatInt(props.total)
   return (
-    <section>
+    <>
       <div className="mb-5 flex items-baseline justify-between">
         <h1 className="text-xl font-semibold">{props.title}</h1>
         <p className="text-sm font-medium text-zinc-500">
@@ -44,12 +44,22 @@ export function TableWithPagination(props: TableWithPaginationProps) {
       )}
       <div className="mt-6">
         <TablePagination
+          className="hidden sm:block"
+          surroundingPages={2}
+          limit={props.limit}
+          offset={props.offset}
+          total={props.total}
+          link={props.link}
+        />
+        <TablePagination
+          className="sm:hidden"
+          surroundingPages={1}
           limit={props.limit}
           offset={props.offset}
           total={props.total}
           link={props.link}
         />
       </div>
-    </section>
+    </>
   )
 }

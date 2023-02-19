@@ -9,9 +9,9 @@ export interface TablePaginationProps {
   offset: number
   total: number
   link: string
+  surroundingPages: number
+  className?: string
 }
-
-const SURROUNDING_PAGES = 2
 
 export function TablePagination(props: TablePaginationProps) {
   const { previous, current, next, display } = getPages(props)
@@ -20,7 +20,7 @@ export function TablePagination(props: TablePaginationProps) {
     `${props.link}?page=${page}&perPage=${props.limit}`
 
   return (
-    <nav>
+    <nav className={props.className}>
       <ol className="flex items-center justify-center gap-2 text-sm font-semibold">
         <li>
           {previous ? (
@@ -65,27 +65,27 @@ export function TablePagination(props: TablePaginationProps) {
   )
 }
 
-function getPages(props: { limit: number; offset: number; total: number }) {
+function getPages(props: TablePaginationProps) {
   const total = Math.ceil(props.total / props.limit)
   const current = Math.floor(props.offset / props.limit) + 1
   return {
     previous: current - 1 < 1 ? undefined : current - 1,
     current,
     next: current + 1 > total ? undefined : current + 1,
-    display: getDisplay(getPageSet(total, current)),
+    display: getDisplay(getPageSet(total, current, props.surroundingPages)),
   }
 }
 
-function getPageSet(total: number, current: number) {
+function getPageSet(total: number, current: number, surroundingPages: number) {
   const pages = new Set([1, total])
 
-  let startFrom = current - SURROUNDING_PAGES
-  if (startFrom > total - SURROUNDING_PAGES * 2 - 2) {
-    startFrom = total - SURROUNDING_PAGES * 2 - 2
+  let startFrom = current - surroundingPages
+  if (startFrom > total - surroundingPages * 2 - 2) {
+    startFrom = total - surroundingPages * 2 - 2
   }
-  let endAt = current + SURROUNDING_PAGES
-  if (endAt < SURROUNDING_PAGES * 2 + 3) {
-    endAt = SURROUNDING_PAGES * 2 + 3
+  let endAt = current + surroundingPages
+  if (endAt < surroundingPages * 2 + 3) {
+    endAt = surroundingPages * 2 + 3
   }
 
   for (let i = startFrom; i <= endAt; i++) {
