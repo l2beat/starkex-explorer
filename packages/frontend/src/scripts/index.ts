@@ -8,6 +8,8 @@ import { initCancelOfferForm } from './offer/cancelForm'
 import { initOffersFilteringForm } from './offer/filteringForm'
 import { initFinalizeForm } from './offer/finalizeForm'
 // eslint-disable-next-line no-restricted-imports
+import { initOldPagination } from './old/pagination'
+// eslint-disable-next-line no-restricted-imports
 import { initFinalizeExitForm } from './old/transaction/finalizeExitForm'
 // eslint-disable-next-line no-restricted-imports
 import { initTransactionForm } from './old/transaction/transactionForm'
@@ -16,7 +18,7 @@ import { initTVLDisplay } from './tvl'
 
 initTVLDisplay()
 initMetamask()
-initPagination()
+initOldPagination()
 initOffersFilteringForm()
 initAcceptOfferForm()
 initCancelOfferForm()
@@ -24,6 +26,7 @@ initFinalizeForm()
 initFinalizeExitForm()
 initCountdownTimer()
 initImageFallback()
+initPagination()
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 if (USE_NEW_DESIGN) {

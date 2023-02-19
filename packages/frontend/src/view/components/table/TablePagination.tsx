@@ -5,19 +5,23 @@ import { PaginationLeftIcon } from '../../assets/icons/PaginationLeftIcon'
 import { PaginationRightIcon } from '../../assets/icons/PaginationRightIcon'
 
 export interface TablePaginationProps {
-  limit: number
-  offset: number
-  total: number
-  link: string
   surroundingPages: number
   className?: string
+  link: string
+  current: number
+  total: number
+  perPage: number
 }
 
 export function TablePagination(props: TablePaginationProps) {
-  const { previous, current, next, display } = getPages(props)
+  const { previous, next, display } = getPages(
+    props.current,
+    props.total,
+    props.surroundingPages
+  )
 
   const link = (page: number) =>
-    `${props.link}?page=${page}&perPage=${props.limit}`
+    `${props.link}?page=${page}&perPage=${props.perPage}`
 
   return (
     <nav className={props.className}>
@@ -36,7 +40,7 @@ export function TablePagination(props: TablePaginationProps) {
             key={i}
             className={cx(
               'flex h-6 min-w-[24px] items-center justify-center px-0.5',
-              page === current && 'rounded bg-brand'
+              page === props.current && 'rounded bg-brand'
             )}
           >
             {page ? (
@@ -65,18 +69,15 @@ export function TablePagination(props: TablePaginationProps) {
   )
 }
 
-function getPages(props: TablePaginationProps) {
-  const total = Math.ceil(props.total / props.limit)
-  const current = Math.floor(props.offset / props.limit) + 1
+function getPages(current: number, total: number, surroundingPages: number) {
   return {
     previous: current - 1 < 1 ? undefined : current - 1,
-    current,
     next: current + 1 > total ? undefined : current + 1,
-    display: getDisplay(getPageSet(total, current, props.surroundingPages)),
+    display: getDisplay(getPageSet(current, total, surroundingPages)),
   }
 }
 
-function getPageSet(total: number, current: number, surroundingPages: number) {
+function getPageSet(current: number, total: number, surroundingPages: number) {
   const pages = new Set([1, total])
 
   let startFrom = current - surroundingPages

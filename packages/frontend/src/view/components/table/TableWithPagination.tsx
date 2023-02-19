@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../utils/formatting/formatAmount'
+import { TableLimitSelect } from './TableLimitSelect'
 import { TablePagination } from './TablePagination'
 
 export interface TableWithPaginationProps {
@@ -19,22 +20,33 @@ export function TableWithPagination(props: TableWithPaginationProps) {
   const start = formatInt(1 + props.offset)
   const end = formatInt(props.offset + props.visible)
   const total = formatInt(props.total)
+
+  const currentPage = Math.floor(props.offset / props.limit) + 1
+  const totalPages = Math.ceil(props.total / props.limit)
+
   return (
     <>
       <div className="mb-5 flex items-baseline justify-between">
         <h1 className="text-xl font-semibold">{props.title}</h1>
-        <p className="text-sm font-medium text-zinc-500">
-          {props.visible !== 0 ? (
-            <>
-              You're viewing {start}-{end} out of {total}{' '}
-              {props.entryShortNamePlural}
-            </>
-          ) : (
-            <>
-              You're viewing 0 out of {total} {props.entryShortNamePlural}
-            </>
-          )}
-        </p>
+        <div className="flex items-baseline gap-4">
+          <p className="text-sm font-medium text-zinc-500">
+            {props.visible !== 0 ? (
+              <>
+                You're viewing {start}-{end} out of {total}{' '}
+                {props.entryShortNamePlural}
+              </>
+            ) : (
+              <>
+                You're viewing 0 out of {total} {props.entryShortNamePlural}
+              </>
+            )}
+          </p>
+          <TableLimitSelect
+            currentPage={currentPage}
+            limit={props.limit}
+            link={props.link}
+          />
+        </div>
       </div>
       {props.children}
       {props.visible === 0 && (
@@ -42,21 +54,28 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           There are no {props.entryLongNamePlural} to view.
         </div>
       )}
-      <div className="mt-6">
-        <TablePagination
-          className="hidden sm:block"
-          surroundingPages={2}
+      <div className="mt-6 flex justify-between">
+        <div className="flex-1">
+          <TablePagination
+            className="hidden sm:block"
+            surroundingPages={2}
+            link={props.link}
+            current={currentPage}
+            total={totalPages}
+            perPage={props.limit}
+          />
+          <TablePagination
+            className="sm:hidden"
+            surroundingPages={1}
+            link={props.link}
+            current={currentPage}
+            total={totalPages}
+            perPage={props.limit}
+          />
+        </div>
+        <TableLimitSelect
+          currentPage={currentPage}
           limit={props.limit}
-          offset={props.offset}
-          total={props.total}
-          link={props.link}
-        />
-        <TablePagination
-          className="sm:hidden"
-          surroundingPages={1}
-          limit={props.limit}
-          offset={props.offset}
-          total={props.total}
           link={props.link}
         />
       </div>

@@ -11,7 +11,11 @@ interface TableProps {
 
 export function Table(props: TableProps) {
   return (
-    <div className={cx('-mx-4 w-[calc(100%+32px)] overflow-x-auto')}>
+    <div
+      className={cx(
+        '-mx-4 w-[calc(100%+32px)] overflow-x-auto sm:mx-0 sm:w-full'
+      )}
+    >
       <table
         cellPadding="0"
         cellSpacing="0"
