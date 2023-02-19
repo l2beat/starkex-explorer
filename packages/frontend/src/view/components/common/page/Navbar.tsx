@@ -21,9 +21,9 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
       >
         <div className="flex gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
-          <DydxLogo className="h-[26px] sm:h-[32px]" />
+          <DydxLogo className="h-[26px] sm:h-8" />
         </div>
-        <span className="py-1 pl-2 uppercase text-slate-400 sm:pl-4">
+        <span className="py-1 pl-2 uppercase text-zinc-500 sm:pl-4">
           Explorer
         </span>
       </a>
@@ -35,7 +35,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
         {account && (
           <a
             href={`/positions/${account.positionId ?? 'not-found'}`}
-            className="relative flex h-[32px] items-center justify-center gap-2 rounded-md px-4 align-middle lg:h-[44px]"
+            className="relative flex h-8 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand lg:h-[44px]"
           >
             <JazzIcon
               className="hidden lg:block"
