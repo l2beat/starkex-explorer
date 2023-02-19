@@ -58,6 +58,17 @@ function StateUpdatePage(props: StateUpdatePageProps) {
       user={props.user}
     >
       <ContentWrapper className="flex flex-col gap-12">
+        <div>
+          <h1 className="mb-4 text-xxl font-bold">State Update #{props.id}</h1>
+          <div>{props.stats.hashes.factHash.toString()}</div>
+          <div>{props.stats.hashes.positionTreeRoot?.toString()}</div>
+          <div>{props.stats.hashes.onChainVaultTreeRoot?.toString()}</div>
+          <div>{props.stats.hashes.offChainVaultTreeRoot?.toString()}</div>
+          <div>{props.stats.hashes.orderRoot.toString()}</div>
+          <div>{props.stats.blockNumber}</div>
+          <div>{props.stats.ethereumTimestamp.toString()}</div>
+          <div>{props.stats.starkExTimestamp.toString()}</div>
+        </div>
         <TablePreview
           {...getBalanceChangeTableProps(props.id)}
           visible={props.balanceChanges.length}
