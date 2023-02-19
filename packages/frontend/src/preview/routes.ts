@@ -5,10 +5,14 @@ import { randomInt } from 'crypto'
 import Koa from 'koa'
 
 import {
+  renderForcedTradePage,
   renderForcedWithdrawPage,
   renderHomeForcedTransactionsPage,
   renderHomeOffersPage,
   renderHomePage,
+  renderHomeStateUpdatesPage,
+  renderNotFoundPage,
+  renderStateUpdatePage,
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
   renderUserOffersPage,
@@ -16,17 +20,17 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderForcedTradePage } from '../view/pages/forced-actions/ForcedTradePage'
-import { renderHomeStateUpdatesPage } from '../view/pages/home/HomeStateUpdatesPage'
-import { renderNotFoundPage } from '../view/pages/NotFoundPage'
-import { renderStateUpdatePage } from '../view/pages/state-update/StateUpdatePage'
+import { renderStateUpdateBalanceChangesPage } from '../view/pages/state-update/StateUpdateBalanceChangesPage'
 import * as DATA from './data'
 import {
   randomHomeForcedTransactionEntry,
   randomHomeOfferEntry,
   randomHomeStateUpdateEntry,
 } from './data/home'
-import { randomStateUpdateBalanceChangeEntry } from './data/stateUpdate'
+import {
+  randomStateUpdateBalanceChangeEntry,
+  randomStateUpdateTransactionEntry,
+} from './data/stateUpdate'
 import {
   randomUserAssetEntry,
   randomUserBalanceChangeEntry,
@@ -154,16 +158,30 @@ const routes: Route[] = [
         },
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
         totalBalanceChanges: 231,
-        forcedTransactions: [],
-        totalForcedTransactions: 0,
+        transactions: repeat(5, randomStateUpdateTransactionEntry),
+        totalTransactions: 5,
       })
     },
   },
   {
-    path: '/state-updates/xyz/balance-changes',
+    path: '/state-updates/:id/balance-changes',
+    link: '/state-updates/xyz/balance-changes',
     description:
       'Balance change list accessible from state update page. Supports pagination.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 231
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderStateUpdateBalanceChangesPage({
+        user,
+        type: 'PERPETUAL',
+        id: '1534',
+        balanceChanges: repeat(visible, randomStateUpdateBalanceChangeEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   {
     path: '/state-updates/xyz/forced-transactions',

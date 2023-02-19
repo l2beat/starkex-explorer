@@ -1,17 +1,20 @@
 import { UserDetails } from '@explorer/shared'
-import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { PedersenHash, Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { Asset } from '../../../utils/assets'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
-import { getBalanceChangeTableProps } from './common'
+import { getBalanceChangeTableProps, getTransactionTableProps } from './common'
 import {
   StateUpdateBalanceChangeEntry,
   StateUpdateBalanceChangesTable,
 } from './components/StateUpdateBalanceChangesTable'
+import {
+  StateUpdateTransactionEntry,
+  StateUpdateTransactionsTable,
+} from './components/StateUpdateTransactionsTable'
 
 export interface StateUpdatePageProps {
   user: UserDetails | undefined
@@ -31,13 +34,8 @@ export interface StateUpdatePageProps {
   }
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
-  forcedTransactions: {
-    hash: Hash256
-    asset: Asset
-    amount: bigint
-    type: 'WITHDRAW' | 'BUY' | 'SELL'
-  }[]
-  totalForcedTransactions: number
+  transactions: StateUpdateTransactionEntry[]
+  totalTransactions: number
 }
 
 export interface StateUpdateTutorialEntry {
@@ -78,6 +76,13 @@ function StateUpdatePage(props: StateUpdatePageProps) {
             type={props.type}
             balanceChanges={props.balanceChanges}
           />
+        </TablePreview>
+        <TablePreview
+          {...getTransactionTableProps(props.id)}
+          visible={props.transactions.length}
+          total={props.totalTransactions}
+        >
+          <StateUpdateTransactionsTable transactions={props.transactions} />
         </TablePreview>
       </ContentWrapper>
     </Page>
