@@ -45,59 +45,61 @@ function ForcedTradePage(props: ForcedActionFormProps) {
       description="Page that allows user to buy or sell assets"
       user={props.user}
     >
-      <div className="my-auto flex gap-12">
-        <div className="flex flex-col">
-          <span className="text-2xl font-semibold">Begin trade process</span>
-          <span className="mt-6 text-sm font-semibold text-zinc-500">
-            The trade process consists of four steps:
-          </span>
-          <OrderedList items={instructions} className="mt-3 max-w-md" />
-        </div>
-        <Card className="h-min w-[480px]">
-          <form
-            id={FormId.Form}
-            className="flex flex-col gap-6"
-            data-props={propsJson}
-          >
-            <div className="flex items-end justify-between">
-              <span className="text-2xl font-semibold">
-                Forced {label} offer
-              </span>
-              <span>
-                <span className="text-sm text-zinc-500">Position</span>{' '}
-                <span className="font-semibold">#11273</span>
-              </span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <ForcedActionCard>
-                <AmountInput {...props} />
-              </ForcedActionCard>
-              <ForcedActionCard>
-                <PriceInput {...props} />
-              </ForcedActionCard>
-
-              <div className="mx-auto flex h-6 w-6 items-center justify-center rounded bg-slate-800">
-                <ArrowDownIcon className="fill-zinc-500" />
+      <main className="mx-auto flex-1 p-16">
+        <div className="my-auto flex gap-12">
+          <div className="flex flex-col">
+            <span className="text-2xl font-semibold">Begin trade process</span>
+            <span className="mt-6 text-sm font-semibold text-zinc-500">
+              The trade process consists of four steps:
+            </span>
+            <OrderedList items={instructions} className="mt-3 max-w-md" />
+          </div>
+          <Card className="h-min w-[480px]">
+            <form
+              id={FormId.Form}
+              className="flex flex-col gap-6"
+              data-props={propsJson}
+            >
+              <div className="flex items-end justify-between">
+                <span className="text-2xl font-semibold">
+                  Forced {label} offer
+                </span>
+                <span>
+                  <span className="text-sm text-zinc-500">Position</span>{' '}
+                  <span className="font-semibold">#11273</span>
+                </span>
               </div>
-              <ForcedActionCard>
-                <TotalInput />
-              </ForcedActionCard>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Button className="w-full" id={FormId.SubmitButton}>
-                Create {label} offer
-              </Button>
-              <LinkButton
-                className="w-full"
-                variant="outlined"
-                href={`/user/${props.starkKey.toString()}`}
-              >
-                Back to assets
-              </LinkButton>
-            </div>
-          </form>
-        </Card>
-      </div>
+              <div className="flex flex-col gap-2">
+                <ForcedActionCard>
+                  <AmountInput {...props} />
+                </ForcedActionCard>
+                <ForcedActionCard>
+                  <PriceInput {...props} />
+                </ForcedActionCard>
+
+                <div className="mx-auto flex h-6 w-6 items-center justify-center rounded bg-slate-800">
+                  <ArrowDownIcon className="fill-zinc-500" />
+                </div>
+                <ForcedActionCard>
+                  <TotalInput />
+                </ForcedActionCard>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Button className="w-full" id={FormId.SubmitButton}>
+                  Create {label} offer
+                </Button>
+                <LinkButton
+                  className="w-full"
+                  variant="outlined"
+                  href={`/user/${props.starkKey.toString()}`}
+                >
+                  Back to assets
+                </LinkButton>
+              </div>
+            </form>
+          </Card>
+        </div>
+      </main>
     </Page>
   )
 }

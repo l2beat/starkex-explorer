@@ -1,6 +1,7 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
+import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
 import { reactToHtml } from '../../reactToHtml'
@@ -29,7 +30,7 @@ function HomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
       description="TODO: description"
       user={props.user}
     >
-      <div className="flex max-w-[960px] flex-col gap-y-12">
+      <ContentWrapper>
         <TableWithPagination
           {...STATE_UPDATE_TABLE_PROPS}
           visible={props.stateUpdates.length}
@@ -39,7 +40,7 @@ function HomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
         >
           <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
         </TableWithPagination>
-      </div>
+      </ContentWrapper>
     </Page>
   )
 }

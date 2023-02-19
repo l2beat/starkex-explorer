@@ -2,6 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
@@ -52,7 +53,7 @@ function UserPage(props: UserPageProps) {
       description="TODO: description"
       user={props.user}
     >
-      <div className="flex max-w-[960] flex-col gap-y-12">
+      <ContentWrapper>
         <UserProfile
           starkKey={props.starkKey}
           ethereumAddress={props.ethereumAddress}
@@ -96,7 +97,7 @@ function UserPage(props: UserPageProps) {
         >
           <UserOffersTable offers={props.offers} />
         </TablePreview>
-      </div>
+      </ContentWrapper>
     </Page>
   )
 }

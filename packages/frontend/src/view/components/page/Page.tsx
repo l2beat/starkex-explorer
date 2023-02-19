@@ -34,7 +34,7 @@ export function Page(props: Props) {
       />
       <body className="flex h-full flex-col">
         <Navbar searchBar={!props.withoutSearch} user={props.user} />
-        <main className="mx-auto flex-1 p-16">{props.children}</main>
+        {props.children}
         <Footer />
         {(props.scripts ?? ['/scripts/main.js']).map((src, i) => (
           <script key={i} src={src} />

@@ -2,6 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
 import { reactToHtml } from '../../reactToHtml'
@@ -25,7 +26,7 @@ function UserOffersPage(props: UserOffersPageProps) {
   const common = getOfferTableProps(props.starkKey)
   return (
     <Page path={common.link} description="TODO: description" user={props.user}>
-      <div className="flex max-w-[960px] flex-col gap-y-12">
+      <ContentWrapper>
         <TableWithPagination
           {...common}
           // TODO: override title
@@ -36,7 +37,7 @@ function UserOffersPage(props: UserOffersPageProps) {
         >
           <UserOffersTable offers={props.offers} />
         </TableWithPagination>
-      </div>
+      </ContentWrapper>
     </Page>
   )
 }

@@ -49,31 +49,33 @@ function HomePage(props: HomePageProps) {
       user={props.user}
       withoutSearch
     >
-      <div className="flex max-w-[760px] flex-col gap-y-12">
-        <TablePreview
-          {...STATE_UPDATE_TABLE_PROPS}
-          visible={props.stateUpdates.length}
-          total={props.totalStateUpdate}
-        >
-          <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
-        </TablePreview>
-        <TablePreview
-          {...FORCED_TRANSACTION_TABLE_PROPS}
-          visible={props.forcedTransactions.length}
-          total={props.totalForcedTransaction}
-        >
-          <HomeForcedTransactionsTable
-            forcedTransactions={props.forcedTransactions}
-          />
-        </TablePreview>
-        <TablePreview
-          {...OFFER_TABLE_PROPS}
-          visible={props.offers.length}
-          total={props.totalOffers}
-        >
-          <HomeOffersTable offers={props.offers} />
-        </TablePreview>
-      </div>
+      <main className="mx-auto flex-1 p-16">
+        <div className="flex max-w-[760px] flex-col gap-y-12">
+          <TablePreview
+            {...STATE_UPDATE_TABLE_PROPS}
+            visible={props.stateUpdates.length}
+            total={props.totalStateUpdate}
+          >
+            <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
+          </TablePreview>
+          <TablePreview
+            {...FORCED_TRANSACTION_TABLE_PROPS}
+            visible={props.forcedTransactions.length}
+            total={props.totalForcedTransaction}
+          >
+            <HomeForcedTransactionsTable
+              forcedTransactions={props.forcedTransactions}
+            />
+          </TablePreview>
+          <TablePreview
+            {...OFFER_TABLE_PROPS}
+            visible={props.offers.length}
+            total={props.totalOffers}
+          >
+            <HomeOffersTable offers={props.offers} />
+          </TablePreview>
+        </div>
+      </main>
     </Page>
   )
 }
