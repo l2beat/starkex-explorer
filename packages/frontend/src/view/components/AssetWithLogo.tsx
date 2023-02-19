@@ -36,7 +36,9 @@ export function AssetWithLogo({
         {type === 'full' && (
           <div>
             <div>{assetInfo.name}</div>
-            <div className="text-xs text-zinc-500 ">{assetInfo.symbol}</div>
+            <InlineEllipsis className="max-w-[80px] text-xs text-zinc-500">
+              {assetInfo.symbol}
+            </InlineEllipsis>
           </div>
         )}
         {type === 'regular' &&
