@@ -36,6 +36,7 @@ export const router = new Router()
 
 interface Route {
   path: string
+  link?: string
   description: string
   breakAfter?: boolean // add bottom margin when displaying this route
   render: (ctx: Koa.ParameterizedContext) => void
@@ -47,7 +48,13 @@ const routes: Route[] = [
     path: '/',
     description: 'A listing of all dev routes.',
     render: (ctx) => {
-      ctx.body = renderDevPage({ routes })
+      ctx.body = renderDevPage({
+        routes: routes.map((x) => ({
+          path: x.link ?? x.path,
+          description: x.description,
+          breakAfter: x.breakAfter,
+        })),
+      })
     },
   },
   {
@@ -141,7 +148,8 @@ const routes: Route[] = [
   // #endregion
   // #region User
   {
-    path: '/user/someone',
+    path: '/user/:starkKey',
+    link: '/user/someone',
     description: 'Someone else’s user page.',
     render: (ctx) => {
       const user = getUser(ctx)
@@ -183,25 +191,6 @@ const routes: Route[] = [
   // #endregion
   // #region User lists
   {
-    path: '/user/someone/assets',
-    description:
-      'Assets list accessible from someone else’s user page. Supports pagination.',
-    render: (ctx) => {
-      const user = getUser(ctx)
-      const total = 7
-      const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderUserAssetsPage({
-        user,
-        type: 'PERPETUAL',
-        starkKey: StarkKey.fake(),
-        assets: repeat(visible, randomUserAssetEntry),
-        limit,
-        offset,
-        total,
-      })
-    },
-  },
-  {
     path: '/user/me/assets',
     description:
       'Assets list accessible from my user page. Supports pagination.',
@@ -221,7 +210,28 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/user/balance-changes',
+    path: '/user/:starkKey/assets',
+    link: '/user/someone/assets',
+    description:
+      'Assets list accessible from someone else’s user page. Supports pagination.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 7
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserAssetsPage({
+        user,
+        type: 'PERPETUAL',
+        starkKey: StarkKey.fake(),
+        assets: repeat(visible, randomUserAssetEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
+  },
+  {
+    path: '/user/:starkKey/balance-changes',
+    link: '/user/someone/balance-changes',
     description:
       'Balance change list accessible from user page. Supports pagination.',
     render: (ctx) => {
@@ -240,7 +250,8 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/user/ethereum-transactions',
+    path: '/user/:starkKey/transactions',
+    link: '/user/someone/transactions',
     description:
       'Ethereum transaction list accessible from user page. Supports pagination.',
     render: (ctx) => {
@@ -258,7 +269,8 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/user/offers',
+    path: '/user/:starkKey/offers',
+    link: '/user/someone/offers',
     description: 'Offer list accessible from user page. Supports pagination.',
     render: (ctx) => {
       const user = getUser(ctx)
