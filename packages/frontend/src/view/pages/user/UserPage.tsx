@@ -53,7 +53,7 @@ function UserPage(props: UserPageProps) {
       description="TODO: description"
       user={props.user}
     >
-      <ContentWrapper>
+      <ContentWrapper className="flex flex-col gap-12">
         <UserProfile
           starkKey={props.starkKey}
           ethereumAddress={props.ethereumAddress}
