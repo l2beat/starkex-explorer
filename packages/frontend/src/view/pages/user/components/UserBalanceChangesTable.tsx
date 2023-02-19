@@ -4,9 +4,9 @@ import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatAmount } from '../../../../utils/formatting/formatAmount'
-import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Table } from '../../../components/table/Table'
+import { TimeCell } from '../../../components/TimeCell'
 
 export interface UserBalanceChangesTableProps {
   balanceChanges: UserBalanceChangeEntry[]
@@ -27,17 +27,17 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
     <Table
       columns={[
         { header: 'Time' },
-        { header: 'State update id' },
+        { header: 'Update' },
         { header: 'Asset' },
-        { header: 'Balance after' },
-        { header: 'Change' },
-        { header: props.type === 'PERPETUAL' ? 'Position id' : 'Vault id' },
+        { header: 'Balance', numeric: true },
+        { header: 'Change', numeric: true },
+        { header: props.type === 'PERPETUAL' ? 'Position' : 'Vault' },
       ]}
       rows={props.balanceChanges.map((entry) => {
         const change = formatAmount(entry.asset, entry.change, { signed: true })
         return {
           cells: [
-            formatTimestamp(entry.timestamp),
+            <TimeCell timestamp={entry.timestamp} />,
             <a
               href={`/state-updates/${entry.stateUpdateId}`}
               className="text-blue-300 underline"

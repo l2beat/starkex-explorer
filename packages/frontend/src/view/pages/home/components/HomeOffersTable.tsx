@@ -6,9 +6,9 @@ import {
   formatAmount,
   formatWithDecimals,
 } from '../../../../utils/formatting/formatAmount'
-import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Table } from '../../../components/table/Table'
+import { TimeCell } from '../../../components/TimeCell'
 
 export interface HomeOfferEntry {
   timestamp: Timestamp
@@ -39,7 +39,7 @@ export function HomeOffersTable(props: HomeOffersTableProps) {
         return {
           link: `/offers/${offer.id}`,
           cells: [
-            formatTimestamp(offer.timestamp),
+            <TimeCell timestamp={offer.timestamp} />,
             <span className="text-blue-600 underline">#{offer.id}</span>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(offer.asset)} />,
             formatAmount(offer.asset, offer.amount),

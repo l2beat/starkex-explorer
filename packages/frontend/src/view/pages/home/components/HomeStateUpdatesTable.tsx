@@ -2,8 +2,8 @@ import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { formatInt } from '../../../../utils/formatting/formatAmount'
-import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { Table } from '../../../components/table/Table'
+import { TimeCell } from '../../../components/TimeCell'
 
 export interface HomeStateUpdateEntry {
   timestamp: Timestamp
@@ -25,15 +25,23 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
         { header: 'Id' },
         { header: 'Hash' },
         { header: 'Updates', numeric: true },
-        { header: 'Forced txs', numeric: true },
+        {
+          header: (
+            <>
+              <span className="hidden sm:inline">Forced txs</span>
+              <span className="sm:hidden">Txs</span>
+            </>
+          ),
+          numeric: true,
+        },
       ]}
       rows={props.stateUpdates.map((stateUpdate) => {
         return {
           link: `/state-updates/${stateUpdate.id}`,
           cells: [
-            formatTimestamp(stateUpdate.timestamp),
+            <TimeCell timestamp={stateUpdate.timestamp} />,
             <span className="text-blue-600 underline">#{stateUpdate.id}</span>,
-            <span className="block max-w-[300px] truncate">
+            <span className="block max-w-[80px] truncate sm:max-w-[300px]">
               {stateUpdate.hash}
             </span>,
             stateUpdate.updateCount > 0

@@ -30,7 +30,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
       columns={[
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
-        { header: props.type === 'PERPETUAL' ? 'Position id' : 'Vault id' },
+        { header: props.type === 'PERPETUAL' ? 'Position' : 'Vault' },
         { header: 'Action' },
       ]}
       rows={props.assets.map((entry) => {

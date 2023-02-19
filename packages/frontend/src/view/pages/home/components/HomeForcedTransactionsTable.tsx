@@ -3,10 +3,10 @@ import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatAmount } from '../../../../utils/formatting/formatAmount'
-import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { Table } from '../../../components/table/Table'
+import { TimeCell } from '../../../components/TimeCell'
 
 export interface HomeForcedTransactionEntry {
   timestamp: Timestamp
@@ -38,7 +38,7 @@ export function HomeForcedTransactionsTable(
         return {
           link: `/forced-transactions/${transaction.hash.toString()}`,
           cells: [
-            formatTimestamp(transaction.timestamp),
+            <TimeCell timestamp={transaction.timestamp} />,
             // TODO: fix truncate and underline
             <span className="block max-w-[80px] truncate text-blue-600 underline">
               {transaction.hash}

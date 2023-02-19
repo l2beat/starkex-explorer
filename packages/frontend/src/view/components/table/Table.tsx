@@ -11,7 +11,7 @@ interface TableProps {
 
 export function Table(props: TableProps) {
   return (
-    <div className={cx('w-full overflow-x-auto')}>
+    <div className={cx('-mx-4 w-[calc(100%+32px)] overflow-x-auto')}>
       <table
         cellPadding="0"
         cellSpacing="0"
@@ -25,7 +25,7 @@ export function Table(props: TableProps) {
                 scope="col"
                 key={i}
                 className={cx(
-                  'bg-gray-800 px-2.5 first:rounded-l first:pl-5 last:rounded-r last:pr-5',
+                  'bg-gray-800 px-2 first:rounded-l first:pl-4 last:rounded-r last:pr-4 sm:px-2.5 sm:first:pl-5 sm:last:pr-5',
                   column.numeric && 'text-right'
                 )}
               >

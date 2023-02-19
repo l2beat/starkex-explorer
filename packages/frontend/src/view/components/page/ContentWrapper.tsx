@@ -9,7 +9,10 @@ export interface ContentWrapperProps {
 export function ContentWrapper(props: ContentWrapperProps) {
   return (
     <main
-      className={cx('mx-auto w-full max-w-[960px] py-16 px-2', props.className)}
+      className={cx(
+        'mx-auto w-full max-w-[1024px] py-16 px-4 sm:px-8',
+        props.className
+      )}
     >
       {props.children}
     </main>

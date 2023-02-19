@@ -6,10 +6,10 @@ import {
   formatAmount,
   formatWithDecimals,
 } from '../../../../utils/formatting/formatAmount'
-import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { Table } from '../../../components/table/Table'
+import { TimeCell } from '../../../components/TimeCell'
 
 export interface UserOffersTableProps {
   offers: UserOfferEntry[]
@@ -33,9 +33,9 @@ export function UserOffersTable({ offers }: UserOffersTableProps) {
         { header: 'Time' },
         { header: 'Id' },
         { header: 'Asset' },
-        { header: 'Amount' },
-        { header: 'Price' },
-        { header: 'Total price' },
+        { header: 'Amount', numeric: true },
+        { header: 'Price', numeric: true },
+        { header: 'Total price', numeric: true },
         { header: 'Status' },
         { header: 'Type' },
       ]}
@@ -43,8 +43,8 @@ export function UserOffersTable({ offers }: UserOffersTableProps) {
         return {
           link: `/offers/${offer.id}`,
           cells: [
-            formatTimestamp(offer.timestamp),
-            `#${offer.id}`,
+            <TimeCell timestamp={offer.timestamp} />,
+            <span className="text-blue-600 underline">#{offer.id}</span>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(offer.asset)} />,
             formatAmount(offer.asset, offer.amount),
             formatWithDecimals(offer.price, 6, { prefix: '$' }),

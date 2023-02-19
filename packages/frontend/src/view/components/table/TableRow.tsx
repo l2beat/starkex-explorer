@@ -18,9 +18,9 @@ export function TableRow(props: TableRowProps) {
           <td
             key={col}
             className={cx(
-              !props.link && 'px-2.5',
-              !props.link && col === 0 && 'pl-5',
-              !props.link && col === props.cells.length - 1 && 'pr-5',
+              !props.link && 'px-2 sm:px-2.5',
+              !props.link && col === 0 && 'pl-4 sm:pl-5',
+              !props.link && col === props.cells.length - 1 && 'pr-4 sm:pr-5',
               (numeric || monospace) && 'font-mono',
               numeric && 'text-right',
               props.link && 'cursor-pointer',
@@ -30,9 +30,9 @@ export function TableRow(props: TableRowProps) {
             {props.link ? (
               <a
                 className={cx(
-                  'flex h-[39px] items-center px-2.5',
-                  col === 0 && 'pl-5',
-                  col === props.cells.length - 1 && 'pr-5',
+                  'flex h-[39px] items-center px-2 sm:px-2.5',
+                  col === 0 && 'pl-4 sm:pl-5',
+                  col === props.cells.length - 1 && 'pr-4 sm:pr-5',
                   className
                 )}
                 href={props.link}
