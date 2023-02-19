@@ -23,6 +23,7 @@ import {
 import {
   randomUserAssetEntry,
   randomUserBalanceChangeEntry,
+  randomUserOfferEntry,
   randomUserTransactionEntry,
 } from './data/user'
 import { repeat } from './data/utils'
@@ -153,8 +154,8 @@ const routes: Route[] = [
         totalBalanceChanges: 3367,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
-        offers: [],
-        totalOffers: 0,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
       })
     },
   },

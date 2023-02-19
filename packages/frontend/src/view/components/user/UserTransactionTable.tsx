@@ -1,4 +1,4 @@
-import { Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
@@ -10,7 +10,6 @@ import { Table } from '../common/table/Table'
 
 export interface UserTransactionsTableProps {
   transactions: UserTransactionEntry[]
-  starkKey: StarkKey
 }
 
 export interface UserTransactionEntry {
@@ -32,17 +31,16 @@ export function UserTransactionsTable(props: UserTransactionsTableProps) {
   return (
     <Table
       columns={[
-        { header: 'TIME' },
-        { header: 'HASH' },
-        { header: 'ASSET' },
-        { header: 'AMOUNT' },
-        { header: 'STATUS' },
-        { header: 'TYPE' },
+        { header: 'Time' },
+        { header: 'Hash' },
+        { header: 'Asset' },
+        { header: 'Amount' },
+        { header: 'Status' },
+        { header: 'Type' },
       ]}
       rows={props.transactions.map((transaction) => {
-        const link = `/user/${props.starkKey.toString()}/transactions/${transaction.hash.toString()}`
         return {
-          link,
+          link: `/transactions/${transaction.hash.toString()}`,
           cells: [
             formatTimestamp(transaction.timestamp),
             // TODO: fix truncate and underline

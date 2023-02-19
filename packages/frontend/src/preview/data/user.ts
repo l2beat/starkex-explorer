@@ -3,6 +3,7 @@ import { Hash256 } from '@explorer/types'
 import {
   UserAssetEntry,
   UserBalanceChangeEntry,
+  UserOfferEntry,
   UserTransactionEntry,
 } from '../../view'
 import { Bucket } from './bucket'
@@ -54,5 +55,27 @@ export function randomUserAssetEntry(): UserAssetEntry {
     value: amountBucket.pick(),
     action: actionBucket.pick(),
     vaultOrPositionId: randomId(),
+  }
+}
+
+const offerStatusBucket = new Bucket([
+  'CREATED',
+  'ACCEPTED',
+  'SENT',
+  'CANCELLED',
+  'EXPIRED',
+] as const)
+const offerTypeBucket = new Bucket(['BUY', 'SELL'] as const)
+
+export function randomUserOfferEntry(): UserOfferEntry {
+  return {
+    timestamp: randomTimestamp(),
+    id: randomId(),
+    asset: assetBucket.pick(),
+    amount: amountBucket.pick(),
+    price: amountBucket.pick(),
+    totalPrice: amountBucket.pick(),
+    status: offerStatusBucket.pick(),
+    type: offerTypeBucket.pick(),
   }
 }

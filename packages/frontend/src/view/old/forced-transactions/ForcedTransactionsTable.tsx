@@ -29,9 +29,8 @@ export function ForcedTransactionsTable({
         { header: 'Asset' },
       ]}
       rows={transactions.map((transaction) => {
-        const link = `/forced/${transaction.hash.toString()}`
         return {
-          link,
+          link: `/forced/${transaction.hash.toString()}`,
           cells: [
             transaction.type,
             formatRelativeTime(transaction.lastUpdate),

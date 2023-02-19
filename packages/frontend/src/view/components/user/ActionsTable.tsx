@@ -1,13 +1,13 @@
 import React from 'react'
 
 import { Button } from '../common/Button'
-import { OfferEntry } from './OffersTable'
+import { UserOfferEntry } from './UserOfferTable'
 
 //TODO: Figure out a better name for this component
 
 interface ActionsTableProps {
   readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
-  readonly offersToAccept: readonly OfferEntry[]
+  readonly offersToAccept: readonly UserOfferEntry[]
 }
 
 export interface WithdrawableAssetEntry {
@@ -53,7 +53,7 @@ export function ActionsTable(props: ActionsTableProps) {
             <div className="flex">
               <p>Icon</p>
               <p className="text-base ml-3 font-bold text-white">
-                {offer.asset}
+                {/* {offer.asset} */}
               </p>
             </div>
             <p className="text-base text-zinc-500">

@@ -8,7 +8,6 @@ import {
   ActionsTable,
   WithdrawableAssetEntry,
 } from '../../components/user/ActionsTable'
-import { OfferEntry, OffersTable } from '../../components/user/OffersTable'
 import {
   UserAssetEntry,
   UserAssetTable,
@@ -17,6 +16,10 @@ import {
   UserBalanceChangeEntry,
   UserBalanceChangeTable,
 } from '../../components/user/UserBalanceChangeTable'
+import {
+  UserOfferEntry,
+  UserOfferTable,
+} from '../../components/user/UserOfferTable'
 import { UserProfile } from '../../components/user/UserProfile'
 import {
   UserTransactionEntry,
@@ -36,14 +39,14 @@ export interface UserPageProps {
   ethereumAddress?: EthereumAddress
   type: 'SPOT' | 'PERPETUAL'
   withdrawableAssets: WithdrawableAssetEntry[] // Does ths make sense?
-  offersToAccept: OfferEntry[] // We could also pass a simpler object here
+  offersToAccept: UserOfferEntry[] // We could also pass a simpler object here
   assets: UserAssetEntry[]
   totalAssets: number
   balanceChanges: UserBalanceChangeEntry[]
   totalBalanceChanges: number
   transactions: UserTransactionEntry[]
   totalTransactions: number
-  offers: OfferEntry[]
+  offers: UserOfferEntry[]
   totalOffers: number
 }
 
@@ -94,17 +97,14 @@ function UserPage(props: UserPageProps) {
           visible={props.transactions.length}
           total={props.totalTransactions}
         >
-          <UserTransactionsTable
-            starkKey={props.starkKey}
-            transactions={props.transactions}
-          />
+          <UserTransactionsTable transactions={props.transactions} />
         </TablePreview>
         <TablePreview
           {...getOfferTableProps(props.starkKey)}
           visible={props.offers.length}
           total={props.totalOffers}
         >
-          <OffersTable offers={props.offers} />
+          <UserOfferTable offers={props.offers} />
         </TablePreview>
       </div>
     </Page>
