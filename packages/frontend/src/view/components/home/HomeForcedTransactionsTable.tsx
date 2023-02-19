@@ -17,12 +17,12 @@ export interface HomeForcedTransactionEntry {
   type: 'WITHDRAW' | 'BUY' | 'SELL'
 }
 
-export interface HomeForcedTransactionTableProps {
+export interface HomeForcedTransactionsTableProps {
   forcedTransactions: HomeForcedTransactionEntry[]
 }
 
-export function HomeForcedTransactionTable(
-  props: HomeForcedTransactionTableProps
+export function HomeForcedTransactionsTable(
+  props: HomeForcedTransactionsTableProps
 ) {
   return (
     <Table

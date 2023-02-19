@@ -11,7 +11,7 @@ import { AssetWithLogo } from '../common/AssetWithLogo'
 import { StatusBadge, StatusType } from '../common/StatusBadge'
 import { Table } from '../common/table/Table'
 
-export interface UserOfferTableProps {
+export interface UserOffersTableProps {
   offers: UserOfferEntry[]
 }
 
@@ -26,7 +26,7 @@ export interface UserOfferEntry {
   type: 'BUY' | 'SELL'
 }
 
-export function UserOfferTable({ offers }: UserOfferTableProps) {
+export function UserOffersTable({ offers }: UserOffersTableProps) {
   return (
     <Table
       columns={[

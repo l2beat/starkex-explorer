@@ -6,12 +6,12 @@ import { Page } from '../../components/common/page/Page'
 import { TableWithPagination } from '../../components/common/table/TableWithPagination'
 import {
   UserBalanceChangeEntry,
-  UserBalanceChangeTable,
-} from '../../components/user/UserBalanceChangeTable'
+  UserBalanceChangesTable,
+} from '../../components/user/UserBalanceChangesTable'
 import { reactToHtml } from '../../reactToHtml'
 import { getBalanceChangeTableProps } from './common'
 
-export interface UserBalanceChangePageProps {
+export interface UserBalanceChangesPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
   type: 'SPOT' | 'PERPETUAL'
@@ -21,11 +21,13 @@ export interface UserBalanceChangePageProps {
   total: number
 }
 
-export function renderUserBalanceChangePage(props: UserBalanceChangePageProps) {
-  return reactToHtml(<UserBalanceChangePage {...props} />)
+export function renderUserBalanceChangesPage(
+  props: UserBalanceChangesPageProps
+) {
+  return reactToHtml(<UserBalanceChangesPage {...props} />)
 }
 
-function UserBalanceChangePage(props: UserBalanceChangePageProps) {
+function UserBalanceChangesPage(props: UserBalanceChangesPageProps) {
   const common = getBalanceChangeTableProps(props.starkKey)
   return (
     <Page path={common.link} description="TODO: description" user={props.user}>
@@ -38,7 +40,7 @@ function UserBalanceChangePage(props: UserBalanceChangePageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <UserBalanceChangeTable
+          <UserBalanceChangesTable
             type={props.type}
             balanceChanges={props.balanceChanges}
           />

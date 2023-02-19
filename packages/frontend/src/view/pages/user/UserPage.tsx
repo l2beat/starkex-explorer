@@ -10,21 +10,21 @@ import {
 } from '../../components/user/ActionsTable'
 import {
   UserAssetEntry,
-  UserAssetTable,
+  UserAssetsTable,
 } from '../../components/user/UserAssetTable'
 import {
   UserBalanceChangeEntry,
-  UserBalanceChangeTable,
-} from '../../components/user/UserBalanceChangeTable'
+  UserBalanceChangesTable,
+} from '../../components/user/UserBalanceChangesTable'
 import {
   UserOfferEntry,
-  UserOfferTable,
-} from '../../components/user/UserOfferTable'
+  UserOffersTable,
+} from '../../components/user/UserOffersTable'
 import { UserProfile } from '../../components/user/UserProfile'
 import {
   UserTransactionEntry,
-  UserTransactionTable,
-} from '../../components/user/UserTransactionTable'
+  UserTransactionsTable,
+} from '../../components/user/UserTransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
   getAssetsTableProps,
@@ -75,7 +75,7 @@ function UserPage(props: UserPageProps) {
           visible={props.assets.length}
           total={props.totalAssets}
         >
-          <UserAssetTable
+          <UserAssetsTable
             type={props.type}
             starkKey={props.starkKey}
             assets={props.assets}
@@ -86,7 +86,7 @@ function UserPage(props: UserPageProps) {
           visible={props.balanceChanges.length}
           total={props.totalBalanceChanges}
         >
-          <UserBalanceChangeTable
+          <UserBalanceChangesTable
             type={props.type}
             balanceChanges={props.balanceChanges}
           />
@@ -96,14 +96,14 @@ function UserPage(props: UserPageProps) {
           visible={props.transactions.length}
           total={props.totalTransactions}
         >
-          <UserTransactionTable transactions={props.transactions} />
+          <UserTransactionsTable transactions={props.transactions} />
         </TablePreview>
         <TablePreview
           {...getOfferTableProps(props.starkKey)}
           visible={props.offers.length}
           total={props.totalOffers}
         >
-          <UserOfferTable offers={props.offers} />
+          <UserOffersTable offers={props.offers} />
         </TablePreview>
       </div>
     </Page>

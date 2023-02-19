@@ -5,16 +5,16 @@ import { Page } from '../../components/common/page/Page'
 import { TablePreview } from '../../components/common/table/TablePreview'
 import {
   HomeForcedTransactionEntry,
-  HomeForcedTransactionTable,
-} from '../../components/home/HomeForcedTransactionTable'
+  HomeForcedTransactionsTable,
+} from '../../components/home/HomeForcedTransactionsTable'
 import {
   HomeOfferEntry,
-  HomeOfferTable,
-} from '../../components/home/HomeOfferTable'
+  HomeOffersTable,
+} from '../../components/home/HomeOffersTable'
 import {
   HomeStateUpdateEntry,
-  HomeStateUpdateTable,
-} from '../../components/home/HomeStateUpdateTable'
+  HomeStateUpdatesTable,
+} from '../../components/home/HomeStateUpdatesTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
   FORCED_TRANSACTION_TABLE_PROPS,
@@ -58,14 +58,14 @@ function HomePage(props: HomePageProps) {
           visible={props.stateUpdates.length}
           total={props.totalStateUpdate}
         >
-          <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
+          <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
         </TablePreview>
         <TablePreview
           {...FORCED_TRANSACTION_TABLE_PROPS}
           visible={props.forcedTransactions.length}
           total={props.totalForcedTransaction}
         >
-          <HomeForcedTransactionTable
+          <HomeForcedTransactionsTable
             forcedTransactions={props.forcedTransactions}
           />
         </TablePreview>
@@ -74,7 +74,7 @@ function HomePage(props: HomePageProps) {
           visible={props.offers.length}
           total={props.totalOffers}
         >
-          <HomeOfferTable offers={props.offers} />
+          <HomeOffersTable offers={props.offers} />
         </TablePreview>
       </div>
     </Page>

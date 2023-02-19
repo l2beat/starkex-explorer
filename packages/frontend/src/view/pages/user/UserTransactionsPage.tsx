@@ -5,44 +5,39 @@ import React from 'react'
 import { Page } from '../../components/common/page/Page'
 import { TableWithPagination } from '../../components/common/table/TableWithPagination'
 import {
-  UserAssetEntry,
-  UserAssetTable,
-} from '../../components/user/UserAssetTable'
+  UserTransactionEntry,
+  UserTransactionsTable,
+} from '../../components/user/UserTransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
-import { getAssetsTableProps } from './common'
+import { getTransactionTableProps } from './common'
 
-export interface UserAssetPageProps {
+export interface UserTransactionsPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
-  type: 'SPOT' | 'PERPETUAL'
-  assets: UserAssetEntry[]
+  transactions: UserTransactionEntry[]
   limit: number
   offset: number
   total: number
 }
 
-export function renderUserAssetPage(props: UserAssetPageProps) {
-  return reactToHtml(<UserAssetPage {...props} />)
+export function renderUserTransactionsPage(props: UserTransactionsPageProps) {
+  return reactToHtml(<UserTransactionsPage {...props} />)
 }
 
-function UserAssetPage(props: UserAssetPageProps) {
-  const common = getAssetsTableProps(props.starkKey)
+function UserTransactionsPage(props: UserTransactionsPageProps) {
+  const common = getTransactionTableProps(props.starkKey)
   return (
     <Page path={common.link} description="TODO: description" user={props.user}>
       <div className="flex max-w-[960px] flex-col gap-y-12">
         <TableWithPagination
           {...common}
           // TODO: override title
-          visible={props.assets.length}
+          visible={props.transactions.length}
           limit={props.limit}
           offset={props.offset}
           total={props.total}
         >
-          <UserAssetTable
-            starkKey={props.starkKey}
-            type={props.type}
-            assets={props.assets}
-          />
+          <UserTransactionsTable transactions={props.transactions} />
         </TableWithPagination>
       </div>
     </Page>

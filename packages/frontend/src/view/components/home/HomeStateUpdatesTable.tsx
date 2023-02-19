@@ -13,11 +13,11 @@ export interface HomeStateUpdateEntry {
   forcedTransactionCount: number
 }
 
-export interface HomeStateUpdateTableProps {
+export interface HomeStateUpdatesTableProps {
   stateUpdates: HomeStateUpdateEntry[]
 }
 
-export function HomeStateUpdateTable(props: HomeStateUpdateTableProps) {
+export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
   return (
     <Table
       columns={[

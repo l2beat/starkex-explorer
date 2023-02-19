@@ -20,11 +20,11 @@ export interface HomeOfferEntry {
   type: 'BUY' | 'SELL'
 }
 
-export interface HomeOfferTableProps {
+export interface HomeOffersTableProps {
   offers: HomeOfferEntry[]
 }
 
-export function HomeOfferTable(props: HomeOfferTableProps) {
+export function HomeOffersTable(props: HomeOffersTableProps) {
   return (
     <Table
       columns={[

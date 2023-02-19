@@ -10,7 +10,7 @@ import { AssetWithLogo } from '../common/AssetWithLogo'
 import { Button } from '../common/Button'
 import { Table } from '../common/table/Table'
 
-export interface UserAssetTableProps {
+export interface UserAssetsTableProps {
   assets: UserAssetEntry[]
   starkKey: StarkKey
   type: 'SPOT' | 'PERPETUAL'
@@ -24,7 +24,7 @@ export interface UserAssetEntry {
   action: 'WITHDRAW' | 'CLOSE'
 }
 
-export function UserAssetTable(props: UserAssetTableProps) {
+export function UserAssetsTable(props: UserAssetsTableProps) {
   return (
     <Table
       columns={[

@@ -5,12 +5,12 @@ import { Page } from '../../components/common/page/Page'
 import { TableWithPagination } from '../../components/common/table/TableWithPagination'
 import {
   HomeStateUpdateEntry,
-  HomeStateUpdateTable,
-} from '../../components/home/HomeStateUpdateTable'
+  HomeStateUpdatesTable,
+} from '../../components/home/HomeStateUpdatesTable'
 import { reactToHtml } from '../../reactToHtml'
 import { STATE_UPDATE_TABLE_PROPS } from './common'
 
-export interface HomeStateUpdatePageProps {
+export interface HomeStateUpdatesPageProps {
   user: UserDetails | undefined
   stateUpdates: HomeStateUpdateEntry[]
   limit: number
@@ -18,11 +18,11 @@ export interface HomeStateUpdatePageProps {
   total: number
 }
 
-export function renderHomeStateUpdatePage(props: HomeStateUpdatePageProps) {
-  return reactToHtml(<HomeStateUpdatePage {...props} />)
+export function renderHomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
+  return reactToHtml(<HomeStateUpdatesPage {...props} />)
 }
 
-function HomeStateUpdatePage(props: HomeStateUpdatePageProps) {
+function HomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
   return (
     <Page
       path={STATE_UPDATE_TABLE_PROPS.link}
@@ -37,7 +37,7 @@ function HomeStateUpdatePage(props: HomeStateUpdatePageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <HomeStateUpdateTable stateUpdates={props.stateUpdates} />
+          <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
         </TableWithPagination>
       </div>
     </Page>

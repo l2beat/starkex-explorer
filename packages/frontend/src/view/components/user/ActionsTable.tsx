@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Button } from '../common/Button'
-import { UserOfferEntry } from './UserOfferTable'
+import { UserOfferEntry } from './UserOffersTable'
 
 //TODO: Figure out a better name for this component
 

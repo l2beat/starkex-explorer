@@ -5,18 +5,18 @@ import Koa from 'koa'
 
 import {
   renderForcedWithdrawPage,
-  renderHomeForcedTransactionPage,
-  renderHomeOfferPage,
+  renderHomeForcedTransactionsPage,
+  renderHomeOffersPage,
   renderHomePage,
-  renderUserAssetPage,
-  renderUserBalanceChangePage,
-  renderUserOfferPage,
+  renderUserAssetsPage,
+  renderUserBalanceChangesPage,
+  renderUserOffersPage,
   renderUserPage,
-  renderUserTransactionPage,
+  renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
 import { renderForcedTradePage } from '../view/pages/forced-actions/ForcedTradePage'
-import { renderHomeStateUpdatePage } from '../view/pages/home/HomeStateUpdatePage'
+import { renderHomeStateUpdatesPage } from '../view/pages/home/HomeStateUpdatesPage'
 import { renderNotFoundPage } from '../view/pages/NotFoundPage'
 import * as DATA from './data'
 import {
@@ -75,7 +75,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 5123
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderHomeStateUpdatePage({
+      ctx.body = renderHomeStateUpdatesPage({
         user,
         stateUpdates: repeat(visible, randomHomeStateUpdateEntry),
         limit,
@@ -92,7 +92,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 68
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderHomeForcedTransactionPage({
+      ctx.body = renderHomeForcedTransactionsPage({
         user,
         forcedTransactions: repeat(visible, randomHomeForcedTransactionEntry),
         limit,
@@ -109,7 +109,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 68
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderHomeOfferPage({
+      ctx.body = renderHomeOffersPage({
         user,
         offers: repeat(visible, randomHomeOfferEntry),
         limit,
@@ -190,7 +190,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 7
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderUserAssetPage({
+      ctx.body = renderUserAssetsPage({
         user,
         type: 'PERPETUAL',
         starkKey: StarkKey.fake(),
@@ -209,7 +209,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 7
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderUserAssetPage({
+      ctx.body = renderUserAssetsPage({
         user,
         type: 'PERPETUAL',
         starkKey: StarkKey.fake(),
@@ -228,7 +228,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 3367
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderUserBalanceChangePage({
+      ctx.body = renderUserBalanceChangesPage({
         user,
         type: 'PERPETUAL',
         starkKey: StarkKey.fake(),
@@ -247,7 +247,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 48
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderUserTransactionPage({
+      ctx.body = renderUserTransactionsPage({
         user,
         starkKey: StarkKey.fake(),
         transactions: repeat(visible, randomUserTransactionEntry),
@@ -264,7 +264,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 6
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderUserOfferPage({
+      ctx.body = renderUserOffersPage({
         user,
         starkKey: StarkKey.fake(),
         offers: repeat(visible, randomUserOfferEntry),

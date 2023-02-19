@@ -5,12 +5,12 @@ import { Page } from '../../components/common/page/Page'
 import { TableWithPagination } from '../../components/common/table/TableWithPagination'
 import {
   HomeForcedTransactionEntry,
-  HomeForcedTransactionTable,
-} from '../../components/home/HomeForcedTransactionTable'
+  HomeForcedTransactionsTable,
+} from '../../components/home/HomeForcedTransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import { OFFER_TABLE_PROPS } from './common'
 
-export interface HomeForcedTransactionPageProps {
+export interface HomeForcedTransactionsPageProps {
   user: UserDetails | undefined
   forcedTransactions: HomeForcedTransactionEntry[]
   limit: number
@@ -18,13 +18,13 @@ export interface HomeForcedTransactionPageProps {
   total: number
 }
 
-export function renderHomeForcedTransactionPage(
-  props: HomeForcedTransactionPageProps
+export function renderHomeForcedTransactionsPage(
+  props: HomeForcedTransactionsPageProps
 ) {
-  return reactToHtml(<HomeForcedTransactionPage {...props} />)
+  return reactToHtml(<HomeForcedTransactionsPage {...props} />)
 }
 
-function HomeForcedTransactionPage(props: HomeForcedTransactionPageProps) {
+function HomeForcedTransactionsPage(props: HomeForcedTransactionsPageProps) {
   return (
     <Page
       path={OFFER_TABLE_PROPS.link}
@@ -39,7 +39,7 @@ function HomeForcedTransactionPage(props: HomeForcedTransactionPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <HomeForcedTransactionTable
+          <HomeForcedTransactionsTable
             forcedTransactions={props.forcedTransactions}
           />
         </TableWithPagination>

@@ -8,7 +8,7 @@ import { formatTimestamp } from '../../../utils/formatting/formatTimestamp'
 import { AssetWithLogo } from '../common/AssetWithLogo'
 import { Table } from '../common/table/Table'
 
-export interface UserBalanceChangeTableProps {
+export interface UserBalanceChangesTableProps {
   balanceChanges: UserBalanceChangeEntry[]
   type: 'SPOT' | 'PERPETUAL'
 }
@@ -22,7 +22,7 @@ export interface UserBalanceChangeEntry {
   vaultOrPositionId: string
 }
 
-export function UserBalanceChangeTable(props: UserBalanceChangeTableProps) {
+export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
   return (
     <Table
       columns={[
