@@ -11,6 +11,7 @@ import {
   UserBalanceChangeEntry,
   UserBalanceChangesTable,
 } from './components/UserBalanceChangesTable'
+import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserBalanceChangesPageProps {
   user: UserDetails | undefined
@@ -35,7 +36,12 @@ function UserBalanceChangesPage(props: UserBalanceChangesPageProps) {
       <ContentWrapper>
         <TableWithPagination
           {...common}
-          // TODO: override title
+          title={
+            <UserPageTitle
+              prefix="Balance changes of"
+              starkKey={props.starkKey}
+            />
+          }
           visible={props.balanceChanges.length}
           limit={props.limit}
           offset={props.offset}

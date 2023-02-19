@@ -8,6 +8,7 @@ import { TableWithPagination } from '../../components/table/TableWithPagination'
 import { reactToHtml } from '../../reactToHtml'
 import { getOfferTableProps } from './common'
 import { UserOfferEntry, UserOffersTable } from './components/UserOffersTable'
+import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserOffersPageProps {
   user: UserDetails | undefined
@@ -29,7 +30,7 @@ function UserOffersPage(props: UserOffersPageProps) {
       <ContentWrapper>
         <TableWithPagination
           {...common}
-          // TODO: override title
+          title={<UserPageTitle prefix="Offers of" starkKey={props.starkKey} />}
           visible={props.offers.length}
           limit={props.limit}
           offset={props.offset}

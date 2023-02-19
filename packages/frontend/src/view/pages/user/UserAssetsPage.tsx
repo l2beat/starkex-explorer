@@ -8,6 +8,7 @@ import { TableWithPagination } from '../../components/table/TableWithPagination'
 import { reactToHtml } from '../../reactToHtml'
 import { getAssetsTableProps } from './common'
 import { UserAssetEntry, UserAssetsTable } from './components/UserAssetTable'
+import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserAssetsPageProps {
   user: UserDetails | undefined
@@ -30,7 +31,7 @@ function UserAssetsPage(props: UserAssetsPageProps) {
       <ContentWrapper>
         <TableWithPagination
           {...common}
-          // TODO: override title
+          title={<UserPageTitle prefix="Assets of" starkKey={props.starkKey} />}
           visible={props.assets.length}
           limit={props.limit}
           offset={props.offset}
