@@ -4,6 +4,7 @@ import React from 'react'
 import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatAmount } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
+import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { Table } from '../../../components/table/Table'
 import { TimeCell } from '../../../components/TimeCell'
@@ -43,9 +44,9 @@ export function UserTransactionsTable(props: UserTransactionsTableProps) {
           link: `/transactions/${transaction.hash.toString()}`,
           cells: [
             <TimeCell timestamp={transaction.timestamp} />,
-            <span className="inline-block max-w-[80px] truncate py-1 text-blue-600 underline">
-              {transaction.hash}
-            </span>,
+            <InlineEllipsis className="max-w-[80px] text-blue-600 underline">
+              {transaction.hash.toString()}
+            </InlineEllipsis>,
             <AssetWithLogo
               type="small"
               assetInfo={assetToInfo(transaction.asset)}

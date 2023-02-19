@@ -16,7 +16,7 @@ export interface TablePreviewProps {
 export function TablePreview(props: TablePreviewProps) {
   return (
     <section>
-      <div className="mb-5 flex items-baseline justify-between">
+      <div className="mb-5 flex flex-col items-baseline justify-between gap-4 lg:flex-row">
         <h2 className="text-xl font-semibold">{props.title}</h2>
         <p className="text-sm font-medium text-zinc-500">
           You're viewing {formatInt(props.visible)} out of{' '}

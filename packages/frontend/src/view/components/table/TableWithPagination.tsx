@@ -26,27 +26,25 @@ export function TableWithPagination(props: TableWithPaginationProps) {
 
   return (
     <>
-      <div className="mb-5 flex items-baseline justify-between">
-        <h1 className="text-xl font-semibold">{props.title}</h1>
-        <div className="flex items-baseline gap-4">
-          <p className="text-sm font-medium text-zinc-500">
-            {props.visible !== 0 ? (
-              <>
-                You're viewing {start}-{end} out of {total}{' '}
-                {props.entryShortNamePlural}
-              </>
-            ) : (
-              <>
-                You're viewing 0 out of {total} {props.entryShortNamePlural}
-              </>
-            )}
-          </p>
-          <TableLimitSelect
-            currentPage={currentPage}
-            limit={props.limit}
-            link={props.link}
-          />
-        </div>
+      <div className="mb-5 flex flex-col items-baseline justify-between gap-4 lg:flex-row">
+        <h1 className="flex-1 text-xl font-semibold">{props.title}</h1>
+        <p className="text-sm font-medium text-zinc-500">
+          {props.visible !== 0 ? (
+            <>
+              You're viewing {start}-{end} out of {total}{' '}
+              {props.entryShortNamePlural}
+            </>
+          ) : (
+            <>
+              You're viewing 0 out of {total} {props.entryShortNamePlural}
+            </>
+          )}
+        </p>
+        <TableLimitSelect
+          currentPage={currentPage}
+          limit={props.limit}
+          link={props.link}
+        />
       </div>
       {props.children}
       {props.visible === 0 && (
@@ -54,7 +52,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           There are no {props.entryLongNamePlural} to view.
         </div>
       )}
-      <div className="mt-6 flex justify-between">
+      <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
         <div className="flex-1">
           <TablePagination
             className="hidden sm:block"

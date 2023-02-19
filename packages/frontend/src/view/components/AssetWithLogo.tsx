@@ -2,6 +2,7 @@ import cx from 'classnames'
 import React from 'react'
 
 import { AssetInfo } from '../../utils/assets'
+import { InlineEllipsis } from './InlineEllipsis'
 
 interface AssetWithLogoProps {
   assetInfo: AssetInfo
@@ -43,9 +44,9 @@ export function AssetWithLogo({
             ? `${assetInfo.name} (${assetInfo.symbol})`
             : assetInfo.symbol)}
         {type === 'small' && (
-          <span className="inline-block max-w-[8ch] truncate">
+          <InlineEllipsis className="max-w-[80px]">
             {assetInfo.symbol}
-          </span>
+          </InlineEllipsis>
         )}
       </span>
     </div>
