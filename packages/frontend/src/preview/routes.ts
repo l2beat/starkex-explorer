@@ -12,7 +12,9 @@ import {
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderNotFoundPage,
+  renderStateUpdateBalanceChangesPage,
   renderStateUpdatePage,
+  renderStateUpdateTransactionsPage,
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
   renderUserOffersPage,
@@ -20,7 +22,6 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderStateUpdateBalanceChangesPage } from '../view/pages/state-update/StateUpdateBalanceChangesPage'
 import * as DATA from './data'
 import {
   randomHomeForcedTransactionEntry,
@@ -184,11 +185,24 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/state-updates/xyz/forced-transactions',
+    path: '/state-updates/:id/transactions',
+    link: '/state-updates/xyz/transactions',
     description:
       'Forced transaction list accessible from state update page. Supports pagination.',
     breakAfter: true,
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 231
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderStateUpdateTransactionsPage({
+        user,
+        id: '1534',
+        transactions: repeat(visible, randomStateUpdateTransactionEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   // #endregion
   // #region User
