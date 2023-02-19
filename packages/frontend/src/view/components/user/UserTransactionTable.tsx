@@ -8,7 +8,7 @@ import { AssetWithLogo } from '../common/AssetWithLogo'
 import { StatusBadge, StatusType } from '../common/StatusBadge'
 import { Table } from '../common/table/Table'
 
-export interface UserTransactionsTableProps {
+export interface UserTransactionTableProps {
   transactions: UserTransactionEntry[]
 }
 
@@ -27,7 +27,7 @@ export interface UserTransactionEntry {
   type: 'Forced withdraw' | 'Forced buy' | 'Forced sell' | 'Withdraw'
 }
 
-export function UserTransactionsTable(props: UserTransactionsTableProps) {
+export function UserTransactionTable(props: UserTransactionTableProps) {
   return (
     <Table
       columns={[

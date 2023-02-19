@@ -8,7 +8,11 @@ import {
   renderHomeForcedTransactionPage,
   renderHomeOfferPage,
   renderHomePage,
+  renderUserAssetPage,
+  renderUserBalanceChangePage,
+  renderUserOfferPage,
   renderUserPage,
+  renderUserTransactionPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
 import { renderForcedTradePage } from '../view/pages/forced-actions/ForcedTradePage'
@@ -182,30 +186,93 @@ const routes: Route[] = [
     path: '/user/someone/assets',
     description:
       'Assets list accessible from someone else’s user page. Supports pagination.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 7
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserAssetPage({
+        user,
+        type: 'PERPETUAL',
+        starkKey: StarkKey.fake(),
+        assets: repeat(visible, randomUserAssetEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   {
     path: '/user/me/assets',
     description:
       'Assets list accessible from my user page. Supports pagination.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 7
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserAssetPage({
+        user,
+        type: 'PERPETUAL',
+        starkKey: StarkKey.fake(),
+        assets: repeat(visible, randomUserAssetEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   {
     path: '/user/balance-changes',
     description:
       'Balance change list accessible from user page. Supports pagination.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 3367
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserBalanceChangePage({
+        user,
+        type: 'PERPETUAL',
+        starkKey: StarkKey.fake(),
+        balanceChanges: repeat(visible, randomUserBalanceChangeEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   {
     path: '/user/ethereum-transactions',
     description:
       'Ethereum transaction list accessible from user page. Supports pagination.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 48
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserTransactionPage({
+        user,
+        starkKey: StarkKey.fake(),
+        transactions: repeat(visible, randomUserTransactionEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
   },
   {
     path: '/user/offers',
     description: 'Offer list accessible from user page. Supports pagination.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      const total = 6
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserOfferPage({
+        user,
+        starkKey: StarkKey.fake(),
+        offers: repeat(visible, randomUserOfferEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
     breakAfter: true,
   },
   // #endregion

@@ -23,7 +23,7 @@ import {
 import { UserProfile } from '../../components/user/UserProfile'
 import {
   UserTransactionEntry,
-  UserTransactionsTable,
+  UserTransactionTable,
 } from '../../components/user/UserTransactionTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
@@ -88,7 +88,6 @@ function UserPage(props: UserPageProps) {
         >
           <UserBalanceChangeTable
             type={props.type}
-            starkKey={props.starkKey}
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>
@@ -97,7 +96,7 @@ function UserPage(props: UserPageProps) {
           visible={props.transactions.length}
           total={props.totalTransactions}
         >
-          <UserTransactionsTable transactions={props.transactions} />
+          <UserTransactionTable transactions={props.transactions} />
         </TablePreview>
         <TablePreview
           {...getOfferTableProps(props.starkKey)}

@@ -1,4 +1,4 @@
-import { StarkKey, Timestamp } from '@explorer/types'
+import { Timestamp } from '@explorer/types'
 import cx from 'classnames'
 import React from 'react'
 
@@ -10,7 +10,6 @@ import { Table } from '../common/table/Table'
 
 export interface UserBalanceChangeTableProps {
   balanceChanges: UserBalanceChangeEntry[]
-  starkKey: StarkKey
   type: 'SPOT' | 'PERPETUAL'
 }
 
