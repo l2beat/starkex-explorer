@@ -67,6 +67,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
           <div>{props.stats.ethereumTimestamp.toString()}</div>
           <div>{props.stats.starkExTimestamp.toString()}</div>
         </div>
+        {/* TODO: price changes */}
         <TablePreview
           {...getBalanceChangeTableProps(props.id)}
           visible={props.balanceChanges.length}
