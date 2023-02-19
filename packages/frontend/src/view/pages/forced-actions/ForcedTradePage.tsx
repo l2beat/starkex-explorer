@@ -91,7 +91,7 @@ function ForcedTradePage(props: ForcedActionFormProps) {
                 <LinkButton
                   className="w-full"
                   variant="outlined"
-                  href={`/user/${props.starkKey.toString()}`}
+                  href={`/users/${props.starkKey.toString()}`}
                 >
                   Back to assets
                 </LinkButton>

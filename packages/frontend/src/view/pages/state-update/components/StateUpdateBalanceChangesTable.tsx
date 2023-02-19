@@ -1,33 +1,33 @@
-import { Timestamp } from '@explorer/types'
+import { StarkKey } from '@explorer/types'
 import cx from 'classnames'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatAmount } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
+import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { Table } from '../../../components/table/Table'
-import { TimeCell } from '../../../components/TimeCell'
 
-export interface UserBalanceChangesTableProps {
-  balanceChanges: UserBalanceChangeEntry[]
+export interface StateUpdateBalanceChangesTableProps {
+  balanceChanges: StateUpdateBalanceChangeEntry[]
   type: 'SPOT' | 'PERPETUAL'
 }
 
-export interface UserBalanceChangeEntry {
-  timestamp: Timestamp
-  stateUpdateId: string
+export interface StateUpdateBalanceChangeEntry {
+  starkKey: StarkKey
   asset: Asset
   balance: bigint
   change: bigint
   vaultOrPositionId: string
 }
 
-export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
+export function StateUpdateBalanceChangesTable(
+  props: StateUpdateBalanceChangesTableProps
+) {
   return (
     <Table
       columns={[
-        { header: 'Time' },
-        { header: 'Update' },
+        { header: 'StarkKey' },
         { header: 'Asset' },
         { header: 'Balance', numeric: true },
         { header: 'Change', numeric: true },
@@ -36,12 +36,11 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
       rows={props.balanceChanges.map((entry) => {
         const change = formatAmount(entry.asset, entry.change, { signed: true })
         return {
-          link: `/state-updates/${entry.stateUpdateId}`,
+          link: `/users/${entry.starkKey.toString()}`,
           cells: [
-            <TimeCell timestamp={entry.timestamp} />,
-            <span className="text-blue-300 underline">
-              #{entry.stateUpdateId}
-            </span>,
+            <InlineEllipsis className="max-w-[80px] text-blue-600 underline sm:max-w-[300px]">
+              {entry.starkKey.toString()}
+            </InlineEllipsis>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(entry.asset)} />,
             formatAmount(entry.asset, entry.balance),
             <span

@@ -12,7 +12,7 @@ export function UserPageTitle({ prefix, starkKey }: UserPageTitleProps) {
   return (
     <span>
       {prefix}{' '}
-      <a href={`/user/${starkKey.toString()}`}>
+      <a href={`/users/${starkKey.toString()}`}>
         <InlineEllipsis className="max-w-[160px] text-blue-600 underline">
           {starkKey.toString()}
         </InlineEllipsis>

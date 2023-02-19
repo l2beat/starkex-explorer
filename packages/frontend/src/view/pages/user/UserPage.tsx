@@ -49,7 +49,7 @@ export function renderUserPage(props: UserPageProps) {
 function UserPage(props: UserPageProps) {
   return (
     <Page
-      path={`/user/${props.starkKey.toString()}`}
+      path={`/users/${props.starkKey.toString()}`}
       description="TODO: description"
       user={props.user}
     >

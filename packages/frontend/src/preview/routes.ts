@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
+import { randomInt } from 'crypto'
 import Koa from 'koa'
 
 import {
@@ -18,19 +19,21 @@ import { renderDevPage } from '../view/pages/DevPage'
 import { renderForcedTradePage } from '../view/pages/forced-actions/ForcedTradePage'
 import { renderHomeStateUpdatesPage } from '../view/pages/home/HomeStateUpdatesPage'
 import { renderNotFoundPage } from '../view/pages/NotFoundPage'
+import { renderStateUpdatePage } from '../view/pages/state-update/StateUpdatePage'
 import * as DATA from './data'
 import {
   randomHomeForcedTransactionEntry,
   randomHomeOfferEntry,
   randomHomeStateUpdateEntry,
 } from './data/home'
+import { randomStateUpdateBalanceChangeEntry } from './data/stateUpdate'
 import {
   randomUserAssetEntry,
   randomUserBalanceChangeEntry,
   randomUserOfferEntry,
   randomUserTransactionEntry,
 } from './data/user'
-import { repeat } from './data/utils'
+import { randomId, randomTimestamp, repeat } from './data/utils'
 
 export const router = new Router()
 
@@ -128,18 +131,42 @@ const routes: Route[] = [
   // #endregion
   // #region State update
   {
-    path: '/state-update',
+    path: '/state-updates/:id',
+    link: '/state-updates/xyz',
     description: 'State update page.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderStateUpdatePage({
+        user,
+        type: 'PERPETUAL',
+        id: randomId(),
+        stats: {
+          hashes: {
+            factHash: PedersenHash.fake(),
+            positionTreeRoot: PedersenHash.fake(),
+            onChainVaultTreeRoot: PedersenHash.fake(),
+            offChainVaultTreeRoot: PedersenHash.fake(),
+            orderRoot: PedersenHash.fake(),
+          },
+          blockNumber: randomInt(14_000_000, 17_000_000),
+          ethereumTimestamp: randomTimestamp(),
+          starkExTimestamp: randomTimestamp(),
+        },
+        balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
+        totalBalanceChanges: 231,
+        forcedTransactions: [],
+        totalForcedTransactions: 0,
+      })
+    },
   },
   {
-    path: '/state-update/balance-changes',
+    path: '/state-updates/xyz/balance-changes',
     description:
       'Balance change list accessible from state update page. Supports pagination.',
     render: notFound,
   },
   {
-    path: '/state-update/forced-transactions',
+    path: '/state-updates/xyz/forced-transactions',
     description:
       'Forced transaction list accessible from state update page. Supports pagination.',
     breakAfter: true,
@@ -148,8 +175,8 @@ const routes: Route[] = [
   // #endregion
   // #region User
   {
-    path: '/user/:starkKey',
-    link: '/user/someone',
+    path: '/users/:starkKey',
+    link: '/users/someone',
     description: 'Someone else’s user page.',
     render: (ctx) => {
       const user = getUser(ctx)
@@ -172,18 +199,18 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/user/me/unknown',
+    path: '/users/me/unknown',
     description: 'My user page, but the stark key is unknown.',
     render: notFound,
   },
   {
-    path: '/user/me/unregistered',
+    path: '/users/me/unregistered',
     description:
       'My user page, the stark key is known, but it’s not registered.',
     render: notFound,
   },
   {
-    path: '/user/me/registered',
+    path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
     render: notFound,
     breakAfter: true,
@@ -191,7 +218,7 @@ const routes: Route[] = [
   // #endregion
   // #region User lists
   {
-    path: '/user/me/assets',
+    path: '/users/me/assets',
     description:
       'Assets list accessible from my user page. Supports pagination.',
     render: (ctx) => {
@@ -210,8 +237,8 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/user/:starkKey/assets',
-    link: '/user/someone/assets',
+    path: '/users/:starkKey/assets',
+    link: '/users/someone/assets',
     description:
       'Assets list accessible from someone else’s user page. Supports pagination.',
     render: (ctx) => {
@@ -230,8 +257,8 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/user/:starkKey/balance-changes',
-    link: '/user/someone/balance-changes',
+    path: '/users/:starkKey/balance-changes',
+    link: '/users/someone/balance-changes',
     description:
       'Balance change list accessible from user page. Supports pagination.',
     render: (ctx) => {
@@ -250,8 +277,8 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/user/:starkKey/transactions',
-    link: '/user/someone/transactions',
+    path: '/users/:starkKey/transactions',
+    link: '/users/someone/transactions',
     description:
       'Ethereum transaction list accessible from user page. Supports pagination.',
     render: (ctx) => {
@@ -269,8 +296,8 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/user/:starkKey/offers',
-    link: '/user/someone/offers',
+    path: '/users/:starkKey/offers',
+    link: '/users/someone/offers',
     description: 'Offer list accessible from user page. Supports pagination.',
     render: (ctx) => {
       const user = getUser(ctx)
