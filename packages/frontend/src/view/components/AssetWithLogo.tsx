@@ -36,7 +36,7 @@ export function AssetWithLogo({
         {type === 'full' && (
           <div>
             <div>{assetInfo.name}</div>
-            <InlineEllipsis className="max-w-[80px] text-xs text-zinc-500">
+            <InlineEllipsis className="max-w-[80px] text-xs text-zinc-500 mt-2 !py-0">
               {assetInfo.symbol}
             </InlineEllipsis>
           </div>
@@ -46,7 +46,7 @@ export function AssetWithLogo({
             ? `${assetInfo.name} (${assetInfo.symbol})`
             : assetInfo.symbol)}
         {type === 'small' && (
-          <InlineEllipsis className="max-w-[80px]">
+          <InlineEllipsis className="max-w-[80px] mt-2 !py-0">
             {assetInfo.symbol}
           </InlineEllipsis>
         )}

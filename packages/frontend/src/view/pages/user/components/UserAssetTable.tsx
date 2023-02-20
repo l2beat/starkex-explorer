@@ -27,6 +27,7 @@ export interface UserAssetEntry {
 export function UserAssetsTable(props: UserAssetsTableProps) {
   return (
     <Table
+    fullBackground
       columns={[
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
@@ -37,10 +38,10 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         return {
           cells: [
             <AssetWithLogo type="full" assetInfo={assetToInfo(entry.asset)} />,
-            <>
-              <div>{formatAmount(entry.asset, entry.balance)}</div>
-              <div>{formatWithDecimals(entry.value, 6, { prefix: '$' })}</div>
-            </>,
+            <div className='flex flex-col'>
+              <span className='font-medium text-white text-lg'>{formatAmount(entry.asset, entry.balance)}</span>
+              <span className='mt-2 text-zinc-500 text-xxs'>{formatWithDecimals(entry.value, 6, { prefix: '$' })}</span>
+            </div>,
             <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
             <Button>{entry.action}</Button>,
           ],
