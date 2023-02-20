@@ -36,12 +36,6 @@ export function ActionsTable(props: ActionsTableProps) {
             className="mt-4 flex items-center justify-between"
             key={assetInfo.symbol}
           >
-            {/* <div className="flex">
-            <img src={assetInfo.imageUrl} className="h-8 w-8" data-fallback="/images/unknown-asset.svg" />
-            <p className="text-base ml-3 font-bold text-white">
-              {symbol}
-            </p>
-          </div> */}
             <AssetWithLogo assetInfo={assetInfo} type="regularSymbol" />
             <p className="text-base text-zinc-500">
               Finalize the withdrawal of{' '}
@@ -68,12 +62,6 @@ export function ActionsTable(props: ActionsTableProps) {
             className="mt-3 flex items-center justify-between"
             key={offer.timestamp.toString()}
           >
-            {/* <div className="flex items-center">
-              <img src={assetInfo.imageUrl} className="h-8 w-8" data-fallback="/images/unknown-asset.svg" />
-              <p className="text-base ml-3 font-bold text-white">
-                {symbol}
-              </p>
-            </div> */}
             <AssetWithLogo assetInfo={assetInfo} type="regularSymbol" />
             <p className="text-base text-zinc-500">
               Finalize the offer{' '}

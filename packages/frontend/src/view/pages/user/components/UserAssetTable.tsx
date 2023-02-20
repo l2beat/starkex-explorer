@@ -14,6 +14,7 @@ export interface UserAssetsTableProps {
   assets: UserAssetEntry[]
   starkKey: StarkKey
   type: 'SPOT' | 'PERPETUAL'
+  myOwnAssets?: boolean
 }
 
 export interface UserAssetEntry {
@@ -32,7 +33,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
         { header: props.type === 'PERPETUAL' ? 'Position' : 'Vault' },
-        { header: 'Action' },
+        { header: props.myOwnAssets ? 'Action' : '' },
       ]}
       rows={props.assets.map((entry) => {
         return {
@@ -47,7 +48,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               </span>
             </div>,
             <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
-            <Button>{entry.action}</Button>,
+            props.myOwnAssets ? <Button>{entry.action}</Button> : '',
           ],
         }
       })}

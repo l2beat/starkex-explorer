@@ -47,6 +47,7 @@ export function renderUserPage(props: UserPageProps) {
 }
 
 function UserPage(props: UserPageProps) {
+  const myUserPage = props.user?.address === props.ethereumAddress
   return (
     <Page
       path={`/users/${props.starkKey.toString()}`}
@@ -55,13 +56,15 @@ function UserPage(props: UserPageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <UserProfile
-          starkKey={props.starkKey}
           ethereumAddress={props.ethereumAddress}
+          myOwnProfile={myUserPage}
         />
-        <ActionsTable
-          withdrawableAssets={props.withdrawableAssets}
-          offersToAccept={props.offersToAccept}
-        />
+        {myUserPage && (
+          <ActionsTable
+            withdrawableAssets={props.withdrawableAssets}
+            offersToAccept={props.offersToAccept}
+          />
+        )}
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
           visible={props.assets.length}
