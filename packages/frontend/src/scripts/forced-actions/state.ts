@@ -1,6 +1,6 @@
 import { AssetId } from '@explorer/types'
 
-import { formatCurrencyInput } from '../../utils/formatUtils'
+import { formatCurrencyInput } from '../../utils/formatting/formatCurrencyInput'
 import { ForcedActionFormProps } from '../../view/pages/forced-actions/ForcedActionFormProps'
 import { FormAction, FormState } from './types'
 import { getAsset, getFormType, parseCurrencyInput } from './utils'

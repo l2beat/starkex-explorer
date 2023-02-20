@@ -7,7 +7,7 @@ import { FormAction } from './types'
 describe(nextFormState.name, () => {
   const INITIAL_STATE = getInitialState(
     {
-      account: {
+      user: {
         address: EthereumAddress.fake(),
         positionId: 123n,
         hasUpdates: false,

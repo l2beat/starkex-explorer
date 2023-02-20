@@ -1,8 +1,11 @@
+import { AssetHash, AssetId } from '@explorer/types'
+
 import { BlockRange } from '../../model'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
 import { IDataSyncService } from '../IDataSyncService'
+import { Preprocessor } from '../preprocessing/Preprocessor'
 import { BlockDownloader } from './BlockDownloader'
 import {
   INITIAL_SYNC_STATE,
@@ -26,6 +29,9 @@ export class SyncScheduler {
     private readonly syncStatusRepository: SyncStatusRepository,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: IDataSyncService,
+    private readonly preprocessor:
+      | Preprocessor<AssetHash>
+      | Preprocessor<AssetId>,
     private readonly logger: Logger,
     opts: SyncSchedulerOptions
   ) {
@@ -40,6 +46,7 @@ export class SyncScheduler {
       (await this.syncStatusRepository.getLastSynced()) ?? this.earliestBlock
 
     await this.dataSyncService.discardAfter(lastSynced)
+    await this.preprocessor.sync()
 
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)
     this.dispatch({ type: 'initialized', lastSynced, knownBlocks })
@@ -96,6 +103,7 @@ export class SyncScheduler {
       await this.dataSyncService.discardAfter(blocks.start - 1)
       await this.dataSyncService.sync(blocks)
       await this.syncStatusRepository.setLastSynced(blocks.end - 1)
+      await this.preprocessor.sync()
       this.dispatch({ type: 'syncSucceeded' })
     } catch (err) {
       this.dispatch({ type: 'syncFailed', blocks })
@@ -106,6 +114,7 @@ export class SyncScheduler {
   private async handleDiscardAfter(blockNumber: number) {
     try {
       await this.syncStatusRepository.setLastSynced(blockNumber)
+      await this.preprocessor.sync()
       await this.dataSyncService.discardAfter(blockNumber)
       this.dispatch({ type: 'discardAfterSucceeded', blockNumber })
     } catch (err) {
