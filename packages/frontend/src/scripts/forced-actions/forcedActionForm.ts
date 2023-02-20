@@ -1,4 +1,4 @@
-import { FormId } from '../../view/components/forced-actions/form/ids'
+import { FormId } from '../../view/pages/forced-actions/components/form/ids'
 import { ForcedActionFormProps } from '../../view/pages/forced-actions/ForcedActionFormProps'
 import { FormElements, getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'

@@ -34,7 +34,7 @@ async function submitExit(state: FormState) {
     method: 'eth_sendTransaction',
     params: [
       {
-        from: state.props.account.address,
+        from: state.props.user.address,
         to: state.props.perpetualAddress,
         data,
       },
@@ -61,7 +61,7 @@ async function submitOffer(state: FormState) {
     isABuyingSynthetic: isBuyable(state.selectedAsset),
   }
 
-  const signature = await signCreate(offer, state.props.account.address)
+  const signature = await signCreate(offer, state.props.user.address)
 
   if (!signature) {
     console.error('Offer parameters need to be signed.')

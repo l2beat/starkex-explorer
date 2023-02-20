@@ -14,7 +14,6 @@
     "lint": "eslint --ext .ts,.tsx --max-warnings 0 src",
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
-    "prebuild": "yarn clean",
     "build": "NODE_ENV=production gulp build",
     "clean": "rm -rf build",
     "test": "mocha",
