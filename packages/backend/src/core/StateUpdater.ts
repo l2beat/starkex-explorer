@@ -146,7 +146,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
           (tx) =>
             tx.data.type === 'FullWithdrawal' &&
             tx.data.starkKey === action.starkKey &&
-            tx.data.vaultId === action.vauldId
+            tx.data.vaultId === action.vaultId
         )
       }
 

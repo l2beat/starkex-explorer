@@ -54,7 +54,7 @@ export function decodeSpotCairoOutput(data: string): SpotCairoOutput {
       starkKey,
       assetHash,
       type,
-      vauldId,
+      vaultId: vauldId,
       balanceDifference,
     })
   }

@@ -48,7 +48,7 @@ export interface SpotModification {
   type: 'fullWithdrawal' | 'regularWithdrawal'
   starkKey: StarkKey
   assetHash: AssetHash
-  vauldId: bigint
+  vaultId: bigint
   balanceDifference: bigint
 }
 
