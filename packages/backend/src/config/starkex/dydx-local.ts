@@ -1,4 +1,4 @@
-import { EthereumAddress } from '@explorer/types'
+import { AssetId, EthereumAddress } from '@explorer/types'
 
 import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
@@ -22,6 +22,10 @@ export function getDydxLocalConfig(): StarkexConfig {
       verifiers: [
         EthereumAddress('0x6ebcf3c79b5bC9195F26dE459f57B6d2f0f27861'),
       ],
+    },
+    collateralAsset: {
+      assetId: AssetId('USDC-6'),
+      price: 1_000_000n,
     },
   }
 }
