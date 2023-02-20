@@ -9,7 +9,7 @@ import { z } from 'zod'
 
 export type ForcedActionFormProps = z.infer<typeof ForcedActionFormProps>
 export const ForcedActionFormProps = z.object({
-  account: AccountDetails,
+  user: AccountDetails,
   perpetualAddress: stringAs(EthereumAddress),
   selectedAsset: stringAs(AssetId),
   positionId: stringAsBigInt(),

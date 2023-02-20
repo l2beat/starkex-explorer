@@ -1,14 +1,14 @@
 import React from 'react'
 
-import { Button, LinkButton } from '../../components/common/Button'
-import { Card } from '../../components/common/Card'
-import { Link } from '../../components/common/Link'
-import { OrderedList } from '../../components/common/OrderedList'
-import { Page } from '../../components/common/page/Page'
-import { ForcedActionCard } from '../../components/forced-actions/ForcedActionCard'
-import { AmountInput } from '../../components/forced-actions/form/AmountInput'
-import { FormId } from '../../components/forced-actions/form/ids'
+import { Button, LinkButton } from '../../components/Button'
+import { Card } from '../../components/Card'
+import { Link } from '../../components/Link'
+import { OrderedList } from '../../components/OrderedList'
+import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
+import { ForcedActionCard } from './components/ForcedActionCard'
+import { AmountInput } from './components/form/AmountInput'
+import { FormId } from './components/form/ids'
 import {
   ForcedActionFormProps,
   serializeForcedActionsFormProps,
@@ -40,53 +40,55 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
     <Page
       path="/forced/new/:positionId/:assetId"
       description="Page that allows user withdrawal of USDC"
-      account={props.account}
+      user={props.user}
     >
-      <div className="my-auto flex gap-12">
-        <div className="flex flex-col">
-          <span className="text-2xl font-semibold">
-            Begin withdrawal process
-          </span>
-          <span className="mt-6 text-sm font-semibold text-zinc-500">
-            The withdrawal process consists of three steps:
-          </span>
-          <OrderedList items={instructions} className="mt-3 max-w-md" />
-        </div>
-        <Card className="h-min w-[480px]">
-          <form
-            id={FormId.Form}
-            className="flex flex-col gap-6"
-            data-props={propsJson}
-          >
-            <div className="flex items-end justify-between">
-              <span className="text-2xl font-semibold">Withdrawal</span>
-              <span>
-                <span className="text-sm text-zinc-500">Position</span>{' '}
-                <span className="font-semibold">
-                  #{props.positionId.toString()}
+      <main className="mx-auto flex-1 p-16">
+        <div className="my-auto flex gap-12">
+          <div className="flex flex-col">
+            <span className="text-2xl font-semibold">
+              Begin withdrawal process
+            </span>
+            <span className="mt-6 text-sm font-semibold text-zinc-500">
+              The withdrawal process consists of three steps:
+            </span>
+            <OrderedList items={instructions} className="mt-3 max-w-md" />
+          </div>
+          <Card className="h-min w-[480px]">
+            <form
+              id={FormId.Form}
+              className="flex flex-col gap-6"
+              data-props={propsJson}
+            >
+              <div className="flex items-end justify-between">
+                <span className="text-2xl font-semibold">Withdrawal</span>
+                <span>
+                  <span className="text-sm text-zinc-500">Position</span>{' '}
+                  <span className="font-semibold">
+                    #{props.positionId.toString()}
+                  </span>
                 </span>
-              </span>
-            </div>
-            <div className="flex flex-col gap-2">
-              <ForcedActionCard>
-                <AmountInput {...props} />
-              </ForcedActionCard>
-            </div>
-            <div className="flex flex-col gap-2">
-              <Button className="w-full" id={FormId.SubmitButton}>
-                Prepare for withdrawal
-              </Button>
-              <LinkButton
-                className="w-full"
-                variant="outlined"
-                href={`/user/${props.starkKey.toString()}`}
-              >
-                Back to assets
-              </LinkButton>
-            </div>
-          </form>
-        </Card>
-      </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <ForcedActionCard>
+                  <AmountInput {...props} />
+                </ForcedActionCard>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Button className="w-full" id={FormId.SubmitButton}>
+                  Prepare for withdrawal
+                </Button>
+                <LinkButton
+                  className="w-full"
+                  variant="outlined"
+                  href={`/users/${props.starkKey.toString()}`}
+                >
+                  Back to assets
+                </LinkButton>
+              </div>
+            </form>
+          </Card>
+        </div>
+      </main>
     </Page>
   )
 }
