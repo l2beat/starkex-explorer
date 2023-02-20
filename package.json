@@ -12,13 +12,13 @@
     ]
   },
   "scripts": {
-    "format": "wsrun -ecsm format",
-    "format:fix": "wsrun -ecsm format:fix",
-    "lint": "wsrun -ecsm lint",
-    "lint:fix": "wsrun -ecsm lint:fix",
-    "typecheck": "wsrun -ecsm typecheck",
+    "format": "wsrun -em format",
+    "format:fix": "wsrun -em format:fix",
+    "lint": "wsrun -em lint",
+    "lint:fix": "wsrun -em lint:fix",
+    "typecheck": "wsrun -em typecheck",
     "test": "wsrun -ecsm test",
-    "build": "wsrun -ecsm build",
+    "build": "wsrun -etm build",
     "clean": "wsrun -ecsm clean",
     "start": "cd packages/backend && yarn start"
   },
