@@ -15,7 +15,6 @@
     "lint": "eslint --ext .ts --max-warnings 0 src",
     "lint:fix": "yarn lint --fix",
     "typecheck": "tsc --noEmit",
-    "prebuild": "yarn clean",
     "build": "tsc",
     "clean": "rm -rf build",
     "test": "mocha"
