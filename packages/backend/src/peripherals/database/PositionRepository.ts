@@ -1,5 +1,6 @@
 import { AssetBalance } from '@explorer/encoding'
 import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
+import { Knex } from 'knex'
 import { AssetBalanceJson, PositionRow, PriceRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -25,6 +26,7 @@ export class PositionRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.findById = this.wrapFind(this.findById)
+    this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
     this.getHistoryById = this.wrapGet(this.getHistoryById)
     this.findIdByStarkKey = this.wrapFind(this.findIdByStarkKey)
     this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
@@ -42,6 +44,13 @@ export class PositionRepository extends BaseRepository {
       .first()
 
     if (row) return toPositionRecord(row)
+  }
+
+  async getByStateUpdateId(stateUpdateId: number, trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    const rows = await knex('positions').where('state_update_id', stateUpdateId)
+
+    return rows.map((r) => toPositionRecord(r))
   }
 
   async getHistoryById(positionId: bigint) {

@@ -1,8 +1,8 @@
+import { AssetDetails, AssetType } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 import { BigNumber } from 'ethers'
 
-import { AssetDetails, AssetType } from '../../model/AssetDetails'
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
 import { AssetRegistrationRecord, AssetRepository } from './AssetRepository'

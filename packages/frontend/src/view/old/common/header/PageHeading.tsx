@@ -8,6 +8,6 @@ export interface PageHeadingProps {
 
 export function PageHeading({ className, children }: PageHeadingProps) {
   return (
-    <h1 className={cx('mb-8 text-2xl font-bold', className)}>{children}</h1>
+    <h1 className={cx('text-2xl mb-8 font-bold', className)}>{children}</h1>
   )
 }
