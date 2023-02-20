@@ -10,6 +10,18 @@ export function AssetId(value: string) {
   return value as unknown as AssetId
 }
 
+AssetId.check = function check(value: unknown): value is AssetId {
+  if (typeof value !== 'string') {
+    return false
+  }
+  try {
+    AssetId(value)
+    return true
+  } catch {
+    return false
+  }
+}
+
 AssetId.decimals = function decimals(assetId: AssetId) {
   // TODO: temporarily returning 0 when no dash in name (TESTTOKEN1)
   return parseInt(assetId.split('-')[1] ?? '0')

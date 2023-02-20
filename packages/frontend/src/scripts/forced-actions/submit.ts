@@ -3,13 +3,14 @@ import {
   encodeForcedWithdrawalRequest,
   serializeCreateOfferBody,
 } from '@explorer/shared'
-import { Hash256 } from '@explorer/types'
+import { AssetId, Hash256 } from '@explorer/types'
 
 import { signCreate } from '../offer/sign'
 import { FormState } from './types'
+import { isBuyable } from './utils'
 
 export async function submit(state: FormState) {
-  if (state.exitButtonSelected) {
+  if (state.props.selectedAsset === AssetId.USDC) {
     return submitExit(state)
   } else {
     return submitOffer(state)
@@ -57,7 +58,7 @@ async function submitOffer(state: FormState) {
     collateralAmount: state.totalInputValue,
     syntheticAmount: state.amountInputValue,
     syntheticAssetId: state.selectedAsset.assetId,
-    isABuyingSynthetic: state.buyButtonSelected,
+    isABuyingSynthetic: isBuyable(state.selectedAsset),
   }
 
   const signature = await signCreate(offer, state.props.account.address)

@@ -1,36 +1,23 @@
 import { AssetId } from '@explorer/types'
 
-// eslint-disable-next-line no-restricted-imports
-import { TransactionFormProps } from '../../view/old/transaction-form'
+import { formatCurrencyInput } from '../../utils/formatUtils'
+import { ForcedActionFormProps } from '../../view/pages/forced-actions/ForcedActionFormProps'
 import { FormAction, FormState } from './types'
-import {
-  formatCurrencyInput,
-  getAsset,
-  isBuyable,
-  isSellable,
-  parseCurrencyInput,
-} from './utils'
+import { getAsset, getFormType, parseCurrencyInput } from './utils'
 
 export function getInitialState(
-  props: TransactionFormProps,
+  props: ForcedActionFormProps,
   queryString: string
 ): FormState {
   const search = new URLSearchParams(queryString)
-  const fromUrl = search.get('assetId')
-  const initialAssetId = fromUrl ? AssetId(fromUrl) : props.selectedAsset
-
-  const hasUSDC = props.assets.some((x) => x.assetId === AssetId.USDC)
-  const hasBuy = props.assets.some(isBuyable)
-  const hasSell = props.assets.some(isSellable)
-
-  const selectedAsset = props.assets[0]
-  if (!selectedAsset) {
-    throw new Error('Programmer error: No assets')
-  }
-
+  const assetId = search.get('assetId')
+  const initialAssetId = assetId ? AssetId(assetId) : props.selectedAsset
+  const selectedAsset = getAsset(initialAssetId, props.assets)
+  const type = getFormType(selectedAsset)
   const candidate: FormState = {
     props,
     selectedAsset,
+    type,
     amountInputString: '',
     amountInputValue: 0n,
     amountInputError: false,
@@ -40,99 +27,17 @@ export function getInitialState(
     totalInputValue: 0n,
     boundVariable: 'price',
     canSubmit: false,
-
-    exitButtonVisible: hasUSDC,
-    buyButtonVisible: hasBuy,
-    sellButtonVisible: hasSell,
-
-    // To be determined by nextFormState
-    exitButtonSelected: false,
-    buyButtonSelected: false,
-    sellButtonSelected: false,
-    priceSectionVisible: false,
-    totalSectionVisible: false,
-    infoSectionVisible: false,
   }
-  return nextFormState(candidate, {
-    type: 'AssetChange',
-    assetId: initialAssetId,
-  })
+  return candidate
 }
 
 export function nextFormState(state: FormState, action: FormAction): FormState {
-  if (action.type === 'AssetChange') {
-    const selectedAsset = getAsset(action.assetId, state.props.assets)
-
-    const isUSDC = selectedAsset.assetId === AssetId.USDC
-    const isPositive = selectedAsset.balance > 0n
-
-    return {
-      ...state,
-      selectedAsset,
-      amountInputString: '',
-      amountInputValue: 0n,
-      amountInputError: false,
-      priceInputString: '',
-      priceInputValue: 0n,
-      totalInputString: '',
-      totalInputValue: 0n,
-      canSubmit: false,
-      exitButtonSelected: isUSDC,
-      buyButtonSelected: !isUSDC && !isPositive,
-      sellButtonSelected: !isUSDC && isPositive,
-      priceSectionVisible: !isUSDC,
-      totalSectionVisible: !isUSDC,
-      infoSectionVisible: isUSDC,
-    }
-  }
-
-  if (action.type === 'SwitchToBuy') {
-    const buyable = state.props.assets.find(isBuyable)
-    if (!buyable) {
-      throw new Error('Programmer error: Buy button should be invisible')
-    }
-    return nextFormState(state, {
-      type: 'AssetChange',
-      assetId: buyable.assetId,
-    })
-  }
-
-  if (action.type === 'SwitchToSell') {
-    const sellable = state.props.assets.find(isSellable)
-    if (!sellable) {
-      throw new Error('Programmer error: Sell button should be invisible')
-    }
-    return nextFormState(state, {
-      type: 'AssetChange',
-      assetId: sellable.assetId,
-    })
-  }
-
-  if (action.type === 'UseMaxBalance') {
-    return nextFormState(state, {
-      type: 'ModifyAmount',
-      value: formatCurrencyInput(
-        state.selectedAsset.balance,
-        state.selectedAsset.assetId
-      ),
-    })
-  }
-
-  if (action.type === 'UseSuggestedPrice') {
-    return nextFormState(state, {
-      type: 'ModifyPrice',
-      value: formatCurrencyInput(
-        state.selectedAsset.priceUSDCents * 10000n,
-        AssetId.USDC
-      ),
-    })
-  }
-
   if (action.type === 'ModifyAmount') {
     const parsed = parseCurrencyInput(action.value, state.selectedAsset.assetId)
     const amountInputString =
       parsed !== undefined ? action.value : state.amountInputString
     const amountInputValue = parsed ?? state.amountInputValue
+
     if (state.boundVariable === 'price') {
       return stateFromAmountAndPrice(
         state,
@@ -257,6 +162,7 @@ function stateFromAmountAndTotal(
 function withChecks(state: FormState): FormState {
   const balance = state.selectedAsset.balance
   const absolute = balance < 0 ? -balance : balance
+
   if (state.selectedAsset.assetId === AssetId.USDC && balance < 0) {
     return {
       ...state,
@@ -271,13 +177,15 @@ function withChecks(state: FormState): FormState {
       canSubmit: false,
     }
   }
-  if (state.exitButtonSelected) {
+
+  if (state.type === 'withdraw') {
     return {
       ...state,
       amountInputError: false,
       canSubmit: state.amountInputValue > 0n,
     }
   }
+
   return {
     ...state,
     amountInputError: false,

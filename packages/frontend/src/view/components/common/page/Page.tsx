@@ -43,7 +43,7 @@ export function Page({
       />
       <body className="flex h-full flex-col">
         <Navbar searchBar={!withoutSearch} account={account} />
-        <main className="flex-1 px-16 py-8">{children}</main>
+        <main className="mx-auto flex-1 p-16">{children}</main>
         <Footer />
         {scripts.map((src, i) => (
           <script key={i} src={src} />

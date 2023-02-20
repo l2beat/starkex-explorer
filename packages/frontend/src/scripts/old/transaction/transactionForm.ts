@@ -1,11 +1,11 @@
 import { AssetId } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
-import { getAssetImageUrl } from '../../view/old/common/icons/getAssetImageUrl'
+import { getAssetImageUrl } from '../../../view/old/common/icons/getAssetImageUrl'
 // eslint-disable-next-line no-restricted-imports
-import { FormId } from '../../view/old/transaction-form/ids'
+import { FormId } from '../../../view/old/transaction-form/ids'
 // eslint-disable-next-line no-restricted-imports
-import { TransactionFormProps } from '../../view/old/transaction-form/TransactionFormProps'
+import { TransactionFormProps } from '../../../view/old/transaction-form/TransactionFormProps'
 import { getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
