@@ -160,7 +160,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
       matchedHashes.push(notIncluded[txIndex]!.transactionHash)
 
       // Remove the transaction from the list of not included transactions
-      // so that it's not matched in the next interation
+      // so that it's not matched in the next iteration
       notIncluded.splice(txIndex, 1)
     })
 

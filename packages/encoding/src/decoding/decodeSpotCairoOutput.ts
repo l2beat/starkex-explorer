@@ -47,14 +47,14 @@ export function decodeSpotCairoOutput(data: string): SpotCairoOutput {
     // Extracting into variables:
     const isFullWithdrawal = ((action >> 128n) & 1n) == 1n
     const type = isFullWithdrawal ? 'fullWithdrawal' : 'regularWithdrawal'
-    const vauldId = (action >> 64n) & ((1n << 64n) - 1n)
+    const vaultId = (action >> 64n) & ((1n << 64n) - 1n)
     const balanceDifference = (action & ((1n << 64n) - 1n)) - (1n << 63n)
 
     modifications.push({
       starkKey,
       assetHash,
       type,
-      vaultId: vauldId,
+      vaultId,
       balanceDifference,
     })
   }
