@@ -37,6 +37,7 @@ import {
   randomUserBalanceChangeEntry,
   randomUserOfferEntry,
   randomUserTransactionEntry,
+  randomWithdrawableAssetEntry,
 } from './data/user'
 import { randomId, randomTimestamp, repeat } from './data/utils'
 
@@ -244,7 +245,25 @@ const routes: Route[] = [
   {
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderUserPage({
+        user,
+        type: 'PERPETUAL',
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
+        offersToAccept: repeat(2, randomUserOfferEntry),
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 7,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+      })
+    },
     breakAfter: true,
   },
   // #endregion
