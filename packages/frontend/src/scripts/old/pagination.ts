@@ -1,0 +1,130 @@
+// eslint-disable-next-line no-restricted-imports
+import { ServerFormAttributes } from '../../view/old/common/pagination/attributes'
+// eslint-disable-next-line no-restricted-imports
+import { styles } from '../../view/old/common/pagination/styles'
+
+export function initOldPagination() {
+  initServerPagination()
+  initClientPagination()
+}
+
+function initServerPagination() {
+  const form = document.querySelector<HTMLFormElement>(
+    `#${ServerFormAttributes.FormId}`
+  )
+  form?.addEventListener('change', () => form.submit())
+}
+
+function initClientPagination() {
+  const items = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-paginates]')
+  )
+  for (const pagination of items) {
+    initClientPaginationInstance(pagination)
+  }
+}
+
+function initClientPaginationInstance(pagination: HTMLElement) {
+  const state = { page: 1, perPage: 10 }
+  const ui = getPaginationElements(pagination)
+
+  ui.firstButton.addEventListener('click', () => onChange(1, state.perPage))
+  ui.previousButton.addEventListener('click', () =>
+    onChange(state.page - 1, state.perPage)
+  )
+  ui.nextButton.addEventListener('click', () =>
+    onChange(state.page + 1, state.perPage)
+  )
+  ui.lastButton.addEventListener('click', () =>
+    onChange(Math.ceil(ui.rows.length / state.perPage), state.perPage)
+  )
+  ui.perPageSelect.addEventListener('change', () =>
+    onChange(1, Number(ui.perPageSelect.value))
+  )
+
+  onChange(state.page, state.perPage)
+
+  function onChange(page: number, perPage: number) {
+    state.page = page
+    state.perPage = perPage
+
+    const start = (page - 1) * perPage
+    const end = page * perPage
+    const last = Math.ceil(ui.rows.length / perPage)
+
+    for (const [i, row] of ui.rows.entries()) {
+      row.classList.toggle('hidden', i < start || i >= end)
+    }
+
+    if (page === 1) {
+      ui.firstButton.setAttribute('disabled', '')
+      ui.firstButton.className = styles.textButtonInactive
+      ui.previousButton.setAttribute('disabled', '')
+      ui.previousButton.className = styles.arrowButtonInactive
+    } else {
+      ui.firstButton.removeAttribute('disabled')
+      ui.firstButton.className = styles.textButtonActive
+      ui.previousButton.removeAttribute('disabled')
+      ui.previousButton.className = styles.arrowButtonActive
+    }
+
+    if (page === last) {
+      ui.nextButton.setAttribute('disabled', '')
+      ui.nextButton.className = styles.arrowButtonInactive
+      ui.lastButton.setAttribute('disabled', '')
+      ui.lastButton.className = styles.textButtonInactive
+    } else {
+      ui.nextButton.removeAttribute('disabled')
+      ui.nextButton.className = styles.arrowButtonActive
+      ui.lastButton.removeAttribute('disabled')
+      ui.lastButton.className = styles.textButtonActive
+    }
+
+    ui.currentPageView.innerText = page.toString()
+    ui.totalPagesView.innerText = last.toString()
+  }
+}
+
+function getPaginationElements(pagination: HTMLElement) {
+  const tableId = pagination.dataset.paginates
+  if (!tableId) {
+    throw new Error('Programmer error: missing table id!')
+  }
+  const table = document.querySelector<HTMLTableElement>(`#${tableId}`)
+  const [firstButton, previousButton, nextButton, lastButton] = Array.from(
+    pagination.querySelectorAll<HTMLButtonElement>('button')
+  ) as (HTMLButtonElement | undefined)[]
+  const currentPageView =
+    pagination.querySelector<HTMLSpanElement>('[data-current]')
+  const totalPagesView =
+    pagination.querySelector<HTMLSpanElement>('[data-total]')
+  const perPageSelect = pagination.querySelector<HTMLSelectElement>('select')
+
+  if (
+    !firstButton ||
+    !previousButton ||
+    !nextButton ||
+    !lastButton ||
+    !currentPageView ||
+    !totalPagesView ||
+    !perPageSelect ||
+    !table
+  ) {
+    throw new Error(`ClientPagination misconfigured for #${tableId}`)
+  }
+
+  const rows = Array.from(
+    table.querySelectorAll<HTMLTableRowElement>('tbody tr')
+  )
+
+  return {
+    firstButton,
+    previousButton,
+    nextButton,
+    lastButton,
+    currentPageView,
+    totalPagesView,
+    perPageSelect,
+    rows,
+  }
+}

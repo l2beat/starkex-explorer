@@ -31,9 +31,8 @@ export function ForcedTradeOffersTable({
         { header: 'Total', numeric: true },
       ]}
       rows={offers.map((offer) => {
-        const link = `/forced/offers/${offer.id}`
         return {
-          link,
+          link: `/forced/offers/${offer.id}`,
           cells: [
             offer.id,
             offer.type,

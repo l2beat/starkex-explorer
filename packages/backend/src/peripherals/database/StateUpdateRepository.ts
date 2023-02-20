@@ -22,7 +22,6 @@ export interface StateUpdateRecord {
 }
 
 export interface StateUpdatePriceRecord {
-  stateUpdateId: number
   assetId: AssetId
   price: bigint
 }
@@ -120,6 +119,17 @@ export class StateUpdateRepository extends BaseRepository {
     const knex = await this.knex()
     const rows = await knex('state_updates').select('*')
     return rows.map(toStateUpdateRecord)
+  }
+
+  async getPricesByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const rows = await knex('prices')
+      .select(['asset_id', 'price'])
+      .where('state_update_id', stateUpdateId)
+    return rows.map(toStateUpdatePriceRecord)
   }
 
   async getPaginated({ offset, limit }: { offset: number; limit: number }) {
@@ -243,6 +253,15 @@ function toPriceRow(record: OraclePrice, stateUpdateId: number): PriceRow {
   return {
     state_update_id: stateUpdateId,
     asset_id: record.assetId.toString(),
+    price: record.price,
+  }
+}
+
+function toStateUpdatePriceRecord(
+  record: Pick<PriceRow, 'asset_id' | 'price'>
+): StateUpdatePriceRecord {
+  return {
+    assetId: AssetId(record.asset_id),
     price: record.price,
   }
 }

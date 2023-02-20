@@ -5,6 +5,15 @@ module.exports = {
     fontFamily: {
       sans: ['Inter', 'sans-serif'],
     },
+    fontSize: {
+      xxs: ['12px', '12px'],
+      xs: ['13px', '13px'],
+      sm: ['14px', '14px'],
+      md: ['15px', '15px'],
+      lg: ['16px', '16px'],
+      xl: ['24px', '24px'],
+      xxl: ['32px', '32px'],
+    },
     colors: {
       transparent: 'transparent',
       white: '#FFFFFF',
@@ -52,9 +61,9 @@ module.exports = {
       yellow: {
         300: '#FFEF5A',
       },
+      black: '#060606',
       brand: '#5F5CFF',
     },
   },
-
   plugins: [],
 }

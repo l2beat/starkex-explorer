@@ -20,9 +20,8 @@ export function StateUpdatesTable({ stateUpdates }: StateUpdatesTableProps) {
         { header: 'Forced txs', numeric: true },
       ]}
       rows={stateUpdates.map((update) => {
-        const link = `/state-updates/${update.id}`
         return {
-          link,
+          link: `/state-updates/${update.id}`,
           cells: [
             update.id.toString(),
             formatHashLong(update.hash),

@@ -1,4 +1,5 @@
 import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
+import { Knex } from 'knex'
 import { VaultRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -21,6 +22,7 @@ export class VaultRepository extends BaseRepository {
     this.findById = this.wrapFind(this.findById)
     this.findIdByStarkKey = this.wrapFind(this.findIdByStarkKey)
     this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
+    this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
     this.getPreviousStates = this.wrapGet(this.getPreviousStates)
     this.count = this.wrapAny(this.count)
 
@@ -57,6 +59,13 @@ export class VaultRepository extends BaseRepository {
         this.on('vaults.stark_key', '=', 'user_registration_events.stark_key')
       })
     return row?.vault_id
+  }
+
+  async getByStateUpdateId(stateUpdateId: number, trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    const rows = await knex('vaults').where('state_update_id', stateUpdateId)
+
+    return rows.map((r) => toVaultRecord(r))
   }
 
   async getPreviousStates(vaultIds: bigint[], stateUpdateId: number) {
