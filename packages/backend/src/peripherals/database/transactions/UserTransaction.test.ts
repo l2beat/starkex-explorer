@@ -42,7 +42,11 @@ describe(encodeUserTransactionData.name, () => {
     expect(encoded).toEqual({
       starkKeyA: data.starkKey,
       vaultOrPositionIdA: data.vaultId,
-      data: expect.anything(),
+      data: {
+        type: 'FullWithdrawal',
+        starkKey: data.starkKey.toString(),
+        vaultId: data.vaultId.toString(),
+      },
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
