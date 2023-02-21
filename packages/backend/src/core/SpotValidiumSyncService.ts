@@ -32,8 +32,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
     )
-    // TODO: fix forced events
-    // await this.userTransactionCollector.collect(blockRange)
+    await this.userTransactionCollector.collect(blockRange)
 
     await this.withdrawableAssetCollector.collect(blockRange)
 
