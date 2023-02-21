@@ -1,4 +1,5 @@
 import {
+  AssetHash,
   EthereumAddress,
   Hash256,
   PedersenHash,
@@ -35,10 +36,27 @@ export function decodeSpotCairoOutput(data: string): SpotCairoOutput {
   const modifications: SpotModification[] = []
   for (let i = 0; i < modificationCount; i++) {
     const starkKey = StarkKey(reader.readHex(32))
-    const assetId = reader.readBigInt(32)
-    const difference =
-      (reader.readBigInt(32) & ((1n << 64n) - 1n)) - (1n << 63n)
-    modifications.push({ starkKey, assetId, difference })
+    const assetHash = AssetHash(reader.readHex(32))
+
+    const action = reader.readBigInt(32)
+    // The format of action is:
+    // +--------------------+------------------+----------------LSB-+
+    // | full_withdraw (1b) |  vault_idx (64b) | balance_diff (64b) |
+    // +--------------------+------------------+--------------------+
+    // where balance_diff is represented using a 2**63 biased-notation.
+    // Extracting into variables:
+    const isFullWithdrawal = ((action >> 128n) & 1n) == 1n
+    const type = isFullWithdrawal ? 'fullWithdrawal' : 'spotWithdrawal'
+    const vaultId = (action >> 64n) & ((1n << 64n) - 1n)
+    const balanceDifference = (action & ((1n << 64n) - 1n)) - (1n << 63n)
+
+    modifications.push({
+      starkKey,
+      assetHash,
+      type,
+      vaultId,
+      balanceDifference,
+    })
   }
 
   const conditionalTransfers: Hash256[] = []

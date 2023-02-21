@@ -105,6 +105,8 @@ describe(ForcedTransactionRepository.name, () => {
     const hash2 = Hash256.fake()
     const data2 = fakeTrade()
 
+    const data3 = { ...data2, starkKeyA: StarkKey.fake() }
+
     await repository.add(
       {
         hash: hash1,
@@ -127,7 +129,7 @@ describe(ForcedTransactionRepository.name, () => {
     const hashes = await repository.getTransactionHashesByData([
       data1,
       data2,
-      { ...data2, starkKeyA: StarkKey.fake() },
+      data3,
     ])
 
     expect(hashes).toEqual([hash1, hash2, undefined])

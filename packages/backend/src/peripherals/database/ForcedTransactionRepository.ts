@@ -1,4 +1,8 @@
-import { ForcedTrade, ForcedWithdrawal } from '@explorer/encoding'
+import {
+  ForcedTrade,
+  ForcedWithdrawal,
+  PerpetualForcedAction,
+} from '@explorer/encoding'
 import {
   AssetId,
   EthereumAddress,
@@ -46,7 +50,7 @@ export interface Updates extends TransactionUpdates {
 }
 export interface ForcedTransactionRecord {
   hash: Hash256
-  data: ForcedWithdrawal | ForcedTrade
+  data: PerpetualForcedAction
   updates: Updates
   lastUpdateAt: Timestamp
 }
@@ -283,7 +287,7 @@ export class ForcedTransactionRepository extends BaseRepository {
   }
 
   async getTransactionHashesByData(
-    datas: (ForcedWithdrawal | ForcedTrade)[]
+    datas: PerpetualForcedAction[]
   ): Promise<(Hash256 | undefined)[]> {
     if (datas.length === 0) {
       return []
