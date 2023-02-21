@@ -8,7 +8,7 @@ import {
 import { providers } from 'ethers'
 
 import { BlockRange } from '../../model/BlockRange'
-import { WithdrawableAssetRepository } from '../../peripherals/database/transactions/WithdrawableAssetRepository'
+import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { assertUnreachable } from '../../utils/assertUnreachable'
 import {

@@ -1,8 +1,8 @@
 import { Hash256, Timestamp } from '@explorer/types'
 
-import { Logger } from '../../../tools/Logger'
-import { BaseRepository } from '../shared/BaseRepository'
-import { Database } from '../shared/Database'
+import { Logger } from '../../tools/Logger'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 import {
   encodeWithdrawableBalanceChangeData,
   WithdrawableBalanceChangeData,

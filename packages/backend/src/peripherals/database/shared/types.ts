@@ -2,7 +2,7 @@ import { json } from '@explorer/types'
 
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import { UserTransactionJSON } from '../transactions/UserTransaction'
-import { WithdrawableBalanceChangeJSON } from '../transactions/WithdrawableBalanceChange'
+import { WithdrawableBalanceChangeJSON } from '../WithdrawableBalanceChange'
 
 declare module 'knex/types/tables' {
   interface KeyValueRow {
