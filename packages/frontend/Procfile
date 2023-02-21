@@ -1,1 +1,1 @@
-web: yarn dev
+web: cd packages/frontend && yarn dev
