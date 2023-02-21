@@ -44,7 +44,7 @@ export class UserTransactionMigrator {
     if (lastSyncedBlock === undefined) {
       return
     }
-    this.logger.info('Migration started')
+    this.logger.info('User transactions migration started')
 
     await this.clearRepositories()
     await this.collectUserTransactions(lastSyncedBlock)

@@ -71,6 +71,7 @@ export class WithdrawableAssetCollector {
       LogMintWithdrawalPerformed.parseLog(log)
 
     // Temporary function to gather timestamps not yet in the file.
+    // TODO: remove
     const getTimestamp = async (blockNumber: number) => {
       const timestamp = await this.ethereumClient.getBlockTimestamp(
         log.blockNumber

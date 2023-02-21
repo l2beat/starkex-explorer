@@ -6,6 +6,7 @@ import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutput
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
+import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetsCollector'
 import { IDataSyncService } from './IDataSyncService'
 import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
 
@@ -17,6 +18,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     private readonly userTransactionCollector: UserTransactionCollector,
     private readonly perpetualCairoOutputCollector: PerpetualCairoOutputCollector,
     private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
+    private readonly withdrawableAssetCollector: WithdrawableAssetCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -26,7 +28,9 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
     )
+
     await this.userTransactionCollector.collect(blockRange)
+    await this.withdrawableAssetCollector.collect(blockRange)
 
     const stateTransitions =
       await this.perpetualValidiumStateTransitionCollector.collect(blockRange)
@@ -61,5 +65,6 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     await this.perpetualValidiumUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
     await this.userTransactionCollector.discardAfter(blockNumber)
+    await this.withdrawableAssetCollector.discardAfter(blockNumber)
   }
 }

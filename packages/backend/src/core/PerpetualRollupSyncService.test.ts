@@ -12,6 +12,7 @@ import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualR
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import type { VerifierCollector } from './collectors/VerifierCollector'
+import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetsCollector'
 import { PerpetualRollupSyncService } from './PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 
@@ -45,6 +46,9 @@ describe(PerpetualRollupSyncService.name, () => {
     const userTransactionCollector = mock<UserTransactionCollector>({
       collect: async () => {},
     })
+    const withdrawableAssetCollector = mock<WithdrawableAssetCollector>({
+      collect: async () => {},
+    })
 
     const stateTransitionRecordWithPages: StateTransitionRecord & {
       pages: string[]
@@ -73,6 +77,7 @@ describe(PerpetualRollupSyncService.name, () => {
       perpetualRollupUpdater,
       userRegistrationCollector,
       userTransactionCollector,
+      withdrawableAssetCollector,
       Logger.SILENT
     )
 
@@ -122,6 +127,9 @@ describe(PerpetualRollupSyncService.name, () => {
       const userTransactionCollector = mock<UserTransactionCollector>({
         discardAfter: noop,
       })
+      const withdrawableAssetCollector = mock<WithdrawableAssetCollector>({
+        discardAfter: noop,
+      })
 
       const dataSyncService = new PerpetualRollupSyncService(
         verifierCollector,
@@ -131,6 +139,7 @@ describe(PerpetualRollupSyncService.name, () => {
         perpetualRollupUpdater,
         userRegistrationCollector,
         userTransactionCollector,
+        withdrawableAssetCollector,
         Logger.SILENT
       )
 

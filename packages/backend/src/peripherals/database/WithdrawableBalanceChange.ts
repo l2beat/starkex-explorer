@@ -120,7 +120,7 @@ function encodeWithdrawalAllowed(
   return {
     starkKey: values.starkKey,
     assetHash: values.assetType, // for ERC-20, AssetType *is* the AssetHash
-    balanceDelta: -values.quantizedAmount,
+    balanceDelta: values.quantizedAmount,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
@@ -137,7 +137,7 @@ function encodeMintableWithdrawalAllowed(
   return {
     starkKey: values.starkKey,
     assetHash: values.assetId,
-    balanceDelta: -values.quantizedAmount,
+    balanceDelta: values.quantizedAmount,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
@@ -153,7 +153,7 @@ function encodeAssetWithdrawalAllowed(
   return {
     starkKey: values.starkKey,
     assetHash: values.assetId,
-    balanceDelta: -values.quantizedAmount,
+    balanceDelta: values.quantizedAmount,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
@@ -169,7 +169,7 @@ function encodeWithdrawalPerformed(
   return {
     starkKey: values.starkKey,
     assetHash: values.assetType, // for ERC-20, AssetType *is* the AssetHash
-    balanceDelta: values.quantizedAmount,
+    balanceDelta: -values.quantizedAmount,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
@@ -187,7 +187,7 @@ function encodeWithdrawalWithTokenIdPerformed(
   return {
     starkKey: values.starkKey,
     assetHash: values.assetId,
-    balanceDelta: values.quantizedAmount,
+    balanceDelta: -values.quantizedAmount,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
@@ -207,7 +207,7 @@ function encodeMintWithdrawalPerformed(
   return {
     starkKey: values.starkKey,
     assetHash: values.assetId,
-    balanceDelta: values.quantizedAmount,
+    balanceDelta: -values.quantizedAmount,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
