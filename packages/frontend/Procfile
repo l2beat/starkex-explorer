@@ -1,1 +1,4 @@
+# Requires https://github.com/heroku/heroku-buildpack-multi-procfile
+# set PROCFILE=packages/frontend/Procfile
+# and NPM_CONFIG_PRODUCTION=false, YARN_PRODUCTION=false
 web: cd packages/frontend && yarn dev
