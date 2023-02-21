@@ -2,6 +2,7 @@ import { json } from '@explorer/types'
 
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import { UserTransactionJSON } from '../transactions/UserTransaction'
+import { WithdrawableBalanceChangeJSON } from '../transactions/WithdrawableBalanceChange'
 
 declare module 'knex/types/tables' {
   interface KeyValueRow {
@@ -233,6 +234,17 @@ declare module 'knex/types/tables' {
     prev_history_id: number | null
   }
 
+  interface WithdrawableAssetRow {
+    id: number
+    block_number: number
+    timestamp: bigint
+    stark_key: string
+    asset_hash: string
+    balance_delta: bigint
+    transaction_hash: string
+    event_data: WithdrawableBalanceChangeJSON
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -259,6 +271,7 @@ declare module 'knex/types/tables' {
     asset_details: AssetDetailsRow
     preprocessed_state_updates: PreprocessedStateUpdateRow
     preprocessed_asset_history: PreprocessedAssetHistoryRow
+    withdrawable_assets: WithdrawableAssetRow
   }
 }
 

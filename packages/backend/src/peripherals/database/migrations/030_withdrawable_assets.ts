@@ -18,14 +18,14 @@ const WITHDRAWABLE_ASSETS_TABLE_NAME = 'withdrawable_assets'
 export async function up(knex: Knex) {
   await knex.schema.createTable(WITHDRAWABLE_ASSETS_TABLE_NAME, (table) => {
     table.increments('id').primary() // sequential id - allows event ordering
-    table.integer('block_number').notNullable()
-    table.bigInteger('timestamp').notNullable()
-    table.string('event').notNullable()
+    table.integer('block_number').notNullable().index(), // index for discardAfter
+      table.bigInteger('timestamp').notNullable()
     table.string('stark_key').notNullable().index()
-    table.string('asset_hash_or_id').notNullable()
+    table.string('asset_hash').notNullable()
     // Delta is negative for withdrawals and positive when item added to withdrawable assets
-    table.bigInteger('amount_delta').notNullable() // this is a quantized amount
-    table.bigInteger('non_quantized_delta')
+    table.bigInteger('balance_delta').notNullable() // this is quantized amount, as expected in our system
+    table.string('transaction_hash').notNullable()
+    table.json('event_data').notNullable()
   })
 }
 
