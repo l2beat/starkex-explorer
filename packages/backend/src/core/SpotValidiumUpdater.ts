@@ -1,4 +1,4 @@
-import { SpotCairoOutput } from '@explorer/encoding'
+import { FullWithdrawal, SpotCairoOutput } from '@explorer/encoding'
 import { IMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
 
@@ -54,6 +54,11 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
 
     const newVaults = this.buildNewVaultLeaves(batch)
 
+    const forcedActions: FullWithdrawal[] =
+      spotCairoOutput.modifications.filter(
+        (modification) => modification.type === 'fullWithdrawal'
+      ) as FullWithdrawal[]
+
     await this.processStateTransition(
       {
         id: id + 1,
@@ -61,9 +66,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
         stateTransitionHash: transition.stateTransitionHash,
       },
       spotCairoOutput.finalValidiumVaultRoot,
-      spotCairoOutput.modifications.filter(
-        (modification) => modification.type === 'fullWithdrawal'
-      ),
+      forcedActions,
       [], // There are no oracle prices for Spot
       newVaults
     )

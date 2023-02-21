@@ -1,4 +1,4 @@
-import { ForcedAction, OraclePrice, SpotModification } from '@explorer/encoding'
+import { ForcedAction, OraclePrice } from '@explorer/encoding'
 import {
   IMerkleStorage,
   MerkleTree,
@@ -30,7 +30,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
   async processStateTransition(
     stateTransitionRecord: StateTransitionRecord,
     expectedPositionRoot: PedersenHash,
-    forcedActions: (ForcedAction | SpotModification)[],
+    forcedActions: ForcedAction[],
     oraclePrices: OraclePrice[],
     newLeaves: { index: bigint; value: T }[]
   ) {
@@ -107,7 +107,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
   }
 
   async extractTransactionHashes(
-    forcedActions: (ForcedAction | SpotModification)[]
+    forcedActions: ForcedAction[]
   ): Promise<Hash256[]> {
     const notIncluded = await this.userTransactionRepository.getNotIncluded([
       'ForcedTrade',
@@ -141,6 +141,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
             tx.data.starkKey === action.starkKey &&
             tx.data.quantizedAmount === action.amount
         )
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       } else if (action.type === 'fullWithdrawal') {
         txIndex = notIncluded.findIndex(
           (tx) =>

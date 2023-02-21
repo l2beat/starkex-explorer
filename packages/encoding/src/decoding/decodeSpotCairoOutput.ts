@@ -46,7 +46,7 @@ export function decodeSpotCairoOutput(data: string): SpotCairoOutput {
     // where balance_diff is represented using a 2**63 biased-notation.
     // Extracting into variables:
     const isFullWithdrawal = ((action >> 128n) & 1n) == 1n
-    const type = isFullWithdrawal ? 'fullWithdrawal' : 'regularWithdrawal'
+    const type = isFullWithdrawal ? 'fullWithdrawal' : 'spotWithdrawal'
     const vaultId = (action >> 64n) & ((1n << 64n) - 1n)
     const balanceDifference = (action & ((1n << 64n) - 1n)) - (1n << 63n)
 

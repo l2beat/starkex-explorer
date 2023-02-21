@@ -1,7 +1,7 @@
 import {
   AssetConfigHash,
-  ForcedAction,
   OraclePrice,
+  PerpetualForcedAction,
   State,
 } from '@explorer/encoding'
 import {
@@ -83,7 +83,7 @@ describe(PerpetualValidiumUpdater.name, () => {
             [
               StateTransitionRecord,
               PedersenHash,
-              ForcedAction[],
+              PerpetualForcedAction[],
               OraclePrice[],
               { index: bigint; value: PositionLeaf }[]
             ]
@@ -104,7 +104,7 @@ describe(PerpetualValidiumUpdater.name, () => {
           sequenceNumber: 12,
           batchId: 13,
         }
-        const testForcedActions: ForcedAction[] = [
+        const testForcedActions: PerpetualForcedAction[] = [
           {
             type: 'withdrawal',
             starkKey: StarkKey.fake('876'),

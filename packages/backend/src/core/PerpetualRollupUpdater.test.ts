@@ -1,7 +1,7 @@
 import {
-  ForcedAction,
   OnChainData,
   OraclePrice,
+  PerpetualForcedAction,
   State,
 } from '@explorer/encoding'
 import {
@@ -149,7 +149,7 @@ describe(PerpetualRollupUpdater.name, () => {
             [
               StateTransitionRecord,
               PedersenHash,
-              ForcedAction[],
+              PerpetualForcedAction[],
               OraclePrice[],
               { index: bigint; value: PositionLeaf }[]
             ]
@@ -162,7 +162,7 @@ describe(PerpetualRollupUpdater.name, () => {
           stateTransitionHash: Hash256.fake('123'),
           blockNumber: 1,
         }
-        const testForcedActions: ForcedAction[] = [
+        const testForcedActions: PerpetualForcedAction[] = [
           {
             type: 'withdrawal',
             starkKey: StarkKey.fake('876'),

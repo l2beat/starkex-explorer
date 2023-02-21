@@ -16,7 +16,7 @@ export interface PerpetualCairoOutput {
   newState: State
   minimumExpirationTimestamp: bigint
   modifications: Modification[]
-  forcedActions: ForcedAction[]
+  forcedActions: PerpetualForcedAction[]
   conditions: PedersenHash[]
   onChainDataHash?: Hash256
   onChainDataSize?: bigint
@@ -43,14 +43,28 @@ export interface SpotCairoOutput {
   onChainDataSize: bigint
 }
 
+export type ForcedAction = PerpetualForcedAction | SpotForcedAction
+
 // https://github.com/starkware-libs/starkex-for-spot-trading/blob/master/src/starkware/cairo/dex/execute_modification.cairo#L13
-export interface SpotModification {
-  type: 'fullWithdrawal' | 'regularWithdrawal'
+export type SpotModification = FullWithdrawal | SpotWithdrawal
+
+export interface FullWithdrawal {
+  type: 'fullWithdrawal'
   starkKey: StarkKey
   assetHash: AssetHash
   vaultId: bigint
   balanceDifference: bigint
 }
+
+export interface SpotWithdrawal {
+  type: 'spotWithdrawal'
+  starkKey: StarkKey
+  assetHash: AssetHash
+  vaultId: bigint
+  balanceDifference: bigint
+}
+
+export type SpotForcedAction = FullWithdrawal
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/data_availability.cairo#L34-L64
 export interface OnChainPositionsUpdate {
@@ -74,7 +88,7 @@ export interface Modification {
 }
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/forced.cairo#L4-L15
-export type ForcedAction = ForcedWithdrawal | ForcedTrade
+export type PerpetualForcedAction = ForcedWithdrawal | ForcedTrade
 
 // https://github.com/starkware-libs/stark-perpetual/blob/0bf87e5c34bd9171482e45ebe037b52933a21689/src/services/perpetual/cairo/output/forced.cairo#L17-L22
 export interface ForcedWithdrawal {

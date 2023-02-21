@@ -1,13 +1,13 @@
 import { StarkKey } from '@explorer/types'
 
-import { ForcedAction } from '../OnChainData'
+import { PerpetualForcedAction } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
 import { DecodingError } from './DecodingError'
 
 export function readForcedActions(reader: ByteReader) {
   const count = reader.readNumber(32)
-  const forcedActions: ForcedAction[] = []
+  const forcedActions: PerpetualForcedAction[] = []
   for (let i = 0; i < count; i++) {
     const type = reader.readNumber(32)
     if (type === 0) {

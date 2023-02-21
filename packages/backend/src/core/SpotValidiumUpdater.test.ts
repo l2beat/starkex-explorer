@@ -1,4 +1,9 @@
-import { SpotCairoOutput, SpotModification } from '@explorer/encoding'
+import {
+  FullWithdrawal,
+  SpotCairoOutput,
+  SpotModification,
+  SpotWithdrawal,
+} from '@explorer/encoding'
 import { InMemoryMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { AssetHash, Hash256, PedersenHash, StarkKey } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
@@ -106,15 +111,15 @@ describe(SpotValidiumUpdater.name, () => {
           sequenceNumber: 1,
           batchId: 2,
         }
-        const fullWithdrawalModification: SpotModification = {
+        const fullWithdrawalModification: FullWithdrawal = {
           type: 'fullWithdrawal',
           starkKey: StarkKey.fake(),
           assetHash: AssetHash.fake(),
           vaultId: 300n,
           balanceDifference: 345n,
         }
-        const regularWithdrawalModification: SpotModification = {
-          type: 'regularWithdrawal',
+        const regularWithdrawalModification: SpotWithdrawal = {
+          type: 'spotWithdrawal',
           starkKey: StarkKey.fake(),
           assetHash: AssetHash.fake(),
           vaultId: 400n,
