@@ -13,6 +13,7 @@ interface Encoded<T> {
 export type UserTransactionData =
   | ForcedTradeData
   | ForcedWithdrawalData
+  | FullWithdrawalData
   | WithdrawData
 
 export type UserTransactionJSON = ToJSON<UserTransactionData>
@@ -22,6 +23,12 @@ export interface ForcedWithdrawalData {
   starkKey: StarkKey
   positionId: bigint
   quantizedAmount: bigint
+}
+
+export interface FullWithdrawalData {
+  type: 'FullWithdrawal'
+  starkKey: StarkKey
+  vaultId: bigint
 }
 
 export interface ForcedTradeData {
@@ -53,6 +60,8 @@ export function encodeUserTransactionData(
   switch (values.type) {
     case 'ForcedWithdrawal':
       return encodeForcedWithdrawal(values)
+    case 'FullWithdrawal':
+      return encodeFullWithdrawal(values)
     case 'ForcedTrade':
       return encodeForcedTrade(values)
     case 'Withdraw':
@@ -66,6 +75,8 @@ export function decodeUserTransactionData(
   switch (values.type) {
     case 'ForcedWithdrawal':
       return decodeForcedWithdrawal(values)
+    case 'FullWithdrawal':
+      return decodeFullWithdrawal(values)
     case 'ForcedTrade':
       return decodeForcedTrade(values)
     case 'Withdraw':
@@ -96,6 +107,30 @@ function decodeForcedWithdrawal(
     starkKey: StarkKey(values.starkKey),
     positionId: BigInt(values.positionId),
     quantizedAmount: BigInt(values.quantizedAmount),
+  }
+}
+
+function encodeFullWithdrawal(
+  values: FullWithdrawalData
+): Encoded<FullWithdrawalData> {
+  return {
+    starkKeyA: values.starkKey,
+    vaultOrPositionIdA: values.vaultId,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      vaultId: values.vaultId.toString(),
+    },
+  }
+}
+
+function decodeFullWithdrawal(
+  values: ToJSON<FullWithdrawalData>
+): FullWithdrawalData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    vaultId: BigInt(values.vaultId),
   }
 }
 

@@ -6,6 +6,7 @@ import {
   encodeUserTransactionData,
   ForcedTradeData,
   ForcedWithdrawalData,
+  FullWithdrawalData,
   WithdrawData,
 } from './UserTransaction'
 
@@ -22,6 +23,25 @@ describe(encodeUserTransactionData.name, () => {
     expect(encoded).toEqual({
       starkKeyA: data.starkKey,
       vaultOrPositionIdA: data.positionId,
+      data: expect.anything(),
+    })
+    expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
+
+    const decoded = decodeUserTransactionData(encoded.data)
+    expect(decoded).toEqual(data)
+  })
+
+  it('can encode a FullWithdrawal', () => {
+    const data: FullWithdrawalData = {
+      type: 'FullWithdrawal',
+      starkKey: StarkKey.fake(),
+      vaultId: 1234n,
+    }
+    const encoded = encodeUserTransactionData(data)
+
+    expect(encoded).toEqual({
+      starkKeyA: data.starkKey,
+      vaultOrPositionIdA: data.vaultId,
       data: expect.anything(),
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
