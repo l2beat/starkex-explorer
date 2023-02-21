@@ -8,13 +8,13 @@ import { WarningIcon } from '../../../components/icons/WarningIcon'
 interface UserProfileProps {
   ethereumAddress?: EthereumAddress
   starkKey?: StarkKey
-  myOwnProfile?: boolean
+  isMine?: boolean
 }
 
 export function UserProfile({
   ethereumAddress,
   starkKey,
-  myOwnProfile,
+  isMine,
 }: UserProfileProps) {
   return (
     <div className="mb-6 flex w-full flex-col rounded-lg bg-gray-800 p-6">
@@ -43,9 +43,9 @@ export function UserProfile({
                 UNKNOWN
               </p>
             </div>
-            {myOwnProfile && <Button>Register</Button>}
+            {isMine && <Button>Register</Button>}
           </div>
-          {myOwnProfile && (
+          {isMine && (
             <div className="mt-5 flex items-center justify-center rounded bg-blue-50 py-2">
               <InfoIcon />
               <p className="ml-2 text-sm font-medium text-white">

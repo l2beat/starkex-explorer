@@ -12,7 +12,6 @@ import {
   getOfferTableProps,
   getTransactionTableProps,
 } from './common'
-import { ActionsTable, WithdrawableAssetEntry } from './components/ActionsTable'
 import { UserAssetEntry, UserAssetsTable } from './components/UserAssetTable'
 import {
   UserBalanceChangeEntry,
@@ -20,6 +19,10 @@ import {
 } from './components/UserBalanceChangesTable'
 import { UserOfferEntry, UserOffersTable } from './components/UserOffersTable'
 import { UserProfile } from './components/UserProfile'
+import {
+  UserQuickActionsTable,
+  WithdrawableAssetEntry,
+} from './components/UserQuickActionsTable'
 import {
   UserTransactionEntry,
   UserTransactionsTable,
@@ -47,7 +50,7 @@ export function renderUserPage(props: UserPageProps) {
 }
 
 function UserPage(props: UserPageProps) {
-  const myUserPage = props.user?.address === props.ethereumAddress
+  const isMine = props.user?.starkKey === props.starkKey
   return (
     <Page
       path={`/users/${props.starkKey.toString()}`}
@@ -56,15 +59,15 @@ function UserPage(props: UserPageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <UserProfile
+          starkKey={props.starkKey}
           ethereumAddress={props.ethereumAddress}
-          myOwnProfile={myUserPage}
+          isMine={isMine}
         />
-        {myUserPage && (
-          <ActionsTable
-            withdrawableAssets={props.withdrawableAssets}
-            offersToAccept={props.offersToAccept}
-          />
-        )}
+        <UserQuickActionsTable
+          withdrawableAssets={props.withdrawableAssets}
+          offersToAccept={props.offersToAccept}
+          isMine={isMine}
+        />
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
           visible={props.assets.length}

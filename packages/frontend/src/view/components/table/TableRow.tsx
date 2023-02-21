@@ -13,8 +13,7 @@ export function TableRow(props: TableRowProps) {
   return (
     <tr
       className={cx(
-        { 'h-16': props.fullBackground },
-        { 'h-10': !props.fullBackground },
+        props.fullBackground ? 'h-16' : 'h-10',
         'whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium'
       )}
     >

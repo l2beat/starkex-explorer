@@ -6,7 +6,7 @@ import {
   UserOfferEntry,
   UserTransactionEntry,
 } from '../../view'
-import { WithdrawableAssetEntry } from '../../view/pages/user/components/ActionsTable'
+import { WithdrawableAssetEntry } from '../../view/pages/user/components/UserQuickActionsTable'
 import { Bucket } from './bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
 import { randomId, randomTimestamp } from './utils'

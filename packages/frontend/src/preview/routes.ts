@@ -218,7 +218,7 @@ const routes: Route[] = [
         type: 'PERPETUAL',
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
-        withdrawableAssets: [],
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         offersToAccept: [],
         assets: repeat(7, randomUserAssetEntry),
         totalAssets: 7,
