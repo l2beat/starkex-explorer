@@ -72,6 +72,22 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderHomePage({
         user,
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        totalStateUpdate: 5123,
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        totalForcedTransaction: 68,
+        offers: repeat(6, randomHomeOfferEntry),
+        totalOffers: 7,
+      })
+    },
+  },
+  {
+    path: '/home/no-tutorials',
+    description: 'The home page, but without any tutorials.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderHomePage({
+        user,
         tutorials: [],
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdate: 5123,

@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../utils/formatting/formatAmount'
 import { LinkButton } from '../Button'
+import { SectionHeading } from '../SectionHeading'
 
 export interface TablePreviewProps {
   title: ReactNode
@@ -16,16 +17,18 @@ export interface TablePreviewProps {
 export function TablePreview(props: TablePreviewProps) {
   return (
     <section>
-      <div className="mb-5 flex flex-col items-baseline justify-between gap-4 lg:flex-row">
-        <h2 className="text-xl font-semibold">{props.title}</h2>
-        <p className="text-sm font-medium text-zinc-500">
-          You're viewing {formatInt(props.visible)} out of{' '}
-          <a className="text-blue-600 underline" href={props.link}>
-            {formatInt(props.total)}
-          </a>{' '}
-          {props.entryShortNamePlural}
-        </p>
-      </div>
+      <SectionHeading
+        title={props.title}
+        description={
+          <>
+            You're viewing {formatInt(props.visible)} out of{' '}
+            <a className="text-blue-600 underline" href={props.link}>
+              {formatInt(props.total)}
+            </a>{' '}
+            {props.entryShortNamePlural}
+          </>
+        }
+      />
       {props.children}
       {props.visible === 0 && (
         <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">

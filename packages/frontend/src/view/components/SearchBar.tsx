@@ -9,7 +9,7 @@ export function SearchBar({ className = '' }) {
       method="GET"
       action="/search"
       className={cx(
-        'group flex h-11 w-full rounded-lg border border-gray-600 bg-transparent drop-shadow-lg focus-within:border-brand hover:border-brand',
+        'group flex h-10 w-full rounded-lg border border-gray-600 bg-transparent drop-shadow-lg focus-within:border-brand hover:border-brand',
         className
       )}
     >
