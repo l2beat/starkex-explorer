@@ -11,7 +11,7 @@ import { z } from 'zod'
 
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
-import { HomeController } from '../controllers/HomeController'
+import { OldHomeController } from '../controllers/OldHomeController'
 import { PositionController } from '../controllers/PositionController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
@@ -20,7 +20,7 @@ import { applyControllerResult } from './utils'
 
 export function createOldFrontendRouter(
   positionController: PositionController,
-  homeController: HomeController,
+  oldHomeController: OldHomeController,
   forcedTradeOfferController: ForcedTradeOfferController,
   forcedTransactionController: ForcedTransactionController,
   stateUpdateController: StateUpdateController,
@@ -30,7 +30,7 @@ export function createOldFrontendRouter(
 
   router.get('/', async (ctx) => {
     const address = getAccountAddress(ctx)
-    const result = await homeController.getHomePage(address)
+    const result = await oldHomeController.getHomePage(address)
     applyControllerResult(ctx, result)
   })
 

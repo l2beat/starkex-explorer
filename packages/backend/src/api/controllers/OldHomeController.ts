@@ -11,7 +11,7 @@ import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
 import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 
-export class HomeController {
+export class OldHomeController {
   constructor(
     private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,

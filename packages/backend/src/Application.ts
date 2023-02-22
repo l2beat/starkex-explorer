@@ -4,7 +4,7 @@ import { AssetHash, AssetId } from '@explorer/types'
 import { ApiServer } from './api/ApiServer'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
-import { HomeController } from './api/controllers/HomeController'
+import { OldHomeController } from './api/controllers/OldHomeController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
@@ -382,7 +382,7 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository
     )
-    const homeController = new HomeController(
+    const oldHomeController = new OldHomeController(
       accountService,
       stateUpdateRepository,
       positionRepository,
@@ -428,7 +428,7 @@ export class Application {
         config.useOldFrontend
           ? createOldFrontendRouter(
               positionController,
-              homeController,
+              oldHomeController,
               forcedTradeOfferController,
               forcedTransactionController,
               stateUpdateController,
