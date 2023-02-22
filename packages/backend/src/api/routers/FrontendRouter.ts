@@ -6,13 +6,15 @@ import * as z from 'zod'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
+import { StateUpdateController } from '../controllers/StateUpdateController'
 import { UserController } from '../controllers/UserController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
 export function createFrontendRouter(
   homeController: HomeController,
-  userController: UserController
+  userController: UserController,
+  stateUpdateController: StateUpdateController
 ) {
   const router = new Router()
 
@@ -38,6 +40,51 @@ export function createFrontendRouter(
           givenUser,
           pagination
         )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/state-updates/:stateUpdateId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          stateUpdateId: stringAsPositiveInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const result = await stateUpdateController.getStateUpdatePage(
+          givenUser,
+          ctx.params.stateUpdateId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/state-updates/:stateUpdateId/balance-changes',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          stateUpdateId: stringAsPositiveInt(),
+        }),
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result =
+          await stateUpdateController.getStateUpdateBalanceChangesPage(
+            givenUser,
+            ctx.params.stateUpdateId,
+            pagination
+          )
         applyControllerResult(ctx, result)
       }
     )

@@ -9,6 +9,7 @@ import { OldHomeController } from './api/controllers/OldHomeController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
+import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
@@ -398,6 +399,11 @@ export class Application {
         ? config.starkex.collateralAsset
         : undefined
     )
+    const stateUpdateController = new StateUpdateController(
+      userService,
+      stateUpdateRepository,
+      preprocessedAssetHistoryRepository
+    )
 
     const oldHomeController = new OldHomeController(
       accountService,
@@ -415,7 +421,7 @@ export class Application {
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
-    const stateUpdateController = new OldStateUpdateController(
+    const oldStateUpdateController = new OldStateUpdateController(
       accountService,
       stateUpdateRepository,
       userTransactionRepository
@@ -448,10 +454,14 @@ export class Application {
               oldHomeController,
               forcedTradeOfferController,
               forcedTransactionController,
-              stateUpdateController,
+              oldStateUpdateController,
               searchController
             )
-          : createFrontendRouter(homeController, userController),
+          : createFrontendRouter(
+              homeController,
+              userController,
+              stateUpdateController
+            ),
         createForcedTransactionRouter(
           forcedTradeOfferController,
           userTransactionController

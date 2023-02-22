@@ -40,6 +40,9 @@ export class PreprocessedAssetHistoryRepository<
     this.add = this.wrapAdd(this.add)
     this.addMany = this.wrapAddMany(this.addMany)
     this.findByHistoryId = this.wrapFind(this.findByHistoryId)
+    this.getByStateUpdateIdPaginated = this.wrapGet(
+      this.getByStateUpdateIdPaginated
+    )
     this.deleteByHistoryId = this.wrapDelete(this.deleteByHistoryId)
     this.findCurrentByStarkKeyAndAsset = this.wrapFind(
       this.findCurrentByStarkKeyAndAsset
@@ -63,6 +66,11 @@ export class PreprocessedAssetHistoryRepository<
       this.getPrevHistoryByStateUpdateId
     )
     this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.getByStarkKeyCount = this.wrapAny(this.getByStarkKeyCount)
+    this.getByStateUpdateIdCount = this.wrapAny(this.getByStateUpdateIdCount)
+    this.getCurrentByStarkKeyCount = this.wrapAny(
+      this.getCurrentByStarkKeyCount
+    )
 
     /* eslint-enable @typescript-eslint/unbound-method */
   }
@@ -100,6 +108,32 @@ export class PreprocessedAssetHistoryRepository<
     const knex = await this.knex(trx)
     const row = await knex('preprocessed_asset_history').where('id', id).first()
     return row && toPreprocessedAssetHistoryRecord(row, this.toAssetType)
+  }
+
+  async getByStateUpdateIdPaginated(
+    stateUpdateId: number,
+    { offset, limit }: { offset: number; limit: number },
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const rows = await knex('preprocessed_asset_history')
+      .where('state_update_id', stateUpdateId)
+      .orderBy('id', 'desc')
+      .offset(offset)
+      .limit(limit)
+
+    return rows.map((r) =>
+      toPreprocessedAssetHistoryRecord(r, this.toAssetType)
+    )
+  }
+
+  async getByStateUpdateIdCount(stateUpdateId: number, trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    const [result] = await knex('preprocessed_asset_history')
+      .where('state_update_id', stateUpdateId)
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count!)
   }
 
   async deleteByHistoryId(historyId: number, trx: Knex.Transaction) {
