@@ -41,13 +41,13 @@ export function HomeTutorials(props: HomeTutorialsProps) {
       <ul className="flex flex-col gap-4">
         {props.tutorials.map((tutorial, i) => (
           <li key={i}>
-            <a href={tutorial.href} className="flex w-full gap-4 items-center">
-              <img className="w-[128px] h-20 rounded" src={tutorial.imageUrl} />
+            <a href={tutorial.href} className="flex w-full items-center gap-4">
+              <img className="h-20 w-[128px] rounded" src={tutorial.imageUrl} />
               <div className="flex-1">
-                <p className="font-semibold text-lg leading-tight mb-1.5">
+                <p className="mb-1.5 text-lg font-semibold leading-tight">
                   {tutorial.title}
                 </p>
-                <p className="text-blue-600 underline text-xs font-semibold">
+                <p className="text-xs font-semibold text-blue-600 underline">
                   Read now
                 </p>
               </div>

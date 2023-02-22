@@ -54,12 +54,12 @@ function HomePage(props: HomePageProps) {
     >
       <main
         className={cx(
-          'mx-auto w-full max-w-[1024px] flex-1 py-12 px-4 sm:px-8 gap-8 flex flex-col',
+          'mx-auto flex w-full max-w-[1024px] flex-1 flex-col gap-8 py-12 px-4 sm:px-8',
           tutorials.length > 0 &&
-            'xl:grid xl:grid-cols-[minmax(760px,_1fr)_380px] xl:max-w-[1236px]'
+            'xl:grid xl:max-w-[1236px] xl:grid-cols-[minmax(760px,_1fr)_380px]'
         )}
       >
-        <div className="flex gap-8 flex-col">
+        <div className="flex flex-col gap-8">
           <SearchBar />
           <TablePreview
             {...STATE_UPDATE_TABLE_PROPS}
