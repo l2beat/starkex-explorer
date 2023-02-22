@@ -36,6 +36,7 @@ import {
 } from './data/home'
 import {
   randomStateUpdateBalanceChangeEntry,
+  randomStateUpdatePriceEntry,
   randomStateUpdateTransactionEntry,
 } from './data/stateUpdate'
 import {
@@ -183,6 +184,7 @@ const routes: Route[] = [
           )
         ),
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
+        priceChanges: repeat(15, randomStateUpdatePriceEntry),
         totalBalanceChanges: 231,
         transactions: repeat(5, randomStateUpdateTransactionEntry),
         totalTransactions: 5,

@@ -3,6 +3,7 @@ import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
+import { SectionHeading } from '../../components/SectionHeading'
 import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
 import { getBalanceChangeTableProps, getTransactionTableProps } from './common'
@@ -10,6 +11,10 @@ import {
   StateUpdateBalanceChangeEntry,
   StateUpdateBalanceChangesTable,
 } from './components/StateUpdateBalanceChangesTable'
+import {
+  StateUpdatePriceEntry,
+  StateUpdatePricesTable,
+} from './components/StateUpdatePricesTable'
 import {
   StateUpdateStats,
   StateUpdateStatsProps,
@@ -24,6 +29,7 @@ export interface StateUpdatePageProps extends StateUpdateStatsProps {
   type: 'SPOT' | 'PERPETUAL'
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
+  priceChanges?: StateUpdatePriceEntry[]
   transactions: StateUpdateTransactionEntry[]
   totalTransactions: number
 }
@@ -47,7 +53,6 @@ function StateUpdatePage(props: StateUpdatePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <StateUpdateStats {...props} />
-        {/* TODO: price changes */}
         <TablePreview
           {...getBalanceChangeTableProps(props.id)}
           visible={props.balanceChanges.length}
@@ -58,6 +63,12 @@ function StateUpdatePage(props: StateUpdatePageProps) {
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>
+        {props.priceChanges && (
+          <section>
+            <SectionHeading title="Price Changes" />
+            <StateUpdatePricesTable priceChanges={props.priceChanges} />
+          </section>
+        )}
         <TablePreview
           {...getTransactionTableProps(props.id)}
           visible={props.transactions.length}
