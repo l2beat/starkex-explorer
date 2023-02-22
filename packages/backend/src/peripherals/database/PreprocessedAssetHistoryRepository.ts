@@ -44,8 +44,14 @@ export class PreprocessedAssetHistoryRepository<
     this.findCurrentByStarkKeyAndAsset = this.wrapFind(
       this.findCurrentByStarkKeyAndAsset
     )
-    this.getByStarkKey = this.wrapGet(this.getByStarkKey)
+    this.getByStarkKeyPaginated = this.wrapGet(this.getByStarkKeyPaginated)
+    this.getCurrentByStarkKeyCount = this.wrapAny(
+      this.getCurrentByStarkKeyCount
+    )
     this.getCurrentByStarkKey = this.wrapGet(this.getCurrentByStarkKey)
+    this.getCurrentByStarkKeyPaginated = this.wrapGet(
+      this.getCurrentByStarkKeyPaginated
+    )
     this.getCurrentByPositionOrVaultId = this.wrapGet(
       this.getCurrentByPositionOrVaultId
     )
@@ -112,12 +118,66 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
+  async getCurrentByStarkKeyCount(starkKey: StarkKey, trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    const [result] = await knex('preprocessed_asset_history')
+      .where({
+        stark_key: starkKey.toString(),
+        is_current: true,
+      })
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count!)
+  }
+
+  async getCurrentByStarkKeyPaginated(
+    starkKey: StarkKey,
+    { offset, limit }: { offset: number; limit: number },
+    assetIdAtTop?: AssetId,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    let query = knex('preprocessed_asset_history').where({
+      stark_key: starkKey.toString(),
+      is_current: true,
+    })
+    if (assetIdAtTop) {
+      // Make sure that assetIdAtTop (normally the collateral asset)
+      // is always the first one in the list, regardless of sorting
+      query = query
+        .orderByRaw(
+          'CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END',
+          assetIdAtTop.toString()
+        )
+        .orderBy('asset_hash_or_id')
+    }
+
+    const rows = await query.offset(offset).limit(limit)
+    return rows.map((r) =>
+      toPreprocessedAssetHistoryRecord(r, this.toAssetType)
+    )
+  }
+
+  async getByStarkKeyCount(starkKey: StarkKey, trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    const [result] = await knex('preprocessed_asset_history')
+      .where('stark_key', starkKey.toString())
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count!)
+  }
+
+  async getByStarkKeyPaginated(
+    starkKey: StarkKey,
+    { offset, limit }: { offset: number; limit: number },
+    trx?: Knex.Transaction
+  ) {
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history')
       .where('stark_key', starkKey.toString())
       .orderBy('timestamp', 'desc')
-      .limit(10)
+      .offset(offset)
+      .limit(limit)
     return rows.map((r) =>
       toPreprocessedAssetHistoryRecord(r, this.toAssetType)
     )
