@@ -4,6 +4,7 @@ import { AssetHash, AssetId } from '@explorer/types'
 import { ApiServer } from './api/ApiServer'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
+import { HomeController } from './api/controllers/HomeController'
 import { OldHomeController } from './api/controllers/OldHomeController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
@@ -44,6 +45,7 @@ import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { UserService } from './core/UserService'
 import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
@@ -298,6 +300,7 @@ export class Application {
       forcedTradeOfferRepository,
       sentTransactionRepository
     )
+    const userService = new UserService(userRegistrationEventRepository)
 
     const userTransactionMigrator = new UserTransactionMigrator(
       database,
@@ -382,6 +385,7 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository
     )
+    const homeController = new HomeController(userService)
     const oldHomeController = new OldHomeController(
       accountService,
       stateUpdateRepository,
@@ -434,7 +438,7 @@ export class Application {
               stateUpdateController,
               searchController
             )
-          : createFrontendRouter(),
+          : createFrontendRouter(homeController),
         createForcedTransactionRouter(
           forcedTradeOfferController,
           userTransactionController
