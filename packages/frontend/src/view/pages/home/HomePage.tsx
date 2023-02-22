@@ -3,6 +3,7 @@ import React from 'react'
 
 import { Page } from '../../components/page/Page'
 import { SearchBar } from '../../components/SearchBar'
+import { SectionHeading } from '../../components/SectionHeading'
 import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
 import {
@@ -77,11 +78,12 @@ function HomePage(props: HomePageProps) {
             <HomeOffersTable offers={props.offers} />
           </TablePreview>
         </div>
-        <section className="mb-5 flex flex-col items-baseline gap-2 lg:flex-row xl:mt-[72px]">
-          <h2 className="text-xl font-semibold">Tutorials</h2>
-          <p className="text-sm font-medium text-zinc-500">
-            Learn how to use the StarkEx Explorer
-          </p>
+        <section className="xl:mt-[72px]">
+          <SectionHeading
+            title="Tutorials"
+            description="Learn how to use the StarkEx Explorer"
+            leftAlign
+          />
         </section>
       </main>
     </Page>
