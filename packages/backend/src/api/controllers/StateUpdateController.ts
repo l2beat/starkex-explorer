@@ -41,7 +41,7 @@ export class StateUpdateController {
     const content = renderOldStateUpdatesIndexPage({
       account,
       stateUpdates: stateUpdates.map(toStateUpdateEntry),
-      total: Number(total),
+      total,
       params: { page, perPage },
     })
     return { type: 'success', content }

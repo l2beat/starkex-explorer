@@ -42,11 +42,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           )
         }
       >
-        <TableLimitSelect
-          currentPage={currentPage}
-          limit={props.limit}
-          link={props.link}
-        />
+        <TableLimitSelect limit={props.limit} link={props.link} />
       </SectionHeading>
       {props.children}
       {props.visible === 0 && (
@@ -73,11 +69,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
             perPage={props.limit}
           />
         </div>
-        <TableLimitSelect
-          currentPage={currentPage}
-          limit={props.limit}
-          link={props.link}
-        />
+        <TableLimitSelect limit={props.limit} link={props.link} />
       </div>
     </>
   )

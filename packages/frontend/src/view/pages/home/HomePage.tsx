@@ -31,9 +31,9 @@ export interface HomePageProps {
   // TODO: statistics
   tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
-  totalStateUpdate: number
+  totalStateUpdates: number
   forcedTransactions: HomeForcedTransactionEntry[]
-  totalForcedTransaction: number
+  totalForcedTransactions: number
   offers: HomeOfferEntry[]
   totalOffers: number
 }
@@ -64,14 +64,14 @@ function HomePage(props: HomePageProps) {
           <TablePreview
             {...STATE_UPDATE_TABLE_PROPS}
             visible={props.stateUpdates.length}
-            total={props.totalStateUpdate}
+            total={props.totalStateUpdates}
           >
             <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
           </TablePreview>
           <TablePreview
             {...FORCED_TRANSACTION_TABLE_PROPS}
             visible={props.forcedTransactions.length}
-            total={props.totalForcedTransaction}
+            total={props.totalForcedTransactions}
           >
             <HomeForcedTransactionsTable
               forcedTransactions={props.forcedTransactions}

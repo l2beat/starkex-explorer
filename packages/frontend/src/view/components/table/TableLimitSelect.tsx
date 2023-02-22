@@ -3,7 +3,6 @@ import React from 'react'
 export interface TableLimitSelectProps {
   link: string
   limit: number
-  currentPage: number
 }
 
 export function TableLimitSelect(props: TableLimitSelectProps) {
@@ -32,7 +31,7 @@ export function TableLimitSelect(props: TableLimitSelectProps) {
           </option>
         ))}
       </select>
-      <input className="hidden" name="page" defaultValue={props.currentPage} />
+      <input className="hidden" name="page" defaultValue={1} />
     </form>
   )
 }
