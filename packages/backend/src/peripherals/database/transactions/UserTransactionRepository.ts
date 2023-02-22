@@ -5,6 +5,7 @@ import { UserTransactionRow } from 'knex/types/tables'
 import { Logger } from '../../../tools/Logger'
 import { BaseRepository } from '../shared/BaseRepository'
 import { Database } from '../shared/Database'
+import { WithdrawableAssetRepository } from '../WithdrawableAssetRepository'
 import {
   decodeUserTransactionData,
   encodeUserTransactionData,
@@ -45,6 +46,10 @@ interface RowWithIncluded extends UserTransactionRow {
 
 export type UserTransactionAddRecord = Parameters<
   UserTransactionRepository['add']
+>['0']
+
+export type WithdrawableAssetAddRecord = Parameters<
+  WithdrawableAssetRepository['add']
 >['0']
 
 export class UserTransactionRepository extends BaseRepository {

@@ -98,6 +98,9 @@ describe(PerpetualRollupSyncService.name, () => {
       expect(userTransactionCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
+      expect(withdrawableAssetCollector.collect).toHaveBeenCalledExactlyWith([
+        [blockRange],
+      ])
       expect(
         perpetualRollupUpdater.loadRequiredPages
       ).toHaveBeenCalledExactlyWith([[stateTransitionsRecords]])
@@ -152,6 +155,7 @@ describe(PerpetualRollupSyncService.name, () => {
       expect(perpetualRollupUpdater.discardAfter).toHaveBeenCalledWith([10])
       expect(userRegistrationCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(userTransactionCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(withdrawableAssetCollector.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })

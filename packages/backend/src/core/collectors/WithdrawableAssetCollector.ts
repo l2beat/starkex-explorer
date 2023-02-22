@@ -70,19 +70,9 @@ export class WithdrawableAssetCollector {
       LogWithdrawalWithTokenIdPerformed.safeParseLog(log) ??
       LogMintWithdrawalPerformed.parseLog(log)
 
-    // Temporary function to gather timestamps not yet in the file.
-    // TODO: remove
-    const getTimestamp = async (blockNumber: number) => {
-      const timestamp = await this.ethereumClient.getBlockTimestamp(
-        log.blockNumber
-      )
-      console.log(`"${blockNumber}": ${timestamp},`)
-      return timestamp
-    }
     const timestamp =
       knownBlockTimestamps?.get(log.blockNumber) ??
-      (await getTimestamp(log.blockNumber))
-    // (await this.ethereumClient.getBlockTimestamp(log.blockNumber))
+      (await this.ethereumClient.getBlockTimestamp(log.blockNumber))
 
     const base = {
       blockNumber: log.blockNumber,
