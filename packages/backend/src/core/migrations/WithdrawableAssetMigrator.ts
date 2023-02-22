@@ -3,7 +3,7 @@ import { SoftwareMigrationRepository } from '../../peripherals/database/Software
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { Logger } from '../../tools/Logger'
-import { WithdrawableAssetCollector } from '../collectors/WithdrawableAssetsCollector'
+import { WithdrawableAssetCollector } from '../collectors/WithdrawableAssetCollector'
 
 export class WithdrawableAssetMigrator {
   constructor(

@@ -6,7 +6,7 @@ import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutput
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
-import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetsCollector'
+import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetCollector'
 import { IDataSyncService } from './IDataSyncService'
 import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
 

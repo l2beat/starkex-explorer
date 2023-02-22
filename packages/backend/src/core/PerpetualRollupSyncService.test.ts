@@ -12,7 +12,7 @@ import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualR
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import type { VerifierCollector } from './collectors/VerifierCollector'
-import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetsCollector'
+import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetCollector'
 import { PerpetualRollupSyncService } from './PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 

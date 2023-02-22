@@ -8,7 +8,7 @@ import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
-import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetsCollector'
+import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetCollector'
 import { IDataSyncService } from './IDataSyncService'
 import { SpotValidiumUpdater } from './SpotValidiumUpdater'
 

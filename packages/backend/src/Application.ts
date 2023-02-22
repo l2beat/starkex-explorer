@@ -29,7 +29,7 @@ import {
   SpotValidiumStateTransitionCollector,
 } from './core/collectors/ValidiumStateTransitionCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
-import { WithdrawableAssetCollector } from './core/collectors/WithdrawableAssetsCollector'
+import { WithdrawableAssetCollector } from './core/collectors/WithdrawableAssetCollector'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
 import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
