@@ -1,9 +1,9 @@
 import { UserDetails } from '@explorer/shared'
+import cx from 'classnames'
 import React from 'react'
 
 import { Page } from '../../components/page/Page'
 import { SearchBar } from '../../components/SearchBar'
-import { SectionHeading } from '../../components/SectionHeading'
 import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
 import {
@@ -20,11 +20,16 @@ import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
 } from './components/HomeStateUpdatesTable'
+import {
+  DEFAULT_TUTORIALS,
+  HomeTutorialEntry,
+  HomeTutorials,
+} from './components/HomeTutorials'
 
 export interface HomePageProps {
   user: UserDetails | undefined
   // TODO: statistics
-  tutorials: HomeTutorialEntry[]
+  tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
   totalStateUpdate: number
   forcedTransactions: HomeForcedTransactionEntry[]
@@ -33,17 +38,13 @@ export interface HomePageProps {
   totalOffers: number
 }
 
-export interface HomeTutorialEntry {
-  title: string
-  imageUrl: string
-  href: string
-}
-
 export function renderHomePage(props: HomePageProps) {
   return reactToHtml(<HomePage {...props} />)
 }
 
 function HomePage(props: HomePageProps) {
+  const tutorials = props.tutorials ?? DEFAULT_TUTORIALS
+
   return (
     <Page
       path="/"
@@ -51,7 +52,13 @@ function HomePage(props: HomePageProps) {
       user={props.user}
       withoutSearch
     >
-      <main className="mx-auto w-full max-w-[1024px] xl:max-w-[1236px] flex-1 py-12 px-4 sm:px-8 xl:grid gap-8 xl:grid-cols-[minmax(760px,_1fr)_380px] flex flex-col">
+      <main
+        className={cx(
+          'mx-auto w-full max-w-[1024px] flex-1 py-12 px-4 sm:px-8 gap-8 flex flex-col',
+          tutorials.length > 0 &&
+            'xl:grid xl:grid-cols-[minmax(760px,_1fr)_380px] xl:max-w-[1236px]'
+        )}
+      >
         <div className="flex gap-8 flex-col">
           <SearchBar />
           <TablePreview
@@ -78,13 +85,7 @@ function HomePage(props: HomePageProps) {
             <HomeOffersTable offers={props.offers} />
           </TablePreview>
         </div>
-        <section className="xl:mt-[72px]">
-          <SectionHeading
-            title="Tutorials"
-            description="Learn how to use the StarkEx Explorer"
-            leftAlign
-          />
-        </section>
+        {tutorials.length > 0 && <HomeTutorials tutorials={tutorials} />}
       </main>
     </Page>
   )
