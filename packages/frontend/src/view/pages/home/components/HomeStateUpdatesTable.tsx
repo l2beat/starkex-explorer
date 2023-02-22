@@ -42,7 +42,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
           cells: [
             <TimeCell timestamp={stateUpdate.timestamp} />,
             <span className="text-blue-600 underline">#{stateUpdate.id}</span>,
-            <InlineEllipsis className="max-w-[80px] sm:max-w-[300px]">
+            <InlineEllipsis className="max-w-[80px] sm:max-w-[160px]">
               {stateUpdate.hash.toString()}
             </InlineEllipsis>,
             stateUpdate.updateCount > 0

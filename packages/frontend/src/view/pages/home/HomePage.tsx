@@ -2,6 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
 import { Page } from '../../components/page/Page'
+import { SearchBar } from '../../components/SearchBar'
 import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
 import {
@@ -49,8 +50,9 @@ function HomePage(props: HomePageProps) {
       user={props.user}
       withoutSearch
     >
-      <main className="mx-auto flex-1 p-16">
-        <div className="flex max-w-[760px] flex-col gap-y-12">
+      <main className="mx-auto w-full max-w-[1024px] xl:max-w-[1236px] flex-1 py-12 px-4 sm:px-8 xl:grid gap-8 xl:grid-cols-[minmax(760px,_1fr)_380px] flex flex-col">
+        <div className="flex gap-8 flex-col">
+          <SearchBar />
           <TablePreview
             {...STATE_UPDATE_TABLE_PROPS}
             visible={props.stateUpdates.length}
@@ -75,6 +77,12 @@ function HomePage(props: HomePageProps) {
             <HomeOffersTable offers={props.offers} />
           </TablePreview>
         </div>
+        <section className="mb-5 flex flex-col items-baseline gap-2 lg:flex-row xl:mt-[72px]">
+          <h2 className="text-xl font-semibold">Tutorials</h2>
+          <p className="text-sm font-medium text-zinc-500">
+            Learn how to use the StarkEx Explorer
+          </p>
+        </section>
       </main>
     </Page>
   )
