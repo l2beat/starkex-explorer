@@ -3,7 +3,7 @@ import Koa from 'koa'
 import serve from 'koa-static'
 
 import { USE_NEW_DESIGN } from '../utils/constants'
-import { ignoreReactSelectWarning } from './ignoreReactSelectWarning'
+import { ignoreReactSelectWarning } from '../utils/ignoreReactSelectWarning'
 import { router as oldRouter } from './oldRoutes'
 import { router } from './routes'
 

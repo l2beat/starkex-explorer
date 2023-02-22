@@ -8,6 +8,7 @@ export * from './old/state-updates'
 export * from './old/transaction-form'
 /* eslint-enable no-restricted-imports */
 
+export * from '../utils/ignoreReactSelectWarning'
 export * from './pages/forced-actions/ForcedTradePage'
 export * from './pages/forced-actions/ForcedWithdrawPage'
 export type { HomeForcedTransactionEntry } from './pages/home/components/HomeForcedTransactionsTable'

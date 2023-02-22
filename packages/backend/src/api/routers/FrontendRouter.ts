@@ -1,3 +1,4 @@
+import { ignoreReactSelectWarning } from '@explorer/frontend'
 import { stringAsPositiveInt, UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
@@ -10,6 +11,8 @@ import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
 export function createFrontendRouter(homeController: HomeController) {
+  ignoreReactSelectWarning()
+
   const router = new Router()
 
   router.get('/', async (ctx) => {
