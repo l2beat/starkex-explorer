@@ -17,7 +17,7 @@ import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
 import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
 import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 
-export class StateUpdateController {
+export class OldStateUpdateController {
   constructor(
     private accountService: AccountService,
     private stateUpdateRepository: StateUpdateRepository,

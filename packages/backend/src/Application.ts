@@ -6,9 +6,9 @@ import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferCo
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { OldHomeController } from './api/controllers/OldHomeController'
+import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
-import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
@@ -415,7 +415,7 @@ export class Application {
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
-    const stateUpdateController = new StateUpdateController(
+    const stateUpdateController = new OldStateUpdateController(
       accountService,
       stateUpdateRepository,
       userTransactionRepository
