@@ -387,7 +387,8 @@ export class Application {
     )
     const homeController = new HomeController(
       userService,
-      stateUpdateRepository
+      stateUpdateRepository,
+      userTransactionRepository
     )
     const oldHomeController = new OldHomeController(
       accountService,

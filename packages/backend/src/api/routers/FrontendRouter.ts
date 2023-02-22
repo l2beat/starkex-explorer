@@ -39,6 +39,27 @@ export function createFrontendRouter(homeController: HomeController) {
     )
   )
 
+  router.get(
+    '/forced-transactions',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result = await homeController.getHomeStateUpdatesPage(
+          givenUser,
+          pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
   return router
 }
 

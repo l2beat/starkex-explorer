@@ -1,16 +1,32 @@
-import { renderHomePage, renderHomeStateUpdatesPage } from '@explorer/frontend'
+import {
+  HomeForcedTransactionEntry,
+  renderHomeForcedTransactionsPage,
+  renderHomePage,
+  renderHomeStateUpdatesPage,
+} from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { Hash256 } from '@explorer/types'
+import { AssetId, Hash256 } from '@explorer/types'
 
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
+
+const FORCED_TRANSACTION_TYPES = [
+  'ForcedTrade' as const,
+  'ForcedWithdrawal' as const,
+  'FullWithdrawal' as const,
+]
 
 export class HomeController {
   constructor(
     private readonly userService: UserService,
-    private readonly stateUpdateRepository: StateUpdateRepository
+    private readonly stateUpdateRepository: StateUpdateRepository,
+    private readonly userTransactionRepository: UserTransactionRepository
   ) {}
 
   async getHomePage(
@@ -18,9 +34,20 @@ export class HomeController {
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
 
-    const [totalStateUpdates, stateUpdates] = await Promise.all([
-      this.stateUpdateRepository.count(),
+    const [
+      stateUpdates,
+      totalStateUpdates,
+      forcedTransactions,
+      totalForcedTransactions,
+    ] = await Promise.all([
       this.stateUpdateRepository.getPaginated({ offset: 0, limit: 6 }),
+      this.stateUpdateRepository.count(),
+      this.userTransactionRepository.getPaginated({
+        offset: 0,
+        limit: 6,
+        types: FORCED_TRANSACTION_TYPES,
+      }),
+      this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
     ])
 
     const content = renderHomePage({
@@ -35,8 +62,8 @@ export class HomeController {
         forcedTransactionCount: update.forcedTransactionsCount,
       })),
       totalStateUpdates,
-      forcedTransactions: [],
-      totalForcedTransactions: 0,
+      forcedTransactions: forcedTransactions.map(toHomeTransaction),
+      totalForcedTransactions,
       offers: [],
       totalOffers: 0,
     })
@@ -49,9 +76,9 @@ export class HomeController {
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
 
-    const [total, stateUpdates] = await Promise.all([
-      this.stateUpdateRepository.count(),
+    const [stateUpdates, total] = await Promise.all([
       this.stateUpdateRepository.getPaginated(pagination),
+      this.stateUpdateRepository.count(),
     ])
 
     const content = renderHomeStateUpdatesPage({
@@ -68,5 +95,59 @@ export class HomeController {
       total,
     })
     return { type: 'success', content }
+  }
+
+  async getHomeForcedTransactionsPage(
+    givenUser: Partial<UserDetails>,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const user = await this.userService.getUserDetails(givenUser)
+
+    const [forcedTransactions, total] = await Promise.all([
+      this.userTransactionRepository.getPaginated({
+        offset: 0,
+        limit: 6,
+        types: FORCED_TRANSACTION_TYPES,
+      }),
+      this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
+    ])
+
+    const content = renderHomeForcedTransactionsPage({
+      user,
+      forcedTransactions: forcedTransactions.map(toHomeTransaction),
+      ...pagination,
+      total,
+    })
+    return { type: 'success', content }
+  }
+}
+
+function toHomeTransaction(
+  record: UserTransactionRecord<typeof FORCED_TRANSACTION_TYPES[number]>
+): HomeForcedTransactionEntry {
+  const data = record.data
+  switch (data.type) {
+    case 'ForcedTrade':
+      return {
+        timestamp: record.timestamp,
+        hash: record.transactionHash,
+        asset: { hashOrId: data.syntheticAssetId },
+        amount: data.syntheticAmount,
+        status: record.included ? 'INCLUDED' : 'MINED',
+        type: data.isABuyingSynthetic ? 'BUY' : 'SELL',
+      }
+    case 'ForcedWithdrawal':
+      return {
+        timestamp: record.timestamp,
+        hash: record.transactionHash,
+        // TODO: not always USDC
+        asset: { hashOrId: AssetId.USDC },
+        amount: data.quantizedAmount,
+        status: record.included ? 'INCLUDED' : 'MINED',
+        type: 'WITHDRAW',
+      }
+    case 'FullWithdrawal':
+      // TODO: assets, amount is unknown
+      throw new Error('Not implemented')
   }
 }
