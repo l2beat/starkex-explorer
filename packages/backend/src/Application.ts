@@ -320,8 +320,9 @@ export class Application {
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
 
+    let preprocessedAssetHistoryRepository
     if (config.starkex.tradingMode === 'perpetual') {
-      const preprocessedAssetHistoryRepository =
+      preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetId, logger)
 
       const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
@@ -341,7 +342,7 @@ export class Application {
         isPreprocessorEnabled
       )
     } else {
-      const preprocessedAssetHistoryRepository =
+      preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetHash, logger)
 
       const vaultRepository = new VaultRepository(database, logger)
@@ -392,8 +393,12 @@ export class Application {
     )
     const userController = new UserController(
       userService,
-      stateUpdateRepository
+      preprocessedAssetHistoryRepository,
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
     )
+
     const oldHomeController = new OldHomeController(
       accountService,
       stateUpdateRepository,

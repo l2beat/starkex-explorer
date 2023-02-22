@@ -44,6 +44,7 @@ export class PreprocessedAssetHistoryRepository<
     this.findCurrentByStarkKeyAndAsset = this.wrapFind(
       this.findCurrentByStarkKeyAndAsset
     )
+    this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     this.getCurrentByStarkKey = this.wrapGet(this.getCurrentByStarkKey)
     this.getCurrentByPositionOrVaultId = this.wrapGet(
       this.getCurrentByPositionOrVaultId
@@ -100,12 +101,23 @@ export class PreprocessedAssetHistoryRepository<
     return knex('preprocessed_asset_history').where('id', historyId).delete()
   }
 
-  async getCurrentByStarkKey(starkKey: StarkKey, trx: Knex.Transaction) {
+  async getCurrentByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history').where({
       stark_key: starkKey.toString(),
       is_current: true,
     })
+    return rows.map((r) =>
+      toPreprocessedAssetHistoryRecord(r, this.toAssetType)
+    )
+  }
+
+  async getByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    const rows = await knex('preprocessed_asset_history')
+      .where('stark_key', starkKey.toString())
+      .orderBy('timestamp', 'desc')
+      .limit(10)
     return rows.map((r) =>
       toPreprocessedAssetHistoryRecord(r, this.toAssetType)
     )
