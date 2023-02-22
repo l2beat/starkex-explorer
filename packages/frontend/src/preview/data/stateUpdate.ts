@@ -2,11 +2,20 @@ import { Hash256, StarkKey } from '@explorer/types'
 
 import {
   StateUpdateBalanceChangeEntry,
+  StateUpdatePriceEntry,
   StateUpdateTransactionEntry,
 } from '../../view'
 import { Bucket } from './bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
 import { randomId } from './utils'
+
+export function randomStateUpdatePriceEntry(): StateUpdatePriceEntry {
+  return {
+    asset: assetBucket.pick(),
+    price: amountBucket.pick(),
+    change: changeBucket.pick(),
+  }
+}
 
 export function randomStateUpdateBalanceChangeEntry(): StateUpdateBalanceChangeEntry {
   return {

@@ -5,6 +5,7 @@ import { ApiServer } from './api/ApiServer'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
+import { OldHomeController } from './api/controllers/OldHomeController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
@@ -12,6 +13,7 @@ import { TransactionSubmitController } from './api/controllers/TransactionSubmit
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
+import { createOldFrontendRouter } from './api/routers/OldFrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
@@ -45,6 +47,7 @@ import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { UserService } from './core/UserService'
 import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
@@ -312,6 +315,7 @@ export class Application {
       forcedTradeOfferRepository,
       sentTransactionRepository
     )
+    const userService = new UserService(userRegistrationEventRepository)
 
     const userTransactionMigrator = new UserTransactionMigrator(
       database,
@@ -404,6 +408,10 @@ export class Application {
       forcedTradeOfferRepository
     )
     const homeController = new HomeController(
+      userService,
+      stateUpdateRepository
+    )
+    const oldHomeController = new OldHomeController(
       accountService,
       stateUpdateRepository,
       positionRepository,
@@ -446,14 +454,16 @@ export class Application {
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
-        createFrontendRouter(
-          positionController,
-          homeController,
-          forcedTradeOfferController,
-          forcedTransactionController,
-          stateUpdateController,
-          searchController
-        ),
+        config.useOldFrontend
+          ? createOldFrontendRouter(
+              positionController,
+              oldHomeController,
+              forcedTradeOfferController,
+              forcedTransactionController,
+              stateUpdateController,
+              searchController
+            )
+          : createFrontendRouter(homeController),
         createForcedTransactionRouter(
           forcedTradeOfferController,
           userTransactionController

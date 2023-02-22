@@ -38,7 +38,7 @@ export function formatWithDecimals(
 
   const core = `${intPart}${fractionPart}`
   const sign = options?.signed && amount > 0n ? '+' : ''
-  return `${options?.prefix ?? ''}${sign}${core}${options?.suffix ?? ''}`
+  return `${sign}${options?.prefix ?? ''}${core}${options?.suffix ?? ''}`
 }
 
 export function formatInt(int: bigint | number) {

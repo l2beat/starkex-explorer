@@ -1,5 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
+import {
+  EthereumAddress,
+  Hash256,
+  PedersenHash,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import Router from '@koa/router'
 import { randomInt } from 'crypto'
 import Koa from 'koa'
@@ -30,6 +36,7 @@ import {
 } from './data/home'
 import {
   randomStateUpdateBalanceChangeEntry,
+  randomStateUpdatePriceEntry,
   randomStateUpdateTransactionEntry,
 } from './data/stateUpdate'
 import {
@@ -72,11 +79,27 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderHomePage({
         user,
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        totalStateUpdates: 5123,
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        totalForcedTransactions: 68,
+        offers: repeat(6, randomHomeOfferEntry),
+        totalOffers: 7,
+      })
+    },
+  },
+  {
+    path: '/home/no-tutorials',
+    description: 'The home page, but without any tutorials.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderHomePage({
+        user,
         tutorials: [],
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
-        totalStateUpdate: 5123,
+        totalStateUpdates: 5123,
         forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
-        totalForcedTransaction: 68,
+        totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
       })
@@ -140,24 +163,28 @@ const routes: Route[] = [
     link: '/state-updates/xyz',
     description: 'State update page.',
     render: (ctx) => {
+      const ethereumTimestamp = randomTimestamp()
       const user = getUser(ctx)
       ctx.body = renderStateUpdatePage({
         user,
         type: 'PERPETUAL',
         id: randomId(),
-        stats: {
-          hashes: {
-            factHash: PedersenHash.fake(),
-            positionTreeRoot: PedersenHash.fake(),
-            onChainVaultTreeRoot: PedersenHash.fake(),
-            offChainVaultTreeRoot: PedersenHash.fake(),
-            orderRoot: PedersenHash.fake(),
-          },
-          blockNumber: randomInt(14_000_000, 17_000_000),
-          ethereumTimestamp: randomTimestamp(),
-          starkExTimestamp: randomTimestamp(),
+        hashes: {
+          factHash: Hash256.fake(),
+          positionTreeRoot: PedersenHash.fake(),
+          onChainVaultTreeRoot: PedersenHash.fake(),
+          offChainVaultTreeRoot: PedersenHash.fake(),
+          orderRoot: PedersenHash.fake(),
         },
+        blockNumber: randomInt(14_000_000, 17_000_000),
+        ethereumTimestamp,
+        starkExTimestamp: Timestamp(
+          Math.floor(
+            Number(ethereumTimestamp) - Math.random() * 12 * 60 * 60 * 1000
+          )
+        ),
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
+        priceChanges: repeat(15, randomStateUpdatePriceEntry),
         totalBalanceChanges: 231,
         transactions: repeat(5, randomStateUpdateTransactionEntry),
         totalTransactions: 5,

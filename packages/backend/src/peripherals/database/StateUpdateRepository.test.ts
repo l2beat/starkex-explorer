@@ -573,7 +573,7 @@ describe(StateUpdateRepository.name, () => {
 
     const total = await repository.count()
 
-    expect(total).toEqual(4n)
+    expect(total).toEqual(4)
   })
 
   it('returns undefined if update is missing', async () => {

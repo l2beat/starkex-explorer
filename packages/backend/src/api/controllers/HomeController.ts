@@ -1,58 +1,71 @@
-import { renderOldHomePage } from '@explorer/frontend'
-import { EthereumAddress } from '@explorer/types'
+import { renderHomePage, renderHomeStateUpdatesPage } from '@explorer/frontend'
+import { UserDetails } from '@explorer/shared'
+import { Hash256 } from '@explorer/types'
 
-import { AccountService } from '../../core/AccountService'
-import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
-import { PositionRepository } from '../../peripherals/database/PositionRepository'
+import { UserService } from '../../core/UserService'
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
-import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
-import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
-import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
-import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 
 export class HomeController {
   constructor(
-    private accountService: AccountService,
-    private stateUpdateRepository: StateUpdateRepository,
-    private positionRepository: PositionRepository,
-    private userTransactionRepository: UserTransactionRepository,
-    private forcedTradeOffersRepository: ForcedTradeOfferRepository
+    private readonly userService: UserService,
+    private readonly stateUpdateRepository: StateUpdateRepository
   ) {}
 
   async getHomePage(
-    address: EthereumAddress | undefined
+    givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
-    const offset = 0
-    const limit = 5
+    const user = await this.userService.getUserDetails(givenUser)
 
-    const [
-      account,
-      stateUpdates,
-      transactions,
-      offers,
-      totalUpdates,
-      totalPositions,
-    ] = await Promise.all([
-      this.accountService.getAccount(address),
-      this.stateUpdateRepository.getPaginated({ offset, limit }),
-      this.userTransactionRepository.getPaginated({
-        limit,
-        offset,
-        types: ['ForcedTrade', 'ForcedWithdrawal'],
-      }),
-      this.forcedTradeOffersRepository.getInitial({ limit, offset }),
+    const [totalStateUpdates, stateUpdates] = await Promise.all([
       this.stateUpdateRepository.count(),
-      this.positionRepository.count(),
+      this.stateUpdateRepository.getPaginated({ offset: 0, limit: 6 }),
     ])
 
-    const content = renderOldHomePage({
-      account,
-      stateUpdates: stateUpdates.map(toStateUpdateEntry),
-      forcedTransactions: transactions.map(toForcedTransactionEntry),
-      totalUpdates,
-      totalPositions,
-      forcedTradeOffers: offers.map(toForcedTradeOfferEntry),
+    const content = renderHomePage({
+      user,
+      tutorials: [], // explicitly no tutorials
+      stateUpdates: stateUpdates.map((update) => ({
+        timestamp: update.timestamp,
+        id: update.id.toString(),
+        // we want fact hash instead
+        hash: Hash256(update.rootHash.toString()),
+        updateCount: update.positionCount,
+        forcedTransactionCount: update.forcedTransactionsCount,
+      })),
+      totalStateUpdates,
+      forcedTransactions: [],
+      totalForcedTransactions: 0,
+      offers: [],
+      totalOffers: 0,
+    })
+    return { type: 'success', content }
+  }
+
+  async getHomeStateUpdatesPage(
+    givenUser: Partial<UserDetails>,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const user = await this.userService.getUserDetails(givenUser)
+
+    const [total, stateUpdates] = await Promise.all([
+      this.stateUpdateRepository.count(),
+      this.stateUpdateRepository.getPaginated(pagination),
+    ])
+
+    const content = renderHomeStateUpdatesPage({
+      user,
+      stateUpdates: stateUpdates.map((update) => ({
+        timestamp: update.timestamp,
+        id: update.id.toString(),
+        // we want fact hash instead
+        hash: Hash256(update.rootHash.toString()),
+        updateCount: update.positionCount,
+        forcedTransactionCount: update.forcedTransactionsCount,
+      })),
+      ...pagination,
+      total,
     })
     return { type: 'success', content }
   }
