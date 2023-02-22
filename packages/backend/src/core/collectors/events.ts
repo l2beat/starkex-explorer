@@ -55,6 +55,14 @@ export const LogForcedWithdrawalRequest = EthereumEvent<
   uint256 quantizedAmount
 )`)
 
+export const LogFullWithdrawalRequest = EthereumEvent<
+  'LogFullWithdrawalRequest',
+  { starkKey: BigNumber; vaultId: BigNumber }
+>(`event LogFullWithdrawalRequest(
+  uint256 starkKey, 
+  uint256 vaultId
+)`)
+
 export const LogMemoryPagesHashes = EthereumEvent<
   'LogMemoryPagesHashes',
   { factHash: string; pagesHashes: string[] }

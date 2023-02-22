@@ -1,7 +1,7 @@
 import {
-  ForcedAction,
   FundingEntry,
   OraclePrice,
+  PerpetualForcedAction,
   PositionUpdate,
 } from '@explorer/encoding'
 import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
@@ -28,7 +28,7 @@ export class Simulation {
     { indices: [], timestamp: this.lastFundingTimestamp },
   ]
   private newPositions: PositionUpdate[] = []
-  private newForcedActions: ForcedAction[] = []
+  private newForcedActions: PerpetualForcedAction[] = []
 
   constructor(private stateUpdater: StateUpdater, assets: AssetDefinition[]) {
     this.prices = assets.map(({ assetId, priceUSDCents }) => ({
@@ -37,7 +37,7 @@ export class Simulation {
     }))
   }
 
-  queueForcedAction(action: ForcedAction) {
+  queueForcedAction(action: PerpetualForcedAction) {
     this.newForcedActions.push(action)
     if (action.type === 'withdrawal') {
       console.log('Withdrawal queued', action.starkKey)

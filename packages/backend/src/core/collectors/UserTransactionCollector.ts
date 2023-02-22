@@ -14,6 +14,7 @@ import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import {
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
+  LogFullWithdrawalRequest,
   LogWithdrawalPerformed,
 } from './events'
 
@@ -35,6 +36,7 @@ export class UserTransactionCollector {
           LogWithdrawalPerformed.topic,
           LogForcedWithdrawalRequest.topic,
           LogForcedTradeRequest.topic,
+          LogFullWithdrawalRequest.topic,
         ],
       ],
     })
@@ -56,6 +58,7 @@ export class UserTransactionCollector {
     const event =
       LogWithdrawalPerformed.safeParseLog(log) ??
       LogForcedWithdrawalRequest.safeParseLog(log) ??
+      LogFullWithdrawalRequest.safeParseLog(log) ??
       LogForcedTradeRequest.parseLog(log)
 
     const timestamp =
@@ -89,6 +92,15 @@ export class UserTransactionCollector {
             starkKey: StarkKey.from(event.args.starkKey),
             positionId: event.args.positionId.toBigInt(),
             quantizedAmount: event.args.quantizedAmount.toBigInt(),
+          },
+        })
+      case 'LogFullWithdrawalRequest':
+        return this.userTransactionRepository.add({
+          ...base,
+          data: {
+            type: 'FullWithdrawal',
+            starkKey: StarkKey.from(event.args.starkKey),
+            vaultId: event.args.vaultId.toBigInt(),
           },
         })
       case 'LogForcedTradeRequest':
