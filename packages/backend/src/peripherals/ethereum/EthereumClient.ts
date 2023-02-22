@@ -82,7 +82,7 @@ export class EthereumClient {
     while (filters.length > 0) {
       batches.push(filters.splice(0, 10))
     }
-    const logs: providers.Log[] = []
+    let logs: providers.Log[] = []
     for (const batch of batches) {
       const nestedLogs = await Promise.all(
         batch.map((filter) => {
@@ -102,7 +102,7 @@ export class EthereumClient {
           return this.provider.getLogs(filter)
         })
       )
-      logs.push(...nestedLogs.flat())
+      logs = logs.concat(nestedLogs.flat())
     }
     return logs
   }
