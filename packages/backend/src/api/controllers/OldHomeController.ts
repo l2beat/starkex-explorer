@@ -50,7 +50,7 @@ export class OldHomeController {
       account,
       stateUpdates: stateUpdates.map(toStateUpdateEntry),
       forcedTransactions: transactions.map(toForcedTransactionEntry),
-      totalUpdates,
+      totalUpdates: BigInt(totalUpdates),
       totalPositions,
       forcedTradeOffers: offers.map(toForcedTradeOfferEntry),
     })

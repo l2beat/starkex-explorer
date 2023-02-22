@@ -385,7 +385,10 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository
     )
-    const homeController = new HomeController(userService)
+    const homeController = new HomeController(
+      userService,
+      stateUpdateRepository
+    )
     const oldHomeController = new OldHomeController(
       accountService,
       stateUpdateRepository,
