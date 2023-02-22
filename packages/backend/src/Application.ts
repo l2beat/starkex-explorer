@@ -10,6 +10,7 @@ import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
+import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
@@ -389,6 +390,10 @@ export class Application {
       userService,
       stateUpdateRepository
     )
+    const userController = new UserController(
+      userService,
+      stateUpdateRepository
+    )
     const oldHomeController = new OldHomeController(
       accountService,
       stateUpdateRepository,
@@ -441,7 +446,7 @@ export class Application {
               stateUpdateController,
               searchController
             )
-          : createFrontendRouter(homeController),
+          : createFrontendRouter(homeController, userController),
         createForcedTransactionRouter(
           forcedTradeOfferController,
           userTransactionController

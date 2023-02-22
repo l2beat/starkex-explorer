@@ -6,10 +6,14 @@ import * as z from 'zod'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
+import { UserController } from '../controllers/UserController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
-export function createFrontendRouter(homeController: HomeController) {
+export function createFrontendRouter(
+  homeController: HomeController,
+  userController: UserController
+) {
   const router = new Router()
 
   router.get('/', async (ctx) => {
@@ -33,6 +37,25 @@ export function createFrontendRouter(homeController: HomeController) {
         const result = await homeController.getHomeStateUpdatesPage(
           givenUser,
           pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/users/:starkKey',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          starkKey: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const result = await userController.getUserPage(
+          givenUser,
+          StarkKey(ctx.params.starkKey)
         )
         applyControllerResult(ctx, result)
       }
