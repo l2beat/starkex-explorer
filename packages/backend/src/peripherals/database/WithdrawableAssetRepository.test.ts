@@ -32,8 +32,8 @@ describe(WithdrawableAssetRepository.name, () => {
       event: 'LogWithdrawalAllowed',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
-      nonQuantizedAmount: 123n,
-      quantizedAmount: 123000n,
+      nonQuantizedAmount: 123000n,
+      quantizedAmount: 123n,
       ...override,
     }
   }
@@ -69,8 +69,8 @@ describe(WithdrawableAssetRepository.name, () => {
       event: 'LogWithdrawalPerformed',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
-      nonQuantizedAmount: 456n,
-      quantizedAmount: 456000n,
+      nonQuantizedAmount: 45600n,
+      quantizedAmount: 456n,
       recipient: EthereumAddress.fake(),
       ...override,
     }
@@ -85,8 +85,8 @@ describe(WithdrawableAssetRepository.name, () => {
       assetType: AssetHash.fake(),
       tokenId: 1n,
       assetId: AssetHash.fake(),
-      nonQuantizedAmount: 567n,
-      quantizedAmount: 567000n,
+      nonQuantizedAmount: 567000n,
+      quantizedAmount: 567n,
       recipient: EthereumAddress.fake(),
       ...override,
     }
@@ -99,8 +99,8 @@ describe(WithdrawableAssetRepository.name, () => {
       event: 'LogMintWithdrawalPerformed',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
-      nonQuantizedAmount: 678n,
-      quantizedAmount: 678000n,
+      nonQuantizedAmount: 678000n,
+      quantizedAmount: 678n,
       assetId: AssetHash.fake(),
       ...override,
     }
