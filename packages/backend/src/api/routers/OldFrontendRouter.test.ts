@@ -22,7 +22,7 @@ import { HomeController } from '../controllers/HomeController'
 import { PositionController } from '../controllers/PositionController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
-import { createFrontendRouter } from './FrontendRouter'
+import { createOldFrontendRouter } from './OldFrontendRouter'
 
 const TEST_PAGE = '<!DOCTYPE html><p>test page</p>'
 const SUCCESS_RESULT: ControllerSuccessResult = {
@@ -33,7 +33,7 @@ const SUCCESS_RESULT: ControllerSuccessResult = {
 describe('FrontendRouter', () => {
   describe('/', () => {
     it('returns html', async () => {
-      const frontendRouter = createFrontendRouter(
+      const frontendRouter = createOldFrontendRouter(
         mock<PositionController>(),
         mock<HomeController>({
           getHomePage: async () => SUCCESS_RESULT,
@@ -50,7 +50,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/state-updates', () => {
-    const frontendRouter = createFrontendRouter(
+    const frontendRouter = createOldFrontendRouter(
       mock<PositionController>(),
       mock<HomeController>(),
       mock<ForcedTradeOfferController>(),
@@ -79,7 +79,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/state-updates/:id', () => {
-    const frontendRouter = createFrontendRouter(
+    const frontendRouter = createOldFrontendRouter(
       mock<PositionController>(),
       mock<HomeController>(),
       mock<ForcedTradeOfferController>(),
@@ -101,7 +101,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/positions/:positionId', () => {
-    const frontendRouter = createFrontendRouter(
+    const frontendRouter = createOldFrontendRouter(
       mock<PositionController>({
         getPositionDetailsPage: async () => SUCCESS_RESULT,
       }),
@@ -123,7 +123,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/positions/:positionId/updates/:updateId', () => {
-    const frontendRouter = createFrontendRouter(
+    const frontendRouter = createOldFrontendRouter(
       mock<PositionController>({
         getPositionUpdatePage: async () => SUCCESS_RESULT,
       }),
@@ -145,7 +145,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/forced', () => {
-    const frontendRouter = createFrontendRouter(
+    const frontendRouter = createOldFrontendRouter(
       mock<PositionController>(),
       mock<HomeController>(),
       mock<ForcedTradeOfferController>(),
@@ -174,7 +174,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/forced/offers', () => {
-    const frontendRouter = createFrontendRouter(
+    const frontendRouter = createOldFrontendRouter(
       mock<PositionController>(),
       mock<HomeController>(),
       mock<ForcedTradeOfferController>({
@@ -197,7 +197,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/forced/:hash', () => {
-    const frontendRouter = createFrontendRouter(
+    const frontendRouter = createOldFrontendRouter(
       mock<PositionController>(),
       mock<HomeController>(),
       mock<ForcedTradeOfferController>(),
@@ -222,7 +222,7 @@ describe('FrontendRouter', () => {
   })
 
   describe('/forced/offers/:id', () => {
-    const frontendRouter = createFrontendRouter(
+    const frontendRouter = createOldFrontendRouter(
       mock<PositionController>(),
       mock<HomeController>(),
       mock<ForcedTradeOfferController>({
@@ -295,7 +295,7 @@ describe('FrontendRouter', () => {
         positionRepository,
         userRegistrationEventRepository
       )
-      const frontendRouter = createFrontendRouter(
+      const frontendRouter = createOldFrontendRouter(
         mock<PositionController>(),
         mock<HomeController>(),
         mock<ForcedTradeOfferController>(),

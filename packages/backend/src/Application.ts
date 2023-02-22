@@ -12,6 +12,7 @@ import { TransactionSubmitController } from './api/controllers/TransactionSubmit
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
+import { createOldFrontendRouter } from './api/routers/OldFrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
@@ -424,14 +425,16 @@ export class Application {
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
-        createFrontendRouter(
-          positionController,
-          homeController,
-          forcedTradeOfferController,
-          forcedTransactionController,
-          stateUpdateController,
-          searchController
-        ),
+        config.useOldFrontend
+          ? createOldFrontendRouter(
+              positionController,
+              homeController,
+              forcedTradeOfferController,
+              forcedTransactionController,
+              stateUpdateController,
+              searchController
+            )
+          : createFrontendRouter(),
         createForcedTransactionRouter(
           forcedTradeOfferController,
           userTransactionController
