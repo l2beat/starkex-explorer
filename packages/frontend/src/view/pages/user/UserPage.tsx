@@ -77,6 +77,7 @@ function UserPage(props: UserPageProps) {
             type={props.type}
             starkKey={props.starkKey}
             assets={props.assets}
+            isMine={isMine}
           />
         </TablePreview>
         <TablePreview

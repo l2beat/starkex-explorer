@@ -32,7 +32,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
             className="mt-4 flex items-center justify-between"
             key={assetInfo.symbol}
           >
-            <AssetWithLogo assetInfo={assetInfo} type="regularSymbol" />
+            <AssetWithLogo assetInfo={assetInfo} type="symbol" />
             <p className="text-base text-zinc-500">
               Finalize the withdrawal of{' '}
               <strong className="text-white">
@@ -59,7 +59,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                 className="mt-3 flex items-center justify-between"
                 key={offer.timestamp.toString()}
               >
-                <AssetWithLogo assetInfo={assetInfo} type="regularSymbol" />
+                <AssetWithLogo assetInfo={assetInfo} type="symbol" />
                 <p className="text-base text-zinc-500">
                   Finalize the offer{' '}
                   <strong className="text-white">

@@ -6,7 +6,7 @@ import { InlineEllipsis } from './InlineEllipsis'
 
 interface AssetWithLogoProps {
   assetInfo: AssetInfo
-  type?: 'full' | 'regular' | 'small' | 'regularSymbol' //TODO: Figure out a better name for regularSymbol
+  type?: 'full' | 'regular' | 'small' | 'symbol'
   className?: string
 }
 
@@ -23,7 +23,7 @@ export function AssetWithLogo({
           'rounded-full',
           type === 'small' && 'h-[20px] w-[20px]',
           type === 'regular' && 'h-6 w-6',
-          (type === 'full' || type === 'regularSymbol') && 'h-8 w-8'
+          (type === 'full' || type === 'symbol') && 'h-8 w-8'
         )}
         data-fallback="/images/unknown-asset.svg"
       />
@@ -45,7 +45,7 @@ export function AssetWithLogo({
           (assetInfo.isUnknownHash
             ? `${assetInfo.name} (${assetInfo.symbol})`
             : assetInfo.symbol)}
-        {(type === 'small' || type === 'regularSymbol') && (
+        {(type === 'small' || type === 'symbol') && (
           <InlineEllipsis className="max-w-[80px] !py-0">
             {assetInfo.symbol}
           </InlineEllipsis>

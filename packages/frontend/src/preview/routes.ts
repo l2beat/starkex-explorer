@@ -250,7 +250,7 @@ const routes: Route[] = [
       ctx.body = renderUserPage({
         user,
         type: 'PERPETUAL',
-        starkKey: StarkKey.fake(),
+        starkKey: user?.starkKey ?? StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         offersToAccept: repeat(2, randomUserOfferEntry),
