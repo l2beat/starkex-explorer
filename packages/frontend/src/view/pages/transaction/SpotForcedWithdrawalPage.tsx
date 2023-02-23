@@ -5,6 +5,16 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
+import {
+  FORCED_TRANSACTION_INCLUDED,
+  FORCED_TRANSACTION_MINED,
+  FORCED_TRANSACTION_SENT,
+  TRANSACTION_REVERTED,
+} from './common'
+import {
+  TransactionHistoryEntry,
+  TransactionHistoryTable,
+} from './components/HistoryTable'
 
 export interface SpotForcedWithdrawalPageProps {
   user: UserDetails | undefined
@@ -33,7 +43,43 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         {/* TODO: content */}
+        <TransactionHistoryTable entries={props.history.map(toHistoryEntry)} />
       </ContentWrapper>
     </Page>
   )
+}
+
+function toHistoryEntry(
+  entry: SpotForcedWithdrawalPageProps['history'][number]
+): TransactionHistoryEntry {
+  const base = {
+    timestamp: entry.timestamp,
+    statusText: entry.status,
+  }
+  switch (entry.status) {
+    case 'SENT (1/3)':
+      return {
+        ...base,
+        statusType: 'BEGIN',
+        description: FORCED_TRANSACTION_SENT,
+      }
+    case 'MINED (2/3)':
+      return {
+        ...base,
+        statusType: 'MIDDLE',
+        description: FORCED_TRANSACTION_MINED,
+      }
+    case 'REVERTED':
+      return {
+        ...base,
+        statusType: 'ERROR',
+        description: TRANSACTION_REVERTED,
+      }
+    case 'INCLUDED (3/3)':
+      return {
+        ...base,
+        statusType: 'END',
+        description: FORCED_TRANSACTION_INCLUDED,
+      }
+  }
 }

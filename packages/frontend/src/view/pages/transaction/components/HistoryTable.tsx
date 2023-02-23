@@ -1,45 +1,44 @@
+import { Timestamp } from '@explorer/types'
 import React from 'react'
 
-import { StatusBadge } from '../../../components/StatusBadge'
+import { SectionHeading } from '../../../components/SectionHeading'
+import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { Table } from '../../../components/table/Table'
-import { TablePreview } from '../../../components/table/TablePreview'
 import { TimeCell } from '../../../components/TimeCell'
-import { toStatusType } from '../../user/components/UserTransactionsTable'
-import { HistoryItem } from '../common'
 
-interface HistoryTableProps {
-  data: HistoryItem[]
+interface TransactionHistoryTableProps {
+  entries: TransactionHistoryEntry[]
 }
 
-export function HistoryTable(props: HistoryTableProps) {
+export interface TransactionHistoryEntry {
+  timestamp: Timestamp
+  statusType: StatusType
+  statusText: string
+  description: string
+}
+
+export function TransactionHistoryTable(props: TransactionHistoryTableProps) {
   return (
-    <TablePreview
-      title="History"
-      entryShortNamePlural="History items"
-      entryLongNamePlural="items"
-      total={props.data.length}
-      visible={props.data.length}
-      link=""
-    >
+    <section>
+      <SectionHeading title="History" />
       <Table
         columns={[
           { header: 'Time' },
           { header: 'Status' },
           { header: 'Description' },
         ]}
-        rows={props.data.map((item) => {
+        rows={props.entries.map((entry) => {
           return {
             cells: [
-              <TimeCell timestamp={item.timestamp} />,
-              <StatusBadge
-                type={toStatusType(item.status)}
-                children={item.status}
-              />,
-              item.description,
+              <TimeCell timestamp={entry.timestamp} />,
+              <StatusBadge type={entry.statusType}>
+                {entry.statusText}
+              </StatusBadge>,
+              entry.description,
             ],
           }
         })}
       />
-    </TablePreview>
+    </section>
   )
 }

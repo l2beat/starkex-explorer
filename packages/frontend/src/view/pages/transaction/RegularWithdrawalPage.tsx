@@ -6,6 +6,10 @@ import { Asset } from '../../../utils/assets'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
+import {
+  TransactionHistoryEntry,
+  TransactionHistoryTable,
+} from './components/HistoryTable'
 
 export interface RegularWithdrawalPageProps {
   user: UserDetails | undefined
@@ -33,7 +37,37 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         {/* TODO: content */}
+        <TransactionHistoryTable entries={props.history.map(toHistoryEntry)} />
       </ContentWrapper>
     </Page>
   )
+}
+
+function toHistoryEntry(
+  entry: RegularWithdrawalPageProps['history'][number]
+): TransactionHistoryEntry {
+  const base = {
+    timestamp: entry.timestamp,
+    statusText: entry.status,
+  }
+  switch (entry.status) {
+    case 'SENT (1/2)':
+      return {
+        ...base,
+        statusType: 'BEGIN',
+        description: 'Transaction sent.',
+      }
+    case 'MINED (2/2)':
+      return {
+        ...base,
+        statusType: 'END',
+        description: 'Transaction mined.',
+      }
+    case 'REVERTED':
+      return {
+        ...base,
+        statusType: 'ERROR',
+        description: 'Transaction reverted.',
+      }
+  }
 }

@@ -5,16 +5,34 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
+import {
+  FORCED_TRANSACTION_INCLUDED,
+  FORCED_TRANSACTION_MINED,
+  FORCED_TRANSACTION_SENT,
+  TRANSACTION_REVERTED,
+} from './common'
+import {
+  TransactionHistoryEntry,
+  TransactionHistoryTable,
+} from './components/HistoryTable'
 
 export interface OfferAndForcedTradePageProps {
   user: UserDetails | undefined
   transactionHash: Hash256
   starkKey: StarkKey
   ethereumAddress: EthereumAddress
+  type: 'BUY' | 'SELL'
   // TODO: more
   history: {
     timestamp: Timestamp
-    status: 'SENT (1/2)' | 'MINED (2/2)' | 'REVERTED'
+    status:
+      | 'CREATED (1/5)'
+      | 'CANCELLED'
+      | 'ACCEPTED (2/5)'
+      | 'SENT (3/5)'
+      | 'MINED (4/5)'
+      | 'REVERTED'
+      | 'INCLUDED (5/5)'
   }[]
 }
 
@@ -33,7 +51,65 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         {/* TODO: content */}
+        <TransactionHistoryTable
+          entries={props.history.map((x) => toHistoryEntry(x, props.type))}
+        />
       </ContentWrapper>
     </Page>
   )
+}
+
+function toHistoryEntry(
+  entry: OfferAndForcedTradePageProps['history'][number],
+  type: 'BUY' | 'SELL'
+): TransactionHistoryEntry {
+  const counterparty = type === 'BUY' ? 'seller' : 'buyer'
+  const base = {
+    timestamp: entry.timestamp,
+    statusText: entry.status,
+  }
+  switch (entry.status) {
+    case 'CREATED (1/5)':
+      return {
+        ...base,
+        statusType: 'BEGIN',
+        description: `Offer created, looking for ${counterparty}s to accept.`,
+      }
+    case 'CANCELLED':
+      return {
+        ...base,
+        statusType: 'CANCEL',
+        description: 'Offer cancelled by creator.',
+      }
+    case 'ACCEPTED (2/5)':
+      return {
+        ...base,
+        statusType: 'MIDDLE',
+        description: `Offer accepted by ${counterparty}, waiting for creator to send.`,
+      }
+    case 'SENT (3/5)':
+      return {
+        ...base,
+        statusType: 'MIDDLE',
+        description: FORCED_TRANSACTION_SENT,
+      }
+    case 'MINED (4/5)':
+      return {
+        ...base,
+        statusType: 'MIDDLE',
+        description: FORCED_TRANSACTION_MINED,
+      }
+    case 'REVERTED':
+      return {
+        ...base,
+        statusType: 'ERROR',
+        description: TRANSACTION_REVERTED,
+      }
+    case 'INCLUDED (5/5)':
+      return {
+        ...base,
+        statusType: 'END',
+        description: FORCED_TRANSACTION_INCLUDED,
+      }
+  }
 }

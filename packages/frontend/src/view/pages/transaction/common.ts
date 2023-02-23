@@ -1,19 +1,10 @@
-import { UserDetails } from '@explorer/shared'
-import { EthereumAddress, Timestamp } from '@explorer/types'
+export const FORCED_TRANSACTION_SENT =
+  'Forced transaction sent. Waiting for it to be mined.'
 
-import { Asset } from '../../../utils/assets'
+export const FORCED_TRANSACTION_MINED =
+  'Forced transaction mined. Waiting for inclusion in a state update.'
 
-export interface WithdrawalPageProps {
-  user: UserDetails | undefined
-  ethereumAddress: EthereumAddress
-  status: 'SENT (1/2)' | 'MINED (2/2)' | 'REVERTED'
-  amount: bigint
-  asset: Asset
-  history: HistoryItem[]
-}
+export const FORCED_TRANSACTION_INCLUDED =
+  'Forced transaction included in a state update.'
 
-export interface HistoryItem {
-  timestamp: Timestamp
-  status: 'SENT (1/2)' | 'MINED (2/2)' | 'REVERTED'
-  description: string
-}
+export const TRANSACTION_REVERTED = 'Transaction reverted.'
