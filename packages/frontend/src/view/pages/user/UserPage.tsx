@@ -4,6 +4,7 @@ import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
+import { PageTitle } from '../../components/PageTitle'
 import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
 import {
@@ -58,16 +59,19 @@ function UserPage(props: UserPageProps) {
       user={props.user}
     >
       <ContentWrapper className="flex flex-col gap-12">
-        <UserProfile
-          starkKey={props.starkKey}
-          ethereumAddress={props.ethereumAddress}
-          isMine={isMine}
-        />
-        <UserQuickActionsTable
-          withdrawableAssets={props.withdrawableAssets}
-          offersToAccept={props.offersToAccept}
-          isMine={isMine}
-        />
+        <section>
+          <PageTitle>User</PageTitle>
+          <UserProfile
+            starkKey={props.starkKey}
+            ethereumAddress={props.ethereumAddress}
+            isMine={isMine}
+          />
+          <UserQuickActionsTable
+            withdrawableAssets={props.withdrawableAssets}
+            offersToAccept={props.offersToAccept}
+            isMine={isMine}
+          />
+        </section>
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
           visible={props.assets.length}

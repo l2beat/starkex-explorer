@@ -3,8 +3,6 @@ import React from 'react'
 
 import { formatTimestampParts } from '../../utils/formatting/formatTimestamp'
 
-export type StatusType = 'BEGIN' | 'MIDDLE' | 'END' | 'ERROR' | 'CANCEL'
-
 export interface TimeCellProps {
   timestamp: Timestamp
 }

@@ -76,9 +76,8 @@ function ForcedTradePage(props: ForcedActionFormProps) {
                 <ForcedActionCard>
                   <PriceInput {...props} />
                 </ForcedActionCard>
-
-                <div className="mx-auto flex h-6 w-6 items-center justify-center rounded bg-slate-800">
-                  <ArrowDownIcon className="fill-zinc-500" />
+                <div className="flex items-center justify-center">
+                  <ArrowDownIcon className="rounded bg-slate-800 text-zinc-500" />
                 </div>
                 <ForcedActionCard>
                   <TotalInput />
