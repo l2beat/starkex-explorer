@@ -21,7 +21,7 @@ export class StateUpdateController {
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
-    private readonly tradingMode: 'perpetual' | 'spot',
+    private readonly tradingMode: 'perpetual' | 'spot'
   ) {}
 
   async getStateUpdatePage(
@@ -40,7 +40,7 @@ export class StateUpdateController {
         this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
           stateUpdateId
         ),
-        this.stateUpdateRepository.getPricesByStateUpdateId(stateUpdateId)
+        this.stateUpdateRepository.getPricesByStateUpdateId(stateUpdateId),
       ])
 
     if (!stateUpdate) {
@@ -51,7 +51,7 @@ export class StateUpdateController {
     const priceEntries = prices.map((p) => ({
       asset: { hashOrId: p.assetId },
       price: p.price,
-      change: 0n
+      change: 0n,
     }))
 
     const content = renderStateUpdatePage({
