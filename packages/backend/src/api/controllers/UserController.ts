@@ -25,7 +25,7 @@ import { ControllerResult } from './ControllerResult'
 const ETHEREUM_TRANSACTION_TYPES = [
   'ForcedTrade' as const,
   'ForcedWithdrawal' as const,
-  'FullWithdrawal' as const,
+  // 'FullWithdrawal' as const,
   'Withdraw' as const,
 ]
 
@@ -188,7 +188,7 @@ function toUserBalanceChangeEntries(
 }
 
 function toUserTransactionEntries(
-  records: UserTransactionRecord[]
+  records: UserTransactionRecord<typeof ETHEREUM_TRANSACTION_TYPES[number]>[]
 ): UserTransactionEntry[] {
   return records.map((record) => {
     const data = record.data
@@ -222,9 +222,9 @@ function toUserTransactionEntries(
           status: record.included ? 'SENT (1/2)' : 'MINED (2/2)',
           type: 'Withdraw',
         }
-      case 'FullWithdrawal':
-        // TODO: assets, amount is unknown
-        throw new Error('Not implemented')
+      // case 'FullWithdrawal':
+      //   // TODO: assets, amount is unknown
+      //   throw new Error('Not implemented')
 
       // TODO: other types return undefined....
     }

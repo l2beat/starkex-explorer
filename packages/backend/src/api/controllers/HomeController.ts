@@ -18,7 +18,7 @@ import { ControllerResult } from './ControllerResult'
 const FORCED_TRANSACTION_TYPES = [
   'ForcedTrade' as const,
   'ForcedWithdrawal' as const,
-  'FullWithdrawal' as const,
+  // 'FullWithdrawal' as const,
 ]
 
 export class HomeController {
@@ -120,9 +120,9 @@ function toUserTransactionEntries(
           status: record.included ? 'INCLUDED' : 'MINED',
           type: 'WITHDRAW',
         }
-      case 'FullWithdrawal':
-        // TODO: assets, amount is unknown
-        throw new Error('Not implemented')
+      // case 'FullWithdrawal':
+      //   // TODO: assets, amount is unknown
+      //   throw new Error('Not implemented')
 
       // TODO: other types return undefined....
     }
