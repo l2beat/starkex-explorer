@@ -49,7 +49,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
             </div>,
             <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
             props.isMine ? (
-              <Button className="w-32">{entry.action}</Button>
+              <Button className="w-32 !px-0">{entry.action}</Button>
             ) : (
               ''
             ),

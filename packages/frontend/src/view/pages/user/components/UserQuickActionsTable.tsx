@@ -42,7 +42,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                 </InlineEllipsis>
               </strong>
             </p>
-            <Button className="w-32">Withdraw now</Button>
+            <Button className="w-32 !px-0">Withdraw now</Button>
           </div>
         )
       })}
@@ -73,7 +73,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                     {formatWithDecimals(totalPrice, 6, { suffix: ' USDC' })}
                   </strong>
                 </p>
-                <Button className="w-32">Accept & sell</Button>
+                <Button className="w-32 !px-0">Accept & sell</Button>
               </div>
             )
           })}
