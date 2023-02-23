@@ -36,7 +36,7 @@ export class StateUpdateController {
           stateUpdateId,
           { offset: 0, limit: 10 }
         ),
-        this.preprocessedAssetHistoryRepository.getByStateUpdateIdCount(
+        this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
           stateUpdateId
         ),
       ])
@@ -89,7 +89,7 @@ export class StateUpdateController {
         stateUpdateId,
         pagination
       ),
-      this.preprocessedAssetHistoryRepository.getByStateUpdateIdCount(
+      this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
         stateUpdateId
       ),
     ])

@@ -48,9 +48,6 @@ export class PreprocessedAssetHistoryRepository<
       this.findCurrentByStarkKeyAndAsset
     )
     this.getByStarkKeyPaginated = this.wrapGet(this.getByStarkKeyPaginated)
-    this.getCurrentByStarkKeyCount = this.wrapAny(
-      this.getCurrentByStarkKeyCount
-    )
     this.getCurrentByStarkKey = this.wrapGet(this.getCurrentByStarkKey)
     this.getCurrentByStarkKeyPaginated = this.wrapGet(
       this.getCurrentByStarkKeyPaginated
@@ -66,10 +63,13 @@ export class PreprocessedAssetHistoryRepository<
       this.getPrevHistoryByStateUpdateId
     )
     this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.getByStarkKeyCount = this.wrapAny(this.getByStarkKeyCount)
-    this.getByStateUpdateIdCount = this.wrapAny(this.getByStateUpdateIdCount)
-    this.getCurrentByStarkKeyCount = this.wrapAny(
-      this.getCurrentByStarkKeyCount
+    this.getCountOfCurrentByStarkKey = this.wrapAny(
+      this.getCountOfCurrentByStarkKey
+    )
+    this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
+    this.getCountByStateUpdateId = this.wrapAny(this.getCountByStateUpdateId)
+    this.getCountOfCurrentByStarkKey = this.wrapAny(
+      this.getCountOfCurrentByStarkKey
     )
 
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -127,7 +127,7 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getByStateUpdateIdCount(stateUpdateId: number, trx?: Knex.Transaction) {
+  async getCountByStateUpdateId(stateUpdateId: number, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where('state_update_id', stateUpdateId)
@@ -152,7 +152,10 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getCurrentByStarkKeyCount(starkKey: StarkKey, trx?: Knex.Transaction) {
+  async getCountOfCurrentByStarkKey(
+    starkKey: StarkKey,
+    trx?: Knex.Transaction
+  ) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where({
@@ -192,7 +195,7 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getByStarkKeyCount(starkKey: StarkKey, trx?: Knex.Transaction) {
+  async getCountByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where('stark_key', starkKey.toString())

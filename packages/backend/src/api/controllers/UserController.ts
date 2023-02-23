@@ -38,16 +38,14 @@ export class UserController {
         { offset: 0, limit: 10 },
         this.collateralAsset?.assetId
       ),
-      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyCount(
+      this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
         starkKey
       ),
-      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
-        starkKey,
-        { offset: 0, limit: 10 }
-      ),
-      this.preprocessedAssetHistoryRepository.getByStarkKeyCount(
-        starkKey
-      ),
+      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(starkKey, {
+        offset: 0,
+        limit: 10,
+      }),
+      this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
     ])
 
     const assets = toUserAssetEntries(userAssets, this.collateralAsset?.assetId)
@@ -87,7 +85,7 @@ export class UserController {
         pagination,
         this.collateralAsset?.assetId
       ),
-      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyCount(
+      this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
         starkKey
       ),
     ])
@@ -117,9 +115,7 @@ export class UserController {
         starkKey,
         pagination
       ),
-      this.preprocessedAssetHistoryRepository.getByStarkKeyCount(
-        starkKey
-      ),
+      this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
     ])
 
     const balanceChanges = toUserBalanceChangeEntries(history)
