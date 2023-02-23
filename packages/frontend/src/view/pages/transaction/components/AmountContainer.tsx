@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { Asset, assetToInfo } from '../../../utils/assets'
-import { formatAmount } from '../../../utils/formatting/formatAmount'
-import { AssetWithLogo } from '../../components/AssetWithLogo'
+import { Asset, assetToInfo } from '../../../../utils/assets'
+import { formatAmount } from '../../../../utils/formatting/formatAmount'
+import { AssetWithLogo } from '../../../components/AssetWithLogo'
 
 interface AmountContainerProps {
   amount: bigint

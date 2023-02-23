@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { StatusBadge } from '../../components/StatusBadge'
-import { toStatusType } from '../user/components/UserTransactionsTable'
+import { StatusBadge } from '../../../components/StatusBadge'
+import { toStatusType } from '../../user/components/UserTransactionsTable'
 
 interface TransactionOverviewProps {
   currentStatus: 'SENT (1/2)' | 'MINED (2/2)' | 'REVERTED' // TODO: Add all possible statuses

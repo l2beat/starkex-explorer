@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { StatusBadge } from '../../components/StatusBadge'
-import { Table } from '../../components/table/Table'
-import { TablePreview } from '../../components/table/TablePreview'
-import { TimeCell } from '../../components/TimeCell'
-import { toStatusType } from '../user/components/UserTransactionsTable'
-import { HistoryItem } from './common'
+import { StatusBadge } from '../../../components/StatusBadge'
+import { Table } from '../../../components/table/Table'
+import { TablePreview } from '../../../components/table/TablePreview'
+import { TimeCell } from '../../../components/TimeCell'
+import { toStatusType } from '../../user/components/UserTransactionsTable'
+import { HistoryItem } from '../common'
 
 interface HistoryTableProps {
   data: HistoryItem[]
