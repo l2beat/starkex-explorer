@@ -6,11 +6,17 @@ import { Column, Row } from './types'
 export interface TableRowProps extends Row {
   i: number
   columns: Column[]
+  fullBackground?: boolean
 }
 
 export function TableRow(props: TableRowProps) {
   return (
-    <tr className="h-10 whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium">
+    <tr
+      className={cx(
+        props.fullBackground ? 'h-16' : 'h-10',
+        'whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium'
+      )}
+    >
       {props.cells.map((cell, col) => {
         const { numeric, monospace, className } = props.columns[col] ?? {}
 
