@@ -3,6 +3,7 @@ import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Asset } from '../../../utils/assets'
+import { Button } from '../../components/Button'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -62,6 +63,7 @@ export function renderOfferAndForcedTradePage(
 }
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
+  const isMine = props.user?.starkKey === props.maker.starkKey
   const historyEntries = props.history.map((x) => toHistoryEntry(x, props.type))
   const lastEntry = historyEntries[0]
   if (!lastEntry) {
@@ -80,14 +82,33 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
-          {props.transactionHash ? (
-            <TransactionPageTitle
-              title={`Forced ${props.type.toLowerCase()}`}
-              transactionHash={props.transactionHash}
-            />
-          ) : (
-            <PageTitle>Offer #{props.offerId}</PageTitle>
-          )}
+          <div className='flex items-center justify-between'>
+            {props.transactionHash ? (
+              <TransactionPageTitle
+                title={`Forced ${props.type.toLowerCase()}`}
+                transactionHash={props.transactionHash}
+              />
+            ) : (
+              <PageTitle>Offer #{props.offerId}</PageTitle>
+            )}
+            <div className='flex items-center gap-2'>
+              {(isMine && (lastEntry.statusText === 'CREATED (1/5)' || lastEntry.statusText === 'ACCEPTED (2/5)')) && 
+                <Button variant='outlined'>
+                  Cancel offer
+                </Button>
+              }
+              {(isMine && lastEntry.statusText === 'ACCEPTED (2/5)') && 
+                <Button variant='contained'>
+                  Send transaction
+                </Button>
+              }
+              {(!isMine && lastEntry.statusText === 'CREATED (1/5)') && 
+                <Button variant='contained'>
+                  Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
+                </Button>
+              }
+            </div>
+          </div>
           <TransactionOverview
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
