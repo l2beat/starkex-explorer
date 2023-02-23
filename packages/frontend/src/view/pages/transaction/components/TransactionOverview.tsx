@@ -1,7 +1,8 @@
-import { Hash256 } from '@explorer/types'
+import { Hash256, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Asset } from '../../../../utils/assets'
+import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { AmountContainer } from './AmountContainer'
@@ -12,6 +13,10 @@ interface TransactionOverviewProps {
   statusText: string
   statusDescription: string
   transactionHash?: Hash256
+  timestamp?: {
+    label: string
+    timestamp: Timestamp
+  }
   value?: {
     asset: Asset
     amount?: bigint
@@ -27,12 +32,24 @@ interface TransactionOverviewProps {
 export function TransactionOverview(props: TransactionOverviewProps) {
   return (
     <div className="flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
-      <TransactionField label="Current status">
-        <div className="flex items-baseline gap-2">
-          <StatusBadge type={props.statusType}>{props.statusText}</StatusBadge>
-          <p>{props.statusDescription}</p>
-        </div>
-      </TransactionField>
+      <div className="flex">
+        <TransactionField label="Current status">
+          <div className="flex items-baseline gap-2">
+            <StatusBadge type={props.statusType}>
+              {props.statusText}
+            </StatusBadge>
+            <p>{props.statusDescription}</p>
+          </div>
+        </TransactionField>
+        {props.timestamp && (
+          <TransactionField
+            label={props.timestamp.label}
+            className="text-right"
+          >
+            {formatTimestamp(props.timestamp.timestamp, 'utc')} UTC
+          </TransactionField>
+        )}
+      </div>
       {props.transactionHash && (
         <TransactionField label="Transaction hash">
           <a

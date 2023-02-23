@@ -93,6 +93,14 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
+            timestamp={
+              !props.transactionHash && lastEntry.statusText !== 'EXPIRED'
+                ? {
+                    label: 'Expiration timestamp',
+                    timestamp: props.expirationTimestamp,
+                  }
+                : undefined
+            }
             trade={
               props.type === 'SELL'
                 ? {
