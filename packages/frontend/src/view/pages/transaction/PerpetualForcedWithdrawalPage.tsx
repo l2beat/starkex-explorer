@@ -68,6 +68,10 @@ function PerpetualForcedWithdrawalPage(
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
+            value={{
+              asset: props.asset,
+              amount: props.amount,
+            }}
           />
         </div>
         <TransactionUserDetails

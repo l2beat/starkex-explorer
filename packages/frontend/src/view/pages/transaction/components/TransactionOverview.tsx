@@ -1,7 +1,10 @@
 import { Hash256 } from '@explorer/types'
 import React from 'react'
 
+import { Asset } from '../../../../utils/assets'
+import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
+import { AmountContainer } from './AmountContainer'
 import { TransactionField } from './TransactionField'
 
 interface TransactionOverviewProps {
@@ -9,6 +12,16 @@ interface TransactionOverviewProps {
   statusText: string
   statusDescription: string
   transactionHash?: Hash256
+  value?: {
+    asset: Asset
+    amount?: bigint
+  }
+  trade?: {
+    offeredAsset: Asset
+    offeredAmount: bigint
+    receivedAsset: Asset
+    receivedAmount: bigint
+  }
 }
 
 export function TransactionOverview(props: TransactionOverviewProps) {
@@ -31,6 +44,32 @@ export function TransactionOverview(props: TransactionOverviewProps) {
             {props.transactionHash.toString()}
           </a>
         </TransactionField>
+      )}
+      {props.value && (
+        <AmountContainer
+          className="w-1/2"
+          amountLabel="Amount"
+          amount={props.value.amount}
+          assetLabel="Asset"
+          asset={props.value.asset}
+        />
+      )}
+      {props.trade && (
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <AmountContainer
+            amountLabel="Offered amount"
+            amount={props.trade.offeredAmount}
+            assetLabel="Offered asset"
+            asset={props.trade.offeredAsset}
+          />
+          <ArrowRightIcon className="rounded bg-slate-800 text-zinc-500" />
+          <AmountContainer
+            amountLabel="Received amount"
+            amount={props.trade.receivedAmount}
+            assetLabel="Received asset"
+            asset={props.trade.receivedAsset}
+          />
+        </div>
       )}
     </div>
   )

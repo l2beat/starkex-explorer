@@ -22,7 +22,7 @@ export interface RegularWithdrawalPageProps {
     ethereumAddress: EthereumAddress
   }
   asset: Asset
-  amount: bigint
+  amount?: bigint
   history: {
     timestamp: Timestamp
     status: 'SENT (1/2)' | 'MINED (2/2)' | 'REVERTED'
@@ -57,6 +57,10 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
+            value={{
+              asset: props.asset,
+              amount: props.amount,
+            }}
           />
         </div>
         <TransactionUserDetails

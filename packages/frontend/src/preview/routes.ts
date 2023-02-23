@@ -823,7 +823,6 @@ const routes: Route[] = [
       ctx.body = renderRegularWithdrawalPage({
         user,
         recipient: randomRecipient(),
-        amount: amountBucket.pick(),
         asset: assetBucket.pick(),
         transactionHash: Hash256.fake(),
         history: [{ timestamp: randomTimestamp(), status: 'SENT (1/2)' }],

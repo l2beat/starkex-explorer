@@ -93,6 +93,21 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
+            trade={
+              props.type === 'SELL'
+                ? {
+                    offeredAmount: props.syntheticAmount,
+                    offeredAsset: props.syntheticAsset,
+                    receivedAmount: props.collateralAmount,
+                    receivedAsset: props.collateralAsset,
+                  }
+                : {
+                    offeredAmount: props.collateralAmount,
+                    offeredAsset: props.collateralAsset,
+                    receivedAmount: props.syntheticAmount,
+                    receivedAsset: props.syntheticAsset,
+                  }
+            }
           />
         </div>
         <TransactionUserDetails
