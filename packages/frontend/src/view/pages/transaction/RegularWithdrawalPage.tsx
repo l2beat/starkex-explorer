@@ -17,8 +17,10 @@ import { TransactionUserDetails } from './components/TransactionUserDetails'
 export interface RegularWithdrawalPageProps {
   user: UserDetails | undefined
   transactionHash: Hash256
-  starkKey: StarkKey
-  ethereumAddress: EthereumAddress
+  recipient: {
+    starkKey: StarkKey
+    ethereumAddress: EthereumAddress
+  }
   asset: Asset
   amount: bigint
   history: {
@@ -59,10 +61,9 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
         </div>
         <TransactionUserDetails
           title="Recipient details"
-          starkKey={props.starkKey}
-          ethereumAddress={props.ethereumAddress}
+          starkKey={props.recipient.starkKey}
+          ethereumAddress={props.recipient.ethereumAddress}
         />
-        {/* TODO: content */}
         <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
     </Page>

@@ -23,8 +23,10 @@ import { TransactionUserDetails } from './components/TransactionUserDetails'
 export interface PerpetualForcedWithdrawalPageProps {
   user: UserDetails | undefined
   transactionHash: Hash256
-  starkKey: StarkKey
-  ethereumAddress: EthereumAddress
+  recipient: {
+    starkKey: StarkKey
+    ethereumAddress: EthereumAddress
+  }
   asset: Asset
   amount: bigint
   positionId: string
@@ -71,11 +73,10 @@ function PerpetualForcedWithdrawalPage(
         <TransactionUserDetails
           title="Recipient details"
           type="PERPETUAL"
-          starkKey={props.starkKey}
-          ethereumAddress={props.ethereumAddress}
+          starkKey={props.recipient.starkKey}
+          ethereumAddress={props.recipient.ethereumAddress}
           vaultOrPositionId={props.positionId}
         />
-        {/* TODO: content */}
         <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
     </Page>

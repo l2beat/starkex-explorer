@@ -46,6 +46,12 @@ import {
   randomStateUpdateTransactionEntry,
 } from './data/stateUpdate'
 import {
+  randomOfferDetails,
+  randomParty,
+  randomRecipient,
+  userParty,
+} from './data/transactions'
+import {
   randomUserAssetEntry,
   randomUserBalanceChangeEntry,
   randomUserOfferEntry,
@@ -469,8 +475,7 @@ const routes: Route[] = [
       ctx.body = renderSpotForcedWithdrawalPage({
         user,
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         vaultId: randomId(),
         history: [{ timestamp: randomTimestamp(), status: 'SENT (1/3)' }],
       })
@@ -485,8 +490,7 @@ const routes: Route[] = [
       ctx.body = renderSpotForcedWithdrawalPage({
         user,
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         vaultId: randomId(),
         history: [
           { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
@@ -504,8 +508,7 @@ const routes: Route[] = [
       ctx.body = renderSpotForcedWithdrawalPage({
         user,
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         vaultId: randomId(),
         history: [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
@@ -524,8 +527,7 @@ const routes: Route[] = [
       ctx.body = renderSpotForcedWithdrawalPage({
         user,
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         vaultId: randomId(),
         history: [
           { timestamp: randomTimestamp(), status: 'INCLUDED (3/3)' },
@@ -546,8 +548,7 @@ const routes: Route[] = [
       ctx.body = renderPerpetualForcedWithdrawalPage({
         user,
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         asset: { hashOrId: AssetId.USDC },
         amount: amountBucket.pick(),
         positionId: randomId(),
@@ -564,8 +565,7 @@ const routes: Route[] = [
       ctx.body = renderPerpetualForcedWithdrawalPage({
         user,
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         asset: { hashOrId: AssetId.USDC },
         amount: amountBucket.pick(),
         positionId: randomId(),
@@ -585,8 +585,7 @@ const routes: Route[] = [
       ctx.body = renderPerpetualForcedWithdrawalPage({
         user,
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         asset: { hashOrId: AssetId.USDC },
         amount: amountBucket.pick(),
         positionId: randomId(),
@@ -607,8 +606,7 @@ const routes: Route[] = [
       ctx.body = renderPerpetualForcedWithdrawalPage({
         user,
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         asset: { hashOrId: AssetId.USDC },
         amount: amountBucket.pick(),
         positionId: randomId(),
@@ -631,10 +629,8 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
-        starkKey: user?.starkKey ?? StarkKey.fake(),
-        ethereumAddress: user?.address ?? EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: userParty(user),
+        ...randomOfferDetails(),
         history: [{ timestamp: randomTimestamp(), status: 'CREATED (1/5)' }],
       })
     },
@@ -648,10 +644,8 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: randomParty(),
+        ...randomOfferDetails(),
         history: [{ timestamp: randomTimestamp(), status: 'CREATED (1/5)' }],
       })
     },
@@ -665,10 +659,9 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
-        starkKey: user?.starkKey ?? StarkKey.fake(),
-        ethereumAddress: user?.address ?? EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: userParty(user),
+        taker: randomParty(),
+        ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
           { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
@@ -685,10 +678,9 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
           { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
@@ -704,10 +696,8 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: randomParty(),
+        ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'CANCELLED' },
           { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
@@ -723,10 +713,9 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'EXPIRED' },
           { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
@@ -744,11 +733,10 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
           { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
@@ -766,11 +754,10 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'MINED (4/5)' },
           { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
@@ -789,11 +776,10 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
           { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
@@ -813,11 +799,10 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        offerId: randomId(),
         transactionHash: Hash256.fake(),
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'INCLUDED (5/5)' },
           { timestamp: randomTimestamp(), status: 'MINED (4/5)' },
@@ -837,8 +822,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderRegularWithdrawalPage({
         user,
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         amount: amountBucket.pick(),
         asset: assetBucket.pick(),
         transactionHash: Hash256.fake(),
@@ -853,8 +837,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderRegularWithdrawalPage({
         user,
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         amount: amountBucket.pick(),
         asset: assetBucket.pick(),
         transactionHash: Hash256.fake(),
@@ -872,8 +855,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderRegularWithdrawalPage({
         user,
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        recipient: randomRecipient(),
         amount: amountBucket.pick(),
         asset: assetBucket.pick(),
         transactionHash: Hash256.fake(),

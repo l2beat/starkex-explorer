@@ -22,8 +22,10 @@ import { TransactionUserDetails } from './components/TransactionUserDetails'
 export interface SpotForcedWithdrawalPageProps {
   user: UserDetails | undefined
   transactionHash: Hash256
-  starkKey: StarkKey
-  ethereumAddress: EthereumAddress
+  recipient: {
+    starkKey: StarkKey
+    ethereumAddress: EthereumAddress
+  }
   vaultId: string
   history: {
     timestamp: Timestamp
@@ -66,11 +68,10 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
         <TransactionUserDetails
           title="Recipient details"
           type="SPOT"
-          starkKey={props.starkKey}
-          ethereumAddress={props.ethereumAddress}
+          starkKey={props.recipient.starkKey}
+          ethereumAddress={props.recipient.ethereumAddress}
           vaultOrPositionId={props.vaultId}
         />
-        {/* TODO: content */}
         <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
     </Page>

@@ -2,6 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
+import { Asset } from '../../../utils/assets'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -18,15 +19,28 @@ import {
 } from './components/HistoryTable'
 import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
+import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface OfferAndForcedTradePageProps {
   user: UserDetails | undefined
   offerId: string
   transactionHash?: Hash256
-  starkKey: StarkKey
-  ethereumAddress: EthereumAddress
+  maker: {
+    starkKey: StarkKey
+    ethereumAddress: EthereumAddress
+    positionId: string
+  }
+  taker?: {
+    starkKey: StarkKey
+    ethereumAddress: EthereumAddress
+    positionId: string
+  }
   type: 'BUY' | 'SELL'
-  // TODO: more
+  collateralAsset: Asset
+  collateralAmount: bigint
+  syntheticAsset: Asset
+  syntheticAmount: bigint
+  expirationTimestamp: Timestamp
   history: {
     timestamp: Timestamp
     status:
@@ -81,7 +95,22 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             transactionHash={props.transactionHash}
           />
         </div>
-        {/* TODO: content */}
+        <TransactionUserDetails
+          title="Offer creator details"
+          type="PERPETUAL"
+          starkKey={props.maker.starkKey}
+          ethereumAddress={props.maker.ethereumAddress}
+          vaultOrPositionId={props.maker.positionId}
+        />
+        {props.taker && (
+          <TransactionUserDetails
+            title={`${props.type === 'BUY' ? 'Seller' : 'Buyer'} details`}
+            type="PERPETUAL"
+            starkKey={props.taker.starkKey}
+            ethereumAddress={props.taker.ethereumAddress}
+            vaultOrPositionId={props.taker.positionId}
+          />
+        )}
         <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
     </Page>
@@ -92,7 +121,6 @@ function toHistoryEntry(
   entry: OfferAndForcedTradePageProps['history'][number],
   type: 'BUY' | 'SELL'
 ): TransactionHistoryEntry {
-  const counterparty = type === 'BUY' ? 'seller' : 'buyer'
   const base = {
     timestamp: entry.timestamp,
     statusText: entry.status,
@@ -102,7 +130,9 @@ function toHistoryEntry(
       return {
         ...base,
         statusType: 'BEGIN',
-        description: `Offer created, looking for ${counterparty}s to accept`,
+        description: `Offer created, looking for ${
+          type === 'BUY' ? 'sellers' : 'buyers'
+        } to accept`,
       }
     case 'CANCELLED':
       return {
@@ -114,7 +144,9 @@ function toHistoryEntry(
       return {
         ...base,
         statusType: 'MIDDLE',
-        description: `Offer accepted by ${counterparty}, waiting for creator to send`,
+        description: `${
+          type === 'BUY' ? 'Seller' : 'Buyer'
+        } found, waiting for creator to send`,
       }
     case 'EXPIRED':
       return {
