@@ -82,7 +82,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
-          <div className='flex items-center justify-between'>
+          <div className="flex items-center justify-between">
             {props.transactionHash ? (
               <TransactionPageTitle
                 title={`Forced ${props.type.toLowerCase()}`}
@@ -91,22 +91,20 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             ) : (
               <PageTitle>Offer #{props.offerId}</PageTitle>
             )}
-            <div className='flex items-center gap-2'>
-              {(isMine && (lastEntry.statusText === 'CREATED (1/5)' || lastEntry.statusText === 'ACCEPTED (2/5)')) && 
-                <Button variant='outlined'>
-                  Cancel offer
-                </Button>
-              }
-              {(isMine && lastEntry.statusText === 'ACCEPTED (2/5)') && 
-                <Button variant='contained'>
-                  Send transaction
-                </Button>
-              }
-              {(!isMine && lastEntry.statusText === 'CREATED (1/5)') && 
-                <Button variant='contained'>
+            <div className="flex items-center gap-2">
+              {isMine &&
+                (lastEntry.statusText === 'CREATED (1/5)' ||
+                  lastEntry.statusText === 'ACCEPTED (2/5)') && (
+                  <Button variant="outlined">Cancel offer</Button>
+                )}
+              {isMine && lastEntry.statusText === 'ACCEPTED (2/5)' && (
+                <Button variant="contained">Send transaction</Button>
+              )}
+              {!isMine && lastEntry.statusText === 'CREATED (1/5)' && (
+                <Button variant="contained">
                   Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
                 </Button>
-              }
+              )}
             </div>
           </div>
           <TransactionOverview
