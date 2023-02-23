@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {
+  AssetId,
   EthereumAddress,
   Hash256,
   PedersenHash,
@@ -18,6 +19,10 @@ import {
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderNotFoundPage,
+  renderOfferAndForcedTradePage,
+  renderPerpetualForcedWithdrawalPage,
+  renderRegularWithdrawalPage,
+  renderSpotForcedWithdrawalPage,
   renderStateUpdateBalanceChangesPage,
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
@@ -29,6 +34,7 @@ import {
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
 import * as DATA from './data'
+import { amountBucket, assetBucket } from './data/buckets'
 import {
   randomHomeForcedTransactionEntry,
   randomHomeOfferEntry,
@@ -432,89 +438,400 @@ const routes: Route[] = [
   {
     path: '/forced/spot/withdraw/sent',
     description: 'Transaction view of a sent spot forced withdraw.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderSpotForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        vaultId: randomId(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT (1/3)' }],
+      })
+    },
   },
   {
     path: '/forced/spot/withdraw/mined',
     description: 'Transaction view of a mined spot forced withdraw.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderSpotForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        vaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
+          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/spot/withdraw/reverted',
     description: 'Transaction view of a reverted spot forced withdraw.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderSpotForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        vaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/spot/withdraw/included',
     description: 'Transaction view of an included spot forced withdraw.',
     breakAfter: true,
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderSpotForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        vaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'INCLUDED (3/3)' },
+          { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
+          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+        ],
+      })
+    },
   },
   // #endregion
   // #region View perpetual withdraw
   {
     path: '/forced/perpetual/withdraw/sent',
     description: 'Transaction view of a sent perpetual forced withdraw.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderPerpetualForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        asset: { hashOrId: AssetId.USDC },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT (1/3)' }],
+      })
+    },
   },
   {
     path: '/forced/perpetual/withdraw/mined',
     description: 'Transaction view of a mined perpetual forced withdraw.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderPerpetualForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        asset: { hashOrId: AssetId.USDC },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
+          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/perpetual/withdraw/reverted',
     description: 'Transaction view of a reverted perpetual forced withdraw.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderPerpetualForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        asset: { hashOrId: AssetId.USDC },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/perpetual/withdraw/included',
     description: 'Transaction view of an included perpetual forced withdraw.',
     breakAfter: true,
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderPerpetualForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        asset: { hashOrId: AssetId.USDC },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'INCLUDED (3/3)' },
+          { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
+          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+        ],
+      })
+    },
   },
   // #endregion
   // #region View perpetual trade
   {
-    path: '/forced/perpetual/trade/created',
-    description: 'Offer view of a created perpetual forced trade.',
-    render: notFound,
+    path: '/forced/perpetual/trade/created/creator',
+    description:
+      'Offer view of a created perpetual forced trade. As viewed by the creator.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: user?.starkKey ?? StarkKey.fake(),
+        ethereumAddress: user?.address ?? EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [{ timestamp: randomTimestamp(), status: 'CREATED (1/5)' }],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/trade/accepted',
-    description: 'Offer view of an accepted perpetual forced trade.',
-    render: notFound,
+    path: '/forced/perpetual/trade/created/someone',
+    description:
+      'Offer view of a created perpetual forced trade. As viewed by someone else.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [{ timestamp: randomTimestamp(), status: 'CREATED (1/5)' }],
+      })
+    },
+  },
+  {
+    path: '/forced/perpetual/trade/accepted/creator',
+    description:
+      'Offer view of an accepted perpetual forced trade. As viewed by the creator.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: user?.starkKey ?? StarkKey.fake(),
+        ethereumAddress: user?.address ?? EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [
+          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
+          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+        ],
+      })
+    },
+  },
+  {
+    path: '/forced/perpetual/trade/accepted/someone',
+    description:
+      'Offer view of an accepted perpetual forced trade. As viewed by someone else.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [
+          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
+          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/perpetual/trade/cancelled',
     description: 'Offer view of a cancelled perpetual forced trade.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [
+          { timestamp: randomTimestamp(), status: 'CANCELLED' },
+          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/perpetual/trade/expired',
     description: 'Offer view of an expired perpetual forced trade.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [
+          { timestamp: randomTimestamp(), status: 'EXPIRED' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
+          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/perpetual/trade/sent',
     description: 'Transaction view of a sent perpetual forced trade.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [
+          { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
+          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/perpetual/trade/mined',
     description: 'Transaction view of a mined perpetual forced trade.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED (4/5)' },
+          { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
+          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/perpetual/trade/reverted',
     description: 'Transaction view of a reverted perpetual forced trade.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
+          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+        ],
+      })
+    },
   },
   {
     path: '/forced/perpetual/trade/included',
     description: 'Transaction view of an included perpetual forced trade.',
     breakAfter: true,
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        type: Math.random() > 0.5 ? 'BUY' : 'SELL',
+        history: [
+          { timestamp: randomTimestamp(), status: 'INCLUDED (5/5)' },
+          { timestamp: randomTimestamp(), status: 'MINED (4/5)' },
+          { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
+          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+        ],
+      })
+    },
+  },
+  // #endregion
+  // #region View regular withdrawal
+  {
+    path: '/withdrawal/sent',
+    description: 'Transaction view of a sent withdrawal.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderRegularWithdrawalPage({
+        user,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        amount: amountBucket.pick(),
+        asset: assetBucket.pick(),
+        transactionHash: Hash256.fake(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT (1/2)' }],
+      })
+    },
+  },
+  {
+    path: '/withdrawal/mined',
+    description: 'Transaction view of a mined withdrawal.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderRegularWithdrawalPage({
+        user,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        amount: amountBucket.pick(),
+        asset: assetBucket.pick(),
+        transactionHash: Hash256.fake(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED (2/2)' },
+          { timestamp: randomTimestamp(), status: 'SENT (1/2)' },
+        ],
+      })
+    },
+  },
+  {
+    path: '/withdrawal/reverted',
+    description: 'Transaction view of a reverted withdrawal.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderRegularWithdrawalPage({
+        user,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        amount: amountBucket.pick(),
+        asset: assetBucket.pick(),
+        transactionHash: Hash256.fake(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT (1/2)' },
+        ],
+      })
+    },
   },
   // #endregion
 ]

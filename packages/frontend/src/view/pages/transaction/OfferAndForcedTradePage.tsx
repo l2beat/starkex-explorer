@@ -29,6 +29,7 @@ export interface OfferAndForcedTradePageProps {
       | 'CREATED (1/5)'
       | 'CANCELLED'
       | 'ACCEPTED (2/5)'
+      | 'EXPIRED'
       | 'SENT (3/5)'
       | 'MINED (4/5)'
       | 'REVERTED'
@@ -86,6 +87,12 @@ function toHistoryEntry(
         ...base,
         statusType: 'MIDDLE',
         description: `Offer accepted by ${counterparty}, waiting for creator to send.`,
+      }
+    case 'EXPIRED':
+      return {
+        ...base,
+        statusType: 'CANCEL',
+        description: 'Offer expired.',
       }
     case 'SENT (3/5)':
       return {
