@@ -63,7 +63,7 @@ export function UserTransactionsTable(props: UserTransactionsTableProps) {
   )
 }
 
-function toStatusType(status: UserTransactionEntry['status']): StatusType {
+export function toStatusType(status: UserTransactionEntry['status']): StatusType {
   switch (status) {
     case 'SENT (1/3)':
     case 'SENT (1/2)':
