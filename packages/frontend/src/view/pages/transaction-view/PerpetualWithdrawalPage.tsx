@@ -11,7 +11,9 @@ interface PerpetualWithdrawalPageProps extends WithdrawalPageProps {
 export function WithdrawalPage(props: PerpetualWithdrawalPageProps) {
   return (
     <Page user={props.user} path="TODO: path" description="TODO: description">
-      <ContentWrapper className="flex flex-col gap-12"></ContentWrapper>
+      <ContentWrapper className="flex flex-col gap-12">
+        {/* TODO: content */}
+      </ContentWrapper>
     </Page>
   )
 }
