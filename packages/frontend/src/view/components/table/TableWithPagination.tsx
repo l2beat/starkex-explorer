@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../utils/formatting/formatAmount'
+import { SectionHeading } from '../SectionHeading'
 import { TableLimitSelect } from './TableLimitSelect'
 import { TablePagination } from './TablePagination'
 
@@ -26,10 +27,10 @@ export function TableWithPagination(props: TableWithPaginationProps) {
 
   return (
     <>
-      <div className="mb-5 flex flex-col items-baseline justify-between gap-4 lg:flex-row">
-        <h1 className="flex-1 text-xl font-semibold">{props.title}</h1>
-        <p className="text-sm font-medium text-zinc-500">
-          {props.visible !== 0 ? (
+      <SectionHeading
+        title={props.title}
+        description={
+          props.visible !== 0 ? (
             <>
               You're viewing {start}-{end} out of {total}{' '}
               {props.entryShortNamePlural}
@@ -38,14 +39,11 @@ export function TableWithPagination(props: TableWithPaginationProps) {
             <>
               You're viewing 0 out of {total} {props.entryShortNamePlural}
             </>
-          )}
-        </p>
-        <TableLimitSelect
-          currentPage={currentPage}
-          limit={props.limit}
-          link={props.link}
-        />
-      </div>
+          )
+        }
+      >
+        <TableLimitSelect limit={props.limit} link={props.link} />
+      </SectionHeading>
       {props.children}
       {props.visible === 0 && (
         <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
@@ -71,11 +69,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
             perPage={props.limit}
           />
         </div>
-        <TableLimitSelect
-          currentPage={currentPage}
-          limit={props.limit}
-          link={props.link}
-        />
+        <TableLimitSelect limit={props.limit} link={props.link} />
       </div>
     </>
   )

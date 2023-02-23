@@ -1,5 +1,6 @@
 import { MerkleTree, PositionLeaf } from '@explorer/state'
 import {
+  AssetHash,
   AssetId,
   Hash256,
   PedersenHash,
@@ -222,6 +223,19 @@ describe(StateUpdater.name, () => {
             nonce: 123n,
           },
         },
+        {
+          transactionHash: Hash256.fake('444'),
+          id: 4,
+          blockNumber: 2,
+          timestamp: Timestamp(2),
+          starkKeyA: StarkKey.fake('aaa'),
+          vaultOrPositionIdA: 45n,
+          data: {
+            type: 'FullWithdrawal',
+            starkKey: StarkKey.fake('aaa'),
+            vaultId: 45n,
+          },
+        },
       ]
 
       const userTransactionRepository = mock<UserTransactionRepository>({
@@ -261,8 +275,82 @@ describe(StateUpdater.name, () => {
             isABuyingSynthetic: true,
             nonce: 123n,
           },
+          {
+            type: 'fullWithdrawal',
+            starkKey: StarkKey.fake('aaa'),
+            assetHash: AssetHash.fake('fff1'),
+            vaultId: 45n,
+            balanceDifference: 100n,
+          },
         ])
-      ).toEqual([Hash256.fake('111'), Hash256.fake('333')])
+      ).toEqual([Hash256.fake('111'), Hash256.fake('333'), Hash256.fake('444')])
+    })
+
+    it("doesn't match identical transaction twice", async () => {
+      const transactions: UserTransactionRecord[] = [
+        {
+          transactionHash: Hash256.fake('111'),
+          id: 1,
+          blockNumber: 2,
+          timestamp: Timestamp(2),
+          starkKeyA: StarkKey.fake('aaa'),
+          vaultOrPositionIdA: 45n,
+          data: {
+            type: 'FullWithdrawal',
+            starkKey: StarkKey.fake('aaa'),
+            vaultId: 45n,
+          },
+        },
+        {
+          transactionHash: Hash256.fake('222'),
+          id: 1,
+          blockNumber: 2,
+          timestamp: Timestamp(2),
+          starkKeyA: StarkKey.fake('aaa'),
+          vaultOrPositionIdA: 45n,
+          data: {
+            type: 'FullWithdrawal',
+            starkKey: StarkKey.fake('aaa'),
+            vaultId: 45n,
+          },
+        },
+      ]
+
+      const userTransactionRepository = mock<UserTransactionRepository>({
+        async getNotIncluded() {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          return transactions as UserTransactionRecord<any>[]
+        },
+      })
+
+      const stateUpdater = new StateUpdater(
+        mock<StateUpdateRepository>(),
+        mock<MerkleTreeRepository<PositionLeaf>>(),
+        mock<EthereumClient>(),
+        userTransactionRepository,
+        Logger.SILENT,
+        EMPTY_STATE_HASH,
+        PositionLeaf.EMPTY
+      )
+
+      expect(
+        await stateUpdater.extractTransactionHashes([
+          {
+            type: 'fullWithdrawal',
+            starkKey: StarkKey.fake('aaa'),
+            assetHash: AssetHash.fake('fff1'),
+            vaultId: 45n,
+            balanceDifference: 100n,
+          },
+          {
+            type: 'fullWithdrawal',
+            starkKey: StarkKey.fake('aaa'),
+            assetHash: AssetHash.fake('fff1'),
+            vaultId: 45n,
+            balanceDifference: 100n,
+          },
+        ])
+      ).toEqual([Hash256.fake('111'), Hash256.fake('222')])
     })
   })
 

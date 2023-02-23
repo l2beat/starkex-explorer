@@ -1,9 +1,11 @@
 import { PositionLeaf, VaultLeaf } from '@explorer/state'
+import { AssetHash, AssetId } from '@explorer/types'
 
 import { ApiServer } from './api/ApiServer'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
+import { OldHomeController } from './api/controllers/OldHomeController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
@@ -11,6 +13,7 @@ import { TransactionSubmitController } from './api/controllers/TransactionSubmit
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
+import { createOldFrontendRouter } from './api/routers/OldFrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
@@ -33,12 +36,16 @@ import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
 import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
 import { PerpetualValidiumUpdater } from './core/PerpetualValidiumUpdater'
+import { PerpetualHistoryPreprocessor } from './core/preprocessing/PerpetualHistoryPreprocessor'
+import { Preprocessor } from './core/preprocessing/Preprocessor'
+import { SpotHistoryPreprocessor } from './core/preprocessing/SpotHistoryPreprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
 import { StatusService } from './core/StatusService'
 import { BlockDownloader } from './core/sync/BlockDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { UserService } from './core/UserService'
 import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
@@ -47,6 +54,8 @@ import { MerkleTreeRepository } from './peripherals/database/MerkleTreeRepositor
 import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
+import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
+import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
@@ -55,6 +64,7 @@ import { SyncStatusRepository } from './peripherals/database/SyncStatusRepositor
 import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
+import { VaultRepository } from './peripherals/database/VaultRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { TokenInspector } from './peripherals/ethereum/TokenInspector'
@@ -280,16 +290,6 @@ export class Application {
       )
     }
 
-    const syncScheduler = new SyncScheduler(
-      syncStatusRepository,
-      blockDownloader,
-      syncService,
-      logger,
-      {
-        earliestBlock: config.starkex.blockchain.minBlockNumber,
-        maxBlockNumber: config.starkex.blockchain.maxBlockNumber,
-      }
-    )
     const transactionStatusService = new TransactionStatusService(
       sentTransactionRepository,
       ethereumClient,
@@ -300,6 +300,7 @@ export class Application {
       forcedTradeOfferRepository,
       sentTransactionRepository
     )
+    const userService = new UserService(userRegistrationEventRepository)
 
     const userTransactionMigrator = new UserTransactionMigrator(
       database,
@@ -310,6 +311,66 @@ export class Application {
       userTransactionCollector,
       ethereumClient,
       logger
+    )
+
+    const preprocessedStateUpdateRepository =
+      new PreprocessedStateUpdateRepository(database, logger)
+
+    let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
+    const isPreprocessorEnabled = config.enablePreprocessing
+
+    if (config.starkex.tradingMode === 'perpetual') {
+      const preprocessedAssetHistoryRepository =
+        new PreprocessedAssetHistoryRepository(database, AssetId, logger)
+
+      const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
+        config.starkex.collateralAsset,
+        preprocessedAssetHistoryRepository,
+        stateUpdateRepository,
+        positionRepository,
+        logger
+      )
+
+      preprocessor = new Preprocessor(
+        preprocessedStateUpdateRepository,
+        syncStatusRepository,
+        stateUpdateRepository,
+        perpetualHistoryPreprocessor,
+        logger,
+        isPreprocessorEnabled
+      )
+    } else {
+      const preprocessedAssetHistoryRepository =
+        new PreprocessedAssetHistoryRepository(database, AssetHash, logger)
+
+      const vaultRepository = new VaultRepository(database, logger)
+
+      const spotHistoryPreprocessor = new SpotHistoryPreprocessor(
+        preprocessedAssetHistoryRepository,
+        vaultRepository,
+        logger
+      )
+
+      preprocessor = new Preprocessor(
+        preprocessedStateUpdateRepository,
+        syncStatusRepository,
+        stateUpdateRepository,
+        spotHistoryPreprocessor,
+        logger,
+        isPreprocessorEnabled
+      )
+    }
+
+    const syncScheduler = new SyncScheduler(
+      syncStatusRepository,
+      blockDownloader,
+      syncService,
+      preprocessor,
+      logger,
+      {
+        earliestBlock: config.starkex.blockchain.minBlockNumber,
+        maxBlockNumber: config.starkex.blockchain.maxBlockNumber,
+      }
     )
 
     // #endregion core
@@ -325,6 +386,10 @@ export class Application {
       forcedTradeOfferRepository
     )
     const homeController = new HomeController(
+      userService,
+      stateUpdateRepository
+    )
+    const oldHomeController = new OldHomeController(
       accountService,
       stateUpdateRepository,
       positionRepository,
@@ -367,14 +432,16 @@ export class Application {
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
-        createFrontendRouter(
-          positionController,
-          homeController,
-          forcedTradeOfferController,
-          forcedTransactionController,
-          stateUpdateController,
-          searchController
-        ),
+        config.useOldFrontend
+          ? createOldFrontendRouter(
+              positionController,
+              oldHomeController,
+              forcedTradeOfferController,
+              forcedTransactionController,
+              stateUpdateController,
+              searchController
+            )
+          : createFrontendRouter(homeController),
         createForcedTransactionRouter(
           forcedTradeOfferController,
           userTransactionController

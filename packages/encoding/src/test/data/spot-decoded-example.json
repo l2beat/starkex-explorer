@@ -1,25 +1,118 @@
 {
   "configCode": 1,
-  "initialValidiumVaultRoot": "0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c",
-  "finalValidiumVaultRoot": "0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c",
+  "initialValidiumVaultRoot": "01a84da2c9980274623fe1a7792080d4e6eeca78422d21cec6e28ff74c208731",
+  "finalValidiumVaultRoot": "0006b2e3e6d193945baf00d145490313fbcc5c1194e10607938b129d25953f0c",
   "initialRollupVaultRoot": "0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c",
   "finalRollupVaultRoot": "0075364111a7a336756626d19fc8ec8df6328a5e63681c68ffaa312f6bf98c5c",
-  "initialOrderRoot": "0000000000000000000000000000000000000000000000000000000000000000",
-  "finalOrderRoot": "0000000000000000000000000000000000000000000000000000000000000000",
-  "globalExpirationTimestamp": 4194303,
+  "initialOrderRoot": "039c58043025bbe38a18bef1e8170635d61ccccfa60b751c635f1632b1aa5f0d",
+  "finalOrderRoot": "00f0efeae404407baaa5d11c197660859b483d00408c4ce091a256364d7e93b1",
+  "globalExpirationTimestamp": 462466,
   "validiumVaultTreeHeight": 31,
   "rollupVaultTreeHeight": 31,
   "orderTreeHeight": 251,
   "modifications": [
     {
-      "starkKey": "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "assetId": 0,
-      "difference": 0
+      "starkKey": "0x069399e273db149474ccc92dbb44af65b85738e4054e6b2510177b2c1720fbaf",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73734,
+      "balanceDifference": 15200000
+    },
+    {
+      "starkKey": "0x0555f94c0facabeb1b5fb40699eee21ba395cc9b3618650fc4443408119382f7",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73735,
+      "balanceDifference": 8000000
+    },
+    {
+      "starkKey": "0x025345b860da072c0b33b59ca2b5c1a2b2c5339394fa3cba8f1d811912e609d6",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73744,
+      "balanceDifference": 5000000
+    },
+    {
+      "starkKey": "0x007972f7247dbe0cb9e3be1acb0bab43821bf778c6f201b24fefe37b291b2e3b",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73750,
+      "balanceDifference": 5500000
+    },
+    {
+      "starkKey": "0x0502fc3809f53716b9674c800e5f3b575b2588003636c452f794765e6c4c4e3a",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73757,
+      "balanceDifference": 49000000
+    },
+    {
+      "starkKey": "0x000000000000000000000000539e04652385a048e920fd98503afaf880a00f6c",
+      "assetHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "fullWithdrawal",
+      "vaultId": 999999,
+      "balanceDifference": 0
+    },
+    {
+      "starkKey": "0x000000000000000000000000539e04652385a048e920fd98503afaf880a00f6c",
+      "assetHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "type": "fullWithdrawal",
+      "vaultId": 999999,
+      "balanceDifference": 0
+    },
+    {
+      "starkKey": "0x0553cf5b4ed6965fc8d02ba7b3ca1ba7e9fc96ddf009dba4c90d1209361e6c08",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73798,
+      "balanceDifference": 32000000
+    },
+    {
+      "starkKey": "0x00ee543f5a08ba86ab9fd7d2046f27d6d0e1fa97af9f132d0a4e02c72fa2bee4",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 71919,
+      "balanceDifference": 800000
+    },
+    {
+      "starkKey": "0x000000000000000000000000c5e958cffd97a47783a74074940a1b2989b8bf57",
+      "assetHash": "0x040024945c9062c338caf2bbc6cb8879be13f71f3bde8834d3d0351537090863",
+      "type": "spotWithdrawal",
+      "vaultId": 73817,
+      "balanceDifference": -1
+    },
+    {
+      "starkKey": "0x039cafd75a3f70d013ef7854e41168c90117c615e924b3689d0f484093c058e5",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73821,
+      "balanceDifference": 5000000
+    },
+    {
+      "starkKey": "0x01fce30f9f902b0f406dbecf1a1170f8ed0a1410fb8a16bc0709f09a229dd70d",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73824,
+      "balanceDifference": 31857700
+    },
+    {
+      "starkKey": "0x018867618fbf210165e944ed9e94d1f2318f9ce3d2a0dbb81ed4011e24565d87",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73833,
+      "balanceDifference": 721600
+    },
+    {
+      "starkKey": "0x037bffc22346a6f3624b9db90b4478fb59b104b7780a97b987b66a9addc55ce2",
+      "assetHash": "0x00b333e3142fe16b78628f19bb15afddaef437e72d6d7f5c6c20c6801a27fba6",
+      "type": "spotWithdrawal",
+      "vaultId": 73845,
+      "balanceDifference": 854000
     }
   ],
   "conditionalTransfers": [],
   "l1VaultUpdates": [],
   "l1OrderMessages": [],
-  "onChainDataHash": "0x18791d5b125488091fc489ccf213ae88feda27e2a656ddb8dc6e5e0e1637b7b5",
+  "onChainDataHash": "0x913b67b1c8b35295e7ca28808c63be5f00e2fc1cd55b71eb233d7038e66f890f",
   "onChainDataSize": 2
 }

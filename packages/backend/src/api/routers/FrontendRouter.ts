@@ -1,238 +1,39 @@
-import {
-  stringAs,
-  stringAsBigInt,
-  stringAsInt,
-  stringAsPositiveInt,
-} from '@explorer/shared'
-import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
+import { stringAsPositiveInt, UserDetails } from '@explorer/shared'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
-import { z } from 'zod'
+import * as z from 'zod'
 
-import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
-import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
-import { PositionController } from '../controllers/PositionController'
-import { SearchController } from '../controllers/SearchController'
-import { StateUpdateController } from '../controllers/StateUpdateController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
-export function createFrontendRouter(
-  positionController: PositionController,
-  homeController: HomeController,
-  forcedTradeOfferController: ForcedTradeOfferController,
-  forcedTransactionController: ForcedTransactionController,
-  stateUpdateController: StateUpdateController,
-  searchController: SearchController
-) {
+export function createFrontendRouter(homeController: HomeController) {
   const router = new Router()
 
   router.get('/', async (ctx) => {
-    const address = getAccountAddress(ctx)
-    const result = await homeController.getHomePage(address)
+    const givenUser = getGivenUser(ctx)
+    const result = await homeController.getHomePage(givenUser)
     applyControllerResult(ctx, result)
   })
-
-  router.get(
-    '/forced',
-    withTypedContext(
-      z.object({
-        query: z.object({
-          page: stringAsPositiveInt(1),
-          perPage: stringAsPositiveInt(10),
-        }),
-      }),
-      async (ctx) => {
-        const { page, perPage } = ctx.query
-        const address = getAccountAddress(ctx)
-        const result =
-          await forcedTransactionController.getForcedTransactionsPage(
-            page,
-            perPage,
-            address
-          )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get('/forced/new', async (ctx) => {
-    const address = getAccountAddress(ctx)
-    const result = await forcedTransactionController.getTransactionFormPage(
-      address
-    )
-    applyControllerResult(ctx, result)
-  })
-
-  router.get(
-    '/forced/offers',
-    withTypedContext(
-      z.object({
-        query: z.object({
-          page: stringAsPositiveInt(1),
-          perPage: stringAsPositiveInt(10),
-          assetId: stringAs(AssetId).optional(),
-          type: z.enum(['sell', 'buy']).optional(),
-        }),
-      }),
-      async (ctx) => {
-        const { page, perPage, assetId, type } = ctx.query
-        const address = getAccountAddress(ctx)
-        const result = await forcedTradeOfferController.getOffersIndexPage({
-          page,
-          perPage,
-          assetId,
-          type,
-          address,
-        })
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
-    '/forced/offers/:id',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          id: stringAsInt(),
-        }),
-      }),
-      async (ctx) => {
-        const { id } = ctx.params
-        const address = getAccountAddress(ctx)
-        const result = await forcedTradeOfferController.getOfferDetailsPage(
-          id,
-          address
-        )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
-    '/forced/:hash',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          hash: stringAs(Hash256),
-        }),
-      }),
-      async (ctx) => {
-        const { hash } = ctx.params
-        const address = getAccountAddress(ctx)
-        const result =
-          await forcedTransactionController.getForcedTransactionDetailsPage(
-            hash,
-            address
-          )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
 
   router.get(
     '/state-updates',
     withTypedContext(
       z.object({
         query: z.object({
-          page: stringAsPositiveInt(1),
-          perPage: stringAsPositiveInt(10),
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
         }),
       }),
       async (ctx) => {
-        const { page, perPage } = ctx.query
-        const address = getAccountAddress(ctx)
-        const result = await stateUpdateController.getStateUpdatesPage(
-          page,
-          perPage,
-          address
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result = await homeController.getHomeStateUpdatesPage(
+          givenUser,
+          pagination
         )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
-    '/state-updates/:id',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          id: stringAsInt(),
-        }),
-      }),
-      async (ctx) => {
-        const { id } = ctx.params
-        const address = getAccountAddress(ctx)
-        const result = await stateUpdateController.getStateUpdateDetailsPage(
-          id,
-          address
-        )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get('/positions/not-found', async (ctx) => {
-    const address = getAccountAddress(ctx)
-    const result = await positionController.getPositionNotFoundPage(address)
-    applyControllerResult(ctx, result)
-  })
-
-  router.get(
-    '/positions/:positionId',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          positionId: stringAsBigInt(),
-        }),
-      }),
-      async (ctx) => {
-        const { positionId } = ctx.params
-        const address = getAccountAddress(ctx)
-        const result = await positionController.getPositionDetailsPage(
-          positionId,
-          address
-        )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
-    '/positions/:positionId/updates/:updateId',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          positionId: stringAsBigInt(),
-          updateId: stringAsInt(),
-        }),
-      }),
-      async (ctx) => {
-        const { positionId, updateId } = ctx.params
-        const address = getAccountAddress(ctx)
-        const result = await positionController.getPositionUpdatePage(
-          positionId,
-          updateId,
-          address
-        )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
-    '/search',
-    withTypedContext(
-      z.object({
-        query: z.object({
-          query: z.string(),
-        }),
-      }),
-      async (ctx) => {
-        const { query } = ctx.query
-        const result = await searchController.getSearchRedirect(query)
         applyControllerResult(ctx, result)
       }
     )
@@ -241,13 +42,30 @@ export function createFrontendRouter(
   return router
 }
 
-export function getAccountAddress(ctx: Context) {
-  const cookie = ctx.cookies.get('account')
-  if (cookie) {
+function getGivenUser(ctx: Context): Partial<UserDetails> {
+  const account = ctx.cookies.get('account')
+  const starkKey = ctx.cookies.get('starkKey')
+  if (account) {
     try {
-      return EthereumAddress(cookie)
+      return {
+        address: EthereumAddress(account),
+        starkKey: starkKey ? StarkKey(starkKey) : undefined,
+      }
     } catch {
-      return
+      return {}
     }
+  }
+  return {}
+}
+
+function getPagination(query: {
+  page?: number
+  perPage?: number
+}): PaginationOptions {
+  const page = Math.max(1, query.page ?? 1)
+  const perPage = Math.max(1, Math.min(200, query.perPage ?? 50))
+  return {
+    limit: perPage,
+    offset: (page - 1) * perPage,
   }
 }

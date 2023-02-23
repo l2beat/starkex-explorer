@@ -1,7 +1,9 @@
 import { UserDetails } from '@explorer/shared'
+import cx from 'classnames'
 import React from 'react'
 
 import { Page } from '../../components/page/Page'
+import { SearchBar } from '../../components/SearchBar'
 import { TablePreview } from '../../components/table/TablePreview'
 import { reactToHtml } from '../../reactToHtml'
 import {
@@ -18,23 +20,22 @@ import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
 } from './components/HomeStateUpdatesTable'
+import {
+  DEFAULT_TUTORIALS,
+  HomeTutorialEntry,
+  HomeTutorials,
+} from './components/HomeTutorials'
 
 export interface HomePageProps {
   user: UserDetails | undefined
   // TODO: statistics
-  tutorials: HomeTutorialEntry[]
+  tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
-  totalStateUpdate: number
+  totalStateUpdates: number
   forcedTransactions: HomeForcedTransactionEntry[]
-  totalForcedTransaction: number
+  totalForcedTransactions: number
   offers: HomeOfferEntry[]
   totalOffers: number
-}
-
-export interface HomeTutorialEntry {
-  title: string
-  imageUrl: string
-  href: string
 }
 
 export function renderHomePage(props: HomePageProps) {
@@ -42,6 +43,8 @@ export function renderHomePage(props: HomePageProps) {
 }
 
 function HomePage(props: HomePageProps) {
+  const tutorials = props.tutorials ?? DEFAULT_TUTORIALS
+
   return (
     <Page
       path="/"
@@ -49,19 +52,26 @@ function HomePage(props: HomePageProps) {
       user={props.user}
       withoutSearch
     >
-      <main className="mx-auto flex-1 p-16">
-        <div className="flex max-w-[760px] flex-col gap-y-12">
+      <main
+        className={cx(
+          'mx-auto flex w-full max-w-[1024px] flex-1 flex-col gap-8 py-12 px-4 sm:px-8',
+          tutorials.length > 0 &&
+            'xl:grid xl:max-w-[1236px] xl:grid-cols-[minmax(760px,_1fr)_380px]'
+        )}
+      >
+        <div className="flex flex-col gap-8">
+          <SearchBar />
           <TablePreview
             {...STATE_UPDATE_TABLE_PROPS}
             visible={props.stateUpdates.length}
-            total={props.totalStateUpdate}
+            total={props.totalStateUpdates}
           >
             <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
           </TablePreview>
           <TablePreview
             {...FORCED_TRANSACTION_TABLE_PROPS}
             visible={props.forcedTransactions.length}
-            total={props.totalForcedTransaction}
+            total={props.totalForcedTransactions}
           >
             <HomeForcedTransactionsTable
               forcedTransactions={props.forcedTransactions}
@@ -75,6 +85,7 @@ function HomePage(props: HomePageProps) {
             <HomeOffersTable offers={props.offers} />
           </TablePreview>
         </div>
+        {tutorials.length > 0 && <HomeTutorials tutorials={tutorials} />}
       </main>
     </Page>
   )

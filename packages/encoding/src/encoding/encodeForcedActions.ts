@@ -1,8 +1,8 @@
-import { ForcedAction } from '../OnChainData'
+import { PerpetualForcedAction } from '../OnChainData'
 import { ByteWriter } from './ByteWriter'
 import { encodeAssetId } from './encodeAssetId'
 
-export function encodeForcedActions(forcedActions: ForcedAction[]) {
+export function encodeForcedActions(forcedActions: PerpetualForcedAction[]) {
   const writer = new ByteWriter()
   writer.writeNumber(forcedActions.length, 32)
   for (const action of forcedActions) {

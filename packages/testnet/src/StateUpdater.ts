@@ -1,9 +1,9 @@
 import {
   encodeOnChainData,
-  ForcedAction,
   FundingEntry,
   OnChainData,
   OraclePrice,
+  PerpetualForcedAction,
   PositionUpdate,
   State,
 } from '@explorer/encoding'
@@ -27,7 +27,7 @@ import { Contracts } from './deployContracts'
 export interface UpdateData {
   funding: FundingEntry[]
   positions: PositionUpdate[]
-  forcedActions: ForcedAction[]
+  forcedActions: PerpetualForcedAction[]
   prices: OraclePrice[]
 }
 

@@ -12,7 +12,9 @@ export interface Config {
   port: number
   databaseConnection: string | Knex.StaticConnectionConfig
   enableSync: boolean
+  enablePreprocessing: boolean
   freshStart: boolean
   forceHttps: boolean
   starkex: StarkexConfig
+  useOldFrontend: boolean
 }

@@ -35,7 +35,7 @@ export function StateUpdateTransactionsTable(
         return {
           link: `/transactions/${transaction.hash.toString()}`,
           cells: [
-            <InlineEllipsis className="max-w-[80px] text-blue-600 underline sm:max-w-[300px]">
+            <InlineEllipsis className="max-w-[80px] text-blue-600 underline sm:max-w-[160px]">
               {transaction.hash.toString()}
             </InlineEllipsis>,
             <AssetWithLogo

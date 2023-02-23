@@ -19,6 +19,7 @@ import { mock } from '../../test/mock'
 import {
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
+  LogFullWithdrawalRequest,
   LogWithdrawalPerformed,
 } from './events'
 import { UserTransactionCollector } from './UserTransactionCollector'
@@ -146,6 +147,63 @@ describe(UserTransactionCollector.name, () => {
         starkKey,
         positionId,
         quantizedAmount,
+      },
+    })
+  })
+
+  it(`can process ${LogFullWithdrawalRequest.name}`, async () => {
+    const blockRange = new BlockRange([], 100, 200)
+    const starkKey = StarkKey.fake('123')
+    const vaultId = 123n
+    const transactionHash = Hash256.fake('abc')
+    const starkExAddress = EthereumAddress.fake('def')
+
+    const ethereumClient = mock<EthereumClient>({
+      async getLogsInRange(range, parameters) {
+        expect(range).toEqual(blockRange)
+        expect(parameters.address).toEqual(starkExAddress.toString())
+
+        const log = LogFullWithdrawalRequest.encodeLog([
+          BigNumber.from(starkKey.toString()),
+          BigNumber.from(vaultId),
+        ])
+        const fullLog = {
+          ...log,
+          blockNumber: 150,
+          transactionHash: transactionHash.toString(),
+        }
+        return [fullLog as providers.Log]
+      },
+      async getBlockTimestamp(blockNumber) {
+        expect(blockNumber).toEqual(150)
+        return 1234
+      },
+    })
+
+    let added: UserTransactionAddRecord | undefined
+    const userTransactionRepository = mock<UserTransactionRepository>({
+      async add(record) {
+        added = record
+        return 1
+      },
+    })
+
+    const collector = new UserTransactionCollector(
+      ethereumClient,
+      userTransactionRepository,
+      starkExAddress
+    )
+
+    await collector.collect(blockRange)
+
+    expect(added).toEqual({
+      blockNumber: 150,
+      transactionHash,
+      timestamp: Timestamp(1234000),
+      data: {
+        type: 'FullWithdrawal',
+        starkKey,
+        vaultId,
       },
     })
   })

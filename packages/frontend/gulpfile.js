@@ -10,6 +10,10 @@ async function clean() {
   await fs.promises.mkdir('build')
 }
 
+async function cleanStatic() {
+  await del(path.join('build', 'static'))
+}
+
 function buildScripts() {
   return exec(
     `esbuild --bundle src/scripts/index.ts --outfile=build/static/scripts/main.js --minify`
@@ -65,13 +69,13 @@ function startPreview() {
 }
 
 const build = gulp.series(
-  clean,
+  cleanStatic,
   gulp.parallel(buildScripts, buildStyles, buildTypescript, copyStatic),
   hashStaticFiles
 )
 
 const watch = gulp.series(
-  clean,
+  cleanStatic,
   gulp.parallel(buildScripts, buildStyles, copyStatic),
   gulp.parallel(watchScripts, watchStyles, watchStatic, startPreview)
 )

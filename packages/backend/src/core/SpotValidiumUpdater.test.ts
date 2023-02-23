@@ -1,10 +1,14 @@
-import { ForcedAction, OraclePrice, SpotCairoOutput } from '@explorer/encoding'
+import {
+  FullWithdrawal,
+  SpotCairoOutput,
+  SpotModification,
+  SpotWithdrawal,
+} from '@explorer/encoding'
 import { InMemoryMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { AssetHash, Hash256, PedersenHash, StarkKey } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
-import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
@@ -96,16 +100,7 @@ describe(SpotValidiumUpdater.name, () => {
           stateTree
         )
 
-        const mockProcessStateTransition =
-          mockFn<
-            [
-              StateTransitionRecord,
-              PedersenHash,
-              ForcedAction[],
-              OraclePrice[],
-              { index: bigint; value: VaultLeaf }[]
-            ]
-          >()
+        const mockProcessStateTransition = mockFn()
         mockProcessStateTransition.returns(Promise.resolve())
         updater.processStateTransition = mockProcessStateTransition
 
@@ -116,8 +111,28 @@ describe(SpotValidiumUpdater.name, () => {
           sequenceNumber: 1,
           batchId: 2,
         }
+        const fullWithdrawalModification: FullWithdrawal = {
+          type: 'fullWithdrawal',
+          starkKey: StarkKey.fake(),
+          assetHash: AssetHash.fake(),
+          vaultId: 300n,
+          balanceDifference: 345n,
+        }
+        const regularWithdrawalModification: SpotWithdrawal = {
+          type: 'spotWithdrawal',
+          starkKey: StarkKey.fake(),
+          assetHash: AssetHash.fake(),
+          vaultId: 400n,
+          balanceDifference: -123n,
+        }
+
+        const modifications: SpotModification[] = [
+          regularWithdrawalModification,
+          fullWithdrawalModification,
+        ]
         const mockSpotCairoOutput = mock<SpotCairoOutput>({
           finalValidiumVaultRoot: PedersenHash.fake('987'),
+          modifications,
         })
         const newVault = {
           vaultId: 5n,
@@ -141,7 +156,7 @@ describe(SpotValidiumUpdater.name, () => {
             stateTransitionHash: validiumStateTransition.stateTransitionHash,
           },
           mockSpotCairoOutput.finalValidiumVaultRoot,
-          [],
+          [fullWithdrawalModification],
           [],
           [
             {

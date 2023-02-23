@@ -112,11 +112,15 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     const notIncluded = await this.userTransactionRepository.getNotIncluded([
       'ForcedTrade',
       'ForcedWithdrawal',
+      'FullWithdrawal',
     ])
 
-    return forcedActions.map((action) => {
+    const matchedHashes: Hash256[] = []
+
+    forcedActions.forEach((action) => {
+      let txIndex = -1
       if (action.type === 'trade') {
-        const transaction = notIncluded.find(
+        txIndex = notIncluded.findIndex(
           (tx) =>
             tx.data.type === 'ForcedTrade' &&
             tx.data.starkKeyA === action.starkKeyA &&
@@ -129,28 +133,39 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
             tx.data.nonce === action.nonce &&
             tx.data.isABuyingSynthetic === action.isABuyingSynthetic
         )
-        if (transaction) {
-          return transaction.transactionHash
-        }
-      }
-
-      if (action.type === 'withdrawal') {
-        const transaction = notIncluded.find(
+      } else if (action.type === 'withdrawal') {
+        txIndex = notIncluded.findIndex(
           (tx) =>
             tx.data.type === 'ForcedWithdrawal' &&
             tx.data.positionId === action.positionId &&
             tx.data.starkKey === action.starkKey &&
             tx.data.quantizedAmount === action.amount
         )
-        if (transaction) {
-          return transaction.transactionHash
-        }
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      } else if (action.type === 'fullWithdrawal') {
+        txIndex = notIncluded.findIndex(
+          (tx) =>
+            tx.data.type === 'FullWithdrawal' &&
+            tx.data.starkKey === action.starkKey &&
+            tx.data.vaultId === action.vaultId
+        )
       }
 
-      throw new Error(
-        'Forced action included in state update does not have a matching mined transaction'
-      )
+      if (txIndex === -1) {
+        throw new Error(
+          'Forced action included in state update does not have a matching mined transaction'
+        )
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      matchedHashes.push(notIncluded[txIndex]!.transactionHash)
+
+      // Remove the transaction from the list of not included transactions
+      // so that it's not matched in the next iteration
+      notIncluded.splice(txIndex, 1)
     })
+
+    return matchedHashes
   }
 
   async discardAfter(blockNumber: BlockNumber) {

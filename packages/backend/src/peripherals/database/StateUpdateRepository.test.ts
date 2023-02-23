@@ -101,6 +101,63 @@ describe(StateUpdateRepository.name, () => {
     expect(await repository.getAll()).toEqual([stateUpdate])
   })
 
+  it('gets all prices for a given state update', async () => {
+    await repository.add({
+      stateUpdate: {
+        id: 900,
+        blockNumber: 10_000,
+        rootHash: PedersenHash.fake(),
+        stateTransitionHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          starkKey: StarkKey.fake('1'),
+          positionId: 0n,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('SOL-7'), balance: 200n }],
+        },
+      ],
+      prices: [{ assetId: AssetId('SOL-7'), price: 10n }],
+      transactionHashes: [Hash256.fake()],
+    })
+
+    await repository.add({
+      stateUpdate: {
+        id: 10_000,
+        blockNumber: 10_000,
+        rootHash: PedersenHash.fake(),
+        stateTransitionHash: Hash256.fake(),
+        timestamp: Timestamp(0),
+      },
+      positions: [
+        {
+          starkKey: StarkKey.fake('1'),
+          positionId: 0n,
+          collateralBalance: 0n,
+          balances: [{ assetId: AssetId('ETH-9'), balance: 20n }],
+        },
+        {
+          starkKey: StarkKey.fake('2'),
+          positionId: 1n,
+          collateralBalance: 100n,
+          balances: [{ assetId: AssetId('BTC-10'), balance: 120n }],
+        },
+      ],
+      prices: [
+        { assetId: AssetId('ETH-9'), price: 40n },
+        { assetId: AssetId('BTC-10'), price: 500n },
+      ],
+      transactionHashes: [Hash256.fake()],
+    })
+
+    const prices = await repository.getPricesByStateUpdateId(10_000)
+    expect(prices).toEqual([
+      { assetId: AssetId('ETH-9'), price: 40n },
+      { assetId: AssetId('BTC-10'), price: 500n },
+    ])
+  })
+
   it('gets last state update by id', async () => {
     let last = await repository.findLast()
 
@@ -516,7 +573,7 @@ describe(StateUpdateRepository.name, () => {
 
     const total = await repository.count()
 
-    expect(total).toEqual(4n)
+    expect(total).toEqual(4)
   })
 
   it('returns undefined if update is missing', async () => {
