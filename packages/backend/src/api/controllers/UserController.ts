@@ -33,19 +33,19 @@ export class UserController {
     const user = await this.userService.getUserDetails(givenUser)
 
     const [userAssets, totalAssets, history, historyCount] = await Promise.all([
-      await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
+      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         { offset: 0, limit: 10 },
         this.collateralAsset?.assetId
       ),
-      await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyCount(
+      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyCount(
         starkKey
       ),
-      await this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
+      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
         starkKey,
         { offset: 0, limit: 10 }
       ),
-      await this.preprocessedAssetHistoryRepository.getByStarkKeyCount(
+      this.preprocessedAssetHistoryRepository.getByStarkKeyCount(
         starkKey
       ),
     ])
@@ -82,12 +82,12 @@ export class UserController {
     const user = await this.userService.getUserDetails(givenUser)
 
     const [userAssets, total] = await Promise.all([
-      await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
+      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         pagination,
         this.collateralAsset?.assetId
       ),
-      await this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyCount(
+      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyCount(
         starkKey
       ),
     ])
@@ -113,11 +113,11 @@ export class UserController {
     const user = await this.userService.getUserDetails(givenUser)
 
     const [history, total] = await Promise.all([
-      await this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
+      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
         starkKey,
         pagination
       ),
-      await this.preprocessedAssetHistoryRepository.getByStarkKeyCount(
+      this.preprocessedAssetHistoryRepository.getByStarkKeyCount(
         starkKey
       ),
     ])

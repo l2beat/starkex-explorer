@@ -31,12 +31,12 @@ export class StateUpdateController {
 
     const [stateUpdate, balanceChanges, totalBalanceChanges] =
       await Promise.all([
-        await this.stateUpdateRepository.findById(stateUpdateId),
-        await this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
+        this.stateUpdateRepository.findById(stateUpdateId),
+        this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
           stateUpdateId,
           { offset: 0, limit: 10 }
         ),
-        await this.preprocessedAssetHistoryRepository.getByStateUpdateIdCount(
+        this.preprocessedAssetHistoryRepository.getByStateUpdateIdCount(
           stateUpdateId
         ),
       ])
@@ -85,11 +85,11 @@ export class StateUpdateController {
     const user = await this.userService.getUserDetails(givenUser)
 
     const [balanceChanges, total] = await Promise.all([
-      await this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
+      this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
         stateUpdateId,
         pagination
       ),
-      await this.preprocessedAssetHistoryRepository.getByStateUpdateIdCount(
+      this.preprocessedAssetHistoryRepository.getByStateUpdateIdCount(
         stateUpdateId
       ),
     ])
