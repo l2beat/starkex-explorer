@@ -390,11 +390,13 @@ export class Application {
     )
     const homeController = new HomeController(
       userService,
-      stateUpdateRepository
+      stateUpdateRepository,
+      userTransactionRepository
     )
     const userController = new UserController(
       userService,
       preprocessedAssetHistoryRepository,
+      userTransactionRepository,
       config.starkex.tradingMode === 'perpetual'
         ? config.starkex.collateralAsset
         : undefined

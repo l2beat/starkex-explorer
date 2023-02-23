@@ -1,16 +1,31 @@
-import { renderHomePage, renderHomeStateUpdatesPage } from '@explorer/frontend'
+import {
+  HomeForcedTransactionEntry,
+  renderHomePage,
+  renderHomeStateUpdatesPage,
+} from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { Hash256 } from '@explorer/types'
+import { AssetId, Hash256 } from '@explorer/types'
 
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
+
+const FORCED_TRANSACTION_TYPES = [
+  'ForcedTrade' as const,
+  'ForcedWithdrawal' as const,
+  'FullWithdrawal' as const,
+]
 
 export class HomeController {
   constructor(
     private readonly userService: UserService,
-    private readonly stateUpdateRepository: StateUpdateRepository
+    private readonly stateUpdateRepository: StateUpdateRepository,
+    private userTransactionRepository: UserTransactionRepository
   ) {}
 
   async getHomePage(
@@ -18,10 +33,19 @@ export class HomeController {
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
 
-    const [totalStateUpdates, stateUpdates] = await Promise.all([
-      this.stateUpdateRepository.count(),
-      this.stateUpdateRepository.getPaginated({ offset: 0, limit: 6 }),
-    ])
+    const [totalStateUpdates, stateUpdates, userTransactions] =
+      await Promise.all([
+        this.stateUpdateRepository.count(),
+        this.stateUpdateRepository.getPaginated({ offset: 0, limit: 6 }),
+        this.userTransactionRepository.getPaginated({
+          offset: 0,
+          limit: 6,
+          types: FORCED_TRANSACTION_TYPES,
+        }),
+      ])
+
+    const userTransactionEntries =
+      toUserTransactionEntries(userTransactions).filter(Boolean) // TODO. removing undefined - this should not be necessary
 
     const content = renderHomePage({
       user,
@@ -35,7 +59,7 @@ export class HomeController {
         forcedTransactionCount: update.forcedTransactionsCount,
       })),
       totalStateUpdates,
-      forcedTransactions: [],
+      forcedTransactions: userTransactionEntries,
       totalForcedTransactions: 0,
       offers: [],
       totalOffers: 0,
@@ -69,4 +93,38 @@ export class HomeController {
     })
     return { type: 'success', content }
   }
+}
+
+function toUserTransactionEntries(
+  records: UserTransactionRecord<typeof FORCED_TRANSACTION_TYPES[number]>[]
+): HomeForcedTransactionEntry[] {
+  return records.map((record) => {
+    const data = record.data
+    switch (data.type) {
+      case 'ForcedTrade':
+        return {
+          timestamp: record.timestamp,
+          hash: record.transactionHash,
+          asset: { hashOrId: data.syntheticAssetId },
+          amount: data.syntheticAmount,
+          status: record.included ? 'INCLUDED' : 'MINED',
+          type: data.isABuyingSynthetic ? 'BUY' : 'SELL',
+        }
+      case 'ForcedWithdrawal':
+        return {
+          timestamp: record.timestamp,
+          hash: record.transactionHash,
+          // TODO: not always USDC
+          asset: { hashOrId: AssetId.USDC },
+          amount: data.quantizedAmount,
+          status: record.included ? 'INCLUDED' : 'MINED',
+          type: 'WITHDRAW',
+        }
+      case 'FullWithdrawal':
+        // TODO: assets, amount is unknown
+        throw new Error('Not implemented')
+
+      // TODO: other types return undefined....
+    }
+  })
 }

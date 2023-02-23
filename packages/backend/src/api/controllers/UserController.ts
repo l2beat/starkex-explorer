@@ -3,6 +3,7 @@ import {
   renderUserBalanceChangesPage,
   renderUserPage,
   UserAssetEntry,
+  UserTransactionEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
 import { UserDetails } from '@explorer/shared'
@@ -15,7 +16,18 @@ import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
+
+const ETHEREUM_TRANSACTION_TYPES = [
+  'ForcedTrade' as const,
+  'ForcedWithdrawal' as const,
+  'FullWithdrawal' as const,
+  'Withdraw' as const,
+]
 
 export class UserController {
   constructor(
@@ -23,6 +35,7 @@ export class UserController {
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
+    private userTransactionRepository: UserTransactionRepository,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -32,25 +45,36 @@ export class UserController {
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
 
-    const [userAssets, totalAssets, history, historyCount] = await Promise.all([
-      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
-        starkKey,
-        { offset: 0, limit: 10 },
-        this.collateralAsset?.assetId
-      ),
-      this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
-        starkKey
-      ),
-      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(starkKey, {
-        offset: 0,
-        limit: 10,
-      }),
-      this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
-    ])
+    const [userAssets, totalAssets, history, historyCount, userTransactions] =
+      await Promise.all([
+        this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
+          starkKey,
+          { offset: 0, limit: 10 },
+          this.collateralAsset?.assetId
+        ),
+        this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
+          starkKey
+        ),
+        this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
+          starkKey,
+          { offset: 0, limit: 10 }
+        ),
+        this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
+        this.userTransactionRepository.getPaginatedByStarkKey({
+          starkKey,
+          offset: 0,
+          limit: 10,
+          types: ETHEREUM_TRANSACTION_TYPES, // TODO: this is not respected! I get 'Withdraw' type when not requested!
+        }),
+      ])
 
-    const assets = toUserAssetEntries(userAssets, this.collateralAsset?.assetId)
-
-    const balanceChanges = toUserBalanceChangeEntries(history)
+    const assetEntries = toUserAssetEntries(
+      userAssets,
+      this.collateralAsset?.assetId
+    )
+    const balanceChangesEntries = toUserBalanceChangeEntries(history)
+    const userTransactionEntries =
+      toUserTransactionEntries(userTransactions).filter(Boolean) // TODO. removing undefined - this should not be necessary
 
     const content = renderUserPage({
       user,
@@ -59,11 +83,11 @@ export class UserController {
       ethereumAddress: EthereumAddress.ZERO,
       withdrawableAssets: [],
       offersToAccept: [],
-      assets,
+      assets: assetEntries,
       totalAssets,
-      balanceChanges,
+      balanceChanges: balanceChangesEntries,
       totalBalanceChanges: historyCount,
-      transactions: [],
+      transactions: userTransactionEntries,
       totalTransactions: 0,
       offers: [],
       totalOffers: 0,
@@ -161,4 +185,48 @@ function toUserBalanceChangeEntries(
       vaultOrPositionId: r.positionOrVaultId.toString(),
     })
   )
+}
+
+function toUserTransactionEntries(
+  records: UserTransactionRecord[]
+): UserTransactionEntry[] {
+  return records.map((record) => {
+    const data = record.data
+    switch (data.type) {
+      case 'ForcedTrade':
+        return {
+          timestamp: record.timestamp,
+          hash: record.transactionHash,
+          asset: { hashOrId: data.syntheticAssetId },
+          amount: data.syntheticAmount,
+          status: record.included ? 'INCLUDED (3/3)' : 'MINED (2/3)',
+          type: data.isABuyingSynthetic ? 'Forced buy' : 'Forced sell',
+        }
+      case 'ForcedWithdrawal':
+        return {
+          timestamp: record.timestamp,
+          hash: record.transactionHash,
+          // TODO: not always USDC
+          asset: { hashOrId: AssetId.USDC },
+          amount: data.quantizedAmount,
+          status: record.included ? 'INCLUDED (3/3)' : 'MINED (2/3)',
+          type: 'Forced withdraw',
+        }
+      case 'Withdraw':
+        return {
+          timestamp: record.timestamp,
+          hash: record.transactionHash,
+          // TODO: not always USDC
+          asset: { hashOrId: AssetId.USDC },
+          amount: data.quantizedAmount,
+          status: record.included ? 'SENT (1/2)' : 'MINED (2/2)',
+          type: 'Withdraw',
+        }
+      case 'FullWithdrawal':
+        // TODO: assets, amount is unknown
+        throw new Error('Not implemented')
+
+      // TODO: other types return undefined....
+    }
+  })
 }
