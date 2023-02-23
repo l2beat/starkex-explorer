@@ -37,7 +37,7 @@ export function HomeForcedTransactionsTable(
       ]}
       rows={props.forcedTransactions.map((transaction) => {
         return {
-          link: `/forced-transactions/${transaction.hash.toString()}`,
+          link: `/transactions/${transaction.hash.toString()}`,
           cells: [
             <TimeCell timestamp={transaction.timestamp} />,
             <InlineEllipsis className="max-w-[80px] text-blue-600 underline">
