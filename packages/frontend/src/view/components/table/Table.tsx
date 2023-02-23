@@ -7,13 +7,15 @@ import { Column, Row } from './types'
 interface TableProps {
   columns: Column[]
   rows: Row[]
+  fullBackground?: boolean
 }
 
 export function Table(props: TableProps) {
   return (
     <div
       className={cx(
-        '-mx-4 w-[calc(100%+32px)] overflow-x-auto sm:mx-0 sm:w-full'
+        '-mx-4 w-[calc(100%+32px)] overflow-x-auto sm:mx-0 sm:w-full',
+        { 'rounded-lg bg-gray-800 pb-4': props.fullBackground }
       )}
     >
       <table
@@ -44,6 +46,7 @@ export function Table(props: TableProps) {
               cells={cells}
               link={link}
               columns={props.columns}
+              fullBackground={props.fullBackground}
               i={i}
               key={i}
             />

@@ -6,6 +6,7 @@ import {
   UserOfferEntry,
   UserTransactionEntry,
 } from '../../view'
+import { WithdrawableAssetEntry } from '../../view/pages/user/components/UserQuickActionsTable'
 import { Bucket } from './bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
 import { randomId, randomTimestamp } from './utils'
@@ -77,5 +78,12 @@ export function randomUserOfferEntry(): UserOfferEntry {
     totalPrice: amountBucket.pick(),
     status: offerStatusBucket.pick(),
     type: offerTypeBucket.pick(),
+  }
+}
+
+export function randomWithdrawableAssetEntry(): WithdrawableAssetEntry {
+  return {
+    asset: assetBucket.pick(),
+    amount: amountBucket.pick(),
   }
 }

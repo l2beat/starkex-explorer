@@ -9,11 +9,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 type ButtonVariant = 'contained' | 'outlined'
 const mainClassNames =
-  'min-w-[150px] rounded-lg px-10 py-2.5 text-sm font-semibold disabled:cursor-not-allowed'
+  'py-2.5 text-sm font-semibold disabled:cursor-not-allowed'
 const classNameMap: Record<ButtonVariant, string> = {
-  contained: 'bg-brand',
+  contained: 'bg-brand rounded',
   outlined:
-    'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20',
+    'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20 px-8 rounded-lg',
 }
 
 export function Button({
