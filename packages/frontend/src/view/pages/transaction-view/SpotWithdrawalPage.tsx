@@ -1,19 +1,17 @@
-import React from "react";
+import React from 'react'
 
-import { ContentWrapper } from "../../components/page/ContentWrapper";
-import { Page } from "../../components/page/Page";
-import { WithdrawalPageProps } from "./common";
+import { ContentWrapper } from '../../components/page/ContentWrapper'
+import { Page } from '../../components/page/Page'
+import { WithdrawalPageProps } from './common'
 
 interface SpotWithdrawalPageProps extends WithdrawalPageProps {
-    vaultId: string
+  vaultId: string
 }
 
 export function WithdrawalPage(props: SpotWithdrawalPageProps) {
-  return(
+  return (
     <Page user={props.user} path="TODO: path" description="TODO: description">
-        <ContentWrapper className="flex flex-col gap-12">
-            
-        </ContentWrapper>
+      <ContentWrapper className="flex flex-col gap-12"></ContentWrapper>
     </Page>
   )
 }
