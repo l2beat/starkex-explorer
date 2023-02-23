@@ -16,6 +16,7 @@ import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
+import { TransactionPageTitle } from './components/TransactionPageTitle'
 
 export interface PerpetualForcedWithdrawalPageProps {
   user: UserDetails | undefined
@@ -47,6 +48,12 @@ function PerpetualForcedWithdrawalPage(
       description="TODO: description"
     >
       <ContentWrapper className="flex flex-col gap-12">
+        <div>
+          <TransactionPageTitle
+            title="Forced withdrawal"
+            transactionHash={props.transactionHash}
+          />
+        </div>
         {/* TODO: content */}
         <TransactionHistoryTable entries={props.history.map(toHistoryEntry)} />
       </ContentWrapper>

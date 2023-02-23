@@ -6,6 +6,7 @@ import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { ChevronDownIcon } from '../../../assets/icons/ChevronDownIcon'
 import { ChevronUpIcon } from '../../../assets/icons/ChevronUpIcon'
 import { Button } from '../../../components/Button'
+import { PageTitle } from '../../../components/PageTitle'
 
 export interface StateUpdateStatsProps {
   id: string
@@ -31,9 +32,9 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
   )
 
   return (
-    <section className="flex flex-col gap-6" data-component="StateUpdateStats">
-      <h1 className="text-xxl font-bold">State Update #{props.id}</h1>
-      <div className="flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
+    <section data-component="StateUpdateStats">
+      <PageTitle>State Update #{props.id}</PageTitle>
+      <div className="mb-6 flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
         <div className="flex justify-between gap-6">
           <ValueItem label="Ethereum block number">
             <a

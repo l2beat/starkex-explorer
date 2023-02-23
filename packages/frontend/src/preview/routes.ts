@@ -631,7 +631,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        transactionHash: Hash256.fake(),
+        offerId: randomId(),
         starkKey: user?.starkKey ?? StarkKey.fake(),
         ethereumAddress: user?.address ?? EthereumAddress.fake(),
         type: Math.random() > 0.5 ? 'BUY' : 'SELL',
@@ -648,7 +648,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        transactionHash: Hash256.fake(),
+        offerId: randomId(),
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         type: Math.random() > 0.5 ? 'BUY' : 'SELL',
@@ -665,7 +665,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        transactionHash: Hash256.fake(),
+        offerId: randomId(),
         starkKey: user?.starkKey ?? StarkKey.fake(),
         ethereumAddress: user?.address ?? EthereumAddress.fake(),
         type: Math.random() > 0.5 ? 'BUY' : 'SELL',
@@ -685,7 +685,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        transactionHash: Hash256.fake(),
+        offerId: randomId(),
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         type: Math.random() > 0.5 ? 'BUY' : 'SELL',
@@ -704,7 +704,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        transactionHash: Hash256.fake(),
+        offerId: randomId(),
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         type: Math.random() > 0.5 ? 'BUY' : 'SELL',
@@ -723,7 +723,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        transactionHash: Hash256.fake(),
+        offerId: randomId(),
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         type: Math.random() > 0.5 ? 'BUY' : 'SELL',
@@ -744,6 +744,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
+        offerId: randomId(),
         transactionHash: Hash256.fake(),
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
@@ -765,6 +766,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
+        offerId: randomId(),
         transactionHash: Hash256.fake(),
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
@@ -787,6 +789,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
+        offerId: randomId(),
         transactionHash: Hash256.fake(),
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
@@ -810,6 +813,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderOfferAndForcedTradePage({
         user,
+        offerId: randomId(),
         transactionHash: Hash256.fake(),
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),

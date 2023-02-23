@@ -4,6 +4,7 @@ import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
+import { PageTitle } from '../../components/PageTitle'
 import { reactToHtml } from '../../reactToHtml'
 import {
   FORCED_TRANSACTION_INCLUDED,
@@ -15,10 +16,12 @@ import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
+import { TransactionPageTitle } from './components/TransactionPageTitle'
 
 export interface OfferAndForcedTradePageProps {
   user: UserDetails | undefined
-  transactionHash: Hash256
+  offerId: string
+  transactionHash?: Hash256
   starkKey: StarkKey
   ethereumAddress: EthereumAddress
   type: 'BUY' | 'SELL'
@@ -47,10 +50,24 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   return (
     <Page
       user={props.user}
-      path={`/transactions/${props.transactionHash.toString()}`}
+      path={
+        props.transactionHash
+          ? `/transactions/${props.transactionHash.toString()}`
+          : `/offers/${props.offerId}`
+      }
       description="TODO: description"
     >
       <ContentWrapper className="flex flex-col gap-12">
+        <div>
+          {props.transactionHash ? (
+            <TransactionPageTitle
+              title={`Forced ${props.type.toLowerCase()}`}
+              transactionHash={props.transactionHash}
+            />
+          ) : (
+            <PageTitle>Offer #{props.offerId}</PageTitle>
+          )}
+        </div>
         {/* TODO: content */}
         <TransactionHistoryTable
           entries={props.history.map((x) => toHistoryEntry(x, props.type))}
