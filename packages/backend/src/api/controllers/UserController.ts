@@ -35,7 +35,8 @@ export class UserController {
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
-    private userTransactionRepository: UserTransactionRepository,
+    private readonly userTransactionRepository: UserTransactionRepository,
+    private readonly tradingMode: 'perpetual' | 'spot',
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -78,7 +79,7 @@ export class UserController {
 
     const content = renderUserPage({
       user,
-      type: 'PERPETUAL',
+      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       starkKey,
       ethereumAddress: EthereumAddress.ZERO,
       withdrawableAssets: [],
@@ -118,7 +119,7 @@ export class UserController {
 
     const content = renderUserAssetsPage({
       user,
-      type: 'PERPETUAL',
+      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       starkKey,
       assets,
       ...pagination,
@@ -146,7 +147,7 @@ export class UserController {
 
     const content = renderUserBalanceChangesPage({
       user,
-      type: 'PERPETUAL',
+      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       starkKey,
       balanceChanges,
       ...pagination,

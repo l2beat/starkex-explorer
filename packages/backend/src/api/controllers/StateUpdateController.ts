@@ -20,7 +20,8 @@ export class StateUpdateController {
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
-    >
+    >,
+    private readonly tradingMode: 'perpetual' | 'spot',
   ) {}
 
   async getStateUpdatePage(
@@ -29,7 +30,7 @@ export class StateUpdateController {
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
 
-    const [stateUpdate, balanceChanges, totalBalanceChanges] =
+    const [stateUpdate, balanceChanges, totalBalanceChanges, prices] =
       await Promise.all([
         this.stateUpdateRepository.findById(stateUpdateId),
         this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
@@ -39,6 +40,7 @@ export class StateUpdateController {
         this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
           stateUpdateId
         ),
+        this.stateUpdateRepository.getPricesByStateUpdateId(stateUpdateId)
       ])
 
     if (!stateUpdate) {
@@ -46,10 +48,15 @@ export class StateUpdateController {
     }
 
     const balanceChangeEntries = toBalanceChangeEntries(balanceChanges)
+    const priceEntries = prices.map((p) => ({
+      asset: { hashOrId: p.assetId },
+      price: p.price,
+      change: 0n
+    }))
 
     const content = renderStateUpdatePage({
       user,
-      type: 'PERPETUAL',
+      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       id: stateUpdateId.toString(),
       hashes: {
         factHash: stateUpdate.stateTransitionHash,
@@ -69,7 +76,7 @@ export class StateUpdateController {
       ),
       balanceChanges: balanceChangeEntries,
       totalBalanceChanges,
-      priceChanges: [],
+      priceChanges: priceEntries,
       transactions: [],
       totalTransactions: 0,
     })
@@ -98,7 +105,7 @@ export class StateUpdateController {
 
     const content = renderStateUpdateBalanceChangesPage({
       user,
-      type: 'PERPETUAL',
+      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       id: '1534',
       balanceChanges: balanceChangeEntries,
       ...pagination,
