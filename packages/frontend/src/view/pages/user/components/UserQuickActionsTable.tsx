@@ -29,7 +29,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
         const assetInfo = assetToInfo(asset.asset)
         return (
           <div
-            className="mt-4 flex items-center justify-between"
+            className="mt-4 flex items-center justify-between gap-2"
             key={assetInfo.symbol}
           >
             <AssetWithLogo assetInfo={assetInfo} type="symbol" />
@@ -56,7 +56,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
             const totalPrice = offer.amount * offer.price
             return (
               <div
-                className="mt-3 flex items-center justify-between"
+                className="mt-3 flex items-center justify-between gap-2"
                 key={offer.timestamp.toString()}
               >
                 <AssetWithLogo assetInfo={assetInfo} type="symbol" />
