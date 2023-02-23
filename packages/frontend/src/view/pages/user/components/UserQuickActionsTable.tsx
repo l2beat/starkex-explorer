@@ -23,7 +23,7 @@ export interface WithdrawableAssetEntry {
 
 export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   return (
-    <div className="mb-12 flex w-full flex-col rounded-lg border border-solid border-brand bg-gray-800 p-6">
+    <div className="flex w-full flex-col rounded-lg border border-solid border-brand bg-gray-800 p-6">
       <p className="text-sm font-semibold text-zinc-500">Withdrawable assets</p>
       {props.withdrawableAssets.map((asset) => {
         const assetInfo = assetToInfo(asset.asset)

@@ -1,8 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 
-import { PaginationLeftIcon } from '../../assets/icons/PaginationLeftIcon'
-import { PaginationRightIcon } from '../../assets/icons/PaginationRightIcon'
+import { ArrowLeftIcon, ArrowRightIcon } from '../../assets/icons/ArrowIcon'
 
 export interface TablePaginationProps {
   surroundingPages: number
@@ -29,10 +28,10 @@ export function TablePagination(props: TablePaginationProps) {
         <li>
           {previous ? (
             <a href={link(previous)}>
-              <PaginationLeftIcon />
+              <ArrowLeftIcon />
             </a>
           ) : (
-            <PaginationLeftIcon className="text-zinc-500" />
+            <ArrowLeftIcon className="text-zinc-500" />
           )}
         </li>
         {display.map((page, i) => (
@@ -58,10 +57,10 @@ export function TablePagination(props: TablePaginationProps) {
         <li>
           {next ? (
             <a href={link(next)}>
-              <PaginationRightIcon />
+              <ArrowRightIcon />
             </a>
           ) : (
-            <PaginationRightIcon className="text-zinc-500" />
+            <ArrowRightIcon className="text-zinc-500" />
           )}
         </li>
       </ol>
