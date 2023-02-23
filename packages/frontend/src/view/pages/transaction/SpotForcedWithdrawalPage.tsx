@@ -6,16 +6,18 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 import {
-  FORCED_TRANSACTION_INCLUDED,
   FORCED_TRANSACTION_MINED,
   FORCED_TRANSACTION_SENT,
+  FORCED_WITHDRAWAL_INCLUDED,
   TRANSACTION_REVERTED,
 } from './common'
 import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
+import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
+import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface SpotForcedWithdrawalPageProps {
   user: UserDetails | undefined
@@ -36,6 +38,12 @@ export function renderSpotForcedWithdrawalPage(
 }
 
 function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
+  const historyEntries = props.history.map(toHistoryEntry)
+  const lastEntry = historyEntries[0]
+  if (!lastEntry) {
+    throw new Error('No history entries')
+  }
+
   return (
     <Page
       user={props.user}
@@ -48,9 +56,22 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
             title="Forced withdrawal"
             transactionHash={props.transactionHash}
           />
+          <TransactionOverview
+            statusText={lastEntry.statusText}
+            statusType={lastEntry.statusType}
+            statusDescription={lastEntry.description}
+            transactionHash={props.transactionHash}
+          />
         </div>
+        <TransactionUserDetails
+          title="Recipient details"
+          type="SPOT"
+          starkKey={props.starkKey}
+          ethereumAddress={props.ethereumAddress}
+          vaultOrPositionId={props.vaultId}
+        />
         {/* TODO: content */}
-        <TransactionHistoryTable entries={props.history.map(toHistoryEntry)} />
+        <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
     </Page>
   )
@@ -86,7 +107,7 @@ function toHistoryEntry(
       return {
         ...base,
         statusType: 'END',
-        description: FORCED_TRANSACTION_INCLUDED,
+        description: FORCED_WITHDRAWAL_INCLUDED,
       }
   }
 }

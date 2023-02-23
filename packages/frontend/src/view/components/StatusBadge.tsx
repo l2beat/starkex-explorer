@@ -12,7 +12,7 @@ export function StatusBadge({ type, children }: StatusBadgeProps) {
   return (
     <div
       className={cx(
-        'w-max rounded-full px-2 py-1 text-xxs font-bold',
+        'w-max whitespace-pre rounded-full px-2 py-1 text-xxs font-bold',
         type === 'BEGIN' && 'bg-blue-500 text-black',
         type === 'MIDDLE' &&
           'bg-gradient-to-r from-blue-500 to-green-400 text-black',

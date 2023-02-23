@@ -10,7 +10,9 @@ import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
+import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
+import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface RegularWithdrawalPageProps {
   user: UserDetails | undefined
@@ -30,6 +32,12 @@ export function renderRegularWithdrawalPage(props: RegularWithdrawalPageProps) {
 }
 
 function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
+  const historyEntries = props.history.map(toHistoryEntry)
+  const lastEntry = historyEntries[0]
+  if (!lastEntry) {
+    throw new Error('No history entries')
+  }
+
   return (
     <Page
       user={props.user}
@@ -42,9 +50,20 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
             title="Withdrawal"
             transactionHash={props.transactionHash}
           />
+          <TransactionOverview
+            statusText={lastEntry.statusText}
+            statusType={lastEntry.statusType}
+            statusDescription={lastEntry.description}
+            transactionHash={props.transactionHash}
+          />
         </div>
+        <TransactionUserDetails
+          title="Recipient details"
+          starkKey={props.starkKey}
+          ethereumAddress={props.ethereumAddress}
+        />
         {/* TODO: content */}
-        <TransactionHistoryTable entries={props.history.map(toHistoryEntry)} />
+        <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
     </Page>
   )
@@ -62,19 +81,19 @@ function toHistoryEntry(
       return {
         ...base,
         statusType: 'BEGIN',
-        description: 'Transaction sent.',
+        description: 'Transaction sent',
       }
     case 'MINED (2/2)':
       return {
         ...base,
         statusType: 'END',
-        description: 'Transaction mined.',
+        description: 'Transaction mined',
       }
     case 'REVERTED':
       return {
         ...base,
         statusType: 'ERROR',
-        description: 'Transaction reverted.',
+        description: 'Transaction reverted',
       }
   }
 }

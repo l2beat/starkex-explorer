@@ -1,50 +1,37 @@
+import { Hash256 } from '@explorer/types'
 import React from 'react'
 
-import { StatusBadge } from '../../../components/StatusBadge'
-import { toStatusType } from '../../user/components/UserTransactionsTable'
+import { StatusBadge, StatusType } from '../../../components/StatusBadge'
+import { TransactionField } from './TransactionField'
 
 interface TransactionOverviewProps {
-  currentStatus: 'SENT (1/2)' | 'MINED (2/2)' | 'REVERTED' // TODO: Add all possible statuses
-  transactionHash: string
-  stateUpdateId: number
-  children: React.ReactNode
+  statusType: StatusType
+  statusText: string
+  statusDescription: string
+  transactionHash?: Hash256
 }
 
 export function TransactionOverview(props: TransactionOverviewProps) {
   return (
-    <div className="flex flex-col gap-6">
-      <p className="text-xxl font-semibold text-white">
-        Transaction{' '}
-        <span className="text-blue-600 underline">
-          #{props.transactionHash.substring(0, 7)}...
-        </span>
-      </p>
-      <div className="flex flex-col items-center gap-6 rounded-lg bg-gray-800 p-6">
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-semibold text-zinc-500">Current status</p>
-          <div className="flex items-center justify-start gap-2">
-            <StatusBadge
-              type={toStatusType(props.currentStatus)}
-              children={props.currentStatus}
-            />
-            <p className="text-lg font-semibold text-white">
-              Transaction included in state update{' '}
-              <span className="text-blue-600 underline">
-                #{props.stateUpdateId}
-              </span>
-            </p>
-          </div>
+    <div className="flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
+      <TransactionField label="Current status">
+        <div className="flex items-baseline gap-2">
+          <StatusBadge type={props.statusType}>{props.statusText}</StatusBadge>
+          <p>{props.statusDescription}</p>
         </div>
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-semibold text-zinc-500">
-            Transaction hash
-          </p>
-          <p className="text-lg text-blue-600 underline">
-            {props.transactionHash}
-          </p>
-        </div>
-        {props.children}
-      </div>
+      </TransactionField>
+      {props.transactionHash && (
+        <TransactionField label="Transaction hash">
+          <a
+            href={`https://etherscan.io/tx/${props.transactionHash.toString()}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            {props.transactionHash.toString()}
+          </a>
+        </TransactionField>
+      )}
     </div>
   )
 }

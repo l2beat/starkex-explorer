@@ -16,6 +16,7 @@ import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
+import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 
 export interface OfferAndForcedTradePageProps {
@@ -47,6 +48,12 @@ export function renderOfferAndForcedTradePage(
 }
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
+  const historyEntries = props.history.map((x) => toHistoryEntry(x, props.type))
+  const lastEntry = historyEntries[0]
+  if (!lastEntry) {
+    throw new Error('No history entries')
+  }
+
   return (
     <Page
       user={props.user}
@@ -67,11 +74,15 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
           ) : (
             <PageTitle>Offer #{props.offerId}</PageTitle>
           )}
+          <TransactionOverview
+            statusText={lastEntry.statusText}
+            statusType={lastEntry.statusType}
+            statusDescription={lastEntry.description}
+            transactionHash={props.transactionHash}
+          />
         </div>
         {/* TODO: content */}
-        <TransactionHistoryTable
-          entries={props.history.map((x) => toHistoryEntry(x, props.type))}
-        />
+        <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
     </Page>
   )
@@ -91,25 +102,25 @@ function toHistoryEntry(
       return {
         ...base,
         statusType: 'BEGIN',
-        description: `Offer created, looking for ${counterparty}s to accept.`,
+        description: `Offer created, looking for ${counterparty}s to accept`,
       }
     case 'CANCELLED':
       return {
         ...base,
         statusType: 'CANCEL',
-        description: 'Offer cancelled by creator.',
+        description: 'Offer cancelled by creator',
       }
     case 'ACCEPTED (2/5)':
       return {
         ...base,
         statusType: 'MIDDLE',
-        description: `Offer accepted by ${counterparty}, waiting for creator to send.`,
+        description: `Offer accepted by ${counterparty}, waiting for creator to send`,
       }
     case 'EXPIRED':
       return {
         ...base,
         statusType: 'CANCEL',
-        description: 'Offer expired.',
+        description: 'Offer expired',
       }
     case 'SENT (3/5)':
       return {
