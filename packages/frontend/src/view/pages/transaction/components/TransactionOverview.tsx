@@ -44,8 +44,11 @@ export function TransactionOverview(props: TransactionOverviewProps) {
               {props.statusText}
             </StatusBadge>
             <p>{props.statusDescription}</p>
-            {props.stateUpdateId && props.statusType === 'END' && 
-            <Link href={`/state-updates/${props.stateUpdateId}`}>#{props.stateUpdateId}</Link>}
+            {props.stateUpdateId && props.statusType === 'END' && (
+              <Link href={`/state-updates/${props.stateUpdateId}`}>
+                #{props.stateUpdateId}
+              </Link>
+            )}
           </div>
         </TransactionField>
         {props.timestamp && (
@@ -53,7 +56,10 @@ export function TransactionOverview(props: TransactionOverviewProps) {
             label={props.timestamp.label}
             className="text-right"
           >
-            {formatTimestamp(props.timestamp.timestamp, 'utc')} UTC <span className='text-zinc-500'>({delayDays} {delayDays === 1 ? 'day' : 'days'})</span>
+            {formatTimestamp(props.timestamp.timestamp, 'utc')} UTC{' '}
+            <span className="text-zinc-500">
+              ({delayDays} {delayDays === 1 ? 'day' : 'days'})
+            </span>
           </TransactionField>
         )}
       </div>

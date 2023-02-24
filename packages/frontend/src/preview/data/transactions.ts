@@ -2,7 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { amountBucket } from './buckets'
-import { randomFutureTimestamp, randomId} from './utils'
+import { randomFutureTimestamp, randomId } from './utils'
 
 export function randomRecipient() {
   return {

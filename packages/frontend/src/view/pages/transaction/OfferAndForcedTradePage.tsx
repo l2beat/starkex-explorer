@@ -95,7 +95,9 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
                 transactionHash={props.transactionHash}
               />
             ) : (
-              <PageTitle>Forced {props.type.toLowerCase()} offer #{props.offerId}</PageTitle>
+              <PageTitle>
+                Forced {props.type.toLowerCase()} offer #{props.offerId}
+              </PageTitle>
             )}
             <div className="mb-6 flex items-center gap-2">
               {showCancel && <Button variant="outlined">Cancel offer</Button>}
