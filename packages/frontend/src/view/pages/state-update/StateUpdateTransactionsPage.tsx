@@ -4,18 +4,18 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
+import {
+  TransactionEntry,
+  TransactionsTable,
+} from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import { getTransactionTableProps } from './common'
 import { StateUpdatePageTitle } from './components/StateUpdatePageTitle'
-import {
-  StateUpdateTransactionEntry,
-  StateUpdateTransactionsTable,
-} from './components/StateUpdateTransactionsTable'
 
 export interface StateUpdateTransactionsPageProps {
   user: UserDetails | undefined
   id: string
-  transactions: StateUpdateTransactionEntry[]
+  transactions: TransactionEntry[]
   limit: number
   offset: number
   total: number
@@ -45,7 +45,7 @@ function StateUpdateTransactionsPage(props: StateUpdateTransactionsPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <StateUpdateTransactionsTable transactions={props.transactions} />
+          <TransactionsTable hideTime transactions={props.transactions} />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

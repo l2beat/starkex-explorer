@@ -30,7 +30,7 @@ export function PositionDetails(props: PositionDetailsProps) {
           Position {props.positionId.toString()}
         </PageHeading>
         {props.ownedByYou && (
-          <span className="ml-4 rounded-full bg-blue-700 px-2">
+          <span className="bg-blue-700 ml-4 rounded-full px-2">
             Owned by you
           </span>
         )}

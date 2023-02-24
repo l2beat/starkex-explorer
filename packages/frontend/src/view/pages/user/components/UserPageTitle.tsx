@@ -2,6 +2,7 @@ import { StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
+import { Link } from '../../../components/Link'
 
 interface UserPageTitleProps {
   prefix: string
@@ -12,11 +13,11 @@ export function UserPageTitle({ prefix, starkKey }: UserPageTitleProps) {
   return (
     <span>
       {prefix}{' '}
-      <a href={`/users/${starkKey.toString()}`}>
-        <InlineEllipsis className="max-w-[160px] text-blue-600 underline">
+      <Link href={`/users/${starkKey.toString()}`}>
+        <InlineEllipsis className="max-w-[160px]">
           {starkKey.toString()}
         </InlineEllipsis>
-      </a>
+      </Link>
     </span>
   )
 }

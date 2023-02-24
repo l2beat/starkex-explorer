@@ -1,26 +1,24 @@
 import cx from 'classnames'
 import React from 'react'
 
-interface LinkProps extends React.HTMLProps<HTMLAnchorElement> {
-  readonly href: string
-}
+type LinkProps = React.HTMLProps<HTMLAnchorElement>
 
 export function Link({ className, href, children, ...rest }: LinkProps) {
-  const isOutLink = /^https?:\/\//.test(href)
+  const isOutLink = /^https?:\/\//.test(href ?? '')
   const target = isOutLink ? '_blank' : undefined
   const rel = isOutLink ? 'noreferrer noopener' : undefined
-  return (
-    <a
-      href={href}
-      className={cx(
-        'text-blue-500 underline underline-offset-[3.5px]',
-        className
-      )}
-      target={target}
-      rel={rel}
-      {...rest}
-    >
+  const hasHref = href != null
+  const classNames = cx(
+    'text-blue-600 underline underline-offset-[3.5px]',
+    className
+  )
+  return hasHref ? (
+    <a href={href} className={classNames} target={target} rel={rel} {...rest}>
       {children}
     </a>
+  ) : (
+    <span className={classNames} {...rest}>
+      {children}
+    </span>
   )
 }

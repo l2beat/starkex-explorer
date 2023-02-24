@@ -3,6 +3,7 @@ import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Asset } from '../../../utils/assets'
+import { Button } from '../../components/Button'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -44,14 +45,14 @@ export interface OfferAndForcedTradePageProps {
   history: {
     timestamp: Timestamp
     status:
-      | 'CREATED (1/5)'
+      | 'CREATED'
       | 'CANCELLED'
-      | 'ACCEPTED (2/5)'
+      | 'ACCEPTED'
       | 'EXPIRED'
-      | 'SENT (3/5)'
-      | 'MINED (4/5)'
+      | 'SENT'
+      | 'MINED'
       | 'REVERTED'
-      | 'INCLUDED (5/5)'
+      | 'INCLUDED'
   }[]
 }
 
@@ -62,11 +63,17 @@ export function renderOfferAndForcedTradePage(
 }
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
+  const isMine = props.user?.starkKey === props.maker.starkKey
   const historyEntries = props.history.map((x) => toHistoryEntry(x, props.type))
   const lastEntry = historyEntries[0]
+  const status = props.history[0]?.status
   if (!lastEntry) {
     throw new Error('No history entries')
   }
+
+  const showCancel = isMine && (status === 'CREATED' || status === 'ACCEPTED')
+  const showSendTransaction = isMine && status === 'ACCEPTED'
+  const showAccept = !isMine && Boolean(props.user) && status === 'CREATED'
 
   return (
     <Page
@@ -80,21 +87,34 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
-          {props.transactionHash ? (
-            <TransactionPageTitle
-              title={`Forced ${props.type.toLowerCase()}`}
-              transactionHash={props.transactionHash}
-            />
-          ) : (
-            <PageTitle>Offer #{props.offerId}</PageTitle>
-          )}
+          <div className="flex items-center justify-between">
+            {props.transactionHash ? (
+              <TransactionPageTitle
+                title={`Forced ${props.type.toLowerCase()}`}
+                transactionHash={props.transactionHash}
+              />
+            ) : (
+              <PageTitle>Offer #{props.offerId}</PageTitle>
+            )}
+            <div className="mb-6 flex items-center gap-2">
+              {showCancel && <Button variant="outlined">Cancel offer</Button>}
+              {showSendTransaction && (
+                <Button variant="contained">Send transaction</Button>
+              )}
+              {showAccept && (
+                <Button variant="contained">
+                  Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
+                </Button>
+              )}
+            </div>
+          </div>
           <TransactionOverview
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
             timestamp={
-              !props.transactionHash && lastEntry.statusText !== 'EXPIRED'
+              !props.transactionHash && status !== 'EXPIRED'
                 ? {
                     label: 'Expiration timestamp',
                     timestamp: props.expirationTimestamp,
@@ -144,14 +164,11 @@ function toHistoryEntry(
   entry: OfferAndForcedTradePageProps['history'][number],
   type: 'BUY' | 'SELL'
 ): TransactionHistoryEntry {
-  const base = {
-    timestamp: entry.timestamp,
-    statusText: entry.status,
-  }
   switch (entry.status) {
-    case 'CREATED (1/5)':
+    case 'CREATED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'CREATED (1/5)',
         statusType: 'BEGIN',
         description: `Offer created, looking for ${
           type === 'BUY' ? 'sellers' : 'buyers'
@@ -159,13 +176,15 @@ function toHistoryEntry(
       }
     case 'CANCELLED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'CANCELLED',
         statusType: 'CANCEL',
         description: 'Offer cancelled by creator',
       }
-    case 'ACCEPTED (2/5)':
+    case 'ACCEPTED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'ACCEPTED (2/5)',
         statusType: 'MIDDLE',
         description: `${
           type === 'BUY' ? 'Seller' : 'Buyer'
@@ -173,31 +192,36 @@ function toHistoryEntry(
       }
     case 'EXPIRED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'EXPIRED',
         statusType: 'CANCEL',
         description: 'Offer expired',
       }
-    case 'SENT (3/5)':
+    case 'SENT':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'SENT (3/5)',
         statusType: 'MIDDLE',
         description: FORCED_TRANSACTION_SENT,
       }
-    case 'MINED (4/5)':
+    case 'MINED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'MINED (4/5)',
         statusType: 'MIDDLE',
         description: FORCED_TRANSACTION_MINED,
       }
     case 'REVERTED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'REVERTED',
         statusType: 'ERROR',
         description: TRANSACTION_REVERTED,
       }
-    case 'INCLUDED (5/5)':
+    case 'INCLUDED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'INCLUDED (5/5)',
         statusType: 'END',
         description: FORCED_TRANSACTION_INCLUDED,
       }
