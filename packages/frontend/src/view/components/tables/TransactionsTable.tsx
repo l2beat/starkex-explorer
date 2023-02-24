@@ -5,6 +5,7 @@ import { Asset, assetToInfo } from '../../../utils/assets'
 import { formatAmount } from '../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../AssetWithLogo'
 import { InlineEllipsis } from '../InlineEllipsis'
+import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
 import { Table } from '../table/Table'
 import { Column } from '../table/types'
@@ -48,9 +49,11 @@ export function TransactionsTable(props: TransactionsTableProps) {
           cells.push(<TimeCell timestamp={transaction.timestamp} />)
         }
         cells.push(
-          <InlineEllipsis className="max-w-[80px] text-blue-600 underline">
-            {transaction.hash.toString()}
-          </InlineEllipsis>,
+          <Link>
+            <InlineEllipsis className="max-w-[80px]">
+              {transaction.hash.toString()}
+            </InlineEllipsis>
+          </Link>,
           transaction.asset ? (
             <AssetWithLogo
               type="small"
