@@ -91,7 +91,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             ) : (
               <PageTitle>Offer #{props.offerId}</PageTitle>
             )}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-6">
               {isMine &&
                 (lastEntry.statusText === 'CREATED (1/5)' ||
                   lastEntry.statusText === 'ACCEPTED (2/5)') && (
@@ -100,7 +100,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
               {isMine && lastEntry.statusText === 'ACCEPTED (2/5)' && (
                 <Button variant="contained">Send transaction</Button>
               )}
-              {!isMine && lastEntry.statusText === 'CREATED (1/5)' && (
+              {!isMine && Boolean(props.user) && lastEntry.statusText === 'CREATED (1/5)' && (
                 <Button variant="contained">
                   Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
                 </Button>
