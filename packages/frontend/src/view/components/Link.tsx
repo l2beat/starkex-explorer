@@ -9,7 +9,7 @@ export function Link({ className, href, children, ...rest }: LinkProps) {
   const rel = isOutLink ? 'noreferrer noopener' : undefined
   const hasHref = href != null
   const classNames = cx(
-    'text-blue-600 underline underline-offset-[3.5px]',
+    'text-blue-500 hover:text-blue-600 underline underline-offset-[3.5px]',
     className
   )
   return hasHref ? (

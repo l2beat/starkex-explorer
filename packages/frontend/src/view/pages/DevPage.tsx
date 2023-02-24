@@ -28,9 +28,7 @@ function DevPage(props: DevPageProps) {
         <ul>
           {props.routes.map((route, i) => (
             <li key={i} className={cx(route.breakAfter && 'mb-4')}>
-              <Link href={route.path} className="text-blue-500">
-                {route.path}
-              </Link>{' '}
+              <Link href={route.path}>{route.path}</Link>{' '}
               <small className="text-sm">{route.description}</small>
             </li>
           ))}
