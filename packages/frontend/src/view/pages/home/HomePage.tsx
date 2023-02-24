@@ -5,16 +5,16 @@ import React from 'react'
 import { Page } from '../../components/page/Page'
 import { SearchBar } from '../../components/SearchBar'
 import { TablePreview } from '../../components/table/TablePreview'
+import {
+  TransactionEntry,
+  TransactionsTable,
+} from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
   FORCED_TRANSACTION_TABLE_PROPS,
   OFFER_TABLE_PROPS,
   STATE_UPDATE_TABLE_PROPS,
 } from './common'
-import {
-  HomeForcedTransactionEntry,
-  HomeForcedTransactionsTable,
-} from './components/HomeForcedTransactionsTable'
 import { HomeOfferEntry, HomeOffersTable } from './components/HomeOffersTable'
 import {
   HomeStateUpdateEntry,
@@ -32,7 +32,7 @@ export interface HomePageProps {
   tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
   totalStateUpdates: number
-  forcedTransactions: HomeForcedTransactionEntry[]
+  transactions: TransactionEntry[]
   totalForcedTransactions: number
   offers: HomeOfferEntry[]
   totalOffers: number
@@ -70,12 +70,10 @@ function HomePage(props: HomePageProps) {
           </TablePreview>
           <TablePreview
             {...FORCED_TRANSACTION_TABLE_PROPS}
-            visible={props.forcedTransactions.length}
+            visible={props.transactions.length}
             total={props.totalForcedTransactions}
           >
-            <HomeForcedTransactionsTable
-              forcedTransactions={props.forcedTransactions}
-            />
+            <TransactionsTable transactions={props.transactions} />
           </TablePreview>
           <TablePreview
             {...OFFER_TABLE_PROPS}

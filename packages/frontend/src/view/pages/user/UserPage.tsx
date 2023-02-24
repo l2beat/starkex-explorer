@@ -6,6 +6,10 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
 import { TablePreview } from '../../components/table/TablePreview'
+import {
+  TransactionEntry,
+  TransactionsTable,
+} from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
   getAssetsTableProps,
@@ -24,10 +28,6 @@ import {
   UserQuickActionsTable,
   WithdrawableAssetEntry,
 } from './components/UserQuickActionsTable'
-import {
-  UserTransactionEntry,
-  UserTransactionsTable,
-} from './components/UserTransactionsTable'
 
 export interface UserPageProps {
   user: UserDetails | undefined
@@ -40,7 +40,7 @@ export interface UserPageProps {
   totalAssets: number
   balanceChanges: UserBalanceChangeEntry[]
   totalBalanceChanges: number
-  transactions: UserTransactionEntry[]
+  transactions: TransactionEntry[]
   totalTransactions: number
   offers: UserOfferEntry[]
   totalOffers: number
@@ -99,7 +99,7 @@ function UserPage(props: UserPageProps) {
           visible={props.transactions.length}
           total={props.totalTransactions}
         >
-          <UserTransactionsTable transactions={props.transactions} />
+          <TransactionsTable transactions={props.transactions} />
         </TablePreview>
         <TablePreview
           {...getOfferTableProps(props.starkKey)}
