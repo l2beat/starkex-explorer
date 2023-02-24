@@ -31,6 +31,7 @@ export interface SpotForcedWithdrawalPageProps {
     timestamp: Timestamp
     status: 'SENT' | 'MINED' | 'REVERTED' | 'INCLUDED'
   }[]
+  stateUpdateId?: number
 }
 
 export function renderSpotForcedWithdrawalPage(
@@ -63,6 +64,7 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
+            stateUpdateId={props.stateUpdateId}
           />
         </div>
         <TransactionUserDetails

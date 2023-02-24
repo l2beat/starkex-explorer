@@ -34,6 +34,7 @@ export interface PerpetualForcedWithdrawalPageProps {
     timestamp: Timestamp
     status: 'SENT' | 'MINED' | 'REVERTED' | 'INCLUDED'
   }[]
+  stateUpdateId?: number
 }
 
 export function renderPerpetualForcedWithdrawalPage(
@@ -72,6 +73,7 @@ function PerpetualForcedWithdrawalPage(
               asset: props.asset,
               amount: props.amount,
             }}
+            stateUpdateId={props.stateUpdateId}
           />
         </div>
         <TransactionUserDetails

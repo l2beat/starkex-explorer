@@ -54,6 +54,7 @@ export interface OfferAndForcedTradePageProps {
       | 'REVERTED'
       | 'INCLUDED'
   }[]
+  stateUpdateId?: number
 }
 
 export function renderOfferAndForcedTradePage(
@@ -109,6 +110,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             </div>
           </div>
           <TransactionOverview
+            stateUpdateId={props.stateUpdateId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}

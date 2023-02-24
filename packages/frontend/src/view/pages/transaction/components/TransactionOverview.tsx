@@ -28,6 +28,7 @@ interface TransactionOverviewProps {
     receivedAsset: Asset
     receivedAmount: bigint
   }
+  stateUpdateId?: number
 }
 
 export function TransactionOverview(props: TransactionOverviewProps) {
@@ -35,11 +36,13 @@ export function TransactionOverview(props: TransactionOverviewProps) {
     <div className="flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
       <div className="flex">
         <TransactionField label="Current status">
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
             <StatusBadge type={props.statusType}>
               {props.statusText}
             </StatusBadge>
             <p>{props.statusDescription}</p>
+            {props.stateUpdateId && props.statusType === 'END' && 
+            <Link href={`/state-updates/${props.stateUpdateId}`}>#{props.stateUpdateId}</Link>}
           </div>
         </TransactionField>
         {props.timestamp && (

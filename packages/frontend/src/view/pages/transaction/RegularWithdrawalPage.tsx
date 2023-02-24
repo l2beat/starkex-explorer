@@ -27,6 +27,7 @@ export interface RegularWithdrawalPageProps {
     timestamp: Timestamp
     status: 'SENT' | 'MINED' | 'REVERTED'
   }[]
+  stateUpdateId?: number
 }
 
 export function renderRegularWithdrawalPage(props: RegularWithdrawalPageProps) {
@@ -61,6 +62,7 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
               asset: props.asset,
               amount: props.amount,
             }}
+            stateUpdateId={props.stateUpdateId}
           />
         </div>
         <TransactionUserDetails

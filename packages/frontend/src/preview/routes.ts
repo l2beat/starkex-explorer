@@ -534,6 +534,7 @@ const routes: Route[] = [
           { timestamp: randomTimestamp(), status: 'MINED' },
           { timestamp: randomTimestamp(), status: 'SENT' },
         ],
+        stateUpdateId: 1234
       })
     },
   },
@@ -615,6 +616,7 @@ const routes: Route[] = [
           { timestamp: randomTimestamp(), status: 'MINED' },
           { timestamp: randomTimestamp(), status: 'SENT' },
         ],
+        stateUpdateId: 1234
       })
     },
   },
@@ -810,6 +812,7 @@ const routes: Route[] = [
           { timestamp: randomTimestamp(), status: 'ACCEPTED' },
           { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
+        stateUpdateId: 1234
       })
     },
   },
