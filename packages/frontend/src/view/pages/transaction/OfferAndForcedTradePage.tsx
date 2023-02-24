@@ -91,7 +91,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
           <div className="flex items-center justify-between">
             {props.transactionHash ? (
               <TransactionPageTitle
-                title={`Forced ${props.type.toLowerCase()}`}
+                title={`Forced ${props.type.toLowerCase()} offer`}
                 transactionHash={props.transactionHash}
               />
             ) : (
