@@ -1,10 +1,6 @@
 import { Hash256 } from '@explorer/types'
 
-import {
-  HomeOfferEntry,
-  HomeStateUpdateEntry,
-  TransactionEntry,
-} from '../../view'
+import { HomeStateUpdateEntry, OfferEntry, TransactionEntry } from '../../view'
 import { Bucket } from './bucket'
 import { amountBucket, assetBucket } from './buckets'
 import { randomId, randomInt, randomTimestamp } from './utils'
@@ -44,7 +40,7 @@ const offerTypeBucket = new Bucket<'BUY' | 'SELL'>()
 offerTypeBucket.add('BUY', 3)
 offerTypeBucket.add('SELL', 3)
 
-export function randomHomeOfferEntry(): HomeOfferEntry {
+export function randomHomeOfferEntry(): OfferEntry {
   return {
     timestamp: randomTimestamp(),
     id: randomId(),
@@ -52,6 +48,7 @@ export function randomHomeOfferEntry(): HomeOfferEntry {
     amount: amountBucket.pick(),
     price: amountBucket.pick(),
     totalPrice: amountBucket.pick(),
+    status: 'CREATED',
     type: offerTypeBucket.pick(),
   }
 }

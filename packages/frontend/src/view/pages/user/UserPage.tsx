@@ -6,6 +6,7 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
 import { TablePreview } from '../../components/table/TablePreview'
+import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import {
   TransactionEntry,
   TransactionsTable,
@@ -22,7 +23,6 @@ import {
   UserBalanceChangeEntry,
   UserBalanceChangesTable,
 } from './components/UserBalanceChangesTable'
-import { UserOfferEntry, UserOffersTable } from './components/UserOffersTable'
 import { UserProfile } from './components/UserProfile'
 import {
   UserQuickActionsTable,
@@ -34,15 +34,15 @@ export interface UserPageProps {
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
   type: 'SPOT' | 'PERPETUAL'
-  withdrawableAssets: WithdrawableAssetEntry[] // Does ths make sense?
-  offersToAccept: UserOfferEntry[] // We could also pass a simpler object here
+  withdrawableAssets: WithdrawableAssetEntry[]
+  offersToAccept: OfferEntry[]
   assets: UserAssetEntry[]
   totalAssets: number
   balanceChanges: UserBalanceChangeEntry[]
   totalBalanceChanges: number
   transactions: TransactionEntry[]
   totalTransactions: number
-  offers: UserOfferEntry[]
+  offers: OfferEntry[]
   totalOffers: number
 }
 
@@ -106,7 +106,7 @@ function UserPage(props: UserPageProps) {
           visible={props.offers.length}
           total={props.totalOffers}
         >
-          <UserOffersTable offers={props.offers} />
+          <OffersTable offers={props.offers} />
         </TablePreview>
       </ContentWrapper>
     </Page>

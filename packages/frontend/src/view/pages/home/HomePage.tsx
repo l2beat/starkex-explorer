@@ -5,6 +5,7 @@ import React from 'react'
 import { Page } from '../../components/page/Page'
 import { SearchBar } from '../../components/SearchBar'
 import { TablePreview } from '../../components/table/TablePreview'
+import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import {
   TransactionEntry,
   TransactionsTable,
@@ -15,7 +16,6 @@ import {
   OFFER_TABLE_PROPS,
   STATE_UPDATE_TABLE_PROPS,
 } from './common'
-import { HomeOfferEntry, HomeOffersTable } from './components/HomeOffersTable'
 import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
@@ -34,7 +34,7 @@ export interface HomePageProps {
   totalStateUpdates: number
   transactions: TransactionEntry[]
   totalForcedTransactions: number
-  offers: HomeOfferEntry[]
+  offers: OfferEntry[]
   totalOffers: number
 }
 
@@ -80,7 +80,7 @@ function HomePage(props: HomePageProps) {
             visible={props.offers.length}
             total={props.totalOffers}
           >
-            <HomeOffersTable offers={props.offers} />
+            <OffersTable offers={props.offers} />
           </TablePreview>
         </div>
         {tutorials.length > 0 && <HomeTutorials tutorials={tutorials} />}

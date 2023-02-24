@@ -1,10 +1,10 @@
 import { Hash256 } from '@explorer/types'
 
 import {
+  OfferEntry,
   TransactionEntry,
   UserAssetEntry,
   UserBalanceChangeEntry,
-  UserOfferEntry,
 } from '../../view'
 import { WithdrawableAssetEntry } from '../../view/pages/user/components/UserQuickActionsTable'
 import { Bucket } from './bucket'
@@ -66,7 +66,7 @@ const offerStatusBucket = new Bucket([
 ] as const)
 const offerTypeBucket = new Bucket(['BUY', 'SELL'] as const)
 
-export function randomUserOfferEntry(): UserOfferEntry {
+export function randomUserOfferEntry(): OfferEntry {
   return {
     timestamp: randomTimestamp(),
     id: randomId(),

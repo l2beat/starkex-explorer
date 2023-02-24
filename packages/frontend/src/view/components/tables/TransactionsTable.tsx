@@ -1,5 +1,5 @@
 import { Hash256, Timestamp } from '@explorer/types'
-import React from 'react'
+import React, { ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
 import { formatAmount } from '../../../utils/formatting/formatAmount'
@@ -7,6 +7,7 @@ import { AssetWithLogo } from '../AssetWithLogo'
 import { InlineEllipsis } from '../InlineEllipsis'
 import { StatusBadge, StatusType } from '../StatusBadge'
 import { Table } from '../table/Table'
+import { Column } from '../table/types'
 import { TimeCell } from '../TimeCell'
 
 export interface TransactionsTableProps {
@@ -24,39 +25,50 @@ export interface TransactionEntry {
 }
 
 export function TransactionsTable(props: TransactionsTableProps) {
+  const columns: Column[] = []
+  if (!props.hideTime) {
+    columns.push({ header: 'Time' })
+  }
+  columns.push(
+    { header: 'Hash' },
+    { header: 'Asset' },
+    { header: 'Amount', numeric: true },
+    { header: 'Status' },
+    { header: 'Type' }
+  )
+
   return (
     <Table
-      columns={[
-        { header: 'Time' },
-        { header: 'Hash' },
-        { header: 'Asset' },
-        { header: 'Amount', numeric: true },
-        { header: 'Status' },
-        { header: 'Type' },
-      ]}
+      columns={columns}
       rows={props.transactions.map((transaction) => {
         const status = getStatus(transaction)
+
+        const cells: ReactNode[] = []
+        if (!props.hideTime) {
+          cells.push(<TimeCell timestamp={transaction.timestamp} />)
+        }
+        cells.push(
+          <InlineEllipsis className="max-w-[80px] text-blue-600 underline">
+            {transaction.hash.toString()}
+          </InlineEllipsis>,
+          transaction.asset ? (
+            <AssetWithLogo
+              type="small"
+              assetInfo={assetToInfo(transaction.asset)}
+            />
+          ) : (
+            '-'
+          ),
+          transaction.asset && transaction.amount !== undefined
+            ? formatAmount(transaction.asset, transaction.amount)
+            : '-',
+          <StatusBadge type={status.type}>{status.text}</StatusBadge>,
+          toTypeText(transaction.type)
+        )
+
         return {
           link: `/transactions/${transaction.hash.toString()}`,
-          cells: [
-            <TimeCell timestamp={transaction.timestamp} />,
-            <InlineEllipsis className="max-w-[80px] text-blue-600 underline">
-              {transaction.hash.toString()}
-            </InlineEllipsis>,
-            transaction.asset ? (
-              <AssetWithLogo
-                type="small"
-                assetInfo={assetToInfo(transaction.asset)}
-              />
-            ) : (
-              '-'
-            ),
-            transaction.asset && transaction.amount !== undefined
-              ? formatAmount(transaction.asset, transaction.amount)
-              : '-',
-            <StatusBadge type={status.type}>{status.text}</StatusBadge>,
-            toTypeText(transaction.type),
-          ],
+          cells,
         }
       })}
     />

@@ -8,11 +8,11 @@ import {
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
-import { UserOfferEntry } from './UserOffersTable'
+import { OfferEntry } from '../../../components/tables/OffersTable'
 
 interface UserQuickActionsTableProps {
   readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
-  readonly offersToAccept: readonly UserOfferEntry[]
+  readonly offersToAccept: readonly OfferEntry[]
   isMine?: boolean
 }
 
