@@ -51,6 +51,7 @@ export class StateUpdateController {
     const priceEntries = prices.map((p) => ({
       asset: { hashOrId: p.assetId },
       price: p.price,
+      // TODO: Don't display or correctly calculate this:
       change: 0n,
     }))
 
