@@ -74,7 +74,8 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   const showCancel =
     isMine && (status === 'CREATED (1/5)' || status === 'ACCEPTED (2/5)')
   const showSendTransaction = isMine && status === 'ACCEPTED (2/5)'
-  const showAccept = !isMine && Boolean(props.user) && status === 'CREATED (1/5)'
+  const showAccept =
+    !isMine && Boolean(props.user) && status === 'CREATED (1/5)'
 
   return (
     <Page
