@@ -7,8 +7,8 @@ import {
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { z } from 'zod'
 
-export type ForcedActionFormProps = z.infer<typeof ForcedActionFormProps>
-export const ForcedActionFormProps = z.object({
+export type NewForcedActionFormProps = z.infer<typeof NewForcedActionFormProps>
+export const NewForcedActionFormProps = z.object({
   user: AccountDetails,
   perpetualAddress: stringAs(EthereumAddress),
   selectedAsset: stringAs(AssetId),
@@ -24,6 +24,8 @@ export const ForcedActionFormProps = z.object({
   ),
 })
 
-export function serializeForcedActionsFormProps(props: ForcedActionFormProps) {
+export function serializeForcedActionsFormProps(
+  props: NewForcedActionFormProps
+) {
   return toJsonWithoutBigInts(props)
 }

@@ -13,11 +13,11 @@ import { FormId } from './components/form/ids'
 import { PriceInput } from './components/form/PriceInput'
 import { TotalInput } from './components/form/TotalInput'
 import {
-  ForcedActionFormProps,
+  NewForcedActionFormProps,
   serializeForcedActionsFormProps,
-} from './ForcedActionFormProps'
+} from './NewForcedActionFormProps'
 
-function ForcedTradePage(props: ForcedActionFormProps) {
+function NewPerpetualForcedTradePage(props: NewForcedActionFormProps) {
   const instructions = [
     'You create a trade offer using this form. This is fully off-chain and does not require any gas fees.',
     'The trade offer will now be visible to all users of the system. You should seek out another user to accept the offer and become a counterparty to the trade. Accepting the offer is also fully off-chain and does not require any gas fees.',
@@ -103,6 +103,8 @@ function ForcedTradePage(props: ForcedActionFormProps) {
   )
 }
 
-export function renderForcedTradePage(props: ForcedActionFormProps) {
-  return reactToHtml(<ForcedTradePage {...props} />)
+export function renderNewPerpetualForcedTradePage(
+  props: NewForcedActionFormProps
+) {
+  return reactToHtml(<NewPerpetualForcedTradePage {...props} />)
 }

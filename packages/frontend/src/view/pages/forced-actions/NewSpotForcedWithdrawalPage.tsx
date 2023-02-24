@@ -1,5 +1,8 @@
 import React from 'react'
 
+import { assetToInfo } from '../../../utils/assets'
+import { formatAmount } from '../../../utils/formatting/formatAmount'
+import { AssetWithLogo } from '../../components/AssetWithLogo'
 import { Button, LinkButton } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { Link } from '../../components/Link'
@@ -7,21 +10,18 @@ import { OrderedList } from '../../components/OrderedList'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 import { ForcedActionCard } from './components/ForcedActionCard'
-import { AmountInput } from './components/form/AmountInput'
-import { FormId } from './components/form/ids'
 import {
-  ForcedActionFormProps,
+  NewForcedActionFormProps,
   serializeForcedActionsFormProps,
-} from './ForcedActionFormProps'
+} from './NewForcedActionFormProps'
 
-function ForcedWithdrawPage(props: ForcedActionFormProps) {
+export const SpotWithdrawalFormId = 'spot-withdraw-form'
+
+function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   const instructions = [
     <>
-      Using this form you request a withdrawal of your funds. (Perpetual only)
-      You can only withdraw USDC, so to fully exit all funds you should first
-      get rid of your synthetic assets by using the close functionality.
-      (Perpetual only) This is achieved through a mechanism called forced
-      withdrawals,{' '}
+      Using this form you request a withdrawal of your funds. This is achieved
+      through a mechanism called full withdrawals,{' '}
       <Link href="https://docs.starkware.co/starkex/perpetual/perpetual-trading-forced-withdrawal-and-forced-trade.html#forced_withdrawal">
         link to docs
       </Link>
@@ -34,12 +34,20 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
       to withdraw your funds by submitting a withdrawal transaction.
     </>,
   ]
+  const assetInfo = assetToInfo({ hashOrId: props.selectedAsset })
   const propsJson = serializeForcedActionsFormProps(props)
-
+  const balance = props.assets.find(
+    (asset) => asset.assetId === props.selectedAsset
+  )?.balance
+  if (!balance) return null
+  const formattedBalance = formatAmount(
+    { hashOrId: props.selectedAsset },
+    balance
+  )
   return (
     <Page
       path="/forced/new/:positionId/:assetId"
-      description="Page that allows user withdrawal of USDC"
+      description="Page that allows user withdrawal of spot asset"
       user={props.user}
     >
       <main className="mx-auto flex-1 p-16">
@@ -55,14 +63,14 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
           </div>
           <Card className="h-min w-[480px]">
             <form
-              id={FormId.Form}
+              id={SpotWithdrawalFormId}
               className="flex flex-col gap-6"
               data-props={propsJson}
             >
               <div className="flex items-end justify-between">
                 <span className="text-2xl font-semibold">Withdrawal</span>
                 <span>
-                  <span className="text-sm text-zinc-500">Position</span>{' '}
+                  <span className="text-sm text-zinc-500">Vault</span>{' '}
                   <span className="font-semibold">
                     #{props.positionId.toString()}
                   </span>
@@ -70,13 +78,22 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
               </div>
               <div className="flex flex-col gap-2">
                 <ForcedActionCard>
-                  <AmountInput {...props} />
+                  <div className="flex gap-2">
+                    <div className="flex flex-1 flex-col gap-2">
+                      <span className="text-sm text-zinc-500">Balance</span>
+                      <span className="text-xl font-semibold">
+                        {formattedBalance}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      <span className="text-sm text-zinc-500">Asset</span>
+                      <AssetWithLogo assetInfo={assetInfo} />
+                    </div>
+                  </div>
                 </ForcedActionCard>
               </div>
               <div className="flex flex-col gap-2">
-                <Button className="w-full" id={FormId.SubmitButton}>
-                  Prepare for withdrawal
-                </Button>
+                <Button className="w-full">Prepare for withdrawal</Button>
                 <LinkButton
                   className="w-full"
                   variant="outlined"
@@ -93,6 +110,8 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
   )
 }
 
-export function renderForcedWithdrawPage(props: ForcedActionFormProps) {
-  return reactToHtml(<ForcedWithdrawPage {...props} />)
+export function renderNewSpotForcedWithdrawPage(
+  props: NewForcedActionFormProps
+) {
+  return reactToHtml(<NewSpotForcedWithdrawalPage {...props} />)
 }

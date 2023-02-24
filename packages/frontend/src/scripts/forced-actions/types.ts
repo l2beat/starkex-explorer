@@ -1,8 +1,8 @@
 import { PositionAssetEntry } from '../../view'
-import { ForcedActionFormProps } from '../../view/pages/forced-actions/ForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
 
 export interface FormState {
-  props: ForcedActionFormProps
+  props: NewForcedActionFormProps
   selectedAsset: PositionAssetEntry
   amountInputString: string
   amountInputValue: bigint

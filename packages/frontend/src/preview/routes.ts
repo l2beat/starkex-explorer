@@ -12,12 +12,12 @@ import { randomInt } from 'crypto'
 import Koa from 'koa'
 
 import {
-  renderForcedTradePage,
-  renderForcedWithdrawPage,
   renderHomeOffersPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
+  renderNewPerpetualForcedTradePage,
+  renderNewPerpetualForcedWithdrawalPage,
   renderNotFoundPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
@@ -33,7 +33,7 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderSpotForcedWithdrawPage } from '../view/pages/forced-actions/SpotForcedWithdrawPage'
+import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
 import * as DATA from './data'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
@@ -415,7 +415,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
       withdrawData.user = getUser(ctx) ?? withdrawData.user
-      ctx.body = renderSpotForcedWithdrawPage(withdrawData)
+      ctx.body = renderNewSpotForcedWithdrawPage(withdrawData)
     },
   },
   {
@@ -424,7 +424,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
       withdrawData.user = getUser(ctx) ?? withdrawData.user
-      ctx.body = renderForcedWithdrawPage(withdrawData)
+      ctx.body = renderNewPerpetualForcedWithdrawalPage(withdrawData)
     },
   },
   {
@@ -433,7 +433,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const buyData = { ...DATA.FORCED_BUY_FORM_PROPS }
       buyData.user = getUser(ctx) ?? buyData.user
-      ctx.body = renderForcedTradePage(buyData)
+      ctx.body = renderNewPerpetualForcedTradePage(buyData)
     },
   },
   {
@@ -443,7 +443,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const sellData = { ...DATA.FORCED_SELL_FORM_PROPS }
       sellData.user = getUser(ctx) ?? sellData.user
-      ctx.body = renderForcedTradePage(sellData)
+      ctx.body = renderNewPerpetualForcedTradePage(sellData)
     },
   },
   // #endregion

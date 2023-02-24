@@ -1,8 +1,8 @@
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
-import { ForcedActionFormProps } from '../view/pages/forced-actions/ForcedActionFormProps'
+import { NewForcedActionFormProps } from '../view/pages/forced-actions/NewForcedActionFormProps'
 
-export const FORCED_ACTION_FORM_PROPS: ForcedActionFormProps = {
+export const FORCED_ACTION_FORM_PROPS: NewForcedActionFormProps = {
   user: {
     address: EthereumAddress.fake(),
     positionId: 123n,
@@ -48,7 +48,7 @@ export const FORCED_ACTION_FORM_PROPS: ForcedActionFormProps = {
   ],
 }
 
-export const FORCED_WITHDRAW_FORM_PROPS: ForcedActionFormProps = {
+export const FORCED_WITHDRAW_FORM_PROPS: NewForcedActionFormProps = {
   user: {
     address: EthereumAddress.fake(),
     positionId: 123n,
@@ -70,7 +70,7 @@ export const FORCED_WITHDRAW_FORM_PROPS: ForcedActionFormProps = {
   ],
 }
 
-export const FORCED_SELL_FORM_PROPS: ForcedActionFormProps = {
+export const FORCED_SELL_FORM_PROPS: NewForcedActionFormProps = {
   user: {
     address: EthereumAddress.fake(),
     positionId: 123n,
@@ -98,7 +98,7 @@ export const FORCED_SELL_FORM_PROPS: ForcedActionFormProps = {
   ],
 }
 
-export const FORCED_BUY_FORM_PROPS: ForcedActionFormProps = {
+export const FORCED_BUY_FORM_PROPS: NewForcedActionFormProps = {
   user: {
     address: EthereumAddress.fake(),
     positionId: 123n,

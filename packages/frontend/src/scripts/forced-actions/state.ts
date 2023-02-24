@@ -1,12 +1,12 @@
 import { AssetId } from '@explorer/types'
 
 import { formatCurrencyInput } from '../../utils/formatting/formatCurrencyInput'
-import { ForcedActionFormProps } from '../../view/pages/forced-actions/ForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormAction, FormState } from './types'
 import { getAsset, getFormType, parseCurrencyInput } from './utils'
 
 export function getInitialState(
-  props: ForcedActionFormProps,
+  props: NewForcedActionFormProps,
   queryString: string
 ): FormState {
   const search = new URLSearchParams(queryString)

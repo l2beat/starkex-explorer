@@ -1,4 +1,4 @@
-import { SpotWithdrawalFormId } from '../../view/pages/forced-actions/SpotForcedWithdrawPage'
+import { SpotWithdrawalFormId } from '../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
 
 export function initSpotWithdrawalForm() {
   const form = document.getElementById(SpotWithdrawalFormId)

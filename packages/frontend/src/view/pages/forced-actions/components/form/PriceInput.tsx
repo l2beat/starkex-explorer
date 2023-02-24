@@ -4,10 +4,10 @@ import React from 'react'
 import { assetToInfo } from '../../../../../utils/assets'
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
-import { ForcedActionFormProps } from '../../ForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../NewForcedActionFormProps'
 import { FormId } from './ids'
 
-export function PriceInput(props: ForcedActionFormProps) {
+export function PriceInput(props: NewForcedActionFormProps) {
   const usdcInfo = assetToInfo({ hashOrId: AssetId.USDC })
   const assetDetails = props.assets.find(
     (asset) => asset.assetId === props.selectedAsset
