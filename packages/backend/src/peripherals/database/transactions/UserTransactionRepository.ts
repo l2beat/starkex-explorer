@@ -62,7 +62,7 @@ export class UserTransactionRepository extends BaseRepository {
       this.getByStateUpdateIdAndPositionId
     )
     this.getPaginated = this.wrapGet(this.getPaginated)
-    this.getPaginatedByStarkKey = this.wrapGet(this.getPaginatedByStarkKey)
+    this.getByStarkKeyPaginated = this.wrapGet(this.getByStarkKeyPaginated)
     this.getNotIncluded = this.wrapGet(this.getNotIncluded)
     this.countAll = this.wrapAny(this.countAll)
     this.findById = this.wrapFind(this.findById)
@@ -190,7 +190,7 @@ export class UserTransactionRepository extends BaseRepository {
     return toRecords<T>(await query)
   }
 
-  async getPaginatedByStarkKey<T extends UserTransactionData['type']>(options: {
+  async getByStarkKeyPaginated<T extends UserTransactionData['type']>(options: {
     starkKey: StarkKey
     limit: number
     offset: number

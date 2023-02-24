@@ -61,7 +61,7 @@ export class UserController {
           { offset: 0, limit: 10 }
         ),
         this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
-        this.userTransactionRepository.getPaginatedByStarkKey({
+        this.userTransactionRepository.getByStarkKeyPaginated({
           starkKey,
           offset: 0,
           limit: 10,
