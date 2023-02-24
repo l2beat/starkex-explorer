@@ -2,7 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { amountBucket } from './buckets'
-import { randomId, randomTimestamp } from './utils'
+import { randomFutureTimestamp, randomId} from './utils'
 
 export function randomRecipient() {
   return {
@@ -35,6 +35,6 @@ export function randomOfferDetails() {
     collateralAmount: amountBucket.pick(),
     syntheticAsset: { hashOrId: AssetId('BTC-10') },
     syntheticAmount: amountBucket.pick(),
-    expirationTimestamp: randomTimestamp(),
+    expirationTimestamp: randomFutureTimestamp(),
   }
 }

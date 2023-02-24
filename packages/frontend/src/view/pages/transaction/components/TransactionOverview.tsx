@@ -32,6 +32,9 @@ interface TransactionOverviewProps {
 }
 
 export function TransactionOverview(props: TransactionOverviewProps) {
+  const delayDays = Math.ceil(
+    (Number(props.timestamp?.timestamp) - Date.now()) / (24 * 60 * 60 * 1000)
+  )
   return (
     <div className="flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
       <div className="flex">
@@ -50,7 +53,7 @@ export function TransactionOverview(props: TransactionOverviewProps) {
             label={props.timestamp.label}
             className="text-right"
           >
-            {formatTimestamp(props.timestamp.timestamp, 'utc')} UTC
+            {formatTimestamp(props.timestamp.timestamp, 'utc')} UTC <span className='text-zinc-500'>({delayDays} {delayDays === 1 ? 'day' : 'days'})</span>
           </TransactionField>
         )}
       </div>
