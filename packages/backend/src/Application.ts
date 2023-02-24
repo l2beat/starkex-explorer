@@ -6,10 +6,12 @@ import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferCo
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { OldHomeController } from './api/controllers/OldHomeController'
+import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
+import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
@@ -319,8 +321,9 @@ export class Application {
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
 
+    let preprocessedAssetHistoryRepository
     if (config.starkex.tradingMode === 'perpetual') {
-      const preprocessedAssetHistoryRepository =
+      preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetId, logger)
 
       const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
@@ -340,7 +343,7 @@ export class Application {
         isPreprocessorEnabled
       )
     } else {
-      const preprocessedAssetHistoryRepository =
+      preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetHash, logger)
 
       const vaultRepository = new VaultRepository(database, logger)
@@ -387,8 +390,25 @@ export class Application {
     )
     const homeController = new HomeController(
       userService,
-      stateUpdateRepository
+      stateUpdateRepository,
+      userTransactionRepository
     )
+    const userController = new UserController(
+      userService,
+      preprocessedAssetHistoryRepository,
+      userTransactionRepository,
+      config.starkex.tradingMode,
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
+    )
+    const stateUpdateController = new StateUpdateController(
+      userService,
+      stateUpdateRepository,
+      preprocessedAssetHistoryRepository,
+      config.starkex.tradingMode
+    )
+
     const oldHomeController = new OldHomeController(
       accountService,
       stateUpdateRepository,
@@ -405,7 +425,7 @@ export class Application {
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
-    const stateUpdateController = new StateUpdateController(
+    const oldStateUpdateController = new OldStateUpdateController(
       accountService,
       stateUpdateRepository,
       userTransactionRepository
@@ -438,10 +458,14 @@ export class Application {
               oldHomeController,
               forcedTradeOfferController,
               forcedTransactionController,
-              stateUpdateController,
+              oldStateUpdateController,
               searchController
             )
-          : createFrontendRouter(homeController),
+          : createFrontendRouter(
+              homeController,
+              userController,
+              stateUpdateController
+            ),
         createForcedTransactionRouter(
           forcedTradeOfferController,
           userTransactionController

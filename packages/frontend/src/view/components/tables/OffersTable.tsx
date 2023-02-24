@@ -7,6 +7,7 @@ import {
   formatWithDecimals,
 } from '../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../AssetWithLogo'
+import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
 import { Table } from '../table/Table'
 import { Column } from '../table/types'
@@ -50,7 +51,7 @@ export function OffersTable(props: OffersTableProps) {
         const cells: ReactNode[] = []
         cells.push(
           <TimeCell timestamp={offer.timestamp} />,
-          <span className="text-blue-600 underline">#{offer.id}</span>,
+          <Link>#{offer.id}</Link>,
           <AssetWithLogo type="small" assetInfo={assetToInfo(offer.asset)} />,
           formatAmount(offer.asset, offer.amount),
           formatWithDecimals(offer.price, 6, { prefix: '$' }),
