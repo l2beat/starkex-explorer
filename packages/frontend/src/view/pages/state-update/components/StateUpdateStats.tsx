@@ -6,6 +6,7 @@ import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { ChevronDownIcon } from '../../../assets/icons/ChevronDownIcon'
 import { ChevronUpIcon } from '../../../assets/icons/ChevronUpIcon'
 import { Button } from '../../../components/Button'
+import { Link } from '../../../components/Link'
 import { PageTitle } from '../../../components/PageTitle'
 
 export interface StateUpdateStatsProps {
@@ -38,12 +39,9 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
       <div className="mb-6 flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
         <div className="flex justify-between gap-6">
           <ValueItem label="Ethereum block number">
-            <a
-              className="block text-blue-600 underline"
-              href={`https://etherscan.io/block/${props.blockNumber}`}
-            >
+            <Link href={`https://etherscan.io/block/${props.blockNumber}`}>
               {formatInt(props.blockNumber)}
-            </a>
+            </Link>
           </ValueItem>
           <ValueItem label="Ethereum block timestamp">
             {formatTimestamp(props.ethereumTimestamp, 'utc')} UTC
@@ -78,12 +76,13 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
             <ValueItem label="Order root">
               0x{props.hashes.orderRoot.toString()}
             </ValueItem>
-            {props.rawDataAvailable &&<a
+            {props.rawDataAvailable &&
+            <Link
               href={`/state-updates/${props.id}/raw`}
-              className="text-lg font-semibold text-blue-600 underline"
+              className="text-lg font-semibold"
             >
               View raw data
-            </a>}
+            </Link>}
           </div>
         </div>
       </div>

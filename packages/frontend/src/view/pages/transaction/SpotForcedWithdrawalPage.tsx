@@ -29,7 +29,7 @@ export interface SpotForcedWithdrawalPageProps {
   vaultId: string
   history: {
     timestamp: Timestamp
-    status: 'SENT (1/3)' | 'MINED (2/3)' | 'REVERTED' | 'INCLUDED (3/3)'
+    status: 'SENT' | 'MINED' | 'REVERTED' | 'INCLUDED'
   }[]
 }
 
@@ -81,32 +81,32 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
 function toHistoryEntry(
   entry: SpotForcedWithdrawalPageProps['history'][number]
 ): TransactionHistoryEntry {
-  const base = {
-    timestamp: entry.timestamp,
-    statusText: entry.status,
-  }
   switch (entry.status) {
-    case 'SENT (1/3)':
+    case 'SENT':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'SENT (1/3)',
         statusType: 'BEGIN',
         description: FORCED_TRANSACTION_SENT,
       }
-    case 'MINED (2/3)':
+    case 'MINED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'MINED (2/3)',
         statusType: 'MIDDLE',
         description: FORCED_TRANSACTION_MINED,
       }
     case 'REVERTED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'REVERTED',
         statusType: 'ERROR',
         description: TRANSACTION_REVERTED,
       }
-    case 'INCLUDED (3/3)':
+    case 'INCLUDED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'INCLUDED (3/3)',
         statusType: 'END',
         description: FORCED_WITHDRAWAL_INCLUDED,
       }

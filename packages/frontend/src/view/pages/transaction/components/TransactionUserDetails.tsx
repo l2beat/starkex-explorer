@@ -2,6 +2,7 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
+import { Link } from '../../../components/Link'
 import { SectionHeading } from '../../../components/SectionHeading'
 import { TransactionField } from './TransactionField'
 
@@ -26,22 +27,20 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
           </TransactionField>
         )}
         <TransactionField label="Stark Key">
-          <a href={`/users/${props.starkKey.toString()}`}>
-            <InlineEllipsis className="max-w-[300px] text-blue-600 underline">
+          <Link href={`/users/${props.starkKey.toString()}`}>
+            <InlineEllipsis className="max-w-[300px]">
               {props.starkKey.toString()}
             </InlineEllipsis>
-          </a>
+          </Link>
         </TransactionField>
         <TransactionField label="Ethereum Address">
-          <a
+          <Link
             href={`https://etherscan.io/address/${props.ethereumAddress.toString()}`}
-            target="_blank"
-            rel="noopener noreferrer"
           >
-            <InlineEllipsis className="max-w-[300px] text-blue-600 underline">
+            <InlineEllipsis className="max-w-[300px]">
               {props.ethereumAddress.toString()}
             </InlineEllipsis>
-          </a>
+          </Link>
         </TransactionField>
       </div>
     </section>

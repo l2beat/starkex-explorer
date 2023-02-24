@@ -5,6 +5,10 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { SectionHeading } from '../../components/SectionHeading'
 import { TablePreview } from '../../components/table/TablePreview'
+import {
+  TransactionEntry,
+  TransactionsTable,
+} from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import { getBalanceChangeTableProps, getTransactionTableProps } from './common'
 import {
@@ -19,10 +23,6 @@ import {
   StateUpdateStats,
   StateUpdateStatsProps,
 } from './components/StateUpdateStats'
-import {
-  StateUpdateTransactionEntry,
-  StateUpdateTransactionsTable,
-} from './components/StateUpdateTransactionsTable'
 
 export interface StateUpdatePageProps extends StateUpdateStatsProps {
   user: UserDetails | undefined
@@ -30,7 +30,7 @@ export interface StateUpdatePageProps extends StateUpdateStatsProps {
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
   priceChanges?: StateUpdatePriceEntry[]
-  transactions: StateUpdateTransactionEntry[]
+  transactions: TransactionEntry[]
   totalTransactions: number
 }
 
@@ -68,7 +68,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
           visible={props.transactions.length}
           total={props.totalTransactions}
         >
-          <StateUpdateTransactionsTable transactions={props.transactions} />
+          <TransactionsTable hideTime transactions={props.transactions} />
         </TablePreview>
         {props.priceChanges && (
           <section>
