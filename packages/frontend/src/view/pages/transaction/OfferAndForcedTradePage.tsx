@@ -66,6 +66,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   const isMine = props.user?.starkKey === props.maker.starkKey
   const historyEntries = props.history.map((x) => toHistoryEntry(x, props.type))
   const lastEntry = historyEntries[0]
+  const status = props.history[0]?.status
   if (!lastEntry) {
     throw new Error('No history entries')
   }
@@ -93,14 +94,14 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             )}
             <div className="flex items-center gap-2 mb-6">
               {isMine &&
-                (lastEntry.statusText === 'CREATED (1/5)' ||
-                  lastEntry.statusText === 'ACCEPTED (2/5)') && (
+                (status === 'CREATED (1/5)' ||
+                  status === 'ACCEPTED (2/5)') && (
                   <Button variant="outlined">Cancel offer</Button>
                 )}
-              {isMine && lastEntry.statusText === 'ACCEPTED (2/5)' && (
+              {isMine && status === 'ACCEPTED (2/5)' && (
                 <Button variant="contained">Send transaction</Button>
               )}
-              {!isMine && Boolean(props.user) && lastEntry.statusText === 'CREATED (1/5)' && (
+              {!isMine && Boolean(props.user) && status === 'CREATED (1/5)' && (
                 <Button variant="contained">
                   Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
                 </Button>
@@ -113,7 +114,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
             timestamp={
-              !props.transactionHash && lastEntry.statusText !== 'EXPIRED'
+              !props.transactionHash && status !== 'EXPIRED'
                 ? {
                     label: 'Expiration timestamp',
                     timestamp: props.expirationTimestamp,
