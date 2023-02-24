@@ -11,7 +11,7 @@ type ButtonVariant = 'contained' | 'outlined'
 const mainClassNames =
   'py-2.5 text-sm font-semibold disabled:cursor-not-allowed px-8'
 const classNameMap: Record<ButtonVariant, string> = {
-  contained: 'bg-brand rounded',
+  contained: 'bg-brand rounded hover:bg-brand-darker',
   outlined:
     'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20 rounded-lg',
 }

@@ -54,7 +54,7 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
               </span>
             </span>
             {account.hasUpdates && (
-              <div className="absolute right-0 top-0 h-4 w-4 translate-x-1/3 translate-y-[-33%] rounded-full bg-blue-200" />
+              <div className="bg-blue-200 absolute right-0 top-0 h-4 w-4 translate-x-1/3 translate-y-[-33%] rounded-full" />
             )}
           </a>
         )}

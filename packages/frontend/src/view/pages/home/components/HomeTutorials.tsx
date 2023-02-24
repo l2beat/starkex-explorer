@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { Link } from '../../../components/Link'
 import { SectionHeading } from '../../../components/SectionHeading'
 
 export const DEFAULT_TUTORIALS: HomeTutorialEntry[] = [
@@ -47,9 +48,7 @@ export function HomeTutorials(props: HomeTutorialsProps) {
                 <p className="mb-1.5 text-lg font-semibold leading-tight">
                   {tutorial.title}
                 </p>
-                <p className="text-xs font-semibold text-blue-600 underline">
-                  Read now
-                </p>
+                <Link className="text-xs font-semibold">Read now</Link>
               </div>
             </a>
           </li>

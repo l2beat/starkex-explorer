@@ -4,6 +4,7 @@ import React from 'react'
 import { Asset } from '../../../../utils/assets'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
+import { Link } from '../../../components/Link'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { AmountContainer } from './AmountContainer'
 import { TransactionField } from './TransactionField'
@@ -52,14 +53,11 @@ export function TransactionOverview(props: TransactionOverviewProps) {
       </div>
       {props.transactionHash && (
         <TransactionField label="Transaction hash">
-          <a
+          <Link
             href={`https://etherscan.io/tx/${props.transactionHash.toString()}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 underline"
           >
             {props.transactionHash.toString()}
-          </a>
+          </Link>
         </TransactionField>
       )}
       {props.value && (

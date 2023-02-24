@@ -5,6 +5,7 @@ import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatAmount } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { ChangeText } from '../../../components/ChangeText'
+import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
 import { TimeCell } from '../../../components/TimeCell'
 
@@ -38,9 +39,7 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
           link: `/state-updates/${entry.stateUpdateId}`,
           cells: [
             <TimeCell timestamp={entry.timestamp} />,
-            <span className="text-blue-300 underline">
-              #{entry.stateUpdateId}
-            </span>,
+            <Link>#{entry.stateUpdateId}</Link>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(entry.asset)} />,
             formatAmount(entry.asset, entry.balance),
             <ChangeText className="text-sm font-medium">

@@ -6,6 +6,7 @@ import { formatAmount } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { ChangeText } from '../../../components/ChangeText'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
+import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
 
 export interface StateUpdateBalanceChangesTableProps {
@@ -37,9 +38,11 @@ export function StateUpdateBalanceChangesTable(
         return {
           link: `/users/${entry.starkKey.toString()}`,
           cells: [
-            <InlineEllipsis className="max-w-[80px] text-blue-600 underline sm:max-w-[160px]">
-              {entry.starkKey.toString()}
-            </InlineEllipsis>,
+            <Link>
+              <InlineEllipsis className="max-w-[80px] sm:max-w-[160px]">
+                {entry.starkKey.toString()}
+              </InlineEllipsis>
+            </Link>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(entry.asset)} />,
             formatAmount(entry.asset, entry.balance),
             <ChangeText className="text-sm font-medium">
