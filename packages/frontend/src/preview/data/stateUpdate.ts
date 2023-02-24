@@ -3,11 +3,11 @@ import { Hash256, StarkKey } from '@explorer/types'
 import {
   StateUpdateBalanceChangeEntry,
   StateUpdatePriceEntry,
-  StateUpdateTransactionEntry,
+  TransactionEntry,
 } from '../../view'
 import { Bucket } from './bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
-import { randomId } from './utils'
+import { randomId, randomTimestamp } from './utils'
 
 export function randomStateUpdatePriceEntry(): StateUpdatePriceEntry {
   return {
@@ -27,12 +27,18 @@ export function randomStateUpdateBalanceChangeEntry(): StateUpdateBalanceChangeE
   }
 }
 
-const transactionTypeBucket = new Bucket(['WITHDRAW', 'BUY', 'SELL'] as const)
-export function randomStateUpdateTransactionEntry(): StateUpdateTransactionEntry {
+const transactionTypeBucket = new Bucket([
+  'FORCED_WITHDRAW',
+  'FORCED_BUY',
+  'FORCED_SELL',
+] as const)
+export function randomStateUpdateTransactionEntry(): TransactionEntry {
   return {
+    timestamp: randomTimestamp(),
     hash: Hash256.fake(),
     asset: assetBucket.pick(),
     amount: amountBucket.pick(),
+    status: 'INCLUDED',
     type: transactionTypeBucket.pick(),
   }
 }

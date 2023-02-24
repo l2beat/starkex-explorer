@@ -14,10 +14,10 @@ import Koa from 'koa'
 import {
   renderForcedTradePage,
   renderForcedWithdrawPage,
-  renderHomeForcedTransactionsPage,
   renderHomeOffersPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
+  renderHomeTransactionsPage,
   renderNotFoundPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
@@ -96,7 +96,7 @@ const routes: Route[] = [
         user,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        transactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
@@ -113,7 +113,7 @@ const routes: Route[] = [
         tutorials: [],
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        transactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
@@ -145,7 +145,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 68
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderHomeForcedTransactionsPage({
+      ctx.body = renderHomeTransactionsPage({
         user,
         forcedTransactions: repeat(visible, randomHomeForcedTransactionEntry),
         limit,

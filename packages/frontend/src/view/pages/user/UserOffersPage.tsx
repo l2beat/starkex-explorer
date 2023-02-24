@@ -5,15 +5,15 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
+import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import { reactToHtml } from '../../reactToHtml'
 import { getOfferTableProps } from './common'
-import { UserOfferEntry, UserOffersTable } from './components/UserOffersTable'
 import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserOffersPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
-  offers: UserOfferEntry[]
+  offers: OfferEntry[]
   limit: number
   offset: number
   total: number
@@ -36,7 +36,7 @@ function UserOffersPage(props: UserOffersPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <UserOffersTable offers={props.offers} />
+          <OffersTable offers={props.offers} />
         </TableWithPagination>
       </ContentWrapper>
     </Page>
