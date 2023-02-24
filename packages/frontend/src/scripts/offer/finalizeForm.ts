@@ -1,11 +1,9 @@
-import {
-  deserializeFinalizeOfferData,
-  serializeFinalizeOfferBody,
-} from '@explorer/shared'
+import { deserializeFinalizeOfferData } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/finalize-form/attributes'
+import * as Api from '../peripherals/api'
 import * as Wallet from '../peripherals/wallet'
 import { getAttribute } from './getAttribute'
 
@@ -26,14 +24,7 @@ export function initFinalizeForm() {
         offer,
         perpetualAddress
       )
-      await fetch(form.action, {
-        method: form.method,
-        headers: { 'Content-Type': 'application/json' },
-        body: serializeFinalizeOfferBody({
-          offerId,
-          hash,
-        }),
-      })
+      await Api.submitForcedTrade(offerId, hash)
       window.location.href = `/forced/${hash.toString()}`
     })
   })

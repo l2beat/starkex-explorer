@@ -1,8 +1,8 @@
-import { serializeCancelOfferBody } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/cancel-form/attributes'
+import * as Api from '../peripherals/api'
 import * as Wallet from '../peripherals/wallet'
 import { getAttribute } from './getAttribute'
 
@@ -15,11 +15,7 @@ export function initCancelOfferForm() {
       const offerId = Number(getAttribute(form, 'offer-id'))
       const address = EthereumAddress(getAttribute(form, 'address'))
       const signature = await Wallet.signCancel(address, offerId)
-      await fetch(form.action, {
-        method: form.method,
-        headers: { 'Content-Type': 'application/json' },
-        body: serializeCancelOfferBody({ signature }),
-      })
+      await Api.cancelOffer(offerId, signature)
       window.location.href = `/forced/offers/${offerId.toString()}`
     })
   })

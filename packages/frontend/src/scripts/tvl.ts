@@ -1,17 +1,15 @@
 // eslint-disable-next-line no-restricted-imports
 import { tvlElId } from '../view/old/home/tvlElId'
+import * as Api from './peripherals/api'
 
 export function initTVLDisplay() {
   const tvlEl = document.querySelector('#' + tvlElId)
   if (tvlEl) {
-    fetch('https://api.l2beat.com/api/dydx')
-      .then((res) => res.json())
-      .then((res) => {
-        const tvl = Number(res)
-        if (Number.isNaN(tvl)) {
-          return
+    Api.getDydxTvl()
+      .then((tvl) => {
+        if (tvl !== undefined) {
+          tvlEl.innerHTML = '$' + formatLargeNumber(tvl)
         }
-        tvlEl.innerHTML = '$' + formatLargeNumber(tvl)
       })
       .catch(console.error)
   }
