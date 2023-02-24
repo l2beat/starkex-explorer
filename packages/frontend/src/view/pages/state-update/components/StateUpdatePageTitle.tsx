@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
+import { Link } from '../../../components/Link'
 
 interface StateUpdatePageTitleProps {
   prefix: string
@@ -14,11 +15,9 @@ export function StateUpdatePageTitle({
   return (
     <span>
       {prefix}{' '}
-      <a href={`/state-updates/${id.toString()}`}>
-        <InlineEllipsis className="max-w-[160px] text-blue-600 underline">
-          #{id}
-        </InlineEllipsis>
-      </a>
+      <Link href={`/state-updates/${id.toString()}`}>
+        <InlineEllipsis className="max-w-[160px]">#{id}</InlineEllipsis>
+      </Link>
     </span>
   )
 }
