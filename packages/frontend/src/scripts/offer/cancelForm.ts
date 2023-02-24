@@ -3,8 +3,8 @@ import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/cancel-form/attributes'
+import * as Wallet from '../peripherals/wallet'
 import { getAttribute } from './getAttribute'
-import { signCancel } from './sign'
 
 export function initCancelOfferForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
@@ -14,10 +14,7 @@ export function initCancelOfferForm() {
       e.preventDefault()
       const offerId = Number(getAttribute(form, 'offer-id'))
       const address = EthereumAddress(getAttribute(form, 'address'))
-      const signature = await signCancel(offerId, address)
-      if (!signature) {
-        throw new Error('Could not create a signature for cancel form')
-      }
+      const signature = await Wallet.signCancel(address, offerId)
       await fetch(form.action, {
         method: form.method,
         headers: { 'Content-Type': 'application/json' },

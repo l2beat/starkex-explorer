@@ -7,8 +7,8 @@ import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/accept-form/attributes'
+import * as Wallet from '../peripherals/wallet'
 import { getAttribute } from './getAttribute'
-import { signAccepted } from './sign'
 
 export function initAcceptOfferForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
@@ -19,10 +19,7 @@ export function initAcceptOfferForm() {
       const address = EthereumAddress(getAttribute(form, 'address'))
       const offer = deserializeCreateOfferData(getAttribute(form, 'offer'))
       const accepted = deserializeAcceptedData(getAttribute(form, 'accepted'))
-      const signature = await signAccepted(offer, accepted, address)
-      if (!signature) {
-        throw new Error('Could not create a signature for accept form')
-      }
+      const signature = await Wallet.signAccepted(address, offer, accepted)
       await fetch(form.action, {
         method: form.method,
         headers: { 'Content-Type': 'application/json' },

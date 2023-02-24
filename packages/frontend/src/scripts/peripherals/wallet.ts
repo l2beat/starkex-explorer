@@ -1,4 +1,11 @@
 import { Interface } from '@ethersproject/abi'
+import {
+  AcceptedData,
+  CreateOfferData,
+  toSignableAcceptOffer,
+  toSignableCancelOffer,
+  toSignableCreateOffer,
+} from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 
 function getProvider() {
@@ -9,7 +16,7 @@ function getProvider() {
   return provider
 }
 
-// #region key recovery and registration
+// #region Key recovery and registration
 
 export async function signDydxKey(account: EthereumAddress): Promise<string> {
   const message =
@@ -30,7 +37,6 @@ export async function signDydxKeyLegacy(
 
   const result = await getProvider().request({
     method: 'personal_sign',
-    // this parameter order is incorrect, but follows dYdX's implementation
     params: [account.toString(), message],
   })
   return result as string
@@ -55,6 +61,46 @@ export async function sendRegistrationTransaction(
     method: 'eth_sendTransaction',
     params: [{ from: account, to: exchangeAddress, data }],
   })
+}
+
+// #endregion
+// #region Offer signing
+
+export async function signCreate(
+  account: EthereumAddress,
+  offer: CreateOfferData
+): Promise<string> {
+  const signable = toSignableCreateOffer(offer)
+  const result = await getProvider().request({
+    method: 'personal_sign',
+    params: [account.toString(), signable],
+  })
+  return result as string
+}
+
+export async function signAccepted(
+  account: EthereumAddress,
+  offer: CreateOfferData,
+  accepted: AcceptedData
+): Promise<string> {
+  const signable = toSignableAcceptOffer(offer, accepted)
+  const result = await getProvider().request({
+    method: 'eth_sign',
+    params: [account.toString(), signable],
+  })
+  return result as string
+}
+
+export async function signCancel(
+  account: EthereumAddress,
+  offerId: number
+): Promise<string> {
+  const signable = toSignableCancelOffer(offerId)
+  const result = await getProvider().request({
+    method: 'personal_sign',
+    params: [account.toString(), signable],
+  })
+  return result as string
 }
 
 // #endregion

@@ -5,7 +5,7 @@ import {
 } from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
-import { signCreate } from '../../offer/sign'
+import * as Wallet from '../../peripherals/wallet'
 import { FormState } from './types'
 
 export async function submit(state: FormState) {
@@ -60,12 +60,7 @@ async function submitOffer(state: FormState) {
     isABuyingSynthetic: state.buyButtonSelected,
   }
 
-  const signature = await signCreate(offer, state.props.account.address)
-
-  if (!signature) {
-    console.error('Offer parameters need to be signed.')
-    return
-  }
+  const signature = await Wallet.signCreate(state.props.account.address, offer)
 
   fetch('/forced/offers', {
     method: 'POST',
