@@ -25,7 +25,7 @@ export interface RegularWithdrawalPageProps {
   amount?: bigint
   history: {
     timestamp: Timestamp
-    status: 'SENT (1/2)' | 'MINED (2/2)' | 'REVERTED'
+    status: 'SENT' | 'MINED' | 'REVERTED'
   }[]
 }
 
@@ -77,26 +77,25 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
 function toHistoryEntry(
   entry: RegularWithdrawalPageProps['history'][number]
 ): TransactionHistoryEntry {
-  const base = {
-    timestamp: entry.timestamp,
-    statusText: entry.status,
-  }
   switch (entry.status) {
-    case 'SENT (1/2)':
+    case 'SENT':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'SENT (1/2)',
         statusType: 'BEGIN',
         description: 'Transaction sent',
       }
-    case 'MINED (2/2)':
+    case 'MINED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'MINED (2/2)',
         statusType: 'END',
         description: 'Transaction mined',
       }
     case 'REVERTED':
       return {
-        ...base,
+        timestamp: entry.timestamp,
+        statusText: 'REVERTED',
         statusType: 'ERROR',
         description: 'Transaction reverted',
       }

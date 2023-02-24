@@ -477,7 +477,7 @@ const routes: Route[] = [
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         vaultId: randomId(),
-        history: [{ timestamp: randomTimestamp(), status: 'SENT (1/3)' }],
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
       })
     },
   },
@@ -493,8 +493,8 @@ const routes: Route[] = [
         recipient: randomRecipient(),
         vaultId: randomId(),
         history: [
-          { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
-          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
         ],
       })
     },
@@ -512,7 +512,7 @@ const routes: Route[] = [
         vaultId: randomId(),
         history: [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
-          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
         ],
       })
     },
@@ -530,9 +530,9 @@ const routes: Route[] = [
         recipient: randomRecipient(),
         vaultId: randomId(),
         history: [
-          { timestamp: randomTimestamp(), status: 'INCLUDED (3/3)' },
-          { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
-          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+          { timestamp: randomTimestamp(), status: 'INCLUDED' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
         ],
       })
     },
@@ -552,7 +552,7 @@ const routes: Route[] = [
         asset: { hashOrId: AssetId.USDC },
         amount: amountBucket.pick(),
         positionId: randomId(),
-        history: [{ timestamp: randomTimestamp(), status: 'SENT (1/3)' }],
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
       })
     },
   },
@@ -570,8 +570,8 @@ const routes: Route[] = [
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [
-          { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
-          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
         ],
       })
     },
@@ -591,7 +591,7 @@ const routes: Route[] = [
         positionId: randomId(),
         history: [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
-          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
         ],
       })
     },
@@ -611,9 +611,9 @@ const routes: Route[] = [
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [
-          { timestamp: randomTimestamp(), status: 'INCLUDED (3/3)' },
-          { timestamp: randomTimestamp(), status: 'MINED (2/3)' },
-          { timestamp: randomTimestamp(), status: 'SENT (1/3)' },
+          { timestamp: randomTimestamp(), status: 'INCLUDED' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
         ],
       })
     },
@@ -631,7 +631,7 @@ const routes: Route[] = [
         user,
         maker: userParty(user),
         ...randomOfferDetails(),
-        history: [{ timestamp: randomTimestamp(), status: 'CREATED (1/5)' }],
+        history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
       })
     },
   },
@@ -646,7 +646,7 @@ const routes: Route[] = [
         user,
         maker: randomParty(),
         ...randomOfferDetails(),
-        history: [{ timestamp: randomTimestamp(), status: 'CREATED (1/5)' }],
+        history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
       })
     },
   },
@@ -663,8 +663,8 @@ const routes: Route[] = [
         taker: randomParty(),
         ...randomOfferDetails(),
         history: [
-          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
-          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
       })
     },
@@ -682,8 +682,8 @@ const routes: Route[] = [
         taker: randomParty(),
         ...randomOfferDetails(),
         history: [
-          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
-          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
       })
     },
@@ -700,7 +700,7 @@ const routes: Route[] = [
         ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'CANCELLED' },
-          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
       })
     },
@@ -718,8 +718,8 @@ const routes: Route[] = [
         ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'EXPIRED' },
-          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
-          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
       })
     },
@@ -738,9 +738,9 @@ const routes: Route[] = [
         taker: randomParty(),
         ...randomOfferDetails(),
         history: [
-          { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
-          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
-          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
       })
     },
@@ -759,10 +759,10 @@ const routes: Route[] = [
         taker: randomParty(),
         ...randomOfferDetails(),
         history: [
-          { timestamp: randomTimestamp(), status: 'MINED (4/5)' },
-          { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
-          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
-          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
       })
     },
@@ -782,9 +782,9 @@ const routes: Route[] = [
         ...randomOfferDetails(),
         history: [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
-          { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
-          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
-          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
       })
     },
@@ -804,11 +804,11 @@ const routes: Route[] = [
         taker: randomParty(),
         ...randomOfferDetails(),
         history: [
-          { timestamp: randomTimestamp(), status: 'INCLUDED (5/5)' },
-          { timestamp: randomTimestamp(), status: 'MINED (4/5)' },
-          { timestamp: randomTimestamp(), status: 'SENT (3/5)' },
-          { timestamp: randomTimestamp(), status: 'ACCEPTED (2/5)' },
-          { timestamp: randomTimestamp(), status: 'CREATED (1/5)' },
+          { timestamp: randomTimestamp(), status: 'INCLUDED' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
       })
     },
@@ -825,7 +825,7 @@ const routes: Route[] = [
         recipient: randomRecipient(),
         asset: assetBucket.pick(),
         transactionHash: Hash256.fake(),
-        history: [{ timestamp: randomTimestamp(), status: 'SENT (1/2)' }],
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
       })
     },
   },
@@ -841,8 +841,8 @@ const routes: Route[] = [
         asset: assetBucket.pick(),
         transactionHash: Hash256.fake(),
         history: [
-          { timestamp: randomTimestamp(), status: 'MINED (2/2)' },
-          { timestamp: randomTimestamp(), status: 'SENT (1/2)' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
         ],
       })
     },
@@ -860,7 +860,7 @@ const routes: Route[] = [
         transactionHash: Hash256.fake(),
         history: [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
-          { timestamp: randomTimestamp(), status: 'SENT (1/2)' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
         ],
       })
     },
