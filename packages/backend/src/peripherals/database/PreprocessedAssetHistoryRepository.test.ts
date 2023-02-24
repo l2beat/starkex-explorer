@@ -457,4 +457,192 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       undefined,
     ])
   })
+
+  it('gets by state update id - paginated and count', async () => {
+    const stateUpdateId = 200
+
+    const id1 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
+        stateUpdateId,
+      },
+      trx
+    )
+    const id2 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
+        stateUpdateId,
+      },
+      trx
+    )
+    const id3 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('3'),
+        stateUpdateId,
+      },
+      trx
+    )
+    const id4 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('4'),
+        stateUpdateId,
+      },
+      trx
+    )
+
+    const count = await repository.getCountByStateUpdateId(stateUpdateId, trx)
+    expect(count).toEqual(4)
+
+    const page1Records = await repository.getByStateUpdateIdPaginated(
+      stateUpdateId,
+      { offset: 0, limit: 2 },
+      trx
+    )
+    expect(page1Records.map((r) => r.historyId)).toEqual(
+      [id1, id2, id3, id4].sort().slice(0, 2)
+    )
+
+    const page2Records = await repository.getByStateUpdateIdPaginated(
+      stateUpdateId,
+      { offset: 2, limit: 2 },
+      trx
+    )
+    expect(page2Records.map((r) => r.historyId)).toEqual(
+      [id1, id2, id3, id4].sort().slice(2, 4)
+    )
+  })
+
+  it('gets by stark key - paginated and count', async () => {
+    const starkKey = StarkKey.fake('000fab')
+
+    const id1 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
+        starkKey,
+        timestamp: Timestamp(900_000_000n),
+      },
+      trx
+    )
+    const id2 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
+        timestamp: Timestamp(800_000_000n),
+        starkKey,
+      },
+      trx
+    )
+    const id3 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('3'),
+        starkKey,
+        timestamp: Timestamp(600_000_000n),
+      },
+      trx
+    )
+    const id4 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('4'),
+        starkKey,
+        timestamp: Timestamp(700_000_000n),
+      },
+      trx
+    )
+
+    const count = await repository.getCountByStarkKey(starkKey, trx)
+    expect(count).toEqual(4)
+
+    const page1Records = await repository.getByStarkKeyPaginated(
+      starkKey,
+      { offset: 0, limit: 2 },
+      trx
+    )
+    expect(page1Records.map((r) => r.historyId)).toEqual([id1, id2])
+
+    const page2Records = await repository.getByStarkKeyPaginated(
+      starkKey,
+      { offset: 2, limit: 4 },
+      trx
+    )
+    // Ordered by timestamp!
+    expect(page2Records.map((r) => r.historyId)).toEqual([id4, id3])
+  })
+
+  it('gets current by stark key - paginated and count, with collateral at top', async () => {
+    const starkKey = StarkKey.fake('000fab')
+    const collateralAsset = AssetHash.fake('fffff')
+
+    const id1 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
+        starkKey,
+        isCurrent: true,
+      },
+      trx
+    )
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
+        starkKey,
+        isCurrent: false,
+      },
+      trx
+    )
+    const id3 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('4'),
+        starkKey,
+        isCurrent: true,
+      },
+      trx
+    )
+    const id4 = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('3'),
+        starkKey,
+        isCurrent: true,
+      },
+      trx
+    )
+    const idCollateral = await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: collateralAsset,
+        starkKey,
+        isCurrent: true,
+      },
+      trx
+    )
+
+    const count = await repository.getCountOfCurrentByStarkKey(starkKey, trx)
+    expect(count).toEqual(4)
+
+    const page1Records = await repository.getCurrentByStarkKeyPaginated(
+      starkKey,
+      { offset: 0, limit: 2 },
+      collateralAsset,
+      trx
+    )
+    expect(page1Records.map((r) => r.historyId)).toEqual([idCollateral, id1])
+
+    const page2Records = await repository.getCurrentByStarkKeyPaginated(
+      starkKey,
+      { offset: 2, limit: 4 },
+      collateralAsset,
+      trx
+    )
+    // Order by hash id desc
+    expect(page2Records.map((r) => r.historyId)).toEqual([id4, id3])
+  })
 })

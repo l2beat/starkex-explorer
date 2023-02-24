@@ -118,7 +118,7 @@ export class PreprocessedAssetHistoryRepository<
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history')
       .where('state_update_id', stateUpdateId)
-      .orderBy('id', 'desc')
+      .orderBy('id')
       .offset(offset)
       .limit(limit)
 
@@ -170,7 +170,7 @@ export class PreprocessedAssetHistoryRepository<
   async getCurrentByStarkKeyPaginated(
     starkKey: StarkKey,
     { offset, limit }: { offset: number; limit: number },
-    assetIdAtTop?: AssetId,
+    assetAtTop?: T,
     trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
@@ -178,13 +178,13 @@ export class PreprocessedAssetHistoryRepository<
       stark_key: starkKey.toString(),
       is_current: true,
     })
-    if (assetIdAtTop) {
+    if (assetAtTop) {
       // Make sure that assetIdAtTop (normally the collateral asset)
       // is always the first one in the list, regardless of sorting
       query = query
         .orderByRaw(
           'CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END',
-          assetIdAtTop.toString()
+          assetAtTop.toString()
         )
         .orderBy('asset_hash_or_id')
     }
