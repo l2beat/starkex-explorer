@@ -1,7 +1,7 @@
 import { pack } from '@ethersproject/solidity'
 import { EthereumAddress } from '@explorer/types'
 
-import * as Wallet from '../peripherals/wallet'
+import { Wallet } from '../peripherals/wallet'
 import { signStarkMessage, StarkKeyPair, starkKeyPairFromData } from './keys'
 
 export async function recoverKeysDydx(account: EthereumAddress) {

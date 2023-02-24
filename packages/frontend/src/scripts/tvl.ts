@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-restricted-imports
 import { tvlElId } from '../view/old/home/tvlElId'
-import * as Api from './peripherals/api'
+import { Api } from './peripherals/api'
 
 export function initTVLDisplay() {
   const tvlEl = document.querySelector('#' + tvlElId)

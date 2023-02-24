@@ -1,7 +1,7 @@
 import { CreateOfferData } from '@explorer/shared'
 
-import * as Api from '../../peripherals/api'
-import * as Wallet from '../../peripherals/wallet'
+import { Api } from '../../peripherals/api'
+import { Wallet } from '../../peripherals/wallet'
 import { FormState } from './types'
 
 export async function submit(state: FormState) {

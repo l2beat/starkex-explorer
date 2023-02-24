@@ -3,8 +3,8 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 // eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../../view/old/forced-transactions/finalize-form'
 import { getAttribute } from '../../offer/getAttribute'
-import * as Api from '../../peripherals/api'
-import * as Wallet from '../../peripherals/wallet'
+import { Api } from '../../peripherals/api'
+import { Wallet } from '../../peripherals/wallet'
 
 export function initFinalizeExitForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)

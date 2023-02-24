@@ -3,8 +3,8 @@ import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/finalize-form/attributes'
-import * as Api from '../peripherals/api'
-import * as Wallet from '../peripherals/wallet'
+import { Api } from '../peripherals/api'
+import { Wallet } from '../peripherals/wallet'
 import { getAttribute } from './getAttribute'
 
 export function initFinalizeForm() {
