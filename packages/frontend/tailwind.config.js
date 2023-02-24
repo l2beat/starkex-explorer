@@ -56,7 +56,7 @@ module.exports = {
         300: '#FFEF5A',
       },
       sky: {
-        400: '#38BDF8'
+        400: '#38BDF8',
       },
       black: '#060606',
       brand: '#5F5CFF',
