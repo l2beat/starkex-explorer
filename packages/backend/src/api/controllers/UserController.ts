@@ -147,6 +147,7 @@ function toUserAssetEntry(
   return {
     asset: { hashOrId: asset.assetHashOrId },
     balance: asset.balance,
+    // TODO: fix value calculation
     value:
       asset.price !== undefined ? asset.price * (asset.balance / 1000000n) : 0n, // temporary assumption of quantum=6
     vaultOrPositionId: asset.positionOrVaultId.toString(),

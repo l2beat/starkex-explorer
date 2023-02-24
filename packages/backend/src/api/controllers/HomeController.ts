@@ -31,8 +31,7 @@ export class HomeController {
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.id.toString(),
-        // we want fact hash instead
-        hash: Hash256(update.rootHash.toString()),
+        hash: Hash256.fake('abc'), // TODO: we want fact hash
         updateCount: update.positionCount,
         forcedTransactionCount: update.forcedTransactionsCount,
       })),
@@ -61,8 +60,7 @@ export class HomeController {
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.id.toString(),
-        // TODO: we want fact hash instead
-        hash: Hash256(update.rootHash.toString()),
+        hash: Hash256.fake('abc'), // TODO: we want fact hash
         updateCount: update.positionCount,
         forcedTransactionCount: update.forcedTransactionsCount,
       })),

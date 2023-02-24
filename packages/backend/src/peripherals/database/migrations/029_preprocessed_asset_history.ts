@@ -54,8 +54,7 @@ export async function up(knex: Knex) {
     // *ordered* by timestamp descending.
     table.index(['stark_key', 'timestamp'])
     // Index used on rollback to find the previous state update id
-    // and rendering single state update page (hence id is last)
-    table.index(['state_update_id', 'id'])
+    table.index(['state_update_id'])
   })
 }
 

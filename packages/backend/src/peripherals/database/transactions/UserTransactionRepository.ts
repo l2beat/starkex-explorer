@@ -62,7 +62,6 @@ export class UserTransactionRepository extends BaseRepository {
       this.getByStateUpdateIdAndPositionId
     )
     this.getPaginated = this.wrapGet(this.getPaginated)
-    this.getByStarkKeyPaginated = this.wrapGet(this.getByStarkKeyPaginated)
     this.getNotIncluded = this.wrapGet(this.getNotIncluded)
     this.countAll = this.wrapAny(this.countAll)
     this.findById = this.wrapFind(this.findById)
@@ -181,25 +180,6 @@ export class UserTransactionRepository extends BaseRepository {
   }): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex)
-      .limit(options.limit)
-      .offset(options.offset)
-      .orderBy('timestamp', 'desc')
-    if (options.types) {
-      query = query.whereIn('type', options.types)
-    }
-    return toRecords<T>(await query)
-  }
-
-  async getByStarkKeyPaginated<T extends UserTransactionData['type']>(options: {
-    starkKey: StarkKey
-    limit: number
-    offset: number
-    types?: T[]
-  }): Promise<UserTransactionRecord<T>[]> {
-    const knex = await this.knex()
-    let query = queryWithIncluded(knex)
-      .where('stark_key_a', options.starkKey.toString())
-      .orWhere('stark_key_b', options.starkKey.toString())
       .limit(options.limit)
       .offset(options.offset)
       .orderBy('timestamp', 'desc')

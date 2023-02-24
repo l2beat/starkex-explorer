@@ -3,7 +3,7 @@ import {
   renderStateUpdatePage,
 } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { AssetHash, AssetId, Timestamp } from '@explorer/types'
+import { AssetHash, AssetId } from '@explorer/types'
 
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
@@ -61,19 +61,15 @@ export class StateUpdateController {
       hashes: {
         factHash: stateUpdate.stateTransitionHash,
         positionTreeRoot: stateUpdate.rootHash,
-        // TODO - don't show this data:
-        onChainVaultTreeRoot: stateUpdate.rootHash,
-        offChainVaultTreeRoot: stateUpdate.rootHash,
-        orderRoot: stateUpdate.rootHash,
+        // TODO - extract this data:
+        onChainVaultTreeRoot: undefined,
+        offChainVaultTreeRoot: undefined,
+        orderRoot: undefined,
       },
       blockNumber: stateUpdate.blockNumber,
       ethereumTimestamp: stateUpdate.timestamp,
       // TODO - what is this?
-      starkExTimestamp: Timestamp(
-        Math.floor(
-          Number(stateUpdate.timestamp) - Math.random() * 2 * 60 * 60 * 1000
-        )
-      ),
+      starkExTimestamp: stateUpdate.timestamp,
       balanceChanges: balanceChangeEntries,
       totalBalanceChanges,
       priceChanges: priceEntries,

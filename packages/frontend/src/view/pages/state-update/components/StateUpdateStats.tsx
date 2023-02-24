@@ -16,7 +16,7 @@ export interface StateUpdateStatsProps {
     positionTreeRoot?: PedersenHash
     onChainVaultTreeRoot?: PedersenHash
     offChainVaultTreeRoot?: PedersenHash
-    orderRoot: PedersenHash
+    orderRoot?: PedersenHash
   }
   blockNumber: number
   ethereumTimestamp: Timestamp
@@ -72,9 +72,11 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
                 0x{props.hashes.offChainVaultTreeRoot.toString()}
               </ValueItem>
             )}
-            <ValueItem label="Order root">
-              0x{props.hashes.orderRoot.toString()}
-            </ValueItem>
+            {props.hashes.orderRoot && (
+              <ValueItem label="Order root">
+                0x{props.hashes.orderRoot.toString()}
+              </ValueItem>
+            )}
             <Link
               href={`/state-updates/${props.id}/raw`}
               className="text-lg font-semibold"
