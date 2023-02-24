@@ -36,8 +36,7 @@ module.exports = {
       },
       blue: {
         400: '#3e8fef',
-        500: '#3E97FF',
-        600: '#2969E9',
+        500: '#3B82F6',
       },
       red: {
         500: '#FF394A',
@@ -55,6 +54,9 @@ module.exports = {
       },
       yellow: {
         300: '#FFEF5A',
+      },
+      sky: {
+        400: '#38BDF8'
       },
       black: '#060606',
       brand: '#5F5CFF',
