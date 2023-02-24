@@ -91,11 +91,11 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
           <div className="flex items-center justify-between">
             {props.transactionHash ? (
               <TransactionPageTitle
-                title={`Forced ${props.type.toLowerCase()} offer`}
+                title={`Forced ${props.type.toLowerCase()}`}
                 transactionHash={props.transactionHash}
               />
             ) : (
-              <PageTitle>Offer #{props.offerId}</PageTitle>
+              <PageTitle>Forced {props.type.toLowerCase()} offer #{props.offerId}</PageTitle>
             )}
             <div className="mb-6 flex items-center gap-2">
               {showCancel && <Button variant="outlined">Cancel offer</Button>}
