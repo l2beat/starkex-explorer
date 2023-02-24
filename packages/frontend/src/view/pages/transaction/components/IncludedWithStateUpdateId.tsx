@@ -18,7 +18,7 @@ export function IncludedWithStateUpdateId(
           #{props.stateUpdateId}
         </Link>
       )}{' '}
-      , you can now send a withdrawal transaction
+      ,<br/>you can now send a withdrawal transaction
     </p>
   )
 }
