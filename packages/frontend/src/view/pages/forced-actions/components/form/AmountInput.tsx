@@ -1,22 +1,27 @@
 import React from 'react'
 
 import { assetToInfo } from '../../../../../utils/assets'
-import { formatCurrencyInput } from '../../../../../utils/formatting/formatCurrencyInput'
+import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
 import { ForcedActionFormProps } from '../../ForcedActionFormProps'
 import { FormId } from './ids'
 
 export function AmountInput(props: ForcedActionFormProps) {
   const assetInfo = assetToInfo({ hashOrId: props.selectedAsset })
-  const balance = props.assets.find(
+  const asset = props.assets.find(
     (asset) => asset.assetId === props.selectedAsset
-  )?.balance
-  const sign = balance && balance < 0 ? '-' : ''
-  const formattedBalance = formatCurrencyInput(balance, props.selectedAsset)
+  )
+  if (!asset) {
+    throw new Error('Asset not found')
+  }
+  const formattedBalance = formatAmount(
+    { hashOrId: props.selectedAsset },
+    asset.balance
+  )
 
   return (
     <div className="flex gap-2">
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col gap-2">
         <span className="text-sm text-zinc-500">Amount</span>
         <div>
           <input
@@ -24,7 +29,7 @@ export function AmountInput(props: ForcedActionFormProps) {
             type="text"
             autoComplete="off"
             placeholder="0.00"
-            className="text-2xl w-full rounded-md bg-transparent leading-none outline-none"
+            className="w-full rounded-md bg-transparent text-xl font-semibold leading-none outline-none"
           />
         </div>
         <div
@@ -34,10 +39,9 @@ export function AmountInput(props: ForcedActionFormProps) {
           Amount too large
         </div>
       </div>
-      <div className="flex flex-col items-end">
+      <div className="flex flex-col items-end gap-2">
         <span className="text-sm text-zinc-500">
-          Balance: {sign}
-          {formattedBalance}
+          Balance: {formattedBalance}
         </span>
         <AssetWithLogo assetInfo={assetInfo} />
       </div>

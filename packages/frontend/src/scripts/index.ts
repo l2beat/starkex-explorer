@@ -1,6 +1,7 @@
 import { USE_NEW_DESIGN } from '../utils/constants'
 import { initCountdownTimer } from './countdownTimer'
 import { initForcedActionForm } from './forced-actions/forcedActionForm'
+import { initSpotWithdrawalForm } from './forced-actions/spotWithdrawalForm'
 import { initImageFallback } from './imageFallback'
 import { initMetamask } from './metamask'
 import { initAcceptOfferForm } from './offer/acceptForm'
@@ -33,6 +34,7 @@ initStateUpdateStats()
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 if (USE_NEW_DESIGN) {
   initForcedActionForm()
+  initSpotWithdrawalForm()
 } else {
   initTransactionForm()
 }

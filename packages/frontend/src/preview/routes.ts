@@ -33,6 +33,7 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderSpotForcedWithdrawPage } from '../view/pages/forced-actions/SpotForcedWithdrawPage'
 import * as DATA from './data'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
@@ -411,7 +412,11 @@ const routes: Route[] = [
   {
     path: '/forced/new/spot/withdraw',
     description: 'Form to create a new spot forced withdrawal.',
-    render: notFound,
+    render: (ctx) => {
+      const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
+      withdrawData.user = getUser(ctx) ?? withdrawData.user
+      ctx.body = renderSpotForcedWithdrawPage(withdrawData)
+    },
   },
   {
     path: '/forced/new/perpetual/withdraw',
