@@ -65,7 +65,9 @@ export function renderOfferAndForcedTradePage(
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   const isMine = props.user?.starkKey === props.maker.starkKey
-  const historyEntries = props.history.map((x) => toHistoryEntry(x, props.type, props.stateUpdateId))
+  const historyEntries = props.history.map((x) =>
+    toHistoryEntry(x, props.type, props.stateUpdateId)
+  )
   const lastEntry = historyEntries[0]
   const status = props.history[0]?.status
   if (!lastEntry) {
@@ -228,7 +230,9 @@ function toHistoryEntry(
         timestamp: entry.timestamp,
         statusText: 'INCLUDED (5/5)',
         statusType: 'END',
-        description: <IncludedWithStateUpdateId stateUpdateId={stateUpdateId} />
+        description: (
+          <IncludedWithStateUpdateId stateUpdateId={stateUpdateId} />
+        ),
       }
   }
 }

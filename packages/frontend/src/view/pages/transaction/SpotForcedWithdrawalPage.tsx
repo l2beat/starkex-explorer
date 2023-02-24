@@ -41,7 +41,9 @@ export function renderSpotForcedWithdrawalPage(
 }
 
 function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
-  const historyEntries = props.history.map((entry) => toHistoryEntry(entry, props.stateUpdateId))
+  const historyEntries = props.history.map((entry) =>
+    toHistoryEntry(entry, props.stateUpdateId)
+  )
   const lastEntry = historyEntries[0]
   if (!lastEntry) {
     throw new Error('No history entries')
@@ -111,7 +113,9 @@ function toHistoryEntry(
         timestamp: entry.timestamp,
         statusText: 'INCLUDED (3/3)',
         statusType: 'END',
-        description: <IncludedWithStateUpdateId stateUpdateId={stateUpdateId} />,
+        description: (
+          <IncludedWithStateUpdateId stateUpdateId={stateUpdateId} />
+        ),
       }
   }
 }
