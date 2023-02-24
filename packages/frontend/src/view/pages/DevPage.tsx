@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
-import { Link } from '../components/Link'
 
+import { Link } from '../components/Link'
 import { reactToHtml } from '../reactToHtml'
 
 export interface DevPageProps {

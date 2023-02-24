@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 
-interface LinkProps extends React.HTMLProps<HTMLAnchorElement> {}
+type LinkProps = React.HTMLProps<HTMLAnchorElement>
 
 export function Link({ className, href, children, ...rest }: LinkProps) {
   const isOutLink = /^https?:\/\//.test(href ?? '')
