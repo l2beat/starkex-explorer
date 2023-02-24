@@ -20,6 +20,7 @@ export interface StateUpdateStatsProps {
   blockNumber: number
   ethereumTimestamp: Timestamp
   starkExTimestamp: Timestamp
+  rawDataAvailable?: boolean
 }
 
 export function StateUpdateStats(props: StateUpdateStatsProps) {
@@ -77,12 +78,12 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
             <ValueItem label="Order root">
               0x{props.hashes.orderRoot.toString()}
             </ValueItem>
-            <a
+            {props.rawDataAvailable &&<a
               href={`/state-updates/${props.id}/raw`}
               className="text-lg font-semibold text-blue-600 underline"
             >
               View raw data
-            </a>
+            </a>}
           </div>
         </div>
       </div>
