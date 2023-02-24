@@ -9,5 +9,7 @@ export function initImageFallback() {
         image.removeAttribute('data-fallback')
       }
     })
+
+    image.setAttribute('src', image.dataset.src)
   })
 }

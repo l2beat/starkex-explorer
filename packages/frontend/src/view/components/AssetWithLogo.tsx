@@ -18,7 +18,7 @@ export function AssetWithLogo({
   return (
     <div className={cx('flex items-center', className)}>
       <img
-        src={assetInfo.imageUrl}
+        data-src={assetInfo.imageUrl}
         className={cx(
           'rounded-full',
           type === 'small' && 'h-[20px] w-[20px]',
