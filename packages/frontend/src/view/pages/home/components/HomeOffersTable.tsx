@@ -7,6 +7,7 @@ import {
   formatWithDecimals,
 } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
+import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
 import { TimeCell } from '../../../components/TimeCell'
 
@@ -40,7 +41,7 @@ export function HomeOffersTable(props: HomeOffersTableProps) {
           link: `/offers/${offer.id}`,
           cells: [
             <TimeCell timestamp={offer.timestamp} />,
-            <span className="text-blue-600 underline">#{offer.id}</span>,
+            <Link>#{offer.id}</Link>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(offer.asset)} />,
             formatAmount(offer.asset, offer.amount),
             formatWithDecimals(offer.totalPrice, 6, { prefix: '$' }),

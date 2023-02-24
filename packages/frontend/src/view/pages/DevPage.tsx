@@ -1,5 +1,6 @@
 import cx from 'classnames'
 import React from 'react'
+import { Link } from '../components/Link'
 
 import { reactToHtml } from '../reactToHtml'
 
@@ -27,9 +28,9 @@ function DevPage(props: DevPageProps) {
         <ul>
           {props.routes.map((route, i) => (
             <li key={i} className={cx(route.breakAfter && 'mb-4')}>
-              <a href={route.path} className="text-blue-500">
+              <Link href={route.path} className="text-blue-500">
                 {route.path}
-              </a>{' '}
+              </Link>{' '}
               <small className="text-sm">{route.description}</small>
             </li>
           ))}

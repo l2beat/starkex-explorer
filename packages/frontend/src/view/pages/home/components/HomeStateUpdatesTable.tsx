@@ -3,6 +3,7 @@ import React from 'react'
 
 import { formatInt } from '../../../../utils/formatting/formatAmount'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
+import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
 import { TimeCell } from '../../../components/TimeCell'
 
@@ -41,7 +42,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
           link: `/state-updates/${stateUpdate.id}`,
           cells: [
             <TimeCell timestamp={stateUpdate.timestamp} />,
-            <span className="text-blue-600 underline">#{stateUpdate.id}</span>,
+            <Link>#{stateUpdate.id}</Link>,
             <InlineEllipsis className="max-w-[80px] sm:max-w-[160px]">
               {stateUpdate.hash.toString()}
             </InlineEllipsis>,

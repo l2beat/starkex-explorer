@@ -46,7 +46,7 @@ export function UserProfile({
             {isMine && <Button>Register</Button>}
           </div>
           {isMine && (
-            <div className="mt-5 flex items-center justify-center rounded bg-blue-50 py-2">
+            <div className="mt-5 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
               <InfoIcon />
               <p className="ml-2 text-sm font-medium text-white">
                 Register your Stark key by proceeding with our step-by-sep

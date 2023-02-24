@@ -5,6 +5,7 @@ import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatAmount } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
+import { Link } from '../../../components/Link'
 import { StatusBadge } from '../../../components/StatusBadge'
 import { Table } from '../../../components/table/Table'
 
@@ -35,9 +36,11 @@ export function StateUpdateTransactionsTable(
         return {
           link: `/transactions/${transaction.hash.toString()}`,
           cells: [
-            <InlineEllipsis className="max-w-[80px] text-blue-600 underline sm:max-w-[160px]">
-              {transaction.hash.toString()}
-            </InlineEllipsis>,
+            <Link>
+              <InlineEllipsis className="max-w-[80px] sm:max-w-[160px]">
+                {transaction.hash.toString()}
+              </InlineEllipsis>
+            </Link>,
             <AssetWithLogo
               type="small"
               assetInfo={assetToInfo(transaction.asset)}
