@@ -12,7 +12,7 @@ import { TransactionField } from './TransactionField'
 interface TransactionOverviewProps {
   statusType: StatusType
   statusText: string
-  statusDescription: string
+  statusDescription: React.ReactNode
   transactionHash?: Hash256
   timestamp?: {
     label: string
@@ -44,11 +44,6 @@ export function TransactionOverview(props: TransactionOverviewProps) {
               {props.statusText}
             </StatusBadge>
             <p>{props.statusDescription}</p>
-            {props.stateUpdateId && props.statusType === 'END' && (
-              <Link href={`/state-updates/${props.stateUpdateId}`}>
-                #{props.stateUpdateId}
-              </Link>
-            )}
           </div>
         </TransactionField>
         {props.timestamp && (

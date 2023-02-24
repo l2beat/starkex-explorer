@@ -8,13 +8,13 @@ import { reactToHtml } from '../../reactToHtml'
 import {
   FORCED_TRANSACTION_MINED,
   FORCED_TRANSACTION_SENT,
-  FORCED_WITHDRAWAL_INCLUDED,
   TRANSACTION_REVERTED,
 } from './common'
 import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
+import { IncludedWithStateUpdateId } from './components/IncludedWithStateUpdateId'
 import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
@@ -41,7 +41,7 @@ export function renderSpotForcedWithdrawalPage(
 }
 
 function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
-  const historyEntries = props.history.map(toHistoryEntry)
+  const historyEntries = props.history.map((entry) => toHistoryEntry(entry, props.stateUpdateId))
   const lastEntry = historyEntries[0]
   if (!lastEntry) {
     throw new Error('No history entries')
@@ -81,7 +81,8 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
 }
 
 function toHistoryEntry(
-  entry: SpotForcedWithdrawalPageProps['history'][number]
+  entry: SpotForcedWithdrawalPageProps['history'][number],
+  stateUpdateId?: number
 ): TransactionHistoryEntry {
   switch (entry.status) {
     case 'SENT':
@@ -110,7 +111,7 @@ function toHistoryEntry(
         timestamp: entry.timestamp,
         statusText: 'INCLUDED (3/3)',
         statusType: 'END',
-        description: FORCED_WITHDRAWAL_INCLUDED,
+        description: <IncludedWithStateUpdateId stateUpdateId={stateUpdateId} />,
       }
   }
 }
