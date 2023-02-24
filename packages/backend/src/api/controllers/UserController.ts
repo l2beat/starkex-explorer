@@ -3,7 +3,6 @@ import {
   renderUserBalanceChangesPage,
   renderUserPage,
   UserAssetEntry,
-  UserTransactionEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
 import { UserDetails } from '@explorer/shared'
@@ -16,18 +15,8 @@ import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import {
-  UserTransactionRecord,
-  UserTransactionRepository,
-} from '../../peripherals/database/transactions/UserTransactionRepository'
+import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
-
-const ETHEREUM_TRANSACTION_TYPES = [
-  'ForcedTrade' as const,
-  'ForcedWithdrawal' as const,
-  // 'FullWithdrawal' as const,
-  'Withdraw' as const,
-]
 
 export class UserController {
   constructor(
@@ -46,36 +35,27 @@ export class UserController {
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
 
-    const [userAssets, totalAssets, history, historyCount, userTransactions] =
-      await Promise.all([
-        this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
-          starkKey,
-          { offset: 0, limit: 10 },
-          this.collateralAsset?.assetId
-        ),
-        this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
-          starkKey
-        ),
-        this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
-          starkKey,
-          { offset: 0, limit: 10 }
-        ),
-        this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
-        this.userTransactionRepository.getByStarkKeyPaginated({
-          starkKey,
-          offset: 0,
-          limit: 10,
-          types: ETHEREUM_TRANSACTION_TYPES, // TODO: this is not respected! I get 'Withdraw' type when not requested!
-        }),
-      ])
+    const [userAssets, totalAssets, history, historyCount] = await Promise.all([
+      this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
+        starkKey,
+        { offset: 0, limit: 10 },
+        this.collateralAsset?.assetId
+      ),
+      this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
+        starkKey
+      ),
+      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(starkKey, {
+        offset: 0,
+        limit: 10,
+      }),
+      this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
+    ])
 
-    const assetEntries = toUserAssetEntries(
-      userAssets,
-      this.collateralAsset?.assetId
+    const assetEntries = userAssets.map((a) =>
+      toUserAssetEntry(a, this.collateralAsset?.assetId)
     )
-    const balanceChangesEntries = toUserBalanceChangeEntries(history)
-    const userTransactionEntries =
-      toUserTransactionEntries(userTransactions).filter(Boolean) // TODO. removing undefined - this should not be necessary
+
+    const balanceChangesEntries = history.map(toUserBalanceChangeEntries)
 
     const content = renderUserPage({
       user,
@@ -88,7 +68,7 @@ export class UserController {
       totalAssets,
       balanceChanges: balanceChangesEntries,
       totalBalanceChanges: historyCount,
-      transactions: userTransactionEntries,
+      transactions: [],
       totalTransactions: 0,
       offers: [],
       totalOffers: 0,
@@ -115,7 +95,9 @@ export class UserController {
       ),
     ])
 
-    const assets = toUserAssetEntries(userAssets, this.collateralAsset?.assetId)
+    const assets = userAssets.map((a) =>
+      toUserAssetEntry(a, this.collateralAsset?.assetId)
+    )
 
     const content = renderUserAssetsPage({
       user,
@@ -143,7 +125,7 @@ export class UserController {
       this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
     ])
 
-    const balanceChanges = toUserBalanceChangeEntries(history)
+    const balanceChanges = history.map(toUserBalanceChangeEntries)
 
     const content = renderUserBalanceChangesPage({
       user,
@@ -158,76 +140,29 @@ export class UserController {
   }
 }
 
-function toUserAssetEntries(
-  userAssets: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[],
+function toUserAssetEntry(
+  asset: PreprocessedAssetHistoryRecord<AssetHash | AssetId>,
   collateralAssetId?: AssetId
-): UserAssetEntry[] {
-  return userAssets.map(
-    (r): UserAssetEntry => ({
-      asset: { hashOrId: r.assetHashOrId },
-      balance: r.balance,
-      value: r.price !== undefined ? r.price * (r.balance / 1000000n) : 0n, // temporary assumption of quantum=6
-      vaultOrPositionId: r.positionOrVaultId.toString(),
-      action: r.assetHashOrId === collateralAssetId ? 'WITHDRAW' : 'CLOSE',
-    })
-  )
+): UserAssetEntry {
+  return {
+    asset: { hashOrId: asset.assetHashOrId },
+    balance: asset.balance,
+    value:
+      asset.price !== undefined ? asset.price * (asset.balance / 1000000n) : 0n, // temporary assumption of quantum=6
+    vaultOrPositionId: asset.positionOrVaultId.toString(),
+    action: asset.assetHashOrId === collateralAssetId ? 'WITHDRAW' : 'CLOSE',
+  }
 }
 
 function toUserBalanceChangeEntries(
-  history: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[]
-): UserBalanceChangeEntry[] {
-  return history.map(
-    (r): UserBalanceChangeEntry => ({
-      timestamp: r.timestamp,
-      stateUpdateId: r.stateUpdateId.toString(),
-      asset: { hashOrId: r.assetHashOrId },
-      balance: r.balance,
-      change: r.balance - r.prevBalance,
-      vaultOrPositionId: r.positionOrVaultId.toString(),
-    })
-  )
-}
-
-function toUserTransactionEntries(
-  records: UserTransactionRecord<typeof ETHEREUM_TRANSACTION_TYPES[number]>[]
-): UserTransactionEntry[] {
-  return records.map((record) => {
-    const data = record.data
-    switch (data.type) {
-      case 'ForcedTrade':
-        return {
-          timestamp: record.timestamp,
-          hash: record.transactionHash,
-          asset: { hashOrId: data.syntheticAssetId },
-          amount: data.syntheticAmount,
-          status: record.included ? 'INCLUDED (3/3)' : 'MINED (2/3)',
-          type: data.isABuyingSynthetic ? 'Forced buy' : 'Forced sell',
-        }
-      case 'ForcedWithdrawal':
-        return {
-          timestamp: record.timestamp,
-          hash: record.transactionHash,
-          // TODO: not always USDC
-          asset: { hashOrId: AssetId.USDC },
-          amount: data.quantizedAmount,
-          status: record.included ? 'INCLUDED (3/3)' : 'MINED (2/3)',
-          type: 'Forced withdraw',
-        }
-      case 'Withdraw':
-        return {
-          timestamp: record.timestamp,
-          hash: record.transactionHash,
-          // TODO: not always USDC
-          asset: { hashOrId: AssetId.USDC },
-          amount: data.quantizedAmount,
-          status: record.included ? 'SENT (1/2)' : 'MINED (2/2)',
-          type: 'Withdraw',
-        }
-      // case 'FullWithdrawal':
-      //   // TODO: assets, amount is unknown
-      //   throw new Error('Not implemented')
-
-      // TODO: other types return undefined....
-    }
-  })
+  record: PreprocessedAssetHistoryRecord<AssetHash | AssetId>
+): UserBalanceChangeEntry {
+  return {
+    timestamp: record.timestamp,
+    stateUpdateId: record.stateUpdateId.toString(),
+    asset: { hashOrId: record.assetHashOrId },
+    balance: record.balance,
+    change: record.balance - record.prevBalance,
+    vaultOrPositionId: record.positionOrVaultId.toString(),
+  }
 }
