@@ -30,6 +30,17 @@ export async function submitForcedTrade(offerId: number, hash: Hash256) {
   })
 }
 
+export async function submitWithdrawal(hash: Hash256) {
+  await fetch('/forced/exits/finalize', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      exitHash: Hash256.fake(),
+      finalizeHash: hash,
+    }),
+  })
+}
+
 export async function createOffer(offer: CreateOfferData, signature: string) {
   const res = await fetch('/forced/offers', {
     method: 'POST',

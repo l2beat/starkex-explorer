@@ -2,6 +2,7 @@ import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
   CreateOfferData,
+  encodeFinalizeExitRequest,
   encodeForcedTradeRequest,
   encodeForcedWithdrawalRequest,
   FinalizeOfferData,
@@ -140,6 +141,28 @@ export async function sendPerpetualForcedWithdrawalTransaction(
     method: 'eth_sendTransaction',
     params: [
       { from: account.toString(), to: exchangeAddress.toString(), data },
+    ],
+  })
+  return Hash256(result as string)
+}
+
+// #endregion
+// #region Withdrawals
+
+export async function sendWithdrawalTransaction(
+  account: EthereumAddress,
+  starkKey: StarkKey,
+  exchangeAddress: EthereumAddress
+) {
+  const data = encodeFinalizeExitRequest(starkKey)
+  const result = await getProvider().request({
+    method: 'eth_sendTransaction',
+    params: [
+      {
+        from: account,
+        to: exchangeAddress,
+        data,
+      },
     ],
   })
   return Hash256(result as string)
