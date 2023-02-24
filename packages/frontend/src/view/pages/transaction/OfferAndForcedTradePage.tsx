@@ -71,6 +71,11 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     throw new Error('No history entries')
   }
 
+  const showCancel =
+    isMine && (status === 'CREATED (1/5)' || status === 'ACCEPTED (2/5)')
+  const showSendTransaction = isMine && status === 'ACCEPTED (2/5)'
+  const showAccept = !isMine && Boolean(props.user) && status === 'CREATED (1/5)'
+
   return (
     <Page
       user={props.user}
@@ -92,16 +97,12 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             ) : (
               <PageTitle>Offer #{props.offerId}</PageTitle>
             )}
-            <div className="flex items-center gap-2 mb-6">
-              {isMine &&
-                (status === 'CREATED (1/5)' ||
-                  status === 'ACCEPTED (2/5)') && (
-                  <Button variant="outlined">Cancel offer</Button>
-                )}
-              {isMine && status === 'ACCEPTED (2/5)' && (
+            <div className="mb-6 flex items-center gap-2">
+              {showCancel && <Button variant="outlined">Cancel offer</Button>}
+              {showSendTransaction && (
                 <Button variant="contained">Send transaction</Button>
               )}
-              {!isMine && Boolean(props.user) && status === 'CREATED (1/5)' && (
+              {showAccept && (
                 <Button variant="contained">
                   Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
                 </Button>
