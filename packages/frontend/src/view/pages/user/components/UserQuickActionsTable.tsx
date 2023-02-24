@@ -8,11 +8,11 @@ import {
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
-import { UserOfferEntry } from './UserOffersTable'
+import { OfferEntry } from '../../../components/tables/OffersTable'
 
 interface UserQuickActionsTableProps {
   readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
-  readonly offersToAccept: readonly UserOfferEntry[]
+  readonly offersToAccept: readonly OfferEntry[]
   isMine?: boolean
 }
 
@@ -42,7 +42,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                 </InlineEllipsis>
               </strong>
             </p>
-            <Button className="w-32">Withdraw now</Button>
+            <Button className="w-32 !px-0">Withdraw now</Button>
           </div>
         )
       })}
@@ -73,7 +73,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                     {formatWithDecimals(totalPrice, 6, { suffix: ' USDC' })}
                   </strong>
                 </p>
-                <Button className="w-32">Accept & sell</Button>
+                <Button className="w-32 !px-0">Accept & sell</Button>
               </div>
             )
           })}

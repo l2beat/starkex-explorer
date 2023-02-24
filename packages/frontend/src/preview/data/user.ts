@@ -1,10 +1,10 @@
 import { Hash256 } from '@explorer/types'
 
 import {
+  OfferEntry,
+  TransactionEntry,
   UserAssetEntry,
   UserBalanceChangeEntry,
-  UserOfferEntry,
-  UserTransactionEntry,
 } from '../../view'
 import { WithdrawableAssetEntry } from '../../view/pages/user/components/UserQuickActionsTable'
 import { Bucket } from './bucket'
@@ -23,21 +23,19 @@ export function randomUserBalanceChangeEntry(): UserBalanceChangeEntry {
 }
 
 const transactionStatusBucket = new Bucket([
-  'SENT (1/3)',
-  'MINED (2/3)',
-  'INCLUDED (3/3)',
-  'SENT (1/2)',
-  'MINED (2/2)',
+  'SENT',
+  'MINED',
+  'INCLUDED',
   'REVERTED',
 ] as const)
 const transactionTypeBucket = new Bucket([
-  'Forced withdraw',
-  'Forced buy',
-  'Forced sell',
-  'Withdraw',
+  'FORCED_WITHDRAW',
+  'FORCED_BUY',
+  'FORCED_SELL',
+  'WITHDRAW',
 ] as const)
 
-export function randomUserTransactionEntry(): UserTransactionEntry {
+export function randomUserTransactionEntry(): TransactionEntry {
   return {
     timestamp: randomTimestamp(),
     hash: Hash256.fake(),
@@ -68,7 +66,7 @@ const offerStatusBucket = new Bucket([
 ] as const)
 const offerTypeBucket = new Bucket(['BUY', 'SELL'] as const)
 
-export function randomUserOfferEntry(): UserOfferEntry {
+export function randomUserOfferEntry(): OfferEntry {
   return {
     timestamp: randomTimestamp(),
     id: randomId(),

@@ -35,7 +35,7 @@ export class HomeController {
         forcedTransactionCount: update.forcedTransactionsCount,
       })),
       totalStateUpdates,
-      forcedTransactions: [],
+      transactions: [],
       totalForcedTransactions: 0,
       offers: [],
       totalOffers: 0,

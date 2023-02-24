@@ -4,28 +4,26 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
+import {
+  TransactionEntry,
+  TransactionsTable,
+} from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import { OFFER_TABLE_PROPS } from './common'
-import {
-  HomeForcedTransactionEntry,
-  HomeForcedTransactionsTable,
-} from './components/HomeForcedTransactionsTable'
 
-export interface HomeForcedTransactionsPageProps {
+export interface HomeTransactionsPageProps {
   user: UserDetails | undefined
-  forcedTransactions: HomeForcedTransactionEntry[]
+  forcedTransactions: TransactionEntry[]
   limit: number
   offset: number
   total: number
 }
 
-export function renderHomeForcedTransactionsPage(
-  props: HomeForcedTransactionsPageProps
-) {
-  return reactToHtml(<HomeForcedTransactionsPage {...props} />)
+export function renderHomeTransactionsPage(props: HomeTransactionsPageProps) {
+  return reactToHtml(<HomeTransactionsPage {...props} />)
 }
 
-function HomeForcedTransactionsPage(props: HomeForcedTransactionsPageProps) {
+function HomeTransactionsPage(props: HomeTransactionsPageProps) {
   return (
     <Page
       path={OFFER_TABLE_PROPS.link}
@@ -40,9 +38,7 @@ function HomeForcedTransactionsPage(props: HomeForcedTransactionsPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <HomeForcedTransactionsTable
-            forcedTransactions={props.forcedTransactions}
-          />
+          <TransactionsTable transactions={props.forcedTransactions} />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

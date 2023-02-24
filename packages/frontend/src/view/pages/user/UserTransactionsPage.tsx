@@ -5,18 +5,18 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
+import {
+  TransactionEntry,
+  TransactionsTable,
+} from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import { getTransactionTableProps } from './common'
 import { UserPageTitle } from './components/UserPageTitle'
-import {
-  UserTransactionEntry,
-  UserTransactionsTable,
-} from './components/UserTransactionsTable'
 
 export interface UserTransactionsPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
-  transactions: UserTransactionEntry[]
+  transactions: TransactionEntry[]
   limit: number
   offset: number
   total: number
@@ -44,7 +44,7 @@ function UserTransactionsPage(props: UserTransactionsPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <UserTransactionsTable transactions={props.transactions} />
+          <TransactionsTable transactions={props.transactions} />
         </TableWithPagination>
       </ContentWrapper>
     </Page>
