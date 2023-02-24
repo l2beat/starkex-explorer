@@ -3,6 +3,7 @@ import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Asset } from '../../../utils/assets'
+import { Button } from '../../components/Button'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -62,11 +63,19 @@ export function renderOfferAndForcedTradePage(
 }
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
+  const isMine = props.user?.starkKey === props.maker.starkKey
   const historyEntries = props.history.map((x) => toHistoryEntry(x, props.type))
   const lastEntry = historyEntries[0]
+  const status = props.history[0]?.status
   if (!lastEntry) {
     throw new Error('No history entries')
   }
+
+  const showCancel =
+    isMine && (status === 'CREATED (1/5)' || status === 'ACCEPTED (2/5)')
+  const showSendTransaction = isMine && status === 'ACCEPTED (2/5)'
+  const showAccept =
+    !isMine && Boolean(props.user) && status === 'CREATED (1/5)'
 
   return (
     <Page
@@ -80,21 +89,34 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
-          {props.transactionHash ? (
-            <TransactionPageTitle
-              title={`Forced ${props.type.toLowerCase()}`}
-              transactionHash={props.transactionHash}
-            />
-          ) : (
-            <PageTitle>Offer #{props.offerId}</PageTitle>
-          )}
+          <div className="flex items-center justify-between">
+            {props.transactionHash ? (
+              <TransactionPageTitle
+                title={`Forced ${props.type.toLowerCase()}`}
+                transactionHash={props.transactionHash}
+              />
+            ) : (
+              <PageTitle>Offer #{props.offerId}</PageTitle>
+            )}
+            <div className="mb-6 flex items-center gap-2">
+              {showCancel && <Button variant="outlined">Cancel offer</Button>}
+              {showSendTransaction && (
+                <Button variant="contained">Send transaction</Button>
+              )}
+              {showAccept && (
+                <Button variant="contained">
+                  Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
+                </Button>
+              )}
+            </div>
+          </div>
           <TransactionOverview
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
             timestamp={
-              !props.transactionHash && lastEntry.statusText !== 'EXPIRED'
+              !props.transactionHash && status !== 'EXPIRED'
                 ? {
                     label: 'Expiration timestamp',
                     timestamp: props.expirationTimestamp,
