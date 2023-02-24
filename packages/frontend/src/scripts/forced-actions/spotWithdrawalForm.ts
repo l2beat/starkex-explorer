@@ -7,7 +7,7 @@ export function initSpotWithdrawalForm() {
     return
   }
 
-  form.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', (e) => {
     e.preventDefault()
     alert('Spot withdrawal submitted')
   })
