@@ -1,9 +1,5 @@
-import {
-  CreateOfferData,
-  encodeForcedWithdrawalRequest,
-  serializeCreateOfferBody,
-} from '@explorer/shared'
-import { AssetId, Hash256 } from '@explorer/types'
+import { CreateOfferData, serializeCreateOfferBody } from '@explorer/shared'
+import { AssetId } from '@explorer/types'
 
 import * as Wallet from '../peripherals/wallet'
 import { FormState } from './types'
@@ -18,30 +14,14 @@ export async function submit(state: FormState) {
 }
 
 async function submitExit(state: FormState) {
-  const provider = window.ethereum
-  if (!provider) {
-    return
-  }
-
-  const data = encodeForcedWithdrawalRequest({
-    starkKey: state.props.starkKey,
-    positionId: state.props.positionId,
-    quantizedAmount: state.amountInputValue,
-    premiumCost: false,
-  })
-
-  const result = await provider.request({
-    method: 'eth_sendTransaction',
-    params: [
-      {
-        from: state.props.user.address,
-        to: state.props.perpetualAddress,
-        data,
-      },
-    ],
-  })
-  const hash = Hash256(result as string)
-
+  const hash = await Wallet.sendPerpetualForcedWithdrawalTransaction(
+    state.props.user.address,
+    state.props.starkKey,
+    state.props.positionId,
+    state.amountInputValue,
+    false,
+    state.props.perpetualAddress
+  )
   await fetch('/forced/exits', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

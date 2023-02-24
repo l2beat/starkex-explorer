@@ -2,11 +2,14 @@ import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
   CreateOfferData,
+  encodeForcedTradeRequest,
+  encodeForcedWithdrawalRequest,
+  FinalizeOfferData,
   toSignableAcceptOffer,
   toSignableCancelOffer,
   toSignableCreateOffer,
 } from '@explorer/shared'
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 function getProvider() {
   const provider = window.ethereum
@@ -101,6 +104,45 @@ export async function signCancel(
     params: [account.toString(), signable],
   })
   return result as string
+}
+
+// #endregion
+// #region Forced transactions
+
+export async function sendForcedTradeTransaction(
+  account: EthereumAddress,
+  offer: FinalizeOfferData,
+  exchangeAddress: EthereumAddress
+) {
+  const data = encodeForcedTradeRequest(offer)
+  const result = await getProvider().request({
+    method: 'eth_sendTransaction',
+    params: [{ from: account, to: exchangeAddress, data }],
+  })
+  return Hash256(result as string)
+}
+
+export async function sendPerpetualForcedWithdrawalTransaction(
+  account: EthereumAddress,
+  starkKey: StarkKey,
+  positionId: bigint,
+  quantizedAmount: bigint,
+  premiumCost: boolean,
+  exchangeAddress: EthereumAddress
+) {
+  const data = encodeForcedWithdrawalRequest({
+    starkKey,
+    positionId,
+    quantizedAmount,
+    premiumCost,
+  })
+  const result = await getProvider().request({
+    method: 'eth_sendTransaction',
+    params: [
+      { from: account.toString(), to: exchangeAddress.toString(), data },
+    ],
+  })
+  return Hash256(result as string)
 }
 
 // #endregion
