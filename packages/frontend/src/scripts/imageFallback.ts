@@ -10,6 +10,6 @@ export function initImageFallback() {
       }
     })
 
-    image.setAttribute('src', image.dataset.src)
+    image.dataset.src && image.setAttribute('src', image.dataset.src)
   })
 }
