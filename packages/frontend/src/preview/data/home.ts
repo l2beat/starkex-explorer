@@ -1,10 +1,6 @@
 import { Hash256 } from '@explorer/types'
 
-import {
-  HomeForcedTransactionEntry,
-  HomeOfferEntry,
-  HomeStateUpdateEntry,
-} from '../../view'
+import { HomeStateUpdateEntry, OfferEntry, TransactionEntry } from '../../view'
 import { Bucket } from './bucket'
 import { amountBucket, assetBucket } from './buckets'
 import { randomId, randomInt, randomTimestamp } from './utils'
@@ -23,12 +19,13 @@ const transactionStatusBucket = new Bucket<'MINED' | 'INCLUDED'>()
 transactionStatusBucket.add('MINED', 2)
 transactionStatusBucket.add('INCLUDED', 4)
 
-const transactionTypeBucket = new Bucket<'BUY' | 'SELL' | 'WITHDRAW'>()
-transactionTypeBucket.add('BUY', 2)
-transactionTypeBucket.add('SELL', 2)
-transactionTypeBucket.add('WITHDRAW', 4)
+const transactionTypeBucket = new Bucket([
+  'FORCED_BUY',
+  'FORCED_SELL',
+  'FORCED_WITHDRAW',
+] as const)
 
-export function randomHomeForcedTransactionEntry(): HomeForcedTransactionEntry {
+export function randomHomeForcedTransactionEntry(): TransactionEntry {
   return {
     timestamp: randomTimestamp(),
     hash: Hash256.fake(),
@@ -43,7 +40,7 @@ const offerTypeBucket = new Bucket<'BUY' | 'SELL'>()
 offerTypeBucket.add('BUY', 3)
 offerTypeBucket.add('SELL', 3)
 
-export function randomHomeOfferEntry(): HomeOfferEntry {
+export function randomHomeOfferEntry(): OfferEntry {
   return {
     timestamp: randomTimestamp(),
     id: randomId(),
@@ -51,6 +48,7 @@ export function randomHomeOfferEntry(): HomeOfferEntry {
     amount: amountBucket.pick(),
     price: amountBucket.pick(),
     totalPrice: amountBucket.pick(),
+    status: 'CREATED',
     type: offerTypeBucket.pick(),
   }
 }

@@ -4,13 +4,13 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
+import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import { reactToHtml } from '../../reactToHtml'
 import { OFFER_TABLE_PROPS } from './common'
-import { HomeOfferEntry, HomeOffersTable } from './components/HomeOffersTable'
 
 export interface HomeOffersPageProps {
   user: UserDetails | undefined
-  offers: HomeOfferEntry[]
+  offers: OfferEntry[]
   limit: number
   offset: number
   total: number
@@ -35,7 +35,7 @@ function HomeOffersPage(props: HomeOffersPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <HomeOffersTable offers={props.offers} />
+          <OffersTable hideStatus offers={props.offers} />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

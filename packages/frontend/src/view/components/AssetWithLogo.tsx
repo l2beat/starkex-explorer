@@ -6,7 +6,7 @@ import { InlineEllipsis } from './InlineEllipsis'
 
 interface AssetWithLogoProps {
   assetInfo: AssetInfo
-  type?: 'full' | 'regular' | 'small'
+  type?: 'full' | 'regular' | 'small' | 'symbol'
   className?: string
 }
 
@@ -23,7 +23,7 @@ export function AssetWithLogo({
           'rounded-full',
           type === 'small' && 'h-[20px] w-[20px]',
           type === 'regular' && 'h-6 w-6',
-          type === 'full' && 'h-8 w-8'
+          (type === 'full' || type === 'symbol') && 'h-8 w-8'
         )}
         data-fallback="/images/unknown-asset.svg"
       />
@@ -36,7 +36,7 @@ export function AssetWithLogo({
         {type === 'full' && (
           <div>
             <div>{assetInfo.name}</div>
-            <InlineEllipsis className="max-w-[80px] text-xs text-zinc-500">
+            <InlineEllipsis className="mt-2 max-w-[80px] !py-0 text-xs text-zinc-500">
               {assetInfo.symbol}
             </InlineEllipsis>
           </div>
@@ -45,8 +45,8 @@ export function AssetWithLogo({
           (assetInfo.isUnknownHash
             ? `${assetInfo.name} (${assetInfo.symbol})`
             : assetInfo.symbol)}
-        {type === 'small' && (
-          <InlineEllipsis className="max-w-[80px]">
+        {(type === 'small' || type === 'symbol') && (
+          <InlineEllipsis className="max-w-[80px] !py-0">
             {assetInfo.symbol}
           </InlineEllipsis>
         )}

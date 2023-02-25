@@ -6,6 +6,8 @@ import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { ChevronDownIcon } from '../../../assets/icons/ChevronDownIcon'
 import { ChevronUpIcon } from '../../../assets/icons/ChevronUpIcon'
 import { Button } from '../../../components/Button'
+import { Link } from '../../../components/Link'
+import { PageTitle } from '../../../components/PageTitle'
 
 export interface StateUpdateStatsProps {
   id: string
@@ -14,7 +16,7 @@ export interface StateUpdateStatsProps {
     positionTreeRoot?: PedersenHash
     onChainVaultTreeRoot?: PedersenHash
     offChainVaultTreeRoot?: PedersenHash
-    orderRoot: PedersenHash
+    orderRoot?: PedersenHash
   }
   blockNumber: number
   ethereumTimestamp: Timestamp
@@ -31,17 +33,14 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
   )
 
   return (
-    <section className="flex flex-col gap-6" data-component="StateUpdateStats">
-      <h1 className="text-xxl font-bold">State Update #{props.id}</h1>
-      <div className="flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
+    <section data-component="StateUpdateStats">
+      <PageTitle>State Update #{props.id}</PageTitle>
+      <div className="mb-6 flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
         <div className="flex justify-between gap-6">
           <ValueItem label="Ethereum block number">
-            <a
-              className="block text-blue-600 underline"
-              href={`https://etherscan.io/block/${props.blockNumber}`}
-            >
+            <Link href={`https://etherscan.io/block/${props.blockNumber}`}>
               {formatInt(props.blockNumber)}
-            </a>
+            </Link>
           </ValueItem>
           <ValueItem label="Ethereum block timestamp">
             {formatTimestamp(props.ethereumTimestamp, 'utc')} UTC
@@ -73,15 +72,17 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
                 0x{props.hashes.offChainVaultTreeRoot.toString()}
               </ValueItem>
             )}
-            <ValueItem label="Order root">
-              0x{props.hashes.orderRoot.toString()}
-            </ValueItem>
-            <a
+            {props.hashes.orderRoot && (
+              <ValueItem label="Order root">
+                0x{props.hashes.orderRoot.toString()}
+              </ValueItem>
+            )}
+            <Link
               href={`/state-updates/${props.id}/raw`}
-              className="text-lg font-semibold text-blue-600 underline"
+              className="text-lg font-semibold"
             >
               View raw data
-            </a>
+            </Link>
           </div>
         </div>
       </div>

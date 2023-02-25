@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {
+  AssetId,
   EthereumAddress,
   Hash256,
   PedersenHash,
@@ -13,11 +14,15 @@ import Koa from 'koa'
 import {
   renderForcedTradePage,
   renderForcedWithdrawPage,
-  renderHomeForcedTransactionsPage,
   renderHomeOffersPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
+  renderHomeTransactionsPage,
   renderNotFoundPage,
+  renderOfferAndForcedTradePage,
+  renderPerpetualForcedWithdrawalPage,
+  renderRegularWithdrawalPage,
+  renderSpotForcedWithdrawalPage,
   renderStateUpdateBalanceChangesPage,
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
@@ -29,6 +34,7 @@ import {
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
 import * as DATA from './data'
+import { amountBucket, assetBucket } from './data/buckets'
 import {
   randomHomeForcedTransactionEntry,
   randomHomeOfferEntry,
@@ -40,10 +46,17 @@ import {
   randomStateUpdateTransactionEntry,
 } from './data/stateUpdate'
 import {
+  randomOfferDetails,
+  randomParty,
+  randomRecipient,
+  userParty,
+} from './data/transactions'
+import {
   randomUserAssetEntry,
   randomUserBalanceChangeEntry,
   randomUserOfferEntry,
   randomUserTransactionEntry,
+  randomWithdrawableAssetEntry,
 } from './data/user'
 import { randomId, randomTimestamp, repeat } from './data/utils'
 
@@ -54,6 +67,8 @@ interface Route {
   link?: string
   description: string
   breakAfter?: boolean // add bottom margin when displaying this route
+  isTransactionPage?: boolean
+  isOfferPage?: boolean
   render: (ctx: Koa.ParameterizedContext) => void
 }
 
@@ -81,7 +96,7 @@ const routes: Route[] = [
         user,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        transactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
@@ -98,7 +113,7 @@ const routes: Route[] = [
         tutorials: [],
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        transactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
@@ -130,7 +145,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       const total = 68
       const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderHomeForcedTransactionsPage({
+      ctx.body = renderHomeTransactionsPage({
         user,
         forcedTransactions: repeat(visible, randomHomeForcedTransactionEntry),
         limit,
@@ -244,7 +259,7 @@ const routes: Route[] = [
         type: 'PERPETUAL',
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
-        withdrawableAssets: [],
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         offersToAccept: [],
         assets: repeat(7, randomUserAssetEntry),
         totalAssets: 7,
@@ -271,7 +286,25 @@ const routes: Route[] = [
   {
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderUserPage({
+        user,
+        type: 'PERPETUAL',
+        starkKey: user?.starkKey ?? StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
+        offersToAccept: repeat(2, randomUserOfferEntry),
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 7,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+      })
+    },
     breakAfter: true,
   },
   // #endregion
@@ -377,12 +410,12 @@ const routes: Route[] = [
   // #region Forced actions
   {
     path: '/forced/new/spot/withdraw',
-    description: 'Form to create a new spot forced withdraw.',
+    description: 'Form to create a new spot forced withdrawal.',
     render: notFound,
   },
   {
     path: '/forced/new/perpetual/withdraw',
-    description: 'Form to create a new perpetual forced withdraw.',
+    description: 'Form to create a new perpetual forced withdrawal.',
     render: (ctx) => {
       const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
       withdrawData.user = getUser(ctx) ?? withdrawData.user
@@ -409,93 +442,428 @@ const routes: Route[] = [
     },
   },
   // #endregion
+  // #region Offers and transactions
+  {
+    path: '/transactions/:hash',
+    link: '/transactions/random',
+    description: 'Random transaction page.',
+    render: (ctx) => {
+      const txRoutes = routes.filter((x) => x.isTransactionPage)
+      const route = txRoutes[randomInt(0, txRoutes.length - 1)]
+      route?.render(ctx)
+    },
+  },
+  {
+    path: '/offers/:id',
+    link: '/offers/random',
+    description: 'Random offer page.',
+    breakAfter: true,
+    render: (ctx) => {
+      const offerRoutes = routes.filter((x) => x.isOfferPage)
+      const route = offerRoutes[randomInt(0, offerRoutes.length - 1)]
+      route?.render(ctx)
+    },
+  },
+  // #endregion
   // #region View spot withdraw
   {
-    path: '/forced/spot/withdraw/sent',
-    description: 'Transaction view of a sent spot forced withdraw.',
-    render: notFound,
+    path: '/transactions/spot-forced-withdrawal/sent',
+    description: 'Transaction view of a sent spot forced withdrawal.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderSpotForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        vaultId: randomId(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+      })
+    },
   },
   {
-    path: '/forced/spot/withdraw/mined',
-    description: 'Transaction view of a mined spot forced withdraw.',
-    render: notFound,
+    path: '/transactions/spot-forced-withdrawal/mined',
+    description: 'Transaction view of a mined spot forced withdrawal.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderSpotForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        vaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/spot/withdraw/reverted',
-    description: 'Transaction view of a reverted spot forced withdraw.',
-    render: notFound,
+    path: '/transactions/spot-forced-withdrawal/reverted',
+    description: 'Transaction view of a reverted spot forced withdrawal.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderSpotForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        vaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/spot/withdraw/included',
-    description: 'Transaction view of an included spot forced withdraw.',
+    path: '/transactions/spot-forced-withdrawal/included',
+    description: 'Transaction view of an included spot forced withdrawal.',
+    isTransactionPage: true,
     breakAfter: true,
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderSpotForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        vaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'INCLUDED' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
   },
   // #endregion
   // #region View perpetual withdraw
   {
-    path: '/forced/perpetual/withdraw/sent',
-    description: 'Transaction view of a sent perpetual forced withdraw.',
-    render: notFound,
+    path: '/transactions/perpetual-forced-withdrawal/sent',
+    description: 'Transaction view of a sent perpetual forced withdrawal.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderPerpetualForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        asset: { hashOrId: AssetId.USDC },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/withdraw/mined',
-    description: 'Transaction view of a mined perpetual forced withdraw.',
-    render: notFound,
+    path: '/transactions/perpetual-forced-withdrawal/mined',
+    description: 'Transaction view of a mined perpetual forced withdrawal.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderPerpetualForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        asset: { hashOrId: AssetId.USDC },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/withdraw/reverted',
-    description: 'Transaction view of a reverted perpetual forced withdraw.',
-    render: notFound,
+    path: '/transactions/perpetual-forced-withdrawal/reverted',
+    description: 'Transaction view of a reverted perpetual forced withdrawal.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderPerpetualForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        asset: { hashOrId: AssetId.USDC },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/withdraw/included',
-    description: 'Transaction view of an included perpetual forced withdraw.',
+    path: '/transactions/perpetual-forced-withdrawal/included',
+    description: 'Transaction view of an included perpetual forced withdrawal.',
+    isTransactionPage: true,
     breakAfter: true,
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderPerpetualForcedWithdrawalPage({
+        user,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        asset: { hashOrId: AssetId.USDC },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'INCLUDED' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
   },
   // #endregion
   // #region View perpetual trade
   {
-    path: '/forced/perpetual/trade/created',
-    description: 'Offer view of a created perpetual forced trade.',
-    render: notFound,
+    path: '/transactions/offer-and-forced-trade/created/creator',
+    description:
+      'Offer view of a created perpetual forced trade. As viewed by the creator.',
+    isOfferPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        maker: userParty(user),
+        ...randomOfferDetails(),
+        history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/trade/accepted',
-    description: 'Offer view of an accepted perpetual forced trade.',
-    render: notFound,
+    path: '/transactions/offer-and-forced-trade/created/someone',
+    description:
+      'Offer view of a created perpetual forced trade. As viewed by someone else.',
+    isOfferPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        maker: randomParty(),
+        ...randomOfferDetails(),
+        history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/trade/cancelled',
+    path: '/transactions/offer-and-forced-trade/accepted/creator',
+    description:
+      'Offer view of an accepted perpetual forced trade. As viewed by the creator.',
+    isOfferPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        maker: userParty(user),
+        taker: randomParty(),
+        ...randomOfferDetails(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
+        ],
+      })
+    },
+  },
+  {
+    path: '/transactions/offer-and-forced-trade/accepted/someone',
+    description:
+      'Offer view of an accepted perpetual forced trade. As viewed by someone else.',
+    isOfferPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
+        ],
+      })
+    },
+  },
+  {
+    path: '/transactions/offer-and-forced-trade/cancelled',
     description: 'Offer view of a cancelled perpetual forced trade.',
-    render: notFound,
+    isOfferPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        maker: randomParty(),
+        ...randomOfferDetails(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'CANCELLED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/trade/expired',
+    path: '/transactions/offer-and-forced-trade/expired',
     description: 'Offer view of an expired perpetual forced trade.',
-    render: notFound,
+    isOfferPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'EXPIRED' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/trade/sent',
+    path: '/transactions/offer-and-forced-trade/sent',
     description: 'Transaction view of a sent perpetual forced trade.',
-    render: notFound,
+    isOfferPage: true,
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'SENT' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/trade/mined',
+    path: '/transactions/offer-and-forced-trade/mined',
     description: 'Transaction view of a mined perpetual forced trade.',
-    render: notFound,
+    isOfferPage: true,
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/trade/reverted',
+    path: '/transactions/offer-and-forced-trade/reverted',
     description: 'Transaction view of a reverted perpetual forced trade.',
-    render: notFound,
+    isOfferPage: true,
+    isTransactionPage: true,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
+        ],
+      })
+    },
   },
   {
-    path: '/forced/perpetual/trade/included',
+    path: '/transactions/offer-and-forced-trade/included',
     description: 'Transaction view of an included perpetual forced trade.',
+    isOfferPage: true,
+    isTransactionPage: true,
     breakAfter: true,
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderOfferAndForcedTradePage({
+        user,
+        transactionHash: Hash256.fake(),
+        maker: randomParty(),
+        taker: randomParty(),
+        ...randomOfferDetails(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'INCLUDED' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+          { timestamp: randomTimestamp(), status: 'ACCEPTED' },
+          { timestamp: randomTimestamp(), status: 'CREATED' },
+        ],
+      })
+    },
+  },
+  // #endregion
+  // #region View regular withdrawal
+  {
+    path: '/transactions/regular-withdrawal/sent',
+    description: 'Transaction view of a sent withdrawal.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderRegularWithdrawalPage({
+        user,
+        recipient: randomRecipient(),
+        asset: assetBucket.pick(),
+        transactionHash: Hash256.fake(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+      })
+    },
+  },
+  {
+    path: '/transactions/regular-withdrawal/mined',
+    description: 'Transaction view of a mined withdrawal.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderRegularWithdrawalPage({
+        user,
+        recipient: randomRecipient(),
+        amount: amountBucket.pick(),
+        asset: assetBucket.pick(),
+        transactionHash: Hash256.fake(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
+  },
+  {
+    path: '/transactions/regular-withdrawal/reverted',
+    description: 'Transaction view of a reverted withdrawal.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderRegularWithdrawalPage({
+        user,
+        recipient: randomRecipient(),
+        amount: amountBucket.pick(),
+        asset: assetBucket.pick(),
+        transactionHash: Hash256.fake(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
   },
   // #endregion
 ]

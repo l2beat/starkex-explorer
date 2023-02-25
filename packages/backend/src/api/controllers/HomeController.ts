@@ -5,12 +5,14 @@ import { Hash256 } from '@explorer/types'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
 
 export class HomeController {
   constructor(
     private readonly userService: UserService,
-    private readonly stateUpdateRepository: StateUpdateRepository
+    private readonly stateUpdateRepository: StateUpdateRepository,
+    private userTransactionRepository: UserTransactionRepository
   ) {}
 
   async getHomePage(
@@ -29,13 +31,12 @@ export class HomeController {
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.id.toString(),
-        // we want fact hash instead
-        hash: Hash256(update.rootHash.toString()),
+        hash: Hash256.fake('abc'), // TODO: we want fact hash
         updateCount: update.positionCount,
         forcedTransactionCount: update.forcedTransactionsCount,
       })),
       totalStateUpdates,
-      forcedTransactions: [],
+      transactions: [],
       totalForcedTransactions: 0,
       offers: [],
       totalOffers: 0,
@@ -59,8 +60,7 @@ export class HomeController {
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.id.toString(),
-        // we want fact hash instead
-        hash: Hash256(update.rootHash.toString()),
+        hash: Hash256.fake('abc'), // TODO: we want fact hash
         updateCount: update.positionCount,
         forcedTransactionCount: update.forcedTransactionsCount,
       })),

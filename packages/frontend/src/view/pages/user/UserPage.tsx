@@ -4,7 +4,13 @@ import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
+import { PageTitle } from '../../components/PageTitle'
 import { TablePreview } from '../../components/table/TablePreview'
+import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
+import {
+  TransactionEntry,
+  TransactionsTable,
+} from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
   getAssetsTableProps,
@@ -12,33 +18,31 @@ import {
   getOfferTableProps,
   getTransactionTableProps,
 } from './common'
-import { ActionsTable, WithdrawableAssetEntry } from './components/ActionsTable'
 import { UserAssetEntry, UserAssetsTable } from './components/UserAssetTable'
 import {
   UserBalanceChangeEntry,
   UserBalanceChangesTable,
 } from './components/UserBalanceChangesTable'
-import { UserOfferEntry, UserOffersTable } from './components/UserOffersTable'
 import { UserProfile } from './components/UserProfile'
 import {
-  UserTransactionEntry,
-  UserTransactionsTable,
-} from './components/UserTransactionsTable'
+  UserQuickActionsTable,
+  WithdrawableAssetEntry,
+} from './components/UserQuickActionsTable'
 
 export interface UserPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
   type: 'SPOT' | 'PERPETUAL'
-  withdrawableAssets: WithdrawableAssetEntry[] // Does ths make sense?
-  offersToAccept: UserOfferEntry[] // We could also pass a simpler object here
+  withdrawableAssets: WithdrawableAssetEntry[]
+  offersToAccept: OfferEntry[]
   assets: UserAssetEntry[]
   totalAssets: number
   balanceChanges: UserBalanceChangeEntry[]
   totalBalanceChanges: number
-  transactions: UserTransactionEntry[]
+  transactions: TransactionEntry[]
   totalTransactions: number
-  offers: UserOfferEntry[]
+  offers: OfferEntry[]
   totalOffers: number
 }
 
@@ -47,6 +51,7 @@ export function renderUserPage(props: UserPageProps) {
 }
 
 function UserPage(props: UserPageProps) {
+  const isMine = props.user?.starkKey === props.starkKey
   return (
     <Page
       path={`/users/${props.starkKey.toString()}`}
@@ -54,14 +59,19 @@ function UserPage(props: UserPageProps) {
       user={props.user}
     >
       <ContentWrapper className="flex flex-col gap-12">
-        <UserProfile
-          starkKey={props.starkKey}
-          ethereumAddress={props.ethereumAddress}
-        />
-        <ActionsTable
-          withdrawableAssets={props.withdrawableAssets}
-          offersToAccept={props.offersToAccept}
-        />
+        <section>
+          <PageTitle>User</PageTitle>
+          <UserProfile
+            starkKey={props.starkKey}
+            ethereumAddress={props.ethereumAddress}
+            isMine={isMine}
+          />
+          <UserQuickActionsTable
+            withdrawableAssets={props.withdrawableAssets}
+            offersToAccept={props.offersToAccept}
+            isMine={isMine}
+          />
+        </section>
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
           visible={props.assets.length}
@@ -71,6 +81,7 @@ function UserPage(props: UserPageProps) {
             type={props.type}
             starkKey={props.starkKey}
             assets={props.assets}
+            isMine={isMine}
           />
         </TablePreview>
         <TablePreview
@@ -88,14 +99,14 @@ function UserPage(props: UserPageProps) {
           visible={props.transactions.length}
           total={props.totalTransactions}
         >
-          <UserTransactionsTable transactions={props.transactions} />
+          <TransactionsTable transactions={props.transactions} />
         </TablePreview>
         <TablePreview
           {...getOfferTableProps(props.starkKey)}
           visible={props.offers.length}
           total={props.totalOffers}
         >
-          <UserOffersTable offers={props.offers} />
+          <OffersTable offers={props.offers} />
         </TablePreview>
       </ContentWrapper>
     </Page>
