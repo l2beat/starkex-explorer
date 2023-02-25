@@ -68,12 +68,12 @@ describe(syncSchedulerReducer.name, () => {
       ])
       expect(state).toEqual({
         isProcessing: true,
-        remaining: new BlockRange([block(2_000_000)], 2001, 2_000_001),
+        remaining: new BlockRange([block(2_000_000)], 7001, 2_000_001),
         discardAfter: undefined,
       })
       expect(effect).toEqual({
         type: 'sync',
-        blocks: new BlockRange([], 1001, 2001),
+        blocks: new BlockRange([], 1001, 7001),
       })
     })
   })
