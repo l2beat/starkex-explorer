@@ -32,11 +32,18 @@ export class UserTransactionMigrator {
   async migrate(): Promise<void> {
     const migrationNumber =
       await this.softwareMigrationRepository.getMigrationNumber()
-    if (migrationNumber >= 1) {
+
+    // We want to re-run migration if it was already run when
+    // migrationNumber was 0, because the implementation
+    // of collector has changed (added spot withdrawals).
+    if (
+      migrationNumber !== 0 &&
+      migrationNumber !== 1 // re-run
+    ) {
       return
     }
     await this.migrateUserTransactions()
-    await this.softwareMigrationRepository.setMigrationNumber(1)
+    await this.softwareMigrationRepository.setMigrationNumber(2)
   }
 
   private async migrateUserTransactions() {

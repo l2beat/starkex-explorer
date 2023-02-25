@@ -33,7 +33,7 @@ import {
   SpotValidiumStateTransitionCollector,
 } from './core/collectors/ValidiumStateTransitionCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
-import { WithdrawableAssetCollector } from './core/collectors/WithdrawableAssetCollector'
+import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
 import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
@@ -163,7 +163,11 @@ export class Application {
     const userTransactionCollector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
-      config.starkex.contracts.perpetual
+      withdrawableAssetRepository,
+      config.starkex.contracts.perpetual,
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
     )
 
     const tokenRegistrationCollector = new AssetRegistrationCollector(
@@ -178,7 +182,7 @@ export class Application {
       assetRepository,
       tokenInspector
     )
-    const withdrawableAssetCollector = new WithdrawableAssetCollector(
+    const withdrawalAllowedCollector = new WithdrawalAllowedCollector(
       ethereumClient,
       withdrawableAssetRepository,
       config.starkex.contracts.perpetual
@@ -220,7 +224,7 @@ export class Application {
           userTransactionCollector,
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
-          withdrawableAssetCollector,
+          withdrawalAllowedCollector,
           logger
         )
       } else {
@@ -255,7 +259,7 @@ export class Application {
           spotValidiumUpdater,
           tokenRegistrationCollector,
           depositWithTokenIdCollector,
-          withdrawableAssetCollector,
+          withdrawalAllowedCollector,
           logger
         )
       }
@@ -302,7 +306,7 @@ export class Application {
         perpetualRollupUpdater,
         userRegistrationCollector,
         userTransactionCollector,
-        withdrawableAssetCollector,
+        withdrawalAllowedCollector,
         logger
       )
     }
@@ -333,7 +337,7 @@ export class Application {
       softwareMigrationRepository,
       syncStatusRepository,
       withdrawableAssetRepository,
-      withdrawableAssetCollector,
+      withdrawalAllowedCollector,
       logger
     )
 

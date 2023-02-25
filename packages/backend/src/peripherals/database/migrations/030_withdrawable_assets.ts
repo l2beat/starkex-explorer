@@ -25,7 +25,7 @@ export async function up(knex: Knex) {
     // Delta is negative for withdrawals and positive when item added to withdrawable assets
     table.bigInteger('balance_delta').notNullable() // this is quantized amount, as expected in our system
     table.string('transaction_hash').notNullable()
-    table.json('event_data').notNullable()
+    table.json('data').notNullable()
   })
 }
 

@@ -1,8 +1,11 @@
 import { json } from '@explorer/types'
 
 import { SentTransactionJSON } from '../transactions/SentTransaction'
-import { UserTransactionJSON } from '../transactions/UserTransaction'
-import { WithdrawableBalanceChangeJSON } from '../WithdrawableBalanceChange'
+import {
+  UserTransactionJSON,
+  WithdrawalPerformedJSON,
+} from '../transactions/UserTransaction'
+import { WithdrawalAllowedJSON } from '../WithdrawalAllowed'
 
 declare module 'knex/types/tables' {
   interface KeyValueRow {
@@ -242,7 +245,7 @@ declare module 'knex/types/tables' {
     asset_hash: string
     balance_delta: bigint
     transaction_hash: string
-    event_data: WithdrawableBalanceChangeJSON
+    data: WithdrawalAllowedJSON | WithdrawalPerformedJSON
   }
 
   interface Tables {

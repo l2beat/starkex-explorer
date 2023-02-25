@@ -14,13 +14,10 @@ import { assertUnreachable } from '../../utils/assertUnreachable'
 import {
   LogAssetWithdrawalAllowed,
   LogMintableWithdrawalAllowed,
-  LogMintWithdrawalPerformed,
   LogWithdrawalAllowed,
-  LogWithdrawalPerformed,
-  LogWithdrawalWithTokenIdPerformed,
 } from './events'
 
-export class WithdrawableAssetCollector {
+export class WithdrawalAllowedCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
@@ -39,11 +36,6 @@ export class WithdrawableAssetCollector {
           LogWithdrawalAllowed.topic,
           LogMintableWithdrawalAllowed.topic,
           LogAssetWithdrawalAllowed.topic,
-
-          // Assets being withdrawn from L2:
-          LogWithdrawalPerformed.topic,
-          LogWithdrawalWithTokenIdPerformed.topic,
-          LogMintWithdrawalPerformed.topic,
         ],
       ],
     })
@@ -65,10 +57,7 @@ export class WithdrawableAssetCollector {
     const event =
       LogWithdrawalAllowed.safeParseLog(log) ??
       LogMintableWithdrawalAllowed.safeParseLog(log) ??
-      LogAssetWithdrawalAllowed.safeParseLog(log) ??
-      LogWithdrawalPerformed.safeParseLog(log) ??
-      LogWithdrawalWithTokenIdPerformed.safeParseLog(log) ??
-      LogMintWithdrawalPerformed.parseLog(log)
+      LogAssetWithdrawalAllowed.parseLog(log)
 
     const timestamp =
       knownBlockTimestamps?.get(log.blockNumber) ??
@@ -85,7 +74,7 @@ export class WithdrawableAssetCollector {
         return this.withdrawableAssetRepository.add({
           ...base,
           data: {
-            event: 'LogWithdrawalAllowed',
+            type: 'WithdrawalAllowed',
             starkKey: StarkKey.from(event.args.starkKey),
             assetType: AssetHash.from(event.args.assetType),
             nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
@@ -96,7 +85,7 @@ export class WithdrawableAssetCollector {
         return this.withdrawableAssetRepository.add({
           ...base,
           data: {
-            event: 'LogMintableWithdrawalAllowed',
+            type: 'MintableWithdrawalAllowed',
             starkKey: StarkKey.from(event.args.starkKey),
             assetId: AssetHash.from(event.args.assetId),
             quantizedAmount: event.args.quantizedAmount.toBigInt(),
@@ -106,48 +95,10 @@ export class WithdrawableAssetCollector {
         return this.withdrawableAssetRepository.add({
           ...base,
           data: {
-            event: 'LogAssetWithdrawalAllowed',
+            type: 'AssetWithdrawalAllowed',
             starkKey: StarkKey.from(event.args.starkKey),
             assetId: AssetHash.from(event.args.assetId),
             quantizedAmount: event.args.quantizedAmount.toBigInt(),
-          },
-        })
-      case 'LogWithdrawalPerformed':
-        return this.withdrawableAssetRepository.add({
-          ...base,
-          data: {
-            event: 'LogWithdrawalPerformed',
-            starkKey: StarkKey.from(event.args.starkKey),
-            assetType: AssetHash.from(event.args.assetType),
-            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
-            quantizedAmount: event.args.quantizedAmount.toBigInt(),
-            recipient: EthereumAddress(event.args.recipient),
-          },
-        })
-      case 'LogWithdrawalWithTokenIdPerformed':
-        return this.withdrawableAssetRepository.add({
-          ...base,
-          data: {
-            event: 'LogWithdrawalWithTokenIdPerformed',
-            starkKey: StarkKey.from(event.args.starkKey),
-            assetType: AssetHash.from(event.args.assetType),
-            tokenId: event.args.tokenId.toBigInt(),
-            assetId: AssetHash.from(event.args.assetId),
-            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
-            quantizedAmount: event.args.quantizedAmount.toBigInt(),
-            recipient: EthereumAddress(event.args.recipient),
-          },
-        })
-      case 'LogMintWithdrawalPerformed':
-        return this.withdrawableAssetRepository.add({
-          ...base,
-          data: {
-            event: 'LogMintWithdrawalPerformed',
-            starkKey: StarkKey.from(event.args.starkKey),
-            assetType: AssetHash.from(event.args.assetType),
-            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
-            quantizedAmount: event.args.quantizedAmount.toBigInt(),
-            assetId: AssetHash.from(event.args.assetId),
           },
         })
       default:

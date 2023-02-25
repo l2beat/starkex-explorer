@@ -8,7 +8,7 @@ import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
-import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetCollector'
+import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { IDataSyncService } from './IDataSyncService'
 import { SpotValidiumUpdater } from './SpotValidiumUpdater'
 
@@ -22,7 +22,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     private readonly spotValidiumUpdater: SpotValidiumUpdater,
     private readonly assetRegistrationCollector: AssetRegistrationCollector,
     private readonly depositWithTokenIdCollector: DepositWithTokenIdCollector,
-    private readonly withdrawableAssetCollector: WithdrawableAssetCollector,
+    private readonly withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -34,7 +34,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     )
     await this.userTransactionCollector.collect(blockRange)
 
-    await this.withdrawableAssetCollector.collect(blockRange)
+    await this.withdrawalAllowedCollector.collect(blockRange)
 
     const assetRegistrations = await this.assetRegistrationCollector.collect(
       blockRange
@@ -76,6 +76,6 @@ export class SpotValidiumSyncService implements IDataSyncService {
     await this.spotValidiumUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
     await this.userTransactionCollector.discardAfter(blockNumber)
-    await this.withdrawableAssetCollector.discardAfter(blockNumber)
+    await this.withdrawalAllowedCollector.discardAfter(blockNumber)
   }
 }

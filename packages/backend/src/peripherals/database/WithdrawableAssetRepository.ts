@@ -4,13 +4,14 @@ import { WithdrawableAssetRow } from 'knex/types/tables'
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
+import { WithdrawalPerformedData } from './transactions/UserTransaction'
 import {
   decodeWithdrawableBalanceChangeData,
   encodeWithdrawableBalanceChangeData,
-  WithdrawableBalanceChangeData,
-} from './WithdrawableBalanceChange'
+  WithdrawalAllowedData,
+} from './WithdrawalAllowed'
 
-export interface WithdrawalBalanceChangeRecord {
+export interface WithdrawableAssetRecord {
   id?: number
   starkKey: StarkKey
   assetHash: AssetHash
@@ -18,8 +19,12 @@ export interface WithdrawalBalanceChangeRecord {
   transactionHash: Hash256
   blockNumber: number
   timestamp: Timestamp
-  data: WithdrawableBalanceChangeData
+  data: WithdrawalAllowedData | WithdrawalPerformedData
 }
+
+export type WithdrawableAssetAddRecord = Parameters<
+  WithdrawableAssetRepository['add']
+>['0']
 
 export class WithdrawableAssetRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
@@ -39,7 +44,7 @@ export class WithdrawableAssetRepository extends BaseRepository {
     transactionHash: Hash256
     blockNumber: number
     timestamp: Timestamp
-    data: WithdrawableBalanceChangeData
+    data: WithdrawalAllowedData | WithdrawalPerformedData
   }): Promise<number> {
     const knex = await this.knex()
     const encoded = encodeWithdrawableBalanceChangeData(record.data)
@@ -51,16 +56,14 @@ export class WithdrawableAssetRepository extends BaseRepository {
         transaction_hash: record.transactionHash.toString(),
         timestamp: BigInt(record.timestamp.toString()),
         block_number: record.blockNumber,
-        event_data: encoded.data,
+        data: encoded.data,
       })
       .returning('id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return results[0]!.id
   }
 
-  async findById(
-    id: number
-  ): Promise<WithdrawalBalanceChangeRecord | undefined> {
+  async findById(id: number): Promise<WithdrawableAssetRecord | undefined> {
     const knex = await this.knex()
     const result = await knex('withdrawable_assets').where('id', id).first()
     return result ? toWithdrawalBalanceChangeRecord(result) : undefined
@@ -81,7 +84,7 @@ export class WithdrawableAssetRepository extends BaseRepository {
 
 function toWithdrawalBalanceChangeRecord(
   row: WithdrawableAssetRow
-): WithdrawalBalanceChangeRecord {
+): WithdrawableAssetRecord {
   return {
     starkKey: StarkKey(row.stark_key),
     assetHash: AssetHash(row.asset_hash),
@@ -89,6 +92,6 @@ function toWithdrawalBalanceChangeRecord(
     transactionHash: Hash256(row.transaction_hash),
     blockNumber: row.block_number,
     timestamp: Timestamp(row.timestamp),
-    data: decodeWithdrawableBalanceChangeData(row.event_data),
+    data: decodeWithdrawableBalanceChangeData(row.data),
   }
 }

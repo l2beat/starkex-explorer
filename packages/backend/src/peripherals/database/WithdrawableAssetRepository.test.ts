@@ -9,15 +9,17 @@ import { expect } from 'earljs'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
+import {
+  MintWithdrawData,
+  WithdrawData,
+  WithdrawWithTokenIdData,
+} from './transactions/UserTransaction'
 import { WithdrawableAssetRepository } from './WithdrawableAssetRepository'
 import {
   AssetWithdrawalAllowedData,
   MintableWithdrawalAllowedData,
-  MintWithdrawalPerformedData,
-  WithdrawalAllowedData,
-  WithdrawalPerformedData,
-  WithdrawalWithTokenIdPerformedData,
-} from './WithdrawableBalanceChange'
+  SpotWithdrawalAllowedData,
+} from './WithdrawalAllowed'
 
 describe(WithdrawableAssetRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
@@ -26,10 +28,10 @@ describe(WithdrawableAssetRepository.name, () => {
   afterEach(() => repository.deleteAll())
 
   function fakeWithdrawalAllowedData(
-    override?: Partial<WithdrawalAllowedData>
-  ): WithdrawalAllowedData {
+    override?: Partial<SpotWithdrawalAllowedData>
+  ): SpotWithdrawalAllowedData {
     return {
-      event: 'LogWithdrawalAllowed',
+      type: 'WithdrawalAllowed',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
       nonQuantizedAmount: 123000n,
@@ -42,7 +44,7 @@ describe(WithdrawableAssetRepository.name, () => {
     override?: Partial<MintableWithdrawalAllowedData>
   ): MintableWithdrawalAllowedData {
     return {
-      event: 'LogMintableWithdrawalAllowed',
+      type: 'MintableWithdrawalAllowed',
       starkKey: StarkKey.fake(),
       assetId: AssetHash.fake(),
       quantizedAmount: 234n,
@@ -54,7 +56,7 @@ describe(WithdrawableAssetRepository.name, () => {
     override?: Partial<AssetWithdrawalAllowedData>
   ): AssetWithdrawalAllowedData {
     return {
-      event: 'LogAssetWithdrawalAllowed',
+      type: 'AssetWithdrawalAllowed',
       starkKey: StarkKey.fake(),
       assetId: AssetHash.fake(),
       quantizedAmount: 345n,
@@ -63,10 +65,10 @@ describe(WithdrawableAssetRepository.name, () => {
   }
 
   function fakeWithdrawalPerformedData(
-    override?: Partial<WithdrawalPerformedData>
-  ): WithdrawalPerformedData {
+    override?: Partial<WithdrawData>
+  ): WithdrawData {
     return {
-      event: 'LogWithdrawalPerformed',
+      type: 'Withdraw',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
       nonQuantizedAmount: 45600n,
@@ -77,10 +79,10 @@ describe(WithdrawableAssetRepository.name, () => {
   }
 
   function fakeWithdrawalWithTokenIdPerformedData(
-    override?: Partial<WithdrawalWithTokenIdPerformedData>
-  ): WithdrawalWithTokenIdPerformedData {
+    override?: Partial<WithdrawWithTokenIdData>
+  ): WithdrawWithTokenIdData {
     return {
-      event: 'LogWithdrawalWithTokenIdPerformed',
+      type: 'WithdrawWithTokenId',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
       tokenId: 1n,
@@ -93,10 +95,10 @@ describe(WithdrawableAssetRepository.name, () => {
   }
 
   function fakeMintWithdrawalPerformedData(
-    override?: Partial<MintWithdrawalPerformedData>
-  ): MintWithdrawalPerformedData {
+    override?: Partial<MintWithdrawData>
+  ): MintWithdrawData {
     return {
-      event: 'LogMintWithdrawalPerformed',
+      type: 'MintWithdraw',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
       nonQuantizedAmount: 678000n,

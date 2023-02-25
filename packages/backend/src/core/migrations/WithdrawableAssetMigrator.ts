@@ -3,14 +3,14 @@ import { SoftwareMigrationRepository } from '../../peripherals/database/Software
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { Logger } from '../../tools/Logger'
-import { WithdrawableAssetCollector } from '../collectors/WithdrawableAssetCollector'
+import { WithdrawalAllowedCollector } from '../collectors/WithdrawalAllowedCollector'
 
 export class WithdrawableAssetMigrator {
   constructor(
     private softwareMigrationRepository: SoftwareMigrationRepository,
     private syncStatusRepository: SyncStatusRepository,
     private withdrawableAssetRepository: WithdrawableAssetRepository,
-    private withdrawableAssetCollector: WithdrawableAssetCollector,
+    private withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private logger: Logger
   ) {
     this.logger = this.logger.for(this)
@@ -19,11 +19,11 @@ export class WithdrawableAssetMigrator {
   async migrate(): Promise<void> {
     const migrationNumber =
       await this.softwareMigrationRepository.getMigrationNumber()
-    if (migrationNumber >= 2) {
+    if (migrationNumber !== 2) {
       return
     }
     await this.migrateWithdrawableAssets()
-    await this.softwareMigrationRepository.setMigrationNumber(2)
+    await this.softwareMigrationRepository.setMigrationNumber(3)
   }
 
   private async migrateWithdrawableAssets() {
@@ -54,7 +54,7 @@ export class WithdrawableAssetMigrator {
     const knownBlockTimestamps = new Map<number, number>(
       Object.entries(timestamps).map(([k, v]) => [parseInt(k), v])
     )
-    await this.withdrawableAssetCollector.collect(
+    await this.withdrawalAllowedCollector.collect(
       blockRange,
       knownBlockTimestamps
     )

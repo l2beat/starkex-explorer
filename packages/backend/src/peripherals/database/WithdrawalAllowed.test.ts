@@ -2,20 +2,22 @@ import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
+  MintWithdrawData,
+  WithdrawData,
+  WithdrawWithTokenIdData,
+} from './transactions/UserTransaction'
+import {
   AssetWithdrawalAllowedData,
   decodeWithdrawableBalanceChangeData,
   encodeWithdrawableBalanceChangeData,
   MintableWithdrawalAllowedData,
-  MintWithdrawalPerformedData,
-  WithdrawalAllowedData,
-  WithdrawalPerformedData,
-  WithdrawalWithTokenIdPerformedData,
-} from './WithdrawableBalanceChange'
+  SpotWithdrawalAllowedData,
+} from './WithdrawalAllowed'
 
 describe(encodeWithdrawableBalanceChangeData.name, () => {
-  it('can encode a LogWithdrawalAllowed', () => {
-    const data: WithdrawalAllowedData = {
-      event: 'LogWithdrawalAllowed',
+  it('can encode a WithdrawalAllowed', () => {
+    const data: SpotWithdrawalAllowedData = {
+      type: 'WithdrawalAllowed',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
       nonQuantizedAmount: 123000n,
@@ -28,7 +30,7 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
       assetHash: data.assetType,
       balanceDelta: data.quantizedAmount,
       data: {
-        event: 'LogWithdrawalAllowed',
+        type: 'WithdrawalAllowed',
         starkKey: data.starkKey.toString(),
         assetType: data.assetType,
         nonQuantizedAmount: data.nonQuantizedAmount.toString(),
@@ -41,9 +43,9 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode a LogMintableWithdrawalAllowed', () => {
+  it('can encode a MintableWithdrawalAllowed', () => {
     const data: MintableWithdrawalAllowedData = {
-      event: 'LogMintableWithdrawalAllowed',
+      type: 'MintableWithdrawalAllowed',
       starkKey: StarkKey.fake(),
       assetId: AssetHash.fake(),
       quantizedAmount: 123n,
@@ -55,7 +57,7 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
       assetHash: data.assetId,
       balanceDelta: data.quantizedAmount,
       data: {
-        event: 'LogMintableWithdrawalAllowed',
+        type: 'MintableWithdrawalAllowed',
         starkKey: data.starkKey.toString(),
         assetId: data.assetId,
         quantizedAmount: data.quantizedAmount.toString(),
@@ -67,9 +69,9 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode a LogAssetWithdrawalAllowed', () => {
+  it('can encode a AssetWithdrawalAllowed', () => {
     const data: AssetWithdrawalAllowedData = {
-      event: 'LogAssetWithdrawalAllowed',
+      type: 'AssetWithdrawalAllowed',
       starkKey: StarkKey.fake(),
       assetId: AssetHash.fake(),
       quantizedAmount: 123n,
@@ -81,7 +83,7 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
       assetHash: data.assetId,
       balanceDelta: data.quantizedAmount,
       data: {
-        event: 'LogAssetWithdrawalAllowed',
+        type: 'AssetWithdrawalAllowed',
         starkKey: data.starkKey.toString(),
         assetId: data.assetId,
         quantizedAmount: data.quantizedAmount.toString(),
@@ -93,9 +95,9 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode a LogWithdrawalPerformed', () => {
-    const data: WithdrawalPerformedData = {
-      event: 'LogWithdrawalPerformed',
+  it('can encode a Withdraw', () => {
+    const data: WithdrawData = {
+      type: 'Withdraw',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
       nonQuantizedAmount: 123000n,
@@ -109,7 +111,7 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
       assetHash: data.assetType,
       balanceDelta: -data.quantizedAmount,
       data: {
-        event: 'LogWithdrawalPerformed',
+        type: 'Withdraw',
         starkKey: data.starkKey.toString(),
         assetType: data.assetType,
         nonQuantizedAmount: data.nonQuantizedAmount.toString(),
@@ -123,9 +125,9 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode a LogWithdrawalWithTokenIdPerformed', () => {
-    const data: WithdrawalWithTokenIdPerformedData = {
-      event: 'LogWithdrawalWithTokenIdPerformed',
+  it('can encode a WithdrawWithTokenId', () => {
+    const data: WithdrawWithTokenIdData = {
+      type: 'WithdrawWithTokenId',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
       tokenId: 45n,
@@ -141,7 +143,7 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
       assetHash: data.assetId,
       balanceDelta: -data.quantizedAmount,
       data: {
-        event: 'LogWithdrawalWithTokenIdPerformed',
+        type: 'WithdrawWithTokenId',
         starkKey: data.starkKey.toString(),
         assetType: data.assetType,
         tokenId: data.tokenId.toString(),
@@ -157,9 +159,9 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode a LogMintWithdrawalPerformed', () => {
-    const data: MintWithdrawalPerformedData = {
-      event: 'LogMintWithdrawalPerformed',
+  it('can encode a MintWithdrawal', () => {
+    const data: MintWithdrawData = {
+      type: 'MintWithdraw',
       starkKey: StarkKey.fake(),
       assetType: AssetHash.fake(),
       assetId: AssetHash.fake(),
@@ -173,7 +175,7 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
       assetHash: data.assetId,
       balanceDelta: -data.quantizedAmount,
       data: {
-        event: 'LogMintWithdrawalPerformed',
+        type: 'MintWithdraw',
         starkKey: data.starkKey.toString(),
         assetType: data.assetType,
         assetId: data.assetId,

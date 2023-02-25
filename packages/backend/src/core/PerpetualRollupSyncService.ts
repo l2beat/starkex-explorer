@@ -9,7 +9,7 @@ import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualR
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
-import { WithdrawableAssetCollector } from './collectors/WithdrawableAssetCollector'
+import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { IDataSyncService } from './IDataSyncService'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 
@@ -22,7 +22,7 @@ export class PerpetualRollupSyncService implements IDataSyncService {
     private readonly perpetualRollupUpdater: PerpetualRollupUpdater,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly userTransactionCollector: UserTransactionCollector,
-    private readonly withdrawableAssetCollector: WithdrawableAssetCollector,
+    private readonly withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -44,7 +44,7 @@ export class PerpetualRollupSyncService implements IDataSyncService {
     )
 
     await this.userTransactionCollector.collect(blockRange)
-    await this.withdrawableAssetCollector.collect(blockRange)
+    await this.withdrawalAllowedCollector.collect(blockRange)
 
     this.logger.info({
       method: 'sync',
@@ -82,6 +82,6 @@ export class PerpetualRollupSyncService implements IDataSyncService {
     await this.perpetualRollupUpdater.discardAfter(blockNumber)
     await this.userRegistrationCollector.discardAfter(blockNumber)
     await this.userTransactionCollector.discardAfter(blockNumber)
-    await this.withdrawableAssetCollector.discardAfter(blockNumber)
+    await this.withdrawalAllowedCollector.discardAfter(blockNumber)
   }
 }
