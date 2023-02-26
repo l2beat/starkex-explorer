@@ -9,7 +9,7 @@ import {
   TransactionsTable,
 } from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
-import { OFFER_TABLE_PROPS } from './common'
+import { FORCED_TRANSACTION_TABLE_PROPS } from './common'
 
 export interface HomeTransactionsPageProps {
   user: UserDetails | undefined
@@ -26,13 +26,13 @@ export function renderHomeTransactionsPage(props: HomeTransactionsPageProps) {
 function HomeTransactionsPage(props: HomeTransactionsPageProps) {
   return (
     <Page
-      path={OFFER_TABLE_PROPS.link}
+      path={FORCED_TRANSACTION_TABLE_PROPS.link}
       description="TODO: description"
       user={props.user}
     >
       <ContentWrapper>
         <TableWithPagination
-          {...OFFER_TABLE_PROPS}
+          {...FORCED_TRANSACTION_TABLE_PROPS}
           visible={props.forcedTransactions.length}
           limit={props.limit}
           offset={props.offset}

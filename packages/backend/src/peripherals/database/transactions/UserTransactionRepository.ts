@@ -64,6 +64,7 @@ export class UserTransactionRepository extends BaseRepository {
     this.getPaginated = this.wrapGet(this.getPaginated)
     this.getNotIncluded = this.wrapGet(this.getNotIncluded)
     this.countAll = this.wrapAny(this.countAll)
+    this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
     this.findById = this.wrapFind(this.findById)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
@@ -112,7 +113,8 @@ export class UserTransactionRepository extends BaseRepository {
 
   async getByStarkKey<T extends UserTransactionData['type']>(
     starkKey: StarkKey,
-    types?: T[]
+    types?: T[],
+    pagination?: { offset: number; limit: number }
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex)
@@ -123,7 +125,29 @@ export class UserTransactionRepository extends BaseRepository {
       .where('stark_key_a', starkKey.toString())
       .orWhere('stark_key_b', starkKey.toString())
       .orderBy('timestamp', 'desc')
+
+    if (pagination) {
+      query = query.limit(pagination.limit).offset(pagination.offset)
+    }
+
     return toRecords<T>(await query)
+  }
+
+  async getCountByStarkKey(
+    starkKey: StarkKey,
+    types?: UserTransactionData['type'][]
+  ): Promise<number> {
+    const knex = await this.knex()
+    let query = knex('user_transactions')
+    if (types) {
+      query = query.whereIn('type', types)
+    }
+    query = query
+      .where('stark_key_a', starkKey.toString())
+      .orWhere('stark_key_b', starkKey.toString())
+    const [result] = await query.count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
   }
 
   async getByPositionId<T extends UserTransactionData['type']>(
