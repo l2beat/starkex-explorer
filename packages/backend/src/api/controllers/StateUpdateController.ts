@@ -1,118 +1,126 @@
 import {
-  PositionUpdateEntry,
-  renderOldStateUpdateDetailsPage,
-  renderOldStateUpdatesIndexPage,
+  renderStateUpdateBalanceChangesPage,
+  renderStateUpdatePage,
 } from '@explorer/frontend'
-import { EthereumAddress } from '@explorer/types'
+import { UserDetails } from '@explorer/shared'
+import { AssetHash, AssetId } from '@explorer/types'
 
-import { AccountService } from '../../core/AccountService'
-import { PositionWithPricesRecord } from '../../peripherals/database/PositionRepository'
-import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { UserService } from '../../core/UserService'
+import { PaginationOptions } from '../../model/PaginationOptions'
 import {
-  UserTransactionRecord,
-  UserTransactionRepository,
-} from '../../peripherals/database/transactions/UserTransactionRepository'
+  PreprocessedAssetHistoryRecord,
+  PreprocessedAssetHistoryRepository,
+} from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
-import { toForcedTransactionEntry } from './utils/toForcedTransactionEntry'
-import { toPositionAssetEntries } from './utils/toPositionAssetEntries'
-import { toStateUpdateEntry } from './utils/toStateUpdateEntry'
 
 export class StateUpdateController {
   constructor(
-    private accountService: AccountService,
-    private stateUpdateRepository: StateUpdateRepository,
-    private userTransactionRepository: UserTransactionRepository
+    private readonly userService: UserService,
+    private readonly stateUpdateRepository: StateUpdateRepository,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
+      AssetHash | AssetId
+    >,
+    private readonly tradingMode: 'perpetual' | 'spot'
   ) {}
 
-  async getStateUpdatesPage(
-    page: number,
-    perPage: number,
-    address: EthereumAddress | undefined
+  async getStateUpdatePage(
+    givenUser: Partial<UserDetails>,
+    stateUpdateId: number
   ): Promise<ControllerResult> {
-    const [account, stateUpdates] = await Promise.all([
-      this.accountService.getAccount(address),
-      this.stateUpdateRepository.getPaginated({
-        offset: (page - 1) * perPage,
-        limit: perPage,
-      }),
-    ])
-    const total = await this.stateUpdateRepository.count()
+    const user = await this.userService.getUserDetails(givenUser)
 
-    const content = renderOldStateUpdatesIndexPage({
-      account,
-      stateUpdates: stateUpdates.map(toStateUpdateEntry),
-      total,
-      params: { page, perPage },
+    const [stateUpdate, balanceChanges, totalBalanceChanges, prices] =
+      await Promise.all([
+        this.stateUpdateRepository.findById(stateUpdateId),
+        this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
+          stateUpdateId,
+          { offset: 0, limit: 10 }
+        ),
+        this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
+          stateUpdateId
+        ),
+        this.stateUpdateRepository.getPricesByStateUpdateId(stateUpdateId),
+      ])
+
+    if (!stateUpdate) {
+      return { type: 'not found', content: 'State update not found' }
+    }
+
+    const balanceChangeEntries = toBalanceChangeEntries(balanceChanges)
+    const priceEntries = prices.map((p) => ({
+      asset: { hashOrId: p.assetId },
+      price: p.price,
+      // TODO: Don't display or correctly calculate this:
+      change: 0n,
+    }))
+
+    const content = renderStateUpdatePage({
+      user,
+      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      id: stateUpdateId.toString(),
+      hashes: {
+        factHash: stateUpdate.stateTransitionHash,
+        positionTreeRoot: stateUpdate.rootHash,
+        // TODO - extract this data:
+        onChainVaultTreeRoot: undefined,
+        offChainVaultTreeRoot: undefined,
+        orderRoot: undefined,
+      },
+      blockNumber: stateUpdate.blockNumber,
+      ethereumTimestamp: stateUpdate.timestamp,
+      // TODO - what is this?
+      starkExTimestamp: stateUpdate.timestamp,
+      balanceChanges: balanceChangeEntries,
+      totalBalanceChanges,
+      priceChanges: priceEntries,
+      transactions: [],
+      totalTransactions: 0,
     })
+
     return { type: 'success', content }
   }
 
-  async getStateUpdateDetailsPage(
-    id: number,
-    address: EthereumAddress | undefined
+  async getStateUpdateBalanceChangesPage(
+    givenUser: Partial<UserDetails>,
+    stateUpdateId: number,
+    pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const [account, stateUpdate, transactions] = await Promise.all([
-      this.accountService.getAccount(address),
-      this.stateUpdateRepository.findByIdWithPositions(id),
-      this.userTransactionRepository.getByStateUpdateId(id, [
-        'ForcedTrade',
-        'ForcedWithdrawal',
-      ]),
+    const user = await this.userService.getUserDetails(givenUser)
+
+    const [balanceChanges, total] = await Promise.all([
+      this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
+        stateUpdateId,
+        pagination
+      ),
+      this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
+        stateUpdateId
+      ),
     ])
 
-    if (!stateUpdate) {
-      const content = 'State update not found'
-      return { type: 'not found', content }
-    }
+    const balanceChangeEntries = toBalanceChangeEntries(balanceChanges)
 
-    const positions = stateUpdate.positions.map((position) =>
-      toPositionUpdateEntry(position, transactions)
-    )
-
-    const content = renderOldStateUpdateDetailsPage({
-      account,
-      id: stateUpdate.id,
-      hash: stateUpdate.hash,
-      rootHash: stateUpdate.rootHash,
-      blockNumber: stateUpdate.blockNumber,
-      timestamp: stateUpdate.timestamp,
-      positions,
-      transactions: transactions.map(toForcedTransactionEntry),
+    const content = renderStateUpdateBalanceChangesPage({
+      user,
+      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      id: '1534',
+      balanceChanges: balanceChangeEntries,
+      ...pagination,
+      total,
     })
+
     return { type: 'success', content }
   }
 }
 
-export function toPositionUpdateEntry(
-  position: PositionWithPricesRecord,
-  transactions: UserTransactionRecord<'ForcedTrade' | 'ForcedWithdrawal'>[]
-): PositionUpdateEntry {
-  const assets = toPositionAssetEntries(
-    position.balances,
-    position.collateralBalance,
-    position.prices
-  )
-  const totalUSDCents = assets.reduce(
-    (total, { totalUSDCents }) => totalUSDCents + total,
-    0n
-  )
-
-  const forcedTransactions = transactions.filter((tx) => {
-    if (tx.data.type === 'ForcedWithdrawal') {
-      return tx.data.positionId === position.positionId
-    } else {
-      return (
-        tx.data.positionIdA === position.positionId ||
-        tx.data.positionIdB === position.positionId
-      )
-    }
-  }).length
-
-  return {
-    starkKey: position.starkKey,
-    positionId: position.positionId,
-    collateralBalance: position.collateralBalance,
-    totalUSDCents,
-    forcedTransactions,
-  }
+function toBalanceChangeEntries(
+  balanceChanges: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[]
+) {
+  return balanceChanges.map((r) => ({
+    starkKey: r.starkKey,
+    asset: { hashOrId: r.assetHashOrId },
+    balance: r.balance,
+    change: r.balance - r.prevBalance,
+    vaultOrPositionId: r.positionOrVaultId.toString(),
+  }))
 }

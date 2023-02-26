@@ -22,8 +22,15 @@ export interface WithdrawableAssetEntry {
 }
 
 export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
+  if (
+    props.withdrawableAssets.length === 0 &&
+    props.offersToAccept.length === 0
+  ) {
+    return null
+  }
+
   return (
-    <div className="flex w-full flex-col rounded-lg border border-solid border-brand bg-gray-800 p-6">
+    <section className="flex w-full flex-col rounded-lg border border-solid border-brand bg-gray-800 p-6">
       <p className="text-sm font-semibold text-zinc-500">Withdrawable assets</p>
       {props.withdrawableAssets.map((asset) => {
         const assetInfo = assetToInfo(asset.asset)
@@ -79,6 +86,6 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
           })}
         </>
       )}
-    </div>
+    </section>
   )
 }

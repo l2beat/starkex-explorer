@@ -17,7 +17,7 @@ export function UserProfile({
   isMine,
 }: UserProfileProps) {
   return (
-    <div className="mb-6 flex w-full flex-col rounded-lg bg-gray-800 p-6">
+    <section className="flex w-full flex-col rounded-lg bg-gray-800 p-6">
       <p className="text-sm font-semibold text-zinc-500">Ethereum address</p>
       {ethereumAddress ? (
         <p className="text-base mt-3 font-semibold text-white">
@@ -56,6 +56,6 @@ export function UserProfile({
           )}
         </>
       )}
-    </div>
+    </section>
   )
 }
