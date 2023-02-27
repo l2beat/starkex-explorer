@@ -61,16 +61,18 @@ function UserPage(props: UserPageProps) {
       <ContentWrapper className="flex flex-col gap-12">
         <section>
           <PageTitle>User</PageTitle>
-          <UserProfile
-            starkKey={props.starkKey}
-            ethereumAddress={props.ethereumAddress}
-            isMine={isMine}
-          />
-          <UserQuickActionsTable
-            withdrawableAssets={props.withdrawableAssets}
-            offersToAccept={props.offersToAccept}
-            isMine={isMine}
-          />
+          <div className="flex flex-col gap-6">
+            <UserProfile
+              starkKey={props.starkKey}
+              ethereumAddress={props.ethereumAddress}
+              isMine={isMine}
+            />
+            <UserQuickActionsTable
+              withdrawableAssets={props.withdrawableAssets}
+              offersToAccept={props.offersToAccept}
+              isMine={isMine}
+            />
+          </div>
         </section>
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
