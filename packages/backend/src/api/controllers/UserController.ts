@@ -89,7 +89,7 @@ export class UserController {
       this.collateralAsset
     )
     // TODO: include the count of sentTransactions
-    const totalTransactions = userTransactionsCount 
+    const totalTransactions = userTransactionsCount
 
     const content = renderUserPage({
       user,
