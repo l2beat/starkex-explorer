@@ -61,7 +61,7 @@ export class HomeController {
       tutorials: [], // explicitly no tutorials
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
-        id: update.id.toString(),
+        id: update.stateUpdateId.toString(),
         hash: update.stateTransitionHash,
         updateCount: update.assetUpdateCount,
         forcedTransactionCount: update.forcedTransactionCount,
@@ -90,7 +90,7 @@ export class HomeController {
       user,
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
-        id: update.id.toString(),
+        id: update.stateUpdateId.toString(),
         hash: update.stateTransitionHash,
         updateCount: update.assetUpdateCount,
         forcedTransactionCount: update.forcedTransactionCount,
