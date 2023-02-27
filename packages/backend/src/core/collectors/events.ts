@@ -2,23 +2,6 @@ import { BigNumber } from 'ethers'
 
 import { EthereumEvent } from './EthereumEvent'
 
-export const LogWithdrawalPerformed = EthereumEvent<
-  'LogWithdrawalPerformed',
-  {
-    starkKey: BigNumber
-    assetType: BigNumber
-    nonQuantizedAmount: BigNumber
-    quantizedAmount: BigNumber
-    recipient: string
-  }
->(`event LogWithdrawalPerformed(
-  uint256 starkKey,
-  uint256 assetType,
-  uint256 nonQuantizedAmount,
-  uint256 quantizedAmount,
-  address recipient
-)`)
-
 export const LogForcedTradeRequest = EthereumEvent<
   'LogForcedTradeRequest',
   {
@@ -166,3 +149,112 @@ export const ImplementationAdded = EthereumEvent<
 export const Upgraded = EthereumEvent<'Upgraded', { implementation: string }>(
   'event Upgraded(address indexed implementation)'
 )
+
+// #region withdrawable_assets
+// These are events modifying the `pendingWithdrawals` map in solidity contracts
+
+// - events *increasing* the amount of withdrawable assets:
+// https://github.com/starkware-libs/starkex-contracts/blob/210bd5f6bcb6977211677821fe925140859a0f6e/scalable-dex/contracts/src/interactions/AcceptModifications.sol#L55
+
+export const LogWithdrawalAllowed = EthereumEvent<
+  'LogWithdrawalAllowed',
+  {
+    starkKey: BigNumber
+    assetType: BigNumber
+    nonQuantizedAmount: BigNumber
+    quantizedAmount: BigNumber
+  }
+>(`event LogWithdrawalAllowed(
+  uint256 starkKey,
+  uint256 assetType,
+  uint256 nonQuantizedAmount,
+  uint256 quantizedAmount
+)`)
+
+export const LogMintableWithdrawalAllowed = EthereumEvent<
+  'LogMintableWithdrawalAllowed',
+  {
+    starkKey: BigNumber
+    assetId: BigNumber
+    quantizedAmount: BigNumber
+  }
+>(`event LogMintableWithdrawalAllowed(
+  uint256 starkKey, 
+  uint256 assetId, 
+  uint256 quantizedAmount
+)`)
+
+export const LogAssetWithdrawalAllowed = EthereumEvent<
+  'LogAssetWithdrawalAllowed',
+  {
+    starkKey: BigNumber
+    assetId: BigNumber
+    quantizedAmount: BigNumber
+  }
+>(`event LogAssetWithdrawalAllowed(
+  uint256 starkKey, 
+  uint256 assetId, 
+  uint256 quantizedAmount
+)`)
+
+// - events *decreasing* the amount of withdrawable assets:
+// https://github.com/starkware-libs/starkex-contracts/blob/210bd5f6bcb6977211677821fe925140859a0f6e/scalable-dex/contracts/src/interactions/Withdrawals.sol#L108
+// https://github.com/starkware-libs/starkex-contracts/blob/210bd5f6bcb6977211677821fe925140859a0f6e/scalable-dex/contracts/src/interactions/Withdrawals.sol#L133
+// https://github.com/starkware-libs/starkex-contracts/blob/210bd5f6bcb6977211677821fe925140859a0f6e/scalable-dex/contracts/src/interactions/Withdrawals.sol#L174
+
+export const LogWithdrawalPerformed = EthereumEvent<
+  'LogWithdrawalPerformed',
+  {
+    starkKey: BigNumber
+    assetType: BigNumber
+    nonQuantizedAmount: BigNumber
+    quantizedAmount: BigNumber
+    recipient: string
+  }
+>(`event LogWithdrawalPerformed(
+  uint256 starkKey,
+  uint256 assetType,
+  uint256 nonQuantizedAmount,
+  uint256 quantizedAmount,
+  address recipient
+)`)
+
+export const LogWithdrawalWithTokenIdPerformed = EthereumEvent<
+  'LogWithdrawalWithTokenIdPerformed',
+  {
+    starkKey: BigNumber
+    assetType: BigNumber
+    tokenId: BigNumber
+    assetId: BigNumber
+    nonQuantizedAmount: BigNumber
+    quantizedAmount: BigNumber
+    recipient: string
+  }
+>(`event LogWithdrawalWithTokenIdPerformed(
+  uint256 starkKey,
+  uint256 assetType,
+  uint256 tokenId,
+  uint256 assetId,
+  uint256 nonQuantizedAmount,
+  uint256 quantizedAmount,
+  address recipient
+)`)
+
+export const LogMintWithdrawalPerformed = EthereumEvent<
+  'LogMintWithdrawalPerformed',
+  {
+    starkKey: BigNumber
+    assetType: BigNumber
+    nonQuantizedAmount: BigNumber
+    quantizedAmount: BigNumber
+    assetId: BigNumber
+  }
+>(`event LogMintWithdrawalPerformed(
+  uint256 starkKey,
+  uint256 assetType,
+  uint256 nonQuantizedAmount,
+  uint256 quantizedAmount,
+  uint256 assetId
+)`)
+
+// #endregion withdrawable_assets

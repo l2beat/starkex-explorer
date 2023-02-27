@@ -1,4 +1,4 @@
-import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -7,7 +7,9 @@ import {
   ForcedTradeData,
   ForcedWithdrawalData,
   FullWithdrawalData,
+  MintWithdrawData,
   WithdrawData,
+  WithdrawWithTokenIdData,
 } from './UserTransaction'
 
 describe(encodeUserTransactionData.name, () => {
@@ -87,7 +89,7 @@ describe(encodeUserTransactionData.name, () => {
     const data: WithdrawData = {
       type: 'Withdraw',
       starkKey: StarkKey.fake(),
-      assetType: '0x1234',
+      assetType: AssetHash('0x1234'),
       nonQuantizedAmount: 10000n,
       quantizedAmount: 5000n,
       recipient: EthereumAddress.fake(),
@@ -97,6 +99,65 @@ describe(encodeUserTransactionData.name, () => {
     expect(encoded).toEqual({
       starkKeyA: data.starkKey,
       data: expect.anything(),
+    })
+    expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
+
+    const decoded = decodeUserTransactionData(encoded.data)
+    expect(decoded).toEqual(data)
+  })
+
+  it('can encode a WithdrawalWithTokenId', () => {
+    const data: WithdrawWithTokenIdData = {
+      type: 'WithdrawWithTokenId',
+      starkKey: StarkKey.fake(),
+      assetType: AssetHash.fake(),
+      tokenId: 45n,
+      assetId: AssetHash.fake(),
+      nonQuantizedAmount: 123000n,
+      quantizedAmount: 123n,
+      recipient: EthereumAddress.fake('abc'),
+    }
+    const encoded = encodeUserTransactionData(data)
+
+    expect(encoded).toEqual({
+      starkKeyA: data.starkKey,
+      data: {
+        type: 'WithdrawWithTokenId',
+        starkKey: data.starkKey.toString(),
+        assetType: data.assetType,
+        tokenId: data.tokenId.toString(),
+        assetId: data.assetId,
+        nonQuantizedAmount: data.nonQuantizedAmount.toString(),
+        quantizedAmount: data.quantizedAmount.toString(),
+        recipient: data.recipient.toString(),
+      },
+    })
+    expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
+
+    const decoded = decodeUserTransactionData(encoded.data)
+    expect(decoded).toEqual(data)
+  })
+  it('can encode a MintWithdraw', () => {
+    const data: MintWithdrawData = {
+      type: 'MintWithdraw',
+      starkKey: StarkKey.fake(),
+      assetType: AssetHash.fake(),
+      assetId: AssetHash.fake(),
+      nonQuantizedAmount: 123000n,
+      quantizedAmount: 123n,
+    }
+    const encoded = encodeUserTransactionData(data)
+
+    expect(encoded).toEqual({
+      starkKeyA: data.starkKey,
+      data: {
+        type: 'MintWithdraw',
+        starkKey: data.starkKey.toString(),
+        assetType: data.assetType,
+        assetId: data.assetId,
+        nonQuantizedAmount: data.nonQuantizedAmount.toString(),
+        quantizedAmount: data.quantizedAmount.toString(),
+      },
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 

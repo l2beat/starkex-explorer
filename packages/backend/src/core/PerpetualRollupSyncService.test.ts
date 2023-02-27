@@ -12,6 +12,7 @@ import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualR
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import type { VerifierCollector } from './collectors/VerifierCollector'
+import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { PerpetualRollupSyncService } from './PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 
@@ -45,6 +46,9 @@ describe(PerpetualRollupSyncService.name, () => {
     const userTransactionCollector = mock<UserTransactionCollector>({
       collect: async () => {},
     })
+    const withdrawalAllowedCollector = mock<WithdrawalAllowedCollector>({
+      collect: async () => {},
+    })
 
     const stateTransitionRecordWithPages: StateTransitionRecord & {
       pages: string[]
@@ -73,6 +77,7 @@ describe(PerpetualRollupSyncService.name, () => {
       perpetualRollupUpdater,
       userRegistrationCollector,
       userTransactionCollector,
+      withdrawalAllowedCollector,
       Logger.SILENT
     )
 
@@ -91,6 +96,9 @@ describe(PerpetualRollupSyncService.name, () => {
         [blockRange],
       ])
       expect(userTransactionCollector.collect).toHaveBeenCalledExactlyWith([
+        [blockRange],
+      ])
+      expect(withdrawalAllowedCollector.collect).toHaveBeenCalledExactlyWith([
         [blockRange],
       ])
       expect(
@@ -122,6 +130,9 @@ describe(PerpetualRollupSyncService.name, () => {
       const userTransactionCollector = mock<UserTransactionCollector>({
         discardAfter: noop,
       })
+      const withdrawalAllowedCollector = mock<WithdrawalAllowedCollector>({
+        discardAfter: noop,
+      })
 
       const dataSyncService = new PerpetualRollupSyncService(
         verifierCollector,
@@ -131,6 +142,7 @@ describe(PerpetualRollupSyncService.name, () => {
         perpetualRollupUpdater,
         userRegistrationCollector,
         userTransactionCollector,
+        withdrawalAllowedCollector,
         Logger.SILENT
       )
 
@@ -143,6 +155,7 @@ describe(PerpetualRollupSyncService.name, () => {
       expect(perpetualRollupUpdater.discardAfter).toHaveBeenCalledWith([10])
       expect(userRegistrationCollector.discardAfter).toHaveBeenCalledWith([10])
       expect(userTransactionCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(withdrawalAllowedCollector.discardAfter).toHaveBeenCalledWith([10])
     })
   })
 })
