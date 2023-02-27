@@ -15,7 +15,7 @@ describe(nextFormState.name, () => {
     starkExAddress: EthereumAddress.fake(),
     starkKey: StarkKey.fake(),
     asset: {
-      hashOrId: AssetId('USDC-6'),
+      hashOrId: AssetId('USDC-9'),
       balance: 69420_654321n,
       priceUSDCents: 100n,
     },
