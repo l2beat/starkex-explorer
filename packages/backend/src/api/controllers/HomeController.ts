@@ -40,7 +40,10 @@ export class HomeController {
       forcedUserTransactionsCount,
     ] = await Promise.all([
       this.preprocessedStateDetailsRepository.countAll(),
-      this.preprocessedStateDetailsRepository.getPaginated({ offset: 0, limit: 6 }),
+      this.preprocessedStateDetailsRepository.getPaginated({
+        offset: 0,
+        limit: 6,
+      }),
       this.userTransactionRepository.getPaginated({
         offset: 0,
         limit: 6,
@@ -61,7 +64,7 @@ export class HomeController {
         id: update.id.toString(),
         hash: update.stateTransitionHash,
         updateCount: update.assetUpdateCount,
-        forcedTransactionCount: update.forcedTransactionCount
+        forcedTransactionCount: update.forcedTransactionCount,
       })),
       totalStateUpdates,
       transactions,

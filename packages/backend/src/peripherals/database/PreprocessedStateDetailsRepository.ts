@@ -57,9 +57,7 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
       .orderBy('state_update_id', 'desc')
       .offset(offset)
       .limit(limit)
-    return rows.map((r) =>
-      toPreprocessedStateDetailsRecord(r)
-    )
+    return rows.map((r) => toPreprocessedStateDetailsRecord(r))
   }
 
   async deleteAll(trx: Knex.Transaction) {
