@@ -35,7 +35,6 @@ import {
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
-import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
 import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
@@ -330,14 +329,9 @@ export class Application {
       userTransactionRepository,
       sentTransactionRepository,
       userTransactionCollector,
-      ethereumClient,
-      logger
-    )
-    const withdrawableAssetMigrator = new WithdrawableAssetMigrator(
-      softwareMigrationRepository,
-      syncStatusRepository,
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
+      ethereumClient,
       logger
     )
 
@@ -519,7 +513,6 @@ export class Application {
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
       await userTransactionMigrator.migrate()
-      await withdrawableAssetMigrator.migrate()
 
       if (config.enableSync) {
         transactionStatusService.start()
