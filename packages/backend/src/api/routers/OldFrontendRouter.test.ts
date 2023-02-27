@@ -19,9 +19,9 @@ import { ControllerSuccessResult } from '../controllers/ControllerResult'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
 import { OldHomeController } from '../controllers/OldHomeController'
+import { OldStateUpdateController } from '../controllers/OldStateUpdateController'
 import { PositionController } from '../controllers/PositionController'
 import { SearchController } from '../controllers/SearchController'
-import { StateUpdateController } from '../controllers/StateUpdateController'
 import { createOldFrontendRouter } from './OldFrontendRouter'
 
 const TEST_PAGE = '<!DOCTYPE html><p>test page</p>'
@@ -40,7 +40,7 @@ describe('FrontendRouter', () => {
         }),
         mock<ForcedTradeOfferController>(),
         mock<ForcedTransactionController>(),
-        mock<StateUpdateController>(),
+        mock<OldStateUpdateController>(),
         mock<SearchController>()
       )
       const server = createTestApiServer([frontendRouter])
@@ -55,7 +55,7 @@ describe('FrontendRouter', () => {
       mock<OldHomeController>(),
       mock<ForcedTradeOfferController>(),
       mock<ForcedTransactionController>(),
-      mock<StateUpdateController>({
+      mock<OldStateUpdateController>({
         getStateUpdatesPage: async () => SUCCESS_RESULT,
       }),
       mock<SearchController>()
@@ -84,7 +84,7 @@ describe('FrontendRouter', () => {
       mock<OldHomeController>(),
       mock<ForcedTradeOfferController>(),
       mock<ForcedTransactionController>(),
-      mock<StateUpdateController>({
+      mock<OldStateUpdateController>({
         getStateUpdateDetailsPage: async () => SUCCESS_RESULT,
       }),
       mock<SearchController>()
@@ -108,7 +108,7 @@ describe('FrontendRouter', () => {
       mock<OldHomeController>(),
       mock<ForcedTradeOfferController>(),
       mock<ForcedTransactionController>(),
-      mock<StateUpdateController>(),
+      mock<OldStateUpdateController>(),
       mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
@@ -130,7 +130,7 @@ describe('FrontendRouter', () => {
       mock<OldHomeController>(),
       mock<ForcedTradeOfferController>(),
       mock<ForcedTransactionController>(),
-      mock<StateUpdateController>(),
+      mock<OldStateUpdateController>(),
       mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
@@ -152,7 +152,7 @@ describe('FrontendRouter', () => {
       mock<ForcedTransactionController>({
         getForcedTransactionsPage: async () => SUCCESS_RESULT,
       }),
-      mock<StateUpdateController>(),
+      mock<OldStateUpdateController>(),
       mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
@@ -181,7 +181,7 @@ describe('FrontendRouter', () => {
         getOffersIndexPage: async () => SUCCESS_RESULT,
       }),
       mock<ForcedTransactionController>(),
-      mock<StateUpdateController>(),
+      mock<OldStateUpdateController>(),
       mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
@@ -204,7 +204,7 @@ describe('FrontendRouter', () => {
       mock<ForcedTransactionController>({
         getForcedTransactionDetailsPage: async () => SUCCESS_RESULT,
       }),
-      mock<StateUpdateController>(),
+      mock<OldStateUpdateController>(),
       mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
@@ -229,7 +229,7 @@ describe('FrontendRouter', () => {
         getOfferDetailsPage: async () => SUCCESS_RESULT,
       }),
       mock<ForcedTransactionController>(),
-      mock<StateUpdateController>(),
+      mock<OldStateUpdateController>(),
       mock<SearchController>()
     )
     const server = createTestApiServer([frontendRouter])
@@ -300,7 +300,7 @@ describe('FrontendRouter', () => {
         mock<OldHomeController>(),
         mock<ForcedTradeOfferController>(),
         mock<ForcedTransactionController>(),
-        mock<StateUpdateController>(),
+        mock<OldStateUpdateController>(),
         searchController
       )
       server = createTestApiServer([frontendRouter])

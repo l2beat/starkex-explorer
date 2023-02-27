@@ -1,13 +1,10 @@
-import {
-  deserializeFinalizeOfferData,
-  encodeForcedTradeRequest,
-  FinalizeOfferData,
-  serializeFinalizeOfferBody,
-} from '@explorer/shared'
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { deserializeFinalizeOfferData } from '@explorer/shared'
+import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../view/old/offers/finalize-form/attributes'
+import { Api } from '../peripherals/api'
+import { Wallet } from '../peripherals/wallet'
 import { getAttribute } from './getAttribute'
 
 export function initFinalizeForm() {
@@ -22,43 +19,13 @@ export function initFinalizeForm() {
       const perpetualAddress = EthereumAddress(
         getAttribute(form, 'perpetual-address')
       )
-      const hash = await sendTransaction(address, perpetualAddress, offer)
-      if (!hash) {
-        throw new Error('Could not send a transaction')
-      }
-      await fetch(form.action, {
-        method: form.method,
-        headers: { 'Content-Type': 'application/json' },
-        body: serializeFinalizeOfferBody({
-          offerId,
-          hash,
-        }),
-      })
+      const hash = await Wallet.sendForcedTradeTransaction(
+        address,
+        offer,
+        perpetualAddress
+      )
+      await Api.submitForcedTrade(offerId, hash)
       window.location.href = `/forced/${hash.toString()}`
     })
   })
-}
-
-async function sendTransaction(
-  address: EthereumAddress,
-  perpetualAddress: EthereumAddress,
-  offer: FinalizeOfferData
-) {
-  const provider = window.ethereum
-  if (!provider) {
-    return
-  }
-
-  const result = await provider.request({
-    method: 'eth_sendTransaction',
-    params: [
-      {
-        from: address,
-        to: perpetualAddress,
-        data: encodeForcedTradeRequest(offer),
-      },
-    ],
-  })
-
-  return Hash256(result as string)
 }

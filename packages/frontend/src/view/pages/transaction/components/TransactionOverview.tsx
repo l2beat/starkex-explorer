@@ -12,7 +12,7 @@ import { TransactionField } from './TransactionField'
 interface TransactionOverviewProps {
   statusType: StatusType
   statusText: string
-  statusDescription: string
+  statusDescription: React.ReactNode
   transactionHash?: Hash256
   timestamp?: {
     label: string
@@ -28,14 +28,18 @@ interface TransactionOverviewProps {
     receivedAsset: Asset
     receivedAmount: bigint
   }
+  stateUpdateId?: number
 }
 
 export function TransactionOverview(props: TransactionOverviewProps) {
+  const delayDays = Math.ceil(
+    (Number(props.timestamp?.timestamp) - Date.now()) / (24 * 60 * 60 * 1000)
+  )
   return (
     <div className="flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
       <div className="flex">
         <TransactionField label="Current status">
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
             <StatusBadge type={props.statusType}>
               {props.statusText}
             </StatusBadge>
@@ -47,7 +51,10 @@ export function TransactionOverview(props: TransactionOverviewProps) {
             label={props.timestamp.label}
             className="text-right"
           >
-            {formatTimestamp(props.timestamp.timestamp, 'utc')} UTC
+            {formatTimestamp(props.timestamp.timestamp, 'utc')} UTC{' '}
+            <span className="text-zinc-500">
+              ({delayDays} {delayDays === 1 ? 'day' : 'days'})
+            </span>
           </TransactionField>
         )}
       </div>
