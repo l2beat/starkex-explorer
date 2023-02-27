@@ -40,6 +40,7 @@ export function AcceptOfferForm(props: AcceptOfferFormProps) {
       action={`/forced/offers/${props.id}/accept`}
       method="POST"
       data-offer={createdJson}
+      data-offer-id={props.id.toString()}
       data-accepted={acceptedJson}
       data-address={props.address.toString()}
     >

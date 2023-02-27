@@ -12,9 +12,9 @@ import { z } from 'zod'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
 import { OldHomeController } from '../controllers/OldHomeController'
+import { OldStateUpdateController } from '../controllers/OldStateUpdateController'
 import { PositionController } from '../controllers/PositionController'
 import { SearchController } from '../controllers/SearchController'
-import { StateUpdateController } from '../controllers/StateUpdateController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
@@ -23,7 +23,7 @@ export function createOldFrontendRouter(
   oldHomeController: OldHomeController,
   forcedTradeOfferController: ForcedTradeOfferController,
   forcedTransactionController: ForcedTransactionController,
-  stateUpdateController: StateUpdateController,
+  stateUpdateController: OldStateUpdateController,
   searchController: SearchController
 ) {
   const router = new Router()

@@ -9,13 +9,13 @@ import { reactToHtml } from '../../reactToHtml'
 import {
   FORCED_TRANSACTION_MINED,
   FORCED_TRANSACTION_SENT,
-  FORCED_WITHDRAWAL_INCLUDED,
   TRANSACTION_REVERTED,
 } from './common'
 import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
+import { IncludedWithStateUpdateId } from './components/IncludedWithStateUpdateId'
 import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
@@ -34,6 +34,7 @@ export interface PerpetualForcedWithdrawalPageProps {
     timestamp: Timestamp
     status: 'SENT' | 'MINED' | 'REVERTED' | 'INCLUDED'
   }[]
+  stateUpdateId?: number
 }
 
 export function renderPerpetualForcedWithdrawalPage(
@@ -45,7 +46,9 @@ export function renderPerpetualForcedWithdrawalPage(
 function PerpetualForcedWithdrawalPage(
   props: PerpetualForcedWithdrawalPageProps
 ) {
-  const historyEntries = props.history.map(toHistoryEntry)
+  const historyEntries = props.history.map((entry) =>
+    toHistoryEntry(entry, props.stateUpdateId)
+  )
   const lastEntry = historyEntries[0]
   if (!lastEntry) {
     throw new Error('No history entries')
@@ -72,6 +75,7 @@ function PerpetualForcedWithdrawalPage(
               asset: props.asset,
               amount: props.amount,
             }}
+            stateUpdateId={props.stateUpdateId}
           />
         </div>
         <TransactionUserDetails
@@ -88,7 +92,8 @@ function PerpetualForcedWithdrawalPage(
 }
 
 function toHistoryEntry(
-  entry: PerpetualForcedWithdrawalPageProps['history'][number]
+  entry: PerpetualForcedWithdrawalPageProps['history'][number],
+  stateUpdateId: number | undefined
 ): TransactionHistoryEntry {
   switch (entry.status) {
     case 'SENT':
@@ -117,7 +122,9 @@ function toHistoryEntry(
         timestamp: entry.timestamp,
         statusText: 'INCLUDED (3/3)',
         statusType: 'END',
-        description: FORCED_WITHDRAWAL_INCLUDED,
+        description: (
+          <IncludedWithStateUpdateId stateUpdateId={stateUpdateId} />
+        ),
       }
   }
 }
