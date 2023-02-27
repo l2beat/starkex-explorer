@@ -9,7 +9,6 @@ import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
 import { reactToHtml } from '../../reactToHtml'
 import {
-  FORCED_TRANSACTION_INCLUDED,
   FORCED_TRANSACTION_MINED,
   FORCED_TRANSACTION_SENT,
   TRANSACTION_REVERTED,
@@ -18,6 +17,7 @@ import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
+import { IncludedWithStateUpdateId } from './components/IncludedWithStateUpdateId'
 import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
@@ -54,6 +54,7 @@ export interface OfferAndForcedTradePageProps {
       | 'REVERTED'
       | 'INCLUDED'
   }[]
+  stateUpdateId?: number
 }
 
 export function renderOfferAndForcedTradePage(
@@ -64,7 +65,9 @@ export function renderOfferAndForcedTradePage(
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   const isMine = props.user?.starkKey === props.maker.starkKey
-  const historyEntries = props.history.map((x) => toHistoryEntry(x, props.type))
+  const historyEntries = props.history.map((x) =>
+    toHistoryEntry(x, props.type, props.stateUpdateId)
+  )
   const lastEntry = historyEntries[0]
   const status = props.history[0]?.status
   if (!lastEntry) {
@@ -94,7 +97,9 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
                 transactionHash={props.transactionHash}
               />
             ) : (
-              <PageTitle>Offer #{props.offerId}</PageTitle>
+              <PageTitle>
+                Forced {props.type.toLowerCase()} offer #{props.offerId}
+              </PageTitle>
             )}
             <div className="mb-6 flex items-center gap-2">
               {showCancel && <Button variant="outlined">Cancel offer</Button>}
@@ -109,6 +114,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             </div>
           </div>
           <TransactionOverview
+            stateUpdateId={props.stateUpdateId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
@@ -162,7 +168,8 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
 
 function toHistoryEntry(
   entry: OfferAndForcedTradePageProps['history'][number],
-  type: 'BUY' | 'SELL'
+  type: 'BUY' | 'SELL',
+  stateUpdateId?: number
 ): TransactionHistoryEntry {
   switch (entry.status) {
     case 'CREATED':
@@ -223,7 +230,9 @@ function toHistoryEntry(
         timestamp: entry.timestamp,
         statusText: 'INCLUDED (5/5)',
         statusType: 'END',
-        description: FORCED_TRANSACTION_INCLUDED,
+        description: (
+          <IncludedWithStateUpdateId stateUpdateId={stateUpdateId} />
+        ),
       }
   }
 }

@@ -9,6 +9,11 @@ export function randomTimestamp(): Timestamp {
   return Timestamp(Date.now() - offset)
 }
 
+export function randomFutureTimestamp(): Timestamp {
+  const offset = Math.floor(Math.random() * 10 * 24 * 60 * 60 * 1000)
+  return Timestamp(Date.now() + offset)
+}
+
 export function randomId(): string {
   return Math.floor(Math.random() * 12_000 + 1).toString()
 }

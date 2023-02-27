@@ -63,12 +63,6 @@ function StateUpdatePage(props: StateUpdatePageProps) {
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>
-        {props.priceChanges && (
-          <section>
-            <SectionHeading title="Price Changes" />
-            <StateUpdatePricesTable priceChanges={props.priceChanges} />
-          </section>
-        )}
         <TablePreview
           {...getTransactionTableProps(props.id)}
           visible={props.transactions.length}
@@ -76,6 +70,12 @@ function StateUpdatePage(props: StateUpdatePageProps) {
         >
           <TransactionsTable hideTime transactions={props.transactions} />
         </TablePreview>
+        {props.priceChanges && (
+          <section>
+            <SectionHeading title="Price Changes" />
+            <StateUpdatePricesTable priceChanges={props.priceChanges} />
+          </section>
+        )}
       </ContentWrapper>
     </Page>
   )
