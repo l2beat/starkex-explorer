@@ -102,4 +102,20 @@ describe(PreprocessedStateDetailsRepository.name, () => {
     await repository.deleteByStateUpdateId(200, trx)
     expect(await repository.countAll(trx)).toEqual(0)
   })
+
+  it('gets paginated', async () => {
+    for (const stateUpdateId of [1900, 100, 200]) {
+      await repository.add(
+        {
+          ...genericRecord,
+          stateUpdateId,
+        },
+        trx
+      )
+    }
+    const result1 = await repository.getPaginated({ offset: 0, limit: 2 }, trx)
+    expect(result1.map((r) => r.stateUpdateId)).toEqual([1900, 200])
+    const result2 = await repository.getPaginated({ offset: 2, limit: 2 }, trx)
+    expect(result2.map((r) => r.stateUpdateId)).toEqual([100])
+  })
 })
