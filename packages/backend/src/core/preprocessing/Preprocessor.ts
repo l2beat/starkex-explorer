@@ -187,4 +187,27 @@ export class Preprocessor<T extends AssetHash | AssetId> {
       }
     )
   }
+
+  async resyncStateDetails() {
+    await this.preprocessedStateUpdateRepository.runInTransaction(
+      async (trx) => {
+        const lastProcessedStateUpdate = await this.preprocessedStateUpdateRepository.findLast(trx)
+        if (!lastProcessedStateUpdate) {
+          return
+        }
+        const lastId = lastProcessedStateUpdate.stateUpdateId
+        for (let stateUpdateId = 1; stateUpdateId <= lastId; stateUpdateId++) {
+          const stateUpdate = await this.stateUpdateRepository.findById(
+            stateUpdateId,
+            trx
+          )
+          if (stateUpdate === undefined) {
+            throw new Error('Missing state update during Preprocessor resync ${stateUpdateId}')
+          }
+          this.logger.info(`Preprocessing state details of id ${stateUpdate.id}`)
+          await this.stateDetailsPreprocessor.preprocessNextStateUpdate(trx, stateUpdate)
+        }
+      }
+    )
+  }
 }
