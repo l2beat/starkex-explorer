@@ -16,7 +16,7 @@ export function getLocalConfig(): Config {
     port: getEnv.integer('PORT', 3000),
     databaseConnection: getEnv('LOCAL_DB_URL'),
     enableSync: true,
-    enablePreprocessing: getEnv.boolean('ENABLE_PREPROCESSING', false),
+    enablePreprocessing: getEnv.boolean('ENABLE_PREPROCESSING', true),
     freshStart: getEnv.boolean('FRESH_START', false),
     forceHttps: false,
     starkex: getStarkexConfig(getEnv('STARKEX_INSTANCE')),
