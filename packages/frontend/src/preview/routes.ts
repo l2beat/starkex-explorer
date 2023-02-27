@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -414,7 +415,10 @@ const routes: Route[] = [
     description: 'Form to create a new spot forced withdrawal.',
     render: (ctx) => {
       const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
+      const asset = { ...withdrawData.asset }
       withdrawData.user = getUser(ctx) ?? withdrawData.user
+      asset.hashOrId = AssetHash.fake()
+      withdrawData.asset = asset
       ctx.body = renderNewSpotForcedWithdrawPage(withdrawData)
     },
   },
@@ -424,6 +428,8 @@ const routes: Route[] = [
     render: (ctx) => {
       const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
       withdrawData.user = getUser(ctx) ?? withdrawData.user
+      console.log(withdrawData)
+
       ctx.body = renderNewPerpetualForcedWithdrawalPage(withdrawData)
     },
   },

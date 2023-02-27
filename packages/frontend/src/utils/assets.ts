@@ -1,10 +1,12 @@
-import { AssetDetails } from '@explorer/shared'
+import { AssetDetails, stringAs } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
+import { z } from 'zod'
 
-export interface Asset {
-  hashOrId: AssetHash | AssetId
-  details?: AssetDetails
-}
+export type Asset = z.infer<typeof Asset>
+export const Asset = z.object({
+  hashOrId: z.union([stringAs(AssetId), stringAs(AssetHash)]),
+  details: AssetDetails.optional(),
+})
 
 export interface AssetInfo {
   name: string

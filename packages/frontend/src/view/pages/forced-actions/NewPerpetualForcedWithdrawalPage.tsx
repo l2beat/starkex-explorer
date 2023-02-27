@@ -64,7 +64,7 @@ function NewPerpetualForcedWithdrawalPage(props: NewForcedActionFormProps) {
                 <span>
                   <span className="text-sm text-zinc-500">Position</span>{' '}
                   <span className="font-semibold">
-                    #{props.positionId.toString()}
+                    #{props.positionOrVaultId.toString()}
                   </span>
                 </span>
               </div>

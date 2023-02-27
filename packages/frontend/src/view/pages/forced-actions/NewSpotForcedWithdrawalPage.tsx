@@ -34,15 +34,11 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
       to withdraw your funds by submitting a withdrawal transaction.
     </>,
   ]
-  const assetInfo = assetToInfo({ hashOrId: props.selectedAsset })
+  const assetInfo = assetToInfo({ hashOrId: props.asset.hashOrId })
   const propsJson = serializeForcedActionsFormProps(props)
-  const balance = props.assets.find(
-    (asset) => asset.assetId === props.selectedAsset
-  )?.balance
-  if (!balance) return null
   const formattedBalance = formatAmount(
-    { hashOrId: props.selectedAsset },
-    balance
+    { hashOrId: props.asset.hashOrId },
+    props.asset.balance
   )
   return (
     <Page
@@ -72,7 +68,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
                 <span>
                   <span className="text-sm text-zinc-500">Vault</span>{' '}
                   <span className="font-semibold">
-                    #{props.positionId.toString()}
+                    #{props.positionOrVaultId.toString()}
                   </span>
                 </span>
               </div>

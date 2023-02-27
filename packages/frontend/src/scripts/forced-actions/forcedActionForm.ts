@@ -47,7 +47,7 @@ export function initForcedActionForm() {
   })
 
   let state: FormState | undefined
-  updateUI(getInitialState(props, location.search))
+  updateUI(getInitialState(props))
 
   function dispatch(action: FormAction) {
     if (state) {

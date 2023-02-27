@@ -1,9 +1,14 @@
-import { PositionAssetEntry } from '../../view'
-import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
+import { AssetId } from '@explorer/types'
+import {
+  NewForcedActionFormAsset,
+  NewForcedActionFormProps,
+} from '../../view/pages/forced-actions/NewForcedActionFormProps'
 
 export interface FormState {
   props: NewForcedActionFormProps
-  selectedAsset: PositionAssetEntry
+  assetId: AssetId
+  balance: bigint
+  priceUSDCents: bigint
   amountInputString: string
   amountInputValue: bigint
   amountInputError: boolean

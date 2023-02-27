@@ -33,9 +33,7 @@ function NewPerpetualForcedTradePage(props: NewForcedActionFormProps) {
     </>,
     'After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the operators of [system name] to process your request. Once this is done the trade will be executed and the funds will be transferred between you and the counterparty.',
   ]
-  const selectedAssetBalance =
-    props.assets.find((a) => a.assetId === props.selectedAsset)?.balance ?? 0
-  const isBuying = selectedAssetBalance < 0
+  const isBuying = props.asset.balance < 0
   const label = isBuying ? 'buy' : 'sell'
   const propsJson = serializeForcedActionsFormProps(props)
 

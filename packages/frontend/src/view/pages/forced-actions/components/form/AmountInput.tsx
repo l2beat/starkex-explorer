@@ -1,22 +1,16 @@
 import React from 'react'
-
 import { assetToInfo } from '../../../../../utils/assets'
+
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
 import { NewForcedActionFormProps } from '../../NewForcedActionFormProps'
 import { FormId } from './ids'
 
 export function AmountInput(props: NewForcedActionFormProps) {
-  const assetInfo = assetToInfo({ hashOrId: props.selectedAsset })
-  const asset = props.assets.find(
-    (asset) => asset.assetId === props.selectedAsset
-  )
-  if (!asset) {
-    throw new Error('Asset not found')
-  }
+  const assetInfo = assetToInfo({ hashOrId: props.asset.hashOrId })
   const formattedBalance = formatAmount(
-    { hashOrId: props.selectedAsset },
-    asset.balance
+    { hashOrId: props.asset.hashOrId },
+    props.asset.balance
   )
 
   return (

@@ -3,20 +3,17 @@ import { AssetId } from '@explorer/types'
 import { formatCurrencyInput } from '../../utils/formatting/formatCurrencyInput'
 import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormAction, FormState } from './types'
-import { getAsset, getFormType, parseCurrencyInput } from './utils'
+import { getFormType, parseCurrencyInput } from './utils'
 
-export function getInitialState(
-  props: NewForcedActionFormProps,
-  queryString: string
-): FormState {
-  const search = new URLSearchParams(queryString)
-  const assetId = search.get('assetId')
-  const initialAssetId = assetId ? AssetId(assetId) : props.selectedAsset
-  const selectedAsset = getAsset(initialAssetId, props.assets)
-  const type = getFormType(selectedAsset)
+export function getInitialState(props: NewForcedActionFormProps): FormState {
+  const { hashOrId, balance, priceUSDCents } = props.asset
+  const assetId = AssetId(hashOrId.toString())
+  const type = getFormType(assetId, balance)
   const candidate: FormState = {
     props,
-    selectedAsset,
+    assetId,
+    balance,
+    priceUSDCents,
     type,
     amountInputString: '',
     amountInputValue: 0n,
@@ -33,7 +30,7 @@ export function getInitialState(
 
 export function nextFormState(state: FormState, action: FormAction): FormState {
   if (action.type === 'ModifyAmount') {
-    const parsed = parseCurrencyInput(action.value, state.selectedAsset.assetId)
+    const parsed = parseCurrencyInput(action.value, state.assetId)
     const amountInputString =
       parsed !== undefined ? action.value : state.amountInputString
     const amountInputValue = parsed ?? state.amountInputValue
@@ -110,7 +107,7 @@ function stateFromAmountAndPrice(
   }
   const totalInputValue =
     (amountInputValue * priceInputValue) /
-    10n ** BigInt(AssetId.decimals(state.selectedAsset.assetId))
+    10n ** BigInt(AssetId.decimals(state.assetId))
   return withChecks({
     ...state,
     boundVariable: 'price',
@@ -143,8 +140,7 @@ function stateFromAmountAndTotal(
     })
   }
   const priceInputValue =
-    (totalInputValue *
-      10n ** BigInt(AssetId.decimals(state.selectedAsset.assetId))) /
+    (totalInputValue * 10n ** BigInt(AssetId.decimals(state.assetId))) /
     amountInputValue
 
   return withChecks({
@@ -160,10 +156,10 @@ function stateFromAmountAndTotal(
 }
 
 function withChecks(state: FormState): FormState {
-  const balance = state.selectedAsset.balance
+  const balance = state.balance
   const absolute = balance < 0 ? -balance : balance
 
-  if (state.selectedAsset.assetId === AssetId.USDC && balance < 0) {
+  if (state.assetId === AssetId.USDC && balance < 0) {
     return {
       ...state,
       amountInputError: true,

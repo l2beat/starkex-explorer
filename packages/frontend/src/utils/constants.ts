@@ -1,1 +1,1 @@
-export const USE_NEW_DESIGN = false
+export const USE_NEW_DESIGN = true

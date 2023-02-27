@@ -9,13 +9,7 @@ import { FormId } from './ids'
 
 export function PriceInput(props: NewForcedActionFormProps) {
   const usdcInfo = assetToInfo({ hashOrId: AssetId.USDC })
-  const assetDetails = props.assets.find(
-    (asset) => asset.assetId === props.selectedAsset
-  )
-  if (!assetDetails) {
-    throw new Error('Asset not found')
-  }
-  const price = assetDetails.priceUSDCents * 10000n
+  const price = props.asset.priceUSDCents * 10000n
   const priceFormatted = formatAmount({ hashOrId: AssetId.USDC }, price)
 
   return (
