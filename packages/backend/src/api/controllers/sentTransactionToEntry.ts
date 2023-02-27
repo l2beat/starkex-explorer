@@ -41,11 +41,10 @@ export function extractSentTxAsset(
 ): Asset | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
+    case 'Withdraw':
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
-    case 'Withdraw':
-      return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     default:
       assertUnreachable(data)
   }

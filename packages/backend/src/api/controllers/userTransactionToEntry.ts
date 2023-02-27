@@ -16,9 +16,7 @@ function extractUserTxAmount(
     case 'FullWithdrawal':
       return undefined
     case 'Withdraw':
-      return data.quantizedAmount
     case 'WithdrawWithTokenId':
-      return data.quantizedAmount
     case 'MintWithdraw':
       return data.quantizedAmount
     default:
@@ -40,7 +38,6 @@ function extractUserTxAsset(
     case 'Withdraw':
       return { hashOrId: data.assetType }
     case 'WithdrawWithTokenId':
-      return { hashOrId: data.assetId }
     case 'MintWithdraw':
       return { hashOrId: data.assetId }
     default:
@@ -59,9 +56,7 @@ function extractUserTxEntryType(
     case 'FullWithdrawal':
       return 'FORCED_WITHDRAW'
     case 'Withdraw':
-      return 'WITHDRAW'
     case 'WithdrawWithTokenId':
-      return 'WITHDRAW'
     case 'MintWithdraw':
       return 'WITHDRAW'
     default:

@@ -43,9 +43,11 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               <span className="text-lg font-medium text-white">
                 {formatAmount(entry.asset, entry.balance)}
               </span>
-              <span className="mt-2 text-xxs text-zinc-500">
-                {formatWithDecimals(entry.value, 6, { prefix: '$' })}
-              </span>
+              {props.type === 'PERPETUAL' && (
+                <span className="mt-2 text-xxs text-zinc-500">
+                  {formatWithDecimals(entry.value, 6, { prefix: '$' })}
+                </span>
+              )}
             </div>,
             <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
             props.isMine ? (
