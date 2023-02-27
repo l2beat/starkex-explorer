@@ -34,7 +34,7 @@ export interface HomePageProps {
   totalStateUpdates: number
   transactions: TransactionEntry[]
   totalForcedTransactions: number
-  offers: OfferEntry[]
+  offers?: OfferEntry[]
   totalOffers: number
 }
 
@@ -75,13 +75,15 @@ function HomePage(props: HomePageProps) {
           >
             <TransactionsTable transactions={props.transactions} />
           </TablePreview>
-          <TablePreview
-            {...OFFER_TABLE_PROPS}
-            visible={props.offers.length}
-            total={props.totalOffers}
-          >
-            <OffersTable offers={props.offers} />
-          </TablePreview>
+          {props.offers && (
+            <TablePreview
+              {...OFFER_TABLE_PROPS}
+              visible={props.offers.length}
+              total={props.totalOffers}
+            >
+              <OffersTable offers={props.offers} />
+            </TablePreview>
+          )}
         </div>
         {tutorials.length > 0 && <HomeTutorials tutorials={tutorials} />}
       </main>
