@@ -237,6 +237,17 @@ declare module 'knex/types/tables' {
     prev_history_id: number | null
   }
 
+  interface PreprocessedStateDetailsRow {
+    id: number
+    state_update_id: number
+    state_transition_hash: string
+    root_hash: string
+    block_number: number
+    timestamp: bigint
+    asset_update_count: number
+    forced_transaction_count: number
+  }
+
   interface WithdrawableAssetRow {
     id: number
     block_number: number
@@ -274,6 +285,7 @@ declare module 'knex/types/tables' {
     asset_details: AssetDetailsRow
     preprocessed_state_updates: PreprocessedStateUpdateRow
     preprocessed_asset_history: PreprocessedAssetHistoryRow
+    preprocessed_state_details: PreprocessedStateDetailsRow
     withdrawable_assets: WithdrawableAssetRow
   }
 }

@@ -8,6 +8,7 @@ import {
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
+import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
 
@@ -17,6 +18,7 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private syncStatusRepository: SyncStatusRepository,
     private stateUpdateRepository: StateUpdateRepository,
     private historyPreprocessor: HistoryPreprocessor<T>,
+    private stateDetailsPreprocessor: StateDetailsPreprocessor,
     private logger: Logger,
     private isEnabled: boolean = true
   ) {
@@ -138,6 +140,12 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           trx,
           nextStateUpdate
         )
+        // This one needs to be called *after* historyPreprocessor  was run
+        // Don't user Promise.all!
+        await this.stateDetailsPreprocessor.preprocessNextStateUpdate(
+          trx,
+          nextStateUpdate
+        )
 
         // END TRANSACTION
       }
@@ -162,6 +170,10 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           `Rolling back preprocessing of state update ${lastProcessedStateUpdate.stateUpdateId}`
         )
         await this.historyPreprocessor.rollbackOneStateUpdate(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
+        await this.stateDetailsPreprocessor.rollbackOneStateUpdate(
           trx,
           lastProcessedStateUpdate.stateUpdateId
         )

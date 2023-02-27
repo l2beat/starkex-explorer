@@ -49,21 +49,21 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     await preprocessedStateUpdateRepository.add(
       {
         stateUpdateId: 1900,
-        stateTransitionHash: Hash256.fake('1900'),
+        stateTransitionHash: Hash256.fake('19000'),
       },
       trx
     )
     await preprocessedStateUpdateRepository.add(
       {
         stateUpdateId: 100,
-        stateTransitionHash: Hash256.fake('1900'),
+        stateTransitionHash: Hash256.fake('12000'),
       },
       trx
     )
     await preprocessedStateUpdateRepository.add(
       {
         stateUpdateId: 200,
-        stateTransitionHash: Hash256.fake('1900'),
+        stateTransitionHash: Hash256.fake('13000'),
       },
       trx
     )

@@ -506,6 +506,57 @@ describe(UserTransactionRepository.name, () => {
     })
   })
 
+  describe(
+    UserTransactionRepository.prototype.getCountOfIncludedByStateUpdateId.name,
+    () => {
+      it('returns the number of forced transactions included in state update', async () => {
+        const transactionHash = Hash256.fake()
+        await repository.add({
+          transactionHash,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+        await repository.addManyIncluded([
+          {
+            transactionHash,
+            blockNumber: 123,
+            timestamp: Timestamp(123000),
+            stateUpdateId: 123,
+          },
+        ])
+
+        // To be ignored (not included)
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 456,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        // To be ignored (wrong state update id)
+        await repository.add({
+          transactionHash: Hash256.fake('aa11'),
+          blockNumber: 234,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+        await repository.addManyIncluded([
+          {
+            transactionHash: Hash256.fake('aa11'),
+            blockNumber: 234,
+            timestamp: Timestamp(123000),
+            stateUpdateId: 789,
+          },
+        ])
+
+        expect(await repository.getCountOfIncludedByStateUpdateId(123)).toEqual(
+          1
+        )
+      })
+    }
+  )
+
   describe(UserTransactionRepository.prototype.getCountByStarkKey.name, () => {
     it('returns 0 for an empty database', async () => {
       expect(await repository.getCountByStarkKey(StarkKey.fake())).toEqual(0)
