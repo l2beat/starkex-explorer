@@ -35,11 +35,12 @@ const transactionTypeBucket = new Bucket([
   'WITHDRAW',
 ] as const)
 
-export function transactionTypeAndStatus(): Pick<
+export function randomTransactionTypeAndStatus(): Pick<
   TransactionEntry,
   'type' | 'status'
 > {
   const type = transactionTypeBucket.pick()
+
   if (type === 'WITHDRAW') {
     return {
       status: transactionStatusBucket.pickExcept('INCLUDED'),
@@ -59,7 +60,7 @@ export function randomUserTransactionEntry(): TransactionEntry {
     hash: Hash256.fake(),
     asset: assetBucket.pick(),
     amount: amountBucket.pick(),
-    ...transactionTypeAndStatus(),
+    ...randomTransactionTypeAndStatus(),
   }
 }
 
