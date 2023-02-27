@@ -18,18 +18,7 @@ export function UserProfile({
 }: UserProfileProps) {
   return (
     <section className="flex w-full flex-col rounded-lg bg-gray-800 p-6">
-      <p className="text-sm font-semibold text-zinc-500">Ethereum address</p>
-      {ethereumAddress ? (
-        <p className="text-base mt-3 font-semibold text-white">
-          {ethereumAddress.toString()}
-        </p>
-      ) : (
-        <div className="mt-3 flex items-center">
-          <WarningIcon />
-          <p className="text-base ml-2 font-semibold text-amber-500">UNKNOWN</p>
-        </div>
-      )}
-      <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
+      <p className="text-sm font-semibold text-zinc-500">Stark key</p>
       {starkKey ? (
         <p className="text-base mt-3 font-semibold text-white">
           {starkKey.toString()}
@@ -55,6 +44,19 @@ export function UserProfile({
             </div>
           )}
         </>
+      )}
+      <p className="mt-6 text-sm font-semibold text-zinc-500 ">
+        Ethereum address
+      </p>
+      {ethereumAddress ? (
+        <p className="text-base mt-3 font-semibold text-white ">
+          {ethereumAddress.toString()}
+        </p>
+      ) : (
+        <div className="mt-3 flex items-center">
+          <WarningIcon />
+          <p className="text-base ml-2 font-semibold text-amber-500">UNKNOWN</p>
+        </div>
       )}
     </section>
   )
