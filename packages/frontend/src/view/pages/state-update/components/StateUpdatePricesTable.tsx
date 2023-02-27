@@ -21,8 +21,8 @@ export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
     <Table
       columns={[
         { header: 'Asset' },
-        { header: 'Price', numeric: true },
         { header: 'Change', numeric: true },
+        { header: 'Price', numeric: true },
       ]}
       rows={props.priceChanges.map((transaction) => {
         return {
@@ -31,13 +31,13 @@ export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
               type="small"
               assetInfo={assetToInfo(transaction.asset)}
             />,
-            formatWithDecimals(transaction.price, 6, { prefix: '$' }),
             <ChangeText className="text-sm font-medium">
               {formatWithDecimals(transaction.change, 6, {
                 prefix: '$',
                 signed: true,
               })}
             </ChangeText>,
+            formatWithDecimals(transaction.price, 6, { prefix: '$' }),
           ],
         }
       })}
