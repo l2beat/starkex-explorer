@@ -14,7 +14,7 @@ export interface TransactionHistoryEntry {
   timestamp: Timestamp
   statusType: StatusType
   statusText: string
-  description: string
+  description: React.ReactNode
 }
 
 export function TransactionHistoryTable(props: TransactionHistoryTableProps) {
