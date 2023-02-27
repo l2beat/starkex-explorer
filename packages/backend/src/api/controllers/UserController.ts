@@ -88,11 +88,8 @@ export class UserController {
       userTransactions,
       this.collateralAsset
     )
-    const totalTransactions =
-      userTransactionsCount +
-      // Skip transactions already in userTransactions
-      sentTransactions.filter((t) => t.mined === undefined || t.mined.reverted)
-        .length
+    // TODO: include the count of sentTransactions
+    const totalTransactions = userTransactionsCount 
 
     const content = renderUserPage({
       user,
