@@ -44,8 +44,8 @@ function NewPerpetualForcedWithdrawalPage(props: NewForcedActionFormProps) {
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold">
+          <div className="mt-6 flex flex-col">
+            <span className="text-xl font-semibold">
               Begin withdrawal process
             </span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
@@ -60,10 +60,12 @@ function NewPerpetualForcedWithdrawalPage(props: NewForcedActionFormProps) {
               data-props={propsJson}
             >
               <div className="flex items-end justify-between">
-                <span className="text-2xl font-semibold">Withdrawal</span>
+                <span className="text-xl font-semibold">Withdrawal</span>
                 <span>
-                  <span className="text-sm text-zinc-500">Position</span>{' '}
-                  <span className="font-semibold">
+                  <span className="text-sm font-medium text-zinc-500">
+                    Position
+                  </span>{' '}
+                  <span className="text-lg font-semibold">
                     #{props.positionOrVaultId.toString()}
                   </span>
                 </span>

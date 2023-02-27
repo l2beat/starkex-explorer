@@ -15,7 +15,7 @@ export function PriceInput(props: NewForcedActionFormProps) {
   return (
     <div className="flex gap-2">
       <div className="flex flex-1 flex-col gap-2">
-        <span className="text-sm text-zinc-500">Price</span>
+        <span className="text-sm font-medium text-zinc-500">Price</span>
         <div>
           <input
             id={FormId.PriceInput}
@@ -33,7 +33,7 @@ export function PriceInput(props: NewForcedActionFormProps) {
         </div>
       </div>
       <div className="flex flex-col items-end gap-2">
-        <span className="text-sm text-zinc-500">
+        <span className="text-sm font-medium text-zinc-500">
           Market price: {priceFormatted}
         </span>
         <AssetWithLogo assetInfo={usdcInfo} />

@@ -11,7 +11,7 @@ export function TotalInput() {
   return (
     <div className="flex gap-2">
       <div className="flex-1 gap-2">
-        <span className="text-sm text-zinc-500">Total</span>
+        <span className="text-sm font-medium text-zinc-500">Total</span>
         <input
           id={FormId.TotalInput}
           type="text"
@@ -21,7 +21,7 @@ export function TotalInput() {
         />
       </div>
       <div className="flex flex-col items-end gap-2">
-        <span className="text-sm text-zinc-500">Asset</span>
+        <span className="text-sm font-medium text-zinc-500">Asset</span>
         <AssetWithLogo assetInfo={usdcInfo} />
       </div>
     </div>

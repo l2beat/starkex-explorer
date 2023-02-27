@@ -16,7 +16,7 @@ export function AmountInput(props: NewForcedActionFormProps) {
   return (
     <div className="flex gap-2">
       <div className="flex flex-1 flex-col gap-2">
-        <span className="text-sm text-zinc-500">Amount</span>
+        <span className="text-sm font-medium text-zinc-500">Amount</span>
         <div>
           <input
             id={FormId.AmountInput}
@@ -34,7 +34,7 @@ export function AmountInput(props: NewForcedActionFormProps) {
         </div>
       </div>
       <div className="flex flex-col items-end gap-2">
-        <span className="text-sm text-zinc-500">
+        <span className="text-sm font-medium text-zinc-500">
           Balance: {formattedBalance}
         </span>
         <AssetWithLogo assetInfo={assetInfo} />

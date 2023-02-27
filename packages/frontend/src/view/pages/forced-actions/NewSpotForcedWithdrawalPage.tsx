@@ -48,8 +48,8 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold">
+          <div className="mt-6 flex flex-col">
+            <span className="text-xl font-semibold">
               Begin withdrawal process
             </span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
@@ -64,10 +64,12 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
               data-props={propsJson}
             >
               <div className="flex items-end justify-between">
-                <span className="text-2xl font-semibold">Withdrawal</span>
+                <span className="text-xl font-semibold">Withdrawal</span>
                 <span>
-                  <span className="text-sm text-zinc-500">Vault</span>{' '}
-                  <span className="font-semibold">
+                  <span className="text-sm font-medium text-zinc-500">
+                    Vault
+                  </span>{' '}
+                  <span className="text-lg font-semibold">
                     #{props.positionOrVaultId.toString()}
                   </span>
                 </span>
@@ -76,13 +78,17 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
                 <ForcedActionCard>
                   <div className="flex gap-2">
                     <div className="flex flex-1 flex-col gap-2">
-                      <span className="text-sm text-zinc-500">Balance</span>
+                      <span className="text-sm font-medium text-zinc-500">
+                        Balance
+                      </span>
                       <span className="text-xl font-semibold">
                         {formattedBalance}
                       </span>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <span className="text-sm text-zinc-500">Asset</span>
+                      <span className="text-sm font-medium text-zinc-500">
+                        Asset
+                      </span>
                       <AssetWithLogo assetInfo={assetInfo} />
                     </div>
                   </div>
