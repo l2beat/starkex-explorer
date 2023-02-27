@@ -4,12 +4,11 @@ import {
   renderHomeTransactionsPage,
 } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { Hash256 } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
@@ -24,8 +23,8 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
 export class HomeController {
   constructor(
     private readonly userService: UserService,
-    private readonly stateUpdateRepository: StateUpdateRepository,
-    private userTransactionRepository: UserTransactionRepository,
+    private readonly userTransactionRepository: UserTransactionRepository,
+    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -40,8 +39,8 @@ export class HomeController {
       forcedUserTransactions,
       forcedUserTransactionsCount,
     ] = await Promise.all([
-      this.stateUpdateRepository.count(),
-      this.stateUpdateRepository.getPaginated({ offset: 0, limit: 6 }),
+      this.preprocessedStateDetailsRepository.countAll(),
+      this.preprocessedStateDetailsRepository.getPaginated({ offset: 0, limit: 6 }),
       this.userTransactionRepository.getPaginated({
         offset: 0,
         limit: 6,
@@ -60,9 +59,9 @@ export class HomeController {
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.id.toString(),
-        hash: Hash256.fake('abc'), // TODO: we want fact hash
-        updateCount: update.positionCount,
-        forcedTransactionCount: update.forcedTransactionsCount,
+        hash: update.stateTransitionHash,
+        updateCount: update.assetUpdateCount,
+        forcedTransactionCount: update.forcedTransactionCount
       })),
       totalStateUpdates,
       transactions,
@@ -80,8 +79,8 @@ export class HomeController {
     const user = await this.userService.getUserDetails(givenUser)
 
     const [total, stateUpdates] = await Promise.all([
-      this.stateUpdateRepository.count(),
-      this.stateUpdateRepository.getPaginated(pagination),
+      this.preprocessedStateDetailsRepository.countAll(),
+      this.preprocessedStateDetailsRepository.getPaginated(pagination),
     ])
 
     const content = renderHomeStateUpdatesPage({
@@ -89,9 +88,9 @@ export class HomeController {
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.id.toString(),
-        hash: Hash256.fake('abc'), // TODO: we want fact hash
-        updateCount: update.positionCount,
-        forcedTransactionCount: update.forcedTransactionsCount,
+        hash: update.stateTransitionHash,
+        updateCount: update.assetUpdateCount,
+        forcedTransactionCount: update.forcedTransactionCount,
       })),
       ...pagination,
       total,

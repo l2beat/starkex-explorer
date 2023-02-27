@@ -24,6 +24,7 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
     this.countAll = this.wrapAny(this.countAll)
+    this.getPaginated = this.wrapGet(this.getPaginated)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -40,11 +41,25 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     return row.stateUpdateId
   }
 
-  async countAll(trx: Knex.Transaction): Promise<number> {
+  async countAll(trx?: Knex.Transaction): Promise<number> {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_state_details').count()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
+  }
+
+  async getPaginated(
+    { offset, limit }: { offset: number; limit: number },
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const rows = await knex('preprocessed_state_details')
+      .orderBy('state_update_id', 'desc')
+      .offset(offset)
+      .limit(limit)
+    return rows.map((r) =>
+      toPreprocessedStateDetailsRecord(r)
+    )
   }
 
   async deleteAll(trx: Knex.Transaction) {
@@ -60,20 +75,20 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
   }
 }
 
-// function toPreprocessedStateDetailsRecord(
-//   row: PreprocessedStateDetailsRow
-// ): PreprocessedStateDetailsRecord {
-//   return {
-//     id: row.id,
-//     stateUpdateId: row.state_update_id,
-//     stateTransitionHash: Hash256(row.state_transition_hash),
-//     rootHash: PedersenHash(row.root_hash),
-//     blockNumber: row.block_number,
-//     timestamp: Timestamp(row.timestamp),
-//     assetUpdateCount: row.asset_update_count,
-//     forcedTransactionCount: row.forced_transaction_count,
-//   }
-// }
+function toPreprocessedStateDetailsRecord(
+  row: PreprocessedStateDetailsRow
+): PreprocessedStateDetailsRecord {
+  return {
+    id: row.id,
+    stateUpdateId: row.state_update_id,
+    stateTransitionHash: Hash256(row.state_transition_hash),
+    rootHash: PedersenHash(row.root_hash),
+    blockNumber: row.block_number,
+    timestamp: Timestamp(row.timestamp),
+    assetUpdateCount: row.asset_update_count,
+    forcedTransactionCount: row.forced_transaction_count,
+  }
+}
 
 function toPreprocessedStateDetailsRow(
   record: Omit<PreprocessedStateDetailsRecord, 'id'>
