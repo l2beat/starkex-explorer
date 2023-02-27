@@ -42,7 +42,7 @@ export interface UserPageProps {
   totalBalanceChanges: number
   transactions: TransactionEntry[]
   totalTransactions: number
-  offers: OfferEntry[]
+  offers?: OfferEntry[]
   totalOffers: number
 }
 
@@ -61,16 +61,18 @@ function UserPage(props: UserPageProps) {
       <ContentWrapper className="flex flex-col gap-12">
         <section>
           <PageTitle>User</PageTitle>
-          <UserProfile
-            starkKey={props.starkKey}
-            ethereumAddress={props.ethereumAddress}
-            isMine={isMine}
-          />
-          <UserQuickActionsTable
-            withdrawableAssets={props.withdrawableAssets}
-            offersToAccept={props.offersToAccept}
-            isMine={isMine}
-          />
+          <div className="flex flex-col gap-6">
+            <UserProfile
+              starkKey={props.starkKey}
+              ethereumAddress={props.ethereumAddress}
+              isMine={isMine}
+            />
+            <UserQuickActionsTable
+              withdrawableAssets={props.withdrawableAssets}
+              offersToAccept={props.offersToAccept}
+              isMine={isMine}
+            />
+          </div>
         </section>
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
@@ -101,13 +103,15 @@ function UserPage(props: UserPageProps) {
         >
           <TransactionsTable transactions={props.transactions} />
         </TablePreview>
-        <TablePreview
-          {...getOfferTableProps(props.starkKey)}
-          visible={props.offers.length}
-          total={props.totalOffers}
-        >
-          <OffersTable offers={props.offers} />
-        </TablePreview>
+        {props.offers && (
+          <TablePreview
+            {...getOfferTableProps(props.starkKey)}
+            visible={props.offers.length}
+            total={props.totalOffers}
+          >
+            <OffersTable offers={props.offers} />
+          </TablePreview>
+        )}
       </ContentWrapper>
     </Page>
   )
