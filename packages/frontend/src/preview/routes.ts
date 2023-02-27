@@ -428,8 +428,6 @@ const routes: Route[] = [
     render: (ctx) => {
       const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
       withdrawData.user = getUser(ctx) ?? withdrawData.user
-      console.log(withdrawData)
-
       ctx.body = renderNewPerpetualForcedWithdrawalPage(withdrawData)
     },
   },
