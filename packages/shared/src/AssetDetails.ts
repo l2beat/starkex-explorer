@@ -1,5 +1,6 @@
 import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
 import { z } from 'zod'
+
 import { stringAs } from './types'
 
 export const ETHDetails = z.object({

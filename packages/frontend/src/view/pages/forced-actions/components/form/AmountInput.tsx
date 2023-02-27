@@ -1,6 +1,6 @@
 import React from 'react'
-import { assetToInfo } from '../../../../../utils/assets'
 
+import { assetToInfo } from '../../../../../utils/assets'
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
 import { NewForcedActionFormProps } from '../../NewForcedActionFormProps'

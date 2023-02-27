@@ -1,8 +1,6 @@
 import { AssetId } from '@explorer/types'
-import {
-  NewForcedActionFormAsset,
-  NewForcedActionFormProps,
-} from '../../view/pages/forced-actions/NewForcedActionFormProps'
+
+import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
 
 export interface FormState {
   props: NewForcedActionFormProps

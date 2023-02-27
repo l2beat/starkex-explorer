@@ -1,4 +1,5 @@
 import { AssetHash } from '@explorer/types'
+
 import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
 import { SpotWithdrawalFormId } from '../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
 
@@ -7,6 +8,7 @@ export function initSpotWithdrawalForm() {
   if (!form) {
     return
   }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
   const props = NewForcedActionFormProps.parse(propsJson)
   const assetHash = AssetHash(props.asset.hashOrId.toString())
