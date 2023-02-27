@@ -27,4 +27,10 @@ export class Bucket<T> {
     this.picked.push(item)
     return item
   }
+
+  pickExcept<A extends T[]>(...exceptItems: A): Exclude<T, A[number]> {
+    const item = this.pick()
+    if (exceptItems.includes(item)) return this.pickExcept(...exceptItems)
+    return item as Exclude<T, A[number]>
+  }
 }
