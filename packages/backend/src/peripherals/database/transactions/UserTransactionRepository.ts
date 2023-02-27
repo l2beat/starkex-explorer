@@ -65,6 +65,9 @@ export class UserTransactionRepository extends BaseRepository {
     this.getNotIncluded = this.wrapGet(this.getNotIncluded)
     this.countAll = this.wrapAny(this.countAll)
     this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
+    this.getCountOfIncludedByStateUpdateId = this.wrapAny(
+      this.getCountOfIncludedByStateUpdateId
+    )
     this.findById = this.wrapFind(this.findById)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
@@ -146,6 +149,18 @@ export class UserTransactionRepository extends BaseRepository {
       .where('stark_key_a', starkKey.toString())
       .orWhere('stark_key_b', starkKey.toString())
     const [result] = await query.count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async getCountOfIncludedByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<number> {
+    const knex = await this.knex(trx)
+    const [result] = await knex('included_forced_requests')
+      .where('state_update_id', stateUpdateId)
+      .count()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
   }

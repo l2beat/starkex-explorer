@@ -43,6 +43,7 @@ import { PerpetualValidiumUpdater } from './core/PerpetualValidiumUpdater'
 import { PerpetualHistoryPreprocessor } from './core/preprocessing/PerpetualHistoryPreprocessor'
 import { Preprocessor } from './core/preprocessing/Preprocessor'
 import { SpotHistoryPreprocessor } from './core/preprocessing/SpotHistoryPreprocessor'
+import { StateDetailsPreprocessor } from './core/preprocessing/StateDetailsPreprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
 import { StatusService } from './core/StatusService'
@@ -59,6 +60,7 @@ import { PageMappingRepository } from './peripherals/database/PageMappingReposit
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
+import { PreprocessedStateDetailsRepository } from './peripherals/database/PreprocessedStateDetailsRepository'
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
@@ -344,6 +346,9 @@ export class Application {
     const preprocessedStateUpdateRepository =
       new PreprocessedStateUpdateRepository(database, logger)
 
+    const preprocessedStateDetailsRepository =
+      new PreprocessedStateDetailsRepository(database, logger)
+
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
 
@@ -360,11 +365,19 @@ export class Application {
         logger
       )
 
+      const stateDetailsPreprocessor = new StateDetailsPreprocessor(
+        preprocessedStateDetailsRepository,
+        preprocessedAssetHistoryRepository,
+        userTransactionRepository,
+        logger
+      )
+
       preprocessor = new Preprocessor(
         preprocessedStateUpdateRepository,
         syncStatusRepository,
         stateUpdateRepository,
         perpetualHistoryPreprocessor,
+        stateDetailsPreprocessor,
         logger,
         isPreprocessorEnabled
       )
@@ -380,11 +393,19 @@ export class Application {
         logger
       )
 
+      const stateDetailsPreprocessor = new StateDetailsPreprocessor(
+        preprocessedStateDetailsRepository,
+        preprocessedAssetHistoryRepository,
+        userTransactionRepository,
+        logger
+      )
+
       preprocessor = new Preprocessor(
         preprocessedStateUpdateRepository,
         syncStatusRepository,
         stateUpdateRepository,
         spotHistoryPreprocessor,
+        stateDetailsPreprocessor,
         logger,
         isPreprocessorEnabled
       )
