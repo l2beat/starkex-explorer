@@ -30,8 +30,8 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
         { header: 'Time' },
         { header: 'Update' },
         { header: 'Asset' },
-        { header: 'Balance', numeric: true },
         { header: 'Change', numeric: true },
+        { header: 'Balance', numeric: true },
         { header: props.type === 'PERPETUAL' ? 'Position' : 'Vault' },
       ]}
       rows={props.balanceChanges.map((entry) => {
@@ -41,10 +41,10 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
             <TimeCell timestamp={entry.timestamp} />,
             <Link>#{entry.stateUpdateId}</Link>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(entry.asset)} />,
-            formatAmount(entry.asset, entry.balance),
             <ChangeText className="text-sm font-medium">
               {formatAmount(entry.asset, entry.change, { signed: true })}
             </ChangeText>,
+            formatAmount(entry.asset, entry.balance),
             <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
           ],
         }
