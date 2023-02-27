@@ -42,7 +42,7 @@ export interface UserPageProps {
   totalBalanceChanges: number
   transactions: TransactionEntry[]
   totalTransactions: number
-  offers: OfferEntry[]
+  offers?: OfferEntry[]
   totalOffers: number
 }
 
@@ -101,13 +101,15 @@ function UserPage(props: UserPageProps) {
         >
           <TransactionsTable transactions={props.transactions} />
         </TablePreview>
-        <TablePreview
-          {...getOfferTableProps(props.starkKey)}
-          visible={props.offers.length}
-          total={props.totalOffers}
-        >
-          <OffersTable offers={props.offers} />
-        </TablePreview>
+        {props.offers && (
+          <TablePreview
+            {...getOfferTableProps(props.starkKey)}
+            visible={props.offers.length}
+            total={props.totalOffers}
+          >
+            <OffersTable offers={props.offers} />
+          </TablePreview>
+        )}
       </ContentWrapper>
     </Page>
   )
