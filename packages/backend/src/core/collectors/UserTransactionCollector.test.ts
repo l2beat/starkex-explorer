@@ -1,5 +1,6 @@
 import { encodeAssetId } from '@explorer/encoding'
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -11,16 +12,27 @@ import { BigNumber, providers } from 'ethers'
 
 import { BlockRange } from '../../model'
 import {
+  MintWithdrawData,
+  WithdrawData,
+  WithdrawWithTokenIdData,
+} from '../../peripherals/database/transactions/UserTransaction'
+import {
   UserTransactionAddRecord,
   UserTransactionRepository,
 } from '../../peripherals/database/transactions/UserTransactionRepository'
+import {
+  WithdrawableAssetAddRecord,
+  WithdrawableAssetRepository,
+} from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { mock } from '../../test/mock'
 import {
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
   LogFullWithdrawalRequest,
+  LogMintWithdrawalPerformed,
   LogWithdrawalPerformed,
+  LogWithdrawalWithTokenIdPerformed,
 } from './events'
 import { UserTransactionCollector } from './UserTransactionCollector'
 
@@ -28,7 +40,7 @@ describe(UserTransactionCollector.name, () => {
   it(`can process ${LogWithdrawalPerformed.name}`, async () => {
     const blockRange = new BlockRange([], 100, 200)
     const starkKey = StarkKey.fake('123')
-    const assetType = '0xa1b2'
+    const assetType = AssetHash.fake('a1b2')
     const nonQuantizedAmount = 111n
     const quantizedAmount = 222n
     const recipient = EthereumAddress.fake('456')
@@ -42,7 +54,7 @@ describe(UserTransactionCollector.name, () => {
 
         const log = LogWithdrawalPerformed.encodeLog([
           starkKey.toString(),
-          assetType,
+          assetType.toString(),
           BigNumber.from(nonQuantizedAmount),
           BigNumber.from(quantizedAmount),
           recipient.toString(),
@@ -67,16 +79,24 @@ describe(UserTransactionCollector.name, () => {
         return 1
       },
     })
+    let addedWithdrawable: WithdrawableAssetAddRecord | undefined
+    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
+      async add(record) {
+        addedWithdrawable = record
+        return 1
+      },
+    })
 
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
+      withdrawableAssetRepository,
       perpetualAddress
     )
 
     await collector.collect(blockRange)
 
-    expect(added).toEqual({
+    const expected = {
       blockNumber: 150,
       transactionHash,
       timestamp: Timestamp(1234000),
@@ -87,8 +107,168 @@ describe(UserTransactionCollector.name, () => {
         nonQuantizedAmount,
         quantizedAmount,
         recipient,
+      } as WithdrawData,
+    }
+    expect(added).toEqual(expected)
+    expect(addedWithdrawable).toEqual(expected)
+  })
+
+  it(`can process ${LogWithdrawalWithTokenIdPerformed.name}`, async () => {
+    const blockRange = new BlockRange([], 100, 200)
+    const starkKey = StarkKey.fake('123')
+    const assetType = AssetHash.fake('a1b2')
+    const assetId = AssetHash.fake('c1d2')
+    const tokenId = 22n
+    const nonQuantizedAmount = 111n
+    const quantizedAmount = 222n
+    const recipient = EthereumAddress.fake('cba')
+    const transactionHash = Hash256.fake('abc')
+    const perpetualAddress = EthereumAddress.fake('def')
+
+    const ethereumClient = mock<EthereumClient>({
+      async getLogsInRange(range, parameters) {
+        expect(range).toEqual(blockRange)
+        expect(parameters.address).toEqual(perpetualAddress.toString())
+
+        const log = LogWithdrawalWithTokenIdPerformed.encodeLog([
+          BigNumber.from(starkKey),
+          BigNumber.from(assetType),
+          BigNumber.from(tokenId),
+          BigNumber.from(assetId),
+          BigNumber.from(nonQuantizedAmount),
+          BigNumber.from(quantizedAmount),
+          recipient.toString(),
+        ])
+        const fullLog = {
+          ...log,
+          blockNumber: 150,
+          transactionHash: transactionHash.toString(),
+        }
+        return [fullLog as providers.Log]
+      },
+      async getBlockTimestamp(blockNumber) {
+        expect(blockNumber).toEqual(150)
+        return 1234
       },
     })
+
+    let added: UserTransactionAddRecord | undefined
+    const userTransactionRepository = mock<UserTransactionRepository>({
+      async add(record) {
+        added = record
+        return 1
+      },
+    })
+    let addedWithdrawable: WithdrawableAssetAddRecord | undefined
+    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
+      async add(record) {
+        addedWithdrawable = record
+        return 1
+      },
+    })
+
+    const collector = new UserTransactionCollector(
+      ethereumClient,
+      userTransactionRepository,
+      withdrawableAssetRepository,
+      perpetualAddress
+    )
+
+    await collector.collect(blockRange)
+
+    const expected = {
+      blockNumber: 150,
+      transactionHash,
+      timestamp: Timestamp(1234000),
+      data: {
+        type: 'WithdrawWithTokenId',
+        starkKey,
+        assetType,
+        tokenId,
+        assetId,
+        nonQuantizedAmount,
+        quantizedAmount,
+        recipient,
+      } as WithdrawWithTokenIdData,
+    }
+    expect(added).toEqual(expected)
+    expect(addedWithdrawable).toEqual(expected)
+  })
+
+  it(`can process ${LogMintWithdrawalPerformed.name}`, async () => {
+    const blockRange = new BlockRange([], 100, 200)
+    const starkKey = StarkKey.fake('123')
+    const assetType = AssetHash.fake('a1b2')
+    const assetId = AssetHash.fake('c1d2')
+    const nonQuantizedAmount = 111n
+    const quantizedAmount = 222n
+    const transactionHash = Hash256.fake('abc')
+    const perpetualAddress = EthereumAddress.fake('def')
+
+    const ethereumClient = mock<EthereumClient>({
+      async getLogsInRange(range, parameters) {
+        expect(range).toEqual(blockRange)
+        expect(parameters.address).toEqual(perpetualAddress.toString())
+
+        const log = LogMintWithdrawalPerformed.encodeLog([
+          BigNumber.from(starkKey),
+          BigNumber.from(assetType),
+          BigNumber.from(nonQuantizedAmount),
+          BigNumber.from(quantizedAmount),
+          BigNumber.from(assetId),
+        ])
+        const fullLog = {
+          ...log,
+          blockNumber: 150,
+          transactionHash: transactionHash.toString(),
+        }
+        return [fullLog as providers.Log]
+      },
+      async getBlockTimestamp(blockNumber) {
+        expect(blockNumber).toEqual(150)
+        return 1234
+      },
+    })
+
+    let added: UserTransactionAddRecord | undefined
+    const userTransactionRepository = mock<UserTransactionRepository>({
+      async add(record) {
+        added = record
+        return 1
+      },
+    })
+    let addedWithdrawable: WithdrawableAssetAddRecord | undefined
+    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
+      async add(record) {
+        addedWithdrawable = record
+        return 1
+      },
+    })
+
+    const collector = new UserTransactionCollector(
+      ethereumClient,
+      userTransactionRepository,
+      withdrawableAssetRepository,
+      perpetualAddress
+    )
+
+    await collector.collect(blockRange)
+
+    const expected = {
+      blockNumber: 150,
+      transactionHash,
+      timestamp: Timestamp(1234000),
+      data: {
+        type: 'MintWithdraw',
+        starkKey,
+        assetType,
+        nonQuantizedAmount,
+        quantizedAmount,
+        assetId,
+      } as MintWithdrawData,
+    }
+    expect(added).toEqual(expected)
+    expect(addedWithdrawable).toEqual(expected)
   })
 
   it(`can process ${LogForcedWithdrawalRequest.name}`, async () => {
@@ -133,6 +313,7 @@ describe(UserTransactionCollector.name, () => {
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
+      mock<WithdrawableAssetRepository>(),
       perpetualAddress
     )
 
@@ -191,6 +372,7 @@ describe(UserTransactionCollector.name, () => {
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
+      mock<WithdrawableAssetRepository>(),
       starkExAddress
     )
 
@@ -265,7 +447,9 @@ describe(UserTransactionCollector.name, () => {
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
-      perpetualAddress
+      mock<WithdrawableAssetRepository>(),
+      perpetualAddress,
+      { assetId: AssetId.USDC, price: 1n }
     )
 
     await collector.collect(blockRange)
@@ -324,6 +508,7 @@ describe(UserTransactionCollector.name, () => {
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
+      mock<WithdrawableAssetRepository>(),
       EthereumAddress.fake()
     )
 

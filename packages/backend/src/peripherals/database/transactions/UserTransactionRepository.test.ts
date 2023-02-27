@@ -1,4 +1,5 @@
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -56,7 +57,7 @@ describe(UserTransactionRepository.name, () => {
   function fakeWithdraw(override?: Partial<WithdrawData>): WithdrawData {
     return {
       type: 'Withdraw',
-      assetType: '0x1234',
+      assetType: AssetHash('0x1234'),
       nonQuantizedAmount: 123n,
       quantizedAmount: 123n,
       recipient: EthereumAddress.fake(),

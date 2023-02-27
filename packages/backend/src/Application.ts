@@ -33,7 +33,9 @@ import {
   SpotValidiumStateTransitionCollector,
 } from './core/collectors/ValidiumStateTransitionCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
+import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
+import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
 import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
@@ -68,6 +70,7 @@ import { UserTransactionRepository } from './peripherals/database/transactions/U
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
 import { VaultRepository } from './peripherals/database/VaultRepository'
 import { VerifierEventRepository } from './peripherals/database/VerifierEventRepository'
+import { WithdrawableAssetRepository } from './peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
@@ -127,6 +130,10 @@ export class Application {
       logger
     )
     const assetRepository = new AssetRepository(database, logger)
+    const withdrawableAssetRepository = new WithdrawableAssetRepository(
+      database,
+      logger
+    )
 
     const ethereumClient = new EthereumClient(
       config.starkex.blockchain.jsonRpcUrl,
@@ -156,7 +163,11 @@ export class Application {
     const userTransactionCollector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
-      config.starkex.contracts.perpetual
+      withdrawableAssetRepository,
+      config.starkex.contracts.perpetual,
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
     )
 
     const tokenRegistrationCollector = new AssetRegistrationCollector(
@@ -170,6 +181,11 @@ export class Application {
       config.starkex.contracts.perpetual,
       assetRepository,
       tokenInspector
+    )
+    const withdrawalAllowedCollector = new WithdrawalAllowedCollector(
+      ethereumClient,
+      withdrawableAssetRepository,
+      config.starkex.contracts.perpetual
     )
 
     let syncService
@@ -208,6 +224,7 @@ export class Application {
           userTransactionCollector,
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
+          withdrawalAllowedCollector,
           logger
         )
       } else {
@@ -242,6 +259,7 @@ export class Application {
           spotValidiumUpdater,
           tokenRegistrationCollector,
           depositWithTokenIdCollector,
+          withdrawalAllowedCollector,
           logger
         )
       }
@@ -288,6 +306,7 @@ export class Application {
         perpetualRollupUpdater,
         userRegistrationCollector,
         userTransactionCollector,
+        withdrawalAllowedCollector,
         logger
       )
     }
@@ -312,6 +331,13 @@ export class Application {
       sentTransactionRepository,
       userTransactionCollector,
       ethereumClient,
+      logger
+    )
+    const withdrawableAssetMigrator = new WithdrawableAssetMigrator(
+      softwareMigrationRepository,
+      syncStatusRepository,
+      withdrawableAssetRepository,
+      withdrawalAllowedCollector,
       logger
     )
 
@@ -489,6 +515,7 @@ export class Application {
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
       await userTransactionMigrator.migrate()
+      await withdrawableAssetMigrator.migrate()
 
       if (config.enableSync) {
         transactionStatusService.start()

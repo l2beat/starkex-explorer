@@ -1,6 +1,6 @@
 import { decodeAssetId } from '@explorer/encoding'
 import {
-  AssetId,
+  AssetHash,
   EthereumAddress,
   Hash256,
   StarkKey,
@@ -8,21 +8,33 @@ import {
 } from '@explorer/types'
 import { providers } from 'ethers'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { BlockRange } from '../../model/BlockRange'
+import {
+  MintWithdrawData,
+  WithdrawalPerformedData,
+  WithdrawWithTokenIdData,
+} from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
+import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { assertUnreachable } from '../../utils/assertUnreachable'
 import {
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
   LogFullWithdrawalRequest,
+  LogMintWithdrawalPerformed,
   LogWithdrawalPerformed,
+  LogWithdrawalWithTokenIdPerformed,
 } from './events'
 
 export class UserTransactionCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly userTransactionRepository: UserTransactionRepository,
-    private readonly perpetualAddress: EthereumAddress
+    private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
+    private readonly perpetualAddress: EthereumAddress,
+    private readonly collateralAsset?: CollateralAsset
   ) {}
 
   async collect(
@@ -33,10 +45,15 @@ export class UserTransactionCollector {
       address: this.perpetualAddress.toString(),
       topics: [
         [
-          LogWithdrawalPerformed.topic,
+          // Forced Actions:
           LogForcedWithdrawalRequest.topic,
           LogForcedTradeRequest.topic,
           LogFullWithdrawalRequest.topic,
+
+          // Assets being withdrawn from L2:
+          LogWithdrawalPerformed.topic,
+          LogWithdrawalWithTokenIdPerformed.topic,
+          LogMintWithdrawalPerformed.topic,
         ],
       ],
     })
@@ -56,10 +73,12 @@ export class UserTransactionCollector {
     knownBlockTimestamps?: Map<number, number>
   ) {
     const event =
-      LogWithdrawalPerformed.safeParseLog(log) ??
       LogForcedWithdrawalRequest.safeParseLog(log) ??
       LogFullWithdrawalRequest.safeParseLog(log) ??
-      LogForcedTradeRequest.parseLog(log)
+      LogForcedTradeRequest.safeParseLog(log) ??
+      LogWithdrawalPerformed.safeParseLog(log) ??
+      LogWithdrawalWithTokenIdPerformed.safeParseLog(log) ??
+      LogMintWithdrawalPerformed.parseLog(log)
 
     const timestamp =
       knownBlockTimestamps?.get(log.blockNumber) ??
@@ -70,20 +89,8 @@ export class UserTransactionCollector {
       timestamp: Timestamp.fromSeconds(timestamp),
     }
 
+    let record
     switch (event.name) {
-      case 'LogWithdrawalPerformed':
-        return this.userTransactionRepository.add({
-          ...base,
-          data: {
-            type: 'Withdraw',
-            starkKey: StarkKey.from(event.args.starkKey),
-            // TODO: decode and use asset type
-            assetType: event.args.assetType.toHexString(),
-            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
-            quantizedAmount: event.args.quantizedAmount.toBigInt(),
-            recipient: EthereumAddress(event.args.recipient),
-          },
-        })
       case 'LogForcedWithdrawalRequest':
         return this.userTransactionRepository.add({
           ...base,
@@ -104,6 +111,9 @@ export class UserTransactionCollector {
           },
         })
       case 'LogForcedTradeRequest':
+        if (this.collateralAsset === undefined) {
+          throw new Error('Collateral asset is not configured')
+        }
         return this.userTransactionRepository.add({
           ...base,
           data: {
@@ -113,14 +123,59 @@ export class UserTransactionCollector {
             positionIdA: event.args.positionIdA.toBigInt(),
             positionIdB: event.args.positionIdB.toBigInt(),
             collateralAmount: event.args.collateralAmount.toBigInt(),
-            // TODO: respect system native asset type
-            collateralAssetId: AssetId.USDC,
+            collateralAssetId: this.collateralAsset.assetId,
             syntheticAmount: event.args.syntheticAmount.toBigInt(),
             syntheticAssetId: decodeAssetId(event.args.syntheticAssetId),
             isABuyingSynthetic: event.args.isABuyingSynthetic,
             nonce: event.args.nonce.toBigInt(),
           },
         })
+      case 'LogWithdrawalPerformed':
+        record = {
+          ...base,
+          data: {
+            type: 'Withdraw',
+            starkKey: StarkKey.from(event.args.starkKey),
+            assetType: AssetHash.from(event.args.assetType),
+            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
+            quantizedAmount: event.args.quantizedAmount.toBigInt(),
+            recipient: EthereumAddress(event.args.recipient),
+          } as WithdrawalPerformedData,
+        }
+        await this.withdrawableAssetRepository.add(record)
+        return this.userTransactionRepository.add(record)
+      case 'LogWithdrawalWithTokenIdPerformed':
+        record = {
+          ...base,
+          data: {
+            type: 'WithdrawWithTokenId',
+            starkKey: StarkKey.from(event.args.starkKey),
+            assetType: AssetHash.from(event.args.assetType),
+            tokenId: event.args.tokenId.toBigInt(),
+            assetId: AssetHash.from(event.args.assetId),
+            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
+            quantizedAmount: event.args.quantizedAmount.toBigInt(),
+            recipient: EthereumAddress(event.args.recipient),
+          } as WithdrawWithTokenIdData,
+        }
+        await this.withdrawableAssetRepository.add(record)
+        return this.userTransactionRepository.add(record)
+      case 'LogMintWithdrawalPerformed':
+        record = {
+          ...base,
+          data: {
+            type: 'MintWithdraw',
+            starkKey: StarkKey.from(event.args.starkKey),
+            assetType: AssetHash.from(event.args.assetType),
+            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
+            quantizedAmount: event.args.quantizedAmount.toBigInt(),
+            assetId: AssetHash.from(event.args.assetId),
+          } as MintWithdrawData,
+        }
+        await this.withdrawableAssetRepository.add(record)
+        return this.userTransactionRepository.add(record)
+      default:
+        assertUnreachable(event)
     }
   }
 

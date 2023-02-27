@@ -14,6 +14,7 @@ export function decodeAssetId(value: string | BigNumerLike): AssetId {
   if (typeof value !== 'string') {
     return decodeAssetId(value.toHexString().slice(2))
   }
+  // TODO: this should be compared to starkex.config.collateralAsset
   if (
     value === DYDX_INTERNAL_USDC_ID_ENCODED ||
     value == GAMMAX_GOERLI_INTERNAL_USDC_ID_ENCODED

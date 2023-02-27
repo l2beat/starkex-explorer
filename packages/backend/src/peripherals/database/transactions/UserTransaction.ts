@@ -1,5 +1,6 @@
-import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
+import { assertUnreachable } from '../../../utils/assertUnreachable'
 import { ToJSON } from './ToJSON'
 
 interface Encoded<T> {
@@ -14,9 +15,16 @@ export type UserTransactionData =
   | ForcedTradeData
   | ForcedWithdrawalData
   | FullWithdrawalData
+  | WithdrawalPerformedData
+
+export type WithdrawalPerformedData =
   | WithdrawData
+  | WithdrawWithTokenIdData
+  | MintWithdrawData
 
 export type UserTransactionJSON = ToJSON<UserTransactionData>
+
+export type WithdrawalPerformedJSON = ToJSON<WithdrawalPerformedData>
 
 export interface ForcedWithdrawalData {
   type: 'ForcedWithdrawal'
@@ -48,10 +56,30 @@ export interface ForcedTradeData {
 export interface WithdrawData {
   type: 'Withdraw'
   starkKey: StarkKey
-  assetType: string
+  assetType: AssetHash
   nonQuantizedAmount: bigint
   quantizedAmount: bigint
   recipient: EthereumAddress
+}
+
+export interface WithdrawWithTokenIdData {
+  type: 'WithdrawWithTokenId'
+  starkKey: StarkKey
+  assetType: AssetHash
+  tokenId: bigint
+  assetId: AssetHash
+  nonQuantizedAmount: bigint
+  quantizedAmount: bigint
+  recipient: EthereumAddress
+}
+
+export interface MintWithdrawData {
+  type: 'MintWithdraw'
+  starkKey: StarkKey
+  assetType: AssetHash
+  nonQuantizedAmount: bigint
+  quantizedAmount: bigint
+  assetId: AssetHash
 }
 
 export function encodeUserTransactionData(
@@ -66,6 +94,12 @@ export function encodeUserTransactionData(
       return encodeForcedTrade(values)
     case 'Withdraw':
       return encodeWithdraw(values)
+    case 'WithdrawWithTokenId':
+      return encodeWithdrawWithTokenId(values)
+    case 'MintWithdraw':
+      return encodeMintWithdraw(values)
+    default:
+      assertUnreachable(values)
   }
 }
 
@@ -81,6 +115,12 @@ export function decodeUserTransactionData(
       return decodeForcedTrade(values)
     case 'Withdraw':
       return decodeWithdraw(values)
+    case 'WithdrawWithTokenId':
+      return decodeWithdrawWithTokenId(values)
+    case 'MintWithdraw':
+      return decodeMintWithdraw(values)
+    default:
+      assertUnreachable(values)
   }
 }
 
@@ -190,5 +230,67 @@ function decodeWithdraw(values: ToJSON<WithdrawData>): WithdrawData {
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
     recipient: EthereumAddress(values.recipient),
+  }
+}
+
+function encodeWithdrawWithTokenId(
+  values: WithdrawWithTokenIdData
+): Encoded<WithdrawWithTokenIdData> {
+  return {
+    starkKeyA: values.starkKey,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      assetType: values.assetType,
+      tokenId: values.tokenId.toString(),
+      assetId: values.assetId,
+      nonQuantizedAmount: values.nonQuantizedAmount.toString(),
+      quantizedAmount: values.quantizedAmount.toString(),
+      recipient: values.recipient.toString(),
+    },
+  }
+}
+
+function decodeWithdrawWithTokenId(
+  values: ToJSON<WithdrawWithTokenIdData>
+): WithdrawWithTokenIdData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    assetType: values.assetType,
+    tokenId: BigInt(values.tokenId),
+    assetId: values.assetId,
+    nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
+    quantizedAmount: BigInt(values.quantizedAmount),
+    recipient: EthereumAddress(values.recipient),
+  }
+}
+
+function encodeMintWithdraw(
+  values: MintWithdrawData
+): Encoded<MintWithdrawData> {
+  return {
+    starkKeyA: values.starkKey,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      assetType: values.assetType,
+      assetId: values.assetId,
+      nonQuantizedAmount: values.nonQuantizedAmount.toString(),
+      quantizedAmount: values.quantizedAmount.toString(),
+    },
+  }
+}
+
+function decodeMintWithdraw(
+  values: ToJSON<MintWithdrawData>
+): MintWithdrawData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    assetType: values.assetType,
+    assetId: values.assetId,
+    nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
+    quantizedAmount: BigInt(values.quantizedAmount),
   }
 }

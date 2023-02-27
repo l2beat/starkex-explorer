@@ -42,6 +42,12 @@ export async function up(knex: Knex) {
     // It also adds a unique constraint, as we don't expect to
     // have the same asset in multiple vaults/positions
     // for the same user at the same time.
+    //
+    // IMPORTANT! If you ever need to remove the UNIQUE constraint,
+    // you MUST update the way prevHistoryId is set in Preprocessors!
+    // Currently we set prevHistoryId to record that held the asset in the past
+    // but if we ever end up with the same asset in multiple vaults/positions
+    // then we need to update prevHistoryId handling to incorporate that.
     table.unique(['stark_key', 'asset_hash_or_id'], {
       predicate: knex.whereRaw('is_current = true'),
     })
