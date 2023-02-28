@@ -193,7 +193,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         const preprocessedRepository = mock<
           PreprocessedAssetHistoryRepository<AssetId>
         >({
-          getCurrentByStarkKey: async () => [
+          getCurrentByPositionOrVaultId: async () => [
             {
               historyId: 100,
               stateUpdateId: 1900,
@@ -267,8 +267,8 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         )
 
         expect(
-          preprocessedRepository.getCurrentByStarkKey
-        ).toHaveBeenCalledExactlyWith([[position1.starkKey, trx]])
+          preprocessedRepository.getCurrentByPositionOrVaultId
+        ).toHaveBeenCalledExactlyWith([[position1.positionId, trx]])
 
         expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenCalledExactlyWith(
           [
