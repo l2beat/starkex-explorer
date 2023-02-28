@@ -23,7 +23,15 @@ export const Api = {
     })
   },
 
-  async submitForcedTrade(offerId: number, hash: Hash256) {
+  async submitSpotForcedWithdrawal(hash: Hash256) {
+    await fetch('/forced/exits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitPerpetualForcedTrade(offerId: number, hash: Hash256) {
     await fetch('/forced/trades', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

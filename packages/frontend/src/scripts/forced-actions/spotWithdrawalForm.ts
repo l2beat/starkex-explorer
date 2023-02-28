@@ -2,6 +2,8 @@ import { AssetHash } from '@explorer/types'
 
 import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
 import { SpotWithdrawalFormId } from '../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
+import { Api } from '../peripherals/api'
+import { Wallet } from '../peripherals/wallet'
 
 export function initSpotWithdrawalForm() {
   const form = document.getElementById(SpotWithdrawalFormId)
@@ -11,9 +13,23 @@ export function initSpotWithdrawalForm() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
   const props = NewForcedActionFormProps.parse(propsJson)
-  const assetHash = AssetHash(props.asset.hashOrId.toString())
+  if (!AssetHash.check(props.asset.hashOrId.toString())) {
+    throw new Error('Invalid asset hash')
+  }
   form.addEventListener('submit', (e) => {
     e.preventDefault()
-    alert('Spot withdrawal - mock submit: ' + assetHash.toString())
+    submitExit(props).catch(console.error)
   })
+}
+
+async function submitExit(props: NewForcedActionFormProps) {
+  const hash = await Wallet.sendSpotForcedWithdrawalTransaction(
+    props.user.address,
+    props.starkKey,
+    props.positionOrVaultId,
+    props.starkExAddress
+  )
+
+  await Api.submitSpotForcedWithdrawal(hash)
+  window.location.href = `/transactions/${hash.toString()}`
 }

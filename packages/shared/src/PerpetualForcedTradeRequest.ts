@@ -20,7 +20,7 @@ const coder = new Interface([
     )`,
 ])
 
-export interface ForcedTradeRequest {
+export interface PerpetualForcedTradeRequest {
   starkKeyA: StarkKey
   starkKeyB: StarkKey
   positionIdA: bigint
@@ -36,9 +36,9 @@ export interface ForcedTradeRequest {
   premiumCost: boolean
 }
 
-export function decodeForcedTradeRequest(
+export function decodePerpetualForcedTradeRequest(
   data: string
-): ForcedTradeRequest | undefined {
+): PerpetualForcedTradeRequest | undefined {
   try {
     const decoded = coder.decodeFunctionData('forcedTradeRequest', data)
     /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
@@ -63,8 +63,8 @@ export function decodeForcedTradeRequest(
   }
 }
 
-export function encodeForcedTradeRequest(
-  data: Omit<ForcedTradeRequest, 'collateralAssetId'>
+export function encodePerpetualForcedTradeRequest(
+  data: Omit<PerpetualForcedTradeRequest, 'collateralAssetId'>
 ) {
   return coder.encodeFunctionData('forcedTradeRequest', [
     data.starkKeyA,
