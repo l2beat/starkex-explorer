@@ -55,8 +55,8 @@ export class BlockRange {
       } else {
         const blockNumbers = [...this.hashes.keys()]
         if (blockNumbers.length !== 0) {
-          start ??= Math.min(...blockNumbers)
-          end ??= Math.max(...blockNumbers) + 1
+          start ??= Math.min.apply(null, blockNumbers)
+          end ??= Math.max.apply(null, blockNumbers) + 1
         }
       }
     }
