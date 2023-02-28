@@ -1,11 +1,11 @@
 import {
-  PerpetualForcedWithdrawalPageProps,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
+  renderRegularWithdrawalPage,
   renderSpotForcedWithdrawalPage,
 } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
@@ -55,7 +55,7 @@ export class TransactionController {
       const txUser = await this.userRegistrationEventRepository.findByStarkKey(
         userTransaction.data.starkKey
       )
-      const history = buildHistory(sentTransaction, userTransaction)
+      const history = buildForcedActionHistory(sentTransaction, userTransaction)
       content = renderPerpetualForcedWithdrawalPage({
         user,
         transactionHash: txHash,
@@ -76,7 +76,7 @@ export class TransactionController {
       const txUser = await this.userRegistrationEventRepository.findByStarkKey(
         userTransaction.data.starkKey
       )
-      const history = buildHistory(sentTransaction, userTransaction)
+      const history = buildForcedActionHistory(sentTransaction, userTransaction)
       content = renderSpotForcedWithdrawalPage({
         user,
         transactionHash: txHash,
@@ -118,7 +118,7 @@ export class TransactionController {
               ethereumAddress: userB.ethAddress,
               positionId: userTransaction.data.positionIdB.toString(),
             }
-      const history = buildHistory(sentTransaction, userTransaction)
+      const history = buildForcedActionHistory(sentTransaction, userTransaction)
       content = renderOfferAndForcedTradePage({
         user,
         transactionHash: txHash,
@@ -149,6 +149,52 @@ export class TransactionController {
       })
     }
 
+    if (
+      userTransaction.data.type === 'Withdraw' ||
+      userTransaction.data.type === 'WithdrawWithTokenId' ||
+      userTransaction.data.type === 'MintWithdraw'
+    ) {
+      const history = buildRegularHistory(sentTransaction, userTransaction)
+      const data = userTransaction.data
+      const assetHash =
+        data.type === 'Withdraw'
+          ? data.assetType
+          : data.type === 'WithdrawWithTokenId'
+          ? data.assetId
+          : data.assetId
+
+      let recipientEthAddress =
+        data.type === 'Withdraw'
+          ? data.recipient
+          : data.type === 'WithdrawWithTokenId'
+          ? data.recipient
+          : undefined
+
+      if (recipientEthAddress === undefined) {
+        const recipient =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            userTransaction.data.starkKey
+          )
+        // TODO handle lack of recipient address
+        recipientEthAddress = recipient?.ethAddress
+      }
+
+      content = renderRegularWithdrawalPage({
+        user,
+        transactionHash: txHash,
+        recipient: {
+          // TODO don't display starkKey if unknown
+          starkKey: StarkKey.ZERO,
+          // TODO don't display ethereum address if unknown
+          ethereumAddress: recipientEthAddress ?? EthereumAddress.ZERO,
+        },
+        asset: { hashOrId: assetHash },
+        amount: userTransaction.data.quantizedAmount,
+        history,
+        stateUpdateId: userTransaction.included?.stateUpdateId,
+      })
+    }
+
     if (!content) {
       return {
         type: 'not found',
@@ -159,32 +205,50 @@ export class TransactionController {
   }
 }
 
-function buildHistory(
+function buildRegularHistory(
   sentTransaction: SentTransactionRecord | undefined,
   userTransaction: UserTransactionRecord
-): PerpetualForcedWithdrawalPageProps['history'] {
-  const history: PerpetualForcedWithdrawalPageProps['history'] = []
-  if (sentTransaction) {
-    history.push({
-      timestamp: sentTransaction.sentTimestamp,
-      status: 'SENT',
-    })
-  }
+): { timestamp: Timestamp; status: 'SENT' | 'REVERTED' | 'MINED' }[] {
+  const history: {
+    timestamp: Timestamp
+    status: 'SENT' | 'REVERTED' | 'MINED'
+  }[] = []
+  history.push({
+    status: 'MINED',
+    timestamp: userTransaction.timestamp,
+  })
   if (sentTransaction?.mined?.reverted) {
     history.push({
       timestamp: sentTransaction.mined.timestamp,
       status: 'REVERTED',
     })
   }
-  history.push({
-    status: 'MINED',
-    timestamp: userTransaction.timestamp,
-  })
+  if (sentTransaction) {
+    history.push({
+      timestamp: sentTransaction.sentTimestamp,
+      status: 'SENT',
+    })
+  }
+  return history
+}
+
+function buildForcedActionHistory(
+  sentTransaction: SentTransactionRecord | undefined,
+  userTransaction: UserTransactionRecord
+): {
+  timestamp: Timestamp
+  status: 'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'
+}[] {
+  const history: {
+    timestamp: Timestamp
+    status: 'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'
+  }[] = []
   if (userTransaction.included) {
     history.push({
       timestamp: userTransaction.included.timestamp,
       status: 'INCLUDED',
     })
   }
+  history.push(...buildRegularHistory(sentTransaction, userTransaction))
   return history
 }

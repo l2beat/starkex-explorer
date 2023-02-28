@@ -443,6 +443,7 @@ export class Application {
       preprocessedAssetHistoryRepository,
       sentTransactionRepository,
       userTransactionRepository,
+      userRegistrationEventRepository,
       config.starkex.tradingMode,
       config.starkex.tradingMode === 'perpetual'
         ? config.starkex.collateralAsset
@@ -451,8 +452,12 @@ export class Application {
     const stateUpdateController = new StateUpdateController(
       userService,
       stateUpdateRepository,
+      userTransactionRepository,
       preprocessedAssetHistoryRepository,
-      config.starkex.tradingMode
+      config.starkex.tradingMode,
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
     )
     const transactionController = new TransactionController(
       userService,

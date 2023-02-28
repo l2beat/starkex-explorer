@@ -114,6 +114,32 @@ export function createFrontendRouter(
   )
 
   router.get(
+    '/state-updates/:stateUpdateId/transactions',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          stateUpdateId: stringAsPositiveInt(),
+        }),
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result =
+          await stateUpdateController.getStateUpdateIncludedTransactionsPage(
+            givenUser,
+            ctx.params.stateUpdateId,
+            pagination
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
     '/users/:starkKey',
     withTypedContext(
       z.object({
