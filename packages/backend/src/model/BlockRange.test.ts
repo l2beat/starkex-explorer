@@ -373,17 +373,25 @@ describe(getMinItem.name, () => {
     expect(getMinItem([4, 1, 2, 3, 4, 5, 10, -1, 2])).toEqual(-1)
   })
 
-  it('returns undefined for an empty array', () => {
-    expect(getMinItem([])).toEqual(undefined)
+  it('returns the minimum item when only 1 item', () => {
+    expect(getMinItem([-1])).toEqual(-1)
+  })
+
+  it('returns +Infinity for an empty array', () => {
+    expect(getMinItem([])).toEqual(+Infinity)
   })
 })
 
 describe(getMaxItem.name, () => {
-  it('returns the maxiumum item', () => {
+  it('returns the maximum item', () => {
     expect(getMaxItem([4, 1, 2, 3, 4, 5, 10, -1, 2])).toEqual(10)
   })
 
-  it('returns undefined for an empty array', () => {
-    expect(getMaxItem([])).toEqual(undefined)
+  it('returns the minimum item when only 1 item', () => {
+    expect(getMaxItem([-1])).toEqual(-1)
+  })
+
+  it('returns -Infinity for an empty array', () => {
+    expect(getMaxItem([])).toEqual(-Infinity)
   })
 })
