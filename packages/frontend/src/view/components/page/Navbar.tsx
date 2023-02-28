@@ -15,7 +15,7 @@ export interface NavbarProps {
 }
 
 export function Navbar({ user, searchBar = true }: NavbarProps) {
-  const projectName = process.env.projectName ?? 'dydx'
+  const starkExInstance = process.env.STARKEX_INSTANCE ?? 'dydx-mainnet'
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
       <a
@@ -24,11 +24,15 @@ export function Navbar({ user, searchBar = true }: NavbarProps) {
       >
         <div className="flex gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
-          {projectName === 'dydx' && <DydxLogo className="h-[26px] sm:h-8" />}
-          {projectName === 'gammax' && (
+          {starkExInstance === 'dydx-mainnet' && (
+            <DydxLogo className="h-[26px] sm:h-8" />
+          )}
+          {starkExInstance === 'gammax-goerli' && (
             <GammaXLogo className="h-[26px] sm:h-8" />
           )}
-          {projectName === 'myria' && <MyriaLogo className="h-[26px] sm:h-8" />}
+          {starkExInstance === 'myria-goerli' && (
+            <MyriaLogo className="h-[26px] sm:h-8" />
+          )}
         </div>
         <span className="py-1 pl-2 uppercase text-zinc-500 sm:pl-4">
           Explorer
