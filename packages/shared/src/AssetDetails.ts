@@ -1,13 +1,13 @@
 import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
 import { z } from 'zod'
 
-import { stringAs } from './types'
+import { stringAs, stringAsBigInt } from './types'
 
 export const ETHDetails = z.object({
   assetHash: stringAs(AssetHash),
   assetTypeHash: stringAs(Hash256),
   type: z.literal('ETH'),
-  quantum: z.bigint(),
+  quantum: stringAsBigInt(),
   name: z.literal('Ethereum'),
   symbol: z.literal('ETH'),
   contractError: z.array(z.unknown()),
@@ -19,7 +19,7 @@ export const ERC20Details = z.object({
   assetHash: stringAs(AssetHash),
   assetTypeHash: stringAs(Hash256),
   type: z.literal('ERC20'),
-  quantum: z.bigint(),
+  quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
   address: stringAs(EthereumAddress),
   name: z.string().optional(),
@@ -32,9 +32,9 @@ export const ERC721Details = z.object({
   assetHash: stringAs(AssetHash),
   assetTypeHash: stringAs(Hash256),
   type: z.literal('ERC721'),
-  quantum: z.bigint(),
+  quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
-  tokenId: z.bigint(),
+  tokenId: stringAsBigInt(),
   address: stringAs(EthereumAddress),
   name: z.string().optional(),
   symbol: z.string().optional(),
@@ -46,9 +46,9 @@ export const ERC1155Details = z.object({
   assetHash: stringAs(AssetHash),
   assetTypeHash: stringAs(Hash256),
   type: z.literal('ERC1155'),
-  quantum: z.bigint(),
+  quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
-  tokenId: z.bigint(),
+  tokenId: stringAsBigInt(),
   address: stringAs(EthereumAddress),
   name: z.string().optional(),
   symbol: z.string().optional(),
@@ -61,7 +61,7 @@ export const MintableERC721Details = z.object({
   assetHash: stringAs(AssetHash),
   assetTypeHash: stringAs(Hash256),
   type: z.literal('MINTABLE_ERC721'),
-  quantum: z.bigint(),
+  quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
   mintingBlob: z.string(),
   address: stringAs(EthereumAddress),
@@ -75,7 +75,7 @@ export const MintableERC20Details = z.object({
   assetHash: stringAs(AssetHash),
   assetTypeHash: stringAs(Hash256),
   type: z.literal('MINTABLE_ERC20'),
-  quantum: z.bigint(),
+  quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
   mintingBlob: z.string(),
   address: stringAs(EthereumAddress),
