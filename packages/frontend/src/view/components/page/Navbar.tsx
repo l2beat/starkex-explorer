@@ -3,7 +3,9 @@ import React from 'react'
 
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
 import { DydxLogo } from '../../assets/logos/DydxLogo'
+import { GammaXLogo } from '../../assets/logos/GammaXLogo'
 import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
+import { MyriaLogo } from '../../assets/logos/MyriaLogo'
 import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
 
@@ -13,6 +15,7 @@ export interface NavbarProps {
 }
 
 export function Navbar({ user, searchBar = true }: NavbarProps) {
+  const projectName = process.env.projectName ?? 'dydx'
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
       <a
@@ -21,7 +24,11 @@ export function Navbar({ user, searchBar = true }: NavbarProps) {
       >
         <div className="flex gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
-          <DydxLogo className="h-[26px] sm:h-8" />
+          {projectName === 'dydx' && <DydxLogo className="h-[26px] sm:h-8" />}
+          {projectName === 'gammax' && (
+            <GammaXLogo className="h-[26px] sm:h-8" />
+          )}
+          {projectName === 'myria' && <MyriaLogo className="h-[26px] sm:h-8" />}
         </div>
         <span className="py-1 pl-2 uppercase text-zinc-500 sm:pl-4">
           Explorer
