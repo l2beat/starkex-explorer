@@ -25,6 +25,7 @@ import {
   UserTransactionRecord,
   UserTransactionRepository,
 } from '../../peripherals/database/transactions/UserTransactionRepository'
+import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
@@ -37,6 +38,7 @@ export class UserController {
     >,
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
+    private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly tradingMode: 'perpetual' | 'spot',
     private readonly collateralAsset?: CollateralAsset
   ) {}
@@ -45,9 +47,9 @@ export class UserController {
     givenUser: Partial<UserDetails>,
     starkKey: StarkKey
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
-
     const [
+      user,
+      registeredUser,
       userAssets,
       totalAssets,
       history,
@@ -56,6 +58,8 @@ export class UserController {
       userTransactions,
       userTransactionsCount,
     ] = await Promise.all([
+      this.userService.getUserDetails(givenUser),
+      this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         { offset: 0, limit: 10 },
@@ -95,7 +99,7 @@ export class UserController {
       user,
       type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       starkKey,
-      ethereumAddress: EthereumAddress.ZERO,
+      ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
       withdrawableAssets: [],
       offersToAccept: [],
       assets: assetEntries,
