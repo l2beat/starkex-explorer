@@ -184,7 +184,7 @@ export class PreprocessedAssetHistoryRepository<
       // is always the first one in the list, regardless of sorting
       query = query
         .orderByRaw(
-          'CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END',
+          'position_or_vault_id, CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END',
           assetAtTop.toString()
         )
         .orderBy('asset_hash_or_id')
