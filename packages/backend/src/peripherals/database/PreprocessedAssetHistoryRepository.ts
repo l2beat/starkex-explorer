@@ -56,9 +56,10 @@ export class PreprocessedAssetHistoryRepository<
       this.getCurrentByPositionOrVaultId
     )
     this.setAsCurrentByHistoryId = this.wrapUpdate(this.setAsCurrentByHistoryId)
-    this.unsetCurrentByStarkKeyAndAsset = this.wrapUpdate(
-      this.unsetCurrentByStarkKeyAndAsset
+    this.unsetCurrentByPositionOrVaultIdAndAsset = this.wrapUpdate(
+      this.unsetCurrentByPositionOrVaultIdAndAsset
     )
+
     this.getPrevHistoryByStateUpdateId = this.wrapGet(
       this.getPrevHistoryByStateUpdateId
     )
@@ -183,7 +184,7 @@ export class PreprocessedAssetHistoryRepository<
       // is always the first one in the list, regardless of sorting
       query = query
         .orderByRaw(
-          'CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END',
+          'position_or_vault_id, CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END',
           assetAtTop.toString()
         )
         .orderBy('asset_hash_or_id')
@@ -259,8 +260,8 @@ export class PreprocessedAssetHistoryRepository<
     return updates
   }
 
-  async unsetCurrentByStarkKeyAndAsset(
-    starkKey: StarkKey,
+  async unsetCurrentByPositionOrVaultIdAndAsset(
+    positionOrVaultId: bigint,
     asset: AssetHash | AssetId,
     trx?: Knex.Transaction
   ) {
@@ -268,7 +269,7 @@ export class PreprocessedAssetHistoryRepository<
     const updates = await knex('preprocessed_asset_history')
       .update('is_current', false)
       .where({
-        stark_key: starkKey.toString(),
+        position_or_vault_id: positionOrVaultId,
         is_current: true,
         asset_hash_or_id: asset.toString(),
       })

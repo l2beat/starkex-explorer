@@ -334,8 +334,9 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     expect(record2?.isCurrent).toEqual(false)
   })
 
-  it('sets isCurrent to false by stark key and asset hash', async () => {
+  it('sets isCurrent to false by positionOrVaultId and asset hash', async () => {
     const starkKey = StarkKey.fake('a')
+    const positionId = 100n
     const assetHash1 = AssetHash.fake('1')
     const assetHash2 = AssetHash.fake('2')
 
@@ -344,7 +345,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
         ...genericRecord,
         assetHashOrId: assetHash1,
         starkKey,
-        positionOrVaultId: 100n,
+        positionOrVaultId: positionId,
         balance: 100_000_000n,
         isCurrent: true,
       },
@@ -355,7 +356,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
         ...genericRecord,
         assetHashOrId: assetHash2, // different asset
         starkKey,
-        positionOrVaultId: 101n,
+        positionOrVaultId: positionId,
         balance: 200_000_000n,
         isCurrent: true,
       },
@@ -364,16 +365,20 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     const id3 = await repository.add(
       {
         ...genericRecord,
-        starkKey: StarkKey.fake('000fa'), // different stark key
+        starkKey,
         assetHashOrId: assetHash2, // same asset
-        positionOrVaultId: 102n,
+        positionOrVaultId: 102n, // different position
         balance: 300_000_000n,
         isCurrent: true,
       },
       trx
     )
 
-    await repository.unsetCurrentByStarkKeyAndAsset(starkKey, assetHash2, trx)
+    await repository.unsetCurrentByPositionOrVaultIdAndAsset(
+      positionId,
+      assetHash2,
+      trx
+    )
 
     const record1 = await repository.findByHistoryId(id1, trx)
     const record2 = await repository.findByHistoryId(id2, trx)

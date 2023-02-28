@@ -71,8 +71,8 @@ export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {
     }
 
     const currentUserRecords =
-      await this.preprocessedAssetHistoryRepository.getCurrentByStarkKey(
-        position.starkKey,
+      await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
+        position.positionId,
         trx
       )
 

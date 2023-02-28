@@ -5,13 +5,7 @@ import {
   PositionLeaf,
   VaultLeaf,
 } from '@explorer/state'
-import {
-  AssetHash,
-  Hash256,
-  PedersenHash,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
@@ -157,31 +151,17 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
         )
       }
 
-      // TODO: why is this forced action in state update with no match in transactions?!
-      if (
-        action.type === 'fullWithdrawal' &&
-        action.starkKey ===
-          StarkKey(
-            '0x05802e0e4637d450d85127e108d8b831773babb92ddb9302ea26c13eed4519c6'
-          ) &&
-        action.assetHash ===
-          AssetHash(
-            '0x0000000000000000000000000000000000000000000000000000000000000000'
-          ) &&
-        action.vaultId === 116933n &&
-        action.balanceDifference === 0n
-      ) {
-        this.logger.error(
-          'Ignoring specific forced action with no matching transaction'
-        )
-        notIncluded.splice(txIndex, 1)
-        return
-      }
-
       if (txIndex === -1) {
-        throw new Error(
+        this.logger.error(
           'Forced action included in state update does not have a matching mined transaction'
         )
+        console.log(action)
+        // Due to many such errors on spot, we are ignoring them for now to continue syncing
+        // throw new Error(
+        //   'Forced action included in state update does not have a matching mined transaction'
+        // )
+        notIncluded.splice(txIndex, 1)
+        return
       }
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
