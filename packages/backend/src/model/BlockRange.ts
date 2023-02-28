@@ -61,8 +61,6 @@ export class BlockRange {
         }
       }
     }
-    console.log('start', start)
-    console.log('end', end)
     this.start = start ?? 0
     this.end = end ?? start ?? 0
 
