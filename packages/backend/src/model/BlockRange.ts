@@ -57,12 +57,10 @@ export class BlockRange {
         if (blockNumbers.length !== 0) {
           // since block numbers can be a huge array, we use a custom implementation of min/max to avoid "Maximum call stack size exceeded" errors
           start ??= getMinItem(blockNumbers)
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          end ??= getMaxItem(blockNumbers)! + 1
+          end ??= getMaxItem(blockNumbers) + 1
         }
       }
     }
-
     this.start = start ?? 0
     this.end = end ?? start ?? 0
 
@@ -139,24 +137,28 @@ export class BlockRange {
   }
 }
 
-export function getMinItem<T>(array: T[]): T | undefined {
-  let minElement = array[0]
-  for (let i = 1; i < array.length; ++i) {
+export function getMinItem(array: number[]): number {
+  let minElement = +Infinity
+  // eslint-disable-next-line
+  for (let i = 0; i < array.length; ++i) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (array[i]! < minElement!) {
-      minElement = array[i]
+    if (array[i]! < minElement) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      minElement = array[i]!
     }
   }
 
   return minElement
 }
 
-export function getMaxItem<T>(array: T[]): T | undefined {
-  let maxElement = array[0]
-  for (let i = 1; i < array.length; ++i) {
+export function getMaxItem(array: number[]): number {
+  let maxElement = -Infinity
+  // eslint-disable-next-line
+  for (let i = 0; i < array.length; ++i) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (array[i]! > maxElement!) {
-      maxElement = array[i]
+    if (array[i]! > maxElement) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      maxElement = array[i]!
     }
   }
 
