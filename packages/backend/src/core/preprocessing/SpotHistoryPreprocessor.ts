@@ -32,13 +32,19 @@ export class SpotHistoryPreprocessor extends HistoryPreprocessor<AssetHash> {
       if (vault.starkKey === StarkKey.ZERO) {
         await this.closePositionOrVault(trx, vault.vaultId, stateUpdate, {})
       } else {
-        const currentRecord =
-          await this.preprocessedAssetHistoryRepository.findCurrentByStarkKeyAndAsset(
-            vault.starkKey,
-            vault.assetHash,
+        const currentRecords =
+          await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
+            vault.vaultId,
             trx
           )
 
+        if (currentRecords.length > 1) {
+          throw new Error(
+            `Found more than one current record for vault ${vault.vaultId}`
+          )
+        }
+
+        const currentRecord = currentRecords[0]
         if (currentRecord?.balance !== vault.balance) {
           const newRecord: Omit<
             PreprocessedAssetHistoryRecord<AssetHash>,

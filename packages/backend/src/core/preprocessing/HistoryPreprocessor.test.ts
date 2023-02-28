@@ -143,7 +143,7 @@ describe(HistoryPreprocessor.name, () => {
         const trx = mock<Knex.Transaction>()
         const starkKey = StarkKey.fake()
         const historyRepo = mock<PreprocessedAssetHistoryRepository<AssetId>>({
-          unsetCurrentByStarkKeyAndAsset: async () => 2,
+          unsetCurrentByPositionOrVaultIdAndAsset: async () => 2,
           add: async () => 2,
         })
         const preprocessor = new NonAbstractHistoryPreprocessor(
@@ -179,15 +179,15 @@ describe(HistoryPreprocessor.name, () => {
           },
         ])
         // Check that current records where set as isCurrent = false
-        expect(historyRepo.unsetCurrentByStarkKeyAndAsset).toHaveBeenCalledWith(
-          [starkKey, AssetId('ETH-9'), trx]
-        )
-        expect(historyRepo.unsetCurrentByStarkKeyAndAsset).toHaveBeenCalledWith(
-          [starkKey, AssetId('WBTC-9'), trx]
-        )
-        expect(historyRepo.unsetCurrentByStarkKeyAndAsset.calls.length).toEqual(
-          2
-        )
+        expect(
+          historyRepo.unsetCurrentByPositionOrVaultIdAndAsset
+        ).toHaveBeenCalledWith([5n, AssetId('ETH-9'), trx])
+        expect(
+          historyRepo.unsetCurrentByPositionOrVaultIdAndAsset
+        ).toHaveBeenCalledWith([5n, AssetId('WBTC-9'), trx])
+        expect(
+          historyRepo.unsetCurrentByPositionOrVaultIdAndAsset.calls.length
+        ).toEqual(2)
 
         // Check that new records where added with correct isCurrent
         expect(historyRepo.add).toHaveBeenCalledWith([
