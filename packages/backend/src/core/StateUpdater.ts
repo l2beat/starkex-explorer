@@ -5,11 +5,7 @@ import {
   PositionLeaf,
   VaultLeaf,
 } from '@explorer/state'
-import {
-  Hash256,
-  PedersenHash,
-  Timestamp,
-} from '@explorer/types'
+import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
