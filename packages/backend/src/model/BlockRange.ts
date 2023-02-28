@@ -55,8 +55,8 @@ export class BlockRange {
       } else {
         const blockNumbers = [...this.hashes.keys()]
         if (blockNumbers.length !== 0) {
-          start ??= Math.min.apply(null, blockNumbers)
-          end ??= Math.max.apply(null, blockNumbers) + 1
+          start ??= arrayMin(blockNumbers)
+          end ??= arrayMax(blockNumbers) + 1
         }
       }
     }
@@ -135,4 +135,12 @@ export class BlockRange {
       new BlockRange(rightBlocks, this.start + count, this.end),
     ]
   }
+}
+
+export function arrayMin(arr: number[]): number {
+  return arr.length === 0 ? Infinity : arr.reduce((p, v) => (p < v ? p : v))
+}
+
+export function arrayMax(arr: number[]): number {
+  return arr.length === 0 ? -Infinity : arr.reduce((p, v) => (p > v ? p : v))
 }

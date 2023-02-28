@@ -1,7 +1,7 @@
 import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { BlockRange } from './BlockRange'
+import { arrayMax, arrayMin, BlockRange } from './BlockRange'
 
 describe(BlockRange.name, () => {
   describe('constructor', () => {
@@ -355,5 +355,18 @@ describe(BlockRange.name, () => {
         new BlockRange([{ number: 12, hash: Hash256.fake('12') }])
       )
     })
+  })
+})
+
+describe('Min and max functions', () => {
+  it('correctly runs arrayMin', () => {
+    expect(arrayMin([10, 1, 2, 3])).toEqual(1)
+    expect(arrayMin([3, 2])).toEqual(2)
+    expect(arrayMin([])).toEqual(Infinity)
+  })
+  it('correctly runs arrayMin', () => {
+    expect(arrayMax([10, 1, 2, 3])).toEqual(10)
+    expect(arrayMax([2, 3])).toEqual(3)
+    expect(arrayMax([])).toEqual(-Infinity)
   })
 })
