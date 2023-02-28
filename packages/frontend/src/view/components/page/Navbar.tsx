@@ -46,7 +46,7 @@ export function Navbar({ user, searchBar = true }: NavbarProps) {
         {user && (
           <a
             href={`/users/${user.starkKey?.toString() ?? 'not-found'}`}
-            className="relative flex h-8 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand lg:h-[44px]"
+            className="relative flex h-10 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand"
           >
             <JazzIcon
               className="hidden lg:block"
