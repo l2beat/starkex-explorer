@@ -1,5 +1,5 @@
 import { stringAsPositiveInt, UserDetails } from '@explorer/shared'
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
 import * as z from 'zod'
@@ -7,6 +7,7 @@ import * as z from 'zod'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
+import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
@@ -14,7 +15,8 @@ import { applyControllerResult } from './utils'
 export function createFrontendRouter(
   homeController: HomeController,
   userController: UserController,
-  stateUpdateController: StateUpdateController
+  stateUpdateController: StateUpdateController,
+  transactionController: TransactionController
 ) {
   const router = new Router()
 
@@ -199,6 +201,25 @@ export function createFrontendRouter(
           givenUser,
           StarkKey(ctx.params.starkKey),
           pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/transactions/:transactionHash',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          transactionHash: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const result = await transactionController.getTransactionPage(
+          givenUser,
+          Hash256(ctx.params.transactionHash)
         )
         applyControllerResult(ctx, result)
       }
