@@ -35,7 +35,9 @@ export function decodePerpetualForcedWithdrawalRequest(
   }
 }
 
-export function encodePerpetualForcedWithdrawalRequest(data: PerpetualForcedWithdrawalRequest) {
+export function encodePerpetualForcedWithdrawalRequest(
+  data: PerpetualForcedWithdrawalRequest
+) {
   return coder.encodeFunctionData('forcedWithdrawalRequest', [
     data.starkKey,
     data.positionId.toString(),
