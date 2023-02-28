@@ -1,4 +1,4 @@
-import { Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { AssetHash, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { setupDatabaseTestSuite } from '../../../test/database'
@@ -29,7 +29,7 @@ describe(SentTransactionRepository.name, () => {
     return {
       type: 'Withdraw',
       starkKey: StarkKey.fake(),
-      assetType: '0x1234',
+      assetType: AssetHash.fake('1234'),
       ...override,
     }
   }
