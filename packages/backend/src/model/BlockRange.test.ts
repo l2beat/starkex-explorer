@@ -1,7 +1,8 @@
 import { Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
-import { BlockRange } from './BlockRange'
+import { Block } from '../core/sync/syncSchedulerReducer'
+import { BlockRange, getMaxItem, getMinItem } from './BlockRange'
 
 describe(BlockRange.name, () => {
   describe('constructor', () => {
@@ -106,6 +107,15 @@ describe(BlockRange.name, () => {
           [12, Hash256.fake('12')],
         ])
       )
+    })
+
+    it('works with huge data sets', () => {
+      const blocks: Block[] = []
+      for (let i = 0; i < 1_000_000; i++) {
+        blocks.push({ number: i, hash: Hash256.fake(i.toString()) })
+      }
+
+      new BlockRange(blocks)
     })
   })
 
@@ -355,5 +365,25 @@ describe(BlockRange.name, () => {
         new BlockRange([{ number: 12, hash: Hash256.fake('12') }])
       )
     })
+  })
+})
+
+describe(getMinItem.name, () => {
+  it('returns the minimum item', () => {
+    expect(getMinItem([4, 1, 2, 3, 4, 5, 10, -1, 2])).toEqual(-1)
+  })
+
+  it('returns undefined for an empty array', () => {
+    expect(getMinItem([])).toEqual(undefined)
+  })
+})
+
+describe(getMaxItem.name, () => {
+  it('returns the maxiumum item', () => {
+    expect(getMaxItem([4, 1, 2, 3, 4, 5, 10, -1, 2])).toEqual(10)
+  })
+
+  it('returns undefined for an empty array', () => {
+    expect(getMaxItem([])).toEqual(undefined)
   })
 })

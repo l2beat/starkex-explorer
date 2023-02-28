@@ -55,8 +55,10 @@ export class BlockRange {
       } else {
         const blockNumbers = [...this.hashes.keys()]
         if (blockNumbers.length !== 0) {
-          start ??= Math.min.apply(null, blockNumbers)
-          end ??= Math.max.apply(null, blockNumbers) + 1
+          // since block numbers can be a huge array, we use a custom implementation of min/max to avoid "Maximum call stack size exceeded" errors
+          start ??= getMinItem(blockNumbers)
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          end ??= getMaxItem(blockNumbers)! + 1
         }
       }
     }
@@ -135,4 +137,28 @@ export class BlockRange {
       new BlockRange(rightBlocks, this.start + count, this.end),
     ]
   }
+}
+
+export function getMinItem<T>(array: T[]): T | undefined {
+  let minElement = array[0]
+  for (let i = 1; i < array.length; ++i) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (array[i]! < minElement!) {
+      minElement = array[i]
+    }
+  }
+
+  return minElement
+}
+
+export function getMaxItem<T>(array: T[]): T | undefined {
+  let maxElement = array[0]
+  for (let i = 1; i < array.length; ++i) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    if (array[i]! > maxElement!) {
+      maxElement = array[i]
+    }
+  }
+
+  return maxElement
 }
