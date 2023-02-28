@@ -118,6 +118,29 @@ describe(UserTransactionRepository.name, () => {
       ])
       expect(records3.map((x) => x.id)).toEqual([id1])
     })
+
+    it('accepts an optional pagination parameter', async () => {
+      const records1 = await repository.getByStarkKey(
+        starkKey,
+        ['ForcedTrade', 'ForcedWithdrawal'],
+        { offset: 1, limit: 1 }
+      )
+      expect(records1.map((x) => x.id)).toEqual([id1])
+
+      const records2 = await repository.getByStarkKey(
+        starkKey,
+        ['ForcedTrade', 'ForcedWithdrawal'],
+        { offset: 0, limit: 1 }
+      )
+      expect(records2.map((x) => x.id)).toEqual([id2])
+
+      const records3 = await repository.getByStarkKey(
+        starkKey,
+        ['ForcedTrade', 'ForcedWithdrawal'],
+        { offset: 0, limit: 2 }
+      )
+      expect(records3.map((x) => x.id)).toEqual([id2, id1])
+    })
   })
 
   describe(UserTransactionRepository.prototype.getByPositionId.name, () => {
@@ -480,6 +503,131 @@ describe(UserTransactionRepository.name, () => {
 
       const result3 = await repository.getNotIncluded(['ForcedTrade'])
       expect(result3.map((x) => x.id)).toEqual([id2])
+    })
+  })
+
+  describe(
+    UserTransactionRepository.prototype.getCountOfIncludedByStateUpdateId.name,
+    () => {
+      it('returns the number of forced transactions included in state update', async () => {
+        const transactionHash = Hash256.fake()
+        await repository.add({
+          transactionHash,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+        await repository.addManyIncluded([
+          {
+            transactionHash,
+            blockNumber: 123,
+            timestamp: Timestamp(123000),
+            stateUpdateId: 123,
+          },
+        ])
+
+        // To be ignored (not included)
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 456,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        // To be ignored (wrong state update id)
+        await repository.add({
+          transactionHash: Hash256.fake('aa11'),
+          blockNumber: 234,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+        await repository.addManyIncluded([
+          {
+            transactionHash: Hash256.fake('aa11'),
+            blockNumber: 234,
+            timestamp: Timestamp(123000),
+            stateUpdateId: 789,
+          },
+        ])
+
+        expect(await repository.getCountOfIncludedByStateUpdateId(123)).toEqual(
+          1
+        )
+      })
+    }
+  )
+
+  describe(UserTransactionRepository.prototype.getCountByStarkKey.name, () => {
+    it('returns 0 for an empty database', async () => {
+      expect(await repository.getCountByStarkKey(StarkKey.fake())).toEqual(0)
+    })
+
+    it('returns the number of transactions', async () => {
+      const transactionHash = Hash256.fake()
+      const starkKey = StarkKey.fake('00fa')
+      await repository.add({
+        transactionHash,
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal({ starkKey }),
+      })
+      await repository.addManyIncluded([
+        {
+          transactionHash,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          stateUpdateId: 123,
+        },
+      ])
+
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal({ starkKey }),
+      })
+
+      // To be ignored (different stark key):
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal({ starkKey: StarkKey.fake('abc') }),
+      })
+
+      expect(await repository.getCountByStarkKey(starkKey)).toEqual(2)
+    })
+
+    it('accepts an optional type parameter', async () => {
+      const starkKey = StarkKey.fake('00fa')
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeForcedWithdrawal({ starkKey }),
+      })
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(123000),
+        data: fakeForcedTrade({ starkKeyA: starkKey }),
+      })
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 456,
+        timestamp: Timestamp(123000),
+        data: fakeForcedTrade({ starkKeyB: starkKey }),
+      })
+
+      expect(
+        await repository.getCountByStarkKey(starkKey, ['ForcedTrade'])
+      ).toEqual(2)
+      expect(
+        await repository.getCountByStarkKey(starkKey, [
+          'ForcedTrade',
+          'ForcedWithdrawal',
+        ])
+      ).toEqual(3)
     })
   })
 

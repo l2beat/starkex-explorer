@@ -35,7 +35,6 @@ import {
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
-import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
 import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
@@ -43,6 +42,7 @@ import { PerpetualValidiumUpdater } from './core/PerpetualValidiumUpdater'
 import { PerpetualHistoryPreprocessor } from './core/preprocessing/PerpetualHistoryPreprocessor'
 import { Preprocessor } from './core/preprocessing/Preprocessor'
 import { SpotHistoryPreprocessor } from './core/preprocessing/SpotHistoryPreprocessor'
+import { StateDetailsPreprocessor } from './core/preprocessing/StateDetailsPreprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
 import { StatusService } from './core/StatusService'
@@ -59,6 +59,7 @@ import { PageMappingRepository } from './peripherals/database/PageMappingReposit
 import { PageRepository } from './peripherals/database/PageRepository'
 import { PositionRepository } from './peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
+import { PreprocessedStateDetailsRepository } from './peripherals/database/PreprocessedStateDetailsRepository'
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
@@ -330,19 +331,17 @@ export class Application {
       userTransactionRepository,
       sentTransactionRepository,
       userTransactionCollector,
-      ethereumClient,
-      logger
-    )
-    const withdrawableAssetMigrator = new WithdrawableAssetMigrator(
-      softwareMigrationRepository,
-      syncStatusRepository,
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
+      ethereumClient,
       logger
     )
 
     const preprocessedStateUpdateRepository =
       new PreprocessedStateUpdateRepository(database, logger)
+
+    const preprocessedStateDetailsRepository =
+      new PreprocessedStateDetailsRepository(database, logger)
 
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
@@ -360,11 +359,19 @@ export class Application {
         logger
       )
 
+      const stateDetailsPreprocessor = new StateDetailsPreprocessor(
+        preprocessedStateDetailsRepository,
+        preprocessedAssetHistoryRepository,
+        userTransactionRepository,
+        logger
+      )
+
       preprocessor = new Preprocessor(
         preprocessedStateUpdateRepository,
         syncStatusRepository,
         stateUpdateRepository,
         perpetualHistoryPreprocessor,
+        stateDetailsPreprocessor,
         logger,
         isPreprocessorEnabled
       )
@@ -380,11 +387,19 @@ export class Application {
         logger
       )
 
+      const stateDetailsPreprocessor = new StateDetailsPreprocessor(
+        preprocessedStateDetailsRepository,
+        preprocessedAssetHistoryRepository,
+        userTransactionRepository,
+        logger
+      )
+
       preprocessor = new Preprocessor(
         preprocessedStateUpdateRepository,
         syncStatusRepository,
         stateUpdateRepository,
         spotHistoryPreprocessor,
+        stateDetailsPreprocessor,
         logger,
         isPreprocessorEnabled
       )
@@ -416,12 +431,16 @@ export class Application {
     )
     const homeController = new HomeController(
       userService,
-      stateUpdateRepository,
-      userTransactionRepository
+      userTransactionRepository,
+      preprocessedStateDetailsRepository,
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
     )
     const userController = new UserController(
       userService,
       preprocessedAssetHistoryRepository,
+      sentTransactionRepository,
       userTransactionRepository,
       config.starkex.tradingMode,
       config.starkex.tradingMode === 'perpetual'
@@ -515,7 +534,6 @@ export class Application {
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
       await userTransactionMigrator.migrate()
-      await withdrawableAssetMigrator.migrate()
 
       if (config.enableSync) {
         transactionStatusService.start()

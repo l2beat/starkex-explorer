@@ -46,6 +46,27 @@ export function createFrontendRouter(
   )
 
   router.get(
+    '/forced-transactions',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result = await homeController.getHomeForcedTransactionsPage(
+          givenUser,
+          pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
     '/state-updates/:stateUpdateId',
     withTypedContext(
       z.object({
@@ -150,6 +171,31 @@ export function createFrontendRouter(
         const givenUser = getGivenUser(ctx)
         const pagination = getPagination(ctx.query)
         const result = await userController.getUserBalanceChangesPage(
+          givenUser,
+          StarkKey(ctx.params.starkKey),
+          pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/users/:starkKey/transactions',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          starkKey: z.string(),
+        }),
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result = await userController.getUserTransactionsPage(
           givenUser,
           StarkKey(ctx.params.starkKey),
           pagination
