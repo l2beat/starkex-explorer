@@ -387,7 +387,7 @@ describe(getMaxItem.name, () => {
     expect(getMaxItem([4, 1, 2, 3, 4, 5, 10, -1, 2])).toEqual(10)
   })
 
-  it('returns the minimum item when only 1 item', () => {
+  it('returns the maximum item when only 1 item', () => {
     expect(getMaxItem([-1])).toEqual(-1)
   })
 
