@@ -20,20 +20,29 @@ interface Props {
 }
 
 export function Page(props: Props) {
+  const projectName = getProjectName()
+
   return (
     <html lang="en" className="h-full bg-neutral-900 text-white">
       <Head
         description={props.description}
         image={props.image ?? '/images/meta-image.png'}
         title={combineTitle(
-          props.baseTitle ?? 'L2BEAT dYdX Explorer',
+          props.baseTitle ?? `L2BEAT ${projectName} Explorer`,
           props.title
         )}
-        url={combineUrl(props.baseUrl ?? 'https://dydx.l2beat.com', props.path)}
+        url={combineUrl(
+          props.baseUrl ?? `https://${projectName.toLowerCase()}.l2beat.com`,
+          props.path
+        )}
         stylesheets={props.stylesheets ?? ['/styles/main.css']}
       />
       <body className="flex h-full flex-col">
-        <Navbar searchBar={!props.withoutSearch} user={props.user} />
+        <Navbar
+          searchBar={!props.withoutSearch}
+          user={props.user}
+          projectName={projectName}
+        />
         {props.children}
         <Footer />
         {(props.scripts ?? ['/scripts/main.js']).map((src, i) => (
@@ -42,6 +51,21 @@ export function Page(props: Props) {
       </body>
     </html>
   )
+}
+
+function getProjectName() {
+  const projectName = process.env.STARKEX_INSTANCE ?? 'dydx-mainnet'
+
+  switch (projectName) {
+    case 'dydx-mainnet':
+      return 'dYdX'
+    case 'myria-goerli':
+      return 'Myria'
+    case 'gammax-goerli':
+      return 'GammaX'
+    default:
+      throw new Error(`Unknown STARKEX_INSTANCE: ${projectName}`)
+  }
 }
 
 function combineTitle(baseTitle: string, title: string | undefined) {
