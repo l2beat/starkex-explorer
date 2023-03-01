@@ -1,10 +1,12 @@
-import { AssetDetails } from '@explorer/shared'
+import { AssetDetails, stringAs } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
+import { z } from 'zod'
 
-export interface Asset {
-  hashOrId: AssetHash | AssetId
-  details?: AssetDetails
-}
+export type Asset = z.infer<typeof Asset>
+export const Asset = z.object({
+  hashOrId: z.union([stringAs(AssetId), stringAs(AssetHash)]),
+  details: AssetDetails.optional(),
+})
 
 export interface AssetInfo {
   name: string
@@ -42,6 +44,14 @@ function assetHashToInfo(
   assetDetails?: AssetDetails
 ): AssetInfo {
   if (!assetDetails) {
+    if (assetHash.startsWith('0x04')) {
+      return {
+        name: 'Mintable NFT',
+        symbol: `Mintable # ${assetHash.substring(4)}`,
+        isUnknownHash: true,
+        imageUrl: '/images/unknown-asset.svg',
+      }
+    }
     return {
       name: 'Unknown',
       symbol: assetHash.toString(),

@@ -5,11 +5,13 @@ import { ApiServer } from './api/ApiServer'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
+import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { OldHomeController } from './api/controllers/OldHomeController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
+import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
@@ -190,6 +192,10 @@ export class Application {
     )
 
     let syncService
+    let stateUpdater:
+      | SpotValidiumUpdater
+      | PerpetualValidiumUpdater
+      | PerpetualRollupUpdater
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -218,6 +224,8 @@ export class Application {
           userTransactionRepository,
           logger
         )
+        stateUpdater = perpetualValidiumUpdater
+
         syncService = new PerpetualValidiumSyncService(
           availabilityGatewayClient,
           perpetualValidiumStateTransitionCollector,
@@ -250,6 +258,7 @@ export class Application {
           userTransactionRepository,
           logger
         )
+        stateUpdater = spotValidiumUpdater
 
         syncService = new SpotValidiumSyncService(
           availabilityGatewayClient,
@@ -299,6 +308,7 @@ export class Application {
         userTransactionRepository,
         logger
       )
+      stateUpdater = perpetualRollupUpdater
       syncService = new PerpetualRollupSyncService(
         verifierCollector,
         pageMappingCollector,
@@ -442,6 +452,8 @@ export class Application {
       preprocessedAssetHistoryRepository,
       sentTransactionRepository,
       userTransactionRepository,
+      userRegistrationEventRepository,
+      assetRepository,
       config.starkex.tradingMode,
       config.starkex.tradingMode === 'perpetual'
         ? config.starkex.collateralAsset
@@ -450,7 +462,25 @@ export class Application {
     const stateUpdateController = new StateUpdateController(
       userService,
       stateUpdateRepository,
+      userTransactionRepository,
       preprocessedAssetHistoryRepository,
+      config.starkex.tradingMode,
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
+    )
+    const transactionController = new TransactionController(
+      userService,
+      sentTransactionRepository,
+      userTransactionRepository,
+      userRegistrationEventRepository,
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
+    )
+    const merkleProofController = new MerkleProofController(
+      userService,
+      stateUpdater,
       config.starkex.tradingMode
     )
 
@@ -509,7 +539,9 @@ export class Application {
           : createFrontendRouter(
               homeController,
               userController,
-              stateUpdateController
+              stateUpdateController,
+              transactionController,
+              merkleProofController
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,
@@ -534,6 +566,7 @@ export class Application {
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
       await userTransactionMigrator.migrate()
+      await stateUpdater.initTree()
 
       if (config.enableSync) {
         transactionStatusService.start()

@@ -1,4 +1,4 @@
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
 
 import { ToJSON } from './ToJSON'
 
@@ -44,7 +44,7 @@ export interface ForcedTradeData {
 export interface WithdrawData {
   type: 'Withdraw'
   starkKey: StarkKey
-  assetType: string
+  assetType: AssetHash
 }
 
 export function encodeSentTransactionData(

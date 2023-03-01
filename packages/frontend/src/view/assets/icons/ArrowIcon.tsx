@@ -1,10 +1,11 @@
+import cx from 'classnames'
 import React from 'react'
 
 interface ArrowProps {
   className?: string
 }
 
-export function ArrowLeftIcon(props: ArrowProps & { transform?: string }) {
+export function ArrowLeftIcon(props: ArrowProps) {
   return (
     <svg
       width="24"
@@ -13,7 +14,6 @@ export function ArrowLeftIcon(props: ArrowProps & { transform?: string }) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={props.className}
-      transform={props.transform}
     >
       <path
         fillRule="evenodd"
@@ -26,13 +26,13 @@ export function ArrowLeftIcon(props: ArrowProps & { transform?: string }) {
 }
 
 export function ArrowRightIcon(props: ArrowProps) {
-  return <ArrowLeftIcon {...props} transform="rotate(180)" />
+  return <ArrowLeftIcon className={cx(props.className, 'rotate-180')} />
 }
 
 export function ArrowUpIcon(props: ArrowProps) {
-  return <ArrowLeftIcon {...props} transform="rotate(90)" />
+  return <ArrowLeftIcon className={cx(props.className, 'rotate-90')} />
 }
 
 export function ArrowDownIcon(props: ArrowProps) {
-  return <ArrowLeftIcon {...props} transform="rotate(-90)" />
+  return <ArrowLeftIcon className={cx(props.className, '-rotate-90')} />
 }

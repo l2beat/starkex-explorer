@@ -183,7 +183,8 @@ export class UserTransactionRepository extends BaseRepository {
 
   async getByStateUpdateId<T extends UserTransactionData['type']>(
     stateUpdateId: number,
-    types?: T[]
+    types?: T[],
+    pagination?: { offset: number; limit: number }
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex).where('state_update_id', stateUpdateId)
@@ -191,6 +192,9 @@ export class UserTransactionRepository extends BaseRepository {
       query = query.whereIn('type', types)
     }
     query = query.orderBy('timestamp', 'desc')
+    if (pagination) {
+      query = query.limit(pagination.limit).offset(pagination.offset)
+    }
     return toRecords<T>(await query)
   }
 

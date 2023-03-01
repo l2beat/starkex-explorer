@@ -18,22 +18,25 @@ export function getAsset(
   return asset
 }
 
-export function getFormType(asset: PositionAssetEntry): FormState['type'] {
-  if (isSellable(asset)) {
+export function getFormType(
+  assetId: AssetId,
+  balance: bigint
+): FormState['type'] {
+  if (isSellable(assetId, balance)) {
     return 'sell'
   }
-  if (isBuyable(asset)) {
+  if (isBuyable(assetId, balance)) {
     return 'buy'
   }
   return 'withdraw'
 }
 
-export function isSellable(x: PositionAssetEntry): boolean {
-  return x.assetId !== AssetId.USDC && x.balance > 0n
+export function isSellable(assetId: AssetId, balance: bigint): boolean {
+  return assetId !== AssetId.USDC && balance > 0n
 }
 
-export function isBuyable(x: PositionAssetEntry): boolean {
-  return x.assetId !== AssetId.USDC && x.balance < 0n
+export function isBuyable(assetId: AssetId, balance: bigint): boolean {
+  return assetId !== AssetId.USDC && balance < 0n
 }
 
 export function parseCurrencyInput(
