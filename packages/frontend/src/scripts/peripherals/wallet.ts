@@ -3,8 +3,9 @@ import {
   AcceptedData,
   CreateOfferData,
   encodeFinalizeExitRequest,
-  encodeForcedTradeRequest,
-  encodeForcedWithdrawalRequest,
+  encodePerpetualForcedTradeRequest,
+  encodePerpetualForcedWithdrawalRequest,
+  encodeSpotForcedWithdrawalRequest,
   FinalizeOfferData,
   toSignableAcceptOffer,
   toSignableCancelOffer,
@@ -106,12 +107,12 @@ export const Wallet = {
   // #endregion
   // #region Forced transactions
 
-  async sendForcedTradeTransaction(
+  async sendPerpetualForcedTradeTransaction(
     account: EthereumAddress,
     offer: FinalizeOfferData,
     exchangeAddress: EthereumAddress
   ) {
-    const data = encodeForcedTradeRequest(offer)
+    const data = encodePerpetualForcedTradeRequest(offer)
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [{ from: account, to: exchangeAddress, data }],
@@ -127,11 +128,30 @@ export const Wallet = {
     premiumCost: boolean,
     exchangeAddress: EthereumAddress
   ) {
-    const data = encodeForcedWithdrawalRequest({
+    const data = encodePerpetualForcedWithdrawalRequest({
       starkKey,
       positionId,
       quantizedAmount,
       premiumCost,
+    })
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        { from: account.toString(), to: exchangeAddress.toString(), data },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendSpotForcedWithdrawalTransaction(
+    account: EthereumAddress,
+    ownerKey: StarkKey,
+    vaultId: bigint,
+    exchangeAddress: EthereumAddress
+  ) {
+    const data = encodeSpotForcedWithdrawalRequest({
+      ownerKey,
+      vaultId,
     })
     const result = await getProvider().request({
       method: 'eth_sendTransaction',

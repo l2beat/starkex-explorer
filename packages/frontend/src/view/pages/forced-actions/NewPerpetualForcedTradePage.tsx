@@ -14,11 +14,11 @@ import { FormId } from './components/form/ids'
 import { PriceInput } from './components/form/PriceInput'
 import { TotalInput } from './components/form/TotalInput'
 import {
-  ForcedActionFormProps,
+  NewForcedActionFormProps,
   serializeForcedActionsFormProps,
-} from './ForcedActionFormProps'
+} from './NewForcedActionFormProps'
 
-function ForcedTradePage(props: ForcedActionFormProps) {
+function NewPerpetualForcedTradePage(props: NewForcedActionFormProps) {
   const instructions = [
     'You create a trade offer using this form. This is fully off-chain and does not require any gas fees.',
     'The trade offer will now be visible to all users of the system. You should seek out another user to accept the offer and become a counterparty to the trade. Accepting the offer is also fully off-chain and does not require any gas fees.',
@@ -34,9 +34,7 @@ function ForcedTradePage(props: ForcedActionFormProps) {
     </>,
     `After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the operators of ${getInstanceName()} to process your request. Once this is done the trade will be executed and the funds will be transferred between you and the counterparty.`,
   ]
-  const selectedAssetBalance =
-    props.assets.find((a) => a.assetId === props.selectedAsset)?.balance ?? 0
-  const isBuying = selectedAssetBalance < 0
+  const isBuying = props.asset.balance < 0
   const label = isBuying ? 'buy' : 'sell'
   const propsJson = serializeForcedActionsFormProps(props)
 
@@ -48,8 +46,8 @@ function ForcedTradePage(props: ForcedActionFormProps) {
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold">Begin trade process</span>
+          <div className="mt-6 flex flex-col">
+            <span className="text-xl font-semibold">Begin trade process</span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
               The trade process consists of four steps:
             </span>
@@ -62,12 +60,14 @@ function ForcedTradePage(props: ForcedActionFormProps) {
               data-props={propsJson}
             >
               <div className="flex items-end justify-between">
-                <span className="text-2xl font-semibold">
+                <span className="text-xl font-semibold">
                   Forced {label} offer
                 </span>
                 <span>
-                  <span className="text-sm text-zinc-500">Position</span>{' '}
-                  <span className="font-semibold">#11273</span>
+                  <span className="text-sm font-medium text-zinc-500">
+                    Position
+                  </span>{' '}
+                  <span className="text-lg font-semibold">#11273</span>
                 </span>
               </div>
               <div className="flex flex-col gap-2">
@@ -104,6 +104,8 @@ function ForcedTradePage(props: ForcedActionFormProps) {
   )
 }
 
-export function renderForcedTradePage(props: ForcedActionFormProps) {
-  return reactToHtml(<ForcedTradePage {...props} />)
+export function renderNewPerpetualForcedTradePage(
+  props: NewForcedActionFormProps
+) {
+  return reactToHtml(<NewPerpetualForcedTradePage {...props} />)
 }

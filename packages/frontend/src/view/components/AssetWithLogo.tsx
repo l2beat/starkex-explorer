@@ -42,9 +42,16 @@ export function AssetWithLogo({
           </div>
         )}
         {type === 'regular' &&
-          (assetInfo.isUnknownHash
-            ? `${assetInfo.name} (${assetInfo.symbol})`
-            : assetInfo.symbol)}
+          (assetInfo.isUnknownHash ? (
+            <div>
+              <div>{assetInfo.name}</div>
+              <InlineEllipsis className="max-w-[100px] !py-0">
+                {assetInfo.symbol}
+              </InlineEllipsis>
+            </div>
+          ) : (
+            assetInfo.symbol
+          ))}
         {(type === 'small' || type === 'symbol') && (
           <InlineEllipsis className="max-w-[80px] !py-0">
             {assetInfo.symbol}

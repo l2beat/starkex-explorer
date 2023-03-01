@@ -11,11 +11,11 @@ import { ForcedActionCard } from './components/ForcedActionCard'
 import { AmountInput } from './components/form/AmountInput'
 import { FormId } from './components/form/ids'
 import {
-  ForcedActionFormProps,
+  NewForcedActionFormProps,
   serializeForcedActionsFormProps,
-} from './ForcedActionFormProps'
+} from './NewForcedActionFormProps'
 
-function ForcedWithdrawPage(props: ForcedActionFormProps) {
+function NewPerpetualForcedWithdrawalPage(props: NewForcedActionFormProps) {
   const instructions = [
     <>
       Using this form you request a withdrawal of your funds. (Perpetual only)
@@ -45,8 +45,8 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold">
+          <div className="mt-6 flex flex-col">
+            <span className="text-xl font-semibold">
               Begin withdrawal process
             </span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
@@ -61,11 +61,13 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
               data-props={propsJson}
             >
               <div className="flex items-end justify-between">
-                <span className="text-2xl font-semibold">Withdrawal</span>
+                <span className="text-xl font-semibold">Withdrawal</span>
                 <span>
-                  <span className="text-sm text-zinc-500">Position</span>{' '}
-                  <span className="font-semibold">
-                    #{props.positionId.toString()}
+                  <span className="text-sm font-medium text-zinc-500">
+                    Position
+                  </span>{' '}
+                  <span className="text-lg font-semibold">
+                    #{props.positionOrVaultId.toString()}
                   </span>
                 </span>
               </div>
@@ -94,6 +96,8 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
   )
 }
 
-export function renderForcedWithdrawPage(props: ForcedActionFormProps) {
-  return reactToHtml(<ForcedWithdrawPage {...props} />)
+export function renderNewPerpetualForcedWithdrawalPage(
+  props: NewForcedActionFormProps
+) {
+  return reactToHtml(<NewPerpetualForcedWithdrawalPage {...props} />)
 }

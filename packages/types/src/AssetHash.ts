@@ -41,3 +41,15 @@ AssetHash.fake = function fake(start?: string) {
     return AssetHash('0' + start.padEnd(63, '0'))
   }
 }
+
+AssetHash.check = function check(value: unknown): value is AssetHash {
+  if (typeof value !== 'string') {
+    return false
+  }
+  try {
+    AssetHash(value)
+    return true
+  } catch {
+    return false
+  }
+}
