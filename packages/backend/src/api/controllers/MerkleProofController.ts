@@ -1,4 +1,4 @@
-import { renderStateUpdateMerkleProofPage } from '@explorer/frontend'
+import { renderMerkleProofPage } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
 import { PositionLeaf, VaultLeaf } from '@explorer/state'
 
@@ -21,8 +21,8 @@ export class MerkleProofController {
     const merkleProof = await this.stateUpdater.generateMerkleProof(
       positionOrVaultId
     )
-    const content = renderStateUpdateMerkleProofPage({
-      id: positionOrVaultId.toString(),
+    const content = renderMerkleProofPage({
+      positionOrVaultId,
       user,
       type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       merkleProof: {
