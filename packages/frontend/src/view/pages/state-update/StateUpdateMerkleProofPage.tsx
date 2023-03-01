@@ -12,31 +12,28 @@ import { reactToHtml } from '../../reactToHtml'
 export interface StateUpdateMerkleProofPageProps {
   id: string
   user: UserDetails | undefined
+  type: 'PERPETUAL' | 'SPOT'
   merkleProof: MerkleProof
+}
+
+interface MerkleProof {
+  rootHash: PedersenHash
+  path: MerkleProofPath[]
+  leaf: string
 }
 
 export interface MerkleProofPath {
   left: PedersenHash
   right: PedersenHash
 }
-type MerkleProof = SpotMerkleProof | PerpetualMerkleProof
-
-interface PerpetualMerkleProof {
-  type: 'PERPETUAL'
-  rootHash: PedersenHash
-  path: MerkleProofPath[]
-  leaf: string
-}
-
-interface SpotMerkleProof {
-  type: 'SPOT'
-  rootHash: PedersenHash
-  path: MerkleProofPath[]
-  leaf: string
-}
 
 function StateUpdateMerkleProofPage(props: StateUpdateMerkleProofPageProps) {
-  const idLabel = props.merkleProof.type === 'SPOT' ? 'Vault' : 'Position'
+  const idLabel = props.type === 'SPOT' ? 'Vault' : 'Position'
+  const formattedJson = JSON.stringify(
+    JSON.parse(props.merkleProof.leaf),
+    null,
+    2
+  )
   return (
     <Page
       title="Merkle Proof"
@@ -70,7 +67,7 @@ function StateUpdateMerkleProofPage(props: StateUpdateMerkleProofPageProps) {
         <div>
           <span className="text-xl font-semibold">Leaf</span>
           <Card className="mt-2">
-            <pre>{props.merkleProof.leaf}</pre>
+            <pre>{formattedJson}</pre>
           </Card>
         </div>
       </ContentWrapper>

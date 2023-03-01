@@ -219,19 +219,15 @@ const routes: Route[] = [
       ctx.body = renderStateUpdateMerkleProofPage({
         user,
         id: randomId(),
+        type: 'SPOT',
         merkleProof: {
-          type: 'SPOT',
           rootHash: PedersenHash.fake(),
           path: repeat(9, randomStateUpdateMerkleProofPath),
-          leaf: JSON.stringify(
-            {
-              starkKey: StarkKey.fake(),
-              balance: 123456789,
-              token: AssetHash.fake(),
-            },
-            null,
-            2
-          ),
+          leaf: JSON.stringify({
+            starkKey: StarkKey.fake(),
+            balance: 123456789,
+            token: AssetHash.fake(),
+          }),
         },
       })
     },

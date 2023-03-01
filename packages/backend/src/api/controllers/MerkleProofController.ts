@@ -24,11 +24,11 @@ export class MerkleProofController {
     const content = renderStateUpdateMerkleProofPage({
       id: positionOrVaultId.toString(),
       user,
+      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       merkleProof: {
-        type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
         rootHash: merkleProof.root,
         path: merkleProof.path,
-        leaf: JSON.stringify(merkleProof.leaf.toJSON(), null, 2),
+        leaf: JSON.stringify(merkleProof.leaf.toJSON()),
       },
     })
 
