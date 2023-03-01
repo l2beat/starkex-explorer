@@ -73,6 +73,43 @@ export class MerkleTree<T extends MerkleValue> {
     return leaf
   }
 
+  // For reference see: https://github.com/starkware-libs/starkex-contracts/blob/master/scalable-dex/contracts/src/components/PedersenMerkleVerifier.sol
+  async getMerkleProofForLeaf(index: bigint): Promise<{
+    root: PedersenHash,
+    path: { left: PedersenHash, right: PedersenHash }[],
+    leaf: T
+  }> {
+    if (index < 0n || index > this.maxIndex) {
+      throw new TypeError('Index out of bounds')
+    }
+    const root = await this.root()
+
+    const path = []
+    let node = root
+    let height = this.height
+    let center = 2n ** (height - 1n)
+    while (node instanceof MerkleNode) {
+      path.push({ left: await node.leftHash(), right: await node.rightHash() })
+      const centers = node.getCenters(center, height)
+      if (index < center) {
+        node = await node.left()
+        center = centers[0]
+      }
+      else {
+        node = await node.right()
+        center = centers[1]
+      }
+      height -= 1n
+    }
+    console.log('Leaf: ', node)
+    console.log(await this.getLeaf(index))
+    return {
+      root: await this.hash(),
+      path,
+      leaf: await this.getLeaf(index)
+    }
+  }
+
   async getLeaves(indices: bigint[]): Promise<T[]> {
     if (indices.some((i) => i < 0n || i > this.maxIndex)) {
       throw new TypeError('Index out of bounds')
