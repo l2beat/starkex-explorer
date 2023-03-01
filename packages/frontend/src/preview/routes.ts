@@ -222,11 +222,15 @@ const routes: Route[] = [
           type: 'SPOT',
           rootHash: PedersenHash.fake(),
           path: repeat(9, randomStateUpdateMerkleProofPath),
-          leaf: {
-            starkKey: StarkKey.fake(),
-            balance: 123456789n,
-            token: AssetHash.fake(),
-          },
+          leaf: JSON.stringify(
+            {
+              starkKey: StarkKey.fake(),
+              balance: 123456789,
+              token: AssetHash.fake(),
+            },
+            null,
+            2
+          ),
         },
       })
     },
