@@ -35,12 +35,13 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
       {props.withdrawableAssets.map((asset) => {
         const assetInfo = assetToInfo(asset.asset)
         return (
-          <div
-            className="mt-4 flex items-center justify-between gap-2"
-            key={assetInfo.symbol}
-          >
-            <AssetWithLogo assetInfo={assetInfo} type="symbol" />
-            <p className="text-base text-zinc-500">
+          <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
+            <AssetWithLogo
+              assetInfo={assetInfo}
+              type="symbol"
+              className="w-48"
+            />
+            <p className="flex-1 text-zinc-500">
               Finalize the withdrawal of{' '}
               <strong className="text-white">
                 {formatAmount(asset.asset, asset.amount)}{' '}
@@ -49,7 +50,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                 </InlineEllipsis>
               </strong>
             </p>
-            <Button className="w-32 !px-0">Withdraw now</Button>
+            <Button className="ml-auto w-32 !px-0">Withdraw now</Button>
           </div>
         )
       })}
@@ -63,11 +64,15 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
             const totalPrice = offer.amount * offer.price
             return (
               <div
-                className="mt-3 flex items-center justify-between gap-2"
+                className="mt-3 flex items-center gap-2"
                 key={offer.timestamp.toString()}
               >
-                <AssetWithLogo assetInfo={assetInfo} type="symbol" />
-                <p className="text-base text-zinc-500">
+                <AssetWithLogo
+                  assetInfo={assetInfo}
+                  type="symbol"
+                  className="w-48"
+                />
+                <p className="flex-1 text-zinc-500">
                   Finalize the offer{' '}
                   <strong className="text-white">
                     {formatAmount(offer.asset, offer.amount)}{' '}
@@ -80,7 +85,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                     {formatWithDecimals(totalPrice, 6, { suffix: ' USDC' })}
                   </strong>
                 </p>
-                <Button className="w-32 !px-0">Accept & sell</Button>
+                <Button className="ml-auto w-32 !px-0">Accept & sell</Button>
               </div>
             )
           })}
