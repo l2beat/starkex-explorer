@@ -31,6 +31,7 @@ import { ControllerResult } from './ControllerResult'
 import { fetchAssetDetailsMap } from './fetchAssetDetailsMap'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
+import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
 
 export class UserController {
   constructor(
@@ -268,9 +269,12 @@ function toUserAssetEntry(
       details: assetDetailsMap?.[asset.assetHashOrId.toString()],
     },
     balance: asset.balance,
-    // TODO: fix value calculation
     value:
-      asset.price !== undefined ? asset.price * (asset.balance / 1000000n) : 0n, // temporary assumption of quantum=6
+      asset.price === undefined
+        ? 0n
+        : asset.assetHashOrId === collateralAssetId
+        ? asset.balance / 10000n // TODO: use the correct decimals
+        : getAssetValueUSDCents(asset.balance, asset.price),
     vaultOrPositionId: asset.positionOrVaultId.toString(),
     action: asset.assetHashOrId === collateralAssetId ? 'WITHDRAW' : 'CLOSE',
   }
