@@ -25,8 +25,8 @@ export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
           <ProjectLogo projectName={instanceName} />
         </div>
-        <span className="py-1 pl-2 uppercase text-zinc-500 sm:pl-4">
-          Explorer
+        <span className="py-1 pl-2 text-zinc-500 sm:pl-4">
+          EXPLORER (Development version)
         </span>
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4">
