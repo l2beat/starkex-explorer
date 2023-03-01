@@ -35,6 +35,7 @@ import {
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
 import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
+import { renderStateUpdateMerkleProofPage } from '../view/pages/state-update/StateUpdateMerkleProofPage'
 import * as DATA from './data'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
@@ -44,6 +45,7 @@ import {
 } from './data/home'
 import {
   randomStateUpdateBalanceChangeEntry,
+  randomStateUpdateMerkleProofPath,
   randomStateUpdatePriceEntry,
   randomStateUpdateTransactionEntry,
 } from './data/stateUpdate'
@@ -205,6 +207,28 @@ const routes: Route[] = [
         totalBalanceChanges: 231,
         transactions: repeat(5, randomStateUpdateTransactionEntry),
         totalTransactions: 5,
+      })
+    },
+  },
+  {
+    path: '/state-updates/:id/merkle-proof',
+    link: '/state-updates/xyz/merkle-proof',
+    description: 'Merkle proof for a state update.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderStateUpdateMerkleProofPage({
+        user,
+        id: randomId(),
+        type: 'SPOT',
+        merkleProof: {
+          rootHash: PedersenHash.fake(),
+          path: repeat(9, randomStateUpdateMerkleProofPath),
+          leaf: JSON.stringify({
+            starkKey: StarkKey.fake(),
+            balance: 123456789,
+            token: AssetHash.fake(),
+          }),
+        },
       })
     },
   },
