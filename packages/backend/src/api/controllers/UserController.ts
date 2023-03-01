@@ -226,9 +226,11 @@ function toUserAssetEntry(
     asset: { hashOrId: asset.assetHashOrId },
     balance: asset.balance,
     value:
-      asset.price !== undefined
-        ? getAssetValueUSDCents(asset.balance, asset.price)
-        : 0n, // temporary assumption of quantum=6
+      asset.price === undefined
+        ? 0n
+        : asset.assetHashOrId === collateralAssetId
+        ? asset.balance / 10000n // TODO: use the correct decimals
+        : getAssetValueUSDCents(asset.balance, asset.price),
     vaultOrPositionId: asset.positionOrVaultId.toString(),
     action: asset.assetHashOrId === collateralAssetId ? 'WITHDRAW' : 'CLOSE',
   }

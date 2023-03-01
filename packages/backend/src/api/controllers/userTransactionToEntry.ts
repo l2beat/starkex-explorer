@@ -36,7 +36,9 @@ function extractUserTxAsset(
     case 'FullWithdrawal':
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     case 'Withdraw':
-      return { hashOrId: data.assetType }
+      return {
+        hashOrId: collateralAsset ? collateralAsset.assetId : data.assetType,
+      }
     case 'WithdrawWithTokenId':
     case 'MintWithdraw':
       return { hashOrId: data.assetId }
