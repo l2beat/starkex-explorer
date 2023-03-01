@@ -9,6 +9,7 @@ import { OldHomeController } from './api/controllers/OldHomeController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
+import { SpotForcedWithdrawalController } from './api/controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
@@ -508,6 +509,11 @@ export class Application {
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
+    const spotForcedWithdrawalController = new SpotForcedWithdrawalController(
+      userService,
+      preprocessedAssetHistoryRepository,
+      assetRepository
+    )
 
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
@@ -525,7 +531,8 @@ export class Application {
               homeController,
               userController,
               stateUpdateController,
-              transactionController
+              transactionController,
+              spotForcedWithdrawalController
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,

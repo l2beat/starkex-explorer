@@ -3,6 +3,7 @@ import {
   stringAs,
   stringAsBigInt,
   toJsonWithoutBigInts,
+  UserDetails,
 } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import { z } from 'zod'
@@ -17,7 +18,7 @@ export const NewForcedActionFormAsset = Asset.extend({
 
 export type NewForcedActionFormProps = z.infer<typeof NewForcedActionFormProps>
 export const NewForcedActionFormProps = z.object({
-  user: AccountDetails,
+  user: UserDetails,
   starkExAddress: stringAs(EthereumAddress),
   positionOrVaultId: stringAsBigInt(),
   starkKey: stringAs(StarkKey),

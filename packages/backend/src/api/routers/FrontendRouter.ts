@@ -1,4 +1,4 @@
-import { stringAsPositiveInt, UserDetails } from '@explorer/shared'
+import { stringAsBigInt, stringAsPositiveInt, UserDetails } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
@@ -6,6 +6,7 @@ import * as z from 'zod'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
+import { SpotForcedWithdrawalController } from '../controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
@@ -16,7 +17,8 @@ export function createFrontendRouter(
   homeController: HomeController,
   userController: UserController,
   stateUpdateController: StateUpdateController,
-  transactionController: TransactionController
+  transactionController: TransactionController,
+  spotForcedWithdrawalController: SpotForcedWithdrawalController
 ) {
   const router = new Router()
 
@@ -246,6 +248,25 @@ export function createFrontendRouter(
         const result = await transactionController.getTransactionPage(
           givenUser,
           Hash256(ctx.params.transactionHash)
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/forced/new/spot/:vaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          vaultId: stringAsBigInt()
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const result = await spotForcedWithdrawalController.getSpotForcedWithdrawalPage(
+          givenUser,
+          ctx.params.vaultId
         )
         applyControllerResult(ctx, result)
       }

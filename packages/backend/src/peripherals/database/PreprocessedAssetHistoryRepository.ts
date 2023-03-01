@@ -223,7 +223,7 @@ export class PreprocessedAssetHistoryRepository<
 
   async getCurrentByPositionOrVaultId(
     positionOrVaultId: bigint,
-    trx: Knex.Transaction
+    trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
     const rows = await knex('preprocessed_asset_history').where({

@@ -7,7 +7,7 @@ import {
   formatWithDecimals,
 } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
-import { Button } from '../../../components/Button'
+import { LinkButton } from '../../../components/Button'
 import { Table } from '../../../components/table/Table'
 
 export interface UserAssetsTableProps {
@@ -49,9 +49,19 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 </span>
               )}
             </div>,
-            <span className="text-zinc-500">#{entry.vaultOrPositionId}</span>,
+            <span className="text-zinc-500">
+              #{entry.vaultOrPositionId}
+              {props.type === 'SPOT' && (
+                <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
+              )}
+            </span>,
             props.isMine ? (
-              <Button className="w-32 !px-0">{entry.action}</Button>
+              <LinkButton 
+                className="w-full" 
+                href={`/forced/new/spot/${entry.vaultOrPositionId}`}
+              >
+                {entry.action}
+              </LinkButton>
             ) : (
               ''
             ),

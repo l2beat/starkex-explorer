@@ -42,7 +42,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   )
   return (
     <Page
-      path="/forced/new/:positionId/:assetHash"
+      path="/forced/new/spot/:vaultId"
       description="Page that allows user withdrawal of spot asset"
       user={props.user}
     >
