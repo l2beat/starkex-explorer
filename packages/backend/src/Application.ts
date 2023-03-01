@@ -5,6 +5,7 @@ import { ApiServer } from './api/ApiServer'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
+import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { OldHomeController } from './api/controllers/OldHomeController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
@@ -191,6 +192,7 @@ export class Application {
     )
 
     let syncService
+    let stateUpdater
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -219,6 +221,8 @@ export class Application {
           userTransactionRepository,
           logger
         )
+        stateUpdater = perpetualValidiumUpdater
+
         syncService = new PerpetualValidiumSyncService(
           availabilityGatewayClient,
           perpetualValidiumStateTransitionCollector,
@@ -251,6 +255,7 @@ export class Application {
           userTransactionRepository,
           logger
         )
+        stateUpdater = spotValidiumUpdater
 
         syncService = new SpotValidiumSyncService(
           availabilityGatewayClient,
@@ -300,6 +305,7 @@ export class Application {
         userTransactionRepository,
         logger
       )
+      stateUpdater = perpetualRollupUpdater
       syncService = new PerpetualRollupSyncService(
         verifierCollector,
         pageMappingCollector,
@@ -468,6 +474,10 @@ export class Application {
         ? config.starkex.collateralAsset
         : undefined
     )
+    const merkleProofController = new MerkleProofController(
+      stateUpdater,
+      config.starkex.tradingMode
+    )
 
     const oldHomeController = new OldHomeController(
       accountService,
@@ -525,7 +535,8 @@ export class Application {
               homeController,
               userController,
               stateUpdateController,
-              transactionController
+              transactionController,
+              merkleProofController
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,
