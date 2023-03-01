@@ -39,7 +39,7 @@ function extractUserTxAsset(
       return undefined
     case 'Withdraw':
       return {
-        hashOrId: data.assetType,
+        hashOrId: collateralAsset ? collateralAsset.assetId : data.assetType,
         details: assetDetailsMap?.[data.assetType.toString()],
       }
     case 'WithdrawWithTokenId':

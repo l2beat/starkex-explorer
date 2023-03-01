@@ -72,7 +72,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
         </TablePreview>
         {props.priceChanges && (
           <section>
-            <SectionHeading title="Price Changes" />
+            <SectionHeading title="Prices at state update" />
             <StateUpdatePricesTable priceChanges={props.priceChanges} />
           </section>
         )}
