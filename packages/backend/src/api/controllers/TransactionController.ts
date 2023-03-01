@@ -157,7 +157,9 @@ export class TransactionController {
       const data = userTransaction.data
       const assetHash =
         data.type === 'Withdraw'
-          ? data.assetType
+          ? this.collateralAsset
+            ? this.collateralAsset.assetId
+            : data.assetType
           : data.type === 'WithdrawWithTokenId'
           ? data.assetId
           : data.assetId
