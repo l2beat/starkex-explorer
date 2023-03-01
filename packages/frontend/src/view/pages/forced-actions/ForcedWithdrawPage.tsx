@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { getInstanceName } from '../../../utils/instance'
 import { Button, LinkButton } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { Link } from '../../components/Link'
@@ -27,7 +28,7 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
       </Link>
       .
     </>,
-    'After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of [system name] to process your request.',
+    `After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of ${getInstanceName()} to process your request.`,
     <>
       Once your request has been processed the status will change to{' '}
       <span className="text-yellow-300">’processed’</span> and you will be able
