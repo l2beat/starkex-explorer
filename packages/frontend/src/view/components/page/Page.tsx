@@ -1,7 +1,7 @@
 import { UserDetails } from '@explorer/shared'
 import React, { ReactNode } from 'react'
-import { getInstanceName } from '../../../utils/instance'
 
+import { getInstanceName } from '../../../utils/instance'
 import { Footer } from './Footer'
 import { Head } from './Head'
 import { Navbar } from './Navbar'

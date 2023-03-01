@@ -1,4 +1,5 @@
 import React from 'react'
+
 import { DydxLogo } from './DydxLogo'
 import { GammaXLogo } from './GammaXLogo'
 import { MyriaLogo } from './MyriaLogo'
