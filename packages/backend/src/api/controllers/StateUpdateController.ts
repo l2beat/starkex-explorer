@@ -18,6 +18,7 @@ import { UserTransactionData } from '../../peripherals/database/transactions/Use
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
 import { userTransactionToEntry } from './userTransactionToEntry'
+import { getAssetPriceUSDCents } from './utils/toPositionAssetEntries'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
   'ForcedWithdrawal',
@@ -77,7 +78,7 @@ export class StateUpdateController {
     const balanceChangeEntries = toBalanceChangeEntries(balanceChanges)
     const priceEntries = prices.map((p) => ({
       asset: { hashOrId: p.assetId },
-      price: p.price,
+      price: getAssetPriceUSDCents(p.price, p.assetId) * 10_000n,
       // TODO: Don't display, or correctly calculate this:
       change: 0n,
     }))
