@@ -475,6 +475,7 @@ export class Application {
         : undefined
     )
     const merkleProofController = new MerkleProofController(
+      userService,
       stateUpdater,
       config.starkex.tradingMode
     )

@@ -267,8 +267,9 @@ export function createFrontendRouter(
         }),
       }),
       async (ctx) => {
-        // const givenUser = getGivenUser(ctx)
+        const givenUser = getGivenUser(ctx)
         const result = await merkleProofController.getMerkleProofPage(
+          givenUser,
           ctx.params.positionOrVaultId
         )
         applyControllerResult(ctx, result)

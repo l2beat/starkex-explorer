@@ -1,8 +1,7 @@
 import { UserDetails } from '@explorer/shared'
-import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
+import { PedersenHash } from '@explorer/types'
 import React from 'react'
 
-import { Asset } from '../../../utils/assets'
 import { Card } from '../../components/Card'
 import { OrderedList } from '../../components/OrderedList'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -26,24 +25,14 @@ interface PerpetualMerkleProof {
   type: 'PERPETUAL'
   rootHash: PedersenHash
   path: MerkleProofPath[]
-  leaf: PerpetualLeaf
-}
-interface PerpetualLeaf {
-  starkKey: StarkKey
-  collateralBalance: bigint
-  assets: Asset
+  leaf: string
 }
 
 interface SpotMerkleProof {
   type: 'SPOT'
   rootHash: PedersenHash
   path: MerkleProofPath[]
-  leaf: SpotLeaf
-}
-interface SpotLeaf {
-  starkKey: StarkKey
-  balance: bigint
-  token: AssetHash
+  leaf: string
 }
 
 function StateUpdateMerkleProofPage(props: StateUpdateMerkleProofPageProps) {
@@ -81,22 +70,7 @@ function StateUpdateMerkleProofPage(props: StateUpdateMerkleProofPageProps) {
         <div>
           <span className="text-xl font-semibold">Leaf</span>
           <Card className="mt-2">
-            {props.merkleProof.type === 'SPOT' ? (
-              <>
-                <p>Stark Key: {props.merkleProof.leaf.starkKey}</p>
-                <p>Balance: {props.merkleProof.leaf.balance.toString()}</p>
-                <p>Token: {props.merkleProof.leaf.token}</p>
-              </>
-            ) : (
-              <>
-                <p>Stark Key: {props.merkleProof.leaf.starkKey}</p>
-                <p>
-                  Collateral Balance:{' '}
-                  {props.merkleProof.leaf.collateralBalance.toString()}
-                </p>
-                <p>Assets: {JSON.stringify(props.merkleProof.leaf.assets)}</p>
-              </>
-            )}
+            <pre>{props.merkleProof.leaf}</pre>
           </Card>
         </div>
       </ContentWrapper>
