@@ -1,5 +1,4 @@
 import {
-  AccountDetails,
   stringAs,
   stringAsBigInt,
   toJsonWithoutBigInts,

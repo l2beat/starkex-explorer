@@ -95,7 +95,12 @@ export class UserController {
     }
 
     const assetEntries = userAssets.map((a) =>
-      toUserAssetEntry(a, this.tradingMode, this.collateralAsset?.assetId, assetDetailsMap)
+      toUserAssetEntry(
+        a,
+        this.tradingMode,
+        this.collateralAsset?.assetId,
+        assetDetailsMap
+      )
     )
 
     const balanceChangesEntries = history.map((h) =>
@@ -112,8 +117,7 @@ export class UserController {
     const totalTransactions = userTransactionsCount
 
     const content = renderUserPage({
-      // TODO: temporary hack to show butons
-      user: { starkKey, address: registeredUser?.ethAddress ?? EthereumAddress.ZERO },
+      user,
       type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
@@ -158,7 +162,12 @@ export class UserController {
     }
 
     const assets = userAssets.map((a) =>
-      toUserAssetEntry(a, this.tradingMode, this.collateralAsset?.assetId, assetDetailsMap)
+      toUserAssetEntry(
+        a,
+        this.tradingMode,
+        this.collateralAsset?.assetId,
+        assetDetailsMap
+      )
     )
 
     const content = renderUserAssetsPage({
@@ -274,10 +283,12 @@ function toUserAssetEntry(
     value:
       asset.price !== undefined ? asset.price * (asset.balance / 1000000n) : 0n, // temporary assumption of quantum=6
     vaultOrPositionId: asset.positionOrVaultId.toString(),
-    action: 
-      tradingMode === 'perpetual' ?
-       (asset.assetHashOrId === collateralAssetId ? 'WITHDRAW' : 'CLOSE')
-        : 'WITHDRAW'
+    action:
+      tradingMode === 'perpetual'
+        ? asset.assetHashOrId === collateralAssetId
+          ? 'WITHDRAW'
+          : 'CLOSE'
+        : 'WITHDRAW',
   }
 }
 

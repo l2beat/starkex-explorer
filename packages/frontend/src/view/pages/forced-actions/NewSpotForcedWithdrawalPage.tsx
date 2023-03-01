@@ -34,12 +34,9 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
       to withdraw your funds by submitting a withdrawal transaction.
     </>,
   ]
-  const assetInfo = assetToInfo({ hashOrId: props.asset.hashOrId })
+  const assetInfo = assetToInfo(props.asset)
   const propsJson = serializeForcedActionsFormProps(props)
-  const formattedBalance = formatAmount(
-    { hashOrId: props.asset.hashOrId },
-    props.asset.balance
-  )
+  const formattedBalance = formatAmount(props.asset, props.asset.balance)
   return (
     <Page
       path="/forced/new/spot/:vaultId"

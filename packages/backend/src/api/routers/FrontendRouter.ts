@@ -265,15 +265,16 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          vaultId: stringAsBigInt()
+          vaultId: stringAsBigInt(),
         }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
-        const result = await spotForcedWithdrawalController.getSpotForcedWithdrawalPage(
-          givenUser,
-          ctx.params.vaultId
-        )
+        const result =
+          await spotForcedWithdrawalController.getSpotForcedWithdrawalPage(
+            givenUser,
+            ctx.params.vaultId
+          )
         applyControllerResult(ctx, result)
       }
     )
@@ -289,7 +290,6 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
-        
 
         const result = await merkleProofController.getMerkleProofPage(
           givenUser,

@@ -47,7 +47,7 @@ function assetHashToInfo(
     if (assetHash.startsWith('0x04')) {
       return {
         name: 'Mintable NFT',
-        symbol: `Mintable # ${assetHash.substring(4)}`,
+        symbol: `Mint # ${assetHash.substring(4)}`,
         isUnknownHash: true,
         imageUrl: '/images/unknown-asset.svg',
       }

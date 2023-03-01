@@ -1,8 +1,6 @@
-
-
 import { renderNewSpotForcedWithdrawPage } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { UserService } from '../../core/UserService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
@@ -20,24 +18,39 @@ export class SpotForcedWithdrawalController {
 
   async getSpotForcedWithdrawalPage(
     givenUser: Partial<UserDetails>,
-    vaultId: bigint,
+    vaultId: bigint
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
-    const assets = await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(vaultId)
+
+    if (!user) {
+      return { type: 'not found', content: 'User must be logged in' }
+    }
+
+    const assets =
+      await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
+        vaultId
+      )
+
     const asset = assets[0]
     if (!asset) {
       return { type: 'not found', content: 'Vault is empty' }
     }
+
+    const assetDetails = await this.assetRepository.findDetailsByAssetHash(
+      asset.assetHashOrId as AssetHash
+    )
+
     const content = renderNewSpotForcedWithdrawPage({
-      user: { starkKey: StarkKey.ZERO, address: EthereumAddress.ZERO },
+      user,
       starkExAddress: EthereumAddress.ZERO,
       positionOrVaultId: vaultId,
       starkKey: asset.starkKey,
       asset: {
         hashOrId: asset.assetHashOrId,
         balance: asset.balance,
-        priceUSDCents: 0n
-      }
+        details: assetDetails,
+        priceUSDCents: 0n,
+      },
     })
 
     return { type: 'success', content }

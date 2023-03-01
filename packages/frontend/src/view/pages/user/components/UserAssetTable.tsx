@@ -56,8 +56,8 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               )}
             </span>,
             props.isMine ? (
-              <LinkButton 
-                className="w-full" 
+              <LinkButton
+                className="w-full"
                 href={`/forced/new/spot/${entry.vaultOrPositionId}`}
               >
                 {entry.action}
