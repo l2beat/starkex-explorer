@@ -44,6 +44,11 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
     )
   }
 
+  async initTree() {
+    const { oldHash } = await this.readLastUpdate()
+    await this.ensureStateTree(oldHash, positionTreeHeight)
+  }
+
   async processValidiumStateTransition(
     transition: ValidiumStateTransition,
     perpetualCairoOutput: PerpetualCairoOutput,
