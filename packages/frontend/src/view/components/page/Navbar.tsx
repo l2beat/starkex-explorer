@@ -1,5 +1,6 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
+import { InstanceName } from '../../../utils/instance'
 
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
 import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
@@ -10,10 +11,10 @@ import { SearchBar } from '../SearchBar'
 export interface NavbarProps {
   readonly user: UserDetails | undefined
   readonly searchBar: boolean
-  readonly projectName: 'dYdX' | 'GammaX' | 'Myria'
+  readonly instanceName: InstanceName
 }
 
-export function Navbar({ user, searchBar = true, projectName }: NavbarProps) {
+export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
       <a
@@ -22,7 +23,7 @@ export function Navbar({ user, searchBar = true, projectName }: NavbarProps) {
       >
         <div className="flex gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
-          <ProjectLogo projectName={projectName} />
+          <ProjectLogo projectName={instanceName} />
         </div>
         <span className="py-1 pl-2 uppercase text-zinc-500 sm:pl-4">
           Explorer

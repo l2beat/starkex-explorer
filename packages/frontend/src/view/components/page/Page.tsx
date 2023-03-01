@@ -1,5 +1,6 @@
 import { UserDetails } from '@explorer/shared'
 import React, { ReactNode } from 'react'
+import { getInstanceName } from '../../../utils/instance'
 
 import { Footer } from './Footer'
 import { Head } from './Head'
@@ -20,7 +21,7 @@ interface Props {
 }
 
 export function Page(props: Props) {
-  const projectName = getProjectName()
+  const instanceName = getInstanceName()
 
   return (
     <html lang="en" className="h-full bg-neutral-900 text-white">
@@ -28,11 +29,11 @@ export function Page(props: Props) {
         description={props.description}
         image={props.image ?? '/images/meta-image.png'}
         title={combineTitle(
-          props.baseTitle ?? `L2BEAT ${projectName} Explorer`,
+          props.baseTitle ?? `L2BEAT ${instanceName} Explorer`,
           props.title
         )}
         url={combineUrl(
-          props.baseUrl ?? `https://${projectName.toLowerCase()}.l2beat.com`,
+          props.baseUrl ?? `https://${instanceName.toLowerCase()}.l2beat.com`,
           props.path
         )}
         stylesheets={props.stylesheets ?? ['/styles/main.css']}
@@ -41,7 +42,7 @@ export function Page(props: Props) {
         <Navbar
           searchBar={!props.withoutSearch}
           user={props.user}
-          projectName={projectName}
+          instanceName={instanceName}
         />
         {props.children}
         <Footer />
@@ -51,21 +52,6 @@ export function Page(props: Props) {
       </body>
     </html>
   )
-}
-
-function getProjectName() {
-  const projectName = process.env.STARKEX_INSTANCE ?? 'dydx-mainnet'
-
-  switch (projectName) {
-    case 'dydx-mainnet':
-      return 'dYdX'
-    case 'myria-goerli':
-      return 'Myria'
-    case 'gammax-goerli':
-      return 'GammaX'
-    default:
-      throw new Error(`Unknown STARKEX_INSTANCE: ${projectName}`)
-  }
 }
 
 function combineTitle(baseTitle: string, title: string | undefined) {
