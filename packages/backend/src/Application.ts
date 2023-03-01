@@ -192,7 +192,10 @@ export class Application {
     )
 
     let syncService
-    let stateUpdater
+    let stateUpdater:
+      | SpotValidiumUpdater
+      | PerpetualValidiumUpdater
+      | PerpetualRollupUpdater
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -563,6 +566,7 @@ export class Application {
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
       await userTransactionMigrator.migrate()
+      await stateUpdater.initTree()
 
       if (config.enableSync) {
         transactionStatusService.start()
