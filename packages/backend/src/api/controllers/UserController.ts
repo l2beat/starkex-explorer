@@ -84,7 +84,7 @@ export class UserController {
       this.userTransactionRepository.getCountByStarkKey(starkKey),
     ])
 
-    let assetDetailsMap = {}
+    let assetDetailsMap: Record<string, AssetDetails> = {}
     if (this.tradingMode === 'spot') {
       assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
         userAssets: userAssets as PreprocessedAssetHistoryRecord<AssetHash>[],
