@@ -134,7 +134,7 @@ export class StateUpdateController {
     const content = renderStateUpdateBalanceChangesPage({
       user,
       type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
-      id: '1534',
+      id: stateUpdateId.toString(),
       balanceChanges: balanceChangeEntries,
       ...pagination,
       total,
