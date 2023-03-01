@@ -4,7 +4,13 @@ import {
   decodePerpetualForcedWithdrawalRequest,
   PerpetualForcedTradeRequest,
 } from '@explorer/shared'
-import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  Timestamp,
+} from '@explorer/types'
 
 import {
   ForcedTradeOfferRecord,
@@ -70,7 +76,7 @@ export class TransactionSubmitController {
       data: {
         type: 'Withdraw',
         starkKey: data.starkKey,
-        assetType: data.assetType,
+        assetType: AssetHash(data.assetType),
       },
     })
     return { type: 'created', content: { id: transactionHash } }
