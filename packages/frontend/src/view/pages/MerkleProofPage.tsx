@@ -2,15 +2,15 @@ import { UserDetails } from '@explorer/shared'
 import { PedersenHash } from '@explorer/types'
 import React from 'react'
 
-import { Card } from '../../components/Card'
-import { OrderedList } from '../../components/OrderedList'
-import { ContentWrapper } from '../../components/page/ContentWrapper'
-import { Page } from '../../components/page/Page'
-import { PageTitle } from '../../components/PageTitle'
-import { reactToHtml } from '../../reactToHtml'
+import { Card } from '../components/Card'
+import { OrderedList } from '../components/OrderedList'
+import { ContentWrapper } from '../components/page/ContentWrapper'
+import { Page } from '../components/page/Page'
+import { PageTitle } from '../components/PageTitle'
+import { reactToHtml } from '../reactToHtml'
 
-export interface StateUpdateMerkleProofPageProps {
-  id: string
+export interface MerkleProofPageProps {
+  positionOrVaultId: bigint
   user: UserDetails | undefined
   type: 'PERPETUAL' | 'SPOT'
   merkleProof: MerkleProof
@@ -27,9 +27,9 @@ export interface MerkleProofPath {
   right: PedersenHash
 }
 
-function StateUpdateMerkleProofPage(props: StateUpdateMerkleProofPageProps) {
+function MerkleProofPage(props: MerkleProofPageProps) {
   const idLabel = props.type === 'SPOT' ? 'Vault' : 'Position'
-  const formattedJson = JSON.stringify(
+  const formattedLeaf = JSON.stringify(
     JSON.parse(props.merkleProof.leaf),
     null,
     2
@@ -37,13 +37,13 @@ function StateUpdateMerkleProofPage(props: StateUpdateMerkleProofPageProps) {
   return (
     <Page
       title="Merkle Proof"
-      description="TODO: description"
-      path="/lol"
+      description="Page showing merkle proof for a vault or position id made from the latest state update"
+      path={`/proof/${props.positionOrVaultId.toString()}`}
       user={props.user}
     >
       <ContentWrapper className="flex flex-col gap-6">
         <PageTitle>
-          Merkle Proof for {idLabel} #{props.id}
+          Merkle Proof for {idLabel} #{props.positionOrVaultId.toString()}
         </PageTitle>
         <div>
           <span className="text-xl font-semibold">Root Hash</span>
@@ -67,7 +67,7 @@ function StateUpdateMerkleProofPage(props: StateUpdateMerkleProofPageProps) {
         <div>
           <span className="text-xl font-semibold">Leaf</span>
           <Card className="mt-2">
-            <pre>{formattedJson}</pre>
+            <pre>{formattedLeaf}</pre>
           </Card>
         </div>
       </ContentWrapper>
@@ -75,8 +75,6 @@ function StateUpdateMerkleProofPage(props: StateUpdateMerkleProofPageProps) {
   )
 }
 
-export function renderStateUpdateMerkleProofPage(
-  props: StateUpdateMerkleProofPageProps
-) {
-  return reactToHtml(<StateUpdateMerkleProofPage {...props} />)
+export function renderMerkleProofPage(props: MerkleProofPageProps) {
+  return reactToHtml(<MerkleProofPage {...props} />)
 }

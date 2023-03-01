@@ -1,11 +1,10 @@
-import { Hash256, PedersenHash, StarkKey } from '@explorer/types'
+import { Hash256, StarkKey } from '@explorer/types'
 
 import {
   StateUpdateBalanceChangeEntry,
   StateUpdatePriceEntry,
   TransactionEntry,
 } from '../../view'
-import { MerkleProofPath } from '../../view/pages/state-update/StateUpdateMerkleProofPage'
 import { Bucket } from './bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
 import { randomId, randomTimestamp } from './utils'
@@ -41,12 +40,5 @@ export function randomStateUpdateTransactionEntry(): TransactionEntry {
     amount: amountBucket.pick(),
     status: 'INCLUDED',
     type: transactionTypeBucket.pick(),
-  }
-}
-
-export function randomStateUpdateMerkleProofPath(): MerkleProofPath {
-  return {
-    left: PedersenHash.fake(),
-    right: PedersenHash.fake(),
   }
 }
