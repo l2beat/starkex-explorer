@@ -45,7 +45,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               </span>
               {props.type === 'PERPETUAL' && (
                 <span className="mt-2 text-xxs text-zinc-500">
-                  {formatWithDecimals(entry.value, 6, { prefix: '$' })}
+                  {formatWithDecimals(entry.value, 2, { prefix: '$' })}
                 </span>
               )}
             </div>,

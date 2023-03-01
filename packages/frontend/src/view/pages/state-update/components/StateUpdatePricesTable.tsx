@@ -3,7 +3,6 @@ import React from 'react'
 import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatWithDecimals } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
-import { ChangeText } from '../../../components/ChangeText'
 import { Table } from '../../../components/table/Table'
 
 export interface StateUpdatePricesTableProps {
@@ -19,11 +18,7 @@ export interface StateUpdatePriceEntry {
 export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
   return (
     <Table
-      columns={[
-        { header: 'Asset' },
-        { header: 'Change', numeric: true },
-        { header: 'Price', numeric: true },
-      ]}
+      columns={[{ header: 'Asset' }, { header: 'Price', numeric: true }]}
       rows={props.priceChanges.map((transaction) => {
         return {
           cells: [
@@ -31,13 +26,7 @@ export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
               type="small"
               assetInfo={assetToInfo(transaction.asset)}
             />,
-            <ChangeText className="text-sm font-medium">
-              {formatWithDecimals(transaction.change, 6, {
-                prefix: '$',
-                signed: true,
-              })}
-            </ChangeText>,
-            formatWithDecimals(transaction.price, 6, { prefix: '$' }),
+            formatWithDecimals(transaction.price, 2, { prefix: '$' }),
           ],
         }
       })}
