@@ -53,7 +53,7 @@ export function AssetWithLogo({
             assetInfo.symbol
           ))}
         {(type === 'small' || type === 'symbol') && (
-          <InlineEllipsis className="max-w-[80px] !py-0">
+          <InlineEllipsis className="max-w-[160px] !py-0">
             {assetInfo.symbol}
           </InlineEllipsis>
         )}

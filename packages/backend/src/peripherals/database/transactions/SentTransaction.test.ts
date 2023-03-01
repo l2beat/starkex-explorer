@@ -1,4 +1,4 @@
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -66,7 +66,7 @@ describe(encodeSentTransactionData.name, () => {
     const data: WithdrawData = {
       type: 'Withdraw',
       starkKey: StarkKey.fake(),
-      assetType: '0x1234',
+      assetType: AssetHash.fake('1234'),
     }
     const encoded = encodeSentTransactionData(data)
 
