@@ -29,6 +29,7 @@ import { UserRegistrationEventRepository } from '../../peripherals/database/User
 import { ControllerResult } from './ControllerResult'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
+import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
 
 export class UserController {
   constructor(
@@ -224,9 +225,8 @@ function toUserAssetEntry(
   return {
     asset: { hashOrId: asset.assetHashOrId },
     balance: asset.balance,
-    // TODO: fix value calculation
     value:
-      asset.price !== undefined ? asset.price * (asset.balance / 1000000n) : 0n, // temporary assumption of quantum=6
+      asset.price !== undefined ? getAssetValueUSDCents(asset.balance, asset.price) : 0n, // temporary assumption of quantum=6
     vaultOrPositionId: asset.positionOrVaultId.toString(),
     action: asset.assetHashOrId === collateralAssetId ? 'WITHDRAW' : 'CLOSE',
   }
