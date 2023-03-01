@@ -1,7 +1,7 @@
 import {
   encodeFinalizeExitRequest,
-  encodeForcedTradeRequest,
-  encodeForcedWithdrawalRequest,
+  encodePerpetualForcedTradeRequest,
+  encodePerpetualForcedWithdrawalRequest,
 } from '@explorer/shared'
 import {
   AssetId,
@@ -43,7 +43,7 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction to a wrong address', async () => {
-      const data = encodeForcedWithdrawalRequest({
+      const data = encodePerpetualForcedWithdrawalRequest({
         starkKey: StarkKey.fake(),
         positionId: 0n,
         quantizedAmount: 0n,
@@ -95,7 +95,7 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction with correct data and address', async () => {
-      const data = encodeForcedWithdrawalRequest({
+      const data = encodePerpetualForcedWithdrawalRequest({
         starkKey: StarkKey.fake(),
         positionId: 0n,
         quantizedAmount: 0n,
@@ -224,7 +224,7 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction to a wrong address', async () => {
-      const data = encodeForcedTradeRequest({
+      const data = encodePerpetualForcedTradeRequest({
         starkKeyA: StarkKey.fake(),
         positionIdA: 0n,
         syntheticAssetId: AssetId.USDC,
@@ -264,7 +264,7 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction with unknown data', async () => {
       const accepted = fakeAccepted({ signature: Hash256.fake().toString() })
       const offer = fakeOffer({ accepted })
-      const data = encodeForcedTradeRequest({
+      const data = encodePerpetualForcedTradeRequest({
         ...offer,
         ...accepted,
         starkKeyA: StarkKey.fake(),
@@ -296,7 +296,7 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction with correct data and address', async () => {
       const accepted = fakeAccepted({ signature: Hash256.fake().toString() })
       const offer = fakeOffer({ accepted })
-      const data = encodeForcedTradeRequest({
+      const data = encodePerpetualForcedTradeRequest({
         ...offer,
         ...accepted,
       })

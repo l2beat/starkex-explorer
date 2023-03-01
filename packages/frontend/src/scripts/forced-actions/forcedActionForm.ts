@@ -1,11 +1,11 @@
 import { FormId } from '../../view/pages/forced-actions/components/form/ids'
-import { ForcedActionFormProps } from '../../view/pages/forced-actions/ForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormElements, getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
 import { FormAction, FormState } from './types'
 
-export function initForcedActionForm() {
+export function initPerpetualForcedActionForm() {
   if (!document.getElementById(FormId.Form)) {
     return
   }
@@ -21,7 +21,7 @@ export function initForcedActionForm() {
   } = formElements
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
-  const props = ForcedActionFormProps.parse(propsJson)
+  const props = NewForcedActionFormProps.parse(propsJson)
 
   amountInput.addEventListener('input', () =>
     dispatch({ type: 'ModifyAmount', value: amountInput.value })
@@ -47,7 +47,7 @@ export function initForcedActionForm() {
   })
 
   let state: FormState | undefined
-  updateUI(getInitialState(props, location.search))
+  updateUI(getInitialState(props))
 
   function dispatch(action: FormAction) {
     if (state) {

@@ -147,7 +147,7 @@ export class MerkleNode<T extends MerkleValue> extends MerkleValue {
     }
   }
 
-  private getCenters(center: bigint, height: bigint): [bigint, bigint] {
+  public getCenters(center: bigint, height: bigint): [bigint, bigint] {
     const leftOffset = height > 1n ? 2n ** (height - 2n) : 1n
     const rightOffset = height > 1n ? 2n ** (height - 2n) : 0n
     return [center - leftOffset, center + rightOffset]

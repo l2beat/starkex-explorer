@@ -187,6 +187,13 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     return { oldHash: this.emptyStateHash, id: 0 }
   }
 
+  async generateMerkleProof(positionOrVaultId: bigint) {
+    if (!this.stateTree) {
+      throw new Error('State tree not initialized')
+    }
+    return await this.stateTree.getMerkleProofForLeaf(positionOrVaultId)
+  }
+
   async ensureStateTree(hash: PedersenHash, height: bigint) {
     if (!this.stateTree) {
       if (hash === this.emptyStateHash) {

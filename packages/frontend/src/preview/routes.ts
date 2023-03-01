@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -12,12 +13,12 @@ import { randomInt } from 'crypto'
 import Koa from 'koa'
 
 import {
-  renderForcedTradePage,
-  renderForcedWithdrawPage,
   renderHomeOffersPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
+  renderNewPerpetualForcedTradePage,
+  renderNewPerpetualForcedWithdrawalPage,
   renderNotFoundPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
@@ -33,6 +34,8 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
+import { renderStateUpdateMerkleProofPage } from '../view/pages/state-update/StateUpdateMerkleProofPage'
 import * as DATA from './data'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
@@ -42,6 +45,7 @@ import {
 } from './data/home'
 import {
   randomStateUpdateBalanceChangeEntry,
+  randomStateUpdateMerkleProofPath,
   randomStateUpdatePriceEntry,
   randomStateUpdateTransactionEntry,
 } from './data/stateUpdate'
@@ -203,6 +207,28 @@ const routes: Route[] = [
         totalBalanceChanges: 231,
         transactions: repeat(5, randomStateUpdateTransactionEntry),
         totalTransactions: 5,
+      })
+    },
+  },
+  {
+    path: '/state-updates/:id/merkle-proof',
+    link: '/state-updates/xyz/merkle-proof',
+    description: 'Merkle proof for a state update.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderStateUpdateMerkleProofPage({
+        user,
+        id: randomId(),
+        type: 'SPOT',
+        merkleProof: {
+          rootHash: PedersenHash.fake(),
+          path: repeat(9, randomStateUpdateMerkleProofPath),
+          leaf: JSON.stringify({
+            starkKey: StarkKey.fake(),
+            balance: 123456789,
+            token: AssetHash.fake(),
+          }),
+        },
       })
     },
   },
@@ -411,7 +437,14 @@ const routes: Route[] = [
   {
     path: '/forced/new/spot/withdraw',
     description: 'Form to create a new spot forced withdrawal.',
-    render: notFound,
+    render: (ctx) => {
+      const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
+      const asset = { ...withdrawData.asset }
+      withdrawData.user = getUser(ctx) ?? withdrawData.user
+      asset.hashOrId = AssetHash.fake()
+      withdrawData.asset = asset
+      ctx.body = renderNewSpotForcedWithdrawPage(withdrawData)
+    },
   },
   {
     path: '/forced/new/perpetual/withdraw',
@@ -419,7 +452,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
       withdrawData.user = getUser(ctx) ?? withdrawData.user
-      ctx.body = renderForcedWithdrawPage(withdrawData)
+      ctx.body = renderNewPerpetualForcedWithdrawalPage(withdrawData)
     },
   },
   {
@@ -428,7 +461,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const buyData = { ...DATA.FORCED_BUY_FORM_PROPS }
       buyData.user = getUser(ctx) ?? buyData.user
-      ctx.body = renderForcedTradePage(buyData)
+      ctx.body = renderNewPerpetualForcedTradePage(buyData)
     },
   },
   {
@@ -438,7 +471,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const sellData = { ...DATA.FORCED_SELL_FORM_PROPS }
       sellData.user = getUser(ctx) ?? sellData.user
-      ctx.body = renderForcedTradePage(sellData)
+      ctx.body = renderNewPerpetualForcedTradePage(sellData)
     },
   },
   // #endregion
