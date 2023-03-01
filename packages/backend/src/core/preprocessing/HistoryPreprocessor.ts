@@ -26,13 +26,13 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
   // all from history
   async closePositionOrVault(
     trx: Knex.Transaction,
-    positionId: bigint,
+    positionOrVaultId: bigint,
     stateUpdate: StateUpdateRecord,
     assetPrices: Record<string, bigint>
   ) {
     const recordsToClose =
       await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
-        positionId,
+        positionOrVaultId,
         trx
       )
 
@@ -46,7 +46,7 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
         blockNumber: stateUpdate.blockNumber,
         timestamp: stateUpdate.timestamp,
         starkKey: starkKey,
-        positionOrVaultId: positionId,
+        positionOrVaultId: positionOrVaultId,
         assetHashOrId: record.assetHashOrId,
         balance: 0n,
         prevBalance: record.balance,
@@ -66,8 +66,8 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
     >[]
   ) {
     for (const record of newRecords) {
-      await this.preprocessedAssetHistoryRepository.unsetCurrentByStarkKeyAndAsset(
-        record.starkKey,
+      await this.preprocessedAssetHistoryRepository.unsetCurrentByPositionOrVaultIdAndAsset(
+        record.positionOrVaultId,
         record.assetHashOrId,
         trx
       )

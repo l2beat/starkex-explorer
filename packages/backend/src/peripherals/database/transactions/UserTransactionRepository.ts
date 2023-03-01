@@ -64,6 +64,10 @@ export class UserTransactionRepository extends BaseRepository {
     this.getPaginated = this.wrapGet(this.getPaginated)
     this.getNotIncluded = this.wrapGet(this.getNotIncluded)
     this.countAll = this.wrapAny(this.countAll)
+    this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
+    this.getCountOfIncludedByStateUpdateId = this.wrapAny(
+      this.getCountOfIncludedByStateUpdateId
+    )
     this.findById = this.wrapFind(this.findById)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
@@ -112,7 +116,8 @@ export class UserTransactionRepository extends BaseRepository {
 
   async getByStarkKey<T extends UserTransactionData['type']>(
     starkKey: StarkKey,
-    types?: T[]
+    types?: T[],
+    pagination?: { offset: number; limit: number }
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex)
@@ -123,7 +128,41 @@ export class UserTransactionRepository extends BaseRepository {
       .where('stark_key_a', starkKey.toString())
       .orWhere('stark_key_b', starkKey.toString())
       .orderBy('timestamp', 'desc')
+
+    if (pagination) {
+      query = query.limit(pagination.limit).offset(pagination.offset)
+    }
+
     return toRecords<T>(await query)
+  }
+
+  async getCountByStarkKey(
+    starkKey: StarkKey,
+    types?: UserTransactionData['type'][]
+  ): Promise<number> {
+    const knex = await this.knex()
+    let query = knex('user_transactions')
+    if (types) {
+      query = query.whereIn('type', types)
+    }
+    query = query
+      .where('stark_key_a', starkKey.toString())
+      .orWhere('stark_key_b', starkKey.toString())
+    const [result] = await query.count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async getCountOfIncludedByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<number> {
+    const knex = await this.knex(trx)
+    const [result] = await knex('included_forced_requests')
+      .where('state_update_id', stateUpdateId)
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
   }
 
   async getByPositionId<T extends UserTransactionData['type']>(
@@ -144,7 +183,8 @@ export class UserTransactionRepository extends BaseRepository {
 
   async getByStateUpdateId<T extends UserTransactionData['type']>(
     stateUpdateId: number,
-    types?: T[]
+    types?: T[],
+    pagination?: { offset: number; limit: number }
   ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex).where('state_update_id', stateUpdateId)
@@ -152,6 +192,9 @@ export class UserTransactionRepository extends BaseRepository {
       query = query.whereIn('type', types)
     }
     query = query.orderBy('timestamp', 'desc')
+    if (pagination) {
+      query = query.limit(pagination.limit).offset(pagination.offset)
+    }
     return toRecords<T>(await query)
   }
 

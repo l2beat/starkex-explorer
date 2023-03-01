@@ -11,9 +11,11 @@ import { SoftwareMigrationRepository } from '../../peripherals/database/Software
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
+import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { Logger } from '../../tools/Logger'
 import { UserTransactionCollector } from '../collectors/UserTransactionCollector'
+import { WithdrawalAllowedCollector } from '../collectors/WithdrawalAllowedCollector'
 
 export class UserTransactionMigrator {
   constructor(
@@ -23,6 +25,8 @@ export class UserTransactionMigrator {
     private userTransactionRepository: UserTransactionRepository,
     private sentTransactionRepository: SentTransactionRepository,
     private userTransactionCollector: UserTransactionCollector,
+    private withdrawableAssetRepository: WithdrawableAssetRepository,
+    private withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private ethereumClient: EthereumClient,
     private logger: Logger
   ) {
@@ -35,15 +39,14 @@ export class UserTransactionMigrator {
 
     // We want to re-run migration if it was already run when
     // migrationNumber was 0, because the implementation
-    // of collector has changed (added spot withdrawals).
-    if (
-      migrationNumber !== 0 &&
-      migrationNumber !== 1 // re-run
-    ) {
+    // of collector has changed (added spot withdrawals),
+    // and later there was a bug in migration (withdrawals
+    // collector cleared table that this migrator populated)
+    if (migrationNumber >= 4) {
       return
     }
     await this.migrateUserTransactions()
-    await this.softwareMigrationRepository.setMigrationNumber(2)
+    await this.softwareMigrationRepository.setMigrationNumber(4)
   }
 
   private async migrateUserTransactions() {
@@ -51,7 +54,9 @@ export class UserTransactionMigrator {
     if (lastSyncedBlock === undefined) {
       return
     }
-    this.logger.info('User transactions migration started')
+    this.logger.info(
+      'User transactions and withdrawable assets migration started'
+    )
 
     await this.clearRepositories()
     await this.collectUserTransactions(lastSyncedBlock)
@@ -64,11 +69,26 @@ export class UserTransactionMigrator {
   private async clearRepositories() {
     await this.userTransactionRepository.deleteAll()
     await this.sentTransactionRepository.deleteAll()
+    await this.withdrawableAssetRepository.deleteAll()
     this.logger.info('Cleared repositories')
   }
 
   private async collectUserTransactions(lastSyncedBlock: number) {
-    const blockRange = new BlockRange([], 0, lastSyncedBlock)
+    // A quick hack to lower the amount of events processed in one go
+    // due to "Reached heap limit" error on Heroku
+    const deltaBlocks = 500000
+    let firstBlock = 0
+    while (firstBlock < lastSyncedBlock) {
+      const lastBlock = Math.min(firstBlock + deltaBlocks, lastSyncedBlock)
+      await this.collectInRange(firstBlock, lastBlock)
+      firstBlock = lastBlock + 1
+    }
+    this.logger.info('Collection finished')
+  }
+
+  private async collectInRange(firstBlock: number, lastBlock: number) {
+    this.logger.info(`Collecting in range ${firstBlock} - ${lastBlock}`)
+    const blockRange = new BlockRange([], firstBlock, lastBlock)
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const timestamps = require('./blockTimestamps.json') as Record<
       number,
@@ -81,7 +101,10 @@ export class UserTransactionMigrator {
       blockRange,
       knownBlockTimestamps
     )
-    this.logger.info('Collected user transactions')
+    await this.withdrawalAllowedCollector.collect(
+      blockRange,
+      knownBlockTimestamps
+    )
   }
 
   private async migrateIncludedTransactions() {

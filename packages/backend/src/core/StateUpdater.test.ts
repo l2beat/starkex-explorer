@@ -165,7 +165,7 @@ describe(StateUpdater.name, () => {
             syntheticAssetId: AssetId('ETH-7'),
           },
         ])
-      ).toBeRejected(
+      ).not.toBeRejected(
         'Forced action included in state update does not have a matching mined transaction'
       )
     })

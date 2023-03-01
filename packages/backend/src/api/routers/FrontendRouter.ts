@@ -1,5 +1,5 @@
 import { stringAsPositiveInt, UserDetails } from '@explorer/shared'
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
 import * as z from 'zod'
@@ -7,6 +7,7 @@ import * as z from 'zod'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
+import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
@@ -14,7 +15,8 @@ import { applyControllerResult } from './utils'
 export function createFrontendRouter(
   homeController: HomeController,
   userController: UserController,
-  stateUpdateController: StateUpdateController
+  stateUpdateController: StateUpdateController,
+  transactionController: TransactionController
 ) {
   const router = new Router()
 
@@ -37,6 +39,27 @@ export function createFrontendRouter(
         const givenUser = getGivenUser(ctx)
         const pagination = getPagination(ctx.query)
         const result = await homeController.getHomeStateUpdatesPage(
+          givenUser,
+          pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/forced-transactions',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result = await homeController.getHomeForcedTransactionsPage(
           givenUser,
           pagination
         )
@@ -81,6 +104,32 @@ export function createFrontendRouter(
         const pagination = getPagination(ctx.query)
         const result =
           await stateUpdateController.getStateUpdateBalanceChangesPage(
+            givenUser,
+            ctx.params.stateUpdateId,
+            pagination
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/state-updates/:stateUpdateId/transactions',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          stateUpdateId: stringAsPositiveInt(),
+        }),
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result =
+          await stateUpdateController.getStateUpdateIncludedTransactionsPage(
             givenUser,
             ctx.params.stateUpdateId,
             pagination
@@ -153,6 +202,50 @@ export function createFrontendRouter(
           givenUser,
           StarkKey(ctx.params.starkKey),
           pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/users/:starkKey/transactions',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          starkKey: z.string(),
+        }),
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result = await userController.getUserTransactionsPage(
+          givenUser,
+          StarkKey(ctx.params.starkKey),
+          pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/transactions/:transactionHash',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          transactionHash: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const result = await transactionController.getTransactionPage(
+          givenUser,
+          Hash256(ctx.params.transactionHash)
         )
         applyControllerResult(ctx, result)
       }
