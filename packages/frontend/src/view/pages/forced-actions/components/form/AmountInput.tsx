@@ -1,30 +1,29 @@
 import React from 'react'
 
 import { assetToInfo } from '../../../../../utils/assets'
-import { formatCurrencyInput } from '../../../../../utils/formatting/formatCurrencyInput'
+import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
-import { ForcedActionFormProps } from '../../ForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../NewForcedActionFormProps'
 import { FormId } from './ids'
 
-export function AmountInput(props: ForcedActionFormProps) {
-  const assetInfo = assetToInfo({ hashOrId: props.selectedAsset })
-  const balance = props.assets.find(
-    (asset) => asset.assetId === props.selectedAsset
-  )?.balance
-  const sign = balance && balance < 0 ? '-' : ''
-  const formattedBalance = formatCurrencyInput(balance, props.selectedAsset)
+export function AmountInput(props: NewForcedActionFormProps) {
+  const assetInfo = assetToInfo({ hashOrId: props.asset.hashOrId })
+  const formattedBalance = formatAmount(
+    { hashOrId: props.asset.hashOrId },
+    props.asset.balance
+  )
 
   return (
     <div className="flex gap-2">
-      <div className="flex flex-1 flex-col">
-        <span className="text-sm text-zinc-500">Amount</span>
+      <div className="flex flex-1 flex-col gap-2">
+        <span className="text-sm font-medium text-zinc-500">Amount</span>
         <div>
           <input
             id={FormId.AmountInput}
             type="text"
             autoComplete="off"
             placeholder="0.00"
-            className="text-2xl w-full rounded-md bg-transparent leading-none outline-none"
+            className="w-full rounded-md bg-transparent text-xl font-semibold leading-none outline-none"
           />
         </div>
         <div
@@ -34,10 +33,9 @@ export function AmountInput(props: ForcedActionFormProps) {
           Amount too large
         </div>
       </div>
-      <div className="flex flex-col items-end">
-        <span className="text-sm text-zinc-500">
-          Balance: {sign}
-          {formattedBalance}
+      <div className="flex flex-col items-end gap-2">
+        <span className="text-sm font-medium text-zinc-500">
+          Balance: {formattedBalance}
         </span>
         <AssetWithLogo assetInfo={assetInfo} />
       </div>

@@ -33,9 +33,8 @@ export class TransactionController {
     givenUser: Partial<UserDetails>,
     txHash: Hash256
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
-
-    const [sentTransaction, userTransaction] = await Promise.all([
+    const [user, sentTransaction, userTransaction] = await Promise.all([
+      this.userService.getUserDetails(givenUser),
       this.sentTransactionRepository.findByTransactionHash(txHash),
       this.userTransactionRepository.findByTransactionHash(txHash),
     ])

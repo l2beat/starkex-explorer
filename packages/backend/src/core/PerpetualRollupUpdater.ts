@@ -43,6 +43,11 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
     )
   }
 
+  async initTree() {
+    const { oldHash } = await this.readLastUpdate()
+    await this.ensureStateTree(oldHash, positionTreeHeight)
+  }
+
   async loadRequiredPages(
     stateTransitions: Omit<StateTransitionRecord, 'id'>[]
   ): Promise<(StateTransitionRecord & { pages: string[] })[]> {

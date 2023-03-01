@@ -44,6 +44,11 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
     )
   }
 
+  async initTree() {
+    const { oldHash } = await this.readLastUpdate()
+    await this.ensureStateTree(oldHash, vaultTreeHeight)
+  }
+
   async processSpotValidiumStateTransition(
     transition: ValidiumStateTransition,
     spotCairoOutput: SpotCairoOutput,

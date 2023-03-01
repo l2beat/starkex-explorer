@@ -1,5 +1,6 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
+import { AssetDetails } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
@@ -26,7 +27,8 @@ function extractUserTxAmount(
 
 function extractUserTxAsset(
   data: UserTransactionRecord['data'],
-  collateralAsset?: CollateralAsset
+  collateralAsset?: CollateralAsset,
+  assetDetailsMap?: Record<string, AssetDetails>
 ): Asset | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
@@ -34,14 +36,18 @@ function extractUserTxAsset(
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
     case 'FullWithdrawal':
-      return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
+      return undefined
     case 'Withdraw':
       return {
         hashOrId: collateralAsset ? collateralAsset.assetId : data.assetType,
+        details: assetDetailsMap?.[data.assetType.toString()],
       }
     case 'WithdrawWithTokenId':
     case 'MintWithdraw':
-      return { hashOrId: data.assetId }
+      return {
+        hashOrId: data.assetId,
+        details: assetDetailsMap?.[data.assetId.toString()],
+      }
     default:
       assertUnreachable(data)
   }
@@ -68,12 +74,17 @@ function extractUserTxEntryType(
 
 export function userTransactionToEntry(
   userTransaction: UserTransactionRecord,
-  collateralAsset?: CollateralAsset
+  collateralAsset?: CollateralAsset,
+  assetDetailsMap?: Record<string, AssetDetails>
 ): TransactionEntry {
   return {
     timestamp: userTransaction.timestamp,
     hash: userTransaction.transactionHash,
-    asset: extractUserTxAsset(userTransaction.data, collateralAsset),
+    asset: extractUserTxAsset(
+      userTransaction.data,
+      collateralAsset,
+      assetDetailsMap
+    ),
     amount: extractUserTxAmount(userTransaction.data),
     status: userTransaction.included !== undefined ? 'INCLUDED' : 'MINED',
     type: extractUserTxEntryType(userTransaction.data),

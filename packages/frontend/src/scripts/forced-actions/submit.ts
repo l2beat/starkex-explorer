@@ -7,7 +7,7 @@ import { FormState } from './types'
 import { isBuyable } from './utils'
 
 export async function submit(state: FormState) {
-  if (state.props.selectedAsset === AssetId.USDC) {
+  if (state.assetId === AssetId.USDC) {
     return submitExit(state)
   } else {
     return submitOffer(state)
@@ -18,10 +18,10 @@ async function submitExit(state: FormState) {
   const hash = await Wallet.sendPerpetualForcedWithdrawalTransaction(
     state.props.user.address,
     state.props.starkKey,
-    state.props.positionId,
+    state.props.positionOrVaultId,
     state.amountInputValue,
     false,
-    state.props.perpetualAddress
+    state.props.starkExAddress
   )
 
   await Api.submitPerpetualForcedWithdrawal(hash)
@@ -31,11 +31,11 @@ async function submitExit(state: FormState) {
 async function submitOffer(state: FormState) {
   const offer: CreateOfferData = {
     starkKeyA: state.props.starkKey,
-    positionIdA: state.props.positionId,
+    positionIdA: state.props.positionOrVaultId,
     collateralAmount: state.totalInputValue,
     syntheticAmount: state.amountInputValue,
-    syntheticAssetId: state.selectedAsset.assetId,
-    isABuyingSynthetic: isBuyable(state.selectedAsset),
+    syntheticAssetId: state.assetId,
+    isABuyingSynthetic: isBuyable(state.assetId, state.balance),
   }
 
   const signature = await Wallet.signCreate(state.props.user.address, offer)

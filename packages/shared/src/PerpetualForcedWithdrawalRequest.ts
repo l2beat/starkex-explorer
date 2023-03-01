@@ -10,16 +10,16 @@ const coder = new Interface([
     )`,
 ])
 
-export interface ForcedWithdrawalRequest {
+export interface PerpetualForcedWithdrawalRequest {
   starkKey: StarkKey
   positionId: bigint
   quantizedAmount: bigint
   premiumCost: boolean
 }
 
-export function decodeForcedWithdrawalRequest(
+export function decodePerpetualForcedWithdrawalRequest(
   data: string
-): ForcedWithdrawalRequest | undefined {
+): PerpetualForcedWithdrawalRequest | undefined {
   try {
     const decoded = coder.decodeFunctionData('forcedWithdrawalRequest', data)
     /* eslint-disable @typescript-eslint/no-unsafe-argument */
@@ -35,7 +35,9 @@ export function decodeForcedWithdrawalRequest(
   }
 }
 
-export function encodeForcedWithdrawalRequest(data: ForcedWithdrawalRequest) {
+export function encodePerpetualForcedWithdrawalRequest(
+  data: PerpetualForcedWithdrawalRequest
+) {
   return coder.encodeFunctionData('forcedWithdrawalRequest', [
     data.starkKey,
     data.positionId.toString(),
