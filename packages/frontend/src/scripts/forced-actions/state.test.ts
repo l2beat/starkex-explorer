@@ -5,40 +5,21 @@ import { getInitialState, nextFormState } from './state'
 import { FormAction } from './types'
 
 describe(nextFormState.name, () => {
-  const INITIAL_STATE = getInitialState(
-    {
-      user: {
-        address: EthereumAddress.fake(),
-        positionId: 123n,
-        hasUpdates: false,
-      },
+  const INITIAL_STATE = getInitialState({
+    user: {
+      address: EthereumAddress.fake(),
       positionId: 123n,
-      perpetualAddress: EthereumAddress.fake(),
-      starkKey: StarkKey.fake(),
-      selectedAsset: AssetId('ETH-9'),
-      assets: [
-        {
-          assetId: AssetId('USDC-6'),
-          balance: 69420_654321n,
-          priceUSDCents: 100n,
-          totalUSDCents: 69420_65n,
-        },
-        {
-          assetId: AssetId('ETH-9'),
-          balance: 21_370000000n,
-          priceUSDCents: 2839_39n,
-          totalUSDCents: 60678_04n,
-        },
-        {
-          assetId: AssetId('BTC-10'),
-          balance: -5287654321n,
-          priceUSDCents: 38504_34n,
-          totalUSDCents: -20359_76n,
-        },
-      ],
+      hasUpdates: false,
     },
-    ''
-  )
+    positionOrVaultId: 123n,
+    starkExAddress: EthereumAddress.fake(),
+    starkKey: StarkKey.fake(),
+    asset: {
+      hashOrId: AssetId('USDC-9'),
+      balance: 69420_654321n,
+      priceUSDCents: 100n,
+    },
+  })
 
   function reduce(actions: FormAction[], from = INITIAL_STATE) {
     return actions.reduce((state, action) => nextFormState(state, action), from)

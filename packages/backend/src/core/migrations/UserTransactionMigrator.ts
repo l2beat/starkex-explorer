@@ -1,7 +1,7 @@
 import {
   decodeFinalizeExitRequest,
-  decodeForcedTradeRequest,
-  decodeForcedWithdrawalRequest,
+  decodePerpetualForcedTradeRequest,
+  decodePerpetualForcedWithdrawalRequest,
 } from '@explorer/shared'
 import { AssetId, Hash256, Timestamp } from '@explorer/types'
 
@@ -180,7 +180,7 @@ export class UserTransactionMigrator {
             },
           })
         } else if (tx.data.startsWith('0xaf1437a3')) {
-          const data = decodeForcedWithdrawalRequest(tx.data)
+          const data = decodePerpetualForcedWithdrawalRequest(tx.data)
           if (!data) {
             throw new Error('Cannot decode forced withdrawal request!')
           }
@@ -196,7 +196,7 @@ export class UserTransactionMigrator {
             },
           })
         } else if (tx.data.startsWith('0x2ecb8162')) {
-          const data = decodeForcedTradeRequest(tx.data)
+          const data = decodePerpetualForcedTradeRequest(tx.data)
           if (!data) {
             throw new Error('Cannot decode forced trade request!')
           }
