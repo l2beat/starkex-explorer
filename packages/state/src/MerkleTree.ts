@@ -75,8 +75,8 @@ export class MerkleTree<T extends MerkleValue> {
 
   // For reference see: https://github.com/starkware-libs/starkex-contracts/blob/master/scalable-dex/contracts/src/components/PedersenMerkleVerifier.sol
   async getMerkleProofForLeaf(index: bigint): Promise<{
-    root: PedersenHash,
-    path: { left: PedersenHash, right: PedersenHash }[],
+    root: PedersenHash
+    path: { left: PedersenHash; right: PedersenHash }[]
     leaf: T
   }> {
     if (index < 0n || index > this.maxIndex) {
@@ -94,19 +94,16 @@ export class MerkleTree<T extends MerkleValue> {
       if (index < center) {
         node = await node.left()
         center = centers[0]
-      }
-      else {
+      } else {
         node = await node.right()
         center = centers[1]
       }
       height -= 1n
     }
-    console.log('Leaf: ', node)
-    console.log(await this.getLeaf(index))
     return {
       root: await this.hash(),
       path,
-      leaf: await this.getLeaf(index)
+      leaf: await this.getLeaf(index),
     }
   }
 
