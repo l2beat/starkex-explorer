@@ -11,6 +11,7 @@ import * as z from 'zod'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
+import { SpotForcedWithdrawalController } from '../controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
@@ -22,6 +23,7 @@ export function createFrontendRouter(
   userController: UserController,
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
+  spotForcedWithdrawalController: SpotForcedWithdrawalController,
   merkleProofController: MerkleProofController
 ) {
   const router = new Router()
@@ -259,6 +261,26 @@ export function createFrontendRouter(
   )
 
   router.get(
+    '/forced/new/spot/:vaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          vaultId: stringAsBigInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const result =
+          await spotForcedWithdrawalController.getSpotForcedWithdrawalPage(
+            givenUser,
+            ctx.params.vaultId
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
     '/proof/:positionOrVaultId',
     withTypedContext(
       z.object({
@@ -268,6 +290,7 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
+
         const result = await merkleProofController.getMerkleProofPage(
           givenUser,
           ctx.params.positionOrVaultId

@@ -41,18 +41,15 @@ export function UserProfile({
           )}
         </>
       )}
-      <p className="mt-6 text-sm font-semibold text-zinc-500 ">
-        Ethereum address
-      </p>
-      {ethereumAddress ? (
-        <p className="mt-3 font-semibold text-white ">
-          {ethereumAddress.toString()}
-        </p>
-      ) : (
-        <div className="mt-3 flex items-center">
-          <WarningIcon />
-          <p className="ml-2 font-semibold text-amber-500">UNKNOWN</p>
-        </div>
+      {ethereumAddress && (
+        <>
+          <p className="mt-6 text-sm font-semibold text-zinc-500 ">
+            Ethereum address
+          </p>
+          <p className="text-base mt-3 font-semibold text-white ">
+            {ethereumAddress.toString()}
+          </p>
+        </>
       )}
     </section>
   )

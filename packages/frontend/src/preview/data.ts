@@ -4,9 +4,8 @@ import { NewForcedActionFormProps } from '../view/pages/forced-actions/NewForced
 
 export const FORCED_WITHDRAW_FORM_PROPS: NewForcedActionFormProps = {
   user: {
+    starkKey: StarkKey.fake(),
     address: EthereumAddress.fake(),
-    positionId: 123n,
-    hasUpdates: false,
   },
   starkExAddress: EthereumAddress('0xD54f502e184B6B739d7D27a6410a67dc462D69c8'),
   positionOrVaultId: 1234n,
@@ -20,9 +19,8 @@ export const FORCED_WITHDRAW_FORM_PROPS: NewForcedActionFormProps = {
 
 export const FORCED_SELL_FORM_PROPS: NewForcedActionFormProps = {
   user: {
+    starkKey: StarkKey.fake(),
     address: EthereumAddress.fake(),
-    positionId: 123n,
-    hasUpdates: false,
   },
   starkExAddress: EthereumAddress('0xD54f502e184B6B739d7D27a6410a67dc462D69c8'),
 
@@ -37,9 +35,8 @@ export const FORCED_SELL_FORM_PROPS: NewForcedActionFormProps = {
 
 export const FORCED_BUY_FORM_PROPS: NewForcedActionFormProps = {
   user: {
+    starkKey: StarkKey.fake(),
     address: EthereumAddress.fake(),
-    positionId: 123n,
-    hasUpdates: false,
   },
   starkExAddress: EthereumAddress('0xD54f502e184B6B739d7D27a6410a67dc462D69c8'),
 

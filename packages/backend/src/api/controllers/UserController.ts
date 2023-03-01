@@ -96,7 +96,12 @@ export class UserController {
     }
 
     const assetEntries = userAssets.map((a) =>
-      toUserAssetEntry(a, this.collateralAsset?.assetId, assetDetailsMap)
+      toUserAssetEntry(
+        a,
+        this.tradingMode,
+        this.collateralAsset?.assetId,
+        assetDetailsMap
+      )
     )
 
     const balanceChangesEntries = history.map((h) =>
@@ -158,7 +163,12 @@ export class UserController {
     }
 
     const assets = userAssets.map((a) =>
-      toUserAssetEntry(a, this.collateralAsset?.assetId, assetDetailsMap)
+      toUserAssetEntry(
+        a,
+        this.tradingMode,
+        this.collateralAsset?.assetId,
+        assetDetailsMap
+      )
     )
 
     const content = renderUserAssetsPage({
@@ -260,6 +270,7 @@ export class UserController {
 
 function toUserAssetEntry(
   asset: PreprocessedAssetHistoryRecord<AssetHash | AssetId>,
+  tradingMode: 'perpetual' | 'spot',
   collateralAssetId?: AssetId,
   assetDetailsMap?: Record<string, AssetDetails>
 ): UserAssetEntry {
@@ -276,7 +287,12 @@ function toUserAssetEntry(
         ? asset.balance / 10000n // TODO: use the correct decimals
         : getAssetValueUSDCents(asset.balance, asset.price),
     vaultOrPositionId: asset.positionOrVaultId.toString(),
-    action: asset.assetHashOrId === collateralAssetId ? 'WITHDRAW' : 'CLOSE',
+    action:
+      tradingMode === 'perpetual'
+        ? asset.assetHashOrId === collateralAssetId
+          ? 'WITHDRAW'
+          : 'CLOSE'
+        : 'WITHDRAW',
   }
 }
 
