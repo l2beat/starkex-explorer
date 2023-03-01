@@ -1,5 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -33,6 +34,7 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderStateUpdateMerkleProofPage } from '../view/pages/state-update/StateUpdateMerkleProofPage'
 import * as DATA from './data'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
@@ -42,6 +44,7 @@ import {
 } from './data/home'
 import {
   randomStateUpdateBalanceChangeEntry,
+  randomStateUpdateMerkleProofPath,
   randomStateUpdatePriceEntry,
   randomStateUpdateTransactionEntry,
 } from './data/stateUpdate'
@@ -203,6 +206,28 @@ const routes: Route[] = [
         totalBalanceChanges: 231,
         transactions: repeat(5, randomStateUpdateTransactionEntry),
         totalTransactions: 5,
+      })
+    },
+  },
+  {
+    path: '/state-updates/:id/merkle-proof',
+    link: '/state-updates/xyz/merkle-proof',
+    description: 'Merkle proof for a state update.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      ctx.body = renderStateUpdateMerkleProofPage({
+        user,
+        id: randomId(),
+        merkleProof: {
+          type: 'SPOT',
+          rootHash: PedersenHash.fake(),
+          path: repeat(9, randomStateUpdateMerkleProofPath),
+          leaf: {
+            starkKey: StarkKey.fake(),
+            balance: 123456789n,
+            token: AssetHash.fake(),
+          },
+        },
       })
     },
   },
