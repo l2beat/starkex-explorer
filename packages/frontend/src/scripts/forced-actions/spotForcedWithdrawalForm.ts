@@ -1,12 +1,12 @@
 import { AssetHash } from '@explorer/types'
 
 import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
-import { SpotWithdrawalFormId } from '../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
+import { SpotForcedWithdrawalFormId } from '../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
 import { Api } from '../peripherals/api'
 import { Wallet } from '../peripherals/wallet'
 
-export function initSpotWithdrawalForm() {
-  const form = document.getElementById(SpotWithdrawalFormId)
+export function initSpotForcedWithdrawalForm() {
+  const form = document.getElementById(SpotForcedWithdrawalFormId)
   if (!form) {
     return
   }

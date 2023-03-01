@@ -15,7 +15,7 @@ import {
   serializeForcedActionsFormProps,
 } from './NewForcedActionFormProps'
 
-export const SpotWithdrawalFormId = 'spot-withdraw-form'
+export const SpotForcedWithdrawalFormId = 'spot-withdraw-form'
 
 function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   const instructions = [
@@ -42,7 +42,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   )
   return (
     <Page
-      path="/forced/new/:positionId/:assetId"
+      path="/forced/new/:positionId/:assetHash"
       description="Page that allows user withdrawal of spot asset"
       user={props.user}
     >
@@ -59,7 +59,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
           </div>
           <Card className="h-min w-[480px]">
             <form
-              id={SpotWithdrawalFormId}
+              id={SpotForcedWithdrawalFormId}
               className="flex flex-col gap-6"
               data-props={propsJson}
             >

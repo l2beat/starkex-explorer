@@ -5,7 +5,7 @@ import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
 import { FormAction, FormState } from './types'
 
-export function initForcedActionForm() {
+export function initPerpetualForcedActionForm() {
   if (!document.getElementById(FormId.Form)) {
     return
   }
