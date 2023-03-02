@@ -75,6 +75,8 @@ function UserPage(props: UserPageProps) {
               withdrawableAssets={props.withdrawableAssets}
               offersToAccept={props.offersToAccept}
               isMine={isMine}
+              starkKey={props.starkKey}
+              user={props.user}
             />
           </div>
         </section>

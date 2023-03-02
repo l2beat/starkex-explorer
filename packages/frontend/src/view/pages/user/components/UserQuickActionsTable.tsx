@@ -1,3 +1,5 @@
+import { UserDetails } from '@explorer/shared'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
@@ -9,10 +11,13 @@ import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { OfferEntry } from '../../../components/tables/OffersTable'
+import { UserWithdrawNowButton } from './UserWithdrawNowButton'
 
 interface UserQuickActionsTableProps {
   readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
   readonly offersToAccept: readonly OfferEntry[]
+  readonly starkKey: StarkKey
+  readonly user: UserDetails | undefined
   isMine?: boolean
 }
 
@@ -50,7 +55,17 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                 </InlineEllipsis>
               </strong>
             </p>
-            <Button className="ml-auto w-32 !px-0">Withdraw now</Button>
+            {props.user && asset.asset.details && (
+              <UserWithdrawNowButton
+                className="ml-auto w-32 !px-0"
+                assetDetails={asset.asset.details}
+                account={props.user.address}
+                starkKey={props.starkKey}
+                exchangeAddress={EthereumAddress.fake()}
+              >
+                Withdraw now
+              </UserWithdrawNowButton>
+            )}
           </div>
         )
       })}

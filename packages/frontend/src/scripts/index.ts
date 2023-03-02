@@ -15,6 +15,7 @@ import { initFinalizeExitForm } from './old/transaction/finalizeExitForm'
 // eslint-disable-next-line no-restricted-imports
 import { initTransactionForm } from './old/transaction/transactionForm'
 import { initPagination } from './pagination'
+import { initRegularWithdrawal } from './regularWithdrawal'
 import { initStateUpdateStats } from './stateUpdateStats'
 import { initTVLDisplay } from './tvl'
 
@@ -30,6 +31,7 @@ initCountdownTimer()
 initImageFallback()
 initPagination()
 initStateUpdateStats()
+initRegularWithdrawal()
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 if (USE_NEW_DESIGN) {

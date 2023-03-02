@@ -1,11 +1,13 @@
 import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
+  AssetType,
   CreateOfferData,
-  encodeFinalizeExitRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
+  encodeWithdrawal,
+  encodeWithdrawalWithTokenId,
   FinalizeOfferData,
   toSignableAcceptOffer,
   toSignableCancelOffer,
@@ -168,9 +170,32 @@ export const Wallet = {
   async sendWithdrawalTransaction(
     account: EthereumAddress,
     starkKey: StarkKey,
-    exchangeAddress: EthereumAddress
+    exchangeAddress: EthereumAddress,
+    assetType: Extract<AssetType, 'ETH' | 'ERC20'>
   ) {
-    const data = encodeFinalizeExitRequest(starkKey)
+    const data = encodeWithdrawal(starkKey, assetType)
+
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account,
+          to: exchangeAddress,
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendWithdrawalWithTokenIdTransaction(
+    account: EthereumAddress,
+    starkKey: StarkKey,
+    exchangeAddress: EthereumAddress,
+    assetType: Extract<AssetType, 'ERC721' | 'ERC1155'>,
+    tokenId: bigint
+  ) {
+    const data = encodeWithdrawalWithTokenId(starkKey, assetType, tokenId)
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [

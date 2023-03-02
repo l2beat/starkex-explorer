@@ -1,6 +1,7 @@
 import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
 import { z } from 'zod'
 
+import { toJsonWithoutBigInts } from './serialize'
 import { stringAs, stringAsBigInt } from './types'
 
 export const ETHDetails = z.object({
@@ -95,3 +96,7 @@ export const AssetDetails = z.union([
 ])
 
 export type AssetType = AssetDetails['type']
+
+export function serializeAssetDetails(assetDetails: AssetDetails) {
+  return toJsonWithoutBigInts(assetDetails)
+}

@@ -1,24 +1,32 @@
 import { Interface } from '@ethersproject/abi'
-import { encodeAssetId } from '@explorer/encoding'
-import { AssetId, StarkKey } from '@explorer/types'
+import { StarkKey } from '@explorer/types'
+
+import { AssetType } from './AssetDetails'
+import { getAssetTypeSelector } from './utils/getAssetTypeSelector'
 
 const coder = new Interface([
-  'function withdraw(uint256 starkKey, uint256 assetType)',
+  'function withdraw(uint256 ownerKey, uint256 assetType)',
 ])
 
-export function encodeFinalizeExitRequest(starkKey: StarkKey) {
+export function encodeWithdrawal(
+  starkKey: StarkKey,
+  assetType: Extract<AssetType, 'ETH' | 'ERC20'>
+) {
+  const assetTypeSelector = getAssetTypeSelector(assetType)
+
   return coder.encodeFunctionData('withdraw', [
     starkKey.toString(),
-    `0x${encodeAssetId(AssetId.USDC)}`,
+    assetTypeSelector,
   ])
 }
 
-export function decodeFinalizeExitRequest(data: string) {
+export function decodeWithdrawal(data: string) {
   try {
     const decoded = coder.decodeFunctionData('withdraw', data)
+
     /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
     return {
-      starkKey: StarkKey.from(decoded.starkKey),
+      starkKey: StarkKey.from(decoded.ownerKey),
       assetType: decoded.assetType.toHexString() as string,
     }
     /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */

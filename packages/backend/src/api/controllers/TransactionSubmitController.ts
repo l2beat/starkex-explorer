@@ -1,7 +1,7 @@
 import {
-  decodeFinalizeExitRequest,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
+  decodeWithdrawal,
   PerpetualForcedTradeRequest,
 } from '@explorer/shared'
 import {
@@ -66,7 +66,7 @@ export class TransactionSubmitController {
         content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
-    const data = decodeFinalizeExitRequest(tx.data)
+    const data = decodeWithdrawal(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
