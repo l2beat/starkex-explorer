@@ -87,7 +87,7 @@ function UserPage(props: UserPageProps) {
             type={props.type}
             starkKey={props.starkKey}
             assets={props.assets}
-            isMine={props.user !== undefined}
+            isMine={isMine}
           />
         </TablePreview>
         <TablePreview

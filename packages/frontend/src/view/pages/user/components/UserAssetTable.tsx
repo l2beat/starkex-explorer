@@ -55,7 +55,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
-            props.isMine ? (
+            props.isMine && props.type === 'SPOT' ? (
               <LinkButton
                 className="w-full"
                 href={`/forced/new/spot/${entry.vaultOrPositionId}`}
