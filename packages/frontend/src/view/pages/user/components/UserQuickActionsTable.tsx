@@ -61,6 +61,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                 assetDetails={asset.asset.details}
                 account={props.user.address}
                 starkKey={props.starkKey}
+                // TODO: change this to the real exchange address
                 exchangeAddress={EthereumAddress.fake()}
               >
                 Withdraw now
