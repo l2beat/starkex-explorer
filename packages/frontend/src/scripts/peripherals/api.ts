@@ -39,6 +39,17 @@ export const Api = {
     })
   },
 
+  async submitOldWithdrawal(hash: Hash256) {
+    await fetch('/forced/exits/finalize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        exitHash: Hash256.fake(),
+        finalizeHash: hash,
+      }),
+    })
+  },
+
   async submitWithdrawal(hash: Hash256) {
     await fetch('/withdrawal', {
       method: 'POST',

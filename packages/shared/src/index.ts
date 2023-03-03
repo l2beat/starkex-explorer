@@ -7,6 +7,8 @@ export * from './CreateOfferBody'
 export * from './CreateOfferData'
 export * from './FinalizeOfferBody'
 export * from './FinalizeOfferData'
+/* eslint-disable-next-line no-restricted-imports */
+export * from './old/FinalizeExitData'
 export * from './PerpetualForcedTradeRequest'
 export * from './PerpetualForcedWithdrawalRequest'
 export * from './serialize'

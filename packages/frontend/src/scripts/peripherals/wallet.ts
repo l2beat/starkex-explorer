@@ -3,6 +3,7 @@ import {
   AcceptedData,
   AssetType,
   CreateOfferData,
+  encodeFinalizeExitRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
@@ -166,6 +167,25 @@ export const Wallet = {
 
   // #endregion
   // #region Withdrawals
+
+  async sendOldWithdrawalTransaction(
+    account: EthereumAddress,
+    starkKey: StarkKey,
+    exchangeAddress: EthereumAddress
+  ) {
+    const data = encodeFinalizeExitRequest(starkKey)
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account,
+          to: exchangeAddress,
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
 
   async sendWithdrawalTransaction(
     account: EthereumAddress,
