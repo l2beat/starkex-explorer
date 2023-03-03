@@ -2,7 +2,7 @@ import { Interface } from '@ethersproject/abi'
 import { StarkKey } from '@explorer/types'
 
 import { AssetType } from './AssetDetails'
-import { getAssetTypeSelector } from './utils/getAssetTypeSelector'
+import { getAssetSelector } from './utils/getAssetSelector'
 
 const coder = new Interface([
   'function withdraw(uint256 ownerKey, uint256 assetType)',
@@ -12,7 +12,7 @@ export function encodeWithdrawal(
   starkKey: StarkKey,
   assetType: Extract<AssetType, 'ETH' | 'ERC20'>
 ) {
-  const assetTypeSelector = getAssetTypeSelector(assetType)
+  const assetTypeSelector = getAssetSelector(assetType)
 
   return coder.encodeFunctionData('withdraw', [
     starkKey.toString(),

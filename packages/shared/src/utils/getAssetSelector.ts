@@ -3,7 +3,7 @@ import { keccak256 } from '@ethersproject/solidity'
 import { AssetType } from '../AssetDetails'
 import { assertUnreachable } from './assert'
 
-export function getAssetTypeSelector(
+export function getAssetSelector(
   assetType:
     | Extract<AssetType, 'ETH' | 'ERC20'>
     | Extract<AssetType, 'ERC721' | 'ERC1155'>
