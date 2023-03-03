@@ -1,10 +1,9 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
-import { AssetDetails } from '@explorer/shared'
+import { assertUnreachable, AssetDetails } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { assertUnreachable } from '../../utils/assertUnreachable'
 
 function extractUserTxAmount(
   data: UserTransactionRecord['data']

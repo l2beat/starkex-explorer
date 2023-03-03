@@ -1,10 +1,9 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
-import { AssetDetails } from '@explorer/shared'
+import { assertUnreachable, AssetDetails } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { SentTransactionRecord } from '../../peripherals/database/transactions/SentTransactionRepository'
-import { assertUnreachable } from '../../utils/assertUnreachable'
 
 export function extractSentTxEntryType(
   data: SentTransactionRecord['data']

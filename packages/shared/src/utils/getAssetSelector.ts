@@ -1,7 +1,7 @@
 import { keccak256 } from '@ethersproject/solidity'
 
 import { AssetType } from '../AssetDetails'
-import { assertUnreachable } from './assert'
+import { assertUnreachable } from './assertUnreachable'
 
 export function getAssetSelector(
   assetType:
