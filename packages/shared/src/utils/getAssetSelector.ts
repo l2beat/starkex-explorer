@@ -4,9 +4,7 @@ import { AssetType } from '../AssetDetails'
 import { assertUnreachable } from './assertUnreachable'
 
 export function getAssetSelector(
-  assetType:
-    | Extract<AssetType, 'ETH' | 'ERC20'>
-    | Extract<AssetType, 'ERC721' | 'ERC1155'>
+  assetType: Extract<AssetType, 'ETH' | 'ERC20' | 'ERC721' | 'ERC1155'>
 ) {
   // These signatures are taken from the Starkware contracts
   // https://github.com/starkware-libs/starkex-contracts/blob/75c3a2a8dfff70604d851fc6b1a2bc8bc1a3964b/scalable-dex/contracts/src/interactions/TokenAssetData.sol#L10
