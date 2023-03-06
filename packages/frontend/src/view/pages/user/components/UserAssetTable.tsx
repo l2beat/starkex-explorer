@@ -1,4 +1,4 @@
-import { StarkKey } from '@explorer/types'
+import { AssetId, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
@@ -26,6 +26,11 @@ export interface UserAssetEntry {
 }
 
 export function UserAssetsTable(props: UserAssetsTableProps) {
+  const forcedActionLink = (entry: UserAssetEntry) =>
+    AssetId.check(entry.asset.hashOrId)
+      ? `/forced/new/perpetual/${entry.vaultOrPositionId}/${entry.asset.hashOrId}`
+      : `/forced/new/spot/${entry.vaultOrPositionId}`
+
   return (
     <Table
       fullBackground
@@ -33,7 +38,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
         { header: props.type === 'PERPETUAL' ? 'Position' : 'Vault' },
-        { header: props.isMine ? 'Action' : '' },
+        ...(props.isMine ? [{ header: 'Action' }] : []),
       ]}
       rows={props.assets.map((entry) => {
         return {
@@ -55,15 +60,10 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
-            props.isMine && props.type === 'SPOT' ? (
-              <LinkButton
-                className="w-full"
-                href={`/forced/new/spot/${entry.vaultOrPositionId}`}
-              >
+            props.isMine && (
+              <LinkButton className="w-full" href={forcedActionLink(entry)}>
                 {entry.action}
               </LinkButton>
-            ) : (
-              ''
             ),
           ],
         }
