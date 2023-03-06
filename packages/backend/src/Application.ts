@@ -2,6 +2,7 @@ import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { ApiServer } from './api/ApiServer'
+import { ForcedActionsController } from './api/controllers/ForcedActionsController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
@@ -10,7 +11,6 @@ import { OldHomeController } from './api/controllers/OldHomeController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
-import { SpotForcedWithdrawalController } from './api/controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
@@ -524,7 +524,7 @@ export class Application {
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
-    const spotForcedWithdrawalController = new SpotForcedWithdrawalController(
+    const forcedActionsController = new ForcedActionsController(
       userService,
       preprocessedAssetHistoryRepository,
       assetRepository
@@ -547,7 +547,7 @@ export class Application {
               userController,
               stateUpdateController,
               transactionController,
-              spotForcedWithdrawalController,
+              forcedActionsController,
               merkleProofController
             ),
         createForcedTransactionRouter(

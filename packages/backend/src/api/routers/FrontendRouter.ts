@@ -1,17 +1,18 @@
 import {
+  stringAs,
   stringAsBigInt,
   stringAsPositiveInt,
   UserDetails,
 } from '@explorer/shared'
-import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import { Context } from 'koa'
 import * as z from 'zod'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
+import { ForcedActionsController } from '../controllers/ForcedActionsController'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
-import { SpotForcedWithdrawalController } from '../controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
@@ -23,7 +24,7 @@ export function createFrontendRouter(
   userController: UserController,
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
-  spotForcedWithdrawalController: SpotForcedWithdrawalController,
+  forcedWithdrawalController: ForcedActionsController,
   merkleProofController: MerkleProofController
 ) {
   const router = new Router()
@@ -271,10 +272,41 @@ export function createFrontendRouter(
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result =
-          await spotForcedWithdrawalController.getSpotForcedWithdrawalPage(
+          await forcedWithdrawalController.getSpotForcedWithdrawalPage(
             givenUser,
             ctx.params.vaultId
           )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/forced/new/perpetual/:positionId/:assetId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionId: stringAsBigInt(),
+          assetId: stringAs(AssetId),
+        }),
+      }),
+      async (ctx) => {
+        const { positionId, assetId } = ctx.params
+        const givenUser = getGivenUser(ctx)
+
+        const result =
+          assetId === AssetId.USDC
+            ? await forcedWithdrawalController.getPerpetualForcedWithdrawalPage(
+                givenUser,
+                positionId,
+                assetId
+              )
+            : await forcedWithdrawalController.getPerpetualForcedTradePage(
+                givenUser,
+                positionId,
+                assetId
+              )
+
         applyControllerResult(ctx, result)
       }
     )

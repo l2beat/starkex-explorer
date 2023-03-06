@@ -1,6 +1,6 @@
 import { USE_NEW_DESIGN } from '../utils/constants'
 import { initCountdownTimer } from './countdownTimer'
-import { initPerpetualForcedActionForm } from './forced-actions/forcedActionForm'
+import { initPerpetualForcedActionForm } from './forced-actions/perpetualForcedActionForm'
 import { initSpotForcedWithdrawalForm } from './forced-actions/spotForcedWithdrawalForm'
 import { initImageFallback } from './imageFallback'
 import { initMetamask } from './metamask'
