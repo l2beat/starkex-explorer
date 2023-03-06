@@ -31,7 +31,8 @@ async function addHashes({
       for (const { name, file } of toHash) {
         for (const [start, end] of patterns) {
           const value = `${start}${name}${end}`
-          if (content.includes(value)) {
+          const isValueInContent = getRegexForDependency(value).test(content)
+          if (isValueInContent) {
             dependencies.push(value)
             fileDependencies.push(file)
           }
@@ -125,11 +126,14 @@ async function sha256(file) {
   })
 }
 
-function escapeRegExp(string) {
-  // $& means the whole matched string
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+function replaceAll(str, find, replace) {
+  return str.replace(getRegexForDependency(find), replace)
 }
 
-function replaceAll(str, find, replace) {
-  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace)
+function getRegexForDependency(name) {
+  const splittedName = name.split('.')
+  return new RegExp(
+    `${splittedName.at(0)}(?:\\.\\w+)?\\.${splittedName.at(-1)}`,
+    'gm'
+  )
 }
