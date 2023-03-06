@@ -28,7 +28,9 @@ export interface UserAssetEntry {
 export function UserAssetsTable(props: UserAssetsTableProps) {
   const forcedActionLink = (entry: UserAssetEntry) =>
     AssetId.check(entry.asset.hashOrId)
-      ? `/forced/new/perpetual/${entry.vaultOrPositionId}/${entry.asset.hashOrId}`
+      ? `/forced/new/perpetual/${
+          entry.vaultOrPositionId
+        }/${entry.asset.hashOrId.toString()}`
       : `/forced/new/spot/${entry.vaultOrPositionId}`
 
   return (
