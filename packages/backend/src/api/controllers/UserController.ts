@@ -7,7 +7,7 @@ import {
   UserAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
-import { AssetDetails, UserDetails } from '@explorer/shared'
+import { AssetDetails, TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
@@ -43,7 +43,7 @@ export class UserController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly assetRepository: AssetRepository,
-    private readonly tradingMode: 'perpetual' | 'spot',
+    private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -270,7 +270,7 @@ export class UserController {
 
 function toUserAssetEntry(
   asset: PreprocessedAssetHistoryRecord<AssetHash | AssetId>,
-  tradingMode: 'perpetual' | 'spot',
+  tradingMode: TradingMode,
   collateralAssetId?: AssetId,
   assetDetailsMap?: Record<string, AssetDetails>
 ): UserAssetEntry {

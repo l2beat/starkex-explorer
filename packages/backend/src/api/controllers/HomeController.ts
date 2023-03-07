@@ -3,7 +3,7 @@ import {
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
 } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
@@ -25,7 +25,7 @@ export class HomeController {
     private readonly userService: UserService,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
-    private readonly tradingMode: 'perpetual' | 'spot',
+    private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 

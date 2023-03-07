@@ -1,5 +1,5 @@
 import { renderMerkleProofPage } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { PositionLeaf, VaultLeaf } from '@explorer/state'
 
 import { StateUpdater } from '../../core/StateUpdater'
@@ -10,7 +10,7 @@ export class MerkleProofController {
   constructor(
     private readonly userService: UserService,
     private readonly stateUpdater: StateUpdater<PositionLeaf | VaultLeaf>,
-    private readonly tradingMode: 'perpetual' | 'spot'
+    private readonly tradingMode: TradingMode
   ) {}
 
   async getMerkleProofPage(
