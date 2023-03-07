@@ -5522,10 +5522,10 @@ path-type@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
-pedersen-fast@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/pedersen-fast/-/pedersen-fast-0.1.0.tgz#4092dbc8df8b43a61d30ab9a36eef77a2b11b97c"
-  integrity sha512-Mtpvp+FmVOEDQr3qbskObJpiOsvbenwwphOtzkYSYbvdiCz2Pmwz2WvcEaqUDiVi12KXS7KxwW8H036MlWOV0Q==
+pedersen-fast@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/pedersen-fast/-/pedersen-fast-0.3.0.tgz#08932bbf78500f15b1625f0659c66ae3cd8ecce9"
+  integrity sha512-/BzLd3HgY5kjBSOinq4ezZ+KgrB3w6Q67jpRnqPjxmbvC2ErhmZpJrfpjyywPQ087OWBPL7OA+vUu022/3yUDg==
 
 performance-now@^2.1.0:
   version "2.1.0"
