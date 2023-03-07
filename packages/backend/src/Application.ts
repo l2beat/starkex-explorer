@@ -444,6 +444,7 @@ export class Application {
       userService,
       userTransactionRepository,
       preprocessedStateDetailsRepository,
+      config.starkex.tradingMode,
       config.starkex.tradingMode === 'perpetual'
         ? config.starkex.collateralAsset
         : undefined

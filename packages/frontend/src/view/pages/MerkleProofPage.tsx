@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { PedersenHash } from '@explorer/types'
 import React from 'react'
 
@@ -12,7 +12,7 @@ import { reactToHtml } from '../reactToHtml'
 export interface MerkleProofPageProps {
   positionOrVaultId: bigint
   user: UserDetails | undefined
-  type: 'PERPETUAL' | 'SPOT'
+  type: TradingMode
   merkleProof: MerkleProof
 }
 
@@ -28,7 +28,7 @@ export interface MerkleProofPath {
 }
 
 function MerkleProofPage(props: MerkleProofPageProps) {
-  const idLabel = props.type === 'SPOT' ? 'Vault' : 'Position'
+  const idLabel = props.type === 'perpetual' ? 'Position' : 'Vault'
   const formattedLeaf = JSON.stringify(
     JSON.parse(props.merkleProof.leaf),
     null,

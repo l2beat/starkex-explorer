@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -26,7 +26,7 @@ import {
 
 export interface StateUpdatePageProps extends StateUpdateStatsProps {
   user: UserDetails | undefined
-  type: 'SPOT' | 'PERPETUAL'
+  type: TradingMode
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
   priceChanges?: StateUpdatePriceEntry[]

@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -16,7 +16,7 @@ import { UserPageTitle } from './components/UserPageTitle'
 export interface UserBalanceChangesPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
-  type: 'SPOT' | 'PERPETUAL'
+  type: TradingMode
   balanceChanges: UserBalanceChangeEntry[]
   limit: number
   offset: number

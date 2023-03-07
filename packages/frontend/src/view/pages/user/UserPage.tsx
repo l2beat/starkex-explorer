@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -33,7 +33,7 @@ export interface UserPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
-  type: 'SPOT' | 'PERPETUAL'
+  type: TradingMode
   withdrawableAssets: WithdrawableAssetEntry[]
   offersToAccept: OfferEntry[]
   assets: UserAssetEntry[]
@@ -107,7 +107,7 @@ function UserPage(props: UserPageProps) {
         >
           <TransactionsTable transactions={props.transactions} />
         </TablePreview>
-        {props.offers && (
+        {props.offers && props.type === 'perpetual' && (
           <TablePreview
             {...getOfferTableProps(props.starkKey)}
             visible={props.offers.length}

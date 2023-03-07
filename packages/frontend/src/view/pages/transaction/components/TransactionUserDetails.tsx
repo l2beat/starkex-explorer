@@ -1,3 +1,4 @@
+import { TradingMode } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -8,7 +9,7 @@ import { TransactionField } from './TransactionField'
 
 interface TransactionUserDetailsProps {
   title: string
-  type?: 'SPOT' | 'PERPETUAL'
+  type?: TradingMode
   ethereumAddress: EthereumAddress
   starkKey: StarkKey
   vaultOrPositionId?: string
@@ -21,7 +22,7 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
       <div className="flex items-center justify-between gap-8 rounded-lg bg-gray-800 p-6 font-semibold">
         {props.vaultOrPositionId && (
           <TransactionField
-            label={props.type === 'SPOT' ? 'Vault' : 'Position'}
+            label={props.type === 'perpetual' ? 'Position' : 'Vault'}
           >
             #{props.vaultOrPositionId}
           </TransactionField>

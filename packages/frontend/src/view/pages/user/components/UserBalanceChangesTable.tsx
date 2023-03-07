@@ -1,3 +1,4 @@
+import { TradingMode } from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
 import React from 'react'
 
@@ -11,7 +12,7 @@ import { TimeCell } from '../../../components/TimeCell'
 
 export interface UserBalanceChangesTableProps {
   balanceChanges: UserBalanceChangeEntry[]
-  type: 'SPOT' | 'PERPETUAL'
+  type: TradingMode
 }
 
 export interface UserBalanceChangeEntry {
@@ -32,7 +33,7 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
         { header: 'Asset' },
         { header: 'Change', numeric: true },
         { header: 'Balance', numeric: true },
-        { header: props.type === 'PERPETUAL' ? 'Position' : 'Vault' },
+        { header: props.type === 'perpetual' ? 'Position' : 'Vault' },
       ]}
       rows={props.balanceChanges.map((entry) => {
         return {

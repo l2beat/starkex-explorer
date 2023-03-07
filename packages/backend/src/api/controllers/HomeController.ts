@@ -25,6 +25,7 @@ export class HomeController {
     private readonly userService: UserService,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
+    private readonly tradingMode: 'perpetual' | 'spot',
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -71,6 +72,7 @@ export class HomeController {
       totalForcedTransactions: forcedUserTransactionsCount,
       offers: [],
       totalOffers: 0,
+      type: this.tradingMode,
     })
     return { type: 'success', content }
   }

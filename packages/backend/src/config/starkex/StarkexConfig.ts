@@ -5,6 +5,7 @@ export type StarkexConfig =
   | PerpetualValidiumConfig
   | SpotValidiumConfig
 
+
 export interface PerpetualRollupConfig {
   dataAvailabilityMode: 'rollup'
   tradingMode: 'perpetual'
