@@ -1,4 +1,7 @@
 /* eslint-disable no-restricted-imports */
+/* eslint-enable no-restricted-imports */
+export type { OfferEntry } from './components/tables/OffersTable'
+export type { TransactionEntry } from './components/tables/TransactionsTable'
 export * from './old/forced-transactions'
 export * from './old/home'
 export * from './old/not-found'
@@ -6,12 +9,7 @@ export * from './old/offers'
 export * from './old/positions'
 export * from './old/state-updates'
 export * from './old/transaction-form'
-/* eslint-enable no-restricted-imports */
-
-export type { OfferEntry } from './components/tables/OffersTable'
-export type { TransactionEntry } from './components/tables/TransactionsTable'
-export * from './pages/forced-actions/NewPerpetualForcedTradePage'
-export * from './pages/forced-actions/NewPerpetualForcedWithdrawalPage'
+export * from './pages/forced-actions/NewPerpetualForcedActionPage'
 export * from './pages/forced-actions/NewSpotForcedWithdrawalPage'
 export type { HomeStateUpdateEntry } from './pages/home/components/HomeStateUpdatesTable'
 export type { HomeTutorialEntry } from './pages/home/components/HomeTutorials'
