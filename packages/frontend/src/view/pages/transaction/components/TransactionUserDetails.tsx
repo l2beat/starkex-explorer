@@ -9,7 +9,7 @@ import { TransactionField } from './TransactionField'
 
 interface TransactionUserDetailsProps {
   title: string
-  type?: TradingMode
+  tradingMode?: TradingMode
   ethereumAddress: EthereumAddress
   starkKey: StarkKey
   vaultOrPositionId?: string
@@ -22,7 +22,7 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
       <div className="flex items-center justify-between gap-8 rounded-lg bg-gray-800 p-6 font-semibold">
         {props.vaultOrPositionId && (
           <TransactionField
-            label={props.type === 'perpetual' ? 'Position' : 'Vault'}
+            label={props.tradingMode === 'perpetual' ? 'Position' : 'Vault'}
           >
             #{props.vaultOrPositionId}
           </TransactionField>

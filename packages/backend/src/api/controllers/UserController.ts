@@ -119,7 +119,7 @@ export class UserController {
 
     const content = renderUserPage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
       withdrawableAssets: [],
@@ -173,7 +173,7 @@ export class UserController {
 
     const content = renderUserAssetsPage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       starkKey,
       assets,
       ...pagination,
@@ -209,7 +209,7 @@ export class UserController {
 
     const content = renderUserBalanceChangesPage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       starkKey,
       balanceChanges,
       ...pagination,

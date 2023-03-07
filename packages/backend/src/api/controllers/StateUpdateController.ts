@@ -89,7 +89,7 @@ export class StateUpdateController {
 
     const content = renderStateUpdatePage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       id: stateUpdateId.toString(),
       hashes: {
         factHash: stateUpdate.stateTransitionHash,
@@ -134,7 +134,7 @@ export class StateUpdateController {
 
     const content = renderStateUpdateBalanceChangesPage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       id: stateUpdateId.toString(),
       balanceChanges: balanceChangeEntries,
       ...pagination,

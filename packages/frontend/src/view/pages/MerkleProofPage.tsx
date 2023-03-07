@@ -12,7 +12,7 @@ import { reactToHtml } from '../reactToHtml'
 export interface MerkleProofPageProps {
   positionOrVaultId: bigint
   user: UserDetails | undefined
-  type: TradingMode
+  tradingMode: TradingMode
   merkleProof: MerkleProof
 }
 
@@ -28,7 +28,7 @@ export interface MerkleProofPath {
 }
 
 function MerkleProofPage(props: MerkleProofPageProps) {
-  const idLabel = props.type === 'perpetual' ? 'Position' : 'Vault'
+  const idLabel = props.tradingMode === 'perpetual' ? 'Position' : 'Vault'
   const formattedLeaf = JSON.stringify(
     JSON.parse(props.merkleProof.leaf),
     null,

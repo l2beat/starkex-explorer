@@ -12,7 +12,7 @@ import { Table } from '../../../components/table/Table'
 
 export interface StateUpdateBalanceChangesTableProps {
   balanceChanges: StateUpdateBalanceChangeEntry[]
-  type: TradingMode
+  tradingMode: TradingMode
 }
 
 export interface StateUpdateBalanceChangeEntry {
@@ -33,7 +33,7 @@ export function StateUpdateBalanceChangesTable(
         { header: 'Asset' },
         { header: 'Change', numeric: true },
         { header: 'Balance', numeric: true },
-        { header: props.type === 'perpetual' ? 'Position' : 'Vault' },
+        { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
       ]}
       rows={props.balanceChanges.map((entry) => {
         return {

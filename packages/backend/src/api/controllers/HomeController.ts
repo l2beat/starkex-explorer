@@ -72,7 +72,7 @@ export class HomeController {
       totalForcedTransactions: forcedUserTransactionsCount,
       offers: [],
       totalOffers: 0,
-      type: this.tradingMode,
+      tradingMode: this.tradingMode,
     })
     return { type: 'success', content }
   }

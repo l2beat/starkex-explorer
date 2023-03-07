@@ -15,7 +15,7 @@ import { StateUpdatePageTitle } from './components/StateUpdatePageTitle'
 export interface StateUpdateBalanceChangesPageProps {
   user: UserDetails | undefined
   id: string
-  type: TradingMode
+  tradingMode: TradingMode
   balanceChanges: StateUpdateBalanceChangeEntry[]
   limit: number
   offset: number
@@ -46,7 +46,7 @@ function StateUpdateBalanceChangesPage(
           total={props.total}
         >
           <StateUpdateBalanceChangesTable
-            type={props.type}
+            tradingMode={props.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TableWithPagination>

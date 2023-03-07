@@ -103,7 +103,7 @@ const routes: Route[] = [
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
       })
     },
   },
@@ -121,7 +121,7 @@ const routes: Route[] = [
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
       })
     },
   },
@@ -185,7 +185,7 @@ const routes: Route[] = [
       ctx.body = renderMerkleProofPage({
         user,
         positionOrVaultId: BigInt(randomId()),
-        type: 'spot',
+        tradingMode: 'spot',
         merkleProof: {
           rootHash: PedersenHash.fake(),
           path: repeat(9, () => ({
@@ -213,7 +213,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderStateUpdatePage({
         user,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
         id: randomId(),
         hashes: {
           factHash: Hash256.fake(),
@@ -248,7 +248,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderStateUpdateBalanceChangesPage({
         user,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
         id: '1534',
         balanceChanges: repeat(visible, randomStateUpdateBalanceChangeEntry),
         limit,
@@ -287,7 +287,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderUserPage({
         user,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
@@ -321,7 +321,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderUserPage({
         user,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
         starkKey: user?.starkKey ?? StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
@@ -350,7 +350,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserAssetsPage({
         user,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         assets: repeat(visible, randomUserAssetEntry),
         limit,
@@ -370,7 +370,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserAssetsPage({
         user,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         assets: repeat(visible, randomUserAssetEntry),
         limit,
@@ -390,7 +390,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserBalanceChangesPage({
         user,
-        type: 'perpetual',
+        tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         balanceChanges: repeat(visible, randomUserBalanceChangeEntry),
         limit,

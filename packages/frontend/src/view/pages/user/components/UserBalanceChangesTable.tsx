@@ -12,7 +12,7 @@ import { TimeCell } from '../../../components/TimeCell'
 
 export interface UserBalanceChangesTableProps {
   balanceChanges: UserBalanceChangeEntry[]
-  type: TradingMode
+  tradingMode: TradingMode
 }
 
 export interface UserBalanceChangeEntry {
@@ -33,7 +33,7 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
         { header: 'Asset' },
         { header: 'Change', numeric: true },
         { header: 'Balance', numeric: true },
-        { header: props.type === 'perpetual' ? 'Position' : 'Vault' },
+        { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
       ]}
       rows={props.balanceChanges.map((entry) => {
         return {

@@ -36,7 +36,7 @@ export interface HomePageProps {
   totalForcedTransactions: number
   offers?: OfferEntry[]
   totalOffers: number
-  type: TradingMode
+  tradingMode: TradingMode
 }
 
 export function renderHomePage(props: HomePageProps) {
@@ -76,7 +76,7 @@ function HomePage(props: HomePageProps) {
           >
             <TransactionsTable transactions={props.transactions} />
           </TablePreview>
-          {props.offers && props.type === 'perpetual' && (
+          {props.offers && props.tradingMode === 'perpetual' && (
             <TablePreview
               {...OFFER_TABLE_PROPS}
               visible={props.offers.length}

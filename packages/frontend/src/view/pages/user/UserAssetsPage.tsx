@@ -13,7 +13,7 @@ import { UserPageTitle } from './components/UserPageTitle'
 export interface UserAssetsPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
-  type: TradingMode
+  tradingMode: TradingMode
   assets: UserAssetEntry[]
   limit: number
   offset: number
@@ -39,7 +39,7 @@ function UserAssetsPage(props: UserAssetsPageProps) {
         >
           <UserAssetsTable
             starkKey={props.starkKey}
-            type={props.type}
+            tradingMode={props.tradingMode}
             assets={props.assets}
           />
         </TableWithPagination>

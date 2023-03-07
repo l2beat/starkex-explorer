@@ -80,7 +80,7 @@ function PerpetualForcedWithdrawalPage(
         </div>
         <TransactionUserDetails
           title="Recipient details"
-          type="perpetual"
+          tradingMode="perpetual"
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}
           vaultOrPositionId={props.positionId}

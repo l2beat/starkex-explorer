@@ -26,7 +26,7 @@ import {
 
 export interface StateUpdatePageProps extends StateUpdateStatsProps {
   user: UserDetails | undefined
-  type: TradingMode
+  tradingMode: TradingMode
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
   priceChanges?: StateUpdatePriceEntry[]
@@ -59,7 +59,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
           total={props.totalBalanceChanges}
         >
           <StateUpdateBalanceChangesTable
-            type={props.type}
+            tradingMode={props.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>

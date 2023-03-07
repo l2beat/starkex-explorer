@@ -24,7 +24,7 @@ export class MerkleProofController {
     const content = renderMerkleProofPage({
       positionOrVaultId,
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       merkleProof: {
         rootHash: merkleProof.root,
         path: merkleProof.path,
