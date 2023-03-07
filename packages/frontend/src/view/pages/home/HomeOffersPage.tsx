@@ -24,7 +24,7 @@ function HomeOffersPage(props: HomeOffersPageProps) {
   return (
     <Page
       path={OFFER_TABLE_PROPS.link}
-      description="TODO: description"
+      description="Shows table of all available trade offers"
       user={props.user}
     >
       <ContentWrapper>

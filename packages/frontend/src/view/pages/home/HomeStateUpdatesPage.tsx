@@ -27,7 +27,7 @@ function HomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
   return (
     <Page
       path={STATE_UPDATE_TABLE_PROPS.link}
-      description="TODO: description"
+      description="Show table of latest state updates"
       user={props.user}
     >
       <ContentWrapper>

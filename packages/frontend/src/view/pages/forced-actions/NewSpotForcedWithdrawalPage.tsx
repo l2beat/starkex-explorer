@@ -40,7 +40,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   return (
     <Page
       path="/forced/new/spot/:vaultId"
-      description="Page that allows user withdrawal of spot asset"
+      description="Allows user to perform forced withdrawal on spot assets"
       user={props.user}
     >
       <main className="mx-auto flex-1 p-16">

@@ -5,6 +5,7 @@ export const getAssetsTableProps = (starkKey: StarkKey) => ({
   entryShortNamePlural: 'assets',
   entryLongNamePlural: 'assets',
   link: `/users/${starkKey.toString()}/assets`,
+  description: `Shows table of assets for ${starkKey.toString()} user`,
 })
 
 export const getBalanceChangeTableProps = (starkKey: StarkKey) => ({
@@ -12,6 +13,7 @@ export const getBalanceChangeTableProps = (starkKey: StarkKey) => ({
   entryShortNamePlural: 'changes',
   entryLongNamePlural: 'balance changes',
   link: `/users/${starkKey.toString()}/balance-changes`,
+  description: `Shows table of balance changes for ${starkKey.toString()} user`,
 })
 
 export const getTransactionTableProps = (starkKey: StarkKey) => ({
@@ -19,6 +21,7 @@ export const getTransactionTableProps = (starkKey: StarkKey) => ({
   entryShortNamePlural: 'transactions',
   entryLongNamePlural: 'ethereum transactions',
   link: `/users/${starkKey.toString()}/transactions`,
+  description: `Shows table of ethereum transactions for ${starkKey.toString()} user`,
 })
 
 export const getOfferTableProps = (starkKey: StarkKey) => ({
@@ -26,4 +29,5 @@ export const getOfferTableProps = (starkKey: StarkKey) => ({
   entryShortNamePlural: 'offers',
   entryLongNamePlural: 'trade offers',
   link: `/users/${starkKey.toString()}/offers`,
+  description: `Shows table ${starkKey.toString()} user's trade offers`,
 })

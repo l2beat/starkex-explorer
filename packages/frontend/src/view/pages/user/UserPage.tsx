@@ -55,7 +55,7 @@ function UserPage(props: UserPageProps) {
   return (
     <Page
       path={`/users/${props.starkKey.toString()}`}
-      description="TODO: description"
+      description={`User page of ${props.starkKey.toString()}`}
       user={props.user}
     >
       <ContentWrapper className="flex flex-col gap-12">
