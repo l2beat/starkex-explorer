@@ -4,6 +4,12 @@ const crypto = require('crypto')
 
 module.exports = { addHashes }
 
+/*
+ * This function is used to add hashes to static files.
+ * HASH_LENGTH - We are using sha256 so the maximum value can be 16. We are using 8 to keep the file names short. If you want to change this, you need to clean and rebuild the project.
+ */
+const HASH_LENGTH = 8
+
 async function addHashes({
   buildDir,
   staticDir,
@@ -60,7 +66,7 @@ async function addHashes({
     }
 
     if (item.needsHash) {
-      const hash = (await sha256(item.file)).slice(0, 8)
+      const hash = (await sha256(item.file)).slice(0, HASH_LENGTH)
       const { name, ext, dir } = path.parse(item.file)
       const base = path.dirname(item.file.slice(staticDir.length))
       const itemWithHash = `${name}.${hash}${ext}`
@@ -132,8 +138,10 @@ function replaceAll(str, find, replace) {
 
 function getRegexForDependency(name) {
   const splittedName = name.split('.')
+  const ext = splittedName.pop()
+  const nameWithoutExt = splittedName.join('.')
   return new RegExp(
-    `${splittedName.at(0)}(?:\\.\\w+)?\\.${splittedName.at(-1)}`,
+    `${nameWithoutExt}(?:\\.[a-fA-F0-9]{${HASH_LENGTH}})?\\.${ext}`,
     'gm'
   )
 }
