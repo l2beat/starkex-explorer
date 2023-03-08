@@ -288,11 +288,9 @@ function toUserAssetEntry(
         : getAssetValueUSDCents(asset.balance, asset.price),
     vaultOrPositionId: asset.positionOrVaultId.toString(),
     action:
-      tradingMode === 'perpetual'
-        ? asset.assetHashOrId === collateralAssetId
-          ? 'WITHDRAW'
-          : 'CLOSE'
-        : 'WITHDRAW',
+      tradingMode === 'spot' || asset.assetHashOrId === collateralAssetId
+        ? 'WITHDRAW'
+        : 'CLOSE',
   }
 }
 
