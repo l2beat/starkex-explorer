@@ -27,7 +27,7 @@
     "bn.js": "^5.2.1",
     "elliptic": "^6.5.4",
     "hash.js": "^1.1.7",
-    "pedersen-fast": "^0.3.0",
+    "pedersen-fast": "^0.1.0",
     "workerpool": "^6.2.1"
   },
   "devDependencies": {}
