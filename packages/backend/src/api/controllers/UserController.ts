@@ -44,6 +44,7 @@ export class UserController {
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly assetRepository: AssetRepository,
     private readonly tradingMode: TradingMode,
+    private readonly exchangeAddress: EthereumAddress,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -122,6 +123,7 @@ export class UserController {
       tradingMode: this.tradingMode,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
+      exchangeAddress: this.exchangeAddress,
       withdrawableAssets: [],
       offersToAccept: [],
       assets: assetEntries,

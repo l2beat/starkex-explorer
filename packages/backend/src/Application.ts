@@ -457,6 +457,7 @@ export class Application {
       userRegistrationEventRepository,
       assetRepository,
       config.starkex.tradingMode,
+      config.starkex.contracts.perpetual,
       config.starkex.tradingMode === 'perpetual'
         ? config.starkex.collateralAsset
         : undefined

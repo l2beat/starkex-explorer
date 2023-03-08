@@ -18,7 +18,8 @@ interface UserQuickActionsTableProps {
   readonly offersToAccept: readonly OfferEntry[]
   readonly starkKey: StarkKey
   readonly user: UserDetails | undefined
-  isMine?: boolean
+  readonly exchangeAddress: EthereumAddress
+  readonly isMine?: boolean
 }
 
 export interface WithdrawableAssetEntry {
@@ -61,8 +62,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                 assetDetails={asset.asset.details}
                 account={props.user.address}
                 starkKey={props.starkKey}
-                // TODO: change this to the real exchange address
-                exchangeAddress={EthereumAddress.fake()}
+                exchangeAddress={props.exchangeAddress}
               >
                 Withdraw now
               </UserWithdrawNowButton>
