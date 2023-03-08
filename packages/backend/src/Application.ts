@@ -523,7 +523,8 @@ export class Application {
     const forcedActionsController = new ForcedActionController(
       userService,
       preprocessedAssetHistoryRepository,
-      assetRepository
+      assetRepository,
+      config.starkex.contracts.perpetual
     )
 
     const apiServer = new ApiServer(config.port, logger, {
@@ -545,7 +546,8 @@ export class Application {
               transactionController,
               forcedActionsController,
               merkleProofController,
-              collateralAsset
+              collateralAsset,
+              config.starkex.tradingMode
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,

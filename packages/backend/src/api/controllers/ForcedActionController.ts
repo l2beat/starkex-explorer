@@ -16,7 +16,8 @@ export class ForcedActionController {
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
-    private readonly assetRepository: AssetRepository
+    private readonly assetRepository: AssetRepository,
+    private readonly starkExAddress: EthereumAddress
   ) {}
 
   async getSpotForcedWithdrawalPage(
@@ -49,7 +50,7 @@ export class ForcedActionController {
 
     const content = renderNewSpotForcedWithdrawPage({
       user,
-      starkExAddress: EthereumAddress.ZERO,
+      starkExAddress: this.starkExAddress,
       positionOrVaultId: vaultId,
       starkKey: asset.starkKey,
       asset: {
@@ -94,7 +95,7 @@ export class ForcedActionController {
 
     const content = renderNewSpotForcedWithdrawPage({
       user,
-      starkExAddress: EthereumAddress.ZERO,
+      starkExAddress: this.starkExAddress,
       positionOrVaultId: positionId,
       starkKey: asset.starkKey,
       asset: {
@@ -133,7 +134,7 @@ export class ForcedActionController {
 
     const content = renderNewPerpetualForcedTradePage({
       user,
-      starkExAddress: EthereumAddress.ZERO,
+      starkExAddress: this.starkExAddress,
       positionOrVaultId: positionId,
       starkKey: asset.starkKey,
       asset: {
