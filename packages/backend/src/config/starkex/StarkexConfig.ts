@@ -1,9 +1,16 @@
+import { TradingMode } from '@explorer/shared'
 import { AssetId, EthereumAddress } from '@explorer/types'
 
-export type StarkexConfig =
-  | PerpetualRollupConfig
-  | PerpetualValidiumConfig
-  | SpotValidiumConfig
+type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
+  T['tradingMode'],
+  TradingMode
+> extends never
+  ? T
+  : never
+
+export type StarkexConfig = CheckTradingMode<
+  PerpetualRollupConfig | PerpetualValidiumConfig | SpotValidiumConfig
+>
 
 export interface PerpetualRollupConfig {
   dataAvailabilityMode: 'rollup'
