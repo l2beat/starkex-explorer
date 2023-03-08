@@ -2,7 +2,7 @@ import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { ApiServer } from './api/ApiServer'
-import { ForcedActionsController } from './api/controllers/ForcedActionsController'
+import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
@@ -519,7 +519,7 @@ export class Application {
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
-    const forcedActionsController = new ForcedActionsController(
+    const forcedActionsController = new ForcedActionController(
       userService,
       preprocessedAssetHistoryRepository,
       assetRepository

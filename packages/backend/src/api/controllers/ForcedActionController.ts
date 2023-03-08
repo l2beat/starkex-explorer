@@ -10,7 +10,7 @@ import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { ControllerResult } from './ControllerResult'
 
-export class ForcedActionsController {
+export class ForcedActionController {
   constructor(
     private readonly userService: UserService,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<

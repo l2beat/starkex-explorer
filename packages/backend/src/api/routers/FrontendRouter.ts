@@ -11,7 +11,7 @@ import * as z from 'zod'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { ForcedActionsController } from '../controllers/ForcedActionsController'
+import { ForcedActionController } from '../controllers/ForcedActionController'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
@@ -25,7 +25,7 @@ export function createFrontendRouter(
   userController: UserController,
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
-  forcedWithdrawalController: ForcedActionsController,
+  forcedActionController: ForcedActionController,
   merkleProofController: MerkleProofController,
   collateralAsset: CollateralAsset | undefined
 ) {
@@ -273,11 +273,10 @@ export function createFrontendRouter(
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
-        const result =
-          await forcedWithdrawalController.getSpotForcedWithdrawalPage(
-            givenUser,
-            ctx.params.vaultId
-          )
+        const result = await forcedActionController.getSpotForcedWithdrawalPage(
+          givenUser,
+          ctx.params.vaultId
+        )
         applyControllerResult(ctx, result)
       }
     )
@@ -298,12 +297,12 @@ export function createFrontendRouter(
 
         const result =
           assetId === collateralAsset?.assetId
-            ? await forcedWithdrawalController.getPerpetualForcedWithdrawalPage(
+            ? await forcedActionController.getPerpetualForcedWithdrawalPage(
                 givenUser,
                 positionId,
                 assetId
               )
-            : await forcedWithdrawalController.getPerpetualForcedTradePage(
+            : await forcedActionController.getPerpetualForcedTradePage(
                 givenUser,
                 positionId,
                 assetId
