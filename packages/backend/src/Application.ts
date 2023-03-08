@@ -6,6 +6,7 @@ import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferCo
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
+import { NewSearchController } from './api/controllers/NewSearchController'
 import { OldHomeController } from './api/controllers/OldHomeController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
@@ -511,6 +512,11 @@ export class Application {
       positionRepository,
       userRegistrationEventRepository
     )
+    const newSearchController = new NewSearchController(
+      stateUpdateRepository,
+      positionRepository,
+      userRegistrationEventRepository
+    )
     const forcedTradeOfferController = new ForcedTradeOfferController(
       accountService,
       forcedTradeOfferRepository,
@@ -548,7 +554,8 @@ export class Application {
               stateUpdateController,
               transactionController,
               spotForcedWithdrawalController,
-              merkleProofController
+              merkleProofController,
+              newSearchController
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,

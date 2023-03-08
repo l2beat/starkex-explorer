@@ -11,6 +11,7 @@ import * as z from 'zod'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
+import { NewSearchController } from '../controllers/NewSearchController'
 import { SpotForcedWithdrawalController } from '../controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
@@ -24,7 +25,8 @@ export function createFrontendRouter(
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
   spotForcedWithdrawalController: SpotForcedWithdrawalController,
-  merkleProofController: MerkleProofController
+  merkleProofController: MerkleProofController,
+  searchController: NewSearchController
 ) {
   const router = new Router()
 
@@ -33,6 +35,22 @@ export function createFrontendRouter(
     const result = await homeController.getHomePage(givenUser)
     applyControllerResult(ctx, result)
   })
+
+  router.get(
+    '/search',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          query: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const { query } = ctx.query
+        const result = await searchController.getSearchRedirect(query)
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
 
   router.get(
     '/state-updates',
