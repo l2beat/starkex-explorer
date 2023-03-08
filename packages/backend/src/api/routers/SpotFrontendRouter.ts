@@ -6,7 +6,7 @@ import { ForcedActionController } from '../controllers/ForcedActionController'
 import { withTypedContext } from './types'
 import { applyControllerResult, getGivenUser } from './utils'
 
-export function addSpotRoutes(
+export function addSpotTradingRoutes(
   router: Router,
   forcedActionController: ForcedActionController
 ) {

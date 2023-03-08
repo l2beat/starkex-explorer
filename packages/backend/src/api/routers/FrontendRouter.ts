@@ -14,8 +14,8 @@ import { MerkleProofController } from '../controllers/MerkleProofController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
-import { addPerpetualRoutes } from './PerpetualFrontendRouter'
-import { addSpotRoutes } from './SpotFrontendRouter'
+import { addPerpetualTradingRoutes } from './PerpetualFrontendRouter'
+import { addSpotTradingRoutes } from './SpotFrontendRouter'
 import { withTypedContext } from './types'
 import { applyControllerResult, getGivenUser, getPagination } from './utils'
 
@@ -284,9 +284,9 @@ export function createFrontendRouter(
   )
 
   if (tradingMode === 'perpetual') {
-    addPerpetualRoutes(router, forcedActionController, collateralAsset)
+    addPerpetualTradingRoutes(router, forcedActionController, collateralAsset)
   } else {
-    addSpotRoutes(router, forcedActionController)
+    addSpotTradingRoutes(router, forcedActionController)
   }
 
   return router

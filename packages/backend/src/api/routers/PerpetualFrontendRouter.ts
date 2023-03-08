@@ -8,7 +8,7 @@ import { ForcedActionController } from '../controllers/ForcedActionController'
 import { withTypedContext } from './types'
 import { applyControllerResult, getGivenUser } from './utils'
 
-export function addPerpetualRoutes(
+export function addPerpetualTradingRoutes(
   router: Router,
   forcedActionController: ForcedActionController,
   collateralAsset: CollateralAsset | undefined
