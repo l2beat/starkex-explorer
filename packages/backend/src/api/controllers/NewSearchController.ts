@@ -31,11 +31,11 @@ export class NewSearchController {
     }
 
     if (!response && parsed.positionId) {
-        response = await this.searchForPositionId(parsed.positionId)
+      response = await this.searchForPositionId(parsed.positionId)
     }
 
-    if(!response && parsed.stateUpdateId) {
-        response = await this.searchForStateUpdateId(parsed.stateUpdateId)
+    if (!response && parsed.stateUpdateId) {
+      response = await this.searchForStateUpdateId(parsed.stateUpdateId)
     }
 
     if (!response) {
@@ -131,8 +131,12 @@ export function parseSearchQuery(query: string): ParsedQuery {
   const parsed: ParsedQuery = {}
   parsed.starkKey = tryOrUndefined(() => StarkKey(query))
   parsed.ethereumAddress = tryOrUndefined(() => EthereumAddress(query))
-  parsed.positionId = query.startsWith('23') ? BigInt(query.slice(2)) : undefined // 23 = #
-  parsed.stateUpdateId = query.startsWith('40') ? parseInt(query.slice(2)) : undefined // 40 = @
+  parsed.positionId = query.startsWith('23')
+    ? BigInt(query.slice(2))
+    : undefined // 23 = #
+  parsed.stateUpdateId = query.startsWith('40')
+    ? parseInt(query.slice(2))
+    : undefined // 40 = @
   parsed.stateUpdateRootHash = tryOrUndefined(() => PedersenHash(query))
   return parsed
 }
