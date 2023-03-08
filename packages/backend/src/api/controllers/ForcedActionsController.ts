@@ -89,7 +89,7 @@ export class ForcedActionsController {
     }
 
     if (asset.starkKey != user.starkKey) {
-      return { type: 'not found', content: 'Vault does not belong to user' }
+      return { type: 'not found', content: 'Position does not belong to user' }
     }
 
     const content = renderNewSpotForcedWithdrawPage({
@@ -128,7 +128,7 @@ export class ForcedActionsController {
     }
 
     if (asset.starkKey != user.starkKey) {
-      return { type: 'not found', content: 'Vault does not belong to user' }
+      return { type: 'not found', content: 'Position does not belong to user' }
     }
 
     const content = renderNewPerpetualForcedTradePage({
