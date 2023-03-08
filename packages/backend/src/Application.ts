@@ -97,6 +97,11 @@ export class Application {
 
     const database = new Database(config.databaseConnection, logger)
 
+    const collateralAsset =
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
+
     const kvStore = new KeyValueStore(database, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
     const softwareMigrationRepository = new SoftwareMigrationRepository(
@@ -169,9 +174,7 @@ export class Application {
       userTransactionRepository,
       withdrawableAssetRepository,
       config.starkex.contracts.perpetual,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
 
     const tokenRegistrationCollector = new AssetRegistrationCollector(
@@ -444,9 +447,7 @@ export class Application {
       userService,
       userTransactionRepository,
       preprocessedStateDetailsRepository,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const userController = new UserController(
       userService,
@@ -456,9 +457,7 @@ export class Application {
       userRegistrationEventRepository,
       assetRepository,
       config.starkex.tradingMode,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const stateUpdateController = new StateUpdateController(
       userService,
@@ -466,18 +465,14 @@ export class Application {
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
       config.starkex.tradingMode,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const transactionController = new TransactionController(
       userService,
       sentTransactionRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const merkleProofController = new MerkleProofController(
       userService,
@@ -548,7 +543,8 @@ export class Application {
               stateUpdateController,
               transactionController,
               forcedActionsController,
-              merkleProofController
+              merkleProofController,
+              collateralAsset
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,

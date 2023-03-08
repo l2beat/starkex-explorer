@@ -9,6 +9,7 @@ import Router from '@koa/router'
 import { Context } from 'koa'
 import * as z from 'zod'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedActionsController } from '../controllers/ForcedActionsController'
 import { HomeController } from '../controllers/HomeController'
@@ -25,7 +26,8 @@ export function createFrontendRouter(
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
   forcedWithdrawalController: ForcedActionsController,
-  merkleProofController: MerkleProofController
+  merkleProofController: MerkleProofController,
+  collateralAsset: CollateralAsset | undefined
 ) {
   const router = new Router()
 
@@ -295,7 +297,7 @@ export function createFrontendRouter(
         const givenUser = getGivenUser(ctx)
 
         const result =
-          assetId === AssetId.USDC
+          assetId === collateralAsset?.assetId
             ? await forcedWithdrawalController.getPerpetualForcedWithdrawalPage(
                 givenUser,
                 positionId,
