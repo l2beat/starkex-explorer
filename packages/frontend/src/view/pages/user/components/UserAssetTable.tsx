@@ -63,7 +63,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
-            props.isMine && props.tradingMode === 'spot' ? (
+            props.isMine && props.tradingMode === 'spot' && (
               <LinkButton
                 className="w-full"
                 href={`/forced/new/spot/${entry.vaultOrPositionId}`}

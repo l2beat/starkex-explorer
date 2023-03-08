@@ -447,6 +447,7 @@ export class Application {
       userService,
       userTransactionRepository,
       preprocessedStateDetailsRepository,
+      config.starkex.tradingMode,
       collateralAsset
     )
     const userController = new UserController(
