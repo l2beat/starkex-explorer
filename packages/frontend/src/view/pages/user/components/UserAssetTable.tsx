@@ -1,5 +1,5 @@
 import { TradingMode } from '@explorer/shared'
-import { AssetId, StarkKey } from '@explorer/types'
+import { StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
