@@ -31,12 +31,12 @@ initCountdownTimer()
 initImageFallback()
 initPagination()
 initStateUpdateStats()
-initRegularWithdrawal()
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 if (USE_NEW_DESIGN) {
   initPerpetualForcedActionForm()
   initSpotForcedWithdrawalForm()
+  initRegularWithdrawal()
 } else {
   initTransactionForm()
 }
