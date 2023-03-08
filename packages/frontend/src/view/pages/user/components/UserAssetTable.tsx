@@ -1,3 +1,4 @@
+import { TradingMode } from '@explorer/shared'
 import { AssetId, StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -13,7 +14,7 @@ import { Table } from '../../../components/table/Table'
 export interface UserAssetsTableProps {
   assets: UserAssetEntry[]
   starkKey: StarkKey
-  type: 'SPOT' | 'PERPETUAL'
+  tradingMode: TradingMode
   isMine?: boolean
 }
 
@@ -39,7 +40,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
       columns={[
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
-        { header: props.type === 'PERPETUAL' ? 'Position' : 'Vault' },
+        { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
         ...(props.isMine ? [{ header: 'Action' }] : []),
       ]}
       rows={props.assets.map((entry) => {
@@ -50,7 +51,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               <span className="text-lg font-medium text-white">
                 {formatAmount(entry.asset, entry.balance)}
               </span>
-              {props.type === 'PERPETUAL' && (
+              {props.tradingMode === 'perpetual' && (
                 <span className="mt-2 text-xxs text-zinc-500">
                   {formatWithDecimals(entry.value, 2, { prefix: '$' })}
                 </span>
@@ -58,12 +59,15 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
             </div>,
             <span className="text-zinc-500">
               #{entry.vaultOrPositionId}
-              {props.type === 'SPOT' && (
+              {props.tradingMode === 'spot' && (
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
-            props.isMine && (
-              <LinkButton className="w-full" href={forcedActionLink(entry)}>
+            props.isMine && props.tradingMode === 'spot' ? (
+              <LinkButton
+                className="w-full"
+                href={`/forced/new/spot/${entry.vaultOrPositionId}`}
+              >
                 {entry.action}
               </LinkButton>
             ),

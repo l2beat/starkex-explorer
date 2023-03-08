@@ -3,7 +3,7 @@ import {
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
@@ -34,7 +34,7 @@ export class StateUpdateController {
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
-    private readonly tradingMode: 'perpetual' | 'spot',
+    private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -89,7 +89,7 @@ export class StateUpdateController {
 
     const content = renderStateUpdatePage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       id: stateUpdateId.toString(),
       hashes: {
         factHash: stateUpdate.stateTransitionHash,
@@ -134,7 +134,7 @@ export class StateUpdateController {
 
     const content = renderStateUpdateBalanceChangesPage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       id: stateUpdateId.toString(),
       balanceChanges: balanceChangeEntries,
       ...pagination,
