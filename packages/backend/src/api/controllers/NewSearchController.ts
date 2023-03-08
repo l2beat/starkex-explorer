@@ -13,7 +13,6 @@ export class NewSearchController {
   ) {}
 
   async getSearchRedirect(query: string): Promise<ControllerResult> {
-    console.log('query', query)
     const parsed = parseSearchQuery(query)
 
     let response: ControllerResult | undefined
@@ -131,12 +130,10 @@ export function parseSearchQuery(query: string): ParsedQuery {
   const parsed: ParsedQuery = {}
   parsed.starkKey = tryOrUndefined(() => StarkKey(query))
   parsed.ethereumAddress = tryOrUndefined(() => EthereumAddress(query))
-  parsed.positionId = query.startsWith('23')
-    ? BigInt(query.slice(2))
-    : undefined // 23 = #
-  parsed.stateUpdateId = query.startsWith('40')
-    ? parseInt(query.slice(2))
-    : undefined // 40 = @
+  parsed.positionId = query.startsWith('#') ? BigInt(query.slice(1)) : undefined
+  parsed.stateUpdateId = query.startsWith('@')
+    ? parseInt(query.slice(1))
+    : undefined
   parsed.stateUpdateRootHash = tryOrUndefined(() => PedersenHash(query))
   return parsed
 }
