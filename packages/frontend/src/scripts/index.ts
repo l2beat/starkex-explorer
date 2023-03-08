@@ -1,7 +1,6 @@
 import { USE_NEW_DESIGN } from '../utils/constants'
 import { initCountdownTimer } from './countdownTimer'
-import { initPerpetualForcedActionForm } from './forced-actions/perpetualForcedActionForm'
-import { initSpotForcedWithdrawalForm } from './forced-actions/spotForcedWithdrawalForm'
+import { initForcedActionForms } from './forced-actions/forcedActionForm'
 import { initImageFallback } from './imageFallback'
 import { initMetamask } from './metamask'
 import { initAcceptOfferForm } from './offer/acceptForm'
@@ -27,14 +26,13 @@ initCancelOfferForm()
 initFinalizeForm()
 initFinalizeExitForm()
 initCountdownTimer()
-initImageFallback()
-initPagination()
-initStateUpdateStats()
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 if (USE_NEW_DESIGN) {
-  initPerpetualForcedActionForm()
-  initSpotForcedWithdrawalForm()
+  initForcedActionForms()
+  initImageFallback()
+  initPagination()
+  initStateUpdateStats()
 } else {
   initTransactionForm()
 }

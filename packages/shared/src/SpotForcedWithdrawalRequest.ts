@@ -17,6 +17,7 @@ export function decodeSpotForcedWithdrawalRequest(
     const decoded = coder.decodeFunctionData('fullWithdrawalRequest', data)
     /* eslint-disable @typescript-eslint/no-unsafe-argument */
     return {
+      //TODO: CHECK IF THIS IS CORRECT
       ownerKey: StarkKey.from(decoded.starkKey),
       vaultId: BigInt(decoded.positionId),
     }
