@@ -82,6 +82,34 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
+  //TODO: Talk with Piotr about what to do with this
+  async submitWithdrawalWithTokenId(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const tx = await this.getTransaction(transactionHash)
+    if (!tx) {
+      return {
+        type: 'bad request',
+        content: `Transaction ${transactionHash.toString()} not found`,
+      }
+    }
+    const data = decodeWithdrawal(tx.data)
+    if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
+      return { type: 'bad request', content: `Invalid transaction` }
+    }
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'Withdraw',
+        starkKey: data.starkKey,
+        assetType: AssetHash(data.assetType),
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
   async submitForcedTrade(
     transactionHash: Hash256,
     offerId: number
