@@ -18,7 +18,7 @@ import { BigNumber, providers } from 'ethers'
 import { LogWithdrawalPerformed } from '../core/collectors/events'
 import {
   Accepted,
-  ForcedTradeOfferRecord,
+  ForcedTradeOfferTransaction,
 } from '../peripherals/database/ForcedTradeOfferRepository'
 import {
   FinalizeExitAction,
@@ -157,8 +157,8 @@ export function fakeAccepted(accepted?: Partial<Accepted>): Accepted {
 }
 
 export function fakeOffer(
-  offer?: Partial<ForcedTradeOfferRecord>
-): ForcedTradeOfferRecord {
+  offer?: Partial<ForcedTradeOfferTransaction>
+): ForcedTradeOfferTransaction {
   return {
     id: fakeInt(),
     createdAt: fakeTimestamp(),
@@ -174,7 +174,7 @@ export function fakeOffer(
 }
 
 export function fakeInitialOffer(
-  offer?: Partial<Omit<ForcedTradeOfferRecord, 'accepted'>>
+  offer?: Partial<Omit<ForcedTradeOfferTransaction, 'accepted'>>
 ) {
   return fakeOffer({ ...offer, accepted: undefined, cancelledAt: undefined })
 }

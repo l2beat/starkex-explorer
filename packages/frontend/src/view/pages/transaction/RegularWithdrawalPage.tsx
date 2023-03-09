@@ -24,7 +24,7 @@ export interface RegularWithdrawalPageProps {
   asset: Asset
   amount?: bigint
   history: {
-    timestamp: Timestamp
+    timestamp: Timestamp | undefined
     status: 'SENT' | 'MINED' | 'REVERTED'
   }[]
   stateUpdateId?: number

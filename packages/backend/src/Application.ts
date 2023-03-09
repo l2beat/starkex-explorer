@@ -474,6 +474,7 @@ export class Application {
     const transactionController = new TransactionController(
       userService,
       sentTransactionRepository,
+      forcedTradeOfferRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
       config.starkex.tradingMode === 'perpetual'

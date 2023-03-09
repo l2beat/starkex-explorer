@@ -17,7 +17,7 @@ export interface Accepted {
   transactionHash?: Hash256
 }
 
-interface Record {
+export interface ForcedTradeOfferTransaction {
   id: number
   createdAt: Timestamp
   starkKeyA: StarkKey
@@ -29,9 +29,10 @@ interface Record {
   accepted?: Accepted
   cancelledAt?: Timestamp
 }
-export { type Record as ForcedTradeOfferRecord }
 
-type RecordCandidate = Omit<Record, 'id'> & { id?: Record['id'] }
+type RecordCandidate = Omit<ForcedTradeOfferTransaction, 'id'> & {
+  id?: ForcedTradeOfferTransaction['id']
+}
 type RowCandidate = Omit<Row, 'id'> & { id?: Row['id'] }
 
 function toRowCandidate(record: RecordCandidate): RowCandidate {
@@ -64,14 +65,14 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
   }
 }
 
-function toRow(record: Record): Row {
+function toRow(record: ForcedTradeOfferTransaction): Row {
   return {
     ...toRowCandidate(record),
     id: record.id,
   }
 }
 
-function toRecord(row: Row): Record {
+function toRecord(row: Row): ForcedTradeOfferTransaction {
   const record = {
     id: row.id,
     createdAt: Timestamp(row.created_at),
@@ -137,7 +138,9 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async add(record: RecordCandidate): Promise<Record['id']> {
+  async add(
+    record: RecordCandidate
+  ): Promise<ForcedTradeOfferTransaction['id']> {
     const row = toRowCandidate(record)
     const knex = await this.knex()
     const [result] = (await knex('forced_trade_offers')
@@ -147,7 +150,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return result!.id
   }
 
-  async update(record: Record): Promise<number> {
+  async update(record: ForcedTradeOfferTransaction): Promise<number> {
     const row = toRow(record)
     const knex = await this.knex()
     const updates = await knex('forced_trade_offers')
@@ -202,7 +205,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   }: {
     limit: number
     offset: number
-  } & InitialFilters): Promise<Record[]> {
+  } & InitialFilters): Promise<ForcedTradeOfferTransaction[]> {
     const knex = await this.knex()
     const rows = await this.getInitialQuery(knex, { assetId, type })
       .orderBy('created_at', 'desc')
@@ -244,13 +247,17 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async findById(id: Record['id']): Promise<Record | undefined> {
+  async findById(
+    id: ForcedTradeOfferTransaction['id']
+  ): Promise<ForcedTradeOfferTransaction | undefined> {
     const knex = await this.knex()
     const row = await knex('forced_trade_offers').where({ id }).first()
     return row ? toRecord(row) : undefined
   }
 
-  async findByHash(hash: Hash256): Promise<Record | undefined> {
+  async findByTransactionHash(
+    hash: Hash256
+  ): Promise<ForcedTradeOfferTransaction | undefined> {
     const knex = await this.knex()
     const row = await knex('forced_trade_offers')
       .where({ transaction_hash: hash.toString() })

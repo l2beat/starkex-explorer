@@ -43,7 +43,7 @@ export interface OfferAndForcedTradePageProps {
   syntheticAmount: bigint
   expirationTimestamp: Timestamp
   history: {
-    timestamp: Timestamp
+    timestamp: Timestamp | undefined
     status:
       | 'CREATED'
       | 'CANCELLED'

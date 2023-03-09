@@ -11,7 +11,7 @@ interface TransactionHistoryTableProps {
 }
 
 export interface TransactionHistoryEntry {
-  timestamp: Timestamp
+  timestamp: Timestamp | undefined
   statusType: StatusType
   statusText: string
   description: React.ReactNode
@@ -30,7 +30,11 @@ export function TransactionHistoryTable(props: TransactionHistoryTableProps) {
         rows={props.entries.map((entry) => {
           return {
             cells: [
-              <TimeCell timestamp={entry.timestamp} />,
+              entry.timestamp ? (
+                <TimeCell timestamp={entry.timestamp} />
+              ) : (
+                'Unknown (off chain)'
+              ),
               <StatusBadge type={entry.statusType}>
                 {entry.statusText}
               </StatusBadge>,

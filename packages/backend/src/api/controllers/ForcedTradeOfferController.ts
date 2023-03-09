@@ -7,8 +7,8 @@ import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 import { AccountService } from '../../core/AccountService'
 import {
   Accepted,
-  ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
+  ForcedTradeOfferTransaction,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
@@ -139,7 +139,7 @@ export class ForcedTradeOfferController {
   }
 
   async postOffer(
-    offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
+    offer: Omit<ForcedTradeOfferTransaction, 'createdAt' | 'id'>,
     signature: string
   ): Promise<ControllerResult> {
     const positionA = await this.positionRepository.findById(offer.positionIdA)

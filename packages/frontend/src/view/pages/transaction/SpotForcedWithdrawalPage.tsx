@@ -28,7 +28,7 @@ export interface SpotForcedWithdrawalPageProps {
   }
   vaultId: string
   history: {
-    timestamp: Timestamp
+    timestamp: Timestamp | undefined
     status: 'SENT' | 'MINED' | 'REVERTED' | 'INCLUDED'
   }[]
   stateUpdateId?: number

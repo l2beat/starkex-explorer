@@ -90,7 +90,7 @@ export class ForcedTransactionController {
     }
 
     const [offer, finalize] = await Promise.all([
-      this.offersRepository.findByHash(transactionHash),
+      this.offersRepository.findByTransactionHash(transactionHash),
       this.findFinalizeTransaction(transaction),
     ])
     const offerHistory = offer ? toForcedTradeOfferHistory(offer) : []

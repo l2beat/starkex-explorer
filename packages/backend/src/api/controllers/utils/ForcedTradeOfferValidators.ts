@@ -9,7 +9,7 @@ import { hashMessage, recoverAddress } from 'ethers/lib/utils'
 
 import {
   Accepted,
-  ForcedTradeOfferRecord,
+  ForcedTradeOfferTransaction,
 } from '../../../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRecord } from '../../../peripherals/database/PositionRepository'
 
@@ -46,7 +46,7 @@ function validatePersonalSignature(
 }
 
 export function validateCreateSignature(
-  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferTransaction, 'createdAt' | 'id'>,
   signature: string,
   address: EthereumAddress
 ) {
@@ -55,7 +55,7 @@ export function validateCreateSignature(
 }
 
 export function validateAcceptSignature(
-  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferTransaction, 'createdAt' | 'id'>,
   accepted: Omit<Accepted, 'at' | 'premiumCost'>,
   address: EthereumAddress
 ): boolean {
@@ -64,7 +64,7 @@ export function validateAcceptSignature(
 }
 
 export function validateCreate(
-  offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
+  offer: Omit<ForcedTradeOfferTransaction, 'createdAt' | 'id'>,
   positionA: PositionRecord,
   signature: string,
   addressA: EthereumAddress
@@ -82,7 +82,7 @@ export function validateCreate(
 }
 
 export function validateCancel(
-  offerId: ForcedTradeOfferRecord['id'],
+  offerId: ForcedTradeOfferTransaction['id'],
   address: EthereumAddress,
   signature: string
 ): boolean {

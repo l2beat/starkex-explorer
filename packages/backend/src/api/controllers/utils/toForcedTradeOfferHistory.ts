@@ -1,13 +1,13 @@
 import { Timestamp } from '@explorer/types'
 
-import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
+import { ForcedTradeOfferTransaction } from '../../../peripherals/database/ForcedTradeOfferRepository'
 
 interface Event {
   timestamp: Timestamp
   text: string
 }
 
-export function toForcedTradeOfferHistory(offer: ForcedTradeOfferRecord) {
+export function toForcedTradeOfferHistory(offer: ForcedTradeOfferTransaction) {
   const history: Event[] = [
     {
       timestamp: offer.createdAt,
