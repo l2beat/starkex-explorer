@@ -1,15 +1,26 @@
-import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  PedersenHash,
+  StarkKey,
+} from '@explorer/types'
 
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
+import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { VaultRepository } from '../../peripherals/database/VaultRepository'
 import { ControllerResult } from './ControllerResult'
 
 export class SearchController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
-    private positionRepository: PositionRepository,
-    private userRegistrationEventRepository: UserRegistrationEventRepository
+    private positionOrVaultRepository: PositionRepository | VaultRepository,
+    private userRegistrationEventRepository: UserRegistrationEventRepository,
+    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
+      AssetHash | AssetId
+    >
   ) {}
 
   async getSearchRedirect(query: string): Promise<ControllerResult> {
@@ -83,13 +94,21 @@ export class SearchController {
       return
     }
 
+    if (
+      !(await this.preprocessedAssetHistoryRepository.starkKeyExists(starkKey))
+    ) {
+      return
+    }
+
     return { type: 'redirect', url: `/users/${starkKey.toString()}` }
   }
 
   private async searchForPositionOrVaultId(
-    positionId: bigint
+    positionOrVaultId: bigint
   ): Promise<ControllerResult | undefined> {
-    const position = await this.positionRepository.findById(positionId)
+    const position = await this.positionOrVaultRepository.findById(
+      positionOrVaultId
+    )
     if (position === undefined) {
       return
     }

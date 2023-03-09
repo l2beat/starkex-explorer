@@ -118,6 +118,7 @@ export class Application {
     const blockRepository = new BlockRepository(database, logger)
     const stateUpdateRepository = new StateUpdateRepository(database, logger)
     const positionRepository = new PositionRepository(database, logger)
+    const vaultRepository = new VaultRepository(database, logger)
     const userRegistrationEventRepository = new UserRegistrationEventRepository(
       database,
       logger
@@ -391,8 +392,6 @@ export class Application {
       preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetHash, logger)
 
-      const vaultRepository = new VaultRepository(database, logger)
-
       const spotHistoryPreprocessor = new SpotHistoryPreprocessor(
         preprocessedAssetHistoryRepository,
         vaultRepository,
@@ -514,8 +513,11 @@ export class Application {
     )
     const newSearchController = new SearchController(
       stateUpdateRepository,
-      positionRepository,
-      userRegistrationEventRepository
+      config.starkex.tradingMode === 'perpetual'
+        ? positionRepository
+        : vaultRepository,
+      userRegistrationEventRepository,
+      preprocessedAssetHistoryRepository
     )
     const forcedTradeOfferController = new ForcedTradeOfferController(
       accountService,
