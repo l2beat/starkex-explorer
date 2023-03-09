@@ -1,9 +1,10 @@
 import {
+  decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
   PerpetualForcedTradeRequest,
 } from '@explorer/shared'
-import { AssetHash, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import { AssetHash, AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 
 import {
   ForcedTradeOfferRecord,
@@ -75,7 +76,7 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  //TODO: Talk with Piotr about what to do with this
+  //TODO: Determine what should this function do
   async submitWithdrawalWithTokenId(
     transactionHash: Hash256
   ): Promise<ControllerResult> {
@@ -96,7 +97,67 @@ export class TransactionSubmitController {
       }
     }
   }
+
+  async submitForcedTrade(
+    transactionHash: Hash256,
+    offerId: number
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const offer = await this.offersRepository.findById(offerId)
+    if (!offer) {
+      return { type: 'not found', content: `Offer ${offerId} not found` }
+    }
+    if (
+      !offer.accepted ||
+      offer.cancelledAt ||
+      offer.accepted.transactionHash
+    ) {
+      return { type: 'bad request', content: `Offer cannot be finalized` }
+    }
+    const tx = await this.getTransaction(transactionHash)
+    if (!tx) {
+      return {
+        type: 'bad request',
+        content: `Transaction ${transactionHash.toString()} not found`,
+      }
+    }
+    const data = decodePerpetualForcedTradeRequest(tx.data)
+    if (
+      !tx.to ||
+      EthereumAddress(tx.to) !== this.perpetualAddress ||
+      !data ||
+      !tradeMatchesOffer(offer, data)
+    ) {
+      return { type: 'bad request', content: `Invalid transaction` }
+    }
+    // TODO: cross repository transaction
+    await this.offersRepository.updateTransactionHash(offerId, transactionHash)
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'ForcedTrade',
+        starkKeyA: data.starkKeyA,
+        starkKeyB: data.starkKeyB,
+        positionIdA: data.positionIdA,
+        positionIdB: data.positionIdB,
+        collateralAmount: data.collateralAmount,
+        collateralAssetId: AssetId.USDC,
+        syntheticAmount: data.syntheticAmount,
+        syntheticAssetId: data.syntheticAssetId,
+        isABuyingSynthetic: data.isABuyingSynthetic,
+        submissionExpirationTime: Timestamp(data.submissionExpirationTime),
+        nonce: data.nonce,
+        signatureB: data.signature,
+        premiumCost: data.premiumCost,
+        offerId,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
 }
+
+
 
 function tradeMatchesOffer(
   offer: ForcedTradeOfferRecord,
