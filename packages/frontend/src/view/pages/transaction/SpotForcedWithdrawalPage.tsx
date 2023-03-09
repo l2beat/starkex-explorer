@@ -71,7 +71,7 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
         </div>
         <TransactionUserDetails
           title="Recipient details"
-          type="SPOT"
+          tradingMode="spot"
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}
           vaultOrPositionId={props.vaultId}

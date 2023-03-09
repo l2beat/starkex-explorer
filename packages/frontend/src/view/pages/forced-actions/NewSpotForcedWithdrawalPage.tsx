@@ -39,7 +39,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   const formattedBalance = formatAmount(props.asset, props.asset.balance)
   return (
     <Page
-      path="/forced/new/spot/:vaultId"
+      path="/forced/new/:vaultId"
       description="Perform forced withdrawal"
       user={props.user}
     >
