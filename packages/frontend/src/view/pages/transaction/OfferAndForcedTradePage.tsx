@@ -89,7 +89,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
       description={
         props.transactionHash
           ? `Details of the ${props.transactionHash.toString()} forced trade transaction`
-          : `Details of the ${props.offerId} offer`
+          : `Details of the ${props.offerId} forced trade offer`
       }
     >
       <ContentWrapper className="flex flex-col gap-12">

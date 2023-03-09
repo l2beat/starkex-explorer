@@ -45,7 +45,7 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
     <Page
       user={props.user}
       path={`/transactions/${props.transactionHash.toString()}`}
-      description="Details of the ${props.transactionHash.toString()} withdrawal transaction"
+      description={`Details of the ${props.transactionHash.toString()} withdrawal transaction`}
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>

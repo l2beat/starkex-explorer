@@ -21,7 +21,7 @@ function NewPerpetualForcedActionPage(props: NewForcedActionFormProps) {
   return (
     <Page
       path="/forced/new/:positionId/:assetId"
-      description="Allows user to perform forced actions on perpetual assets"
+      description="Perform forced actions on your assets"
       user={props.user}
     >
       <main className="mx-auto flex-1 p-16">

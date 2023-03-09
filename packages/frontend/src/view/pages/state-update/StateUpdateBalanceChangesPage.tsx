@@ -33,7 +33,7 @@ function StateUpdateBalanceChangesPage(
 ) {
   const common = getBalanceChangeTableProps(props.id)
   return (
-    <Page path={common.link} description={common.description} user={props.user}>
+    <Page path={common.path} description={common.description} user={props.user}>
       <ContentWrapper>
         <TableWithPagination
           {...common}

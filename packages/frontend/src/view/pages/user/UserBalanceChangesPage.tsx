@@ -32,7 +32,7 @@ export function renderUserBalanceChangesPage(
 function UserBalanceChangesPage(props: UserBalanceChangesPageProps) {
   const common = getBalanceChangeTableProps(props.starkKey)
   return (
-    <Page path={common.link} description={common.description} user={props.user}>
+    <Page path={common.path} description={common.description} user={props.user}>
       <ContentWrapper>
         <TableWithPagination
           {...common}

@@ -27,7 +27,7 @@ export function renderUserAssetsPage(props: UserAssetsPageProps) {
 function UserAssetsPage(props: UserAssetsPageProps) {
   const common = getAssetsTableProps(props.starkKey)
   return (
-    <Page path={common.link} description={common.description} user={props.user}>
+    <Page path={common.path} description={common.description} user={props.user}>
       <ContentWrapper>
         <TableWithPagination
           {...common}

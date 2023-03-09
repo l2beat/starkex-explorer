@@ -30,7 +30,7 @@ export function renderStateUpdateTransactionsPage(
 function StateUpdateTransactionsPage(props: StateUpdateTransactionsPageProps) {
   const common = getTransactionTableProps(props.id)
   return (
-    <Page path={common.link} description={common.description} user={props.user}>
+    <Page path={common.path} description={common.description} user={props.user}>
       <ContentWrapper>
         <TableWithPagination
           {...common}

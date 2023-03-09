@@ -26,8 +26,8 @@ export function renderHomeTransactionsPage(props: HomeTransactionsPageProps) {
 function HomeTransactionsPage(props: HomeTransactionsPageProps) {
   return (
     <Page
-      path={FORCED_TRANSACTION_TABLE_PROPS.link}
-      description="Show table of all forced transactions"
+      path={FORCED_TRANSACTION_TABLE_PROPS.path}
+      description="All forced transactions"
       user={props.user}
     >
       <ContentWrapper>
