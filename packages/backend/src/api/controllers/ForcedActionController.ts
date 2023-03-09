@@ -1,5 +1,5 @@
 import {
-  renderNewPerpetualForcedTradePage,
+  renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
 } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
@@ -132,7 +132,7 @@ export class ForcedActionController {
       return { type: 'not found', content: 'Position does not belong to user' }
     }
 
-    const content = renderNewPerpetualForcedTradePage({
+    const content = renderNewPerpetualForcedActionPage({
       user,
       starkExAddress: this.starkExAddress,
       positionOrVaultId: positionId,

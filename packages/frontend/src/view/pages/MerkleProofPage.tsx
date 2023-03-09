@@ -38,7 +38,7 @@ function MerkleProofPage(props: MerkleProofPageProps) {
     <Page
       title="Merkle Proof"
       description={`Merkle proof for #${props.positionOrVaultId.toString()} ${
-        props.type === 'PERPETUAL' ? 'position' : 'vault'
+        props.tradingMode === 'perpetual' ? 'position' : 'vault'
       } made from the latest state update`}
       path={`/proof/${props.positionOrVaultId.toString()}`}
       user={props.user}
