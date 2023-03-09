@@ -16,7 +16,7 @@ export function SearchBar({ className = '' }) {
       <input
         className="w-full rounded-l-lg bg-transparent p-4 outline-0 placeholder:text-gray-600 group-focus-within:placeholder:text-zinc-500 group-hover:placeholder:text-zinc-500"
         type="text"
-        placeholder="Search by Hash, Id, Public Key or Address"
+        placeholder="Search by Ethereum address, Stark key, @state-update-id or #vault-id"
         name="query"
       />
       <button className="flex w-12 items-center justify-center rounded-r-lg bg-transparent ">
