@@ -293,9 +293,11 @@ function buildForcedTradeTransactionHistory(
   history.push(...buildTransactionHistory(sentTransaction, userTransaction))
 
   /*
-    TODO: Right now it's not possible to have a forcedTradeOfferTransaction without a userTransaction,
-    but probably it should be possible.
+    TODO: Right now it's not possible to have a forcedTradeOfferTransaction without a userTransaction, but probably it should be possible.
+    TODO: Remove the eslint-disable-next-line @typescript-eslint/no-unnecessary-condition when it's possible to have a forcedTradeOfferTransaction without a userTransaction
   */
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!forcedTradeOfferTransaction && !sentTransaction && !userTransaction) {
     return history
   }
@@ -309,6 +311,7 @@ function buildForcedTradeTransactionHistory(
   if (
     forcedTradeOfferTransaction?.accepted?.at ||
     sentTransaction ||
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     userTransaction
   ) {
     if (
