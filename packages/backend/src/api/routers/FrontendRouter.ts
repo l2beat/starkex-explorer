@@ -11,7 +11,7 @@ import * as z from 'zod'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
-import { NewSearchController } from '../controllers/NewSearchController'
+import { SearchController } from '../controllers/SearchController'
 import { SpotForcedWithdrawalController } from '../controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
@@ -26,7 +26,7 @@ export function createFrontendRouter(
   transactionController: TransactionController,
   spotForcedWithdrawalController: SpotForcedWithdrawalController,
   merkleProofController: MerkleProofController,
-  searchController: NewSearchController
+  searchController: SearchController
 ) {
   const router = new Router()
 

@@ -6,8 +6,8 @@ import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferCo
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
-import { NewSearchController } from './api/controllers/NewSearchController'
 import { OldHomeController } from './api/controllers/OldHomeController'
+import { OldSearchController } from './api/controllers/OldSearchController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
@@ -507,12 +507,12 @@ export class Application {
       stateUpdateRepository,
       userTransactionRepository
     )
-    const searchController = new SearchController(
+    const searchController = new OldSearchController(
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository
     )
-    const newSearchController = new NewSearchController(
+    const newSearchController = new SearchController(
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository

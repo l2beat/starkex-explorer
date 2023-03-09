@@ -5,7 +5,7 @@ import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRep
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 
-export class NewSearchController {
+export class OldSearchController {
   constructor(
     private stateUpdateRepository: StateUpdateRepository,
     private positionRepository: PositionRepository,
@@ -21,20 +21,12 @@ export class NewSearchController {
       response = await this.searchForEthereumAddress(parsed.ethereumAddress)
     }
 
-    if (!response && parsed.stateUpdateRootHash) {
-      response = await this.searchForRootHash(parsed.stateUpdateRootHash)
+    if (!response && parsed.stateTreeHash) {
+      response = await this.searchForRootHash(parsed.stateTreeHash)
     }
 
     if (!response && parsed.starkKey) {
       response = await this.searchForStarkKey(parsed.starkKey)
-    }
-
-    if (!response && parsed.positionId) {
-      response = await this.searchForPositionId(parsed.positionId)
-    }
-
-    if (!response && parsed.stateUpdateId) {
-      response = await this.searchForStateUpdateId(parsed.stateUpdateId)
     }
 
     if (!response) {
@@ -56,9 +48,14 @@ export class NewSearchController {
       return
     }
 
-    const starkKey = userRegistrationEvent.starkKey.toString()
+    const positionId = await this.positionRepository.findIdByStarkKey(
+      userRegistrationEvent.starkKey
+    )
+    if (positionId === undefined) {
+      return
+    }
 
-    return { type: 'redirect', url: `/users/${starkKey}` }
+    return { type: 'redirect', url: `/positions/${positionId}` }
   }
 
   private async searchForRootHash(
@@ -92,49 +89,20 @@ export class NewSearchController {
 
     return { type: 'redirect', url: `/positions/${positionId}` }
   }
-
-  private async searchForPositionId(
-    positionId: bigint
-  ): Promise<ControllerResult | undefined> {
-    const position = await this.positionRepository.findById(positionId)
-    if (position === undefined) {
-      return
-    }
-
-    const starkKey = position.starkKey.toString()
-
-    return { type: 'redirect', url: `/user/${starkKey}` }
-  }
-
-  private async searchForStateUpdateId(
-    stateUpdateId: number
-  ): Promise<ControllerResult | undefined> {
-    const stateUpdate = await this.stateUpdateRepository.findById(stateUpdateId)
-    if (stateUpdate === undefined) {
-      return
-    }
-
-    return { type: 'redirect', url: `/state-updates/${stateUpdateId}` }
-  }
 }
 
 interface ParsedQuery {
   ethereumAddress?: EthereumAddress
+  stateTreeHash?: PedersenHash
   starkKey?: StarkKey
-  positionId?: bigint
-  stateUpdateId?: number
-  stateUpdateRootHash?: PedersenHash
 }
 
 export function parseSearchQuery(query: string): ParsedQuery {
   const parsed: ParsedQuery = {}
+  parsed.stateTreeHash = tryOrUndefined(() => PedersenHash(query))
   parsed.starkKey = tryOrUndefined(() => StarkKey(query))
   parsed.ethereumAddress = tryOrUndefined(() => EthereumAddress(query))
-  parsed.positionId = query.startsWith('#') ? BigInt(query.slice(1)) : undefined
-  parsed.stateUpdateId = query.startsWith('@')
-    ? parseInt(query.slice(1))
-    : undefined
-  parsed.stateUpdateRootHash = tryOrUndefined(() => PedersenHash(query))
+
   return parsed
 }
 
