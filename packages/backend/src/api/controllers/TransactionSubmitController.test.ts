@@ -4,6 +4,7 @@ import {
   encodeWithdrawal,
 } from '@explorer/shared'
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -354,7 +355,10 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction to a wrong address', async () => {
-      const data = encodeWithdrawal(StarkKey.fake(), Hash256.fake())
+      const data = encodeWithdrawal({
+        starkKey: StarkKey.fake(),
+        assetTypeHash: Hash256.fake(),
+      })
       const controller = new TransactionSubmitController(
         mock<EthereumClient>({
           getTransaction: async () =>
@@ -401,7 +405,10 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction with correct data and address', async () => {
-      const data = encodeWithdrawal(StarkKey.fake(), Hash256.fake())
+      const data = encodeWithdrawal({
+        starkKey: StarkKey.fake(),
+        assetTypeHash: Hash256(AssetHash.fake().toString()),
+      })
       const perpetualAddress = EthereumAddress.fake()
       const hash = Hash256.fake()
 

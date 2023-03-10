@@ -6,7 +6,7 @@ import { expect } from 'earljs'
 import {
   decodeWithdrawalWithTokenId,
   encodeWithdrawalWithTokenId,
-} from './WithdrawalWithTokenId'
+} from './WithdrawalWithTokenIdRequest'
 
 const starkKey = StarkKey(
   '0x070A6100ED8EF5DD2D61E6D00DE188E1EF2AC191F6178D99781150A04E889FD3'
@@ -19,9 +19,9 @@ const assetTypeHash = Hash256(
 
 describe(encodeWithdrawalWithTokenId.name, () => {
   it('encodes an example tx', () => {
-    expect(encodeWithdrawalWithTokenId(starkKey, assetTypeHash, 123n)).toEqual(
-      encodedData
-    )
+    expect(
+      encodeWithdrawalWithTokenId({ starkKey, assetTypeHash, tokenId: 123n })
+    ).toEqual(encodedData)
   })
 })
 describe(decodeWithdrawalWithTokenId.name, () => {

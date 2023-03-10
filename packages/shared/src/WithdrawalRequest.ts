@@ -5,14 +5,19 @@ const coder = new Interface([
   'function withdraw(uint256 ownerKey, uint256 assetType)',
 ])
 
-export function encodeWithdrawal(starkKey: StarkKey, assetTypeHash: Hash256) {
+export interface WithdrawalRequest {
+  starkKey: StarkKey
+  assetTypeHash: Hash256
+}
+
+export function encodeWithdrawal(data: WithdrawalRequest) {
   return coder.encodeFunctionData('withdraw', [
-    starkKey.toString(),
-    assetTypeHash,
+    data.starkKey.toString(),
+    data.assetTypeHash,
   ])
 }
 
-export function decodeWithdrawal(data: string) {
+export function decodeWithdrawal(data: string): WithdrawalRequest | undefined {
   try {
     const decoded = coder.decodeFunctionData('withdraw', data)
 
