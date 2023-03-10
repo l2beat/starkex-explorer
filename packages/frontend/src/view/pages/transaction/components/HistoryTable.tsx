@@ -33,7 +33,7 @@ export function TransactionHistoryTable(props: TransactionHistoryTableProps) {
               entry.timestamp ? (
                 <TimeCell timestamp={entry.timestamp} />
               ) : (
-                'Unknown (off chain)'
+                'Unknown'
               ),
               <StatusBadge type={entry.statusType}>
                 {entry.statusText}
