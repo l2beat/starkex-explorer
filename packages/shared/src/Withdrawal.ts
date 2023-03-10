@@ -1,22 +1,14 @@
 import { Interface } from '@ethersproject/abi'
-import { StarkKey } from '@explorer/types'
-
-import { AssetType } from './AssetDetails'
-import { getAssetSelector } from './utils/getAssetSelector'
+import { Hash256, StarkKey } from '@explorer/types'
 
 const coder = new Interface([
   'function withdraw(uint256 ownerKey, uint256 assetType)',
 ])
 
-export function encodeWithdrawal(
-  starkKey: StarkKey,
-  assetType: Extract<AssetType, 'ETH' | 'ERC20'>
-) {
-  const assetTypeSelector = getAssetSelector(assetType)
-
+export function encodeWithdrawal(starkKey: StarkKey, assetTypeHash: Hash256) {
   return coder.encodeFunctionData('withdraw', [
     starkKey.toString(),
-    assetTypeSelector,
+    assetTypeHash,
   ])
 }
 
@@ -27,7 +19,7 @@ export function decodeWithdrawal(data: string) {
     /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
     return {
       starkKey: StarkKey.from(decoded.ownerKey),
-      assetType: decoded.assetType.toHexString() as string,
+      assetTypeHash: Hash256(decoded.assetType.toHexString()),
     }
     /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
   } catch {

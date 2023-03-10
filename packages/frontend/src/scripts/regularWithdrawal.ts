@@ -1,5 +1,5 @@
 import { AssetDetails, AssetType } from '@explorer/shared'
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 import { WITHDRAW_NOW_BUTTON_ID } from '../view/pages/user/components/UserWithdrawNowButton'
 import { Api } from './peripherals/api'
@@ -36,7 +36,7 @@ async function submit(
       account,
       starkKey,
       exchangeAddress,
-      assetDetails.type
+      assetDetails.assetTypeHash
     )
   }
   if (assetDetails.type === 'ERC721' || assetDetails.type === 'ERC1155') {
@@ -44,7 +44,7 @@ async function submit(
       account,
       starkKey,
       exchangeAddress,
-      assetDetails.type,
+      assetDetails.assetTypeHash,
       assetDetails.tokenId
     )
   }
@@ -55,13 +55,13 @@ async function submitWithdrawal(
   account: EthereumAddress,
   starkKey: StarkKey,
   exchangeAddress: EthereumAddress,
-  assetType: Extract<AssetType, 'ETH' | 'ERC20'>
+  assetTypeHash: Hash256
 ) {
   const hash = await Wallet.sendWithdrawalTransaction(
     account,
     starkKey,
     exchangeAddress,
-    assetType
+    assetTypeHash
   )
   await Api.submitWithdrawal(hash)
   window.location.href = `/transactions/${hash.toString()}`
@@ -71,14 +71,14 @@ async function submitWithdrawalWithTokenId(
   account: EthereumAddress,
   starkKey: StarkKey,
   exchangeAddress: EthereumAddress,
-  assetType: Extract<AssetType, 'ERC721' | 'ERC1155'>,
+  assetTypeHash: Hash256,
   tokenId: bigint
 ) {
   const hash = await Wallet.sendWithdrawalWithTokenIdTransaction(
     account,
     starkKey,
     exchangeAddress,
-    assetType,
+    assetTypeHash,
     tokenId
   )
 

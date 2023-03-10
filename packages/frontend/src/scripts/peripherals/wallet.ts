@@ -1,7 +1,6 @@
 import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
-  AssetType,
   CreateOfferData,
   encodeFinalizeExitRequest,
   encodePerpetualForcedTradeRequest,
@@ -191,9 +190,9 @@ export const Wallet = {
     account: EthereumAddress,
     starkKey: StarkKey,
     exchangeAddress: EthereumAddress,
-    assetType: Extract<AssetType, 'ETH' | 'ERC20'>
+    assetTypeHash: Hash256
   ) {
-    const data = encodeWithdrawal(starkKey, assetType)
+    const data = encodeWithdrawal(starkKey, assetTypeHash)
 
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
@@ -212,10 +211,10 @@ export const Wallet = {
     account: EthereumAddress,
     starkKey: StarkKey,
     exchangeAddress: EthereumAddress,
-    assetType: Extract<AssetType, 'ERC721' | 'ERC1155'>,
+    assetTypeHash: Hash256,
     tokenId: bigint
   ) {
-    const data = encodeWithdrawalWithTokenId(starkKey, assetType, tokenId)
+    const data = encodeWithdrawalWithTokenId(starkKey, assetTypeHash, tokenId)
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [
