@@ -54,6 +54,7 @@ export function extractSentTxAsset(
         details: assetDetailsMap?.[data.assetType.toString()],
       }
     case 'WithdrawWithTokenId':
+      //TODO: implement
       throw new Error('NIY')
     default:
       assertUnreachable(data)
