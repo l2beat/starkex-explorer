@@ -1,4 +1,4 @@
-import { AssetDetails, AssetType } from '@explorer/shared'
+import { AssetDetails } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 import { WITHDRAW_NOW_BUTTON_ID } from '../view/pages/user/components/UserWithdrawNowButton'

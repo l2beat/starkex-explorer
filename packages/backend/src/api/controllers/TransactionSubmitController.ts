@@ -4,7 +4,13 @@ import {
   decodeWithdrawal,
   PerpetualForcedTradeRequest,
 } from '@explorer/shared'
-import { AssetHash, AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  Timestamp,
+} from '@explorer/types'
 
 import {
   ForcedTradeOfferRecord,
@@ -156,8 +162,6 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 }
-
-
 
 function tradeMatchesOffer(
   offer: ForcedTradeOfferRecord,

@@ -42,10 +42,6 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
       <p className="text-sm font-semibold text-zinc-500">Withdrawable assets</p>
       {props.withdrawableAssets.map((asset) => {
         const assetInfo = assetToInfo(asset.asset)
-        const shouldShowWithdrawNowButton =
-          props.isMine &&
-          asset.asset.details &&
-          SUPPORTED_ASSET_TYPES.includes(asset.asset.details.type)
         return (
           <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
             <AssetWithLogo
