@@ -354,7 +354,7 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction to a wrong address', async () => {
-      const data = encodeWithdrawal(StarkKey.fake(), 'ERC20')
+      const data = encodeWithdrawal(StarkKey.fake(), Hash256.fake())
       const controller = new TransactionSubmitController(
         mock<EthereumClient>({
           getTransaction: async () =>
@@ -401,7 +401,7 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction with correct data and address', async () => {
-      const data = encodeWithdrawal(StarkKey.fake(), 'ERC20')
+      const data = encodeWithdrawal(StarkKey.fake(), Hash256.fake())
       const perpetualAddress = EthereumAddress.fake()
       const hash = Hash256.fake()
 

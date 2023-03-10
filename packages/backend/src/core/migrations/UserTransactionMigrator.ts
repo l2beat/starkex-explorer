@@ -176,7 +176,7 @@ export class UserTransactionMigrator {
             data: {
               type: 'Withdraw',
               starkKey: data.starkKey,
-              assetType: AssetHash(data.assetType),
+              assetType: AssetHash(data.assetTypeHash.toString()),
             },
           })
         } else if (tx.data.startsWith('0xaf1437a3')) {

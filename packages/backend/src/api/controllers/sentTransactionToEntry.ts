@@ -14,6 +14,7 @@ export function extractSentTxEntryType(
     case 'ForcedTrade':
       return data.isABuyingSynthetic ? 'FORCED_BUY' : 'FORCED_SELL'
     case 'Withdraw':
+    case 'WithdrawWithTokenId':
       return 'WITHDRAW'
     default:
       assertUnreachable(data)
@@ -29,6 +30,7 @@ export function extractSentTxAmount(
     case 'ForcedTrade':
       return data.syntheticAmount
     case 'Withdraw':
+    case 'WithdrawWithTokenId':
       return undefined
     default:
       assertUnreachable(data)
@@ -43,17 +45,21 @@ export function extractSentTxAsset(
   switch (data.type) {
     case 'ForcedWithdrawal':
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
+    case 'ForcedTrade':
+      return { hashOrId: data.syntheticAssetId }
     case 'Withdraw':
       return {
+        //assetId = assetType, ref: https://docs.starkware.co/starkex/perpetual/shared/starkex-specific-concepts.html#on_chain_starkex_contracts
         hashOrId: data.assetType,
         details: assetDetailsMap?.[data.assetType.toString()],
       }
-    case 'ForcedTrade':
-      return { hashOrId: data.syntheticAssetId }
+    case 'WithdrawWithTokenId':
+      throw new Error('NIY')
     default:
       assertUnreachable(data)
   }
 }
+
 export function sentTransactionToEntry(
   sentTransaction: SentTransactionRecord,
   collateralAsset?: CollateralAsset,

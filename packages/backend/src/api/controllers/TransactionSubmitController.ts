@@ -2,6 +2,7 @@ import {
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
+  decodeWithdrawalWithTokenId,
   PerpetualForcedTradeRequest,
 } from '@explorer/shared'
 import {
@@ -76,17 +77,38 @@ export class TransactionSubmitController {
       data: {
         type: 'Withdraw',
         starkKey: data.starkKey,
-        assetType: AssetHash(data.assetType),
+        assetType: AssetHash(data.assetTypeHash.toString()),
       },
     })
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  //TODO: Determine what should this function do
   async submitWithdrawalWithTokenId(
     transactionHash: Hash256
   ): Promise<ControllerResult> {
-    throw new Error('Not implemented')
+    const timestamp = Timestamp.now()
+    const tx = await this.getTransaction(transactionHash)
+    if (!tx) {
+      return {
+        type: 'bad request',
+        content: `Transaction ${transactionHash.toString()} not found`,
+      }
+    }
+    const data = decodeWithdrawalWithTokenId(tx.data)
+    if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
+      return { type: 'bad request', content: `Invalid transaction` }
+    }
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'WithdrawWithTokenId',
+        starkKey: data.starkKey,
+        assetType: data.assetTypeHash,
+        tokenId: data.tokenId,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
   }
 
   private async getTransaction(hash: Hash256) {

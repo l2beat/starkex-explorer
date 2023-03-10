@@ -1,4 +1,11 @@
-import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { assertUnreachable } from '@explorer/shared'
+import {
+  AssetHash,
+  AssetId,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 
 import { ToJSON } from './ToJSON'
 
@@ -12,6 +19,7 @@ export type SentTransactionData =
   | ForcedTradeData
   | ForcedWithdrawalData
   | WithdrawData
+  | WithdrawWithTokenIdData
 
 export type SentTransactionJSON = ToJSON<SentTransactionData>
 
@@ -47,6 +55,13 @@ export interface WithdrawData {
   assetType: AssetHash
 }
 
+export interface WithdrawWithTokenIdData {
+  type: 'WithdrawWithTokenId'
+  starkKey: StarkKey
+  assetType: Hash256
+  tokenId: bigint
+}
+
 export function encodeSentTransactionData(
   values: SentTransactionData
 ): Encoded<SentTransactionData> {
@@ -57,6 +72,10 @@ export function encodeSentTransactionData(
       return encodeForcedTrade(values)
     case 'Withdraw':
       return encodeWithdraw(values)
+    case 'WithdrawWithTokenId':
+      return encodeWithdrawWithTokenId(values)
+    default:
+      assertUnreachable(values)
   }
 }
 
@@ -70,6 +89,10 @@ export function decodeSentTransactionData(
       return decodeForcedTrade(values)
     case 'Withdraw':
       return decodeWithdraw(values)
+    case 'WithdrawWithTokenId':
+      return decodeWithdrawWithTokenId(values)
+    default:
+      assertUnreachable(values)
   }
 }
 
@@ -152,5 +175,29 @@ function decodeWithdraw(values: ToJSON<WithdrawData>): WithdrawData {
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
+  }
+}
+
+function encodeWithdrawWithTokenId(
+  values: WithdrawWithTokenIdData
+): Encoded<WithdrawWithTokenIdData> {
+  return {
+    starkKey: values.starkKey,
+    vaultOrPositionId: undefined,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      tokenId: values.tokenId.toString(),
+    },
+  }
+}
+
+function decodeWithdrawWithTokenId(
+  values: ToJSON<WithdrawWithTokenIdData>
+): WithdrawWithTokenIdData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    tokenId: BigInt(values.tokenId),
   }
 }
