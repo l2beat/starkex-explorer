@@ -1,10 +1,16 @@
 import {
   decodeFinalizeExitRequest,
-  decodeForcedTradeRequest,
-  decodeForcedWithdrawalRequest,
-  ForcedTradeRequest,
+  decodePerpetualForcedTradeRequest,
+  decodePerpetualForcedWithdrawalRequest,
+  PerpetualForcedTradeRequest,
 } from '@explorer/shared'
-import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  Timestamp,
+} from '@explorer/types'
 
 import {
   ForcedTradeOfferRecord,
@@ -33,7 +39,7 @@ export class TransactionSubmitController {
         content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
-    const data = decodeForcedWithdrawalRequest(tx.data)
+    const data = decodePerpetualForcedWithdrawalRequest(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
@@ -70,7 +76,7 @@ export class TransactionSubmitController {
       data: {
         type: 'Withdraw',
         starkKey: data.starkKey,
-        assetType: data.assetType,
+        assetType: AssetHash(data.assetType),
       },
     })
     return { type: 'created', content: { id: transactionHash } }
@@ -99,7 +105,7 @@ export class TransactionSubmitController {
         content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
-    const data = decodeForcedTradeRequest(tx.data)
+    const data = decodePerpetualForcedTradeRequest(tx.data)
     if (
       !tx.to ||
       EthereumAddress(tx.to) !== this.perpetualAddress ||
@@ -152,7 +158,7 @@ export class TransactionSubmitController {
 
 function tradeMatchesOffer(
   offer: ForcedTradeOfferRecord,
-  trade: ForcedTradeRequest
+  trade: PerpetualForcedTradeRequest
 ): boolean {
   return (
     offer.starkKeyA === trade.starkKeyA &&

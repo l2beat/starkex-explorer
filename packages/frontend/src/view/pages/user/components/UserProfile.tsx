@@ -20,17 +20,13 @@ export function UserProfile({
     <section className="flex w-full flex-col rounded-lg bg-gray-800 p-6">
       <p className="text-sm font-semibold text-zinc-500">Stark key</p>
       {starkKey ? (
-        <p className="text-base mt-3 font-semibold text-white">
-          {starkKey.toString()}
-        </p>
+        <p className="mt-3 font-semibold text-white">{starkKey.toString()}</p>
       ) : (
         <>
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center">
               <WarningIcon />
-              <p className="text-base ml-2 font-semibold text-amber-500">
-                UNKNOWN
-              </p>
+              <p className="ml-2 font-semibold text-amber-500">UNKNOWN</p>
             </div>
             {isMine && <Button>Register</Button>}
           </div>
@@ -45,18 +41,15 @@ export function UserProfile({
           )}
         </>
       )}
-      <p className="mt-6 text-sm font-semibold text-zinc-500 ">
-        Ethereum address
-      </p>
-      {ethereumAddress ? (
-        <p className="text-base mt-3 font-semibold text-white ">
-          {ethereumAddress.toString()}
-        </p>
-      ) : (
-        <div className="mt-3 flex items-center">
-          <WarningIcon />
-          <p className="text-base ml-2 font-semibold text-amber-500">UNKNOWN</p>
-        </div>
+      {ethereumAddress && (
+        <>
+          <p className="mt-6 text-sm font-semibold text-zinc-500 ">
+            Ethereum address
+          </p>
+          <p className="text-base mt-3 font-semibold text-white ">
+            {ethereumAddress.toString()}
+          </p>
+        </>
       )}
     </section>
   )

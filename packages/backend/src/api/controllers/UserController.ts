@@ -7,12 +7,13 @@ import {
   UserAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
-import { UserDetails } from '@explorer/shared'
+import { AssetDetails, TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
+import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -27,8 +28,10 @@ import {
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
+import { fetchAssetDetailsMap } from './fetchAssetDetailsMap'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
+import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
 
 export class UserController {
   constructor(
@@ -39,7 +42,8 @@ export class UserController {
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
-    private readonly tradingMode: 'perpetual' | 'spot',
+    private readonly assetRepository: AssetRepository,
+    private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -81,23 +85,41 @@ export class UserController {
       this.userTransactionRepository.getCountByStarkKey(starkKey),
     ])
 
+    let assetDetailsMap: Record<string, AssetDetails> = {}
+    if (this.tradingMode === 'spot') {
+      assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
+        userAssets: userAssets as PreprocessedAssetHistoryRecord<AssetHash>[],
+        assetHistory: history as PreprocessedAssetHistoryRecord<AssetHash>[],
+        sentTransactions,
+        userTransactions,
+      })
+    }
+
     const assetEntries = userAssets.map((a) =>
-      toUserAssetEntry(a, this.collateralAsset?.assetId)
+      toUserAssetEntry(
+        a,
+        this.tradingMode,
+        this.collateralAsset?.assetId,
+        assetDetailsMap
+      )
     )
 
-    const balanceChangesEntries = history.map(toUserBalanceChangeEntries)
+    const balanceChangesEntries = history.map((h) =>
+      toUserBalanceChangeEntries(h, assetDetailsMap)
+    )
 
     const transactions = buildUserTransactions(
       sentTransactions,
       userTransactions,
-      this.collateralAsset
+      this.collateralAsset,
+      assetDetailsMap
     )
     // TODO: include the count of sentTransactions
     const totalTransactions = userTransactionsCount
 
     const content = renderUserPage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
       withdrawableAssets: [],
@@ -133,13 +155,25 @@ export class UserController {
       ),
     ])
 
+    let assetDetailsMap = {}
+    if (this.tradingMode === 'spot') {
+      assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
+        userAssets: userAssets as PreprocessedAssetHistoryRecord<AssetHash>[],
+      })
+    }
+
     const assets = userAssets.map((a) =>
-      toUserAssetEntry(a, this.collateralAsset?.assetId)
+      toUserAssetEntry(
+        a,
+        this.tradingMode,
+        this.collateralAsset?.assetId,
+        assetDetailsMap
+      )
     )
 
     const content = renderUserAssetsPage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       starkKey,
       assets,
       ...pagination,
@@ -163,11 +197,19 @@ export class UserController {
       this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
     ])
 
-    const balanceChanges = history.map(toUserBalanceChangeEntries)
+    let assetDetailsMap = {}
+    if (this.tradingMode === 'spot') {
+      assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
+        assetHistory: history as PreprocessedAssetHistoryRecord<AssetHash>[],
+      })
+    }
+    const balanceChanges = history.map((h) =>
+      toUserBalanceChangeEntries(h, assetDetailsMap)
+    )
 
     const content = renderUserBalanceChangesPage({
       user,
-      type: this.tradingMode === 'perpetual' ? 'PERPETUAL' : 'SPOT',
+      tradingMode: this.tradingMode,
       starkKey,
       balanceChanges,
       ...pagination,
@@ -195,10 +237,19 @@ export class UserController {
         this.userTransactionRepository.getCountByStarkKey(starkKey),
       ])
 
+    let assetDetailsMap = {}
+    if (this.tradingMode === 'spot') {
+      assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
+        sentTransactions,
+        userTransactions,
+      })
+    }
+
     const transactions = buildUserTransactions(
       pagination.offset === 0 ? sentTransactions : [], // display sent transactions only on the first page
       userTransactions,
-      this.collateralAsset
+      this.collateralAsset,
+      assetDetailsMap
     )
     const totalTransactions =
       userTransactionsCount +
@@ -219,26 +270,41 @@ export class UserController {
 
 function toUserAssetEntry(
   asset: PreprocessedAssetHistoryRecord<AssetHash | AssetId>,
-  collateralAssetId?: AssetId
+  tradingMode: TradingMode,
+  collateralAssetId?: AssetId,
+  assetDetailsMap?: Record<string, AssetDetails>
 ): UserAssetEntry {
   return {
-    asset: { hashOrId: asset.assetHashOrId },
+    asset: {
+      hashOrId: asset.assetHashOrId,
+      details: assetDetailsMap?.[asset.assetHashOrId.toString()],
+    },
     balance: asset.balance,
-    // TODO: fix value calculation
     value:
-      asset.price !== undefined ? asset.price * (asset.balance / 1000000n) : 0n, // temporary assumption of quantum=6
+      asset.price === undefined
+        ? 0n
+        : asset.assetHashOrId === collateralAssetId
+        ? asset.balance / 10000n // TODO: use the correct decimals
+        : getAssetValueUSDCents(asset.balance, asset.price),
     vaultOrPositionId: asset.positionOrVaultId.toString(),
-    action: asset.assetHashOrId === collateralAssetId ? 'WITHDRAW' : 'CLOSE',
+    action:
+      tradingMode === 'spot' || asset.assetHashOrId === collateralAssetId
+        ? 'WITHDRAW'
+        : 'CLOSE',
   }
 }
 
 function toUserBalanceChangeEntries(
-  record: PreprocessedAssetHistoryRecord<AssetHash | AssetId>
+  record: PreprocessedAssetHistoryRecord<AssetHash | AssetId>,
+  assetDetailsMap?: Record<string, AssetDetails>
 ): UserBalanceChangeEntry {
   return {
     timestamp: record.timestamp,
     stateUpdateId: record.stateUpdateId.toString(),
-    asset: { hashOrId: record.assetHashOrId },
+    asset: {
+      hashOrId: record.assetHashOrId,
+      details: assetDetailsMap?.[record.assetHashOrId.toString()],
+    },
     balance: record.balance,
     change: record.balance - record.prevBalance,
     vaultOrPositionId: record.positionOrVaultId.toString(),
@@ -248,15 +314,16 @@ function toUserBalanceChangeEntries(
 function buildUserTransactions(
   sentTransactions: SentTransactionRecord[],
   userTransactions: UserTransactionRecord[],
-  collateralAsset?: CollateralAsset
+  collateralAsset?: CollateralAsset,
+  assetDetailsMap?: Record<string, AssetDetails>
 ): TransactionEntry[] {
   const sentEntries = sentTransactions
     // Mined non-reverted transactions will be inside userTransactions
     .filter((t) => t.mined === undefined || t.mined.reverted)
-    .map((t) => sentTransactionToEntry(t, collateralAsset))
+    .map((t) => sentTransactionToEntry(t, collateralAsset, assetDetailsMap))
 
   const userEntries = userTransactions.map((t) =>
-    userTransactionToEntry(t, collateralAsset)
+    userTransactionToEntry(t, collateralAsset, assetDetailsMap)
   )
 
   return [...sentEntries, ...userEntries]

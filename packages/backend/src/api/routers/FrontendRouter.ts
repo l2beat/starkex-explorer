@@ -1,22 +1,33 @@
-import { stringAsPositiveInt, UserDetails } from '@explorer/shared'
-import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import {
+  stringAsBigInt,
+  stringAsPositiveInt,
+  TradingMode,
+} from '@explorer/shared'
+import { Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
-import { Context } from 'koa'
 import * as z from 'zod'
 
-import { PaginationOptions } from '../../model/PaginationOptions'
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { ForcedActionController } from '../controllers/ForcedActionController'
 import { HomeController } from '../controllers/HomeController'
+import { MerkleProofController } from '../controllers/MerkleProofController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
+import { addPerpetualTradingRoutes } from './PerpetualFrontendRouter'
+import { addSpotTradingRoutes } from './SpotFrontendRouter'
 import { withTypedContext } from './types'
-import { applyControllerResult } from './utils'
+import { applyControllerResult, getGivenUser, getPagination } from './utils'
 
 export function createFrontendRouter(
   homeController: HomeController,
   userController: UserController,
   stateUpdateController: StateUpdateController,
-  transactionController: TransactionController
+  transactionController: TransactionController,
+  forcedActionController: ForcedActionController,
+  merkleProofController: MerkleProofController,
+  collateralAsset: CollateralAsset | undefined,
+  tradingMode: TradingMode
 ) {
   const router = new Router()
 
@@ -252,33 +263,31 @@ export function createFrontendRouter(
     )
   )
 
-  return router
-}
+  router.get(
+    '/proof/:positionOrVaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionOrVaultId: stringAsBigInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
 
-function getGivenUser(ctx: Context): Partial<UserDetails> {
-  const account = ctx.cookies.get('account')
-  const starkKey = ctx.cookies.get('starkKey')
-  if (account) {
-    try {
-      return {
-        address: EthereumAddress(account),
-        starkKey: starkKey ? StarkKey(starkKey) : undefined,
+        const result = await merkleProofController.getMerkleProofPage(
+          givenUser,
+          ctx.params.positionOrVaultId
+        )
+        applyControllerResult(ctx, result)
       }
-    } catch {
-      return {}
-    }
-  }
-  return {}
-}
+    )
+  )
 
-function getPagination(query: {
-  page?: number
-  perPage?: number
-}): PaginationOptions {
-  const page = Math.max(1, query.page ?? 1)
-  const perPage = Math.max(1, Math.min(200, query.perPage ?? 50))
-  return {
-    limit: perPage,
-    offset: (page - 1) * perPage,
+  if (tradingMode === 'perpetual') {
+    addPerpetualTradingRoutes(router, forcedActionController, collateralAsset)
+  } else {
+    addSpotTradingRoutes(router, forcedActionController)
   }
+
+  return router
 }

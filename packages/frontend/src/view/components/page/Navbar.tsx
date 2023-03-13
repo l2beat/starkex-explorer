@@ -1,21 +1,20 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
+import { InstanceName } from '../../../utils/instance'
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
-import { DydxLogo } from '../../assets/logos/DydxLogo'
-import { GammaXLogo } from '../../assets/logos/GammaXLogo'
 import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
-import { MyriaLogo } from '../../assets/logos/MyriaLogo'
+import { ProjectLogo } from '../../assets/logos/ProjectLogo'
 import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
 
 export interface NavbarProps {
   readonly user: UserDetails | undefined
   readonly searchBar: boolean
+  readonly instanceName: InstanceName
 }
 
-export function Navbar({ user, searchBar = true }: NavbarProps) {
-  const starkExInstance = process.env.STARKEX_INSTANCE ?? 'dydx-mainnet'
+export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
       <a
@@ -24,18 +23,10 @@ export function Navbar({ user, searchBar = true }: NavbarProps) {
       >
         <div className="flex gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
-          {starkExInstance === 'dydx-mainnet' && (
-            <DydxLogo className="h-[26px] sm:h-8" />
-          )}
-          {starkExInstance === 'gammax-goerli' && (
-            <GammaXLogo className="h-[26px] sm:h-8" />
-          )}
-          {starkExInstance === 'myria-goerli' && (
-            <MyriaLogo className="h-[26px] sm:h-8" />
-          )}
+          <ProjectLogo projectName={instanceName} />
         </div>
-        <span className="py-1 pl-2 uppercase text-zinc-500 sm:pl-4">
-          Explorer
+        <span className="py-1 pl-2 text-zinc-500 sm:pl-4">
+          EXPLORER (Development version)
         </span>
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4">
@@ -46,7 +37,7 @@ export function Navbar({ user, searchBar = true }: NavbarProps) {
         {user && (
           <a
             href={`/users/${user.starkKey?.toString() ?? 'not-found'}`}
-            className="relative flex h-8 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand lg:h-[44px]"
+            className="relative flex h-10 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand"
           >
             <JazzIcon
               className="hidden lg:block"

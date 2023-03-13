@@ -1,9 +1,9 @@
 import {
   decodeFinalizeExitRequest,
-  decodeForcedTradeRequest,
-  decodeForcedWithdrawalRequest,
+  decodePerpetualForcedTradeRequest,
+  decodePerpetualForcedWithdrawalRequest,
 } from '@explorer/shared'
-import { AssetId, Hash256, Timestamp } from '@explorer/types'
+import { AssetHash, AssetId, Hash256, Timestamp } from '@explorer/types'
 
 import { BlockRange } from '../../model'
 import { Database } from '../../peripherals/database/shared/Database'
@@ -176,11 +176,11 @@ export class UserTransactionMigrator {
             data: {
               type: 'Withdraw',
               starkKey: data.starkKey,
-              assetType: data.assetType,
+              assetType: AssetHash(data.assetType),
             },
           })
         } else if (tx.data.startsWith('0xaf1437a3')) {
-          const data = decodeForcedWithdrawalRequest(tx.data)
+          const data = decodePerpetualForcedWithdrawalRequest(tx.data)
           if (!data) {
             throw new Error('Cannot decode forced withdrawal request!')
           }
@@ -196,7 +196,7 @@ export class UserTransactionMigrator {
             },
           })
         } else if (tx.data.startsWith('0x2ecb8162')) {
-          const data = decodeForcedTradeRequest(tx.data)
+          const data = decodePerpetualForcedTradeRequest(tx.data)
           if (!data) {
             throw new Error('Cannot decode forced trade request!')
           }

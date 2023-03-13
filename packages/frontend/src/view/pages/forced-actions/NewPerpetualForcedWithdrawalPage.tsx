@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { getInstanceName } from '../../../utils/instance'
 import { Button, LinkButton } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { Link } from '../../components/Link'
@@ -10,11 +11,11 @@ import { ForcedActionCard } from './components/ForcedActionCard'
 import { AmountInput } from './components/form/AmountInput'
 import { FormId } from './components/form/ids'
 import {
-  ForcedActionFormProps,
+  NewForcedActionFormProps,
   serializeForcedActionsFormProps,
-} from './ForcedActionFormProps'
+} from './NewForcedActionFormProps'
 
-function ForcedWithdrawPage(props: ForcedActionFormProps) {
+function NewPerpetualForcedWithdrawalPage(props: NewForcedActionFormProps) {
   const instructions = [
     <>
       Using this form you request a withdrawal of your funds. (Perpetual only)
@@ -27,7 +28,7 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
       </Link>
       .
     </>,
-    'After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of [system name] to process your request.',
+    `After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of ${getInstanceName()} to process your request.`,
     <>
       Once your request has been processed the status will change to{' '}
       <span className="text-yellow-300">’processed’</span> and you will be able
@@ -44,8 +45,8 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
-          <div className="flex flex-col">
-            <span className="text-2xl font-semibold">
+          <div className="mt-6 flex flex-col">
+            <span className="text-xl font-semibold">
               Begin withdrawal process
             </span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
@@ -60,11 +61,13 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
               data-props={propsJson}
             >
               <div className="flex items-end justify-between">
-                <span className="text-2xl font-semibold">Withdrawal</span>
+                <span className="text-xl font-semibold">Withdrawal</span>
                 <span>
-                  <span className="text-sm text-zinc-500">Position</span>{' '}
-                  <span className="font-semibold">
-                    #{props.positionId.toString()}
+                  <span className="text-sm font-medium text-zinc-500">
+                    Position
+                  </span>{' '}
+                  <span className="text-lg font-semibold">
+                    #{props.positionOrVaultId.toString()}
                   </span>
                 </span>
               </div>
@@ -93,6 +96,8 @@ function ForcedWithdrawPage(props: ForcedActionFormProps) {
   )
 }
 
-export function renderForcedWithdrawPage(props: ForcedActionFormProps) {
-  return reactToHtml(<ForcedWithdrawPage {...props} />)
+export function renderNewPerpetualForcedWithdrawalPage(
+  props: NewForcedActionFormProps
+) {
+  return reactToHtml(<NewPerpetualForcedWithdrawalPage {...props} />)
 }

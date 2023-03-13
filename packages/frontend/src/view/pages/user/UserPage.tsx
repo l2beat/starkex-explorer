@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -33,7 +33,7 @@ export interface UserPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
-  type: 'SPOT' | 'PERPETUAL'
+  tradingMode: TradingMode
   withdrawableAssets: WithdrawableAssetEntry[]
   offersToAccept: OfferEntry[]
   assets: UserAssetEntry[]
@@ -64,7 +64,11 @@ function UserPage(props: UserPageProps) {
           <div className="flex flex-col gap-6">
             <UserProfile
               starkKey={props.starkKey}
-              ethereumAddress={props.ethereumAddress}
+              ethereumAddress={
+                props.ethereumAddress !== EthereumAddress.ZERO
+                  ? props.ethereumAddress
+                  : undefined
+              }
               isMine={isMine}
             />
             <UserQuickActionsTable
@@ -80,7 +84,7 @@ function UserPage(props: UserPageProps) {
           total={props.totalAssets}
         >
           <UserAssetsTable
-            type={props.type}
+            tradingMode={props.tradingMode}
             starkKey={props.starkKey}
             assets={props.assets}
             isMine={isMine}
@@ -92,7 +96,7 @@ function UserPage(props: UserPageProps) {
           total={props.totalBalanceChanges}
         >
           <UserBalanceChangesTable
-            type={props.type}
+            tradingMode={props.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>
@@ -103,7 +107,7 @@ function UserPage(props: UserPageProps) {
         >
           <TransactionsTable transactions={props.transactions} />
         </TablePreview>
-        {props.offers && (
+        {props.offers && props.tradingMode === 'perpetual' && (
           <TablePreview
             {...getOfferTableProps(props.starkKey)}
             visible={props.offers.length}

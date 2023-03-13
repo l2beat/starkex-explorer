@@ -2,9 +2,11 @@ import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { ApiServer } from './api/ApiServer'
+import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
+import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { OldHomeController } from './api/controllers/OldHomeController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
@@ -95,6 +97,11 @@ export class Application {
 
     const database = new Database(config.databaseConnection, logger)
 
+    const collateralAsset =
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
+
     const kvStore = new KeyValueStore(database, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
     const softwareMigrationRepository = new SoftwareMigrationRepository(
@@ -167,9 +174,7 @@ export class Application {
       userTransactionRepository,
       withdrawableAssetRepository,
       config.starkex.contracts.perpetual,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
 
     const tokenRegistrationCollector = new AssetRegistrationCollector(
@@ -191,6 +196,10 @@ export class Application {
     )
 
     let syncService
+    let stateUpdater:
+      | SpotValidiumUpdater
+      | PerpetualValidiumUpdater
+      | PerpetualRollupUpdater
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -219,6 +228,8 @@ export class Application {
           userTransactionRepository,
           logger
         )
+        stateUpdater = perpetualValidiumUpdater
+
         syncService = new PerpetualValidiumSyncService(
           availabilityGatewayClient,
           perpetualValidiumStateTransitionCollector,
@@ -251,6 +262,7 @@ export class Application {
           userTransactionRepository,
           logger
         )
+        stateUpdater = spotValidiumUpdater
 
         syncService = new SpotValidiumSyncService(
           availabilityGatewayClient,
@@ -300,6 +312,7 @@ export class Application {
         userTransactionRepository,
         logger
       )
+      stateUpdater = perpetualRollupUpdater
       syncService = new PerpetualRollupSyncService(
         verifierCollector,
         pageMappingCollector,
@@ -434,9 +447,8 @@ export class Application {
       userService,
       userTransactionRepository,
       preprocessedStateDetailsRepository,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      config.starkex.tradingMode,
+      collateralAsset
     )
     const userController = new UserController(
       userService,
@@ -444,10 +456,9 @@ export class Application {
       sentTransactionRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
+      assetRepository,
       config.starkex.tradingMode,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const stateUpdateController = new StateUpdateController(
       userService,
@@ -455,18 +466,19 @@ export class Application {
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
       config.starkex.tradingMode,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const transactionController = new TransactionController(
       userService,
       sentTransactionRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
+    )
+    const merkleProofController = new MerkleProofController(
+      userService,
+      stateUpdater,
+      config.starkex.tradingMode
     )
 
     const oldHomeController = new OldHomeController(
@@ -508,6 +520,12 @@ export class Application {
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
+    const forcedActionsController = new ForcedActionController(
+      userService,
+      preprocessedAssetHistoryRepository,
+      assetRepository,
+      config.starkex.contracts.perpetual
+    )
 
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
@@ -525,7 +543,11 @@ export class Application {
               homeController,
               userController,
               stateUpdateController,
-              transactionController
+              transactionController,
+              forcedActionsController,
+              merkleProofController,
+              collateralAsset,
+              config.starkex.tradingMode
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,
@@ -550,6 +572,7 @@ export class Application {
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
       await userTransactionMigrator.migrate()
+      await stateUpdater.initTree()
 
       if (config.enableSync) {
         transactionStatusService.start()

@@ -1,5 +1,6 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
+import { AssetDetails } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { SentTransactionRecord } from '../../peripherals/database/transactions/SentTransactionRepository'
@@ -37,12 +38,17 @@ export function extractSentTxAmount(
 
 export function extractSentTxAsset(
   data: SentTransactionRecord['data'],
-  collateralAsset?: CollateralAsset
+  collateralAsset?: CollateralAsset,
+  assetDetailsMap?: Record<string, AssetDetails>
 ): Asset | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
-    case 'Withdraw':
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
+    case 'Withdraw':
+      return {
+        hashOrId: data.assetType,
+        details: assetDetailsMap?.[data.assetType.toString()],
+      }
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
     default:
@@ -51,7 +57,8 @@ export function extractSentTxAsset(
 }
 export function sentTransactionToEntry(
   sentTransaction: SentTransactionRecord,
-  collateralAsset?: CollateralAsset
+  collateralAsset?: CollateralAsset,
+  assetDetailsMap?: Record<string, AssetDetails>
 ): TransactionEntry {
   if (sentTransaction.mined !== undefined && !sentTransaction.mined.reverted) {
     throw new Error(
@@ -61,7 +68,11 @@ export function sentTransactionToEntry(
   return {
     timestamp: sentTransaction.sentTimestamp,
     hash: sentTransaction.transactionHash,
-    asset: extractSentTxAsset(sentTransaction.data, collateralAsset),
+    asset: extractSentTxAsset(
+      sentTransaction.data,
+      collateralAsset,
+      assetDetailsMap
+    ),
     amount: extractSentTxAmount(sentTransaction.data),
     status: sentTransaction.mined?.reverted ? 'REVERTED' : 'SENT',
     type: extractSentTxEntryType(sentTransaction.data),

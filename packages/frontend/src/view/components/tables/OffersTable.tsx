@@ -30,43 +30,37 @@ export interface OfferEntry {
 }
 
 export function OffersTable(props: OffersTableProps) {
-  const columns: Column[] = []
-  columns.push(
+  const columns: Column[] = [
     { header: 'Time' },
     { header: 'Id' },
     { header: 'Asset' },
     { header: 'Amount', numeric: true },
     { header: 'Price', numeric: true },
-    { header: 'Total price', numeric: true }
-  )
-  if (!props.hideStatus) {
-    columns.push({ header: 'Status' })
-  }
-  columns.push({ header: 'Type' })
+    { header: 'Total price', numeric: true },
+    ...(!props.hideStatus ? [{ header: 'Status' }] : []),
+    { header: 'Type' },
+  ]
 
   return (
     <Table
       columns={columns}
       rows={props.offers.map((offer) => {
-        const cells: ReactNode[] = []
-        cells.push(
+        const cells: ReactNode[] = [
           <TimeCell timestamp={offer.timestamp} />,
           <Link>#{offer.id}</Link>,
           <AssetWithLogo type="small" assetInfo={assetToInfo(offer.asset)} />,
           formatAmount(offer.asset, offer.amount),
           formatWithDecimals(offer.price, 6, { prefix: '$' }),
-          formatWithDecimals(offer.totalPrice, 6, { prefix: '$' })
-        )
-        if (!props.hideStatus) {
-          cells.push(
-            <StatusBadge type={toStatusType(offer.status)}>
-              {toStatusText(offer.status)}
-            </StatusBadge>
-          )
-        }
-        cells.push(
-          <span className="capitalize">{offer.type.toLowerCase()}</span>
-        )
+          formatWithDecimals(offer.totalPrice, 6, { prefix: '$' }),
+          ...(!props.hideStatus
+            ? [
+                <StatusBadge type={toStatusType(offer.status)}>
+                  {toStatusText(offer.status)}
+                </StatusBadge>,
+              ]
+            : []),
+          <span className="capitalize">{offer.type.toLowerCase()}</span>,
+        ]
 
         return {
           link: `/offers/${offer.id}`,

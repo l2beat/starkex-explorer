@@ -19,12 +19,12 @@ export function initFinalizeForm() {
       const perpetualAddress = EthereumAddress(
         getAttribute(form, 'perpetual-address')
       )
-      const hash = await Wallet.sendForcedTradeTransaction(
+      const hash = await Wallet.sendPerpetualForcedTradeTransaction(
         address,
         offer,
         perpetualAddress
       )
-      await Api.submitForcedTrade(offerId, hash)
+      await Api.submitPerpetualForcedTrade(offerId, hash)
       window.location.href = `/forced/${hash.toString()}`
     })
   })
