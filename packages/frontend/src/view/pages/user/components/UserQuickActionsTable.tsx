@@ -27,8 +27,6 @@ export interface WithdrawableAssetEntry {
   readonly amount: bigint
 }
 
-const SUPPORTED_ASSET_TYPES = ['ETH', 'ERC20', 'ERC721', 'ERC1155']
-
 export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   if (
     props.withdrawableAssets.length === 0 &&
@@ -58,20 +56,17 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                 </InlineEllipsis>
               </strong>
             </p>
-            {props.isMine &&
-              props.user &&
-              asset.asset.details &&
-              SUPPORTED_ASSET_TYPES.includes(asset.asset.details.type) && (
-                <UserWithdrawNowButton
-                  className="ml-auto w-32 !px-0"
-                  assetDetails={asset.asset.details}
-                  account={props.user.address}
-                  starkKey={props.starkKey}
-                  exchangeAddress={props.exchangeAddress}
-                >
-                  Withdraw now
-                </UserWithdrawNowButton>
-              )}
+            {props.isMine && props.user && asset.asset.details && (
+              <UserWithdrawNowButton
+                className="ml-auto w-32 !px-0"
+                assetDetails={asset.asset.details}
+                account={props.user.address}
+                starkKey={props.starkKey}
+                exchangeAddress={props.exchangeAddress}
+              >
+                Withdraw now
+              </UserWithdrawNowButton>
+            )}
           </div>
         )
       })}
