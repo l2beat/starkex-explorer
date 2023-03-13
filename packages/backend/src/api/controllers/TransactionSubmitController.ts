@@ -13,8 +13,8 @@ import {
 } from '@explorer/types'
 
 import {
+  ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
-  ForcedTradeOfferTransaction,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
@@ -157,7 +157,7 @@ export class TransactionSubmitController {
 }
 
 function tradeMatchesOffer(
-  offer: ForcedTradeOfferTransaction,
+  offer: ForcedTradeOfferRecord,
   trade: PerpetualForcedTradeRequest
 ): boolean {
   return (

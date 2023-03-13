@@ -5,7 +5,7 @@ import {
 } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 
-import { ForcedTradeOfferTransaction } from '../../../peripherals/database/ForcedTradeOfferRepository'
+import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
 
 interface User {
   starkKey: StarkKey
@@ -19,7 +19,7 @@ interface AcceptForm extends CreateOfferData, AcceptedData {
 }
 
 export function getAcceptForm(
-  offer: ForcedTradeOfferTransaction,
+  offer: ForcedTradeOfferRecord,
   user: User
 ): AcceptForm | undefined {
   const isAcceptable = !offer.accepted && !offer.cancelledAt
@@ -53,7 +53,7 @@ interface CancelForm {
 }
 
 export function getCancelForm(
-  offer: ForcedTradeOfferTransaction,
+  offer: ForcedTradeOfferRecord,
   user: User
 ): CancelForm | undefined {
   const isOwner = user.positionId === offer.positionIdA
@@ -75,7 +75,7 @@ interface FinalizeForm extends FinalizeOfferData {
 }
 
 export function getFinalizeForm(
-  offer: ForcedTradeOfferTransaction,
+  offer: ForcedTradeOfferRecord,
   user: User,
   perpetualAddress: EthereumAddress
 ): FinalizeForm | undefined {

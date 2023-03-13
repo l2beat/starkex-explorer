@@ -10,8 +10,8 @@ import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
 import {
+  ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
-  ForcedTradeOfferTransaction,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   SentTransactionRecord,
@@ -90,7 +90,7 @@ export class TransactionController {
     user: UserDetails | undefined,
     userTransaction: UserTransactionRecord,
     sentTransaction: SentTransactionRecord | undefined,
-    forcedTradeOfferTransaction: ForcedTradeOfferTransaction | undefined
+    forcedTradeOfferTransaction: ForcedTradeOfferRecord | undefined
   ) {
     switch (userTransaction.data.type) {
       case 'ForcedWithdrawal': {
@@ -353,7 +353,7 @@ export class TransactionController {
 
   async getTransactionPageForForcedTradeOfferTransaction(
     user: UserDetails | undefined,
-    forcedTradeOfferTransaction: ForcedTradeOfferTransaction
+    forcedTradeOfferTransaction: ForcedTradeOfferRecord
   ) {
     if (!this.collateralAsset) {
       throw new Error(
@@ -436,7 +436,7 @@ interface TransactionHistoryItem<
 interface TransactionHistoryArgs {
   userTransaction?: UserTransactionRecord
   sentTransaction?: SentTransactionRecord
-  forcedTradeOfferTransaction?: ForcedTradeOfferTransaction
+  forcedTradeOfferTransaction?: ForcedTradeOfferRecord
 }
 
 function buildRegularTransactionHistory({
