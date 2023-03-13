@@ -26,9 +26,7 @@ export function TableLimitSelect(props: TableLimitSelectProps) {
         className="w-14 rounded bg-gray-800 px-2 py-0.5 font-semibold"
       >
         {options.map((n) => (
-          <option key={n} selected={n === props.limit}>
-            {n}
-          </option>
+          <option key={n}>{n}</option>
         ))}
       </select>
       <input className="hidden" name="page" defaultValue={1} />
