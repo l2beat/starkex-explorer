@@ -318,9 +318,34 @@ export class TransactionController {
         })
       }
 
-      case 'Withdraw':
-        throw new Error('Withdraw not supported')
+      case 'Withdraw': {
+        const history = buildRegularTransactionHistory({
+          sentTransaction,
+        })
+        const data = sentTransaction.data
+        const assetHash = this.collateralAsset
+          ? this.collateralAsset.assetId
+          : data.assetType
 
+        const recipient =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKey
+          )
+        //TODO: Is this the right way to handle this?
+        if (!recipient) {
+          throw new Error('Recipient not found')
+        }
+        return renderRegularWithdrawalPage({
+          user,
+          transactionHash: sentTransaction.transactionHash,
+          recipient: {
+            starkKey: recipient.starkKey,
+            ethereumAddress: recipient.ethAddress,
+          },
+          asset: { hashOrId: assetHash },
+          history,
+        })
+      }
       default:
         assertUnreachable(sentTransaction.data)
     }
