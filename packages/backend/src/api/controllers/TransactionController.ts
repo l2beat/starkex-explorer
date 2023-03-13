@@ -22,6 +22,7 @@ import {
   UserTransactionRepository,
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { assertUnreachable } from '../../utils/assertUnreachable'
 import { ControllerResult } from './ControllerResult'
 
 export class TransactionController {
@@ -91,150 +92,155 @@ export class TransactionController {
     sentTransaction: SentTransactionRecord | undefined,
     forcedTradeOfferTransaction: ForcedTradeOfferTransaction | undefined
   ) {
-    if (userTransaction.data.type === 'ForcedWithdrawal') {
-      if (!this.collateralAsset) {
-        throw new Error(
-          'Collateral asset not passed when displaying ForcedWithdrawal'
-        )
-      }
-      const txUser = await this.userRegistrationEventRepository.findByStarkKey(
-        userTransaction.data.starkKey
-      )
-      const history = buildTransactionHistory(sentTransaction, userTransaction)
-      return renderPerpetualForcedWithdrawalPage({
-        user,
-        transactionHash: userTransaction.transactionHash,
-        recipient: {
-          starkKey: userTransaction.data.starkKey,
-          // TODO don't display ethereum address if unknown
-          ethereumAddress: txUser?.ethAddress ?? EthereumAddress.ZERO,
-        },
-        asset: { hashOrId: this.collateralAsset.assetId },
-        amount: userTransaction.data.quantizedAmount,
-        positionId: userTransaction.data.positionId.toString(),
-        history,
-        stateUpdateId: userTransaction.included?.stateUpdateId,
-      })
-    }
-
-    if (userTransaction.data.type === 'FullWithdrawal') {
-      const txUser = await this.userRegistrationEventRepository.findByStarkKey(
-        userTransaction.data.starkKey
-      )
-      const history = buildTransactionHistory(sentTransaction, userTransaction)
-      return renderSpotForcedWithdrawalPage({
-        user,
-        transactionHash: userTransaction.transactionHash,
-        recipient: {
-          starkKey: userTransaction.data.starkKey,
-          // TODO don't display ethereum address if unknown
-          ethereumAddress: txUser?.ethAddress ?? EthereumAddress.ZERO,
-        },
-        vaultId: userTransaction.data.vaultId.toString(),
-        history,
-        stateUpdateId: userTransaction.included?.stateUpdateId,
-      })
-    }
-
-    if (userTransaction.data.type === 'ForcedTrade') {
-      const [userA, userB] = await Promise.all([
-        this.userRegistrationEventRepository.findByStarkKey(
-          userTransaction.data.starkKeyA
-        ),
-        this.userRegistrationEventRepository.findByStarkKey(
-          userTransaction.data.starkKeyB
-        ),
-      ])
-      if (!userA) {
-        throw new Error('User A not found')
-      }
-      const maker = {
-        starkKey: userA.starkKey,
-        // TODO don't display ethereum address if unknown
-        ethereumAddress: userA.ethAddress,
-        positionId: userTransaction.data.positionIdA.toString(),
-      }
-      const taker =
-        userB === undefined
-          ? undefined
-          : {
-              starkKey: userB.starkKey,
-              // TODO don't display ethereum address if unknown
-              ethereumAddress: userB.ethAddress,
-              positionId: userTransaction.data.positionIdB.toString(),
-            }
-      //TODO: NOT ENOUGH DATA TO DISPLAY OFFER
-      const history = buildForcedTradeTransactionHistory(
-        forcedTradeOfferTransaction,
-        sentTransaction,
-        userTransaction
-      )
-      return renderOfferAndForcedTradePage({
-        user,
-        transactionHash: userTransaction.transactionHash,
-        offerId: '-', // TODO: pass correct data
-        maker,
-        taker,
-        type: userTransaction.data.isABuyingSynthetic ? 'BUY' : 'SELL',
-        collateralAsset: { hashOrId: userTransaction.data.collateralAssetId },
-        collateralAmount: userTransaction.data.collateralAmount,
-        syntheticAsset: { hashOrId: userTransaction.data.syntheticAssetId },
-        syntheticAmount: userTransaction.data.syntheticAmount,
-        expirationTimestamp: userTransaction.timestamp, // TODO: fix
-        history,
-        stateUpdateId: userTransaction.included?.stateUpdateId,
-      })
-    }
-
-    if (
-      userTransaction.data.type === 'Withdraw' ||
-      userTransaction.data.type === 'WithdrawWithTokenId' ||
-      userTransaction.data.type === 'MintWithdraw'
-    ) {
-      const history = buildRegularTransactionHistory(
-        sentTransaction,
-        userTransaction
-      )
-      const data = userTransaction.data
-      const assetHash =
-        data.type === 'Withdraw'
-          ? this.collateralAsset
-            ? this.collateralAsset.assetId
-            : data.assetType
-          : data.type === 'WithdrawWithTokenId'
-          ? data.assetId
-          : data.assetId
-
-      let recipientEthAddress =
-        data.type === 'Withdraw'
-          ? data.recipient
-          : data.type === 'WithdrawWithTokenId'
-          ? data.recipient
-          : undefined
-
-      if (recipientEthAddress === undefined) {
-        const recipient =
+    switch (userTransaction.data.type) {
+      case 'ForcedWithdrawal': {
+        if (!this.collateralAsset) {
+          throw new Error(
+            'Collateral asset not passed when displaying ForcedWithdrawal'
+          )
+        }
+        const txUser =
           await this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKey
           )
-        // TODO handle lack of recipient address
-        recipientEthAddress = recipient?.ethAddress
+        const history = buildTransactionHistory(
+          sentTransaction,
+          userTransaction
+        )
+        return renderPerpetualForcedWithdrawalPage({
+          user,
+          transactionHash: userTransaction.transactionHash,
+          recipient: {
+            starkKey: userTransaction.data.starkKey,
+            // TODO don't display ethereum address if unknown
+            ethereumAddress: txUser?.ethAddress ?? EthereumAddress.ZERO,
+          },
+          asset: { hashOrId: this.collateralAsset.assetId },
+          amount: userTransaction.data.quantizedAmount,
+          positionId: userTransaction.data.positionId.toString(),
+          history,
+          stateUpdateId: userTransaction.included?.stateUpdateId,
+        })
       }
-
-      return renderRegularWithdrawalPage({
-        user,
-        transactionHash: userTransaction.transactionHash,
-        recipient: {
-          // TODO don't display starkKey if unknown
-          starkKey: StarkKey.ZERO,
+      case 'FullWithdrawal': {
+        const txUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            userTransaction.data.starkKey
+          )
+        const history = buildTransactionHistory(
+          sentTransaction,
+          userTransaction
+        )
+        return renderSpotForcedWithdrawalPage({
+          user,
+          transactionHash: userTransaction.transactionHash,
+          recipient: {
+            starkKey: userTransaction.data.starkKey,
+            // TODO don't display ethereum address if unknown
+            ethereumAddress: txUser?.ethAddress ?? EthereumAddress.ZERO,
+          },
+          vaultId: userTransaction.data.vaultId.toString(),
+          history,
+          stateUpdateId: userTransaction.included?.stateUpdateId,
+        })
+      }
+      case 'ForcedTrade': {
+        const [userA, userB] = await Promise.all([
+          this.userRegistrationEventRepository.findByStarkKey(
+            userTransaction.data.starkKeyA
+          ),
+          this.userRegistrationEventRepository.findByStarkKey(
+            userTransaction.data.starkKeyB
+          ),
+        ])
+        if (!userA) {
+          throw new Error('User A not found')
+        }
+        const maker = {
+          starkKey: userA.starkKey,
           // TODO don't display ethereum address if unknown
-          ethereumAddress: recipientEthAddress ?? EthereumAddress.ZERO,
-        },
-        asset: { hashOrId: assetHash },
-        amount: userTransaction.data.quantizedAmount,
-        history,
-        stateUpdateId: userTransaction.included?.stateUpdateId,
-      })
+          ethereumAddress: userA.ethAddress,
+          positionId: userTransaction.data.positionIdA.toString(),
+        }
+        const taker =
+          userB === undefined
+            ? undefined
+            : {
+                starkKey: userB.starkKey,
+                // TODO don't display ethereum address if unknown
+                ethereumAddress: userB.ethAddress,
+                positionId: userTransaction.data.positionIdB.toString(),
+              }
+        const history = buildForcedTradeTransactionHistory(
+          forcedTradeOfferTransaction,
+          sentTransaction,
+          userTransaction
+        )
+        return renderOfferAndForcedTradePage({
+          user,
+          transactionHash: userTransaction.transactionHash,
+          offerId: '-', // TODO: pass correct data
+          maker,
+          taker,
+          type: userTransaction.data.isABuyingSynthetic ? 'BUY' : 'SELL',
+          collateralAsset: { hashOrId: userTransaction.data.collateralAssetId },
+          collateralAmount: userTransaction.data.collateralAmount,
+          syntheticAsset: { hashOrId: userTransaction.data.syntheticAssetId },
+          syntheticAmount: userTransaction.data.syntheticAmount,
+          expirationTimestamp: userTransaction.timestamp, // TODO: fix
+          history,
+          stateUpdateId: userTransaction.included?.stateUpdateId,
+        })
+      }
+      case 'Withdraw':
+      case 'WithdrawWithTokenId':
+      case 'MintWithdraw': {
+        const history = buildRegularTransactionHistory(
+          sentTransaction,
+          userTransaction
+        )
+        const data = userTransaction.data
+        const assetHash =
+          data.type === 'Withdraw'
+            ? this.collateralAsset
+              ? this.collateralAsset.assetId
+              : data.assetType
+            : data.type === 'WithdrawWithTokenId'
+            ? data.assetId
+            : data.assetId
+
+        let recipientEthAddress =
+          data.type === 'Withdraw'
+            ? data.recipient
+            : data.type === 'WithdrawWithTokenId'
+            ? data.recipient
+            : undefined
+
+        if (recipientEthAddress === undefined) {
+          const recipient =
+            await this.userRegistrationEventRepository.findByStarkKey(
+              userTransaction.data.starkKey
+            )
+          // TODO handle lack of recipient address
+          recipientEthAddress = recipient?.ethAddress
+        }
+        return renderRegularWithdrawalPage({
+          user,
+          transactionHash: userTransaction.transactionHash,
+          recipient: {
+            // TODO don't display starkKey if unknown
+            starkKey: StarkKey.ZERO,
+            // TODO don't display ethereum address if unknown
+            ethereumAddress: recipientEthAddress ?? EthereumAddress.ZERO,
+          },
+          asset: { hashOrId: assetHash },
+          amount: userTransaction.data.quantizedAmount,
+          history,
+          stateUpdateId: userTransaction.included?.stateUpdateId,
+        })
+      }
+      default:
+        assertUnreachable(userTransaction.data)
     }
   }
 
@@ -245,7 +251,7 @@ export class TransactionController {
     const history = buildRegularTransactionHistory(sentTransaction)
 
     switch (sentTransaction.data.type) {
-      case 'ForcedTrade':
+      case 'ForcedTrade': {
         const [userA, userB] = await Promise.all([
           this.userRegistrationEventRepository.findByStarkKey(
             sentTransaction.data.starkKeyA
@@ -263,15 +269,14 @@ export class TransactionController {
           ethereumAddress: userA.ethAddress,
           positionId: sentTransaction.data.positionIdA.toString(),
         }
-        const taker =
-          userB === undefined
-            ? undefined
-            : {
-                starkKey: userB.starkKey,
-                // TODO don't display ethereum address if unknown
-                ethereumAddress: userB.ethAddress,
-                positionId: sentTransaction.data.positionIdB.toString(),
-              }
+        const taker = userB
+          ? {
+              starkKey: userB.starkKey,
+              // TODO don't display ethereum address if unknown
+              ethereumAddress: userB.ethAddress,
+              positionId: sentTransaction.data.positionIdB.toString(),
+            }
+          : undefined
         return renderOfferAndForcedTradePage({
           user,
           transactionHash: sentTransaction.transactionHash,
@@ -286,6 +291,7 @@ export class TransactionController {
           expirationTimestamp: sentTransaction.data.submissionExpirationTime, // TODO: fix
           history,
         })
+      }
       case 'ForcedWithdrawal': {
         if (!this.collateralAsset) {
           throw new Error(
@@ -313,6 +319,9 @@ export class TransactionController {
 
       case 'Withdraw':
         throw new Error('Withdraw not supported')
+
+      default:
+        assertUnreachable(sentTransaction.data)
     }
   }
 
