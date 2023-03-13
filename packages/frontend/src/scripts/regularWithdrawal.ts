@@ -87,30 +87,16 @@ async function submitWithdrawalWithTokenId(
 }
 
 function getDataFromButton(buttonDataset: DOMStringMap) {
-  const {
-    assetDetails: assetDetailsData,
-    account: accountData,
-    starkKey: starkKeyData,
-    exchangeAddress: exchangeAddressData,
-  } = buttonDataset
+  const { assetDetails, account, starkKey, exchangeAddress } = buttonDataset
 
-  if (
-    !assetDetailsData ||
-    !accountData ||
-    !starkKeyData ||
-    !exchangeAddressData
-  ) {
+  if (!assetDetails || !account || !starkKey || !exchangeAddress) {
     throw new Error('Invalid data')
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const assetDetailsJson = JSON.parse(assetDetailsData)
-
-  const assetDetails = AssetDetails.parse(assetDetailsJson)
 
   return {
-    assetDetails,
-    account: EthereumAddress(accountData),
-    starkKey: StarkKey(starkKeyData),
-    exchangeAddress: EthereumAddress(exchangeAddressData),
+    assetDetails: AssetDetails.parse(JSON.parse(assetDetails)),
+    account: EthereumAddress(account),
+    starkKey: StarkKey(starkKey),
+    exchangeAddress: EthereumAddress(exchangeAddress),
   }
 }
