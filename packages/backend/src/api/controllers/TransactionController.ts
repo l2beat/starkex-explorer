@@ -103,10 +103,10 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKey
           )
-        const history = buildTransactionHistory(
+        const history = buildTransactionHistory({
           sentTransaction,
-          userTransaction
-        )
+          userTransaction,
+        })
         return renderPerpetualForcedWithdrawalPage({
           user,
           transactionHash: userTransaction.transactionHash,
@@ -127,10 +127,10 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKey
           )
-        const history = buildTransactionHistory(
+        const history = buildTransactionHistory({
           sentTransaction,
-          userTransaction
-        )
+          userTransaction,
+        })
         return renderSpotForcedWithdrawalPage({
           user,
           transactionHash: userTransaction.transactionHash,
@@ -171,11 +171,11 @@ export class TransactionController {
                 ethereumAddress: userB.ethAddress,
                 positionId: userTransaction.data.positionIdB.toString(),
               }
-        const history = buildForcedTradeTransactionHistory(
+        const history = buildForcedTradeTransactionHistory({
           forcedTradeOfferTransaction,
           sentTransaction,
-          userTransaction
-        )
+          userTransaction,
+        })
         return renderOfferAndForcedTradePage({
           user,
           transactionHash: userTransaction.transactionHash,
@@ -195,10 +195,10 @@ export class TransactionController {
       case 'Withdraw':
       case 'WithdrawWithTokenId':
       case 'MintWithdraw': {
-        const history = buildRegularTransactionHistory(
+        const history = buildRegularTransactionHistory({
           sentTransaction,
-          userTransaction
-        )
+          userTransaction,
+        })
         const data = userTransaction.data
         const assetHash =
           data.type === 'Withdraw'
@@ -248,8 +248,6 @@ export class TransactionController {
     user: UserDetails | undefined,
     sentTransaction: SentTransactionRecord
   ): Promise<string | undefined> {
-    const history = buildRegularTransactionHistory(sentTransaction)
-
     switch (sentTransaction.data.type) {
       case 'ForcedTrade': {
         const [userA, userB] = await Promise.all([
@@ -277,6 +275,7 @@ export class TransactionController {
               positionId: sentTransaction.data.positionIdB.toString(),
             }
           : undefined
+        const history = buildForcedTradeTransactionHistory({ sentTransaction })
         return renderOfferAndForcedTradePage({
           user,
           transactionHash: sentTransaction.transactionHash,
@@ -302,6 +301,8 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             sentTransaction.data.starkKey
           )
+        const history = buildTransactionHistory({ sentTransaction })
+
         return renderPerpetualForcedWithdrawalPage({
           user,
           transactionHash: sentTransaction.transactionHash,
@@ -327,7 +328,7 @@ export class TransactionController {
 
   async getTransactionPageForForcedTradeOfferTransaction(
     user: UserDetails | undefined,
-    forcedTradeOffer: ForcedTradeOfferTransaction
+    forcedTradeOfferTransaction: ForcedTradeOfferTransaction
   ) {
     if (!this.collateralAsset) {
       throw new Error(
@@ -335,11 +336,11 @@ export class TransactionController {
       )
     }
     const userA = await this.userRegistrationEventRepository.findByStarkKey(
-      forcedTradeOffer.starkKeyA
+      forcedTradeOfferTransaction.starkKeyA
     )
-    const userB = forcedTradeOffer.accepted
+    const userB = forcedTradeOfferTransaction.accepted
       ? await this.userRegistrationEventRepository.findByStarkKey(
-          forcedTradeOffer.accepted.starkKeyB
+          forcedTradeOfferTransaction.accepted.starkKeyB
         )
       : undefined
 
@@ -350,58 +351,77 @@ export class TransactionController {
       starkKey: userA.starkKey,
       // TODO don't display ethereum address if unknown
       ethereumAddress: userA.ethAddress,
-      positionId: forcedTradeOffer.positionIdA.toString(),
+      positionId: forcedTradeOfferTransaction.positionIdA.toString(),
     }
     const taker =
-      userB && forcedTradeOffer.accepted
+      userB && forcedTradeOfferTransaction.accepted
         ? {
             starkKey: userB.starkKey,
             // TODO don't display ethereum address if unknown
             ethereumAddress: userB.ethAddress,
-            positionId: forcedTradeOffer.accepted.positionIdB.toString(),
+            positionId:
+              forcedTradeOfferTransaction.accepted.positionIdB.toString(),
           }
         : undefined
-    const history = buildForcedTradeTransactionHistory(forcedTradeOffer)
+    const history = buildForcedTradeTransactionHistory({
+      forcedTradeOfferTransaction,
+    })
     return renderOfferAndForcedTradePage({
       user,
-      transactionHash: forcedTradeOffer.accepted?.transactionHash,
-      offerId: forcedTradeOffer.id.toString(),
+      transactionHash: forcedTradeOfferTransaction.accepted?.transactionHash,
+      offerId: forcedTradeOfferTransaction.id.toString(),
       maker,
       taker,
-      type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
+      type: forcedTradeOfferTransaction.isABuyingSynthetic ? 'BUY' : 'SELL',
       //TODO: Take correct collateralAssetId
       collateralAsset: { hashOrId: this.collateralAsset.assetId },
-      collateralAmount: forcedTradeOffer.collateralAmount,
-      syntheticAsset: { hashOrId: forcedTradeOffer.syntheticAssetId },
-      syntheticAmount: forcedTradeOffer.syntheticAmount,
-      expirationTimestamp: forcedTradeOffer.accepted?.submissionExpirationTime
-        ? Timestamp(forcedTradeOffer.accepted.submissionExpirationTime)
+      collateralAmount: forcedTradeOfferTransaction.collateralAmount,
+      syntheticAsset: {
+        hashOrId: forcedTradeOfferTransaction.syntheticAssetId,
+      },
+      syntheticAmount: forcedTradeOfferTransaction.syntheticAmount,
+      expirationTimestamp: forcedTradeOfferTransaction.accepted
+        ?.submissionExpirationTime
+        ? Timestamp(
+            forcedTradeOfferTransaction.accepted.submissionExpirationTime
+          )
         : undefined,
       history,
     })
   }
 }
 
-interface HistoryItem<
-  T extends
-    | 'CREATED'
-    | 'CANCELLED'
-    | 'ACCEPTED'
-    | 'EXPIRED'
-    | 'SENT'
-    | 'REVERTED'
-    | 'MINED'
-    | 'INCLUDED'
+type TransactionStatus =
+  | 'CREATED'
+  | 'CANCELLED'
+  | 'ACCEPTED'
+  | 'EXPIRED'
+  | 'SENT'
+  | 'REVERTED'
+  | 'MINED'
+  | 'INCLUDED'
+
+interface TransactionHistoryItem<
+  T extends TransactionStatus = TransactionStatus
 > {
   timestamp: Timestamp | undefined
   status: T
 }
 
-function buildRegularTransactionHistory(
-  sentTransaction: SentTransactionRecord | undefined,
+interface TransactionHistoryArgs {
   userTransaction?: UserTransactionRecord
-): HistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] {
-  const history: HistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] = []
+  sentTransaction?: SentTransactionRecord
+  forcedTradeOfferTransaction?: ForcedTradeOfferTransaction
+}
+
+function buildRegularTransactionHistory({
+  sentTransaction,
+  userTransaction,
+}: Omit<
+  TransactionHistoryArgs,
+  'forcedTradeOfferTransaction'
+>): TransactionHistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] {
+  const history: TransactionHistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] = []
 
   if (sentTransaction?.mined?.reverted) {
     history.push({
@@ -425,11 +445,16 @@ function buildRegularTransactionHistory(
   return history
 }
 
-function buildTransactionHistory(
-  sentTransaction: SentTransactionRecord | undefined,
-  userTransaction: UserTransactionRecord | undefined
-): HistoryItem<'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'>[] {
-  const history: HistoryItem<'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'>[] = []
+function buildTransactionHistory({
+  sentTransaction,
+  userTransaction,
+}: Omit<
+  TransactionHistoryArgs,
+  'forcedTradeOfferTransaction'
+>): TransactionHistoryItem<'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'>[] {
+  const history: TransactionHistoryItem<
+    'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'
+  >[] = []
 
   if (userTransaction?.included) {
     history.push({
@@ -439,38 +464,20 @@ function buildTransactionHistory(
   }
 
   history.push(
-    ...buildRegularTransactionHistory(sentTransaction, userTransaction)
+    ...buildRegularTransactionHistory({ sentTransaction, userTransaction })
   )
 
   return history
 }
 
-function buildForcedTradeTransactionHistory(
-  forcedTradeOfferTransaction: ForcedTradeOfferTransaction | undefined,
-  sentTransaction?: SentTransactionRecord,
-  userTransaction?: UserTransactionRecord
-): HistoryItem<
-  | 'CREATED'
-  | 'CANCELLED'
-  | 'ACCEPTED'
-  | 'EXPIRED'
-  | 'SENT'
-  | 'REVERTED'
-  | 'MINED'
-  | 'INCLUDED'
->[] {
-  const history: HistoryItem<
-    | 'CREATED'
-    | 'CANCELLED'
-    | 'ACCEPTED'
-    | 'EXPIRED'
-    | 'SENT'
-    | 'REVERTED'
-    | 'MINED'
-    | 'INCLUDED'
-  >[] = []
+function buildForcedTradeTransactionHistory({
+  forcedTradeOfferTransaction,
+  sentTransaction,
+  userTransaction,
+}: TransactionHistoryArgs): TransactionHistoryItem[] {
+  const history: TransactionHistoryItem[] = []
   history.push(
-    ...buildRegularTransactionHistory(sentTransaction, userTransaction)
+    ...buildRegularTransactionHistory({ sentTransaction, userTransaction })
   )
   if (!forcedTradeOfferTransaction && !sentTransaction && !userTransaction) {
     return history
