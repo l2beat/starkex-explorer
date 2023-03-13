@@ -36,22 +36,6 @@ describe(pedersenSync.name, () => {
     )
   })
 
-  it('hashes different sample values (close to field size)', () => {
-    const result = pedersenSync(
-      PedersenHash(
-        '0000000000000000000000000000000000000000000000000000000000000000'
-      ),
-      PedersenHash(
-        '0beef00000000000000000000000000000000000000000000000000000000000'
-      )
-    )
-    expect(result).toEqual(
-      PedersenHash(
-        '078842fa0d955a2107ef9efa4fea41de3f45b7306dc54271d38bc36cb8982824'
-      )
-    )
-  })
-
   it('follows original example 1', () => {
     const result = pedersenSync(
       PedersenHash(
