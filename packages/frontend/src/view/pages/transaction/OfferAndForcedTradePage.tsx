@@ -41,7 +41,6 @@ export interface OfferAndForcedTradePageProps {
   collateralAmount: bigint
   syntheticAsset: Asset
   syntheticAmount: bigint
-  expirationTimestamp: Timestamp
   history: {
     timestamp: Timestamp | undefined
     status:
@@ -54,6 +53,7 @@ export interface OfferAndForcedTradePageProps {
       | 'REVERTED'
       | 'INCLUDED'
   }[]
+  expirationTimestamp?: Timestamp
   stateUpdateId?: number
 }
 
@@ -120,7 +120,9 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
             timestamp={
-              !props.transactionHash && status !== 'EXPIRED'
+              !props.transactionHash &&
+              status !== 'EXPIRED' &&
+              props.expirationTimestamp
                 ? {
                     label: 'Expiration timestamp',
                     timestamp: props.expirationTimestamp,

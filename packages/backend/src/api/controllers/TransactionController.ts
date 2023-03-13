@@ -50,12 +50,47 @@ export class TransactionController {
       this.userTransactionRepository.findByTransactionHash(txHash),
     ])
 
-    // TODO: cover the case where there is ONLY a sentTransaction
-    if (!userTransaction) {
+    if (!userTransaction && !sentTransaction && !forcedTradeOfferTransaction) {
       return { type: 'not found', content: 'Transaction not found' }
     }
-
     let content
+
+    if (sentTransaction && !forcedTradeOfferTransaction && !userTransaction) {
+      content = await this.getTransactionPageForSentTransaction(
+        user,
+        sentTransaction
+      )
+    }
+    if (!sentTransaction && forcedTradeOfferTransaction && !userTransaction) {
+      content = await this.getTransactionPageForForcedTradeOfferTransaction(
+        user,
+        forcedTradeOfferTransaction
+      )
+    }
+
+    if (userTransaction) {
+      content = await this.getTransactionPageForUserTransaction(
+        user,
+        userTransaction,
+        sentTransaction,
+        forcedTradeOfferTransaction
+      )
+    }
+
+    if (!content) {
+      return {
+        type: 'not found',
+        content: "Transaction can't be displayed right now...",
+      }
+    }
+    return { type: 'success', content }
+  }
+  async getTransactionPageForUserTransaction(
+    user: UserDetails | undefined,
+    userTransaction: UserTransactionRecord,
+    sentTransaction: SentTransactionRecord | undefined,
+    forcedTradeOfferTransaction: ForcedTradeOfferTransaction | undefined
+  ) {
     if (userTransaction.data.type === 'ForcedWithdrawal') {
       if (!this.collateralAsset) {
         throw new Error(
@@ -66,9 +101,9 @@ export class TransactionController {
         userTransaction.data.starkKey
       )
       const history = buildTransactionHistory(sentTransaction, userTransaction)
-      content = renderPerpetualForcedWithdrawalPage({
+      return renderPerpetualForcedWithdrawalPage({
         user,
-        transactionHash: txHash,
+        transactionHash: userTransaction.transactionHash,
         recipient: {
           starkKey: userTransaction.data.starkKey,
           // TODO don't display ethereum address if unknown
@@ -87,9 +122,9 @@ export class TransactionController {
         userTransaction.data.starkKey
       )
       const history = buildTransactionHistory(sentTransaction, userTransaction)
-      content = renderSpotForcedWithdrawalPage({
+      return renderSpotForcedWithdrawalPage({
         user,
-        transactionHash: txHash,
+        transactionHash: userTransaction.transactionHash,
         recipient: {
           starkKey: userTransaction.data.starkKey,
           // TODO don't display ethereum address if unknown
@@ -128,14 +163,15 @@ export class TransactionController {
               ethereumAddress: userB.ethAddress,
               positionId: userTransaction.data.positionIdB.toString(),
             }
+      //TODO: NOT ENOUGH DATA TO DISPLAY OFFER
       const history = buildForcedTradeTransactionHistory(
-        sentTransaction,
         forcedTradeOfferTransaction,
+        sentTransaction,
         userTransaction
       )
-      content = renderOfferAndForcedTradePage({
+      return renderOfferAndForcedTradePage({
         user,
-        transactionHash: txHash,
+        transactionHash: userTransaction.transactionHash,
         offerId: '-', // TODO: pass correct data
         maker,
         taker,
@@ -185,9 +221,9 @@ export class TransactionController {
         recipientEthAddress = recipient?.ethAddress
       }
 
-      content = renderRegularWithdrawalPage({
+      return renderRegularWithdrawalPage({
         user,
-        transactionHash: txHash,
+        transactionHash: userTransaction.transactionHash,
         recipient: {
           // TODO don't display starkKey if unknown
           starkKey: StarkKey.ZERO,
@@ -200,14 +236,140 @@ export class TransactionController {
         stateUpdateId: userTransaction.included?.stateUpdateId,
       })
     }
+  }
 
-    if (!content) {
-      return {
-        type: 'not found',
-        content: "Transaction can't be displayed right now...",
+  async getTransactionPageForSentTransaction(
+    user: UserDetails | undefined,
+    sentTransaction: SentTransactionRecord
+  ): Promise<string | undefined> {
+    const history = buildRegularTransactionHistory(sentTransaction)
+
+    switch (sentTransaction.data.type) {
+      case 'ForcedTrade':
+        const [userA, userB] = await Promise.all([
+          this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKeyA
+          ),
+          this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKeyB
+          ),
+        ])
+        if (!userA) {
+          throw new Error('User A not found')
+        }
+        const maker = {
+          starkKey: userA.starkKey,
+          // TODO don't display ethereum address if unknown
+          ethereumAddress: userA.ethAddress,
+          positionId: sentTransaction.data.positionIdA.toString(),
+        }
+        const taker =
+          userB === undefined
+            ? undefined
+            : {
+                starkKey: userB.starkKey,
+                // TODO don't display ethereum address if unknown
+                ethereumAddress: userB.ethAddress,
+                positionId: sentTransaction.data.positionIdB.toString(),
+              }
+        return renderOfferAndForcedTradePage({
+          user,
+          transactionHash: sentTransaction.transactionHash,
+          offerId: '-', // TODO: pass correct data
+          maker,
+          taker,
+          type: sentTransaction.data.isABuyingSynthetic ? 'BUY' : 'SELL',
+          collateralAsset: { hashOrId: sentTransaction.data.collateralAssetId },
+          collateralAmount: sentTransaction.data.collateralAmount,
+          syntheticAsset: { hashOrId: sentTransaction.data.syntheticAssetId },
+          syntheticAmount: sentTransaction.data.syntheticAmount,
+          expirationTimestamp: sentTransaction.data.submissionExpirationTime, // TODO: fix
+          history,
+        })
+      case 'ForcedWithdrawal': {
+        if (!this.collateralAsset) {
+          throw new Error(
+            'Collateral asset not passed when displaying ForcedWithdrawal'
+          )
+        }
+        const txUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKey
+          )
+        return renderPerpetualForcedWithdrawalPage({
+          user,
+          transactionHash: sentTransaction.transactionHash,
+          recipient: {
+            starkKey: sentTransaction.data.starkKey,
+            // TODO don't display ethereum address if unknown
+            ethereumAddress: txUser?.ethAddress ?? EthereumAddress.ZERO,
+          },
+          asset: { hashOrId: this.collateralAsset.assetId },
+          amount: sentTransaction.data.quantizedAmount,
+          positionId: sentTransaction.data.positionId.toString(),
+          history,
+        })
       }
+
+      case 'Withdraw':
+        throw new Error('Withdraw not supported')
     }
-    return { type: 'success', content }
+  }
+
+  async getTransactionPageForForcedTradeOfferTransaction(
+    user: UserDetails | undefined,
+    forcedTradeOffer: ForcedTradeOfferTransaction
+  ) {
+    if (!this.collateralAsset) {
+      throw new Error(
+        'Collateral asset not passed when displaying ForcedTradeOffer'
+      )
+    }
+    const userA = await this.userRegistrationEventRepository.findByStarkKey(
+      forcedTradeOffer.starkKeyA
+    )
+    const userB = forcedTradeOffer.accepted
+      ? await this.userRegistrationEventRepository.findByStarkKey(
+          forcedTradeOffer.accepted.starkKeyB
+        )
+      : undefined
+
+    if (!userA) {
+      throw new Error('User A not found')
+    }
+    const maker = {
+      starkKey: userA.starkKey,
+      // TODO don't display ethereum address if unknown
+      ethereumAddress: userA.ethAddress,
+      positionId: forcedTradeOffer.positionIdA.toString(),
+    }
+    const taker =
+      userB && forcedTradeOffer.accepted
+        ? {
+            starkKey: userB.starkKey,
+            // TODO don't display ethereum address if unknown
+            ethereumAddress: userB.ethAddress,
+            positionId: forcedTradeOffer.accepted.positionIdB.toString(),
+          }
+        : undefined
+    const history = buildForcedTradeTransactionHistory(forcedTradeOffer)
+    return renderOfferAndForcedTradePage({
+      user,
+      transactionHash: forcedTradeOffer.accepted?.transactionHash,
+      offerId: forcedTradeOffer.id.toString(),
+      maker,
+      taker,
+      type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
+      //TODO: Take correct collateralAssetId
+      collateralAsset: { hashOrId: this.collateralAsset.assetId },
+      collateralAmount: forcedTradeOffer.collateralAmount,
+      syntheticAsset: { hashOrId: forcedTradeOffer.syntheticAssetId },
+      syntheticAmount: forcedTradeOffer.syntheticAmount,
+      expirationTimestamp: forcedTradeOffer.accepted?.submissionExpirationTime
+        ? Timestamp(forcedTradeOffer.accepted.submissionExpirationTime)
+        : undefined,
+      history,
+    })
   }
 }
 
@@ -228,19 +390,25 @@ interface HistoryItem<
 
 function buildRegularTransactionHistory(
   sentTransaction: SentTransactionRecord | undefined,
-  userTransaction: UserTransactionRecord
+  userTransaction?: UserTransactionRecord
 ): HistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] {
   const history: HistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] = []
-  history.push({
-    status: 'MINED',
-    timestamp: userTransaction.timestamp,
-  })
+
   if (sentTransaction?.mined?.reverted) {
     history.push({
       timestamp: sentTransaction.mined.timestamp,
       status: 'REVERTED',
     })
   }
+
+  if (sentTransaction?.mined || userTransaction) {
+    history.push({
+      status: 'MINED',
+      timestamp:
+        sentTransaction?.mined?.timestamp ?? userTransaction?.timestamp,
+    })
+  }
+
   history.push({
     timestamp: sentTransaction?.sentTimestamp,
     status: 'SENT',
@@ -250,15 +418,17 @@ function buildRegularTransactionHistory(
 
 function buildTransactionHistory(
   sentTransaction: SentTransactionRecord | undefined,
-  userTransaction: UserTransactionRecord
+  userTransaction: UserTransactionRecord | undefined
 ): HistoryItem<'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'>[] {
   const history: HistoryItem<'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'>[] = []
-  if (userTransaction.included) {
+
+  if (userTransaction?.included) {
     history.push({
       timestamp: userTransaction.included.timestamp,
       status: 'INCLUDED',
     })
   }
+
   history.push(
     ...buildRegularTransactionHistory(sentTransaction, userTransaction)
   )
@@ -267,9 +437,9 @@ function buildTransactionHistory(
 }
 
 function buildForcedTradeTransactionHistory(
-  sentTransaction: SentTransactionRecord | undefined,
   forcedTradeOfferTransaction: ForcedTradeOfferTransaction | undefined,
-  userTransaction: UserTransactionRecord
+  sentTransaction?: SentTransactionRecord,
+  userTransaction?: UserTransactionRecord
 ): HistoryItem<
   | 'CREATED'
   | 'CANCELLED'
@@ -290,14 +460,9 @@ function buildForcedTradeTransactionHistory(
     | 'MINED'
     | 'INCLUDED'
   >[] = []
-  history.push(...buildTransactionHistory(sentTransaction, userTransaction))
-
-  /*
-    TODO: Right now it's not possible to have a forcedTradeOfferTransaction without a userTransaction, but probably it should be possible.
-    TODO: Remove the eslint-disable-next-line @typescript-eslint/no-unnecessary-condition when it's possible to have a forcedTradeOfferTransaction without a userTransaction
-  */
-
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  history.push(
+    ...buildRegularTransactionHistory(sentTransaction, userTransaction)
+  )
   if (!forcedTradeOfferTransaction && !sentTransaction && !userTransaction) {
     return history
   }
@@ -311,7 +476,6 @@ function buildForcedTradeTransactionHistory(
   if (
     forcedTradeOfferTransaction?.accepted?.at ||
     sentTransaction ||
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     userTransaction
   ) {
     if (
