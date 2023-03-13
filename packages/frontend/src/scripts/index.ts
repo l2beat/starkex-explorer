@@ -4,6 +4,8 @@ import { initPerpetualForcedActionForm } from './forced-actions/forcedActionForm
 import { initSpotForcedWithdrawalForm } from './forced-actions/spotForcedWithdrawalForm'
 import { initImageFallback } from './imageFallback'
 import { initMetamask } from './metamask'
+import { initPopup } from './popupService'
+import { initWalletConnect } from './walletConnect'
 import { initAcceptOfferForm } from './offer/acceptForm'
 import { initCancelOfferForm } from './offer/cancelForm'
 import { initOffersFilteringForm } from './offer/filteringForm'
@@ -20,6 +22,8 @@ import { initTVLDisplay } from './tvl'
 
 initTVLDisplay()
 initMetamask()
+initPopup()
+initWalletConnect()
 initOldPagination()
 initOffersFilteringForm()
 initAcceptOfferForm()

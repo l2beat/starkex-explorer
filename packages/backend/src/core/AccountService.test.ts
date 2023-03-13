@@ -51,6 +51,7 @@ describe(AccountService.name, () => {
       address,
       hasUpdates: false,
       positionId: 123n,
+      is_wallet_connect: false
     })
   })
 
@@ -72,6 +73,7 @@ describe(AccountService.name, () => {
       address,
       hasUpdates: true,
       positionId: 123n,
+      is_wallet_connect: false
     })
   })
 
@@ -93,6 +95,7 @@ describe(AccountService.name, () => {
       address,
       hasUpdates: true,
       positionId: 123n,
+      is_wallet_connect: false
     })
   })
 })

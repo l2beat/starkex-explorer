@@ -350,6 +350,7 @@ export const TRANSACTION_FORM_PROPS: TransactionFormProps = {
     address: EthereumAddress.fake(),
     positionId: 123n,
     hasUpdates: false,
+    is_wallet_connect: false
   },
   perpetualAddress: EthereumAddress(
     '0xD54f502e184B6B739d7D27a6410a67dc462D69c8'

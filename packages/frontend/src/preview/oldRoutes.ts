@@ -102,6 +102,7 @@ function getAccount(ctx: Koa.Context) {
         address: EthereumAddress(cookie),
         positionId: 123n,
         hasUpdates: Math.random() < 0.5,
+        is_wallet_connect: false
       }
     } catch {
       return

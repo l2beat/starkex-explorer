@@ -11,6 +11,7 @@ describe(nextFormState.name, () => {
         address: EthereumAddress.fake(),
         positionId: 123n,
         hasUpdates: false,
+        is_wallet_connect: false
       },
       positionId: 123n,
       perpetualAddress: EthereumAddress.fake(),

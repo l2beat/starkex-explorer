@@ -1,52 +1,48 @@
 import Cookie from 'js-cookie'
 
-export function initMetamask() {
+export async function initMetamask() {
+ 
   const provider = window.ethereum
-
   const connectButton = document.querySelector<HTMLButtonElement>(
     '#connect-with-metamask'
   )
+     
   if (connectButton) {
+    Cookie.set("is_walletconnect","false")
     connectButton.addEventListener('click', () => {
       if (provider) {
         provider.request({ method: 'eth_requestAccounts' }).catch(console.error)
+        connectButton.disabled = false;
+        connectButton.innerText = 'Connect Metamask'
       } else {
         window.open('https://metamask.io/download/')
       }
     })
   }
-
+  
+  const is_walletconnect = Cookie.get('is_walletconnect')
   if (!provider) {
     return
   }
-
-  provider
+  if (is_walletconnect == "false"){
+    provider
     .request({ method: 'eth_accounts' })
     .then((accounts) => {
       updateAccount((accounts as string[])[0])
     })
     .catch(console.error)
-
-  provider
-    .request({ method: 'eth_chainId' })
-    .then((chainId) => {
-      updateChainId(chainId as string)
+    provider.on('accountsChanged', (accounts) => {
+      updateAccount(accounts[0])
     })
-    .catch(console.error)
-
-  provider.on('accountsChanged', (accounts) => {
-    updateAccount(accounts[0])
-  })
-
-  provider.on('chainChanged', (chainId) => {
-    updateChainId(chainId)
-  })
+  }
 
   function updateAccount(account: string | undefined) {
+    console.log("account",account)
     const lower = account?.toLowerCase()
     const existing = Cookie.get('account')
     if (lower !== existing) {
       if (lower !== undefined) {
+        Cookie.set("is_walletconnect","false")
         Cookie.set('account', lower)
       } else {
         Cookie.remove('account')
@@ -54,7 +50,6 @@ export function initMetamask() {
       location.reload()
     }
   }
-
   const MAINNET_CHAIN_ID = '0x1'
   const GANACHE_CHAIN_ID = '0x539'
   function updateChainId(chainId: string) {

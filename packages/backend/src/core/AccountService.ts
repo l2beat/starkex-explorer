@@ -33,6 +33,7 @@ export class AccountService {
       address,
       positionId: id,
       hasUpdates: activeCount > 0 || pendingCount > 0,
+      is_wallet_connect: false
     }
   }
 }

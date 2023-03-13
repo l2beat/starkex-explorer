@@ -56,6 +56,7 @@ describe(ForcedTradeOfferController.name, () => {
             address: address,
             positionId: 123n,
             hasUpdates: false,
+            is_wallet_connect: false
           }
         : undefined,
   })
