@@ -192,7 +192,7 @@ export const Wallet = {
     exchangeAddress: EthereumAddress,
     assetTypeHash: Hash256
   ) {
-    const data = encodeWithdrawal(starkKey, assetTypeHash)
+    const data = encodeWithdrawal({ starkKey, assetTypeHash })
 
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
@@ -214,7 +214,11 @@ export const Wallet = {
     assetTypeHash: Hash256,
     tokenId: bigint
   ) {
-    const data = encodeWithdrawalWithTokenId(starkKey, assetTypeHash, tokenId)
+    const data = encodeWithdrawalWithTokenId({
+      starkKey,
+      assetTypeHash,
+      tokenId,
+    })
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [
