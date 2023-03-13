@@ -24,7 +24,7 @@ export interface SpotForcedWithdrawalPageProps {
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey
-    ethereumAddress: EthereumAddress
+    ethereumAddress: EthereumAddress | undefined
   }
   vaultId: string
   history: {

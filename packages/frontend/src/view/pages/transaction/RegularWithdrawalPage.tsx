@@ -19,7 +19,7 @@ export interface RegularWithdrawalPageProps {
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey
-    ethereumAddress: EthereumAddress
+    ethereumAddress: EthereumAddress | undefined
   }
   asset: Asset
   amount?: bigint

@@ -25,7 +25,7 @@ export interface PerpetualForcedWithdrawalPageProps {
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey
-    ethereumAddress: EthereumAddress
+    ethereumAddress: EthereumAddress | undefined
   }
   asset: Asset
   amount: bigint

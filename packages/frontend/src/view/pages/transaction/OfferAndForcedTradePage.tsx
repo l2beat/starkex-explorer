@@ -24,7 +24,7 @@ import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface OfferAndForcedTradePageProps {
   user: UserDetails | undefined
-  offerId: string
+  offerId: string | undefined
   transactionHash?: Hash256
   maker: {
     starkKey: StarkKey
@@ -98,7 +98,8 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
               />
             ) : (
               <PageTitle>
-                Forced {props.type.toLowerCase()} offer #{props.offerId}
+                Forced {props.type.toLowerCase()} offer{' '}
+                {props.offerId ? `#${props.offerId}` : ''}
               </PageTitle>
             )}
             <div className="mb-6 flex items-center gap-2">
