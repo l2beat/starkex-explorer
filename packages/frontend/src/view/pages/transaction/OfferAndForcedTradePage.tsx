@@ -65,6 +65,7 @@ export function renderOfferAndForcedTradePage(
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   const isMine = props.user?.starkKey === props.maker.starkKey
+  const common = getCommon(props.transactionHash, props.offerId)
   const historyEntries = props.history.map((x) =>
     toHistoryEntry(x, props.type, props.stateUpdateId)
   )
@@ -79,15 +80,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   const showAccept = !isMine && Boolean(props.user) && status === 'CREATED'
 
   return (
-    <Page
-      user={props.user}
-      path={getPath(props.transactionHash, props.offerId)}
-      description={
-        props.transactionHash
-          ? `Details of the ${props.transactionHash.toString()} forced trade transaction`
-          : `Details of the ${props.offerId} forced trade offer`
-      }
-    >
+    <Page user={props.user} path={common.path} description={common.description}>
       <ContentWrapper className="flex flex-col gap-12">
         <div>
           <div className="flex items-center justify-between">
@@ -240,12 +233,18 @@ function toHistoryEntry(
   }
 }
 
-function getPath(transactionHash?: Hash256, offerId?: string) {
+function getCommon(transactionHash?: Hash256, offerId?: string) {
   if (transactionHash) {
-    return `/transactions/${transactionHash.toString()}`
+    return {
+      path: `/transactions/${transactionHash.toString()}`,
+      description: `Details of the ${transactionHash.toString()} forced trade transaction`,
+    }
   }
   if (offerId) {
-    return `/offers/${offerId}`
+    return {
+      path: `/offers/${offerId}`,
+      description: `Details of the ${offerId} forced trade offer`,
+    }
   }
   throw new Error('No transaction hash or offer id')
 }
