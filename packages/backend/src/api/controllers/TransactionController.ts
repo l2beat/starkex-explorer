@@ -166,7 +166,7 @@ export class TransactionController {
           collateralAmount: userTransaction.data.collateralAmount,
           syntheticAsset: { hashOrId: userTransaction.data.syntheticAssetId },
           syntheticAmount: userTransaction.data.syntheticAmount,
-          // TODO: maybe submmisionExpirationTime should be a timestamp
+          // TODO: maybe submisionExpirationTime should be a timestamp
           expirationTimestamp: forcedTradeOffer?.accepted
             ?.submissionExpirationTime
             ? Timestamp.fromHours(
@@ -429,7 +429,7 @@ function buildForcedTradeTransactionHistory({
   if (forcedTradeOffer?.accepted?.at || sentTransaction || userTransaction) {
     if (
       forcedTradeOffer?.accepted?.submissionExpirationTime &&
-      Timestamp(forcedTradeOffer.accepted.submissionExpirationTime) <
+      Timestamp.fromHours(forcedTradeOffer.accepted.submissionExpirationTime) <
         Timestamp.now()
     ) {
       history.push({
