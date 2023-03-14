@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -26,7 +26,7 @@ import {
 
 export interface StateUpdatePageProps extends StateUpdateStatsProps {
   user: UserDetails | undefined
-  type: 'SPOT' | 'PERPETUAL'
+  tradingMode: TradingMode
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
   priceChanges?: StateUpdatePriceEntry[]
@@ -48,7 +48,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
   return (
     <Page
       path={`/state-update/${props.id}`}
-      description="TODO: description"
+      description="Show state update details, including balance changes, transactions and prices"
       user={props.user}
     >
       <ContentWrapper className="flex flex-col gap-12">
@@ -59,7 +59,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
           total={props.totalBalanceChanges}
         >
           <StateUpdateBalanceChangesTable
-            type={props.type}
+            tradingMode={props.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>

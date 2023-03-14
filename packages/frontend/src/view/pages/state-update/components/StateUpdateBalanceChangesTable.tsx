@@ -1,3 +1,4 @@
+import { TradingMode } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -11,7 +12,7 @@ import { Table } from '../../../components/table/Table'
 
 export interface StateUpdateBalanceChangesTableProps {
   balanceChanges: StateUpdateBalanceChangeEntry[]
-  type: 'SPOT' | 'PERPETUAL'
+  tradingMode: TradingMode
 }
 
 export interface StateUpdateBalanceChangeEntry {
@@ -32,7 +33,7 @@ export function StateUpdateBalanceChangesTable(
         { header: 'Asset' },
         { header: 'Change', numeric: true },
         { header: 'Balance', numeric: true },
-        { header: props.type === 'PERPETUAL' ? 'Position' : 'Vault' },
+        { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
       ]}
       rows={props.balanceChanges.map((entry) => {
         return {

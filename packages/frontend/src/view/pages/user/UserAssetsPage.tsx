@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -13,7 +13,7 @@ import { UserPageTitle } from './components/UserPageTitle'
 export interface UserAssetsPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
-  type: 'SPOT' | 'PERPETUAL'
+  tradingMode: TradingMode
   assets: UserAssetEntry[]
   limit: number
   offset: number
@@ -27,7 +27,7 @@ export function renderUserAssetsPage(props: UserAssetsPageProps) {
 function UserAssetsPage(props: UserAssetsPageProps) {
   const common = getAssetsTableProps(props.starkKey)
   return (
-    <Page path={common.link} description="TODO: description" user={props.user}>
+    <Page path={common.path} description={common.description} user={props.user}>
       <ContentWrapper>
         <TableWithPagination
           {...common}
@@ -39,7 +39,7 @@ function UserAssetsPage(props: UserAssetsPageProps) {
         >
           <UserAssetsTable
             starkKey={props.starkKey}
-            type={props.type}
+            tradingMode={props.tradingMode}
             assets={props.assets}
           />
         </TableWithPagination>

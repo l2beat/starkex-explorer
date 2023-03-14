@@ -26,8 +26,8 @@ export function renderHomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
 function HomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
   return (
     <Page
-      path={STATE_UPDATE_TABLE_PROPS.link}
-      description="TODO: description"
+      path={STATE_UPDATE_TABLE_PROPS.path}
+      description="Latest state updates"
       user={props.user}
     >
       <ContentWrapper>
