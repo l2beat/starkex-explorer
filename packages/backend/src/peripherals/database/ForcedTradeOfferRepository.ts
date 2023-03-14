@@ -10,7 +10,7 @@ export interface Accepted {
   at: Timestamp
   starkKeyB: StarkKey
   positionIdB: bigint
-  submissionExpirationTime: bigint // unix time in hours
+  submissionExpirationTime: Timestamp // unix time in hours
   nonce: bigint
   premiumCost: boolean
   signature: string // HEX string signature of all parameters
@@ -50,9 +50,9 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
       : null,
     stark_key_b: orNull(record.accepted?.starkKeyB.toString()),
     position_id_b: orNull(record.accepted?.positionIdB),
-    submission_expiration_time: orNull(
-      record.accepted?.submissionExpirationTime
-    ),
+    submission_expiration_time: record.accepted
+      ? BigInt(record.accepted.submissionExpirationTime.toString())
+      : null,
     nonce: orNull(record.accepted?.nonce),
     premium_cost: orNull(record.accepted?.premiumCost),
     signature: orNull(record.accepted?.signature),
@@ -102,7 +102,9 @@ function toRecord(row: Row): Record {
         premiumCost: row.premium_cost,
         signature: row.signature,
         starkKeyB: StarkKey(row.stark_key_b),
-        submissionExpirationTime: row.submission_expiration_time,
+        submissionExpirationTime: Timestamp.fromHours(
+          row.submission_expiration_time
+        ),
         transactionHash: row.transaction_hash
           ? Hash256(row.transaction_hash)
           : undefined,

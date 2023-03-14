@@ -220,9 +220,7 @@ export class UserTransactionMigrator {
               syntheticAmount: data.syntheticAmount,
               syntheticAssetId: data.syntheticAssetId,
               isABuyingSynthetic: data.isABuyingSynthetic,
-              submissionExpirationTime: Timestamp(
-                data.submissionExpirationTime
-              ),
+              submissionExpirationTime: data.submissionExpirationTime,
               nonce: data.nonce,
               signatureB: data.signature,
               premiumCost: data.premiumCost,

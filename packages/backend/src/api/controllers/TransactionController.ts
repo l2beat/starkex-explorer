@@ -168,10 +168,7 @@ export class TransactionController {
           syntheticAmount: userTransaction.data.syntheticAmount,
           // TODO: maybe submisionExpirationTime should be a timestamp
           expirationTimestamp: forcedTradeOffer?.accepted
-            ?.submissionExpirationTime
-            ? Timestamp.fromHours(
-                forcedTradeOffer.accepted.submissionExpirationTime
-              )
+            ? forcedTradeOffer.accepted.submissionExpirationTime
             : undefined,
           history,
           stateUpdateId: userTransaction.included?.stateUpdateId,
@@ -429,13 +426,10 @@ function buildForcedTradeTransactionHistory({
   if (forcedTradeOffer?.accepted?.at || sentTransaction || userTransaction) {
     if (
       forcedTradeOffer?.accepted?.submissionExpirationTime &&
-      Timestamp.fromHours(forcedTradeOffer.accepted.submissionExpirationTime) <
-        Timestamp.now()
+      forcedTradeOffer.accepted.submissionExpirationTime < Timestamp.now()
     ) {
       history.push({
-        timestamp: Timestamp(
-          forcedTradeOffer.accepted.submissionExpirationTime
-        ),
+        timestamp: forcedTradeOffer.accepted.submissionExpirationTime,
         status: 'EXPIRED',
       })
     }

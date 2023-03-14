@@ -235,7 +235,7 @@ describe(TransactionSubmitController.name, () => {
         signature: Hash256.fake().toString(),
         starkKeyB: StarkKey.fake(),
         positionIdB: 0n,
-        submissionExpirationTime: 0n,
+        submissionExpirationTime: Timestamp.fromHours(0n),
         premiumCost: false,
       })
       const offer = fakeOffer()

@@ -1,5 +1,5 @@
 import { recoverAddress } from '@ethersproject/transactions'
-import { AssetId, StarkKey } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { toSignableAcceptOffer } from './toSignableAcceptOffer'
@@ -22,7 +22,7 @@ const ACCEPTED = {
     '069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41'
   ),
   positionIdB: BigInt('0x2ce'),
-  submissionExpirationTime: 3456000000000n,
+  submissionExpirationTime: Timestamp.fromHours(960000),
   nonce: BigInt(38404830),
   premiumCost: true,
   signature:
