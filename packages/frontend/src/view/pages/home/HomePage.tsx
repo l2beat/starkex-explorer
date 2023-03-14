@@ -29,7 +29,6 @@ import {
 export interface HomePageProps {
   user: UserDetails | undefined
   // TODO: statistics
-  tradingMode: 'spot' | 'perpetual'
   tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
   totalStateUpdates: number
