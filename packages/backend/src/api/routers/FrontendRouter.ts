@@ -1,31 +1,34 @@
 import {
   stringAsBigInt,
   stringAsPositiveInt,
-  UserDetails,
+  TradingMode,
 } from '@explorer/shared'
-import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
-import { Context } from 'koa'
 import * as z from 'zod'
 
-import { PaginationOptions } from '../../model/PaginationOptions'
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { ForcedActionController } from '../controllers/ForcedActionController'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
-import { SpotForcedWithdrawalController } from '../controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
+import { addPerpetualTradingRoutes } from './PerpetualFrontendRouter'
+import { addSpotTradingRoutes } from './SpotFrontendRouter'
 import { withTypedContext } from './types'
-import { applyControllerResult } from './utils'
+import { applyControllerResult, getGivenUser, getPagination } from './utils'
 
 export function createFrontendRouter(
   homeController: HomeController,
   userController: UserController,
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
-  spotForcedWithdrawalController: SpotForcedWithdrawalController,
+  forcedActionController: ForcedActionController,
   merkleProofController: MerkleProofController,
+  collateralAsset: CollateralAsset | undefined,
+  tradingMode: TradingMode,
   searchController: SearchController
 ) {
   const router = new Router()
@@ -279,26 +282,6 @@ export function createFrontendRouter(
   )
 
   router.get(
-    '/forced/new/spot/:vaultId',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          vaultId: stringAsBigInt(),
-        }),
-      }),
-      async (ctx) => {
-        const givenUser = getGivenUser(ctx)
-        const result =
-          await spotForcedWithdrawalController.getSpotForcedWithdrawalPage(
-            givenUser,
-            ctx.params.vaultId
-          )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
     '/proof/:positionOrVaultId',
     withTypedContext(
       z.object({
@@ -318,33 +301,11 @@ export function createFrontendRouter(
     )
   )
 
+  if (tradingMode === 'perpetual') {
+    addPerpetualTradingRoutes(router, forcedActionController, collateralAsset)
+  } else {
+    addSpotTradingRoutes(router, forcedActionController)
+  }
+
   return router
-}
-
-function getGivenUser(ctx: Context): Partial<UserDetails> {
-  const account = ctx.cookies.get('account')
-  const starkKey = ctx.cookies.get('starkKey')
-  if (account) {
-    try {
-      return {
-        address: EthereumAddress(account),
-        starkKey: starkKey ? StarkKey(starkKey) : undefined,
-      }
-    } catch {
-      return {}
-    }
-  }
-  return {}
-}
-
-function getPagination(query: {
-  page?: number
-  perPage?: number
-}): PaginationOptions {
-  const page = Math.max(1, query.page ?? 1)
-  const perPage = Math.max(1, Math.min(200, query.perPage ?? 50))
-  return {
-    limit: perPage,
-    offset: (page - 1) * perPage,
-  }
 }

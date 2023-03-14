@@ -39,8 +39,8 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   const formattedBalance = formatAmount(props.asset, props.asset.balance)
   return (
     <Page
-      path="/forced/new/spot/:vaultId"
-      description="Page that allows user withdrawal of spot asset"
+      path="/forced/new/:vaultId"
+      description="Perform forced withdrawal"
       user={props.user}
     >
       <main className="mx-auto flex-1 p-16">

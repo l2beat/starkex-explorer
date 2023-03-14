@@ -17,8 +17,7 @@ import {
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
-  renderNewPerpetualForcedTradePage,
-  renderNewPerpetualForcedWithdrawalPage,
+  renderNewPerpetualForcedActionPage,
   renderNotFoundPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
@@ -36,7 +35,6 @@ import {
 import { renderDevPage } from '../view/pages/DevPage'
 import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
 import { renderMerkleProofPage } from '../view/pages/MerkleProofPage'
-import * as DATA from './data'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
   randomHomeForcedTransactionEntry,
@@ -103,6 +101,7 @@ const routes: Route[] = [
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
+        tradingMode: 'perpetual',
       })
     },
   },
@@ -120,6 +119,7 @@ const routes: Route[] = [
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
+        tradingMode: 'perpetual',
       })
     },
   },
@@ -183,7 +183,7 @@ const routes: Route[] = [
       ctx.body = renderMerkleProofPage({
         user,
         positionOrVaultId: BigInt(randomId()),
-        type: 'SPOT',
+        tradingMode: 'spot',
         merkleProof: {
           rootHash: PedersenHash.fake(),
           path: repeat(9, () => ({
@@ -211,7 +211,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderStateUpdatePage({
         user,
-        type: 'PERPETUAL',
+        tradingMode: 'perpetual',
         id: randomId(),
         hashes: {
           factHash: Hash256.fake(),
@@ -246,7 +246,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderStateUpdateBalanceChangesPage({
         user,
-        type: 'PERPETUAL',
+        tradingMode: 'perpetual',
         id: '1534',
         balanceChanges: repeat(visible, randomStateUpdateBalanceChangeEntry),
         limit,
@@ -285,7 +285,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderUserPage({
         user,
-        type: 'PERPETUAL',
+        tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
@@ -319,7 +319,7 @@ const routes: Route[] = [
       const user = getUser(ctx)
       ctx.body = renderUserPage({
         user,
-        type: 'PERPETUAL',
+        tradingMode: 'perpetual',
         starkKey: user?.starkKey ?? StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
@@ -348,7 +348,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserAssetsPage({
         user,
-        type: 'PERPETUAL',
+        tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         assets: repeat(visible, randomUserAssetEntry),
         limit,
@@ -368,7 +368,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserAssetsPage({
         user,
-        type: 'PERPETUAL',
+        tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         assets: repeat(visible, randomUserAssetEntry),
         limit,
@@ -388,7 +388,7 @@ const routes: Route[] = [
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserBalanceChangesPage({
         user,
-        type: 'PERPETUAL',
+        tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         balanceChanges: repeat(visible, randomUserBalanceChangeEntry),
         limit,
@@ -441,30 +441,54 @@ const routes: Route[] = [
     path: '/forced/new/spot/withdraw',
     description: 'Form to create a new spot forced withdrawal.',
     render: (ctx) => {
-      const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
-      const asset = { ...withdrawData.asset }
-      withdrawData.user = getUser(ctx) ?? withdrawData.user
-      asset.hashOrId = AssetHash.fake()
-      withdrawData.asset = asset
-      ctx.body = renderNewSpotForcedWithdrawPage(withdrawData)
+      const user = getUser(ctx, true)
+      ctx.body = renderNewSpotForcedWithdrawPage({
+        user,
+        starkKey: StarkKey.fake(),
+        starkExAddress: EthereumAddress.fake(),
+        asset: {
+          hashOrId: AssetHash.fake(),
+          balance: amountBucket.pick(),
+          priceUSDCents: 10000n,
+        },
+        positionOrVaultId: 1234n,
+      })
     },
   },
   {
     path: '/forced/new/perpetual/withdraw',
     description: 'Form to create a new perpetual forced withdrawal.',
     render: (ctx) => {
-      const withdrawData = { ...DATA.FORCED_WITHDRAW_FORM_PROPS }
-      withdrawData.user = getUser(ctx) ?? withdrawData.user
-      ctx.body = renderNewPerpetualForcedWithdrawalPage(withdrawData)
+      const user = getUser(ctx, true)
+      ctx.body = renderNewPerpetualForcedActionPage({
+        user,
+        starkKey: StarkKey.fake(),
+        starkExAddress: EthereumAddress.fake(),
+        asset: {
+          hashOrId: AssetId.USDC,
+          balance: amountBucket.pick(),
+          priceUSDCents: 10000n,
+        },
+        positionOrVaultId: 1234n,
+      })
     },
   },
   {
     path: '/forced/new/perpetual/buy',
     description: 'Form to create a new perpetual forced buy.',
     render: (ctx) => {
-      const buyData = { ...DATA.FORCED_BUY_FORM_PROPS }
-      buyData.user = getUser(ctx) ?? buyData.user
-      ctx.body = renderNewPerpetualForcedTradePage(buyData)
+      const user = getUser(ctx, true)
+      ctx.body = renderNewPerpetualForcedActionPage({
+        user,
+        starkKey: StarkKey.fake(),
+        starkExAddress: EthereumAddress.fake(),
+        asset: {
+          hashOrId: AssetId('BTC-10'),
+          balance: amountBucket.pick() * -1n,
+          priceUSDCents: 10000n,
+        },
+        positionOrVaultId: 1234n,
+      })
     },
   },
   {
@@ -472,9 +496,18 @@ const routes: Route[] = [
     description: 'Form to create a new perpetual forced sell.',
     breakAfter: true,
     render: (ctx) => {
-      const sellData = { ...DATA.FORCED_SELL_FORM_PROPS }
-      sellData.user = getUser(ctx) ?? sellData.user
-      ctx.body = renderNewPerpetualForcedTradePage(sellData)
+      const user = getUser(ctx, true)
+      ctx.body = renderNewPerpetualForcedActionPage({
+        user,
+        starkKey: StarkKey.fake(),
+        starkExAddress: EthereumAddress.fake(),
+        asset: {
+          hashOrId: AssetId('ETH-9'),
+          balance: amountBucket.pick(),
+          priceUSDCents: 10000n,
+        },
+        positionOrVaultId: 1234n,
+      })
     },
   },
   // #endregion
@@ -930,10 +963,23 @@ function getPagination(ctx: Koa.Context, total: number) {
     return { limit, offset, visible: limit }
   }
 }
-
-function getUser(ctx: Koa.Context) {
+function getUser(
+  ctx: Koa.Context,
+  fake: true
+): { address: EthereumAddress; starkKey: StarkKey }
+function getUser(
+  ctx: Koa.Context,
+  fake?: false
+): { address: EthereumAddress; starkKey: StarkKey } | undefined
+function getUser(ctx: Koa.Context, fake?: boolean) {
   const account = ctx.cookies.get('account')
   const starkKey = ctx.cookies.get('starkKey')
+  if (!account && fake)
+    return {
+      address: EthereumAddress.fake(),
+      starkKey: StarkKey.fake(),
+    }
+
   if (account) {
     try {
       return {

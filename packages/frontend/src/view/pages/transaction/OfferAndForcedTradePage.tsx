@@ -86,7 +86,11 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
           ? `/transactions/${props.transactionHash.toString()}`
           : `/offers/${props.offerId}`
       }
-      description="TODO: description"
+      description={
+        props.transactionHash
+          ? `Details of the ${props.transactionHash.toString()} forced trade transaction`
+          : `Details of the ${props.offerId} forced trade offer`
+      }
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
@@ -146,7 +150,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
         </div>
         <TransactionUserDetails
           title="Offer creator details"
-          type="PERPETUAL"
+          tradingMode="perpetual"
           starkKey={props.maker.starkKey}
           ethereumAddress={props.maker.ethereumAddress}
           vaultOrPositionId={props.maker.positionId}
@@ -154,7 +158,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
         {props.taker && (
           <TransactionUserDetails
             title={`${props.type === 'BUY' ? 'Seller' : 'Buyer'} details`}
-            type="PERPETUAL"
+            tradingMode="perpetual"
             starkKey={props.taker.starkKey}
             ethereumAddress={props.taker.ethereumAddress}
             vaultOrPositionId={props.taker.positionId}

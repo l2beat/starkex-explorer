@@ -4,6 +4,12 @@ const crypto = require('crypto')
 
 module.exports = { addHashes }
 
+/*
+ * This function is used to add hashes to static files.
+ * HASH_LENGTH - We are using sha256 so the maximum value can be 16. We are using 8 to keep the file names short. If you want to change this, you need to clean and rebuild the project.
+ */
+const HASH_LENGTH = 8
+
 async function addHashes({
   buildDir,
   staticDir,
@@ -31,7 +37,8 @@ async function addHashes({
       for (const { name, file } of toHash) {
         for (const [start, end] of patterns) {
           const value = `${start}${name}${end}`
-          if (content.includes(value)) {
+          const isValueInContent = getRegexForDependency(value).test(content)
+          if (isValueInContent) {
             dependencies.push(value)
             fileDependencies.push(file)
           }
@@ -59,7 +66,7 @@ async function addHashes({
     }
 
     if (item.needsHash) {
-      const hash = (await sha256(item.file)).slice(0, 8)
+      const hash = (await sha256(item.file)).slice(0, HASH_LENGTH)
       const { name, ext, dir } = path.parse(item.file)
       const base = path.dirname(item.file.slice(staticDir.length))
       const itemWithHash = `${name}.${hash}${ext}`
@@ -125,11 +132,16 @@ async function sha256(file) {
   })
 }
 
-function escapeRegExp(string) {
-  // $& means the whole matched string
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+function replaceAll(str, find, replace) {
+  return str.replace(getRegexForDependency(find), replace)
 }
 
-function replaceAll(str, find, replace) {
-  return str.replace(new RegExp(escapeRegExp(find), 'g'), replace)
+function getRegexForDependency(name) {
+  const splittedName = name.split('.')
+  const ext = splittedName.pop()
+  const nameWithoutExt = splittedName.join('.')
+  return new RegExp(
+    `${nameWithoutExt}(?:\\.[a-fA-F0-9]{${HASH_LENGTH}})?\\.${ext}`,
+    'gm'
+  )
 }

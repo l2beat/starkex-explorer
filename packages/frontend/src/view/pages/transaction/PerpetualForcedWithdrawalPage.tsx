@@ -58,7 +58,7 @@ function PerpetualForcedWithdrawalPage(
     <Page
       user={props.user}
       path={`/transactions/${props.transactionHash.toString()}`}
-      description="TODO: description"
+      description={`Details of the ${props.transactionHash.toString()} forced withdrawal transaction`}
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
@@ -80,7 +80,7 @@ function PerpetualForcedWithdrawalPage(
         </div>
         <TransactionUserDetails
           title="Recipient details"
-          type="PERPETUAL"
+          tradingMode="perpetual"
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}
           vaultOrPositionId={props.positionId}

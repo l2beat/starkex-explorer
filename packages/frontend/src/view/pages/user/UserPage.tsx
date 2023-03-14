@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -17,6 +17,7 @@ import {
   getBalanceChangeTableProps,
   getOfferTableProps,
   getTransactionTableProps,
+  getUserPageProps,
 } from './common'
 import { UserAssetEntry, UserAssetsTable } from './components/UserAssetTable'
 import {
@@ -33,7 +34,7 @@ export interface UserPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
-  type: 'SPOT' | 'PERPETUAL'
+  tradingMode: TradingMode
   withdrawableAssets: WithdrawableAssetEntry[]
   offersToAccept: OfferEntry[]
   assets: UserAssetEntry[]
@@ -51,13 +52,10 @@ export function renderUserPage(props: UserPageProps) {
 }
 
 function UserPage(props: UserPageProps) {
+  const common = getUserPageProps(props.starkKey)
   const isMine = props.user?.starkKey === props.starkKey
   return (
-    <Page
-      path={`/users/${props.starkKey.toString()}`}
-      description="TODO: description"
-      user={props.user}
-    >
+    <Page path={common.path} description={common.description} user={props.user}>
       <ContentWrapper className="flex flex-col gap-12">
         <section>
           <PageTitle>User</PageTitle>
@@ -84,7 +82,7 @@ function UserPage(props: UserPageProps) {
           total={props.totalAssets}
         >
           <UserAssetsTable
-            type={props.type}
+            tradingMode={props.tradingMode}
             starkKey={props.starkKey}
             assets={props.assets}
             isMine={isMine}
@@ -96,7 +94,7 @@ function UserPage(props: UserPageProps) {
           total={props.totalBalanceChanges}
         >
           <UserBalanceChangesTable
-            type={props.type}
+            tradingMode={props.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>
@@ -107,7 +105,7 @@ function UserPage(props: UserPageProps) {
         >
           <TransactionsTable transactions={props.transactions} />
         </TablePreview>
-        {props.offers && (
+        {props.offers && props.tradingMode === 'perpetual' && (
           <TablePreview
             {...getOfferTableProps(props.starkKey)}
             visible={props.offers.length}

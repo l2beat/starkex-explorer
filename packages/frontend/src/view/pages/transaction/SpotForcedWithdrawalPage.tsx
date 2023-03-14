@@ -53,7 +53,7 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
     <Page
       user={props.user}
       path={`/transactions/${props.transactionHash.toString()}`}
-      description="TODO: description"
+      description={`Details of the ${props.transactionHash.toString()} forced withdrawal transaction`}
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
@@ -71,7 +71,7 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
         </div>
         <TransactionUserDetails
           title="Recipient details"
-          type="SPOT"
+          tradingMode="spot"
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}
           vaultOrPositionId={props.vaultId}
