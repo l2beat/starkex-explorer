@@ -81,11 +81,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   return (
     <Page
       user={props.user}
-      path={
-        props.transactionHash
-          ? `/transactions/${props.transactionHash.toString()}`
-          : `/offers/${props.offerId}`
-      }
+      path={getPath(props.transactionHash, props.offerId)}
       description="TODO: description"
     >
       <ContentWrapper className="flex flex-col gap-12">
@@ -238,4 +234,14 @@ function toHistoryEntry(
         ),
       }
   }
+}
+
+function getPath(transactionHash?: Hash256, offerId?: string) {
+  if (transactionHash) {
+    return `/transactions/${transactionHash.toString()}`
+  }
+  if (offerId) {
+    return `/offers/${offerId}`
+  }
+  throw new Error('No transaction hash or offer id')
 }
