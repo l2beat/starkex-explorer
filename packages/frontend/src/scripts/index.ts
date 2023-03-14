@@ -16,9 +16,13 @@ import { initTransactionForm } from './old/transaction/transactionForm'
 import { initPagination } from './pagination'
 import { initStateUpdateStats } from './stateUpdateStats'
 import { initTVLDisplay } from './tvl'
+import { initPopup } from './popupService'
+import { initWalletConnect } from './walletConnect'
 
 initTVLDisplay()
 initMetamask()
+initPopup()
+initWalletConnect()
 initOldPagination()
 initOffersFilteringForm()
 initAcceptOfferForm()

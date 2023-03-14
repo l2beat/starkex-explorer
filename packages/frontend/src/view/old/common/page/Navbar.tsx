@@ -1,10 +1,15 @@
+import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
 import { AccountDetails } from '../AccountDetails'
-import { JazzIcon } from '../jazzicon/JazzIcon'
-import { DydxLogo } from '../logos/DydxLogo'
-import { L2beatExplorerLogo } from '../logos/L2beatExplorerLogo'
-import { SearchBar } from '../SearchBar'
+import { JazzIcon } from '../../../assets/icons/jazz/JazzIcon'
+import { DydxLogo } from '../../../assets/logos/DydxLogo'
+import { GammaXLogo } from '../../../assets/logos/GammaXLogo'
+import { L2BeatMinimalLogo } from '../../../assets/logos/L2BeatMinimalLogo'
+import { MyriaLogo } from '../../../assets/logos/MyriaLogo'
+import { Button } from '../../../components/Button'
+import { SearchBar } from '../../../components/SearchBar'
+import { Popup } from '../../../components/Popup'
 
 export interface NavbarProps {
   readonly account: AccountDetails | undefined
@@ -12,30 +17,50 @@ export interface NavbarProps {
 }
 
 export function Navbar({ account, searchBar = true }: NavbarProps) {
+  const starkExInstance = process.env.STARKEX_INSTANCE ?? 'dydx-mainnet'
   return (
-    <div className="wide:px-4 border-gray-300 flex flex-wrap items-center justify-between gap-y-2 border-b-[1px] px-2 py-2.5">
-      <a className="flex items-center justify-center" href="/">
-        <span className="pr-2 sm:pr-4">
-          <L2beatExplorerLogo className="h-[30px] sm:h-[36px]" />
+    
+    <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
+      <a
+        className="flex items-center justify-center gap-2 divide-x sm:gap-4"
+        href="/"
+      >
+        <div className="flex gap-2 sm:gap-4">
+          <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
+          {starkExInstance === 'dydx-mainnet' && (
+            <DydxLogo className="h-[26px] sm:h-8" />
+          )}
+          {starkExInstance === 'gammax-goerli' && (
+            <GammaXLogo className="h-[26px] sm:h-8" />
+          )}
+          {starkExInstance === 'myria-goerli' && (
+            <MyriaLogo className="h-[26px] sm:h-8" />
+          )}
+        </div>
+        <span className="py-1 pl-2 uppercase text-zinc-500 sm:pl-4">
+          Explorer
         </span>
-        <DydxLogo className="h-[26px] sm:h-[32px]" />
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4">
         {searchBar && (
-          <SearchBar className="hidden w-auto min-w-[500px] lg:flex" />
+          <SearchBar className="hidden w-auto min-w-[400px] lg:flex" />
         )}
-        {!account && (
-          <button
-            id="connect-with-metamask"
-            className="bg-gray-300 h-[32px] rounded-md px-4 lg:h-[44px]"
-          >
-            Connect
-          </button>
-        )}
+      {!account && <Button id="connect-with-global-button">Connect</Button>}
+        <Popup id="popup" trigger={true}>
+          <div className="flex gap-4 flex-wrap">
+            <div className='text-zinc-500 absolute left-40 top-10 font-bold'>Connect a Wallet</div>
+            {!account && <button className="absolute inset-x-20 top-20 text-zinc-500 p-4 rounded text-left bg-gray-200 hover:border" id="connect-with-metamask">Connect Metamask</button>}                
+            {!account && <img className="absolute right-24 top-24 w-8"src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/MetaMask_Fox.svg/1024px-MetaMask_Fox.svg.png" alt="fsd"/>}
+            {!account && <button className="absolute inset-x-20 top-40 text-zinc-500 p-4 rounded text-left bg-gray-200 hover:border" id="connect-with-wallet-connect">Connect wallet</button>}
+            {!account && <img className="absolute right-24 top-44 w-8"src="https://workablehr.s3.amazonaws.com/uploads/account/open_graph_logo/492879/social?1675329233000" alt="fsd"/>}   
+           
+          </div>
+        </Popup>
+        {account && (account.is_wallet_connect) && <Button id="disconnect-wallet-connect">Disconnect</Button>}
         {account && (
           <a
             href={`/positions/${account.positionId ?? 'not-found'}`}
-            className="bg-gray-300 relative flex h-[32px] items-center justify-center gap-2 rounded-md px-4 align-middle lg:h-[44px]"
+            className="relative flex h-8 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand lg:h-[44px]"
           >
             <JazzIcon
               className="hidden lg:block"
@@ -49,15 +74,11 @@ export function Navbar({ account, searchBar = true }: NavbarProps) {
             />
             <span className="font-mono">
               {account.address.slice(0, 6)}&hellip;
-              <span className="hidden sm:inline">
-                {account.address.slice(-4)}
-              </span>
+              <span className="hidden sm:inline">{account.address.slice(-4)}</span>
             </span>
-            {account.hasUpdates && (
-              <div className="bg-blue-200 absolute right-0 top-0 h-4 w-4 translate-x-1/3 translate-y-[-33%] rounded-full" />
-            )}
           </a>
         )}
+        
       </div>
     </div>
   )

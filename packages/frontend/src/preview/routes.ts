@@ -9,6 +9,7 @@ import {
 } from '@explorer/types'
 import Router from '@koa/router'
 import { randomInt } from 'crypto'
+import Cookie from 'js-cookie'
 import Koa from 'koa'
 
 import {
@@ -898,11 +899,13 @@ function getPagination(ctx: Koa.Context, total: number) {
 function getUser(ctx: Koa.Context) {
   const account = ctx.cookies.get('account')
   const starkKey = ctx.cookies.get('starkKey')
+  const is_walletconnect = (ctx.cookies.get('is_walletconnect')=='true')
   if (account) {
     try {
       return {
         address: EthereumAddress(account),
         starkKey: starkKey ? StarkKey(starkKey) : StarkKey.fake(),
+        is_wallet_connect: is_walletconnect
       }
     } catch {
       return

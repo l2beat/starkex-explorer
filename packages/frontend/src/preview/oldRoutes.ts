@@ -96,12 +96,14 @@ router.get('/not-found', (ctx) => {
 
 function getAccount(ctx: Koa.Context) {
   const cookie = ctx.cookies.get('account')
+  const is_walletconnect = (ctx.cookies.get('is_walletconnect')=='true')
   if (cookie) {
     try {
       return {
         address: EthereumAddress(cookie),
         positionId: 123n,
         hasUpdates: Math.random() < 0.5,
+        is_wallet_connect: is_walletconnect
       }
     } catch {
       return

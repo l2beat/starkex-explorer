@@ -155,6 +155,52 @@
   font-feature-settings: 'tnum' on, 'calt' off;
 }
 
+.bg-gray-200{
+  --tw-bg-opacity: 1;
+  background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+}
+
+.popup{
+  position: fixed;
+  left:0;
+  top:0;
+  right: 0;
+  width:100%;
+  z-index: 1;
+  height: 100%;
+  background-color: rgba(0,0,0,0.6);
+  display:flex;
+  align-items: center;
+  justify-content: center;
+  font-size: medium;
+  
+}
+
+.popup-inner{
+  padding: 60px;;
+  position: relative;
+  background-color: white;
+  max-width: 450px;
+  height:300px;
+  width: 100%;
+}
+
+.close-btn{
+  position: absolute;
+  top:10px;
+  right:16px;
+  height: 45px;
+  font-size:large;
+  color: black;
+  
+}
+
+
+.close-btn:hover{
+  cursor: pointer;
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
