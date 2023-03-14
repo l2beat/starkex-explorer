@@ -31,7 +31,7 @@ export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4">
         {searchBar && (
-          <SearchBar className="hidden w-auto min-w-[400px] lg:flex" />
+          <SearchBar tradingMode={instanceName === 'Myria' ? 'spot': 'perpetual'} className="hidden w-auto min-w-[400px] lg:flex" />
         )}
         {!user && <Button id="connect-with-metamask">Connect wallet</Button>}
         {user && (

@@ -3,7 +3,12 @@ import React from 'react'
 
 import { SearchIcon } from '../assets/icons/SearchIcon'
 
-export function SearchBar({ className = '' }) {
+interface SearchBarProps {
+  tradingMode: 'spot' | 'perpetual'
+  className?: string
+}
+
+export function SearchBar({ tradingMode, className }: SearchBarProps) {
   return (
     <form
       method="GET"
@@ -16,7 +21,7 @@ export function SearchBar({ className = '' }) {
       <input
         className="w-full rounded-l-lg bg-transparent p-4 outline-0 placeholder:text-gray-600 group-focus-within:placeholder:text-zinc-500 group-hover:placeholder:text-zinc-500"
         type="text"
-        placeholder="Search by Ethereum address, Stark key, @state-update-id or #vault-id"
+        placeholder={`Search by Ethereum address, Stark key, @state-update-id or #${tradingMode === 'perpetual' ?  'position-id':'vault-id'}`}
         name="query"
       />
       <button className="flex w-12 items-center justify-center rounded-r-lg bg-transparent ">

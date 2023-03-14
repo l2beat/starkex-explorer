@@ -88,12 +88,6 @@ export class SearchController {
   private async searchForStarkKey(
     starkKey: StarkKey
   ): Promise<ControllerResult | undefined> {
-    const userRegistrationEvent =
-      await this.userRegistrationEventRepository.findByStarkKey(starkKey)
-    if (userRegistrationEvent === undefined) {
-      return
-    }
-
     if (
       !(await this.preprocessedAssetHistoryRepository.starkKeyExists(starkKey))
     ) {
@@ -106,14 +100,14 @@ export class SearchController {
   private async searchForPositionOrVaultId(
     positionOrVaultId: bigint
   ): Promise<ControllerResult | undefined> {
-    const position = await this.positionOrVaultRepository.findById(
+    const positionOrVault = await this.positionOrVaultRepository.findById(
       positionOrVaultId
     )
-    if (position === undefined) {
+    if (positionOrVault === undefined) {
       return
     }
 
-    const starkKey = position.starkKey.toString()
+    const starkKey = positionOrVault.starkKey.toString()
 
     return { type: 'redirect', url: `/user/${starkKey}` }
   }
