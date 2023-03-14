@@ -82,7 +82,11 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     <Page
       user={props.user}
       path={getPath(props.transactionHash, props.offerId)}
-      description="TODO: description"
+      description={
+        props.transactionHash
+          ? `Details of the ${props.transactionHash.toString()} forced trade transaction`
+          : `Details of the ${props.offerId} forced trade offer`
+      }
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
