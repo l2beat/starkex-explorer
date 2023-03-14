@@ -7,7 +7,7 @@ import { TablePagination } from './TablePagination'
 
 export interface TableWithPaginationProps {
   title: ReactNode
-  link: string
+  path: string
   entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
@@ -42,7 +42,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           )
         }
       >
-        <TableLimitSelect limit={props.limit} link={props.link} />
+        <TableLimitSelect limit={props.limit} link={props.path} />
       </SectionHeading>
       {props.children}
       {props.visible === 0 && (
@@ -55,7 +55,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           <TablePagination
             className="hidden sm:block"
             surroundingPages={2}
-            link={props.link}
+            link={props.path}
             current={currentPage}
             total={totalPages}
             perPage={props.limit}
@@ -63,13 +63,13 @@ export function TableWithPagination(props: TableWithPaginationProps) {
           <TablePagination
             className="sm:hidden"
             surroundingPages={1}
-            link={props.link}
+            link={props.path}
             current={currentPage}
             total={totalPages}
             perPage={props.limit}
           />
         </div>
-        <TableLimitSelect limit={props.limit} link={props.link} />
+        <TableLimitSelect limit={props.limit} link={props.path} />
       </div>
     </>
   )

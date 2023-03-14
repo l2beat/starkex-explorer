@@ -48,7 +48,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
   return (
     <Page
       path={`/state-update/${props.id}`}
-      description="TODO: description"
+      description="Show state update details, including balance changes, transactions and prices"
       user={props.user}
     >
       <ContentWrapper className="flex flex-col gap-12">

@@ -23,8 +23,8 @@ export function renderHomeOffersPage(props: HomeOffersPageProps) {
 function HomeOffersPage(props: HomeOffersPageProps) {
   return (
     <Page
-      path={OFFER_TABLE_PROPS.link}
-      description="TODO: description"
+      path={OFFER_TABLE_PROPS.path}
+      description="All available trade offers"
       user={props.user}
     >
       <ContentWrapper>
