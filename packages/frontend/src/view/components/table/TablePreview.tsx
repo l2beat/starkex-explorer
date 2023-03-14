@@ -7,7 +7,7 @@ import { SectionHeading } from '../SectionHeading'
 
 export interface TablePreviewProps {
   title: ReactNode
-  link: string
+  path: string
   entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
@@ -23,7 +23,7 @@ export function TablePreview(props: TablePreviewProps) {
         description={
           <>
             You're viewing {formatInt(props.visible)} out of{' '}
-            <Link href={props.link}>{formatInt(props.total)}</Link>{' '}
+            <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
             {props.entryShortNamePlural}
           </>
         }
@@ -36,7 +36,7 @@ export function TablePreview(props: TablePreviewProps) {
       )}
       {props.total > props.visible && (
         <div className="mt-6 flex items-center justify-center">
-          <LinkButton variant="outlined" href={props.link}>
+          <LinkButton variant="outlined" href={props.path}>
             View all {props.entryLongNamePlural}
           </LinkButton>
         </div>

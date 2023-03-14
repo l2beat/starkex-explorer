@@ -26,7 +26,7 @@ export function renderUserOffersPage(props: UserOffersPageProps) {
 function UserOffersPage(props: UserOffersPageProps) {
   const common = getOfferTableProps(props.starkKey)
   return (
-    <Page path={common.link} description="TODO: description" user={props.user}>
+    <Page path={common.path} description={common.description} user={props.user}>
       <ContentWrapper>
         <TableWithPagination
           {...common}
