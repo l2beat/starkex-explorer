@@ -447,7 +447,7 @@ export class Application {
       config.starkex.tradingMode,
       config.starkex.tradingMode === 'perpetual'
         ? config.starkex.collateralAsset
-        : undefined,
+        : undefined
     )
     const userController = new UserController(
       userService,
