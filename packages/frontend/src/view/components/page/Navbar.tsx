@@ -1,7 +1,8 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
-import { getTradingMode, InstanceName } from '../../../utils/instance'
+import { InstanceName } from '../../../utils/instance'
+import { getTradingMode } from '../../../utils/tradingMode'
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
 import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
 import { ProjectLogo } from '../../assets/logos/ProjectLogo'
