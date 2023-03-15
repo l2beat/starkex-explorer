@@ -23,7 +23,11 @@ export function TablePreview(props: TablePreviewProps) {
         description={
           <>
             You're viewing {formatInt(props.visible)} out of{' '}
-            <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
+            {props.total > 0 ? (
+              <Link href={props.path}>{formatInt(props.total)}</Link>
+            ) : (
+              formatInt(props.total)
+            )}{' '}
             {props.entryShortNamePlural}
           </>
         }
