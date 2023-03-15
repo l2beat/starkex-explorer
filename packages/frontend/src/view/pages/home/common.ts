@@ -13,7 +13,7 @@ export const FORCED_TRANSACTION_TABLE_PROPS = {
 }
 
 export const OFFER_TABLE_PROPS = {
-  title: 'Available trade offers',
+  title: 'Available forced trade offers',
   entryShortNamePlural: 'offers',
   entryLongNamePlural: 'trade offers',
   path: '/offers',
