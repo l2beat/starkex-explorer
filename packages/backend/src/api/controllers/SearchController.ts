@@ -109,7 +109,7 @@ export class SearchController {
 
     const starkKey = positionOrVault.starkKey.toString()
 
-    return { type: 'redirect', url: `/user/${starkKey}` }
+    return { type: 'redirect', url: `/users/${starkKey}` }
   }
 
   private async searchForStateUpdateId(
