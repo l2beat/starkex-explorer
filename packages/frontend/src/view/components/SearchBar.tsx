@@ -1,10 +1,11 @@
+import { TradingMode } from '@explorer/shared'
 import cx from 'classnames'
 import React from 'react'
 
 import { SearchIcon } from '../assets/icons/SearchIcon'
 
 interface SearchBarProps {
-  tradingMode: 'spot' | 'perpetual'
+  tradingMode: TradingMode
   className?: string
 }
 
