@@ -61,7 +61,7 @@ function HomePage(props: HomePageProps) {
         )}
       >
         <div className="flex flex-col gap-8">
-          <SearchBar />
+          <SearchBar tradingMode={props.tradingMode} />
           <TablePreview
             {...STATE_UPDATE_TABLE_PROPS}
             visible={props.stateUpdates.length}
