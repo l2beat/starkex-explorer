@@ -87,11 +87,11 @@ function toStatusType(status: OfferEntry['status']): StatusType {
 function toStatusText(status: OfferEntry['status']): string {
   switch (status) {
     case 'CREATED':
-      return 'CREATED (1/5)'
+      return 'CREATED (1/3)'
     case 'ACCEPTED':
-      return 'ACCEPTED (2/5)'
+      return 'ACCEPTED (2/3)'
     case 'SENT':
-      return 'SENT (3/5)'
+      return 'SENT (3/3)'
     case 'CANCELLED':
       return 'CANCELLED'
     case 'EXPIRED':
