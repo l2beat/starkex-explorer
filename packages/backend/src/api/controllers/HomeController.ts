@@ -8,10 +8,12 @@ import { TradingMode, UserDetails } from '@explorer/shared'
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
+import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
+import { forcedTradeOfferToEntry } from './forcedTradeOfferToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
@@ -24,6 +26,7 @@ export class HomeController {
   constructor(
     private readonly userService: UserService,
     private readonly userTransactionRepository: UserTransactionRepository,
+    private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
     private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
@@ -33,24 +36,25 @@ export class HomeController {
     givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
-
+    const paginationOpts = { offset: 0, limit: 6 }
     const [
-      totalStateUpdates,
       stateUpdates,
+      totalStateUpdates,
       forcedUserTransactions,
       forcedUserTransactionsCount,
+      forcedTradeOffers,
+      forcedTradeOffersCount,
     ] = await Promise.all([
+      this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
-      this.preprocessedStateDetailsRepository.getPaginated({
-        offset: 0,
-        limit: 6,
-      }),
+
       this.userTransactionRepository.getPaginated({
-        offset: 0,
-        limit: 6,
+        ...paginationOpts,
         types: FORCED_TRANSACTION_TYPES,
       }),
       this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
+      this.forcedTradeOfferRepository.getPaginated(paginationOpts),
+      this.forcedTradeOfferRepository.countAll(),
     ])
 
     const transactions = forcedUserTransactions.map((t) =>
@@ -70,8 +74,8 @@ export class HomeController {
       totalStateUpdates,
       transactions,
       totalForcedTransactions: forcedUserTransactionsCount,
-      offers: [],
-      totalOffers: 0,
+      offers: forcedTradeOffers.map(forcedTradeOfferToEntry),
+      totalOffers: forcedTradeOffersCount,
       tradingMode: this.tradingMode,
     })
     return { type: 'success', content }

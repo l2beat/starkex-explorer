@@ -2,6 +2,7 @@ import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
@@ -167,23 +168,6 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return updates
   }
 
-  private getInitialQuery(knex: Knex, { assetId, type }: InitialFilters = {}) {
-    let query = knex('forced_trade_offers')
-      .whereNull('accepted_at')
-      .whereNull('cancelled_at')
-    if (assetId) {
-      query = query.andWhere('synthetic_asset_id', '=', assetId.toString())
-    }
-    if (type) {
-      query = query.andWhere(
-        'is_a_buying_synthetic',
-        '=',
-        type === 'buy' ? true : false
-      )
-    }
-    return query
-  }
-
   async countInitial({ assetId, type }: InitialFilters = {}): Promise<number> {
     const knex = await this.knex()
     const [result] = await this.getInitialQuery(knex, {
@@ -220,14 +204,6 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rowIds.map((x) => x.synthetic_asset_id).map(AssetId)
   }
 
-  private getByPositionIdQuery(knex: Knex, positionId: bigint) {
-    return knex('forced_trade_offers').where(function () {
-      void this.where({ position_id_a: positionId }).orWhere({
-        position_id_b: positionId,
-      })
-    })
-  }
-
   async countActiveByPositionId(positionId: bigint) {
     const knex = await this.knex()
     const [result] = await this.getByPositionIdQuery(knex, positionId)
@@ -241,6 +217,20 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   async getByPositionId(positionId: bigint) {
     const knex = await this.knex()
     const rows = await this.getByPositionIdQuery(knex, positionId)
+    return rows.map(toRecord)
+  }
+
+  async getByStarkKey(starkKey: StarkKey, pagination: PaginationOptions) {
+    const knex = await this.knex()
+    let query = knex('forced_trade_offers')
+      .where({
+        stark_key_a: starkKey.toString(),
+      })
+      .orderBy('created_at', 'desc')
+    if (pagination) {
+      query = query.limit(pagination.limit).offset(pagination.offset)
+    }
+    const rows = await query
     return rows.map(toRecord)
   }
 
@@ -258,8 +248,64 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
+  async getPaginated({
+    limit,
+    offset,
+  }: {
+    limit: number
+    offset: number
+  }): Promise<Record[]> {
+    const knex = await this.knex()
+    const rows = await knex('forced_trade_offers')
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .offset(offset)
+    return rows.map(toRecord)
+  }
+
+  async countAll() {
+    const knex = await this.knex()
+    const [result] = await knex('forced_trade_offers').count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async getCountByStarkKey(starkKey: StarkKey) {
+    const knex = await this.knex()
+    const [result] = await knex('forced_trade_offers')
+      .where({ stark_key_a: starkKey.toString() })
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
   async deleteAll() {
     const knex = await this.knex()
     return await knex('forced_trade_offers').delete()
+  }
+
+  private getInitialQuery(knex: Knex, { assetId, type }: InitialFilters = {}) {
+    let query = knex('forced_trade_offers')
+      .whereNull('accepted_at')
+      .whereNull('cancelled_at')
+    if (assetId) {
+      query = query.andWhere('synthetic_asset_id', '=', assetId.toString())
+    }
+    if (type) {
+      query = query.andWhere(
+        'is_a_buying_synthetic',
+        '=',
+        type === 'buy' ? true : false
+      )
+    }
+    return query
+  }
+
+  private getByPositionIdQuery(knex: Knex, positionId: bigint) {
+    return knex('forced_trade_offers').where(function () {
+      void this.where({ position_id_a: positionId }).orWhere({
+        position_id_b: positionId,
+      })
+    })
   }
 }

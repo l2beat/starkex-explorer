@@ -14,6 +14,7 @@ import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
+import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -29,6 +30,7 @@ import {
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
 import { fetchAssetDetailsMap } from './fetchAssetDetailsMap'
+import { forcedTradeOfferToEntry } from './forcedTradeOfferToEntry'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
@@ -41,6 +43,7 @@ export class UserController {
     >,
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
+    private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly assetRepository: AssetRepository,
     private readonly tradingMode: TradingMode,
@@ -51,6 +54,10 @@ export class UserController {
     givenUser: Partial<UserDetails>,
     starkKey: StarkKey
   ): Promise<ControllerResult> {
+    const paginationOpts = {
+      offset: 0,
+      limit: 10,
+    }
     const [
       user,
       registeredUser,
@@ -61,28 +68,33 @@ export class UserController {
       sentTransactions,
       userTransactions,
       userTransactionsCount,
+      forcedTradeOffers,
+      forcedTradeOffersCount,
     ] = await Promise.all([
       this.userService.getUserDetails(givenUser),
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
-        { offset: 0, limit: 10 },
+        paginationOpts,
         this.collateralAsset?.assetId
       ),
       this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
         starkKey
       ),
-      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(starkKey, {
-        offset: 0,
-        limit: 10,
-      }),
+      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
+        starkKey,
+        paginationOpts
+      ),
       this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
-      this.userTransactionRepository.getByStarkKey(starkKey, undefined, {
-        offset: 0,
-        limit: 10,
-      }),
+      this.userTransactionRepository.getByStarkKey(
+        starkKey,
+        undefined,
+        paginationOpts
+      ),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
+      this.forcedTradeOfferRepository.getByStarkKey(starkKey, paginationOpts),
+      this.forcedTradeOfferRepository.getCountByStarkKey(starkKey),
     ])
 
     let assetDetailsMap: Record<string, AssetDetails> = {}
@@ -130,8 +142,8 @@ export class UserController {
       totalBalanceChanges: historyCount,
       transactions,
       totalTransactions,
-      offers: [],
-      totalOffers: 0,
+      offers: forcedTradeOffers.map(forcedTradeOfferToEntry),
+      totalOffers: forcedTradeOffersCount,
     })
 
     return { type: 'success', content }

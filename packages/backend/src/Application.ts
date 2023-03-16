@@ -446,6 +446,7 @@ export class Application {
     const homeController = new HomeController(
       userService,
       userTransactionRepository,
+      forcedTradeOfferRepository,
       preprocessedStateDetailsRepository,
       config.starkex.tradingMode,
       collateralAsset
@@ -455,6 +456,7 @@ export class Application {
       preprocessedAssetHistoryRepository,
       sentTransactionRepository,
       userTransactionRepository,
+      forcedTradeOfferRepository,
       userRegistrationEventRepository,
       assetRepository,
       config.starkex.tradingMode,
