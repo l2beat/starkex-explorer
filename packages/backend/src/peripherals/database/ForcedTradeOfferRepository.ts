@@ -220,7 +220,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async getByStarkKey(starkKey: StarkKey, pagination: PaginationOptions) {
+  async getByStarkKey(starkKey: StarkKey, pagination?: PaginationOptions) {
     const knex = await this.knex()
     let query = knex('forced_trade_offers')
       .where({

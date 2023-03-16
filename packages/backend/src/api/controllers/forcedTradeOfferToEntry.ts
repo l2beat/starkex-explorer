@@ -35,6 +35,8 @@ function buildTradeOfferHistory(
 export function forcedTradeOfferToEntry(
   forcedTradeOffer: ForcedTradeOfferRecord
 ): OfferEntry {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const status = buildTradeOfferHistory(forcedTradeOffer)[0]!
   return {
     id: forcedTradeOffer.id.toString(),
     timestamp: forcedTradeOffer.createdAt,
@@ -44,7 +46,7 @@ export function forcedTradeOfferToEntry(
     amount: forcedTradeOffer.syntheticAmount,
     price: 0n, //TODO: calculate price
     totalPrice: 0n * forcedTradeOffer.syntheticAmount,
-    status: buildTradeOfferHistory(forcedTradeOffer)[0]!,
+    status,
     type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
   }
 }
