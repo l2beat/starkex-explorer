@@ -11,6 +11,7 @@ import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
+import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
@@ -27,7 +28,8 @@ export function createFrontendRouter(
   forcedActionController: ForcedActionController,
   merkleProofController: MerkleProofController,
   collateralAsset: CollateralAsset | undefined,
-  tradingMode: TradingMode
+  tradingMode: TradingMode,
+  searchController: SearchController
 ) {
   const router = new Router()
 
@@ -36,6 +38,22 @@ export function createFrontendRouter(
     const result = await homeController.getHomePage(givenUser)
     applyControllerResult(ctx, result)
   })
+
+  router.get(
+    '/search',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          query: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const { query } = ctx.query
+        const result = await searchController.getSearchRedirect(query)
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
 
   router.get(
     '/state-updates',

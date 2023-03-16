@@ -2,6 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
 import { InstanceName } from '../../../utils/instance'
+import { getTradingMode } from '../../../utils/tradingMode'
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
 import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
 import { ProjectLogo } from '../../assets/logos/ProjectLogo'
@@ -18,6 +19,7 @@ export interface NavbarProps {
 export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
 
     return (
+    const tradingMode = getTradingMode()
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
       <a
         className="flex items-center justify-center gap-2 divide-x sm:gap-4"
@@ -33,7 +35,10 @@ export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4">
         {searchBar && (
-          <SearchBar className="hidden w-auto min-w-[400px] lg:flex" />
+          <SearchBar
+            tradingMode={tradingMode}
+            className="hidden w-auto min-w-[400px] lg:flex"
+          />
         )}
         {!user && <Button id="connect-with-global-button">Connect</Button>}
         <Popup id="popup" trigger={true}>
