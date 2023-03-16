@@ -234,6 +234,19 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
+  async getPaginated(options: {
+    limit: number
+    offset: number
+  }): Promise<Record[]> {
+    const knex = await this.knex()
+    const rows = await knex('forced_trade_offers')
+      .limit(options.limit)
+      .offset(options.offset)
+      .orderBy('created_at', 'desc')
+
+    return rows.map(toRecord)
+  }
+
   async findById(id: Record['id']): Promise<Record | undefined> {
     const knex = await this.knex()
     const row = await knex('forced_trade_offers').where({ id }).first()
@@ -246,21 +259,6 @@ export class ForcedTradeOfferRepository extends BaseRepository {
       .where({ transaction_hash: hash.toString() })
       .first()
     return row ? toRecord(row) : undefined
-  }
-
-  async getPaginated({
-    limit,
-    offset,
-  }: {
-    limit: number
-    offset: number
-  }): Promise<Record[]> {
-    const knex = await this.knex()
-    const rows = await knex('forced_trade_offers')
-      .orderBy('created_at', 'desc')
-      .limit(limit)
-      .offset(offset)
-    return rows.map(toRecord)
   }
 
   async countAll() {
