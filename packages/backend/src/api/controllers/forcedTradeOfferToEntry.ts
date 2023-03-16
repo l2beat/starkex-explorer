@@ -1,10 +1,21 @@
 import { OfferEntry } from '@explorer/frontend'
+import { Timestamp } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../peripherals/database/ForcedTradeOfferRepository'
 
-function getOfferStatus(
-  forcedTradeOffer: ForcedTradeOfferRecord
-): OfferEntry['status'] {
+function getOfferStatus(forcedTradeOffer: ForcedTradeOfferRecord) {
+  if (forcedTradeOffer.accepted) {
+    if (forcedTradeOffer.accepted.transactionHash) {
+      return 'SENT'
+    }
+    if (
+      Timestamp.fromHours(forcedTradeOffer.accepted.submissionExpirationTime) <
+      Timestamp.now()
+    ) {
+      return 'EXPIRED'
+    }
+  }
+
   if (forcedTradeOffer.cancelledAt) {
     return 'CANCELLED'
   }
@@ -27,7 +38,7 @@ export function forcedTradeOfferToEntry(
     amount: forcedTradeOffer.syntheticAmount,
     price: 0n, //TODO: calculate price
     totalPrice: 0n * forcedTradeOffer.syntheticAmount,
-    status: getOfferStatus(forcedTradeOffer), //TODO: HANDLE SENT STATUS
+    status: getOfferStatus(forcedTradeOffer),
     type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
   }
 }
