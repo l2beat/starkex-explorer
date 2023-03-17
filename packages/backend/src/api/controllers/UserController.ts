@@ -94,7 +94,7 @@ export class UserController {
       ),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
       this.forcedTradeOfferRepository.getByStarkKey(starkKey, paginationOpts),
-      this.forcedTradeOfferRepository.getCountByStarkKey(starkKey),
+      this.forcedTradeOfferRepository.countByStarkKey(starkKey),
     ])
 
     let assetDetailsMap: Record<string, AssetDetails> = {}

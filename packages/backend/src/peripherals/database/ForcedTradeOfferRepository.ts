@@ -124,17 +124,20 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     super(database, logger)
 
     /* eslint-disable @typescript-eslint/unbound-method */
-
     this.add = this.wrapAdd(this.add)
     this.update = this.wrapUpdate(this.update)
     this.updateTransactionHash = this.wrapUpdate(this.updateTransactionHash)
     this.findById = this.wrapFind(this.findById)
-    this.countInitial = this.wrapAny(this.countInitial)
     this.getInitial = this.wrapGet(this.getInitial)
-    this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
+    this.getByStarkKey = this.wrapGet(this.getByStarkKey)
+    this.getInitialAssetIds = this.wrapGet(this.getInitialAssetIds)
+    this.getPaginated = this.wrapGet(this.getPaginated)
+    this.countAll = this.wrapAny(this.countAll)
+    this.countInitial = this.wrapAny(this.countInitial)
+    this.countByStarkKey = this.wrapAny(this.countByStarkKey)
+    this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
@@ -265,7 +268,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return Number(result!.count)
   }
 
-  async getCountByStarkKey(starkKey: StarkKey) {
+  async countByStarkKey(starkKey: StarkKey) {
     const knex = await this.knex()
     const [result] = await knex('forced_trade_offers')
       .where({ stark_key_a: starkKey.toString() })

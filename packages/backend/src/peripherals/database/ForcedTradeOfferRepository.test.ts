@@ -302,11 +302,11 @@ describe(ForcedTradeOfferRepository.name, () => {
     })
   })
 
-  describe(ForcedTradeOfferRepository.prototype.getCountByStarkKey.name, () => {
+  describe(ForcedTradeOfferRepository.prototype.countByStarkKey.name, () => {
     it('returns the number of records', async () => {
       const starkKey = StarkKey.fake()
       const expectedCount = 3
-      expect(await repository.getCountByStarkKey(starkKey)).toEqual(0)
+      expect(await repository.countByStarkKey(starkKey)).toEqual(0)
 
       for (let i = 0; i < expectedCount; i++) {
         await repository.add(
