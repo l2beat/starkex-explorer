@@ -8,7 +8,6 @@ function buildTradeOfferHistory(
 ): OfferEntry['status'][] {
   const history: OfferEntry['status'][] = []
   if (forcedTradeOffer.accepted) {
-    //TODO: is this assumption correct?
     if (forcedTradeOffer.accepted.transactionHash) {
       history.push('SENT')
     } else if (
