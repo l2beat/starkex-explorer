@@ -38,7 +38,7 @@ function UserBalanceChangesPage(props: UserBalanceChangesPageProps) {
           {...common}
           title={
             <UserPageTitle
-              prefix="Balance changes of"
+              prefix="Balance changes of user"
               starkKey={props.starkKey}
             />
           }

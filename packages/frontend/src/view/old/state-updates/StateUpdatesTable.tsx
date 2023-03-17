@@ -14,7 +14,7 @@ export function StateUpdatesTable({ stateUpdates }: StateUpdatesTableProps) {
       noRowsText="no state updates have occurred so far"
       columns={[
         { header: 'No.' },
-        { header: 'Hash', monospace: true, fullWidth: true },
+        { header: 'Tx Hash', monospace: true, fullWidth: true },
         { header: 'Time' },
         { header: 'Position updates', numeric: true },
         { header: 'Forced txs', numeric: true },
