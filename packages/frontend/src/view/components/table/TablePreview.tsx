@@ -21,15 +21,13 @@ export function TablePreview(props: TablePreviewProps) {
       <SectionHeading
         title={props.title}
         description={
-          <>
-            You're viewing {formatInt(props.visible)} out of{' '}
-            {props.total > 0 ? (
-              <Link href={props.path}>{formatInt(props.total)}</Link>
-            ) : (
-              formatInt(props.total)
-            )}{' '}
-            {props.entryShortNamePlural}
-          </>
+          props.total > 0 && (
+            <>
+              You're viewing {formatInt(props.visible)} out of{' '}
+              <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
+              {props.entryShortNamePlural}
+            </>
+          )
         }
       />
       {props.children}
