@@ -46,12 +46,14 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
           <ValueItem label="Ethereum block timestamp">
             {formatTimestamp(props.ethereumTimestamp, 'utc')} UTC
           </ValueItem>
+
+          {/* Disabled until StarkEx timestamp will be fixed
           <ValueItem label="StarkEx timestamp">
             {formatTimestamp(props.starkExTimestamp, 'utc')} UTC{' '}
             <span className="text-sm font-semibold text-zinc-500">
               ({delayHours}h delay)
             </span>
-          </ValueItem>
+          </ValueItem> */}
         </div>
         <div className="hidden" data-component="StateUpdateStats-Advanced">
           <div className="flex flex-col gap-4 rounded bg-slate-800 p-6">
