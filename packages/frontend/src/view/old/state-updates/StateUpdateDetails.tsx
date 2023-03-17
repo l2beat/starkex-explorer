@@ -95,7 +95,7 @@ export function StateUpdateDetails({
         columns={[
           { header: 'Type' },
           { header: 'Time' },
-          { header: 'Hash', monospace: true, fullWidth: true },
+          { header: 'Tx Hash', monospace: true, fullWidth: true },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },
           { header: 'Position ID', numeric: true },
