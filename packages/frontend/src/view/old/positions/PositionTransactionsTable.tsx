@@ -44,7 +44,7 @@ const transactionHistoryTableColumns: Column[] = [
   { header: 'Type' },
   { header: 'Time' },
   { header: 'Status' },
-  { header: 'Hash', monospace: true, fullWidth: true },
+  { header: 'Tx Hash', monospace: true, fullWidth: true },
   { header: 'Amount', numeric: true },
   { header: 'Asset' },
 ]
