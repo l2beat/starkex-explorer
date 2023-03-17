@@ -26,17 +26,19 @@ function NewPerpetualForcedActionPage(props: NewForcedActionFormProps) {
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
-          <div className="mt-6 flex flex-col">
+          <div className="mt-6 flex max-w-md flex-col">
             <span className="text-xl font-semibold">
               {instructionParams.header}
+            </span>
+            <span className="mt-3 text-sm font-semibold text-zinc-500">
+              The process you are about to begin should be used only in
+              emergency. Please use a regular operation on the exchange to
+              perform it.
             </span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
               {instructionParams.description}
             </span>
-            <OrderedList
-              items={instructionParams.items}
-              className="mt-3 max-w-md"
-            />
+            <OrderedList items={instructionParams.items} className="mt-3" />
           </div>
           <Card className="h-min w-[480px]">
             <form
