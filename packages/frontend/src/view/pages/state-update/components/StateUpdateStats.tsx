@@ -25,13 +25,14 @@ export interface StateUpdateStatsProps {
 }
 
 export function StateUpdateStats(props: StateUpdateStatsProps) {
-  const delayHours = Math.max(
-    Math.floor(
-      (Number(props.ethereumTimestamp) - Number(props.starkExTimestamp)) /
-        (60 * 60 * 1000)
-    ),
-    0
-  )
+  // Disabled until StarkEx timestamp will be fixed
+  // const delayHours = Math.max(
+  //   Math.floor(
+  //     (Number(props.ethereumTimestamp) - Number(props.starkExTimestamp)) /
+  //       (60 * 60 * 1000)
+  //   ),
+  //   0
+  // )
 
   return (
     <section data-component="StateUpdateStats">
