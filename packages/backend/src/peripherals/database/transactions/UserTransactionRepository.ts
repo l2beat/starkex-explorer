@@ -2,6 +2,7 @@ import { Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { UserTransactionRow } from 'knex/types/tables'
 
+import { PaginationOptions } from '../../../model/PaginationOptions'
 import { Logger } from '../../../tools/Logger'
 import { BaseRepository } from '../shared/BaseRepository'
 import { Database } from '../shared/Database'
@@ -216,11 +217,11 @@ export class UserTransactionRepository extends BaseRepository {
     return toRecords<T>(await query)
   }
 
-  async getPaginated<T extends UserTransactionData['type']>(options: {
-    limit: number
-    offset: number
-    types?: T[]
-  }): Promise<UserTransactionRecord<T>[]> {
+  async getPaginated<T extends UserTransactionData['type']>(
+    options: PaginationOptions & {
+      types?: T[]
+    }
+  ): Promise<UserTransactionRecord<T>[]> {
     const knex = await this.knex()
     let query = queryWithIncluded(knex)
       .limit(options.limit)

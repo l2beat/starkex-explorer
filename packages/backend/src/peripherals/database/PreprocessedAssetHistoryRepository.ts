@@ -2,6 +2,7 @@ import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { PreprocessedAssetHistoryRow } from 'knex/types/tables'
 
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
@@ -113,7 +114,7 @@ export class PreprocessedAssetHistoryRepository<
 
   async getByStateUpdateIdPaginated(
     stateUpdateId: number,
-    { offset, limit }: { offset: number; limit: number },
+    { offset, limit }: PaginationOptions,
     trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
@@ -170,7 +171,7 @@ export class PreprocessedAssetHistoryRepository<
 
   async getCurrentByStarkKeyPaginated(
     starkKey: StarkKey,
-    { offset, limit }: { offset: number; limit: number },
+    { offset, limit }: PaginationOptions,
     assetAtTop?: T,
     trx?: Knex.Transaction
   ) {
@@ -207,7 +208,7 @@ export class PreprocessedAssetHistoryRepository<
 
   async getByStarkKeyPaginated(
     starkKey: StarkKey,
-    { offset, limit }: { offset: number; limit: number },
+    { offset, limit }: PaginationOptions,
     trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)

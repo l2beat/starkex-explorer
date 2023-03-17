@@ -234,10 +234,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async getPaginated(options: {
-    limit: number
-    offset: number
-  }): Promise<Record[]> {
+  async getPaginated(options: PaginationOptions): Promise<Record[]> {
     const knex = await this.knex()
     const rows = await knex('forced_trade_offers')
       .limit(options.limit)
