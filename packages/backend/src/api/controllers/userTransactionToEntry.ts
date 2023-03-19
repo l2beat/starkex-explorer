@@ -36,7 +36,7 @@ function extractUserTxAsset(
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
     case 'FullWithdrawal':
-      return undefined
+      return undefined //TODO: Fix this
     case 'Withdraw':
       return {
         hashOrId: collateralAsset ? collateralAsset.assetId : data.assetType,
@@ -57,10 +57,9 @@ function extractUserTxEntryType(
   data: UserTransactionRecord['data']
 ): TransactionEntry['type'] {
   switch (data.type) {
-    case 'ForcedWithdrawal':
-      return 'FORCED_WITHDRAW'
     case 'ForcedTrade':
       return data.isABuyingSynthetic ? 'FORCED_BUY' : 'FORCED_SELL'
+    case 'ForcedWithdrawal':
     case 'FullWithdrawal':
       return 'FORCED_WITHDRAW'
     case 'Withdraw':

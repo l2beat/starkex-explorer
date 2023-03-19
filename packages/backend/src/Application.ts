@@ -445,6 +445,7 @@ export class Application {
     )
     const homeController = new HomeController(
       userService,
+      assetRepository,
       userTransactionRepository,
       preprocessedStateDetailsRepository,
       config.starkex.tradingMode,
@@ -463,6 +464,7 @@ export class Application {
     const stateUpdateController = new StateUpdateController(
       userService,
       stateUpdateRepository,
+      assetRepository,
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
       config.starkex.tradingMode,
