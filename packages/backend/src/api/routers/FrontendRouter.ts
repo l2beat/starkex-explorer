@@ -9,6 +9,7 @@ import * as z from 'zod'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { ForcedActionController } from '../controllers/ForcedActionController'
+import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
@@ -26,6 +27,7 @@ export function createFrontendRouter(
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
   forcedActionController: ForcedActionController,
+  forcedTradeOfferController: ForcedTradeOfferController,
   merkleProofController: MerkleProofController,
   collateralAsset: CollateralAsset | undefined,
   tradingMode: TradingMode,
@@ -256,6 +258,23 @@ export function createFrontendRouter(
           givenUser,
           StarkKey(ctx.params.starkKey),
           pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/offers/:offerId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          offerId: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const result = await forcedTradeOfferController.getOfferPage(
+          Number(ctx.params.offerId)
         )
         applyControllerResult(ctx, result)
       }

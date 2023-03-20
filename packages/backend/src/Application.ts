@@ -7,6 +7,7 @@ import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferCo
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
+import { OldForcedTradeOfferController } from './api/controllers/OldForcedTradeOfferController'
 import { OldHomeController } from './api/controllers/OldHomeController'
 import { OldSearchController } from './api/controllers/OldSearchController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
@@ -517,7 +518,7 @@ export class Application {
       userRegistrationEventRepository,
       preprocessedAssetHistoryRepository
     )
-    const forcedTradeOfferController = new ForcedTradeOfferController(
+    const oldForcedTradeOfferController = new OldForcedTradeOfferController(
       accountService,
       forcedTradeOfferRepository,
       positionRepository,
@@ -536,6 +537,12 @@ export class Application {
       assetRepository,
       config.starkex.contracts.perpetual
     )
+    const forcedTradeOfferController = new ForcedTradeOfferController(
+      forcedTradeOfferRepository,
+      positionRepository,
+      userRegistrationEventRepository,
+      collateralAsset
+    )
 
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
@@ -544,7 +551,7 @@ export class Application {
           ? createOldFrontendRouter(
               positionController,
               oldHomeController,
-              forcedTradeOfferController,
+              oldForcedTradeOfferController,
               forcedTransactionController,
               oldStateUpdateController,
               oldSearchController
@@ -555,13 +562,14 @@ export class Application {
               stateUpdateController,
               transactionController,
               forcedActionsController,
+              forcedTradeOfferController,
               merkleProofController,
               collateralAsset,
               config.starkex.tradingMode,
               searchController
             ),
         createForcedTransactionRouter(
-          forcedTradeOfferController,
+          oldForcedTradeOfferController,
           userTransactionController
         ),
       ],
