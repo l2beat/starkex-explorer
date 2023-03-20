@@ -291,23 +291,23 @@ describe(ForcedTradeOfferRepository.name, () => {
 
   describe(ForcedTradeOfferRepository.prototype.countAll.name, () => {
     it('returns the number of records', async () => {
-      const expectedCount = 3
       expect(await repository.countAll()).toEqual(0)
 
+      const expectedCount = 3
       for (let i = 0; i < expectedCount; i++) {
         await repository.add(fakeOffer())
       }
 
-      expect(await repository.countAll()).toEqual(3)
+      expect(await repository.countAll()).toEqual(expectedCount)
     })
   })
 
   describe(ForcedTradeOfferRepository.prototype.countByStarkKey.name, () => {
     it('returns the number of records', async () => {
       const starkKey = StarkKey.fake()
-      const expectedCount = 3
       expect(await repository.countByStarkKey(starkKey)).toEqual(0)
 
+      const expectedCount = 3
       for (let i = 0; i < expectedCount; i++) {
         await repository.add(
           fakeOffer({
@@ -316,7 +316,7 @@ describe(ForcedTradeOfferRepository.name, () => {
         )
       }
 
-      expect(await repository.countAll()).toEqual(3)
+      expect(await repository.countAll()).toEqual(expectedCount)
     })
   })
 })
