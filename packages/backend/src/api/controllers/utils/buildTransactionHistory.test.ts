@@ -202,7 +202,7 @@ const sentTransaction = (opts?: {
   transactionHash: Hash256.fake(),
   starkKey: StarkKey.fake(),
   vaultOrPositionId: BigInt(0),
-  // @ts-expect-error
+  // @ts-expect-error omitted unnecessary fields for test
   data: {} as SentTransactionRecord,
   sentTimestamp: Timestamp(10),
   mined: opts?.mined
@@ -220,7 +220,7 @@ const userTransaction = (opts?: {
   id: 0,
   transactionHash: Hash256.fake(),
   starkKeyA: StarkKey.fake(),
-  // @ts-expect-error
+  // @ts-expect-error omitted unnecessary fields for test
   data: {} as UserTransactionRecord,
   timestamp: Timestamp(10),
   included: opts?.included
@@ -246,7 +246,7 @@ const forcedTradeOffer = (opts?: {
   collateralAmount: BigInt(0),
   syntheticAmount: BigInt(0),
   isABuyingSynthetic: true,
-  // @ts-expect-error
+  // @ts-expect-error omitted unnecessary fields for test
   accepted: opts?.accepted
     ? {
         at: Timestamp(20),
