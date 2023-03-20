@@ -23,7 +23,7 @@ export function ForcedTransactionsTable({
         { header: 'Type' },
         { header: 'Time' },
         { header: 'Status' },
-        { header: 'Hash', monospace: true, fullWidth: true },
+        { header: 'Tx Hash', monospace: true, fullWidth: true },
         { header: 'Position' },
         { header: 'Amount', numeric: true },
         { header: 'Asset' },

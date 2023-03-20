@@ -9,11 +9,13 @@ import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
+import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
 import { forcedTradeOfferToEntry } from './forcedTradeOfferToEntry'
+import { getAssetHashToAssetDetailsMap } from './getAssetDetailsMap'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
@@ -25,6 +27,7 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
 export class HomeController {
   constructor(
     private readonly userService: UserService,
+    private readonly assetRepository: AssetRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
@@ -47,7 +50,6 @@ export class HomeController {
     ] = await Promise.all([
       this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
-
       this.userTransactionRepository.getPaginated({
         ...paginationOpts,
         types: FORCED_TRANSACTION_TYPES,
@@ -57,8 +59,16 @@ export class HomeController {
       this.forcedTradeOfferRepository.countAll(),
     ])
 
+    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
+      this.tradingMode,
+      this.assetRepository,
+      {
+        userTransactions: forcedUserTransactions,
+      }
+    )
+
     const transactions = forcedUserTransactions.map((t) =>
-      userTransactionToEntry(t, this.collateralAsset)
+      userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
     )
 
     const content = renderHomePage({
@@ -122,8 +132,16 @@ export class HomeController {
         this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
       ])
 
+    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
+      this.tradingMode,
+      this.assetRepository,
+      {
+        userTransactions: forcedUserTransactions,
+      }
+    )
+
     const transactions = forcedUserTransactions.map((t) =>
-      userTransactionToEntry(t, this.collateralAsset)
+      userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
     )
 
     const content = renderHomeTransactionsPage({

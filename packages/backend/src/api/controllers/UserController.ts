@@ -29,8 +29,8 @@ import {
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
-import { fetchAssetDetailsMap } from './fetchAssetDetailsMap'
 import { forcedTradeOfferToEntry } from './forcedTradeOfferToEntry'
+import { getAssetHashToAssetDetailsMap } from './getAssetDetailsMap'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
@@ -97,15 +97,16 @@ export class UserController {
       this.forcedTradeOfferRepository.countByStarkKey(starkKey),
     ])
 
-    let assetDetailsMap: Record<string, AssetDetails> = {}
-    if (this.tradingMode === 'spot') {
-      assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
-        userAssets: userAssets as PreprocessedAssetHistoryRecord<AssetHash>[],
-        assetHistory: history as PreprocessedAssetHistoryRecord<AssetHash>[],
+    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
+      this.tradingMode,
+      this.assetRepository,
+      {
+        userAssets: userAssets,
+        assetHistory: history,
         sentTransactions,
         userTransactions,
-      })
-    }
+      }
+    )
 
     const assetEntries = userAssets.map((a) =>
       toUserAssetEntry(
@@ -167,12 +168,13 @@ export class UserController {
       ),
     ])
 
-    let assetDetailsMap = {}
-    if (this.tradingMode === 'spot') {
-      assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
-        userAssets: userAssets as PreprocessedAssetHistoryRecord<AssetHash>[],
-      })
-    }
+    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
+      this.tradingMode,
+      this.assetRepository,
+      {
+        userAssets: userAssets,
+      }
+    )
 
     const assets = userAssets.map((a) =>
       toUserAssetEntry(
@@ -209,12 +211,13 @@ export class UserController {
       this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
     ])
 
-    let assetDetailsMap = {}
-    if (this.tradingMode === 'spot') {
-      assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
-        assetHistory: history as PreprocessedAssetHistoryRecord<AssetHash>[],
-      })
-    }
+    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
+      this.tradingMode,
+      this.assetRepository,
+      {
+        assetHistory: history,
+      }
+    )
     const balanceChanges = history.map((h) =>
       toUserBalanceChangeEntries(h, assetDetailsMap)
     )
@@ -249,13 +252,14 @@ export class UserController {
         this.userTransactionRepository.getCountByStarkKey(starkKey),
       ])
 
-    let assetDetailsMap = {}
-    if (this.tradingMode === 'spot') {
-      assetDetailsMap = await fetchAssetDetailsMap(this.assetRepository, {
+    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
+      this.tradingMode,
+      this.assetRepository,
+      {
         sentTransactions,
         userTransactions,
-      })
-    }
+      }
+    )
 
     const transactions = buildUserTransactions(
       pagination.offset === 0 ? sentTransactions : [], // display sent transactions only on the first page
