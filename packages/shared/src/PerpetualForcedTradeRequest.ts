@@ -37,7 +37,8 @@ export interface PerpetualForcedTradeRequest {
 }
 
 export function decodePerpetualForcedTradeRequest(
-  data: string
+  data: string,
+  collateralAssetId: AssetId
 ): PerpetualForcedTradeRequest | undefined {
   try {
     const decoded = coder.decodeFunctionData('forcedTradeRequest', data)
@@ -47,8 +48,14 @@ export function decodePerpetualForcedTradeRequest(
       starkKeyB: StarkKey.from(decoded.starkKeyB),
       positionIdA: BigInt(decoded.positionIdA),
       positionIdB: BigInt(decoded.positionIdB),
-      collateralAssetId: decodeAssetId(decoded.collateralAssetId),
-      syntheticAssetId: decodeAssetId(decoded.syntheticAssetId),
+      collateralAssetId: decodeAssetId(
+        decoded.collateralAssetId,
+        collateralAssetId
+      ),
+      syntheticAssetId: decodeAssetId(
+        decoded.syntheticAssetId,
+        collateralAssetId
+      ),
       collateralAmount: BigInt(decoded.collateralAmount),
       syntheticAmount: BigInt(decoded.syntheticAmount),
       isABuyingSynthetic: Boolean(decoded.isABuyingSynthetic),

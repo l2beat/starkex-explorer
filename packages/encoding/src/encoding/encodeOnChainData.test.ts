@@ -31,6 +31,8 @@ import { writeOraclePrices } from './writeOraclePrices'
 import { writePositionUpdate } from './writePositionUpdate'
 import { writeState } from './writeState'
 
+const collateralAssetId = AssetId('USDC-6')
+
 describe(encodeOnChainData.name, () => {
   const data: OnChainData = {
     configurationHash: Hash256.fake(),
@@ -144,7 +146,7 @@ describe(encodeOnChainData.name, () => {
 
   it(`is compatible with ${decodeOnChainData.name}`, () => {
     const encoded = encodeOnChainData(data)
-    const decoded = decodeOnChainData(encoded)
+    const decoded = decodeOnChainData(encoded, collateralAssetId)
     expect(decoded).toEqual(data)
   })
 
@@ -154,7 +156,7 @@ describe(encodeOnChainData.name, () => {
       writeAssetConfigHashes(writer, [])
       const encoded = writer.getBytes()
       const reader = new ByteReader(encoded)
-      const decoded = readAssetConfigHashes(reader)
+      const decoded = readAssetConfigHashes(reader, collateralAssetId)
       expect(decoded).toEqual([])
     })
 
@@ -163,7 +165,7 @@ describe(encodeOnChainData.name, () => {
       writeAssetConfigHashes(writer, data.assetConfigHashes)
       const encoded = writer.getBytes()
       const reader = new ByteReader(encoded)
-      const decoded = readAssetConfigHashes(reader)
+      const decoded = readAssetConfigHashes(reader, collateralAssetId)
       expect(decoded).toEqual(data.assetConfigHashes)
     })
   })
@@ -174,7 +176,7 @@ describe(encodeOnChainData.name, () => {
       writeState(writer, data.oldState)
       const encoded = writer.getBytes()
       const reader = new ByteReader(encoded)
-      const decoded = readState(reader)
+      const decoded = readState(reader, collateralAssetId)
       expect(decoded).toEqual(data.oldState)
     })
   })
@@ -185,7 +187,7 @@ describe(encodeOnChainData.name, () => {
       writeFundingIndices(writer, data.oldState.indices)
       const encoded = writer.getBytes()
       const reader = new ByteReader(encoded)
-      const decoded = readFundingIndices(reader)
+      const decoded = readFundingIndices(reader, collateralAssetId)
       expect(decoded).toEqual(data.oldState.indices)
     })
   })
@@ -196,7 +198,7 @@ describe(encodeOnChainData.name, () => {
       writeOraclePrices(writer, data.oldState.oraclePrices)
       const encoded = writer.getBytes()
       const reader = new ByteReader(encoded)
-      const decoded = readOraclePrices(reader)
+      const decoded = readOraclePrices(reader, collateralAssetId)
       expect(decoded).toEqual(data.oldState.oraclePrices)
     })
   })
@@ -216,7 +218,7 @@ describe(encodeOnChainData.name, () => {
     it(`is compatible with ${readForcedActions.name}`, () => {
       const encoded = encodeForcedActions(data.forcedActions)
       const reader = new ByteReader(encoded)
-      const decoded = readForcedActions(reader)
+      const decoded = readForcedActions(reader, collateralAssetId)
       expect(decoded).toEqual(data.forcedActions)
     })
   })
@@ -238,7 +240,7 @@ describe(encodeOnChainData.name, () => {
       writeFundingEntries(writer, data.funding)
       const encoded = writer.getBytes()
       const reader = new ByteReader(encoded)
-      const decoded = readFundingEntries(reader)
+      const decoded = readFundingEntries(reader, collateralAssetId)
       expect(decoded).toEqual(data.funding)
     })
   })
@@ -253,7 +255,7 @@ describe(encodeOnChainData.name, () => {
       writePositionUpdate(writer, position)
       const encoded = writer.getBytes()
       const reader = new ByteReader(encoded)
-      const decoded = readPositionUpdate(reader)
+      const decoded = readPositionUpdate(reader, collateralAssetId)
       expect(decoded).toEqual(position)
     })
   })

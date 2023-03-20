@@ -209,6 +209,11 @@ export class Application {
       )
 
       if (config.starkex.tradingMode === 'perpetual') {
+        if (!collateralAsset) {
+          throw new Error(
+            'Collateral asset is not defined but trading mode is perpetual'
+          )
+        }
         const perpetualValidiumStateTransitionCollector =
           new PerpetualValidiumStateTransitionCollector(
             ethereumClient,
@@ -216,7 +221,8 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
-          ethereumClient
+          ethereumClient,
+          collateralAsset
         )
         const rollupStateRepository = new MerkleTreeRepository(
           database,
@@ -240,6 +246,7 @@ export class Application {
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
+          collateralAsset,
           logger
         )
       } else {
@@ -324,6 +331,7 @@ export class Application {
         userRegistrationCollector,
         userTransactionCollector,
         withdrawalAllowedCollector,
+        collateralAsset,
         logger
       )
     }
@@ -350,6 +358,7 @@ export class Application {
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
       ethereumClient,
+      collateralAsset,
       logger
     )
 
@@ -528,7 +537,8 @@ export class Application {
       ethereumClient,
       sentTransactionRepository,
       forcedTradeOfferRepository,
-      config.starkex.contracts.perpetual
+      config.starkex.contracts.perpetual,
+      collateralAsset
     )
     const forcedActionsController = new ForcedActionController(
       userService,

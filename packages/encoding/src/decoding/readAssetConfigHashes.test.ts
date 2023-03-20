@@ -7,8 +7,12 @@ import { readToDecode } from '../test/readToDecode'
 import { DecodingError } from './DecodingError'
 import { readAssetConfigHashes } from './readAssetConfigHashes'
 
+const collateralAssetId = AssetId('USDC-6')
+
 describe(readAssetConfigHashes.name, () => {
-  const decode = readToDecode(readAssetConfigHashes)
+  const decode = readToDecode((reader) =>
+    readAssetConfigHashes(reader, collateralAssetId)
+  )
 
   it('fails for empty data', () => {
     expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')

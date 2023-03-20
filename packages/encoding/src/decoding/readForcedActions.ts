@@ -1,11 +1,14 @@
-import { StarkKey } from '@explorer/types'
+import { AssetId, StarkKey } from '@explorer/types'
 
 import { PerpetualForcedAction } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
 import { DecodingError } from './DecodingError'
 
-export function readForcedActions(reader: ByteReader) {
+export function readForcedActions(
+  reader: ByteReader,
+  collateralAssetId: AssetId
+) {
   const count = reader.readNumber(32)
   const forcedActions: PerpetualForcedAction[] = []
   for (let i = 0; i < count; i++) {
@@ -21,7 +24,7 @@ export function readForcedActions(reader: ByteReader) {
       const positionIdA = reader.readBigInt(32)
       const positionIdB = reader.readBigInt(32)
       reader.skip(17)
-      const syntheticAssetId = decodeAssetId(reader.read(15))
+      const syntheticAssetId = decodeAssetId(reader.read(15), collateralAssetId)
       const collateralAmount = reader.readBigInt(32)
       const syntheticAmount = reader.readBigInt(32)
       const isABuyingSynthetic = reader.readBigInt(32) != 0n

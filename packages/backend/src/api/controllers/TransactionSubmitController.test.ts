@@ -13,6 +13,7 @@ import {
 import { expect } from 'earljs'
 import { providers } from 'ethers'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
@@ -21,6 +22,11 @@ import { mock } from '../../test/mock'
 import { TransactionSubmitController } from './TransactionSubmitController'
 
 describe(TransactionSubmitController.name, () => {
+  const collateralAsset: CollateralAsset = {
+    assetId: AssetId('USDC-6'),
+    price: 1n,
+  }
+
   describe(TransactionSubmitController.prototype.submitForcedExit.name, () => {
     it('handles nonexistent transaction', async () => {
       const controller = new TransactionSubmitController(
@@ -30,6 +36,7 @@ describe(TransactionSubmitController.name, () => {
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>(),
         EthereumAddress.fake(),
+        collateralAsset,
         false
       )
 
@@ -59,7 +66,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake('a')
+        EthereumAddress.fake('a'),
+        collateralAsset
       )
 
       const hash = Hash256.fake()
@@ -82,7 +90,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake('a')
+        EthereumAddress.fake('a'),
+        collateralAsset
       )
 
       const hash = Hash256.fake()
@@ -117,7 +126,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         repository,
         mock<ForcedTradeOfferRepository>(),
-        perpetualAddress
+        perpetualAddress,
+        collateralAsset
       )
 
       const result = await controller.submitForcedExit(hash)
@@ -134,7 +144,8 @@ describe(TransactionSubmitController.name, () => {
         mock<EthereumClient>(),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>({ findById: async () => undefined }),
-        EthereumAddress.fake()
+        EthereumAddress.fake(),
+        collateralAsset
       )
 
       const offerId = 1
@@ -152,7 +163,8 @@ describe(TransactionSubmitController.name, () => {
         mock<EthereumClient>(),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake()
+        EthereumAddress.fake(),
+        collateralAsset
       )
 
       const hash = Hash256.fake()
@@ -170,7 +182,8 @@ describe(TransactionSubmitController.name, () => {
         mock<EthereumClient>(),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake()
+        EthereumAddress.fake(),
+        collateralAsset
       )
 
       const hash = Hash256.fake()
@@ -190,7 +203,8 @@ describe(TransactionSubmitController.name, () => {
         mock<EthereumClient>(),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake()
+        EthereumAddress.fake(),
+        collateralAsset
       )
 
       const hash = Hash256.fake()
@@ -211,6 +225,7 @@ describe(TransactionSubmitController.name, () => {
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>({ findById: async () => offer }),
         EthereumAddress.fake(),
+        collateralAsset,
         false
       )
 
@@ -249,7 +264,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake('a')
+        EthereumAddress.fake('a'),
+        collateralAsset
       )
 
       const hash = Hash256.fake()
@@ -281,7 +297,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        perpetualAddress
+        perpetualAddress,
+        collateralAsset
       )
 
       const hash = Hash256.fake()
@@ -320,7 +337,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         sentTransactionRepository,
         forcedTradeOfferRepository,
-        perpetualAddress
+        perpetualAddress,
+        collateralAsset
       )
 
       const result = await controller.submitForcedTrade(hash, 1)
@@ -341,6 +359,7 @@ describe(TransactionSubmitController.name, () => {
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>(),
         EthereumAddress.fake(),
+        collateralAsset,
         false
       )
 
@@ -365,7 +384,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake('a')
+        EthereumAddress.fake('a'),
+        collateralAsset
       )
 
       const finalizeHash = Hash256.fake()
@@ -388,7 +408,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         mock<SentTransactionRepository>(),
         mock<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake('a')
+        EthereumAddress.fake('a'),
+        collateralAsset
       )
 
       const hash = Hash256.fake()
@@ -418,7 +439,8 @@ describe(TransactionSubmitController.name, () => {
         }),
         repository,
         mock<ForcedTradeOfferRepository>(),
-        perpetualAddress
+        perpetualAddress,
+        collateralAsset
       )
 
       const result = await controller.submitWithdrawal(hash)

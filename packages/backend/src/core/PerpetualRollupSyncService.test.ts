@@ -1,6 +1,7 @@
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256 } from '@explorer/types'
 import { expect } from 'earljs'
 
+import { CollateralAsset } from '../config/starkex/StarkexConfig'
 import { BlockRange } from '../model'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { decodedFakePages, fakePages } from '../test/fakes'
@@ -17,6 +18,10 @@ import { PerpetualRollupSyncService } from './PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 
 const noop = async () => {}
+const collateralAsset: CollateralAsset = {
+  assetId: AssetId('USDC'),
+  price: 1n,
+}
 
 describe(PerpetualRollupSyncService.name, () => {
   describe(PerpetualRollupSyncService.prototype.sync.name, () => {
@@ -78,6 +83,7 @@ describe(PerpetualRollupSyncService.name, () => {
       userRegistrationCollector,
       userTransactionCollector,
       withdrawalAllowedCollector,
+      collateralAsset,
       Logger.SILENT
     )
 
@@ -143,6 +149,7 @@ describe(PerpetualRollupSyncService.name, () => {
         userRegistrationCollector,
         userTransactionCollector,
         withdrawalAllowedCollector,
+        collateralAsset,
         Logger.SILENT
       )
 

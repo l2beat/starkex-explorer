@@ -30,7 +30,8 @@ export interface PerpetualBatchOrder {
 }
 
 export function toPerpetualBatch(
-  response: PerpetualBatchResponse
+  response: PerpetualBatchResponse,
+  collateralAssetId: AssetId
 ): PerpetualBatch | undefined {
   if (!response.update) {
     return
@@ -46,7 +47,7 @@ export function toPerpetualBatch(
         collateralBalance: BigInt(position.collateral_balance),
         starkKey: StarkKey.from(BigInt(position.public_key)),
         assets: Object.entries(position.assets).map(([assetId, asset]) => ({
-          assetId: decodeAssetId(assetId.slice(2)),
+          assetId: decodeAssetId(assetId.slice(2), collateralAssetId),
           balance: BigInt(asset.balance),
           fundingIndex: BigInt(asset.cached_funding_index),
         })),

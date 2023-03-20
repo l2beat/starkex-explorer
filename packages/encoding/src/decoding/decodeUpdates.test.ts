@@ -6,10 +6,14 @@ import { ByteWriter } from '../encoding/ByteWriter'
 import { encodeAssetId } from '../encoding/encodeAssetId'
 import { decodeUpdates } from './decodeUpdates'
 import { DecodingError } from './DecodingError'
+const collateralAssetId = AssetId('USDC-6')
 
 describe('decodeUpdates', () => {
   it('fails for empty data', () => {
-    expect(() => decodeUpdates('')).toThrow(DecodingError, 'Went out of bounds')
+    expect(() => decodeUpdates('', collateralAssetId)).toThrow(
+      DecodingError,
+      'Went out of bounds'
+    )
   })
 
   it('decodes multiple entries and positions', () => {
@@ -53,7 +57,7 @@ describe('decodeUpdates', () => {
       .writePadding(9)
       .write(encodeAssetId(AssetId('ETH-9')))
       .writeNumber(66n - MIN_INT, 8)
-    expect(decodeUpdates(writer.getBytes())).toEqual({
+    expect(decodeUpdates(writer.getBytes(), collateralAssetId)).toEqual({
       funding: [
         {
           indices: [

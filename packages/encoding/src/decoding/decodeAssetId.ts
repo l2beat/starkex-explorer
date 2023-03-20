@@ -1,25 +1,20 @@
 import { AssetId } from '@explorer/types'
 
-import {
-  DYDX_INTERNAL_USDC_ID_ENCODED,
-  GAMMAX_GOERLI_INTERNAL_USDC_ID_ENCODED,
-} from '../constants'
 import { DecodingError } from './DecodingError'
 
 interface BigNumerLike {
   toHexString(): string
 }
 
-export function decodeAssetId(value: string | BigNumerLike): AssetId {
+export function decodeAssetId(
+  value: string | BigNumerLike,
+  collateralAssetId?: AssetId
+): AssetId {
   if (typeof value !== 'string') {
-    return decodeAssetId(value.toHexString().slice(2))
+    return decodeAssetId(value.toHexString().slice(2), collateralAssetId)
   }
-  // TODO: this should be compared to starkex.config.collateralAsset
-  if (
-    value === DYDX_INTERNAL_USDC_ID_ENCODED ||
-    value == GAMMAX_GOERLI_INTERNAL_USDC_ID_ENCODED
-  ) {
-    return AssetId.USDC
+  if (value === collateralAssetId?.toString()) {
+    return collateralAssetId
   }
 
   if (value.length !== 30) {

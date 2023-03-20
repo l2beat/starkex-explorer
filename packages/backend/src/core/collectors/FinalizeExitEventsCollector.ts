@@ -1,5 +1,11 @@
 import { decodeAssetId } from '@explorer/encoding'
-import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 
 import { BlockRange } from '../../model/BlockRange'
 import {
@@ -27,9 +33,13 @@ export class FinalizeExitEventsCollector {
   ) {}
 
   async collect(
-    blockRange: BlockRange
+    blockRange: BlockRange,
+    collateralAssetId: AssetId
   ): Promise<{ added: number; updated: number; ignored: number }> {
-    const minedFinalizes = await this.getMinedFinalizes(blockRange)
+    const minedFinalizes = await this.getMinedFinalizes(
+      blockRange,
+      collateralAssetId
+    )
     const results = await Promise.all(
       minedFinalizes.map(async (finalize, i, array) => {
         let previousFinalizeMinedAt =
@@ -104,7 +114,8 @@ export class FinalizeExitEventsCollector {
   }
 
   private async getMinedFinalizes(
-    blockRange: BlockRange
+    blockRange: BlockRange,
+    collateralAssetId: AssetId
   ): Promise<MinedTransaction[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.perpetualAddress.toString(),
@@ -125,7 +136,7 @@ export class FinalizeExitEventsCollector {
           minedAt,
           data: {
             starkKey: StarkKey.from(event.args.starkKey),
-            assetType: decodeAssetId(event.args.assetType),
+            assetType: decodeAssetId(event.args.assetType, collateralAssetId),
             nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
             quantizedAmount: event.args.quantizedAmount.toBigInt(),
             recipient: EthereumAddress(event.args.recipient),

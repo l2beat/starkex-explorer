@@ -5,14 +5,18 @@ import { EXAMPLE_PERPETUAL_BATCH } from '../../test/starkwareData'
 import { PerpetualBatchResponse } from './schema'
 import { toPerpetualBatch } from './toPerpetualBatch'
 
+const collateralAssetId = AssetId('USDC-6')
+
 describe(toPerpetualBatch.name, () => {
   it('transforms a null update batch', () => {
-    expect(toPerpetualBatch({ update: null })).toEqual(undefined)
+    expect(toPerpetualBatch({ update: null }, collateralAssetId)).toEqual(
+      undefined
+    )
   })
 
   it('transforms the parsed batch', () => {
     const parsed = PerpetualBatchResponse.parse(EXAMPLE_PERPETUAL_BATCH)
-    expect(toPerpetualBatch(parsed)).toEqual({
+    expect(toPerpetualBatch(parsed, collateralAssetId)).toEqual({
       previousBatchId: 1205,
       positionRoot: PedersenHash(
         '00d766904591c4a3b7353f977e3b0be5c13dd1f1b028d6769828e4aa5861fd67'

@@ -125,7 +125,10 @@ export class UserTransactionCollector {
             collateralAmount: event.args.collateralAmount.toBigInt(),
             collateralAssetId: this.collateralAsset.assetId,
             syntheticAmount: event.args.syntheticAmount.toBigInt(),
-            syntheticAssetId: decodeAssetId(event.args.syntheticAssetId),
+            syntheticAssetId: decodeAssetId(
+              event.args.syntheticAssetId,
+              this.collateralAsset.assetId
+            ),
             isABuyingSynthetic: event.args.isABuyingSynthetic,
             nonce: event.args.nonce.toBigInt(),
           },

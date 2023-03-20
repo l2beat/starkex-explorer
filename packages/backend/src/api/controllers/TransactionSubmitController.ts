@@ -12,6 +12,7 @@ import {
   Timestamp,
 } from '@explorer/types'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import {
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
@@ -27,6 +28,7 @@ export class TransactionSubmitController {
     private sentTransactionRepository: SentTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress,
+    private collateralAsset: CollateralAsset,
     private retryTransactions = true
   ) {}
 
@@ -105,7 +107,10 @@ export class TransactionSubmitController {
         content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
-    const data = decodePerpetualForcedTradeRequest(tx.data)
+    const data = decodePerpetualForcedTradeRequest(
+      tx.data,
+      this.collateralAsset.assetId
+    )
     if (
       !tx.to ||
       EthereumAddress(tx.to) !== this.perpetualAddress ||

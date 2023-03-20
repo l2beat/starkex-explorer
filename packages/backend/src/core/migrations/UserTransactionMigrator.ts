@@ -5,6 +5,7 @@ import {
 } from '@explorer/shared'
 import { AssetHash, AssetId, Hash256, Timestamp } from '@explorer/types'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { BlockRange } from '../../model'
 import { Database } from '../../peripherals/database/shared/Database'
 import { SoftwareMigrationRepository } from '../../peripherals/database/SoftwareMigrationRepository'
@@ -28,6 +29,7 @@ export class UserTransactionMigrator {
     private withdrawableAssetRepository: WithdrawableAssetRepository,
     private withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private ethereumClient: EthereumClient,
+    private collateralAsset: CollateralAsset,
     private logger: Logger
   ) {
     this.logger = this.logger.for(this)
@@ -45,11 +47,11 @@ export class UserTransactionMigrator {
     if (migrationNumber >= 4) {
       return
     }
-    await this.migrateUserTransactions()
+    await this.migrateUserTransactions(this.collateralAsset.assetId)
     await this.softwareMigrationRepository.setMigrationNumber(4)
   }
 
-  private async migrateUserTransactions() {
+  private async migrateUserTransactions(collateralAssetId: AssetId) {
     const lastSyncedBlock = await this.syncStatusRepository.getLastSynced()
     if (lastSyncedBlock === undefined) {
       return
@@ -61,7 +63,7 @@ export class UserTransactionMigrator {
     await this.clearRepositories()
     await this.collectUserTransactions(lastSyncedBlock)
     await this.migrateIncludedTransactions()
-    await this.migrateSentTransactions()
+    await this.migrateSentTransactions(collateralAssetId)
 
     this.logger.info('Migration finished')
   }
@@ -140,7 +142,7 @@ export class UserTransactionMigrator {
     )
   }
 
-  private async migrateSentTransactions() {
+  private async migrateSentTransactions(collateralAssetId: AssetId) {
     const knex = await this.database.getKnex()
 
     const rows = await knex('transaction_status')
@@ -196,7 +198,10 @@ export class UserTransactionMigrator {
             },
           })
         } else if (tx.data.startsWith('0x2ecb8162')) {
-          const data = decodePerpetualForcedTradeRequest(tx.data)
+          const data = decodePerpetualForcedTradeRequest(
+            tx.data,
+            collateralAssetId
+          )
           if (!data) {
             throw new Error('Cannot decode forced trade request!')
           }
