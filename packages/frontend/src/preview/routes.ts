@@ -692,56 +692,107 @@ const routes: Route[] = [
   // #endregion
   // #region View perpetual trade
   {
-    path: '/transactions/offer-and-forced-trade/created/creator',
+    path: '/offers/xyz/created/creator',
     description:
       'Offer view of a created perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const user = getUser(ctx, true)
+      const offer = randomOfferDetails()
       ctx.body = renderOfferAndForcedTradePage({
         user,
         maker: userParty(user),
-        ...randomOfferDetails(),
+        ...offer,
         history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
+        cancelForm: {
+          offerId: Number(offer.offerId),
+          address: user.address,
+        },
       })
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/created/someone',
+    path: '/offers/xyz/created/someone',
     description:
       'Offer view of a created perpetual forced trade. As viewed by someone else.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const offer = randomOfferDetails()
+      const user = getUser(ctx, true)
+      const taker = {
+        ethereumAddress: user.address,
+        starkKey: user.starkKey,
+        positionId: randomId(),
+      }
+      const maker = randomParty()
       ctx.body = renderOfferAndForcedTradePage({
         user,
         maker: randomParty(),
-        ...randomOfferDetails(),
+        ...offer,
         history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
+        acceptForm: {
+          id: Number(offer.offerId),
+          address: user.address,
+          starkKeyA: maker.starkKey,
+          positionIdA: BigInt(maker.positionId),
+          syntheticAssetId: AssetId('ETH-9'),
+          collateralAmount: 2n,
+          syntheticAmount: 1n,
+          isABuyingSynthetic: true,
+          starkKeyB: taker.starkKey,
+          positionIdB: BigInt(taker.positionId),
+          submissionExpirationTime: 12345678n,
+          nonce: 1234n,
+          premiumCost: false,
+        },
       })
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/accepted/creator',
+    path: '/transactions/xyz/accepted/creator',
     description:
       'Offer view of an accepted perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const user = getUser(ctx, true)
+      const maker = userParty(user)
+      const taker = randomParty()
+      const offer = randomOfferDetails()
       ctx.body = renderOfferAndForcedTradePage({
         user,
-        maker: userParty(user),
-        taker: randomParty(),
-        ...randomOfferDetails(),
+        maker,
+        taker,
+        ...offer,
         history: [
           { timestamp: randomTimestamp(), status: 'ACCEPTED' },
           { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
+        cancelForm: {
+          offerId: Number(offer.offerId),
+          address: user.address,
+        },
+        finalizeForm: {
+          offerId: Number(offer.offerId),
+          address: user.address,
+          perpetualAddress: EthereumAddress.fake(),
+          starkKeyA: maker.starkKey,
+          positionIdA: BigInt(maker.positionId),
+          syntheticAssetId: AssetId('ETH-9'),
+          collateralAmount: 2n,
+          syntheticAmount: 1n,
+          isABuyingSynthetic: true,
+          starkKeyB: taker.starkKey,
+          positionIdB: BigInt(taker.positionId),
+          submissionExpirationTime: 12345678n,
+          nonce: 1234n,
+          premiumCost: false,
+          signature: Hash256.fake().toString(),
+        },
       })
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/accepted/someone',
+    path: '/transactions/xyz/accepted/someone',
     description:
       'Offer view of an accepted perpetual forced trade. As viewed by someone else.',
     isOfferPage: true,
@@ -760,7 +811,7 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/cancelled',
+    path: '/offers/xyz/cancelled',
     description: 'Offer view of a cancelled perpetual forced trade.',
     isOfferPage: true,
     render: (ctx) => {
@@ -777,7 +828,7 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/expired',
+    path: '/offers/xyz/expired',
     description: 'Offer view of an expired perpetual forced trade.',
     isOfferPage: true,
     render: (ctx) => {
@@ -796,7 +847,7 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/sent',
+    path: '/transactions/xyz/sent',
     description: 'Transaction view of a sent perpetual forced trade.',
     isOfferPage: true,
     isTransactionPage: true,
@@ -817,7 +868,7 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/mined',
+    path: '/transactions/xyz/mined',
     description: 'Transaction view of a mined perpetual forced trade.',
     isOfferPage: true,
     isTransactionPage: true,
@@ -839,7 +890,7 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/reverted',
+    path: '/transactions/xyz/reverted',
     description: 'Transaction view of a reverted perpetual forced trade.',
     isOfferPage: true,
     isTransactionPage: true,
@@ -861,7 +912,7 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/transactions/offer-and-forced-trade/included',
+    path: '/transactions/xyz/included',
     description: 'Transaction view of an included perpetual forced trade.',
     isOfferPage: true,
     isTransactionPage: true,
