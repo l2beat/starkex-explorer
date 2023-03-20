@@ -5,7 +5,7 @@ import {
   renderSpotForcedWithdrawalPage,
 } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { Hash256, Timestamp } from '@explorer/types'
+import { Hash256 } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
@@ -24,6 +24,11 @@ import {
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { assertUnreachable } from '../../utils/assertUnreachable'
 import { ControllerResult } from './ControllerResult'
+import {
+  buildForcedTradeTransactionHistory,
+  buildForcedTransactionHistory,
+  buildRegularTransactionHistory,
+} from './utils/buildTransactionHistory'
 
 export class TransactionController {
   constructor(
@@ -69,6 +74,7 @@ export class TransactionController {
 
     return { type: 'not found', content: 'Transaction not found' }
   }
+
   async getTransactionPageForUserTransaction(
     user: UserDetails | undefined,
     userTransaction: UserTransactionRecord,
@@ -86,7 +92,7 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKey
           )
-        const history = buildTransactionHistory({
+        const history = buildForcedTransactionHistory({
           sentTransaction,
           userTransaction,
         })
@@ -109,7 +115,7 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKey
           )
-        const history = buildTransactionHistory({
+        const history = buildForcedTransactionHistory({
           sentTransaction,
           userTransaction,
         })
@@ -278,7 +284,7 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             sentTransaction.data.starkKey
           )
-        const history = buildTransactionHistory({ sentTransaction })
+        const history = buildForcedTransactionHistory({ sentTransaction })
 
         return renderPerpetualForcedWithdrawalPage({
           user,
@@ -323,125 +329,4 @@ export class TransactionController {
         assertUnreachable(sentTransaction.data)
     }
   }
-}
-
-type TransactionStatus =
-  | 'CREATED'
-  | 'CANCELLED'
-  | 'ACCEPTED'
-  | 'EXPIRED'
-  | 'SENT'
-  | 'REVERTED'
-  | 'MINED'
-  | 'INCLUDED'
-
-interface TransactionHistoryItem<
-  T extends TransactionStatus = TransactionStatus
-> {
-  timestamp: Timestamp | undefined
-  status: T
-}
-
-interface TransactionHistoryArgs {
-  userTransaction?: UserTransactionRecord
-  sentTransaction?: SentTransactionRecord
-  forcedTradeOffer?: ForcedTradeOfferRecord
-}
-
-function buildRegularTransactionHistory({
-  sentTransaction,
-  userTransaction,
-}: Omit<
-  TransactionHistoryArgs,
-  'forcedTradeOfferTransaction'
->): TransactionHistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] {
-  const history: TransactionHistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] = []
-
-  if (sentTransaction?.mined?.reverted) {
-    history.push({
-      timestamp: sentTransaction.mined.timestamp,
-      status: 'REVERTED',
-    })
-  }
-
-  if (sentTransaction?.mined || userTransaction) {
-    history.push({
-      status: 'MINED',
-      timestamp:
-        sentTransaction?.mined?.timestamp ?? userTransaction?.timestamp,
-    })
-  }
-
-  history.push({
-    timestamp: sentTransaction?.sentTimestamp,
-    status: 'SENT',
-  })
-  return history
-}
-
-function buildTransactionHistory({
-  sentTransaction,
-  userTransaction,
-}: Omit<
-  TransactionHistoryArgs,
-  'forcedTradeOfferTransaction'
->): TransactionHistoryItem<'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'>[] {
-  const history: TransactionHistoryItem<
-    'SENT' | 'REVERTED' | 'MINED' | 'INCLUDED'
-  >[] = []
-
-  if (userTransaction?.included) {
-    history.push({
-      timestamp: userTransaction.included.timestamp,
-      status: 'INCLUDED',
-    })
-  }
-
-  history.push(
-    ...buildRegularTransactionHistory({ sentTransaction, userTransaction })
-  )
-
-  return history
-}
-
-function buildForcedTradeTransactionHistory({
-  forcedTradeOffer,
-  sentTransaction,
-  userTransaction,
-}: TransactionHistoryArgs): TransactionHistoryItem[] {
-  const history: TransactionHistoryItem[] = []
-  history.push(
-    ...buildRegularTransactionHistory({ sentTransaction, userTransaction })
-  )
-  if (!forcedTradeOffer && !sentTransaction && !userTransaction) {
-    return history
-  }
-
-  if (forcedTradeOffer?.cancelledAt) {
-    history.push({
-      timestamp: forcedTradeOffer.cancelledAt,
-      status: 'CANCELLED',
-    })
-  }
-  if (forcedTradeOffer?.accepted?.at || sentTransaction || userTransaction) {
-    if (
-      forcedTradeOffer?.accepted?.submissionExpirationTime &&
-      forcedTradeOffer.accepted.submissionExpirationTime < Timestamp.now()
-    ) {
-      history.push({
-        timestamp: forcedTradeOffer.accepted.submissionExpirationTime,
-        status: 'EXPIRED',
-      })
-    }
-    history.push({
-      timestamp: forcedTradeOffer?.accepted?.at,
-      status: 'ACCEPTED',
-    })
-  }
-  history.push({
-    timestamp: forcedTradeOffer?.createdAt,
-    status: 'CREATED',
-  })
-
-  return history
 }
