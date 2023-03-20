@@ -465,6 +465,7 @@ export class Application {
       stateUpdateRepository,
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
+      assetRepository,
       config.starkex.tradingMode,
       collateralAsset
     )

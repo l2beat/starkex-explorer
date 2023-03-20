@@ -9,6 +9,7 @@ import { AssetHash, AssetId } from '@explorer/types'
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
+import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -34,6 +35,7 @@ export class StateUpdateController {
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
+    private readonly assetRepository: AssetRepository,
     private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
@@ -73,6 +75,15 @@ export class StateUpdateController {
 
     if (!stateUpdate) {
       return { type: 'not found', content: 'State update not found' }
+    }
+
+    for (const balanceChange of balanceChanges) {
+      const assetHash = balanceChange.assetHashOrId
+      if(AssetHash.check(assetHash)) {
+        balanceChange.asset = await this.assetRepository.findDetailsByAssetHash(
+          assetHash
+        )
+      }
     }
 
     const balanceChangeEntries = toBalanceChangeEntries(balanceChanges)
@@ -185,7 +196,7 @@ function toBalanceChangeEntries(
 ) {
   return balanceChanges.map((r) => ({
     starkKey: r.starkKey,
-    asset: { hashOrId: r.assetHashOrId },
+    asset: { hashOrId: r.assetHashOrId, details: r.asset },
     balance: r.balance,
     change: r.balance - r.prevBalance,
     vaultOrPositionId: r.positionOrVaultId.toString(),

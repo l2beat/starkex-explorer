@@ -1,3 +1,4 @@
+import { AssetDetails } from '@explorer/shared'
 import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { PreprocessedAssetHistoryRow } from 'knex/types/tables'
@@ -20,6 +21,7 @@ export interface PreprocessedAssetHistoryRecord<T extends AssetHash | AssetId> {
   prevPrice?: bigint
   isCurrent: boolean
   prevHistoryId?: number
+  asset?: AssetDetails
 }
 
 export class PreprocessedAssetHistoryRepository<

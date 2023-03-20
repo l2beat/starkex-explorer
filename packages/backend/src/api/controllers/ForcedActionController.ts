@@ -9,6 +9,7 @@ import { UserService } from '../../core/UserService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { ControllerResult } from './ControllerResult'
+import { getAssetPriceUSDCents } from './utils/toPositionAssetEntries'
 
 export class ForcedActionController {
   constructor(
@@ -140,7 +141,7 @@ export class ForcedActionController {
       asset: {
         hashOrId: asset.assetHashOrId,
         balance: asset.balance,
-        priceUSDCents: 0n,
+        priceUSDCents: asset.price && AssetId.check(asset.assetHashOrId) ? getAssetPriceUSDCents(asset.price, asset.assetHashOrId): 0n,
       },
     })
     return { type: 'success', content }
