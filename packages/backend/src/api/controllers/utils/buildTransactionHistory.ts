@@ -44,7 +44,6 @@ export function buildRegularTransactionHistory({
       history.push({
         status: 'MINED',
         timestamp:
-          // is that correct?
           sentTransaction?.mined?.timestamp ?? userTransaction?.timestamp,
       })
     }
