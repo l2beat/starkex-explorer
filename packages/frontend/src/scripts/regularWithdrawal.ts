@@ -86,7 +86,7 @@ function getDataFromForm(form: HTMLFormElement) {
   const { assetDetails, account, starkKey, exchangeAddress } = form.dataset
 
   if (!assetDetails || !account || !starkKey || !exchangeAddress) {
-    throw new Error('Invalid data')
+    throw new Error('Invalid data for regular withdrawal')
   }
 
   return {
