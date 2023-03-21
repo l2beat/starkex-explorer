@@ -9,6 +9,7 @@ export function initCancelOfferForm() {
     `.${CANCEL_OFFER_FORM_ID}`
   )
   forms.forEach((form) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
       const { address, offerId } = getFormData(form)
