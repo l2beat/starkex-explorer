@@ -3,7 +3,7 @@ import {
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
 } from '@explorer/shared'
-import { AssetId, Hash256, Timestamp } from '@explorer/types'
+import { AssetHash, AssetId, Hash256, Timestamp } from '@explorer/types'
 
 import { BlockRange } from '../../model'
 import { Database } from '../../peripherals/database/shared/Database'
@@ -176,7 +176,7 @@ export class UserTransactionMigrator {
             data: {
               type: 'Withdraw',
               starkKey: data.starkKey,
-              assetType: data.assetTypeHash,
+              assetType: AssetHash(data.assetTypeHash.toString()),
             },
           })
         } else if (tx.data.startsWith('0xaf1437a3')) {
