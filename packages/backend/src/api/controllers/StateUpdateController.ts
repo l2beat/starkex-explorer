@@ -3,10 +3,11 @@ import {
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
-import { AssetDetails, TradingMode, UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
@@ -19,7 +20,6 @@ import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRep
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
-import { getAssetHashToAssetDetailsMap } from './getAssetDetailsMap'
 import { userTransactionToEntry } from './userTransactionToEntry'
 import { getAssetPriceUSDCents } from './utils/toPositionAssetEntries'
 
@@ -140,13 +140,9 @@ export class StateUpdateController {
       ),
     ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        assetHistory: balanceChanges,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      assetHistory: balanceChanges,
+    })
 
     const balanceChangeEntries = toBalanceChangeEntries(
       balanceChanges,
@@ -207,13 +203,15 @@ export class StateUpdateController {
 
 function toBalanceChangeEntries(
   balanceChanges: PreprocessedAssetHistoryRecord[],
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ) {
   return balanceChanges.map((r) => ({
     starkKey: r.starkKey,
     asset: {
       hashOrId: r.assetHashOrId,
-      assetDetails: assetDetailsMap?.[r.assetHashOrId.toString()],
+      assetDetails: AssetHash.check(r.assetHashOrId)
+        ? assetDetailsMap?.getByAssetHash(r.assetHashOrId)
+        : undefined,
     },
     balance: r.balance,
     change: r.balance - r.prevBalance,
