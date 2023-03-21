@@ -7,6 +7,7 @@ import { AssetDetails, TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
@@ -31,6 +32,7 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
 export class StateUpdateController {
   constructor(
     private readonly userService: UserService,
+    private readonly assetDetailsService: AssetDetailsService,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
@@ -86,14 +88,10 @@ export class StateUpdateController {
       change: 0n,
     }))
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        assetHistory: balanceChanges,
-        userTransactions: forcedUserTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      assetHistory: balanceChanges,
+      userTransactions: forcedUserTransactions,
+    })
 
     const transactions = forcedUserTransactions.map((t) =>
       userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
@@ -187,13 +185,9 @@ export class StateUpdateController {
       ]
     )
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userTransactions: includedTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      userTransactions: includedTransactions,
+    })
 
     const transactions = includedTransactions.map((t) =>
       userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
@@ -212,7 +206,7 @@ export class StateUpdateController {
 }
 
 function toBalanceChangeEntries(
-  balanceChanges: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[],
+  balanceChanges: PreprocessedAssetHistoryRecord[],
   assetDetailsMap?: Record<string, AssetDetails>
 ) {
   return balanceChanges.map((r) => ({

@@ -84,6 +84,20 @@ export class AssetRepository extends BaseRepository {
     return rows.map((r) => toAssetDetailsRecord(r))
   }
 
+  async getDetailsByAssetTypeHashes(
+    assetTypeHashes: Hash256[]
+  ): Promise<AssetDetails[]> {
+    const knex = await this.knex()
+    const rows = await knex('asset_details')
+      .select()
+      .whereIn(
+        'asset_type_hash',
+        assetTypeHashes.map((x) => x.toString())
+      )
+
+    return rows.map((r) => toAssetDetailsRecord(r))
+  }
+
   async findRegistrationByAssetTypeHash(
     assetTypeHash: Hash256
   ): Promise<AssetRegistrationRecord | undefined> {

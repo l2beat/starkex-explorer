@@ -1,8 +1,9 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
-import { assertUnreachable, AssetDetails } from '@explorer/shared'
+import { assertUnreachable } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { SentTransactionRecord } from '../../peripherals/database/transactions/SentTransactionRepository'
 
 export function extractSentTxEntryType(
@@ -40,7 +41,7 @@ export function extractSentTxAmount(
 export function extractSentTxAsset(
   data: SentTransactionRecord['data'],
   collateralAsset?: CollateralAsset,
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ): Asset | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
@@ -51,11 +52,21 @@ export function extractSentTxAsset(
       return {
         //assetId = assetType, ref: https://docs.starkware.co/starkex/perpetual/shared/starkex-specific-concepts.html#on_chain_starkex_contracts
         hashOrId: data.assetType,
-        details: assetDetailsMap?.[data.assetType.toString()],
+        details: assetDetailsMap?.getByAssetHash(data.assetType),
       }
-    case 'WithdrawWithTokenId':
-      //TODO: implement
-      throw new Error('NIY')
+    case 'WithdrawWithTokenId': {
+      const assetDetails = assetDetailsMap?.getByAssetTypeHashAndTokenId(
+        data.assetType,
+        data.tokenId
+      )
+      if (!assetDetails) {
+        return undefined
+      }
+      return {
+        hashOrId: assetDetails.assetHash,
+        details: assetDetails,
+      }
+    }
     default:
       assertUnreachable(data)
   }
@@ -64,7 +75,7 @@ export function extractSentTxAsset(
 export function sentTransactionToEntry(
   sentTransaction: SentTransactionRecord,
   collateralAsset?: CollateralAsset,
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry {
   if (sentTransaction.mined !== undefined && !sentTransaction.mined.reverted) {
     throw new Error(

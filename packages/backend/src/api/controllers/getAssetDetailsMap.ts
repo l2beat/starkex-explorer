@@ -1,5 +1,5 @@
 import { AssetDetails, TradingMode } from '@explorer/shared'
-import { AssetHash, AssetId } from '@explorer/types'
+import { AssetHash } from '@explorer/types'
 
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRecord } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
@@ -10,8 +10,8 @@ export async function getAssetHashToAssetDetailsMap(
   tradingMode: TradingMode,
   assetRepository: AssetRepository,
   records: {
-    userAssets?: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[]
-    assetHistory?: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[]
+    userAssets?: PreprocessedAssetHistoryRecord[]
+    assetHistory?: PreprocessedAssetHistoryRecord[]
     sentTransactions?: SentTransactionRecord[]
     userTransactions?: UserTransactionRecord[]
   }

@@ -7,10 +7,12 @@ import {
   UserAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
-import { AssetDetails, TradingMode, UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsMap } from '../../core/AssetDetailsMap'
+import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
@@ -28,7 +30,6 @@ import {
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
-import { getAssetHashToAssetDetailsMap } from './getAssetDetailsMap'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
@@ -36,6 +37,7 @@ import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
 export class UserController {
   constructor(
     private readonly userService: UserService,
+    private readonly assetDetailsService: AssetDetailsService,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
@@ -86,16 +88,12 @@ export class UserController {
       this.userTransactionRepository.getCountByStarkKey(starkKey),
     ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userAssets: userAssets,
-        assetHistory: history,
-        sentTransactions,
-        userTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      userAssets: userAssets,
+      assetHistory: history,
+      sentTransactions,
+      userTransactions,
+    })
 
     const assetEntries = userAssets.map((a) =>
       toUserAssetEntry(
@@ -158,13 +156,9 @@ export class UserController {
       ),
     ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userAssets: userAssets,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      userAssets: userAssets,
+    })
 
     const assets = userAssets.map((a) =>
       toUserAssetEntry(
@@ -201,13 +195,10 @@ export class UserController {
       this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
     ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        assetHistory: history,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      assetHistory: history,
+    })
+
     const balanceChanges = history.map((h) =>
       toUserBalanceChangeEntries(h, assetDetailsMap)
     )
@@ -242,14 +233,10 @@ export class UserController {
         this.userTransactionRepository.getCountByStarkKey(starkKey),
       ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        sentTransactions,
-        userTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      sentTransactions,
+      userTransactions,
+    })
 
     const transactions = buildUserTransactions(
       pagination.offset === 0 ? sentTransactions : [], // display sent transactions only on the first page
@@ -275,15 +262,17 @@ export class UserController {
 }
 
 function toUserAssetEntry(
-  asset: PreprocessedAssetHistoryRecord<AssetHash | AssetId>,
+  asset: PreprocessedAssetHistoryRecord,
   tradingMode: TradingMode,
   collateralAssetId?: AssetId,
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ): UserAssetEntry {
   return {
     asset: {
       hashOrId: asset.assetHashOrId,
-      details: assetDetailsMap?.[asset.assetHashOrId.toString()],
+      details: AssetHash.check(asset.assetHashOrId)
+        ? assetDetailsMap?.getByAssetHash(asset.assetHashOrId)
+        : undefined,
     },
     balance: asset.balance,
     value:
@@ -301,15 +290,17 @@ function toUserAssetEntry(
 }
 
 function toUserBalanceChangeEntries(
-  record: PreprocessedAssetHistoryRecord<AssetHash | AssetId>,
-  assetDetailsMap?: Record<string, AssetDetails>
+  record: PreprocessedAssetHistoryRecord,
+  assetDetailsMap?: AssetDetailsMap
 ): UserBalanceChangeEntry {
   return {
     timestamp: record.timestamp,
     stateUpdateId: record.stateUpdateId.toString(),
     asset: {
       hashOrId: record.assetHashOrId,
-      details: assetDetailsMap?.[record.assetHashOrId.toString()],
+      details: AssetHash.check(record.assetHashOrId)
+        ? assetDetailsMap?.getByAssetHash(record.assetHashOrId)
+        : undefined,
     },
     balance: record.balance,
     change: record.balance - record.prevBalance,
@@ -321,7 +312,7 @@ function buildUserTransactions(
   sentTransactions: SentTransactionRecord[],
   userTransactions: UserTransactionRecord[],
   collateralAsset?: CollateralAsset,
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry[] {
   const sentEntries = sentTransactions
     // Mined non-reverted transactions will be inside userTransactions

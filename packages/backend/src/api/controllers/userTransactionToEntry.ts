@@ -1,8 +1,9 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
-import { assertUnreachable, AssetDetails } from '@explorer/shared'
+import { assertUnreachable } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
 
 function extractUserTxAmount(
@@ -27,7 +28,7 @@ function extractUserTxAmount(
 function extractUserTxAsset(
   data: UserTransactionRecord['data'],
   collateralAsset?: CollateralAsset,
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ): Asset | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
@@ -39,13 +40,13 @@ function extractUserTxAsset(
     case 'Withdraw':
       return {
         hashOrId: collateralAsset ? collateralAsset.assetId : data.assetType,
-        details: assetDetailsMap?.[data.assetType.toString()],
+        details: assetDetailsMap?.getByAssetHash(data.assetType),
       }
     case 'WithdrawWithTokenId':
     case 'MintWithdraw':
       return {
         hashOrId: data.assetId,
-        details: assetDetailsMap?.[data.assetId.toString()],
+        details: assetDetailsMap?.getByAssetHash(data.assetId),
       }
     default:
       assertUnreachable(data)
@@ -73,7 +74,7 @@ function extractUserTxEntryType(
 export function userTransactionToEntry(
   userTransaction: UserTransactionRecord,
   collateralAsset?: CollateralAsset,
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry {
   return {
     timestamp: userTransaction.timestamp,
