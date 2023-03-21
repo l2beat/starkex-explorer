@@ -224,4 +224,73 @@ describe(WithdrawableAssetRepository.name, () => {
       expect(await repository.findById(id2)).toEqual(undefined)
     })
   })
+  describe(WithdrawableAssetRepository.prototype.getWithdrawableAssetsByStarkKey.name, () => {
+    it('returns all records for the given stark key', async () => {
+      const starkKey1 = StarkKey.fake()
+      const starkKey2 = StarkKey.fake()
+
+      const firstAsset = AssetHash.fake()
+      const secondAsset = AssetHash.fake()
+
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeWithdrawalAllowedData({ starkKey: starkKey1, assetType: firstAsset }),
+      })
+
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeWithdrawalAllowedData({ starkKey: starkKey2, assetType: secondAsset }),
+      })
+
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeWithdrawalAllowedData({ starkKey: starkKey1, assetType: firstAsset }),
+      })
+
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeWithdrawalAllowedData({ starkKey: starkKey2, assetType: secondAsset }),
+      })
+
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: fakeWithdrawalAllowedData({ starkKey: starkKey1, assetType: secondAsset }),
+      })
+
+      const records1 = await repository.getWithdrawableAssetsByStarkKey(starkKey1)
+      const records2 = await repository.getWithdrawableAssetsByStarkKey(starkKey2)
+
+      expect(records1.length).toEqual(2)
+      
+      expect(records2.length).toEqual(1)
+
+      expect(records1).toBeAnArrayWith(
+        {
+          assetHash: secondAsset,
+          balanceDelta: 123n.toString()
+        },
+        {
+          assetHash: firstAsset,
+          balanceDelta: 246n.toString()
+        }
+      )
+      
+      expect(records2).toBeAnArrayWith(
+        {
+          assetHash: secondAsset,
+          balanceDelta: 246n.toString()
+        },
+      )
+    })
+  })
 })
