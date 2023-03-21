@@ -1,23 +1,19 @@
 import { AssetDetails } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
-import { WITHDRAW_NOW_BUTTON_ID } from '../view/pages/user/components/UserWithdrawNowButton'
+import { REGULAR_WITHDRAWAL_FORM_ID } from '../view/pages/user/components/RegularWithdrawalForm'
 import { Api } from './peripherals/api'
 import { Wallet } from './peripherals/wallet'
 
-export function initRegularWithdrawal() {
-  const buttons = document.querySelectorAll<HTMLButtonElement>(
-    `#${WITHDRAW_NOW_BUTTON_ID}`
+export function initRegularWithdrawalForm() {
+  const form = document.querySelector<HTMLFormElement>(
+    `#${REGULAR_WITHDRAWAL_FORM_ID}`
   )
-  buttons.forEach((button) => {
-    setupWithdrawNowButton(button)
-  })
-}
 
-function setupWithdrawNowButton(button: HTMLButtonElement) {
-  button.addEventListener('click', () => {
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault()
     const { assetDetails, account, starkKey, exchangeAddress } =
-      getDataFromButton(button.dataset)
+      getDataFromForm(form)
 
     submit(account, starkKey, exchangeAddress, assetDetails).catch(
       console.error
@@ -86,8 +82,8 @@ async function submitWithdrawalWithTokenId(
   window.location.href = `/transactions/${hash.toString()}`
 }
 
-function getDataFromButton(buttonDataset: DOMStringMap) {
-  const { assetDetails, account, starkKey, exchangeAddress } = buttonDataset
+function getDataFromForm(form: HTMLFormElement) {
+  const { assetDetails, account, starkKey, exchangeAddress } = form.dataset
 
   if (!assetDetails || !account || !starkKey || !exchangeAddress) {
     throw new Error('Invalid data')

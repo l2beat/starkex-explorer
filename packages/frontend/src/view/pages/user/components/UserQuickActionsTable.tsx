@@ -11,7 +11,7 @@ import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button } from '../../../components/Button'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { OfferEntry } from '../../../components/tables/OffersTable'
-import { UserWithdrawNowButton } from './UserWithdrawNowButton'
+import { RegularWithdrawalForm } from './RegularWithdrawalForm'
 
 interface UserQuickActionsTableProps {
   readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
@@ -57,15 +57,14 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
               </strong>
             </p>
             {props.isMine && props.user && asset.asset.details && (
-              <UserWithdrawNowButton
-                className="ml-auto w-32 !px-0"
+              <RegularWithdrawalForm
                 assetDetails={asset.asset.details}
                 account={props.user.address}
                 starkKey={props.starkKey}
                 exchangeAddress={props.exchangeAddress}
               >
-                Withdraw now
-              </UserWithdrawNowButton>
+                <Button className="ml-auto w-32 !px-0">Withdraw now</Button>
+              </RegularWithdrawalForm>
             )}
           </div>
         )

@@ -6,10 +6,7 @@ import {
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { Button } from '../../../components/Button'
-
-interface UserWithdrawNowButtonProps {
-  className?: string
+interface Props {
   children: React.ReactNode
   account: EthereumAddress
   assetDetails: AssetDetails
@@ -19,12 +16,17 @@ interface UserWithdrawNowButtonProps {
 
 const SUPPORTED_ASSET_TYPES: AssetType[] = ['ETH', 'ERC20', 'ERC721', 'ERC1155']
 
-export const WITHDRAW_NOW_BUTTON_ID = 'withdraw-now-button'
+export const REGULAR_WITHDRAWAL_FORM_ID = 'regular-withdrawal-form'
 
-export function UserWithdrawNowButton(props: UserWithdrawNowButtonProps) {
+export function RegularWithdrawalForm(props: Props) {
   if (!SUPPORTED_ASSET_TYPES.includes(props.assetDetails.type)) {
     return null
   }
+
+  const action =
+    props.assetDetails.type === 'ETH' || props.assetDetails.type === 'ERC20'
+      ? '/withdrawal'
+      : '/withdrawal-with-token-id'
 
   const dataset = {
     'data-account': props.account,
@@ -34,12 +36,13 @@ export function UserWithdrawNowButton(props: UserWithdrawNowButtonProps) {
   }
 
   return (
-    <Button
-      className={props.className}
-      id={WITHDRAW_NOW_BUTTON_ID}
+    <form
+      id={REGULAR_WITHDRAWAL_FORM_ID}
+      action={action}
+      method="POST"
       {...dataset}
     >
       {props.children}
-    </Button>
+    </form>
   )
 }

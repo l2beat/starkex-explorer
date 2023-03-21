@@ -14,7 +14,7 @@ import { initFinalizeExitForm } from './old/transaction/finalizeExitForm'
 // eslint-disable-next-line no-restricted-imports
 import { initTransactionForm } from './old/transaction/transactionForm'
 import { initPagination } from './pagination'
-import { initRegularWithdrawal } from './regularWithdrawal'
+import { initRegularWithdrawalForm } from './regularWithdrawal'
 import { initStateUpdateStats } from './stateUpdateStats'
 import { initTVLDisplay } from './tvl'
 
@@ -34,7 +34,7 @@ if (USE_NEW_DESIGN) {
   initImageFallback()
   initPagination()
   initStateUpdateStats()
-  initRegularWithdrawal()
+  initRegularWithdrawalForm()
 } else {
   initTransactionForm()
 }
