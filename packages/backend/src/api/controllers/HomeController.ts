@@ -57,17 +57,64 @@ export class HomeController {
       this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
     ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userTransactions: forcedUserTransactions,
-      }
-    )
+    const transactions = this.transactionViewService.toEntries({
+      userTransactions: forcedUserTransactions,
+    })
 
-    const transactions = forcedUserTransactions.map((t) =>
-      userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
-    )
+    /*
+
+    // core
+    class TransactionViewService {
+      constructor(assetDetailsService){}
+    
+      toEntries({sentTransactions, userTransactions}) {
+        const assetDetailsMap = await this.assetDetailsService.getDetailsMap({
+          sentTransactions,
+          userTransactions,
+        })
+        return concat(
+          sentTransactions.map((t) => sentTransactionToEntry(t, assetDetailsMap)),
+          userTransactions.map((t) =>
+            userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
+          )
+        )
+      }
+    }
+
+    // core
+    class AssetDetailsService {
+      constructor(assetRepository){}
+
+      async getDetailsMap({sentTransactions, userTransactions}) {
+        ...
+        return new AssetDetailsMap(assetDetails)
+      }
+    }
+
+    class AssetDetailsMap {
+      getByAssetHash(assetHash) {
+      }
+
+      getByAssetTypeHash(assetTypeHash) {
+      }
+
+      getByAssetTypeHashAndTokenId(assetTypeHash, tokenId) {
+      }
+    }
+
+    */
+
+    // const assetDetailsMap = await getAssetHashToAssetDetailsMap(
+    //   this.tradingMode,
+    //   this.assetRepository,
+    //   {
+    //     userTransactions: forcedUserTransactions,
+    //   }
+    // )
+
+    // const transactions = forcedUserTransactions.map((t) =>
+    //   userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
+    // )
 
     const content = renderHomePage({
       user,
