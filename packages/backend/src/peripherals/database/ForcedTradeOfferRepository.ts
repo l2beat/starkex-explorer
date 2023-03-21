@@ -133,7 +133,9 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.getByStarkKey = this.wrapGet(this.getByStarkKey)
     this.getInitialAssetIds = this.wrapGet(this.getInitialAssetIds)
     this.getPaginated = this.wrapGet(this.getPaginated)
+    this.getAvailablePaginated = this.wrapGet(this.getAvailablePaginated)
     this.countAll = this.wrapAny(this.countAll)
+    this.countAvailable = this.wrapAny(this.countAvailable)
     this.countInitial = this.wrapAny(this.countInitial)
     this.countByStarkKey = this.wrapAny(this.countByStarkKey)
     this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
@@ -239,10 +241,15 @@ export class ForcedTradeOfferRepository extends BaseRepository {
 
   async getPaginated(options: PaginationOptions): Promise<Record[]> {
     const knex = await this.knex()
-    const rows = await knex('forced_trade_offers')
-      .limit(options.limit)
-      .offset(options.offset)
-      .orderBy('created_at', 'desc')
+    const rows = await this.getPaginatedQuery(knex, options)
+
+    return rows.map(toRecord)
+  }
+
+  async getAvailablePaginated(options: PaginationOptions): Promise<Record[]> {
+    const knex = await this.knex()
+    const query = this.getPaginatedQuery(knex, options)
+    const rows = await query.whereNull('accepted_at')
 
     return rows.map(toRecord)
   }
@@ -264,6 +271,15 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   async countAll() {
     const knex = await this.knex()
     const [result] = await knex('forced_trade_offers').count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async countAvailable() {
+    const knex = await this.knex()
+    const [result] = await knex('forced_trade_offers')
+      .whereNull('accepted_at')
+      .count()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
   }
@@ -305,5 +321,12 @@ export class ForcedTradeOfferRepository extends BaseRepository {
         position_id_b: positionId,
       })
     })
+  }
+
+  private getPaginatedQuery(knex: Knex, options: PaginationOptions) {
+    return knex('forced_trade_offers')
+      .limit(options.limit)
+      .offset(options.offset)
+      .orderBy('created_at', 'desc')
   }
 }

@@ -45,8 +45,8 @@ export class HomeController {
       totalStateUpdates,
       forcedUserTransactions,
       forcedUserTransactionsCount,
-      forcedTradeOffers,
-      forcedTradeOffersCount,
+      availableOffers,
+      availableOffersCount,
     ] = await Promise.all([
       this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
@@ -55,8 +55,8 @@ export class HomeController {
         types: FORCED_TRANSACTION_TYPES,
       }),
       this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
-      this.forcedTradeOfferRepository.getPaginated(paginationOpts),
-      this.forcedTradeOfferRepository.countAll(),
+      this.forcedTradeOfferRepository.getAvailablePaginated(paginationOpts),
+      this.forcedTradeOfferRepository.countAvailable(),
     ])
 
     const assetDetailsMap = await getAssetHashToAssetDetailsMap(
@@ -84,8 +84,8 @@ export class HomeController {
       totalStateUpdates,
       transactions,
       totalForcedTransactions: forcedUserTransactionsCount,
-      offers: forcedTradeOffers.map(forcedTradeOfferToEntry),
-      totalOffers: forcedTradeOffersCount,
+      offers: availableOffers.map(forcedTradeOfferToEntry),
+      totalOffers: availableOffersCount,
       tradingMode: this.tradingMode,
     })
     return { type: 'success', content }

@@ -258,6 +258,7 @@ describe(ForcedTradeOfferRepository.name, () => {
       expect(ids).toEqual([AssetId('ETH-9')])
     })
   })
+
   describe(ForcedTradeOfferRepository.prototype.getPaginated.name, () => {
     it('respects the limit parameter', async () => {
       const ids = []
@@ -269,7 +270,10 @@ describe(ForcedTradeOfferRepository.name, () => {
           })
         )
       }
-      const records = await repository.getPaginated({ limit: 5, offset: 0 })
+      const records = await repository.getPaginated({
+        limit: 5,
+        offset: 0,
+      })
 
       expect(records.map((x) => x.id)).toEqual(ids.slice(0, 5))
     })
@@ -284,10 +288,82 @@ describe(ForcedTradeOfferRepository.name, () => {
           })
         )
       }
-      const records = await repository.getPaginated({ limit: 5, offset: 2 })
+      const records = await repository.getPaginated({
+        limit: 5,
+        offset: 2,
+      })
       expect(records.map((x) => x.id)).toEqual(ids.slice(2, 5 + 2))
     })
   })
+
+  describe(
+    ForcedTradeOfferRepository.prototype.getAvailablePaginated.name,
+    () => {
+      it('returns only offers that have not been accepted yet', async () => {
+        const ids = []
+        //Add 5 offers that has not been accepted
+        for (let i = 0; i < 5; i++) {
+          ids.push(
+            await repository.add({
+              ...fakeOffer({ accepted: undefined }),
+              createdAt: Timestamp(123000 - i),
+            })
+          )
+        }
+        //Add 5 offers that has been accepted
+        for (let i = 0; i < 5; i++) {
+          ids.push(
+            await repository.add({
+              ...fakeOffer(),
+              createdAt: Timestamp(123000 - i),
+            })
+          )
+        }
+
+        const records = await repository.getAvailablePaginated({
+          limit: 10,
+          offset: 0,
+        })
+        expect(records.length).toEqual(5)
+        expect(records.map((x) => x.id)).toEqual(ids.slice(0, 5))
+      })
+
+      it('respects the limit parameter', async () => {
+        const ids = []
+        for (let i = 0; i < 10; i++) {
+          ids.push(
+            await repository.add({
+              ...fakeOffer({ accepted: undefined }),
+              createdAt: Timestamp(123000 - i),
+            })
+          )
+        }
+        const records = await repository.getAvailablePaginated({
+          limit: 5,
+          offset: 0,
+        })
+
+        expect(records.map((x) => x.id)).toEqual(ids.slice(0, 5))
+      })
+
+      it('respects the offset parameter', async () => {
+        const ids = []
+        for (let i = 0; i < 10; i++) {
+          ids.push(
+            await repository.add({
+              ...fakeOffer({ accepted: undefined }),
+              createdAt: Timestamp(123000 - i),
+            })
+          )
+        }
+        const records = await repository.getAvailablePaginated({
+          limit: 5,
+          offset: 2,
+        })
+        expect(records.map((x) => x.id)).toEqual(ids.slice(2, 5 + 2))
+      })
+    }
+  )
 
   describe(ForcedTradeOfferRepository.prototype.countAll.name, () => {
     it('returns the number of records', async () => {
@@ -299,6 +375,21 @@ describe(ForcedTradeOfferRepository.name, () => {
       }
 
       expect(await repository.countAll()).toEqual(expectedCount)
+    })
+  })
+
+  describe(ForcedTradeOfferRepository.prototype.countAvailable.name, () => {
+    it('returns the number of available records', async () => {
+      expect(await repository.countAvailable()).toEqual(0)
+
+      const expectedCount = 3
+      for (let i = 0; i < expectedCount * 2; i++) {
+        await repository.add(
+          fakeOffer(i % 2 === 0 ? { accepted: undefined } : undefined)
+        )
+      }
+
+      expect(await repository.countAvailable()).toEqual(expectedCount)
     })
   })
 
