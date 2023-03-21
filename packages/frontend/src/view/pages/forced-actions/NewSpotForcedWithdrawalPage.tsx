@@ -39,20 +39,25 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   const formattedBalance = formatAmount(props.asset, props.asset.balance)
   return (
     <Page
-      path="/forced/new/spot/:vaultId"
-      description="Page that allows user withdrawal of spot asset"
+      path="/forced/new/:vaultId"
+      description="Perform forced withdrawal"
       user={props.user}
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
-          <div className="mt-6 flex flex-col">
+          <div className="mt-6 flex max-w-md flex-col">
             <span className="text-xl font-semibold">
               Begin withdrawal process
+            </span>
+            <span className="mt-3 text-sm font-semibold text-zinc-500">
+              The process you are about to begin should be used only in
+              emergency. Please use a regular operation on the exchange to
+              perform it.
             </span>
             <span className="mt-6 text-sm font-semibold text-zinc-500">
               The withdrawal process consists of three steps:
             </span>
-            <OrderedList items={instructions} className="mt-3 max-w-md" />
+            <OrderedList items={instructions} className="mt-3" />
           </div>
           <Card className="h-min w-[480px]">
             <form

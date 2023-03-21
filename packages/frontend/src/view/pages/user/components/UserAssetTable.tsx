@@ -27,6 +27,13 @@ export interface UserAssetEntry {
 }
 
 export function UserAssetsTable(props: UserAssetsTableProps) {
+  const forcedActionLink = (entry: UserAssetEntry) =>
+    props.tradingMode === 'perpetual'
+      ? `/forced/new/${
+          entry.vaultOrPositionId
+        }/${entry.asset.hashOrId.toString()}`
+      : `/forced/new/${entry.vaultOrPositionId}`
+
   return (
     <Table
       fullBackground
@@ -34,7 +41,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
         { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
-        { header: props.isMine ? 'Action' : '' },
+        ...(props.isMine ? [{ header: 'Action' }] : []),
       ]}
       rows={props.assets.map((entry) => {
         return {
@@ -56,15 +63,10 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
-            props.isMine && props.tradingMode === 'spot' ? (
-              <LinkButton
-                className="w-full"
-                href={`/forced/new/spot/${entry.vaultOrPositionId}`}
-              >
+            props.isMine && (
+              <LinkButton className="w-full" href={forcedActionLink(entry)}>
                 {entry.action}
               </LinkButton>
-            ) : (
-              ''
             ),
           ],
         }

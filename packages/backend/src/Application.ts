@@ -2,15 +2,16 @@ import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { ApiServer } from './api/ApiServer'
+import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { OldHomeController } from './api/controllers/OldHomeController'
+import { OldSearchController } from './api/controllers/OldSearchController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
-import { SpotForcedWithdrawalController } from './api/controllers/SpotForcedWithdrawalController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
@@ -97,6 +98,11 @@ export class Application {
 
     const database = new Database(config.databaseConnection, logger)
 
+    const collateralAsset =
+      config.starkex.tradingMode === 'perpetual'
+        ? config.starkex.collateralAsset
+        : undefined
+
     const kvStore = new KeyValueStore(database, logger)
     const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
     const softwareMigrationRepository = new SoftwareMigrationRepository(
@@ -117,6 +123,7 @@ export class Application {
     const blockRepository = new BlockRepository(database, logger)
     const stateUpdateRepository = new StateUpdateRepository(database, logger)
     const positionRepository = new PositionRepository(database, logger)
+    const vaultRepository = new VaultRepository(database, logger)
     const userRegistrationEventRepository = new UserRegistrationEventRepository(
       database,
       logger
@@ -169,9 +176,7 @@ export class Application {
       userTransactionRepository,
       withdrawableAssetRepository,
       config.starkex.contracts.perpetual,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
 
     const tokenRegistrationCollector = new AssetRegistrationCollector(
@@ -390,8 +395,6 @@ export class Application {
       preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetHash, logger)
 
-      const vaultRepository = new VaultRepository(database, logger)
-
       const spotHistoryPreprocessor = new SpotHistoryPreprocessor(
         preprocessedAssetHistoryRepository,
         vaultRepository,
@@ -442,12 +445,11 @@ export class Application {
     )
     const homeController = new HomeController(
       userService,
+      assetRepository,
       userTransactionRepository,
       preprocessedStateDetailsRepository,
       config.starkex.tradingMode,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const userController = new UserController(
       userService,
@@ -458,28 +460,23 @@ export class Application {
       assetRepository,
       config.starkex.tradingMode,
       config.starkex.contracts.perpetual,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const stateUpdateController = new StateUpdateController(
       userService,
       stateUpdateRepository,
+      assetRepository,
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
       config.starkex.tradingMode,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const transactionController = new TransactionController(
       userService,
       sentTransactionRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
-      config.starkex.tradingMode === 'perpetual'
-        ? config.starkex.collateralAsset
-        : undefined
+      collateralAsset
     )
     const merkleProofController = new MerkleProofController(
       userService,
@@ -508,10 +505,18 @@ export class Application {
       stateUpdateRepository,
       userTransactionRepository
     )
-    const searchController = new SearchController(
+    const oldSearchController = new OldSearchController(
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository
+    )
+    const searchController = new SearchController(
+      stateUpdateRepository,
+      config.starkex.tradingMode === 'perpetual'
+        ? positionRepository
+        : vaultRepository,
+      userRegistrationEventRepository,
+      preprocessedAssetHistoryRepository
     )
     const forcedTradeOfferController = new ForcedTradeOfferController(
       accountService,
@@ -526,10 +531,11 @@ export class Application {
       forcedTradeOfferRepository,
       config.starkex.contracts.perpetual
     )
-    const spotForcedWithdrawalController = new SpotForcedWithdrawalController(
+    const forcedActionsController = new ForcedActionController(
       userService,
       preprocessedAssetHistoryRepository,
-      assetRepository
+      assetRepository,
+      config.starkex.contracts.perpetual
     )
 
     const apiServer = new ApiServer(config.port, logger, {
@@ -542,15 +548,18 @@ export class Application {
               forcedTradeOfferController,
               forcedTransactionController,
               oldStateUpdateController,
-              searchController
+              oldSearchController
             )
           : createFrontendRouter(
               homeController,
               userController,
               stateUpdateController,
               transactionController,
-              spotForcedWithdrawalController,
-              merkleProofController
+              forcedActionsController,
+              merkleProofController,
+              collateralAsset,
+              config.starkex.tradingMode,
+              searchController
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,

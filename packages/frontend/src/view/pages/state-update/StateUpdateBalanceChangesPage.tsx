@@ -33,12 +33,15 @@ function StateUpdateBalanceChangesPage(
 ) {
   const common = getBalanceChangeTableProps(props.id)
   return (
-    <Page path={common.link} description="TODO: description" user={props.user}>
+    <Page path={common.path} description={common.description} user={props.user}>
       <ContentWrapper>
         <TableWithPagination
           {...common}
           title={
-            <StateUpdatePageTitle prefix="Balance changes of" id={props.id} />
+            <StateUpdatePageTitle
+              prefix="Balance changes of state update"
+              id={props.id}
+            />
           }
           visible={props.balanceChanges.length}
           limit={props.limit}

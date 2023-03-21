@@ -31,7 +31,7 @@ export function TransactionsTable(props: TransactionsTableProps) {
     columns.push({ header: 'Time' })
   }
   columns.push(
-    { header: 'Hash' },
+    { header: 'Tx Hash' },
     { header: 'Asset' },
     { header: 'Amount', numeric: true },
     { header: 'Status' },
