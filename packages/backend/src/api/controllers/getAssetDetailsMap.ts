@@ -39,9 +39,8 @@ export async function getAssetHashToAssetDetailsMap(
   ].filter((i) => i !== undefined) as AssetHash[]
 
   const uniqueHashes = [...new Set(assetHashes)]
-  const assetDetails = await assetRepository.getDetailsByAssetHashes(
-    uniqueHashes
-  )
+  const assetDetails =
+    await assetRepository.getDetailsByAssetHashesOrTypeHashes(uniqueHashes)
   const detailsByHashMap = assetDetails.reduce<Record<string, AssetDetails>>(
     (acc, assetDetail) => {
       acc[assetDetail.assetHash.toString()] = assetDetail
