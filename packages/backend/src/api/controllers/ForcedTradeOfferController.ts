@@ -1,5 +1,5 @@
 import { renderOfferAndForcedTradePage } from '@explorer/frontend'
-import { Timestamp } from '@explorer/types'
+import { EthereumAddress, Timestamp } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import {
@@ -15,16 +15,25 @@ import {
   validateCancel,
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
+import {
+  getAcceptForm,
+  getCancelForm,
+  getFinalizeForm,
+} from './utils/offerForms'
 
 export class ForcedTradeOfferController {
   constructor(
     private offerRepository: ForcedTradeOfferRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private collateralAsset: CollateralAsset | undefined
+    private collateralAsset: CollateralAsset | undefined,
+    private perpetualAddress: EthereumAddress
   ) {}
 
-  async getOfferPage(id: number): Promise<ControllerResult> {
+  async getOfferPage(
+    id: number,
+    userAddress: EthereumAddress | undefined
+  ): Promise<ControllerResult> {
     if (!this.collateralAsset) {
       throw new Error(
         'Collateral asset not passed when displaying ForcedTradeOffer'
@@ -70,6 +79,21 @@ export class ForcedTradeOfferController {
           }
         : undefined
 
+    const [userPositionId, userEvent] = await Promise.all([
+      userAddress &&
+        this.positionRepository.findIdByEthereumAddress(userAddress),
+      userAddress &&
+        this.userRegistrationEventRepository.findByEthereumAddress(userAddress),
+    ])
+    const user =
+      userPositionId && userEvent
+        ? {
+            address: userEvent.ethAddress,
+            starkKey: userEvent.starkKey,
+            positionId: userPositionId,
+          }
+        : undefined
+
     const content = renderOfferAndForcedTradePage({
       user: {
         starkKey: userA.starkKey,
@@ -89,6 +113,9 @@ export class ForcedTradeOfferController {
         ? Timestamp.fromHours(offer.accepted.submissionExpirationTime)
         : Timestamp(0),
       history: [{ timestamp: offer.createdAt, status: 'CREATED' }],
+      acceptForm: user && getAcceptForm(offer, user),
+      cancelForm: user && getCancelForm(offer, user),
+      finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
     })
 
     return { type: 'success', content }

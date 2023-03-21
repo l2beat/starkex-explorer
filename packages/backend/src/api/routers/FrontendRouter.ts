@@ -273,8 +273,10 @@ export function createFrontendRouter(
         }),
       }),
       async (ctx) => {
+        const user = getGivenUser(ctx)
         const result = await forcedTradeOfferController.getOfferPage(
-          Number(ctx.params.offerId)
+          Number(ctx.params.offerId),
+          user.address
         )
         applyControllerResult(ctx, result)
       }

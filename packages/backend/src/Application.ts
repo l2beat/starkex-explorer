@@ -541,7 +541,8 @@ export class Application {
       forcedTradeOfferRepository,
       positionRepository,
       userRegistrationEventRepository,
-      collateralAsset
+      collateralAsset,
+      config.starkex.contracts.perpetual
     )
 
     const apiServer = new ApiServer(config.port, logger, {
