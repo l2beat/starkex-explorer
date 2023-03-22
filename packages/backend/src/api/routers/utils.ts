@@ -1,8 +1,9 @@
-import { assertUnreachable, UserDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import { Context } from 'koa'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
+import { assertUnreachable } from '../../utils/assertUnreachable'
 import { ControllerResult } from '../controllers/ControllerResult'
 
 export function applyControllerResult(ctx: Context, result: ControllerResult) {
