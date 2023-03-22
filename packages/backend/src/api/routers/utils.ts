@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { assertUnreachable, UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import { Context } from 'koa'
 
@@ -6,21 +6,26 @@ import { PaginationOptions } from '../../model/PaginationOptions'
 import { ControllerResult } from '../controllers/ControllerResult'
 
 export function applyControllerResult(ctx: Context, result: ControllerResult) {
-  if (result.type === 'redirect') {
-    ctx.redirect(result.url)
-  } else {
-    if (result.type === 'success') {
+  switch (result.type) {
+    case 'redirect':
+      ctx.redirect(result.url)
+      return
+    case 'success':
       ctx.status = 200
-    } else if (result.type === 'created') {
+      break
+    case 'created':
       ctx.status = 201
-    } else if (result.type === 'bad request') {
+      break
+    case 'bad request':
       ctx.status = 400
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    } else if (result.type === 'not found') {
+      break
+    case 'not found':
       ctx.status = 404
-    }
-    ctx.body = result.content
+      break
+    default:
+      assertUnreachable(result)
   }
+  ctx.body = result.content
 }
 
 export function getGivenUser(ctx: Context): Partial<UserDetails> {
