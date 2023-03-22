@@ -27,6 +27,7 @@ import {
   UserTransactionRepository,
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { ControllerResult } from './ControllerResult'
 import { getAssetHashToAssetDetailsMap } from './getAssetDetailsMap'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
@@ -43,6 +44,7 @@ export class UserController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
@@ -61,6 +63,7 @@ export class UserController {
       sentTransactions,
       userTransactions,
       userTransactionsCount,
+      withdrawableAssets
     ] = await Promise.all([
       this.userService.getUserDetails(givenUser),
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
@@ -83,6 +86,7 @@ export class UserController {
         limit: 10,
       }),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
+      this.withdrawableAssetRepository.getWithdrawableAssetsByStarkKey(starkKey),
     ])
 
     const assetDetailsMap = await getAssetHashToAssetDetailsMap(
@@ -123,7 +127,7 @@ export class UserController {
       tradingMode: this.tradingMode,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
-      withdrawableAssets: [],
+      withdrawableAssets: withdrawableAssets.map(asset => ({asset: {hashOrId: asset.assetHash}, amount: asset.balanceDelta})),
       offersToAccept: [],
       assets: assetEntries,
       totalAssets,
