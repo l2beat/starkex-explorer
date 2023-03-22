@@ -63,7 +63,7 @@ export class UserController {
       sentTransactions,
       userTransactions,
       userTransactionsCount,
-      withdrawableAssets
+      withdrawableAssets,
     ] = await Promise.all([
       this.userService.getUserDetails(givenUser),
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
@@ -86,7 +86,9 @@ export class UserController {
         limit: 10,
       }),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
-      this.withdrawableAssetRepository.getWithdrawableAssetsByStarkKey(starkKey),
+      this.withdrawableAssetRepository.getWithdrawableAssetsByStarkKey(
+        starkKey
+      ),
     ])
 
     const assetDetailsMap = await getAssetHashToAssetDetailsMap(
@@ -127,7 +129,10 @@ export class UserController {
       tradingMode: this.tradingMode,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
-      withdrawableAssets: withdrawableAssets.map(asset => ({asset: {hashOrId: asset.assetHash}, amount: asset.balanceDelta})),
+      withdrawableAssets: withdrawableAssets.map((asset) => ({
+        asset: { hashOrId: asset.assetHash },
+        amount: asset.balanceDelta,
+      })),
       offersToAccept: [],
       assets: assetEntries,
       totalAssets,
