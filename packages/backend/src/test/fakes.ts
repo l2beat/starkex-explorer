@@ -162,6 +162,7 @@ export function fakeOffer(
   return {
     id: fakeInt(),
     createdAt: fakeTimestamp(),
+    cancelledAt: undefined,
     starkKeyA: StarkKey.fake(),
     positionIdA: fakeBigInt(),
     syntheticAssetId: AssetId('ETH-9'),

@@ -410,4 +410,31 @@ describe(ForcedTradeOfferRepository.name, () => {
       expect(await repository.countAll()).toEqual(expectedCount)
     })
   })
+
+  describe(
+    ForcedTradeOfferRepository.prototype.getUserOffersByStarkKey.name,
+    () => {
+      it('returns the offers in which the user is involved', async () => {
+        const starkKey = StarkKey.fake()
+        const makerOffer = fakeOffer({
+          starkKeyA: starkKey,
+        })
+        const takerOffer = fakeOffer({
+          accepted: {
+            ...fakeAccepted({ starkKeyB: starkKey }),
+          },
+        })
+        const notInvolvedOffer = fakeOffer()
+
+        await repository.add(makerOffer)
+        await repository.add(takerOffer)
+        await repository.add(notInvolvedOffer)
+
+        expect(await repository.getUserOffersByStarkKey(starkKey)).toEqual([
+          makerOffer,
+          takerOffer,
+        ])
+      })
+    }
+  )
 })
