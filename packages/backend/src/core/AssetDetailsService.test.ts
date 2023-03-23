@@ -13,9 +13,9 @@ import { SentTransactionData } from '../peripherals/database/transactions/SentTr
 import { UserTransactionData } from '../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRecord } from '../peripherals/database/transactions/UserTransactionRepository'
 import {
-  fakeErc1155Details,
   fakeErc20Details,
   fakeErc721Details,
+  fakeErc1155Details,
 } from '../test/fakes'
 import { mock } from '../test/mock'
 import { AssetDetailsMap } from './AssetDetailsMap'

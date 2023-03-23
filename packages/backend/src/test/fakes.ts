@@ -5,9 +5,9 @@ import {
   OnChainData,
 } from '@explorer/encoding'
 import {
-  ERC1155Details,
   ERC20Details,
   ERC721Details,
+  ERC1155Details,
   ETHDetails,
 } from '@explorer/shared'
 import {

@@ -1,9 +1,9 @@
 import { expect } from 'earljs'
 
 import {
-  fakeErc1155Details,
   fakeErc20Details,
   fakeErc721Details,
+  fakeErc1155Details,
   fakeEthDetails,
 } from '../test/fakes'
 import { AssetDetailsMap } from './AssetDetailsMap'

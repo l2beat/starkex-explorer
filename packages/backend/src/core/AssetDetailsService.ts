@@ -24,13 +24,13 @@ export class AssetDetailsService {
     }
 
     const assetHashes: (AssetHash | Hash256)[] = [
-      ...(records.sentTransactions?.map(
-        this.getSentTransactionAssetIdentifiers
+      ...(records.sentTransactions?.map((tx) =>
+        this.getSentTransactionAssetIdentifiers(tx)
       ) ?? []),
       ...(records.userAssets?.map((a) => a.assetHashOrId) ?? []),
       ...(records.assetHistory?.map((a) => a.assetHashOrId) ?? []),
-      ...(records.userTransactions?.map(
-        this.getUserTransactionAssetIdentifiers
+      ...(records.userTransactions?.map((tx) =>
+        this.getUserTransactionAssetIdentifiers(tx)
       ) ?? []),
     ].filter(
       (i): i is AssetHash | Hash256 => AssetHash.check(i) || Hash256.check(i)
