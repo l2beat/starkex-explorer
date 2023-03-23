@@ -1,18 +1,17 @@
 import { EthereumAddress } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 
 import { ForcedTradeOfferRepository } from '../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../peripherals/database/PositionRepository'
 import { SentTransactionRepository } from '../peripherals/database/transactions/SentTransactionRepository'
-import { mock } from '../test/mock'
 import { AccountService } from './AccountService'
 
 describe(AccountService.name, () => {
   it('returns undefined for undefined', async () => {
     const accountService = new AccountService(
-      mock<PositionRepository>(),
-      mock<ForcedTradeOfferRepository>(),
-      mock<SentTransactionRepository>()
+      mockObject<PositionRepository>(),
+      mockObject<ForcedTradeOfferRepository>(),
+      mockObject<SentTransactionRepository>()
     )
     const result = await accountService.getAccount(undefined)
     expect(result).toEqual(undefined)
@@ -20,11 +19,11 @@ describe(AccountService.name, () => {
 
   it('returns account without position id', async () => {
     const accountService = new AccountService(
-      mock<PositionRepository>({
+      mockObject<PositionRepository>({
         findIdByEthereumAddress: async () => undefined,
       }),
-      mock<ForcedTradeOfferRepository>(),
-      mock<SentTransactionRepository>()
+      mockObject<ForcedTradeOfferRepository>(),
+      mockObject<SentTransactionRepository>()
     )
     const address = EthereumAddress.fake()
     const result = await accountService.getAccount(address)
@@ -35,13 +34,13 @@ describe(AccountService.name, () => {
 
   it('returns account with position id', async () => {
     const accountService = new AccountService(
-      mock<PositionRepository>({
+      mockObject<PositionRepository>({
         findIdByEthereumAddress: async () => 123n,
       }),
-      mock<ForcedTradeOfferRepository>({
+      mockObject<ForcedTradeOfferRepository>({
         countActiveByPositionId: async () => 0,
       }),
-      mock<SentTransactionRepository>({
+      mockObject<SentTransactionRepository>({
         countNotMinedByPositionId: async () => 0,
       })
     )
@@ -56,13 +55,13 @@ describe(AccountService.name, () => {
 
   it('returns has updates when active offers exist', async () => {
     const accountService = new AccountService(
-      mock<PositionRepository>({
+      mockObject<PositionRepository>({
         findIdByEthereumAddress: async () => 123n,
       }),
-      mock<ForcedTradeOfferRepository>({
+      mockObject<ForcedTradeOfferRepository>({
         countActiveByPositionId: async () => 1,
       }),
-      mock<SentTransactionRepository>({
+      mockObject<SentTransactionRepository>({
         countNotMinedByPositionId: async () => 0,
       })
     )
@@ -77,13 +76,13 @@ describe(AccountService.name, () => {
 
   it('returns has updates when pending transactions exist', async () => {
     const accountService = new AccountService(
-      mock<PositionRepository>({
+      mockObject<PositionRepository>({
         findIdByEthereumAddress: async () => 123n,
       }),
-      mock<ForcedTradeOfferRepository>({
+      mockObject<ForcedTradeOfferRepository>({
         countActiveByPositionId: async () => 0,
       }),
-      mock<SentTransactionRepository>({
+      mockObject<SentTransactionRepository>({
         countNotMinedByPositionId: async () => 1,
       })
     )

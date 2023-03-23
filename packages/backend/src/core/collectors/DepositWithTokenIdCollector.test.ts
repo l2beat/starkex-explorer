@@ -1,11 +1,10 @@
 import { EthereumAddress } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 
 import { BlockRange } from '../../model'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
-import { mock } from '../../test/mock'
 import { DepositWithTokenIdCollector } from './DepositWithTokenIdCollector'
 import { LogDepositWithTokenId } from './events'
 
@@ -14,16 +13,16 @@ import { LogDepositWithTokenId } from './events'
 describe(DepositWithTokenIdCollector.name, () => {
   describe(DepositWithTokenIdCollector.prototype.collect.name, () => {
     it('collects asset data properly', async () => {
-      const assetRepository = mock<AssetRepository>({
+      const assetRepository = mockObject<AssetRepository>({
         addManyDetails: async () => [],
       })
 
-      const ethereumClient = mock<EthereumClient>({
+      const ethereumClient = mockObject<EthereumClient>({
         async getLogsInRange() {
           return []
         },
       })
-      const tokenInspector = mock<TokenInspector>()
+      const tokenInspector = mockObject<TokenInspector>()
       const contractAddress = EthereumAddress.fake()
 
       const collector = new DepositWithTokenIdCollector(
@@ -36,13 +35,13 @@ describe(DepositWithTokenIdCollector.name, () => {
       const blockRange = new BlockRange([])
       const actualAssetsWithTokenId = await collector.collect(blockRange)
 
-      expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
+      expect(ethereumClient.getLogsInRange).toHaveBeenOnlyCalledWith(
         blockRange,
         {
           address: contractAddress.toString(),
           topics: [LogDepositWithTokenId.topic],
-        },
-      ])
+        }
+      )
 
       expect(actualAssetsWithTokenId).toEqual(expectedAssetsWithTokenId)
     })

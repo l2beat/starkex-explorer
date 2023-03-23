@@ -1,10 +1,9 @@
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 import { Knex } from 'knex'
 
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
-import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 
@@ -16,8 +15,10 @@ describe(HistoryPreprocessor.name, () => {
   describe(HistoryPreprocessor.prototype.closePositionOrVault.name, () => {
     it('should add new history records with 0 balance for all nonempty positions', async () => {
       const starkKey = StarkKey.fake()
-      const trx = mock<Knex.Transaction>()
-      const historyRepo = mock<PreprocessedAssetHistoryRepository<AssetId>>({
+      const trx = mockObject<Knex.Transaction>()
+      const historyRepo = mockObject<
+        PreprocessedAssetHistoryRepository<AssetId>
+      >({
         getCurrentByPositionOrVaultId: async () => [
           {
             historyId: 10,
@@ -62,7 +63,7 @@ describe(HistoryPreprocessor.name, () => {
       await preprocessor.closePositionOrVault(
         trx,
         5n,
-        mock<StateUpdateRecord>({
+        mockObject<StateUpdateRecord>({
           id: 1_005,
           blockNumber: 1_005,
           timestamp: Timestamp(223_456_789n),
@@ -72,41 +73,40 @@ describe(HistoryPreprocessor.name, () => {
           'WBTC-9': 9_999_000n,
         }
       )
-      expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenCalledWith([
-        trx,
-        [
-          {
-            assetHashOrId: AssetId('ETH-9'),
-            balance: 0n,
-            blockNumber: 1_005,
-            positionOrVaultId: 5n,
-            prevBalance: 2_000_000n,
-            prevHistoryId: 10,
-            prevPrice: 666_000n,
-            price: 777_000n,
-            starkKey: starkKey,
-            stateUpdateId: 1_005,
-            timestamp: Timestamp(223_456_789n),
-          },
-          {
-            assetHashOrId: AssetId('WBTC-9'),
-            balance: 0n,
-            blockNumber: 1_005,
-            positionOrVaultId: 5n,
-            prevBalance: 3_000_000n,
-            prevHistoryId: 13,
-            prevPrice: 8_888_000n,
-            price: 9_999_000n,
-            starkKey: starkKey,
-            stateUpdateId: 1_005,
-            timestamp: Timestamp(223_456_789n),
-          },
-        ],
+      expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenCalledWith(trx, [
+        {
+          assetHashOrId: AssetId('ETH-9'),
+          balance: 0n,
+          blockNumber: 1_005,
+          positionOrVaultId: 5n,
+          prevBalance: 2_000_000n,
+          prevHistoryId: 10,
+          prevPrice: 666_000n,
+          price: 777_000n,
+          starkKey: starkKey,
+          stateUpdateId: 1_005,
+          timestamp: Timestamp(223_456_789n),
+        },
+        {
+          assetHashOrId: AssetId('WBTC-9'),
+          balance: 0n,
+          blockNumber: 1_005,
+          positionOrVaultId: 5n,
+          prevBalance: 3_000_000n,
+          prevHistoryId: 13,
+          prevPrice: 8_888_000n,
+          price: 9_999_000n,
+          starkKey: starkKey,
+          stateUpdateId: 1_005,
+          timestamp: Timestamp(223_456_789n),
+        },
       ])
     })
 
     it('should handle case where there are no records to close', async () => {
-      const historyRepo = mock<PreprocessedAssetHistoryRepository<AssetId>>({
+      const historyRepo = mockObject<
+        PreprocessedAssetHistoryRepository<AssetId>
+      >({
         getCurrentByPositionOrVaultId: async () => [],
       })
       const preprocessor = new NonAbstractHistoryPreprocessor(
@@ -118,12 +118,12 @@ describe(HistoryPreprocessor.name, () => {
       )
       preprocessor.addNewRecordsAndUpdateIsCurrent =
         mockAddNewRecordsAndUpdateIsCurrent
-      const trx = mock<Knex.Transaction>()
+      const trx = mockObject<Knex.Transaction>()
 
       await preprocessor.closePositionOrVault(
         trx,
         5n,
-        mock<StateUpdateRecord>({
+        mockObject<StateUpdateRecord>({
           id: 1_005,
           blockNumber: 1_005,
           timestamp: Timestamp(223_456_789n),
@@ -140,9 +140,11 @@ describe(HistoryPreprocessor.name, () => {
     HistoryPreprocessor.prototype.addNewRecordsAndUpdateIsCurrent.name,
     () => {
       it('should clear isCurrent on old records and set on new ones with balance > 0', async () => {
-        const trx = mock<Knex.Transaction>()
+        const trx = mockObject<Knex.Transaction>()
         const starkKey = StarkKey.fake()
-        const historyRepo = mock<PreprocessedAssetHistoryRepository<AssetId>>({
+        const historyRepo = mockObject<
+          PreprocessedAssetHistoryRepository<AssetId>
+        >({
           unsetCurrentByPositionOrVaultIdAndAsset: async () => 2,
           add: async () => 2,
         })
@@ -181,16 +183,15 @@ describe(HistoryPreprocessor.name, () => {
         // Check that current records where set as isCurrent = false
         expect(
           historyRepo.unsetCurrentByPositionOrVaultIdAndAsset
-        ).toHaveBeenCalledWith([5n, AssetId('ETH-9'), trx])
+        ).toHaveBeenNthCalledWith(1, 5n, AssetId('ETH-9'), trx)
         expect(
           historyRepo.unsetCurrentByPositionOrVaultIdAndAsset
-        ).toHaveBeenCalledWith([5n, AssetId('WBTC-9'), trx])
-        expect(
-          historyRepo.unsetCurrentByPositionOrVaultIdAndAsset.calls.length
-        ).toEqual(2)
+        ).toHaveBeenNthCalledWith(2, 5n, AssetId('WBTC-9'), trx)
 
+        expect(historyRepo.add).toHaveBeenCalledTimes(2)
         // Check that new records where added with correct isCurrent
-        expect(historyRepo.add).toHaveBeenCalledWith([
+        expect(historyRepo.add).toHaveBeenNthCalledWith(
+          1,
           {
             assetHashOrId: AssetId('ETH-9'),
             balance: 100_000n,
@@ -205,11 +206,11 @@ describe(HistoryPreprocessor.name, () => {
             timestamp: Timestamp(223_456_789n),
             isCurrent: true,
           },
-          trx,
-        ])
-
+          trx
+        )
         // When balance = 0, isCurrent should be set to false
-        expect(historyRepo.add).toHaveBeenCalledWith([
+        expect(historyRepo.add).toHaveBeenNthCalledWith(
+          2,
           {
             assetHashOrId: AssetId('WBTC-9'),
             balance: 0n,
@@ -224,17 +225,18 @@ describe(HistoryPreprocessor.name, () => {
             timestamp: Timestamp(223_456_789n),
             isCurrent: false,
           },
-          trx,
-        ])
-        expect(historyRepo.add.calls.length).toEqual(2)
+          trx
+        )
       })
     }
   )
 
   describe(HistoryPreprocessor.prototype.rollbackOneStateUpdate.name, () => {
     it('should delete relevant records and set current to their prevHistoryId', async () => {
-      const trx = mock<Knex.Transaction>()
-      const historyRepo = mock<PreprocessedAssetHistoryRepository<AssetId>>({
+      const trx = mockObject<Knex.Transaction>()
+      const historyRepo = mockObject<
+        PreprocessedAssetHistoryRepository<AssetId>
+      >({
         getPrevHistoryByStateUpdateId: async () => [
           { historyId: 10, prevHistoryId: 9 },
           { historyId: 100, prevHistoryId: 90 },
@@ -251,21 +253,40 @@ describe(HistoryPreprocessor.name, () => {
 
       await preprocessor.rollbackOneStateUpdate(trx, 123)
 
-      expect(historyRepo.getPrevHistoryByStateUpdateId).toHaveBeenCalledWith([
-        123,
-        trx,
-      ])
-      expect(historyRepo.deleteByHistoryId).toHaveBeenCalledExactlyWith([
-        [10, trx],
-        [100, trx],
-        [1000, trx],
-        [10000, trx],
-      ])
-      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenCalledExactlyWith([
-        [9, trx],
-        [90, trx],
-        [900, trx],
-      ])
+      expect(
+        historyRepo.getPrevHistoryByStateUpdateId
+      ).toHaveBeenOnlyCalledWith(123, trx)
+
+      expect(historyRepo.deleteByHistoryId).toHaveBeenCalledTimes(4)
+      expect(historyRepo.deleteByHistoryId).toHaveBeenNthCalledWith(1, 10, trx)
+      expect(historyRepo.deleteByHistoryId).toHaveBeenNthCalledWith(2, 100, trx)
+      expect(historyRepo.deleteByHistoryId).toHaveBeenNthCalledWith(
+        3,
+        1000,
+        trx
+      )
+      expect(historyRepo.deleteByHistoryId).toHaveBeenNthCalledWith(
+        4,
+        10000,
+        trx
+      )
+
+      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenCalledTimes(3)
+      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenNthCalledWith(
+        1,
+        9,
+        trx
+      )
+      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenNthCalledWith(
+        2,
+        90,
+        trx
+      )
+      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenNthCalledWith(
+        3,
+        900,
+        trx
+      )
     })
   })
 })

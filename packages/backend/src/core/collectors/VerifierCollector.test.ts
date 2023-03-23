@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 
 import { BlockRange } from '../../model'
 import {
@@ -7,7 +7,6 @@ import {
   VerifierEventRepository,
 } from '../../peripherals/database/VerifierEventRepository'
 import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { mock } from '../../test/mock'
 import { VerifierCollector } from './VerifierCollector'
 
 const PROXY_ADDRESS = EthereumAddress.fake('1234')
@@ -20,12 +19,12 @@ describe(VerifierCollector.name, () => {
   it('saves events to repository and returns verifier addresses', async () => {
     const addMany = mockFn(async (_records: VerifierEventRecord[]) => [])
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       getLogsInRange: async () => testData().logs,
     })
     const collector = new VerifierCollector(
       ethereumClient,
-      mock<VerifierEventRepository>({
+      mockObject<VerifierEventRepository>({
         addMany,
         async getAll() {
           return []
@@ -64,47 +63,42 @@ describe(VerifierCollector.name, () => {
 
     const verifiers = await collector.collect(blockRange)
 
-    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
-      blockRange,
-      {
-        address: expect.stringMatching('0x'),
-        topics: [
-          [
-            // ImplementationAdded
-            '0x723a7080d63c133cf338e44e00705cc1b7b2bde7e88d6218a8d62710a329ce1b',
-            // Upgraded
-            '0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b',
-          ],
+    expect(ethereumClient.getLogsInRange).toHaveBeenOnlyCalledWith(blockRange, {
+      address: expect.regex(/^0x/),
+      topics: [
+        [
+          // ImplementationAdded
+          '0x723a7080d63c133cf338e44e00705cc1b7b2bde7e88d6218a8d62710a329ce1b',
+          // Upgraded
+          '0xbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b',
         ],
-      },
-    ])
-    expect(addMany).toHaveBeenCalledWith([
-      [
-        expect.objectWith({
-          name: 'ImplementationAdded',
-          blockNumber: 12004790,
-          implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
-          initializer:
-            '0x000000000000000000000000b1eda32c467569fbdc8c3e041c81825d76b32b84',
-        }),
-        expect.objectWith({
-          name: 'Upgraded',
-          blockNumber: 12004790,
-          implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
-        }),
-        expect.objectWith({
-          name: 'ImplementationAdded',
-          blockNumber: 12016212,
-          implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
-          initializer:
-            '0x000000000000000000000000894c4a12548fb18eaa48cf34f9cd874fc08b7fc3',
-        }),
-        expect.objectWith({
-          name: 'Upgraded',
-          blockNumber: 12016212,
-          implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
-        }),
       ],
+    })
+    expect(addMany).toHaveBeenOnlyCalledWith([
+      expect.subset({
+        name: 'ImplementationAdded',
+        blockNumber: 12004790,
+        implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
+        initializer:
+          '0x000000000000000000000000b1eda32c467569fbdc8c3e041c81825d76b32b84',
+      }),
+      expect.subset({
+        name: 'Upgraded',
+        blockNumber: 12004790,
+        implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
+      }),
+      expect.subset({
+        name: 'ImplementationAdded',
+        blockNumber: 12016212,
+        implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
+        initializer:
+          '0x000000000000000000000000894c4a12548fb18eaa48cf34f9cd874fc08b7fc3',
+      }),
+      expect.subset({
+        name: 'Upgraded',
+        blockNumber: 12016212,
+        implementation: '0xCC5B2c75cbbD281b2Fc4B58C7d5B080d023C92F2',
+      }),
     ])
 
     expect(verifiers).toEqual([
@@ -114,11 +108,11 @@ describe(VerifierCollector.name, () => {
   })
 
   it('discards all records from repository after given block', async () => {
-    const verifierEventRepository = mock<VerifierEventRepository>({
+    const verifierEventRepository = mockObject<VerifierEventRepository>({
       deleteAfter: async (_blockNumber: number) => 0,
     })
     const collector = new VerifierCollector(
-      mock<EthereumClient>(),
+      mockObject<EthereumClient>(),
       verifierEventRepository,
       PROXY_ADDRESS,
       VERIFIER_ADDRESSES
@@ -126,13 +120,13 @@ describe(VerifierCollector.name, () => {
 
     await collector.discardAfter(123)
 
-    expect(verifierEventRepository.deleteAfter).toHaveBeenCalledWith([123])
+    expect(verifierEventRepository.deleteAfter).toHaveBeenOnlyCalledWith(123)
   })
 
   it('includes hardcoded addresses in collected', async () => {
     const collector = new VerifierCollector(
-      mock<EthereumClient>({ getLogsInRange: async () => [] }),
-      mock<VerifierEventRepository>({
+      mockObject<EthereumClient>({ getLogsInRange: async () => [] }),
+      mockObject<VerifierEventRepository>({
         addMany: async () => [],
         getAll: async () => [],
       }),
