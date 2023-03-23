@@ -93,9 +93,16 @@ export class UserController {
         paginationOpts
       ),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
-      this.forcedTradeOfferRepository.getByStarkKey(starkKey, paginationOpts),
+      this.forcedTradeOfferRepository.getUserOffersByStarkKey(
+        starkKey,
+        paginationOpts
+      ),
       this.forcedTradeOfferRepository.countByStarkKey(starkKey),
     ])
+
+    if (!registeredUser) {
+      return { type: 'not found', content: 'User not found' }
+    }
 
     const assetDetailsMap = await getAssetHashToAssetDetailsMap(
       this.tradingMode,
@@ -134,7 +141,7 @@ export class UserController {
       user,
       tradingMode: this.tradingMode,
       starkKey,
-      ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
+      ethereumAddress: registeredUser.ethAddress ?? EthereumAddress.ZERO,
       withdrawableAssets: [],
       offersToAccept: [],
       assets: assetEntries,
@@ -143,7 +150,9 @@ export class UserController {
       totalBalanceChanges: historyCount,
       transactions,
       totalTransactions,
-      offers: forcedTradeOffers.map(forcedTradeOfferToEntry),
+      offers: forcedTradeOffers.map((offer) =>
+        forcedTradeOfferToEntry(offer, registeredUser.starkKey)
+      ),
       totalOffers: forcedTradeOffersCount,
     })
 

@@ -1,5 +1,5 @@
 import { OfferEntry } from '@explorer/frontend'
-import { Timestamp } from '@explorer/types'
+import { StarkKey, Timestamp } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../peripherals/database/ForcedTradeOfferRepository'
 
@@ -32,10 +32,17 @@ function buildTradeOfferHistory(
 }
 
 export function forcedTradeOfferToEntry(
-  forcedTradeOffer: ForcedTradeOfferRecord
+  forcedTradeOffer: ForcedTradeOfferRecord,
+  userStarkKey?: StarkKey
 ): OfferEntry {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const status = buildTradeOfferHistory(forcedTradeOffer)[0]!
+  const role =
+    forcedTradeOffer.starkKeyA === userStarkKey
+      ? 'MAKER'
+      : forcedTradeOffer.accepted?.starkKeyB === userStarkKey
+      ? 'TAKER'
+      : undefined
   return {
     id: forcedTradeOffer.id.toString(),
     timestamp: forcedTradeOffer.createdAt,
@@ -47,5 +54,6 @@ export function forcedTradeOfferToEntry(
     totalPrice: 0n * forcedTradeOffer.syntheticAmount,
     status,
     type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
+    role,
   }
 }

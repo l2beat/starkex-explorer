@@ -130,7 +130,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.findById = this.wrapFind(this.findById)
     this.getInitial = this.wrapGet(this.getInitial)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
-    this.getByStarkKey = this.wrapGet(this.getByStarkKey)
+    this.getUserOffersByStarkKey = this.wrapGet(this.getUserOffersByStarkKey)
     this.getInitialAssetIds = this.wrapGet(this.getInitialAssetIds)
     this.getPaginated = this.wrapGet(this.getPaginated)
     this.getAvailablePaginated = this.wrapGet(this.getAvailablePaginated)
@@ -225,11 +225,17 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async getByStarkKey(starkKey: StarkKey, pagination?: PaginationOptions) {
+  async getUserOffersByStarkKey(
+    starkKey: StarkKey,
+    pagination?: PaginationOptions
+  ) {
     const knex = await this.knex()
     let query = knex('forced_trade_offers')
       .where({
         stark_key_a: starkKey.toString(),
+      })
+      .orWhere({
+        stark_key_b: starkKey.toString(),
       })
       .orderBy('created_at', 'desc')
     if (pagination) {

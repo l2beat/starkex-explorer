@@ -1,5 +1,5 @@
 import { Timestamp } from '@explorer/types'
-import React, { ReactNode } from 'react'
+import { default as React, ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
 import {
@@ -15,7 +15,8 @@ import { TimeCell } from '../TimeCell'
 
 export interface OffersTableProps {
   offers: OfferEntry[]
-  hideStatus?: boolean
+  showStatus?: boolean
+  showRole?: boolean
 }
 
 export interface OfferEntry {
@@ -27,6 +28,7 @@ export interface OfferEntry {
   totalPrice: bigint
   status: 'CREATED' | 'ACCEPTED' | 'SENT' | 'CANCELLED' | 'EXPIRED'
   type: 'BUY' | 'SELL'
+  role?: 'MAKER' | 'TAKER'
 }
 
 export function OffersTable(props: OffersTableProps) {
@@ -37,7 +39,8 @@ export function OffersTable(props: OffersTableProps) {
     { header: 'Amount', numeric: true },
     { header: 'Price', numeric: true },
     { header: 'Total price', numeric: true },
-    ...(!props.hideStatus ? [{ header: 'Status' }] : []),
+    ...(props.showStatus ? [{ header: 'Status' }] : []),
+    ...(props.showRole ? [{ header: 'Role' }] : []),
     { header: 'Type' },
   ]
 
@@ -52,12 +55,15 @@ export function OffersTable(props: OffersTableProps) {
           formatAmount(offer.asset, offer.amount),
           formatWithDecimals(offer.price, 6, { prefix: '$' }),
           formatWithDecimals(offer.totalPrice, 6, { prefix: '$' }),
-          ...(!props.hideStatus
+          ...(props.showStatus
             ? [
                 <StatusBadge type={toStatusType(offer.status)}>
                   {toStatusText(offer.status)}
                 </StatusBadge>,
               ]
+            : []),
+          ...(props.showRole
+            ? [<span className="capitalize">{offer.role?.toLowerCase()}</span>]
             : []),
           <span className="capitalize">{offer.type.toLowerCase()}</span>,
         ]

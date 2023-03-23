@@ -84,7 +84,7 @@ export class HomeController {
       totalStateUpdates,
       transactions,
       totalForcedTransactions: forcedUserTransactionsCount,
-      offers: availableOffers.map(forcedTradeOfferToEntry),
+      offers: availableOffers.map((offer) => forcedTradeOfferToEntry(offer)),
       totalOffers: availableOffersCount,
       tradingMode: this.tradingMode,
     })
