@@ -33,8 +33,8 @@ export class WithdrawableAssetRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.add = this.wrapAdd(this.add)
-    this.getWithdrawableAssetsByStarkKey = this.wrapGet(
-      this.getWithdrawableAssetsByStarkKey
+    this.getAssetBalancesByStarkKey = this.wrapGet(
+      this.getAssetBalancesByStarkKey
     )
     this.findById = this.wrapFind(this.findById)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
@@ -66,7 +66,7 @@ export class WithdrawableAssetRepository extends BaseRepository {
     return results[0]!.id
   }
 
-  async getWithdrawableAssetsByStarkKey(
+  async getAssetBalancesByStarkKey(
     starkKey: StarkKey
   ): Promise<{ assetHash: AssetHash; balanceDelta: bigint }[]> {
     const knex = await this.knex()

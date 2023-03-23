@@ -225,7 +225,7 @@ describe(WithdrawableAssetRepository.name, () => {
     })
   })
   describe(
-    WithdrawableAssetRepository.prototype.getWithdrawableAssetsByStarkKey.name,
+    WithdrawableAssetRepository.prototype.getAssetBalancesByStarkKey.name,
     () => {
       it('returns all records for the given stark key', async () => {
         const starkKey1 = StarkKey.fake()
@@ -284,10 +284,10 @@ describe(WithdrawableAssetRepository.name, () => {
           }),
         })
 
-        const records1 = await repository.getWithdrawableAssetsByStarkKey(
+        const records1 = await repository.getAssetBalancesByStarkKey(
           starkKey1
         )
-        const records2 = await repository.getWithdrawableAssetsByStarkKey(
+        const records2 = await repository.getAssetBalancesByStarkKey(
           starkKey2
         )
 
