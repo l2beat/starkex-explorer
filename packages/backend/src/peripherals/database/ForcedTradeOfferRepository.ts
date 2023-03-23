@@ -255,7 +255,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   async getAvailablePaginated(options: PaginationOptions): Promise<Record[]> {
     const knex = await this.knex()
     const query = this.getPaginatedQuery(knex, options)
-    const rows = await query.whereNull('accepted_at')
+    const rows = await query.whereNull('accepted_at').whereNull('cancelled_at')
 
     return rows.map(toRecord)
   }
@@ -285,6 +285,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     const knex = await this.knex()
     const [result] = await knex('forced_trade_offers')
       .whereNull('accepted_at')
+      .whereNull('cancelled_at')
       .count()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)

@@ -299,9 +299,9 @@ describe(ForcedTradeOfferRepository.name, () => {
   describe(
     ForcedTradeOfferRepository.prototype.getAvailablePaginated.name,
     () => {
-      it('returns only offers that have not been accepted yet', async () => {
+      it('returns only offers that are available (not accepted or cancelled)', async () => {
         const ids = []
-        //Add 5 offers that has not been accepted
+        //Add 5 offers that has not been accepted and cancelled
         for (let i = 0; i < 5; i++) {
           ids.push(
             await repository.add({
@@ -320,8 +320,18 @@ describe(ForcedTradeOfferRepository.name, () => {
           )
         }
 
+        //Add 5 offers that has been cancelled
+        for (let i = 0; i < 5; i++) {
+          ids.push(
+            await repository.add({
+              ...fakeOffer({ accepted: undefined, cancelledAt: Timestamp(1) }),
+              createdAt: Timestamp(123000 - i),
+            })
+          )
+        }
+
         const records = await repository.getAvailablePaginated({
-          limit: 10,
+          limit: 15,
           offset: 0,
         })
         expect(records.length).toEqual(5)
@@ -382,14 +392,16 @@ describe(ForcedTradeOfferRepository.name, () => {
     it('returns the number of available records', async () => {
       expect(await repository.countAvailable()).toEqual(0)
 
-      const expectedCount = 3
-      for (let i = 0; i < expectedCount * 2; i++) {
-        await repository.add(
-          fakeOffer(i % 2 === 0 ? { accepted: undefined } : undefined)
-        )
-      }
+      await repository.add(fakeOffer({ accepted: undefined }))
+      await repository.add(fakeOffer({ accepted: undefined }))
+      await repository.add(
+        fakeOffer({
+          accepted: fakeAccepted(),
+        })
+      )
+      await repository.add(fakeOffer({ cancelledAt: Timestamp(123) }))
 
-      expect(await repository.countAvailable()).toEqual(expectedCount)
+      expect(await repository.countAvailable()).toEqual(2)
     })
   })
 
