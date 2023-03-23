@@ -2,6 +2,7 @@ import {
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
   renderUserPage,
+  renderUserRegisterPage,
   renderUserTransactionsPage,
   TransactionEntry,
   UserAssetEntry,
@@ -46,6 +47,20 @@ export class UserController {
     private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
+
+  getRegisterPage(givenUser: Partial<UserDetails>): ControllerResult {
+    if (!givenUser.address) {
+      return { type: 'not found', content: 'Wallet not connect' }
+    }
+
+    const content = renderUserRegisterPage({
+      user: {
+        address: givenUser.address,
+      },
+    })
+
+    return { type: 'success', content }
+  }
 
   async getUserPage(
     givenUser: Partial<UserDetails>,

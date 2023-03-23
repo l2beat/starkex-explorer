@@ -30,6 +30,7 @@ import {
   renderUserBalanceChangesPage,
   renderUserOffersPage,
   renderUserPage,
+  renderUserRegisterPage,
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
@@ -93,6 +94,7 @@ const routes: Route[] = [
     description: 'The home page.',
     render: (ctx) => {
       const user = getUser(ctx)
+
       ctx.body = renderHomePage({
         user,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
@@ -278,33 +280,30 @@ const routes: Route[] = [
   // #endregion
   // #region User
   {
+    path: '/users/register',
+    description: 'My user page, the stark key is known and registered.',
+    render: (ctx) => {
+      const user = getUser(ctx)
+      if (!user) return
+      ctx.body = renderUserRegisterPage({ user })
+    },
+  },
+  {
     path: '/users/:starkKey',
     link: '/users/someone',
     description: 'Someone else’s user page.',
-    render: (ctx) => {
-      const user = getUser(ctx)
-      ctx.body = renderUserPage({
-        user,
-        tradingMode: 'perpetual',
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
-        offersToAccept: [],
-        assets: repeat(7, randomUserAssetEntry),
-        totalAssets: 7,
-        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
-        totalBalanceChanges: 3367,
-        transactions: repeat(10, randomUserTransactionEntry),
-        totalTransactions: 48,
-        offers: repeat(6, randomUserOfferEntry),
-        totalOffers: 6,
-      })
-    },
+    render: notFound,
   },
   {
     path: '/users/me/unknown',
     description: 'My user page, but the stark key is unknown.',
-    render: notFound,
+    render: (ctx) => {
+      const user = getUser(ctx)
+      if (!user) return
+      ctx.body = renderUserRegisterPage({
+        user,
+      })
+    },
   },
   {
     path: '/users/me/unregistered',
@@ -321,7 +320,7 @@ const routes: Route[] = [
         user,
         tradingMode: 'perpetual',
         starkKey: user?.starkKey ?? StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        ethereumAddress: user?.address ?? EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         offersToAccept: repeat(2, randomUserOfferEntry),
         assets: repeat(7, randomUserAssetEntry),
@@ -966,11 +965,11 @@ function getPagination(ctx: Koa.Context, total: number) {
 function getUser(
   ctx: Koa.Context,
   fake: true
-): { address: EthereumAddress; starkKey: StarkKey }
+): { address: EthereumAddress; starkKey: StarkKey | undefined }
 function getUser(
   ctx: Koa.Context,
   fake?: false
-): { address: EthereumAddress; starkKey: StarkKey } | undefined
+): { address: EthereumAddress; starkKey: StarkKey | undefined } | undefined
 function getUser(ctx: Koa.Context, fake?: boolean) {
   const account = ctx.cookies.get('account')
   const starkKey = ctx.cookies.get('starkKey')
@@ -984,7 +983,7 @@ function getUser(ctx: Koa.Context, fake?: boolean) {
     try {
       return {
         address: EthereumAddress(account),
-        starkKey: starkKey ? StarkKey(starkKey) : StarkKey.fake(),
+        starkKey: starkKey ? StarkKey(starkKey) : undefined,
       }
     } catch {
       return
