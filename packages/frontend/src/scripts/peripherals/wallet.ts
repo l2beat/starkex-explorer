@@ -46,6 +46,17 @@ export const Wallet = {
     return result as string
   },
 
+  async signMyriaKey(account: EthereumAddress): Promise<string> {
+    const message =
+      '0x5369676e2d696e20746f20796f7572204d79726961204c322057616c6c6574'
+
+    const result = await getProvider().request({
+      method: 'personal_sign',
+      params: [message, account.toString()],
+    })
+    return result as string
+  },
+
   async sendRegistrationTransaction(
     account: EthereumAddress,
     starkKey: StarkKey,

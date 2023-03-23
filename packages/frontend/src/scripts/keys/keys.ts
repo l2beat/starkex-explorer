@@ -1,5 +1,8 @@
 import { keccak256 } from '@ethersproject/keccak256'
+import BN from 'bn.js'
+import { Buffer } from 'buffer'
 import { ec as EllipticCurve } from 'elliptic'
+import { sha256 } from 'hash.js'
 
 import { EC_ORDER_INT, starkEc } from './curve'
 
@@ -10,13 +13,12 @@ export interface StarkKeyPair {
 }
 
 // Follows the same logic as https://github.com/dydxprotocol/starkex-lib
-export function starkKeyPairFromData(hexData: string): StarkKeyPair {
+export function getDydxStarkExKeyPairFromData(hexData: string): StarkKeyPair {
   const hashedData = keccak256(hexData)
   const privateKey = BigInt(hashedData) / 2n ** 5n
   const normalized = normalizeHex32(privateKey.toString(16))
 
   const keyPair = starkEc.keyFromPrivate(normalized)
-
   return toSimpleKeyPair(keyPair)
 }
 
@@ -29,14 +31,6 @@ function toSimpleKeyPair(keyPair: EllipticCurve.KeyPair): StarkKeyPair {
     publicKeyYCoordinate: normalizeHex32(y.toString(16)),
     privateKey: normalizeHex32(privateKey.toString(16)),
   }
-}
-
-function normalizeHex32(hex: string): string {
-  return stripHexPrefix(hex).toLowerCase().padStart(64, '0')
-}
-
-function stripHexPrefix(hex: string): string {
-  return hex.startsWith('0x') ? hex.slice(2) : hex
 }
 
 export function signStarkMessage(pair: StarkKeyPair, hexMessage: string) {
@@ -69,4 +63,66 @@ function adjustHashLength(msgHash: string) {
     throw new Error('Invalid msgHash length')
   }
   return msgHash + '0'
+}
+
+// Myria's implementation
+export function getMyriaStarkExKeyPairFromData(signature: string) {
+  const sig = stripHexPrefix(signature).slice(0, 64)
+  const privateKey = getStarkExPrivateKeyFromSignature(sig, starkEc.n!)
+  const keyPair = starkEc.keyFromPrivate(privateKey, 'hex')
+
+  return toSimpleKeyPair(keyPair)
+}
+
+function getStarkExPrivateKeyFromSignature(
+  signature: string,
+  curveOrder: BN
+  // TODO: remove this parameter
+): string {
+  const rMax = new BN(
+    '10000000000000000000000000000000000000000000000000000000000000000',
+    16
+  )
+  const rModOrder = rMax.sub(rMax.mod(curveOrder))
+  let attemptCount = 0
+  let hashValue = calculateHashValue(signature, attemptCount)
+  while (!hashValue.lt(rModOrder)) {
+    attemptCount++
+    hashValue = calculateHashValue(
+      Buffer.from(signature, 'hex').toString('hex'),
+      attemptCount
+    )
+  }
+  return hashValue.umod(curveOrder).toString('hex')
+}
+
+function calculateHashValue(hexString: string, number: number): BN {
+  const bytes = Buffer.from(
+    stripHexPrefix(hexString) + sanitizeBytes(numberToHex(number), 2),
+    'hex'
+  )
+  const hash = sha256().update(bytes).digest('hex')
+  return new BN(hash, 16)
+}
+
+// End of Myria's implementation
+
+function normalizeHex32(hex: string): string {
+  return stripHexPrefix(hex).toLowerCase().padStart(64, '0')
+}
+
+function stripHexPrefix(hex: string): string {
+  return hex.startsWith('0x') ? hex.slice(2) : hex
+}
+
+function sanitizeBytes(bytes: string, expectedLength: number): string {
+  const lengthDiff = expectedLength - bytes.length
+  if (lengthDiff > 0) {
+    bytes = '0'.repeat(lengthDiff) + bytes
+  }
+  return bytes
+}
+
+function numberToHex(n: number): string {
+  return n.toString(16)
 }
