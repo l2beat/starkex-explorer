@@ -1,5 +1,11 @@
 import { assertUnreachable } from '@explorer/shared'
-import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+} from '@explorer/types'
 
 import { ToJSON } from './ToJSON'
 
@@ -65,7 +71,7 @@ export interface WithdrawData {
 export interface WithdrawWithTokenIdData {
   type: 'WithdrawWithTokenId'
   starkKey: StarkKey
-  assetType: AssetHash
+  assetType: Hash256
   tokenId: bigint
   assetId: AssetHash
   nonQuantizedAmount: bigint
@@ -76,7 +82,7 @@ export interface WithdrawWithTokenIdData {
 export interface MintWithdrawData {
   type: 'MintWithdraw'
   starkKey: StarkKey
-  assetType: AssetHash
+  assetType: Hash256
   nonQuantizedAmount: bigint
   quantizedAmount: bigint
   assetId: AssetHash

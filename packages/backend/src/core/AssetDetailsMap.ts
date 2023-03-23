@@ -8,7 +8,18 @@ export class AssetDetailsMap {
     this.initializeAssetDetailsMap(assetDetails)
   }
 
-  initializeAssetDetailsMap(assetDetails: AssetDetails[]) {
+  getByAssetHash(assetHash: AssetHash): AssetDetails | undefined {
+    return this.map.get(assetHash.toString())
+  }
+
+  getByAssetTypeHashAndTokenId(
+    assetTypeHash: Hash256,
+    tokenId: bigint
+  ): AssetDetails | undefined {
+    return this.map.get(this.getAssetTypeWithTokenIdKey(assetTypeHash, tokenId))
+  }
+
+  private initializeAssetDetailsMap(assetDetails: AssetDetails[]) {
     assetDetails.forEach((assetDetail) => {
       if (assetDetail.type === 'ERC721' || assetDetail.type === 'ERC1155') {
         const { assetTypeHash, tokenId } = assetDetail
@@ -20,17 +31,6 @@ export class AssetDetailsMap {
       }
       this.map.set(assetDetail.assetHash.toString(), assetDetail)
     })
-  }
-
-  getByAssetHash(assetHash: AssetHash): AssetDetails | undefined {
-    return this.map.get(assetHash.toString())
-  }
-
-  getByAssetTypeHashAndTokenId(
-    assetTypeHash: Hash256,
-    tokenId: bigint
-  ): AssetDetails | undefined {
-    return this.map.get(this.getAssetTypeWithTokenIdKey(assetTypeHash, tokenId))
   }
 
   private getAssetTypeWithTokenIdKey(assetTypeHash: Hash256, tokenId: bigint) {

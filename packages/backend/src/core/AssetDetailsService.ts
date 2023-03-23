@@ -19,17 +19,19 @@ export class AssetDetailsService {
     sentTransactions?: SentTransactionRecord[]
     userTransactions?: UserTransactionRecord[]
   }): Promise<AssetDetailsMap | undefined> {
-    if (this.tradingMode === 'spot') {
+    if (this.tradingMode !== 'spot') {
       return undefined
     }
 
     const assetHashes: (AssetHash | Hash256)[] = [
-      ...(records.sentTransactions?.map(getSentTransactionAssetIdentifiers) ??
-        []),
+      ...(records.sentTransactions?.map(
+        this.getSentTransactionAssetIdentifiers
+      ) ?? []),
       ...(records.userAssets?.map((a) => a.assetHashOrId) ?? []),
       ...(records.assetHistory?.map((a) => a.assetHashOrId) ?? []),
-      ...(records.userTransactions?.map(getUserTransactionAssetIdentifiers) ??
-        []),
+      ...(records.userTransactions?.map(
+        this.getUserTransactionAssetIdentifiers
+      ) ?? []),
     ].filter(
       (i): i is AssetHash | Hash256 => AssetHash.check(i) || Hash256.check(i)
     )
@@ -42,37 +44,37 @@ export class AssetDetailsService {
 
     return new AssetDetailsMap(assetDetails)
   }
-}
 
-function getSentTransactionAssetIdentifiers(
-  sentTransaction: SentTransactionRecord
-): AssetHash | Hash256 | undefined {
-  switch (sentTransaction.data.type) {
-    case 'Withdraw':
-    case 'WithdrawWithTokenId':
-      return sentTransaction.data.assetType
-    case 'ForcedWithdrawal':
-    case 'ForcedTrade':
-      return undefined
-    default:
-      assertUnreachable(sentTransaction.data)
+  getSentTransactionAssetIdentifiers(
+    sentTransaction: SentTransactionRecord
+  ): AssetHash | Hash256 | undefined {
+    switch (sentTransaction.data.type) {
+      case 'Withdraw':
+      case 'WithdrawWithTokenId':
+        return sentTransaction.data.assetType
+      case 'ForcedWithdrawal':
+      case 'ForcedTrade':
+        return undefined
+      default:
+        assertUnreachable(sentTransaction.data)
+    }
   }
-}
 
-function getUserTransactionAssetIdentifiers(
-  userTransaction: UserTransactionRecord
-): AssetHash | undefined {
-  switch (userTransaction.data.type) {
-    case 'Withdraw':
-      return userTransaction.data.assetType
-    case 'WithdrawWithTokenId':
-    case 'MintWithdraw':
-      return userTransaction.data.assetId
-    case 'ForcedTrade':
-    case 'ForcedWithdrawal':
-    case 'FullWithdrawal':
-      return undefined
-    default:
-      assertUnreachable(userTransaction.data)
+  getUserTransactionAssetIdentifiers(
+    userTransaction: UserTransactionRecord
+  ): AssetHash | undefined {
+    switch (userTransaction.data.type) {
+      case 'Withdraw':
+        return userTransaction.data.assetType
+      case 'WithdrawWithTokenId':
+      case 'MintWithdraw':
+        return userTransaction.data.assetId
+      case 'ForcedTrade':
+      case 'ForcedWithdrawal':
+      case 'FullWithdrawal':
+        return undefined
+      default:
+        assertUnreachable(userTransaction.data)
+    }
   }
 }

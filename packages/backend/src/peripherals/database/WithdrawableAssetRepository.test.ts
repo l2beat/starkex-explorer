@@ -84,7 +84,7 @@ describe(WithdrawableAssetRepository.name, () => {
     return {
       type: 'WithdrawWithTokenId',
       starkKey: StarkKey.fake(),
-      assetType: AssetHash.fake(),
+      assetType: Hash256.fake(),
       tokenId: 1n,
       assetId: AssetHash.fake(),
       nonQuantizedAmount: 567000n,
@@ -100,7 +100,7 @@ describe(WithdrawableAssetRepository.name, () => {
     return {
       type: 'MintWithdraw',
       starkKey: StarkKey.fake(),
-      assetType: AssetHash.fake(),
+      assetType: Hash256.fake(),
       nonQuantizedAmount: 678000n,
       quantizedAmount: 678n,
       assetId: AssetHash.fake(),
