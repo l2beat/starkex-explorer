@@ -255,6 +255,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   async getAvailablePaginated(options: PaginationOptions): Promise<Record[]> {
     const knex = await this.knex()
     const query = this.getPaginatedQuery(knex, options)
+    //TODO: Check if it is not expired. Currently blocked by PR#340
     const rows = await query.whereNull('accepted_at').whereNull('cancelled_at')
 
     return rows.map(toRecord)
