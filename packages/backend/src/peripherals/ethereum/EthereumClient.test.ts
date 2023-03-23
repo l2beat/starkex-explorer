@@ -1,9 +1,8 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 import { providers } from 'ethers'
 
 import { BlockRange } from '../../model'
-import { mock } from '../../test/mock'
 import { EthereumClient } from './EthereumClient'
 import { HackJsonRpcProvider } from './HackJsonRpcProvider'
 
@@ -17,14 +16,17 @@ describe(EthereumClient.name, () => {
       const blockRange = new BlockRange([], 5, 10)
 
       const getLogs = mockFn().resolvesTo([])
-      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const provider = mockObject<HackJsonRpcProvider>({ getLogs })
       const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
-      expect(getLogs).toHaveBeenCalledExactlyWith([
-        [{ ...filter, fromBlock: 5, toBlock: 9, topics: undefined }],
-      ])
+      expect(getLogs).toHaveBeenOnlyCalledWith({
+        ...filter,
+        fromBlock: 5,
+        toBlock: 9,
+        topics: undefined,
+      })
     })
 
     it('works for a block range with some hashes', async () => {
@@ -38,16 +40,26 @@ describe(EthereumClient.name, () => {
       )
 
       const getLogs = mockFn().resolvesTo([])
-      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const provider = mockObject<HackJsonRpcProvider>({ getLogs })
       const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
-      expect(getLogs).toHaveBeenCalledExactlyWith([
-        [{ ...filter, fromBlock: 5, toBlock: 7, topics: undefined }],
-        [{ ...filter, blockHash: Hash256.fake('8').toString() }],
-        [{ ...filter, blockHash: Hash256.fake('9').toString() }],
-      ])
+      expect(getLogs).toHaveBeenCalledTimes(3)
+      expect(getLogs).toHaveBeenNthCalledWith(1, {
+        ...filter,
+        fromBlock: 5,
+        toBlock: 7,
+        topics: undefined,
+      })
+      expect(getLogs).toHaveBeenNthCalledWith(2, {
+        ...filter,
+        blockHash: Hash256.fake('8').toString(),
+      })
+      expect(getLogs).toHaveBeenNthCalledWith(3, {
+        ...filter,
+        blockHash: Hash256.fake('9').toString(),
+      })
     })
 
     it('works for a single block single hash', async () => {
@@ -56,14 +68,15 @@ describe(EthereumClient.name, () => {
       ])
 
       const getLogs = mockFn().resolvesTo([])
-      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const provider = mockObject<HackJsonRpcProvider>({ getLogs })
       const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
-      expect(getLogs).toHaveBeenCalledExactlyWith([
-        [{ ...filter, blockHash: Hash256.fake('8').toString() }],
-      ])
+      expect(getLogs).toHaveBeenOnlyCalledWith({
+        ...filter,
+        blockHash: Hash256.fake('8').toString(),
+      })
     })
 
     it('works for a lot of hashes', async () => {
@@ -75,29 +88,25 @@ describe(EthereumClient.name, () => {
       )
 
       const getLogs = mockFn().resolvesTo([])
-      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const provider = mockObject<HackJsonRpcProvider>({ getLogs })
       const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await ethereumClient.getLogsInRange(blockRange, filter)
 
-      expect(getLogs).toHaveBeenCalledExactlyWith([
-        [
-          {
-            ...filter,
-            fromBlock: 1000,
-            toBlock: 1499 - SAFE_BLOCK_DISTANCE,
-            topics: undefined,
-          },
-        ],
-        ...Array.from({ length: SAFE_BLOCK_DISTANCE }).map((v, i) => [
-          {
-            ...filter,
-            blockHash: Hash256.fake(
-              `${1500 - SAFE_BLOCK_DISTANCE + i}`
-            ).toString(),
-          },
-        ]),
-      ])
+      expect(getLogs).toHaveBeenNthCalledWith(1, {
+        ...filter,
+        fromBlock: 1000,
+        toBlock: 1499 - SAFE_BLOCK_DISTANCE,
+        topics: undefined,
+      })
+      for (let i = 0; i < SAFE_BLOCK_DISTANCE; i++) {
+        expect(getLogs).toHaveBeenNthCalledWith(i + 2, {
+          ...filter,
+          blockHash: Hash256.fake(
+            `${1500 - SAFE_BLOCK_DISTANCE + i}`
+          ).toString(),
+        })
+      }
     })
 
     it('crashes on logs from reorged history', async () => {
@@ -127,18 +136,18 @@ describe(EthereumClient.name, () => {
       }
 
       const getLogs = mockFn().resolvesTo([]).resolvesToOnce([log])
-      const provider = mock<HackJsonRpcProvider>({ getLogs })
+      const provider = mockObject<HackJsonRpcProvider>({ getLogs })
       const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
 
       await expect(
         ethereumClient.getLogsInRange(blockRange, filter)
-      ).toBeRejected('all logs must be from the block range')
+      ).toBeRejectedWith('all logs must be from the block range')
     })
   })
 
   describe(EthereumClient.prototype.getAllLogs.name, () => {
     it('divides on two calls', async () => {
-      const provider = mock<HackJsonRpcProvider>({
+      const provider = mockObject<HackJsonRpcProvider>({
         getLogs: mockFn()
           .throwsOnce(new Error('Log response size exceeded'))
           .returnsOnce([])
@@ -151,36 +160,29 @@ describe(EthereumClient.name, () => {
       const topic = 'aaaa'
       await ethereumClient.getAllLogs(address.toString(), [topic], 1000, 2000)
 
-      expect(provider.getLogs).toHaveBeenCalledExactlyWith([
-        [
-          {
-            address: address.toString(),
-            topics: [topic],
-            fromBlock: 1000,
-            toBlock: 2000,
-          },
-        ],
-        [
-          {
-            address: address.toString(),
-            topics: [topic],
-            fromBlock: 1000,
-            toBlock: 1500,
-          },
-        ],
-        [
-          {
-            address: address.toString(),
-            topics: [topic],
-            fromBlock: 1501,
-            toBlock: 2000,
-          },
-        ],
-      ])
+      expect(provider.getLogs).toHaveBeenCalledTimes(3)
+      expect(provider.getLogs).toHaveBeenNthCalledWith(1, {
+        address: address.toString(),
+        topics: [topic],
+        fromBlock: 1000,
+        toBlock: 2000,
+      })
+      expect(provider.getLogs).toHaveBeenNthCalledWith(2, {
+        address: address.toString(),
+        topics: [topic],
+        fromBlock: 1000,
+        toBlock: 1500,
+      })
+      expect(provider.getLogs).toHaveBeenNthCalledWith(3, {
+        address: address.toString(),
+        topics: [topic],
+        fromBlock: 1501,
+        toBlock: 2000,
+      })
     })
 
     it('correctly divides range of two', async () => {
-      const provider = mock<HackJsonRpcProvider>({
+      const provider = mockObject<HackJsonRpcProvider>({
         getLogs: mockFn()
           .throwsOnce(new Error('Log response size exceeded'))
           .returnsOnce([])
@@ -193,36 +195,29 @@ describe(EthereumClient.name, () => {
       const topic = 'aaaa'
       await ethereumClient.getAllLogs(address.toString(), [topic], 1, 2)
 
-      expect(provider.getLogs).toHaveBeenCalledExactlyWith([
-        [
-          {
-            address: address.toString(),
-            topics: [topic],
-            fromBlock: 1,
-            toBlock: 2,
-          },
-        ],
-        [
-          {
-            address: address.toString(),
-            topics: [topic],
-            fromBlock: 1,
-            toBlock: 1,
-          },
-        ],
-        [
-          {
-            address: address.toString(),
-            topics: [topic],
-            fromBlock: 2,
-            toBlock: 2,
-          },
-        ],
-      ])
+      expect(provider.getLogs).toHaveBeenCalledTimes(3)
+      expect(provider.getLogs).toHaveBeenNthCalledWith(1, {
+        address: address.toString(),
+        topics: [topic],
+        fromBlock: 1,
+        toBlock: 2,
+      })
+      expect(provider.getLogs).toHaveBeenNthCalledWith(2, {
+        address: address.toString(),
+        topics: [topic],
+        fromBlock: 1,
+        toBlock: 1,
+      })
+      expect(provider.getLogs).toHaveBeenNthCalledWith(3, {
+        address: address.toString(),
+        topics: [topic],
+        fromBlock: 2,
+        toBlock: 2,
+      })
     })
 
     it('fromBlock === toBlock', async () => {
-      const provider = mock<HackJsonRpcProvider>({
+      const provider = mockObject<HackJsonRpcProvider>({
         getLogs: mockFn().throwsOnce(new Error('Log response size exceeded')),
       })
 
@@ -235,16 +230,12 @@ describe(EthereumClient.name, () => {
         ethereumClient.getAllLogs(address.toString(), [topic], 1, 1)
       ).toBeRejected()
 
-      expect(provider.getLogs).toHaveBeenCalledExactlyWith([
-        [
-          {
-            address: address.toString(),
-            topics: [topic],
-            fromBlock: 1,
-            toBlock: 1,
-          },
-        ],
-      ])
+      expect(provider.getLogs).toHaveBeenOnlyCalledWith({
+        address: address.toString(),
+        topics: [topic],
+        fromBlock: 1,
+        toBlock: 1,
+      })
     })
   })
 })

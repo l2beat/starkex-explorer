@@ -1,10 +1,9 @@
 import { Hash256, Timestamp } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 import { providers } from 'ethers'
 
 import { SentTransactionRepository } from '../peripherals/database/transactions/SentTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
 import { TransactionStatusService } from './TransactionStatusService'
 
@@ -12,7 +11,7 @@ describe(TransactionStatusService.name, () => {
   it('marks a transaction as mined', async () => {
     const hash = Hash256.fake()
     let updated = false
-    const sentTransactionRepository = mock<SentTransactionRepository>({
+    const sentTransactionRepository = mockObject<SentTransactionRepository>({
       async updateMined(_hash, mined) {
         updated = true
         expect(_hash).toEqual(hash)
@@ -24,7 +23,7 @@ describe(TransactionStatusService.name, () => {
         return 1
       },
     })
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getTransaction(_hash) {
         expect(_hash).toEqual(hash)
         return {} as providers.TransactionResponse
@@ -50,7 +49,7 @@ describe(TransactionStatusService.name, () => {
   it('marks a transaction as reverted', async () => {
     const hash = Hash256.fake()
     let updated = false
-    const sentTransactionRepository = mock<SentTransactionRepository>({
+    const sentTransactionRepository = mockObject<SentTransactionRepository>({
       async updateMined(_hash, mined) {
         updated = true
         expect(_hash).toEqual(hash)
@@ -62,7 +61,7 @@ describe(TransactionStatusService.name, () => {
         return 1
       },
     })
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getTransaction(_hash) {
         expect(_hash).toEqual(hash)
         return {} as providers.TransactionResponse
@@ -88,14 +87,14 @@ describe(TransactionStatusService.name, () => {
   it('removes a transaction after a specified number of checks', async () => {
     const hash = Hash256.fake()
     let removed = false
-    const sentTransactionRepository = mock<SentTransactionRepository>({
+    const sentTransactionRepository = mockObject<SentTransactionRepository>({
       async deleteByTransactionHash(_hash) {
         removed = true
         expect(_hash).toEqual(hash)
         return 1
       },
     })
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getTransaction(_hash) {
         expect(_hash).toEqual(hash)
         return undefined

@@ -1,10 +1,9 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 
 import { BlockRange } from '../model'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { decodedFakePages, fakePages } from '../test/fakes'
-import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
 import type { PageCollector } from './collectors/PageCollector'
 import type { PageMappingCollector } from './collectors/PageMappingCollector'
@@ -21,13 +20,13 @@ const noop = async () => {}
 describe(PerpetualRollupSyncService.name, () => {
   describe(PerpetualRollupSyncService.prototype.sync.name, () => {
     const verifierAddresses = [EthereumAddress.fake('123')]
-    const verifierCollector = mock<VerifierCollector>({
+    const verifierCollector = mockObject<VerifierCollector>({
       collect: async (_blockRange) => verifierAddresses,
     })
-    const pageMappingCollector = mock<PageMappingCollector>({
+    const pageMappingCollector = mockObject<PageMappingCollector>({
       collect: async (_blockRange, _verifiers) => [],
     })
-    const pageCollector = mock<PageCollector>({
+    const pageCollector = mockObject<PageCollector>({
       collect: async (_blockRange) => [],
     })
 
@@ -36,17 +35,17 @@ describe(PerpetualRollupSyncService.name, () => {
     ]
 
     const stateTransitionCollector =
-      mock<PerpetualRollupStateTransitionCollector>({
+      mockObject<PerpetualRollupStateTransitionCollector>({
         collect: async (_blockRange) => stateTransitionsRecords,
       })
 
-    const userRegistrationCollector = mock<UserRegistrationCollector>({
+    const userRegistrationCollector = mockObject<UserRegistrationCollector>({
       collect: async () => [],
     })
-    const userTransactionCollector = mock<UserTransactionCollector>({
+    const userTransactionCollector = mockObject<UserTransactionCollector>({
       collect: async () => {},
     })
-    const withdrawalAllowedCollector = mock<WithdrawalAllowedCollector>({
+    const withdrawalAllowedCollector = mockObject<WithdrawalAllowedCollector>({
       collect: async () => {},
     })
 
@@ -58,7 +57,7 @@ describe(PerpetualRollupSyncService.name, () => {
       blockNumber: 1,
       pages: fakePages,
     }
-    const perpetualRollupUpdater = mock<PerpetualRollupUpdater>({
+    const perpetualRollupUpdater = mockObject<PerpetualRollupUpdater>({
       loadRequiredPages: async () => [stateTransitionRecordWithPages],
       processOnChainStateTransition: noop,
     })
@@ -85,54 +84,57 @@ describe(PerpetualRollupSyncService.name, () => {
       const blockRange = { start: 10, end: 25 } as BlockRange
       await service.sync(blockRange)
 
-      expect(verifierCollector.collect).toHaveBeenCalledExactlyWith([
-        [blockRange],
-      ])
-      expect(pageMappingCollector.collect).toHaveBeenCalledExactlyWith([
-        [blockRange, verifierAddresses],
-      ])
-      expect(pageCollector.collect).toHaveBeenCalledExactlyWith([[blockRange]])
-      expect(stateTransitionCollector.collect).toHaveBeenCalledExactlyWith([
-        [blockRange],
-      ])
-      expect(userTransactionCollector.collect).toHaveBeenCalledExactlyWith([
-        [blockRange],
-      ])
-      expect(withdrawalAllowedCollector.collect).toHaveBeenCalledExactlyWith([
-        [blockRange],
-      ])
-      expect(
-        perpetualRollupUpdater.loadRequiredPages
-      ).toHaveBeenCalledExactlyWith([[stateTransitionsRecords]])
+      expect(verifierCollector.collect).toHaveBeenOnlyCalledWith(blockRange)
+      expect(pageMappingCollector.collect).toHaveBeenOnlyCalledWith(
+        blockRange,
+        verifierAddresses
+      )
+      expect(pageCollector.collect).toHaveBeenOnlyCalledWith(blockRange)
+      expect(stateTransitionCollector.collect).toHaveBeenOnlyCalledWith(
+        blockRange
+      )
+      expect(userTransactionCollector.collect).toHaveBeenOnlyCalledWith(
+        blockRange
+      )
+      expect(withdrawalAllowedCollector.collect).toHaveBeenOnlyCalledWith(
+        blockRange
+      )
+      expect(perpetualRollupUpdater.loadRequiredPages).toHaveBeenOnlyCalledWith(
+        stateTransitionsRecords
+      )
       expect(
         perpetualRollupUpdater.processOnChainStateTransition
-      ).toHaveBeenCalledExactlyWith([[stateTransitionRecord, decodedFakePages]])
+      ).toHaveBeenOnlyCalledWith(stateTransitionRecord, decodedFakePages)
     })
   })
 
   describe(PerpetualRollupSyncService.prototype.discardAfter.name, () => {
     it('discards data from block number', async () => {
-      const verifierCollector = mock<VerifierCollector>({ discardAfter: noop })
-      const pageMappingCollector = mock<PageMappingCollector>({
+      const verifierCollector = mockObject<VerifierCollector>({
         discardAfter: noop,
       })
-      const pageCollector = mock<PageCollector>({ discardAfter: noop })
+      const pageMappingCollector = mockObject<PageMappingCollector>({
+        discardAfter: noop,
+      })
+      const pageCollector = mockObject<PageCollector>({ discardAfter: noop })
       const stateTransitionCollector =
-        mock<PerpetualRollupStateTransitionCollector>({
+        mockObject<PerpetualRollupStateTransitionCollector>({
           discardAfter: noop,
         })
-      const userRegistrationCollector = mock<UserRegistrationCollector>({
+      const userRegistrationCollector = mockObject<UserRegistrationCollector>({
         discardAfter: noop,
       })
-      const perpetualRollupUpdater = mock<PerpetualRollupUpdater>({
+      const perpetualRollupUpdater = mockObject<PerpetualRollupUpdater>({
         discardAfter: noop,
       })
-      const userTransactionCollector = mock<UserTransactionCollector>({
+      const userTransactionCollector = mockObject<UserTransactionCollector>({
         discardAfter: noop,
       })
-      const withdrawalAllowedCollector = mock<WithdrawalAllowedCollector>({
-        discardAfter: noop,
-      })
+      const withdrawalAllowedCollector = mockObject<WithdrawalAllowedCollector>(
+        {
+          discardAfter: noop,
+        }
+      )
 
       const dataSyncService = new PerpetualRollupSyncService(
         verifierCollector,
@@ -148,14 +150,18 @@ describe(PerpetualRollupSyncService.name, () => {
 
       await dataSyncService.discardAfter(10)
 
-      expect(verifierCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(pageMappingCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(pageCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(stateTransitionCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(perpetualRollupUpdater.discardAfter).toHaveBeenCalledWith([10])
-      expect(userRegistrationCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(userTransactionCollector.discardAfter).toHaveBeenCalledWith([10])
-      expect(withdrawalAllowedCollector.discardAfter).toHaveBeenCalledWith([10])
+      expect(verifierCollector.discardAfter).toHaveBeenOnlyCalledWith(10)
+      expect(pageMappingCollector.discardAfter).toHaveBeenOnlyCalledWith(10)
+      expect(pageCollector.discardAfter).toHaveBeenOnlyCalledWith(10)
+      expect(stateTransitionCollector.discardAfter).toHaveBeenOnlyCalledWith(10)
+      expect(perpetualRollupUpdater.discardAfter).toHaveBeenOnlyCalledWith(10)
+      expect(userRegistrationCollector.discardAfter).toHaveBeenOnlyCalledWith(
+        10
+      )
+      expect(userTransactionCollector.discardAfter).toHaveBeenOnlyCalledWith(10)
+      expect(withdrawalAllowedCollector.discardAfter).toHaveBeenOnlyCalledWith(
+        10
+      )
     })
   })
 })
