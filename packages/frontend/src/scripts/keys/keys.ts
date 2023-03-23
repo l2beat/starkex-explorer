@@ -67,26 +67,22 @@ function adjustHashLength(msgHash: string) {
 
 // Myria's implementation
 export function getMyriaStarkExKeyPairFromData(signature: string) {
-  if (!starkEc.n) {
-    throw new Error('starkEc.n is not defined')
-  }
   const sig = stripHexPrefix(signature).slice(0, 64)
-  const privateKey = getStarkExPrivateKeyFromSignature(sig, starkEc.n)
+  const privateKey = getStarkExPrivateKeyFromSignature(sig)
   const keyPair = starkEc.keyFromPrivate(privateKey, 'hex')
 
   return toSimpleKeyPair(keyPair)
 }
 
-function getStarkExPrivateKeyFromSignature(
-  signature: string,
-  curveOrder: BN
-  // TODO: remove this parameter
-): string {
+function getStarkExPrivateKeyFromSignature(signature: string): string {
+  if (!starkEc.n) {
+    throw new Error('starkEc.n is not defined')
+  }
   const rMax = new BN(
     '10000000000000000000000000000000000000000000000000000000000000000',
     16
   )
-  const rModOrder = rMax.sub(rMax.mod(curveOrder))
+  const rModOrder = rMax.sub(rMax.mod(starkEc.n))
   let attemptCount = 0
   let hashValue = calculateHashValue(signature, attemptCount)
   while (!hashValue.lt(rModOrder)) {
@@ -96,7 +92,7 @@ function getStarkExPrivateKeyFromSignature(
       attemptCount
     )
   }
-  return hashValue.umod(curveOrder).toString('hex')
+  return hashValue.umod(starkEc.n).toString('hex')
 }
 
 function calculateHashValue(hexString: string, number: number): BN {
