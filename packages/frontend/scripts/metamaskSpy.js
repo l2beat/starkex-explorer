@@ -1,4 +1,7 @@
-// Copy the code below and paste it into the console of the browser where Metamask is installed
+/*
+  This file contains a scripts that can be injected inside console of the browser where Metamask is installed.
+  These scripts help to debug Metamask.
+*/
 
 const oldRequest = window.ethereum.request
 window.ethereum.request = function (...args) {
