@@ -228,6 +228,16 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     })
   }
 
+  async getAcceptedByStarkKey(starkKey: StarkKey): Promise<Record[]> {
+    const knex = await this.knex()
+    const rows = await knex('forced_trade_offers')
+      .where('stark_key_a', starkKey.toString())
+      .whereNotNull('accepted_at')
+      .whereNull('cancelled_at')
+      .whereNotNull('transaction_hash')
+    return rows.map(toRecord)
+  }
+
   async countActiveByPositionId(positionId: bigint) {
     const knex = await this.knex()
     const [result] = await this.getByPositionIdQuery(knex, positionId)

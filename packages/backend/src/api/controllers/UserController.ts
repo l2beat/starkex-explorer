@@ -14,6 +14,7 @@ import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
+import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -44,6 +45,7 @@ export class UserController {
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly assetRepository: AssetRepository,
     private readonly tradingMode: TradingMode,
+    private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -61,6 +63,7 @@ export class UserController {
       sentTransactions,
       userTransactions,
       userTransactionsCount,
+      acceptedOffers,
     ] = await Promise.all([
       this.userService.getUserDetails(givenUser),
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
@@ -83,6 +86,7 @@ export class UserController {
         limit: 10,
       }),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
+      this.forcedTradeOfferRepository.getAcceptedByStarkKey(starkKey),
     ])
 
     const assetDetailsMap = await getAssetHashToAssetDetailsMap(
@@ -124,7 +128,19 @@ export class UserController {
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
       withdrawableAssets: [],
-      offersToAccept: [],
+      offersToAccept: acceptedOffers.map((offer) => ({
+        timestamp: offer.createdAt,
+        id: offer.id.toString(),
+        asset: {
+          hashOrId: offer.syntheticAssetId,
+          details: assetDetailsMap[offer.syntheticAssetId.toString()],
+        },
+        amount: offer.syntheticAmount,
+        price: offer.collateralAmount,
+        totalPrice: offer.collateralAmount, // TODO: make sure that the prices are right
+        status: 'ACCEPTED',
+        type: offer.isABuyingSynthetic ? 'BUY' : 'SELL',
+      })),
       assets: assetEntries,
       totalAssets,
       balanceChanges: balanceChangesEntries,

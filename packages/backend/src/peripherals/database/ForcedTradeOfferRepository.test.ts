@@ -1,4 +1,4 @@
-import { AssetId, Hash256, Timestamp } from '@explorer/types'
+import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { setupDatabaseTestSuite } from '../../test/database'
@@ -214,6 +214,40 @@ describe(ForcedTradeOfferRepository.name, () => {
     await repository.add(offer)
 
     expect(await repository.getByPositionId(offer.positionIdA)).toEqual([offer])
+  })
+
+  it('returns accepted offers by stark key', async () => {
+    const starkKey = StarkKey.fake()
+    const offer1 = fakeInitialOffer({ starkKeyA: starkKey })
+    const offer2 = fakeInitialOffer({ starkKeyA: starkKey })
+    const offer3 = fakeInitialOffer({ starkKeyA: starkKey })
+    const offer4 = fakeInitialOffer()
+    const offer5 = fakeInitialOffer()
+
+    await repository.add(offer1)
+    await repository.add(offer2)
+    await repository.add(offer3)
+    await repository.add(offer4)
+    await repository.add(offer5)
+
+    const accepted = fakeAccepted()
+    await repository.update({ ...offer1, accepted })
+    await repository.update({ ...offer2, accepted: fakeAccepted() })
+    await repository.update({ ...offer4, accepted: fakeAccepted() })
+
+    const transactionHash = Hash256.fake()
+    await repository.updateTransactionHash(offer1.id, transactionHash)
+    await repository.updateTransactionHash(offer4.id, transactionHash)
+
+    expect(await repository.getAcceptedByStarkKey(starkKey)).toEqual([
+      {
+        ...offer1,
+        accepted: {
+          ...accepted,
+          transactionHash,
+        },
+      },
+    ])
   })
 
   it('deletes all records', async () => {

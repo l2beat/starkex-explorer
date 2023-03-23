@@ -459,6 +459,7 @@ export class Application {
       userRegistrationEventRepository,
       assetRepository,
       config.starkex.tradingMode,
+      forcedTradeOfferRepository,
       collateralAsset
     )
     const stateUpdateController = new StateUpdateController(

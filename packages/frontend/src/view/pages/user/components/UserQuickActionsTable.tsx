@@ -57,7 +57,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
       {props.isMine && (
         <>
           <p className="mt-6 text-sm font-semibold text-zinc-500">
-            Offers to accept
+            Accepted offers
           </p>
           {props.offersToAccept.map((offer) => {
             const assetInfo = assetToInfo(offer.asset)
@@ -85,7 +85,8 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                     {formatWithDecimals(totalPrice, 6, { suffix: ' USDC' })}
                   </strong>
                 </p>
-                <Button className="ml-auto w-32 !px-0">Accept & sell</Button>
+                <Button className="ml-auto w-32 !px-0">Send to L1</Button>{' '}
+                {/* Label to be determined */}
               </div>
             )
           })}
