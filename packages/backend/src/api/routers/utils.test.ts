@@ -1,7 +1,6 @@
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 import { Context } from 'koa'
 
-import { mock } from '../../test/mock'
 import {
   ControllerBadRequestResult,
   ControllerCreatedResult,
@@ -37,7 +36,7 @@ const REDIRECT_RESULT: ControllerRedirectResult = {
 }
 
 describe(applyControllerResult.name, () => {
-  const ctx = mock<Context>({
+  const ctx = mockObject<Context>({
     redirect: (url) => url,
   })
 
@@ -67,6 +66,6 @@ describe(applyControllerResult.name, () => {
 
   it('handles redirect result', () => {
     applyControllerResult(ctx, REDIRECT_RESULT)
-    expect(ctx.redirect).toHaveBeenCalledWith([REDIRECT_RESULT.url])
+    expect(ctx.redirect).toHaveBeenOnlyCalledWith(REDIRECT_RESULT.url)
   })
 })

@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 
 import { BlockRange } from '../../model'
 import type {
@@ -7,7 +7,6 @@ import type {
   StateTransitionRepository,
 } from '../../peripherals/database/StateTransitionRepository'
 import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { mock } from '../../test/mock'
 import { LogStateTransitionFact } from './events'
 import { PerpetualRollupStateTransitionCollector } from './PerpetualRollupStateTransitionCollector'
 
@@ -15,10 +14,10 @@ const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
 
 describe(PerpetualRollupStateTransitionCollector.name, () => {
   it('parses logs, saves and returns records', async () => {
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       getLogsInRange: async () => testData().logs,
     })
-    const stateTransitionRepository = mock<StateTransitionRepository>({
+    const stateTransitionRepository = mockObject<StateTransitionRepository>({
       addMany: async () => [],
     })
     const stateTransitionCollector =
@@ -85,32 +84,29 @@ describe(PerpetualRollupStateTransitionCollector.name, () => {
     ]
 
     expect(records).toEqual(expectedRecords)
-    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
-      blockRange,
-      {
-        address: PERPETUAL_ADDRESS.toString(),
-        topics: [LogStateTransitionFact.topic],
-      },
-    ])
-    expect(stateTransitionRepository.addMany).toHaveBeenCalledWith([
-      expectedRecords,
-    ])
+    expect(ethereumClient.getLogsInRange).toHaveBeenOnlyCalledWith(blockRange, {
+      address: PERPETUAL_ADDRESS.toString(),
+      topics: [LogStateTransitionFact.topic],
+    })
+    expect(stateTransitionRepository.addMany).toHaveBeenOnlyCalledWith(
+      expectedRecords
+    )
   })
 
   it('discards all records from pageMappingRepository after given block', async () => {
-    const stateTransitionRepository = mock<StateTransitionRepository>({
+    const stateTransitionRepository = mockObject<StateTransitionRepository>({
       deleteAfter: async () => 0,
     })
 
     const collector = new PerpetualRollupStateTransitionCollector(
-      mock<EthereumClient>(),
+      mockObject<EthereumClient>(),
       stateTransitionRepository,
       PERPETUAL_ADDRESS
     )
 
     await collector.discardAfter(123)
 
-    expect(stateTransitionRepository.deleteAfter).toHaveBeenCalledWith([123])
+    expect(stateTransitionRepository.deleteAfter).toHaveBeenOnlyCalledWith(123)
   })
 })
 
