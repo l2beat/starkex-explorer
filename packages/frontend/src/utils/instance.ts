@@ -1,4 +1,11 @@
-export type InstanceName = 'dYdX' | 'Myria' | 'GammaX'
+import { z } from 'zod'
+
+export type InstanceName = z.infer<typeof InstanceName>
+export const InstanceName = z.union([
+  z.literal('dYdX'),
+  z.literal('Myria'),
+  z.literal('GammaX'),
+])
 
 export function getInstanceName(): InstanceName {
   const projectName = process.env.STARKEX_INSTANCE ?? 'dydx-mainnet'

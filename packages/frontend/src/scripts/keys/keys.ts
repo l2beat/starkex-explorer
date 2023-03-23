@@ -67,8 +67,11 @@ function adjustHashLength(msgHash: string) {
 
 // Myria's implementation
 export function getMyriaStarkExKeyPairFromData(signature: string) {
+  if (!starkEc.n) {
+    throw new Error('starkEc.n is not defined')
+  }
   const sig = stripHexPrefix(signature).slice(0, 64)
-  const privateKey = getStarkExPrivateKeyFromSignature(sig, starkEc.n!)
+  const privateKey = getStarkExPrivateKeyFromSignature(sig, starkEc.n)
   const keyPair = starkEc.keyFromPrivate(privateKey, 'hex')
 
   return toSimpleKeyPair(keyPair)

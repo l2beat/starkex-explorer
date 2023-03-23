@@ -1,6 +1,7 @@
 import { UserDetails } from '@explorer/shared'
 import React from 'react'
 
+import { getInstanceName } from '../../../utils/instance'
 import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
@@ -63,7 +64,9 @@ function UserRegisterPage(props: UserRegisterPageProps) {
                 Unknown
               </p>
             </div>
-            <Button>Register</Button>
+            <Button id="register-button" data-instance-name={getInstanceName()}>
+              Register
+            </Button>
           </div>
           <div className="mt-3 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
             <InfoIcon />

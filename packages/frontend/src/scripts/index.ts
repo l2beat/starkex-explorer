@@ -2,6 +2,7 @@ import { USE_NEW_DESIGN } from '../utils/constants'
 import { initCountdownTimer } from './countdownTimer'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
 import { initImageFallback } from './imageFallback'
+import { initStarkKeyRegistration } from './keys/starkKeyRegistration'
 import { initMetamask } from './metamask'
 import { initAcceptOfferForm } from './offer/acceptForm'
 import { initCancelOfferForm } from './offer/cancelForm'
@@ -33,6 +34,7 @@ if (USE_NEW_DESIGN) {
   initImageFallback()
   initPagination()
   initStateUpdateStats()
+  initStarkKeyRegistration()
 } else {
   initTransactionForm()
 }
