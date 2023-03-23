@@ -8,7 +8,7 @@ import {
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
 import { AssetDetails, TradingMode, UserDetails } from '@explorer/shared'
-import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, StarkKey } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
@@ -141,7 +141,7 @@ export class UserController {
       user,
       tradingMode: this.tradingMode,
       starkKey,
-      ethereumAddress: registeredUser.ethAddress ?? EthereumAddress.ZERO,
+      ethereumAddress: registeredUser.ethAddress,
       withdrawableAssets: [],
       offersToAccept: [],
       assets: assetEntries,
