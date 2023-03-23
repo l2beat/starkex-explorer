@@ -284,12 +284,8 @@ describe(WithdrawableAssetRepository.name, () => {
           }),
         })
 
-        const records1 = await repository.getAssetBalancesByStarkKey(
-          starkKey1
-        )
-        const records2 = await repository.getAssetBalancesByStarkKey(
-          starkKey2
-        )
+        const records1 = await repository.getAssetBalancesByStarkKey(starkKey1)
+        const records2 = await repository.getAssetBalancesByStarkKey(starkKey2)
 
         expect(records1.length).toEqual(2)
 

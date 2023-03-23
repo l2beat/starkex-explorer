@@ -86,9 +86,7 @@ export class UserController {
         limit: 10,
       }),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
-      this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
-        starkKey
-      ),
+      this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
     ])
 
     const assetDetailsMap = await getAssetHashToAssetDetailsMap(
