@@ -130,7 +130,9 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.findById = this.wrapFind(this.findById)
     this.getInitial = this.wrapGet(this.getInitial)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
-    this.getUserOffersByStarkKey = this.wrapGet(this.getUserOffersByStarkKey)
+    this.getByMakerOrTakerStarkKey = this.wrapGet(
+      this.getByMakerOrTakerStarkKey
+    )
     this.getInitialAssetIds = this.wrapGet(this.getInitialAssetIds)
     this.getPaginated = this.wrapGet(this.getPaginated)
     this.getAvailablePaginated = this.wrapGet(this.getAvailablePaginated)
@@ -225,7 +227,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async getUserOffersByStarkKey(
+  async getByMakerOrTakerStarkKey(
     starkKey: StarkKey,
     pagination?: PaginationOptions
   ) {

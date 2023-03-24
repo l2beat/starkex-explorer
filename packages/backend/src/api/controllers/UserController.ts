@@ -93,7 +93,7 @@ export class UserController {
         paginationOpts
       ),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
-      this.forcedTradeOfferRepository.getUserOffersByStarkKey(
+      this.forcedTradeOfferRepository.getByMakerOrTakerStarkKey(
         starkKey,
         paginationOpts
       ),

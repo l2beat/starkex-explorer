@@ -424,7 +424,7 @@ describe(ForcedTradeOfferRepository.name, () => {
   })
 
   describe(
-    ForcedTradeOfferRepository.prototype.getUserOffersByStarkKey.name,
+    ForcedTradeOfferRepository.prototype.getByMakerOrTakerStarkKey.name,
     () => {
       it('returns the offers in which the user is involved', async () => {
         const starkKey = StarkKey.fake()
@@ -443,7 +443,7 @@ describe(ForcedTradeOfferRepository.name, () => {
         await repository.add(notInvolvedOffer)
 
         expect(
-          await repository.getUserOffersByStarkKey(starkKey)
+          await repository.getByMakerOrTakerStarkKey(starkKey)
         ).toEqualUnsorted([makerOffer, takerOffer])
       })
     }
