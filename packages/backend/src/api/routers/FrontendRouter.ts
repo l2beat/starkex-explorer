@@ -170,7 +170,7 @@ export function createFrontendRouter(
 
   router.get('/users/register', (ctx) => {
     const givenUser = getGivenUser(ctx)
-    const result = userController.getRegisterPage(givenUser)
+    const result = userController.getRegisterPage(givenUser.address)
 
     applyControllerResult(ctx, result)
   })

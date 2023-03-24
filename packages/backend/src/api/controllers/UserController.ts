@@ -48,14 +48,14 @@ export class UserController {
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
-  getRegisterPage(givenUser: Partial<UserDetails>): ControllerResult {
-    if (!givenUser.address) {
+  getRegisterPage(address: EthereumAddress | undefined): ControllerResult {
+    if (!address) {
       return { type: 'not found', content: 'Wallet not connect' }
     }
 
     const content = renderUserRegisterPage({
       user: {
-        address: givenUser.address,
+        address,
       },
     })
 
