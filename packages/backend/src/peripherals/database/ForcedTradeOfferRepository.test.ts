@@ -442,10 +442,9 @@ describe(ForcedTradeOfferRepository.name, () => {
         await repository.add(takerOffer)
         await repository.add(notInvolvedOffer)
 
-        expect(await repository.getUserOffersByStarkKey(starkKey)).toEqual([
-          makerOffer,
-          takerOffer,
-        ])
+        expect(
+          await repository.getUserOffersByStarkKey(starkKey)
+        ).toEqualUnsorted([makerOffer, takerOffer])
       })
     }
   )
