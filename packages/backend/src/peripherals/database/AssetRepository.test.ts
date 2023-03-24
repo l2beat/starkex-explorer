@@ -1,5 +1,5 @@
 import { AssetDetails, AssetType } from '@explorer/shared'
-import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetHash, EthereumAddress } from '@explorer/types'
 import { expect } from 'earljs'
 import { BigNumber } from 'ethers'
 
@@ -135,7 +135,7 @@ function dummyAsset(
   contractError = []
 ): AssetDetails {
   return {
-    assetTypeHash: Hash256.fake(assetTypeHash),
+    assetTypeHash: AssetHash.fake(assetTypeHash),
     assetHash: AssetHash.fake(assetHash),
     type: 'ERC20',
     name,
@@ -158,7 +158,7 @@ export function dummyAssetRegistration(
   contractError = []
 ): AssetRegistrationRecord {
   return {
-    assetTypeHash: Hash256.fake(assetTypeHash),
+    assetTypeHash: AssetHash.fake(assetTypeHash),
     address,
     type,
     name,

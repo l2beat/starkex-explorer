@@ -1,6 +1,6 @@
 //TODO: Add tests for WithdrawalWithTokenId
 
-import { Hash256, StarkKey } from '@explorer/types'
+import { AssetHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -13,7 +13,7 @@ const starkKey = StarkKey(
 )
 const encodedData =
   '0x64d84842070a6100ed8ef5dd2d61e6d00de188e1ef2ac191f6178d99781150a04e889fd35f5becfffb42eac9db17002f559f25c8c25617304f85f92794ad481031346783000000000000000000000000000000000000000000000000000000000000007b'
-const assetTypeHash = Hash256(
+const assetTypeHash = AssetHash(
   '0x5f5becfffb42eac9db17002f559f25c8c25617304f85f92794ad481031346783'
 )
 

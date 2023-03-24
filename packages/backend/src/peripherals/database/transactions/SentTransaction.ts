@@ -1,11 +1,5 @@
 import { assertUnreachable } from '@explorer/shared'
-import {
-  AssetHash,
-  AssetId,
-  Hash256,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
 
 import { ToJSON } from './ToJSON'
 
@@ -58,7 +52,7 @@ export interface WithdrawData {
 export interface WithdrawWithTokenIdData {
   type: 'WithdrawWithTokenId'
   starkKey: StarkKey
-  assetType: Hash256
+  assetType: AssetHash
   tokenId: bigint
 }
 

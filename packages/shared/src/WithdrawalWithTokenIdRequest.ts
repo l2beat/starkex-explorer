@@ -1,5 +1,5 @@
 import { Interface } from '@ethersproject/abi'
-import { Hash256, StarkKey } from '@explorer/types'
+import { AssetHash, StarkKey } from '@explorer/types'
 
 const coder = new Interface([
   'function withdrawWithTokenId(uint256 ownerKey, uint256 assetType, uint256 tokenId)',
@@ -7,7 +7,7 @@ const coder = new Interface([
 
 export interface WithdrawalWithTokenIdRequest {
   starkKey: StarkKey
-  assetTypeHash: Hash256
+  assetTypeHash: AssetHash
   tokenId: bigint
 }
 
@@ -30,7 +30,7 @@ export function decodeWithdrawalWithTokenId(
     /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
     return {
       starkKey: StarkKey.from(decoded.ownerKey),
-      assetTypeHash: Hash256(decoded.assetType.toHexString()),
+      assetTypeHash: AssetHash(decoded.assetType.toHexString()),
       tokenId: BigInt(decoded.tokenId),
     }
     /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */

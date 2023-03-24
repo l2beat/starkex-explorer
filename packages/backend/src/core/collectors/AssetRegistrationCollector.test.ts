@@ -1,4 +1,4 @@
-import { EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetHash, EthereumAddress } from '@explorer/types'
 import { expect } from 'earljs'
 import { BigNumber } from 'ethers'
 
@@ -155,7 +155,7 @@ const logs = [
 
 const expectedRegistrations: AssetRegistrationRecord[] = [
   {
-    assetTypeHash: Hash256.from(
+    assetTypeHash: AssetHash.from(
       BigNumber.from(
         '395462755788972160729939577683135559676285060777562998674961596667455525528'
       )
@@ -168,7 +168,7 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     contractError: [],
   },
   {
-    assetTypeHash: Hash256.from(
+    assetTypeHash: AssetHash.from(
       BigNumber.from(
         '1652465222767998105503059181114991553434372817454395374606707395630983981654'
       )
@@ -181,7 +181,7 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     contractError: [],
   },
   {
-    assetTypeHash: Hash256.from(
+    assetTypeHash: AssetHash.from(
       BigNumber.from(
         '1727679741333866338593640246949654840813891965024044849102687714219146492163'
       )
@@ -194,7 +194,7 @@ const expectedRegistrations: AssetRegistrationRecord[] = [
     contractError: [],
   },
   {
-    assetTypeHash: Hash256.from(
+    assetTypeHash: AssetHash.from(
       BigNumber.from(
         '819699508121163634638867493810194564998637738546813278417243317074555237559'
       )

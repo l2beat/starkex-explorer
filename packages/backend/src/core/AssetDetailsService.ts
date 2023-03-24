@@ -1,5 +1,5 @@
 import { assertUnreachable, TradingMode } from '@explorer/shared'
-import { AssetHash, Hash256 } from '@explorer/types'
+import { AssetHash } from '@explorer/types'
 
 import { AssetRepository } from '../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRecord } from '../peripherals/database/PreprocessedAssetHistoryRepository'
@@ -23,7 +23,7 @@ export class AssetDetailsService {
       return undefined
     }
 
-    const assetHashes: (AssetHash | Hash256)[] = [
+    const assetHashes: AssetHash[] = [
       ...(records.sentTransactions?.map((tx) =>
         this.getSentTransactionAssetIdentifiers(tx)
       ) ?? []),
@@ -32,9 +32,7 @@ export class AssetDetailsService {
       ...(records.userTransactions?.map((tx) =>
         this.getUserTransactionAssetIdentifiers(tx)
       ) ?? []),
-    ].filter(
-      (i): i is AssetHash | Hash256 => AssetHash.check(i) || Hash256.check(i)
-    )
+    ].filter((i): i is AssetHash => AssetHash.check(i))
 
     const uniqueAssetHashes = [...new Set(assetHashes)]
     const assetDetails =
@@ -47,7 +45,7 @@ export class AssetDetailsService {
 
   getSentTransactionAssetIdentifiers(
     sentTransaction: SentTransactionRecord
-  ): AssetHash | Hash256 | undefined {
+  ): AssetHash | undefined {
     switch (sentTransaction.data.type) {
       case 'Withdraw':
       case 'WithdrawWithTokenId':

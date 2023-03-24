@@ -1,5 +1,5 @@
 import { AssetDetails } from '@explorer/shared'
-import { AssetHash, Hash256 } from '@explorer/types'
+import { AssetHash } from '@explorer/types'
 
 export class AssetDetailsMap {
   private readonly map = new Map<string, AssetDetails>()
@@ -13,7 +13,7 @@ export class AssetDetailsMap {
   }
 
   getByAssetTypeHashAndTokenId(
-    assetTypeHash: Hash256,
+    assetTypeHash: AssetHash,
     tokenId: bigint
   ): AssetDetails | undefined {
     return this.map.get(this.getAssetTypeWithTokenIdKey(assetTypeHash, tokenId))
@@ -33,7 +33,10 @@ export class AssetDetailsMap {
     })
   }
 
-  private getAssetTypeWithTokenIdKey(assetTypeHash: Hash256, tokenId: bigint) {
+  private getAssetTypeWithTokenIdKey(
+    assetTypeHash: AssetHash,
+    tokenId: bigint
+  ) {
     return `${assetTypeHash.toString()}:${tokenId.toString()}`
   }
 }

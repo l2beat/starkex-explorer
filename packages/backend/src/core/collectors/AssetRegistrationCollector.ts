@@ -65,7 +65,7 @@ export class AssetRegistrationCollector {
   ): Promise<[AssetRegistrationRecord, AssetDetails | undefined]> {
     const assetSelector = event.args.assetInfo.substring(0, 10)
     const quantum = event.args.quantum.toBigInt()
-    const assetTypeHash = Hash256.from(event.args.assetType)
+    const assetTypeHash = AssetHash.from(event.args.assetType)
 
     switch (assetSelector) {
       case ETH_SELECTOR: {

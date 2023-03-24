@@ -1,4 +1,4 @@
-import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetHash, EthereumAddress } from '@explorer/types'
 import { z } from 'zod'
 
 import { toJsonWithoutBigInts } from './serialize'
@@ -6,7 +6,7 @@ import { stringAs, stringAsBigInt } from './types'
 
 export const ETHDetails = z.object({
   assetHash: stringAs(AssetHash),
-  assetTypeHash: stringAs(Hash256),
+  assetTypeHash: stringAs(AssetHash),
   type: z.literal('ETH'),
   quantum: stringAsBigInt(),
   name: z.literal('Ethereum'),
@@ -18,7 +18,7 @@ export type ETHDetails = z.infer<typeof ETHDetails>
 export type ERC20Details = z.infer<typeof ERC20Details>
 export const ERC20Details = z.object({
   assetHash: stringAs(AssetHash),
-  assetTypeHash: stringAs(Hash256),
+  assetTypeHash: stringAs(AssetHash),
   type: z.literal('ERC20'),
   quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
@@ -31,7 +31,7 @@ export const ERC20Details = z.object({
 export type ERC721Details = z.infer<typeof ERC721Details>
 export const ERC721Details = z.object({
   assetHash: stringAs(AssetHash),
-  assetTypeHash: stringAs(Hash256),
+  assetTypeHash: stringAs(AssetHash),
   type: z.literal('ERC721'),
   quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
@@ -45,7 +45,7 @@ export const ERC721Details = z.object({
 export type ERC1155Details = z.infer<typeof ERC1155Details>
 export const ERC1155Details = z.object({
   assetHash: stringAs(AssetHash),
-  assetTypeHash: stringAs(Hash256),
+  assetTypeHash: stringAs(AssetHash),
   type: z.literal('ERC1155'),
   quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
@@ -60,7 +60,7 @@ export const ERC1155Details = z.object({
 export type MintableERC721Details = z.infer<typeof MintableERC721Details>
 export const MintableERC721Details = z.object({
   assetHash: stringAs(AssetHash),
-  assetTypeHash: stringAs(Hash256),
+  assetTypeHash: stringAs(AssetHash),
   type: z.literal('MINTABLE_ERC721'),
   quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
@@ -74,7 +74,7 @@ export const MintableERC721Details = z.object({
 export type MintableERC20Details = z.infer<typeof MintableERC20Details>
 export const MintableERC20Details = z.object({
   assetHash: stringAs(AssetHash),
-  assetTypeHash: stringAs(Hash256),
+  assetTypeHash: stringAs(AssetHash),
   type: z.literal('MINTABLE_ERC20'),
   quantum: stringAsBigInt(),
   contractError: z.array(z.unknown()),
