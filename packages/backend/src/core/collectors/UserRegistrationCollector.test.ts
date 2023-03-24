@@ -1,10 +1,9 @@
 import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 
 import { BlockRange } from '../../model'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { mock } from '../../test/mock'
 import { UserRegistrationCollector } from './UserRegistrationCollector'
 
 const PERPETUAL_ADDRESS = EthereumAddress.fake('deadbeef1234')
@@ -64,10 +63,10 @@ const TEST_BLOCKS = TEST_LOGS.map((log) => ({
 
 describe(UserRegistrationCollector.name, () => {
   it('saves events to repository and returns user registrations', async () => {
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       getLogsInRange: async () => TEST_LOGS,
     })
-    const repository = mock<UserRegistrationEventRepository>({
+    const repository = mockObject<UserRegistrationEventRepository>({
       addMany: async () => [],
     })
     const collector = new UserRegistrationCollector(
@@ -110,25 +109,26 @@ describe(UserRegistrationCollector.name, () => {
       },
     ]
 
-    expect(repository.addMany).toHaveBeenCalledWith([
-      expectedRegistrationEvents,
-    ])
+    expect(repository.addMany).toHaveBeenOnlyCalledWith(
+      expectedRegistrationEvents
+    )
 
     expect(registrations).toEqual(expectedRegistrationEvents)
   })
 
   it('discards all records from repository after given block', async () => {
-    const userRegistrationRepository = mock<UserRegistrationEventRepository>({
-      deleteAfter: async () => 0,
-    })
+    const userRegistrationRepository =
+      mockObject<UserRegistrationEventRepository>({
+        deleteAfter: async () => 0,
+      })
     const collector = new UserRegistrationCollector(
-      mock<EthereumClient>(),
+      mockObject<EthereumClient>(),
       userRegistrationRepository,
       PERPETUAL_ADDRESS
     )
 
     await collector.discardAfter(123)
 
-    expect(userRegistrationRepository.deleteAfter).toHaveBeenCalledWith([123])
+    expect(userRegistrationRepository.deleteAfter).toHaveBeenOnlyCalledWith(123)
   })
 })

@@ -1,9 +1,4 @@
-import {
-  OnChainData,
-  OraclePrice,
-  PerpetualForcedAction,
-  State,
-} from '@explorer/encoding'
+import { OnChainData, PerpetualForcedAction, State } from '@explorer/encoding'
 import {
   InMemoryMerkleStorage,
   MerkleTree,
@@ -16,15 +11,13 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
-import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import type { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 import { EMPTY_STATE_HASH } from './PerpetualValidiumUpdater'
@@ -45,7 +38,9 @@ describe(PerpetualRollupUpdater.name, () => {
     // calculating hashes is slow :(
     this.timeout(5000)
 
-    const rollupStateRepository = mock<MerkleTreeRepository<PositionLeaf>>({
+    const rollupStateRepository = mockObject<
+      MerkleTreeRepository<PositionLeaf>
+    >({
       persist: async () => {},
     })
     const emptyTree = await MerkleTree.create(
@@ -59,32 +54,32 @@ describe(PerpetualRollupUpdater.name, () => {
 
   describe(PerpetualRollupUpdater.prototype.loadRequiredPages.name, () => {
     it('throws if pages are missing in database', async () => {
-      const pageRepository = mock<PageRepository>({
+      const pageRepository = mockObject<PageRepository>({
         getByStateTransitions: async () => [],
       })
       const stateUpdater = new PerpetualRollupUpdater(
         pageRepository,
-        mock<StateUpdateRepository>(),
-        mock<MerkleTreeRepository<PositionLeaf>>(),
-        mock<EthereumClient>(),
-        mock<UserTransactionRepository>(),
+        mockObject<StateUpdateRepository>(),
+        mockObject<MerkleTreeRepository<PositionLeaf>>(),
+        mockObject<EthereumClient>(),
+        mockObject<UserTransactionRepository>(),
         Logger.SILENT
       )
       await expect(
         stateUpdater.loadRequiredPages([
           { stateTransitionHash: Hash256.fake('a'), blockNumber: 1 },
         ])
-      ).toBeRejected('Missing pages for state transitions in database')
+      ).toBeRejectedWith('Missing pages for state transitions in database')
     })
 
     it('returns correct StateTransition for every update', async () => {
-      const pageRepository = mock<PageRepository>({
+      const pageRepository = mockObject<PageRepository>({
         getByStateTransitions: async () => [
           ['aa', 'ab', 'ac'],
           ['ba', 'bb'],
         ],
       })
-      const stateUpdateRepository = mock<StateUpdateRepository>({
+      const stateUpdateRepository = mockObject<StateUpdateRepository>({
         findLast: async () => ({
           rootHash: PedersenHash.fake('1234'),
           id: 567,
@@ -96,9 +91,9 @@ describe(PerpetualRollupUpdater.name, () => {
       const stateUpdater = new PerpetualRollupUpdater(
         pageRepository,
         stateUpdateRepository,
-        mock<MerkleTreeRepository<PositionLeaf>>(),
-        mock<EthereumClient>(),
-        mock<UserTransactionRepository>(),
+        mockObject<MerkleTreeRepository<PositionLeaf>>(),
+        mockObject<EthereumClient>(),
+        mockObject<UserTransactionRepository>(),
         Logger.SILENT
       )
 
@@ -135,26 +130,18 @@ describe(PerpetualRollupUpdater.name, () => {
         )
 
         const updater = new PerpetualRollupUpdater(
-          mock<PageRepository>(),
-          mock<StateUpdateRepository>(),
+          mockObject<PageRepository>(),
+          mockObject<StateUpdateRepository>(),
           storage,
-          mock<EthereumClient>(),
-          mock<UserTransactionRepository>(),
+          mockObject<EthereumClient>(),
+          mockObject<UserTransactionRepository>(),
           Logger.SILENT,
           stateTree
         )
 
         const mockProcessStateTransition =
-          mockFn<
-            [
-              StateTransitionRecord,
-              PedersenHash,
-              PerpetualForcedAction[],
-              OraclePrice[],
-              { index: bigint; value: PositionLeaf }[]
-            ]
-          >()
-        mockProcessStateTransition.returns(Promise.resolve())
+          mockFn<typeof updater.processStateTransition>()
+        mockProcessStateTransition.resolvesTo(undefined)
         updater.processStateTransition = mockProcessStateTransition
 
         const update = {
@@ -170,9 +157,9 @@ describe(PerpetualRollupUpdater.name, () => {
             amount: 55n,
           },
         ]
-        const mockOnChainData = mock<OnChainData>({
+        const mockOnChainData = mockObject<OnChainData>({
           oldState: emptyState,
-          newState: mock<State>({
+          newState: mockObject<State>({
             positionRoot: PedersenHash.fake('987'),
             oraclePrices: [{ assetId: AssetId('BTC-9'), price: 5n }],
           }),
@@ -195,13 +182,13 @@ describe(PerpetualRollupUpdater.name, () => {
           },
         ]
         await updater.processOnChainStateTransition(update, mockOnChainData)
-        expect(mockProcessStateTransition).toHaveBeenCalledWith([
+        expect(mockProcessStateTransition).toHaveBeenOnlyCalledWith(
           update,
           PedersenHash.fake('987'),
           testForcedActions,
           mockOnChainData.newState.oraclePrices,
-          updatedPositions,
-        ])
+          updatedPositions
+        )
       })
     }
   )

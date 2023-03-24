@@ -5,7 +5,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 import { Knex } from 'knex'
 
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
@@ -14,7 +14,6 @@ import {
   VaultRecord,
   VaultRepository,
 } from '../../peripherals/database/VaultRepository'
-import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { SpotHistoryPreprocessor } from './SpotHistoryPreprocessor'
 
@@ -57,11 +56,11 @@ describe(SpotHistoryPreprocessor.name, () => {
     SpotHistoryPreprocessor.prototype.preprocessNextStateUpdate.name,
     () => {
       it('should close vaults with zero stark key and process others', async () => {
-        const trx = mock<Knex.Transaction>()
-        const vaultRepository = mock<VaultRepository>({
+        const trx = mockObject<Knex.Transaction>()
+        const vaultRepository = mockObject<VaultRepository>({
           getByStateUpdateId: async () => [vault1, vault2, closingVault],
         })
-        const preprocessedRepository = mock<
+        const preprocessedRepository = mockObject<
           PreprocessedAssetHistoryRepository<AssetHash>
         >({
           getCurrentByPositionOrVaultId: async (positionOrVaultId: bigint) => {
@@ -106,43 +105,46 @@ describe(SpotHistoryPreprocessor.name, () => {
           stateUpdate
         )
 
-        expect(mockClosePositionOrVault).toHaveBeenCalledExactlyWith([
-          [trx, closingVault.vaultId, stateUpdate, {}],
-        ])
-        expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenCalledExactlyWith(
+        expect(mockClosePositionOrVault).toHaveBeenOnlyCalledWith(
+          trx,
+          closingVault.vaultId,
+          stateUpdate,
+          {}
+        )
+
+        expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenCalledTimes(2)
+        expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenNthCalledWith(
+          1,
+          trx,
           [
-            [
-              trx,
-              [
-                {
-                  stateUpdateId: stateUpdate.id,
-                  blockNumber: stateUpdate.blockNumber,
-                  timestamp: stateUpdate.timestamp,
-                  starkKey,
-                  positionOrVaultId: vault1.vaultId,
-                  assetHashOrId: vault1.assetHash,
-                  balance: vault1.balance,
-                  prevBalance: 500_000n,
-                  prevHistoryId: 10,
-                },
-              ],
-            ],
-            [
-              trx,
-              [
-                {
-                  stateUpdateId: stateUpdate.id,
-                  blockNumber: stateUpdate.blockNumber,
-                  timestamp: stateUpdate.timestamp,
-                  starkKey,
-                  positionOrVaultId: vault2.vaultId,
-                  assetHashOrId: vault2.assetHash,
-                  balance: vault2.balance,
-                  prevBalance: 0n,
-                  prevHistoryId: undefined,
-                },
-              ],
-            ],
+            {
+              stateUpdateId: stateUpdate.id,
+              blockNumber: stateUpdate.blockNumber,
+              timestamp: stateUpdate.timestamp,
+              starkKey,
+              positionOrVaultId: vault1.vaultId,
+              assetHashOrId: vault1.assetHash,
+              balance: vault1.balance,
+              prevBalance: 500_000n,
+              prevHistoryId: 10,
+            },
+          ]
+        )
+        expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenNthCalledWith(
+          2,
+          trx,
+          [
+            {
+              stateUpdateId: stateUpdate.id,
+              blockNumber: stateUpdate.blockNumber,
+              timestamp: stateUpdate.timestamp,
+              starkKey,
+              positionOrVaultId: vault2.vaultId,
+              assetHashOrId: vault2.assetHash,
+              balance: vault2.balance,
+              prevBalance: 0n,
+              prevHistoryId: undefined,
+            },
           ]
         )
       })

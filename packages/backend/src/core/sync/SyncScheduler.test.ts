@@ -1,10 +1,9 @@
 import { AssetId, Hash256 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 import waitForExpect from 'wait-for-expect'
 
 import { BlockRange } from '../../model'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
-import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
@@ -20,18 +19,18 @@ describe(SyncScheduler.name, () => {
 
   describe(SyncScheduler.prototype.start.name, () => {
     it('starts from scratch', async () => {
-      const syncStatusRepository = mock<SyncStatusRepository>({
+      const syncStatusRepository = mockObject<SyncStatusRepository>({
         getLastSynced: async () => undefined,
       })
-      const blockDownloader = mock<BlockDownloader>({
+      const blockDownloader = mockObject<BlockDownloader>({
         getKnownBlocks: async () => [],
         onNewBlock: () => () => {},
         onReorg: () => () => {},
       })
-      const dataSyncService = mock<PerpetualRollupSyncService>({
+      const dataSyncService = mockObject<PerpetualRollupSyncService>({
         discardAfter: async () => {},
       })
-      const preprocessor = mock<Preprocessor<AssetId>>({
+      const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
       const syncScheduler = new SyncScheduler(
@@ -45,26 +44,26 @@ describe(SyncScheduler.name, () => {
 
       await syncScheduler.start()
 
-      expect(dataSyncService.discardAfter).toHaveBeenCalledWith([1_000_000])
-      expect(blockDownloader.getKnownBlocks).toHaveBeenCalledWith([1_000_000])
-      expect(blockDownloader.onNewBlock.calls.length).toEqual(1)
-      expect(blockDownloader.onReorg.calls.length).toEqual(1)
-      expect(preprocessor.sync).toHaveBeenCalledWith([])
+      expect(dataSyncService.discardAfter).toHaveBeenOnlyCalledWith(1_000_000)
+      expect(blockDownloader.getKnownBlocks).toHaveBeenOnlyCalledWith(1_000_000)
+      expect(blockDownloader.onNewBlock).toHaveBeenCalledTimes(1)
+      expect(blockDownloader.onReorg).toHaveBeenCalledTimes(1)
+      expect(preprocessor.sync).toHaveBeenCalled()
     })
 
     it('starts from the middle', async () => {
-      const syncStatusRepository = mock<SyncStatusRepository>({
+      const syncStatusRepository = mockObject<SyncStatusRepository>({
         getLastSynced: async () => 2_000_000,
       })
-      const blockDownloader = mock<BlockDownloader>({
+      const blockDownloader = mockObject<BlockDownloader>({
         getKnownBlocks: async () => [block(2_000_100), block(2_000_101)],
         onNewBlock: () => () => {},
         onReorg: () => () => {},
       })
-      const dataSyncService = mock<PerpetualRollupSyncService>({
+      const dataSyncService = mockObject<PerpetualRollupSyncService>({
         discardAfter: async () => {},
       })
-      const preprocessor = mock<Preprocessor<AssetId>>({
+      const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
       const syncScheduler = new SyncScheduler(
@@ -80,32 +79,30 @@ describe(SyncScheduler.name, () => {
       syncScheduler.dispatch = dispatch
       await syncScheduler.start()
 
-      expect(dataSyncService.discardAfter).toHaveBeenCalledWith([2_000_000])
-      expect(blockDownloader.getKnownBlocks).toHaveBeenCalledWith([2_000_000])
-      expect(blockDownloader.onNewBlock.calls.length).toEqual(1)
-      expect(blockDownloader.onReorg.calls.length).toEqual(1)
-      expect(dispatch).toHaveBeenCalledWith([
-        {
-          type: 'initialized',
-          lastSynced: 2_000_000,
-          knownBlocks: [block(2_000_100), block(2_000_101)],
-        },
-      ])
-      expect(preprocessor.sync).toHaveBeenCalledWith([])
+      expect(dataSyncService.discardAfter).toHaveBeenOnlyCalledWith(2_000_000)
+      expect(blockDownloader.getKnownBlocks).toHaveBeenOnlyCalledWith(2_000_000)
+      expect(blockDownloader.onNewBlock).toHaveBeenCalledTimes(1)
+      expect(blockDownloader.onReorg).toHaveBeenCalledTimes(1)
+      expect(dispatch).toHaveBeenOnlyCalledWith({
+        type: 'initialized',
+        lastSynced: 2_000_000,
+        knownBlocks: [block(2_000_100), block(2_000_101)],
+      })
+      expect(preprocessor.sync).toHaveBeenCalled()
     })
   })
 
   describe(SyncScheduler.prototype.dispatch.name, () => {
     it('handles a successful sync', async () => {
-      const syncStatusRepository = mock<SyncStatusRepository>({
+      const syncStatusRepository = mockObject<SyncStatusRepository>({
         setLastSynced: async () => {},
       })
-      const blockDownloader = mock<BlockDownloader>()
-      const dataSyncService = mock<PerpetualRollupSyncService>({
+      const blockDownloader = mockObject<BlockDownloader>()
+      const dataSyncService = mockObject<PerpetualRollupSyncService>({
         sync: async () => {},
         discardAfter: async () => {},
       })
-      const preprocessor = mock<Preprocessor<AssetId>>({
+      const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
       const syncScheduler = new SyncScheduler(
@@ -124,27 +121,27 @@ describe(SyncScheduler.name, () => {
       })
 
       await waitForExpect(() => {
-        expect(dataSyncService.discardAfter).toHaveBeenCalledWith([1_000_000])
-        expect(dataSyncService.sync).toHaveBeenCalledWith([
-          new BlockRange([block(1_000_001), block(1_000_002)]),
-        ])
-        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledWith([
-          1_000_002,
-        ])
-        expect(preprocessor.sync).toHaveBeenCalledWith([])
+        expect(dataSyncService.discardAfter).toHaveBeenOnlyCalledWith(1_000_000)
+        expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
+          new BlockRange([block(1_000_001), block(1_000_002)])
+        )
+        expect(syncStatusRepository.setLastSynced).toHaveBeenOnlyCalledWith(
+          1_000_002
+        )
+        expect(preprocessor.sync).toHaveBeenCalled()
       })
     })
 
     it('handles a failing sync', async () => {
-      const syncStatusRepository = mock<SyncStatusRepository>({
+      const syncStatusRepository = mockObject<SyncStatusRepository>({
         setLastSynced: async () => {},
       })
-      const blockDownloader = mock<BlockDownloader>()
-      const dataSyncService = mock<PerpetualRollupSyncService>({
+      const blockDownloader = mockObject<BlockDownloader>()
+      const dataSyncService = mockObject<PerpetualRollupSyncService>({
         sync: mockFn().rejectsWith(new Error('oops')),
         discardAfter: async () => {},
       })
-      const preprocessor = mock<Preprocessor<AssetId>>({
+      const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
       const syncScheduler = new SyncScheduler(
@@ -163,12 +160,12 @@ describe(SyncScheduler.name, () => {
       })
 
       await waitForExpect(() => {
-        expect(dataSyncService.sync).toHaveBeenCalledWith([
-          new BlockRange([block(1_000_001), block(1_000_002)]),
-        ])
-        expect(syncStatusRepository.setLastSynced).not.toHaveBeenCalledWith([
-          1_000_002,
-        ])
+        expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
+          new BlockRange([block(1_000_001), block(1_000_002)])
+        )
+        expect(syncStatusRepository.setLastSynced).not.toHaveBeenCalledWith(
+          1_000_002
+        )
       })
 
       // allow the jobQueue to finish
@@ -176,15 +173,15 @@ describe(SyncScheduler.name, () => {
     })
 
     it('handles a successful discardAfter', async () => {
-      const syncStatusRepository = mock<SyncStatusRepository>({
+      const syncStatusRepository = mockObject<SyncStatusRepository>({
         setLastSynced: async () => {},
       })
-      const blockDownloader = mock<BlockDownloader>()
-      const dataSyncService = mock<PerpetualRollupSyncService>({
+      const blockDownloader = mockObject<BlockDownloader>()
+      const dataSyncService = mockObject<PerpetualRollupSyncService>({
         sync: async () => {},
         discardAfter: async () => {},
       })
-      const preprocessor = mock<Preprocessor<AssetId>>({
+      const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
       const syncScheduler = new SyncScheduler(
@@ -207,31 +204,38 @@ describe(SyncScheduler.name, () => {
       })
 
       await waitForExpect(() => {
-        expect(dataSyncService.discardAfter).toHaveBeenCalledExactlyWith([
-          [999_999], // this from handleDiscard
-          [999_999], // this from later handleSync
-        ])
-        expect(dataSyncService.sync).toHaveBeenCalledExactlyWith([
-          [new BlockRange([block(1_000_000), block(1_000_001)])],
-        ])
-        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledExactlyWith([
-          [999_999],
-          [1_000_001],
-        ])
-        expect(preprocessor.sync).toHaveBeenCalledWith([])
+        expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(2)
+        expect(dataSyncService.discardAfter).toHaveBeenNthCalledWith(1, 999_999)
+        expect(dataSyncService.discardAfter).toHaveBeenNthCalledWith(2, 999_999)
+
+        expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
+          new BlockRange([block(1_000_000), block(1_000_001)])
+        )
+
+        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledTimes(2)
+        expect(syncStatusRepository.setLastSynced).toHaveBeenNthCalledWith(
+          1,
+          999_999
+        )
+        expect(syncStatusRepository.setLastSynced).toHaveBeenNthCalledWith(
+          2,
+          1_000_001
+        )
+
+        expect(preprocessor.sync).toHaveBeenCalled()
       })
     })
 
     it('handles a failing discardAfter', async () => {
-      const syncStatusRepository = mock<SyncStatusRepository>({
+      const syncStatusRepository = mockObject<SyncStatusRepository>({
         setLastSynced: async () => {},
       })
-      const blockDownloader = mock<BlockDownloader>()
-      const dataSyncService = mock<PerpetualRollupSyncService>({
+      const blockDownloader = mockObject<BlockDownloader>()
+      const dataSyncService = mockObject<PerpetualRollupSyncService>({
         sync: async () => {},
         discardAfter: mockFn().rejectsWith(new Error('oops')),
       })
-      const preprocessor = mock<Preprocessor<AssetId>>({
+      const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
       const syncScheduler = new SyncScheduler(
@@ -254,11 +258,11 @@ describe(SyncScheduler.name, () => {
       })
 
       await waitForExpect(() => {
-        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledWith([
-          999_999,
-        ])
-        expect(dataSyncService.discardAfter).toHaveBeenCalledWith([999_999])
-        expect(preprocessor.sync).toHaveBeenCalledWith([])
+        expect(syncStatusRepository.setLastSynced).toHaveBeenOnlyCalledWith(
+          999_999
+        )
+        expect(dataSyncService.discardAfter).toHaveBeenOnlyCalledWith(999_999)
+        expect(preprocessor.sync).toHaveBeenCalled()
       })
 
       // allow the jobQueue to finish
@@ -269,19 +273,19 @@ describe(SyncScheduler.name, () => {
   describe(SyncScheduler.prototype.handleSync.name, () => {
     it('triggers data sync only if block range is inside the limit', async () => {
       const maxBlockNumber = 10
-      const dataSyncService = mock<PerpetualRollupSyncService>({
+      const dataSyncService = mockObject<PerpetualRollupSyncService>({
         discardAfter: async () => {},
         sync: async () => {},
       })
-      const syncStatusRepository = mock<SyncStatusRepository>({
+      const syncStatusRepository = mockObject<SyncStatusRepository>({
         setLastSynced: async () => {},
       })
-      const preprocessor = mock<Preprocessor<AssetId>>({
+      const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
-        mock<BlockDownloader>(),
+        mockObject<BlockDownloader>(),
         dataSyncService,
         preprocessor,
         Logger.SILENT,
@@ -293,10 +297,10 @@ describe(SyncScheduler.name, () => {
       )
 
       await waitForExpect(() => {
-        expect(dataSyncService.discardAfter.calls.length).toEqual(1)
-        expect(dataSyncService.sync.calls.length).toEqual(1)
-        expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
-        expect(preprocessor.sync).toHaveBeenCalledWith([])
+        expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(1)
+        expect(dataSyncService.sync).toHaveBeenCalledTimes(1)
+        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledTimes(1)
+        expect(preprocessor.sync).toHaveBeenCalled()
       })
 
       await syncScheduler.handleSync(
@@ -304,10 +308,10 @@ describe(SyncScheduler.name, () => {
       )
 
       await waitForExpect(() => {
-        expect(dataSyncService.discardAfter.calls.length).toEqual(1)
-        expect(dataSyncService.sync.calls.length).toEqual(1)
-        expect(syncStatusRepository.setLastSynced.calls.length).toEqual(1)
-        expect(preprocessor.sync).toHaveBeenCalledWith([])
+        expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(1)
+        expect(dataSyncService.sync).toHaveBeenCalledTimes(1)
+        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledTimes(1)
+        expect(preprocessor.sync).toHaveBeenCalled()
       })
     })
   })
