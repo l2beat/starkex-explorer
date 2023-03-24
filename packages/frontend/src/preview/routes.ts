@@ -283,8 +283,7 @@ const routes: Route[] = [
     path: '/users/register',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
-      const user = getUser(ctx)
-      if (!user) return
+      const user = getUser(ctx) ?? getFakeUser()
       ctx.body = renderUserRegisterPage({ user })
     },
   },
@@ -293,17 +292,6 @@ const routes: Route[] = [
     link: '/users/someone',
     description: 'Someone else’s user page.',
     render: notFound,
-  },
-  {
-    path: '/users/me/unknown',
-    description: 'My user page, but the stark key is unknown.',
-    render: (ctx) => {
-      const user = getUser(ctx)
-      if (!user) return
-      ctx.body = renderUserRegisterPage({
-        user,
-      })
-    },
   },
   {
     path: '/users/me/unregistered',
@@ -315,12 +303,12 @@ const routes: Route[] = [
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const user = getUser(ctx) ?? getFakeUser()
       ctx.body = renderUserPage({
         user,
         tradingMode: 'perpetual',
-        starkKey: user?.starkKey ?? StarkKey.fake(),
-        ethereumAddress: user?.address ?? EthereumAddress.fake(),
+        starkKey: user.starkKey ?? StarkKey.fake(),
+        ethereumAddress: user.address,
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         offersToAccept: repeat(2, randomUserOfferEntry),
         assets: repeat(7, randomUserAssetEntry),
@@ -337,25 +325,7 @@ const routes: Route[] = [
   },
   // #endregion
   // #region User lists
-  {
-    path: '/users/me/assets',
-    description:
-      'Assets list accessible from my user page. Supports pagination.',
-    render: (ctx) => {
-      const user = getUser(ctx)
-      const total = 7
-      const { limit, offset, visible } = getPagination(ctx, total)
-      ctx.body = renderUserAssetsPage({
-        user,
-        tradingMode: 'perpetual',
-        starkKey: StarkKey.fake(),
-        assets: repeat(visible, randomUserAssetEntry),
-        limit,
-        offset,
-        total,
-      })
-    },
-  },
+
   {
     path: '/users/:starkKey/assets',
     link: '/users/someone/assets',
@@ -440,7 +410,7 @@ const routes: Route[] = [
     path: '/forced/new/spot/withdraw',
     description: 'Form to create a new spot forced withdrawal.',
     render: (ctx) => {
-      const user = getUser(ctx, true)
+      const user = getUser(ctx) ?? getFakeUser()
       ctx.body = renderNewSpotForcedWithdrawPage({
         user,
         starkKey: StarkKey.fake(),
@@ -458,7 +428,7 @@ const routes: Route[] = [
     path: '/forced/new/perpetual/withdraw',
     description: 'Form to create a new perpetual forced withdrawal.',
     render: (ctx) => {
-      const user = getUser(ctx, true)
+      const user = getUser(ctx) ?? getFakeUser()
       ctx.body = renderNewPerpetualForcedActionPage({
         user,
         starkKey: StarkKey.fake(),
@@ -476,7 +446,7 @@ const routes: Route[] = [
     path: '/forced/new/perpetual/buy',
     description: 'Form to create a new perpetual forced buy.',
     render: (ctx) => {
-      const user = getUser(ctx, true)
+      const user = getUser(ctx) ?? getFakeUser()
       ctx.body = renderNewPerpetualForcedActionPage({
         user,
         starkKey: StarkKey.fake(),
@@ -495,7 +465,7 @@ const routes: Route[] = [
     description: 'Form to create a new perpetual forced sell.',
     breakAfter: true,
     render: (ctx) => {
-      const user = getUser(ctx, true)
+      const user = getUser(ctx) ?? getFakeUser()
       ctx.body = renderNewPerpetualForcedActionPage({
         user,
         starkKey: StarkKey.fake(),
@@ -962,22 +932,10 @@ function getPagination(ctx: Koa.Context, total: number) {
     return { limit, offset, visible: limit }
   }
 }
-function getUser(
-  ctx: Koa.Context,
-  fake: true
-): { address: EthereumAddress; starkKey: StarkKey | undefined }
-function getUser(
-  ctx: Koa.Context,
-  fake?: false
-): { address: EthereumAddress; starkKey: StarkKey | undefined } | undefined
-function getUser(ctx: Koa.Context, fake?: boolean) {
+
+function getUser(ctx: Koa.Context) {
   const account = ctx.cookies.get('account')
   const starkKey = ctx.cookies.get('starkKey')
-  if (!account && fake)
-    return {
-      address: EthereumAddress.fake(),
-      starkKey: StarkKey.fake(),
-    }
 
   if (account) {
     try {
@@ -988,5 +946,12 @@ function getUser(ctx: Koa.Context, fake?: boolean) {
     } catch {
       return
     }
+  }
+}
+
+function getFakeUser() {
+  return {
+    address: EthereumAddress.fake(),
+    starkKey: StarkKey.fake(),
   }
 }
