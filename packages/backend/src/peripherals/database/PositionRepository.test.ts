@@ -410,10 +410,13 @@ describe(PositionRepository.name, () => {
       nextStateUpdateId
     )
     expect(positions.length).toEqual(1)
-    expect(positions[0]).toBeAnObjectWith({
-      stateUpdateId,
-      prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
-      balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
-    })
+    // TODO: update once earljs supports .toHaveSubset!
+    expect(positions[0]).toEqual(
+      expect.subset({
+        stateUpdateId,
+        prices: [{ assetId: AssetId('ETH-9'), price: BigInt(stateUpdateId) }],
+        balances: [{ assetId: AssetId('ETH-9'), balance: 10n }],
+      })
+    )
   })
 })

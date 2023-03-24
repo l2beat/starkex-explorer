@@ -1,7 +1,7 @@
 import { AssetId, Hash256, StarkKey } from '@explorer/types'
+import { mockObject } from 'earljs'
 
 import { fakeBigInt, fakeBoolean, fakeInt } from '../../test/fakes'
-import { mock } from '../../test/mock'
 import { createTestApiServer } from '../../test/TestApiServer'
 import { OldForcedTradeOfferController } from '../controllers/OldForcedTradeOfferController'
 import { TransactionSubmitController } from '../controllers/TransactionSubmitController'
@@ -43,7 +43,7 @@ describe('ForcedTransactionRouter', () => {
         mock<OldForcedTradeOfferController>({
           postOffer: async () => ({ type: 'created', content: { id } }),
         }),
-        mock<TransactionSubmitController>()
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers')
         .send(initialData)
@@ -60,7 +60,7 @@ describe('ForcedTransactionRouter', () => {
             content: 'Accept offer was submitted.',
           }),
         }),
-        mock<TransactionSubmitController>()
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers/1/accept')
         .send(acceptedData)
@@ -74,7 +74,7 @@ describe('ForcedTransactionRouter', () => {
             content: 'Offer does not exist.',
           }),
         }),
-        mock<TransactionSubmitController>()
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers/1/accept')
         .send(acceptedData)
@@ -91,7 +91,7 @@ describe('ForcedTransactionRouter', () => {
             content: 'Offer cancelled.',
           }),
         }),
-        mock<TransactionSubmitController>()
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers/1/cancel')
         .send({ signature })

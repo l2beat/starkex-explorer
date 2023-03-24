@@ -540,7 +540,7 @@ describe(StateUpdateRepository.name, () => {
       rootHash,
       timestamp,
       positions: Array.from({ length: 4 }).map((_, i) =>
-        expect.objectWith({
+        expect.subset({
           starkKey: StarkKey.fake(`${blockNumber}${i}`),
           positionId: BigInt(blockNumber * 10 + i),
           collateralBalance: collateralBalance,
@@ -578,6 +578,6 @@ describe(StateUpdateRepository.name, () => {
 
   it('returns undefined if update is missing', async () => {
     const update = await repository.findByIdWithPositions(1)
-    expect(update).not.toBeDefined()
+    expect(update).toEqual(undefined)
   })
 })

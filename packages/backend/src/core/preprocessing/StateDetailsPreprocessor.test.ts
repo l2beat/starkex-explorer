@@ -1,12 +1,11 @@
 import { AssetHash, Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 import { Knex } from 'knex'
 
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
 
@@ -23,17 +22,18 @@ describe(StateDetailsPreprocessor.name, () => {
     StateDetailsPreprocessor.prototype.preprocessNextStateUpdate.name,
     () => {
       it('should calculate assetUpdateCount and forcedTransactionCount', async () => {
-        const trx = mock<Knex.Transaction>()
-        const mockPreprocessedAssetHistoryRepository = mock<
+        const trx = mockObject<Knex.Transaction>()
+        const mockPreprocessedAssetHistoryRepository = mockObject<
           PreprocessedAssetHistoryRepository<AssetHash>
         >({
           getCountByStateUpdateId: mockFn().resolvesTo(10),
         })
-        const mockUserTransactionRepository = mock<UserTransactionRepository>({
-          getCountOfIncludedByStateUpdateId: mockFn().resolvesTo(20),
-        })
+        const mockUserTransactionRepository =
+          mockObject<UserTransactionRepository>({
+            getCountOfIncludedByStateUpdateId: mockFn().resolvesTo(20),
+          })
         const mockPreprocessedStateDetailsRepository =
-          mock<PreprocessedStateDetailsRepository>({
+          mockObject<PreprocessedStateDetailsRepository>({
             add: mockFn().resolvesTo(undefined),
           })
 
@@ -51,20 +51,18 @@ describe(StateDetailsPreprocessor.name, () => {
 
         expect(
           mockPreprocessedStateDetailsRepository.add
-        ).toHaveBeenCalledExactlyWith([
-          [
-            {
-              stateUpdateId: stateUpdate.id,
-              stateTransitionHash: stateUpdate.stateTransitionHash,
-              rootHash: stateUpdate.rootHash,
-              blockNumber: stateUpdate.blockNumber,
-              timestamp: stateUpdate.timestamp,
-              assetUpdateCount: 10,
-              forcedTransactionCount: 20,
-            },
-            trx,
-          ],
-        ])
+        ).toHaveBeenOnlyCalledWith(
+          {
+            stateUpdateId: stateUpdate.id,
+            stateTransitionHash: stateUpdate.stateTransitionHash,
+            rootHash: stateUpdate.rootHash,
+            blockNumber: stateUpdate.blockNumber,
+            timestamp: stateUpdate.timestamp,
+            assetUpdateCount: 10,
+            forcedTransactionCount: 20,
+          },
+          trx
+        )
       })
     }
   )
@@ -72,16 +70,16 @@ describe(StateDetailsPreprocessor.name, () => {
     StateDetailsPreprocessor.prototype.rollbackOneStateUpdate.name,
     () => {
       it('should delete the state details', async () => {
-        const trx = mock<Knex.Transaction>()
+        const trx = mockObject<Knex.Transaction>()
         const mockPreprocessedStateDetailsRepository =
-          mock<PreprocessedStateDetailsRepository>({
+          mockObject<PreprocessedStateDetailsRepository>({
             deleteByStateUpdateId: mockFn().resolvesTo(undefined),
           })
 
         const stateDetailsPreprocessor = new StateDetailsPreprocessor(
           mockPreprocessedStateDetailsRepository,
-          mock<PreprocessedAssetHistoryRepository<AssetHash>>(),
-          mock<UserTransactionRepository>(),
+          mockObject<PreprocessedAssetHistoryRepository<AssetHash>>(),
+          mockObject<UserTransactionRepository>(),
           Logger.SILENT
         )
 
@@ -92,7 +90,7 @@ describe(StateDetailsPreprocessor.name, () => {
 
         expect(
           mockPreprocessedStateDetailsRepository.deleteByStateUpdateId
-        ).toHaveBeenCalledExactlyWith([[stateUpdate.id, trx]])
+        ).toHaveBeenOnlyCalledWith(stateUpdate.id, trx)
       })
     }
   )
