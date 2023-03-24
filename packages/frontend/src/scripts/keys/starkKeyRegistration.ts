@@ -1,4 +1,3 @@
-import { assertUnreachable } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 import Cookie from 'js-cookie'
 
@@ -35,6 +34,7 @@ const recoverKeys = (account: EthereumAddress, instanceName: InstanceName) => {
       //TODO: Implement
       throw new Error('NIY')
     default:
-      assertUnreachable(instanceName)
+      // TODO: Use assertUnreachable after merging
+      throw new Error('Unknown instance name')
   }
 }
