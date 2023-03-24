@@ -1,4 +1,5 @@
 import {
+  stringAs,
   stringAsBigInt,
   stringAsPositiveInt,
   TradingMode,
@@ -255,6 +256,32 @@ export function createFrontendRouter(
         const result = await userController.getUserTransactionsPage(
           givenUser,
           StarkKey(ctx.params.starkKey),
+          pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/users/:starkKey/offers',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          starkKey: stringAs(StarkKey),
+        }),
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+
+        const result = await userController.getUserOffersPage(
+          givenUser,
+          ctx.params.starkKey,
           pagination
         )
         applyControllerResult(ctx, result)

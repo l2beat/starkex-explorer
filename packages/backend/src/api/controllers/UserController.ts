@@ -1,6 +1,7 @@
 import {
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
+  renderUserOffersPage,
   renderUserPage,
   renderUserTransactionsPage,
   TransactionEntry,
@@ -289,6 +290,31 @@ export class UserController {
       total: totalTransactions,
     })
 
+    return { type: 'success', content }
+  }
+
+  async getUserOffersPage(
+    givenUser: Partial<UserDetails>,
+    starkKey: StarkKey,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const user = await this.userService.getUserDetails(givenUser)
+    const [forcedTradeOffers, forcedTradeOffersCount] = await Promise.all([
+      this.forcedTradeOfferRepository.getByMakerOrTakerStarkKey(
+        starkKey,
+        pagination
+      ),
+      this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
+    ])
+    const content = renderUserOffersPage({
+      user,
+      starkKey,
+      offers: forcedTradeOffers.map((offer) =>
+        forcedTradeOfferToEntry(offer, starkKey)
+      ),
+      ...pagination,
+      total: forcedTradeOffersCount,
+    })
     return { type: 'success', content }
   }
 }
