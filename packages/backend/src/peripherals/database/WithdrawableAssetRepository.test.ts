@@ -287,8 +287,7 @@ describe(WithdrawableAssetRepository.name, () => {
         const records1 = await repository.getAssetBalancesByStarkKey(starkKey1)
         const records2 = await repository.getAssetBalancesByStarkKey(starkKey2)
 
-        expect(records1).toEqualUnsorted(
-          [
+        expect(records1).toEqualUnsorted([
           {
             assetHash: secondAsset,
             balanceDelta: 123n,
@@ -296,14 +295,15 @@ describe(WithdrawableAssetRepository.name, () => {
           {
             assetHash: firstAsset,
             balanceDelta: 246n,
-          }
-        ]
-        )
+          },
+        ])
 
-        expect(records2).toEqual([{
-          assetHash: secondAsset,
-          balanceDelta: 246n,
-        }])
+        expect(records2).toEqual([
+          {
+            assetHash: secondAsset,
+            balanceDelta: 246n,
+          },
+        ])
       })
     }
   )
