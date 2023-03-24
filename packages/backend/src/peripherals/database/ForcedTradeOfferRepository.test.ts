@@ -405,23 +405,35 @@ describe(ForcedTradeOfferRepository.name, () => {
     })
   })
 
-  describe(ForcedTradeOfferRepository.prototype.countByStarkKey.name, () => {
-    it('returns the number of records', async () => {
-      const starkKey = StarkKey.fake()
-      expect(await repository.countByStarkKey(starkKey)).toEqual(0)
+  describe(
+    ForcedTradeOfferRepository.prototype.countByMakerOrTakerStarkKey.name,
+    () => {
+      it('returns the number of records', async () => {
+        const starkKey = StarkKey.fake()
+        expect(await repository.countByMakerOrTakerStarkKey(starkKey)).toEqual(
+          0
+        )
 
-      const expectedCount = 3
-      for (let i = 0; i < expectedCount; i++) {
         await repository.add(
           fakeOffer({
             starkKeyA: starkKey,
           })
         )
-      }
+        await repository.add(
+          fakeOffer({
+            accepted: {
+              ...fakeAccepted({ starkKeyB: starkKey }),
+            },
+          })
+        )
+        await repository.add(fakeOffer())
 
-      expect(await repository.countAll()).toEqual(expectedCount)
-    })
-  })
+        expect(await repository.countByMakerOrTakerStarkKey(starkKey)).toEqual(
+          2
+        )
+      })
+    }
+  )
 
   describe(
     ForcedTradeOfferRepository.prototype.getByMakerOrTakerStarkKey.name,

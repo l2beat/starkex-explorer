@@ -139,7 +139,9 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.countAll = this.wrapAny(this.countAll)
     this.countAvailable = this.wrapAny(this.countAvailable)
     this.countInitial = this.wrapAny(this.countInitial)
-    this.countByStarkKey = this.wrapAny(this.countByStarkKey)
+    this.countByMakerOrTakerStarkKey = this.wrapAny(
+      this.countByMakerOrTakerStarkKey
+    )
     this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -294,10 +296,11 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return Number(result!.count)
   }
 
-  async countByStarkKey(starkKey: StarkKey) {
+  async countByMakerOrTakerStarkKey(starkKey: StarkKey) {
     const knex = await this.knex()
     const [result] = await knex('forced_trade_offers')
       .where({ stark_key_a: starkKey.toString() })
+      .orWhere({ stark_key_b: starkKey.toString() })
       .count()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)

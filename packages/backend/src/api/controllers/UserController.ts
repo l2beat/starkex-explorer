@@ -97,7 +97,7 @@ export class UserController {
         starkKey,
         paginationOpts
       ),
-      this.forcedTradeOfferRepository.countByStarkKey(starkKey),
+      this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
     ])
 
     if (!registeredUser) {
