@@ -27,7 +27,6 @@ export class AssetDetailsMap {
           this.getAssetTypeWithTokenIdKey(assetTypeHash, tokenId),
           assetDetail
         )
-        return
       }
       this.map.set(assetDetail.assetHash.toString(), assetDetail)
     })

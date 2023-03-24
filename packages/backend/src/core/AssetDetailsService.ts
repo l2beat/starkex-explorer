@@ -1,5 +1,6 @@
 import { assertUnreachable, TradingMode } from '@explorer/shared'
 import { AssetHash } from '@explorer/types'
+import { uniqBy } from 'lodash'
 
 import { AssetRepository } from '../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRecord } from '../peripherals/database/PreprocessedAssetHistoryRepository'
@@ -25,20 +26,41 @@ export class AssetDetailsService {
 
     const assetHashes: AssetHash[] = [
       ...(records.sentTransactions?.map((tx) =>
-        this.getSentTransactionAssetIdentifiers(tx)
+        tx.data.type === 'Withdraw' ? tx.data.assetType : undefined
       ) ?? []),
       ...(records.userAssets?.map((a) => a.assetHashOrId) ?? []),
       ...(records.assetHistory?.map((a) => a.assetHashOrId) ?? []),
       ...(records.userTransactions?.map((tx) =>
-        this.getUserTransactionAssetIdentifiers(tx)
+        this.getUserTransactionAssetHash(tx)
       ) ?? []),
-    ].filter((i): i is AssetHash => AssetHash.check(i))
+    ].filter((hash): hash is AssetHash => AssetHash.check(hash))
 
+    const assetTypeAndTokenIds: { assetType: AssetHash; tokenId: bigint }[] =
+      records.sentTransactions
+        ?.map((tx) => {
+          if (tx.data.type !== 'WithdrawWithTokenId') {
+            return
+          }
+          return {
+            assetType: tx.data.assetType,
+            tokenId: tx.data.tokenId,
+          }
+        })
+        .filter((i): i is { assetType: AssetHash; tokenId: bigint } => !!i) ??
+      []
     const uniqueAssetHashes = [...new Set(assetHashes)]
-    const assetDetails =
-      await this.assetRepository.getDetailsByAssetHashesOrTypeHashes(
-        uniqueAssetHashes
-      )
+
+    const [assetDetailsByHash, assetDetailsByTypeAndTokenId] =
+      await Promise.all([
+        this.assetRepository.getDetailsByAssetHashes(uniqueAssetHashes),
+        this.assetRepository.getDetailsByAssetTypeAndTokenIds(
+          assetTypeAndTokenIds
+        ),
+      ])
+    const assetDetails = uniqBy(
+      [...assetDetailsByHash, ...assetDetailsByTypeAndTokenId],
+      (d) => d.assetHash
+    )
 
     return new AssetDetailsMap(assetDetails)
   }
@@ -58,7 +80,7 @@ export class AssetDetailsService {
     }
   }
 
-  getUserTransactionAssetIdentifiers(
+  getUserTransactionAssetHash(
     userTransaction: UserTransactionRecord
   ): AssetHash | undefined {
     switch (userTransaction.data.type) {

@@ -26,9 +26,7 @@ export class AssetRepository extends BaseRepository {
     this.addManyDetails = this.wrapAddMany(this.addManyDetails)
     this.addManyRegistrations = this.wrapAddMany(this.addManyRegistrations)
     this.findDetailsByAssetHash = this.wrapFind(this.findDetailsByAssetHash)
-    this.getDetailsByAssetHashesOrTypeHashes = this.wrapGet(
-      this.getDetailsByAssetHashesOrTypeHashes
-    )
+    this.getDetailsByAssetHashes = this.wrapGet(this.getDetailsByAssetHashes)
     this.findRegistrationByAssetTypeHash = this.wrapFind(
       this.findRegistrationByAssetTypeHash
     )
@@ -72,8 +70,8 @@ export class AssetRepository extends BaseRepository {
     return row ? toAssetDetailsRecord(row) : undefined
   }
 
-  async getDetailsByAssetHashesOrTypeHashes(
-    assetHashes: (AssetHash | Hash256)[]
+  async getDetailsByAssetHashes(
+    assetHashes: AssetHash[]
   ): Promise<AssetDetails[]> {
     const knex = await this.knex()
     const rows = await knex('asset_details')
@@ -82,9 +80,23 @@ export class AssetRepository extends BaseRepository {
         'asset_hash',
         assetHashes.map((x) => x.toString())
       )
-      .orWhereIn(
-        'asset_type_hash',
-        assetHashes.map((x) => x.toString())
+
+    return rows.map((r) => toAssetDetailsRecord(r))
+  }
+
+  async getDetailsByAssetTypeAndTokenIds(
+    assetTypeAndTokenIds: { assetType: AssetHash; tokenId: bigint }[]
+  ): Promise<AssetDetails[]> {
+    const knex = await this.knex()
+
+    const rows = await knex('asset_details')
+      .select()
+      .whereIn(
+        ['asset_type_hash', 'token_id'],
+        assetTypeAndTokenIds.map((x) => [
+          x.assetType.toString(),
+          x.tokenId.toString(),
+        ])
       )
 
     return rows.map((r) => toAssetDetailsRecord(r))

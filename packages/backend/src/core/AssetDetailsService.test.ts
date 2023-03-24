@@ -13,9 +13,9 @@ import { SentTransactionData } from '../peripherals/database/transactions/SentTr
 import { UserTransactionData } from '../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRecord } from '../peripherals/database/transactions/UserTransactionRepository'
 import {
+  fakeErc1155Details,
   fakeErc20Details,
   fakeErc721Details,
-  fakeErc1155Details,
 } from '../test/fakes'
 import { mock } from '../test/mock'
 import { AssetDetailsMap } from './AssetDetailsMap'
@@ -57,8 +57,8 @@ describe(AssetDetailsService.name, () => {
     it('should return asset detail map when trading mode is spot', async () => {
       const assetRepository = mock<AssetRepository>()
       const mockGetDetailsByAssetHashesOrTypeHashes =
-        mockFn<AssetRepository['getDetailsByAssetHashesOrTypeHashes']>()
-      assetRepository.getDetailsByAssetHashesOrTypeHashes =
+        mockFn<AssetRepository['getDetailsByAssetHashes']>()
+      assetRepository.getDetailsByAssetHashes =
         mockGetDetailsByAssetHashesOrTypeHashes
       mockGetDetailsByAssetHashesOrTypeHashes
         .given([
@@ -190,14 +190,14 @@ describe(AssetDetailsService.name, () => {
   )
 
   describe(
-    AssetDetailsService.prototype.getUserTransactionAssetIdentifiers.name,
+    AssetDetailsService.prototype.getUserTransactionAssetHash.name,
     () => {
       const assetDetailsService = new AssetDetailsService(
         mock<AssetRepository>(),
         'spot'
       )
       it('should return assetType from data for Withdraw', () => {
-        const result = assetDetailsService.getUserTransactionAssetIdentifiers(
+        const result = assetDetailsService.getUserTransactionAssetHash(
           userTransaction({
             type: 'Withdraw',
             starkKey: StarkKey.fake(),
@@ -212,7 +212,7 @@ describe(AssetDetailsService.name, () => {
       })
 
       it('should return assetId from data for WithdrawWithTokenId', () => {
-        const result = assetDetailsService.getUserTransactionAssetIdentifiers(
+        const result = assetDetailsService.getUserTransactionAssetHash(
           userTransaction({
             type: 'WithdrawWithTokenId',
             starkKey: StarkKey.fake(),
@@ -229,7 +229,7 @@ describe(AssetDetailsService.name, () => {
       })
 
       it('should return assetId from data for MintWithdraw', () => {
-        const result = assetDetailsService.getUserTransactionAssetIdentifiers(
+        const result = assetDetailsService.getUserTransactionAssetHash(
           userTransaction({
             type: 'MintWithdraw',
             starkKey: StarkKey.fake(),
@@ -243,19 +243,19 @@ describe(AssetDetailsService.name, () => {
       })
 
       it('should return undefined for ForcedWithdrawal', () => {
-        const result = assetDetailsService.getUserTransactionAssetIdentifiers(
+        const result = assetDetailsService.getUserTransactionAssetHash(
           userTransaction({ type: 'ForcedWithdrawal' } as UserTransactionData)
         )
         expect(result).toEqual(undefined)
       })
       it('should return undefined for ForcedTrade', () => {
-        const result = assetDetailsService.getUserTransactionAssetIdentifiers(
+        const result = assetDetailsService.getUserTransactionAssetHash(
           userTransaction({ type: 'ForcedTrade' } as UserTransactionData)
         )
         expect(result).toEqual(undefined)
       })
       it('should return undefined for FullWithdrawal', () => {
-        const result = assetDetailsService.getUserTransactionAssetIdentifiers(
+        const result = assetDetailsService.getUserTransactionAssetHash(
           userTransaction({ type: 'FullWithdrawal' } as UserTransactionData)
         )
         expect(result).toEqual(undefined)
