@@ -570,7 +570,9 @@ export class Application {
               searchController
             ),
         createForcedTransactionRouter(
-          oldForcedTradeOfferController,
+          config.useOldFrontend
+            ? oldForcedTradeOfferController
+            : forcedTradeOfferController,
           userTransactionController
         ),
       ],

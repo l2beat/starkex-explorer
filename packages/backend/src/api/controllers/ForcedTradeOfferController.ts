@@ -30,7 +30,7 @@ export class ForcedTradeOfferController {
     private perpetualAddress: EthereumAddress
   ) {}
 
-  async getOfferPage(
+  async getOfferDetailsPage(
     id: number,
     userAddress: EthereumAddress | undefined
   ): Promise<ControllerResult> {

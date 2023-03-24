@@ -1,17 +1,20 @@
 import { toSignableCancelOffer, toSignableCreateOffer } from '@explorer/shared'
-import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect, mockObject } from 'earljs'
 import { Wallet } from 'ethers'
 
-import { AccountService } from '../../core/AccountService'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { fakeAccepted, fakeOffer } from '../../test/fakes'
-import { OldForcedTradeOfferController } from './OldForcedTradeOfferController'
+import { ForcedTradeOfferController } from './ForcedTradeOfferController'
 import * as tradeMock from './utils/ForcedTradeOfferMockData'
 
-describe(OldForcedTradeOfferController.name, () => {
+describe(ForcedTradeOfferController.name, () => {
+  const collateralAsset = {
+    assetId: AssetId('USDC-6'),
+    price: 1n,
+  }
   const stateUpdateId = 1
   const positionA = {
     positionId: tradeMock.offer.positionIdA,
@@ -48,19 +51,8 @@ describe(OldForcedTradeOfferController.name, () => {
   }
   const invalidSignature = '0x12345'
 
-  const mockAccountService = mockObject<AccountService>({
-    getAccount: async (address) =>
-      address
-        ? {
-            address: address,
-            positionId: 123n,
-            hasUpdates: false,
-          }
-        : undefined,
-  })
-
   describe(
-    OldForcedTradeOfferController.prototype.getOfferDetailsPage.name,
+    ForcedTradeOfferController.prototype.getOfferDetailsPage.name,
     () => {
       it('redirects to transaction page after submission', async () => {
         const offer = fakeOffer({
@@ -69,11 +61,11 @@ describe(OldForcedTradeOfferController.name, () => {
         const offerRepository = mockObject<ForcedTradeOfferRepository>({
           findById: async () => offer,
         })
-        const controller = new OldForcedTradeOfferController(
-          mockAccountService,
+        const controller = new ForcedTradeOfferController(
           offerRepository,
           mockObject<PositionRepository>(),
           mockObject<UserRegistrationEventRepository>(),
+          collateralAsset,
           EthereumAddress.fake()
         )
 
@@ -81,13 +73,15 @@ describe(OldForcedTradeOfferController.name, () => {
           await controller.getOfferDetailsPage(offer.id, undefined)
         ).toEqual({
           type: 'redirect',
-          url: `/forced/${offer.accepted?.transactionHash?.toString() ?? ''}`,
+          url: `/transactions/${
+            offer.accepted?.transactionHash?.toString() ?? ''
+          }`,
         })
       })
     }
   )
 
-  describe(OldForcedTradeOfferController.prototype.postOffer.name, () => {
+  describe(ForcedTradeOfferController.prototype.postOffer.name, () => {
     it('blocks invalid signature', async () => {
       const offerRepository = mockObject<ForcedTradeOfferRepository>({
         add: async () => 1,
@@ -99,11 +93,11 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         })
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         offerRepository,
         positionRepository,
         userRegistrationEventRepository,
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -116,8 +110,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing position', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => undefined,
@@ -125,6 +118,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -137,8 +131,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing user', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => positionA,
@@ -146,6 +139,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -158,8 +152,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks invalid balance', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => ({ ...positionA, collateralAmount: 0n }),
@@ -167,6 +160,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -190,11 +184,11 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         })
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         offerRepository,
         positionRepository,
         userRegistrationEventRepository,
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -207,10 +201,9 @@ describe(OldForcedTradeOfferController.name, () => {
     })
   })
 
-  describe(OldForcedTradeOfferController.prototype.acceptOffer.name, () => {
+  describe(ForcedTradeOfferController.prototype.acceptOffer.name, () => {
     it('blocks missing position', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => undefined,
@@ -218,6 +211,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -228,8 +222,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing user', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => positionA,
@@ -237,6 +230,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -247,8 +241,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing offer', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => undefined,
         }),
@@ -258,6 +251,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -268,8 +262,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks accepted offer', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => ({
             id: 1,
@@ -287,6 +280,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -297,8 +291,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks cancelled offer', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => ({
             id: 1,
@@ -313,6 +306,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -324,8 +318,7 @@ describe(OldForcedTradeOfferController.name, () => {
 
     it('blocks invalid signature', async () => {
       const id = 1
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           add: async () => id,
           findById: async () => ({
@@ -354,6 +347,7 @@ describe(OldForcedTradeOfferController.name, () => {
             }
           },
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -370,8 +364,7 @@ describe(OldForcedTradeOfferController.name, () => {
 
     it('accepts offer', async () => {
       const id = 1
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           add: async () => id,
           findById: async () => ({
@@ -401,6 +394,7 @@ describe(OldForcedTradeOfferController.name, () => {
             }
           },
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -411,7 +405,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
   })
 
-  describe(OldForcedTradeOfferController.prototype.cancelOffer.name, () => {
+  describe(ForcedTradeOfferController.prototype.cancelOffer.name, () => {
     const id = 1
     const request = toSignableCancelOffer(id)
     const initial = {
@@ -429,13 +423,13 @@ describe(OldForcedTradeOfferController.name, () => {
     }
 
     it('blocks missing offer', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => undefined,
         }),
         mockObject<PositionRepository>(),
         mockObject<UserRegistrationEventRepository>(),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -446,8 +440,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks cancelled offer', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => ({
             ...initial,
@@ -456,6 +449,7 @@ describe(OldForcedTradeOfferController.name, () => {
         }),
         mockObject<PositionRepository>(),
         mockObject<UserRegistrationEventRepository>(),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -467,8 +461,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks submitted offer', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => ({
             ...accepted,
@@ -480,6 +473,7 @@ describe(OldForcedTradeOfferController.name, () => {
         }),
         mockObject<PositionRepository>(),
         mockObject<UserRegistrationEventRepository>(),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -491,8 +485,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing position', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => accepted,
         }),
@@ -500,6 +493,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -511,8 +505,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('blocks invalid signature', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => accepted,
         }),
@@ -520,6 +513,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -531,8 +525,7 @@ describe(OldForcedTradeOfferController.name, () => {
     })
 
     it('cancels offer', async () => {
-      const controller = new OldForcedTradeOfferController(
-        mockAccountService,
+      const controller = new ForcedTradeOfferController(
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => accepted,
           update: async () => 1,
@@ -544,6 +537,7 @@ describe(OldForcedTradeOfferController.name, () => {
             ethAddress: addressA,
           }),
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
       const signature = await wallet.signMessage(request)

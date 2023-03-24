@@ -11,13 +11,14 @@ import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
 import { z } from 'zod'
 
+import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { OldForcedTradeOfferController } from '../controllers/OldForcedTradeOfferController'
 import { TransactionSubmitController } from '../controllers/TransactionSubmitController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
 export function createForcedTransactionRouter(
-  offerController: OldForcedTradeOfferController,
+  offerController: OldForcedTradeOfferController | ForcedTradeOfferController,
   transactionSubmitController: TransactionSubmitController
 ) {
   const router = new Router()
