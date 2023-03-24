@@ -70,13 +70,18 @@ export class WithdrawableAssetRepository extends BaseRepository {
     starkKey: StarkKey
   ): Promise<{ assetHash: AssetHash; balanceDelta: bigint }[]> {
     const knex = await this.knex()
-    const results: { assetHash: AssetHash; balanceDelta: bigint }[] =
-      await knex('withdrawable_assets')
-        .select('asset_hash as assetHash')
-        .where('stark_key', starkKey.toString())
-        .groupBy('asset_hash')
-        .sum('balance_delta as balanceDelta')
-    return results.filter((result) => result.balanceDelta > 0)
+    const results: { assetHash: string; balanceDelta: string }[] = await knex(
+      'withdrawable_assets'
+    )
+      .select('asset_hash as assetHash')
+      .where('stark_key', starkKey.toString())
+      .groupBy('asset_hash')
+      .having(knex.raw('sum(balance_delta) > 0'))
+      .sum('balance_delta as balanceDelta')
+    return results.map((x) => ({
+      assetHash: AssetHash(x.assetHash),
+      balanceDelta: BigInt(x.balanceDelta),
+    }))
   }
 
   async findById(id: number): Promise<WithdrawableAssetRecord | undefined> {
