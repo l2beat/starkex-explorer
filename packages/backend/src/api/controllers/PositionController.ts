@@ -184,6 +184,7 @@ function toTransactionHistory(
   for (const sentTransaction of sentTransactions) {
     if (
       sentTransaction.data.type === 'Withdraw' ||
+      sentTransaction.data.type === 'WithdrawWithTokenId' ||
       userTransactions.some(
         (x) => x.transactionHash === sentTransaction.transactionHash
       )

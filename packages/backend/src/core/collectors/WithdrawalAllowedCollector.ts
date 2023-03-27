@@ -1,3 +1,4 @@
+import { assertUnreachable } from '@explorer/shared'
 import {
   AssetHash,
   EthereumAddress,
@@ -10,7 +11,6 @@ import { providers } from 'ethers'
 import { BlockRange } from '../../model/BlockRange'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { assertUnreachable } from '../../utils/assertUnreachable'
 import {
   LogAssetWithdrawalAllowed,
   LogMintableWithdrawalAllowed,

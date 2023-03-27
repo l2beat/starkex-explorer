@@ -1,4 +1,4 @@
-import { AssetId, Hash256, StarkKey } from '@explorer/types'
+import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { mockObject } from 'earljs'
 
 import { fakeBigInt, fakeBoolean, fakeInt } from '../../test/fakes'
@@ -22,7 +22,7 @@ const initialData = {
 const acceptedData = {
   starkKeyB: StarkKey.fake(),
   positionIdB: fakeBigInt().toString(),
-  submissionExpirationTime: fakeInt().toString(),
+  submissionExpirationTime: Timestamp(fakeInt()),
   nonce: fakeBigInt().toString(),
   premiumCost: fakeBoolean(),
   signature,

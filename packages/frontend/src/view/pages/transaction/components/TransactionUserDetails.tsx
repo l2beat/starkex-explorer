@@ -10,7 +10,7 @@ import { TransactionField } from './TransactionField'
 interface TransactionUserDetailsProps {
   title: string
   tradingMode?: TradingMode
-  ethereumAddress: EthereumAddress
+  ethereumAddress: EthereumAddress | undefined
   starkKey: StarkKey
   vaultOrPositionId?: string
 }
@@ -35,13 +35,17 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
           </Link>
         </TransactionField>
         <TransactionField label="Ethereum Address">
-          <Link
-            href={`https://etherscan.io/address/${props.ethereumAddress.toString()}`}
-          >
-            <InlineEllipsis className="max-w-[300px]">
-              {props.ethereumAddress.toString()}
-            </InlineEllipsis>
-          </Link>
+          {props.ethereumAddress ? (
+            <Link
+              href={`https://etherscan.io/address/${props.ethereumAddress.toString()}`}
+            >
+              <InlineEllipsis className="max-w-[300px]">
+                {props.ethereumAddress.toString()}
+              </InlineEllipsis>
+            </Link>
+          ) : (
+            'Unknown'
+          )}
         </TransactionField>
       </div>
     </section>

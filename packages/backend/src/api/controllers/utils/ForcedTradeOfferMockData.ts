@@ -1,4 +1,4 @@
-import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetId, EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
 // Taken from: https://etherscan.io/tx/0x9b2dce5538d0c8c08511c9383be9b67da6f952b367baff0c8bdb5f66c9395634
 
@@ -22,7 +22,7 @@ export const accepted = {
     '069913f789acdd07ff1aff8aa5dcf3d4935cf1d8b29d0f41839cd1be52dc4a41'
   ),
   positionIdB: BigInt('0x2ce'),
-  submissionExpirationTime: 3456000000000n,
+  submissionExpirationTime: Timestamp(12441600000000000000n),
   nonce: BigInt(38404830),
   premiumCost: true,
   signature:

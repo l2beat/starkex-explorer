@@ -1,6 +1,6 @@
 import { Interface } from '@ethersproject/abi'
 import { decodeAssetId, encodeAssetId } from '@explorer/encoding'
-import { AssetId, StarkKey } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
 const coder = new Interface([
   `function forcedTradeRequest(
@@ -30,7 +30,7 @@ export interface PerpetualForcedTradeRequest {
   collateralAmount: bigint
   syntheticAmount: bigint
   isABuyingSynthetic: boolean
-  submissionExpirationTime: bigint
+  submissionExpirationTime: Timestamp
   nonce: bigint
   signature: string
   premiumCost: boolean
@@ -52,7 +52,9 @@ export function decodePerpetualForcedTradeRequest(
       collateralAmount: BigInt(decoded.collateralAmount),
       syntheticAmount: BigInt(decoded.syntheticAmount),
       isABuyingSynthetic: Boolean(decoded.isABuyingSynthetic),
-      submissionExpirationTime: BigInt(decoded.submissionExpirationTime),
+      submissionExpirationTime: Timestamp.fromHours(
+        decoded.submissionExpirationTime
+      ),
       nonce: BigInt(decoded.nonce),
       signature: String(decoded.signature),
       premiumCost: Boolean(decoded.premiumCost),
@@ -76,7 +78,7 @@ export function encodePerpetualForcedTradeRequest(
     data.collateralAmount,
     data.syntheticAmount,
     data.isABuyingSynthetic,
-    data.submissionExpirationTime,
+    Timestamp.toHours(data.submissionExpirationTime),
     data.nonce,
     data.signature,
     data.premiumCost,

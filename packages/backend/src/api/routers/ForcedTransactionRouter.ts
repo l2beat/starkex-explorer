@@ -98,6 +98,7 @@ export function createForcedTransactionRouter(
     )
   )
 
+  //TODO: Remove later as it is used in old frontend
   router.post(
     '/forced/exits/finalize',
     bodyParser(),
@@ -115,6 +116,47 @@ export function createForcedTransactionRouter(
         const result = await transactionSubmitController.submitWithdrawal(
           ctx.request.body.finalizeHash
         )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/withdrawal',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result = await transactionSubmitController.submitWithdrawal(
+          ctx.request.body.hash
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/withdrawal-with-token-id',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result =
+          await transactionSubmitController.submitWithdrawalWithTokenId(
+            ctx.request.body.hash
+          )
         applyControllerResult(ctx, result)
       }
     )
