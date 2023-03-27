@@ -485,6 +485,7 @@ export class Application {
       forcedTradeOfferRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
+      assetRepository,
       collateralAsset
     )
     const merkleProofController = new MerkleProofController(

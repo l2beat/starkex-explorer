@@ -4,11 +4,12 @@ import {
   renderRegularWithdrawalPage,
   renderSpotForcedWithdrawalPage,
 } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { assertUnreachable, UserDetails } from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { UserService } from '../../core/UserService'
+import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import {
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
@@ -22,7 +23,6 @@ import {
   UserTransactionRepository,
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
-import { assertUnreachable } from '../../utils/assertUnreachable'
 import { ControllerResult } from './ControllerResult'
 import {
   buildForcedTradeTransactionHistory,
@@ -37,6 +37,7 @@ export class TransactionController {
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
+    private readonly assetRepository: AssetRepository,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -325,6 +326,38 @@ export class TransactionController {
           history,
         })
       }
+
+      case 'WithdrawWithTokenId': {
+        const history = buildRegularTransactionHistory({
+          sentTransaction,
+        })
+        const asset =
+          await this.assetRepository.findDetailsByAssetTypeAndTokenId(
+            sentTransaction.data.assetType,
+            sentTransaction.data.tokenId
+          )
+
+        if (!asset) {
+          throw new Error('Asset not found')
+        }
+
+        const recipient =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKey
+          )
+
+        return renderRegularWithdrawalPage({
+          user,
+          transactionHash: sentTransaction.transactionHash,
+          recipient: {
+            starkKey: sentTransaction.data.starkKey,
+            ethereumAddress: recipient?.ethAddress,
+          },
+          asset: { hashOrId: asset.assetHash },
+          history,
+        })
+      }
+
       default:
         assertUnreachable(sentTransaction.data)
     }
