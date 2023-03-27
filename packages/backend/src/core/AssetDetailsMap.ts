@@ -2,10 +2,10 @@ import { AssetDetails } from '@explorer/shared'
 import { AssetHash } from '@explorer/types'
 
 export class AssetDetailsMap {
-  private readonly map = new Map<string, AssetDetails>()
+  private readonly map: Map<string, AssetDetails>
 
   constructor(assetDetails: AssetDetails[]) {
-    this.initializeAssetDetailsMap(assetDetails)
+    this.map = this.getInitialAssetDetailsMap(assetDetails)
   }
 
   getByAssetHash(assetHash: AssetHash): AssetDetails | undefined {
@@ -19,17 +19,19 @@ export class AssetDetailsMap {
     return this.map.get(this.getAssetTypeWithTokenIdKey(assetTypeHash, tokenId))
   }
 
-  private initializeAssetDetailsMap(assetDetails: AssetDetails[]) {
+  getInitialAssetDetailsMap(assetDetails: AssetDetails[]) {
+    const map = new Map<string, AssetDetails>()
     assetDetails.forEach((assetDetail) => {
       if (assetDetail.type === 'ERC721' || assetDetail.type === 'ERC1155') {
         const { assetTypeHash, tokenId } = assetDetail
-        this.map.set(
+        map.set(
           this.getAssetTypeWithTokenIdKey(assetTypeHash, tokenId),
           assetDetail
         )
       }
-      this.map.set(assetDetail.assetHash.toString(), assetDetail)
+      map.set(assetDetail.assetHash.toString(), assetDetail)
     })
+    return map
   }
 
   private getAssetTypeWithTokenIdKey(
