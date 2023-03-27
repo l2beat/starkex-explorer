@@ -34,7 +34,7 @@ describe(AssetDetailsService.name, () => {
     data,
   })
 
-  describe(AssetDetailsService.prototype.getAssetDetailsMap.name, () => {
+  describe.only(AssetDetailsService.prototype.getAssetDetailsMap.name, () => {
     it('should return undefined when trading mode is spot', async () => {
       const assetRepository = mockObject<AssetRepository>()
       const assetDetailsService = new AssetDetailsService(
@@ -48,22 +48,28 @@ describe(AssetDetailsService.name, () => {
     })
 
     it('should return asset detail map when trading mode is spot', async () => {
-      const assetRepository = mockObject<AssetRepository>()
-      const mockGetDetailsByAssetHashesOrTypeHashes =
-        mockFn<AssetRepository['getDetailsByAssetHashes']>()
-      assetRepository.getDetailsByAssetHashes =
-        mockGetDetailsByAssetHashesOrTypeHashes
-      mockGetDetailsByAssetHashesOrTypeHashes
-        .given([
-          fakeErc20Details.assetHash,
-          fakeErc721Details.assetHash,
-          fakeErc1155Details.assetHash,
-        ])
-        .resolvesToOnce([
-          fakeErc20Details,
-          fakeErc721Details,
-          fakeErc1155Details,
-        ])
+      const assetRepository = mockObject<AssetRepository>({
+        getDetailsByAssetHashes: mockFn()
+          .given([
+            fakeErc721Details.assetHash,
+            fakeErc1155Details.assetHash,
+            fakeErc20Details.assetHash,
+          ])
+          .resolvesToOnce([
+            fakeErc20Details,
+            fakeErc721Details,
+            fakeErc1155Details,
+          ]),
+        getDetailsByAssetTypeAndTokenIds: mockFn()
+          .given([
+            {
+              assetType: fakeErc721Details.assetTypeHash,
+              tokenId: fakeErc721Details.tokenId,
+            },
+          ])
+          .resolvesToOnce([fakeErc721Details]),
+      })
+
       const assetDetailsService = new AssetDetailsService(
         assetRepository,
         'spot'
@@ -72,19 +78,20 @@ describe(AssetDetailsService.name, () => {
       const result = await assetDetailsService.getAssetDetailsMap({
         sentTransactions: [
           sentTransaction({
-            type: 'Withdraw',
-            assetType: fakeErc20Details.assetHash,
+            type: 'WithdrawWithTokenId',
+            assetType: fakeErc721Details.assetTypeHash,
+            tokenId: fakeErc721Details.tokenId,
             starkKey: StarkKey.fake(),
           }),
         ],
         userTransactions: [
           userTransaction({
-            type: 'MintWithdraw',
+            type: 'Withdraw',
             starkKey: StarkKey.fake(),
-            assetType: Hash256.fake(),
-            assetId: fakeErc721Details.assetHash,
+            assetType: fakeErc20Details.assetHash,
             nonQuantizedAmount: 2n,
             quantizedAmount: 3n,
+            recipient: EthereumAddress.fake(),
           }),
         ],
         userAssets: [
