@@ -17,6 +17,8 @@ type TransactionStatus =
 interface TransactionHistoryItem<
   T extends TransactionStatus = TransactionStatus
 > {
+  // Timestamp may be undefined if i.e. forced trade offer was not initiated with our explorer.
+  // We assume that the offer had been "CREATED" but we do not know when.
   timestamp: Timestamp | undefined
   status: T
 }
