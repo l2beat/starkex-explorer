@@ -1,5 +1,5 @@
 import { AssetDetails } from '@explorer/shared'
-import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetHash, EthereumAddress } from '@explorer/types'
 
 import { BlockRange } from '../../model'
 import {
@@ -9,11 +9,6 @@ import {
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
 import { LogTokenRegistered } from './events'
-
-export interface TokenRegistration {
-  name: string
-  assetId: Hash256
-}
 
 const ETH_SELECTOR = '0x8322fff2'
 const ERC20_SELECTOR = '0xf47261b0'

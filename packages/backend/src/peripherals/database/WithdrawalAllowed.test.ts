@@ -1,4 +1,4 @@
-import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import {
@@ -129,7 +129,7 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
     const data: WithdrawWithTokenIdData = {
       type: 'WithdrawWithTokenId',
       starkKey: StarkKey.fake(),
-      assetType: Hash256.fake(),
+      assetType: AssetHash.fake(),
       tokenId: 45n,
       assetId: AssetHash.fake(),
       nonQuantizedAmount: 123000n,
@@ -163,7 +163,7 @@ describe(encodeWithdrawableBalanceChangeData.name, () => {
     const data: MintWithdrawData = {
       type: 'MintWithdraw',
       starkKey: StarkKey.fake(),
-      assetType: Hash256.fake(),
+      assetType: AssetHash.fake(),
       assetId: AssetHash.fake(),
       nonQuantizedAmount: 123000n,
       quantizedAmount: 123n,

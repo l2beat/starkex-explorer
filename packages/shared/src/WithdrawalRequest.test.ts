@@ -1,4 +1,4 @@
-import { Hash256, StarkKey } from '@explorer/types'
+import { AssetHash, StarkKey } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { decodeWithdrawal, encodeWithdrawal } from './WithdrawalRequest'
@@ -8,7 +8,7 @@ const starkKey = StarkKey(
 )
 const exampleData =
   '0x441a3e70070a6100ed8ef5dd2d61e6d00de188e1ef2ac191f6178d99781150a04e889fd3a040c21f6b2b83cabea7749502bf2a6984d6e309e01195461590989b424c867f'
-const assetTypeHash = Hash256(
+const assetTypeHash = AssetHash(
   '0xa040c21f6b2b83cabea7749502bf2a6984d6e309e01195461590989b424c867f'
 )
 describe(encodeWithdrawal.name, () => {

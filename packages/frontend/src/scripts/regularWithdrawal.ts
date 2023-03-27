@@ -1,5 +1,5 @@
 import { AssetDetails } from '@explorer/shared'
-import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 import { REGULAR_WITHDRAWAL_FORM_ID } from '../view/pages/user/components/RegularWithdrawalForm'
 import { Api } from './peripherals/api'
@@ -51,7 +51,7 @@ async function submitWithdrawal(
   account: EthereumAddress,
   starkKey: StarkKey,
   exchangeAddress: EthereumAddress,
-  assetTypeHash: Hash256
+  assetTypeHash: AssetHash
 ) {
   const hash = await Wallet.sendWithdrawalTransaction(
     account,
@@ -67,7 +67,7 @@ async function submitWithdrawalWithTokenId(
   account: EthereumAddress,
   starkKey: StarkKey,
   exchangeAddress: EthereumAddress,
-  assetTypeHash: Hash256,
+  assetTypeHash: AssetHash,
   tokenId: bigint
 ) {
   const hash = await Wallet.sendWithdrawalWithTokenIdTransaction(

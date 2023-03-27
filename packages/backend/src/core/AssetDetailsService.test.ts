@@ -1,4 +1,10 @@
-import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetHash,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect, mockFn, mockObject } from 'earljs'
 
 import { AssetRepository } from '../peripherals/database/AssetRepository'
@@ -143,7 +149,7 @@ describe(AssetDetailsService.name, () => {
           userTransaction({
             type: 'WithdrawWithTokenId',
             starkKey: StarkKey.fake(),
-            assetType: Hash256.fake(),
+            assetType: AssetHash.fake(),
             tokenId: 2n,
             assetId: fakeErc721Details.assetHash,
             nonQuantizedAmount: 2n,
@@ -160,7 +166,7 @@ describe(AssetDetailsService.name, () => {
           userTransaction({
             type: 'MintWithdraw',
             starkKey: StarkKey.fake(),
-            assetType: Hash256.fake(),
+            assetType: AssetHash.fake(),
             assetId: fakeErc721Details.assetHash,
             nonQuantizedAmount: 2n,
             quantizedAmount: 3n,

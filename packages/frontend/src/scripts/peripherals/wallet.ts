@@ -13,7 +13,7 @@ import {
   toSignableCancelOffer,
   toSignableCreateOffer,
 } from '@explorer/shared'
-import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 function getProvider() {
   const provider = window.ethereum
@@ -190,7 +190,7 @@ export const Wallet = {
     account: EthereumAddress,
     starkKey: StarkKey,
     exchangeAddress: EthereumAddress,
-    assetTypeHash: Hash256
+    assetTypeHash: AssetHash
   ) {
     const data = encodeWithdrawal({ starkKey, assetTypeHash })
 
@@ -211,7 +211,7 @@ export const Wallet = {
     account: EthereumAddress,
     starkKey: StarkKey,
     exchangeAddress: EthereumAddress,
-    assetTypeHash: Hash256,
+    assetTypeHash: AssetHash,
     tokenId: bigint
   ) {
     const data = encodeWithdrawalWithTokenId({

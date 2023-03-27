@@ -150,7 +150,7 @@ export class UserTransactionCollector {
           data: {
             type: 'WithdrawWithTokenId',
             starkKey: StarkKey.from(event.args.starkKey),
-            assetType: Hash256.from(event.args.assetType),
+            assetType: AssetHash.from(event.args.assetType),
             tokenId: event.args.tokenId.toBigInt(),
             assetId: AssetHash.from(event.args.assetId),
             nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
@@ -166,7 +166,7 @@ export class UserTransactionCollector {
           data: {
             type: 'MintWithdraw',
             starkKey: StarkKey.from(event.args.starkKey),
-            assetType: Hash256.from(event.args.assetType),
+            assetType: AssetHash.from(event.args.assetType),
             nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
             quantizedAmount: event.args.quantizedAmount.toBigInt(),
             assetId: AssetHash.from(event.args.assetId),
