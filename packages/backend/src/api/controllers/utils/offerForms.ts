@@ -7,6 +7,8 @@ import { EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
 
+const THREE_DAYS_IN_MILLIS = 3 * 24 * 60 * 60 * 1000
+
 interface User {
   starkKey: StarkKey
   positionId: bigint
@@ -25,7 +27,7 @@ export function getAcceptForm(
   const isAcceptable = !offer.accepted && !offer.cancelledAt
   const shouldRenderForm = isAcceptable && user.positionId !== offer.positionIdA
   const submissionExpirationTime = Timestamp(
-    BigInt(Math.floor(Date.now() + 3 * 24 * 60 * 60 * 1000))
+    BigInt(Math.floor(Date.now() + THREE_DAYS_IN_MILLIS))
   )
   if (!shouldRenderForm) {
     return undefined
