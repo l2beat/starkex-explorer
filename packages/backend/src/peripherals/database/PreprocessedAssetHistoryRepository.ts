@@ -6,7 +6,9 @@ import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export interface PreprocessedAssetHistoryRecord<T extends AssetHash | AssetId> {
+export interface PreprocessedAssetHistoryRecord<
+  T extends AssetHash | AssetId = AssetHash | AssetId
+> {
   historyId: number
   stateUpdateId: number
   blockNumber: number
@@ -331,7 +333,7 @@ function toPreprocessedAssetHistoryRecord<T extends AssetHash | AssetId>(
 }
 
 function toPreprocessedAssetHistoryRow(
-  record: Omit<PreprocessedAssetHistoryRecord<AssetHash | AssetId>, 'historyId'>
+  record: Omit<PreprocessedAssetHistoryRecord, 'historyId'>
 ): Omit<PreprocessedAssetHistoryRow, 'id'> {
   return {
     state_update_id: record.stateUpdateId,

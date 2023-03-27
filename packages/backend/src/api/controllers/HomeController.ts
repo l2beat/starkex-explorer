@@ -6,6 +6,7 @@ import {
 import { TradingMode, UserDetails } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
@@ -13,7 +14,6 @@ import { PreprocessedStateDetailsRepository } from '../../peripherals/database/P
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
-import { getAssetHashToAssetDetailsMap } from './getAssetDetailsMap'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
@@ -25,6 +25,7 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
 export class HomeController {
   constructor(
     private readonly userService: UserService,
+    private readonly assetDetailsService: AssetDetailsService,
     private readonly assetRepository: AssetRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
@@ -57,13 +58,9 @@ export class HomeController {
       this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
     ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userTransactions: forcedUserTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      userTransactions: forcedUserTransactions,
+    })
 
     const transactions = forcedUserTransactions.map((t) =>
       userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
@@ -130,13 +127,9 @@ export class HomeController {
         this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
       ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userTransactions: forcedUserTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      userTransactions: forcedUserTransactions,
+    })
 
     const transactions = forcedUserTransactions.map((t) =>
       userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)

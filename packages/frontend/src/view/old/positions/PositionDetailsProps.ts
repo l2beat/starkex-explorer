@@ -43,7 +43,7 @@ export interface OfferHistoryEntry {
   role: 'maker' | 'taker'
   createdAt: Timestamp
   accepted?: {
-    submissionExpirationTime: bigint
+    submissionExpirationTime: Timestamp
     transactionHash?: Hash256
   }
   cancelledAt?: Timestamp

@@ -21,3 +21,8 @@ Timestamp.fromSeconds = function fromSeconds(seconds: number | bigint) {
 Timestamp.fromHours = function fromHours(hours: number | bigint) {
   return Timestamp(Number(hours) * 1000 * 3600)
 }
+
+Timestamp.toHours = function toHours(timestamp: Timestamp) {
+  const milliseconds = Number(timestamp)
+  return Timestamp(milliseconds / 3600 / 1000)
+}
