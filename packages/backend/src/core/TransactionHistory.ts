@@ -142,11 +142,10 @@ export class TransactionHistory {
 
   getLatestStatus() {
     const history = this.getForcedTradeTransactionHistory()
-    const latestHistoryItem = history[0]
+    // We know that there is at least one item in the history
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const latestHistoryItem = history[0]!
 
-    if (!latestHistoryItem) {
-      throw Error('No transaction history found')
-    }
     return latestHistoryItem.status
   }
 }

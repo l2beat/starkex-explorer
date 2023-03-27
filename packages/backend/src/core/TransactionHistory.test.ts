@@ -278,12 +278,16 @@ describe(TransactionHistory.name, () => {
         },
         { status: 'SENT', timestamp: sentTransaction.sentTimestamp },
       ]
+      // Basicly for the next two describes we want to test all possible combinations of sentTransaction and userTransaction.
+      // Even though they do not make any difference as only the forced trade offer matters.
+      // To prevent code duplication we use the following array of tuples.
       const additionalTransactionConfiguration = [
         [],
         [fakeSentTransaction()],
         [undefined, fakeUserTransaction()],
         [fakeSentTransaction(), fakeUserTransaction()],
       ] as const
+
       additionalTransactionConfiguration.forEach(
         ([sentTransaction, userTransaction]) => {
           const describeTitle = `forcedTradeOffer ✔ | sentTransaction ${
@@ -466,6 +470,7 @@ describe(TransactionHistory.name, () => {
           })
         }
       )
+      // We do not need the first element of the array, because there is no way to have all three transactions undefined
       additionalTransactionConfiguration
         .slice(1)
         .forEach(([sentTransaction, userTransaction]) => {
