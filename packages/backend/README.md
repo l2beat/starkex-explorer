@@ -1,5 +1,7 @@
 # @explorer/backend
 
+Backend project for StarEx explorer.
+
 ## Scripts
 
 - `yarn build` - build the application
