@@ -206,8 +206,10 @@ describe(AssetRepository.name, () => {
       it('returns records that match', async () => {
         const records = [
           dummyAssetWithTokenId('1', '1', 1n),
-          dummyAssetWithTokenId('2', '2', 2n),
-          dummyAssetWithTokenId('3', '3', 3n),
+          dummyAssetWithTokenId('1', '3', 2n),
+          dummyAssetWithTokenId('2', '4', 1n),
+          dummyAssetWithTokenId('2', '5', 2n),
+          dummyAssetWithTokenId('3', '6', 3n),
         ]
 
         await assetRepository.addManyDetails(records)
@@ -218,12 +220,16 @@ describe(AssetRepository.name, () => {
             tokenId: records[0]!.tokenId,
           },
           {
-            assetType: records[2]!.assetTypeHash,
-            tokenId: records[2]!.tokenId,
+            assetType: records[3]!.assetTypeHash,
+            tokenId: records[3]!.tokenId,
+          },
+          {
+            assetType: records[4]!.assetTypeHash,
+            tokenId: records[4]!.tokenId,
           },
         ])
 
-        expect(actual).toEqual([records[0]!, records[2]!])
+        expect(actual).toEqual([records[0]!, records[3]!, records[4]!])
       })
     }
   )
