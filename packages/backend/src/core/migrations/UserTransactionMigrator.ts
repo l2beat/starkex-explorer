@@ -1,7 +1,7 @@
 import {
-  decodeFinalizeExitRequest,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
+  decodeWithdrawal,
 } from '@explorer/shared'
 import { AssetHash, AssetId, Hash256, Timestamp } from '@explorer/types'
 
@@ -166,7 +166,7 @@ export class UserTransactionMigrator {
         }
 
         if (tx.data.startsWith('0x441a3e70')) {
-          const data = decodeFinalizeExitRequest(tx.data)
+          const data = decodeWithdrawal(tx.data)
           if (!data) {
             throw new Error('Cannot decode finalize exit request!')
           }
@@ -176,7 +176,7 @@ export class UserTransactionMigrator {
             data: {
               type: 'Withdraw',
               starkKey: data.starkKey,
-              assetType: AssetHash(data.assetType),
+              assetType: AssetHash(data.assetTypeHash.toString()),
             },
           })
         } else if (tx.data.startsWith('0xaf1437a3')) {

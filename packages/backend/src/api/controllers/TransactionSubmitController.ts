@@ -1,7 +1,8 @@
 import {
-  decodeFinalizeExitRequest,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
+  decodeWithdrawal,
+  decodeWithdrawalWithTokenId,
   PerpetualForcedTradeRequest,
 } from '@explorer/shared'
 import {
@@ -66,7 +67,7 @@ export class TransactionSubmitController {
         content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
-    const data = decodeFinalizeExitRequest(tx.data)
+    const data = decodeWithdrawal(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
       return { type: 'bad request', content: `Invalid transaction` }
     }
@@ -76,10 +77,53 @@ export class TransactionSubmitController {
       data: {
         type: 'Withdraw',
         starkKey: data.starkKey,
-        assetType: AssetHash(data.assetType),
+        assetType: AssetHash(data.assetTypeHash.toString()),
       },
     })
     return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitWithdrawalWithTokenId(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const tx = await this.getTransaction(transactionHash)
+    if (!tx) {
+      return {
+        type: 'bad request',
+        content: `Transaction ${transactionHash.toString()} not found`,
+      }
+    }
+    const data = decodeWithdrawalWithTokenId(tx.data)
+    if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
+      return { type: 'bad request', content: `Invalid transaction` }
+    }
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'WithdrawWithTokenId',
+        starkKey: data.starkKey,
+        assetType: data.assetTypeHash,
+        tokenId: data.tokenId,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  private async getTransaction(hash: Hash256) {
+    if (!this.retryTransactions) {
+      return this.ethereumClient.getTransaction(hash)
+    }
+    for (const ms of [0, 1000, 4000]) {
+      if (ms) {
+        await sleep(ms)
+      }
+      const tx = await this.ethereumClient.getTransaction(hash)
+      if (tx) {
+        return tx
+      }
+    }
   }
 
   async submitForcedTrade(
@@ -138,21 +182,6 @@ export class TransactionSubmitController {
       },
     })
     return { type: 'created', content: { id: transactionHash } }
-  }
-
-  private async getTransaction(hash: Hash256) {
-    if (!this.retryTransactions) {
-      return this.ethereumClient.getTransaction(hash)
-    }
-    for (const ms of [0, 1000, 4000]) {
-      if (ms) {
-        await sleep(ms)
-      }
-      const tx = await this.ethereumClient.getTransaction(hash)
-      if (tx) {
-        return tx
-      }
-    }
   }
 }
 

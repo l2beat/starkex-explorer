@@ -7,7 +7,7 @@ import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface AssetRegistrationRecord {
-  assetTypeHash: Hash256
+  assetTypeHash: AssetHash
   type: AssetType
   quantum: bigint
   address?: EthereumAddress
@@ -27,6 +27,9 @@ export class AssetRepository extends BaseRepository {
     this.addManyRegistrations = this.wrapAddMany(this.addManyRegistrations)
     this.findDetailsByAssetHash = this.wrapFind(this.findDetailsByAssetHash)
     this.getDetailsByAssetHashes = this.wrapGet(this.getDetailsByAssetHashes)
+    this.getDetailsByAssetTypeAndTokenIds = this.wrapGet(
+      this.getDetailsByAssetTypeAndTokenIds
+    )
     this.findRegistrationByAssetTypeHash = this.wrapFind(
       this.findRegistrationByAssetTypeHash
     )
@@ -84,8 +87,26 @@ export class AssetRepository extends BaseRepository {
     return rows.map((r) => toAssetDetailsRecord(r))
   }
 
+  async getDetailsByAssetTypeAndTokenIds(
+    assetTypeAndTokenIds: { assetType: AssetHash; tokenId: bigint }[]
+  ): Promise<AssetDetails[]> {
+    const knex = await this.knex()
+
+    const rows = await knex('asset_details')
+      .select()
+      .whereIn(
+        ['asset_type_hash', 'token_id'],
+        assetTypeAndTokenIds.map((x) => [
+          x.assetType.toString(),
+          x.tokenId.toString(),
+        ])
+      )
+
+    return rows.map((r) => toAssetDetailsRecord(r))
+  }
+
   async findRegistrationByAssetTypeHash(
-    assetTypeHash: Hash256
+    assetTypeHash: AssetHash
   ): Promise<AssetRegistrationRecord | undefined> {
     const knex = await this.knex()
     const row = await knex('asset_registrations')
@@ -140,7 +161,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
     case 'ETH': {
       return {
         assetHash: AssetHash(row.asset_hash),
-        assetTypeHash: Hash256(row.asset_type_hash),
+        assetTypeHash: AssetHash(row.asset_type_hash),
         type: 'ETH',
         quantum: BigInt(row.quantum),
         name: 'Ethereum',
@@ -154,7 +175,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       }
       return {
         assetHash: AssetHash(row.asset_hash),
-        assetTypeHash: Hash256(row.asset_type_hash),
+        assetTypeHash: AssetHash(row.asset_type_hash),
         type: 'ERC20',
         quantum: BigInt(row.quantum),
         address: EthereumAddress(row.address),
@@ -173,7 +194,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       }
       return {
         assetHash: AssetHash(row.asset_hash),
-        assetTypeHash: Hash256(row.asset_type_hash),
+        assetTypeHash: AssetHash(row.asset_type_hash),
         type: 'ERC721',
         quantum: BigInt(row.quantum),
         address: EthereumAddress(row.address),
@@ -193,7 +214,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       }
       return {
         assetHash: AssetHash(row.asset_hash),
-        assetTypeHash: Hash256(row.asset_type_hash),
+        assetTypeHash: AssetHash(row.asset_type_hash),
         type: 'ERC1155',
         quantum: BigInt(row.quantum),
         address: EthereumAddress(row.address),
@@ -213,7 +234,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       }
       return {
         assetHash: AssetHash(row.asset_hash),
-        assetTypeHash: Hash256(row.asset_type_hash),
+        assetTypeHash: AssetHash(row.asset_type_hash),
         type: 'MINTABLE_ERC20',
         quantum: BigInt(row.quantum),
         address: EthereumAddress(row.address),
@@ -233,7 +254,7 @@ function toAssetDetailsRecord(row: AssetDetailsRow): AssetDetails {
       }
       return {
         assetHash: AssetHash(row.asset_hash),
-        assetTypeHash: Hash256(row.asset_type_hash),
+        assetTypeHash: AssetHash(row.asset_type_hash),
         type: 'MINTABLE_ERC721',
         quantum: BigInt(row.quantum),
         address: EthereumAddress(row.address),
@@ -253,7 +274,7 @@ function toAssetRegistrationRecord(
   row: AssetRegistrationRow
 ): AssetRegistrationRecord {
   return {
-    assetTypeHash: Hash256(row.asset_type_hash),
+    assetTypeHash: AssetHash(row.asset_type_hash),
     type: row.type as AssetType,
     quantum: BigInt(row.quantum),
     address: row.address ? EthereumAddress(row.address) : undefined,
