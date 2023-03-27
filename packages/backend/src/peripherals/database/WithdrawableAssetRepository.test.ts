@@ -233,6 +233,7 @@ describe(WithdrawableAssetRepository.name, () => {
 
         const firstAsset = AssetHash.fake()
         const secondAsset = AssetHash.fake()
+        const thirdAsset = AssetHash.fake()
 
         await repository.add({
           transactionHash: Hash256.fake(),
@@ -281,6 +282,17 @@ describe(WithdrawableAssetRepository.name, () => {
           data: fakeWithdrawalAllowedData({
             starkKey: starkKey1,
             assetType: secondAsset,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+            assetType: thirdAsset,
+            quantizedAmount: 0n
           }),
         })
 
