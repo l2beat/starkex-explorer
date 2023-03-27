@@ -17,7 +17,7 @@ export function initFinalizeExitForm() {
         getAttribute(form, 'perpetual-address')
       )
       const starkKey = StarkKey(getAttribute(form, 'stark-key'))
-      const finalizeHash = await Wallet.sendWithdrawalTransaction(
+      const finalizeHash = await Wallet.sendOldWithdrawalTransaction(
         address,
         starkKey,
         perpetualAddress

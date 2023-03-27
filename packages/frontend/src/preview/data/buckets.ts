@@ -1,4 +1,4 @@
-import { AssetHash, AssetId, EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { Asset } from '../../utils/assets'
 import { Bucket } from './bucket'
@@ -12,7 +12,7 @@ assetBucket.add({
   hashOrId: AssetHash.fake(),
   details: {
     assetHash: AssetHash.fake(),
-    assetTypeHash: Hash256.fake(),
+    assetTypeHash: AssetHash.fake(),
     address: EthereumAddress('0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984'),
     type: 'ERC20',
     name: 'Uniswap',
@@ -26,7 +26,7 @@ assetBucket.add({
   hashOrId: AssetHash.fake(),
   details: {
     assetHash: AssetHash.fake(),
-    assetTypeHash: Hash256.fake(),
+    assetTypeHash: AssetHash.fake(),
     address: EthereumAddress('0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB'),
     type: 'ERC721',
     name: 'CRYPTOPUNKS',

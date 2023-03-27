@@ -6,12 +6,14 @@ import {
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
+  encodeWithdrawal,
+  encodeWithdrawalWithTokenId,
   FinalizeOfferData,
   toSignableAcceptOffer,
   toSignableCancelOffer,
   toSignableCreateOffer,
 } from '@explorer/shared'
-import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
 function getProvider() {
   const provider = window.ethereum
@@ -165,12 +167,58 @@ export const Wallet = {
   // #endregion
   // #region Withdrawals
 
-  async sendWithdrawalTransaction(
+  async sendOldWithdrawalTransaction(
     account: EthereumAddress,
     starkKey: StarkKey,
     exchangeAddress: EthereumAddress
   ) {
     const data = encodeFinalizeExitRequest(starkKey)
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account,
+          to: exchangeAddress,
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendWithdrawalTransaction(
+    account: EthereumAddress,
+    starkKey: StarkKey,
+    exchangeAddress: EthereumAddress,
+    assetTypeHash: AssetHash
+  ) {
+    const data = encodeWithdrawal({ starkKey, assetTypeHash })
+
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account,
+          to: exchangeAddress,
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendWithdrawalWithTokenIdTransaction(
+    account: EthereumAddress,
+    starkKey: StarkKey,
+    exchangeAddress: EthereumAddress,
+    assetTypeHash: AssetHash,
+    tokenId: bigint
+  ) {
+    const data = encodeWithdrawalWithTokenId({
+      starkKey,
+      assetTypeHash,
+      tokenId,
+    })
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [

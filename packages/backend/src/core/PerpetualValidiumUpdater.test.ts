@@ -1,6 +1,5 @@
 import {
   AssetConfigHash,
-  OraclePrice,
   PerpetualForcedAction,
   State,
 } from '@explorer/encoding'
@@ -16,14 +15,12 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
-import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
 import {
   EMPTY_STATE_HASH,
@@ -46,7 +43,9 @@ describe(PerpetualValidiumUpdater.name, () => {
     // calculating hashes is slow :(
     this.timeout(5000)
 
-    const rollupStateRepository = mock<MerkleTreeRepository<PositionLeaf>>({
+    const rollupStateRepository = mockObject<
+      MerkleTreeRepository<PositionLeaf>
+    >({
       persist: async () => {},
     })
     const emptyTree = await MerkleTree.create(
@@ -70,32 +69,24 @@ describe(PerpetualValidiumUpdater.name, () => {
         )
 
         const updater = new PerpetualValidiumUpdater(
-          mock<StateUpdateRepository>(),
+          mockObject<StateUpdateRepository>(),
           storage,
-          mock<EthereumClient>(),
-          mock<UserTransactionRepository>(),
+          mockObject<EthereumClient>(),
+          mockObject<UserTransactionRepository>(),
           Logger.SILENT,
           stateTree
         )
 
         const mockProcessStateTransition =
-          mockFn<
-            [
-              StateTransitionRecord,
-              PedersenHash,
-              PerpetualForcedAction[],
-              OraclePrice[],
-              { index: bigint; value: PositionLeaf }[]
-            ]
-          >()
-        mockProcessStateTransition.returns(Promise.resolve())
+          mockFn<typeof updater.processStateTransition>()
+        mockProcessStateTransition.resolvesTo(undefined)
         updater.processStateTransition = mockProcessStateTransition
 
-        const mockReadLastupdate = mockFn()
-        mockReadLastupdate.returns(
+        const mockReadLastUpdate = mockFn()
+        mockReadLastUpdate.returns(
           Promise.resolve({ oldHash: PedersenHash.fake('321'), id: 1 })
         )
-        updater.readLastUpdate = mockReadLastupdate
+        updater.readLastUpdate = mockReadLastUpdate
 
         const transition = {
           blockNumber: 1,
@@ -114,16 +105,16 @@ describe(PerpetualValidiumUpdater.name, () => {
         ]
         const mockProgramOutput = {
           configurationHash: Hash256.fake('997'),
-          assetConfigHashes: mock<AssetConfigHash[]>(),
+          assetConfigHashes: mockObject<AssetConfigHash[]>(),
           oldState: emptyState,
-          newState: mock<State>({
+          newState: mockObject<State>({
             positionRoot: PedersenHash.fake('987'),
             oraclePrices: [{ assetId: AssetId('BTC-9'), price: 5n }],
           }),
           minimumExpirationTimestamp: 123n,
           modifications: [],
           forcedActions: testForcedActions,
-          conditions: mock<PedersenHash[]>(),
+          conditions: mockObject<PedersenHash[]>(),
         }
         const testPerpetualBatch = {
           previousBatchId: 12,
@@ -156,13 +147,13 @@ describe(PerpetualValidiumUpdater.name, () => {
           mockProgramOutput,
           testPerpetualBatch
         )
-        expect(mockProcessStateTransition).toHaveBeenCalledWith([
+        expect(mockProcessStateTransition).toHaveBeenOnlyCalledWith(
           update,
           mockProgramOutput.newState.positionRoot,
           testForcedActions,
           mockProgramOutput.newState.oraclePrices,
-          updatedPositions,
-        ])
+          updatedPositions
+        )
       })
     }
   )

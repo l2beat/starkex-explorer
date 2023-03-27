@@ -1,4 +1,4 @@
-import { StarkKey } from '@explorer/types'
+import { StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
 
 import { AcceptOfferBody, serializeAcceptOfferBody } from './AcceptOfferBody'
@@ -11,7 +11,7 @@ describe('AcceptOfferBody', () => {
       premiumCost: false,
       signature: '0x1234567890abcdef',
       starkKeyB: StarkKey.fake(),
-      submissionExpirationTime: 3n,
+      submissionExpirationTime: Timestamp(3n),
     }
     const serialized = serializeAcceptOfferBody(body)
     expect(serialized).toBeA(String)

@@ -79,7 +79,7 @@ describe(MerkleTree.name, () => {
     it('throws for negative indices', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionLeaf.EMPTY)
-      await expect(tree.getLeaf(-1n)).toBeRejected(
+      await expect(tree.getLeaf(-1n)).toBeRejectedWith(
         TypeError,
         'Index out of bounds'
       )
@@ -88,7 +88,7 @@ describe(MerkleTree.name, () => {
     it('throws for too large indices', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionLeaf.EMPTY)
-      await expect(tree.getLeaf(8n)).toBeRejected(
+      await expect(tree.getLeaf(8n)).toBeRejectedWith(
         TypeError,
         'Index out of bounds'
       )
@@ -117,7 +117,7 @@ describe(MerkleTree.name, () => {
     it('throws for negative indices', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionLeaf.EMPTY)
-      await expect(tree.getLeaf(-1n)).toBeRejected(
+      await expect(tree.getLeaf(-1n)).toBeRejectedWith(
         TypeError,
         'Index out of bounds'
       )
@@ -126,7 +126,7 @@ describe(MerkleTree.name, () => {
     it('throws for too large indices', async () => {
       const storage = new InMemoryMerkleStorage()
       const tree = await MerkleTree.create(storage, 3n, PositionLeaf.EMPTY)
-      await expect(tree.getLeaf(8n)).toBeRejected(
+      await expect(tree.getLeaf(8n)).toBeRejectedWith(
         TypeError,
         'Index out of bounds'
       )
@@ -180,7 +180,7 @@ describe(MerkleTree.name, () => {
           { index: -1n, value: positionLeafA },
           { index: 7n, value: positionLeafB },
         ])
-      ).toBeRejected(TypeError, 'Index out of bounds')
+      ).toBeRejectedWith(TypeError, 'Index out of bounds')
     })
 
     it('throws for too large indices', async () => {
@@ -192,7 +192,7 @@ describe(MerkleTree.name, () => {
           { index: 2n, value: positionLeafA },
           { index: 8n, value: positionLeafB },
         ])
-      ).toBeRejected(TypeError, 'Index out of bounds')
+      ).toBeRejectedWith(TypeError, 'Index out of bounds')
     })
 
     it('throws for too large indices', async () => {
@@ -204,7 +204,7 @@ describe(MerkleTree.name, () => {
           { index: 2n, value: positionLeafA },
           { index: 8n, value: positionLeafB },
         ])
-      ).toBeRejected(TypeError, 'Index out of bounds')
+      ).toBeRejectedWith(TypeError, 'Index out of bounds')
     })
 
     it('uses last value for multiple updates at the same index', async () => {

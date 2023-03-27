@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 
 import { BlockRange } from '../../model'
 import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'
@@ -13,7 +13,6 @@ import {
   fakeInt,
   fakeTimestamp,
 } from '../../test/fakes'
-import { mock } from '../../test/mock'
 import { LogWithdrawalPerformed } from './events'
 import { FinalizeExitEventsCollector } from './FinalizeExitEventsCollector'
 
@@ -38,7 +37,7 @@ describe(FinalizeExitEventsCollector.name, () => {
       const minedAt = Timestamp.fromSeconds(timestamp)
       const sentAt = fakeTimestamp()
 
-      const forcedRepo = mock<ForcedTransactionRepository>({
+      const forcedRepo = mockObject<ForcedTransactionRepository>({
         findByFinalizeHash: async () =>
           fakeExit({
             hash: exitHash,
@@ -52,7 +51,7 @@ describe(FinalizeExitEventsCollector.name, () => {
           }),
         findLatestFinalize: async () => undefined,
       })
-      const ethereumClient = mock<EthereumClient>({
+      const ethereumClient = mockObject<EthereumClient>({
         getLogsInRange: async () => [
           fakeFinalizeLog({
             blockNumber,
@@ -62,7 +61,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         ],
         getBlock: async () => fakeBlock({ timestamp, number: blockNumber }),
       })
-      const transactionStatusRepo = mock<TransactionStatusRepository>({
+      const transactionStatusRepo = mockObject<TransactionStatusRepository>({
         updateIfWaitingToBeMined: async () => true,
       })
 
@@ -77,9 +76,10 @@ describe(FinalizeExitEventsCollector.name, () => {
       expect(result).toEqual({ updated: 1, added: 0, ignored: 0 })
       expect(
         transactionStatusRepo.updateIfWaitingToBeMined
-      ).toHaveBeenCalledExactlyWith([
-        [{ hash: finalizeHash, mined: { blockNumber, at: minedAt } }],
-      ])
+      ).toHaveBeenOnlyCalledWith({
+        hash: finalizeHash,
+        mined: { blockNumber, at: minedAt },
+      })
     })
 
     it('adds new transaction', async () => {
@@ -89,13 +89,13 @@ describe(FinalizeExitEventsCollector.name, () => {
       const timestamp = fakeInt()
       const minedAt = Timestamp.fromSeconds(timestamp)
 
-      const forcedRepo = mock<ForcedTransactionRepository>({
+      const forcedRepo = mockObject<ForcedTransactionRepository>({
         findByFinalizeHash: async () => undefined,
         getWithdrawalsForFinalize: async () => [fakeExit({ hash: exitHash })],
         saveFinalize: async () => true,
         findLatestFinalize: async () => undefined,
       })
-      const ethereumClient = mock<EthereumClient>({
+      const ethereumClient = mockObject<EthereumClient>({
         getLogsInRange: async () => [
           fakeFinalizeLog({
             blockNumber,
@@ -109,15 +109,19 @@ describe(FinalizeExitEventsCollector.name, () => {
       const collector = new FinalizeExitEventsCollector(
         ethereumClient,
         forcedRepo,
-        mock<TransactionStatusRepository>({}),
+        mockObject<TransactionStatusRepository>({}),
         EthereumAddress.fake()
       )
       const result = await collector.collect(blockRange)
 
       expect(result).toEqual({ updated: 0, added: 1, ignored: 0 })
-      expect(forcedRepo.saveFinalize).toHaveBeenCalledExactlyWith([
-        [exitHash, finalizeHash, null, minedAt, blockNumber],
-      ])
+      expect(forcedRepo.saveFinalize).toHaveBeenOnlyCalledWith(
+        exitHash,
+        finalizeHash,
+        null,
+        minedAt,
+        blockNumber
+      )
     })
 
     it('ignores regular withdraw transactions', async () => {
@@ -125,13 +129,13 @@ describe(FinalizeExitEventsCollector.name, () => {
       const blockNumber = fakeInt()
       const timestamp = fakeInt()
 
-      const forcedRepo = mock<ForcedTransactionRepository>({
+      const forcedRepo = mockObject<ForcedTransactionRepository>({
         findByFinalizeHash: async () => undefined,
         getWithdrawalsForFinalize: async () => [],
         saveFinalize: async () => true,
         findLatestFinalize: async () => undefined,
       })
-      const ethereumClient = mock<EthereumClient>({
+      const ethereumClient = mockObject<EthereumClient>({
         getLogsInRange: async () => [
           fakeFinalizeLog({
             blockNumber,
@@ -141,7 +145,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         ],
         getBlock: async () => fakeBlock({ timestamp, number: blockNumber }),
       })
-      const statusRepo = mock<TransactionStatusRepository>({
+      const statusRepo = mockObject<TransactionStatusRepository>({
         updateIfWaitingToBeMined: async () => false,
       })
 
@@ -154,8 +158,8 @@ describe(FinalizeExitEventsCollector.name, () => {
       const result = await collector.collect(blockRange)
 
       expect(result).toEqual({ updated: 0, added: 0, ignored: 1 })
-      expect(statusRepo.updateIfWaitingToBeMined.calls.length).toEqual(0)
-      expect(forcedRepo.saveFinalize.calls.length).toEqual(0)
+      expect(statusRepo.updateIfWaitingToBeMined).toHaveBeenCalledTimes(0)
+      expect(forcedRepo.saveFinalize).toHaveBeenCalledTimes(0)
     })
   })
 })

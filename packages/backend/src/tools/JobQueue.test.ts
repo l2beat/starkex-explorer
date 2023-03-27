@@ -117,8 +117,8 @@ describe(JobQueue.name, () => {
     })
 
     await waitForExpect(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      expect(queue.getStats()).toEqual(expect.objectWith({ jobsInProgress: 1 }))
+      // TODO: update once earljs supports .toHaveSubset!
+      expect(queue.getStats()).toEqual(expect.subset({ jobsInProgress: 1 }))
     })
 
     resolve()
