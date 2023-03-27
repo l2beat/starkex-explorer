@@ -292,7 +292,7 @@ describe(WithdrawableAssetRepository.name, () => {
           data: fakeWithdrawalAllowedData({
             starkKey: starkKey1,
             assetType: thirdAsset,
-            quantizedAmount: 0n
+            quantizedAmount: 0n,
           }),
         })
 

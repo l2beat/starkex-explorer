@@ -128,7 +128,10 @@ export class UserController {
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
-        asset: { hashOrId: asset.assetHash, details: assetDetailsMap?.getByAssetHash(asset.assetHash) },
+        asset: {
+          hashOrId: asset.assetHash,
+          details: assetDetailsMap?.getByAssetHash(asset.assetHash),
+        },
         amount: asset.balanceDelta,
       })),
       exchangeAddress: this.exchangeAddress,
