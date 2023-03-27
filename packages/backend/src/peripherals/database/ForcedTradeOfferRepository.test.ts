@@ -42,7 +42,7 @@ describe(ForcedTradeOfferRepository.name, () => {
       accepted: {
         ...acceptedOffer.accepted,
         submissionExpirationTime: Timestamp(
-          Number(acceptedOffer.accepted.submissionExpirationTime) * 1000 * 3600
+          Number(acceptedOffer.accepted.submissionExpirationTime)
         ),
       },
     }
@@ -69,7 +69,7 @@ describe(ForcedTradeOfferRepository.name, () => {
       accepted: {
         ...submittedOffer.accepted,
         submissionExpirationTime: Timestamp(
-          Number(submittedOffer.accepted.submissionExpirationTime) * 1000 * 3600
+          Number(submittedOffer.accepted.submissionExpirationTime)
         ),
       },
     }
