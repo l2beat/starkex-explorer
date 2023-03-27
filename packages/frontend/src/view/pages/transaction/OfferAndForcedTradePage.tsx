@@ -79,7 +79,6 @@ export function renderOfferAndForcedTradePage(
 }
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
-  const isMine = props.user?.starkKey === props.maker.starkKey
   const common = getCommon(props.transactionHash, props.offerId)
   const historyEntries = props.history.map((x) =>
     toHistoryEntry(x, props.type, props.stateUpdateId)
