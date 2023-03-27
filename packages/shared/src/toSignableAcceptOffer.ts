@@ -1,6 +1,6 @@
 import { keccak256, pack } from '@ethersproject/solidity'
 import { encodeAssetId } from '@explorer/encoding'
-import { AssetId, StarkKey } from '@explorer/types'
+import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
 export function toSignableAcceptOffer(
   offer: {
@@ -15,7 +15,7 @@ export function toSignableAcceptOffer(
     starkKeyB: StarkKey
     positionIdB: bigint
     nonce: bigint
-    submissionExpirationTime: bigint
+    submissionExpirationTime: Timestamp
   }
 ) {
   const packedParameters = pack(
@@ -52,7 +52,7 @@ export function toSignableAcceptOffer(
 
   const digestToSign = keccak256(
     ['bytes32', 'uint256'],
-    [actionHash, accepted.submissionExpirationTime]
+    [actionHash, Timestamp.toHours(accepted.submissionExpirationTime)]
   )
   return digestToSign
 }

@@ -156,7 +156,7 @@ export function fakeAccepted(accepted?: Partial<Accepted>): Accepted {
     premiumCost: fakeBoolean(),
     signature: fakeHexString(32),
     starkKeyB: StarkKey.fake(),
-    submissionExpirationTime: fakeBigInt(),
+    submissionExpirationTime: Timestamp(3456000000000n),
     transactionHash: undefined,
     ...accepted,
   }

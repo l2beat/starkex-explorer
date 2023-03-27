@@ -134,6 +134,33 @@ describe(AssetRepository.name, () => {
     })
   })
 
+  describe(
+    AssetRepository.prototype.findDetailsByAssetTypeAndTokenId.name,
+    () => {
+      it('returns undefined if no record', async () => {
+        const actual = await assetRepository.findDetailsByAssetTypeAndTokenId(
+          AssetHash.fake(),
+          1n
+        )
+
+        expect(actual).toBeNullish()
+      })
+
+      it('returns record if found', async () => {
+        const record = dummyAssetWithTokenId('1', '2', 3n)
+
+        await assetRepository.addManyDetails([record])
+
+        const actual = await assetRepository.findDetailsByAssetTypeAndTokenId(
+          record.assetTypeHash,
+          record.tokenId
+        )
+
+        expect(actual).toEqual(record)
+      })
+    }
+  )
+
   describe(AssetRepository.prototype.getDetailsByAssetHashes.name, () => {
     it('returns empty array if no records', async () => {
       const actual = await assetRepository.getDetailsByAssetHashes([

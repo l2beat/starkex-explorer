@@ -482,8 +482,10 @@ export class Application {
     const transactionController = new TransactionController(
       userService,
       sentTransactionRepository,
+      forcedTradeOfferRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
+      assetRepository,
       collateralAsset
     )
     const merkleProofController = new MerkleProofController(
