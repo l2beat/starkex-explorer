@@ -102,9 +102,7 @@ function toRecord(row: Row): Record {
         premiumCost: row.premium_cost,
         signature: row.signature,
         starkKeyB: StarkKey(row.stark_key_b),
-        submissionExpirationTime: Timestamp.fromHours(
-          row.submission_expiration_time
-        ),
+        submissionExpirationTime: Timestamp(row.submission_expiration_time),
         transactionHash: row.transaction_hash
           ? Hash256(row.transaction_hash)
           : undefined,
