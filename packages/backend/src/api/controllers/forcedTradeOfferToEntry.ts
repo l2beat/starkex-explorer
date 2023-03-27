@@ -11,8 +11,7 @@ function buildTradeOfferHistory(
     if (forcedTradeOffer.accepted.transactionHash) {
       history.push('SENT')
     } else if (
-      Timestamp.fromHours(forcedTradeOffer.accepted.submissionExpirationTime) <
-      Timestamp.now()
+      forcedTradeOffer.accepted.submissionExpirationTime < Timestamp.now()
     ) {
       history.push('EXPIRED')
     }

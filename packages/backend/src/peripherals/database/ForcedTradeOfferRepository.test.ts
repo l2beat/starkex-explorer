@@ -1,6 +1,5 @@
 import { AssetId, Hash256, Timestamp } from '@explorer/types'
 import { expect } from 'earljs'
-import { accepted } from '../../api/controllers/utils/ForcedTradeOfferMockData'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import {
@@ -36,78 +35,43 @@ describe(ForcedTradeOfferRepository.name, () => {
     }
     const updated = await repository.update(acceptedOffer)
     expect(updated).toEqual(1)
-    describe(ForcedTradeOfferRepository.prototype.update.name, () => {
-      it('saves accepted offer', async () => {
-        const initial = fakeInitialOffer({ id: undefined })
-        const id = await repository.add(initial)
-        const accepted = {
-          ...initial,
-          id,
-          accepted: fakeAccepted(),
-        }
-        const updated = await repository.update(accepted)
-        expect(updated).toEqual(1)
 
-        const actual = await repository.findById(id)
-        const expected = {
-          ...acceptedOffer,
-          accepted: {
-            ...acceptedOffer.accepted,
-            submissionExpirationTime: Timestamp(
-              Number(acceptedOffer.accepted.submissionExpirationTime)
-            ),
-          },
-        }
-        expect(actual).toEqual(expected)
-      })
-      const actual = await repository.findById(id)
+    const actual = await repository.findById(id)
+    const expected = {
+      ...acceptedOffer,
+      accepted: {
+        ...acceptedOffer.accepted,
+        submissionExpirationTime:
+          acceptedOffer.accepted.submissionExpirationTime,
+      },
+    }
+    expect(actual).toEqual(expected)
+  })
 
-      expect(actual).toEqual(accepted)
-    })
+  it('saves submitted offer', async () => {
+    const initial = fakeInitialOffer({ id: undefined })
+    const id = await repository.add(initial)
+    const submittedOffer = {
+      ...initial,
+      id,
+      accepted: {
+        ...fakeAccepted(),
+        transactionHash: Hash256.fake(),
+      },
+    }
+    const updated = await repository.update(submittedOffer)
+    expect(updated).toEqual(1)
 
-    it('saves submitted offer', async () => {
-      const initial = fakeInitialOffer({ id: undefined })
-      const id = await repository.add(initial)
-      const submittedOffer = {
-        ...initial,
-        id,
-        accepted: {
-          ...fakeAccepted(),
-          transactionHash: Hash256.fake(),
-        },
-      }
-      const updated = await repository.update(submittedOffer)
-      expect(updated).toEqual(1)
-      it('saves submitted offer', async () => {
-        const initial = fakeInitialOffer({ id: undefined })
-        const id = await repository.add(initial)
-        const submitted = {
-          ...initial,
-          id,
-          accepted: {
-            ...fakeAccepted(),
-            transactionHash: Hash256.fake(),
-          },
-        }
-        const updated = await repository.update(submitted)
-        expect(updated).toEqual(1)
-
-        const actual = await repository.findById(id)
-        const expected = {
-          ...submittedOffer,
-          accepted: {
-            ...submittedOffer.accepted,
-            submissionExpirationTime: Timestamp(
-              Number(submittedOffer.accepted.submissionExpirationTime)
-            ),
-          },
-        }
-        expect(actual).toEqual(expected)
-      })
-      const actual = await repository.findById(id)
-
-      expect(actual).toEqual(submitted)
-    })
+    const actual = await repository.findById(id)
+    const expected = {
+      ...submittedOffer,
+      accepted: {
+        ...submittedOffer.accepted,
+        submissionExpirationTime:
+          submittedOffer.accepted.submissionExpirationTime,
+      },
+    }
+    expect(actual).toEqual(expected)
   })
 
   it('updates the transaction hash', async () => {
