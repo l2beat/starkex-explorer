@@ -1,4 +1,5 @@
 import { decodeAssetId } from '@explorer/encoding'
+import { assertUnreachable } from '@explorer/shared'
 import {
   AssetHash,
   EthereumAddress,
@@ -18,7 +19,6 @@ import {
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { assertUnreachable } from '../../utils/assertUnreachable'
 import {
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,

@@ -1,10 +1,10 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
-import { AssetDetails } from '@explorer/shared'
+import { assertUnreachable } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { SentTransactionRecord } from '../../peripherals/database/transactions/SentTransactionRepository'
-import { assertUnreachable } from '../../utils/assertUnreachable'
 
 export function extractSentTxEntryType(
   data: SentTransactionRecord['data']
@@ -15,6 +15,7 @@ export function extractSentTxEntryType(
     case 'ForcedTrade':
       return data.isABuyingSynthetic ? 'FORCED_BUY' : 'FORCED_SELL'
     case 'Withdraw':
+    case 'WithdrawWithTokenId':
       return 'WITHDRAW'
     default:
       assertUnreachable(data)
@@ -30,6 +31,7 @@ export function extractSentTxAmount(
     case 'ForcedTrade':
       return data.syntheticAmount
     case 'Withdraw':
+    case 'WithdrawWithTokenId':
       return undefined
     default:
       assertUnreachable(data)
@@ -39,26 +41,41 @@ export function extractSentTxAmount(
 export function extractSentTxAsset(
   data: SentTransactionRecord['data'],
   collateralAsset?: CollateralAsset,
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ): Asset | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
-    case 'Withdraw':
-      return {
-        hashOrId: data.assetType,
-        details: assetDetailsMap?.[data.assetType.toString()],
-      }
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
+    case 'Withdraw':
+      return {
+        //assetId = assetType, ref: https://docs.starkware.co/starkex/perpetual/shared/starkex-specific-concepts.html#on_chain_starkex_contracts
+        hashOrId: data.assetType,
+        details: assetDetailsMap?.getByAssetHash(data.assetType),
+      }
+    case 'WithdrawWithTokenId': {
+      const assetDetails = assetDetailsMap?.getByAssetTypeHashAndTokenId(
+        data.assetType,
+        data.tokenId
+      )
+      if (!assetDetails) {
+        return undefined
+      }
+      return {
+        hashOrId: assetDetails.assetHash,
+        details: assetDetails,
+      }
+    }
     default:
       assertUnreachable(data)
   }
 }
+
 export function sentTransactionToEntry(
   sentTransaction: SentTransactionRecord,
   collateralAsset?: CollateralAsset,
-  assetDetailsMap?: Record<string, AssetDetails>
+  assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry {
   if (sentTransaction.mined !== undefined && !sentTransaction.mined.reverted) {
     throw new Error(
