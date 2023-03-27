@@ -8,6 +8,7 @@ import { ForcedTransactionController } from './api/controllers/ForcedTransaction
 import { HomeController } from './api/controllers/HomeController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { OldHomeController } from './api/controllers/OldHomeController'
+import { OldSearchController } from './api/controllers/OldSearchController'
 import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
 import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
@@ -122,6 +123,7 @@ export class Application {
     const blockRepository = new BlockRepository(database, logger)
     const stateUpdateRepository = new StateUpdateRepository(database, logger)
     const positionRepository = new PositionRepository(database, logger)
+    const vaultRepository = new VaultRepository(database, logger)
     const userRegistrationEventRepository = new UserRegistrationEventRepository(
       database,
       logger
@@ -393,8 +395,6 @@ export class Application {
       preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetHash, logger)
 
-      const vaultRepository = new VaultRepository(database, logger)
-
       const spotHistoryPreprocessor = new SpotHistoryPreprocessor(
         preprocessedAssetHistoryRepository,
         vaultRepository,
@@ -445,6 +445,7 @@ export class Application {
     )
     const homeController = new HomeController(
       userService,
+      assetRepository,
       userTransactionRepository,
       preprocessedStateDetailsRepository,
       config.starkex.tradingMode,
@@ -463,6 +464,7 @@ export class Application {
     const stateUpdateController = new StateUpdateController(
       userService,
       stateUpdateRepository,
+      assetRepository,
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
       config.starkex.tradingMode,
@@ -503,10 +505,18 @@ export class Application {
       stateUpdateRepository,
       userTransactionRepository
     )
-    const searchController = new SearchController(
+    const oldSearchController = new OldSearchController(
       stateUpdateRepository,
       positionRepository,
       userRegistrationEventRepository
+    )
+    const searchController = new SearchController(
+      stateUpdateRepository,
+      config.starkex.tradingMode === 'perpetual'
+        ? positionRepository
+        : vaultRepository,
+      userRegistrationEventRepository,
+      preprocessedAssetHistoryRepository
     )
     const forcedTradeOfferController = new ForcedTradeOfferController(
       accountService,
@@ -538,7 +548,7 @@ export class Application {
               forcedTradeOfferController,
               forcedTransactionController,
               oldStateUpdateController,
-              searchController
+              oldSearchController
             )
           : createFrontendRouter(
               homeController,
@@ -548,7 +558,8 @@ export class Application {
               forcedActionsController,
               merkleProofController,
               collateralAsset,
-              config.starkex.tradingMode
+              config.starkex.tradingMode,
+              searchController
             ),
         createForcedTransactionRouter(
           forcedTradeOfferController,

@@ -23,7 +23,7 @@ export function TableLimitSelect(props: TableLimitSelectProps) {
         name="perPage"
         autoComplete="off"
         defaultValue={props.limit}
-        className="w-14 rounded bg-gray-800 px-2 py-0.5 font-semibold"
+        className="rounded bg-gray-800 px-2 py-0.5 font-semibold"
       >
         {options.map((n) => (
           <option key={n}>{n}</option>

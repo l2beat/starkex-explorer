@@ -49,7 +49,7 @@ describe(calculateUpdatedPositions.name, () => {
     expect(newPositions).toEqual([
       {
         index: 5n,
-        value: expect.objectWith({
+        value: expect.subset({
           assets: [],
           collateralBalance: data.collateralBalance,
           starkKey: data.starkKey,
@@ -312,7 +312,7 @@ describe(calculateUpdatedPositions.name, () => {
           },
         ],
       })
-    ).toBeRejected(Error, 'Missing funding for timestamp: 1001000!')
+    ).toBeRejectedWith(Error, 'Missing funding for timestamp: 1001000!')
 
     await expect(
       calculateUpdatedPositions(stateTree, {
@@ -333,7 +333,7 @@ describe(calculateUpdatedPositions.name, () => {
           },
         ],
       })
-    ).toBeRejected(Error, 'Missing funding for asset: BTC-10!')
+    ).toBeRejectedWith(Error, 'Missing funding for asset: BTC-10!')
   })
 
   it('recovers positions and indices', async () => {

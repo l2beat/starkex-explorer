@@ -1,7 +1,7 @@
 import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { mockObject } from 'earljs'
 
 import { fakeBigInt, fakeBoolean, fakeInt } from '../../test/fakes'
-import { mock } from '../../test/mock'
 import { createTestApiServer } from '../../test/TestApiServer'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { TransactionSubmitController } from '../controllers/TransactionSubmitController'
@@ -40,10 +40,10 @@ describe('ForcedTransactionRouter', () => {
     it('returns created', async () => {
       const id = 1
       await createServer(
-        mock<ForcedTradeOfferController>({
+        mockObject<ForcedTradeOfferController>({
           postOffer: async () => ({ type: 'created', content: { id } }),
         }),
-        mock<TransactionSubmitController>()
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers')
         .send(initialData)
@@ -54,13 +54,13 @@ describe('ForcedTransactionRouter', () => {
   describe('/forced/offers/:offerId/accept', () => {
     it('returns success', async () => {
       await createServer(
-        mock<ForcedTradeOfferController>({
+        mockObject<ForcedTradeOfferController>({
           acceptOffer: async () => ({
             type: 'success',
             content: 'Accept offer was submitted.',
           }),
         }),
-        mock<TransactionSubmitController>()
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers/1/accept')
         .send(acceptedData)
@@ -68,13 +68,13 @@ describe('ForcedTransactionRouter', () => {
     })
     it('returns not found when offer not found', async () => {
       await createServer(
-        mock<ForcedTradeOfferController>({
+        mockObject<ForcedTradeOfferController>({
           acceptOffer: async () => ({
             type: 'not found',
             content: 'Offer does not exist.',
           }),
         }),
-        mock<TransactionSubmitController>()
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers/1/accept')
         .send(acceptedData)
@@ -85,13 +85,13 @@ describe('ForcedTransactionRouter', () => {
   describe('/forced/offers/:initialOfferId', () => {
     it('returns success', async () => {
       await createServer(
-        mock<ForcedTradeOfferController>({
+        mockObject<ForcedTradeOfferController>({
           cancelOffer: async () => ({
             type: 'success',
             content: 'Offer cancelled.',
           }),
         }),
-        mock<TransactionSubmitController>()
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers/1/cancel')
         .send({ signature })
@@ -100,8 +100,8 @@ describe('ForcedTransactionRouter', () => {
 
     it('returns bad request for invalid input', async () => {
       await createServer(
-        mock<ForcedTradeOfferController>(),
-        mock<TransactionSubmitController>()
+        mockObject<ForcedTradeOfferController>(),
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/offers/1/cancel')
         .send({
@@ -115,8 +115,8 @@ describe('ForcedTransactionRouter', () => {
     it('returns success', async () => {
       const hash = Hash256.fake()
       await createServer(
-        mock<ForcedTradeOfferController>(),
-        mock<TransactionSubmitController>({
+        mockObject<ForcedTradeOfferController>(),
+        mockObject<TransactionSubmitController>({
           submitForcedExit: async () => ({
             type: 'created',
             content: { id: hash },
@@ -133,8 +133,8 @@ describe('ForcedTransactionRouter', () => {
         const exitHash = Hash256.fake()
         const finalizeHash = Hash256.fake()
         await createServer(
-          mock<ForcedTradeOfferController>(),
-          mock<TransactionSubmitController>({
+          mockObject<ForcedTradeOfferController>(),
+          mockObject<TransactionSubmitController>({
             submitWithdrawal: async () => ({
               type: 'created',
               content: { id: finalizeHash },
@@ -149,8 +149,8 @@ describe('ForcedTransactionRouter', () => {
 
     it('returns bad request for invalid input', async () => {
       await createServer(
-        mock<ForcedTradeOfferController>(),
-        mock<TransactionSubmitController>()
+        mockObject<ForcedTradeOfferController>(),
+        mockObject<TransactionSubmitController>()
       )
         .post('/forced/exits')
         .send({ hash: 123 })

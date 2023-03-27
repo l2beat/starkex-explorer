@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 import { BigNumber } from 'ethers'
 
 import { BlockRange } from '../../model'
@@ -9,24 +9,23 @@ import {
 } from '../../peripherals/database/AssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { TokenInspector } from '../../peripherals/ethereum/TokenInspector'
-import { mock } from '../../test/mock'
 import { AssetRegistrationCollector } from './AssetRegistrationCollector'
 import { LogTokenRegistered } from './events'
 
 describe(AssetRegistrationCollector.name, () => {
   describe(AssetRegistrationCollector.prototype.collect.name, () => {
     it('collects asset data properly', async () => {
-      const assetRepository = mock<AssetRepository>({
+      const assetRepository = mockObject<AssetRepository>({
         addManyRegistrations: async () => [],
         addManyDetails: async () => [],
       })
 
-      const ethereumClient = mock<EthereumClient>({
+      const ethereumClient = mockObject<EthereumClient>({
         async getLogsInRange() {
           return logs
         },
       })
-      const tokenInspector = mock<TokenInspector>({ inspectERC721 })
+      const tokenInspector = mockObject<TokenInspector>({ inspectERC721 })
       const contractAddress = EthereumAddress.fake()
 
       const collector = new AssetRegistrationCollector(
@@ -39,17 +38,17 @@ describe(AssetRegistrationCollector.name, () => {
       const blockRange = new BlockRange([])
       const actualRegistrationsCount = await collector.collect(blockRange)
 
-      expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
+      expect(ethereumClient.getLogsInRange).toHaveBeenOnlyCalledWith(
         blockRange,
         {
           address: contractAddress.toString(),
           topics: [LogTokenRegistered.topic],
-        },
-      ])
+        }
+      )
 
-      expect(assetRepository.addManyRegistrations).toHaveBeenCalledWith([
-        expectedRegistrations,
-      ])
+      expect(assetRepository.addManyRegistrations).toHaveBeenOnlyCalledWith(
+        expectedRegistrations
+      )
       expect(actualRegistrationsCount).toEqual(expectedRegistrations.length)
     })
   })

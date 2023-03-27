@@ -25,7 +25,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
       columns={[
         { header: 'Time' },
         { header: 'Id' },
-        { header: 'Hash' },
+        { header: 'Tx Hash' },
         { header: 'Updates', numeric: true },
         {
           header: (

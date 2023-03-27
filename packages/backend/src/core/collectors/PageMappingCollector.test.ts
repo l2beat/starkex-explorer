@@ -1,20 +1,19 @@
 import { Hash256 } from '@explorer/types'
 import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 
 import { BlockRange } from '../../model'
 import { PageMappingRepository } from '../../peripherals/database/PageMappingRepository'
 import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { mock } from '../../test/mock'
 import { LogMemoryPagesHashes } from './events'
 import { PageMappingCollector } from './PageMappingCollector'
 
 describe(PageMappingCollector.name, () => {
   it('fetches memory hash events and saves them to repository', async () => {
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       getLogsInRange: async () => testData().logs,
     })
-    const pageMappingRepository = mock<PageMappingRepository>({
+    const pageMappingRepository = mockObject<PageMappingRepository>({
       addMany: async () => [],
     })
     const collector = new PageMappingCollector(
@@ -116,81 +115,76 @@ describe(PageMappingCollector.name, () => {
 
     expect(actual).toEqual(expectedEvents)
 
-    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
-      blockRange,
-      {
-        address: verifierAddresses.map((x) => x.toString()),
-        topics: [LogMemoryPagesHashes.topic],
-      },
-    ])
+    expect(ethereumClient.getLogsInRange).toHaveBeenOnlyCalledWith(blockRange, {
+      address: verifierAddresses.map((x) => x.toString()),
+      topics: [LogMemoryPagesHashes.topic],
+    })
 
-    expect(pageMappingRepository.addMany).toHaveBeenCalledWith([
-      [
-        {
-          pageIndex: 0,
-          pageHash: expectedEvents[0]!.pageHashes[0]!,
-          stateTransitionHash: expectedEvents[0]!.stateTransitionHash,
-          blockNumber: expectedEvents[0]!.blockNumber,
-        },
-        {
-          pageIndex: 1,
-          pageHash: expectedEvents[0]!.pageHashes[1]!,
-          stateTransitionHash: expectedEvents[0]!.stateTransitionHash,
-          blockNumber: expectedEvents[0]!.blockNumber,
-        },
-        {
-          pageIndex: 0,
-          pageHash: expectedEvents[1]!.pageHashes[0]!,
-          stateTransitionHash: expectedEvents[1]!.stateTransitionHash,
-          blockNumber: expectedEvents[1]!.blockNumber,
-        },
-        {
-          pageIndex: 1,
-          pageHash: expectedEvents[1]!.pageHashes[1]!,
-          stateTransitionHash: expectedEvents[1]!.stateTransitionHash,
-          blockNumber: expectedEvents[1]!.blockNumber,
-        },
-        {
-          pageIndex: 0,
-          pageHash: expectedEvents[2]!.pageHashes[0]!,
-          stateTransitionHash: expectedEvents[2]!.stateTransitionHash,
-          blockNumber: expectedEvents[2]!.blockNumber,
-        },
-        {
-          pageIndex: 1,
-          pageHash: expectedEvents[2]!.pageHashes[1]!,
-          stateTransitionHash: expectedEvents[2]!.stateTransitionHash,
-          blockNumber: expectedEvents[2]!.blockNumber,
-        },
-        {
-          pageIndex: 0,
-          pageHash: expectedEvents[3]!.pageHashes[0]!,
-          stateTransitionHash: expectedEvents[3]!.stateTransitionHash,
-          blockNumber: expectedEvents[3]!.blockNumber,
-        },
-        {
-          pageIndex: 1,
-          pageHash: expectedEvents[3]!.pageHashes[1]!,
-          stateTransitionHash: expectedEvents[3]!.stateTransitionHash,
-          blockNumber: expectedEvents[3]!.blockNumber,
-        },
-      ],
+    expect(pageMappingRepository.addMany).toHaveBeenOnlyCalledWith([
+      {
+        pageIndex: 0,
+        pageHash: expectedEvents[0]!.pageHashes[0]!,
+        stateTransitionHash: expectedEvents[0]!.stateTransitionHash,
+        blockNumber: expectedEvents[0]!.blockNumber,
+      },
+      {
+        pageIndex: 1,
+        pageHash: expectedEvents[0]!.pageHashes[1]!,
+        stateTransitionHash: expectedEvents[0]!.stateTransitionHash,
+        blockNumber: expectedEvents[0]!.blockNumber,
+      },
+      {
+        pageIndex: 0,
+        pageHash: expectedEvents[1]!.pageHashes[0]!,
+        stateTransitionHash: expectedEvents[1]!.stateTransitionHash,
+        blockNumber: expectedEvents[1]!.blockNumber,
+      },
+      {
+        pageIndex: 1,
+        pageHash: expectedEvents[1]!.pageHashes[1]!,
+        stateTransitionHash: expectedEvents[1]!.stateTransitionHash,
+        blockNumber: expectedEvents[1]!.blockNumber,
+      },
+      {
+        pageIndex: 0,
+        pageHash: expectedEvents[2]!.pageHashes[0]!,
+        stateTransitionHash: expectedEvents[2]!.stateTransitionHash,
+        blockNumber: expectedEvents[2]!.blockNumber,
+      },
+      {
+        pageIndex: 1,
+        pageHash: expectedEvents[2]!.pageHashes[1]!,
+        stateTransitionHash: expectedEvents[2]!.stateTransitionHash,
+        blockNumber: expectedEvents[2]!.blockNumber,
+      },
+      {
+        pageIndex: 0,
+        pageHash: expectedEvents[3]!.pageHashes[0]!,
+        stateTransitionHash: expectedEvents[3]!.stateTransitionHash,
+        blockNumber: expectedEvents[3]!.blockNumber,
+      },
+      {
+        pageIndex: 1,
+        pageHash: expectedEvents[3]!.pageHashes[1]!,
+        stateTransitionHash: expectedEvents[3]!.stateTransitionHash,
+        blockNumber: expectedEvents[3]!.blockNumber,
+      },
     ])
   })
 
   it('discards all records from pageMappingRepository after given block', async () => {
-    const pageMappingRepository = mock<PageMappingRepository>({
+    const pageMappingRepository = mockObject<PageMappingRepository>({
       deleteAllAfter: async () => 0,
     })
 
     const collector = new PageMappingCollector(
-      mock<EthereumClient>(),
+      mockObject<EthereumClient>(),
       pageMappingRepository
     )
 
     await collector.discardAfter(123)
 
-    expect(pageMappingRepository.deleteAllAfter).toHaveBeenCalledWith([123])
+    expect(pageMappingRepository.deleteAllAfter).toHaveBeenOnlyCalledWith(123)
   })
 })
 

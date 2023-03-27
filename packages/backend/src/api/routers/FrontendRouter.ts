@@ -1,4 +1,5 @@
 import {
+  stringAs,
   stringAsBigInt,
   stringAsPositiveInt,
   TradingMode,
@@ -11,6 +12,7 @@ import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { HomeController } from '../controllers/HomeController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
+import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
 import { TransactionController } from '../controllers/TransactionController'
 import { UserController } from '../controllers/UserController'
@@ -27,7 +29,8 @@ export function createFrontendRouter(
   forcedActionController: ForcedActionController,
   merkleProofController: MerkleProofController,
   collateralAsset: CollateralAsset | undefined,
-  tradingMode: TradingMode
+  tradingMode: TradingMode,
+  searchController: SearchController
 ) {
   const router = new Router()
 
@@ -36,6 +39,22 @@ export function createFrontendRouter(
     const result = await homeController.getHomePage(givenUser)
     applyControllerResult(ctx, result)
   })
+
+  router.get(
+    '/search',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          query: z.string(),
+        }),
+      }),
+      async (ctx) => {
+        const { query } = ctx.query
+        const result = await searchController.getSearchRedirect(query)
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
 
   router.get(
     '/state-updates',
@@ -155,14 +174,14 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          starkKey: z.string(),
+          starkKey: stringAs(StarkKey),
         }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result = await userController.getUserPage(
           givenUser,
-          StarkKey(ctx.params.starkKey)
+          ctx.params.starkKey
         )
         applyControllerResult(ctx, result)
       }
@@ -174,7 +193,7 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          starkKey: z.string(),
+          starkKey: stringAs(StarkKey),
         }),
         query: z.object({
           page: z.optional(stringAsPositiveInt()),
@@ -186,7 +205,7 @@ export function createFrontendRouter(
         const pagination = getPagination(ctx.query)
         const result = await userController.getUserAssetsPage(
           givenUser,
-          StarkKey(ctx.params.starkKey),
+          ctx.params.starkKey,
           pagination
         )
         applyControllerResult(ctx, result)
@@ -199,7 +218,7 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          starkKey: z.string(),
+          starkKey: stringAs(StarkKey),
         }),
         query: z.object({
           page: z.optional(stringAsPositiveInt()),
@@ -211,7 +230,7 @@ export function createFrontendRouter(
         const pagination = getPagination(ctx.query)
         const result = await userController.getUserBalanceChangesPage(
           givenUser,
-          StarkKey(ctx.params.starkKey),
+          ctx.params.starkKey,
           pagination
         )
         applyControllerResult(ctx, result)
@@ -249,14 +268,14 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          transactionHash: z.string(),
+          transactionHash: stringAs(Hash256),
         }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result = await transactionController.getTransactionPage(
           givenUser,
-          Hash256(ctx.params.transactionHash)
+          ctx.params.transactionHash
         )
         applyControllerResult(ctx, result)
       }

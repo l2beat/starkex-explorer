@@ -1,24 +1,33 @@
-import { AssetDetails } from '@explorer/shared'
-import { AssetHash } from '@explorer/types'
+import { AssetDetails, TradingMode } from '@explorer/shared'
+import { AssetHash, AssetId } from '@explorer/types'
 
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRecord } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { SentTransactionRecord } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
 
-export async function fetchAssetDetailsMap(
+export async function getAssetHashToAssetDetailsMap(
+  tradingMode: TradingMode,
   assetRepository: AssetRepository,
   records: {
-    userAssets?: PreprocessedAssetHistoryRecord<AssetHash>[]
-    assetHistory?: PreprocessedAssetHistoryRecord<AssetHash>[]
+    userAssets?: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[]
+    assetHistory?: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[]
     sentTransactions?: SentTransactionRecord[]
     userTransactions?: UserTransactionRecord[]
   }
 ): Promise<Record<string, AssetDetails>> {
+  if (tradingMode !== 'spot') return {}
+
   const assetHashes: AssetHash[] = [
-    // TODO add sentTransactions
     ...(records.userAssets?.map((a) => a.assetHashOrId) ?? []),
     ...(records.assetHistory?.map((a) => a.assetHashOrId) ?? []),
+    ...(records.sentTransactions?.map((t) =>
+      t.data.type === 'ForcedTrade'
+        ? t.data.syntheticAssetId
+        : t.data.type === 'Withdraw'
+        ? t.data.assetType
+        : undefined
+    ) ?? []),
     ...(records.userTransactions?.map((t) =>
       t.data.type === 'Withdraw'
         ? t.data.assetType

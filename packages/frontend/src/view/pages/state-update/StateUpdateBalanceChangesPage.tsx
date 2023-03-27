@@ -38,7 +38,10 @@ function StateUpdateBalanceChangesPage(
         <TableWithPagination
           {...common}
           title={
-            <StateUpdatePageTitle prefix="Balance changes of" id={props.id} />
+            <StateUpdatePageTitle
+              prefix="Balance changes of state update"
+              id={props.id}
+            />
           }
           visible={props.balanceChanges.length}
           limit={props.limit}
