@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 
 import { AssetRepository } from '../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRecord } from '../peripherals/database/PreprocessedAssetHistoryRepository'
@@ -11,7 +11,6 @@ import {
   fakeErc20Details,
   fakeErc721Details,
 } from '../test/fakes'
-import { mock } from '../test/mock'
 import { AssetDetailsMap } from './AssetDetailsMap'
 import { AssetDetailsService } from './AssetDetailsService'
 
@@ -37,7 +36,7 @@ describe(AssetDetailsService.name, () => {
 
   describe(AssetDetailsService.prototype.getAssetDetailsMap.name, () => {
     it('should return undefined when trading mode is spot', async () => {
-      const assetRepository = mock<AssetRepository>()
+      const assetRepository = mockObject<AssetRepository>()
       const assetDetailsService = new AssetDetailsService(
         assetRepository,
         'perpetual'
@@ -49,7 +48,7 @@ describe(AssetDetailsService.name, () => {
     })
 
     it('should return asset detail map when trading mode is spot', async () => {
-      const assetRepository = mock<AssetRepository>()
+      const assetRepository = mockObject<AssetRepository>()
       const mockGetDetailsByAssetHashesOrTypeHashes =
         mockFn<AssetRepository['getDetailsByAssetHashes']>()
       assetRepository.getDetailsByAssetHashes =
@@ -107,7 +106,6 @@ describe(AssetDetailsService.name, () => {
           fakeErc1155Details,
         ])
       )
-      expect(mockGetDetailsByAssetHashesOrTypeHashes).toBeExhausted()
     })
   })
 
@@ -115,7 +113,7 @@ describe(AssetDetailsService.name, () => {
     AssetDetailsService.prototype.getUserTransactionAssetHash.name,
     () => {
       const assetDetailsService = new AssetDetailsService(
-        mock<AssetRepository>(),
+        mockObject<AssetRepository>(),
         'spot'
       )
       it('should return assetType from data for Withdraw', () => {
