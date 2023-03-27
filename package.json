@@ -19,7 +19,7 @@
     "typecheck": "wsrun -em typecheck",
     "test": "wsrun -ecsm test",
     "build": "wsrun -etm build",
-    "build:dependencies": "wsrun -p @explorer/{crypto,encoding,shared,state,types} -etm build",
+    "build:dependencies": "wsrun -p @explorer/{crypto,encoding,shared,state,types,testnet} -etm build",
     "clean": "wsrun -ecsm clean",
     "start": "cd packages/backend && yarn start"
   },
