@@ -8,6 +8,7 @@ import { assertUnreachable, UserDetails } from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { TransactionHistory } from '../../core/TransactionHistory'
 import { UserService } from '../../core/UserService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import {
@@ -24,11 +25,6 @@ import {
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
-import {
-  buildForcedTradeTransactionHistory,
-  buildForcedTransactionHistory,
-  buildRegularTransactionHistory,
-} from './utils/buildTransactionHistory'
 
 export class TransactionController {
   constructor(
@@ -93,10 +89,11 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKey
           )
-        const history = buildForcedTransactionHistory({
-          sentTransaction,
-          userTransaction,
+        const transactionHistory = new TransactionHistory({
+          sentTransaction: sentTransaction,
+          userTransaction: userTransaction,
         })
+
         return renderPerpetualForcedWithdrawalPage({
           user,
           transactionHash: userTransaction.transactionHash,
@@ -107,7 +104,7 @@ export class TransactionController {
           asset: { hashOrId: this.collateralAsset.assetId },
           amount: userTransaction.data.quantizedAmount,
           positionId: userTransaction.data.positionId.toString(),
-          history,
+          history: transactionHistory.getForcedTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
       }
@@ -116,7 +113,7 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKey
           )
-        const history = buildForcedTransactionHistory({
+        const transactionHistory = new TransactionHistory({
           sentTransaction,
           userTransaction,
         })
@@ -128,7 +125,7 @@ export class TransactionController {
             ethereumAddress: txUser?.ethAddress,
           },
           vaultId: userTransaction.data.vaultId.toString(),
-          history,
+          history: transactionHistory.getForcedTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
       }
@@ -157,7 +154,7 @@ export class TransactionController {
             }
           : undefined
 
-        const history = buildForcedTradeTransactionHistory({
+        const transactionHistory = new TransactionHistory({
           forcedTradeOffer,
           sentTransaction,
           userTransaction,
@@ -177,14 +174,14 @@ export class TransactionController {
           expirationTimestamp: forcedTradeOffer?.accepted
             ? forcedTradeOffer.accepted.submissionExpirationTime
             : undefined,
-          history,
+          history: transactionHistory.getForcedTradeTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
       }
       case 'Withdraw':
       case 'WithdrawWithTokenId':
       case 'MintWithdraw': {
-        const history = buildRegularTransactionHistory({
+        const transactionHistory = new TransactionHistory({
           sentTransaction,
           userTransaction,
         })
@@ -217,7 +214,7 @@ export class TransactionController {
           },
           asset: { hashOrId: assetHash },
           amount: userTransaction.data.quantizedAmount,
-          history,
+          history: transactionHistory.getRegularTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
       }
@@ -256,7 +253,7 @@ export class TransactionController {
               positionId: sentTransaction.data.positionIdB.toString(),
             }
           : undefined
-        const history = buildForcedTradeTransactionHistory({
+        const transactionHistory = new TransactionHistory({
           forcedTradeOffer,
           sentTransaction,
         })
@@ -272,7 +269,7 @@ export class TransactionController {
           syntheticAsset: { hashOrId: sentTransaction.data.syntheticAssetId },
           syntheticAmount: sentTransaction.data.syntheticAmount,
           expirationTimestamp: sentTransaction.data.submissionExpirationTime,
-          history,
+          history: transactionHistory.getForcedTradeTransactionHistory(),
         })
       }
       case 'ForcedWithdrawal': {
@@ -285,7 +282,7 @@ export class TransactionController {
           await this.userRegistrationEventRepository.findByStarkKey(
             sentTransaction.data.starkKey
           )
-        const history = buildForcedTransactionHistory({ sentTransaction })
+        const transactionHistory = new TransactionHistory({ sentTransaction })
 
         return renderPerpetualForcedWithdrawalPage({
           user,
@@ -297,12 +294,12 @@ export class TransactionController {
           asset: { hashOrId: this.collateralAsset.assetId },
           amount: sentTransaction.data.quantizedAmount,
           positionId: sentTransaction.data.positionId.toString(),
-          history,
+          history: transactionHistory.getForcedTransactionHistory(),
         })
       }
 
       case 'Withdraw': {
-        const history = buildRegularTransactionHistory({
+        const transactionHistory = new TransactionHistory({
           sentTransaction,
         })
         const data = sentTransaction.data
@@ -323,14 +320,11 @@ export class TransactionController {
             ethereumAddress: recipient?.ethAddress,
           },
           asset: { hashOrId: assetHash },
-          history,
+          history: transactionHistory.getRegularTransactionHistory(),
         })
       }
 
       case 'WithdrawWithTokenId': {
-        const history = buildRegularTransactionHistory({
-          sentTransaction,
-        })
         const asset =
           await this.assetRepository.findDetailsByAssetTypeAndTokenId(
             sentTransaction.data.assetType,
@@ -346,6 +340,10 @@ export class TransactionController {
             sentTransaction.data.starkKey
           )
 
+        const transactionHistory = new TransactionHistory({
+          sentTransaction,
+        })
+
         return renderRegularWithdrawalPage({
           user,
           transactionHash: sentTransaction.transactionHash,
@@ -354,7 +352,7 @@ export class TransactionController {
             ethereumAddress: recipient?.ethAddress,
           },
           asset: { hashOrId: asset.assetHash },
-          history,
+          history: transactionHistory.getRegularTransactionHistory(),
         })
       }
 

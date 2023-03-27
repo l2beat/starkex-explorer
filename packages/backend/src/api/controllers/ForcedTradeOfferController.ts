@@ -2,6 +2,7 @@ import { renderOfferAndForcedTradePage } from '@explorer/frontend'
 import { EthereumAddress, Timestamp } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { TransactionHistory } from '../../core/TransactionHistory'
 import {
   Accepted,
   ForcedTradeOfferRecord,
@@ -41,6 +42,7 @@ export class ForcedTradeOfferController {
     }
 
     const offer = await this.offerRepository.findById(id)
+
     if (!offer) {
       return { type: 'not found', content: 'Offer not found.' }
     }
@@ -93,6 +95,9 @@ export class ForcedTradeOfferController {
             positionId: userPositionId,
           }
         : undefined
+    const transactionHistory = new TransactionHistory({
+      forcedTradeOffer: offer,
+    })
 
     const content = renderOfferAndForcedTradePage({
       user: {
@@ -108,11 +113,8 @@ export class ForcedTradeOfferController {
       collateralAmount: offer.collateralAmount,
       syntheticAsset: { hashOrId: offer.syntheticAssetId },
       syntheticAmount: offer.syntheticAmount,
-      //TODO: error will be resolved after https://github.com/l2beat/starkex-explorer/pull/340 merged
-      expirationTimestamp: offer.accepted
-        ? Timestamp.fromHours(offer.accepted.submissionExpirationTime)
-        : Timestamp(0),
-      history: [{ timestamp: offer.createdAt, status: 'CREATED' }],
+      expirationTimestamp: offer.accepted?.submissionExpirationTime,
+      history: transactionHistory.getForcedTradeTransactionHistory(),
       acceptForm: user && getAcceptForm(offer, user),
       cancelForm: user && getCancelForm(offer, user),
       finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
