@@ -1,5 +1,5 @@
 import { AssetDetails } from '@explorer/shared'
-import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { REGULAR_WITHDRAWAL_FORM_ID } from '../view/pages/user/components/RegularWithdrawalForm'
 import { Api } from './peripherals/api'

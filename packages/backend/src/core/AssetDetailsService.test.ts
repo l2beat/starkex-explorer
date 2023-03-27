@@ -13,9 +13,9 @@ import { SentTransactionData } from '../peripherals/database/transactions/SentTr
 import { UserTransactionData } from '../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRecord } from '../peripherals/database/transactions/UserTransactionRepository'
 import {
-  fakeErc1155Details,
   fakeErc20Details,
   fakeErc721Details,
+  fakeErc1155Details,
 } from '../test/fakes'
 import { AssetDetailsMap } from './AssetDetailsMap'
 import { AssetDetailsService } from './AssetDetailsService'
@@ -40,7 +40,7 @@ describe(AssetDetailsService.name, () => {
     data,
   })
 
-  describe.only(AssetDetailsService.prototype.getAssetDetailsMap.name, () => {
+  describe(AssetDetailsService.prototype.getAssetDetailsMap.name, () => {
     it('should return undefined when trading mode is spot', async () => {
       const assetRepository = mockObject<AssetRepository>()
       const assetDetailsService = new AssetDetailsService(

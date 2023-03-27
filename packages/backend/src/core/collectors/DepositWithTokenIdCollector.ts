@@ -1,6 +1,6 @@
 import {
-  ERC1155Details,
   ERC721Details,
+  ERC1155Details,
   MintableERC721Details,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress } from '@explorer/types'

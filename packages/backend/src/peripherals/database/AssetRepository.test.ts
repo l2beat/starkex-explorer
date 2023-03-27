@@ -257,7 +257,7 @@ function dummyAssetWithTokenId(
   assetHash: string,
   tokenId: bigint
 ): ERC721Details {
-  const { decimals, ...rest } = dummyAsset(assetTypeHash, assetHash)
+  const { decimals: _, ...rest } = dummyAsset(assetTypeHash, assetHash)
   return {
     ...rest,
     type: 'ERC721',
