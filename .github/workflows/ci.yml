@@ -8,7 +8,7 @@ on:
       - master
 
 jobs:
-  lint_build_test:
+  lint:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -23,15 +23,56 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.x
       - run: yarn --frozen-lockfile
-      - run: yarn format
-      - run: yarn build
+      - run: yarn build:dependencies
       - run: yarn lint
-      - run: yarn typecheck
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: "yarn"
+      - run: yarn --frozen-lockfile
+      - run: yarn format
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: "yarn"
+      - run: yarn --frozen-lockfile
+      - run: yarn build:dependencies
       - run: yarn test
         env:
           TEST_DB_URL: postgresql://postgres:postgres@localhost:5432/postgres
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: "yarn"
+      - run: yarn --frozen-lockfile
+      - run: yarn build
+      - run: yarn typecheck
