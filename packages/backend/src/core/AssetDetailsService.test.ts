@@ -1,10 +1,4 @@
-import {
-  AssetId,
-  EthereumAddress,
-  Hash256,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { expect, mockFn } from 'earljs'
 
 import { AssetRepository } from '../peripherals/database/AssetRepository'
@@ -116,78 +110,6 @@ describe(AssetDetailsService.name, () => {
       expect(mockGetDetailsByAssetHashesOrTypeHashes).toBeExhausted()
     })
   })
-
-  describe(
-    AssetDetailsService.prototype.getSentTransactionAssetIdentifiers.name,
-    () => {
-      const assetDetailsService = new AssetDetailsService(
-        mock<AssetRepository>(),
-        'spot'
-      )
-      it('should return assetType from data when type is Withdraw', () => {
-        const result = assetDetailsService.getSentTransactionAssetIdentifiers(
-          sentTransaction({
-            type: 'Withdraw',
-            assetType: fakeErc20Details.assetHash,
-            starkKey: StarkKey.fake(),
-          })
-        )
-
-        expect(result).toEqual(fakeErc20Details.assetHash)
-      })
-
-      it('should return assetTypeHash from data for WithdrawWithTokenId', () => {
-        const result = assetDetailsService.getSentTransactionAssetIdentifiers(
-          sentTransaction({
-            type: 'WithdrawWithTokenId',
-            assetType: fakeErc721Details.assetTypeHash,
-            tokenId: 1n,
-            starkKey: StarkKey.fake(),
-          })
-        )
-
-        expect(result).toEqual(fakeErc721Details.assetTypeHash)
-      })
-
-      it('should return undefined for ForcedWithdrawal', () => {
-        const result = assetDetailsService.getSentTransactionAssetIdentifiers(
-          sentTransaction({
-            type: 'ForcedWithdrawal',
-            starkKey: StarkKey.fake(),
-            positionId: 2n,
-            quantizedAmount: 3n,
-            premiumCost: false,
-          })
-        )
-
-        expect(result).toEqual(undefined)
-      })
-
-      it('should return undefined for ForcedTrade', () => {
-        const result = assetDetailsService.getSentTransactionAssetIdentifiers(
-          sentTransaction({
-            type: 'ForcedTrade',
-            starkKeyA: StarkKey.fake(),
-            starkKeyB: StarkKey.fake(),
-            positionIdA: 1n,
-            positionIdB: 2n,
-            collateralAmount: 3n,
-            collateralAssetId: AssetId('USDC-6'),
-            syntheticAmount: 4n,
-            syntheticAssetId: AssetId('ETH-9'),
-            isABuyingSynthetic: true,
-            submissionExpirationTime: Timestamp.fromHours(12345),
-            nonce: 1n,
-            signatureB: '0x',
-            premiumCost: false,
-            offerId: 1,
-          })
-        )
-
-        expect(result).toEqual(undefined)
-      })
-    }
-  )
 
   describe(
     AssetDetailsService.prototype.getUserTransactionAssetHash.name,

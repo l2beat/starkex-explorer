@@ -65,21 +65,6 @@ export class AssetDetailsService {
     return new AssetDetailsMap(assetDetails)
   }
 
-  getSentTransactionAssetIdentifiers(
-    sentTransaction: SentTransactionRecord
-  ): AssetHash | undefined {
-    switch (sentTransaction.data.type) {
-      case 'Withdraw':
-      case 'WithdrawWithTokenId':
-        return sentTransaction.data.assetType
-      case 'ForcedWithdrawal':
-      case 'ForcedTrade':
-        return undefined
-      default:
-        assertUnreachable(sentTransaction.data)
-    }
-  }
-
   getUserTransactionAssetHash(
     userTransaction: UserTransactionRecord
   ): AssetHash | undefined {
