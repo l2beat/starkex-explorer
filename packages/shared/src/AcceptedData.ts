@@ -1,14 +1,14 @@
-import { StarkKey } from '@explorer/types'
+import { StarkKey, Timestamp } from '@explorer/types'
 import { z } from 'zod'
 
 import { toJsonWithoutBigInts } from './serialize'
-import { stringAs, stringAsBigInt } from './types'
+import { numberAs, stringAs, stringAsBigInt } from './types'
 
 export type AcceptedData = z.infer<typeof AcceptedData>
 export const AcceptedData = z.object({
   starkKeyB: stringAs(StarkKey),
   positionIdB: stringAsBigInt(),
-  submissionExpirationTime: stringAsBigInt(),
+  submissionExpirationTime: numberAs(Timestamp),
   nonce: stringAsBigInt(),
   premiumCost: z.boolean(),
 })

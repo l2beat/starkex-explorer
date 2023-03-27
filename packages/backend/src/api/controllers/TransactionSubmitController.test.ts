@@ -1,9 +1,10 @@
 import {
-  encodeFinalizeExitRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
+  encodeWithdrawal,
 } from '@explorer/shared'
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -236,7 +237,7 @@ describe(TransactionSubmitController.name, () => {
         signature: Hash256.fake().toString(),
         starkKeyB: StarkKey.fake(),
         positionIdB: 0n,
-        submissionExpirationTime: 0n,
+        submissionExpirationTime: Timestamp(0n),
         premiumCost: false,
       })
       const offer = fakeOffer()
@@ -357,7 +358,10 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction to a wrong address', async () => {
-      const data = encodeFinalizeExitRequest(StarkKey.fake())
+      const data = encodeWithdrawal({
+        starkKey: StarkKey.fake(),
+        assetTypeHash: AssetHash.fake(),
+      })
       const controller = new TransactionSubmitController(
         mockObject<EthereumClient>({
           getTransaction: async () =>
@@ -404,7 +408,10 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction with correct data and address', async () => {
-      const data = encodeFinalizeExitRequest(StarkKey.fake())
+      const data = encodeWithdrawal({
+        starkKey: StarkKey.fake(),
+        assetTypeHash: AssetHash.fake(),
+      })
       const perpetualAddress = EthereumAddress.fake()
       const hash = Hash256.fake()
 

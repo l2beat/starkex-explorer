@@ -193,8 +193,8 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       syntheticAmount: 1000000n,
       collateralAmount: 10000000n,
       accepted: {
-        submissionExpirationTime: BigInt(
-          Math.floor((Date.now() + 4 * 12 * 3600 * 1000) / (3600 * 1000))
+        submissionExpirationTime: Timestamp(
+          BigInt(Math.floor(Date.now() + 4 * 12 * 3600 * 1000))
         ),
       },
     },
@@ -207,8 +207,8 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       syntheticAmount: 1000000n,
       collateralAmount: 10000000n,
       accepted: {
-        submissionExpirationTime: BigInt(
-          Math.floor((Date.now() + 6 * 3560 * 900) / (3600 * 1000))
+        submissionExpirationTime: Timestamp.fromHours(
+          BigInt(Math.floor((Date.now() + 6 * 3560 * 900) / (3600 * 1000)))
         ),
       },
     },

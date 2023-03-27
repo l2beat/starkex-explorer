@@ -1,4 +1,5 @@
 import {
+  stringAs,
   stringAsBigInt,
   stringAsPositiveInt,
   TradingMode,
@@ -173,14 +174,14 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          starkKey: z.string(),
+          starkKey: stringAs(StarkKey),
         }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result = await userController.getUserPage(
           givenUser,
-          StarkKey(ctx.params.starkKey)
+          ctx.params.starkKey
         )
         applyControllerResult(ctx, result)
       }
@@ -192,7 +193,7 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          starkKey: z.string(),
+          starkKey: stringAs(StarkKey),
         }),
         query: z.object({
           page: z.optional(stringAsPositiveInt()),
@@ -204,7 +205,7 @@ export function createFrontendRouter(
         const pagination = getPagination(ctx.query)
         const result = await userController.getUserAssetsPage(
           givenUser,
-          StarkKey(ctx.params.starkKey),
+          ctx.params.starkKey,
           pagination
         )
         applyControllerResult(ctx, result)
@@ -217,7 +218,7 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          starkKey: z.string(),
+          starkKey: stringAs(StarkKey),
         }),
         query: z.object({
           page: z.optional(stringAsPositiveInt()),
@@ -229,7 +230,7 @@ export function createFrontendRouter(
         const pagination = getPagination(ctx.query)
         const result = await userController.getUserBalanceChangesPage(
           givenUser,
-          StarkKey(ctx.params.starkKey),
+          ctx.params.starkKey,
           pagination
         )
         applyControllerResult(ctx, result)
@@ -267,14 +268,14 @@ export function createFrontendRouter(
     withTypedContext(
       z.object({
         params: z.object({
-          transactionHash: z.string(),
+          transactionHash: stringAs(Hash256),
         }),
       }),
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
         const result = await transactionController.getTransactionPage(
           givenUser,
-          Hash256(ctx.params.transactionHash)
+          ctx.params.transactionHash
         )
         applyControllerResult(ctx, result)
       }

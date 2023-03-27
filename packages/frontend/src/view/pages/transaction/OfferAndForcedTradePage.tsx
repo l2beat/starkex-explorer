@@ -24,7 +24,7 @@ import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface OfferAndForcedTradePageProps {
   user: UserDetails | undefined
-  offerId: string
+  offerId: string | undefined
   transactionHash?: Hash256
   maker: {
     starkKey: StarkKey
@@ -41,9 +41,8 @@ export interface OfferAndForcedTradePageProps {
   collateralAmount: bigint
   syntheticAsset: Asset
   syntheticAmount: bigint
-  expirationTimestamp: Timestamp
   history: {
-    timestamp: Timestamp
+    timestamp: Timestamp | undefined
     status:
       | 'CREATED'
       | 'CANCELLED'
@@ -54,6 +53,7 @@ export interface OfferAndForcedTradePageProps {
       | 'REVERTED'
       | 'INCLUDED'
   }[]
+  expirationTimestamp?: Timestamp
   stateUpdateId?: number
 }
 
@@ -65,6 +65,7 @@ export function renderOfferAndForcedTradePage(
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   const isMine = props.user?.starkKey === props.maker.starkKey
+  const common = getCommon(props.transactionHash, props.offerId)
   const historyEntries = props.history.map((x) =>
     toHistoryEntry(x, props.type, props.stateUpdateId)
   )
@@ -79,19 +80,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   const showAccept = !isMine && Boolean(props.user) && status === 'CREATED'
 
   return (
-    <Page
-      user={props.user}
-      path={
-        props.transactionHash
-          ? `/transactions/${props.transactionHash.toString()}`
-          : `/offers/${props.offerId}`
-      }
-      description={
-        props.transactionHash
-          ? `Details of the ${props.transactionHash.toString()} forced trade transaction`
-          : `Details of the ${props.offerId} forced trade offer`
-      }
-    >
+    <Page user={props.user} path={common.path} description={common.description}>
       <ContentWrapper className="flex flex-col gap-12">
         <div>
           <div className="flex items-center justify-between">
@@ -102,7 +91,8 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
               />
             ) : (
               <PageTitle>
-                Forced {props.type.toLowerCase()} offer #{props.offerId}
+                Forced {props.type.toLowerCase()} offer{' '}
+                {props.offerId ? `#${props.offerId}` : ''}
               </PageTitle>
             )}
             <div className="mb-6 flex items-center gap-2">
@@ -124,7 +114,9 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
             timestamp={
-              !props.transactionHash && status !== 'EXPIRED'
+              !props.transactionHash &&
+              status !== 'EXPIRED' &&
+              props.expirationTimestamp
                 ? {
                     label: 'Expiration timestamp',
                     timestamp: props.expirationTimestamp,
@@ -239,4 +231,20 @@ function toHistoryEntry(
         ),
       }
   }
+}
+
+function getCommon(transactionHash?: Hash256, offerId?: string) {
+  if (transactionHash) {
+    return {
+      path: `/transactions/${transactionHash.toString()}`,
+      description: `Details of the ${transactionHash.toString()} forced trade transaction`,
+    }
+  }
+  if (offerId) {
+    return {
+      path: `/offers/${offerId}`,
+      description: `Details of the ${offerId} forced trade offer`,
+    }
+  }
+  throw new Error('No transaction hash or offer id')
 }

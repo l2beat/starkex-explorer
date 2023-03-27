@@ -3,10 +3,12 @@ import {
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
-import { AssetDetails, TradingMode, UserDetails } from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsMap } from '../../core/AssetDetailsMap'
+import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
@@ -18,7 +20,6 @@ import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRep
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
-import { getAssetHashToAssetDetailsMap } from './getAssetDetailsMap'
 import { userTransactionToEntry } from './userTransactionToEntry'
 import { getAssetPriceUSDCents } from './utils/toPositionAssetEntries'
 
@@ -31,6 +32,7 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
 export class StateUpdateController {
   constructor(
     private readonly userService: UserService,
+    private readonly assetDetailsService: AssetDetailsService,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
@@ -86,14 +88,10 @@ export class StateUpdateController {
       change: 0n,
     }))
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        assetHistory: balanceChanges,
-        userTransactions: forcedUserTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      assetHistory: balanceChanges,
+      userTransactions: forcedUserTransactions,
+    })
 
     const transactions = forcedUserTransactions.map((t) =>
       userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
@@ -142,13 +140,9 @@ export class StateUpdateController {
       ),
     ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        assetHistory: balanceChanges,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      assetHistory: balanceChanges,
+    })
 
     const balanceChangeEntries = toBalanceChangeEntries(
       balanceChanges,
@@ -187,13 +181,9 @@ export class StateUpdateController {
       ]
     )
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userTransactions: includedTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      userTransactions: includedTransactions,
+    })
 
     const transactions = includedTransactions.map((t) =>
       userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
@@ -212,14 +202,16 @@ export class StateUpdateController {
 }
 
 function toBalanceChangeEntries(
-  balanceChanges: PreprocessedAssetHistoryRecord<AssetHash | AssetId>[],
-  assetDetailsMap?: Record<string, AssetDetails>
+  balanceChanges: PreprocessedAssetHistoryRecord[],
+  assetDetailsMap?: AssetDetailsMap
 ) {
   return balanceChanges.map((r) => ({
     starkKey: r.starkKey,
     asset: {
       hashOrId: r.assetHashOrId,
-      assetDetails: assetDetailsMap?.[r.assetHashOrId.toString()],
+      assetDetails: AssetHash.check(r.assetHashOrId)
+        ? assetDetailsMap?.getByAssetHash(r.assetHashOrId)
+        : undefined,
     },
     balance: r.balance,
     change: r.balance - r.prevBalance,

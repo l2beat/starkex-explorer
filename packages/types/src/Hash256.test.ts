@@ -60,4 +60,26 @@ describe(Hash256.name, () => {
       )
     })
   })
+
+  describe(Hash256.check.name, () => {
+    it('returns true for valid Hash256 strings', () => {
+      const validHash =
+        '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+      expect(Hash256.check(validHash)).toEqual(true)
+    })
+
+    it('returns false for strings that are not valid Hash256', () => {
+      const invalidHash =
+        '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde'
+      expect(Hash256.check(invalidHash)).toEqual(false)
+    })
+
+    it('returns false for non-string values', () => {
+      expect(Hash256.check(12345)).toEqual(false)
+      expect(Hash256.check(null)).toEqual(false)
+      expect(Hash256.check(undefined)).toEqual(false)
+      expect(Hash256.check({})).toEqual(false)
+      expect(Hash256.check([])).toEqual(false)
+    })
+  })
 })

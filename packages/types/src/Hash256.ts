@@ -23,6 +23,18 @@ Hash256.from = function from(value: BigNumber | bigint) {
   return Hash256('0x' + value.toString(16).padStart(64, '0'))
 }
 
+Hash256.check = function check(value: unknown): value is Hash256 {
+  if (typeof value !== 'string') {
+    return false
+  }
+  try {
+    Hash256(value)
+    return true
+  } catch {
+    return false
+  }
+}
+
 Hash256.fake = function fake(start?: string) {
   if (!start) {
     return Hash256(fakeHexString(64))

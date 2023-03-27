@@ -23,6 +23,7 @@ import { createOldFrontendRouter } from './api/routers/OldFrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
 import { AccountService } from './core/AccountService'
+import { AssetDetailsService } from './core/AssetDetailsService'
 import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
 import { DepositWithTokenIdCollector } from './core/collectors/DepositWithTokenIdCollector'
 import { PageCollector } from './core/collectors/PageCollector'
@@ -339,6 +340,10 @@ export class Application {
       sentTransactionRepository
     )
     const userService = new UserService(userRegistrationEventRepository)
+    const assetDetailsService = new AssetDetailsService(
+      assetRepository,
+      config.starkex.tradingMode
+    )
 
     const userTransactionMigrator = new UserTransactionMigrator(
       database,
@@ -445,6 +450,7 @@ export class Application {
     )
     const homeController = new HomeController(
       userService,
+      assetDetailsService,
       assetRepository,
       userTransactionRepository,
       forcedTradeOfferRepository,
@@ -454,6 +460,7 @@ export class Application {
     )
     const userController = new UserController(
       userService,
+      assetDetailsService,
       preprocessedAssetHistoryRepository,
       sentTransactionRepository,
       userTransactionRepository,
@@ -461,10 +468,12 @@ export class Application {
       userRegistrationEventRepository,
       assetRepository,
       config.starkex.tradingMode,
+      config.starkex.contracts.perpetual,
       collateralAsset
     )
     const stateUpdateController = new StateUpdateController(
       userService,
+      assetDetailsService,
       stateUpdateRepository,
       assetRepository,
       userTransactionRepository,
@@ -475,8 +484,10 @@ export class Application {
     const transactionController = new TransactionController(
       userService,
       sentTransactionRepository,
+      forcedTradeOfferRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
+      assetRepository,
       collateralAsset
     )
     const merkleProofController = new MerkleProofController(
