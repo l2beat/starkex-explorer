@@ -58,39 +58,28 @@ describe(ForcedTransactionRepository.name, () => {
 
     const actual = await repository.getAll()
 
-    expect(actual).toBeAnArrayOfLength(4)
-    expect(actual).toBeAnArrayWith(
+    expect(actual).toEqualUnsorted([
       {
         ...tx1,
         lastUpdateAt: sentAt1,
-        updates: fakeForcedUpdates({
-          sentAt: sentAt1,
-        }),
+        updates: fakeForcedUpdates({ sentAt: sentAt1 }),
       },
       {
         ...tx2,
         lastUpdateAt: sentAt2,
-        updates: fakeForcedUpdates({
-          sentAt: sentAt2,
-        }),
+        updates: fakeForcedUpdates({ sentAt: sentAt2 }),
       },
       {
         ...tx3,
         lastUpdateAt: minedAt3,
-        updates: fakeForcedUpdates({
-          sentAt: sentAt3,
-          minedAt: minedAt3,
-        }),
+        updates: fakeForcedUpdates({ sentAt: sentAt3, minedAt: minedAt3 }),
       },
       {
         ...tx4,
         lastUpdateAt: minedAt4,
-        updates: fakeForcedUpdates({
-          sentAt: sentAt4,
-          minedAt: minedAt4,
-        }),
-      }
-    )
+        updates: fakeForcedUpdates({ sentAt: sentAt4, minedAt: minedAt4 }),
+      },
+    ])
   })
 
   it('returns no transaction hashes if no data passed', async () => {
@@ -346,7 +335,7 @@ describe(ForcedTransactionRepository.name, () => {
 
   it('returns undefined if transaction not found by hash', async () => {
     const transaction = await repository.findByHash(Hash256.fake())
-    expect(transaction).not.toBeDefined()
+    expect(transaction).toEqual(undefined)
   })
 
   it('gets by hash', async () => {
@@ -413,8 +402,7 @@ describe(ForcedTransactionRepository.name, () => {
     )
 
     const actual = await repository.getAll()
-    expect(actual).toBeAnArrayOfLength(2)
-    expect(actual).toEqual([
+    expect(actual).toEqualUnsorted([
       {
         ...tx1,
         lastUpdateAt: sentAtFinalize1,
@@ -429,7 +417,6 @@ describe(ForcedTransactionRepository.name, () => {
           },
         }),
       },
-
       {
         ...tx2,
         lastUpdateAt: minedAtFinalize2,

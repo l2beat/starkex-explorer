@@ -25,12 +25,11 @@ describe(KeyValueStore.name, () => {
     ])
 
     let actual = await kvStore.getAll()
-    expect(actual).toBeAnArrayOfLength(3)
-    expect(actual).toBeAnArrayWith(
+    expect(actual).toEqualUnsorted([
       { key: '1', value: 'one' },
       { key: '2', value: 'two' },
-      { key: '3', value: 'three' }
-    )
+      { key: '3', value: 'three' },
+    ])
 
     await kvStore.deleteAll()
     actual = await kvStore.getAll()

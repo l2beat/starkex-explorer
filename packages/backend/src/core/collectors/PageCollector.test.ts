@@ -1,12 +1,11 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 import { providers } from 'ethers'
 
 import { BlockRange } from '../../model'
 import { PageRepository } from '../../peripherals/database/PageRepository'
 import type { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { mock } from '../../test/mock'
 import { LogMemoryPageFactContinuous } from './events'
 import { PAGE_TRANSACTION_ABI, PageCollector, PageEvent } from './PageCollector'
 
@@ -48,12 +47,12 @@ describe(PageCollector.name, () => {
   ] as TransactionResponse[]
 
   it('fetches and saves memory pages', async () => {
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       getTransaction: async (txHash) =>
         transactions.find((x) => x.hash === txHash.toString()),
       getLogsInRange: async () => logs,
     })
-    const pageRepository = mock<PageRepository>({
+    const pageRepository = mockObject<PageRepository>({
       addMany: async () => [],
     })
 
@@ -88,31 +87,28 @@ describe(PageCollector.name, () => {
 
     expect(actualRecords).toEqual(expectedRecords)
 
-    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith([
-      blockRange,
-      {
-        address: REGISTRY_ADDRESS.toString(),
-        topics: [LogMemoryPageFactContinuous.topic],
-      },
-    ])
+    expect(ethereumClient.getLogsInRange).toHaveBeenOnlyCalledWith(blockRange, {
+      address: REGISTRY_ADDRESS.toString(),
+      topics: [LogMemoryPageFactContinuous.topic],
+    })
 
-    expect(pageRepository.addMany).toHaveBeenCalledWith([expectedRecords])
+    expect(pageRepository.addMany).toHaveBeenOnlyCalledWith(expectedRecords)
   })
 
   it('discards all records from repository after given block', async () => {
-    const pageRepository = mock<PageRepository>({
+    const pageRepository = mockObject<PageRepository>({
       deleteAfter: async () => 0,
     })
 
     const collector = new PageCollector(
-      mock<EthereumClient>(),
+      mockObject<EthereumClient>(),
       pageRepository,
       REGISTRY_ADDRESS
     )
 
     await collector.discardAfter(123)
 
-    expect(pageRepository.deleteAfter).toHaveBeenCalledWith([123])
+    expect(pageRepository.deleteAfter).toHaveBeenOnlyCalledWith(123)
   })
 })
 

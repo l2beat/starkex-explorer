@@ -7,7 +7,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 import { BigNumber, providers } from 'ethers'
 
 import { BlockRange } from '../../model'
@@ -25,7 +25,6 @@ import {
   WithdrawableAssetRepository,
 } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { mock } from '../../test/mock'
 import {
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
@@ -47,7 +46,7 @@ describe(UserTransactionCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const perpetualAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(perpetualAddress.toString())
@@ -73,19 +72,21 @@ describe(UserTransactionCollector.name, () => {
     })
 
     let added: UserTransactionAddRecord | undefined
-    const userTransactionRepository = mock<UserTransactionRepository>({
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
       async add(record) {
         added = record
         return 1
       },
     })
     let addedWithdrawable: WithdrawableAssetAddRecord | undefined
-    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
-      async add(record) {
-        addedWithdrawable = record
-        return 1
-      },
-    })
+    const withdrawableAssetRepository = mockObject<WithdrawableAssetRepository>(
+      {
+        async add(record) {
+          addedWithdrawable = record
+          return 1
+        },
+      }
+    )
 
     const collector = new UserTransactionCollector(
       ethereumClient,
@@ -125,7 +126,7 @@ describe(UserTransactionCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const perpetualAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(perpetualAddress.toString())
@@ -153,19 +154,21 @@ describe(UserTransactionCollector.name, () => {
     })
 
     let added: UserTransactionAddRecord | undefined
-    const userTransactionRepository = mock<UserTransactionRepository>({
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
       async add(record) {
         added = record
         return 1
       },
     })
     let addedWithdrawable: WithdrawableAssetAddRecord | undefined
-    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
-      async add(record) {
-        addedWithdrawable = record
-        return 1
-      },
-    })
+    const withdrawableAssetRepository = mockObject<WithdrawableAssetRepository>(
+      {
+        async add(record) {
+          addedWithdrawable = record
+          return 1
+        },
+      }
+    )
 
     const collector = new UserTransactionCollector(
       ethereumClient,
@@ -205,7 +208,7 @@ describe(UserTransactionCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const perpetualAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(perpetualAddress.toString())
@@ -231,19 +234,21 @@ describe(UserTransactionCollector.name, () => {
     })
 
     let added: UserTransactionAddRecord | undefined
-    const userTransactionRepository = mock<UserTransactionRepository>({
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
       async add(record) {
         added = record
         return 1
       },
     })
     let addedWithdrawable: WithdrawableAssetAddRecord | undefined
-    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
-      async add(record) {
-        addedWithdrawable = record
-        return 1
-      },
-    })
+    const withdrawableAssetRepository = mockObject<WithdrawableAssetRepository>(
+      {
+        async add(record) {
+          addedWithdrawable = record
+          return 1
+        },
+      }
+    )
 
     const collector = new UserTransactionCollector(
       ethereumClient,
@@ -279,7 +284,7 @@ describe(UserTransactionCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const perpetualAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(perpetualAddress.toString())
@@ -303,7 +308,7 @@ describe(UserTransactionCollector.name, () => {
     })
 
     let added: UserTransactionAddRecord | undefined
-    const userTransactionRepository = mock<UserTransactionRepository>({
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
       async add(record) {
         added = record
         return 1
@@ -313,7 +318,7 @@ describe(UserTransactionCollector.name, () => {
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
-      mock<WithdrawableAssetRepository>(),
+      mockObject<WithdrawableAssetRepository>(),
       perpetualAddress
     )
 
@@ -339,7 +344,7 @@ describe(UserTransactionCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const starkExAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(starkExAddress.toString())
@@ -362,7 +367,7 @@ describe(UserTransactionCollector.name, () => {
     })
 
     let added: UserTransactionAddRecord | undefined
-    const userTransactionRepository = mock<UserTransactionRepository>({
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
       async add(record) {
         added = record
         return 1
@@ -372,7 +377,7 @@ describe(UserTransactionCollector.name, () => {
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
-      mock<WithdrawableAssetRepository>(),
+      mockObject<WithdrawableAssetRepository>(),
       starkExAddress
     )
 
@@ -406,7 +411,7 @@ describe(UserTransactionCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const perpetualAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(perpetualAddress.toString())
@@ -437,7 +442,7 @@ describe(UserTransactionCollector.name, () => {
     })
 
     let added: UserTransactionAddRecord | undefined
-    const userTransactionRepository = mock<UserTransactionRepository>({
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
       async add(record) {
         added = record
         return 1
@@ -447,7 +452,7 @@ describe(UserTransactionCollector.name, () => {
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
-      mock<WithdrawableAssetRepository>(),
+      mockObject<WithdrawableAssetRepository>(),
       perpetualAddress,
       { assetId: AssetId.USDC, price: 1n }
     )
@@ -475,7 +480,7 @@ describe(UserTransactionCollector.name, () => {
   })
 
   it('can process multiple events', async () => {
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange() {
         return Array.from({ length: 3 }).map((_, i) => {
           const log = LogForcedWithdrawalRequest.encodeLog([
@@ -498,7 +503,7 @@ describe(UserTransactionCollector.name, () => {
     })
 
     let added = 0
-    const userTransactionRepository = mock<UserTransactionRepository>({
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
       async add() {
         added += 1
         return 1
@@ -508,7 +513,7 @@ describe(UserTransactionCollector.name, () => {
     const collector = new UserTransactionCollector(
       ethereumClient,
       userTransactionRepository,
-      mock<WithdrawableAssetRepository>(),
+      mockObject<WithdrawableAssetRepository>(),
       EthereumAddress.fake()
     )
 
