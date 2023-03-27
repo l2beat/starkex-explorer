@@ -8,7 +8,7 @@ import {
 } from '../test/fakes'
 import { AssetDetailsMap } from './AssetDetailsMap'
 
-describe.only(AssetDetailsMap.name, () => {
+describe(AssetDetailsMap.name, () => {
   const assetDetails = [
     fakeEthDetails,
     fakeErc20Details,
