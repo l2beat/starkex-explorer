@@ -27,6 +27,9 @@ export class AssetRepository extends BaseRepository {
     this.addManyRegistrations = this.wrapAddMany(this.addManyRegistrations)
     this.findDetailsByAssetHash = this.wrapFind(this.findDetailsByAssetHash)
     this.getDetailsByAssetHashes = this.wrapGet(this.getDetailsByAssetHashes)
+    this.getDetailsByAssetTypeAndTokenIds = this.wrapGet(
+      this.getDetailsByAssetTypeAndTokenIds
+    )
     this.findRegistrationByAssetTypeHash = this.wrapFind(
       this.findRegistrationByAssetTypeHash
     )
