@@ -97,6 +97,7 @@ export class UserController {
       assetHistory: history,
       sentTransactions,
       userTransactions,
+      withdrawableAssets,
     })
 
     const assetEntries = userAssets.map((a) =>
@@ -127,7 +128,7 @@ export class UserController {
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
-        asset: { hashOrId: asset.assetHash },
+        asset: { hashOrId: asset.assetHash, details: assetDetailsMap?.getByAssetHash(asset.assetHash) },
         amount: asset.balanceDelta,
       })),
       exchangeAddress: this.exchangeAddress,
