@@ -193,10 +193,8 @@ export const POSITION_DETAILS_PROPS: PositionDetailsProps = {
       syntheticAmount: 1000000n,
       collateralAmount: 10000000n,
       accepted: {
-        submissionExpirationTime: Timestamp.fromHours(
-          BigInt(
-            Math.floor((Date.now() + 4 * 12 * 3600 * 1000) / (3600 * 1000))
-          )
+        submissionExpirationTime: Timestamp(
+          BigInt(Math.floor(Date.now() + 4 * 12 * 3600 * 1000))
         ),
       },
     },
