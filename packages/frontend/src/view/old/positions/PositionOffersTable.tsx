@@ -1,4 +1,4 @@
-import { AssetId, Timestamp } from '@explorer/types'
+import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { ClientPaginatedTable, Column, Table } from '../common/table'
@@ -59,11 +59,7 @@ function buildOfferHistoryRow(offer: OfferHistoryEntry) {
       offer.cancelledAt ? (
         formatRelativeTime(offer.cancelledAt)
       ) : offer.accepted ? (
-        <span
-          data-timestamp={Timestamp.fromHours(
-            offer.accepted.submissionExpirationTime
-          )}
-        >
+        <span data-timestamp={offer.accepted.submissionExpirationTime}>
           ...
         </span>
       ) : (

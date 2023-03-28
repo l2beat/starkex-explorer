@@ -14,7 +14,7 @@ export function TableRow(props: TableRowProps) {
     <tr
       className={cx(
         props.fullBackground ? 'h-16' : 'h-10',
-        'whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium'
+        'group whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium'
       )}
     >
       {props.cells.map((cell, col) => {
@@ -24,6 +24,7 @@ export function TableRow(props: TableRowProps) {
           <td
             key={col}
             className={cx(
+              'group-hover:bg-gray-800 group-hover:bg-opacity-40',
               !props.link && 'px-2 sm:px-2.5',
               !props.link && col === 0 && 'pl-4 sm:pl-5',
               !props.link && col === props.cells.length - 1 && 'pr-4 sm:pr-5',

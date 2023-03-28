@@ -5,7 +5,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 import { BigNumber, providers } from 'ethers'
 
 import { BlockRange } from '../../model'
@@ -14,7 +14,6 @@ import {
   WithdrawableAssetRepository,
 } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { mock } from '../../test/mock'
 import {
   LogAssetWithdrawalAllowed,
   LogMintableWithdrawalAllowed,
@@ -32,7 +31,7 @@ describe(WithdrawalAllowedCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const perpetualAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(perpetualAddress.toString())
@@ -57,12 +56,14 @@ describe(WithdrawalAllowedCollector.name, () => {
     })
 
     let added: WithdrawableAssetAddRecord | undefined
-    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
-      async add(record) {
-        added = record
-        return 1
-      },
-    })
+    const withdrawableAssetRepository = mockObject<WithdrawableAssetRepository>(
+      {
+        async add(record) {
+          added = record
+          return 1
+        },
+      }
+    )
 
     const collector = new WithdrawalAllowedCollector(
       ethereumClient,
@@ -94,7 +95,7 @@ describe(WithdrawalAllowedCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const perpetualAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(perpetualAddress.toString())
@@ -118,12 +119,14 @@ describe(WithdrawalAllowedCollector.name, () => {
     })
 
     let added: WithdrawableAssetAddRecord | undefined
-    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
-      async add(record) {
-        added = record
-        return 1
-      },
-    })
+    const withdrawableAssetRepository = mockObject<WithdrawableAssetRepository>(
+      {
+        async add(record) {
+          added = record
+          return 1
+        },
+      }
+    )
 
     const collector = new WithdrawalAllowedCollector(
       ethereumClient,
@@ -154,7 +157,7 @@ describe(WithdrawalAllowedCollector.name, () => {
     const transactionHash = Hash256.fake('abc')
     const perpetualAddress = EthereumAddress.fake('def')
 
-    const ethereumClient = mock<EthereumClient>({
+    const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange(range, parameters) {
         expect(range).toEqual(blockRange)
         expect(parameters.address).toEqual(perpetualAddress.toString())
@@ -178,12 +181,14 @@ describe(WithdrawalAllowedCollector.name, () => {
     })
 
     let added: WithdrawableAssetAddRecord | undefined
-    const withdrawableAssetRepository = mock<WithdrawableAssetRepository>({
-      async add(record) {
-        added = record
-        return 1
-      },
-    })
+    const withdrawableAssetRepository = mockObject<WithdrawableAssetRepository>(
+      {
+        async add(record) {
+          added = record
+          return 1
+        },
+      }
+    )
 
     const collector = new WithdrawalAllowedCollector(
       ethereumClient,

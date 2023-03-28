@@ -5,6 +5,12 @@ import {
   OnChainData,
 } from '@explorer/encoding'
 import {
+  ERC20Details,
+  ERC721Details,
+  ERC1155Details,
+  ETHDetails,
+} from '@explorer/shared'
+import {
   AssetId,
   EthereumAddress,
   Hash256,
@@ -150,7 +156,7 @@ export function fakeAccepted(accepted?: Partial<Accepted>): Accepted {
     premiumCost: fakeBoolean(),
     signature: fakeHexString(32),
     starkKeyB: StarkKey.fake(),
-    submissionExpirationTime: fakeBigInt(),
+    submissionExpirationTime: Timestamp(3456000000000n),
     transactionHash: undefined,
     ...accepted,
   }
@@ -328,3 +334,59 @@ export const decodedFakePages: OnChainData = {
     },
   ],
 }
+
+export const fakeEthDetails = ETHDetails.parse({
+  assetHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000001',
+  assetTypeHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000001',
+  type: 'ETH',
+  quantum: '1',
+  name: 'Ethereum',
+  symbol: 'ETH',
+  contractError: [],
+})
+
+export const fakeErc20Details = ERC20Details.parse({
+  assetHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000002',
+  assetTypeHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000002',
+  type: 'ERC20',
+  quantum: '1',
+  contractError: [],
+  address: '0x0000000000000000000000000000000000000001',
+  name: 'ERC20 Token',
+  symbol: 'ERC20',
+  decimals: 18,
+})
+
+export const fakeErc721Details = ERC721Details.parse({
+  assetHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000003',
+  assetTypeHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000003',
+  type: 'ERC721',
+  quantum: '1',
+  contractError: [],
+  tokenId: '1',
+  address: '0x0000000000000000000000000000000000000002',
+  name: 'ERC721 Token',
+  symbol: 'ERC721',
+  uri: 'https://example.com/erc721/1',
+})
+
+export const fakeErc1155Details = ERC1155Details.parse({
+  assetHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000004',
+  assetTypeHash:
+    '0x0000000000000000000000000000000000000000000000000000000000000004',
+  type: 'ERC1155',
+  quantum: '1',
+  contractError: [],
+  tokenId: '1',
+  address: '0x0000000000000000000000000000000000000002',
+  name: 'ERC1155 Token',
+  symbol: 'ERC1155',
+  uri: 'https://example.com/erc1155/1',
+})

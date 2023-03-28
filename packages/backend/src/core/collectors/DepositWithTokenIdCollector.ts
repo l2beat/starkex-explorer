@@ -3,7 +3,7 @@ import {
   ERC1155Details,
   MintableERC721Details,
 } from '@explorer/shared'
-import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
+import { AssetHash, EthereumAddress } from '@explorer/types'
 
 import { BlockRange } from '../../model'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
@@ -29,7 +29,7 @@ export class DepositWithTokenIdCollector {
       logs.map(async (log) => {
         const event = LogDepositWithTokenId.parseLog(log)
 
-        const assetTypeHash = Hash256(event.args.assetType.toString())
+        const assetTypeHash = AssetHash(event.args.assetType.toString())
 
         const registeredToken =
           await this.assetRepository.findRegistrationByAssetTypeHash(

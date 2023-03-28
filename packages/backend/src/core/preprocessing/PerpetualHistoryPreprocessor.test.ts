@@ -5,7 +5,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 import { Knex } from 'knex'
 
 import {
@@ -18,7 +18,6 @@ import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
 
@@ -84,7 +83,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
     PerpetualHistoryPreprocessor.prototype.getAssetPricesForStateUpdate.name,
     () => {
       it('should return a map of asset prices for a given state update id', async () => {
-        const stateUpdateRepository = mock<StateUpdateRepository>({
+        const stateUpdateRepository = mockObject<StateUpdateRepository>({
           getPricesByStateUpdateId: async (): Promise<
             StateUpdatePriceRecord[]
           > => [
@@ -94,13 +93,13 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         })
         const preprocessor = new PerpetualHistoryPreprocessor(
           mockCollateralAsset,
-          mock<PreprocessedAssetHistoryRepository<AssetId>>(),
+          mockObject<PreprocessedAssetHistoryRepository<AssetId>>(),
           stateUpdateRepository,
-          mock<PositionRepository>(),
+          mockObject<PositionRepository>(),
           Logger.SILENT
         )
         const pricesMap = await preprocessor.getAssetPricesForStateUpdate(
-          mock<Knex.Transaction>(),
+          mockObject<Knex.Transaction>(),
           100
         )
         expect(pricesMap).toEqual({
@@ -116,15 +115,15 @@ describe(PerpetualHistoryPreprocessor.name, () => {
     PerpetualHistoryPreprocessor.prototype.preprocessNextStateUpdate.name,
     () => {
       it('should close position when starkKey is ZERO, process otherwise', async () => {
-        const trx = mock<Knex.Transaction>()
-        const positionRepository = mock<PositionRepository>({
+        const trx = mockObject<Knex.Transaction>()
+        const positionRepository = mockObject<PositionRepository>({
           getByStateUpdateId: async () => [
             position1,
             closingPosition,
             position2,
           ],
         })
-        const stateUpdateRepository = mock<StateUpdateRepository>({
+        const stateUpdateRepository = mockObject<StateUpdateRepository>({
           getPricesByStateUpdateId: async (): Promise<
             StateUpdatePriceRecord[]
           > => [
@@ -135,7 +134,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
 
         const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
           mockCollateralAsset,
-          mock<PreprocessedAssetHistoryRepository<AssetId>>(),
+          mockObject<PreprocessedAssetHistoryRepository<AssetId>>(),
           stateUpdateRepository,
           positionRepository,
           Logger.SILENT
@@ -156,13 +155,27 @@ describe(PerpetualHistoryPreprocessor.name, () => {
           'ETH-9': 123n,
           'USDC-6': 1_000_000n,
         }
-        expect(mockClosePositionOrVault).toHaveBeenCalledExactlyWith([
-          [trx, 10_002n, stateUpdate, expectedPriceMap],
-        ])
-        expect(mockPreprocessSinglePosition).toHaveBeenCalledExactlyWith([
-          [trx, position1, stateUpdate, expectedPriceMap],
-          [trx, position2, stateUpdate, expectedPriceMap],
-        ])
+        expect(mockClosePositionOrVault).toHaveBeenOnlyCalledWith(
+          trx,
+          10_002n,
+          stateUpdate,
+          expectedPriceMap
+        )
+        expect(mockPreprocessSinglePosition).toHaveBeenCalledTimes(2)
+        expect(mockPreprocessSinglePosition).toHaveBeenNthCalledWith(
+          1,
+          trx,
+          position1,
+          stateUpdate,
+          expectedPriceMap
+        )
+        expect(mockPreprocessSinglePosition).toHaveBeenNthCalledWith(
+          2,
+          trx,
+          position2,
+          stateUpdate,
+          expectedPriceMap
+        )
       })
     }
   )
@@ -173,24 +186,24 @@ describe(PerpetualHistoryPreprocessor.name, () => {
       it('fails if position has StarkKey.ZERO', async () => {
         const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
           mockCollateralAsset,
-          mock<PreprocessedAssetHistoryRepository<AssetId>>(),
-          mock<StateUpdateRepository>(),
-          mock<PositionRepository>(),
+          mockObject<PreprocessedAssetHistoryRepository<AssetId>>(),
+          mockObject<StateUpdateRepository>(),
+          mockObject<PositionRepository>(),
           Logger.SILENT
         )
         await expect(
           perpetualHistoryPreprocessor.preprocessSinglePosition(
-            mock<Knex.Transaction>(),
+            mockObject<Knex.Transaction>(),
             closingPosition,
             stateUpdate,
             {}
           )
-        ).toBeRejected('Cannot preprocess position with StarkKey.ZERO')
+        ).toBeRejectedWith('Cannot preprocess position with StarkKey.ZERO')
       })
 
       it('should properly update history when there are only some previous records', async () => {
-        const trx = mock<Knex.Transaction>()
-        const preprocessedRepository = mock<
+        const trx = mockObject<Knex.Transaction>()
+        const preprocessedRepository = mockObject<
           PreprocessedAssetHistoryRepository<AssetId>
         >({
           getCurrentByPositionOrVaultId: async () => [
@@ -245,8 +258,8 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
           mockCollateralAsset,
           preprocessedRepository,
-          mock<StateUpdateRepository>(),
-          mock<PositionRepository>(),
+          mockObject<StateUpdateRepository>(),
+          mockObject<PositionRepository>(),
           Logger.SILENT
         )
         const mockAddNewRecordsAndUpdateIsCurrent =
@@ -268,72 +281,68 @@ describe(PerpetualHistoryPreprocessor.name, () => {
 
         expect(
           preprocessedRepository.getCurrentByPositionOrVaultId
-        ).toHaveBeenCalledExactlyWith([[position1.positionId, trx]])
+        ).toHaveBeenOnlyCalledWith(position1.positionId, trx)
 
-        expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenCalledExactlyWith(
+        expect(mockAddNewRecordsAndUpdateIsCurrent).toHaveBeenOnlyCalledWith(
+          trx,
           [
-            [
-              trx,
-              [
-                // There was a history entry for this record:
-                {
-                  assetHashOrId: mockCollateralAsset.assetId,
-                  balance: position1.collateralBalance,
-                  blockNumber: stateUpdate.blockNumber,
-                  positionOrVaultId: position1.positionId,
-                  prevBalance: 100_000_000n,
-                  prevHistoryId: 100,
-                  prevPrice: 1_000_000n,
-                  price: mockCollateralAsset.price,
-                  starkKey: position1.starkKey,
-                  stateUpdateId: stateUpdate.id,
-                  timestamp: stateUpdate.timestamp,
-                },
-                // There was no history entry for this record:
-                {
-                  assetHashOrId: AssetId('ETH-9'),
-                  balance: 47_198_000_000n,
-                  blockNumber: stateUpdate.blockNumber,
-                  positionOrVaultId: position1.positionId,
-                  prevBalance: 0n,
-                  prevHistoryId: undefined,
-                  prevPrice: undefined,
-                  price: 123n,
-                  starkKey: position1.starkKey,
-                  stateUpdateId: stateUpdate.id,
-                  timestamp: stateUpdate.timestamp,
-                },
-                // There was a history entry for this record:
-                {
-                  assetHashOrId: AssetId('BTC-10'),
-                  balance: -40_000_000_000n,
-                  blockNumber: stateUpdate.blockNumber,
-                  positionOrVaultId: position1.positionId,
-                  prevBalance: 600_000n,
-                  prevHistoryId: 80,
-                  prevPrice: 345_678n,
-                  price: 456_789n,
-                  starkKey: position1.starkKey,
-                  stateUpdateId: stateUpdate.id,
-                  timestamp: stateUpdate.timestamp,
-                },
-                // There was a history entry but not in position,
-                // so balance needs to be set to 0:
-                {
-                  assetHashOrId: AssetId('SOL-7'),
-                  balance: 0n,
-                  blockNumber: stateUpdate.blockNumber,
-                  starkKey: position1.starkKey,
-                  positionOrVaultId: position1.positionId,
-                  prevBalance: 5_000_000n,
-                  price: 11_000n,
-                  prevPrice: 10_123n,
-                  prevHistoryId: 70,
-                  stateUpdateId: stateUpdate.id,
-                  timestamp: stateUpdate.timestamp,
-                },
-              ],
-            ],
+            // There was a history entry for this record:
+            {
+              assetHashOrId: mockCollateralAsset.assetId,
+              balance: position1.collateralBalance,
+              blockNumber: stateUpdate.blockNumber,
+              positionOrVaultId: position1.positionId,
+              prevBalance: 100_000_000n,
+              prevHistoryId: 100,
+              prevPrice: 1_000_000n,
+              price: mockCollateralAsset.price,
+              starkKey: position1.starkKey,
+              stateUpdateId: stateUpdate.id,
+              timestamp: stateUpdate.timestamp,
+            },
+            // There was no history entry for this record:
+            {
+              assetHashOrId: AssetId('ETH-9'),
+              balance: 47_198_000_000n,
+              blockNumber: stateUpdate.blockNumber,
+              positionOrVaultId: position1.positionId,
+              prevBalance: 0n,
+              prevHistoryId: undefined,
+              prevPrice: undefined,
+              price: 123n,
+              starkKey: position1.starkKey,
+              stateUpdateId: stateUpdate.id,
+              timestamp: stateUpdate.timestamp,
+            },
+            // There was a history entry for this record:
+            {
+              assetHashOrId: AssetId('BTC-10'),
+              balance: -40_000_000_000n,
+              blockNumber: stateUpdate.blockNumber,
+              positionOrVaultId: position1.positionId,
+              prevBalance: 600_000n,
+              prevHistoryId: 80,
+              prevPrice: 345_678n,
+              price: 456_789n,
+              starkKey: position1.starkKey,
+              stateUpdateId: stateUpdate.id,
+              timestamp: stateUpdate.timestamp,
+            },
+            // There was a history entry but not in position,
+            // so balance needs to be set to 0:
+            {
+              assetHashOrId: AssetId('SOL-7'),
+              balance: 0n,
+              blockNumber: stateUpdate.blockNumber,
+              starkKey: position1.starkKey,
+              positionOrVaultId: position1.positionId,
+              prevBalance: 5_000_000n,
+              price: 11_000n,
+              prevPrice: 10_123n,
+              prevHistoryId: 70,
+              stateUpdateId: stateUpdate.id,
+              timestamp: stateUpdate.timestamp,
+            },
           ]
         )
       })

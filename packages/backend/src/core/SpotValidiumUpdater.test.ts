@@ -6,14 +6,13 @@ import {
 } from '@explorer/encoding'
 import { InMemoryMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { AssetHash, Hash256, PedersenHash, StarkKey } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn, mockObject } from 'earljs'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
-import { mock } from '../test/mock'
 import { Logger } from '../tools/Logger'
 import { EMPTY_STATE_HASH, SpotValidiumUpdater } from './SpotValidiumUpdater'
 
@@ -22,7 +21,7 @@ describe(SpotValidiumUpdater.name, () => {
     // calculating hashes is slow :(
     this.timeout(5000)
 
-    const rollupStateRepository = mock<MerkleTreeRepository<VaultLeaf>>({
+    const rollupStateRepository = mockObject<MerkleTreeRepository<VaultLeaf>>({
       persist: async () => {},
     })
     const emptyTree = await MerkleTree.create(
@@ -37,12 +36,12 @@ describe(SpotValidiumUpdater.name, () => {
   describe(SpotValidiumUpdater.prototype.buildNewVaultLeaves.name, () => {
     it('correctly maps SpotBatch to updated vault leaves', () => {
       const updater = new SpotValidiumUpdater(
-        mock<StateUpdateRepository>({}),
-        mock<InMemoryMerkleStorage<VaultLeaf>>(),
-        mock<EthereumClient>(),
-        mock<UserTransactionRepository>(),
+        mockObject<StateUpdateRepository>({}),
+        mockObject<InMemoryMerkleStorage<VaultLeaf>>(),
+        mockObject<EthereumClient>(),
+        mockObject<UserTransactionRepository>(),
         Logger.SILENT,
-        mock<MerkleTree<VaultLeaf>>()
+        mockObject<MerkleTree<VaultLeaf>>()
       )
       const newVaultA = {
         vaultId: 5n,
@@ -56,7 +55,7 @@ describe(SpotValidiumUpdater.name, () => {
         assetHash: AssetHash.fake('54321'),
         balance: 10999n,
       }
-      const mockSpotBatch = mock<SpotBatch>({
+      const mockSpotBatch = mockObject<SpotBatch>({
         vaults: [newVaultA, newVaultB],
       })
 
@@ -90,12 +89,12 @@ describe(SpotValidiumUpdater.name, () => {
         const stateTree = await MerkleTree.create(storage, 3n, VaultLeaf.EMPTY)
 
         const updater = new SpotValidiumUpdater(
-          mock<StateUpdateRepository>({
+          mockObject<StateUpdateRepository>({
             findLast: async () => undefined,
           }),
           storage,
-          mock<EthereumClient>(),
-          mock<UserTransactionRepository>(),
+          mockObject<EthereumClient>(),
+          mockObject<UserTransactionRepository>(),
           Logger.SILENT,
           stateTree
         )
@@ -130,7 +129,7 @@ describe(SpotValidiumUpdater.name, () => {
           regularWithdrawalModification,
           fullWithdrawalModification,
         ]
-        const mockSpotCairoOutput = mock<SpotCairoOutput>({
+        const mockSpotCairoOutput = mockObject<SpotCairoOutput>({
           finalValidiumVaultRoot: PedersenHash.fake('987'),
           modifications,
         })
@@ -140,7 +139,7 @@ describe(SpotValidiumUpdater.name, () => {
           assetHash: AssetHash.fake('678'),
           balance: 555n,
         }
-        const mockSpotBatch = mock<SpotBatch>({
+        const mockSpotBatch = mockObject<SpotBatch>({
           vaults: [newVault],
         })
         await updater.processSpotValidiumStateTransition(
@@ -149,7 +148,7 @@ describe(SpotValidiumUpdater.name, () => {
           mockSpotBatch
         )
 
-        expect(mockProcessStateTransition).toHaveBeenCalledWith([
+        expect(mockProcessStateTransition).toHaveBeenCalledWith(
           {
             id: 1,
             blockNumber: validiumStateTransition.blockNumber,
@@ -167,8 +166,8 @@ describe(SpotValidiumUpdater.name, () => {
                 newVault.assetHash
               ),
             },
-          ],
-        ])
+          ]
+        )
       })
     }
   )

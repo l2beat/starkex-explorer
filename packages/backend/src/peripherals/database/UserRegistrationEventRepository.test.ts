@@ -138,7 +138,7 @@ describe(UserRegistrationEventRepository.name, () => {
 
   it('returns undefined if no event exists for stark key', async () => {
     const event = await repository.findByStarkKey(StarkKey.fake('123'))
-    expect(event).not.toBeDefined()
+    expect(event).toEqual(undefined)
   })
 
   it('finds event by ethereum address', async () => {

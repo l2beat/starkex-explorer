@@ -19,12 +19,12 @@ export interface RegularWithdrawalPageProps {
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey
-    ethereumAddress: EthereumAddress
+    ethereumAddress: EthereumAddress | undefined
   }
   asset: Asset
   amount?: bigint
   history: {
-    timestamp: Timestamp
+    timestamp: Timestamp | undefined
     status: 'SENT' | 'MINED' | 'REVERTED'
   }[]
   stateUpdateId?: number

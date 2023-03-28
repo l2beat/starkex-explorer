@@ -19,6 +19,7 @@
     "typecheck": "wsrun -em typecheck",
     "test": "wsrun -ecsm test",
     "build": "wsrun -etm build",
+    "build:dependencies": "wsrun -p @explorer/{crypto,encoding,shared,state,types,testnet,frontend} -etm build",
     "clean": "wsrun -ecsm clean",
     "start": "cd packages/backend && yarn start"
   },
@@ -27,7 +28,7 @@
     "@types/node": "^17.0.38",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
-    "earljs": "^0.2.3",
+    "earljs": "^0.3.0-canary.20230323T082220",
     "esbuild": "^0.14.42",
     "esbuild-register": "^3.3.2",
     "eslint": "^8.16.0",
