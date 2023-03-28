@@ -19,7 +19,7 @@ import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
 
 const noop = async () => {}
 const collateralAsset: CollateralAsset = {
-  assetId: AssetId('USDC'),
+  assetId: AssetId('USDC-6'),
   price: 1n,
 }
 
