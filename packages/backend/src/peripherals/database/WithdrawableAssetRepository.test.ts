@@ -302,18 +302,18 @@ describe(WithdrawableAssetRepository.name, () => {
         expect(records1).toEqualUnsorted([
           {
             assetHash: secondAsset,
-            balanceDelta: 123n,
+            withdrawableBalance: 123n,
           },
           {
             assetHash: firstAsset,
-            balanceDelta: 246n,
+            withdrawableBalance: 246n,
           },
         ])
 
         expect(records2).toEqual([
           {
             assetHash: secondAsset,
-            balanceDelta: 246n,
+            withdrawableBalance: 246n,
           },
         ])
       })

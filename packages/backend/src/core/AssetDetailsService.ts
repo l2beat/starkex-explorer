@@ -19,7 +19,7 @@ export class AssetDetailsService {
     assetHistory?: PreprocessedAssetHistoryRecord[]
     sentTransactions?: SentTransactionRecord[]
     userTransactions?: UserTransactionRecord[]
-    withdrawableAssets?: { assetHash: AssetHash; balanceDelta: bigint }[]
+    withdrawableAssets?: { assetHash: AssetHash; withdrawableBalance: bigint }[]
   }): Promise<AssetDetailsMap | undefined> {
     if (this.tradingMode !== 'spot') {
       return undefined

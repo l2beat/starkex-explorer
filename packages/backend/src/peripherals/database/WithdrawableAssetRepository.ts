@@ -68,19 +68,18 @@ export class WithdrawableAssetRepository extends BaseRepository {
 
   async getAssetBalancesByStarkKey(
     starkKey: StarkKey
-  ): Promise<{ assetHash: AssetHash; balanceDelta: bigint }[]> {
+  ): Promise<{ assetHash: AssetHash; withdrawableBalance: bigint }[]> {
     const knex = await this.knex()
-    const results: { assetHash: string; balanceDelta: string }[] = await knex(
-      'withdrawable_assets'
-    )
-      .select('asset_hash as assetHash')
-      .where('stark_key', starkKey.toString())
-      .groupBy('asset_hash')
-      .having(knex.raw('sum(balance_delta) > 0'))
-      .sum('balance_delta as balanceDelta')
+    const results: { assetHash: string; withdrawableBalance: string }[] =
+      await knex('withdrawable_assets')
+        .select('asset_hash as assetHash')
+        .where('stark_key', starkKey.toString())
+        .groupBy('asset_hash')
+        .having(knex.raw('sum(balance_delta) > 0'))
+        .sum('balance_delta as withdrawableBalance')
     return results.map((x) => ({
       assetHash: AssetHash(x.assetHash),
-      balanceDelta: BigInt(x.balanceDelta),
+      withdrawableBalance: BigInt(x.withdrawableBalance),
     }))
   }
 

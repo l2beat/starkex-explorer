@@ -132,7 +132,7 @@ export class UserController {
           hashOrId: asset.assetHash,
           details: assetDetailsMap?.getByAssetHash(asset.assetHash),
         },
-        amount: asset.balanceDelta,
+        amount: asset.withdrawableBalance,
       })),
       exchangeAddress: this.exchangeAddress,
       offersToAccept: [],
