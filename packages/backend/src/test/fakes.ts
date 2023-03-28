@@ -33,6 +33,10 @@ import {
   Updates,
 } from '../peripherals/database/ForcedTransactionRepository'
 import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
+import { SentTransactionData } from '../peripherals/database/transactions/SentTransaction'
+import { SentTransactionRecord } from '../peripherals/database/transactions/SentTransactionRepository'
+import { UserTransactionData } from '../peripherals/database/transactions/UserTransaction'
+import { UserTransactionRecord } from '../peripherals/database/transactions/UserTransactionRepository'
 import { Record as TransactionStatusRecord } from '../peripherals/database/TransactionStatusRepository'
 
 const MAX_SAFE_POSTGRES_INT = 2 ** 31 - 1
@@ -134,7 +138,7 @@ export function fakeForcedUpdatesVerified(
   }
 }
 
-export function fakeSentTransaction(
+export function fakeTransactionStatus(
   record?: Partial<TransactionStatusRecord>
 ): TransactionStatusRecord & { sentAt: Timestamp } {
   return {
@@ -195,6 +199,55 @@ export function fakeExit(
     updates: fakeForcedUpdates(),
     lastUpdateAt: fakeTimestamp(),
     ...exit,
+  }
+}
+
+export function fakeSentTransaction(
+  record?: Partial<SentTransactionRecord>
+): SentTransactionRecord {
+  return {
+    transactionHash: Hash256.fake(),
+    starkKey: StarkKey.fake(),
+    vaultOrPositionId: fakeBigInt(),
+    data: {} as SentTransactionData,
+    sentTimestamp: fakeTimestamp(),
+    ...record,
+  }
+}
+
+export function fakeMined(
+  mined?: Partial<SentTransactionRecord['mined']>
+): SentTransactionRecord['mined'] {
+  return {
+    timestamp: fakeTimestamp(),
+    blockNumber: fakeInt(),
+    reverted: false,
+    ...mined,
+  }
+}
+
+export function fakeUserTransaction(
+  record?: Partial<UserTransactionRecord>
+): UserTransactionRecord {
+  return {
+    id: fakeInt(),
+    transactionHash: Hash256.fake(),
+    starkKeyA: StarkKey.fake(),
+    blockNumber: fakeInt(),
+    timestamp: fakeTimestamp(),
+    data: {} as UserTransactionData,
+    ...record,
+  }
+}
+
+export function fakeIncluded(
+  included?: Partial<UserTransactionRecord['included']>
+): UserTransactionRecord['included'] {
+  return {
+    blockNumber: fakeInt(),
+    timestamp: fakeTimestamp(),
+    stateUpdateId: fakeInt(),
+    ...included,
   }
 }
 

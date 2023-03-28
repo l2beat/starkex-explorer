@@ -1,7 +1,7 @@
 import { expect } from 'earljs'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { fakeSentTransaction, fakeTimestamp } from '../../test/fakes'
+import { fakeTimestamp, fakeTransactionStatus } from '../../test/fakes'
 import { Logger } from '../../tools/Logger'
 import { TransactionStatusRepository } from './TransactionStatusRepository'
 
@@ -12,25 +12,25 @@ describe(TransactionStatusRepository.name, () => {
   beforeEach(() => repository.deleteAll())
 
   it('adds transaction', async () => {
-    const tx = fakeSentTransaction()
+    const tx = fakeTransactionStatus()
     await repository.add(tx)
   })
 
   it('returns transactions waiting to be mined', async () => {
-    const sent = fakeSentTransaction()
+    const sent = fakeTransactionStatus()
     const mined = {
-      ...fakeSentTransaction(),
+      ...fakeTransactionStatus(),
       mined: {
         at: fakeTimestamp(),
         blockNumber: 1,
       },
     }
     const reverted = {
-      ...fakeSentTransaction(),
+      ...fakeTransactionStatus(),
       revertedAt: fakeTimestamp(),
     }
     const forgotten = {
-      ...fakeSentTransaction(),
+      ...fakeTransactionStatus(),
       forgottenAt: fakeTimestamp(),
     }
     await repository.add(sent)
@@ -43,7 +43,7 @@ describe(TransactionStatusRepository.name, () => {
   })
 
   it('updates transaction waiting to be mined', async () => {
-    const sent = fakeSentTransaction()
+    const sent = fakeTransactionStatus()
     await repository.add(sent)
     const minedAt = fakeTimestamp()
     const blockNumber = 1
