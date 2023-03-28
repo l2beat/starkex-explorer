@@ -466,6 +466,7 @@ export class Application {
       userTransactionRepository,
       userRegistrationEventRepository,
       assetRepository,
+      withdrawableAssetRepository,
       config.starkex.tradingMode,
       config.starkex.contracts.perpetual,
       collateralAsset

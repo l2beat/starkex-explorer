@@ -29,6 +29,7 @@ import {
   UserTransactionRepository,
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { ControllerResult } from './ControllerResult'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
@@ -45,6 +46,7 @@ export class UserController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly tradingMode: TradingMode,
     private readonly exchangeAddress: EthereumAddress,
     private readonly collateralAsset?: CollateralAsset
@@ -64,6 +66,7 @@ export class UserController {
       sentTransactions,
       userTransactions,
       userTransactionsCount,
+      withdrawableAssets,
     ] = await Promise.all([
       this.userService.getUserDetails(givenUser),
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
@@ -86,6 +89,7 @@ export class UserController {
         limit: 10,
       }),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
+      this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
     ])
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -93,6 +97,7 @@ export class UserController {
       assetHistory: history,
       sentTransactions,
       userTransactions,
+      withdrawableAssets,
     })
 
     const assetEntries = userAssets.map((a) =>
@@ -122,8 +127,14 @@ export class UserController {
       tradingMode: this.tradingMode,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
+      withdrawableAssets: withdrawableAssets.map((asset) => ({
+        asset: {
+          hashOrId: asset.assetHash,
+          details: assetDetailsMap?.getByAssetHash(asset.assetHash),
+        },
+        amount: asset.withdrawableBalance,
+      })),
       exchangeAddress: this.exchangeAddress,
-      withdrawableAssets: [],
       offersToAccept: [],
       assets: assetEntries,
       totalAssets,
