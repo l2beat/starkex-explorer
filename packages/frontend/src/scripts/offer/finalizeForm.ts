@@ -2,23 +2,20 @@ import { deserializeFinalizeOfferData } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
-import { FormClass } from '../../view/old/offers/finalize-form/attributes'
+import { FINALIZE_OFFER_FORM_ID } from '../../view/pages/transaction/components/FinalizeOfferForm'
 import { Api } from '../peripherals/api'
 import { Wallet } from '../peripherals/wallet'
-import { getAttribute } from './getAttribute'
 
 export function initFinalizeForm() {
-  const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
+  const forms = document.querySelectorAll<HTMLFormElement>(
+    `.${FINALIZE_OFFER_FORM_ID}`
+  )
   forms.forEach((form) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
-      const address = EthereumAddress(getAttribute(form, 'address'))
-      const offer = deserializeFinalizeOfferData(getAttribute(form, 'offer'))
-      const offerId = Number(getAttribute(form, 'offer-id'))
-      const perpetualAddress = EthereumAddress(
-        getAttribute(form, 'perpetual-address')
-      )
+      const { address, offer, offerId, perpetualAddress } = getFormData(form)
+
       const hash = await Wallet.sendPerpetualForcedTradeTransaction(
         address,
         offer,
@@ -28,4 +25,19 @@ export function initFinalizeForm() {
       window.location.href = `/forced/${hash.toString()}`
     })
   })
+}
+
+function getFormData(form: HTMLFormElement) {
+  const { address, offer, offerId, perpetualAddress } = form.dataset
+
+  if (!address || !offer || !offerId || !perpetualAddress) {
+    throw new Error('Invalid data')
+  }
+
+  return {
+    address: EthereumAddress(address),
+    offer: deserializeFinalizeOfferData(offer),
+    offerId: Number(offerId),
+    perpetualAddress: EthereumAddress(perpetualAddress),
+  }
 }
