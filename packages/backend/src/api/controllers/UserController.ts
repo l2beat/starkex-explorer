@@ -31,7 +31,7 @@ import {
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
-import { forcedTradeOfferToEntry } from './forcedTradeOfferToEntry'
+import { forcedTradeOffersToEntry } from './forcedTradeOfferToEntry'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
@@ -135,7 +135,12 @@ export class UserController {
     )
     // TODO: include the count of sentTransactions
     const totalTransactions = userTransactionsCount
-
+    const offers = await forcedTradeOffersToEntry(
+      forcedTradeOffers,
+      this.userTransactionRepository,
+      this.sentTransactionRepository,
+      registeredUser.starkKey
+    )
     const content = renderUserPage({
       user,
       tradingMode: this.tradingMode,
@@ -150,9 +155,7 @@ export class UserController {
       totalBalanceChanges: historyCount,
       transactions,
       totalTransactions,
-      offers: forcedTradeOffers.map((offer) =>
-        forcedTradeOfferToEntry(offer, registeredUser.starkKey)
-      ),
+      offers,
       totalOffers: forcedTradeOffersCount,
     })
 

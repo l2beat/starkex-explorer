@@ -1,3 +1,4 @@
+import { assertUnreachable } from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
 import { default as React, ReactNode } from 'react'
 
@@ -26,7 +27,16 @@ export interface OfferEntry {
   amount: bigint
   price: bigint
   totalPrice: bigint
-  status: 'CREATED' | 'ACCEPTED' | 'SENT' | 'CANCELLED' | 'EXPIRED'
+  status:
+    | 'CREATED'
+    | 'ACCEPTED'
+    | 'SENT'
+    | 'CANCELLED'
+    | 'EXPIRED'
+    | 'MINED'
+    | 'INCLUDED'
+    | 'EXPIRED'
+    | 'REVERTED'
   type: 'BUY' | 'SELL'
   role?: 'MAKER' | 'TAKER'
 }
@@ -83,24 +93,38 @@ function toStatusType(status: OfferEntry['status']): StatusType {
       return 'BEGIN'
     case 'ACCEPTED':
     case 'SENT':
+    case 'MINED':
       return 'MIDDLE'
+    case 'INCLUDED':
+      return 'END'
     case 'CANCELLED':
     case 'EXPIRED':
+    case 'REVERTED':
       return 'CANCEL'
+    default:
+      assertUnreachable(status)
   }
 }
 
 function toStatusText(status: OfferEntry['status']): string {
   switch (status) {
     case 'CREATED':
-      return 'CREATED (1/3)'
+      return 'CREATED (1/5)'
     case 'ACCEPTED':
-      return 'ACCEPTED (2/3)'
+      return 'ACCEPTED (2/5)'
     case 'SENT':
-      return 'SENT (3/3)'
+      return 'SENT (3/5)'
+    case 'MINED':
+      return 'MINED (4/5)'
+    case 'INCLUDED':
+      return 'INCLUDED (5/5)'
     case 'CANCELLED':
       return 'CANCELLED'
     case 'EXPIRED':
       return 'EXPIRED'
+    case 'REVERTED':
+      return 'REVERTED'
+    default:
+      assertUnreachable(status)
   }
 }

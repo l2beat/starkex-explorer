@@ -81,6 +81,8 @@ export class HomeController {
       totalStateUpdates,
       transactions,
       totalForcedTransactions: forcedUserTransactionsCount,
+      // We use forcedTradeOfferToEntry here because we only need status from the offer,
+      // as we do not show other statuses on this page
       offers: availableOffers.map((offer) => forcedTradeOfferToEntry(offer)),
       totalOffers: availableOffersCount,
       tradingMode: this.tradingMode,

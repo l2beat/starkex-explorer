@@ -901,4 +901,52 @@ describe(UserTransactionRepository.name, () => {
       expect(after?.included).toEqual(undefined)
     })
   })
+
+  describe(
+    UserTransactionRepository.prototype.getByTransactionHashes.name,
+    () => {
+      it('returns an empty array if no records were found', async () => {
+        expect(
+          await repository.getByTransactionHashes([Hash256.fake()])
+        ).toEqual([])
+      })
+
+      it('returns the records for the given transaction hashes', async () => {
+        const transactionHash1 = Hash256.fake()
+        const transactionHash2 = Hash256.fake()
+        const transactionHash3 = Hash256.fake()
+
+        const id1 = await repository.add({
+          transactionHash: transactionHash1,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        await repository.add({
+          transactionHash: transactionHash2,
+          blockNumber: 456,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        const id3 = await repository.add({
+          transactionHash: transactionHash3,
+          blockNumber: 789,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        const records = await repository.getByTransactionHashes([
+          transactionHash1,
+          transactionHash3,
+        ])
+        expect(records.map((record) => record.id)).toEqual([id1, id3])
+        expect(records.map((record) => record.transactionHash)).toEqual([
+          transactionHash1,
+          transactionHash3,
+        ])
+      })
+    }
+  )
 })

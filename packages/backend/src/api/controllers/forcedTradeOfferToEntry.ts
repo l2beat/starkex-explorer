@@ -1,41 +1,66 @@
 import { OfferEntry } from '@explorer/frontend'
-import { StarkKey, Timestamp } from '@explorer/types'
+import { Hash256, StarkKey } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../peripherals/database/ForcedTradeOfferRepository'
+import {
+  SentTransactionRecord,
+  SentTransactionRepository,
+} from '../../peripherals/database/transactions/SentTransactionRepository'
+import {
+  UserTransactionRecord,
+  UserTransactionRepository,
+} from '../../peripherals/database/transactions/UserTransactionRepository'
+import { buildForcedTradeTransactionHistory } from './utils/buildTransactionHistory'
 
-function buildTradeOfferHistory(
-  forcedTradeOffer: ForcedTradeOfferRecord
-): OfferEntry['status'][] {
-  const history: OfferEntry['status'][] = []
-  if (forcedTradeOffer.accepted) {
-    if (forcedTradeOffer.accepted.transactionHash) {
-      history.push('SENT')
-    } else if (
-      forcedTradeOffer.accepted.submissionExpirationTime < Timestamp.now()
-    ) {
-      history.push('EXPIRED')
-    }
-  }
+export async function forcedTradeOffersToEntry(
+  forcedTradeOffers: ForcedTradeOfferRecord[],
+  userTransactionRepository: UserTransactionRepository,
+  sentTransactionRepository: SentTransactionRepository,
+  userStarkKey?: StarkKey
+) {
+  const transactionHashes = forcedTradeOffers
+    .map((forcedTradeOffer) => forcedTradeOffer.accepted?.transactionHash)
+    .filter((transactionHash): transactionHash is Hash256 =>
+      Hash256.check(transactionHash)
+    )
+  const userTransactions =
+    await userTransactionRepository.getByTransactionHashes(transactionHashes)
+  const sentTransactions =
+    await sentTransactionRepository.getByTransactionHashes(transactionHashes)
 
-  if (forcedTradeOffer.cancelledAt) {
-    history.push('CANCELLED')
-  }
-
-  if (forcedTradeOffer.accepted) {
-    history.push('ACCEPTED')
-  }
-
-  history.push('CREATED')
-
-  return history
+  return forcedTradeOffers.map((forcedTradeOffer) => {
+    const userTransaction = userTransactions.find(
+      (userTransaction) =>
+        userTransaction.transactionHash ===
+        forcedTradeOffer.accepted?.transactionHash
+    )
+    const sentTransaction = sentTransactions.find(
+      (sentTransaction) =>
+        sentTransaction.transactionHash ===
+        forcedTradeOffer.accepted?.transactionHash
+    )
+    return forcedTradeOfferToEntry(
+      forcedTradeOffer,
+      sentTransaction,
+      userTransaction,
+      userStarkKey
+    )
+  })
 }
 
 export function forcedTradeOfferToEntry(
   forcedTradeOffer: ForcedTradeOfferRecord,
+  sentTransaction?: SentTransactionRecord,
+  userTransaction?: UserTransactionRecord,
   userStarkKey?: StarkKey
 ): OfferEntry {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const status = buildTradeOfferHistory(forcedTradeOffer)[0]!
+  const status = buildForcedTradeTransactionHistory({
+    forcedTradeOffer,
+    sentTransaction,
+    userTransaction,
+  })[0]!.status
+
   const role =
     forcedTradeOffer.starkKeyA === userStarkKey
       ? 'MAKER'

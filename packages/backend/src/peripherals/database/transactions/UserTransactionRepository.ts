@@ -277,6 +277,15 @@ export class UserTransactionRepository extends BaseRepository {
     const result = await query
     return result ? toRecord(result) : undefined
   }
+  async getByTransactionHashes(transactionHashes: Hash256[]) {
+    const knex = await this.knex()
+    const result = await queryWithIncluded(knex).whereIn(
+      'user_transactions.transaction_hash',
+      transactionHashes.map((hash) => hash.toString())
+    )
+
+    return result.map((record) => toRecord(record))
+  }
 
   async findFirstWithdrawByStarkKeyAfter(
     starkKey: StarkKey,

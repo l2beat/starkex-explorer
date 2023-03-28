@@ -411,4 +411,43 @@ describe(SentTransactionRepository.name, () => {
       })
     }
   )
+
+  describe(
+    SentTransactionRepository.prototype.getByTransactionHashes.name,
+    () => {
+      it('returns an empty array if no records were found', async () => {
+        expect(
+          await repository.getByTransactionHashes([
+            Hash256.fake(),
+            Hash256.fake(),
+          ])
+        ).toEqual([])
+      })
+
+      it('returns an array of transactions', async () => {
+        const hash1 = await repository.add({
+          transactionHash: Hash256.fake(),
+          timestamp: Timestamp(100),
+          data: fakeForcedWithdrawal(),
+        })
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          timestamp: Timestamp(200),
+          data: fakeForcedWithdrawal(),
+        })
+        const hash3 = await repository.add({
+          transactionHash: Hash256.fake(),
+          timestamp: Timestamp(300),
+          data: fakeForcedWithdrawal(),
+        })
+
+        const results = await repository.getByTransactionHashes([hash1, hash3])
+
+        expect(results.map((result) => result.transactionHash)).toEqual([
+          hash1,
+          hash3,
+        ])
+      })
+    }
+  )
 })

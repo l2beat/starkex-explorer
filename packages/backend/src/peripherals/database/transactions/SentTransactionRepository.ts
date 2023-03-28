@@ -126,6 +126,17 @@ export class SentTransactionRepository extends BaseRepository {
     return toRecord(row)
   }
 
+  async getByTransactionHashes(
+    hashes: Hash256[]
+  ): Promise<SentTransactionRecord[]> {
+    const knex = await this.knex()
+    const rows = await knex('sent_transactions').whereIn(
+      'transaction_hash',
+      hashes.map((x) => x.toString())
+    )
+    return rows.map(toRecord)
+  }
+
   async findFirstWithdrawByStarkKeyAfter(
     starkKey: StarkKey,
     timestamp: Timestamp
