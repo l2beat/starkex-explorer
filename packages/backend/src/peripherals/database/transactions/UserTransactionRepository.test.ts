@@ -926,14 +926,14 @@ describe(UserTransactionRepository.name, () => {
         await repository.add({
           transactionHash: transactionHash2,
           blockNumber: 456,
-          timestamp: Timestamp(123000),
+          timestamp: Timestamp(124000),
           data: fakeForcedWithdrawal(),
         })
 
         const id3 = await repository.add({
           transactionHash: transactionHash3,
           blockNumber: 789,
-          timestamp: Timestamp(123000),
+          timestamp: Timestamp(125000),
           data: fakeForcedWithdrawal(),
         })
 
@@ -941,11 +941,10 @@ describe(UserTransactionRepository.name, () => {
           transactionHash1,
           transactionHash3,
         ])
-        expect(records.map((record) => record.id)).toEqual([id1, id3])
-        expect(records.map((record) => record.transactionHash)).toEqual([
-          transactionHash1,
-          transactionHash3,
-        ])
+        expect(records.map((record) => record.id)).toEqualUnsorted([id3, id1])
+        expect(records.map((record) => record.transactionHash)).toEqualUnsorted(
+          [transactionHash3, transactionHash1]
+        )
       })
     }
   )

@@ -7,15 +7,14 @@ import { TradingMode, UserDetails } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
+import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
-import { forcedTradeOfferToEntry } from './forcedTradeOfferToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
@@ -28,7 +27,7 @@ export class HomeController {
   constructor(
     private readonly userService: UserService,
     private readonly assetDetailsService: AssetDetailsService,
-    private readonly assetRepository: AssetRepository,
+    private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
@@ -83,7 +82,9 @@ export class HomeController {
       totalForcedTransactions: forcedUserTransactionsCount,
       // We use forcedTradeOfferToEntry here because we only need status from the offer,
       // as we do not show other statuses on this page
-      offers: availableOffers.map((offer) => forcedTradeOfferToEntry(offer)),
+      offers: availableOffers.map((offer) =>
+        this.forcedTradeOfferViewService.forcedTradeOfferToEntry(offer)
+      ),
       totalOffers: availableOffersCount,
       tradingMode: this.tradingMode,
     })

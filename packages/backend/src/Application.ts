@@ -39,6 +39,7 @@ import {
 } from './core/collectors/ValidiumStateTransitionCollector'
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
+import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
@@ -140,6 +141,10 @@ export class Application {
     const userTransactionRepository = new UserTransactionRepository(
       database,
       logger
+    )
+    const forcedTradeOfferViewService = new ForcedTradeOfferViewService(
+      userTransactionRepository,
+      sentTransactionRepository
     )
     const assetRepository = new AssetRepository(database, logger)
     const withdrawableAssetRepository = new WithdrawableAssetRepository(
@@ -448,16 +453,18 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository
     )
+
     const homeController = new HomeController(
       userService,
       assetDetailsService,
-      assetRepository,
+      forcedTradeOfferViewService,
       userTransactionRepository,
       forcedTradeOfferRepository,
       preprocessedStateDetailsRepository,
       config.starkex.tradingMode,
       collateralAsset
     )
+
     const userController = new UserController(
       userService,
       assetDetailsService,
@@ -466,7 +473,7 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository,
       userRegistrationEventRepository,
-      assetRepository,
+      forcedTradeOfferViewService,
       config.starkex.tradingMode,
       config.starkex.contracts.perpetual,
       collateralAsset

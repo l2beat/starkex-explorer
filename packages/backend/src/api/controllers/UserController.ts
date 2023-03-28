@@ -13,9 +13,9 @@ import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
+import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   PreprocessedAssetHistoryRecord,
@@ -31,7 +31,6 @@ import {
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { ControllerResult } from './ControllerResult'
-import { forcedTradeOffersToEntry } from './forcedTradeOfferToEntry'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
@@ -47,7 +46,7 @@ export class UserController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
-    private readonly assetRepository: AssetRepository,
+    private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly tradingMode: TradingMode,
     private readonly exchangeAddress: EthereumAddress,
     private readonly collateralAsset?: CollateralAsset
@@ -135,12 +134,11 @@ export class UserController {
     )
     // TODO: include the count of sentTransactions
     const totalTransactions = userTransactionsCount
-    const offers = await forcedTradeOffersToEntry(
-      forcedTradeOffers,
-      this.userTransactionRepository,
-      this.sentTransactionRepository,
-      registeredUser.starkKey
-    )
+    const offers =
+      await this.forcedTradeOfferViewService.aggregatedForcedTradeOffersToEntry(
+        forcedTradeOffers,
+        registeredUser.starkKey
+      )
     const content = renderUserPage({
       user,
       tradingMode: this.tradingMode,
