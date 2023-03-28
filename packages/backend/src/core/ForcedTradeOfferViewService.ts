@@ -26,14 +26,10 @@ export class ForcedTradeOfferViewService {
       .filter((transactionHash): transactionHash is Hash256 =>
         Hash256.check(transactionHash)
       )
-    const userTransactions =
-      await this.userTransactionRepository.getByTransactionHashes(
-        transactionHashes
-      )
-    const sentTransactions =
-      await this.sentTransactionRepository.getByTransactionHashes(
-        transactionHashes
-      )
+    const [userTransactions, sentTransactions] = await Promise.all([
+      this.userTransactionRepository.getByTransactionHashes(transactionHashes),
+      this.sentTransactionRepository.getByTransactionHashes(transactionHashes),
+    ])
 
     return forcedTradeOffers.map((forcedTradeOffer) => {
       const userTransaction = userTransactions.find(
