@@ -22,7 +22,7 @@ const initialData = {
 const acceptedData = {
   starkKeyB: StarkKey.fake(),
   positionIdB: fakeBigInt().toString(),
-  submissionExpirationTime: Timestamp(fakeInt()),
+  submissionExpirationTime: Timestamp(fakeInt()).toString(),
   nonce: fakeBigInt().toString(),
   premiumCost: fakeBoolean(),
   signature,
