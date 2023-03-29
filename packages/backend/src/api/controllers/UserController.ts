@@ -1,6 +1,7 @@
 import {
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
+  renderUserOffersPage,
   renderUserPage,
   renderUserTransactionsPage,
   TransactionEntry,
@@ -13,9 +14,9 @@ import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
+import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import {
   PreprocessedAssetHistoryRecord,
@@ -30,6 +31,7 @@ import {
   UserTransactionRepository,
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
+import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { ControllerResult } from './ControllerResult'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
@@ -44,10 +46,11 @@ export class UserController {
     >,
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
-    private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
-    private readonly assetRepository: AssetRepository,
-    private readonly tradingMode: TradingMode,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
+    private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
+    private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
+    private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
+    private readonly tradingMode: TradingMode,
     private readonly exchangeAddress: EthereumAddress,
     private readonly collateralAsset?: CollateralAsset
   ) {}
@@ -56,6 +59,10 @@ export class UserController {
     givenUser: Partial<UserDetails>,
     starkKey: StarkKey
   ): Promise<ControllerResult> {
+    const paginationOpts = {
+      offset: 0,
+      limit: 10,
+    }
     const [
       user,
       registeredUser,
@@ -67,36 +74,51 @@ export class UserController {
       userTransactions,
       userTransactionsCount,
       acceptedOffers,
+      forcedTradeOffers,
+      forcedTradeOffersCount,
+      withdrawableAssets,
     ] = await Promise.all([
       this.userService.getUserDetails(givenUser),
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
-        { offset: 0, limit: 10 },
+        paginationOpts,
         this.collateralAsset?.assetId
       ),
       this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
         starkKey
       ),
-      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(starkKey, {
-        offset: 0,
-        limit: 10,
-      }),
+      this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
+        starkKey,
+        paginationOpts
+      ),
       this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
-      this.userTransactionRepository.getByStarkKey(starkKey, undefined, {
-        offset: 0,
-        limit: 10,
-      }),
+      this.userTransactionRepository.getByStarkKey(
+        starkKey,
+        undefined,
+        paginationOpts
+      ),
       this.userTransactionRepository.getCountByStarkKey(starkKey),
       this.forcedTradeOfferRepository.getAcceptedByStarkKey(starkKey),
+      this.forcedTradeOfferRepository.getByMakerOrTakerStarkKey(
+        starkKey,
+        paginationOpts
+      ),
+      this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
+      this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
     ])
+
+    if (!registeredUser) {
+      return { type: 'not found', content: 'User not found' }
+    }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
       assetHistory: history,
       sentTransactions,
       userTransactions,
+      withdrawableAssets,
     })
 
     const assetEntries = userAssets.map((a) =>
@@ -120,14 +142,24 @@ export class UserController {
     )
     // TODO: include the count of sentTransactions
     const totalTransactions = userTransactionsCount
-
+    const offers =
+      await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
+        forcedTradeOffers,
+        registeredUser.starkKey
+      )
     const content = renderUserPage({
       user,
       tradingMode: this.tradingMode,
       starkKey,
-      ethereumAddress: registeredUser?.ethAddress ?? EthereumAddress.ZERO,
+      ethereumAddress: registeredUser.ethAddress,
+      withdrawableAssets: withdrawableAssets.map((asset) => ({
+        asset: {
+          hashOrId: asset.assetHash,
+          details: assetDetailsMap?.getByAssetHash(asset.assetHash),
+        },
+        amount: asset.withdrawableBalance,
+      })),
       exchangeAddress: this.exchangeAddress,
-      withdrawableAssets: [],
       offersToAccept: acceptedOffers.map((offer) => ({
         timestamp: offer.createdAt,
         id: offer.id.toString(),
@@ -146,8 +178,8 @@ export class UserController {
       totalBalanceChanges: historyCount,
       transactions,
       totalTransactions,
-      offers: [],
-      totalOffers: 0,
+      offers,
+      totalOffers: forcedTradeOffersCount,
     })
 
     return { type: 'success', content }
@@ -272,6 +304,36 @@ export class UserController {
       total: totalTransactions,
     })
 
+    return { type: 'success', content }
+  }
+
+  async getUserOffersPage(
+    givenUser: Partial<UserDetails>,
+    starkKey: StarkKey,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const user = await this.userService.getUserDetails(givenUser)
+    const [forcedTradeOffers, forcedTradeOffersCount] = await Promise.all([
+      this.forcedTradeOfferRepository.getByMakerOrTakerStarkKey(
+        starkKey,
+        pagination
+      ),
+      this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
+    ])
+
+    const offers =
+      await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
+        forcedTradeOffers,
+        starkKey
+      )
+
+    const content = renderUserOffersPage({
+      user,
+      starkKey,
+      offers,
+      ...pagination,
+      total: forcedTradeOffersCount,
+    })
     return { type: 'success', content }
   }
 }

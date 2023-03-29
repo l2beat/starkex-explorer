@@ -4,6 +4,7 @@ import { assertUnreachable } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
+import { TransactionHistory } from '../../core/TransactionHistory'
 import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
 
 function extractUserTxAmount(
@@ -76,6 +77,7 @@ export function userTransactionToEntry(
   collateralAsset?: CollateralAsset,
   assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry {
+  const transactionHistory = new TransactionHistory({ userTransaction })
   return {
     timestamp: userTransaction.timestamp,
     hash: userTransaction.transactionHash,
@@ -85,7 +87,7 @@ export function userTransactionToEntry(
       assetDetailsMap
     ),
     amount: extractUserTxAmount(userTransaction.data),
-    status: userTransaction.included !== undefined ? 'INCLUDED' : 'MINED',
+    status: transactionHistory.getLatestForcedTransactionStatus(),
     type: extractUserTxEntryType(userTransaction.data),
   }
 }

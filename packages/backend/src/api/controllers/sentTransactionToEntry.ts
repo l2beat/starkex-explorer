@@ -4,6 +4,7 @@ import { assertUnreachable } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
+import { TransactionHistory } from '../../core/TransactionHistory'
 import { SentTransactionRecord } from '../../peripherals/database/transactions/SentTransactionRepository'
 
 export function extractSentTxEntryType(
@@ -82,6 +83,7 @@ export function sentTransactionToEntry(
       'Sent non-reverted transactions will be in userTransactions'
     )
   }
+  const transactionHistory = new TransactionHistory({ sentTransaction })
   return {
     timestamp: sentTransaction.sentTimestamp,
     hash: sentTransaction.transactionHash,
@@ -91,7 +93,7 @@ export function sentTransactionToEntry(
       assetDetailsMap
     ),
     amount: extractSentTxAmount(sentTransaction.data),
-    status: sentTransaction.mined?.reverted ? 'REVERTED' : 'SENT',
+    status: transactionHistory.getLatestForcedTransactionStatus(),
     type: extractSentTxEntryType(sentTransaction.data),
   }
 }
