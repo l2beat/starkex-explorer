@@ -82,7 +82,7 @@ function HomePage(props: HomePageProps) {
               visible={props.offers.length}
               total={props.totalOffers}
             >
-              <OffersTable offers={props.offers} />
+              <OffersTable showStatus offers={props.offers} />
             </TablePreview>
           )}
         </div>

@@ -503,26 +503,115 @@ describe(TransactionHistory.name, () => {
     }
   )
 
-  describe(TransactionHistory.prototype.getLatestStatus.name, () => {
-    const previousForcedTradeTransactionHistoryResults: TransactionHistoryItem[] =
-      [
-        {
-          status: 'ACCEPTED',
-          timestamp: fakeTimestamp(),
-        },
-      ]
-    it('returns the latest status', () => {
-      const transactionHistory = new TransactionHistory({
-        userTransaction: fakeUserTransaction(),
-        sentTransaction: fakeSentTransaction(),
-      })
-      transactionHistory.getForcedTradeTransactionHistory = mockFn(
-        () => previousForcedTradeTransactionHistoryResults
-      )
+  describe(
+    TransactionHistory.prototype.getLatestRegularTransactionStatus.name,
+    () => {
+      it('should throw an error if there is no regular transaction history', () => {
+        const transactionHistory = new TransactionHistory({
+          userTransaction: fakeUserTransaction(),
+          sentTransaction: fakeSentTransaction(),
+        })
+        transactionHistory.getRegularTransactionHistory = mockFn(() => [])
 
-      expect(transactionHistory.getLatestStatus()).toEqual(
-        previousForcedTradeTransactionHistoryResults.at(0)!.status
-      )
-    })
-  })
+        expect(() =>
+          transactionHistory.getLatestRegularTransactionStatus()
+        ).toThrow(Error, 'Transaction history is empty')
+      })
+
+      it('returns the latest status of regular transaction', () => {
+        const regularTransactionHistory: TransactionHistoryItem<'SENT'>[] = [
+          {
+            status: 'SENT',
+            timestamp: fakeTimestamp(),
+          },
+        ]
+        const transactionHistory = new TransactionHistory({
+          userTransaction: fakeUserTransaction(),
+          sentTransaction: fakeSentTransaction(),
+        })
+        transactionHistory.getRegularTransactionHistory = mockFn(
+          () => regularTransactionHistory
+        )
+
+        expect(
+          transactionHistory.getLatestForcedTradeTransactionStatus()
+        ).toEqual(regularTransactionHistory.at(0)!.status)
+      })
+    }
+  )
+
+  describe(
+    TransactionHistory.prototype.getLatestForcedTransactionStatus.name,
+    () => {
+      it('should throw an error if there is no forced transaction history', () => {
+        const transactionHistory = new TransactionHistory({
+          userTransaction: fakeUserTransaction(),
+          sentTransaction: fakeSentTransaction(),
+        })
+        transactionHistory.getForcedTransactionHistory = mockFn(() => [])
+
+        expect(() =>
+          transactionHistory.getLatestForcedTransactionStatus()
+        ).toThrow(Error, 'Transaction history is empty')
+      })
+
+      it('returns the latest status of forced transaction', () => {
+        const forcedTransactionHistoryResults: TransactionHistoryItem<'INCLUDED'>[] =
+          [
+            {
+              status: 'INCLUDED',
+              timestamp: fakeTimestamp(),
+            },
+          ]
+        const transactionHistory = new TransactionHistory({
+          userTransaction: fakeUserTransaction(),
+          sentTransaction: fakeSentTransaction(),
+        })
+        transactionHistory.getForcedTransactionHistory = mockFn(
+          () => forcedTransactionHistoryResults
+        )
+
+        expect(transactionHistory.getLatestForcedTransactionStatus()).toEqual(
+          forcedTransactionHistoryResults.at(0)!.status
+        )
+      })
+    }
+  )
+
+  describe(
+    TransactionHistory.prototype.getLatestForcedTradeTransactionStatus.name,
+    () => {
+      it('should throw an error if there is no forced trade transaction history', () => {
+        const transactionHistory = new TransactionHistory({
+          userTransaction: fakeUserTransaction(),
+          sentTransaction: fakeSentTransaction(),
+        })
+        transactionHistory.getForcedTradeTransactionHistory = mockFn(() => [])
+
+        expect(() =>
+          transactionHistory.getLatestForcedTradeTransactionStatus()
+        ).toThrow(Error, 'Transaction history is empty')
+      })
+
+      it('returns the latest status of forced trade transaction', () => {
+        const forcedTradeTransactionHistory: TransactionHistoryItem[] = [
+          {
+            status: 'ACCEPTED',
+            timestamp: fakeTimestamp(),
+          },
+        ]
+        const transactionHistory = new TransactionHistory({
+          userTransaction: fakeUserTransaction(),
+          sentTransaction: fakeSentTransaction(),
+        })
+        transactionHistory.getForcedTradeTransactionHistory = mockFn(
+          () => forcedTradeTransactionHistory
+        )
+
+        expect(
+          transactionHistory.getLatestForcedTradeTransactionStatus()
+        ).toEqual(forcedTradeTransactionHistory.at(0)!.status)
+      })
+    }
+  )
 })

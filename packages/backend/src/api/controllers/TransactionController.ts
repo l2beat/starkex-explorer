@@ -170,7 +170,6 @@ export class TransactionController {
           collateralAmount: userTransaction.data.collateralAmount,
           syntheticAsset: { hashOrId: userTransaction.data.syntheticAssetId },
           syntheticAmount: userTransaction.data.syntheticAmount,
-          // TODO: maybe submisionExpirationTime should be a timestamp
           expirationTimestamp: forcedTradeOffer?.accepted
             ? forcedTradeOffer.accepted.submissionExpirationTime
             : undefined,

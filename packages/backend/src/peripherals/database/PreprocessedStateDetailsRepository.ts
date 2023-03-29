@@ -2,6 +2,7 @@ import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { PreprocessedStateDetailsRow } from 'knex/types/tables'
 
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
@@ -49,7 +50,7 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
   }
 
   async getPaginated(
-    { offset, limit }: { offset: number; limit: number },
+    { offset, limit }: PaginationOptions,
     trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)

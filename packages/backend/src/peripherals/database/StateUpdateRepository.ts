@@ -3,6 +3,7 @@ import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { PriceRow, StateUpdateRow } from 'knex/types/tables'
 
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
 import {
   PositionRecord,
@@ -132,7 +133,7 @@ export class StateUpdateRepository extends BaseRepository {
     return rows.map(toStateUpdatePriceRecord)
   }
 
-  async getPaginated({ offset, limit }: { offset: number; limit: number }) {
+  async getPaginated({ offset, limit }: PaginationOptions) {
     interface Row {
       id: number
       root_hash: string
