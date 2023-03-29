@@ -4,8 +4,8 @@ import { assertUnreachable } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
+import { TransactionHistory } from '../../core/TransactionHistory'
 import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { buildForcedTransactionHistory } from './utils/buildTransactionHistory'
 
 function extractUserTxAmount(
   data: UserTransactionRecord['data']
@@ -77,6 +77,7 @@ export function userTransactionToEntry(
   collateralAsset?: CollateralAsset,
   assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry {
+  const transactionHistory = new TransactionHistory({ userTransaction })
   return {
     timestamp: userTransaction.timestamp,
     hash: userTransaction.transactionHash,
@@ -86,9 +87,7 @@ export function userTransactionToEntry(
       assetDetailsMap
     ),
     amount: extractUserTxAmount(userTransaction.data),
-    // TODO: Use TransactionHistory.getLatestStatus after it gets merged
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    status: buildForcedTransactionHistory({ userTransaction }).at(0)!.status,
+    status: transactionHistory.getLatestForcedTransactionStatus(),
     type: extractUserTxEntryType(userTransaction.data),
   }
 }

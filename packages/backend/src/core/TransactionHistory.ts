@@ -140,11 +140,35 @@ export class TransactionHistory {
     return history
   }
 
-  getLatestStatus() {
+  getLatestRegularTransactionStatus() {
+    const history = this.getRegularTransactionHistory()
+    const latestHistoryItem = history[0]
+
+    if (!latestHistoryItem) {
+      throw new Error('Transaction history is empty')
+    }
+
+    return latestHistoryItem.status
+  }
+
+  getLatestForcedTransactionStatus() {
+    const history = this.getForcedTransactionHistory()
+    const latestHistoryItem = history[0]
+
+    if (!latestHistoryItem) {
+      throw new Error('Transaction history is empty')
+    }
+
+    return latestHistoryItem.status
+  }
+
+  getLatestForcedTradeTransactionStatus() {
     const history = this.getForcedTradeTransactionHistory()
-    // We know that there is at least one item in the history
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const latestHistoryItem = history[0]!
+    const latestHistoryItem = history[0]
+
+    if (!latestHistoryItem) {
+      throw new Error('Transaction history is empty')
+    }
 
     return latestHistoryItem.status
   }

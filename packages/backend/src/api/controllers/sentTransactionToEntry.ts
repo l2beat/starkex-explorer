@@ -4,8 +4,8 @@ import { assertUnreachable } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
+import { TransactionHistory } from '../../core/TransactionHistory'
 import { SentTransactionRecord } from '../../peripherals/database/transactions/SentTransactionRepository'
-import { buildForcedTransactionHistory } from './utils/buildTransactionHistory'
 
 export function extractSentTxEntryType(
   data: SentTransactionRecord['data']
@@ -83,6 +83,7 @@ export function sentTransactionToEntry(
       'Sent non-reverted transactions will be in userTransactions'
     )
   }
+  const transactionHistory = new TransactionHistory({ sentTransaction })
   return {
     timestamp: sentTransaction.sentTimestamp,
     hash: sentTransaction.transactionHash,
@@ -92,9 +93,7 @@ export function sentTransactionToEntry(
       assetDetailsMap
     ),
     amount: extractSentTxAmount(sentTransaction.data),
-    // TODO: Use TransactionHistory.getLatestStatus after it gets merged
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    status: buildForcedTransactionHistory({ sentTransaction }).at(0)!.status,
+    status: transactionHistory.getLatestForcedTransactionStatus(),
     type: extractSentTxEntryType(sentTransaction.data),
   }
 }

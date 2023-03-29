@@ -1,7 +1,6 @@
 import { OfferEntry } from '@explorer/frontend'
 import { Hash256, StarkKey } from '@explorer/types'
 
-import { buildForcedTradeTransactionHistory } from '../api/controllers/utils/buildTransactionHistory'
 import { ForcedTradeOfferRecord } from '../peripherals/database/ForcedTradeOfferRepository'
 import {
   SentTransactionRecord,
@@ -11,13 +10,14 @@ import {
   UserTransactionRecord,
   UserTransactionRepository,
 } from '../peripherals/database/transactions/UserTransactionRepository'
+import { TransactionHistory } from './TransactionHistory'
 
 export class ForcedTradeOfferViewService {
   constructor(
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly sentTransactionRepository: SentTransactionRepository
   ) {}
-  async aggregatedForcedTradeOffersToEntry(
+  async forcedTradeOffersToEntriesWithFullHistory(
     forcedTradeOffers: ForcedTradeOfferRecord[],
     userStarkKey?: StarkKey
   ) {
@@ -57,12 +57,12 @@ export class ForcedTradeOfferViewService {
     userTransaction?: UserTransactionRecord,
     userStarkKey?: StarkKey
   ): OfferEntry {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const status = buildForcedTradeTransactionHistory({
+    const transactionHistory = new TransactionHistory({
       forcedTradeOffer,
       sentTransaction,
       userTransaction,
-    })[0]!.status
+    })
+    const status = transactionHistory.getLatestForcedTradeTransactionStatus()
 
     const role =
       forcedTradeOffer.starkKeyA === userStarkKey

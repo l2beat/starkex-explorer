@@ -136,7 +136,7 @@ export class UserController {
     // TODO: include the count of sentTransactions
     const totalTransactions = userTransactionsCount
     const offers =
-      await this.forcedTradeOfferViewService.aggregatedForcedTradeOffersToEntry(
+      await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
         forcedTradeOffers,
         registeredUser.starkKey
       )
@@ -296,12 +296,17 @@ export class UserController {
       ),
       this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
     ])
+
+    const offers =
+      await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
+        forcedTradeOffers,
+        starkKey
+      )
+
     const content = renderUserOffersPage({
       user,
       starkKey,
-      offers: forcedTradeOffers.map((offer) =>
-        forcedTradeOfferToEntry(offer, starkKey)
-      ),
+      offers,
       ...pagination,
       total: forcedTradeOffersCount,
     })
