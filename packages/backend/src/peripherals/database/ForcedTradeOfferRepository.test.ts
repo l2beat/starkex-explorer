@@ -251,16 +251,14 @@ describe(ForcedTradeOfferRepository.name, () => {
     await repository.update({ ...offer2, accepted: fakeAccepted() })
     await repository.update({ ...offer4, accepted: fakeAccepted() })
 
-    const transactionHash = Hash256.fake()
-    await repository.updateTransactionHash(offer1.id, transactionHash)
-    await repository.updateTransactionHash(offer4.id, transactionHash)
+    await repository.updateTransactionHash(offer2.id, Hash256.fake())
+    await repository.updateTransactionHash(offer4.id, Hash256.fake())
 
     expect(await repository.getAcceptedByStarkKey(starkKey)).toEqual([
       {
         ...offer1,
         accepted: {
           ...accepted,
-          transactionHash,
         },
       },
     ])

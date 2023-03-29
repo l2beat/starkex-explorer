@@ -234,7 +234,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
       .where('stark_key_a', starkKey.toString())
       .whereNotNull('accepted_at')
       .whereNull('cancelled_at')
-      .whereNotNull('transaction_hash')
+      .whereNull('transaction_hash')
     return rows.map(toRecord)
   }
 
