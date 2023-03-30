@@ -14,6 +14,18 @@ import {
   TRANSACTION_REVERTED,
 } from './common'
 import {
+  AcceptOfferForm,
+  AcceptOfferFormData,
+} from './components/AcceptOfferForm'
+import {
+  CancelOfferForm,
+  CancelOfferFormData,
+} from './components/CancelOfferForm'
+import {
+  FinalizeOfferForm,
+  FinalizeOfferFormData,
+} from './components/FinalizeOfferForm'
+import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
@@ -24,7 +36,7 @@ import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface OfferAndForcedTradePageProps {
   user: UserDetails | undefined
-  offerId: string
+  offerId: string | undefined
   transactionHash?: Hash256
   maker: {
     starkKey: StarkKey
@@ -41,9 +53,8 @@ export interface OfferAndForcedTradePageProps {
   collateralAmount: bigint
   syntheticAsset: Asset
   syntheticAmount: bigint
-  expirationTimestamp: Timestamp
   history: {
-    timestamp: Timestamp
+    timestamp: Timestamp | undefined
     status:
       | 'CREATED'
       | 'CANCELLED'
@@ -54,7 +65,11 @@ export interface OfferAndForcedTradePageProps {
       | 'REVERTED'
       | 'INCLUDED'
   }[]
+  expirationTimestamp?: Timestamp
   stateUpdateId?: number
+  acceptForm?: AcceptOfferFormData
+  cancelForm?: CancelOfferFormData
+  finalizeForm?: FinalizeOfferFormData
 }
 
 export function renderOfferAndForcedTradePage(
@@ -64,7 +79,7 @@ export function renderOfferAndForcedTradePage(
 }
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
-  const isMine = props.user?.starkKey === props.maker.starkKey
+  const common = getCommon(props.transactionHash, props.offerId)
   const historyEntries = props.history.map((x) =>
     toHistoryEntry(x, props.type, props.stateUpdateId)
   )
@@ -74,24 +89,8 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
     throw new Error('No history entries')
   }
 
-  const showCancel = isMine && (status === 'CREATED' || status === 'ACCEPTED')
-  const showSendTransaction = isMine && status === 'ACCEPTED'
-  const showAccept = !isMine && Boolean(props.user) && status === 'CREATED'
-
   return (
-    <Page
-      user={props.user}
-      path={
-        props.transactionHash
-          ? `/transactions/${props.transactionHash.toString()}`
-          : `/offers/${props.offerId}`
-      }
-      description={
-        props.transactionHash
-          ? `Details of the ${props.transactionHash.toString()} forced trade transaction`
-          : `Details of the ${props.offerId} forced trade offer`
-      }
-    >
+    <Page user={props.user} path={common.path} description={common.description}>
       <ContentWrapper className="flex flex-col gap-12">
         <div>
           <div className="flex items-center justify-between">
@@ -102,18 +101,31 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
               />
             ) : (
               <PageTitle>
-                Forced {props.type.toLowerCase()} offer #{props.offerId}
+                Forced {props.type.toLowerCase()} offer{' '}
+                {props.offerId ? `#${props.offerId}` : ''}
               </PageTitle>
             )}
             <div className="mb-6 flex items-center gap-2">
-              {showCancel && <Button variant="outlined">Cancel offer</Button>}
-              {showSendTransaction && (
-                <Button variant="contained">Send transaction</Button>
+              {props.acceptForm && (
+                <AcceptOfferForm {...props.acceptForm}>
+                  <Button variant="contained">
+                    Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
+                  </Button>
+                </AcceptOfferForm>
               )}
-              {showAccept && (
-                <Button variant="contained">
-                  Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
-                </Button>
+              {props.cancelForm && (
+                <CancelOfferForm {...props.cancelForm}>
+                  <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
+                    Cancel
+                  </button>
+                </CancelOfferForm>
+              )}
+              {props.finalizeForm && (
+                <FinalizeOfferForm {...props.finalizeForm}>
+                  <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
+                    Finalize
+                  </button>
+                </FinalizeOfferForm>
               )}
             </div>
           </div>
@@ -124,7 +136,9 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
             timestamp={
-              !props.transactionHash && status !== 'EXPIRED'
+              !props.transactionHash &&
+              status !== 'EXPIRED' &&
+              props.expirationTimestamp
                 ? {
                     label: 'Expiration timestamp',
                     timestamp: props.expirationTimestamp,
@@ -239,4 +253,20 @@ function toHistoryEntry(
         ),
       }
   }
+}
+
+function getCommon(transactionHash?: Hash256, offerId?: string) {
+  if (transactionHash) {
+    return {
+      path: `/transactions/${transactionHash.toString()}`,
+      description: `Details of the ${transactionHash.toString()} forced trade transaction`,
+    }
+  }
+  if (offerId) {
+    return {
+      path: `/offers/${offerId}`,
+      description: `Details of the ${offerId} forced trade offer`,
+    }
+  }
+  throw new Error('No transaction hash or offer id')
 }

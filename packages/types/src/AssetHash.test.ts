@@ -72,4 +72,26 @@ describe(AssetHash.name, () => {
       )
     })
   })
+
+  describe(AssetHash.check.name, () => {
+    it('returns true for valid AssetHash strings', () => {
+      const validHash =
+        '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef'
+      expect(AssetHash.check(validHash)).toEqual(true)
+    })
+
+    it('returns false for strings that are not valid AssetHash', () => {
+      const invalidHash =
+        '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef12'
+      expect(AssetHash.check(invalidHash)).toEqual(false)
+    })
+
+    it('returns false for non-string values', () => {
+      expect(AssetHash.check(12345)).toEqual(false)
+      expect(AssetHash.check(null)).toEqual(false)
+      expect(AssetHash.check(undefined)).toEqual(false)
+      expect(AssetHash.check({})).toEqual(false)
+      expect(AssetHash.check([])).toEqual(false)
+    })
+  })
 })

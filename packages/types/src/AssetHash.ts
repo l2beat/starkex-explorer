@@ -34,14 +34,6 @@ AssetHash.from = function from(value: BigNumber | bigint) {
   return AssetHash('0x' + value.toString(16).padStart(64, '0'))
 }
 
-AssetHash.fake = function fake(start?: string) {
-  if (!start) {
-    return AssetHash('0' + fakeHexString(63))
-  } else {
-    return AssetHash('0' + start.padEnd(63, '0'))
-  }
-}
-
 AssetHash.check = function check(value: unknown): value is AssetHash {
   if (typeof value !== 'string') {
     return false
@@ -51,5 +43,13 @@ AssetHash.check = function check(value: unknown): value is AssetHash {
     return true
   } catch {
     return false
+  }
+}
+
+AssetHash.fake = function fake(start?: string) {
+  if (!start) {
+    return AssetHash('0' + fakeHexString(63))
+  } else {
+    return AssetHash('0' + start.padEnd(63, '0'))
   }
 }

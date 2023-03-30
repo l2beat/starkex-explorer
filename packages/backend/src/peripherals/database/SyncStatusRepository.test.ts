@@ -1,39 +1,39 @@
-import { expect } from 'earljs'
+import { expect, mockObject } from 'earljs'
 
-import { mock } from '../../test/mock'
 import { Logger } from '../../tools/Logger'
 import { KeyValueStore } from './KeyValueStore'
 import { SyncStatusRepository } from './SyncStatusRepository'
 
 describe(SyncStatusRepository.name, () => {
   it('writes value to store', async () => {
-    const store = mock<KeyValueStore>({
+    const store = mockObject<KeyValueStore>({
       addOrUpdate: async () => 'lastBlockNumberSynced',
     })
     const repository = new SyncStatusRepository(store, Logger.SILENT)
 
     await repository.setLastSynced(20)
-    expect(store.addOrUpdate).toHaveBeenCalledWith([
-      { key: 'lastBlockNumberSynced', value: '20' },
-    ])
+    expect(store.addOrUpdate).toHaveBeenOnlyCalledWith({
+      key: 'lastBlockNumberSynced',
+      value: '20',
+    })
   })
 
   it('reads value from store', async () => {
-    const store = mock<KeyValueStore>({
+    const store = mockObject<KeyValueStore>({
       findByKey: async () => '20',
     })
     const repository = new SyncStatusRepository(store, Logger.SILENT)
 
     const actual = await repository.getLastSynced()
     expect(actual).toEqual(20)
-    expect(store.findByKey).toHaveBeenCalledWith([
+    expect(store.findByKey).toHaveBeenOnlyCalledWith(
       'lastBlockNumberSynced',
-      undefined,
-    ])
+      undefined
+    )
   })
 
   it('returns undefined when store is empty', async () => {
-    const store = mock<KeyValueStore>({
+    const store = mockObject<KeyValueStore>({
       findByKey: async () => undefined,
     })
     const repository = new SyncStatusRepository(store, Logger.SILENT)
@@ -43,7 +43,7 @@ describe(SyncStatusRepository.name, () => {
   })
 
   it('returns undefined when the store is corrupt', async () => {
-    const store = mock<KeyValueStore>({
+    const store = mockObject<KeyValueStore>({
       findByKey: async () => '3 is my favorite number',
     })
     const repository = new SyncStatusRepository(store, Logger.SILENT)

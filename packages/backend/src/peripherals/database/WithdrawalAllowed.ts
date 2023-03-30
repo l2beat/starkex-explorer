@@ -1,6 +1,6 @@
+import { assertUnreachable } from '@explorer/shared'
 import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
 
-import { assertUnreachable } from '../../utils/assertUnreachable'
 import { ToJSON } from './transactions/ToJSON'
 import {
   MintWithdrawData,

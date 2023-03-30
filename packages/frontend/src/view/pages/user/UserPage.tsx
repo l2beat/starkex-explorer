@@ -34,6 +34,7 @@ export interface UserPageProps {
   user: UserDetails | undefined
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
+  exchangeAddress: EthereumAddress
   tradingMode: TradingMode
   withdrawableAssets: WithdrawableAssetEntry[]
   offersToAccept: OfferEntry[]
@@ -73,6 +74,9 @@ function UserPage(props: UserPageProps) {
               withdrawableAssets={props.withdrawableAssets}
               offersToAccept={props.offersToAccept}
               isMine={isMine}
+              exchangeAddress={props.exchangeAddress}
+              starkKey={props.starkKey}
+              user={props.user}
             />
           </div>
         </section>
@@ -111,7 +115,7 @@ function UserPage(props: UserPageProps) {
             visible={props.offers.length}
             total={props.totalOffers}
           >
-            <OffersTable offers={props.offers} />
+            <OffersTable showStatus showRole offers={props.offers} />
           </TablePreview>
         )}
       </ContentWrapper>

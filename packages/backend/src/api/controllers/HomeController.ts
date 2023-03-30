@@ -6,14 +6,15 @@ import {
 import { TradingMode, UserDetails } from '@explorer/shared'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
+import { AssetDetailsService } from '../../core/AssetDetailsService'
+import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { AssetRepository } from '../../peripherals/database/AssetRepository'
+import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
-import { getAssetHashToAssetDetailsMap } from './getAssetDetailsMap'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
@@ -25,8 +26,10 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
 export class HomeController {
   constructor(
     private readonly userService: UserService,
-    private readonly assetRepository: AssetRepository,
+    private readonly assetDetailsService: AssetDetailsService,
+    private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly userTransactionRepository: UserTransactionRepository,
+    private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
     private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
@@ -36,34 +39,29 @@ export class HomeController {
     givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
     const user = await this.userService.getUserDetails(givenUser)
-
+    const paginationOpts = { offset: 0, limit: 6 }
     const [
       stateUpdates,
       totalStateUpdates,
       forcedUserTransactions,
       forcedUserTransactionsCount,
+      availableOffers,
+      availableOffersCount,
     ] = await Promise.all([
-      this.preprocessedStateDetailsRepository.getPaginated({
-        offset: 0,
-        limit: 6,
-      }),
+      this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
-
       this.userTransactionRepository.getPaginated({
-        offset: 0,
-        limit: 6,
+        ...paginationOpts,
         types: FORCED_TRANSACTION_TYPES,
       }),
       this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
+      this.forcedTradeOfferRepository.getAvailablePaginated(paginationOpts),
+      this.forcedTradeOfferRepository.countAvailable(),
     ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userTransactions: forcedUserTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      userTransactions: forcedUserTransactions,
+    })
 
     const transactions = forcedUserTransactions.map((t) =>
       userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
@@ -82,8 +80,12 @@ export class HomeController {
       totalStateUpdates,
       transactions,
       totalForcedTransactions: forcedUserTransactionsCount,
-      offers: [],
-      totalOffers: 0,
+      // We use forcedTradeOfferToEntry here because we only need status from the offer,
+      // as we do not show other statuses on this page
+      offers: availableOffers.map((offer) =>
+        this.forcedTradeOfferViewService.forcedTradeOfferToEntry(offer)
+      ),
+      totalOffers: availableOffersCount,
       tradingMode: this.tradingMode,
     })
     return { type: 'success', content }
@@ -130,13 +132,9 @@ export class HomeController {
         this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
       ])
 
-    const assetDetailsMap = await getAssetHashToAssetDetailsMap(
-      this.tradingMode,
-      this.assetRepository,
-      {
-        userTransactions: forcedUserTransactions,
-      }
-    )
+    const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
+      userTransactions: forcedUserTransactions,
+    })
 
     const transactions = forcedUserTransactions.map((t) =>
       userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)

@@ -2,6 +2,7 @@ import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
@@ -10,7 +11,7 @@ export interface Accepted {
   at: Timestamp
   starkKeyB: StarkKey
   positionIdB: bigint
-  submissionExpirationTime: bigint // unix time in hours
+  submissionExpirationTime: Timestamp // unix time in hours
   nonce: bigint
   premiumCost: boolean
   signature: string // HEX string signature of all parameters
@@ -50,9 +51,9 @@ function toRowCandidate(record: RecordCandidate): RowCandidate {
       : null,
     stark_key_b: orNull(record.accepted?.starkKeyB.toString()),
     position_id_b: orNull(record.accepted?.positionIdB),
-    submission_expiration_time: orNull(
-      record.accepted?.submissionExpirationTime
-    ),
+    submission_expiration_time: record.accepted
+      ? BigInt(record.accepted.submissionExpirationTime.toString())
+      : null,
     nonce: orNull(record.accepted?.nonce),
     premium_cost: orNull(record.accepted?.premiumCost),
     signature: orNull(record.accepted?.signature),
@@ -102,7 +103,7 @@ function toRecord(row: Row): Record {
         premiumCost: row.premium_cost,
         signature: row.signature,
         starkKeyB: StarkKey(row.stark_key_b),
-        submissionExpirationTime: row.submission_expiration_time,
+        submissionExpirationTime: Timestamp(row.submission_expiration_time),
         transactionHash: row.transaction_hash
           ? Hash256(row.transaction_hash)
           : undefined,
@@ -123,17 +124,26 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     super(database, logger)
 
     /* eslint-disable @typescript-eslint/unbound-method */
-
     this.add = this.wrapAdd(this.add)
     this.update = this.wrapUpdate(this.update)
     this.updateTransactionHash = this.wrapUpdate(this.updateTransactionHash)
     this.findById = this.wrapFind(this.findById)
-    this.countInitial = this.wrapAny(this.countInitial)
     this.getInitial = this.wrapGet(this.getInitial)
-    this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
     this.getByPositionId = this.wrapGet(this.getByPositionId)
+    this.getByMakerOrTakerStarkKey = this.wrapGet(
+      this.getByMakerOrTakerStarkKey
+    )
+    this.getInitialAssetIds = this.wrapGet(this.getInitialAssetIds)
+    this.getPaginated = this.wrapGet(this.getPaginated)
+    this.getAvailablePaginated = this.wrapGet(this.getAvailablePaginated)
+    this.countAll = this.wrapAny(this.countAll)
+    this.countAvailable = this.wrapAny(this.countAvailable)
+    this.countInitial = this.wrapAny(this.countInitial)
+    this.countByMakerOrTakerStarkKey = this.wrapAny(
+      this.countByMakerOrTakerStarkKey
+    )
+    this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
@@ -165,23 +175,6 @@ export class ForcedTradeOfferRepository extends BaseRepository {
       .update({ transaction_hash: transactionHash.toString() })
       .where({ id })
     return updates
-  }
-
-  private getInitialQuery(knex: Knex, { assetId, type }: InitialFilters = {}) {
-    let query = knex('forced_trade_offers')
-      .whereNull('accepted_at')
-      .whereNull('cancelled_at')
-    if (assetId) {
-      query = query.andWhere('synthetic_asset_id', '=', assetId.toString())
-    }
-    if (type) {
-      query = query.andWhere(
-        'is_a_buying_synthetic',
-        '=',
-        type === 'buy' ? true : false
-      )
-    }
-    return query
   }
 
   async countInitial({ assetId, type }: InitialFilters = {}): Promise<number> {
@@ -220,14 +213,6 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rowIds.map((x) => x.synthetic_asset_id).map(AssetId)
   }
 
-  private getByPositionIdQuery(knex: Knex, positionId: bigint) {
-    return knex('forced_trade_offers').where(function () {
-      void this.where({ position_id_a: positionId }).orWhere({
-        position_id_b: positionId,
-      })
-    })
-  }
-
   async countActiveByPositionId(positionId: bigint) {
     const knex = await this.knex()
     const [result] = await this.getByPositionIdQuery(knex, positionId)
@@ -244,13 +229,49 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
+  async getByMakerOrTakerStarkKey(
+    starkKey: StarkKey,
+    pagination?: PaginationOptions
+  ) {
+    const knex = await this.knex()
+    let query = knex('forced_trade_offers')
+      .where({
+        stark_key_a: starkKey.toString(),
+      })
+      .orWhere({
+        stark_key_b: starkKey.toString(),
+      })
+      .orderBy('created_at', 'desc')
+    if (pagination) {
+      query = query.limit(pagination.limit).offset(pagination.offset)
+    }
+    const rows = await query
+    return rows.map(toRecord)
+  }
+
+  async getPaginated(options: PaginationOptions): Promise<Record[]> {
+    const knex = await this.knex()
+    const rows = await this.getPaginatedQuery(knex, options)
+
+    return rows.map(toRecord)
+  }
+
+  async getAvailablePaginated(options: PaginationOptions): Promise<Record[]> {
+    const knex = await this.knex()
+    const query = this.getPaginatedQuery(knex, options)
+    //TODO: Check if it is not expired. Currently blocked by PR#340
+    const rows = await query.whereNull('accepted_at').whereNull('cancelled_at')
+
+    return rows.map(toRecord)
+  }
+
   async findById(id: Record['id']): Promise<Record | undefined> {
     const knex = await this.knex()
     const row = await knex('forced_trade_offers').where({ id }).first()
     return row ? toRecord(row) : undefined
   }
 
-  async findByHash(hash: Hash256): Promise<Record | undefined> {
+  async findByTransactionHash(hash: Hash256): Promise<Record | undefined> {
     const knex = await this.knex()
     const row = await knex('forced_trade_offers')
       .where({ transaction_hash: hash.toString() })
@@ -258,8 +279,67 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
+  async countAll() {
+    const knex = await this.knex()
+    const [result] = await knex('forced_trade_offers').count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async countAvailable() {
+    const knex = await this.knex()
+    const [result] = await knex('forced_trade_offers')
+      .whereNull('accepted_at')
+      .whereNull('cancelled_at')
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async countByMakerOrTakerStarkKey(starkKey: StarkKey) {
+    const knex = await this.knex()
+    const [result] = await knex('forced_trade_offers')
+      .where({ stark_key_a: starkKey.toString() })
+      .orWhere({ stark_key_b: starkKey.toString() })
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
   async deleteAll() {
     const knex = await this.knex()
     return await knex('forced_trade_offers').delete()
+  }
+
+  private getInitialQuery(knex: Knex, { assetId, type }: InitialFilters = {}) {
+    let query = knex('forced_trade_offers')
+      .whereNull('accepted_at')
+      .whereNull('cancelled_at')
+    if (assetId) {
+      query = query.andWhere('synthetic_asset_id', '=', assetId.toString())
+    }
+    if (type) {
+      query = query.andWhere(
+        'is_a_buying_synthetic',
+        '=',
+        type === 'buy' ? true : false
+      )
+    }
+    return query
+  }
+
+  private getByPositionIdQuery(knex: Knex, positionId: bigint) {
+    return knex('forced_trade_offers').where(function () {
+      void this.where({ position_id_a: positionId }).orWhere({
+        position_id_b: positionId,
+      })
+    })
+  }
+
+  private getPaginatedQuery(knex: Knex, options: PaginationOptions) {
+    return knex('forced_trade_offers')
+      .limit(options.limit)
+      .offset(options.offset)
+      .orderBy('created_at', 'desc')
   }
 }

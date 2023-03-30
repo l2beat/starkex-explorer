@@ -1,5 +1,6 @@
+import { assertUnreachable } from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
-import React, { ReactNode } from 'react'
+import { default as React, ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
 import {
@@ -15,7 +16,8 @@ import { TimeCell } from '../TimeCell'
 
 export interface OffersTableProps {
   offers: OfferEntry[]
-  hideStatus?: boolean
+  showStatus?: boolean
+  showRole?: boolean
 }
 
 export interface OfferEntry {
@@ -25,8 +27,18 @@ export interface OfferEntry {
   amount: bigint
   price: bigint
   totalPrice: bigint
-  status: 'CREATED' | 'ACCEPTED' | 'SENT' | 'CANCELLED' | 'EXPIRED'
+  status:
+    | 'CREATED'
+    | 'ACCEPTED'
+    | 'SENT'
+    | 'CANCELLED'
+    | 'EXPIRED'
+    | 'MINED'
+    | 'INCLUDED'
+    | 'EXPIRED'
+    | 'REVERTED'
   type: 'BUY' | 'SELL'
+  role?: 'MAKER' | 'TAKER'
 }
 
 export function OffersTable(props: OffersTableProps) {
@@ -37,7 +49,8 @@ export function OffersTable(props: OffersTableProps) {
     { header: 'Amount', numeric: true },
     { header: 'Price', numeric: true },
     { header: 'Total price', numeric: true },
-    ...(!props.hideStatus ? [{ header: 'Status' }] : []),
+    ...(props.showStatus ? [{ header: 'Status' }] : []),
+    ...(props.showRole ? [{ header: 'Role' }] : []),
     { header: 'Type' },
   ]
 
@@ -52,12 +65,15 @@ export function OffersTable(props: OffersTableProps) {
           formatAmount(offer.asset, offer.amount),
           formatWithDecimals(offer.price, 6, { prefix: '$' }),
           formatWithDecimals(offer.totalPrice, 6, { prefix: '$' }),
-          ...(!props.hideStatus
+          ...(props.showStatus
             ? [
                 <StatusBadge type={toStatusType(offer.status)}>
                   {toStatusText(offer.status)}
                 </StatusBadge>,
               ]
+            : []),
+          ...(props.showRole
+            ? [<span className="capitalize">{offer.role?.toLowerCase()}</span>]
             : []),
           <span className="capitalize">{offer.type.toLowerCase()}</span>,
         ]
@@ -77,10 +93,16 @@ function toStatusType(status: OfferEntry['status']): StatusType {
       return 'BEGIN'
     case 'ACCEPTED':
     case 'SENT':
+    case 'MINED':
       return 'MIDDLE'
+    case 'INCLUDED':
+      return 'END'
     case 'CANCELLED':
     case 'EXPIRED':
+    case 'REVERTED':
       return 'CANCEL'
+    default:
+      assertUnreachable(status)
   }
 }
 
@@ -92,9 +114,17 @@ function toStatusText(status: OfferEntry['status']): string {
       return 'ACCEPTED (2/5)'
     case 'SENT':
       return 'SENT (3/5)'
+    case 'MINED':
+      return 'MINED (4/5)'
+    case 'INCLUDED':
+      return 'INCLUDED (5/5)'
     case 'CANCELLED':
       return 'CANCELLED'
     case 'EXPIRED':
       return 'EXPIRED'
+    case 'REVERTED':
+      return 'REVERTED'
+    default:
+      assertUnreachable(status)
   }
 }

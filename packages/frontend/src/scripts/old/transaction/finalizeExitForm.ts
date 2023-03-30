@@ -2,9 +2,9 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
 import { FormClass } from '../../../view/old/forced-transactions/finalize-form'
-import { getAttribute } from '../../offer/getAttribute'
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
+import { getAttribute } from '../offer/getAttribute'
 
 export function initFinalizeExitForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
@@ -17,7 +17,7 @@ export function initFinalizeExitForm() {
         getAttribute(form, 'perpetual-address')
       )
       const starkKey = StarkKey(getAttribute(form, 'stark-key'))
-      const finalizeHash = await Wallet.sendWithdrawalTransaction(
+      const finalizeHash = await Wallet.sendOldWithdrawalTransaction(
         address,
         starkKey,
         perpetualAddress
