@@ -6,7 +6,7 @@ import { decodeAssetId } from './decodeAssetId'
 
 export function readAssetConfigHashes(
   reader: ByteReader,
-  collateralAssetId: AssetId
+  collateralAssetId?: AssetId
 ) {
   const count = reader.readNumber(32)
   const assetDataHashes: AssetConfigHash[] = []

@@ -10,7 +10,7 @@ import { readState } from './readState'
 
 export function decodePerpetualCairoOutput(
   data: string,
-  collateralAssetId: AssetId
+  collateralAssetId?: AssetId
 ): PerpetualCairoOutput {
   const reader = new ByteReader(data)
 

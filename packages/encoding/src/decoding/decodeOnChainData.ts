@@ -7,7 +7,7 @@ import { DecodingError } from './DecodingError'
 
 export function decodeOnChainData(
   pages: string[],
-  collateralAssetId: AssetId
+  collateralAssetId?: AssetId
 ): OnChainData {
   const [first, ...rest] = pages
   if (!first) {

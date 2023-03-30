@@ -332,6 +332,7 @@ export class Application {
         userRegistrationCollector,
         userTransactionCollector,
         withdrawalAllowedCollector,
+        // TODO: shouldn't this be already defined as it is used in perpetual service?
         collateralAsset,
         logger
       )

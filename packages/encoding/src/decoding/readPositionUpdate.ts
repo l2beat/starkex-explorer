@@ -7,7 +7,7 @@ import { decodeAssetId } from './decodeAssetId'
 
 export function readPositionUpdate(
   reader: ByteReader,
-  collateralAssetId: AssetId
+  collateralAssetId?: AssetId
 ): PositionUpdate {
   const count = reader.readNumber(32)
   const positionId = reader.readBigInt(32)

@@ -7,7 +7,7 @@ import { DecodingError } from './DecodingError'
 
 export function readForcedActions(
   reader: ByteReader,
-  collateralAssetId: AssetId
+  collateralAssetId?: AssetId
 ) {
   const count = reader.readNumber(32)
   const forcedActions: PerpetualForcedAction[] = []

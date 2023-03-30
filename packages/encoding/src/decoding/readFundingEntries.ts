@@ -6,7 +6,7 @@ import { readFundingIndices } from './readFundingIndices'
 
 export function readFundingEntries(
   reader: ByteReader,
-  collateralAssetId: AssetId
+  collateralAssetId?: AssetId
 ) {
   const count = reader.readNumber(32)
   const funding: FundingEntry[] = []

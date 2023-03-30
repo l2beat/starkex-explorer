@@ -38,7 +38,7 @@ export interface PerpetualForcedTradeRequest {
 
 export function decodePerpetualForcedTradeRequest(
   data: string,
-  collateralAssetId: AssetId
+  collateralAssetId?: AssetId
 ): PerpetualForcedTradeRequest | undefined {
   try {
     const decoded = coder.decodeFunctionData('forcedTradeRequest', data)

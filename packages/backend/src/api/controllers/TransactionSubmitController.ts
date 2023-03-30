@@ -29,7 +29,7 @@ export class TransactionSubmitController {
     private sentTransactionRepository: SentTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress,
-    private collateralAsset: CollateralAsset,
+    private collateralAsset: CollateralAsset | undefined,
     private retryTransactions = true
   ) {}
 
@@ -153,7 +153,7 @@ export class TransactionSubmitController {
     }
     const data = decodePerpetualForcedTradeRequest(
       tx.data,
-      this.collateralAsset.assetId
+      this.collateralAsset?.assetId
     )
     if (
       !tx.to ||

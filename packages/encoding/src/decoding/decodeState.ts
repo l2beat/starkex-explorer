@@ -5,7 +5,7 @@ import { ByteReader } from './ByteReader'
 import { readFundingIndices } from './readFundingIndices'
 import { readOraclePrices } from './readOraclePrices'
 
-export function decodeState(data: string, collateralAssetId: AssetId): State {
+export function decodeState(data: string, collateralAssetId?: AssetId): State {
   const reader = new ByteReader(data)
 
   const positionRoot = PedersenHash(reader.readHex(32))

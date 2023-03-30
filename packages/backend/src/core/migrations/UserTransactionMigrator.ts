@@ -29,7 +29,7 @@ export class UserTransactionMigrator {
     private withdrawableAssetRepository: WithdrawableAssetRepository,
     private withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private ethereumClient: EthereumClient,
-    private collateralAsset: CollateralAsset,
+    private collateralAsset: CollateralAsset | undefined,
     private logger: Logger
   ) {
     this.logger = this.logger.for(this)
@@ -47,11 +47,11 @@ export class UserTransactionMigrator {
     if (migrationNumber >= 4) {
       return
     }
-    await this.migrateUserTransactions(this.collateralAsset.assetId)
+    await this.migrateUserTransactions(this.collateralAsset?.assetId)
     await this.softwareMigrationRepository.setMigrationNumber(4)
   }
 
-  private async migrateUserTransactions(collateralAssetId: AssetId) {
+  private async migrateUserTransactions(collateralAssetId?: AssetId) {
     const lastSyncedBlock = await this.syncStatusRepository.getLastSynced()
     if (lastSyncedBlock === undefined) {
       return
@@ -142,7 +142,7 @@ export class UserTransactionMigrator {
     )
   }
 
-  private async migrateSentTransactions(collateralAssetId: AssetId) {
+  private async migrateSentTransactions(collateralAssetId?: AssetId) {
     const knex = await this.database.getKnex()
 
     const rows = await knex('transaction_status')
