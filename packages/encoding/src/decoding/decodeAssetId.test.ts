@@ -6,7 +6,7 @@ import { DecodingError } from './DecodingError'
 
 const collateralAssetId = AssetId.USDC
 
-describe.only('decodeAssetId', () => {
+describe('decodeAssetId', () => {
   it('fails for non-15 byte strings', () => {
     expect(() => decodeAssetId('112233', collateralAssetId)).toThrow(
       DecodingError,
