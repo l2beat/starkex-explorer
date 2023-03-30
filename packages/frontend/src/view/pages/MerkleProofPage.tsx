@@ -43,14 +43,32 @@ function MerkleProofPage(props: MerkleProofPageProps) {
       path={`/proof/${props.positionOrVaultId.toString()}`}
       user={props.user}
     >
-      <ContentWrapper className="flex flex-col gap-6">
-        <PageTitle>
-          Merkle Proof for {idLabel} #{props.positionOrVaultId.toString()}
-        </PageTitle>
+      <ContentWrapper className="flex flex-col gap-12">
+        <div>
+          <PageTitle>
+            Merkle Proof for {idLabel} #{props.positionOrVaultId.toString()}
+          </PageTitle>
+          <span className="text-sm font-semibold text-zinc-500">
+            {/* TODO: add some explanation */}
+            Sit do eu officia incididunt amet id occaecat mollit tempor nulla.
+            Laborum commodo velit id nisi voluptate ex quis ullamco fugiat
+            laboris et. Esse est reprehenderit veniam nisi magna nulla amet sint
+            do magna. Sint commodo veniam sunt ullamco sunt esse exercitation
+            adipisicing voluptate aute adipisicing amet quis incididunt. Minim
+            mollit anim eiusmod adipisicing minim cillum nostrud pariatur eu
+            sunt fugiat aliqua.
+          </span>
+        </div>
         <div>
           <span className="text-xl font-semibold">Root Hash</span>
           <Card className="mt-2">
             <p>{props.merkleProof.rootHash}</p>
+          </Card>
+        </div>
+        <div>
+          <span className="text-xl font-semibold">Leaf</span>
+          <Card className="mt-2">
+            <pre>{formattedLeaf}</pre>
           </Card>
         </div>
         <div>
@@ -64,12 +82,6 @@ function MerkleProofPage(props: MerkleProofPageProps) {
                 </div>
               ))}
             />
-          </Card>
-        </div>
-        <div>
-          <span className="text-xl font-semibold">Leaf</span>
-          <Card className="mt-2">
-            <pre>{formattedLeaf}</pre>
           </Card>
         </div>
       </ContentWrapper>
