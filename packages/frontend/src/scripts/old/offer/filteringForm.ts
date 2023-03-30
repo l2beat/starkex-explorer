@@ -4,7 +4,7 @@ import {
   DisabledOptionValue,
   FormId,
   TypeRadioName,
-} from '../../view/old/offers/filtering/attributes'
+} from '../../../view/old/offers/filtering/attributes'
 
 export function initOffersFilteringForm() {
   const form = document.querySelector<HTMLFormElement>(`#${FormId}`)

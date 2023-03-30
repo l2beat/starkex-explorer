@@ -1,8 +1,10 @@
-import { renderOfferAndForcedTradePage } from '@explorer/frontend'
-import { EthereumAddress, Timestamp } from '@explorer/types'
+import {
+  renderOldForcedTradeOfferDetailsPage,
+  renderOldForcedTradeOffersIndexPage,
+} from '@explorer/frontend'
+import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
-import { TransactionHistory } from '../../core/TransactionHistory'
+import { AccountService } from '../../core/AccountService'
 import {
   Accepted,
   ForcedTradeOfferRecord,
@@ -21,36 +23,72 @@ import {
   getCancelForm,
   getFinalizeForm,
 } from './utils/offerForms'
+import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
+import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
 
-export class ForcedTradeOfferController {
+export class OldForcedTradeOfferController {
   constructor(
+    private accountService: AccountService,
     private offerRepository: ForcedTradeOfferRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private collateralAsset: CollateralAsset | undefined,
     private perpetualAddress: EthereumAddress
   ) {}
 
+  async getOffersIndexPage({
+    page,
+    perPage,
+    assetId,
+    type,
+    address,
+  }: {
+    page: number
+    perPage: number
+    assetId?: AssetId
+    type?: 'buy' | 'sell'
+    address: EthereumAddress | undefined
+  }): Promise<ControllerResult> {
+    const [account, total, offers, assetIds] = await Promise.all([
+      this.accountService.getAccount(address),
+      this.offerRepository.countInitial({ assetId, type }),
+      this.offerRepository.getInitial({
+        offset: (page - 1) * perPage,
+        limit: perPage,
+        assetId,
+        type,
+      }),
+      this.offerRepository.getInitialAssetIds(),
+    ])
+
+    const content = renderOldForcedTradeOffersIndexPage({
+      account,
+      offers: offers.map(toForcedTradeOfferEntry),
+      total,
+      assetIds,
+      params: { page, perPage, type, assetId },
+    })
+    return { type: 'success', content }
+  }
+
   async getOfferDetailsPage(
     id: number,
-    userAddress: EthereumAddress | undefined
+    address: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    if (!this.collateralAsset) {
-      throw new Error(
-        'Collateral asset not passed when displaying ForcedTradeOffer'
-      )
-    }
-
-    const offer = await this.offerRepository.findById(id)
-
+    const [account, offer] = await Promise.all([
+      this.accountService.getAccount(address),
+      this.offerRepository.findById(id),
+    ])
     if (!offer) {
-      return { type: 'not found', content: 'Offer not found.' }
+      return {
+        type: 'not found',
+        content: 'Offer not found.',
+      }
     }
 
     if (offer.accepted?.transactionHash) {
       return {
         type: 'redirect',
-        url: `/transactions/${offer.accepted.transactionHash.toString()}`,
+        url: `/forced/${offer.accepted.transactionHash.toString()}`,
       }
     }
 
@@ -62,30 +100,13 @@ export class ForcedTradeOfferController {
           )
         : undefined,
     ])
-
     if (!userA) {
       throw new Error('User A not found')
     }
-
-    const maker = {
-      starkKey: userA.starkKey,
-      ethereumAddress: userA.ethAddress,
-      positionId: offer.positionIdA.toString(),
-    }
-    const taker =
-      userB && offer.accepted
-        ? {
-            starkKey: userB.starkKey,
-            ethereumAddress: userB.ethAddress,
-            positionId: offer.accepted.positionIdB.toString(),
-          }
-        : undefined
-
     const [userPositionId, userEvent] = await Promise.all([
-      userAddress &&
-        this.positionRepository.findIdByEthereumAddress(userAddress),
-      userAddress &&
-        this.userRegistrationEventRepository.findByEthereumAddress(userAddress),
+      address && this.positionRepository.findIdByEthereumAddress(address),
+      address &&
+        this.userRegistrationEventRepository.findByEthereumAddress(address),
     ])
     const user =
       userPositionId && userEvent
@@ -95,31 +116,25 @@ export class ForcedTradeOfferController {
             positionId: userPositionId,
           }
         : undefined
-    const transactionHistory = new TransactionHistory({
-      forcedTradeOffer: offer,
-    })
 
-    const content = renderOfferAndForcedTradePage({
-      user: {
-        starkKey: userA.starkKey,
-        address: userA.ethAddress,
+    const content = renderOldForcedTradeOfferDetailsPage({
+      account,
+      history: toForcedTradeOfferHistory(offer),
+      offer: {
+        type: offer.isABuyingSynthetic ? 'buy' : 'sell',
+        id,
+        addressA: userA.ethAddress,
+        positionIdA: offer.positionIdA,
+        collateralAmount: offer.collateralAmount,
+        syntheticAmount: offer.syntheticAmount,
+        syntheticAssetId: offer.syntheticAssetId,
+        positionIdB: offer.accepted?.positionIdB,
+        addressB: userB?.ethAddress,
       },
-      offerId: id.toString(),
-      transactionHash: offer.accepted?.transactionHash,
-      maker,
-      taker,
-      type: offer.isABuyingSynthetic ? 'BUY' : 'SELL',
-      collateralAsset: { hashOrId: this.collateralAsset.assetId },
-      collateralAmount: offer.collateralAmount,
-      syntheticAsset: { hashOrId: offer.syntheticAssetId },
-      syntheticAmount: offer.syntheticAmount,
-      expirationTimestamp: offer.accepted?.submissionExpirationTime,
-      history: transactionHistory.getForcedTradeTransactionHistory(),
       acceptForm: user && getAcceptForm(offer, user),
       cancelForm: user && getCancelForm(offer, user),
       finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
     })
-
     return { type: 'success', content }
   }
 

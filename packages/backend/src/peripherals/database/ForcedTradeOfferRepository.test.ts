@@ -41,9 +41,8 @@ describe(ForcedTradeOfferRepository.name, () => {
       ...acceptedOffer,
       accepted: {
         ...acceptedOffer.accepted,
-        submissionExpirationTime: Timestamp(
-          Number(acceptedOffer.accepted.submissionExpirationTime)
-        ),
+        submissionExpirationTime:
+          acceptedOffer.accepted.submissionExpirationTime,
       },
     }
     expect(actual).toEqual(expected)
@@ -68,9 +67,8 @@ describe(ForcedTradeOfferRepository.name, () => {
       ...submittedOffer,
       accepted: {
         ...submittedOffer.accepted,
-        submissionExpirationTime: Timestamp(
-          Number(submittedOffer.accepted.submissionExpirationTime)
-        ),
+        submissionExpirationTime:
+          submittedOffer.accepted.submissionExpirationTime,
       },
     }
     expect(actual).toEqual(expected)

@@ -224,4 +224,99 @@ describe(WithdrawableAssetRepository.name, () => {
       expect(await repository.findById(id2)).toEqual(undefined)
     })
   })
+  describe(
+    WithdrawableAssetRepository.prototype.getAssetBalancesByStarkKey.name,
+    () => {
+      it('returns all records for the given stark key', async () => {
+        const starkKey1 = StarkKey.fake()
+        const starkKey2 = StarkKey.fake()
+
+        const firstAsset = AssetHash.fake()
+        const secondAsset = AssetHash.fake()
+        const thirdAsset = AssetHash.fake()
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+            assetType: firstAsset,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey2,
+            assetType: secondAsset,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+            assetType: firstAsset,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey2,
+            assetType: secondAsset,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+            assetType: secondAsset,
+          }),
+        })
+
+        await repository.add({
+          transactionHash: Hash256.fake(),
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeWithdrawalAllowedData({
+            starkKey: starkKey1,
+            assetType: thirdAsset,
+            quantizedAmount: 0n,
+          }),
+        })
+
+        const records1 = await repository.getAssetBalancesByStarkKey(starkKey1)
+        const records2 = await repository.getAssetBalancesByStarkKey(starkKey2)
+
+        expect(records1).toEqualUnsorted([
+          {
+            assetHash: secondAsset,
+            withdrawableBalance: 123n,
+          },
+          {
+            assetHash: firstAsset,
+            withdrawableBalance: 246n,
+          },
+        ])
+
+        expect(records2).toEqual([
+          {
+            assetHash: secondAsset,
+            withdrawableBalance: 246n,
+          },
+        ])
+      })
+    }
+  )
 })

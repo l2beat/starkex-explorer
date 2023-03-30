@@ -115,7 +115,7 @@ function UserPage(props: UserPageProps) {
             visible={props.offers.length}
             total={props.totalOffers}
           >
-            <OffersTable offers={props.offers} />
+            <OffersTable showStatus showRole offers={props.offers} />
           </TablePreview>
         )}
       </ContentWrapper>

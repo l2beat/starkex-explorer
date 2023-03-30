@@ -9,8 +9,8 @@ import Router from '@koa/router'
 import { Context } from 'koa'
 import { z } from 'zod'
 
-import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { ForcedTransactionController } from '../controllers/ForcedTransactionController'
+import { OldForcedTradeOfferController } from '../controllers/OldForcedTradeOfferController'
 import { OldHomeController } from '../controllers/OldHomeController'
 import { OldSearchController } from '../controllers/OldSearchController'
 import { OldStateUpdateController } from '../controllers/OldStateUpdateController'
@@ -21,7 +21,7 @@ import { applyControllerResult } from './utils'
 export function createOldFrontendRouter(
   positionController: PositionController,
   oldHomeController: OldHomeController,
-  forcedTradeOfferController: ForcedTradeOfferController,
+  forcedTradeOfferController: OldForcedTradeOfferController,
   forcedTransactionController: ForcedTransactionController,
   stateUpdateController: OldStateUpdateController,
   searchController: OldSearchController

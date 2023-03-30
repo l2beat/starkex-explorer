@@ -14,6 +14,18 @@ import {
   TRANSACTION_REVERTED,
 } from './common'
 import {
+  AcceptOfferForm,
+  AcceptOfferFormData,
+} from './components/AcceptOfferForm'
+import {
+  CancelOfferForm,
+  CancelOfferFormData,
+} from './components/CancelOfferForm'
+import {
+  FinalizeOfferForm,
+  FinalizeOfferFormData,
+} from './components/FinalizeOfferForm'
+import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
 } from './components/HistoryTable'
@@ -55,6 +67,9 @@ export interface OfferAndForcedTradePageProps {
   }[]
   expirationTimestamp?: Timestamp
   stateUpdateId?: number
+  acceptForm?: AcceptOfferFormData
+  cancelForm?: CancelOfferFormData
+  finalizeForm?: FinalizeOfferFormData
 }
 
 export function renderOfferAndForcedTradePage(
@@ -64,7 +79,6 @@ export function renderOfferAndForcedTradePage(
 }
 
 function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
-  const isMine = props.user?.starkKey === props.maker.starkKey
   const common = getCommon(props.transactionHash, props.offerId)
   const historyEntries = props.history.map((x) =>
     toHistoryEntry(x, props.type, props.stateUpdateId)
@@ -74,10 +88,6 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   if (!lastEntry) {
     throw new Error('No history entries')
   }
-
-  const showCancel = isMine && (status === 'CREATED' || status === 'ACCEPTED')
-  const showSendTransaction = isMine && status === 'ACCEPTED'
-  const showAccept = !isMine && Boolean(props.user) && status === 'CREATED'
 
   return (
     <Page user={props.user} path={common.path} description={common.description}>
@@ -96,14 +106,26 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
               </PageTitle>
             )}
             <div className="mb-6 flex items-center gap-2">
-              {showCancel && <Button variant="outlined">Cancel offer</Button>}
-              {showSendTransaction && (
-                <Button variant="contained">Send transaction</Button>
+              {props.acceptForm && (
+                <AcceptOfferForm {...props.acceptForm}>
+                  <Button variant="contained">
+                    Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
+                  </Button>
+                </AcceptOfferForm>
               )}
-              {showAccept && (
-                <Button variant="contained">
-                  Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
-                </Button>
+              {props.cancelForm && (
+                <CancelOfferForm {...props.cancelForm}>
+                  <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
+                    Cancel
+                  </button>
+                </CancelOfferForm>
+              )}
+              {props.finalizeForm && (
+                <FinalizeOfferForm {...props.finalizeForm}>
+                  <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
+                    Finalize
+                  </button>
+                </FinalizeOfferForm>
               )}
             </div>
           </div>
