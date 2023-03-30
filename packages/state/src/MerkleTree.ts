@@ -84,12 +84,15 @@ export class MerkleTree<T extends MerkleValue> {
     }
     const root = await this.root()
 
-    const path = []
+    const path: { left: PedersenHash; right: PedersenHash }[] = []
     let node = root
     let height = this.height
     let center = 2n ** (height - 1n)
     while (node instanceof MerkleNode) {
-      path.push({ left: await node.leftHash(), right: await node.rightHash() })
+      path.push({
+        left: await node.leftHash(),
+        right: await node.rightHash(),
+      })
       const centers = node.getCenters(center, height)
       if (index < center) {
         node = await node.left()
@@ -103,7 +106,7 @@ export class MerkleTree<T extends MerkleValue> {
     return {
       root: await this.hash(),
       path,
-      leaf: await this.getLeaf(index),
+      leaf: node,
     }
   }
 
