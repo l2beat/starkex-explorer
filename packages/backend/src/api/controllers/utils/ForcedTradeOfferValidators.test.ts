@@ -31,7 +31,9 @@ describe(validateCreateSignature.name, () => {
 
 describe(validateAcceptSignature.name, () => {
   it('accepts correct input', async () => {
-    expect(validateAcceptSignature(offer, accepted, addressB)).toBeTruthy()
+    expect(
+      validateAcceptSignature(offer, accepted, addressB, AssetId('USDC-6'))
+    ).toBeTruthy()
   })
 })
 

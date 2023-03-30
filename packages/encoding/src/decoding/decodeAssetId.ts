@@ -1,5 +1,6 @@
 import { AssetId } from '@explorer/types'
 
+import { encodeAssetId } from '../encoding/encodeAssetId'
 import { DecodingError } from './DecodingError'
 
 interface BigNumerLike {
@@ -13,7 +14,8 @@ export function decodeAssetId(
   if (typeof value !== 'string') {
     return decodeAssetId(value.toHexString().slice(2), collateralAssetId)
   }
-  if (value === collateralAssetId?.toString()) {
+
+  if (collateralAssetId && value === encodeAssetId(collateralAssetId)) {
     return collateralAssetId
   }
 

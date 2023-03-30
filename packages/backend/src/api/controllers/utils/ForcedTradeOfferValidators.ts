@@ -57,9 +57,10 @@ export function validateCreateSignature(
 export function validateAcceptSignature(
   offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   accepted: Omit<Accepted, 'at' | 'premiumCost'>,
-  address: EthereumAddress
+  address: EthereumAddress,
+  collateralAssetId: AssetId
 ): boolean {
-  const request = toSignableAcceptOffer(offer, accepted)
+  const request = toSignableAcceptOffer(offer, accepted, collateralAssetId)
   return validateSignature(request, accepted.signature, address)
 }
 

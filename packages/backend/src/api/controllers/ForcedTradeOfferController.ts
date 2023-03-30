@@ -157,6 +157,9 @@ export class ForcedTradeOfferController {
     offerId: number,
     accepted: Omit<Accepted, 'at'>
   ): Promise<ControllerResult> {
+    if (!this.collateralAsset) {
+      throw new Error('Collateral asset not set')
+    }
     const positionB = await this.positionRepository.findById(
       accepted.positionIdB
     )
@@ -185,7 +188,8 @@ export class ForcedTradeOfferController {
     const signatureValid = validateAcceptSignature(
       offer,
       accepted,
-      userB.ethAddress
+      userB.ethAddress,
+      this.collateralAsset.assetId
     )
     if (!signatureValid) {
       return { type: 'bad request', content: 'Invalid signature.' }

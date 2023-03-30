@@ -33,7 +33,7 @@ const ETH_ADDRESS = '0xD848fd793e1D483f1352E147d3c1A489FFE21Ff6'
 
 describe(toSignableAcceptOffer.name, () => {
   it('works on an example tx', () => {
-    const digest = toSignableAcceptOffer(INITIAL, ACCEPTED)
+    const digest = toSignableAcceptOffer(INITIAL, ACCEPTED, AssetId('USDC-6'))
     expect(recoverAddress(digest, ACCEPTED.signature)).toEqual(ETH_ADDRESS)
   })
 })

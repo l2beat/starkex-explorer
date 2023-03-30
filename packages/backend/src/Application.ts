@@ -204,23 +204,40 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
+    const accountService = new AccountService(
+      positionRepository,
+      forcedTradeOfferRepository,
+      sentTransactionRepository
+    )
+
     let syncService
     let stateUpdater:
       | SpotValidiumUpdater
       | PerpetualValidiumUpdater
       | PerpetualRollupUpdater
-
+    let forcedTradeOfferController: ForcedTradeOfferController | undefined
+    let oldForcedTradeOfferController: OldForcedTradeOfferController | undefined
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
         config.starkex.availabilityGateway
       )
 
       if (config.starkex.tradingMode === 'perpetual') {
-        if (!collateralAsset) {
-          throw new Error(
-            'Collateral asset is not defined but trading mode is perpetual'
-          )
-        }
+        forcedTradeOfferController = new ForcedTradeOfferController(
+          forcedTradeOfferRepository,
+          positionRepository,
+          userRegistrationEventRepository,
+          config.starkex.collateralAsset,
+          config.starkex.contracts.perpetual
+        )
+        oldForcedTradeOfferController = new OldForcedTradeOfferController(
+          accountService,
+          forcedTradeOfferRepository,
+          positionRepository,
+          userRegistrationEventRepository,
+          config.starkex.collateralAsset,
+          config.starkex.contracts.perpetual
+        )
         const perpetualValidiumStateTransitionCollector =
           new PerpetualValidiumStateTransitionCollector(
             ethereumClient,
@@ -229,7 +246,7 @@ export class Application {
           )
         const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
           ethereumClient,
-          collateralAsset
+          config.starkex.collateralAsset
         )
         const rollupStateRepository = new MerkleTreeRepository(
           database,
@@ -253,7 +270,7 @@ export class Application {
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
-          collateralAsset,
+          config.starkex.collateralAsset,
           logger
         )
       } else {
@@ -349,11 +366,7 @@ export class Application {
       ethereumClient,
       logger
     )
-    const accountService = new AccountService(
-      positionRepository,
-      forcedTradeOfferRepository,
-      sentTransactionRepository
-    )
+
     const userService = new UserService(userRegistrationEventRepository)
     const assetDetailsService = new AssetDetailsService(
       assetRepository,
@@ -549,13 +562,7 @@ export class Application {
       userRegistrationEventRepository,
       preprocessedAssetHistoryRepository
     )
-    const oldForcedTradeOfferController = new OldForcedTradeOfferController(
-      accountService,
-      forcedTradeOfferRepository,
-      positionRepository,
-      userRegistrationEventRepository,
-      config.starkex.contracts.perpetual
-    )
+
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
       sentTransactionRepository,
@@ -567,13 +574,6 @@ export class Application {
       userService,
       preprocessedAssetHistoryRepository,
       assetRepository,
-      config.starkex.contracts.perpetual
-    )
-    const forcedTradeOfferController = new ForcedTradeOfferController(
-      forcedTradeOfferRepository,
-      positionRepository,
-      userRegistrationEventRepository,
-      collateralAsset,
       config.starkex.contracts.perpetual
     )
 

@@ -4,7 +4,7 @@ import { expect } from 'earljs'
 import { decodeAssetId } from './decodeAssetId'
 import { DecodingError } from './DecodingError'
 
-const collateralAssetId = AssetId.USDC
+const collateralAssetId = AssetId('USDC-6')
 
 describe('decodeAssetId', () => {
   it('fails for non-15 byte strings', () => {
@@ -24,7 +24,7 @@ describe('decodeAssetId', () => {
 
   it('can decode USDC-6', () => {
     const result = decodeAssetId(
-      AssetId('USDC-6').toString(),
+      '02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d',
       collateralAssetId
     )
     expect(result).toEqual(AssetId('USDC-6'))

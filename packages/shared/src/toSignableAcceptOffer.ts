@@ -16,7 +16,8 @@ export function toSignableAcceptOffer(
     positionIdB: bigint
     nonce: bigint
     submissionExpirationTime: Timestamp
-  }
+  },
+  collateralAssetId: AssetId
 ) {
   const packedParameters = pack(
     [
@@ -36,7 +37,7 @@ export function toSignableAcceptOffer(
       accepted.starkKeyB,
       offer.positionIdA,
       accepted.positionIdB,
-      `0x${encodeAssetId(AssetId.USDC)}`,
+      `0x${encodeAssetId(collateralAssetId)}`,
       `0x${encodeAssetId(offer.syntheticAssetId)}`,
       offer.collateralAmount,
       offer.syntheticAmount,

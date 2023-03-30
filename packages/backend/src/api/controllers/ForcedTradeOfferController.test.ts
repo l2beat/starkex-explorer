@@ -3,6 +3,7 @@ import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect, mockObject } from 'earljs'
 import { Wallet } from 'ethers'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
@@ -11,10 +12,6 @@ import { ForcedTradeOfferController } from './ForcedTradeOfferController'
 import * as tradeMock from './utils/ForcedTradeOfferMockData'
 
 describe(ForcedTradeOfferController.name, () => {
-  const collateralAsset = {
-    assetId: AssetId('USDC-6'),
-    price: 1n,
-  }
   const stateUpdateId = 1
   const positionA = {
     positionId: tradeMock.offer.positionIdA,
@@ -34,6 +31,10 @@ describe(ForcedTradeOfferController.name, () => {
       },
     ],
     stateUpdateId,
+  }
+  const collateralAsset: CollateralAsset = {
+    assetId: AssetId('USDC-6'),
+    price: 1n,
   }
   const wallet = Wallet.createRandom()
   const addressA = EthereumAddress(wallet.address)

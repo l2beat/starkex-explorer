@@ -28,7 +28,7 @@ export function createFrontendRouter(
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
   forcedActionController: ForcedActionController,
-  forcedTradeOfferController: ForcedTradeOfferController,
+  forcedTradeOfferController: ForcedTradeOfferController | undefined,
   merkleProofController: MerkleProofController,
   collateralAsset: CollateralAsset | undefined,
   tradingMode: TradingMode,
@@ -291,24 +291,26 @@ export function createFrontendRouter(
     )
   )
 
-  router.get(
-    '/offers/:offerId',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          offerId: z.string(),
+  if (forcedTradeOfferController) {
+    router.get(
+      '/offers/:offerId',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            offerId: z.string(),
+          }),
         }),
-      }),
-      async (ctx) => {
-        const user = getGivenUser(ctx)
-        const result = await forcedTradeOfferController.getOfferDetailsPage(
-          Number(ctx.params.offerId),
-          user.address
-        )
-        applyControllerResult(ctx, result)
-      }
+        async (ctx) => {
+          const user = getGivenUser(ctx)
+          const result = await forcedTradeOfferController.getOfferDetailsPage(
+            Number(ctx.params.offerId),
+            user.address
+          )
+          applyControllerResult(ctx, result)
+        }
+      )
     )
-  )
+  }
 
   router.get(
     '/transactions/:transactionHash',

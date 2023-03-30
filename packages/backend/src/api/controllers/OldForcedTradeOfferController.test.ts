@@ -1,8 +1,9 @@
 import { toSignableCancelOffer, toSignableCreateOffer } from '@explorer/shared'
-import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect, mockObject } from 'earljs'
 import { Wallet } from 'ethers'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AccountService } from '../../core/AccountService'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
@@ -19,6 +20,10 @@ describe(OldForcedTradeOfferController.name, () => {
     collateralBalance: tradeMock.offer.collateralAmount,
     balances: [],
     stateUpdateId,
+  }
+  const collateralAsset: CollateralAsset = {
+    assetId: AssetId('USDC-6'),
+    price: 1n,
   }
   const positionB = {
     starkKey: tradeMock.accepted.starkKeyB,
@@ -74,6 +79,7 @@ describe(OldForcedTradeOfferController.name, () => {
           offerRepository,
           mockObject<PositionRepository>(),
           mockObject<UserRegistrationEventRepository>(),
+          collateralAsset,
           EthereumAddress.fake()
         )
 
@@ -104,6 +110,7 @@ describe(OldForcedTradeOfferController.name, () => {
         offerRepository,
         positionRepository,
         userRegistrationEventRepository,
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -125,6 +132,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -146,6 +154,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -167,6 +176,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -195,6 +205,7 @@ describe(OldForcedTradeOfferController.name, () => {
         offerRepository,
         positionRepository,
         userRegistrationEventRepository,
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -218,6 +229,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -237,6 +249,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -258,6 +271,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -287,6 +301,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -313,6 +328,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -354,6 +370,7 @@ describe(OldForcedTradeOfferController.name, () => {
             }
           },
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -401,6 +418,7 @@ describe(OldForcedTradeOfferController.name, () => {
             }
           },
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -436,6 +454,7 @@ describe(OldForcedTradeOfferController.name, () => {
         }),
         mockObject<PositionRepository>(),
         mockObject<UserRegistrationEventRepository>(),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -456,6 +475,7 @@ describe(OldForcedTradeOfferController.name, () => {
         }),
         mockObject<PositionRepository>(),
         mockObject<UserRegistrationEventRepository>(),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -480,6 +500,7 @@ describe(OldForcedTradeOfferController.name, () => {
         }),
         mockObject<PositionRepository>(),
         mockObject<UserRegistrationEventRepository>(),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -500,6 +521,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => undefined,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -520,6 +542,7 @@ describe(OldForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
 
@@ -544,6 +567,7 @@ describe(OldForcedTradeOfferController.name, () => {
             ethAddress: addressA,
           }),
         }),
+        collateralAsset,
         EthereumAddress.fake()
       )
       const signature = await wallet.signMessage(request)

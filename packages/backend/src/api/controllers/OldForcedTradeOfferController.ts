@@ -4,6 +4,7 @@ import {
 } from '@explorer/frontend'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
+import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AccountService } from '../../core/AccountService'
 import {
   Accepted,
@@ -32,6 +33,7 @@ export class OldForcedTradeOfferController {
     private offerRepository: ForcedTradeOfferRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
+    private collateralAsset: CollateralAsset,
     private perpetualAddress: EthereumAddress
   ) {}
 
@@ -200,7 +202,8 @@ export class OldForcedTradeOfferController {
     const signatureValid = validateAcceptSignature(
       offer,
       accepted,
-      userB.ethAddress
+      userB.ethAddress,
+      this.collateralAsset.assetId
     )
     if (!signatureValid) {
       return { type: 'bad request', content: 'Invalid signature.' }
