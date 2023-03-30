@@ -682,7 +682,7 @@ const routes: Route[] = [
       'Offer view of a created perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx, true)
+      const user = getUser(ctx) ?? getFakeUser()
       const offer = randomOfferDetails()
       ctx.body = renderOfferAndForcedTradePage({
         user,
@@ -703,7 +703,7 @@ const routes: Route[] = [
     isOfferPage: true,
     render: (ctx) => {
       const offer = randomOfferDetails()
-      const user = getUser(ctx, true)
+      const user = getUser(ctx) ?? getFakeUser()
       const taker = {
         ethereumAddress: user.address,
         starkKey: user.starkKey,
@@ -724,7 +724,7 @@ const routes: Route[] = [
           collateralAmount: 2n,
           syntheticAmount: 1n,
           isABuyingSynthetic: true,
-          starkKeyB: taker.starkKey,
+          starkKeyB: taker.starkKey ?? StarkKey.fake(),
           positionIdB: BigInt(taker.positionId),
           submissionExpirationTime: Timestamp(12345678),
           nonce: 1234n,
@@ -739,7 +739,7 @@ const routes: Route[] = [
       'Offer view of an accepted perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx, true)
+      const user = getUser(ctx) ?? getFakeUser()
       const maker = userParty(user)
       const taker = randomParty()
       const offer = randomOfferDetails()
