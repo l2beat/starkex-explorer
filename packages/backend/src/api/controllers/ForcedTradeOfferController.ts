@@ -27,7 +27,7 @@ export class ForcedTradeOfferController {
     private offerRepository: ForcedTradeOfferRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private collateralAsset: CollateralAsset | undefined,
+    private collateralAsset: CollateralAsset,
     private perpetualAddress: EthereumAddress
   ) {}
 
@@ -157,9 +157,6 @@ export class ForcedTradeOfferController {
     offerId: number,
     accepted: Omit<Accepted, 'at'>
   ): Promise<ControllerResult> {
-    if (!this.collateralAsset) {
-      throw new Error('Collateral asset not set')
-    }
     const positionB = await this.positionRepository.findById(
       accepted.positionIdB
     )
