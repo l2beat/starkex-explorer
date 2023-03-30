@@ -35,7 +35,7 @@ function HomeOffersPage(props: HomeOffersPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <OffersTable hideStatus offers={props.offers} />
+          <OffersTable showStatus={false} offers={props.offers} />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

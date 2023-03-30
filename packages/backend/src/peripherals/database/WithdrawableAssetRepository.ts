@@ -33,6 +33,9 @@ export class WithdrawableAssetRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.add = this.wrapAdd(this.add)
+    this.getAssetBalancesByStarkKey = this.wrapGet(
+      this.getAssetBalancesByStarkKey
+    )
     this.findById = this.wrapFind(this.findById)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -61,6 +64,23 @@ export class WithdrawableAssetRepository extends BaseRepository {
       .returning('id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return results[0]!.id
+  }
+
+  async getAssetBalancesByStarkKey(
+    starkKey: StarkKey
+  ): Promise<{ assetHash: AssetHash; withdrawableBalance: bigint }[]> {
+    const knex = await this.knex()
+    const results: { assetHash: string; withdrawableBalance: string }[] =
+      await knex('withdrawable_assets')
+        .select('asset_hash as assetHash')
+        .where('stark_key', starkKey.toString())
+        .groupBy('asset_hash')
+        .having(knex.raw('sum(balance_delta) > 0'))
+        .sum('balance_delta as withdrawableBalance')
+    return results.map((x) => ({
+      assetHash: AssetHash(x.assetHash),
+      withdrawableBalance: BigInt(x.withdrawableBalance),
+    }))
   }
 
   async findById(id: number): Promise<WithdrawableAssetRecord | undefined> {

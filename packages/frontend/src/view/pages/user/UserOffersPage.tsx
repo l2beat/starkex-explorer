@@ -36,7 +36,7 @@ function UserOffersPage(props: UserOffersPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <OffersTable offers={props.offers} />
+          <OffersTable showStatus showRole offers={props.offers} />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

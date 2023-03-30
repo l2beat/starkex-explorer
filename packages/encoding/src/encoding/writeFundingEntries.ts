@@ -1,6 +1,7 @@
+import { Timestamp } from '@explorer/types'
+
 import { FundingEntry } from '../OnChainData'
 import { ByteWriter } from './ByteWriter'
-import { toSeconds } from './toSeconds'
 import { writeFundingIndices } from './writeFundingIndices'
 
 export function writeFundingEntries(
@@ -10,6 +11,6 @@ export function writeFundingEntries(
   writer.writeNumber(funding.length, 32)
   for (const { indices, timestamp } of funding) {
     writeFundingIndices(writer, indices)
-    writer.writeNumber(toSeconds(timestamp), 32)
+    writer.writeNumber(Timestamp.toSeconds(timestamp), 32)
   }
 }

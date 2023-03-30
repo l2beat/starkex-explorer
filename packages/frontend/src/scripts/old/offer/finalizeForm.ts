@@ -1,29 +1,31 @@
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { deserializeFinalizeOfferData } from '@explorer/shared'
+import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
-import { FormClass } from '../../../view/old/forced-transactions/finalize-form'
+import { FormClass } from '../../../view/old/offers/finalize-form/attributes'
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
-import { getAttribute } from '../offer/getAttribute'
+import { getAttribute } from './getAttribute'
 
-export function initFinalizeExitForm() {
+export function initFinalizeForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(`.${FormClass}`)
   forms.forEach((form) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
       const address = EthereumAddress(getAttribute(form, 'address'))
+      const offer = deserializeFinalizeOfferData(getAttribute(form, 'offer'))
+      const offerId = Number(getAttribute(form, 'offer-id'))
       const perpetualAddress = EthereumAddress(
         getAttribute(form, 'perpetual-address')
       )
-      const starkKey = StarkKey(getAttribute(form, 'stark-key'))
-      const finalizeHash = await Wallet.sendOldWithdrawalTransaction(
+      const hash = await Wallet.sendPerpetualForcedTradeTransaction(
         address,
-        starkKey,
+        offer,
         perpetualAddress
       )
-      await Api.submitWithdrawal(finalizeHash)
-      window.location.reload()
+      await Api.submitPerpetualForcedTrade(offerId, hash)
+      window.location.href = `/forced/${hash.toString()}`
     })
   })
 }
