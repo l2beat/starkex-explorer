@@ -1,6 +1,6 @@
 import { State } from '@explorer/encoding'
 import { AssetId, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { calculateUpdatedPositions } from './calculateUpdatedPositions'
 import { InMemoryMerkleStorage } from './InMemoryMerkleStorage'

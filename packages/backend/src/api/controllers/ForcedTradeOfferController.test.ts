@@ -1,6 +1,6 @@
 import { toSignableCancelOffer, toSignableCreateOffer } from '@explorer/shared'
 import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 import { Wallet } from 'ethers'
 
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'

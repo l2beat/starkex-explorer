@@ -6,7 +6,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { mockObject } from 'earljs'
+import { mockObject } from 'earl'
 import { SuperAgentTest } from 'supertest'
 
 import { PositionRepository } from '../../peripherals/database/PositionRepository'

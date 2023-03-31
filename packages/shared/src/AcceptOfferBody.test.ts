@@ -1,5 +1,5 @@
 import { StarkKey, Timestamp } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { AcceptOfferBody, serializeAcceptOfferBody } from './AcceptOfferBody'
 

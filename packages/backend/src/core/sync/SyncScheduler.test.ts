@@ -1,5 +1,5 @@
 import { AssetId, Hash256 } from '@explorer/types'
-import { expect, mockFn, mockObject } from 'earljs'
+import { expect, mockFn, mockObject } from 'earl'
 import waitForExpect from 'wait-for-expect'
 
 import { BlockRange } from '../../model'
