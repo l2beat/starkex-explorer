@@ -1,4 +1,5 @@
 import {
+  CollateralAsset,
   stringAs,
   stringAsBigInt,
   stringAsPositiveInt,
@@ -8,7 +9,6 @@ import { Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import * as z from 'zod'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'

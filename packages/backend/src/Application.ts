@@ -245,8 +245,7 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
-          ethereumClient,
-          config.starkex.collateralAsset
+          ethereumClient
         )
         const rollupStateRepository = new MerkleTreeRepository(
           database,
@@ -270,7 +269,6 @@ export class Application {
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
-          config.starkex.collateralAsset,
           logger
         )
       } else {
@@ -355,8 +353,6 @@ export class Application {
         userRegistrationCollector,
         userTransactionCollector,
         withdrawalAllowedCollector,
-        // TODO: shouldn't this be already defined as it is used in perpetual service?
-        collateralAsset,
         logger
       )
     }
@@ -507,11 +503,9 @@ export class Application {
       userService,
       assetDetailsService,
       stateUpdateRepository,
-      assetRepository,
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
-      config.starkex.tradingMode,
-      collateralAsset
+      config.starkex.tradingMode
     )
     const transactionController = new TransactionController(
       userService,

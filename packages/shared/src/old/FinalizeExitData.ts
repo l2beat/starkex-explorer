@@ -1,6 +1,5 @@
 import { Interface } from '@ethersproject/abi'
-import { encodeAssetId } from '@explorer/encoding'
-import { AssetId, StarkKey } from '@explorer/types'
+import { StarkKey } from '@explorer/types'
 
 const coder = new Interface([
   'function withdraw(uint256 starkKey, uint256 assetType)',
@@ -9,7 +8,7 @@ const coder = new Interface([
 export function encodeFinalizeExitRequest(starkKey: StarkKey) {
   return coder.encodeFunctionData('withdraw', [
     starkKey.toString(),
-    `0x${encodeAssetId(AssetId.USDC)}`,
+    `0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d`,
   ])
 }
 

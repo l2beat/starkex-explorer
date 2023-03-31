@@ -1,8 +1,7 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
-import { assertUnreachable } from '@explorer/shared'
+import { assertUnreachable,CollateralAsset } from '@explorer/shared'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { TransactionHistory } from '../../core/TransactionHistory'
 import { SentTransactionRecord } from '../../peripherals/database/transactions/SentTransactionRepository'

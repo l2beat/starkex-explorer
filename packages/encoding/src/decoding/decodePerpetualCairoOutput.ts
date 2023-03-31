@@ -1,4 +1,4 @@
-import { AssetId, Hash256 } from '@explorer/types'
+import { Hash256 } from '@explorer/types'
 
 import { PerpetualCairoOutput } from '../OnChainData'
 import { ByteReader } from './ByteReader'
@@ -8,21 +8,18 @@ import { readForcedActions } from './readForcedActions'
 import { readModifications } from './readModifications'
 import { readState } from './readState'
 
-export function decodePerpetualCairoOutput(
-  data: string,
-  collateralAssetId?: AssetId
-): PerpetualCairoOutput {
+export function decodePerpetualCairoOutput(data: string): PerpetualCairoOutput {
   const reader = new ByteReader(data)
 
   const configurationHash = Hash256(reader.readHex(32))
-  const assetConfigHashes = readAssetConfigHashes(reader, collateralAssetId)
-  const oldState = readState(reader, collateralAssetId)
-  const newState = readState(reader, collateralAssetId)
+  const assetConfigHashes = readAssetConfigHashes(reader)
+  const oldState = readState(reader)
+  const newState = readState(reader)
 
   const minimumExpirationTimestamp = reader.readBigInt(32)
   const modifications = readModifications(reader)
   reader.skip(32) // Total size of forced actions data. Not needed
-  const forcedActions = readForcedActions(reader, collateralAssetId)
+  const forcedActions = readForcedActions(reader)
   const conditions = readConditions(reader)
 
   const validiumObject = {

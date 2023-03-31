@@ -1,4 +1,5 @@
 import {
+  CollateralAsset,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
@@ -13,7 +14,6 @@ import {
   Timestamp,
 } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import {
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
@@ -132,6 +132,9 @@ export class TransactionSubmitController {
     transactionHash: Hash256,
     offerId: number
   ): Promise<ControllerResult> {
+    if (!this.collateralAsset) {
+      throw new Error('No collateral asset')
+    }
     const timestamp = Timestamp.now()
     const offer = await this.offersRepository.findById(offerId)
     if (!offer) {
@@ -153,7 +156,7 @@ export class TransactionSubmitController {
     }
     const data = decodePerpetualForcedTradeRequest(
       tx.data,
-      this.collateralAsset?.assetId
+      this.collateralAsset
     )
     if (
       !tx.to ||

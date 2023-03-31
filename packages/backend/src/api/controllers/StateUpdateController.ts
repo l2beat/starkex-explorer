@@ -3,15 +3,13 @@ import {
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { CollateralAsset, TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { UserService } from '../../core/UserService'
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -34,7 +32,6 @@ export class StateUpdateController {
     private readonly userService: UserService,
     private readonly assetDetailsService: AssetDetailsService,
     private readonly stateUpdateRepository: StateUpdateRepository,
-    private readonly assetRepository: AssetRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId

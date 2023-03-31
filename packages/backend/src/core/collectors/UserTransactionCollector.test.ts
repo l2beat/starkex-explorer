@@ -25,6 +25,7 @@ import {
   WithdrawableAssetRepository,
 } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { fakeCollateralAsset } from '../../test/fakes'
 import {
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
@@ -402,7 +403,8 @@ describe(UserTransactionCollector.name, () => {
     const positionIdA = 123n
     const positionIdB = 456n
     const collateralAmount = 1000n
-    const collateralAssetId = '0xa1b2'
+    const collateralAssetId =
+      '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d'
     const syntheticAmount = 2000n
     const syntheticAssetId = AssetId('ETH-9')
     const isABuyingSynthetic = true
@@ -454,7 +456,7 @@ describe(UserTransactionCollector.name, () => {
       userTransactionRepository,
       mockObject<WithdrawableAssetRepository>(),
       perpetualAddress,
-      { assetId: AssetId.USDC, price: 1n }
+      fakeCollateralAsset
     )
 
     await collector.collect(blockRange)

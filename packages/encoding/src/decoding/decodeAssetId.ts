@@ -1,27 +1,20 @@
 import { AssetId } from '@explorer/types'
 
-import { encodeAssetId } from '../encoding/encodeAssetId'
 import { DecodingError } from './DecodingError'
 
 interface BigNumerLike {
   toHexString(): string
 }
 
-export function decodeAssetId(
-  value: string | BigNumerLike,
-  collateralAssetId?: AssetId
-): AssetId {
+export function decodeAssetId(value: string | BigNumerLike): AssetId {
   if (typeof value !== 'string') {
-    return decodeAssetId(value.toHexString().slice(2), collateralAssetId)
-  }
-
-  if (collateralAssetId && value === encodeAssetId(collateralAssetId)) {
-    return collateralAssetId
+    return decodeAssetId(value.toHexString().slice(2))
   }
 
   if (value.length !== 30) {
     throw new DecodingError('Invalid AssetId length')
   }
+
   const idString =
     value
       .match(/..?/g)

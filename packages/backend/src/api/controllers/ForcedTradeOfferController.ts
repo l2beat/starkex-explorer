@@ -1,7 +1,7 @@
 import { renderOfferAndForcedTradePage } from '@explorer/frontend'
+import { CollateralAsset } from '@explorer/shared'
 import { EthereumAddress, Timestamp } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { TransactionHistory } from '../../core/TransactionHistory'
 import {
   Accepted,
@@ -180,7 +180,7 @@ export class ForcedTradeOfferController {
       offer,
       accepted,
       userB.ethAddress,
-      this.collateralAsset.assetId
+      this.collateralAsset
     )
     if (!signatureValid) {
       return { type: 'bad request', content: 'Invalid signature.' }

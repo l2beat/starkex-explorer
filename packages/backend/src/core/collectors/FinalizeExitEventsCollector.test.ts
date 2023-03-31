@@ -1,4 +1,4 @@
-import { AssetId, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 import { expect, mockObject } from 'earljs'
 
 import { BlockRange } from '../../model'
@@ -71,7 +71,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         transactionStatusRepo,
         EthereumAddress.fake()
       )
-      const result = await collector.collect(blockRange, AssetId('USDC-6'))
+      const result = await collector.collect(blockRange)
 
       expect(result).toEqual({ updated: 1, added: 0, ignored: 0 })
       expect(
@@ -112,7 +112,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         mockObject<TransactionStatusRepository>({}),
         EthereumAddress.fake()
       )
-      const result = await collector.collect(blockRange, AssetId('USDC-6'))
+      const result = await collector.collect(blockRange)
 
       expect(result).toEqual({ updated: 0, added: 1, ignored: 0 })
       expect(forcedRepo.saveFinalize).toHaveBeenOnlyCalledWith(
@@ -155,7 +155,7 @@ describe(FinalizeExitEventsCollector.name, () => {
         statusRepo,
         EthereumAddress.fake()
       )
-      const result = await collector.collect(blockRange, AssetId('USDC-6'))
+      const result = await collector.collect(blockRange)
 
       expect(result).toEqual({ updated: 0, added: 0, ignored: 1 })
       expect(statusRepo.updateIfWaitingToBeMined).toHaveBeenCalledTimes(0)

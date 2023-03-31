@@ -1,6 +1,5 @@
 import { decodeOnChainData } from '@explorer/encoding'
 
-import { CollateralAsset } from '../config/starkex/StarkexConfig'
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
@@ -24,7 +23,6 @@ export class PerpetualRollupSyncService implements IDataSyncService {
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly userTransactionCollector: UserTransactionCollector,
     private readonly withdrawalAllowedCollector: WithdrawalAllowedCollector,
-    private readonly collateralAsset: CollateralAsset | undefined,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -64,10 +62,7 @@ export class PerpetualRollupSyncService implements IDataSyncService {
       )
 
     for (const record of recordsWithPages) {
-      const onChainData = decodeOnChainData(
-        record.pages,
-        this.collateralAsset?.assetId
-      )
+      const onChainData = decodeOnChainData(record.pages)
       await this.perpetualRollupUpdater.processOnChainStateTransition(
         {
           id: record.id,

@@ -1,4 +1,3 @@
-import { AssetId } from '@explorer/types'
 import { Agent } from 'https'
 import fetch from 'node-fetch'
 
@@ -24,10 +23,10 @@ export class AvailabilityGatewayClient {
     })
   }
 
-  async getPerpetualBatch(batchId: number, collateralAssetId: AssetId) {
+  async getPerpetualBatch(batchId: number) {
     const data = await this.getBatch(batchId)
     const parsed = PerpetualBatchResponse.parse(data)
-    return toPerpetualBatch(parsed, collateralAssetId)
+    return toPerpetualBatch(parsed)
   }
 
   async getSpotBatch(batchId: number) {

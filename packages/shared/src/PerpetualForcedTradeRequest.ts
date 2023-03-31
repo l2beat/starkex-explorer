@@ -2,6 +2,8 @@ import { Interface } from '@ethersproject/abi'
 import { decodeAssetId, encodeAssetId } from '@explorer/encoding'
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
+import { CollateralAsset } from './CollateralAsset'
+
 const coder = new Interface([
   `function forcedTradeRequest(
       uint256 starkKeyA,
@@ -38,24 +40,19 @@ export interface PerpetualForcedTradeRequest {
 
 export function decodePerpetualForcedTradeRequest(
   data: string,
-  collateralAssetId?: AssetId
+  collateralAsset: CollateralAsset
 ): PerpetualForcedTradeRequest | undefined {
   try {
     const decoded = coder.decodeFunctionData('forcedTradeRequest', data)
+
     /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
     return {
       starkKeyA: StarkKey.from(decoded.starkKeyA),
       starkKeyB: StarkKey.from(decoded.starkKeyB),
       positionIdA: BigInt(decoded.positionIdA),
       positionIdB: BigInt(decoded.positionIdB),
-      collateralAssetId: decodeAssetId(
-        decoded.collateralAssetId,
-        collateralAssetId
-      ),
-      syntheticAssetId: decodeAssetId(
-        decoded.syntheticAssetId,
-        collateralAssetId
-      ),
+      collateralAssetId: collateralAsset.assetId,
+      syntheticAssetId: decodeAssetId(decoded.syntheticAssetId),
       collateralAmount: BigInt(decoded.collateralAmount),
       syntheticAmount: BigInt(decoded.syntheticAmount),
       isABuyingSynthetic: Boolean(decoded.isABuyingSynthetic),

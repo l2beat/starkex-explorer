@@ -2,9 +2,9 @@ import {
   renderOldForcedTradeOfferDetailsPage,
   renderOldForcedTradeOffersIndexPage,
 } from '@explorer/frontend'
+import { CollateralAsset } from '@explorer/shared'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AccountService } from '../../core/AccountService'
 import {
   Accepted,
@@ -203,7 +203,7 @@ export class OldForcedTradeOfferController {
       offer,
       accepted,
       userB.ethAddress,
-      this.collateralAsset.assetId
+      this.collateralAsset
     )
     if (!signatureValid) {
       return { type: 'bad request', content: 'Invalid signature.' }

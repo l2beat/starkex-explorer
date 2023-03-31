@@ -8,12 +8,8 @@ import { readToDecode } from '../test/readToDecode'
 import { DecodingError } from './DecodingError'
 import { readPositionUpdate } from './readPositionUpdate'
 
-const collateralAssetId = AssetId('USDC-6')
-
 describe('readPositionUpdate', () => {
-  const decode = readToDecode((reader) =>
-    readPositionUpdate(reader, collateralAssetId)
-  )
+  const decode = readToDecode((reader) => readPositionUpdate(reader))
 
   it('fails for empty data', () => {
     expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')

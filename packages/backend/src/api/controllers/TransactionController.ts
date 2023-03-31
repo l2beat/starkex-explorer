@@ -4,10 +4,13 @@ import {
   renderRegularWithdrawalPage,
   renderSpotForcedWithdrawalPage,
 } from '@explorer/frontend'
-import { assertUnreachable, UserDetails } from '@explorer/shared'
+import {
+  assertUnreachable,
+  CollateralAsset,
+  UserDetails,
+} from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { TransactionHistory } from '../../core/TransactionHistory'
 import { UserService } from '../../core/UserService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
@@ -80,6 +83,7 @@ export class TransactionController {
   ) {
     switch (userTransaction.data.type) {
       case 'ForcedWithdrawal': {
+        //TODO: IS THIS CORRECT?
         if (!this.collateralAsset) {
           throw new Error(
             'Collateral asset not passed when displaying ForcedWithdrawal'

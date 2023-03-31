@@ -1,9 +1,8 @@
-import { stringAs, stringAsBigInt } from '@explorer/shared'
+import { CollateralAsset, stringAs, stringAsBigInt } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 import Router from '@koa/router'
 import { z } from 'zod'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { withTypedContext } from './types'
 import { applyControllerResult, getGivenUser } from './utils'
