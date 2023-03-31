@@ -49,14 +49,13 @@ function MerkleProofPage(props: MerkleProofPageProps) {
             Merkle Proof for {idLabel} #{props.positionOrVaultId.toString()}
           </PageTitle>
           <span className="text-sm font-semibold text-zinc-500">
-            {/* TODO: add some explanation */}
-            Sit do eu officia incididunt amet id occaecat mollit tempor nulla.
-            Laborum commodo velit id nisi voluptate ex quis ullamco fugiat
-            laboris et. Esse est reprehenderit veniam nisi magna nulla amet sint
-            do magna. Sint commodo veniam sunt ullamco sunt esse exercitation
-            adipisicing voluptate aute adipisicing amet quis incididunt. Minim
-            mollit anim eiusmod adipisicing minim cillum nostrud pariatur eu
-            sunt fugiat aliqua.
+            Merkle proofs provide a way to verify the existence and correctness
+            of data within a Merkle tree. In the context of trading, they are
+            used to prove that a specific{' '}
+            {props.tradingMode === 'perpetual' ? 'position' : 'vault'} exists in
+            the latest state update. By using Merkle proofs, users can trust the
+            integrity of the data they receive without having to store or
+            validate the entire state of the system.
           </span>
         </div>
         <div>

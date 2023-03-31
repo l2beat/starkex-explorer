@@ -58,7 +58,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               )}
             </div>,
             <span className="text-zinc-500">
-              #{entry.vaultOrPositionId}
+              #{entry.vaultOrPositionId}{' '}
               {props.tradingMode === 'spot' && (
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
