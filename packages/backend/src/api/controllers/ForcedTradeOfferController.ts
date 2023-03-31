@@ -35,12 +35,6 @@ export class ForcedTradeOfferController {
     id: number,
     userAddress: EthereumAddress | undefined
   ): Promise<ControllerResult> {
-    if (!this.collateralAsset) {
-      throw new Error(
-        'Collateral asset not passed when displaying ForcedTradeOffer'
-      )
-    }
-
     const offer = await this.offerRepository.findById(id)
 
     if (!offer) {
