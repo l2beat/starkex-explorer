@@ -1,5 +1,5 @@
 import { Hash256 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger, LogLevel } from '../../tools/Logger'

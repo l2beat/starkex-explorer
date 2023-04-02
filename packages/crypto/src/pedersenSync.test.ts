@@ -1,5 +1,5 @@
 import { PedersenHash } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { pedersenSync } from './pedersenSync'
 

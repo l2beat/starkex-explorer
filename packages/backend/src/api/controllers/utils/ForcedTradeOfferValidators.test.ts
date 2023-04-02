@@ -1,6 +1,6 @@
 import { toSignableCreateOffer } from '@explorer/shared'
 import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 import { Wallet } from 'ethers'
 
 import { fakeBigInt } from '../../../test/fakes'

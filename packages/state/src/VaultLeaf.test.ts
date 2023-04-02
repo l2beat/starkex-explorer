@@ -1,5 +1,5 @@
 import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { VaultLeaf } from './VaultLeaf'
 

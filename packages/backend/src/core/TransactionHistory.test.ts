@@ -1,5 +1,5 @@
 import { Hash256, Timestamp } from '@explorer/types'
-import { expect, mockFn } from 'earljs'
+import { expect, mockFn } from 'earl'
 
 import {
   fakeAccepted,

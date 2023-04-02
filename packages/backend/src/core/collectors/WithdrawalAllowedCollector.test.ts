@@ -5,7 +5,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 import { BigNumber, providers } from 'ethers'
 
 import { BlockRange } from '../../model'

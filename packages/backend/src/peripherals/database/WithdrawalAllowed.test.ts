@@ -1,5 +1,5 @@
 import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import {
   MintWithdrawData,

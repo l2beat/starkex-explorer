@@ -5,7 +5,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { ByteReader } from '../decoding/ByteReader'
 import { decodeOnChainData } from '../decoding/decodeOnChainData'

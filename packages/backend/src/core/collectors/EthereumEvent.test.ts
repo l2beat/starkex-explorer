@@ -1,4 +1,4 @@
-import { expect } from 'earljs'
+import { expect } from 'earl'
 import { BigNumber } from 'ethers'
 
 import { EthereumEvent } from './EthereumEvent'

@@ -1,5 +1,5 @@
 import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { EXAMPLE_SPOT_BATCH } from '../../test/starkwareData'
 import { SpotBatchResponse } from './schema'

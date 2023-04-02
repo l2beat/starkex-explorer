@@ -11,7 +11,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 import { providers } from 'ethers'
 
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'

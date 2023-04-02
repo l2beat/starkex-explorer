@@ -1,4 +1,4 @@
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { ByteReader } from './ByteReader'
 import { DecodingError } from './DecodingError'
