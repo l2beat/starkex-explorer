@@ -15,12 +15,13 @@ Make sure that you have the required dependencies installed:
 - [node.js](https://nodejs.org/en/) - version 16
 - [Yarn](https://classic.yarnpkg.com/en/docs/install) - version 1.22.0 or later
 
-This repository is a monorepo consisting of four projects:
+This repository is a monorepo consisting of five projects:
 
 - `packages/backend` - [README.md](./packages/backend/README.md)
 - `packages/frontend`
 - `packages/crypto`
 - `packages/encoding`
+- `packages/tesnet` - [README.md](./packages/testnet/README.md)
 
 ## Setup
 
