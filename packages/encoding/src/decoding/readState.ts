@@ -1,4 +1,3 @@
-
 import { ByteReader } from './ByteReader'
 import { decodeState } from './decodeState'
 

@@ -1,6 +1,6 @@
 import { TransactionEntry } from '@explorer/frontend'
 import { Asset } from '@explorer/frontend/src/utils/assets'
-import { assertUnreachable,CollateralAsset } from '@explorer/shared'
+import { assertUnreachable, CollateralAsset } from '@explorer/shared'
 
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { TransactionHistory } from '../../core/TransactionHistory'

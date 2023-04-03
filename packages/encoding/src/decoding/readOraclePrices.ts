@@ -1,4 +1,3 @@
-
 import { OraclePrice } from '../OnChainData'
 import { ByteReader } from './ByteReader'
 import { decodeAssetId } from './decodeAssetId'
