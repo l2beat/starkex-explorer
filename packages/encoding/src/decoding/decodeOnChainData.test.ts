@@ -1,4 +1,4 @@
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import DECODED_EXAMPLE from '../test/data/decoded-example.json'
 import DECODED_FORCED from '../test/data/decoded-forced.json'

@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 
 import { BlockRange } from '../../model'
 import { ForcedTransactionRepository } from '../../peripherals/database/ForcedTransactionRepository'

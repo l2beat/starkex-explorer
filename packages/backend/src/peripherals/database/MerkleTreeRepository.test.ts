@@ -1,6 +1,6 @@
 import { MerkleNode, PositionLeaf } from '@explorer/state'
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'

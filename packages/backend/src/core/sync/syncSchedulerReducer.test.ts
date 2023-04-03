@@ -1,5 +1,5 @@
 import { Hash256 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { BlockRange } from '../../model'
 import {

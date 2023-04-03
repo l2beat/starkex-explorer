@@ -5,7 +5,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../test/fakes'

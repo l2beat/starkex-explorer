@@ -1,6 +1,6 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 import { providers } from 'ethers'
 
 import { BlockRange } from '../../model'

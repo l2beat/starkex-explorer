@@ -1,5 +1,5 @@
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 import { Knex } from 'knex'
 
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'

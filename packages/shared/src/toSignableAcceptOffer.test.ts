@@ -1,6 +1,6 @@
 import { recoverAddress } from '@ethersproject/transactions'
 import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { CollateralAsset } from './CollateralAsset'
 import { toSignableAcceptOffer } from './toSignableAcceptOffer'

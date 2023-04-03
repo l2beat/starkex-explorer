@@ -1,5 +1,5 @@
 import { AssetId } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { encodeAssetId } from './encodeAssetId'
 

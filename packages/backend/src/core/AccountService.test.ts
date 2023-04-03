@@ -1,5 +1,5 @@
 import { EthereumAddress } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 
 import { ForcedTradeOfferRepository } from '../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../peripherals/database/PositionRepository'

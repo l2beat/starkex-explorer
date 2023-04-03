@@ -1,5 +1,5 @@
 import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
-import { mockObject } from 'earljs'
+import { mockObject } from 'earl'
 
 import { fakeBigInt, fakeBoolean, fakeInt } from '../../test/fakes'
 import { createTestApiServer } from '../../test/TestApiServer'

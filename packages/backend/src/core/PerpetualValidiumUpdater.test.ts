@@ -15,7 +15,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockFn, mockObject } from 'earljs'
+import { expect, mockFn, mockObject } from 'earl'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
