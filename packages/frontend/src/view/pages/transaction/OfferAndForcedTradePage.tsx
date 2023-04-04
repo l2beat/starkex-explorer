@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { AcceptOfferFormData, UserDetails } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
@@ -13,10 +13,7 @@ import {
   FORCED_TRANSACTION_SENT,
   TRANSACTION_REVERTED,
 } from './common'
-import {
-  AcceptOfferForm,
-  AcceptOfferFormData,
-} from './components/AcceptOfferForm'
+import { AcceptOfferForm } from './components/AcceptOfferForm'
 import {
   CancelOfferForm,
   CancelOfferFormData,

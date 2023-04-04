@@ -1,8 +1,8 @@
 import { AssetId, EthereumAddress } from '@explorer/types'
 
+import { AcceptOfferFormData } from '@explorer/shared'
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
-import { AcceptOfferFormData } from './accept-form'
 import { CancelOfferFormData } from './cancel-form'
 import { FinalizeOfferFormData } from './finalize-form'
 

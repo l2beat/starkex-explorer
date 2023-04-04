@@ -1,21 +1,12 @@
 import {
-  AcceptedData,
-  CollateralAsset,
-  CreateOfferData,
+  AcceptOfferFormData,
   serializeAcceptedData,
   serializeCollateralAsset,
   serializeCreateOfferData,
 } from '@explorer/shared'
-import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
 export const ACCEPT_OFFER_FORM_ID = 'accept-offer-form'
-
-export interface AcceptOfferFormData extends CreateOfferData, AcceptedData {
-  id: number
-  address: EthereumAddress
-  collateralAsset: CollateralAsset
-}
 
 interface AcceptOfferFormProps extends AcceptOfferFormData {
   children: ReactNode

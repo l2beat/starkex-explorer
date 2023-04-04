@@ -1,5 +1,6 @@
 export * from './AcceptedData'
 export * from './AcceptOfferBody'
+export * from './AcceptOfferFormData'
 export * from './AccountDetails'
 export * from './AssetDetails'
 export * from './CancelOfferBody'

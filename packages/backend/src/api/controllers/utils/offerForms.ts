@@ -1,7 +1,6 @@
 import {
-  AcceptedData,
+  AcceptOfferFormData,
   CollateralAsset,
-  CreateOfferData,
   FinalizeOfferData,
 } from '@explorer/shared'
 import { EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
@@ -16,17 +15,11 @@ interface User {
   address: EthereumAddress
 }
 
-interface AcceptForm extends CreateOfferData, AcceptedData {
-  id: number
-  address: EthereumAddress
-  collateralAsset: CollateralAsset
-}
-
 export function getAcceptForm(
   offer: ForcedTradeOfferRecord,
   user: User,
   collateralAsset: CollateralAsset
-): AcceptForm | undefined {
+): AcceptOfferFormData | undefined {
   const isAcceptable = !offer.accepted && !offer.cancelledAt
   const shouldRenderForm = isAcceptable && user.positionId !== offer.positionIdA
   const submissionExpirationTime = Timestamp(
