@@ -100,10 +100,7 @@ export class ForcedTradeOfferController {
     })
 
     const content = renderOfferAndForcedTradePage({
-      user: {
-        starkKey: userA.starkKey,
-        address: userA.ethAddress,
-      },
+      user,
       offerId: id.toString(),
       transactionHash: offer.accepted?.transactionHash,
       maker,
