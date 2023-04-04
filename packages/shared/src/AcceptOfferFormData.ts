@@ -1,4 +1,5 @@
 import { EthereumAddress } from '@explorer/types'
+
 import { AcceptedData } from './AcceptedData'
 import { CollateralAsset } from './CollateralAsset'
 import { CreateOfferData } from './CreateOfferData'
