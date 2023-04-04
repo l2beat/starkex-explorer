@@ -52,7 +52,7 @@ export function LinkButton({
     <Link
       href={href}
       className={cx(
-        'text-center !text-white !no-underline',
+        'flex justify-center !text-white !no-underline',
         mainClassNames,
         classNameMap[variant],
         className

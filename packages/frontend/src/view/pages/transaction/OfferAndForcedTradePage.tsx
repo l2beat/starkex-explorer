@@ -163,7 +163,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
           />
         </div>
         <TransactionUserDetails
-          title="Offer creator details"
+          title="Creator details"
           tradingMode="perpetual"
           starkKey={props.maker.starkKey}
           ethereumAddress={props.maker.ethereumAddress}
