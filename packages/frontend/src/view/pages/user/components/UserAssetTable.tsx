@@ -43,6 +43,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
         ...(props.isMine ? [{ header: 'Action' }] : []),
       ]}
+      alignLastColumnRight={true}
       rows={props.assets.map((entry) => {
         return {
           cells: [
@@ -64,7 +65,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               )}
             </span>,
             props.isMine && (
-              <LinkButton className="w-full" href={forcedActionLink(entry)}>
+              <LinkButton className="w-32" href={forcedActionLink(entry)}>
                 {entry.action}
               </LinkButton>
             ),
