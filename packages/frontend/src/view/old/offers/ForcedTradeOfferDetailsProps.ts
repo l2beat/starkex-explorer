@@ -1,9 +1,8 @@
+import { AcceptOfferFormData, CancelOfferFormData } from '@explorer/shared'
 import { AssetId, EthereumAddress } from '@explorer/types'
 
-import { AcceptOfferFormData } from '@explorer/shared'
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
-import { CancelOfferFormData } from './cancel-form'
 import { FinalizeOfferFormData } from './finalize-form'
 
 export interface ForcedTradeOffer {

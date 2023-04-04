@@ -6,6 +6,7 @@ import {
 import { EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
+import { CancelOfferFormData } from '@explorer/frontend/build/view/old/offers/cancel-form'
 
 const THREE_DAYS_IN_MILLIS = 3 * 24 * 60 * 60 * 1000
 
@@ -46,15 +47,10 @@ export function getAcceptForm(
   }
 }
 
-interface CancelForm {
-  address: EthereumAddress
-  offerId: number
-}
-
 export function getCancelForm(
   offer: ForcedTradeOfferRecord,
   user: User
-): CancelForm | undefined {
+): CancelOfferFormData | undefined {
   const isOwner = user.positionId === offer.positionIdA
   const isCancellable = !offer.cancelledAt
   const shouldRenderForm = isOwner && isCancellable
