@@ -1,13 +1,12 @@
 import {
   AcceptOfferFormData,
+  CancelOfferFormData,
   CollateralAsset,
-  FinalizeOfferData,
   FinalizeOfferFormData,
 } from '@explorer/shared'
 import { EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../../../peripherals/database/ForcedTradeOfferRepository'
-import { CancelOfferFormData } from '@explorer/frontend/build/view/old/offers/cancel-form'
 
 const THREE_DAYS_IN_MILLIS = 3 * 24 * 60 * 60 * 1000
 
@@ -17,7 +16,7 @@ interface User {
   address: EthereumAddress
 }
 
-export function getAcceptForm(
+export function getAcceptOfferFormData(
   offer: ForcedTradeOfferRecord,
   user: User,
   collateralAsset: CollateralAsset
@@ -48,7 +47,7 @@ export function getAcceptForm(
   }
 }
 
-export function getCancelForm(
+export function getCancelOfferFormData(
   offer: ForcedTradeOfferRecord,
   user: User
 ): CancelOfferFormData | undefined {
@@ -64,7 +63,7 @@ export function getCancelForm(
   }
 }
 
-export function getFinalizeForm(
+export function getFinalizeOfferFormData(
   offer: ForcedTradeOfferRecord,
   user: User,
   perpetualAddress: EthereumAddress

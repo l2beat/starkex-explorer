@@ -20,9 +20,9 @@ import {
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
 import {
-  getAcceptForm,
-  getCancelForm,
-  getFinalizeForm,
+  getAcceptOfferFormData,
+  getCancelOfferFormData,
+  getFinalizeOfferFormData,
 } from './utils/offerForms'
 import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
 import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
@@ -133,9 +133,11 @@ export class OldForcedTradeOfferController {
         positionIdB: offer.accepted?.positionIdB,
         addressB: userB?.ethAddress,
       },
-      acceptForm: user && getAcceptForm(offer, user, this.collateralAsset),
-      cancelForm: user && getCancelForm(offer, user),
-      finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
+      acceptForm:
+        user && getAcceptOfferFormData(offer, user, this.collateralAsset),
+      cancelForm: user && getCancelOfferFormData(offer, user),
+      finalizeForm:
+        user && getFinalizeOfferFormData(offer, user, this.perpetualAddress),
     })
     return { type: 'success', content }
   }

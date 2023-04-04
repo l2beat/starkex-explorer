@@ -17,9 +17,9 @@ import {
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
 import {
-  getAcceptForm,
-  getCancelForm,
-  getFinalizeForm,
+  getAcceptOfferFormData,
+  getCancelOfferFormData,
+  getFinalizeOfferFormData,
 } from './utils/offerForms'
 
 export class ForcedTradeOfferController {
@@ -109,9 +109,11 @@ export class ForcedTradeOfferController {
       syntheticAmount: offer.syntheticAmount,
       expirationTimestamp: offer.accepted?.submissionExpirationTime,
       history: transactionHistory.getForcedTradeTransactionHistory(),
-      acceptForm: user && getAcceptForm(offer, user, this.collateralAsset),
-      cancelForm: user && getCancelForm(offer, user),
-      finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
+      acceptOfferFormData:
+        user && getAcceptOfferFormData(offer, user, this.collateralAsset),
+      cancelOfferFormData: user && getCancelOfferFormData(offer, user),
+      finalizeOfferFormData:
+        user && getFinalizeOfferFormData(offer, user, this.perpetualAddress),
     })
 
     return { type: 'success', content }

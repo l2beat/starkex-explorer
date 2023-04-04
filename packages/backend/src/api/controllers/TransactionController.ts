@@ -178,7 +178,7 @@ export class TransactionController {
             ? forcedTradeOffer.accepted.submissionExpirationTime
             : undefined,
           history: transactionHistory.getForcedTradeTransactionHistory(),
-          stateUpdateId: userTransaction.included?.stateUpdateId,
+          acceptOfferFormData: userTransaction.included?.stateUpdateId,
         })
       }
       case 'Withdraw':
