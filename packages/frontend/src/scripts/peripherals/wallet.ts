@@ -72,7 +72,7 @@ export const Wallet = {
   // #endregion
   // #region Offer signing
 
-  async signCreate(
+  async signOfferCreate(
     account: EthereumAddress,
     offer: CreateOfferData
   ): Promise<string> {
@@ -84,7 +84,7 @@ export const Wallet = {
     return result as string
   },
 
-  async signAccepted(
+  async signOfferAccept(
     account: EthereumAddress,
     offer: CreateOfferData,
     accepted: AcceptedData
@@ -97,7 +97,10 @@ export const Wallet = {
     return result as string
   },
 
-  async signCancel(account: EthereumAddress, offerId: number): Promise<string> {
+  async signOfferCancel(
+    account: EthereumAddress,
+    offerId: number
+  ): Promise<string> {
     const signable = toSignableCancelOffer(offerId)
     const result = await getProvider().request({
       method: 'personal_sign',

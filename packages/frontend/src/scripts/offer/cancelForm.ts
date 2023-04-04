@@ -14,7 +14,7 @@ export function initCancelOfferForm() {
       e.preventDefault()
       const { address, offerId } = getFormData(form)
 
-      const signature = await Wallet.signCancel(address, offerId)
+      const signature = await Wallet.signOfferCancel(address, offerId)
       await Api.cancelOffer(offerId, signature)
       window.location.href = `/forced/offers/${offerId.toString()}`
     })

@@ -39,7 +39,8 @@ export function initPerpetualForcedActionForm() {
     )
   }
 
-  submitButton.addEventListener('click', () => {
+  submitButton.addEventListener('click', (e) => {
+    e.preventDefault()
     if (!state || !state.canSubmit) {
       throw new Error('Programmer error: Submit button should be disabled')
     }

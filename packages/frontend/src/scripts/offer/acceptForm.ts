@@ -18,7 +18,7 @@ export function initAcceptOfferForm() {
       e.preventDefault()
       const { address, offer, offerId, accepted } = getFormData(form)
 
-      const signature = await Wallet.signAccepted(address, offer, accepted)
+      const signature = await Wallet.signOfferAccept(address, offer, accepted)
       await Api.acceptOffer(offerId, accepted, signature)
       window.location.reload()
     })

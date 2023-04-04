@@ -38,8 +38,11 @@ async function submitOffer(state: FormState) {
     isABuyingSynthetic: isBuyable(state.assetId, state.balance),
   }
 
-  const signature = await Wallet.signCreate(state.props.user.address, offer)
+  const signature = await Wallet.signOfferCreate(
+    state.props.user.address,
+    offer
+  )
 
   const offerId = await Api.createOffer(offer, signature)
-  window.location.href = `/forced/offers/${offerId}`
+  window.location.href = `/offers/${offerId}`
 }
