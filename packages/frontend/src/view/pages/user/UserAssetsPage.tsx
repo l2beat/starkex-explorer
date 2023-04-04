@@ -31,7 +31,9 @@ function UserAssetsPage(props: UserAssetsPageProps) {
       <ContentWrapper>
         <TableWithPagination
           {...common}
-          title={<UserPageTitle prefix="Assets of" starkKey={props.starkKey} />}
+          title={
+            <UserPageTitle prefix="Assets of user" starkKey={props.starkKey} />
+          }
           visible={props.assets.length}
           limit={props.limit}
           offset={props.offset}
