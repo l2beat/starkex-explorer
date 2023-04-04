@@ -24,7 +24,7 @@ export interface ForcedTradeOfferDetailsProps {
   readonly offer: ForcedTradeOffer
   readonly account: AccountDetails | undefined
   readonly history: ForcedHistoryEvent[]
-  readonly acceptForm?: AcceptOfferFormData
-  readonly cancelForm?: CancelOfferFormData
-  readonly finalizeForm?: FinalizeOfferFormData
+  readonly acceptOfferFormData?: AcceptOfferFormData
+  readonly cancelOfferFormData?: CancelOfferFormData
+  readonly finalizeOfferFormData?: FinalizeOfferFormData
 }

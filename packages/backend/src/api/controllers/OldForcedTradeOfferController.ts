@@ -133,10 +133,10 @@ export class OldForcedTradeOfferController {
         positionIdB: offer.accepted?.positionIdB,
         addressB: userB?.ethAddress,
       },
-      acceptForm:
+      acceptOfferFormData:
         user && getAcceptOfferFormData(offer, user, this.collateralAsset),
-      cancelForm: user && getCancelOfferFormData(offer, user),
-      finalizeForm:
+      cancelOfferFormData: user && getCancelOfferFormData(offer, user),
+      finalizeOfferFormData:
         user && getFinalizeOfferFormData(offer, user, this.perpetualAddress),
     })
     return { type: 'success', content }
