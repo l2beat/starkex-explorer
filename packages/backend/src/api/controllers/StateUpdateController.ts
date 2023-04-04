@@ -4,7 +4,7 @@ import {
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
 import { TradingMode, UserDetails } from '@explorer/shared'
-import { AssetHash, AssetId } from '@explorer/types'
+import { AssetHash } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
@@ -36,9 +36,7 @@ export class StateUpdateController {
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
-    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
-      AssetHash | AssetId
-    >,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}

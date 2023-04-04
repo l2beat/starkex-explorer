@@ -1,4 +1,3 @@
-import { AssetHash, AssetId } from '@explorer/types'
 import { Knex } from 'knex'
 
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
@@ -10,9 +9,7 @@ import { Logger } from '../../tools/Logger'
 export class StateDetailsPreprocessor {
   constructor(
     protected readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
-    protected readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
-      AssetId | AssetHash
-    >,
+    protected readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     protected readonly userTransactionRepository: UserTransactionRepository,
     protected readonly logger: Logger
   ) {}

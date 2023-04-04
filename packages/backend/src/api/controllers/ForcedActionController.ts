@@ -13,9 +13,7 @@ import { ControllerResult } from './ControllerResult'
 export class ForcedActionController {
   constructor(
     private readonly userService: UserService,
-    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
-      AssetHash | AssetId
-    >,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private readonly assetRepository: AssetRepository,
     private readonly starkExAddress: EthereumAddress
   ) {}

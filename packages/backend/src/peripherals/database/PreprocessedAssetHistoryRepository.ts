@@ -26,7 +26,7 @@ export interface PreprocessedAssetHistoryRecord<
 }
 
 export class PreprocessedAssetHistoryRepository<
-  T extends AssetHash | AssetId
+  T extends AssetHash | AssetId = AssetHash | AssetId
 > extends BaseRepository {
   private toAssetType: (value: string) => T
 
@@ -66,6 +66,13 @@ export class PreprocessedAssetHistoryRepository<
     this.getPrevHistoryByStateUpdateId = this.wrapGet(
       this.getPrevHistoryByStateUpdateId
     )
+    this.getUniqueStarkKeysByStateUpdateId = this.wrapGet(
+      this.getUniqueStarkKeysByStateUpdateId
+    )
+    this.getCountByStarkKeysAndStateUpdateId = this.wrapGet(
+      this.getCountByStarkKeysAndStateUpdateId
+    )
+
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.getCountOfCurrentByStarkKey = this.wrapAny(
       this.getCountOfCurrentByStarkKey
@@ -199,6 +206,22 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
+  async getCountByStarkKeysAndStateUpdateId(
+    starkKeys: StarkKey[],
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<{ starkKey: StarkKey; count: bigint }[]> {
+    const knex = await this.knex(trx)
+    const rows: { starkKey: StarkKey; count: bigint }[] = await knex(
+      'preprocessed_asset_history'
+    )
+      .select('stark_key as starkKey')
+      .count('* as count')
+      .where('state_update_id', stateUpdateId)
+      .groupBy('stark_key')
+    return rows
+  }
+
   async getCountByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
@@ -295,6 +318,18 @@ export class PreprocessedAssetHistoryRepository<
       historyId: row.id,
       prevHistoryId: row.prev_history_id ?? undefined,
     }))
+  }
+
+  async getUniqueStarkKeysByStateUpdateId(
+    stateUpdateId: number,
+    trx: Knex.Transaction
+  ): Promise<StarkKey[]> {
+    const knex = await this.knex(trx)
+    const rows = await knex('preprocessed_asset_history')
+      .distinct('stark_key')
+      .where('state_update_id', stateUpdateId)
+
+    return rows.map((r) => StarkKey(r.stark_key))
   }
 
   async starkKeyExists(starkKey: StarkKey, trx?: Knex.Transaction) {

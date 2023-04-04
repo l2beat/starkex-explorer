@@ -12,6 +12,7 @@ import { Logger } from '../../tools/Logger'
 import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
 import { Preprocessor, SyncDirection } from './Preprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
+import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 const generateFakeStateUpdate = (
   state_update_id: number
@@ -32,6 +33,7 @@ describe(Preprocessor.name, () => {
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
 
@@ -72,6 +74,7 @@ describe(Preprocessor.name, () => {
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.getLastSyncedStateUpdate()).toEqual(undefined)
@@ -91,6 +94,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       const lastStateUpdate = await preprocessor.getLastSyncedStateUpdate()
@@ -115,6 +119,7 @@ describe(Preprocessor.name, () => {
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -138,6 +143,7 @@ describe(Preprocessor.name, () => {
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -162,6 +168,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -189,6 +196,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -217,6 +225,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       await expect(
@@ -247,6 +256,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -276,6 +286,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -306,6 +317,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -335,6 +347,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
@@ -357,6 +370,10 @@ describe(Preprocessor.name, () => {
           preprocessNextStateUpdate: async () => undefined,
         }
       )
+      const mockUserStatisticsPreprocessor =
+        mockObject<UserStatisticsPreprocessor>({
+          preprocessNextStateUpdate: async () => undefined,
+        })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async (id: number) => ({ [2]: fakeStateUpdate2 }[id]),
       })
@@ -374,6 +391,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockPerpetualHistoryPreprocessor,
         mockStateDetailsPreprocessor,
+        mockUserStatisticsPreprocessor,
         Logger.SILENT
       )
       await preprocessor.preprocessNextStateUpdate()
@@ -389,6 +407,9 @@ describe(Preprocessor.name, () => {
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2)
       expect(
         mockStateDetailsPreprocessor.preprocessNextStateUpdate
+      ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2)
+      expect(
+        mockUserStatisticsPreprocessor.preprocessNextStateUpdate
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2)
     })
 
@@ -412,6 +433,7 @@ describe(Preprocessor.name, () => {
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       await expect(preprocessor.preprocessNextStateUpdate()).toBeRejectedWith(
@@ -433,6 +455,10 @@ describe(Preprocessor.name, () => {
           rollbackOneStateUpdate: async () => undefined,
         }
       )
+      const mockUserStatisticsPreprocessor =
+        mockObject<UserStatisticsPreprocessor>({
+          rollbackOneStateUpdate: async () => undefined,
+        })
       const preprocessedRepo = mockObject<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
           stateUpdateId: fakeStateUpdate.id,
@@ -447,6 +473,7 @@ describe(Preprocessor.name, () => {
         mockObject<StateUpdateRepository>(),
         mockPerpetualHistoryPreprocessor,
         mockStateDetailsPreprocessor,
+        mockUserStatisticsPreprocessor,
         Logger.SILENT
       )
       await preprocessor.rollbackOneStateUpdate()
@@ -459,6 +486,9 @@ describe(Preprocessor.name, () => {
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate.id)
       expect(
         mockStateDetailsPreprocessor.rollbackOneStateUpdate
+      ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate.id)
+      expect(
+        mockUserStatisticsPreprocessor.rollbackOneStateUpdate
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate.id)
     })
 
@@ -474,6 +504,7 @@ describe(Preprocessor.name, () => {
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
         Logger.SILENT
       )
       await expect(preprocessor.rollbackOneStateUpdate()).toBeRejectedWith(
