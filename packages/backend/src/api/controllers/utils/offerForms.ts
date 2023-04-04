@@ -1,5 +1,6 @@
 import {
   AcceptedData,
+  CollateralAsset,
   CreateOfferData,
   FinalizeOfferData,
 } from '@explorer/shared'
@@ -18,11 +19,13 @@ interface User {
 interface AcceptForm extends CreateOfferData, AcceptedData {
   id: number
   address: EthereumAddress
+  collateralAsset: CollateralAsset
 }
 
 export function getAcceptForm(
   offer: ForcedTradeOfferRecord,
-  user: User
+  user: User,
+  collateralAsset: CollateralAsset
 ): AcceptForm | undefined {
   const isAcceptable = !offer.accepted && !offer.cancelledAt
   const shouldRenderForm = isAcceptable && user.positionId !== offer.positionIdA
@@ -46,6 +49,7 @@ export function getAcceptForm(
     syntheticAmount: offer.syntheticAmount,
     id: offer.id,
     syntheticAssetId: offer.syntheticAssetId,
+    collateralAsset,
   }
 }
 

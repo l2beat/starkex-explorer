@@ -746,6 +746,11 @@ const routes: Route[] = [
           submissionExpirationTime: Timestamp(12345678),
           nonce: 1234n,
           premiumCost: false,
+          collateralAsset: {
+            assetId: AssetId('USDC-6'),
+            assetHash: AssetHash.fake(),
+            price: 1_000_000n,
+          },
         },
       })
     },

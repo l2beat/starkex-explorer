@@ -133,7 +133,7 @@ export class OldForcedTradeOfferController {
         positionIdB: offer.accepted?.positionIdB,
         addressB: userB?.ethAddress,
       },
-      acceptForm: user && getAcceptForm(offer, user),
+      acceptForm: user && getAcceptForm(offer, user, this.collateralAsset),
       cancelForm: user && getCancelForm(offer, user),
       finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
     })
