@@ -4,9 +4,9 @@ import {
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
-import { ACCEPT_OFFER_FORM_ID } from '../../view/pages/transaction/components/AcceptOfferForm'
-import { Api } from '../peripherals/api'
-import { Wallet } from '../peripherals/wallet'
+import { ACCEPT_OFFER_FORM_ID } from '../../../view/pages/transaction/components/AcceptOfferForm'
+import { Api } from '../../peripherals/api'
+import { Wallet } from '../../peripherals/wallet'
 
 export function initAcceptOfferForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(
