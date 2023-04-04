@@ -1,6 +1,7 @@
 import {
   AcceptOfferFormData,
   CancelOfferFormData,
+  FinalizeOfferFormData,
   UserDetails,
 } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
@@ -19,10 +20,7 @@ import {
 } from './common'
 import { AcceptOfferForm } from './components/AcceptOfferForm'
 import { CancelOfferForm } from './components/CancelOfferForm'
-import {
-  FinalizeOfferForm,
-  FinalizeOfferFormData,
-} from './components/FinalizeOfferForm'
+import { FinalizeOfferForm } from './components/FinalizeOfferForm'
 import {
   TransactionHistoryEntry,
   TransactionHistoryTable,

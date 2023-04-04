@@ -1,9 +1,12 @@
-import { AcceptOfferFormData, CancelOfferFormData } from '@explorer/shared'
+import {
+  AcceptOfferFormData,
+  CancelOfferFormData,
+  FinalizeOfferFormData,
+} from '@explorer/shared'
 import { AssetId, EthereumAddress } from '@explorer/types'
 
 import { AccountDetails } from '../common/AccountDetails'
 import { ForcedHistoryEvent } from '../common/ForcedHistory'
-import { FinalizeOfferFormData } from './finalize-form'
 
 export interface ForcedTradeOffer {
   readonly type: 'sell' | 'buy'

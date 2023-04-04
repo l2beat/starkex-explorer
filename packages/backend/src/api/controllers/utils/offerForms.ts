@@ -2,6 +2,7 @@ import {
   AcceptOfferFormData,
   CollateralAsset,
   FinalizeOfferData,
+  FinalizeOfferFormData,
 } from '@explorer/shared'
 import { EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
@@ -63,17 +64,11 @@ export function getCancelForm(
   }
 }
 
-interface FinalizeForm extends FinalizeOfferData {
-  offerId: number
-  address: EthereumAddress
-  perpetualAddress: EthereumAddress
-}
-
 export function getFinalizeForm(
   offer: ForcedTradeOfferRecord,
   user: User,
   perpetualAddress: EthereumAddress
-): FinalizeForm | undefined {
+): FinalizeOfferFormData | undefined {
   const isOwner = user.positionId === offer.positionIdA
   if (!(offer.accepted && !offer.cancelledAt && isOwner)) {
     return undefined

@@ -10,6 +10,7 @@ export * from './CreateOfferBody'
 export * from './CreateOfferData'
 export * from './FinalizeOfferBody'
 export * from './FinalizeOfferData'
+export * from './FinalizeOfferFormData'
 /* eslint-disable-next-line no-restricted-imports */
 export * from './old/FinalizeExitData'
 export * from './PerpetualForcedTradeRequest'
