@@ -50,8 +50,9 @@ export function initMetamask() {
         Cookie.set('account', lower)
       } else {
         Cookie.remove('account')
-        Cookie.remove('starkKey')
       }
+      Cookie.remove('starkKey')
+      localStorage.removeItem('registration')
       location.reload()
     }
   }
