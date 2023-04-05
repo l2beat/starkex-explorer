@@ -12,6 +12,8 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 
+export const REGISTER_STARK_KEY_BUTTON_ID = 'register-stark-key-button'
+
 interface UserRegisterPageProps {
   user: UserDetails
 }
@@ -64,7 +66,10 @@ function UserRegisterPage(props: UserRegisterPageProps) {
                 Unknown
               </p>
             </div>
-            <Button id="register-button" data-instance-name={getInstanceName()}>
+            <Button
+              id={REGISTER_STARK_KEY_BUTTON_ID}
+              data-instance-name={getInstanceName()}
+            >
               Register
             </Button>
           </div>

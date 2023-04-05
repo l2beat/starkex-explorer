@@ -63,12 +63,9 @@ function UserPage(props: UserPageProps) {
           <div className="flex flex-col gap-6">
             <UserProfile
               starkKey={props.starkKey}
-              ethereumAddress={
-                props.ethereumAddress !== EthereumAddress.ZERO
-                  ? props.ethereumAddress
-                  : undefined
-              }
+              ethereumAddress={props.ethereumAddress}
               isMine={isMine}
+              exchangeAddress={props.exchangeAddress}
             />
             <UserQuickActionsTable
               withdrawableAssets={props.withdrawableAssets}

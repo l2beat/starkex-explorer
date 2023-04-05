@@ -14,6 +14,7 @@ import {
   toSignableCreateOffer,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { Registration } from '../keys/keys'
 
 function getProvider() {
   const provider = window.ethereum
@@ -62,7 +63,7 @@ export const Wallet = {
   async sendRegistrationTransaction(
     account: EthereumAddress,
     starkKey: StarkKey,
-    registration: { rsy: string },
+    registration: Registration,
     exchangeAddress: EthereumAddress
   ) {
     const coder = new Interface([

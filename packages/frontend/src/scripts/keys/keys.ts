@@ -4,6 +4,7 @@ import { Buffer } from 'buffer'
 import { ec as EllipticCurve } from 'elliptic'
 import { sha256 } from 'hash.js'
 
+import { z } from 'zod'
 import { EC_ORDER_INT, starkEc } from './curve'
 
 export interface StarkKeyPair {
@@ -11,6 +12,14 @@ export interface StarkKeyPair {
   publicKeyYCoordinate: string
   privateKey: string
 }
+
+export type Registration = z.infer<typeof Registration>
+export const Registration = z.object({
+  r: z.string(),
+  s: z.string(),
+  y: z.string(),
+  rsy: z.string(),
+})
 
 // Follows the same logic as https://github.com/dydxprotocol/starkex-lib
 export function getDydxStarkExKeyPairFromData(hexData: string): StarkKeyPair {
@@ -33,7 +42,10 @@ function toSimpleKeyPair(keyPair: EllipticCurve.KeyPair): StarkKeyPair {
   }
 }
 
-export function signStarkMessage(pair: StarkKeyPair, hexMessage: string) {
+export function signStarkMessage(
+  pair: StarkKeyPair,
+  hexMessage: string
+): Registration {
   const keyPair = starkEc.keyFromPrivate(pair.privateKey)
 
   const hashed = keccak256(hexMessage)

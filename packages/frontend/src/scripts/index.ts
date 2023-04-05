@@ -18,6 +18,7 @@ import { initOldPagination } from './old/pagination'
 // eslint-disable-next-line no-restricted-imports
 import { initFinalizeExitForm } from './old/transaction/finalizeExitForm'
 // eslint-disable-next-line no-restricted-imports
+import { initEthereumAddressRegistration } from './ethereumAddressRegistration'
 import { initTransactionForm } from './old/transaction/transactionForm'
 import { initPagination } from './pagination'
 import { initRegularWithdrawalForm } from './regularWithdrawal'
@@ -35,6 +36,7 @@ if (USE_NEW_DESIGN) {
   initStarkKeyRegistration()
   initForcedTradeOfferForms()
   initRegularWithdrawalForm()
+  initEthereumAddressRegistration()
 } else {
   initTVLDisplay()
   initCountdownTimer()
