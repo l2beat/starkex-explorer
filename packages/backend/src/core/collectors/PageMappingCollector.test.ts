@@ -1,6 +1,6 @@
 import { Hash256 } from '@explorer/types'
 import { EthereumAddress } from '@explorer/types/src/EthereumAddress'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 
 import { BlockRange } from '../../model'
 import { PageMappingRepository } from '../../peripherals/database/PageMappingRepository'

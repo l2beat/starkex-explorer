@@ -1,4 +1,4 @@
-import { expect } from 'earljs'
+import { expect } from 'earl'
 import waitForExpect from 'wait-for-expect'
 
 import { JobQueue } from './JobQueue'

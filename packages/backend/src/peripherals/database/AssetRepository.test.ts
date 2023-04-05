@@ -5,7 +5,7 @@ import {
   ERC721Details,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 import { BigNumber } from 'ethers'
 
 import { setupDatabaseTestSuite } from '../../test/database'

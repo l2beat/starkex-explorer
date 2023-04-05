@@ -1,5 +1,5 @@
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 import { Knex } from 'knex'
 
 import { setupDatabaseTestSuite } from '../../test/database'

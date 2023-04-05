@@ -30,7 +30,7 @@ const TRADE_INSTRUCTIONS = [
       Once the offer is accepted you can submit a trade request.
     </span>{' '}
     This is achieved through a mechanism called forced trades,{' '}
-    <Link href="https://docs.starkware.co/starkex/perpetual/perpetual-trading-forced-withdrawal-and-forced-trade.html#forced_withdrawal">
+    <Link href="https://docs.starkware.co/starkex/perpetual/perpetual-trading-forced-withdrawal-and-forced-trade.html#forced_trade">
       link to docs
     </Link>
     .

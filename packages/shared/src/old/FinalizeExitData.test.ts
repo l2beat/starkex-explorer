@@ -1,5 +1,5 @@
 import { StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import {
   decodeFinalizeExitRequest,

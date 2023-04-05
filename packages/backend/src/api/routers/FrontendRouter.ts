@@ -357,6 +357,11 @@ export function createFrontendRouter(
   )
 
   if (tradingMode === 'perpetual') {
+    if (!collateralAsset) {
+      throw new Error(
+        'Collateral asset must be defined in perpetual trading mode'
+      )
+    }
     addPerpetualTradingRoutes(router, forcedActionController, collateralAsset)
   } else {
     addSpotTradingRoutes(router, forcedActionController)

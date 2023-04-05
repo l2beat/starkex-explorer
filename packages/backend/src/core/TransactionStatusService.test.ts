@@ -1,5 +1,5 @@
 import { Hash256, Timestamp } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 import { providers } from 'ethers'
 
 import { SentTransactionRepository } from '../peripherals/database/transactions/SentTransactionRepository'

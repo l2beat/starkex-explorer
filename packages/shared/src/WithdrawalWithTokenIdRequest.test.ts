@@ -1,7 +1,7 @@
 //TODO: Add tests for WithdrawalWithTokenId
 
 import { AssetHash, StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import {
   decodeWithdrawalWithTokenId,

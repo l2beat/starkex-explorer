@@ -21,7 +21,7 @@ export function NewPerpetualForcedTradeFormContent(
         <span>
           <span className="text-sm font-medium text-zinc-500">Position</span>{' '}
           <span className="text-lg font-semibold">
-            {props.positionOrVaultId.toString()}
+            #{props.positionOrVaultId.toString()}
           </span>
         </span>
       </div>

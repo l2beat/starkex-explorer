@@ -1,5 +1,5 @@
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { EXAMPLE_PERPETUAL_BATCH } from '../../test/starkwareData'
 import { PerpetualBatchResponse } from './schema'

@@ -1,5 +1,5 @@
 import { EthereumAddress } from '@explorer/types'
-import { expect } from 'earljs'
+import { expect } from 'earl'
 
 import { getDydxStarkExKeyPairFromData } from './keys'
 import { signRegistration } from './recovery'

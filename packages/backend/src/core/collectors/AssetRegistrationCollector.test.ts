@@ -1,5 +1,5 @@
 import { AssetHash, EthereumAddress } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 import { BigNumber } from 'ethers'
 
 import { BlockRange } from '../../model'

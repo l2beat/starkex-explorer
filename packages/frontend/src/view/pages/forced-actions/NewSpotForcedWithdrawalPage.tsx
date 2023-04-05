@@ -22,7 +22,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
     <>
       Using this form you request a withdrawal of your funds. This is achieved
       through a mechanism called full withdrawals,{' '}
-      <Link href="https://docs.starkware.co/starkex/perpetual/perpetual-trading-forced-withdrawal-and-forced-trade.html#forced_withdrawal">
+      <Link href="https://docs.starkware.co/starkex/spot/spot-trading-full-withdrawals.html">
         link to docs
       </Link>
       .

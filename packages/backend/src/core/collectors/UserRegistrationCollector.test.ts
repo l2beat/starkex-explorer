@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
-import { expect, mockObject } from 'earljs'
+import { expect, mockObject } from 'earl'
 
 import { BlockRange } from '../../model'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
