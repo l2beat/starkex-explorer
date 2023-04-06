@@ -34,9 +34,9 @@ export class KeyValueStore extends BaseRepository {
     return row?.value
   }
 
-  async addOrUpdate(record: KeyValueRecord) {
+  async addOrUpdate(record: KeyValueRecord, trx?: Knex.Transaction) {
     const primaryKey: keyof KeyValueRow = 'key'
-    const knex = await this.knex()
+    const knex = await this.knex(trx)
     await knex('key_values').insert(record).onConflict([primaryKey]).merge()
     return record.key
   }

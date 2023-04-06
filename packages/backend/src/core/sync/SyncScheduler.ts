@@ -46,6 +46,8 @@ export class SyncScheduler {
       (await this.syncStatusRepository.getLastSynced()) ?? this.earliestBlock
 
     await this.dataSyncService.discardAfter(lastSynced)
+
+    await this.preprocessor.catchUp()
     await this.preprocessor.sync()
 
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)

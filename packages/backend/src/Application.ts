@@ -401,6 +401,9 @@ export class Application {
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
         preprocessedUserStatisticsRepository,
         preprocessedAssetHistoryRepository,
+        preprocessedStateUpdateRepository,
+        stateUpdateRepository,
+        kvStore,
         logger
       )
 
@@ -434,6 +437,9 @@ export class Application {
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
         preprocessedUserStatisticsRepository,
         preprocessedAssetHistoryRepository,
+        preprocessedStateUpdateRepository,
+        stateUpdateRepository,
+        kvStore,
         logger
       )
 

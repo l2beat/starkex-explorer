@@ -110,6 +110,14 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     return 'stop'
   }
 
+  async catchUp() {
+    await this.preprocessedStateUpdateRepository.runInTransaction(
+      async (trx) => {
+        await this.userStatisticsPreprocessor.catchUp(trx)
+      }
+    )
+  }
+
   async preprocessNextStateUpdate() {
     await this.preprocessedStateUpdateRepository.runInTransaction(
       async (trx) => {
