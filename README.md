@@ -21,7 +21,7 @@ This repository is a monorepo consisting of five projects:
 - `packages/frontend`
 - `packages/crypto`
 - `packages/encoding`
-- `packages/tesnet` - [README.md](./packages/testnet/README.md)
+- `packages/testnet` - [README.md](./packages/testnet/README.md)
 
 ## Setup
 
