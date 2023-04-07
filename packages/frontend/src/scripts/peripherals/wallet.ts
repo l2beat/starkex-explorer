@@ -92,7 +92,7 @@ export const Wallet = {
     const signable = toSignableAcceptOffer(offer, accepted)
 
     const result = await getProvider().request({
-      method: 'personal_sign',
+      method: 'eth_sign',
       params: [account.toString(), signable],
     })
     return result as string

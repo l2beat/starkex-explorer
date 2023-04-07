@@ -9,19 +9,17 @@ import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 
 export function initAcceptOfferForm() {
-  const forms = document.querySelectorAll<HTMLFormElement>(
+  const form = document.querySelector<HTMLFormElement>(
     `.${ACCEPT_OFFER_FORM_ID}`
   )
-  forms.forEach((form) => {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      const { address, offer, offerId, accepted } = getFormData(form)
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const { address, offer, offerId, accepted } = getFormData(form)
 
-      const signature = await Wallet.signOfferAccept(address, offer, accepted)
-      await Api.acceptOffer(offerId, accepted, signature)
-      window.location.reload()
-    })
+    const signature = await Wallet.signOfferAccept(address, offer, accepted)
+    await Api.acceptOffer(offerId, accepted, signature)
+    window.location.reload()
   })
 }
 
