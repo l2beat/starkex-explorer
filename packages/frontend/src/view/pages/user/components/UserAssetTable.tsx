@@ -46,8 +46,6 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
       alignLastColumnRight={true}
       rows={props.assets.map((entry) => {
         const isDisabled = entry.balance <= 0n && entry.action === 'WITHDRAW'
-        console.log(entry.balance, isDisabled)
-
         return {
           cells: [
             <AssetWithLogo type="full" assetInfo={assetToInfo(entry.asset)} />,
