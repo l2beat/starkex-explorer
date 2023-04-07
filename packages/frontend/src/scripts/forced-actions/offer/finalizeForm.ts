@@ -7,23 +7,21 @@ import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 
 export function initFinalizeForm() {
-  const forms = document.querySelectorAll<HTMLFormElement>(
+  const form = document.querySelector<HTMLFormElement>(
     `.${FINALIZE_OFFER_FORM_ID}`
   )
-  forms.forEach((form) => {
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault()
-      const { address, offer, offerId, perpetualAddress } = getFormData(form)
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const { address, offer, offerId, perpetualAddress } = getFormData(form)
 
-      const hash = await Wallet.sendPerpetualForcedTradeTransaction(
-        address,
-        offer,
-        perpetualAddress
-      )
-      await Api.submitPerpetualForcedTrade(offerId, hash)
-      window.location.href = `/forced/${hash.toString()}`
-    })
+    const hash = await Wallet.sendPerpetualForcedTradeTransaction(
+      address,
+      offer,
+      perpetualAddress
+    )
+    await Api.submitPerpetualForcedTrade(offerId, hash)
+    window.location.reload()
   })
 }
 
