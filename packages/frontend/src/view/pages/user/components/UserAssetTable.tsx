@@ -45,6 +45,9 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
       ]}
       alignLastColumnRight={true}
       rows={props.assets.map((entry) => {
+        const isDisabled = entry.balance <= 0n && entry.action === 'WITHDRAW'
+        console.log(entry.balance, isDisabled)
+
         return {
           cells: [
             <AssetWithLogo type="full" assetInfo={assetToInfo(entry.asset)} />,
@@ -65,7 +68,11 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               )}
             </span>,
             props.isMine && (
-              <LinkButton className="w-32" href={forcedActionLink(entry)}>
+              <LinkButton
+                className="w-32"
+                href={forcedActionLink(entry)}
+                disabled={isDisabled}
+              >
                 {entry.action}
               </LinkButton>
             ),
