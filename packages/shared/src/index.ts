@@ -1,5 +1,5 @@
-export * from './AcceptOfferBody'
 export * from './AcceptedData'
+export * from './AcceptOfferBody'
 export * from './AccountDetails'
 export * from './AssetDetails'
 export * from './CancelOfferBody'

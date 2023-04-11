@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { InstanceName } from './InstanceName'
 import { TradingMode } from './TradingMode'
 import { UserDetails } from './UserDetails'
