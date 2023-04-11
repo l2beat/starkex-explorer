@@ -4,7 +4,7 @@ import {
   MerkleValue,
   NodeOrLeaf,
 } from '@explorer/state'
-import { json,PedersenHash } from '@explorer/types'
+import { json, PedersenHash } from '@explorer/types'
 import partition from 'lodash/partition'
 
 import { Logger } from '../../tools/Logger'

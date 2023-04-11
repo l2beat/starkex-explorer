@@ -10,7 +10,7 @@ import range from 'lodash/range'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../test/fakes'
-import { Logger,LogLevel } from '../../tools/Logger'
+import { Logger, LogLevel } from '../../tools/Logger'
 import { ForcedTransactionRepository } from './ForcedTransactionRepository'
 import {
   StateUpdateRecord,
