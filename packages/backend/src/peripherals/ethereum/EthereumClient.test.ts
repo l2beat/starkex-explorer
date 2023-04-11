@@ -1,6 +1,7 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect, mockFn, mockObject } from 'earl'
 import { providers } from 'ethers'
+import range from 'lodash/range'
 
 import { BlockRange } from '../../model'
 import { EthereumClient } from './EthereumClient'
@@ -81,7 +82,7 @@ describe(EthereumClient.name, () => {
 
     it('works for a lot of hashes', async () => {
       const blockRange = new BlockRange(
-        Array.from({ length: 500 }).map((v, i) => ({
+        range(500).map((i) => ({
           number: 1000 + i,
           hash: Hash256.fake(`${1000 + i}`),
         }))

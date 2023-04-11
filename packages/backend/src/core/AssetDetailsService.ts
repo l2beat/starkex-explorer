@@ -1,6 +1,6 @@
 import { assertUnreachable, TradingMode } from '@explorer/shared'
 import { AssetHash } from '@explorer/types'
-import { uniqBy } from 'lodash'
+import uniqBy from 'lodash/uniqBy'
 
 import { AssetRepository } from '../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRecord } from '../peripherals/database/PreprocessedAssetHistoryRepository'

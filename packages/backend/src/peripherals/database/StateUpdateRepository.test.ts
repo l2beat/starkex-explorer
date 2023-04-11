@@ -6,10 +6,11 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { expect } from 'earl'
+import range from 'lodash/range'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../test/fakes'
-import { Logger, LogLevel } from '../../tools/Logger'
+import { Logger,LogLevel } from '../../tools/Logger'
 import { ForcedTransactionRepository } from './ForcedTransactionRepository'
 import {
   StateUpdateRecord,
@@ -347,7 +348,7 @@ describe(StateUpdateRepository.name, () => {
           stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(blockNumber),
         },
-        positions: Array.from({ length: blockNumber - 20_000 }).map((_, i) => ({
+        positions: range(blockNumber - 20_000).map((_, i) => ({
           starkKey: StarkKey.fake(),
           positionId: BigInt(blockNumber * 10 + i),
           collateralBalance: 0n,
@@ -449,14 +450,12 @@ describe(StateUpdateRepository.name, () => {
             stateTransitionHash: Hash256.fake(),
             timestamp: Timestamp(blockNumber),
           },
-          positions: Array.from({ length: blockNumber - 20_000 }).map(
-            (_, i) => ({
-              starkKey: StarkKey.fake(),
-              positionId: BigInt(blockNumber * 10 + i),
-              collateralBalance: 0n,
-              balances: [],
-            })
-          ),
+          positions: range(blockNumber - 20_000).map((i) => ({
+            starkKey: StarkKey.fake(),
+            positionId: BigInt(blockNumber * 10 + i),
+            collateralBalance: 0n,
+            balances: [],
+          })),
           prices: [],
           transactionHashes: [],
         })
@@ -522,7 +521,7 @@ describe(StateUpdateRepository.name, () => {
         stateTransitionHash,
         timestamp,
       },
-      positions: Array.from({ length: 4 }).map((_, i) => ({
+      positions: range(4).map((i) => ({
         starkKey: StarkKey.fake(`${blockNumber}${i}`),
         positionId: BigInt(blockNumber * 10 + i),
         collateralBalance: collateralBalance,
@@ -539,7 +538,7 @@ describe(StateUpdateRepository.name, () => {
       blockNumber,
       rootHash,
       timestamp,
-      positions: Array.from({ length: 4 }).map((_, i) =>
+      positions: range(4).map((i) =>
         expect.subset({
           starkKey: StarkKey.fake(`${blockNumber}${i}`),
           positionId: BigInt(blockNumber * 10 + i),
@@ -561,7 +560,7 @@ describe(StateUpdateRepository.name, () => {
           stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(blockNumber),
         },
-        positions: Array.from({ length: blockNumber - 40_000 }).map((_, i) => ({
+        positions: range(blockNumber - 40_000).map((_, i) => ({
           starkKey: StarkKey.fake(),
           positionId: BigInt(blockNumber * 10 + i),
           collateralBalance: 0n,

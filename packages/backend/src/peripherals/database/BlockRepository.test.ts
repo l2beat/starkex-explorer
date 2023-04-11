@@ -1,6 +1,6 @@
 import { Hash256 } from '@explorer/types'
 import { expect } from 'earl'
-import { range } from 'lodash'
+import range from 'lodash/range'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
@@ -54,7 +54,7 @@ describe(BlockRepository.name, () => {
   })
 
   it('deletes all records after a block number', async () => {
-    const records: BlockRecord[] = Array.from({ length: 10 }).map((_, i) => ({
+    const records: BlockRecord[] = range(10).map((_, i) => ({
       hash: Hash256.fake(),
       number: i,
     }))
