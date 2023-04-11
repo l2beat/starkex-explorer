@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 
-import { range } from 'lodash'
+import range from 'lodash/range'
 import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatWithDecimals } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
