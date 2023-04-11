@@ -1,4 +1,4 @@
-import { TradingMode } from '@explorer/shared'
+import { InstanceName, TradingMode } from '@explorer/shared'
 import { AssetId, EthereumAddress } from '@explorer/types'
 
 type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
@@ -13,6 +13,7 @@ export type StarkexConfig = CheckTradingMode<
 >
 
 export interface PerpetualRollupConfig {
+  instanceName: InstanceName
   dataAvailabilityMode: 'rollup'
   tradingMode: 'perpetual'
   blockchain: BlockchainConfig
@@ -26,6 +27,7 @@ export interface PerpetualRollupConfig {
 }
 
 export interface PerpetualValidiumConfig {
+  instanceName: InstanceName
   dataAvailabilityMode: 'validium'
   tradingMode: 'perpetual'
   blockchain: BlockchainConfig
@@ -42,6 +44,7 @@ export interface PerpetualValidiumConfig {
 }
 
 export interface SpotValidiumConfig {
+  instanceName: InstanceName
   dataAvailabilityMode: 'validium'
   tradingMode: 'spot'
   blockchain: BlockchainConfig

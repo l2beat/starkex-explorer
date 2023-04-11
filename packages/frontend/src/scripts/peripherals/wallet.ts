@@ -14,6 +14,7 @@ import {
   toSignableCreateOffer,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+
 import { Registration } from '../keys/keys'
 
 function getProvider() {

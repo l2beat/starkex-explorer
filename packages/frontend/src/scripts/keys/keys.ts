@@ -3,8 +3,8 @@ import BN from 'bn.js'
 import { Buffer } from 'buffer'
 import { ec as EllipticCurve } from 'elliptic'
 import { sha256 } from 'hash.js'
-
 import { z } from 'zod'
+
 import { EC_ORDER_INT, starkEc } from './curve'
 
 export interface StarkKeyPair {

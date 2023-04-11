@@ -171,9 +171,9 @@ export function createFrontendRouter(
     )
   )
 
-  router.get('/users/register', (ctx) => {
+  router.get('/users/register', async (ctx) => {
     const givenUser = getGivenUser(ctx)
-    const result = userController.getRegisterPage(givenUser.address)
+    const result = await userController.getRegisterPage(givenUser)
 
     applyControllerResult(ctx, result)
   })
@@ -307,10 +307,10 @@ export function createFrontendRouter(
         }),
       }),
       async (ctx) => {
-        const user = getGivenUser(ctx)
+        const givenUser = getGivenUser(ctx)
         const result = await forcedTradeOfferController.getOfferDetailsPage(
           Number(ctx.params.offerId),
-          user.address
+          givenUser
         )
         applyControllerResult(ctx, result)
       }

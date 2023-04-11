@@ -8,7 +8,7 @@ import { TradingMode, UserDetails } from '@explorer/shared'
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
-import { UserService } from '../../core/UserService'
+import { PageContextService } from '../../core/PageContextService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
@@ -25,7 +25,7 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
 
 export class HomeController {
   constructor(
-    private readonly userService: UserService,
+    private readonly pageContextService: PageContextService,
     private readonly assetDetailsService: AssetDetailsService,
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly userTransactionRepository: UserTransactionRepository,
@@ -38,7 +38,7 @@ export class HomeController {
   async getHomePage(
     givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
     const paginationOpts = { offset: 0, limit: 6 }
     const [
       stateUpdates,
@@ -68,7 +68,7 @@ export class HomeController {
     )
 
     const content = renderHomePage({
-      user,
+      context,
       tutorials: [], // explicitly no tutorials
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
@@ -95,7 +95,7 @@ export class HomeController {
     givenUser: Partial<UserDetails>,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
     const [total, stateUpdates] = await Promise.all([
       this.preprocessedStateDetailsRepository.countAll(),
@@ -103,7 +103,7 @@ export class HomeController {
     ])
 
     const content = renderHomeStateUpdatesPage({
-      user,
+      context,
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.stateUpdateId.toString(),
@@ -121,7 +121,7 @@ export class HomeController {
     givenUser: Partial<UserDetails>,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
     const [forcedUserTransactions, forcedUserTransactionsCount] =
       await Promise.all([
@@ -141,7 +141,7 @@ export class HomeController {
     )
 
     const content = renderHomeTransactionsPage({
-      user,
+      context,
       forcedTransactions: transactions,
       total: forcedUserTransactionsCount,
       ...pagination,

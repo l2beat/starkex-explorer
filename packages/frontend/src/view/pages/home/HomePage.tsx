@@ -1,4 +1,4 @@
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { PageContext, TradingMode } from '@explorer/shared'
 import cx from 'classnames'
 import React from 'react'
 
@@ -27,7 +27,7 @@ import {
 } from './components/HomeTutorials'
 
 export interface HomePageProps {
-  user: UserDetails | undefined
+  context: PageContext
   // TODO: statistics
   tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
@@ -50,7 +50,7 @@ function HomePage(props: HomePageProps) {
     <Page
       path="/"
       description="This explorer allows you to view everything happening on dYdX from the perspective of the Ethereum blockchain. Browse positions, forced transaction and submit your own forced trades and withdrawals."
-      user={props.user}
+      context={props.context}
       withoutSearch
     >
       <main

@@ -1,15 +1,15 @@
 import { renderNewSpotForcedWithdrawPage } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { isPageContextUserDefined,UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
-import { UserService } from '../../core/UserService'
+import { PageContextService } from '../../core/PageContextService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { ControllerResult } from './ControllerResult'
 
 export class SpotForcedWithdrawalController {
   constructor(
-    private readonly userService: UserService,
+    private readonly pageContextService: PageContextService,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
@@ -20,9 +20,9 @@ export class SpotForcedWithdrawalController {
     givenUser: Partial<UserDetails>,
     vaultId: bigint
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
-    if (!user) {
+    if (!isPageContextUserDefined(context)) {
       return { type: 'not found', content: 'User must be logged in' }
     }
 
@@ -41,7 +41,8 @@ export class SpotForcedWithdrawalController {
     )
 
     const content = renderNewSpotForcedWithdrawPage({
-      user,
+      context,
+      user: context.user,
       starkExAddress: EthereumAddress.ZERO,
       positionOrVaultId: vaultId,
       starkKey: asset.starkKey,

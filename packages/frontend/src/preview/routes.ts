@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { PageContext, PageContextWithUser, UserDetails } from '@explorer/shared'
 import {
   AssetHash,
   AssetId,
@@ -92,10 +93,10 @@ const routes: Route[] = [
     path: '/home',
     description: 'The home page.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
 
       ctx.body = renderHomePage({
-        user,
+        context,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
         transactions: repeat(6, randomHomeForcedTransactionEntry),
@@ -110,9 +111,9 @@ const routes: Route[] = [
     path: '/home/no-tutorials',
     description: 'The home page, but without any tutorials.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderHomePage({
-        user,
+        context,
         tutorials: [],
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
@@ -129,11 +130,11 @@ const routes: Route[] = [
     description:
       'State update list accessible from home page. Supports pagination.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 5123
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderHomeStateUpdatesPage({
-        user,
+        context,
         stateUpdates: repeat(visible, randomHomeStateUpdateEntry),
         limit,
         offset,
@@ -146,11 +147,11 @@ const routes: Route[] = [
     description:
       'Forced transaction list accessible from home page. Supports pagination.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 68
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderHomeTransactionsPage({
-        user,
+        context,
         forcedTransactions: repeat(visible, randomHomeForcedTransactionEntry),
         limit,
         offset,
@@ -162,11 +163,11 @@ const routes: Route[] = [
     path: '/offers',
     description: 'Offer list accessible from home page. Supports pagination.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 68
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderHomeOffersPage({
-        user,
+        context,
         offers: repeat(visible, randomHomeOfferEntry),
         limit,
         offset,
@@ -180,9 +181,9 @@ const routes: Route[] = [
     description:
       'Merkle proof for a vault or position id made from the latest state update',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderMerkleProofPage({
-        user,
+        context,
         positionOrVaultId: BigInt(randomId()),
         tradingMode: 'spot',
         merkleProof: {
@@ -209,9 +210,9 @@ const routes: Route[] = [
     description: 'State update page.',
     render: (ctx) => {
       const ethereumTimestamp = randomTimestamp()
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderStateUpdatePage({
-        user,
+        context,
         tradingMode: 'perpetual',
         id: randomId(),
         hashes: {
@@ -242,11 +243,11 @@ const routes: Route[] = [
     description:
       'Balance change list accessible from state update page. Supports pagination.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 231
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderStateUpdateBalanceChangesPage({
-        user,
+        context,
         tradingMode: 'perpetual',
         id: '1534',
         balanceChanges: repeat(visible, randomStateUpdateBalanceChangeEntry),
@@ -263,11 +264,11 @@ const routes: Route[] = [
       'Forced transaction list accessible from state update page. Supports pagination.',
     breakAfter: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 231
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderStateUpdateTransactionsPage({
-        user,
+        context,
         id: '1534',
         transactions: repeat(visible, randomStateUpdateTransactionEntry),
         limit,
@@ -282,10 +283,10 @@ const routes: Route[] = [
     path: '/users/register',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderUserPage({
-        user,
-        tradingMode: 'perpetual',
+        context,
+        tradingMode: context.tradingMode,
         starkKey: StarkKey.fake(),
         ethereumAddress: EthereumAddress.fake(),
         exchangeAddress: EthereumAddress.fake(),
@@ -318,12 +319,12 @@ const routes: Route[] = [
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
-      const user = getUser(ctx) ?? getFakeUser()
+      const context = getPageContext(ctx, true)
       ctx.body = renderUserPage({
-        user,
-        tradingMode: 'perpetual',
-        starkKey: user.starkKey ?? StarkKey.fake(),
-        ethereumAddress: user.address,
+        context,
+        tradingMode: context.tradingMode,
+        starkKey: context.user.starkKey ?? StarkKey.fake(),
+        ethereumAddress: context.user.address,
         exchangeAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         offersToAccept: repeat(2, randomUserOfferEntry),
@@ -348,11 +349,11 @@ const routes: Route[] = [
     description:
       'Assets list accessible from someone else’s user page. Supports pagination.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 7
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserAssetsPage({
-        user,
+        context,
         tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         assets: repeat(visible, randomUserAssetEntry),
@@ -368,11 +369,11 @@ const routes: Route[] = [
     description:
       'Balance change list accessible from user page. Supports pagination.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 3367
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserBalanceChangesPage({
-        user,
+        context,
         tradingMode: 'perpetual',
         starkKey: StarkKey.fake(),
         balanceChanges: repeat(visible, randomUserBalanceChangeEntry),
@@ -388,11 +389,11 @@ const routes: Route[] = [
     description:
       'Ethereum transaction list accessible from user page. Supports pagination.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 48
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserTransactionsPage({
-        user,
+        context,
         starkKey: StarkKey.fake(),
         transactions: repeat(visible, randomUserTransactionEntry),
         limit,
@@ -406,11 +407,11 @@ const routes: Route[] = [
     link: '/users/someone/offers',
     description: 'Offer list accessible from user page. Supports pagination.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       const total = 6
       const { limit, offset, visible } = getPagination(ctx, total)
       ctx.body = renderUserOffersPage({
-        user,
+        context,
         starkKey: StarkKey.fake(),
         offers: repeat(visible, randomUserOfferEntry),
         limit,
@@ -426,9 +427,10 @@ const routes: Route[] = [
     path: '/forced/new/spot/withdraw',
     description: 'Form to create a new spot forced withdrawal.',
     render: (ctx) => {
-      const user = getUser(ctx) ?? getFakeUser()
+      const context = getPageContext(ctx, true)
       ctx.body = renderNewSpotForcedWithdrawPage({
-        user,
+        context,
+        user: context.user,
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
@@ -444,9 +446,10 @@ const routes: Route[] = [
     path: '/forced/new/perpetual/withdraw',
     description: 'Form to create a new perpetual forced withdrawal.',
     render: (ctx) => {
-      const user = getUser(ctx) ?? getFakeUser()
+      const context = getPageContext(ctx, true)
       ctx.body = renderNewPerpetualForcedActionPage({
-        user,
+        context,
+        user: context.user,
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
@@ -462,9 +465,10 @@ const routes: Route[] = [
     path: '/forced/new/perpetual/buy',
     description: 'Form to create a new perpetual forced buy.',
     render: (ctx) => {
-      const user = getUser(ctx) ?? getFakeUser()
+      const context = getPageContext(ctx, true)
       ctx.body = renderNewPerpetualForcedActionPage({
-        user,
+        context,
+        user: context.user,
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
@@ -481,9 +485,10 @@ const routes: Route[] = [
     description: 'Form to create a new perpetual forced sell.',
     breakAfter: true,
     render: (ctx) => {
-      const user = getUser(ctx) ?? getFakeUser()
+      const context = getPageContext(ctx, true)
       ctx.body = renderNewPerpetualForcedActionPage({
-        user,
+        context,
+        user: context.user,
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
@@ -525,9 +530,9 @@ const routes: Route[] = [
     description: 'Transaction view of a sent spot forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderSpotForcedWithdrawalPage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         vaultId: randomId(),
@@ -540,9 +545,9 @@ const routes: Route[] = [
     description: 'Transaction view of a mined spot forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderSpotForcedWithdrawalPage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         vaultId: randomId(),
@@ -558,9 +563,9 @@ const routes: Route[] = [
     description: 'Transaction view of a reverted spot forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderSpotForcedWithdrawalPage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         vaultId: randomId(),
@@ -577,9 +582,9 @@ const routes: Route[] = [
     isTransactionPage: true,
     breakAfter: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderSpotForcedWithdrawalPage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         vaultId: randomId(),
@@ -599,9 +604,9 @@ const routes: Route[] = [
     description: 'Transaction view of a sent perpetual forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderPerpetualForcedWithdrawalPage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         asset: { hashOrId: AssetId.USDC },
@@ -616,9 +621,9 @@ const routes: Route[] = [
     description: 'Transaction view of a mined perpetual forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderPerpetualForcedWithdrawalPage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         asset: { hashOrId: AssetId.USDC },
@@ -636,9 +641,9 @@ const routes: Route[] = [
     description: 'Transaction view of a reverted perpetual forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderPerpetualForcedWithdrawalPage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         asset: { hashOrId: AssetId.USDC },
@@ -657,9 +662,9 @@ const routes: Route[] = [
     isTransactionPage: true,
     breakAfter: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderPerpetualForcedWithdrawalPage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
         asset: { hashOrId: AssetId.USDC },
@@ -682,16 +687,16 @@ const routes: Route[] = [
       'Offer view of a created perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx) ?? getFakeUser()
+      const context = getPageContext(ctx, true)
       const offer = randomOfferDetails()
       ctx.body = renderOfferAndForcedTradePage({
-        user,
-        maker: userParty(user),
+        context,
+        maker: userParty(context.user),
         ...offer,
         history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
         cancelForm: {
           offerId: Number(offer.offerId),
-          address: user.address,
+          address: context.user.address,
         },
       })
     },
@@ -703,21 +708,21 @@ const routes: Route[] = [
     isOfferPage: true,
     render: (ctx) => {
       const offer = randomOfferDetails()
-      const user = getUser(ctx) ?? getFakeUser()
+      const context = getPageContext(ctx, true)
       const taker = {
-        ethereumAddress: user.address,
-        starkKey: user.starkKey,
+        ethereumAddress: context.user.address,
+        starkKey: context.user.starkKey,
         positionId: randomId(),
       }
       const maker = randomParty()
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         maker: randomParty(),
         ...offer,
         history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
         acceptForm: {
           id: Number(offer.offerId),
-          address: user.address,
+          address: context.user.address,
           starkKeyA: maker.starkKey,
           positionIdA: BigInt(maker.positionId),
           syntheticAssetId: AssetId('ETH-9'),
@@ -739,12 +744,12 @@ const routes: Route[] = [
       'Offer view of an accepted perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx) ?? getFakeUser()
-      const maker = userParty(user)
+      const context = getPageContext(ctx, true)
+      const maker = userParty(context.user)
       const taker = randomParty()
       const offer = randomOfferDetails()
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         maker,
         taker,
         ...offer,
@@ -754,11 +759,11 @@ const routes: Route[] = [
         ],
         cancelForm: {
           offerId: Number(offer.offerId),
-          address: user.address,
+          address: context.user.address,
         },
         finalizeForm: {
           offerId: Number(offer.offerId),
-          address: user.address,
+          address: context.user.address,
           perpetualAddress: EthereumAddress.fake(),
           starkKeyA: maker.starkKey,
           positionIdA: BigInt(maker.positionId),
@@ -782,9 +787,9 @@ const routes: Route[] = [
       'Offer view of an accepted perpetual forced trade. As viewed by someone else.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         maker: randomParty(),
         taker: randomParty(),
         ...randomOfferDetails(),
@@ -800,9 +805,9 @@ const routes: Route[] = [
     description: 'Offer view of a cancelled perpetual forced trade.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         maker: randomParty(),
         ...randomOfferDetails(),
         history: [
@@ -817,9 +822,9 @@ const routes: Route[] = [
     description: 'Offer view of an expired perpetual forced trade.',
     isOfferPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         maker: randomParty(),
         taker: randomParty(),
         ...randomOfferDetails(),
@@ -837,9 +842,9 @@ const routes: Route[] = [
     isOfferPage: true,
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         maker: randomParty(),
         taker: randomParty(),
@@ -858,9 +863,9 @@ const routes: Route[] = [
     isOfferPage: true,
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         maker: randomParty(),
         taker: randomParty(),
@@ -880,9 +885,9 @@ const routes: Route[] = [
     isOfferPage: true,
     isTransactionPage: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         maker: randomParty(),
         taker: randomParty(),
@@ -903,9 +908,9 @@ const routes: Route[] = [
     isTransactionPage: true,
     breakAfter: true,
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderOfferAndForcedTradePage({
-        user,
+        context,
         transactionHash: Hash256.fake(),
         maker: randomParty(),
         taker: randomParty(),
@@ -927,9 +932,9 @@ const routes: Route[] = [
     path: '/transactions/regular-withdrawal/sent',
     description: 'Transaction view of a sent withdrawal.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderRegularWithdrawalPage({
-        user,
+        context,
         recipient: randomRecipient(),
         asset: assetBucket.pick(),
         transactionHash: Hash256.fake(),
@@ -941,9 +946,9 @@ const routes: Route[] = [
     path: '/transactions/regular-withdrawal/mined',
     description: 'Transaction view of a mined withdrawal.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderRegularWithdrawalPage({
-        user,
+        context,
         recipient: randomRecipient(),
         amount: amountBucket.pick(),
         asset: assetBucket.pick(),
@@ -959,9 +964,9 @@ const routes: Route[] = [
     path: '/transactions/regular-withdrawal/reverted',
     description: 'Transaction view of a reverted withdrawal.',
     render: (ctx) => {
-      const user = getUser(ctx)
+      const context = getPageContext(ctx)
       ctx.body = renderRegularWithdrawalPage({
-        user,
+        context,
         recipient: randomRecipient(),
         asset: assetBucket.pick(),
         transactionHash: Hash256.fake(),
@@ -980,8 +985,8 @@ for (const route of routes) {
 }
 
 function notFound(ctx: Koa.Context) {
-  const account = getUser(ctx)
-  ctx.body = renderNotFoundPage({ account })
+  const context = getPageContext(ctx)
+  ctx.body = renderNotFoundPage({ context })
 }
 
 function getPagination(ctx: Koa.Context, total: number) {
@@ -1000,7 +1005,7 @@ function getPagination(ctx: Koa.Context, total: number) {
   }
 }
 
-function getUser(ctx: Koa.Context) {
+function getUser(ctx: Koa.Context): UserDetails | undefined {
   const account = ctx.cookies.get('account')
   const starkKey = ctx.cookies.get('starkKey')
 
@@ -1020,5 +1025,26 @@ function getFakeUser() {
   return {
     address: EthereumAddress.fake(),
     starkKey: StarkKey.fake(),
+  }
+}
+
+function getPageContext(
+  ctx: Koa.Context,
+  fallbackToFakeUser: true
+): PageContextWithUser
+function getPageContext(
+  ctx: Koa.Context,
+  fallbackToFakeUser?: false
+): PageContext
+function getPageContext(
+  ctx: Koa.Context,
+  fallbackToFakeUser?: boolean
+): PageContextWithUser | PageContext {
+  const user = getUser(ctx) ?? (fallbackToFakeUser ? getFakeUser() : undefined)
+
+  return {
+    user,
+    instanceName: 'dYdX',
+    tradingMode: 'perpetual',
   }
 }

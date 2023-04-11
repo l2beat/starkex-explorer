@@ -1,4 +1,4 @@
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { PageContext, TradingMode } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -25,7 +25,7 @@ import {
 } from './components/StateUpdateStats'
 
 export interface StateUpdatePageProps extends StateUpdateStatsProps {
-  user: UserDetails | undefined
+  context: PageContext
   tradingMode: TradingMode
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
@@ -49,7 +49,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
     <Page
       path={`/state-update/${props.id}`}
       description="Show state update details, including balance changes, transactions and prices"
-      user={props.user}
+      context={props.context}
     >
       <ContentWrapper className="flex flex-col gap-12">
         <StateUpdateStats {...props} />

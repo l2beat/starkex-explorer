@@ -2,7 +2,6 @@ import { EthereumAddress } from '@explorer/types'
 import Cookie from 'js-cookie'
 
 import { InstanceName } from '../../utils/instance'
-
 import { REGISTER_STARK_KEY_BUTTON_ID } from '../../view'
 import { RecoveredKeys, recoverKeysDydx, recoverKeysMyria } from './recovery'
 
@@ -21,7 +20,7 @@ export function initStarkKeyRegistration() {
     const keys = await recoverKeys(account, instanceName)
     Cookie.set('starkKey', keys.starkKey.toString())
     localStorage.setItem('registration', JSON.stringify(keys.registration))
-    window.location.href = `/users/${keys.starkKey}`
+    window.location.href = `/users/${keys.starkKey.toString()}`
   })
 }
 

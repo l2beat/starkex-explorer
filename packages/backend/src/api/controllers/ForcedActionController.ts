@@ -2,17 +2,17 @@ import {
   renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
 } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { isPageContextUserDefined,UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
-import { UserService } from '../../core/UserService'
+import { PageContextService } from '../../core/PageContextService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { ControllerResult } from './ControllerResult'
 
 export class ForcedActionController {
   constructor(
-    private readonly userService: UserService,
+    private readonly pageContextService: PageContextService,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
@@ -24,10 +24,10 @@ export class ForcedActionController {
     givenUser: Partial<UserDetails>,
     vaultId: bigint
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
-    if (!user) {
-      return { type: 'not found', content: 'User must be logged in' }
+    if (!isPageContextUserDefined(context)) {
+      return { type: 'not found', content: 'User not found' }
     }
 
     const assets =
@@ -40,7 +40,7 @@ export class ForcedActionController {
       return { type: 'not found', content: 'Vault is empty' }
     }
 
-    if (asset.starkKey != user.starkKey) {
+    if (asset.starkKey != context.user.starkKey) {
       return { type: 'not found', content: 'Vault does not belong to user' }
     }
 
@@ -49,7 +49,8 @@ export class ForcedActionController {
     )
 
     const content = renderNewSpotForcedWithdrawPage({
-      user,
+      context,
+      user: context.user,
       starkExAddress: this.starkExAddress,
       positionOrVaultId: vaultId,
       starkKey: asset.starkKey,
@@ -69,10 +70,10 @@ export class ForcedActionController {
     positionId: bigint,
     assetId: AssetId
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
-    if (!user) {
-      return { type: 'not found', content: 'User must be logged in' }
+    if (!isPageContextUserDefined(context)) {
+      return { type: 'not found', content: 'User not found' }
     }
 
     const assets =
@@ -89,12 +90,13 @@ export class ForcedActionController {
       }
     }
 
-    if (asset.starkKey != user.starkKey) {
+    if (asset.starkKey != context.user.starkKey) {
       return { type: 'not found', content: 'Position does not belong to user' }
     }
 
     const content = renderNewSpotForcedWithdrawPage({
-      user,
+      context,
+      user: context.user,
       starkExAddress: this.starkExAddress,
       positionOrVaultId: positionId,
       starkKey: asset.starkKey,
@@ -113,11 +115,12 @@ export class ForcedActionController {
     positionId: bigint,
     assetId: AssetId
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
-    if (!user) {
-      return { type: 'not found', content: 'User must be logged in' }
+    if (!context.user) {
+      return { type: 'not found', content: 'User not found' }
     }
+
     const assets =
       await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
         positionId
@@ -128,12 +131,13 @@ export class ForcedActionController {
       return { type: 'not found', content: 'Position is empty' }
     }
 
-    if (asset.starkKey != user.starkKey) {
+    if (asset.starkKey != context.user.starkKey) {
       return { type: 'not found', content: 'Position does not belong to user' }
     }
 
     const content = renderNewPerpetualForcedActionPage({
-      user,
+      context,
+      user: context.user,
       starkExAddress: this.starkExAddress,
       positionOrVaultId: positionId,
       starkKey: asset.starkKey,

@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -12,7 +12,7 @@ import { reactToHtml } from '../../reactToHtml'
 import { FORCED_TRANSACTION_TABLE_PROPS } from './common'
 
 export interface HomeTransactionsPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   forcedTransactions: TransactionEntry[]
   limit: number
   offset: number
@@ -28,7 +28,7 @@ function HomeTransactionsPage(props: HomeTransactionsPageProps) {
     <Page
       path={FORCED_TRANSACTION_TABLE_PROPS.path}
       description="All forced transactions"
-      user={props.user}
+      context={props.context}
     >
       <ContentWrapper>
         <TableWithPagination

@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContextWithUser } from '@explorer/shared'
 import React from 'react'
 
 import { getInstanceName } from '../../../utils/instance'
@@ -15,13 +15,13 @@ import { reactToHtml } from '../../reactToHtml'
 export const REGISTER_STARK_KEY_BUTTON_ID = 'register-stark-key-button'
 
 interface UserRegisterPageProps {
-  user: UserDetails
+  context: PageContextWithUser
 }
 
 function UserRegisterPage(props: UserRegisterPageProps) {
   return (
     <Page
-      user={props.user}
+      context={props.context}
       description="TODO: description"
       path="/users/register"
     >
@@ -83,7 +83,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             Ethereum address
           </p>
           <InlineEllipsis className="mt-1 w-full max-w-[99%] font-semibold text-white ">
-            {props.user.address.toString()}
+            {props.context.user.address.toString()}
           </InlineEllipsis>
         </Card>
       </ContentWrapper>

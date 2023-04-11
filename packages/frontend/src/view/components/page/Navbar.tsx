@@ -1,7 +1,6 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
-import { InstanceName } from '../../../utils/instance'
 import { getTradingMode } from '../../../utils/tradingMode'
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
 import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
@@ -10,13 +9,13 @@ import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
 
 export interface NavbarProps {
-  readonly user: UserDetails | undefined
+  readonly pageContext: PageContext
   readonly searchBar: boolean
-  readonly instanceName: InstanceName
 }
 
-export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
+export function Navbar({ searchBar = true, pageContext }: NavbarProps) {
   const tradingMode = getTradingMode()
+  const { user, instanceName } = pageContext
 
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
@@ -26,7 +25,7 @@ export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
       >
         <div className="flex gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
-          <ProjectLogo projectName={instanceName} />
+          <ProjectLogo instanceName={instanceName} />
         </div>
         <span className="py-1 pl-2 text-zinc-500 sm:pl-4">
           EXPLORER (Development version)

@@ -1,3 +1,4 @@
+import { PageContextWithUser } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
@@ -14,7 +15,11 @@ import {
   serializeForcedActionsFormProps,
 } from './NewForcedActionFormProps'
 
-function NewPerpetualForcedActionPage(props: NewForcedActionFormProps) {
+interface Props extends NewForcedActionFormProps {
+  context: PageContextWithUser
+}
+
+function NewPerpetualForcedActionPage(props: Props) {
   const isWithdrawal = props.asset.hashOrId === AssetId.USDC
   const propsJson = serializeForcedActionsFormProps(props)
   const instructionParams = getForcedActionInstructionsParams(isWithdrawal)
@@ -22,7 +27,7 @@ function NewPerpetualForcedActionPage(props: NewForcedActionFormProps) {
     <Page
       path="/forced/new/:positionId/:assetId"
       description="Perform forced actions on your assets"
-      user={props.user}
+      context={props.context}
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
@@ -59,8 +64,6 @@ function NewPerpetualForcedActionPage(props: NewForcedActionFormProps) {
   )
 }
 
-export function renderNewPerpetualForcedActionPage(
-  props: NewForcedActionFormProps
-) {
+export function renderNewPerpetualForcedActionPage(props: Props) {
   return reactToHtml(<NewPerpetualForcedActionPage {...props} />)
 }

@@ -1,3 +1,4 @@
+import { PageContextWithUser } from '@explorer/shared'
 import React from 'react'
 
 import { assetToInfo } from '../../../utils/assets'
@@ -17,7 +18,11 @@ import {
 
 export const SpotForcedWithdrawalFormId = 'spot-withdraw-form'
 
-function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
+interface Props extends NewForcedActionFormProps {
+  context: PageContextWithUser
+}
+
+function NewSpotForcedWithdrawalPage(props: Props) {
   const instructions = [
     <>
       Using this form you request a withdrawal of your funds. This is achieved
@@ -41,7 +46,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
     <Page
       path="/forced/new/:vaultId"
       description="Perform forced withdrawal"
-      user={props.user}
+      context={props.context}
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">
@@ -114,8 +119,6 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   )
 }
 
-export function renderNewSpotForcedWithdrawPage(
-  props: NewForcedActionFormProps
-) {
+export function renderNewSpotForcedWithdrawPage(props: Props) {
   return reactToHtml(<NewSpotForcedWithdrawalPage {...props} />)
 }

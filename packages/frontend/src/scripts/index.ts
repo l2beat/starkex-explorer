@@ -1,5 +1,6 @@
 import { USE_NEW_DESIGN } from '../utils/constants'
 import { initCountdownTimer } from './countdownTimer'
+import { initEthereumAddressRegistration } from './ethereumAddressRegistration'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
 import { initImageFallback } from './imageFallback'
 import { initStarkKeyRegistration } from './keys/starkKeyRegistration'
@@ -18,7 +19,6 @@ import { initOldPagination } from './old/pagination'
 // eslint-disable-next-line no-restricted-imports
 import { initFinalizeExitForm } from './old/transaction/finalizeExitForm'
 // eslint-disable-next-line no-restricted-imports
-import { initEthereumAddressRegistration } from './ethereumAddressRegistration'
 import { initTransactionForm } from './old/transaction/transactionForm'
 import { initPagination } from './pagination'
 import { initRegularWithdrawalForm } from './regularWithdrawal'

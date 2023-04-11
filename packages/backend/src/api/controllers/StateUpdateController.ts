@@ -9,7 +9,7 @@ import { AssetHash, AssetId } from '@explorer/types'
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
-import { UserService } from '../../core/UserService'
+import { PageContextService } from '../../core/PageContextService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import {
@@ -31,7 +31,7 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
 
 export class StateUpdateController {
   constructor(
-    private readonly userService: UserService,
+    private readonly pageContextService: PageContextService,
     private readonly assetDetailsService: AssetDetailsService,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly assetRepository: AssetRepository,
@@ -47,7 +47,7 @@ export class StateUpdateController {
     givenUser: Partial<UserDetails>,
     stateUpdateId: number
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
     const [
       stateUpdate,
@@ -98,7 +98,7 @@ export class StateUpdateController {
     )
 
     const content = renderStateUpdatePage({
-      user,
+      context,
       tradingMode: this.tradingMode,
       id: stateUpdateId.toString(),
       hashes: {
@@ -128,7 +128,7 @@ export class StateUpdateController {
     stateUpdateId: number,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
     const [balanceChanges, total] = await Promise.all([
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
@@ -150,7 +150,7 @@ export class StateUpdateController {
     )
 
     const content = renderStateUpdateBalanceChangesPage({
-      user,
+      context,
       tradingMode: this.tradingMode,
       id: stateUpdateId.toString(),
       balanceChanges: balanceChangeEntries,
@@ -166,7 +166,7 @@ export class StateUpdateController {
     stateUpdateId: number,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
 
     const [includedTransactions, includedTransactionsCount] = await Promise.all(
       [
@@ -190,7 +190,7 @@ export class StateUpdateController {
     )
 
     const content = renderStateUpdateTransactionsPage({
-      user,
+      context,
       id: stateUpdateId.toString(),
       transactions: transactions,
       total: includedTransactionsCount,

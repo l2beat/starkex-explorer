@@ -42,6 +42,7 @@ import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
+import { PageContextService } from './core/PageContextService'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
 import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
@@ -131,6 +132,8 @@ export class Application {
       database,
       logger
     )
+    const userService = new UserService(userRegistrationEventRepository)
+    const pageContextService = new PageContextService(config, userService)
     const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
       database,
       logger
@@ -345,7 +348,6 @@ export class Application {
       forcedTradeOfferRepository,
       sentTransactionRepository
     )
-    const userService = new UserService(userRegistrationEventRepository)
     const assetDetailsService = new AssetDetailsService(
       assetRepository,
       config.starkex.tradingMode
@@ -456,7 +458,7 @@ export class Application {
     )
 
     const homeController = new HomeController(
-      userService,
+      pageContextService,
       assetDetailsService,
       forcedTradeOfferViewService,
       userTransactionRepository,
@@ -467,7 +469,7 @@ export class Application {
     )
 
     const userController = new UserController(
-      userService,
+      pageContextService,
       assetDetailsService,
       preprocessedAssetHistoryRepository,
       sentTransactionRepository,
@@ -481,7 +483,7 @@ export class Application {
       collateralAsset
     )
     const stateUpdateController = new StateUpdateController(
-      userService,
+      pageContextService,
       assetDetailsService,
       stateUpdateRepository,
       assetRepository,
@@ -491,7 +493,7 @@ export class Application {
       collateralAsset
     )
     const transactionController = new TransactionController(
-      userService,
+      pageContextService,
       sentTransactionRepository,
       forcedTradeOfferRepository,
       userTransactionRepository,
@@ -500,7 +502,7 @@ export class Application {
       collateralAsset
     )
     const merkleProofController = new MerkleProofController(
-      userService,
+      pageContextService,
       stateUpdater,
       config.starkex.tradingMode
     )
@@ -553,12 +555,13 @@ export class Application {
       config.starkex.contracts.perpetual
     )
     const forcedActionsController = new ForcedActionController(
-      userService,
+      pageContextService,
       preprocessedAssetHistoryRepository,
       assetRepository,
       config.starkex.contracts.perpetual
     )
     const forcedTradeOfferController = new ForcedTradeOfferController(
+      pageContextService,
       forcedTradeOfferRepository,
       positionRepository,
       userRegistrationEventRepository,

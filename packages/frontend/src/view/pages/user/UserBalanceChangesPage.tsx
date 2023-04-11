@@ -1,4 +1,4 @@
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { PageContext, TradingMode } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -14,7 +14,7 @@ import {
 import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserBalanceChangesPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   starkKey: StarkKey
   tradingMode: TradingMode
   balanceChanges: UserBalanceChangeEntry[]
@@ -32,7 +32,11 @@ export function renderUserBalanceChangesPage(
 function UserBalanceChangesPage(props: UserBalanceChangesPageProps) {
   const common = getBalanceChangeTableProps(props.starkKey)
   return (
-    <Page path={common.path} description={common.description} user={props.user}>
+    <Page
+      path={common.path}
+      description={common.description}
+      context={props.context}
+    >
       <ContentWrapper>
         <TableWithPagination
           {...common}

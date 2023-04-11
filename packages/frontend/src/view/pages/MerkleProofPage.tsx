@@ -1,4 +1,4 @@
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { PageContext, TradingMode } from '@explorer/shared'
 import { PedersenHash } from '@explorer/types'
 import React from 'react'
 
@@ -11,7 +11,7 @@ import { reactToHtml } from '../reactToHtml'
 
 export interface MerkleProofPageProps {
   positionOrVaultId: bigint
-  user: UserDetails | undefined
+  context: PageContext
   tradingMode: TradingMode
   merkleProof: MerkleProof
 }
@@ -41,7 +41,7 @@ function MerkleProofPage(props: MerkleProofPageProps) {
         props.tradingMode === 'perpetual' ? 'position' : 'vault'
       } made from the latest state update`}
       path={`/proof/${props.positionOrVaultId.toString()}`}
-      user={props.user}
+      context={props.context}
     >
       <ContentWrapper className="flex flex-col gap-6">
         <PageTitle>

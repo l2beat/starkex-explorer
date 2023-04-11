@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -13,7 +13,7 @@ import { getTransactionTableProps } from './common'
 import { StateUpdatePageTitle } from './components/StateUpdatePageTitle'
 
 export interface StateUpdateTransactionsPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   id: string
   transactions: TransactionEntry[]
   limit: number
@@ -30,7 +30,11 @@ export function renderStateUpdateTransactionsPage(
 function StateUpdateTransactionsPage(props: StateUpdateTransactionsPageProps) {
   const common = getTransactionTableProps(props.id)
   return (
-    <Page path={common.path} description={common.description} user={props.user}>
+    <Page
+      path={common.path}
+      description={common.description}
+      context={props.context}
+    >
       <ContentWrapper>
         <TableWithPagination
           {...common}

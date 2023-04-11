@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
@@ -35,7 +35,7 @@ import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface OfferAndForcedTradePageProps {
-  user: UserDetails | undefined
+  context: PageContext
   offerId: string | undefined
   transactionHash?: Hash256
   maker: {
@@ -90,7 +90,11 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   }
 
   return (
-    <Page user={props.user} path={common.path} description={common.description}>
+    <Page
+      context={props.context}
+      path={common.path}
+      description={common.description}
+    >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
           <div className="flex items-center justify-between">

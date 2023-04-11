@@ -1,5 +1,6 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import Cookies from 'js-cookie'
+
 import { REGISTER_ETHEREUM_ADDRESS_BUTTON_ID } from '../view/pages/user/components/UserProfile'
 import { Registration } from './keys/keys'
 import { Wallet } from './peripherals/wallet'
@@ -13,6 +14,7 @@ export function initEthereumAddressRegistration() {
     return
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   registerButton.addEventListener('click', async (e) => {
     e.preventDefault()
     const account = Cookies.get('account')

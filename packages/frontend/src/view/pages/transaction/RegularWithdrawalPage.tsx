@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
@@ -15,7 +15,7 @@ import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface RegularWithdrawalPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey
@@ -43,7 +43,7 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
 
   return (
     <Page
-      user={props.user}
+      context={props.context}
       path={`/transactions/${props.transactionHash.toString()}`}
       description={`Details of the ${props.transactionHash.toString()} withdrawal transaction`}
     >
