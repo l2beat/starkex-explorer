@@ -4,7 +4,7 @@ import {
   renderRegularWithdrawalPage,
   renderSpotForcedWithdrawalPage,
 } from '@explorer/frontend'
-import { assertUnreachable,PageContext, UserDetails } from '@explorer/shared'
+import { assertUnreachable, PageContext, UserDetails } from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'

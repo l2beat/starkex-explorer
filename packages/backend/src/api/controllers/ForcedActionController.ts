@@ -2,7 +2,7 @@ import {
   renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
 } from '@explorer/frontend'
-import { isPageContextUserDefined,UserDetails } from '@explorer/shared'
+import { UserDetails, isPageContextUserDefined } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { PageContextService } from '../../core/PageContextService'
@@ -117,7 +117,7 @@ export class ForcedActionController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
-    if (!context.user) {
+    if (!isPageContextUserDefined(context)) {
       return { type: 'not found', content: 'User not found' }
     }
 
