@@ -2,7 +2,7 @@ import {
   renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
 } from '@explorer/frontend'
-import { isPageContextUserDefined,UserDetails } from '@explorer/shared'
+import { isPageContextUserDefined, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { PageContextService } from '../../core/PageContextService'
