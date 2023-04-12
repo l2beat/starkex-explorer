@@ -1,4 +1,3 @@
-import { PageContextWithUser } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
@@ -15,11 +14,7 @@ import {
   serializeForcedActionsFormProps,
 } from './NewForcedActionFormProps'
 
-interface Props extends NewForcedActionFormProps {
-  context: PageContextWithUser
-}
-
-function NewPerpetualForcedActionPage(props: Props) {
+function NewPerpetualForcedActionPage(props: NewForcedActionFormProps) {
   const isWithdrawal = props.asset.hashOrId === AssetId.USDC
   const propsJson = serializeForcedActionsFormProps(props)
   const instructionParams = getForcedActionInstructionsParams(
@@ -67,6 +62,8 @@ function NewPerpetualForcedActionPage(props: Props) {
   )
 }
 
-export function renderNewPerpetualForcedActionPage(props: Props) {
+export function renderNewPerpetualForcedActionPage(
+  props: NewForcedActionFormProps
+) {
   return reactToHtml(<NewPerpetualForcedActionPage {...props} />)
 }

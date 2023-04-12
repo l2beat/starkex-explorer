@@ -461,7 +461,6 @@ const routes: Route[] = [
       const context = getPageContext(ctx, true)
       ctx.body = renderNewSpotForcedWithdrawPage({
         context,
-        user: context.user,
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
@@ -480,7 +479,6 @@ const routes: Route[] = [
       const context = getPageContext(ctx, true)
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
-        user: context.user,
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
@@ -499,7 +497,6 @@ const routes: Route[] = [
       const context = getPageContext(ctx, true)
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
-        user: context.user,
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
@@ -519,7 +516,6 @@ const routes: Route[] = [
       const context = getPageContext(ctx, true)
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
-        user: context.user,
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {

@@ -1,4 +1,3 @@
-import { PageContextWithUser } from '@explorer/shared'
 import React from 'react'
 
 import { assetToInfo } from '../../../utils/assets'
@@ -18,11 +17,7 @@ import {
 
 export const SpotForcedWithdrawalFormId = 'spot-withdraw-form'
 
-interface Props extends NewForcedActionFormProps {
-  context: PageContextWithUser
-}
-
-function NewSpotForcedWithdrawalPage(props: Props) {
+function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   const instructions = [
     <>
       Using this form you request a withdrawal of your funds. This is achieved
@@ -119,6 +114,8 @@ function NewSpotForcedWithdrawalPage(props: Props) {
   )
 }
 
-export function renderNewSpotForcedWithdrawPage(props: Props) {
+export function renderNewSpotForcedWithdrawPage(
+  props: NewForcedActionFormProps
+) {
   return reactToHtml(<NewSpotForcedWithdrawalPage {...props} />)
 }
