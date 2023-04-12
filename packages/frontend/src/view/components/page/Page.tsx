@@ -37,7 +37,7 @@ export function Page(props: Props) {
         stylesheets={props.stylesheets ?? ['/styles/main.css']}
       />
       <body className="flex h-full flex-col">
-        <Navbar searchBar={!props.withoutSearch} pageContext={props.context} />
+        <Navbar searchBar={!props.withoutSearch} context={props.context} />
         {props.children}
         <Footer />
         {(props.scripts ?? ['/scripts/main.js']).map((src, i) => (

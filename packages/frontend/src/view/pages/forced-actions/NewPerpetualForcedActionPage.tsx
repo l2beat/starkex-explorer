@@ -22,7 +22,10 @@ interface Props extends NewForcedActionFormProps {
 function NewPerpetualForcedActionPage(props: Props) {
   const isWithdrawal = props.asset.hashOrId === AssetId.USDC
   const propsJson = serializeForcedActionsFormProps(props)
-  const instructionParams = getForcedActionInstructionsParams(isWithdrawal)
+  const instructionParams = getForcedActionInstructionsParams(
+    isWithdrawal,
+    props.context.instanceName
+  )
   return (
     <Page
       path="/forced/new/:positionId/:assetId"

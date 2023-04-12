@@ -1,7 +1,6 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
-import { getTradingMode } from '../../../utils/tradingMode'
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
 import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
 import { ProjectLogo } from '../../assets/logos/ProjectLogo'
@@ -9,13 +8,12 @@ import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
 
 export interface NavbarProps {
-  readonly pageContext: PageContext
+  readonly context: PageContext
   readonly searchBar: boolean
 }
 
-export function Navbar({ searchBar = true, pageContext }: NavbarProps) {
-  const tradingMode = getTradingMode()
-  const { user, instanceName } = pageContext
+export function Navbar({ searchBar = true, context }: NavbarProps) {
+  const { user, instanceName, tradingMode } = context
 
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">

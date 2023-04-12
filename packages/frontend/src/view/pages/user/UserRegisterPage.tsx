@@ -2,7 +2,6 @@ import { PageContextWithUser } from '@explorer/shared'
 import React from 'react'
 
 import { EthereumAddress, StarkKey } from '@explorer/types'
-import { getInstanceName } from '../../../utils/instance'
 import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
@@ -70,7 +69,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             </div>
             <Button
               id={REGISTER_ETHEREUM_ADDRESS_BUTTON_ID}
-              data-instance-name={getInstanceName()}
+              data-instance-name={props.instanceName}
             >
               Register
             </Button>

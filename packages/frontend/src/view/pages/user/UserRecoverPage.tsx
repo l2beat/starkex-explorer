@@ -1,7 +1,6 @@
 import { PageContextWithUser } from '@explorer/shared'
 import React from 'react'
 
-import { getInstanceName } from '../../../utils/instance'
 import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
@@ -66,7 +65,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
             </div>
             <Button
               id={RECOVER_STARK_KEY_BUTTON_ID}
-              data-instance-name={getInstanceName()}
+              data-instance-name={props.context.instanceName}
             >
               Recover
             </Button>
