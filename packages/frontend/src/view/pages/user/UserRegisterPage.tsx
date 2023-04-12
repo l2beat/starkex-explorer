@@ -1,7 +1,7 @@
-import { PageContextWithUser } from '@explorer/shared'
+import { PageContextWithUserAndStarkKey } from '@explorer/shared'
 import React from 'react'
 
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { EthereumAddress } from '@explorer/types'
 import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
@@ -15,12 +15,7 @@ export const REGISTER_ETHEREUM_ADDRESS_BUTTON_ID =
   'register-ethereum-address-button'
 
 interface UserRegisterPageProps {
-  context: PageContextWithUser & {
-    user: {
-      starkKey: StarkKey
-      address: EthereumAddress
-    }
-  }
+  context: PageContextWithUserAndStarkKey
   exchangeAddress: EthereumAddress
 }
 

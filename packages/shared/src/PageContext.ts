@@ -16,6 +16,13 @@ export const PageContextWithUser = PageContext.extend({
   user: UserDetails,
 })
 
+export type PageContextWithUserAndStarkKey = z.infer<
+  typeof PageContextWithUserAndStarkKey
+>
+export const PageContextWithUserAndStarkKey = PageContext.extend({
+  user: UserDetails.transform((o) => ({ ...o, starkKey: o.starkKey! })),
+})
+
 export function isPageContextUserDefined(
   context: PageContext
 ): context is PageContextWithUser {

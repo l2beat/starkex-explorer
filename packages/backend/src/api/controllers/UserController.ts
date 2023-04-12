@@ -4,16 +4,13 @@ import {
   renderUserOffersPage,
   renderUserPage,
   renderUserRecoverPage,
+  renderUserRegisterPage,
   renderUserTransactionsPage,
   TransactionEntry,
   UserAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
-import {
-  isPageContextUserDefined,
-  TradingMode,
-  UserDetails,
-} from '@explorer/shared'
+import { TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
@@ -60,12 +57,32 @@ export class UserController {
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
+  async getUserRegisterPage(
+    givenUser: Partial<UserDetails>
+  ): Promise<ControllerResult> {
+    const context =
+      await this.pageContextService.getPageContextWithUserAndStarkKey(givenUser)
+
+    if (!context) {
+      return { type: 'redirect', url: '/users/recover' }
+    }
+
+    const content = renderUserRegisterPage({
+      context,
+      exchangeAddress: this.exchangeAddress,
+    })
+
+    return { type: 'success', content }
+  }
+
   async getUserRecoverPage(
     givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
-    const context = await this.pageContextService.getPageContext(givenUser)
+    const context = await this.pageContextService.getPageContextWithUser(
+      givenUser
+    )
 
-    if (!isPageContextUserDefined(context)) {
+    if (!context) {
       return { type: 'not found', content: 'Wallet not connect' }
     }
 
