@@ -1,27 +1,31 @@
 import { PageContextWithUser } from '@explorer/shared'
 import React from 'react'
 
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import { getInstanceName } from '../../../utils/instance'
 import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
-import { Link } from '../../components/Link'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 
-export const REGISTER_STARK_KEY_BUTTON_ID = 'register-stark-key-button'
+export const REGISTER_ETHEREUM_ADDRESS_BUTTON_ID =
+  'register-ethereum-address-button'
 
-interface UserRegisterPageProps {
-  context: PageContextWithUser
+interface UserRegisterPageProps extends PageContextWithUser {
+  user: {
+    starkKey: StarkKey
+    address: EthereumAddress
+  }
 }
 
 function UserRegisterPage(props: UserRegisterPageProps) {
   return (
     <Page
-      context={props.context}
+      context={props}
       description="TODO: description"
       path="/users/register"
     >
@@ -30,35 +34,33 @@ function UserRegisterPage(props: UserRegisterPageProps) {
           <div className="text-xxl font-semibold">Register Stark key</div>
           <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">
             <span>
-              You have connected your wallet, but our system doesn't see any
-              registered account for this address. This is because StarkEx
-              systems use Stark keys and not Ethereum addresses as user ids. If
-              you are a user of this system please register your Ethereum
-              address with your Stark key.
+              Aute ad culpa eiusmod et anim adipisicing non consectetur amet
+              aliqua. Magna reprehenderit do laboris labore cupidatat sint. Non
+              ullamco ut consectetur aute deserunt. Sunt aute pariatur tempor
+              sit velit excepteur consectetur id mollit adipisicing enim
+              excepteur.
             </span>
             <span>
-              Registering requires you to sign a message with your stark private
-              key. To obtain the key we will ask you to sign a message with
-              metamask. CAUTION This operation can be dangerous if done on a
-              malicious website. Make sure you trust this website (you can read
-              the code{' '}
-              <Link href="https://github.com/l2beat/starkex-explorer">
-                here
-              </Link>
-              ). Metamask will say that the message should only be signed on
-              DOMAIN, but you can make an exception for this explorer.
+              Cupidatat laborum excepteur enim irure. Culpa aliquip consequat
+              dolore laboris ullamco cupidatat velit exercitation non laboris
+              magna in. Excepteur minim consectetur proident deserunt
+              exercitation aute irure cillum ex incididunt. Ad velit proident
+              aliquip cupidatat sint proident incididunt ex. Pariatur do elit
+              nostrud voluptate aliqua duis sunt Lorem fugiat ipsum officia
+              minim dolore.
             </span>
-            {/* TODO: Add link to DOMAIN */}
             <span>
-              As an alternative to registration you can try to figure out your
-              stark key yourself. Then just paste it into the search bar. You
-              will however be unable to submit forced transactions without
-              registering.
+              Velit enim enim mollit labore. Fugiat tempor enim occaecat
+              incididunt consequat esse aliquip mollit consequat. Consectetur
+              adipisicing adipisicing consequat irure est sint reprehenderit
+              irure.
             </span>
           </div>
         </div>
-        <Card className="h-min flex-1">
-          <p className="text-sm font-semibold text-zinc-500">Stark key</p>
+        <Card className="h-min max-w-lg flex-1">
+          <p className="text-sm font-semibold text-zinc-500">
+            Ethereum address
+          </p>
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center">
               <WarningIcon />
@@ -67,7 +69,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
               </p>
             </div>
             <Button
-              id={REGISTER_STARK_KEY_BUTTON_ID}
+              id={REGISTER_ETHEREUM_ADDRESS_BUTTON_ID}
               data-instance-name={getInstanceName()}
             >
               Register
@@ -79,11 +81,9 @@ function UserRegisterPage(props: UserRegisterPageProps) {
               Register your Stark key
             </p>
           </div>
-          <p className="mt-6 text-sm font-semibold text-zinc-500 ">
-            Ethereum address
-          </p>
-          <InlineEllipsis className="mt-1 w-full max-w-[99%] font-semibold text-white ">
-            {props.context.user.address.toString()}
+          <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
+          <InlineEllipsis className="mt-1 max-w-[70%] font-semibold text-white">
+            {props.user.starkKey.toString()}
           </InlineEllipsis>
         </Card>
       </ContentWrapper>

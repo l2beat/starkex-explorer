@@ -35,8 +35,9 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
 import { renderMerkleProofPage } from '../view/pages/MerkleProofPage'
+import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
+import { renderUserRegisterPage } from '../view/pages/user/UserRegisterPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
   randomHomeForcedTransactionEntry,
@@ -288,6 +289,23 @@ const routes: Route[] = [
       ctx.body = renderUserRecoverPage({
         context,
       })
+    },
+  },
+  {
+    path: '/users/register',
+    description:
+      'Stark key register page, the stark key is known but not registered.',
+    render: (ctx) => {
+      const context = getPageContext(ctx, true)
+      const props = {
+        ...context,
+        user: {
+          ...context.user,
+          starkKey: context.user.starkKey ?? StarkKey.fake(),
+        },
+      }
+
+      ctx.body = renderUserRegisterPage(props)
     },
   },
   {

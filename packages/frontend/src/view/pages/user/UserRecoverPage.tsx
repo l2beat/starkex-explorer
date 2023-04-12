@@ -55,7 +55,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
             </span>
           </div>
         </div>
-        <Card className="h-min flex-1">
+        <Card className="h-min max-w-lg flex-1">
           <p className="text-sm font-semibold text-zinc-500">Stark key</p>
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center">
@@ -68,16 +68,16 @@ function UserRecoverPage(props: UserRegisterPageProps) {
               id={RECOVER_STARK_KEY_BUTTON_ID}
               data-instance-name={getInstanceName()}
             >
-              Register
+              Recover
             </Button>
           </div>
           <div className="mt-3 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
             <InfoIcon />
             <p className="ml-2 text-sm font-medium text-white">
-              Register your Stark key
+              Recover your Stark key
             </p>
           </div>
-          <p className="mt-6 text-sm font-semibold text-zinc-500 ">
+          <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
           <InlineEllipsis className="mt-1 w-full max-w-[99%] font-semibold text-white ">
