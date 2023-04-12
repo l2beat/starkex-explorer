@@ -1,8 +1,8 @@
 import { CreateOfferData } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
-import { Api } from '../peripherals/api'
-import { Wallet } from '../peripherals/wallet'
+import { Api } from '../../peripherals/api'
+import { Wallet } from '../../peripherals/wallet'
 import { FormState } from './types'
 import { isBuyable } from './utils'
 

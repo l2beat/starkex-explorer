@@ -1,5 +1,5 @@
-import { FormId } from '../../view/pages/forced-actions/components/form/ids'
-import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
+import { FormId } from '../../../view/pages/forced-actions/components/form/ids'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormElements, getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'

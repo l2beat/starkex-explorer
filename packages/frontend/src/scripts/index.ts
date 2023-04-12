@@ -1,7 +1,7 @@
 import { USE_NEW_DESIGN } from '../utils/constants'
 import { initCountdownTimer } from './countdownTimer'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
-import { initForcedTradeOfferForms } from './forced-actions/offer'
+import { initForcedTradeOfferForms } from './forced-actions/perpetual/offer'
 import { initImageFallback } from './imageFallback'
 import { initMetamask } from './metamask'
 // eslint-disable-next-line no-restricted-imports

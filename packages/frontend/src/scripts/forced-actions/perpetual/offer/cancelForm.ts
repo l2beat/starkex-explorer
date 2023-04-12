@@ -1,8 +1,8 @@
 import { EthereumAddress } from '@explorer/types'
 
-import { CANCEL_OFFER_FORM_ID } from '../../../view/pages/transaction/components/CancelOfferForm'
-import { Api } from '../../peripherals/api'
-import { Wallet } from '../../peripherals/wallet'
+import { CANCEL_OFFER_FORM_ID } from '../../../../view/pages/transaction/components/CancelOfferForm'
+import { Api } from '../../../peripherals/api'
+import { Wallet } from '../../../peripherals/wallet'
 
 export function initCancelOfferForm() {
   const form = document.querySelector<HTMLFormElement>(

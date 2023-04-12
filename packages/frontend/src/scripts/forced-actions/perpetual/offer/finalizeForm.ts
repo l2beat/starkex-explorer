@@ -2,9 +2,9 @@ import { deserializeFinalizeOfferData } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
-import { FINALIZE_OFFER_FORM_ID } from '../../../view/pages/transaction/components/FinalizeOfferForm'
-import { Api } from '../../peripherals/api'
-import { Wallet } from '../../peripherals/wallet'
+import { FINALIZE_OFFER_FORM_ID } from '../../../../view/pages/transaction/components/FinalizeOfferForm'
+import { Api } from '../../../peripherals/api'
+import { Wallet } from '../../../peripherals/wallet'
 
 export function initFinalizeForm() {
   const form = document.querySelector<HTMLFormElement>(
