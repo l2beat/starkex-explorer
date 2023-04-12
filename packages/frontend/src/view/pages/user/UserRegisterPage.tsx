@@ -1,7 +1,7 @@
 import { PageContextWithUserAndStarkKey } from '@explorer/shared'
+import { EthereumAddress } from '@explorer/types'
 import React from 'react'
 
-import { EthereumAddress } from '@explorer/types'
 import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'

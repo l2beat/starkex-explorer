@@ -42,7 +42,6 @@ export class SpotForcedWithdrawalController {
 
     const content = renderNewSpotForcedWithdrawPage({
       context,
-      user: context.user,
       starkExAddress: EthereumAddress.ZERO,
       positionOrVaultId: vaultId,
       starkKey: asset.starkKey,

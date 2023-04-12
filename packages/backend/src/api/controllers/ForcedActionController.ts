@@ -2,7 +2,7 @@ import {
   renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
 } from '@explorer/frontend'
-import { isPageContextUserDefined, UserDetails } from '@explorer/shared'
+import { UserDetails, isPageContextUserDefined } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { PageContextService } from '../../core/PageContextService'
@@ -50,7 +50,6 @@ export class ForcedActionController {
 
     const content = renderNewSpotForcedWithdrawPage({
       context,
-      user: context.user,
       starkExAddress: this.starkExAddress,
       positionOrVaultId: vaultId,
       starkKey: asset.starkKey,
@@ -96,7 +95,6 @@ export class ForcedActionController {
 
     const content = renderNewSpotForcedWithdrawPage({
       context,
-      user: context.user,
       starkExAddress: this.starkExAddress,
       positionOrVaultId: positionId,
       starkKey: asset.starkKey,
@@ -137,7 +135,6 @@ export class ForcedActionController {
 
     const content = renderNewPerpetualForcedActionPage({
       context,
-      user: context.user,
       starkExAddress: this.starkExAddress,
       positionOrVaultId: positionId,
       starkKey: asset.starkKey,

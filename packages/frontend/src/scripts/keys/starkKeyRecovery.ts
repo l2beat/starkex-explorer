@@ -1,7 +1,7 @@
+import { InstanceName } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 import Cookie from 'js-cookie'
 
-import { InstanceName } from '@explorer/shared'
 import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
 import { RecoveredKeys, recoverKeysDydx, recoverKeysMyria } from './recovery'
 

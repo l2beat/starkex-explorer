@@ -35,8 +35,8 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderMerkleProofPage } from '../view/pages/MerkleProofPage'
 import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
+import { renderMerkleProofPage } from '../view/pages/MerkleProofPage'
 import { renderUserRegisterPage } from '../view/pages/user/UserRegisterPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import {

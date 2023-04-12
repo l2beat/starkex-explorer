@@ -1,6 +1,6 @@
+import { InstanceName } from '@explorer/shared'
 import React from 'react'
 
-import { InstanceName } from '@explorer/shared'
 import { Link } from '../../../components/Link'
 
 const getWithdrawalInstructions = (instanceName: InstanceName) => [

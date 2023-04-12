@@ -20,6 +20,7 @@ export type PageContextWithUserAndStarkKey = z.infer<
   typeof PageContextWithUserAndStarkKey
 >
 export const PageContextWithUserAndStarkKey = PageContext.extend({
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   user: UserDetails.transform((o) => ({ ...o, starkKey: o.starkKey! })),
 })
 
