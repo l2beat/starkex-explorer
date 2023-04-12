@@ -25,7 +25,7 @@ async function submitExit(state: FormState) {
   )
 
   await Api.submitPerpetualForcedWithdrawal(hash)
-  window.location.href = `/forced/${hash.toString()}`
+  window.location.href = `/transactions/${hash.toString()}`
 }
 
 async function submitOffer(state: FormState) {
