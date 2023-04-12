@@ -2,11 +2,11 @@ import { EthereumAddress } from '@explorer/types'
 import Cookie from 'js-cookie'
 
 import { InstanceName } from '../../utils/instance'
-import { REGISTER_STARK_KEY_BUTTON_ID } from '../../view'
+import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
 import { RecoveredKeys, recoverKeysDydx, recoverKeysMyria } from './recovery'
 
-export function initStarkKeyRegistration() {
-  const registerButton = document.getElementById(REGISTER_STARK_KEY_BUTTON_ID)
+export function initStarkKeyRecovery() {
+  const registerButton = document.getElementById(RECOVER_STARK_KEY_BUTTON_ID)
   const cookieAccount = Cookie.get('account')
   const account = cookieAccount ? EthereumAddress(cookieAccount) : undefined
 

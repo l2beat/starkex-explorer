@@ -31,6 +31,7 @@ import {
   renderUserBalanceChangesPage,
   renderUserOffersPage,
   renderUserPage,
+  renderUserRecoverPage,
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
@@ -280,7 +281,17 @@ const routes: Route[] = [
   // #endregion
   // #region User
   {
-    path: '/users/register',
+    path: '/users/recover',
+    description: 'Stark key recovery page, the stark key is not known.',
+    render: (ctx) => {
+      const context = getPageContext(ctx, true)
+      ctx.body = renderUserRecoverPage({
+        context,
+      })
+    },
+  },
+  {
+    path: '/users/registered',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
       const context = getPageContext(ctx)

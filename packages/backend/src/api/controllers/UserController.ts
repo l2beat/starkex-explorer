@@ -3,7 +3,7 @@ import {
   renderUserBalanceChangesPage,
   renderUserOffersPage,
   renderUserPage,
-  renderUserRegisterPage,
+  renderUserRecoverPage,
   renderUserTransactionsPage,
   TransactionEntry,
   UserAssetEntry,
@@ -60,7 +60,7 @@ export class UserController {
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
-  async getRegisterPage(
+  async getUserRecoverPage(
     givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
@@ -76,7 +76,7 @@ export class UserController {
       }
     }
 
-    const content = renderUserRegisterPage({
+    const content = renderUserRecoverPage({
       context,
     })
 

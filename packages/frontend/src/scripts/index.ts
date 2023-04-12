@@ -3,7 +3,7 @@ import { initCountdownTimer } from './countdownTimer'
 import { initEthereumAddressRegistration } from './ethereumAddressRegistration'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
 import { initImageFallback } from './imageFallback'
-import { initStarkKeyRegistration } from './keys/starkKeyRegistration'
+import { initStarkKeyRecovery } from './keys/starkKeyRecovery'
 import { initMetamask } from './metamask'
 import { initForcedTradeOfferForms } from './offer'
 // eslint-disable-next-line no-restricted-imports
@@ -33,7 +33,7 @@ if (USE_NEW_DESIGN) {
   initImageFallback()
   initPagination()
   initStateUpdateStats()
-  initStarkKeyRegistration()
+  initStarkKeyRecovery()
   initForcedTradeOfferForms()
   initRegularWithdrawalForm()
   initEthereumAddressRegistration()
