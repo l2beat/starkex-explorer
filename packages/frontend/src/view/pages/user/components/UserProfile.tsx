@@ -3,7 +3,7 @@ import React from 'react'
 
 import { InfoIcon } from '../../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../../assets/icons/WarningIcon'
-import { Button } from '../../../components/Button'
+import { LinkButton } from '../../../components/Button'
 
 export const REGISTER_ETHEREUM_ADDRESS_BUTTON_ID =
   'register-ethereum-address-button'
@@ -18,7 +18,6 @@ export function UserProfile({
   starkKey,
   ethereumAddress,
   isMine,
-  exchangeAddress,
 }: UserProfileProps) {
   return (
     <section className="flex w-full flex-col rounded-lg bg-gray-800 p-6">
@@ -38,14 +37,7 @@ export function UserProfile({
               <WarningIcon />
               <p className="ml-2 font-semibold text-amber-500">Unknown</p>
             </div>
-            {isMine && (
-              <Button
-                id={REGISTER_ETHEREUM_ADDRESS_BUTTON_ID}
-                data-exchange-address={exchangeAddress.toString()}
-              >
-                Register
-              </Button>
-            )}
+            {isMine && <LinkButton href="/users/register">Register</LinkButton>}
           </div>
           {isMine && (
             <div className="mt-5 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">

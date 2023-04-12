@@ -297,15 +297,17 @@ const routes: Route[] = [
       'Stark key register page, the stark key is known but not registered.',
     render: (ctx) => {
       const context = getPageContext(ctx, true)
-      const props = {
-        ...context,
-        user: {
-          ...context.user,
-          starkKey: context.user.starkKey ?? StarkKey.fake(),
-        },
-      }
 
-      ctx.body = renderUserRegisterPage(props)
+      ctx.body = renderUserRegisterPage({
+        context: {
+          ...context,
+          user: {
+            ...context.user,
+            starkKey: context.user.starkKey ?? StarkKey.fake(),
+          },
+        },
+        exchangeAddress: EthereumAddress.fake(),
+      })
     },
   },
   {

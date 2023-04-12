@@ -39,7 +39,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
         {!user && <Button id="connect-with-metamask">Connect wallet</Button>}
         {user && (
           <a
-            href={`/users/${user.starkKey?.toString() ?? 'register'}`}
+            href={`/users/${user.starkKey?.toString() ?? 'recover'}`}
             className="relative flex h-10 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand"
           >
             <JazzIcon

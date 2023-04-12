@@ -14,17 +14,20 @@ import { reactToHtml } from '../../reactToHtml'
 export const REGISTER_ETHEREUM_ADDRESS_BUTTON_ID =
   'register-ethereum-address-button'
 
-interface UserRegisterPageProps extends PageContextWithUser {
-  user: {
-    starkKey: StarkKey
-    address: EthereumAddress
+interface UserRegisterPageProps {
+  context: PageContextWithUser & {
+    user: {
+      starkKey: StarkKey
+      address: EthereumAddress
+    }
   }
+  exchangeAddress: EthereumAddress
 }
 
 function UserRegisterPage(props: UserRegisterPageProps) {
   return (
     <Page
-      context={props}
+      context={props.context}
       description="TODO: description"
       path="/users/register"
     >
@@ -69,7 +72,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             </div>
             <Button
               id={REGISTER_ETHEREUM_ADDRESS_BUTTON_ID}
-              data-instance-name={props.instanceName}
+              data-exchange-address={props.exchangeAddress.toString()}
             >
               Register
             </Button>
@@ -82,7 +85,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
           </div>
           <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
           <InlineEllipsis className="mt-1 max-w-[70%] font-semibold text-white">
-            {props.user.starkKey.toString()}
+            {props.context.user.starkKey.toString()}
           </InlineEllipsis>
         </Card>
       </ContentWrapper>
