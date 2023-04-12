@@ -3,6 +3,7 @@ import { EthereumAddress } from '@explorer/types'
 import Cookie from 'js-cookie'
 
 import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
+import { getUsersInfo } from '../metamask'
 import { RecoveredKeys, recoverKeysDydx, recoverKeysMyria } from './recovery'
 
 export function initStarkKeyRecovery() {
@@ -19,9 +20,20 @@ export function initStarkKeyRecovery() {
   registerButton.addEventListener('click', async () => {
     const keys = await recoverKeys(account, instanceName)
     Cookie.set('starkKey', keys.starkKey.toString())
-    localStorage.setItem('registration', JSON.stringify(keys.registration))
+    setToLocalStorage(account, keys)
     window.location.href = `/users/${keys.starkKey.toString()}`
   })
+}
+
+const setToLocalStorage = (account: EthereumAddress, keys: RecoveredKeys) => {
+  const accountsMap = getUsersInfo()
+
+  accountsMap[account.toLowerCase()] = {
+    starkKey: keys.starkKey,
+    registration: keys.registration,
+  }
+
+  localStorage.setItem('accountsMap', JSON.stringify(accountsMap))
 }
 
 const recoverKeys = (
