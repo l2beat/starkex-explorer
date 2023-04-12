@@ -44,4 +44,5 @@ Next, you should import one of the accounts to your metamask. You can find the p
 
 **BE AWARE OF THE FACT THAT THIS ACCOUNT CAN BE USED BY ANYONE SO KEEP IN MIND TO NOT TRANSFER ANY MONEY TO IT**
 
+Testnet does not save current state after terminating it, it starts all over again. So you probably need to drop all tables from testnet database.
 You are now good to go. Launch the testnet and backend packages, switch your metamask network to the one you have added and open page served by the backend.
