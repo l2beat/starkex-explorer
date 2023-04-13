@@ -117,7 +117,6 @@ export class UserTransactionCollector {
         if (this.collateralAsset === undefined) {
           throw new Error('Collateral asset is not configured')
         }
-        console.log('LogForcedTradeRequest', event.args.collateralAssetId)
 
         return this.userTransactionRepository.add({
           ...base,
