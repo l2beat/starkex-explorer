@@ -31,26 +31,15 @@ function UserRegisterPage(props: UserRegisterPageProps) {
           <div className="text-xxl font-semibold">Register Stark key</div>
           <div className="mt-6 flex flex-col gap-6 text-md font-medium leading-5 text-zinc-500">
             <span>
-              Aute ad culpa eiusmod et anim adipisicing non consectetur amet
-              aliqua. Magna reprehenderit do laboris labore cupidatat sint. Non
-              ullamco ut consectetur aute deserunt. Sunt aute pariatur tempor
-              sit velit excepteur consectetur id mollit adipisicing enim
-              excepteur.
+              You have connected your wallet and recovered the stark key but our
+              system doesn't see any registered account for this address. There
+              is no need for doing anything, registering your stark key is only
+              needed when you want to perform forced actions.
             </span>
             <span>
-              Cupidatat laborum excepteur enim irure. Culpa aliquip consequat
-              dolore laboris ullamco cupidatat velit exercitation non laboris
-              magna in. Excepteur minim consectetur proident deserunt
-              exercitation aute irure cillum ex incididunt. Ad velit proident
-              aliquip cupidatat sint proident incididunt ex. Pariatur do elit
-              nostrud voluptate aliqua duis sunt Lorem fugiat ipsum officia
-              minim dolore.
-            </span>
-            <span>
-              Velit enim enim mollit labore. Fugiat tempor enim occaecat
-              incididunt consequat esse aliquip mollit consequat. Consectetur
-              adipisicing adipisicing consequat irure est sint reprehenderit
-              irure.
+              Registering means that your stark key will be linked to your
+              ethereum address on L1. However the cost is very high so do not do
+              this if you don't need to.
             </span>
           </div>
         </div>
