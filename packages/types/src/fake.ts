@@ -1,3 +1,5 @@
+import range from 'lodash/range'
+
 const HEX_DIGITS = '0123456789abcdef'
 
 export function fakeHexDigit() {
@@ -5,5 +7,5 @@ export function fakeHexDigit() {
 }
 
 export function fakeHexString(length: number) {
-  return Array.from({ length }).map(fakeHexDigit).join('')
+  return range(length).map(fakeHexDigit).join('')
 }

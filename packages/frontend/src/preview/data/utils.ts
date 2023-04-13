@@ -1,7 +1,8 @@
 import { Timestamp } from '@explorer/types'
+import range from 'lodash/range'
 
 export function repeat<T>(n: number, create: () => T) {
-  return Array.from({ length: n }).map(create)
+  return range(n).map(create)
 }
 
 export function randomTimestamp(): Timestamp {

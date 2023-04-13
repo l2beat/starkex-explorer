@@ -1,6 +1,6 @@
 import { EthereumAddress } from '@explorer/types'
 import { AbiCoder } from 'ethers/lib/utils'
-import { partition } from 'lodash'
+import partition from 'lodash/partition'
 
 import { BlockRange } from '../../model/BlockRange'
 import {

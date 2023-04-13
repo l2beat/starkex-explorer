@@ -1,6 +1,6 @@
 import { OnChainData } from '@explorer/encoding'
 import { AssetId, Timestamp } from '@explorer/types'
-import { zip } from 'lodash'
+import zip from 'lodash/zip'
 
 import { MerkleTree } from './MerkleTree'
 import { PositionLeaf } from './PositionLeaf'

@@ -1,3 +1,5 @@
+import classNames from 'classnames'
+import range from 'lodash/range'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
@@ -16,20 +18,30 @@ export interface StateUpdatePriceEntry {
 }
 
 export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
+  const tableCount = props.priceChanges.length == 1 ? 1 : 2
+
   return (
-    <Table
-      columns={[{ header: 'Asset' }, { header: 'Price', numeric: true }]}
-      rows={props.priceChanges.map((transaction) => {
-        return {
-          cells: [
-            <AssetWithLogo
-              type="small"
-              assetInfo={assetToInfo(transaction.asset)}
-            />,
-            formatWithDecimals(transaction.price, 2, { prefix: '$' }),
-          ],
-        }
+    <div className={classNames('flex', tableCount === 2 && 'gap-12')}>
+      {range(tableCount).map((index) => {
+        return (
+          <Table
+            columns={[{ header: 'Asset' }, { header: 'Price', numeric: true }]}
+            rows={props.priceChanges
+              .filter((_, txIndex) => txIndex % tableCount === index)
+              .map((transaction) => {
+                return {
+                  cells: [
+                    <AssetWithLogo
+                      type="small"
+                      assetInfo={assetToInfo(transaction.asset)}
+                    />,
+                    formatWithDecimals(transaction.price, 2, { prefix: '$' }),
+                  ],
+                }
+              })}
+          />
+        )
       })}
-    />
+    </div>
   )
 }
