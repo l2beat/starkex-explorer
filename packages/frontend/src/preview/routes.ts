@@ -378,7 +378,31 @@ const routes: Route[] = [
     path: '/users/:starkKey',
     link: '/users/someone',
     description: 'Someone else’s user page.',
-    render: notFound,
+    render: (ctx) => {
+      const fakeUser = getFakeUser()
+      const context = {
+        ...getPageContext(ctx),
+        user: fakeUser,
+      }
+
+      ctx.body = renderUserPage({
+        context,
+        tradingMode: context.tradingMode,
+        starkKey: context.user.starkKey,
+        ethereumAddress: context.user.address,
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
+        offersToAccept: repeat(2, randomUserOfferEntry),
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 7,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+      })
+    },
   },
   // #endregion
   // #region User lists
