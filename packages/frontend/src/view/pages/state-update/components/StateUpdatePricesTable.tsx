@@ -18,12 +18,11 @@ export interface StateUpdatePriceEntry {
 }
 
 export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
-  const tableCount =
-    props.priceChanges.length > 20 ? 3 : props.priceChanges.length > 10 ? 2 : 1
+  const tableCount = props.priceChanges.length == 1 ? 1 : 2
 
   return (
-    <div className={classNames('flex', tableCount === 2 ? 'gap-12' : 'gap-6')}>
-      {range(tableCount).map((_, index) => {
+    <div className={classNames('flex', tableCount === 2 && 'gap-12')}>
+      {range(tableCount).map((index) => {
         return (
           <Table
             columns={[{ header: 'Asset' }, { header: 'Price', numeric: true }]}
