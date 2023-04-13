@@ -83,7 +83,6 @@ export class TransactionController {
   ) {
     switch (userTransaction.data.type) {
       case 'ForcedWithdrawal': {
-        //TODO: IS THIS CORRECT?
         if (!this.collateralAsset) {
           throw new Error(
             'Collateral asset not passed when displaying ForcedWithdrawal'

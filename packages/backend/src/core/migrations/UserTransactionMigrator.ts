@@ -198,9 +198,8 @@ export class UserTransactionMigrator {
             },
           })
         } else if (tx.data.startsWith('0x2ecb8162')) {
-          //TODO: IS THIS CORRECT?
           if (!this.collateralAsset) {
-            throw new Error('Collateral asset ID is not set!')
+            throw new Error('Collateral asset is not set!')
           }
           const data = decodePerpetualForcedTradeRequest(
             tx.data,
