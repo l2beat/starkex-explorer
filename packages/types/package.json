@@ -21,7 +21,8 @@
   },
   "dependencies": {
     "@ethersproject/address": "^5.6.1",
-    "@ethersproject/bignumber": "^5.6.2"
+    "@ethersproject/bignumber": "^5.6.2",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {}
 }
