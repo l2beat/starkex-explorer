@@ -23,7 +23,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
   return (
     <Page
       context={props.context}
-      description="TODO: description"
+      description="Register your stark key to your ethereum address"
       path="/users/register"
     >
       <ContentWrapper className="flex gap-12">
