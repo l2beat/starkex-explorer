@@ -311,15 +311,22 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/users/registered',
-    description: 'My user page, the stark key is known and registered.',
+    path: '/users/me/unregistered',
+    description:
+      'My user page, the stark key is known, but it’s not registered.',
     render: (ctx) => {
-      const context = getPageContext(ctx)
+      const context = getPageContext(ctx, true)
+      const starkKey = context.user.starkKey ?? StarkKey.fake()
       ctx.body = renderUserPage({
-        context,
+        context: {
+          ...context,
+          user: {
+            ...context.user,
+            starkKey,
+          },
+        },
         tradingMode: context.tradingMode,
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
+        starkKey: starkKey,
         exchangeAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         offersToAccept: [],
@@ -335,26 +342,22 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/users/:starkKey',
-    link: '/users/someone',
-    description: 'Someone else’s user page.',
-    render: notFound,
-  },
-  {
-    path: '/users/me/unregistered',
-    description:
-      'My user page, the stark key is known, but it’s not registered.',
-    render: notFound,
-  },
-  {
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
       const context = getPageContext(ctx, true)
+      const starkKey = context.user.starkKey ?? StarkKey.fake()
+
       ctx.body = renderUserPage({
-        context,
+        context: {
+          ...context,
+          user: {
+            ...context.user,
+            starkKey,
+          },
+        },
         tradingMode: context.tradingMode,
-        starkKey: context.user.starkKey ?? StarkKey.fake(),
+        starkKey: starkKey,
         ethereumAddress: context.user.address,
         exchangeAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
@@ -371,9 +374,14 @@ const routes: Route[] = [
     },
     breakAfter: true,
   },
+  {
+    path: '/users/:starkKey',
+    link: '/users/someone',
+    description: 'Someone else’s user page.',
+    render: notFound,
+  },
   // #endregion
   // #region User lists
-
   {
     path: '/users/:starkKey/assets',
     link: '/users/someone/assets',
