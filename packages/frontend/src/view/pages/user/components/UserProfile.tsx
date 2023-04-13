@@ -1,23 +1,23 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { UserDetails } from '@explorer/shared'
 import { InfoIcon } from '../../../assets/icons/InfoIcon'
-import { WarningIcon } from '../../../assets/icons/WarningIcon'
 import { LinkButton } from '../../../components/Button'
 
 export const REGISTER_STARK_KEY_BUTTON_ID = 'register-stark-key-button'
 interface UserProfileProps {
+  user: Partial<UserDetails> | undefined
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
-  isMine?: boolean
-  exchangeAddress: EthereumAddress
 }
 
 export function UserProfile({
+  user,
   starkKey,
   ethereumAddress,
-  isMine,
 }: UserProfileProps) {
+  const isMine = user?.starkKey === starkKey
   return (
     <section className="flex w-full flex-col rounded-lg bg-gray-800 p-6">
       <p className="text-sm font-semibold text-zinc-500">Stark key</p>
@@ -32,18 +32,17 @@ export function UserProfile({
       ) : (
         <>
           <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center">
-              <WarningIcon />
-              <p className="ml-2 font-semibold text-amber-500">Unknown</p>
-            </div>
+            <p className="font-semibold">
+              {user?.address && isMine ? user.address.toString() : 'Unknown'}
+            </p>
             {isMine && <LinkButton href="/users/register">Register</LinkButton>}
           </div>
           {isMine && (
             <div className="mt-5 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
               <InfoIcon />
               <p className="ml-2 text-sm text-white">
-                Register your Stark key by proceeding with our step-by-step
-                instructions.
+                Your stark key is not linked to your ethereum address. You don't
+                need this unless you want to perform forced actions.
               </p>
             </div>
           )}

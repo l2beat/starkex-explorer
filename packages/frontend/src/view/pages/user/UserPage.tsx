@@ -65,10 +65,9 @@ function UserPage(props: UserPageProps) {
           <PageTitle>User</PageTitle>
           <div className="flex flex-col gap-6">
             <UserProfile
+              user={props.context.user}
               starkKey={props.starkKey}
               ethereumAddress={props.ethereumAddress}
-              isMine={isMine}
-              exchangeAddress={props.exchangeAddress}
             />
             <UserQuickActionsTable
               withdrawableAssets={props.withdrawableAssets}
