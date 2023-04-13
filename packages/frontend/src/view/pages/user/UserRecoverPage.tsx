@@ -42,8 +42,8 @@ function UserRecoverPage(props: UserRegisterPageProps) {
               <Link href="https://github.com/l2beat/starkex-explorer">
                 here
               </Link>
-              ). Metamask will say that the message should only be signed on
-              DOMAIN, but you can make an exception for this explorer.
+              ). Metamask may say that the message should only be signed on
+              given domain, but you can make an exception for this explorer.
             </span>
             {/* TODO: Add link to DOMAIN */}
             <span>
