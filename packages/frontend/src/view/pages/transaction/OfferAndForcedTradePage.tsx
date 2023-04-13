@@ -119,14 +119,14 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
               )}
               {props.cancelForm && (
                 <CancelOfferForm {...props.cancelForm}>
-                  <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
+                  <button className="bg-blue-700 rounded-md px-4 py-2 text-white">
                     Cancel
                   </button>
                 </CancelOfferForm>
               )}
               {props.finalizeForm && (
                 <FinalizeOfferForm {...props.finalizeForm}>
-                  <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
+                  <button className="bg-blue-700 rounded-md px-4 py-2 text-white">
                     Finalize
                   </button>
                 </FinalizeOfferForm>

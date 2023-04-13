@@ -3,7 +3,6 @@ import { EthereumAddress } from '@explorer/types'
 import React from 'react'
 
 import { InfoIcon } from '../../assets/icons/InfoIcon'
-import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
@@ -47,12 +46,9 @@ function UserRegisterPage(props: UserRegisterPageProps) {
             Ethereum address
           </p>
           <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center">
-              <WarningIcon />
-              <p className="text-base ml-2 font-semibold text-amber-500">
-                Unknown
-              </p>
-            </div>
+            <InlineEllipsis className="max-w-[200px] font-semibold">
+              {props.context.user.address.toString()}
+            </InlineEllipsis>
             <Button
               id={REGISTER_STARK_KEY_BUTTON_ID}
               data-exchange-address={props.exchangeAddress.toString()}

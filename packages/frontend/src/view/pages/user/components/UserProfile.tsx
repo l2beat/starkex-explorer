@@ -25,7 +25,7 @@ export function UserProfile({
         Ethereum address
       </p>
       {ethereumAddress ? (
-        <p className="text-base mt-3 font-semibold text-white ">
+        <p className="mt-3 font-semibold text-white ">
           {ethereumAddress.toString()}
         </p>
       ) : (

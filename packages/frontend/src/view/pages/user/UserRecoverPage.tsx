@@ -59,9 +59,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
           <div className="mt-3 flex items-center justify-between">
             <div className="flex items-center">
               <WarningIcon />
-              <p className="text-base ml-2 font-semibold text-amber-500">
-                Unknown
-              </p>
+              <p className="ml-2 font-semibold text-amber-500">Unknown</p>
             </div>
             <Button
               id={RECOVER_STARK_KEY_BUTTON_ID}
