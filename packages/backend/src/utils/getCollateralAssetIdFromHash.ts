@@ -1,6 +1,6 @@
 import { AssetHash, Hash256 } from '@explorer/types'
 
-import { CollateralAsset } from '../CollateralAsset'
+import { CollateralAsset } from '@explorer/shared/src/CollateralAsset'
 
 export function getCollateralAssetIdFromHash(
   hash: AssetHash | Hash256 | string,
