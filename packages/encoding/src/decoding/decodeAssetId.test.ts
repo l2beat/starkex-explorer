@@ -17,7 +17,7 @@ describe('decodeAssetId', () => {
     expect(result).toEqual(AssetId('BTC-10'))
   })
 
-  it('can decode USDC-6', () => {
+  it('can decode ETH-9', () => {
     const result = decodeAssetId('4554482d3900000000000000000000')
     expect(result).toEqual(AssetId('ETH-9'))
   })

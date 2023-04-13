@@ -9,7 +9,7 @@ import { DecodingError } from './DecodingError'
 import { readPositionUpdate } from './readPositionUpdate'
 
 describe('readPositionUpdate', () => {
-  const decode = readToDecode((reader) => readPositionUpdate(reader))
+  const decode = readToDecode(readPositionUpdate)
 
   it('fails for empty data', () => {
     expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')

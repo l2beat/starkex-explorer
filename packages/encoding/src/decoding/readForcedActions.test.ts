@@ -8,7 +8,7 @@ import { DecodingError } from './DecodingError'
 import { readForcedActions } from './readForcedActions'
 
 describe(readForcedActions.name, () => {
-  const decode = readToDecode((reader) => readForcedActions(reader))
+  const decode = readToDecode(readForcedActions)
 
   it('fails for empty data', () => {
     expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')

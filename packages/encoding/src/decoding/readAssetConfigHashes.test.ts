@@ -8,7 +8,7 @@ import { DecodingError } from './DecodingError'
 import { readAssetConfigHashes } from './readAssetConfigHashes'
 
 describe(readAssetConfigHashes.name, () => {
-  const decode = readToDecode((reader) => readAssetConfigHashes(reader))
+  const decode = readToDecode(readAssetConfigHashes)
 
   it('fails for empty data', () => {
     expect(() => decode('')).toThrow(DecodingError, 'Went out of bounds')
