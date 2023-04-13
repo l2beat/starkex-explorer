@@ -5,6 +5,7 @@ export function getInstanceName(): InstanceName {
 
   switch (projectName) {
     case 'dydx-mainnet':
+    case 'dydx-local':
       return 'dYdX'
     case 'myria-goerli':
       return 'Myria'

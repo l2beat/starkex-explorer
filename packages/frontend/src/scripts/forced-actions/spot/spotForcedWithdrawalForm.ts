@@ -1,9 +1,9 @@
 import { AssetHash } from '@explorer/types'
 
-import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
-import { SpotForcedWithdrawalFormId } from '../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
-import { Api } from '../peripherals/api'
-import { Wallet } from '../peripherals/wallet'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+import { SpotForcedWithdrawalFormId } from '../../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
+import { Api } from '../../peripherals/api'
+import { Wallet } from '../../peripherals/wallet'
 
 export function initSpotForcedWithdrawalForm() {
   const form = document.getElementById(SpotForcedWithdrawalFormId)

@@ -1,5 +1,5 @@
-import { FormId } from '../../view/pages/forced-actions/components/form/ids'
-import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
+import { FormId } from '../../../view/pages/forced-actions/components/form/ids'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormElements, getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
@@ -39,7 +39,8 @@ export function initPerpetualForcedActionForm() {
     )
   }
 
-  submitButton.addEventListener('click', () => {
+  submitButton.addEventListener('click', (e) => {
+    e.preventDefault()
     if (!state || !state.canSubmit) {
       throw new Error('Programmer error: Submit button should be disabled')
     }

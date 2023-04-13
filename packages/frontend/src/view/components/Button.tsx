@@ -9,12 +9,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 
 type ButtonVariant = 'contained' | 'outlined'
 const mainClassNames =
-  'py-2.5 text-sm font-semibold disabled:cursor-not-allowed px-8'
+  'py-2.5 text-sm font-semibold disabled:cursor-not-allowed px-8 rounded'
 const classNameMap: Record<ButtonVariant, string> = {
   contained:
-    'bg-brand rounded hover:bg-brand-darker disabled:bg-white disabled:bg-opacity-20',
+    'bg-brand hover:bg-brand-darker disabled:bg-white disabled:bg-opacity-20',
   outlined:
-    'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20 rounded-lg',
+    'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20',
 }
 
 export function Button({
@@ -35,8 +35,7 @@ export function Button({
   )
 }
 
-interface LinkButtonProps
-  extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+interface LinkButtonProps extends React.HTMLProps<HTMLAnchorElement> {
   readonly variant?: ButtonVariant
   readonly href: string
 }
@@ -46,15 +45,19 @@ export function LinkButton({
   className,
   children,
   href,
+  disabled,
   ...rest
 }: LinkButtonProps) {
   return (
     <Link
-      href={href}
+      href={disabled ? undefined : href}
+      disabled={disabled}
       className={cx(
         'flex items-center justify-center !text-white !no-underline',
         mainClassNames,
-        classNameMap[variant],
+        disabled
+          ? 'cursor-not-allowed bg-white bg-opacity-20'
+          : classNameMap[variant],
         className
       )}
       {...rest}
