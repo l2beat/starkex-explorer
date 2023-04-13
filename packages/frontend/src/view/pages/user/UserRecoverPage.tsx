@@ -11,7 +11,7 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 
-export const RECOVER_STARK_KEY_BUTTON_ID = 'register-stark-key-button'
+export const RECOVER_STARK_KEY_BUTTON_ID = 'recover-stark-key-button'
 
 interface UserRegisterPageProps {
   context: PageContextWithUser
