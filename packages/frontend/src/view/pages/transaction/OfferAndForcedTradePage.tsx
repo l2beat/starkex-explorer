@@ -108,23 +108,19 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             <div className="mb-6 flex items-center gap-2">
               {props.acceptForm && (
                 <AcceptOfferForm {...props.acceptForm}>
-                  <Button variant="contained">
+                  <Button>
                     Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
                   </Button>
                 </AcceptOfferForm>
               )}
               {props.cancelForm && (
                 <CancelOfferForm {...props.cancelForm}>
-                  <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
-                    Cancel
-                  </button>
+                  <Button variant="outlined">Cancel</Button>
                 </CancelOfferForm>
               )}
               {props.finalizeForm && (
                 <FinalizeOfferForm {...props.finalizeForm}>
-                  <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
-                    Finalize
-                  </button>
+                  <Button>Send transaction</Button>
                 </FinalizeOfferForm>
               )}
             </div>
