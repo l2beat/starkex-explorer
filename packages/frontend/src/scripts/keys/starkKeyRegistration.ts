@@ -1,7 +1,7 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import Cookies from 'js-cookie'
 
-import { REGISTER_STARK_KEY_BUTTON_ID } from '../../view/pages/user/components/UserProfile'
+import { REGISTER_STARK_KEY_BUTTON_ID } from '../../view'
 import { getUsersInfo } from '../metamask'
 import { Wallet } from '../peripherals/wallet'
 

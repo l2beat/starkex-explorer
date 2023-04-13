@@ -5,7 +5,6 @@ import React from 'react'
 import { InfoIcon } from '../../../assets/icons/InfoIcon'
 import { LinkButton } from '../../../components/Button'
 
-export const REGISTER_STARK_KEY_BUTTON_ID = 'register-stark-key-button'
 interface UserProfileProps {
   user: Partial<UserDetails> | undefined
   starkKey: StarkKey

@@ -11,8 +11,7 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 
-export const REGISTER_ETHEREUM_ADDRESS_BUTTON_ID =
-  'register-ethereum-address-button'
+export const REGISTER_STARK_KEY_BUTTON_ID = 'register-stark-key-button'
 
 interface UserRegisterPageProps {
   context: PageContextWithUserAndStarkKey
@@ -55,7 +54,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
               </p>
             </div>
             <Button
-              id={REGISTER_ETHEREUM_ADDRESS_BUTTON_ID}
+              id={REGISTER_STARK_KEY_BUTTON_ID}
               data-exchange-address={props.exchangeAddress.toString()}
             >
               Register
