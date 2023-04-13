@@ -18,7 +18,7 @@ import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
-import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
+import { createTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createOldFrontendRouter } from './api/routers/OldFrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
@@ -595,7 +595,7 @@ export class Application {
               config.starkex.tradingMode,
               searchController
             ),
-        createForcedTransactionRouter(
+        createTransactionRouter(
           config.useOldFrontend
             ? oldForcedTradeOfferController
             : forcedTradeOfferController,

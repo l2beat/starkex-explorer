@@ -17,7 +17,7 @@ import { TransactionSubmitController } from '../controllers/TransactionSubmitCon
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
-export function createForcedTransactionRouter(
+export function createTransactionRouter(
   offerController:
     | OldForcedTradeOfferController
     | ForcedTradeOfferController

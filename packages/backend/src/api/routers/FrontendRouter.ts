@@ -291,27 +291,6 @@ export function createFrontendRouter(
     )
   )
 
-  if (forcedTradeOfferController) {
-    router.get(
-      '/offers/:offerId',
-      withTypedContext(
-        z.object({
-          params: z.object({
-            offerId: z.string(),
-          }),
-        }),
-        async (ctx) => {
-          const user = getGivenUser(ctx)
-          const result = await forcedTradeOfferController.getOfferDetailsPage(
-            Number(ctx.params.offerId),
-            user.address
-          )
-          applyControllerResult(ctx, result)
-        }
-      )
-    )
-  }
-
   router.get(
     '/transactions/:transactionHash',
     withTypedContext(
@@ -352,7 +331,18 @@ export function createFrontendRouter(
   )
 
   if (tradingMode === 'perpetual') {
-    addPerpetualTradingRoutes(router, forcedActionController, collateralAsset)
+    if (!forcedTradeOfferController) {
+      throw new Error(
+        'forcedTradeOfferController is required in perpetual trading mode'
+      )
+    }
+
+    addPerpetualTradingRoutes(
+      router,
+      forcedTradeOfferController,
+      forcedActionController,
+      collateralAsset
+    )
   } else {
     addSpotTradingRoutes(router, forcedActionController)
   }
