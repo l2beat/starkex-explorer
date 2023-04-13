@@ -1,14 +1,12 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import Cookies from 'js-cookie'
 
-import { REGISTER_ETHEREUM_ADDRESS_BUTTON_ID } from '../view/pages/user/components/UserProfile'
-import { getUsersInfo } from './metamask'
-import { Wallet } from './peripherals/wallet'
+import { REGISTER_STARK_KEY_BUTTON_ID } from '../../view/pages/user/components/UserProfile'
+import { getUsersInfo } from '../metamask'
+import { Wallet } from '../peripherals/wallet'
 
-export function initEthereumAddressRegistration() {
-  const registerButton = document.getElementById(
-    REGISTER_ETHEREUM_ADDRESS_BUTTON_ID
-  )
+export function initStarkKeyRegistration() {
+  const registerButton = document.getElementById(REGISTER_STARK_KEY_BUTTON_ID)
 
   if (!registerButton) {
     return

@@ -5,8 +5,7 @@ import { InfoIcon } from '../../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../../assets/icons/WarningIcon'
 import { LinkButton } from '../../../components/Button'
 
-export const REGISTER_ETHEREUM_ADDRESS_BUTTON_ID =
-  'register-ethereum-address-button'
+export const REGISTER_STARK_KEY_BUTTON_ID = 'register-stark-key-button'
 interface UserProfileProps {
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
