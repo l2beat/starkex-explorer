@@ -1,7 +1,7 @@
+import { UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { UserDetails } from '@explorer/shared'
 import { InfoIcon } from '../../../assets/icons/InfoIcon'
 import { LinkButton } from '../../../components/Button'
 
