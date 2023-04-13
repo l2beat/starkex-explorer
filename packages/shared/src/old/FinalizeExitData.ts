@@ -8,6 +8,7 @@ const coder = new Interface([
 export function encodeFinalizeExitRequest(starkKey: StarkKey) {
   return coder.encodeFunctionData('withdraw', [
     starkKey.toString(),
+    //hardcoded just because it will take time to pass collateral asset to this function and it is going to be removed soon
     `0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d`,
   ])
 }
