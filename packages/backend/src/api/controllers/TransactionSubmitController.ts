@@ -197,8 +197,8 @@ function tradeMatchesOffer(
     offer.collateralAmount === trade.collateralAmount &&
     offer.syntheticAmount === trade.syntheticAmount &&
     offer.isABuyingSynthetic === trade.isABuyingSynthetic &&
-    Timestamp.toHours(offer.accepted.submissionExpirationTime) ===
-      Timestamp.toHours(trade.submissionExpirationTime) &&
+    offer.accepted.submissionExpirationTime ===
+      trade.submissionExpirationTime &&
     offer.accepted.nonce === trade.nonce &&
     offer.accepted.signature === trade.signature &&
     offer.accepted.premiumCost === trade.premiumCost

@@ -26,3 +26,7 @@ Timestamp.toHours = function toHours(timestamp: Timestamp) {
 Timestamp.toSeconds = function toSeconds(timestamp: Timestamp) {
   return timestamp.valueOf() / 1000n
 }
+
+Timestamp.roundDownToHours = function roundUpToHours(timestamp: Timestamp) {
+  return Timestamp.fromHours(Timestamp.toHours(timestamp))
+}
