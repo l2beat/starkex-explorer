@@ -28,8 +28,8 @@ export async function up(knex: Knex) {
       table.integer('block_number').notNullable()
       table.bigInteger('timestamp').notNullable()
       table.string('stark_key').notNullable()
-      table.bigInteger('asset_count').notNullable()
-      table.bigInteger('balance_change_count').notNullable()
+      table.integer('asset_count').notNullable()
+      table.integer('balance_change_count').notNullable()
       // Not adding ethereum transactions count because it's
       // independent of state updates.
       table.integer('prev_history_id') // this is for potential future optimizations

@@ -22,6 +22,7 @@ import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   SentTransactionRecord,
   SentTransactionRepository,
@@ -48,6 +49,7 @@ export class UserController {
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
+    private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
     private readonly tradingMode: TradingMode,
     private readonly exchangeAddress: EthereumAddress,
     private readonly collateralAsset?: CollateralAsset
@@ -67,13 +69,13 @@ export class UserController {
       userAssets,
       totalAssets,
       history,
-      historyCount,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
       forcedTradeOffers,
       forcedTradeOffersCount,
       withdrawableAssets,
+      userStatistics,
     ] = await Promise.all([
       this.userService.getUserDetails(givenUser),
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
@@ -89,7 +91,6 @@ export class UserController {
         starkKey,
         paginationOpts
       ),
-      this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
@@ -103,10 +104,15 @@ export class UserController {
       ),
       this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
       this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
+      this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
 
     if (!registeredUser) {
       return { type: 'not found', content: 'User not found' }
+    }
+
+    if (!userStatistics) {
+      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
     }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -158,9 +164,9 @@ export class UserController {
       exchangeAddress: this.exchangeAddress,
       offersToAccept: [],
       assets: assetEntries,
-      totalAssets,
+      totalAssets: userStatistics.assetCount,
       balanceChanges: balanceChangesEntries,
-      totalBalanceChanges: historyCount,
+      totalBalanceChanges: Number(userStatistics.balanceChangeCount), // TODO: don't cast
       transactions,
       totalTransactions,
       offers,

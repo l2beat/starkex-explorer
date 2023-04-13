@@ -12,8 +12,8 @@ export interface PreprocessedUserStatisticsRecord {
   blockNumber: number
   timestamp: Timestamp
   starkKey: StarkKey
-  assetCount: bigint
-  balanceChangeCount: bigint
+  assetCount: number
+  balanceChangeCount: number
   prevHistoryId?: number
 }
 
@@ -44,7 +44,7 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
     return results[0]!.id
   }
 
-  async findCurrentByStarkKey(starkKey: StarkKey, trx: Knex.Transaction) {
+  async findCurrentByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const row = await knex('preprocessed_user_statistics')
       .where('stark_key', starkKey.toString())

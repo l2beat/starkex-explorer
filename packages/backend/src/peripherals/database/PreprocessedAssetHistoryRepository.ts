@@ -74,13 +74,19 @@ export class PreprocessedAssetHistoryRepository<
     )
 
     this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.getCountOfCurrentByStarkKey = this.wrapAny(
-      this.getCountOfCurrentByStarkKey
-    )
     this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
+    this.getCountByStarkKeyUntilStateUpdateId = this.wrapAny(
+      this.getCountByStarkKeyUntilStateUpdateId
+    )
     this.getCountByStateUpdateId = this.wrapAny(this.getCountByStateUpdateId)
     this.getCountOfCurrentByStarkKey = this.wrapAny(
       this.getCountOfCurrentByStarkKey
+    )
+    this.getCountOfNewAssetsByStarkKeyAndStateUpdateId = this.wrapAny(
+      this.getCountOfNewAssetsByStarkKeyAndStateUpdateId
+    )
+    this.getCountOfRemovedAssetsByStarkKeyAndStateUpdateId = this.wrapAny(
+      this.getCountOfRemovedAssetsByStarkKeyAndStateUpdateId
     )
 
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -142,6 +148,20 @@ export class PreprocessedAssetHistoryRepository<
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where('state_update_id', stateUpdateId)
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count!)
+  }
+
+  async getCountByStarkKeyUntilStateUpdateId(
+    starkKey: StarkKey,
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const [result] = await knex('preprocessed_asset_history')
+      .where('state_update_id', '<=', stateUpdateId)
+      .andWhere('stark_key', starkKey)
       .count()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count!)
@@ -210,7 +230,7 @@ export class PreprocessedAssetHistoryRepository<
     starkKeys: StarkKey[],
     stateUpdateId: number,
     trx?: Knex.Transaction
-  ): Promise<{ starkKey: StarkKey; count: bigint }[]> {
+  ): Promise<{ starkKey: StarkKey; count: number }[]> {
     const knex = await this.knex(trx)
     const rows: { starkKey: StarkKey; count: bigint }[] = await knex(
       'preprocessed_asset_history'
@@ -219,13 +239,46 @@ export class PreprocessedAssetHistoryRepository<
       .count('* as count')
       .where('state_update_id', stateUpdateId)
       .groupBy('stark_key')
-    return rows
+    return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count)}))
   }
 
   async getCountByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where('stark_key', starkKey.toString())
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count!)
+  }
+
+  async getCountOfNewAssetsByStarkKeyAndStateUpdateId(
+    starkKey: StarkKey,
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const [result] = await knex('preprocessed_asset_history')
+      .where('state_update_id', stateUpdateId)
+      .where('stark_key', starkKey.toString())
+      .where('balance', '<>', 0)
+      // This is how we differentiate between balance change and new asset being added:
+      // new assets don't have prev_history_id
+      .whereNull('prev_history_id')
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count!)
+  }
+
+  async getCountOfRemovedAssetsByStarkKeyAndStateUpdateId(
+    starkKey: StarkKey,
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const [result] = await knex('preprocessed_asset_history')
+      .where('state_update_id', stateUpdateId)
+      .where('stark_key', starkKey.toString())
+      .where('balance', 0)
       .count()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count!)

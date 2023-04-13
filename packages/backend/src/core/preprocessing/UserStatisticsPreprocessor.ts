@@ -80,20 +80,29 @@ export class UserStatisticsPreprocessor {
         trx
       )
     for (const starkKeyCount of starkKeyCounts) {
-      const current =
-        // it's ok to get current because even during catchUp() current is the same as the state update we're processing
-        await this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(
-          starkKeyCount.starkKey,
-          trx
-        )
-      const updatedBalanceChangeCount =
-        current?.balanceChangeCount ?? 0n + starkKeyCount.count
-
+      const [newAssets, removedAssets, currentStatisticsRecord] =
+        await Promise.all([
+          this.preprocessedAssetHistoryRepository.getCountOfNewAssetsByStarkKeyAndStateUpdateId(
+            starkKeyCount.starkKey,
+            stateUpdate.id,
+            trx
+          ),
+          this.preprocessedAssetHistoryRepository.getCountOfRemovedAssetsByStarkKeyAndStateUpdateId(
+            starkKeyCount.starkKey,
+            stateUpdate.id,
+            trx
+          ),
+          // it's ok to get "current" on preprocessedUserStatisticsRepository
+          // because that's what we're building here, so we're always at the tip.
+          this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(
+            starkKeyCount.starkKey,
+            trx
+          ),
+        ])
+      const balanceChangeCount =
+        (currentStatisticsRecord?.balanceChangeCount ?? 0) + starkKeyCount.count
       const assetCount =
-        await this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
-          starkKeyCount.starkKey,
-          trx
-        )
+        (currentStatisticsRecord?.assetCount ?? 0) + newAssets - removedAssets
 
       await this.preprocessedUserStatisticsRepository.add(
         {
@@ -101,9 +110,9 @@ export class UserStatisticsPreprocessor {
           blockNumber: stateUpdate.blockNumber,
           timestamp: stateUpdate.timestamp,
           starkKey: starkKeyCount.starkKey,
-          balanceChangeCount: updatedBalanceChangeCount,
-          assetCount: BigInt(assetCount),
-          prevHistoryId: current?.id,
+          balanceChangeCount,
+          assetCount,
+          prevHistoryId: currentStatisticsRecord?.id,
         },
         trx
       )

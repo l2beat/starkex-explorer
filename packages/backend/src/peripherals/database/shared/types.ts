@@ -265,8 +265,8 @@ declare module 'knex/types/tables' {
     block_number: number
     timestamp: bigint
     stark_key: string
-    asset_count: bigint
-    balance_change_count: bigint
+    asset_count: number
+    balance_change_count: number
     prev_history_id: number | null
   }
 
