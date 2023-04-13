@@ -19,7 +19,6 @@ import {
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
   renderNewPerpetualForcedActionPage,
-  renderNotFoundPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
   renderRegularWithdrawalPage,
@@ -1041,11 +1040,6 @@ const routes: Route[] = [
 
 for (const route of routes) {
   router.get(route.path, route.render)
-}
-
-function notFound(ctx: Koa.Context) {
-  const context = getPageContext(ctx)
-  ctx.body = renderNotFoundPage({ context })
 }
 
 function getPagination(ctx: Koa.Context, total: number) {
