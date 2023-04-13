@@ -371,16 +371,12 @@ const routes: Route[] = [
     link: '/users/someone',
     description: 'Someone else’s user page.',
     render: (ctx) => {
-      const fakeUser = getFakeUser()
-      const context = {
-        ...getPageContext(ctx),
-        user: fakeUser,
-      }
+      const context = getPageContext(ctx)
 
       ctx.body = renderUserPage({
         context,
-        starkKey: context.user.starkKey,
-        ethereumAddress: context.user.address,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
         exchangeAddress: EthereumAddress.fake(),
         withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
         offersToAccept: repeat(2, randomUserOfferEntry),
