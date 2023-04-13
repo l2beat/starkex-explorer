@@ -31,7 +31,6 @@ export class HomeController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
-    private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -86,7 +85,6 @@ export class HomeController {
         this.forcedTradeOfferViewService.forcedTradeOfferToEntry(offer)
       ),
       totalOffers: availableOffersCount,
-      tradingMode: this.tradingMode,
     })
     return { type: 'success', content }
   }

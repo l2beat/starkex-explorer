@@ -464,7 +464,6 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository,
       preprocessedStateDetailsRepository,
-      config.starkex.tradingMode,
       collateralAsset
     )
 
@@ -478,7 +477,6 @@ export class Application {
       userRegistrationEventRepository,
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
-      config.starkex.tradingMode,
       config.starkex.contracts.perpetual,
       collateralAsset
     )
@@ -486,10 +484,8 @@ export class Application {
       pageContextService,
       assetDetailsService,
       stateUpdateRepository,
-      assetRepository,
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
-      config.starkex.tradingMode,
       collateralAsset
     )
     const transactionController = new TransactionController(
@@ -503,8 +499,7 @@ export class Application {
     )
     const merkleProofController = new MerkleProofController(
       pageContextService,
-      stateUpdater,
-      config.starkex.tradingMode
+      stateUpdater
     )
 
     const oldHomeController = new OldHomeController(

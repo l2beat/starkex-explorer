@@ -1,4 +1,4 @@
-import { PageContext, TradingMode } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -15,7 +15,6 @@ import { StateUpdatePageTitle } from './components/StateUpdatePageTitle'
 export interface StateUpdateBalanceChangesPageProps {
   context: PageContext
   id: string
-  tradingMode: TradingMode
   balanceChanges: StateUpdateBalanceChangeEntry[]
   limit: number
   offset: number
@@ -53,7 +52,7 @@ function StateUpdateBalanceChangesPage(
           total={props.total}
         >
           <StateUpdateBalanceChangesTable
-            tradingMode={props.tradingMode}
+            tradingMode={props.context.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TableWithPagination>

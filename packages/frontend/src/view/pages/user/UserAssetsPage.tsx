@@ -1,4 +1,4 @@
-import { PageContext, TradingMode } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -13,7 +13,6 @@ import { UserPageTitle } from './components/UserPageTitle'
 export interface UserAssetsPageProps {
   context: PageContext
   starkKey: StarkKey
-  tradingMode: TradingMode
   assets: UserAssetEntry[]
   limit: number
   offset: number
@@ -45,7 +44,7 @@ function UserAssetsPage(props: UserAssetsPageProps) {
         >
           <UserAssetsTable
             starkKey={props.starkKey}
-            tradingMode={props.tradingMode}
+            tradingMode={props.context.tradingMode}
             assets={props.assets}
           />
         </TableWithPagination>

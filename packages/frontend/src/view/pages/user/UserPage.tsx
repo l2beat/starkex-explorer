@@ -1,4 +1,4 @@
-import { PageContext, TradingMode } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -35,7 +35,6 @@ export interface UserPageProps {
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
   exchangeAddress: EthereumAddress
-  tradingMode: TradingMode
   withdrawableAssets: WithdrawableAssetEntry[]
   offersToAccept: OfferEntry[]
   assets: UserAssetEntry[]
@@ -87,7 +86,7 @@ function UserPage(props: UserPageProps) {
           total={props.totalAssets}
         >
           <UserAssetsTable
-            tradingMode={props.tradingMode}
+            tradingMode={props.context.tradingMode}
             starkKey={props.starkKey}
             assets={props.assets}
             isMine={isMine}
@@ -99,7 +98,7 @@ function UserPage(props: UserPageProps) {
           total={props.totalBalanceChanges}
         >
           <UserBalanceChangesTable
-            tradingMode={props.tradingMode}
+            tradingMode={props.context.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>
@@ -110,7 +109,7 @@ function UserPage(props: UserPageProps) {
         >
           <TransactionsTable transactions={props.transactions} />
         </TablePreview>
-        {props.offers && props.tradingMode === 'perpetual' && (
+        {props.offers && props.context.tradingMode === 'perpetual' && (
           <TablePreview
             {...getOfferTableProps(props.starkKey)}
             visible={props.offers.length}

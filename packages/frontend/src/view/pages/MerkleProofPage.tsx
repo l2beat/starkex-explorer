@@ -1,4 +1,4 @@
-import { PageContext, TradingMode } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { PedersenHash } from '@explorer/types'
 import React from 'react'
 
@@ -12,7 +12,6 @@ import { reactToHtml } from '../reactToHtml'
 export interface MerkleProofPageProps {
   positionOrVaultId: bigint
   context: PageContext
-  tradingMode: TradingMode
   merkleProof: MerkleProof
 }
 
@@ -28,7 +27,8 @@ export interface MerkleProofPath {
 }
 
 function MerkleProofPage(props: MerkleProofPageProps) {
-  const idLabel = props.tradingMode === 'perpetual' ? 'Position' : 'Vault'
+  const idLabel =
+    props.context.tradingMode === 'perpetual' ? 'Position' : 'Vault'
   const formattedLeaf = JSON.stringify(
     JSON.parse(props.merkleProof.leaf),
     null,
@@ -37,9 +37,7 @@ function MerkleProofPage(props: MerkleProofPageProps) {
   return (
     <Page
       title="Merkle Proof"
-      description={`Merkle proof for #${props.positionOrVaultId.toString()} ${
-        props.tradingMode === 'perpetual' ? 'position' : 'vault'
-      } made from the latest state update`}
+      description={`Merkle proof for #${props.positionOrVaultId.toString()} ${idLabel} made from the latest state update`}
       path={`/proof/${props.positionOrVaultId.toString()}`}
       context={props.context}
     >

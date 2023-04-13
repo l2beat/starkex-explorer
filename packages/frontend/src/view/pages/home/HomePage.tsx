@@ -1,4 +1,4 @@
-import { PageContext, TradingMode } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import cx from 'classnames'
 import React from 'react'
 
@@ -36,7 +36,6 @@ export interface HomePageProps {
   totalForcedTransactions: number
   offers?: OfferEntry[]
   totalOffers: number
-  tradingMode: TradingMode
 }
 
 export function renderHomePage(props: HomePageProps) {
@@ -61,7 +60,7 @@ function HomePage(props: HomePageProps) {
         )}
       >
         <div className="flex flex-col gap-8">
-          <SearchBar tradingMode={props.tradingMode} />
+          <SearchBar tradingMode={props.context.tradingMode} />
           <TablePreview
             {...STATE_UPDATE_TABLE_PROPS}
             visible={props.stateUpdates.length}
@@ -76,7 +75,7 @@ function HomePage(props: HomePageProps) {
           >
             <TransactionsTable transactions={props.transactions} />
           </TablePreview>
-          {props.offers && props.tradingMode === 'perpetual' && (
+          {props.offers && props.context.tradingMode === 'perpetual' && (
             <TablePreview
               {...OFFER_TABLE_PROPS}
               visible={props.offers.length}

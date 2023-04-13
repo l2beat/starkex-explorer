@@ -52,7 +52,6 @@ export class UserController {
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
-    private readonly tradingMode: TradingMode,
     private readonly exchangeAddress: EthereumAddress,
     private readonly collateralAsset?: CollateralAsset
   ) {}
@@ -163,7 +162,7 @@ export class UserController {
     const assetEntries = userAssets.map((a) =>
       toUserAssetEntry(
         a,
-        this.tradingMode,
+        context.tradingMode,
         this.collateralAsset?.assetId,
         assetDetailsMap
       )
@@ -188,7 +187,6 @@ export class UserController {
       )
     const content = renderUserPage({
       context,
-      tradingMode: this.tradingMode,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
@@ -237,7 +235,7 @@ export class UserController {
     const assets = userAssets.map((a) =>
       toUserAssetEntry(
         a,
-        this.tradingMode,
+        context.tradingMode,
         this.collateralAsset?.assetId,
         assetDetailsMap
       )
@@ -245,7 +243,6 @@ export class UserController {
 
     const content = renderUserAssetsPage({
       context,
-      tradingMode: this.tradingMode,
       starkKey,
       assets,
       ...pagination,
@@ -278,7 +275,6 @@ export class UserController {
 
     const content = renderUserBalanceChangesPage({
       context,
-      tradingMode: this.tradingMode,
       starkKey,
       balanceChanges,
       ...pagination,

@@ -1,4 +1,4 @@
-import { PageContext, TradingMode } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -16,7 +16,6 @@ import { UserPageTitle } from './components/UserPageTitle'
 export interface UserBalanceChangesPageProps {
   context: PageContext
   starkKey: StarkKey
-  tradingMode: TradingMode
   balanceChanges: UserBalanceChangeEntry[]
   limit: number
   offset: number
@@ -52,7 +51,7 @@ function UserBalanceChangesPage(props: UserBalanceChangesPageProps) {
           total={props.total}
         >
           <UserBalanceChangesTable
-            tradingMode={props.tradingMode}
+            tradingMode={props.context.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TableWithPagination>

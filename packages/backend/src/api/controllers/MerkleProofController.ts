@@ -1,5 +1,5 @@
 import { renderMerkleProofPage } from '@explorer/frontend'
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 import { PositionLeaf, VaultLeaf } from '@explorer/state'
 
 import { PageContextService } from '../../core/PageContextService'
@@ -9,8 +9,7 @@ import { ControllerResult } from './ControllerResult'
 export class MerkleProofController {
   constructor(
     private readonly pageContextService: PageContextService,
-    private readonly stateUpdater: StateUpdater<PositionLeaf | VaultLeaf>,
-    private readonly tradingMode: TradingMode
+    private readonly stateUpdater: StateUpdater<PositionLeaf | VaultLeaf>
   ) {}
 
   async getMerkleProofPage(
@@ -24,7 +23,6 @@ export class MerkleProofController {
     const content = renderMerkleProofPage({
       context,
       positionOrVaultId,
-      tradingMode: this.tradingMode,
       merkleProof: {
         rootHash: merkleProof.root,
         path: merkleProof.path,

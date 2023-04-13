@@ -3,7 +3,7 @@ import {
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { CollateralAsset } from '../../config/starkex/StarkexConfig'
@@ -11,7 +11,6 @@ import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { PageContextService } from '../../core/PageContextService'
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -34,12 +33,10 @@ export class StateUpdateController {
     private readonly pageContextService: PageContextService,
     private readonly assetDetailsService: AssetDetailsService,
     private readonly stateUpdateRepository: StateUpdateRepository,
-    private readonly assetRepository: AssetRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
     >,
-    private readonly tradingMode: TradingMode,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -99,7 +96,6 @@ export class StateUpdateController {
 
     const content = renderStateUpdatePage({
       context,
-      tradingMode: this.tradingMode,
       id: stateUpdateId.toString(),
       hashes: {
         factHash: stateUpdate.stateTransitionHash,
@@ -151,7 +147,6 @@ export class StateUpdateController {
 
     const content = renderStateUpdateBalanceChangesPage({
       context,
-      tradingMode: this.tradingMode,
       id: stateUpdateId.toString(),
       balanceChanges: balanceChangeEntries,
       ...pagination,
