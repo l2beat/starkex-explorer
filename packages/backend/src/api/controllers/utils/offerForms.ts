@@ -66,7 +66,8 @@ export function getCancelOfferFormData(
 export function getFinalizeOfferFormData(
   offer: ForcedTradeOfferRecord,
   user: User,
-  perpetualAddress: EthereumAddress
+  perpetualAddress: EthereumAddress,
+  collateralAsset: CollateralAsset
 ): FinalizeOfferFormData | undefined {
   const isOwner = user.positionId === offer.positionIdA
   if (!(offer.accepted && !offer.cancelledAt && isOwner)) {
@@ -88,5 +89,6 @@ export function getFinalizeOfferFormData(
     address: user.address,
     perpetualAddress,
     signature: offer.accepted.signature,
+    collateralAsset,
   }
 }

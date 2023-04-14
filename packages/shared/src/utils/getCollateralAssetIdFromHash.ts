@@ -1,9 +1,9 @@
-import { AssetHash, Hash256 } from '@explorer/types'
+import { AssetHash } from '@explorer/types'
 
-import { CollateralAsset } from '@explorer/shared/src/CollateralAsset'
+import { CollateralAsset } from '../CollateralAsset'
 
 export function getCollateralAssetIdFromHash(
-  hash: AssetHash | Hash256 | string,
+  hash: string,
   collateralAsset: CollateralAsset
 ) {
   if (AssetHash(hash.toString()) !== collateralAsset.assetHash) {

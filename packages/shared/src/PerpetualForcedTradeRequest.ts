@@ -3,6 +3,7 @@ import { decodeAssetId, encodeAssetId } from '@explorer/encoding'
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
 import { CollateralAsset } from './CollateralAsset'
+import { getCollateralAssetIdFromHash } from './utils'
 
 const coder = new Interface([
   `function forcedTradeRequest(
@@ -51,7 +52,10 @@ export function decodePerpetualForcedTradeRequest(
       starkKeyB: StarkKey.from(decoded.starkKeyB),
       positionIdA: BigInt(decoded.positionIdA),
       positionIdB: BigInt(decoded.positionIdB),
-      collateralAssetId: collateralAsset.assetId,
+      collateralAssetId: getCollateralAssetIdFromHash(
+        decoded.collateralAssetId.toHexString(),
+        collateralAsset
+      ),
       syntheticAssetId: decodeAssetId(decoded.syntheticAssetId),
       collateralAmount: BigInt(decoded.collateralAmount),
       syntheticAmount: BigInt(decoded.syntheticAmount),
@@ -70,14 +74,15 @@ export function decodePerpetualForcedTradeRequest(
 }
 
 export function encodePerpetualForcedTradeRequest(
-  data: Omit<PerpetualForcedTradeRequest, 'collateralAssetId'>
+  data: Omit<PerpetualForcedTradeRequest, 'collateralAssetId'>,
+  collateralAsset: CollateralAsset
 ) {
   return coder.encodeFunctionData('forcedTradeRequest', [
     data.starkKeyA,
     data.starkKeyB,
     data.positionIdA,
     data.positionIdB,
-    '0x' + encodeAssetId(AssetId.USDC),
+    collateralAsset.assetHash,
     '0x' + encodeAssetId(data.syntheticAssetId),
     data.collateralAmount,
     data.syntheticAmount,

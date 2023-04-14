@@ -240,20 +240,23 @@ describe(TransactionSubmitController.name, () => {
     })
 
     it('handles transaction to a wrong address', async () => {
-      const data = encodePerpetualForcedTradeRequest({
-        starkKeyA: StarkKey.fake(),
-        positionIdA: 0n,
-        syntheticAssetId: AssetId.USDC,
-        collateralAmount: 0n,
-        syntheticAmount: 0n,
-        isABuyingSynthetic: false,
-        nonce: 0n,
-        signature: Hash256.fake().toString(),
-        starkKeyB: StarkKey.fake(),
-        positionIdB: 0n,
-        submissionExpirationTime: Timestamp(0n),
-        premiumCost: false,
-      })
+      const data = encodePerpetualForcedTradeRequest(
+        {
+          starkKeyA: StarkKey.fake(),
+          positionIdA: 0n,
+          syntheticAssetId: AssetId.USDC,
+          collateralAmount: 0n,
+          syntheticAmount: 0n,
+          isABuyingSynthetic: false,
+          nonce: 0n,
+          signature: Hash256.fake().toString(),
+          starkKeyB: StarkKey.fake(),
+          positionIdB: 0n,
+          submissionExpirationTime: Timestamp(0n),
+          premiumCost: false,
+        },
+        fakeCollateralAsset
+      )
       const offer = fakeOffer()
       const controller = new TransactionSubmitController(
         mockObject<EthereumClient>({
@@ -281,11 +284,14 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction with unknown data', async () => {
       const accepted = fakeAccepted({ signature: Hash256.fake().toString() })
       const offer = fakeOffer({ accepted })
-      const data = encodePerpetualForcedTradeRequest({
-        ...offer,
-        ...accepted,
-        starkKeyA: StarkKey.fake(),
-      })
+      const data = encodePerpetualForcedTradeRequest(
+        {
+          ...offer,
+          ...accepted,
+          starkKeyA: StarkKey.fake(),
+        },
+        fakeCollateralAsset
+      )
       const perpetualAddress = EthereumAddress.fake()
 
       const controller = new TransactionSubmitController(
@@ -314,10 +320,13 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction with correct data and address', async () => {
       const accepted = fakeAccepted({ signature: Hash256.fake().toString() })
       const offer = fakeOffer({ accepted })
-      const data = encodePerpetualForcedTradeRequest({
-        ...offer,
-        ...accepted,
-      })
+      const data = encodePerpetualForcedTradeRequest(
+        {
+          ...offer,
+          ...accepted,
+        },
+        fakeCollateralAsset
+      )
       const perpetualAddress = EthereumAddress.fake()
       const hash = Hash256.fake()
 

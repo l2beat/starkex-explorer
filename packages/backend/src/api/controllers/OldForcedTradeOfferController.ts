@@ -137,7 +137,13 @@ export class OldForcedTradeOfferController {
         user && getAcceptOfferFormData(offer, user, this.collateralAsset),
       cancelOfferFormData: user && getCancelOfferFormData(offer, user),
       finalizeOfferFormData:
-        user && getFinalizeOfferFormData(offer, user, this.perpetualAddress),
+        user &&
+        getFinalizeOfferFormData(
+          offer,
+          user,
+          this.perpetualAddress,
+          this.collateralAsset
+        ),
     })
     return { type: 'success', content }
   }

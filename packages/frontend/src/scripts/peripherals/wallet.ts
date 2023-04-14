@@ -114,9 +114,10 @@ export const Wallet = {
   async sendPerpetualForcedTradeTransaction(
     account: EthereumAddress,
     offer: FinalizeOfferData,
-    exchangeAddress: EthereumAddress
+    exchangeAddress: EthereumAddress,
+    collateralAsset: CollateralAsset
   ) {
-    const data = encodePerpetualForcedTradeRequest(offer)
+    const data = encodePerpetualForcedTradeRequest(offer, collateralAsset)
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [{ from: account, to: exchangeAddress, data }],
