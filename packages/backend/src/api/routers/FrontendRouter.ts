@@ -337,6 +337,12 @@ export function createFrontendRouter(
       )
     }
 
+    if (!collateralAsset) {
+      throw new Error(
+        'Collateral asset must be defined in perpetual trading mode'
+      )
+    }
+
     addPerpetualTradingRoutes(
       router,
       forcedTradeOfferController,

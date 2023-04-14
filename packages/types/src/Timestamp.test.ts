@@ -52,4 +52,12 @@ describe(Timestamp.name, () => {
       expect(Timestamp.toSeconds(Timestamp(7_200_000n))).toEqual(7200n)
     })
   })
+
+  describe(Timestamp.roundDownToHours.name, () => {
+    it('rounds down to hours', () => {
+      const timestamp = Timestamp(new Date().setHours(12, 35))
+      const expectedTimestamp = Timestamp(new Date().setHours(12, 0, 0, 0))
+      expect(Timestamp.roundDownToHours(timestamp)).toEqual(expectedTimestamp)
+    })
+  })
 })

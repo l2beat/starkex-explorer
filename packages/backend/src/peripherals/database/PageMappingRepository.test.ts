@@ -1,5 +1,6 @@
 import { Hash256 } from '@explorer/types'
 import { expect } from 'earl'
+import range from 'lodash/range'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
@@ -65,7 +66,7 @@ describe(PageMappingRepository.name, () => {
   })
 
   it('deletes all records after a block number', async () => {
-    const records = Array.from({ length: 10 }).map((_, i) =>
+    const records = range(10).map((_, i) =>
       dummyPageMappingRecord({ blockNumber: i })
     )
     await repository.addMany(records)

@@ -1,6 +1,6 @@
 import { AssetId } from '@explorer/types'
 
-import { PositionAssetEntry } from '../../view'
+import { PositionAssetEntry } from '../../../view'
 import { FormState } from './types'
 
 export function getAsset(

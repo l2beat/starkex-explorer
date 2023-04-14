@@ -23,8 +23,8 @@ export function getAcceptOfferFormData(
 ): AcceptOfferFormData | undefined {
   const isAcceptable = !offer.accepted && !offer.cancelledAt
   const shouldRenderForm = isAcceptable && user.positionId !== offer.positionIdA
-  const submissionExpirationTime = Timestamp(
-    BigInt(Math.floor(Date.now() + THREE_DAYS_IN_MILLIS))
+  const submissionExpirationTime = Timestamp.roundDownToHours(
+    Timestamp(Math.floor(Date.now() + THREE_DAYS_IN_MILLIS))
   )
   if (!shouldRenderForm) {
     return undefined

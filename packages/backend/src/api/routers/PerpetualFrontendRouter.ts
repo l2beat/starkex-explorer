@@ -12,10 +12,10 @@ export function addPerpetualTradingRoutes(
   router: Router,
   forcedTradeOfferController: ForcedTradeOfferController,
   forcedActionController: ForcedActionController,
-  collateralAsset: CollateralAsset | undefined
+  collateralAsset: CollateralAsset
 ) {
   router.get(
-    '/forced/new/perpetual/:positionId/:assetId',
+    '/forced/new/:positionId/:assetId',
     withTypedContext(
       z.object({
         params: z.object({
@@ -28,7 +28,7 @@ export function addPerpetualTradingRoutes(
         const givenUser = getGivenUser(ctx)
 
         const result =
-          assetId === collateralAsset?.assetId
+          assetId === collateralAsset.assetId
             ? await forcedActionController.getPerpetualForcedWithdrawalPage(
                 givenUser,
                 positionId,

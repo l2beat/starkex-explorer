@@ -9,6 +9,7 @@ import {
 } from '@explorer/types'
 import { expect, mockObject } from 'earl'
 import { BigNumber, providers } from 'ethers'
+import range from 'lodash/range'
 
 import { BlockRange } from '../../model'
 import {
@@ -484,7 +485,7 @@ describe(UserTransactionCollector.name, () => {
   it('can process multiple events', async () => {
     const ethereumClient = mockObject<EthereumClient>({
       async getLogsInRange() {
-        return Array.from({ length: 3 }).map((_, i) => {
+        return range(3).map((i) => {
           const log = LogForcedWithdrawalRequest.encodeLog([
             BigNumber.from(i),
             BigNumber.from(i),

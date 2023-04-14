@@ -24,7 +24,7 @@ export function initAcceptOfferForm() {
       const collateralAsset = deserializeCollateralAsset(
         getAttribute(form, 'collateralAsset')
       )
-      const signature = await Wallet.signAccepted(
+      const signature = await Wallet.signOfferAccept(
         address,
         offer,
         accepted,

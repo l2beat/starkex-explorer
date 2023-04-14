@@ -1,6 +1,6 @@
 import { Hash256 } from '@explorer/types'
 import assert from 'assert'
-import { partition } from 'lodash'
+import partition from 'lodash/partition'
 
 import { BlockNumber } from '../peripherals/ethereum/types'
 

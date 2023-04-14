@@ -38,7 +38,19 @@
     "no-only-tests/no-only-tests": "error",
     "no-restricted-imports": [
       "error",
-      { "paths": [".", "..", "../..", "../../.."], "patterns": ["**/old/**"] }
+      {
+        "paths": [
+          ".",
+          "..",
+          "../..",
+          "../../..",
+          {
+            "name": "lodash",
+            "message": "Import [module] from lodash/[module] instead"
+          }
+        ],
+        "patterns": ["**/old/**"]
+      }
     ],
     "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",

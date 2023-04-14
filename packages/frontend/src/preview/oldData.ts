@@ -7,6 +7,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import range from 'lodash/range'
 
 import {
   ForcedTradeOfferDetailsProps,
@@ -27,7 +28,7 @@ import { TransactionFormProps } from '../view/old/transaction-form'
 const ONE_HOUR = 60 * 60 * 1000
 
 const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
-  Array.from({ length: count }).map((_, i) => {
+  range(count).map((_, i) => {
     const assetId = randomChoice([
       AssetId('LINK-7'),
       AssetId('MKR-9'),
@@ -39,7 +40,7 @@ const createFakeTransactions = (count: number): ForcedTransactionEntry[] =>
     const decimals = AssetId.decimals(assetId)
     const digits = Math.floor(Math.random() * decimals + 6)
     const randomDigit = () => randomChoice('0123456789'.split(''))
-    const amount = Array.from({ length: digits }).map(randomDigit).join('')
+    const amount = range(digits).map(randomDigit).join('')
 
     return {
       type,
@@ -61,7 +62,7 @@ function randomChoice<T>(items: readonly T[]) {
 }
 
 const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
-  Array.from({ length: count }).map((_, i) => {
+  range(count).map((_, i) => {
     const collateralAmount = BigInt(
       Math.floor(Math.random() * 1000000 * (i + 1))
     )
@@ -89,7 +90,7 @@ const createFakeOffers = (count: number): ForcedTradeOfferEntry[] =>
 
 export const HOME_PROPS: HomeProps = {
   account: undefined,
-  stateUpdates: Array.from({ length: 6 }).map((_, i) => ({
+  stateUpdates: range(6).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),
     forcedTransactionsCount: Math.floor(Math.random() * 3),
@@ -111,7 +112,7 @@ export const STATE_CHANGE_DETAILS_PROPS: StateUpdateDetailsProps = {
   rootHash: PedersenHash.fake(),
   blockNumber: Math.floor(Math.random() * 100),
   timestamp: Timestamp.now(),
-  positions: Array.from({ length: 57 }).map((_, i) => ({
+  positions: range(57).map((_, i) => ({
     starkKey: StarkKey.fake(),
     positionId: BigInt(i + 1),
     totalUSDCents: BigInt(Math.floor(Math.random() * 500_000_00)),
@@ -247,7 +248,7 @@ export const POSITION_AT_UPDATE_PROPS: PositionAtUpdateProps = {
 
 export const STATE_CHANGES_INDEX_PROPS: StateUpdatesIndexProps = {
   account: undefined,
-  stateUpdates: Array.from({ length: 10 }).map((_, i) => ({
+  stateUpdates: range(10).map((_, i) => ({
     id: i,
     hash: PedersenHash.fake(),
     forcedTransactionsCount: Math.floor(Math.random() * 3),

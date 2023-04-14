@@ -5,6 +5,7 @@ export function getTradingMode(): TradingMode {
 
   switch (projectName) {
     case 'dydx-mainnet':
+    case 'dydx-local':
       return 'perpetual'
     case 'myria-goerli':
       return 'spot'

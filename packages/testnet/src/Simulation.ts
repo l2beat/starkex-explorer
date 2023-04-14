@@ -184,7 +184,7 @@ function randomChoice<T>(items: readonly T[]) {
 }
 
 function randomNextTimestamp(last: Timestamp) {
-  const lastSeconds = Math.floor(+last / 1000)
+  const lastSeconds = Math.floor(Number(last) / 1000)
   const nowSeconds = Math.floor(Date.now() / 1000)
   if (nowSeconds <= lastSeconds) {
     return Timestamp.fromSeconds(lastSeconds + 1)

@@ -106,10 +106,6 @@ export class UserController {
       this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
     ])
 
-    if (!registeredUser) {
-      return { type: 'not found', content: 'User not found' }
-    }
-
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
       assetHistory: history,
@@ -142,13 +138,13 @@ export class UserController {
     const offers =
       await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
         forcedTradeOffers,
-        registeredUser.starkKey
+        starkKey
       )
     const content = renderUserPage({
       user,
       tradingMode: this.tradingMode,
       starkKey,
-      ethereumAddress: registeredUser.ethAddress,
+      ethereumAddress: registeredUser?.ethAddress,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId: asset.assetHash,
