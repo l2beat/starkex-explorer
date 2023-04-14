@@ -3,7 +3,7 @@ import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earl'
 import { Wallet } from 'ethers'
 
-import { fakeBigInt } from '../../../test/fakes'
+import { fakeBigInt, fakeCollateralAsset } from '../../../test/fakes'
 import { accepted, addressB, offer } from './ForcedTradeOfferMockData'
 import {
   validateAcceptSignature,
@@ -31,7 +31,9 @@ describe(validateCreateSignature.name, () => {
 
 describe(validateAcceptSignature.name, () => {
   it('accepts correct input', async () => {
-    expect(validateAcceptSignature(offer, accepted, addressB)).toBeTruthy()
+    expect(
+      validateAcceptSignature(offer, accepted, addressB, fakeCollateralAsset)
+    ).toBeTruthy()
   })
 })
 

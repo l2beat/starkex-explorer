@@ -1,6 +1,7 @@
 import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
+  CollateralAsset,
   CreateOfferData,
   encodeFinalizeExitRequest,
   encodePerpetualForcedTradeRequest,
@@ -87,9 +88,10 @@ export const Wallet = {
   async signOfferAccept(
     account: EthereumAddress,
     offer: CreateOfferData,
-    accepted: AcceptedData
+    accepted: AcceptedData,
+    collateralAsset: CollateralAsset
   ): Promise<string> {
-    const signable = toSignableAcceptOffer(offer, accepted)
+    const signable = toSignableAcceptOffer(offer, accepted, collateralAsset)
 
     const result = await getProvider().request({
       method: 'eth_sign',
@@ -116,9 +118,10 @@ export const Wallet = {
   async sendPerpetualForcedTradeTransaction(
     account: EthereumAddress,
     offer: FinalizeOfferData,
-    exchangeAddress: EthereumAddress
+    exchangeAddress: EthereumAddress,
+    collateralAsset: CollateralAsset
   ) {
-    const data = encodePerpetualForcedTradeRequest(offer)
+    const data = encodePerpetualForcedTradeRequest(offer, collateralAsset)
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [{ from: account, to: exchangeAddress, data }],

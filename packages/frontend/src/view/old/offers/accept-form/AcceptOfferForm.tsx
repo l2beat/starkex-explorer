@@ -1,19 +1,12 @@
 import {
-  AcceptedData,
-  CreateOfferData,
+  AcceptOfferFormData,
   serializeAcceptedData,
+  serializeCollateralAsset,
   serializeCreateOfferData,
 } from '@explorer/shared'
-import { EthereumAddress } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
 import { FormClass } from './attributes'
-
-export interface AcceptOfferFormData extends CreateOfferData, AcceptedData {
-  id: number
-  address: EthereumAddress
-}
-
 interface AcceptOfferFormProps extends AcceptOfferFormData {
   children: ReactNode
 }
@@ -34,6 +27,7 @@ export function AcceptOfferForm(props: AcceptOfferFormProps) {
     syntheticAmount: props.syntheticAmount,
     isABuyingSynthetic: props.isABuyingSynthetic,
   })
+  const collateralAssetJson = serializeCollateralAsset(props.collateralAsset)
   return (
     <form
       className={FormClass}
@@ -43,6 +37,7 @@ export function AcceptOfferForm(props: AcceptOfferFormProps) {
       data-offer-id={props.id.toString()}
       data-accepted={acceptedJson}
       data-address={props.address.toString()}
+      data-collateral-asset={collateralAssetJson}
     >
       {props.children}
     </form>

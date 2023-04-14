@@ -1,4 +1,5 @@
 import {
+  CollateralAsset,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
@@ -28,6 +29,7 @@ export class TransactionSubmitController {
     private sentTransactionRepository: SentTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private perpetualAddress: EthereumAddress,
+    private collateralAsset: CollateralAsset | undefined,
     private retryTransactions = true
   ) {}
 
@@ -130,6 +132,9 @@ export class TransactionSubmitController {
     transactionHash: Hash256,
     offerId: number
   ): Promise<ControllerResult> {
+    if (!this.collateralAsset) {
+      throw new Error('No collateral asset')
+    }
     const timestamp = Timestamp.now()
     const offer = await this.offersRepository.findById(offerId)
     if (!offer) {
@@ -149,7 +154,10 @@ export class TransactionSubmitController {
         content: `Transaction ${transactionHash.toString()} not found`,
       }
     }
-    const data = decodePerpetualForcedTradeRequest(tx.data)
+    const data = decodePerpetualForcedTradeRequest(
+      tx.data,
+      this.collateralAsset
+    )
     if (
       !tx.to ||
       EthereumAddress(tx.to) !== this.perpetualAddress ||

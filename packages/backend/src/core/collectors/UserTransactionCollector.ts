@@ -1,5 +1,9 @@
 import { decodeAssetId } from '@explorer/encoding'
-import { assertUnreachable } from '@explorer/shared'
+import {
+  assertUnreachable,
+  CollateralAsset,
+  getCollateralAssetIdFromHash,
+} from '@explorer/shared'
 import {
   AssetHash,
   EthereumAddress,
@@ -9,7 +13,6 @@ import {
 } from '@explorer/types'
 import { providers } from 'ethers'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { BlockRange } from '../../model/BlockRange'
 import {
   MintWithdrawData,
@@ -114,6 +117,7 @@ export class UserTransactionCollector {
         if (this.collateralAsset === undefined) {
           throw new Error('Collateral asset is not configured')
         }
+
         return this.userTransactionRepository.add({
           ...base,
           data: {
@@ -123,7 +127,10 @@ export class UserTransactionCollector {
             positionIdA: event.args.positionIdA.toBigInt(),
             positionIdB: event.args.positionIdB.toBigInt(),
             collateralAmount: event.args.collateralAmount.toBigInt(),
-            collateralAssetId: this.collateralAsset.assetId,
+            collateralAssetId: getCollateralAssetIdFromHash(
+              event.args.collateralAssetId.toHexString(),
+              this.collateralAsset
+            ),
             syntheticAmount: event.args.syntheticAmount.toBigInt(),
             syntheticAssetId: decodeAssetId(event.args.syntheticAssetId),
             isABuyingSynthetic: event.args.isABuyingSynthetic,

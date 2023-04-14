@@ -5,7 +5,7 @@ import { fakeBigInt, fakeBoolean, fakeInt } from '../../test/fakes'
 import { createTestApiServer } from '../../test/TestApiServer'
 import { OldForcedTradeOfferController } from '../controllers/OldForcedTradeOfferController'
 import { TransactionSubmitController } from '../controllers/TransactionSubmitController'
-import { createForcedTransactionRouter } from './ForcedTransactionRouter'
+import { createTransactionRouter } from './ForcedTransactionRouter'
 
 const signature = '0x12345'
 const initialData = {
@@ -28,10 +28,8 @@ const acceptedData = {
   signature,
 }
 
-function createServer(
-  ...params: Parameters<typeof createForcedTransactionRouter>
-) {
-  const router = createForcedTransactionRouter(...params)
+function createServer(...params: Parameters<typeof createTransactionRouter>) {
+  const router = createTransactionRouter(...params)
   return createTestApiServer([router])
 }
 

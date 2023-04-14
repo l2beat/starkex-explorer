@@ -5,12 +5,14 @@ import {
   OnChainData,
 } from '@explorer/encoding'
 import {
+  CollateralAsset,
   ERC20Details,
   ERC721Details,
   ERC1155Details,
   ETHDetails,
 } from '@explorer/shared'
 import {
+  AssetHash,
   AssetId,
   EthereumAddress,
   Hash256,
@@ -444,3 +446,11 @@ export const fakeErc1155Details = ERC1155Details.parse({
   symbol: 'ERC1155',
   uri: 'https://example.com/erc1155/1',
 })
+
+export const fakeCollateralAsset: CollateralAsset = {
+  assetId: AssetId('USDC-6'),
+  assetHash: AssetHash(
+    '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d'
+  ),
+  price: 1_000_000n,
+}

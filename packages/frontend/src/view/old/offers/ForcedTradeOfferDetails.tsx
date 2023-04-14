@@ -20,22 +20,22 @@ export function ForcedTradeOfferDetails(props: ForcedTradeOfferDetailsProps) {
     >
       <ForcedTradeOfferHeader offerId={props.offer.id} type={props.offer.type}>
         <div className="flex gap-x-2">
-          {props.acceptForm && (
-            <AcceptOfferForm {...props.acceptForm}>
+          {props.acceptOfferFormData && (
+            <AcceptOfferForm {...props.acceptOfferFormData}>
               <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
                 Accept &amp; {props.offer.type === 'buy' ? 'sell' : 'buy'}
               </button>
             </AcceptOfferForm>
           )}
-          {props.cancelForm && (
-            <CancelOfferForm {...props.cancelForm}>
+          {props.cancelOfferFormData && (
+            <CancelOfferForm {...props.cancelOfferFormData}>
               <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
                 Cancel
               </button>
             </CancelOfferForm>
           )}
-          {props.finalizeForm && (
-            <FinalizeOfferForm {...props.finalizeForm}>
+          {props.finalizeOfferFormData && (
+            <FinalizeOfferForm {...props.finalizeOfferFormData}>
               <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
                 Finalize
               </button>

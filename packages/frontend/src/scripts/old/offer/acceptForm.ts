@@ -1,5 +1,6 @@
 import {
   deserializeAcceptedData,
+  deserializeCollateralAsset,
   deserializeCreateOfferData,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
@@ -20,7 +21,15 @@ export function initAcceptOfferForm() {
       const offer = deserializeCreateOfferData(getAttribute(form, 'offer'))
       const offerId = Number(getAttribute(form, 'offer-id'))
       const accepted = deserializeAcceptedData(getAttribute(form, 'accepted'))
-      const signature = await Wallet.signOfferAccept(address, offer, accepted)
+      const collateralAsset = deserializeCollateralAsset(
+        getAttribute(form, 'collateralAsset')
+      )
+      const signature = await Wallet.signOfferAccept(
+        address,
+        offer,
+        accepted,
+        collateralAsset
+      )
       await Api.acceptOffer(offerId, accepted, signature)
       window.location.reload()
     })

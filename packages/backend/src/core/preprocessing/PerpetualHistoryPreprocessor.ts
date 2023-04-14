@@ -1,7 +1,7 @@
+import { CollateralAsset } from '@explorer/shared'
 import { AssetId, StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import {
   PositionRecord,
   PositionRepository,

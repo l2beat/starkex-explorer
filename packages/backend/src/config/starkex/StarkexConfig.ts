@@ -1,5 +1,5 @@
-import { TradingMode } from '@explorer/shared'
-import { AssetId, EthereumAddress } from '@explorer/types'
+import { CollateralAsset, TradingMode } from '@explorer/shared'
+import { EthereumAddress } from '@explorer/types'
 
 type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
   T['tradingMode'],
@@ -63,9 +63,4 @@ export interface BlockchainConfig {
   syncBatchSize: number
   minBlockNumber: number
   maxBlockNumber: number
-}
-
-export interface CollateralAsset {
-  assetId: AssetId
-  price: bigint
 }

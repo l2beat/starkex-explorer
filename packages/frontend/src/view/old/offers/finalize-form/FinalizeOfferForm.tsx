@@ -1,14 +1,10 @@
-import { FinalizeOfferData, serializeFinalizeOfferData } from '@explorer/shared'
-import { EthereumAddress } from '@explorer/types'
+import {
+  FinalizeOfferFormData,
+  serializeFinalizeOfferData,
+} from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
 import { FormClass } from './attributes'
-
-export interface FinalizeOfferFormData extends FinalizeOfferData {
-  offerId: number
-  address: EthereumAddress
-  perpetualAddress: EthereumAddress
-}
 
 interface FinalizeOfferFormProps extends FinalizeOfferFormData {
   children: ReactNode
