@@ -47,8 +47,6 @@ export class SyncScheduler {
 
     await this.dataSyncService.discardAfter(lastSynced)
 
-    // TODO: catchUp should block! so move it up to Application.js
-    await this.preprocessor.catchUp()
     await this.preprocessor.sync()
 
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)

@@ -637,6 +637,7 @@ export class Application {
       await apiServer.listen()
       if (config.freshStart) await database.rollbackAll()
       await database.migrateToLatest()
+      await preprocessor.catchUp()
 
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
