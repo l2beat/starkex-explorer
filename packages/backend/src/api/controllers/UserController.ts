@@ -118,6 +118,7 @@ export class UserController {
       userTransactionsCount,
       forcedTradeOffers,
       forcedTradeOffersCount,
+      finalizableOffers,
       withdrawableAssets,
     ] = await Promise.all([
       this.pageContextService.getPageContext(givenUser),
@@ -147,6 +148,7 @@ export class UserController {
         paginationOpts
       ),
       this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
+      this.forcedTradeOfferRepository.getFinalizableByStarkKey(starkKey),
       this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
     ])
 
@@ -180,10 +182,11 @@ export class UserController {
     // TODO: include the count of sentTransactions
     const totalTransactions = userTransactionsCount
     const offers =
-      await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
+      await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
       )
+
     const content = renderUserPage({
       context,
       starkKey,
@@ -196,7 +199,9 @@ export class UserController {
         amount: asset.withdrawableBalance,
       })),
       exchangeAddress: this.exchangeAddress,
-      offersToAccept: [],
+      finalizableOffers: finalizableOffers.map(
+        this.forcedTradeOfferViewService.toFinalizableOfferEntry
+      ),
       assets: assetEntries,
       totalAssets,
       balanceChanges: balanceChangesEntries,
@@ -343,7 +348,7 @@ export class UserController {
       ])
 
     const offers =
-      await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
+      await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
       )

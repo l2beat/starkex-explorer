@@ -1,6 +1,6 @@
-import { OfferEntry } from '@explorer/frontend'
 import { Hash256, StarkKey } from '@explorer/types'
 
+import { FinalizableOfferEntry, OfferEntry } from '@explorer/frontend'
 import { ForcedTradeOfferRecord } from '../peripherals/database/ForcedTradeOfferRepository'
 import {
   SentTransactionRecord,
@@ -17,7 +17,7 @@ export class ForcedTradeOfferViewService {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly sentTransactionRepository: SentTransactionRepository
   ) {}
-  async forcedTradeOffersToEntriesWithFullHistory(
+  async ToEntriesWithFullHistory(
     forcedTradeOffers: ForcedTradeOfferRecord[],
     userStarkKey?: StarkKey
   ) {
@@ -42,7 +42,7 @@ export class ForcedTradeOfferViewService {
           sentTransaction.transactionHash ===
           forcedTradeOffer.accepted?.transactionHash
       )
-      return this.forcedTradeOfferToEntry(
+      return this.toOfferEntry(
         forcedTradeOffer,
         sentTransaction,
         userTransaction,
@@ -51,7 +51,7 @@ export class ForcedTradeOfferViewService {
     })
   }
 
-  forcedTradeOfferToEntry(
+  toOfferEntry(
     forcedTradeOffer: ForcedTradeOfferRecord,
     sentTransaction?: SentTransactionRecord,
     userTransaction?: UserTransactionRecord,
@@ -83,6 +83,22 @@ export class ForcedTradeOfferViewService {
       status,
       type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
       role,
+    }
+  }
+
+  toFinalizableOfferEntry(
+    forcedTradeOffer: ForcedTradeOfferRecord
+  ): FinalizableOfferEntry {
+    return {
+      timestamp: forcedTradeOffer.createdAt,
+      id: forcedTradeOffer.id.toString(),
+      asset: {
+        hashOrId: forcedTradeOffer.syntheticAssetId,
+      },
+      amount: forcedTradeOffer.syntheticAmount,
+      price: forcedTradeOffer.collateralAmount,
+      totalPrice: forcedTradeOffer.collateralAmount,
+      type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
     }
   }
 }
