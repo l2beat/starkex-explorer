@@ -215,17 +215,19 @@ export class UserController {
     starkKey: StarkKey,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const [context, userAssets, total] = await Promise.all([
+    const [context, userAssets, userStatistics] = await Promise.all([
       this.pageContextService.getPageContext(givenUser),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         pagination,
         this.collateralAsset?.assetId
       ),
-      this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
-        starkKey
-      ),
+      this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
+
+    if (!userStatistics) {
+      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+    }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
@@ -245,7 +247,7 @@ export class UserController {
       starkKey,
       assets,
       ...pagination,
-      total,
+      total: userStatistics.assetCount,
     })
     return { type: 'success', content }
   }
@@ -255,14 +257,18 @@ export class UserController {
     starkKey: StarkKey,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const [context, history, total] = await Promise.all([
+    const [context, history, userStatistics] = await Promise.all([
       this.pageContextService.getPageContext(givenUser),
       this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
         starkKey,
         pagination
       ),
-      this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
+      this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
+
+    if (!userStatistics) {
+      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+    }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       assetHistory: history,
@@ -277,7 +283,7 @@ export class UserController {
       starkKey,
       balanceChanges,
       ...pagination,
-      total,
+      total: userStatistics.balanceChangeCount,
     })
 
     return { type: 'success', content }
