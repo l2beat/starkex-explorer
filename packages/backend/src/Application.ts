@@ -215,29 +215,13 @@ export class Application {
       | SpotValidiumUpdater
       | PerpetualValidiumUpdater
       | PerpetualRollupUpdater
-    let forcedTradeOfferController: ForcedTradeOfferController | undefined
-    let oldForcedTradeOfferController: OldForcedTradeOfferController | undefined
+
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
         config.starkex.availabilityGateway
       )
 
       if (config.starkex.tradingMode === 'perpetual') {
-        forcedTradeOfferController = new ForcedTradeOfferController(
-          forcedTradeOfferRepository,
-          positionRepository,
-          userRegistrationEventRepository,
-          config.starkex.collateralAsset,
-          config.starkex.contracts.perpetual
-        )
-        oldForcedTradeOfferController = new OldForcedTradeOfferController(
-          accountService,
-          forcedTradeOfferRepository,
-          positionRepository,
-          userRegistrationEventRepository,
-          config.starkex.collateralAsset,
-          config.starkex.contracts.perpetual
-        )
         const perpetualValidiumStateTransitionCollector =
           new PerpetualValidiumStateTransitionCollector(
             ethereumClient,
@@ -354,6 +338,27 @@ export class Application {
         userTransactionCollector,
         withdrawalAllowedCollector,
         logger
+      )
+    }
+
+    let forcedTradeOfferController: ForcedTradeOfferController | undefined
+    let oldForcedTradeOfferController: OldForcedTradeOfferController | undefined
+
+    if (config.starkex.tradingMode === 'perpetual') {
+      forcedTradeOfferController = new ForcedTradeOfferController(
+        forcedTradeOfferRepository,
+        positionRepository,
+        userRegistrationEventRepository,
+        config.starkex.collateralAsset,
+        config.starkex.contracts.perpetual
+      )
+      oldForcedTradeOfferController = new OldForcedTradeOfferController(
+        accountService,
+        forcedTradeOfferRepository,
+        positionRepository,
+        userRegistrationEventRepository,
+        config.starkex.collateralAsset,
+        config.starkex.contracts.perpetual
       )
     }
 
