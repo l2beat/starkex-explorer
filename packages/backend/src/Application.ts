@@ -18,7 +18,7 @@ import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
-import { createForcedTransactionRouter } from './api/routers/ForcedTransactionRouter'
+import { createTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createOldFrontendRouter } from './api/routers/OldFrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
@@ -42,6 +42,7 @@ import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
+import { PageContextService } from './core/PageContextService'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
 import { PerpetualValidiumSyncService } from './core/PerpetualValidiumSyncService'
@@ -133,6 +134,8 @@ export class Application {
       database,
       logger
     )
+    const userService = new UserService(userRegistrationEventRepository)
+    const pageContextService = new PageContextService(config, userService)
     const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
       database,
       logger
@@ -204,6 +207,12 @@ export class Application {
       ethereumClient,
       withdrawableAssetRepository,
       config.starkex.contracts.perpetual
+    )
+
+    const accountService = new AccountService(
+      positionRepository,
+      forcedTradeOfferRepository,
+      sentTransactionRepository
     )
 
     let syncService
@@ -337,17 +346,34 @@ export class Application {
       )
     }
 
+    let forcedTradeOfferController: ForcedTradeOfferController | undefined
+    let oldForcedTradeOfferController: OldForcedTradeOfferController | undefined
+
+    if (config.starkex.tradingMode === 'perpetual') {
+      forcedTradeOfferController = new ForcedTradeOfferController(
+        pageContextService,
+        forcedTradeOfferRepository,
+        positionRepository,
+        userRegistrationEventRepository,
+        config.starkex.collateralAsset,
+        config.starkex.contracts.perpetual
+      )
+      oldForcedTradeOfferController = new OldForcedTradeOfferController(
+        accountService,
+        forcedTradeOfferRepository,
+        positionRepository,
+        userRegistrationEventRepository,
+        config.starkex.collateralAsset,
+        config.starkex.contracts.perpetual
+      )
+    }
+
     const transactionStatusService = new TransactionStatusService(
       sentTransactionRepository,
       ethereumClient,
       logger
     )
-    const accountService = new AccountService(
-      positionRepository,
-      forcedTradeOfferRepository,
-      sentTransactionRepository
-    )
-    const userService = new UserService(userRegistrationEventRepository)
+
     const assetDetailsService = new AssetDetailsService(
       assetRepository,
       config.starkex.tradingMode
@@ -363,6 +389,7 @@ export class Application {
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
       ethereumClient,
+      collateralAsset,
       logger
     )
 
@@ -481,18 +508,17 @@ export class Application {
     )
 
     const homeController = new HomeController(
-      userService,
+      pageContextService,
       assetDetailsService,
       forcedTradeOfferViewService,
       userTransactionRepository,
       forcedTradeOfferRepository,
       preprocessedStateDetailsRepository,
-      config.starkex.tradingMode,
       collateralAsset
     )
 
     const userController = new UserController(
-      userService,
+      pageContextService,
       assetDetailsService,
       preprocessedAssetHistoryRepository,
       sentTransactionRepository,
@@ -502,22 +528,19 @@ export class Application {
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
-      config.starkex.tradingMode,
       config.starkex.contracts.perpetual,
       collateralAsset
     )
     const stateUpdateController = new StateUpdateController(
-      userService,
+      pageContextService,
       assetDetailsService,
       stateUpdateRepository,
-      assetRepository,
       userTransactionRepository,
       preprocessedAssetHistoryRepository,
-      config.starkex.tradingMode,
       collateralAsset
     )
     const transactionController = new TransactionController(
-      userService,
+      pageContextService,
       sentTransactionRepository,
       forcedTradeOfferRepository,
       userTransactionRepository,
@@ -526,9 +549,8 @@ export class Application {
       collateralAsset
     )
     const merkleProofController = new MerkleProofController(
-      userService,
-      stateUpdater,
-      config.starkex.tradingMode
+      pageContextService,
+      stateUpdater
     )
 
     const oldHomeController = new OldHomeController(
@@ -565,30 +587,18 @@ export class Application {
       userRegistrationEventRepository,
       preprocessedAssetHistoryRepository
     )
-    const oldForcedTradeOfferController = new OldForcedTradeOfferController(
-      accountService,
-      forcedTradeOfferRepository,
-      positionRepository,
-      userRegistrationEventRepository,
-      config.starkex.contracts.perpetual
-    )
+
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
       sentTransactionRepository,
       forcedTradeOfferRepository,
-      config.starkex.contracts.perpetual
+      config.starkex.contracts.perpetual,
+      collateralAsset
     )
     const forcedActionsController = new ForcedActionController(
-      userService,
+      pageContextService,
       preprocessedAssetHistoryRepository,
       assetRepository,
-      config.starkex.contracts.perpetual
-    )
-    const forcedTradeOfferController = new ForcedTradeOfferController(
-      forcedTradeOfferRepository,
-      positionRepository,
-      userRegistrationEventRepository,
-      collateralAsset,
       config.starkex.contracts.perpetual
     )
 
@@ -616,7 +626,7 @@ export class Application {
               config.starkex.tradingMode,
               searchController
             ),
-        createForcedTransactionRouter(
+        createTransactionRouter(
           config.useOldFrontend
             ? oldForcedTradeOfferController
             : forcedTradeOfferController,

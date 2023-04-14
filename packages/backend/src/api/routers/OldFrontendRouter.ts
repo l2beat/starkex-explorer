@@ -21,7 +21,7 @@ import { applyControllerResult } from './utils'
 export function createOldFrontendRouter(
   positionController: PositionController,
   oldHomeController: OldHomeController,
-  forcedTradeOfferController: OldForcedTradeOfferController,
+  oldForcedTradeOfferController: OldForcedTradeOfferController | undefined,
   forcedTransactionController: ForcedTransactionController,
   stateUpdateController: OldStateUpdateController,
   searchController: OldSearchController
@@ -65,51 +65,53 @@ export function createOldFrontendRouter(
     applyControllerResult(ctx, result)
   })
 
-  router.get(
-    '/forced/offers',
-    withTypedContext(
-      z.object({
-        query: z.object({
-          page: stringAsPositiveInt(1),
-          perPage: stringAsPositiveInt(10),
-          assetId: stringAs(AssetId).optional(),
-          type: z.enum(['sell', 'buy']).optional(),
+  if (oldForcedTradeOfferController) {
+    router.get(
+      '/forced/offers',
+      withTypedContext(
+        z.object({
+          query: z.object({
+            page: stringAsPositiveInt(1),
+            perPage: stringAsPositiveInt(10),
+            assetId: stringAs(AssetId).optional(),
+            type: z.enum(['sell', 'buy']).optional(),
+          }),
         }),
-      }),
-      async (ctx) => {
-        const { page, perPage, assetId, type } = ctx.query
-        const address = getAccountAddress(ctx)
-        const result = await forcedTradeOfferController.getOffersIndexPage({
-          page,
-          perPage,
-          assetId,
-          type,
-          address,
-        })
-        applyControllerResult(ctx, result)
-      }
+        async (ctx) => {
+          const { page, perPage, assetId, type } = ctx.query
+          const address = getAccountAddress(ctx)
+          const result = await oldForcedTradeOfferController.getOffersIndexPage(
+            {
+              page,
+              perPage,
+              assetId,
+              type,
+              address,
+            }
+          )
+          applyControllerResult(ctx, result)
+        }
+      )
     )
-  )
 
-  router.get(
-    '/forced/offers/:id',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          id: stringAsInt(),
+    router.get(
+      '/forced/offers/:id',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            id: stringAsInt(),
+          }),
         }),
-      }),
-      async (ctx) => {
-        const { id } = ctx.params
-        const address = getAccountAddress(ctx)
-        const result = await forcedTradeOfferController.getOfferDetailsPage(
-          id,
-          address
-        )
-        applyControllerResult(ctx, result)
-      }
+        async (ctx) => {
+          const { id } = ctx.params
+          const address = getAccountAddress(ctx)
+          const result =
+            await oldForcedTradeOfferController.getOfferDetailsPage(id, address)
+          applyControllerResult(ctx, result)
+        }
+      )
     )
-  )
+  }
 
   router.get(
     '/forced/:hash',

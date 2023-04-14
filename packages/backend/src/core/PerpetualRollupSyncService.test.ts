@@ -14,7 +14,6 @@ import type { VerifierCollector } from './collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { PerpetualRollupSyncService } from './PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
-
 const noop = async () => {}
 
 describe(PerpetualRollupSyncService.name, () => {

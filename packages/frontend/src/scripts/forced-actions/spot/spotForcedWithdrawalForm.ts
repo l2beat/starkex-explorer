@@ -1,9 +1,9 @@
 import { AssetHash } from '@explorer/types'
 
-import { NewForcedActionFormProps } from '../../view/pages/forced-actions/NewForcedActionFormProps'
-import { SpotForcedWithdrawalFormId } from '../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
-import { Api } from '../peripherals/api'
-import { Wallet } from '../peripherals/wallet'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+import { SpotForcedWithdrawalFormId } from '../../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
+import { Api } from '../../peripherals/api'
+import { Wallet } from '../../peripherals/wallet'
 
 export function initSpotForcedWithdrawalForm() {
   const form = document.getElementById(SpotForcedWithdrawalFormId)
@@ -24,7 +24,7 @@ export function initSpotForcedWithdrawalForm() {
 
 async function submitExit(props: NewForcedActionFormProps) {
   const hash = await Wallet.sendSpotForcedWithdrawalTransaction(
-    props.user.address,
+    props.context.user.address,
     props.starkKey,
     props.positionOrVaultId,
     props.starkExAddress

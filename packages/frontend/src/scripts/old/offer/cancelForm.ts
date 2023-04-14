@@ -14,7 +14,7 @@ export function initCancelOfferForm() {
       e.preventDefault()
       const offerId = Number(getAttribute(form, 'offer-id'))
       const address = EthereumAddress(getAttribute(form, 'address'))
-      const signature = await Wallet.signCancel(address, offerId)
+      const signature = await Wallet.signOfferCancel(address, offerId)
       await Api.cancelOffer(offerId, signature)
       window.location.href = `/forced/offers/${offerId.toString()}`
     })

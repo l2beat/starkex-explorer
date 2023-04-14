@@ -1,4 +1,4 @@
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { PedersenHash } from '@explorer/types'
 import React from 'react'
 
@@ -11,8 +11,7 @@ import { reactToHtml } from '../reactToHtml'
 
 export interface MerkleProofPageProps {
   positionOrVaultId: bigint
-  user: UserDetails | undefined
-  tradingMode: TradingMode
+  context: PageContext
   merkleProof: MerkleProof
 }
 
@@ -28,7 +27,8 @@ export interface MerkleProofPath {
 }
 
 function MerkleProofPage(props: MerkleProofPageProps) {
-  const idLabel = props.tradingMode === 'perpetual' ? 'Position' : 'Vault'
+  const idLabel =
+    props.context.tradingMode === 'perpetual' ? 'Position' : 'Vault'
   const formattedLeaf = JSON.stringify(
     JSON.parse(props.merkleProof.leaf),
     null,
@@ -37,20 +37,34 @@ function MerkleProofPage(props: MerkleProofPageProps) {
   return (
     <Page
       title="Merkle Proof"
-      description={`Merkle proof for #${props.positionOrVaultId.toString()} ${
-        props.tradingMode === 'perpetual' ? 'position' : 'vault'
-      } made from the latest state update`}
+      description={`Merkle proof for #${props.positionOrVaultId.toString()} ${idLabel} made from the latest state update`}
       path={`/proof/${props.positionOrVaultId.toString()}`}
-      user={props.user}
+      context={props.context}
     >
-      <ContentWrapper className="flex flex-col gap-6">
-        <PageTitle>
-          Merkle Proof for {idLabel} #{props.positionOrVaultId.toString()}
-        </PageTitle>
+      <ContentWrapper className="flex flex-col gap-12">
+        <div>
+          <PageTitle>
+            Merkle Proof for {idLabel} #{props.positionOrVaultId.toString()}
+          </PageTitle>
+          <span className="text-sm font-semibold text-zinc-500">
+            Merkle proofs provide a way to verify the existence and correctness
+            of data within a Merkle tree. In the context of trading, they are
+            used to prove that a specific {idLabel.toLowerCase()} exists in the
+            latest state update. By using Merkle proofs, users can trust the
+            integrity of the data they receive without having to store or
+            validate the entire state of the system.
+          </span>
+        </div>
         <div>
           <span className="text-xl font-semibold">Root Hash</span>
           <Card className="mt-2">
             <p>{props.merkleProof.rootHash}</p>
+          </Card>
+        </div>
+        <div>
+          <span className="text-xl font-semibold">Leaf</span>
+          <Card className="mt-2">
+            <pre>{formattedLeaf}</pre>
           </Card>
         </div>
         <div>
@@ -64,12 +78,6 @@ function MerkleProofPage(props: MerkleProofPageProps) {
                 </div>
               ))}
             />
-          </Card>
-        </div>
-        <div>
-          <span className="text-xl font-semibold">Leaf</span>
-          <Card className="mt-2">
-            <pre>{formattedLeaf}</pre>
           </Card>
         </div>
       </ContentWrapper>

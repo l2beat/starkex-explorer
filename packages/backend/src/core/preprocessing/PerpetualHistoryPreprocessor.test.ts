@@ -18,6 +18,7 @@ import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
+import { fakeCollateralAsset } from '../../test/fakes'
 import { Logger } from '../../tools/Logger'
 import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
 
@@ -73,11 +74,6 @@ const position2: PositionRecord & { stateUpdateId: number } = {
   ],
 }
 
-const mockCollateralAsset = {
-  assetId: AssetId.USDC,
-  price: 1_000_000n,
-}
-
 describe(PerpetualHistoryPreprocessor.name, () => {
   describe(
     PerpetualHistoryPreprocessor.prototype.getAssetPricesForStateUpdate.name,
@@ -92,7 +88,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
           ],
         })
         const preprocessor = new PerpetualHistoryPreprocessor(
-          mockCollateralAsset,
+          fakeCollateralAsset,
           mockObject<PreprocessedAssetHistoryRepository<AssetId>>(),
           stateUpdateRepository,
           mockObject<PositionRepository>(),
@@ -105,7 +101,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         expect(pricesMap).toEqual({
           'ETH-9': 123n,
           'BTC-10': 456_789n,
-          [mockCollateralAsset.assetId.toString()]: mockCollateralAsset.price,
+          [fakeCollateralAsset.assetId.toString()]: fakeCollateralAsset.price,
         })
       })
     }
@@ -133,7 +129,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         })
 
         const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
-          mockCollateralAsset,
+          fakeCollateralAsset,
           mockObject<PreprocessedAssetHistoryRepository<AssetId>>(),
           stateUpdateRepository,
           positionRepository,
@@ -185,7 +181,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
     () => {
       it('fails if position has StarkKey.ZERO', async () => {
         const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
-          mockCollateralAsset,
+          fakeCollateralAsset,
           mockObject<PreprocessedAssetHistoryRepository<AssetId>>(),
           mockObject<StateUpdateRepository>(),
           mockObject<PositionRepository>(),
@@ -214,10 +210,10 @@ describe(PerpetualHistoryPreprocessor.name, () => {
               timestamp: Timestamp(900_000_000n),
               starkKey: position1.starkKey,
               positionOrVaultId: position1.positionId,
-              assetHashOrId: mockCollateralAsset.assetId,
+              assetHashOrId: fakeCollateralAsset.assetId,
               balance: 100_000_000n,
               prevBalance: 900_000_000n,
-              price: mockCollateralAsset.price,
+              price: fakeCollateralAsset.price,
               prevPrice: 234_456n,
               isCurrent: true,
               prevHistoryId: 99,
@@ -256,7 +252,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
         })
 
         const perpetualHistoryPreprocessor = new PerpetualHistoryPreprocessor(
-          mockCollateralAsset,
+          fakeCollateralAsset,
           preprocessedRepository,
           mockObject<StateUpdateRepository>(),
           mockObject<PositionRepository>(),
@@ -275,7 +271,7 @@ describe(PerpetualHistoryPreprocessor.name, () => {
             'BTC-10': 456789n,
             'ETH-9': 123n,
             'SOL-7': 11_000n,
-            [mockCollateralAsset.assetId.toString()]: mockCollateralAsset.price,
+            [fakeCollateralAsset.assetId.toString()]: fakeCollateralAsset.price,
           }
         )
 
@@ -288,14 +284,14 @@ describe(PerpetualHistoryPreprocessor.name, () => {
           [
             // There was a history entry for this record:
             {
-              assetHashOrId: mockCollateralAsset.assetId,
+              assetHashOrId: fakeCollateralAsset.assetId,
               balance: position1.collateralBalance,
               blockNumber: stateUpdate.blockNumber,
               positionOrVaultId: position1.positionId,
               prevBalance: 100_000_000n,
               prevHistoryId: 100,
               prevPrice: 1_000_000n,
-              price: mockCollateralAsset.price,
+              price: fakeCollateralAsset.price,
               starkKey: position1.starkKey,
               stateUpdateId: stateUpdate.id,
               timestamp: stateUpdate.timestamp,

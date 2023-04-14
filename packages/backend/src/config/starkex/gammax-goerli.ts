@@ -1,10 +1,11 @@
-import { AssetId, EthereumAddress } from '@explorer/types'
+import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
 
 export function getGammaxGoerliConfig(): StarkexConfig {
   return {
+    instanceName: 'GammaX',
     dataAvailabilityMode: 'validium',
     tradingMode: 'perpetual',
     blockchain: {
@@ -26,6 +27,9 @@ export function getGammaxGoerliConfig(): StarkexConfig {
     },
     collateralAsset: {
       assetId: AssetId('COLLATERAL-1'),
+      assetHash: AssetHash(
+        '0xa21edc9d9997b1b1956f542fe95922518a9e28ace11b7b2972a1974bf5971f'
+      ),
       price: 1n,
     },
   }

@@ -45,6 +45,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
       ]}
       alignLastColumnRight={true}
       rows={props.assets.map((entry) => {
+        const isDisabled = entry.balance <= 0n && entry.action === 'WITHDRAW'
         return {
           cells: [
             <AssetWithLogo type="full" assetInfo={assetToInfo(entry.asset)} />,
@@ -59,13 +60,17 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               )}
             </div>,
             <span className="text-zinc-500">
-              #{entry.vaultOrPositionId}
+              #{entry.vaultOrPositionId}{' '}
               {props.tradingMode === 'spot' && (
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
             props.isMine && (
-              <LinkButton className="w-32" href={forcedActionLink(entry)}>
+              <LinkButton
+                className="w-32"
+                href={forcedActionLink(entry)}
+                disabled={isDisabled}
+              >
                 {entry.action}
               </LinkButton>
             ),

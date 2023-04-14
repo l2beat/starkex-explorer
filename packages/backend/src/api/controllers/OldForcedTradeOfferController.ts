@@ -2,6 +2,7 @@ import {
   renderOldForcedTradeOfferDetailsPage,
   renderOldForcedTradeOffersIndexPage,
 } from '@explorer/frontend'
+import { CollateralAsset } from '@explorer/shared'
 import { AssetId, EthereumAddress, Timestamp } from '@explorer/types'
 
 import { AccountService } from '../../core/AccountService'
@@ -19,9 +20,9 @@ import {
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
 import {
-  getAcceptForm,
-  getCancelForm,
-  getFinalizeForm,
+  getAcceptOfferFormData,
+  getCancelOfferFormData,
+  getFinalizeOfferFormData,
 } from './utils/offerForms'
 import { toForcedTradeOfferEntry } from './utils/toForcedTradeOfferEntry'
 import { toForcedTradeOfferHistory } from './utils/toForcedTradeOfferHistory'
@@ -32,6 +33,7 @@ export class OldForcedTradeOfferController {
     private offerRepository: ForcedTradeOfferRepository,
     private positionRepository: PositionRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
+    private collateralAsset: CollateralAsset,
     private perpetualAddress: EthereumAddress
   ) {}
 
@@ -131,9 +133,17 @@ export class OldForcedTradeOfferController {
         positionIdB: offer.accepted?.positionIdB,
         addressB: userB?.ethAddress,
       },
-      acceptForm: user && getAcceptForm(offer, user),
-      cancelForm: user && getCancelForm(offer, user),
-      finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
+      acceptOfferFormData:
+        user && getAcceptOfferFormData(offer, user, this.collateralAsset),
+      cancelOfferFormData: user && getCancelOfferFormData(offer, user),
+      finalizeOfferFormData:
+        user &&
+        getFinalizeOfferFormData(
+          offer,
+          user,
+          this.perpetualAddress,
+          this.collateralAsset
+        ),
     })
     return { type: 'success', content }
   }
@@ -200,7 +210,8 @@ export class OldForcedTradeOfferController {
     const signatureValid = validateAcceptSignature(
       offer,
       accepted,
-      userB.ethAddress
+      userB.ethAddress,
+      this.collateralAsset
     )
     if (!signatureValid) {
       return { type: 'bad request', content: 'Invalid signature.' }

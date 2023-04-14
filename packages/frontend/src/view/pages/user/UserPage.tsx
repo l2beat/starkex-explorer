@@ -1,4 +1,4 @@
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -31,11 +31,10 @@ import {
 } from './components/UserQuickActionsTable'
 
 export interface UserPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
   exchangeAddress: EthereumAddress
-  tradingMode: TradingMode
   withdrawableAssets: WithdrawableAssetEntry[]
   offersToAccept: OfferEntry[]
   assets: UserAssetEntry[]
@@ -54,21 +53,21 @@ export function renderUserPage(props: UserPageProps) {
 
 function UserPage(props: UserPageProps) {
   const common = getUserPageProps(props.starkKey)
-  const isMine = props.user?.starkKey === props.starkKey
+  const isMine = props.context.user?.starkKey === props.starkKey
   return (
-    <Page path={common.path} description={common.description} user={props.user}>
+    <Page
+      path={common.path}
+      description={common.description}
+      context={props.context}
+    >
       <ContentWrapper className="flex flex-col gap-12">
         <section>
           <PageTitle>User</PageTitle>
           <div className="flex flex-col gap-6">
             <UserProfile
+              user={props.context.user}
               starkKey={props.starkKey}
-              ethereumAddress={
-                props.ethereumAddress !== EthereumAddress.ZERO
-                  ? props.ethereumAddress
-                  : undefined
-              }
-              isMine={isMine}
+              ethereumAddress={props.ethereumAddress}
             />
             <UserQuickActionsTable
               withdrawableAssets={props.withdrawableAssets}
@@ -76,7 +75,7 @@ function UserPage(props: UserPageProps) {
               isMine={isMine}
               exchangeAddress={props.exchangeAddress}
               starkKey={props.starkKey}
-              user={props.user}
+              user={props.context.user}
             />
           </div>
         </section>
@@ -86,7 +85,7 @@ function UserPage(props: UserPageProps) {
           total={props.totalAssets}
         >
           <UserAssetsTable
-            tradingMode={props.tradingMode}
+            tradingMode={props.context.tradingMode}
             starkKey={props.starkKey}
             assets={props.assets}
             isMine={isMine}
@@ -98,7 +97,7 @@ function UserPage(props: UserPageProps) {
           total={props.totalBalanceChanges}
         >
           <UserBalanceChangesTable
-            tradingMode={props.tradingMode}
+            tradingMode={props.context.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TablePreview>
@@ -109,7 +108,7 @@ function UserPage(props: UserPageProps) {
         >
           <TransactionsTable transactions={props.transactions} />
         </TablePreview>
-        {props.offers && props.tradingMode === 'perpetual' && (
+        {props.offers && props.context.tradingMode === 'perpetual' && (
           <TablePreview
             {...getOfferTableProps(props.starkKey)}
             visible={props.offers.length}

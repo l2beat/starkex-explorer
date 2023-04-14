@@ -1,4 +1,4 @@
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -13,9 +13,8 @@ import {
 import { StateUpdatePageTitle } from './components/StateUpdatePageTitle'
 
 export interface StateUpdateBalanceChangesPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   id: string
-  tradingMode: TradingMode
   balanceChanges: StateUpdateBalanceChangeEntry[]
   limit: number
   offset: number
@@ -33,7 +32,11 @@ function StateUpdateBalanceChangesPage(
 ) {
   const common = getBalanceChangeTableProps(props.id)
   return (
-    <Page path={common.path} description={common.description} user={props.user}>
+    <Page
+      path={common.path}
+      description={common.description}
+      context={props.context}
+    >
       <ContentWrapper>
         <TableWithPagination
           {...common}
@@ -49,7 +52,7 @@ function StateUpdateBalanceChangesPage(
           total={props.total}
         >
           <StateUpdateBalanceChangesTable
-            tradingMode={props.tradingMode}
+            tradingMode={props.context.tradingMode}
             balanceChanges={props.balanceChanges}
           />
         </TableWithPagination>

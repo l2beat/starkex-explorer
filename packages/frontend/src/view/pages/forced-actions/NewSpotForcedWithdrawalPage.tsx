@@ -41,7 +41,7 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
     <Page
       path="/forced/new/:vaultId"
       description="Perform forced withdrawal"
-      user={props.user}
+      context={props.context}
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">

@@ -5,6 +5,7 @@ import { StarkexConfig } from './StarkexConfig'
 
 export function getMyriaGoerliConfig(): StarkexConfig {
   return {
+    instanceName: 'Myria',
     dataAvailabilityMode: 'validium',
     tradingMode: 'spot',
     blockchain: {

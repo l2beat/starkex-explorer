@@ -6,9 +6,13 @@ import { FormAction } from './types'
 
 describe(nextFormState.name, () => {
   const INITIAL_STATE = getInitialState({
-    user: {
-      starkKey: StarkKey.fake(),
-      address: EthereumAddress.fake(),
+    context: {
+      user: {
+        starkKey: StarkKey.fake(),
+        address: EthereumAddress.fake(),
+      },
+      tradingMode: 'perpetual',
+      instanceName: 'dYdX',
     },
     positionOrVaultId: 123n,
     starkExAddress: EthereumAddress.fake(),

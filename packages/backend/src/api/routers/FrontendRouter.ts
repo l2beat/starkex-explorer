@@ -1,4 +1,5 @@
 import {
+  CollateralAsset,
   stringAs,
   stringAsBigInt,
   stringAsPositiveInt,
@@ -8,7 +9,6 @@ import { Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import * as z from 'zod'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'
@@ -28,7 +28,7 @@ export function createFrontendRouter(
   stateUpdateController: StateUpdateController,
   transactionController: TransactionController,
   forcedActionController: ForcedActionController,
-  forcedTradeOfferController: ForcedTradeOfferController,
+  forcedTradeOfferController: ForcedTradeOfferController | undefined,
   merkleProofController: MerkleProofController,
   collateralAsset: CollateralAsset | undefined,
   tradingMode: TradingMode,
@@ -171,6 +171,20 @@ export function createFrontendRouter(
     )
   )
 
+  router.get('/users/register', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await userController.getUserRegisterPage(givenUser)
+
+    applyControllerResult(ctx, result)
+  })
+
+  router.get('/users/recover', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await userController.getUserRecoverPage(givenUser)
+
+    applyControllerResult(ctx, result)
+  })
+
   router.get(
     '/users/:starkKey',
     withTypedContext(
@@ -292,25 +306,6 @@ export function createFrontendRouter(
   )
 
   router.get(
-    '/offers/:offerId',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          offerId: z.string(),
-        }),
-      }),
-      async (ctx) => {
-        const user = getGivenUser(ctx)
-        const result = await forcedTradeOfferController.getOfferDetailsPage(
-          Number(ctx.params.offerId),
-          user.address
-        )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
     '/transactions/:transactionHash',
     withTypedContext(
       z.object({
@@ -350,12 +345,24 @@ export function createFrontendRouter(
   )
 
   if (tradingMode === 'perpetual') {
+    if (!forcedTradeOfferController) {
+      throw new Error(
+        'forcedTradeOfferController is required in perpetual trading mode'
+      )
+    }
+
     if (!collateralAsset) {
       throw new Error(
         'Collateral asset must be defined in perpetual trading mode'
       )
     }
-    addPerpetualTradingRoutes(router, forcedActionController, collateralAsset)
+
+    addPerpetualTradingRoutes(
+      router,
+      forcedTradeOfferController,
+      forcedActionController,
+      collateralAsset
+    )
   } else {
     addSpotTradingRoutes(router, forcedActionController)
   }

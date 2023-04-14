@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -9,7 +9,7 @@ import { reactToHtml } from '../../reactToHtml'
 import { OFFER_TABLE_PROPS } from './common'
 
 export interface HomeOffersPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   offers: OfferEntry[]
   limit: number
   offset: number
@@ -25,7 +25,7 @@ function HomeOffersPage(props: HomeOffersPageProps) {
     <Page
       path={OFFER_TABLE_PROPS.path}
       description="All available trade offers"
-      user={props.user}
+      context={props.context}
     >
       <ContentWrapper>
         <TableWithPagination

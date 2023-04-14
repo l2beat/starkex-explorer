@@ -1,10 +1,11 @@
-import { AssetId, EthereumAddress } from '@explorer/types'
+import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
 
 export function getDydxMainnetConfig(): StarkexConfig {
   return {
+    instanceName: 'dYdX',
     dataAvailabilityMode: 'rollup',
     tradingMode: 'perpetual',
     blockchain: {
@@ -26,6 +27,9 @@ export function getDydxMainnetConfig(): StarkexConfig {
     },
     collateralAsset: {
       assetId: AssetId('USDC-6'),
+      assetHash: AssetHash(
+        '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d'
+      ),
       price: 1_000_000n,
     },
   }

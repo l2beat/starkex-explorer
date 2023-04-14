@@ -36,7 +36,10 @@ async function submitOffer(state: FormState) {
     isABuyingSynthetic: state.buyButtonSelected,
   }
 
-  const signature = await Wallet.signCreate(state.props.account.address, offer)
+  const signature = await Wallet.signOfferCreate(
+    state.props.account.address,
+    offer
+  )
 
   const offerId = await Api.createOffer(offer, signature)
   window.location.href = `/forced/offers/${offerId}`

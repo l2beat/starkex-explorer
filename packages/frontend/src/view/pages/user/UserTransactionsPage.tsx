@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -14,7 +14,7 @@ import { getTransactionTableProps } from './common'
 import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserTransactionsPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   starkKey: StarkKey
   transactions: TransactionEntry[]
   limit: number
@@ -29,7 +29,11 @@ export function renderUserTransactionsPage(props: UserTransactionsPageProps) {
 function UserTransactionsPage(props: UserTransactionsPageProps) {
   const common = getTransactionTableProps(props.starkKey)
   return (
-    <Page path={common.path} description={common.description} user={props.user}>
+    <Page
+      path={common.path}
+      description={common.description}
+      context={props.context}
+    >
       <ContentWrapper>
         <TableWithPagination
           {...common}

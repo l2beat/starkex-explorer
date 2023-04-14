@@ -1,12 +1,13 @@
 import {
   deserializeAcceptedData,
+  deserializeCollateralAsset,
   deserializeFinalizeOfferData,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
-import { ACCEPT_OFFER_FORM_ID } from '../../view/pages/transaction/components/AcceptOfferForm'
-import { Api } from '../peripherals/api'
-import { Wallet } from '../peripherals/wallet'
+import { ACCEPT_OFFER_FORM_ID } from '../../../../view/pages/transaction/components/AcceptOfferForm'
+import { Api } from '../../../peripherals/api'
+import { Wallet } from '../../../peripherals/wallet'
 
 export function initAcceptOfferForm() {
   const forms = document.querySelectorAll<HTMLFormElement>(
@@ -16,9 +17,15 @@ export function initAcceptOfferForm() {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
       e.preventDefault()
-      const { address, offer, offerId, accepted } = getFormData(form)
+      const { address, offer, offerId, accepted, collateralAsset } =
+        getFormData(form)
 
-      const signature = await Wallet.signAccepted(address, offer, accepted)
+      const signature = await Wallet.signOfferAccept(
+        address,
+        offer,
+        accepted,
+        collateralAsset
+      )
       await Api.acceptOffer(offerId, accepted, signature)
       window.location.reload()
     })
@@ -26,9 +33,9 @@ export function initAcceptOfferForm() {
 }
 
 function getFormData(form: HTMLFormElement) {
-  const { address, offer, offerId, accepted } = form.dataset
+  const { address, offer, offerId, accepted, collateralAsset } = form.dataset
 
-  if (!address || !offer || !offerId || !accepted) {
+  if (!address || !offer || !offerId || !accepted || !collateralAsset) {
     throw new Error('Invalid data')
   }
 
@@ -37,5 +44,6 @@ function getFormData(form: HTMLFormElement) {
     offer: deserializeFinalizeOfferData(offer),
     offerId: Number(offerId),
     accepted: deserializeAcceptedData(accepted),
+    collateralAsset: deserializeCollateralAsset(collateralAsset),
   }
 }

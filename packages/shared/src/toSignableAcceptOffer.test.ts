@@ -1,7 +1,8 @@
 import { recoverAddress } from '@ethersproject/transactions'
-import { AssetId, StarkKey, Timestamp } from '@explorer/types'
+import { AssetHash, AssetId, StarkKey, Timestamp } from '@explorer/types'
 import { expect } from 'earl'
 
+import { CollateralAsset } from './CollateralAsset'
 import { toSignableAcceptOffer } from './toSignableAcceptOffer'
 
 // Mock data taken from real transaction:https://etherscan.io/tx/0x9b2dce5538d0c8c08511c9383be9b67da6f952b367baff0c8bdb5f66c9395634
@@ -30,10 +31,16 @@ const ACCEPTED = {
 }
 
 const ETH_ADDRESS = '0xD848fd793e1D483f1352E147d3c1A489FFE21Ff6'
-
+const collateralAsset: CollateralAsset = {
+  assetId: AssetId('USDC-6'),
+  assetHash: AssetHash(
+    '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d'
+  ),
+  price: 1_000_000n,
+}
 describe(toSignableAcceptOffer.name, () => {
   it('works on an example tx', () => {
-    const digest = toSignableAcceptOffer(INITIAL, ACCEPTED)
+    const digest = toSignableAcceptOffer(INITIAL, ACCEPTED, collateralAsset)
     expect(recoverAddress(digest, ACCEPTED.signature)).toEqual(ETH_ADDRESS)
   })
 })
