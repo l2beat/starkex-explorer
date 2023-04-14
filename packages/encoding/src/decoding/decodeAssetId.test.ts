@@ -1,7 +1,6 @@
 import { AssetId } from '@explorer/types'
 import { expect } from 'earl'
 
-import { DYDX_INTERNAL_USDC_ID_ENCODED } from '../constants'
 import { decodeAssetId } from './decodeAssetId'
 import { DecodingError } from './DecodingError'
 
@@ -18,9 +17,9 @@ describe('decodeAssetId', () => {
     expect(result).toEqual(AssetId('BTC-10'))
   })
 
-  it('can decode USDC-6', () => {
-    const result = decodeAssetId(DYDX_INTERNAL_USDC_ID_ENCODED)
-    expect(result).toEqual(AssetId.USDC)
+  it('can decode ETH-9', () => {
+    const result = decodeAssetId('4554482d3900000000000000000000')
+    expect(result).toEqual(AssetId('ETH-9'))
   })
 
   it('can decode BigNumbers', () => {

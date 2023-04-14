@@ -1,8 +1,8 @@
 import { CreateOfferData } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
-import { Api } from '../peripherals/api'
-import { Wallet } from '../peripherals/wallet'
+import { Api } from '../../peripherals/api'
+import { Wallet } from '../../peripherals/wallet'
 import { FormState } from './types'
 import { isBuyable } from './utils'
 
@@ -25,7 +25,7 @@ async function submitExit(state: FormState) {
   )
 
   await Api.submitPerpetualForcedWithdrawal(hash)
-  window.location.href = `/forced/${hash.toString()}`
+  window.location.href = `/transactions/${hash.toString()}`
 }
 
 async function submitOffer(state: FormState) {
@@ -38,11 +38,11 @@ async function submitOffer(state: FormState) {
     isABuyingSynthetic: isBuyable(state.assetId, state.balance),
   }
 
-  const signature = await Wallet.signCreate(
+  const signature = await Wallet.signOfferCreate(
     state.props.context.user.address,
     offer
   )
 
   const offerId = await Api.createOffer(offer, signature)
-  window.location.href = `/forced/offers/${offerId}`
+  window.location.href = `/offers/${offerId}`
 }

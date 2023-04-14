@@ -1,6 +1,7 @@
 import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
+  CollateralAsset,
   CreateOfferData,
   encodeFinalizeExitRequest,
   encodePerpetualForcedTradeRequest,
@@ -85,7 +86,7 @@ export const Wallet = {
   // #endregion
   // #region Offer signing
 
-  async signCreate(
+  async signOfferCreate(
     account: EthereumAddress,
     offer: CreateOfferData
   ): Promise<string> {
@@ -97,12 +98,14 @@ export const Wallet = {
     return result as string
   },
 
-  async signAccepted(
+  async signOfferAccept(
     account: EthereumAddress,
     offer: CreateOfferData,
-    accepted: AcceptedData
+    accepted: AcceptedData,
+    collateralAsset: CollateralAsset
   ): Promise<string> {
-    const signable = toSignableAcceptOffer(offer, accepted)
+    const signable = toSignableAcceptOffer(offer, accepted, collateralAsset)
+
     const result = await getProvider().request({
       method: 'eth_sign',
       params: [account.toString(), signable],
@@ -110,7 +113,10 @@ export const Wallet = {
     return result as string
   },
 
-  async signCancel(account: EthereumAddress, offerId: number): Promise<string> {
+  async signOfferCancel(
+    account: EthereumAddress,
+    offerId: number
+  ): Promise<string> {
     const signable = toSignableCancelOffer(offerId)
     const result = await getProvider().request({
       method: 'personal_sign',
@@ -125,9 +131,10 @@ export const Wallet = {
   async sendPerpetualForcedTradeTransaction(
     account: EthereumAddress,
     offer: FinalizeOfferData,
-    exchangeAddress: EthereumAddress
+    exchangeAddress: EthereumAddress,
+    collateralAsset: CollateralAsset
   ) {
-    const data = encodePerpetualForcedTradeRequest(offer)
+    const data = encodePerpetualForcedTradeRequest(offer, collateralAsset)
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [{ from: account, to: exchangeAddress, data }],

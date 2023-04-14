@@ -38,6 +38,7 @@
     "elliptic": "^6.5.4",
     "hash.js": "^1.1.7",
     "js-cookie": "^3.0.1",
+    "lodash": "^4.17.21",
     "mersenne-twister": "^1.1.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",

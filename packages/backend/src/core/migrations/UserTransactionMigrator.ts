@@ -1,4 +1,5 @@
 import {
+  CollateralAsset,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
@@ -28,6 +29,7 @@ export class UserTransactionMigrator {
     private withdrawableAssetRepository: WithdrawableAssetRepository,
     private withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private ethereumClient: EthereumClient,
+    private collateralAsset: CollateralAsset | undefined,
     private logger: Logger
   ) {
     this.logger = this.logger.for(this)
@@ -196,7 +198,13 @@ export class UserTransactionMigrator {
             },
           })
         } else if (tx.data.startsWith('0x2ecb8162')) {
-          const data = decodePerpetualForcedTradeRequest(tx.data)
+          if (!this.collateralAsset) {
+            throw new Error('Collateral asset is not set!')
+          }
+          const data = decodePerpetualForcedTradeRequest(
+            tx.data,
+            this.collateralAsset
+          )
           if (!data) {
             throw new Error('Cannot decode forced trade request!')
           }

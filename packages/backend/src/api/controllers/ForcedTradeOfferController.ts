@@ -1,8 +1,7 @@
 import { renderOfferAndForcedTradePage } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
 import { EthereumAddress, Timestamp } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { PageContextService } from '../../core/PageContextService'
 import { TransactionHistory } from '../../core/TransactionHistory'
 import {
@@ -19,9 +18,9 @@ import {
   validateCreate,
 } from './utils/ForcedTradeOfferValidators'
 import {
-  getAcceptForm,
-  getCancelForm,
-  getFinalizeForm,
+  getAcceptOfferFormData,
+  getCancelOfferFormData,
+  getFinalizeOfferFormData,
 } from './utils/offerForms'
 
 export class ForcedTradeOfferController {
@@ -30,7 +29,7 @@ export class ForcedTradeOfferController {
     private readonly offerRepository: ForcedTradeOfferRepository,
     private readonly positionRepository: PositionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
-    private readonly collateralAsset: CollateralAsset | undefined,
+    private readonly collateralAsset: CollateralAsset,
     private readonly perpetualAddress: EthereumAddress
   ) {}
 
@@ -38,12 +37,6 @@ export class ForcedTradeOfferController {
     id: number,
     givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
-    if (!this.collateralAsset) {
-      throw new Error(
-        'Collateral asset not passed when displaying ForcedTradeOffer'
-      )
-    }
-
     const context = await this.pageContextService.getPageContext(givenUser)
 
     const offer = await this.offerRepository.findById(id)
@@ -119,9 +112,17 @@ export class ForcedTradeOfferController {
       syntheticAmount: offer.syntheticAmount,
       expirationTimestamp: offer.accepted?.submissionExpirationTime,
       history: transactionHistory.getForcedTradeTransactionHistory(),
-      acceptForm: user && getAcceptForm(offer, user),
-      cancelForm: user && getCancelForm(offer, user),
-      finalizeForm: user && getFinalizeForm(offer, user, this.perpetualAddress),
+      acceptOfferFormData:
+        user && getAcceptOfferFormData(offer, user, this.collateralAsset),
+      cancelOfferFormData: user && getCancelOfferFormData(offer, user),
+      finalizeOfferFormData:
+        user &&
+        getFinalizeOfferFormData(
+          offer,
+          user,
+          this.perpetualAddress,
+          this.collateralAsset
+        ),
     })
 
     return { type: 'success', content }
@@ -189,7 +190,8 @@ export class ForcedTradeOfferController {
     const signatureValid = validateAcceptSignature(
       offer,
       accepted,
-      userB.ethAddress
+      userB.ethAddress,
+      this.collateralAsset
     )
     if (!signatureValid) {
       return { type: 'bad request', content: 'Invalid signature.' }

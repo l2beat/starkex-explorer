@@ -1,5 +1,6 @@
 import { AssetBalance } from '@explorer/encoding'
 import {
+  CollateralAsset,
   toSignableAcceptOffer,
   toSignableCancelOffer,
   toSignableCreateOffer,
@@ -57,9 +58,10 @@ export function validateCreateSignature(
 export function validateAcceptSignature(
   offer: Omit<ForcedTradeOfferRecord, 'createdAt' | 'id'>,
   accepted: Omit<Accepted, 'at' | 'premiumCost'>,
-  address: EthereumAddress
+  address: EthereumAddress,
+  collateralAsset: CollateralAsset
 ): boolean {
-  const request = toSignableAcceptOffer(offer, accepted)
+  const request = toSignableAcceptOffer(offer, accepted, collateralAsset)
   return validateSignature(request, accepted.signature, address)
 }
 

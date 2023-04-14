@@ -3,10 +3,9 @@ import {
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { PageContextService } from '../../core/PageContextService'

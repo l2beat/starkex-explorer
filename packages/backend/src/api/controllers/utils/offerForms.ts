@@ -1,7 +1,8 @@
 import {
-  AcceptedData,
-  CreateOfferData,
-  FinalizeOfferData,
+  AcceptOfferFormData,
+  CancelOfferFormData,
+  CollateralAsset,
+  FinalizeOfferFormData,
 } from '@explorer/shared'
 import { EthereumAddress, StarkKey, Timestamp } from '@explorer/types'
 
@@ -15,19 +16,15 @@ interface User {
   address: EthereumAddress
 }
 
-interface AcceptForm extends CreateOfferData, AcceptedData {
-  id: number
-  address: EthereumAddress
-}
-
-export function getAcceptForm(
+export function getAcceptOfferFormData(
   offer: ForcedTradeOfferRecord,
-  user: User
-): AcceptForm | undefined {
+  user: User,
+  collateralAsset: CollateralAsset
+): AcceptOfferFormData | undefined {
   const isAcceptable = !offer.accepted && !offer.cancelledAt
   const shouldRenderForm = isAcceptable && user.positionId !== offer.positionIdA
-  const submissionExpirationTime = Timestamp(
-    BigInt(Math.floor(Date.now() + THREE_DAYS_IN_MILLIS))
+  const submissionExpirationTime = Timestamp.roundDownToHours(
+    Timestamp(Math.floor(Date.now() + THREE_DAYS_IN_MILLIS))
   )
   if (!shouldRenderForm) {
     return undefined
@@ -46,18 +43,14 @@ export function getAcceptForm(
     syntheticAmount: offer.syntheticAmount,
     id: offer.id,
     syntheticAssetId: offer.syntheticAssetId,
+    collateralAsset,
   }
 }
 
-interface CancelForm {
-  address: EthereumAddress
-  offerId: number
-}
-
-export function getCancelForm(
+export function getCancelOfferFormData(
   offer: ForcedTradeOfferRecord,
   user: User
-): CancelForm | undefined {
+): CancelOfferFormData | undefined {
   const isOwner = user.positionId === offer.positionIdA
   const isCancellable = !offer.cancelledAt
   const shouldRenderForm = isOwner && isCancellable
@@ -70,17 +63,12 @@ export function getCancelForm(
   }
 }
 
-interface FinalizeForm extends FinalizeOfferData {
-  offerId: number
-  address: EthereumAddress
-  perpetualAddress: EthereumAddress
-}
-
-export function getFinalizeForm(
+export function getFinalizeOfferFormData(
   offer: ForcedTradeOfferRecord,
   user: User,
-  perpetualAddress: EthereumAddress
-): FinalizeForm | undefined {
+  perpetualAddress: EthereumAddress,
+  collateralAsset: CollateralAsset
+): FinalizeOfferFormData | undefined {
   const isOwner = user.positionId === offer.positionIdA
   if (!(offer.accepted && !offer.cancelledAt && isOwner)) {
     return undefined
@@ -101,5 +89,6 @@ export function getFinalizeForm(
     address: user.address,
     perpetualAddress,
     signature: offer.accepted.signature,
+    collateralAsset,
   }
 }

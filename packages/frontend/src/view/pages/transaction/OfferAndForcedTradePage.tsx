@@ -1,4 +1,9 @@
-import { PageContext } from '@explorer/shared'
+import {
+  AcceptOfferFormData,
+  CancelOfferFormData,
+  FinalizeOfferFormData,
+  PageContext,
+} from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
@@ -13,18 +18,9 @@ import {
   FORCED_TRANSACTION_SENT,
   TRANSACTION_REVERTED,
 } from './common'
-import {
-  AcceptOfferForm,
-  AcceptOfferFormData,
-} from './components/AcceptOfferForm'
-import {
-  CancelOfferForm,
-  CancelOfferFormData,
-} from './components/CancelOfferForm'
-import {
-  FinalizeOfferForm,
-  FinalizeOfferFormData,
-} from './components/FinalizeOfferForm'
+import { AcceptOfferForm } from './components/AcceptOfferForm'
+import { CancelOfferForm } from './components/CancelOfferForm'
+import { FinalizeOfferForm } from './components/FinalizeOfferForm'
 import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
@@ -67,9 +63,9 @@ export interface OfferAndForcedTradePageProps {
   }[]
   expirationTimestamp?: Timestamp
   stateUpdateId?: number
-  acceptForm?: AcceptOfferFormData
-  cancelForm?: CancelOfferFormData
-  finalizeForm?: FinalizeOfferFormData
+  acceptOfferFormData?: AcceptOfferFormData
+  cancelOfferFormData?: CancelOfferFormData
+  finalizeOfferFormData?: FinalizeOfferFormData
 }
 
 export function renderOfferAndForcedTradePage(
@@ -110,25 +106,21 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
               </PageTitle>
             )}
             <div className="mb-6 flex items-center gap-2">
-              {props.acceptForm && (
-                <AcceptOfferForm {...props.acceptForm}>
-                  <Button variant="contained">
+              {props.acceptOfferFormData && (
+                <AcceptOfferForm {...props.acceptOfferFormData}>
+                  <Button>
                     Accept & {props.type === 'BUY' ? 'sell' : 'buy'}
                   </Button>
                 </AcceptOfferForm>
               )}
-              {props.cancelForm && (
-                <CancelOfferForm {...props.cancelForm}>
-                  <button className="bg-blue-700 rounded-md px-4 py-2 text-white">
-                    Cancel
-                  </button>
+              {props.cancelOfferFormData && (
+                <CancelOfferForm {...props.cancelOfferFormData}>
+                  <Button variant="outlined">Cancel</Button>
                 </CancelOfferForm>
               )}
-              {props.finalizeForm && (
-                <FinalizeOfferForm {...props.finalizeForm}>
-                  <button className="bg-blue-700 rounded-md px-4 py-2 text-white">
-                    Finalize
-                  </button>
+              {props.finalizeOfferFormData && (
+                <FinalizeOfferForm {...props.finalizeOfferFormData}>
+                  <Button>Send transaction</Button>
                 </FinalizeOfferForm>
               )}
             </div>

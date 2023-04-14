@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { Button } from '../../components/Button'
 import { ForcedHistory } from '../common/ForcedHistory'
 import { SectionHeading } from '../common/header/SectionHeading'
 import { Page } from '../common/page/Page'
@@ -20,25 +21,21 @@ export function ForcedTradeOfferDetails(props: ForcedTradeOfferDetailsProps) {
     >
       <ForcedTradeOfferHeader offerId={props.offer.id} type={props.offer.type}>
         <div className="flex gap-x-2">
-          {props.acceptForm && (
-            <AcceptOfferForm {...props.acceptForm}>
-              <button className="bg-blue-700 rounded-md px-4 py-2 text-white">
+          {props.acceptOfferFormData && (
+            <AcceptOfferForm {...props.acceptOfferFormData}>
+              <Button>
                 Accept &amp; {props.offer.type === 'buy' ? 'sell' : 'buy'}
-              </button>
+              </Button>
             </AcceptOfferForm>
           )}
-          {props.cancelForm && (
-            <CancelOfferForm {...props.cancelForm}>
-              <button className="bg-blue-700 rounded-md px-4 py-2 text-white">
-                Cancel
-              </button>
+          {props.cancelOfferFormData && (
+            <CancelOfferForm {...props.cancelOfferFormData}>
+              <Button variant="outlined">Cancel</Button>
             </CancelOfferForm>
           )}
-          {props.finalizeForm && (
-            <FinalizeOfferForm {...props.finalizeForm}>
-              <button className="bg-blue-700 rounded-md px-4 py-2 text-white">
-                Finalize
-              </button>
+          {props.finalizeOfferFormData && (
+            <FinalizeOfferForm {...props.finalizeOfferFormData}>
+              <Button>Send transaction</Button>
             </FinalizeOfferForm>
           )}
         </div>

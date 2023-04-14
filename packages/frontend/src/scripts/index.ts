@@ -1,11 +1,11 @@
 import { USE_NEW_DESIGN } from '../utils/constants'
 import { initCountdownTimer } from './countdownTimer'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
+import { initForcedTradeOfferForms } from './forced-actions/perpetual/offer'
 import { initImageFallback } from './imageFallback'
 import { initStarkKeyRecovery } from './keys/starkKeyRecovery'
 import { initStarkKeyRegistration } from './keys/starkKeyRegistration'
 import { initMetamask } from './metamask'
-import { initForcedTradeOfferForms } from './offer'
 // eslint-disable-next-line no-restricted-imports
 import { initAcceptOfferForm } from './old/offer/acceptForm'
 // eslint-disable-next-line no-restricted-imports

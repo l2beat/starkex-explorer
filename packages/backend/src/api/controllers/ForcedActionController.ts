@@ -2,7 +2,7 @@ import {
   renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
 } from '@explorer/frontend'
-import { isPageContextUserDefined, UserDetails } from '@explorer/shared'
+import { isPageContextUserDefined,UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { PageContextService } from '../../core/PageContextService'
@@ -93,7 +93,7 @@ export class ForcedActionController {
       return { type: 'not found', content: 'Position does not belong to user' }
     }
 
-    const content = renderNewSpotForcedWithdrawPage({
+    const content = renderNewPerpetualForcedActionPage({
       context,
       starkExAddress: this.starkExAddress,
       positionOrVaultId: positionId,

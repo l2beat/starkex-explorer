@@ -2,6 +2,8 @@ import { keccak256, pack } from '@ethersproject/solidity'
 import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
+import { CollateralAsset } from './CollateralAsset'
+
 export function toSignableAcceptOffer(
   offer: {
     starkKeyA: StarkKey
@@ -16,7 +18,8 @@ export function toSignableAcceptOffer(
     positionIdB: bigint
     nonce: bigint
     submissionExpirationTime: Timestamp
-  }
+  },
+  collateralAsset: CollateralAsset
 ) {
   const packedParameters = pack(
     [
@@ -36,7 +39,7 @@ export function toSignableAcceptOffer(
       accepted.starkKeyB,
       offer.positionIdA,
       accepted.positionIdB,
-      `0x${encodeAssetId(AssetId.USDC)}`,
+      collateralAsset.assetHash,
       `0x${encodeAssetId(offer.syntheticAssetId)}`,
       offer.collateralAmount,
       offer.syntheticAmount,

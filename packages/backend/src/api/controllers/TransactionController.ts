@@ -4,10 +4,14 @@ import {
   renderRegularWithdrawalPage,
   renderSpotForcedWithdrawalPage,
 } from '@explorer/frontend'
-import { assertUnreachable, PageContext, UserDetails } from '@explorer/shared'
+import {
+  assertUnreachable,
+  CollateralAsset,
+  PageContext,
+  UserDetails,
+} from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { PageContextService } from '../../core/PageContextService'
 import { TransactionHistory } from '../../core/TransactionHistory'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'

@@ -1,5 +1,5 @@
-import { initPerpetualForcedActionForm } from './perpetualForcedActionForm'
-import { initSpotForcedWithdrawalForm } from './spotForcedWithdrawalForm'
+import { initPerpetualForcedActionForm } from './perpetual/perpetualForcedActionForm'
+import { initSpotForcedWithdrawalForm } from './spot/spotForcedWithdrawalForm'
 
 export function initForcedActionForms() {
   initPerpetualForcedActionForm()

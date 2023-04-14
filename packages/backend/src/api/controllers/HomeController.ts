@@ -3,9 +3,8 @@ import {
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
 } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
 
-import { CollateralAsset } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { PageContextService } from '../../core/PageContextService'

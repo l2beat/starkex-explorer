@@ -1,12 +1,7 @@
-import { EthereumAddress } from '@explorer/types'
+import { CancelOfferFormData } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
 export const CANCEL_OFFER_FORM_ID = 'cancel-offer-form'
-
-export interface CancelOfferFormData {
-  offerId: number
-  address: EthereumAddress
-}
 
 interface CancelOfferFormProps extends CancelOfferFormData {
   children: ReactNode

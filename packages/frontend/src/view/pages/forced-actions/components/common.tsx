@@ -5,10 +5,10 @@ import { Link } from '../../../components/Link'
 
 const getWithdrawalInstructions = (instanceName: InstanceName) => [
   <>
-    Using this form you request a withdrawal of your funds. (Perpetual only) You
-    can only withdraw USDC, so to fully exit all funds you should first get rid
-    of your synthetic assets by using the close functionality. (Perpetual only)
-    This is achieved through a mechanism called forced withdrawals,{' '}
+    Using this form you request a withdrawal of your funds. You can only
+    withdraw USDC, so to fully exit all funds you should first get rid of your
+    synthetic assets by using the close functionality. This is achieved through
+    a mechanism called forced withdrawals,{' '}
     <Link href="https://docs.starkware.co/starkex/perpetual/perpetual-trading-forced-withdrawal-and-forced-trade.html#forced_withdrawal">
       link to docs
     </Link>

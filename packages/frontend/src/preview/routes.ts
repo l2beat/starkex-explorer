@@ -738,7 +738,7 @@ const routes: Route[] = [
         maker: userParty(context.user),
         ...offer,
         history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
-        cancelForm: {
+        cancelOfferFormData: {
           offerId: Number(offer.offerId),
           address: context.user.address,
         },
@@ -764,7 +764,7 @@ const routes: Route[] = [
         maker: randomParty(),
         ...offer,
         history: [{ timestamp: randomTimestamp(), status: 'CREATED' }],
-        acceptForm: {
+        acceptOfferFormData: {
           id: Number(offer.offerId),
           address: context.user.address,
           starkKeyA: maker.starkKey,
@@ -778,6 +778,11 @@ const routes: Route[] = [
           submissionExpirationTime: Timestamp(12345678),
           nonce: 1234n,
           premiumCost: false,
+          collateralAsset: {
+            assetId: AssetId('USDC-6'),
+            assetHash: AssetHash.fake(),
+            price: 1_000_000n,
+          },
         },
       })
     },
@@ -801,11 +806,11 @@ const routes: Route[] = [
           { timestamp: randomTimestamp(), status: 'ACCEPTED' },
           { timestamp: randomTimestamp(), status: 'CREATED' },
         ],
-        cancelForm: {
+        cancelOfferFormData: {
           offerId: Number(offer.offerId),
           address: context.user.address,
         },
-        finalizeForm: {
+        finalizeOfferFormData: {
           offerId: Number(offer.offerId),
           address: context.user.address,
           perpetualAddress: EthereumAddress.fake(),
