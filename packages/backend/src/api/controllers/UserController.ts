@@ -67,7 +67,6 @@ export class UserController {
       user,
       registeredUser,
       userAssets,
-      totalAssets,
       history,
       sentTransactions,
       userTransactions,
@@ -83,9 +82,6 @@ export class UserController {
         starkKey,
         paginationOpts,
         this.collateralAsset?.assetId
-      ),
-      this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
-        starkKey
       ),
       this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
         starkKey,
@@ -142,7 +138,7 @@ export class UserController {
       this.collateralAsset,
       assetDetailsMap
     )
-    // TODO: include the count of sentTransactions
+
     const totalTransactions = userTransactionsCount
     const offers =
       await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
