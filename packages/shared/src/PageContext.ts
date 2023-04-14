@@ -23,9 +23,3 @@ export const PageContextWithUserAndStarkKey = PageContext.extend({
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   user: UserDetails.transform((o) => ({ ...o, starkKey: o.starkKey! })),
 })
-
-export function isPageContextUserDefined(
-  context: PageContext
-): context is PageContextWithUser {
-  return context.user !== undefined
-}

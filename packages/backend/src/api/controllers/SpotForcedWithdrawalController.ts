@@ -1,5 +1,5 @@
 import { renderNewSpotForcedWithdrawPage } from '@explorer/frontend'
-import { isPageContextUserDefined, UserDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { PageContextService } from '../../core/PageContextService'
@@ -20,9 +20,11 @@ export class SpotForcedWithdrawalController {
     givenUser: Partial<UserDetails>,
     vaultId: bigint
   ): Promise<ControllerResult> {
-    const context = await this.pageContextService.getPageContext(givenUser)
+    const context = await this.pageContextService.getPageContextWithUser(
+      givenUser
+    )
 
-    if (!isPageContextUserDefined(context)) {
+    if (!context) {
       return { type: 'not found', content: 'User must be logged in' }
     }
 
