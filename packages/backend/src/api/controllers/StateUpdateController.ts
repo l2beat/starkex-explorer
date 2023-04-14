@@ -4,7 +4,7 @@ import {
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
 import { CollateralAsset, UserDetails } from '@explorer/shared'
-import { AssetHash, AssetId } from '@explorer/types'
+import { AssetHash } from '@explorer/types'
 
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
@@ -33,9 +33,7 @@ export class StateUpdateController {
     private readonly assetDetailsService: AssetDetailsService,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
-    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
-      AssetHash | AssetId
-    >,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 

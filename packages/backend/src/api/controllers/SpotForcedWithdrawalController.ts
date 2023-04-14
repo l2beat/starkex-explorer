@@ -10,9 +10,7 @@ import { ControllerResult } from './ControllerResult'
 export class SpotForcedWithdrawalController {
   constructor(
     private readonly pageContextService: PageContextService,
-    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
-      AssetHash | AssetId
-    >,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private readonly assetRepository: AssetRepository
   ) {}
 
