@@ -1,6 +1,7 @@
 import {
   deserializeAcceptedData,
-  deserializeCreateOfferData,
+  deserializeCollateralAsset,
+  deserializeFinalizeOfferData,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
@@ -9,31 +10,40 @@ import { Api } from '../../../peripherals/api'
 import { Wallet } from '../../../peripherals/wallet'
 
 export function initAcceptOfferForm() {
-  const form = document.querySelector<HTMLFormElement>(
+  const forms = document.querySelectorAll<HTMLFormElement>(
     `.${ACCEPT_OFFER_FORM_ID}`
   )
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    const { address, offer, offerId, accepted } = getFormData(form)
+  forms.forEach((form) => {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const { address, offer, offerId, accepted, collateralAsset } =
+        getFormData(form)
 
-    const signature = await Wallet.signOfferAccept(address, offer, accepted)
-    await Api.acceptOffer(offerId, accepted, signature)
-    window.location.reload()
+      const signature = await Wallet.signOfferAccept(
+        address,
+        offer,
+        accepted,
+        collateralAsset
+      )
+      await Api.acceptOffer(offerId, accepted, signature)
+      window.location.reload()
+    })
   })
 }
 
 function getFormData(form: HTMLFormElement) {
-  const { address, offer, offerId, accepted } = form.dataset
+  const { address, offer, offerId, accepted, collateralAsset } = form.dataset
 
-  if (!address || !offer || !offerId || !accepted) {
+  if (!address || !offer || !offerId || !accepted || !collateralAsset) {
     throw new Error('Invalid data')
   }
 
   return {
     address: EthereumAddress(address),
-    offer: deserializeCreateOfferData(offer),
+    offer: deserializeFinalizeOfferData(offer),
     offerId: Number(offerId),
     accepted: deserializeAcceptedData(accepted),
+    collateralAsset: deserializeCollateralAsset(collateralAsset),
   }
 }
