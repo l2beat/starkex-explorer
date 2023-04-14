@@ -65,42 +65,40 @@ export class UserStatisticsPreprocessor {
     trx: Knex.Transaction,
     stateUpdate: StateUpdateRecord
   ) {
-    const uniqueStarkKeys =
-      // We must get by state update id and not "current" because we use this function in catchUp()
-      await this.preprocessedAssetHistoryRepository.getUniqueStarkKeysByStateUpdateId(
-        stateUpdate.id,
-        trx
-      )
+    // We must get by state update id and not "current" because we use this function in catchUp()
+    const [starkKeyCounts, newAssetCounts, removedAssetCounts] =
+      await Promise.all([
+        this.preprocessedAssetHistoryRepository.getCountByStarkKeysAndStateUpdateId(
+          stateUpdate.id,
+          trx
+        ),
+        this.preprocessedAssetHistoryRepository.getCountOfNewAssetsByStarkKeysAndStateUpdateId(
+          stateUpdate.id,
+          trx
+        ),
+        this.preprocessedAssetHistoryRepository.getCountOfRemovedAssetsByStarkKeysAndStateUpdateId(
+          stateUpdate.id,
+          trx
+        ),
+      ])
 
-    const starkKeyCounts =
-      // We must get by state update id and not "current" because we use this function in catchUp()
-      await this.preprocessedAssetHistoryRepository.getCountByStarkKeysAndStateUpdateId(
-        uniqueStarkKeys,
-        stateUpdate.id,
-        trx
-      )
     for (const starkKeyCount of starkKeyCounts) {
-      const [newAssets, removedAssets, currentStatisticsRecord] =
-        await Promise.all([
-          this.preprocessedAssetHistoryRepository.getCountOfNewAssetsByStarkKeyAndStateUpdateId(
-            starkKeyCount.starkKey,
-            stateUpdate.id,
-            trx
-          ),
-          this.preprocessedAssetHistoryRepository.getCountOfRemovedAssetsByStarkKeyAndStateUpdateId(
-            starkKeyCount.starkKey,
-            stateUpdate.id,
-            trx
-          ),
-          // it's ok to get "current" on preprocessedUserStatisticsRepository
-          // because that's what we're building here, so we're always at the tip.
-          this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(
-            starkKeyCount.starkKey,
-            trx
-          ),
-        ])
+      const starkKey = starkKeyCount.starkKey
+      // it's ok to get "current" on preprocessedUserStatisticsRepository
+      // because that's what we're building here, so we're always at the tip.
+      const currentStatisticsRecord =
+        await this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(
+          starkKey,
+          trx
+        )
+
       const balanceChangeCount =
         (currentStatisticsRecord?.balanceChangeCount ?? 0) + starkKeyCount.count
+      const newAssets =
+        newAssetCounts.find((x) => x.starkKey === starkKey)?.count ?? 0
+      const removedAssets =
+        removedAssetCounts.find((x) => x.starkKey === starkKey)?.count ?? 0
+
       const assetCount =
         (currentStatisticsRecord?.assetCount ?? 0) + newAssets - removedAssets
 

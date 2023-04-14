@@ -66,9 +66,6 @@ export class PreprocessedAssetHistoryRepository<
     this.getPrevHistoryByStateUpdateId = this.wrapGet(
       this.getPrevHistoryByStateUpdateId
     )
-    this.getUniqueStarkKeysByStateUpdateId = this.wrapGet(
-      this.getUniqueStarkKeysByStateUpdateId
-    )
     this.getCountByStarkKeysAndStateUpdateId = this.wrapGet(
       this.getCountByStarkKeysAndStateUpdateId
     )
@@ -78,15 +75,15 @@ export class PreprocessedAssetHistoryRepository<
     this.getCountByStarkKeyUntilStateUpdateId = this.wrapAny(
       this.getCountByStarkKeyUntilStateUpdateId
     )
+    this.getCountOfNewAssetsByStarkKeysAndStateUpdateId = this.wrapAny(
+      this.getCountOfNewAssetsByStarkKeysAndStateUpdateId
+    )
+    this.getCountOfRemovedAssetsByStarkKeysAndStateUpdateId = this.wrapAny(
+      this.getCountOfRemovedAssetsByStarkKeysAndStateUpdateId
+    )
     this.getCountByStateUpdateId = this.wrapAny(this.getCountByStateUpdateId)
     this.getCountOfCurrentByStarkKey = this.wrapAny(
       this.getCountOfCurrentByStarkKey
-    )
-    this.getCountOfNewAssetsByStarkKeyAndStateUpdateId = this.wrapAny(
-      this.getCountOfNewAssetsByStarkKeyAndStateUpdateId
-    )
-    this.getCountOfRemovedAssetsByStarkKeyAndStateUpdateId = this.wrapAny(
-      this.getCountOfRemovedAssetsByStarkKeyAndStateUpdateId
     )
 
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -227,7 +224,6 @@ export class PreprocessedAssetHistoryRepository<
   }
 
   async getCountByStarkKeysAndStateUpdateId(
-    starkKeys: StarkKey[],
     stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<{ starkKey: StarkKey; count: number }[]> {
@@ -239,46 +235,47 @@ export class PreprocessedAssetHistoryRepository<
       .count('* as count')
       .where('state_update_id', stateUpdateId)
       .groupBy('stark_key')
-    return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count)}))
+    return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
+  }
+
+  async getCountOfNewAssetsByStarkKeysAndStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<{ starkKey: StarkKey; count: number }[]> {
+    const knex = await this.knex(trx)
+    const rows: { starkKey: StarkKey; count: bigint }[] = await knex(
+      'preprocessed_asset_history'
+    )
+      .select('stark_key as starkKey')
+      .count('* as count')
+      .where('state_update_id', stateUpdateId)
+      .where('prev_balance', 0)
+      .where('balance', '<>', 0)
+      .groupBy('stark_key')
+    return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
+  }
+
+  async getCountOfRemovedAssetsByStarkKeysAndStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<{ starkKey: StarkKey; count: number }[]> {
+    const knex = await this.knex(trx)
+    const rows: { starkKey: StarkKey; count: bigint }[] = await knex(
+      'preprocessed_asset_history'
+    )
+      .select('stark_key as starkKey')
+      .count('* as count')
+      .where('state_update_id', stateUpdateId)
+      .where('prev_balance', '<>', 0)
+      .where('balance', 0)
+      .groupBy('stark_key')
+    return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
   }
 
   async getCountByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where('stark_key', starkKey.toString())
-      .count()
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count!)
-  }
-
-  async getCountOfNewAssetsByStarkKeyAndStateUpdateId(
-    starkKey: StarkKey,
-    stateUpdateId: number,
-    trx?: Knex.Transaction
-  ) {
-    const knex = await this.knex(trx)
-    const [result] = await knex('preprocessed_asset_history')
-      .where('state_update_id', stateUpdateId)
-      .where('stark_key', starkKey.toString())
-      .where('balance', '<>', 0)
-      // This is how we differentiate between balance change and new asset being added:
-      // new assets don't have prev_history_id
-      .whereNull('prev_history_id')
-      .count()
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count!)
-  }
-
-  async getCountOfRemovedAssetsByStarkKeyAndStateUpdateId(
-    starkKey: StarkKey,
-    stateUpdateId: number,
-    trx?: Knex.Transaction
-  ) {
-    const knex = await this.knex(trx)
-    const [result] = await knex('preprocessed_asset_history')
-      .where('state_update_id', stateUpdateId)
-      .where('stark_key', starkKey.toString())
-      .where('balance', 0)
       .count()
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count!)
@@ -371,18 +368,6 @@ export class PreprocessedAssetHistoryRepository<
       historyId: row.id,
       prevHistoryId: row.prev_history_id ?? undefined,
     }))
-  }
-
-  async getUniqueStarkKeysByStateUpdateId(
-    stateUpdateId: number,
-    trx: Knex.Transaction
-  ): Promise<StarkKey[]> {
-    const knex = await this.knex(trx)
-    const rows = await knex('preprocessed_asset_history')
-      .distinct('stark_key')
-      .where('state_update_id', stateUpdateId)
-
-    return rows.map((r) => StarkKey(r.stark_key))
   }
 
   async starkKeyExists(starkKey: StarkKey, trx?: Knex.Transaction) {
