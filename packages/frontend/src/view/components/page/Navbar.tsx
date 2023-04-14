@@ -1,8 +1,6 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
-import { InstanceName } from '../../../utils/instance'
-import { getTradingMode } from '../../../utils/tradingMode'
 import { JazzIcon } from '../../assets/icons/jazz/JazzIcon'
 import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
 import { ProjectLogo } from '../../assets/logos/ProjectLogo'
@@ -10,13 +8,12 @@ import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
 
 export interface NavbarProps {
-  readonly user: UserDetails | undefined
+  readonly context: PageContext
   readonly searchBar: boolean
-  readonly instanceName: InstanceName
 }
 
-export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
-  const tradingMode = getTradingMode()
+export function Navbar({ searchBar = true, context }: NavbarProps) {
+  const { user, instanceName, tradingMode } = context
 
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
@@ -26,7 +23,7 @@ export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
       >
         <div className="flex gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
-          <ProjectLogo projectName={instanceName} />
+          <ProjectLogo instanceName={instanceName} />
         </div>
         <span className="py-1 pl-2 text-zinc-500 sm:pl-4">
           EXPLORER (Development version)
@@ -42,7 +39,7 @@ export function Navbar({ user, searchBar = true, instanceName }: NavbarProps) {
         {!user && <Button id="connect-with-metamask">Connect wallet</Button>}
         {user && (
           <a
-            href={`/users/${user.starkKey?.toString() ?? 'not-found'}`}
+            href={`/users/${user.starkKey?.toString() ?? 'recover'}`}
             className="relative flex h-10 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand"
           >
             <JazzIcon

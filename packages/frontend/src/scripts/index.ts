@@ -3,6 +3,8 @@ import { initCountdownTimer } from './countdownTimer'
 import { initForcedActionForms } from './forced-actions/forcedActionForm'
 import { initForcedTradeOfferForms } from './forced-actions/perpetual/offer'
 import { initImageFallback } from './imageFallback'
+import { initStarkKeyRecovery } from './keys/starkKeyRecovery'
+import { initStarkKeyRegistration } from './keys/starkKeyRegistration'
 import { initMetamask } from './metamask'
 // eslint-disable-next-line no-restricted-imports
 import { initAcceptOfferForm } from './old/offer/acceptForm'
@@ -31,8 +33,10 @@ if (USE_NEW_DESIGN) {
   initImageFallback()
   initPagination()
   initStateUpdateStats()
+  initStarkKeyRecovery()
   initForcedTradeOfferForms()
   initRegularWithdrawalForm()
+  initStarkKeyRegistration()
 } else {
   initTVLDisplay()
   initCountdownTimer()

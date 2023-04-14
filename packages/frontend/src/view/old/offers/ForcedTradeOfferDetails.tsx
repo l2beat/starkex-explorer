@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { Button } from '../../components/Button'
 import { ForcedHistory } from '../common/ForcedHistory'
 import { SectionHeading } from '../common/header/SectionHeading'
 import { Page } from '../common/page/Page'
@@ -22,23 +23,19 @@ export function ForcedTradeOfferDetails(props: ForcedTradeOfferDetailsProps) {
         <div className="flex gap-x-2">
           {props.acceptOfferFormData && (
             <AcceptOfferForm {...props.acceptOfferFormData}>
-              <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
+              <Button>
                 Accept &amp; {props.offer.type === 'buy' ? 'sell' : 'buy'}
-              </button>
+              </Button>
             </AcceptOfferForm>
           )}
           {props.cancelOfferFormData && (
             <CancelOfferForm {...props.cancelOfferFormData}>
-              <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
-                Cancel
-              </button>
+              <Button variant="outlined">Cancel</Button>
             </CancelOfferForm>
           )}
           {props.finalizeOfferFormData && (
             <FinalizeOfferForm {...props.finalizeOfferFormData}>
-              <button className="text-base bg-blue-700 rounded-md px-4 py-2 text-white">
-                Finalize
-              </button>
+              <Button>Send transaction</Button>
             </FinalizeOfferForm>
           )}
         </div>

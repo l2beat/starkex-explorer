@@ -171,6 +171,20 @@ export function createFrontendRouter(
     )
   )
 
+  router.get('/users/register', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await userController.getUserRegisterPage(givenUser)
+
+    applyControllerResult(ctx, result)
+  })
+
+  router.get('/users/recover', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await userController.getUserRecoverPage(givenUser)
+
+    applyControllerResult(ctx, result)
+  })
+
   router.get(
     '/users/:starkKey',
     withTypedContext(

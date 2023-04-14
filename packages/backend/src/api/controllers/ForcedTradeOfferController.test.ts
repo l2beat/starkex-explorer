@@ -1,8 +1,13 @@
-import { toSignableCancelOffer, toSignableCreateOffer } from '@explorer/shared'
+import {
+  PageContext,
+  toSignableCancelOffer,
+  toSignableCreateOffer,
+} from '@explorer/shared'
 import { EthereumAddress, Hash256, Timestamp } from '@explorer/types'
-import { expect, mockObject } from 'earl'
+import { expect, mockFn, mockObject } from 'earl'
 import { Wallet } from 'ethers'
 
+import { PageContextService } from '../../core/PageContextService'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
@@ -46,7 +51,11 @@ describe(ForcedTradeOfferController.name, () => {
     ethAddress: tradeMock.addressB,
   }
   const invalidSignature = '0x12345'
-
+  const pageContext: PageContext = {
+    user: undefined,
+    tradingMode: 'perpetual',
+    instanceName: 'dYdX',
+  }
   describe(
     ForcedTradeOfferController.prototype.getOfferDetailsPage.name,
     () => {
@@ -57,7 +66,11 @@ describe(ForcedTradeOfferController.name, () => {
         const offerRepository = mockObject<ForcedTradeOfferRepository>({
           findById: async () => offer,
         })
+        const pageContextService = mockObject<PageContextService>({
+          getPageContext: async () => pageContext,
+        })
         const controller = new ForcedTradeOfferController(
+          pageContextService,
           offerRepository,
           mockObject<PositionRepository>(),
           mockObject<UserRegistrationEventRepository>(),
@@ -65,9 +78,7 @@ describe(ForcedTradeOfferController.name, () => {
           EthereumAddress.fake()
         )
 
-        expect(
-          await controller.getOfferDetailsPage(offer.id, undefined)
-        ).toEqual({
+        expect(await controller.getOfferDetailsPage(offer.id, {})).toEqual({
           type: 'redirect',
           url: `/transactions/${
             offer.accepted?.transactionHash?.toString() ?? ''
@@ -89,7 +100,18 @@ describe(ForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         })
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         offerRepository,
         positionRepository,
         userRegistrationEventRepository,
@@ -106,7 +128,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing position', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => undefined,
@@ -127,7 +160,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing user', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => positionA,
@@ -148,7 +192,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks invalid balance', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => ({ ...positionA, collateralAmount: 0n }),
@@ -180,7 +235,18 @@ describe(ForcedTradeOfferController.name, () => {
         mockObject<UserRegistrationEventRepository>({
           findByStarkKey: async () => userA,
         })
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         offerRepository,
         positionRepository,
         userRegistrationEventRepository,
@@ -199,7 +265,18 @@ describe(ForcedTradeOfferController.name, () => {
 
   describe(ForcedTradeOfferController.prototype.acceptOffer.name, () => {
     it('blocks missing position', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => undefined,
@@ -218,7 +295,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing user', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>(),
         mockObject<PositionRepository>({
           findById: async () => positionA,
@@ -237,7 +325,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing offer', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => undefined,
         }),
@@ -258,7 +357,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks accepted offer', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => ({
             id: 1,
@@ -287,7 +397,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks cancelled offer', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => ({
             id: 1,
@@ -314,7 +435,18 @@ describe(ForcedTradeOfferController.name, () => {
 
     it('blocks invalid signature', async () => {
       const id = 1
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           add: async () => id,
           findById: async () => ({
@@ -360,7 +492,18 @@ describe(ForcedTradeOfferController.name, () => {
 
     it('accepts offer', async () => {
       const id = 1
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           add: async () => id,
           findById: async () => ({
@@ -419,7 +562,18 @@ describe(ForcedTradeOfferController.name, () => {
     }
 
     it('blocks missing offer', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => undefined,
         }),
@@ -436,7 +590,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks cancelled offer', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => ({
             ...initial,
@@ -457,7 +622,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks submitted offer', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => ({
             ...accepted,
@@ -481,7 +657,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks missing position', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => accepted,
         }),
@@ -501,7 +688,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('blocks invalid signature', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => accepted,
         }),
@@ -521,7 +719,18 @@ describe(ForcedTradeOfferController.name, () => {
     })
 
     it('cancels offer', async () => {
+      const pageContextService = mockObject<PageContextService>({
+        getPageContext: mockFn(
+          async () =>
+            ({
+              user: undefined,
+              tradingMode: 'perpetual',
+              instanceName: 'dYdX',
+            } as const)
+        ),
+      })
       const controller = new ForcedTradeOfferController(
+        pageContextService,
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => accepted,
           update: async () => 1,

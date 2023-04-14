@@ -24,7 +24,7 @@ export function initSpotForcedWithdrawalForm() {
 
 async function submitExit(props: NewForcedActionFormProps) {
   const hash = await Wallet.sendSpotForcedWithdrawalTransaction(
-    props.user.address,
+    props.context.user.address,
     props.starkKey,
     props.positionOrVaultId,
     props.starkExAddress

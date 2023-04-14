@@ -5,6 +5,7 @@ import { StarkexConfig } from './StarkexConfig'
 
 export function getGammaxGoerliConfig(): StarkexConfig {
   return {
+    instanceName: 'GammaX',
     dataAvailabilityMode: 'validium',
     tradingMode: 'perpetual',
     blockchain: {

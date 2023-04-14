@@ -16,6 +16,8 @@ import {
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
+import { Registration } from '../keys/keys'
+
 function getProvider() {
   const provider = window.ethereum
   if (!provider) {
@@ -49,10 +51,21 @@ export const Wallet = {
     return result as string
   },
 
+  async signMyriaKey(account: EthereumAddress): Promise<string> {
+    const message =
+      '0x5369676e2d696e20746f20796f7572204d79726961204c322057616c6c6574'
+
+    const result = await getProvider().request({
+      method: 'personal_sign',
+      params: [message, account.toString()],
+    })
+    return result as string
+  },
+
   async sendRegistrationTransaction(
     account: EthereumAddress,
     starkKey: StarkKey,
-    registration: { rsy: string },
+    registration: Registration,
     exchangeAddress: EthereumAddress
   ) {
     const coder = new Interface([

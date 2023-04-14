@@ -54,10 +54,10 @@ export function addPerpetualTradingRoutes(
         }),
       }),
       async (ctx) => {
-        const user = getGivenUser(ctx)
+        const givenUser = getGivenUser(ctx)
         const result = await forcedTradeOfferController.getOfferDetailsPage(
           Number(ctx.params.offerId),
-          user.address
+          givenUser
         )
         applyControllerResult(ctx, result)
       }

@@ -5,6 +5,7 @@ import { StarkexConfig } from './StarkexConfig'
 
 export function getDydxLocalConfig(): StarkexConfig {
   return {
+    instanceName: 'dYdX',
     dataAvailabilityMode: 'rollup',
     tradingMode: 'perpetual',
     blockchain: {

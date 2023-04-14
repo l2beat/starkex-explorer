@@ -1,11 +1,11 @@
-import { AccountDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { Page } from '../components/page/Page'
 import { reactToHtml } from '../reactToHtml'
 
 export interface NotFoundPageProps {
-  account: AccountDetails | undefined
+  context: PageContext
 }
 
 export function renderNotFoundPage(props: NotFoundPageProps) {
@@ -14,7 +14,12 @@ export function renderNotFoundPage(props: NotFoundPageProps) {
 
 function NotFoundPage(props: NotFoundPageProps) {
   return (
-    <Page path="/" description="Not found." user={props.account} withoutSearch>
+    <Page
+      path="/"
+      description="Not found."
+      context={props.context}
+      withoutSearch
+    >
       <h1>Not found</h1>
     </Page>
   )

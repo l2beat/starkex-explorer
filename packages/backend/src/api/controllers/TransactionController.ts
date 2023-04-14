@@ -7,12 +7,13 @@ import {
 import {
   assertUnreachable,
   CollateralAsset,
+  PageContext,
   UserDetails,
 } from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
+import { PageContextService } from '../../core/PageContextService'
 import { TransactionHistory } from '../../core/TransactionHistory'
-import { UserService } from '../../core/UserService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import {
   ForcedTradeOfferRecord,
@@ -31,7 +32,7 @@ import { ControllerResult } from './ControllerResult'
 
 export class TransactionController {
   constructor(
-    private readonly userService: UserService,
+    private readonly pageContextService: PageContextService,
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
@@ -44,9 +45,9 @@ export class TransactionController {
     givenUser: Partial<UserDetails>,
     txHash: Hash256
   ): Promise<ControllerResult> {
-    const [user, sentTransaction, forcedTradeOffer, userTransaction] =
+    const [context, sentTransaction, forcedTradeOffer, userTransaction] =
       await Promise.all([
-        this.userService.getUserDetails(givenUser),
+        await this.pageContextService.getPageContext(givenUser),
         this.sentTransactionRepository.findByTransactionHash(txHash),
         this.forcedTradeOfferRepository.findByTransactionHash(txHash),
         this.userTransactionRepository.findByTransactionHash(txHash),
@@ -54,7 +55,7 @@ export class TransactionController {
 
     if (sentTransaction && !userTransaction) {
       const content = await this.getTransactionPageForSentTransaction(
-        user,
+        context,
         sentTransaction,
         forcedTradeOffer
       )
@@ -63,7 +64,7 @@ export class TransactionController {
 
     if (userTransaction) {
       const content = await this.getTransactionPageForUserTransaction(
-        user,
+        context,
         userTransaction,
         sentTransaction,
         forcedTradeOffer
@@ -76,7 +77,7 @@ export class TransactionController {
   }
 
   async getTransactionPageForUserTransaction(
-    user: UserDetails | undefined,
+    context: PageContext,
     userTransaction: UserTransactionRecord,
     sentTransaction: SentTransactionRecord | undefined,
     forcedTradeOffer: ForcedTradeOfferRecord | undefined
@@ -98,7 +99,7 @@ export class TransactionController {
         })
 
         return renderPerpetualForcedWithdrawalPage({
-          user,
+          context,
           transactionHash: userTransaction.transactionHash,
           recipient: {
             starkKey: userTransaction.data.starkKey,
@@ -121,7 +122,7 @@ export class TransactionController {
           userTransaction,
         })
         return renderSpotForcedWithdrawalPage({
-          user,
+          context,
           transactionHash: userTransaction.transactionHash,
           recipient: {
             starkKey: userTransaction.data.starkKey,
@@ -163,7 +164,7 @@ export class TransactionController {
           userTransaction,
         })
         return renderOfferAndForcedTradePage({
-          user,
+          context,
           transactionHash: userTransaction.transactionHash,
           offerId: forcedTradeOffer?.id.toString(),
           maker,
@@ -208,7 +209,7 @@ export class TransactionController {
           recipientEthAddress = recipient?.ethAddress
         }
         return renderRegularWithdrawalPage({
-          user,
+          context,
           transactionHash: userTransaction.transactionHash,
           recipient: {
             starkKey: userTransaction.data.starkKey,
@@ -226,7 +227,7 @@ export class TransactionController {
   }
 
   async getTransactionPageForSentTransaction(
-    user: UserDetails | undefined,
+    context: PageContext,
     sentTransaction: SentTransactionRecord,
     forcedTradeOffer: ForcedTradeOfferRecord | undefined
   ) {
@@ -260,7 +261,7 @@ export class TransactionController {
           sentTransaction,
         })
         return renderOfferAndForcedTradePage({
-          user,
+          context,
           transactionHash: sentTransaction.transactionHash,
           offerId: forcedTradeOffer?.id.toString(),
           maker,
@@ -287,7 +288,7 @@ export class TransactionController {
         const transactionHistory = new TransactionHistory({ sentTransaction })
 
         return renderPerpetualForcedWithdrawalPage({
-          user,
+          context,
           transactionHash: sentTransaction.transactionHash,
           recipient: {
             starkKey: sentTransaction.data.starkKey,
@@ -315,7 +316,7 @@ export class TransactionController {
           )
 
         return renderRegularWithdrawalPage({
-          user,
+          context,
           transactionHash: sentTransaction.transactionHash,
           recipient: {
             starkKey: sentTransaction.data.starkKey,
@@ -347,7 +348,7 @@ export class TransactionController {
         })
 
         return renderRegularWithdrawalPage({
-          user,
+          context,
           transactionHash: sentTransaction.transactionHash,
           recipient: {
             starkKey: sentTransaction.data.starkKey,

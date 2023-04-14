@@ -1,30 +1,28 @@
 import { renderMerkleProofPage } from '@explorer/frontend'
-import { TradingMode, UserDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 import { PositionLeaf, VaultLeaf } from '@explorer/state'
 
+import { PageContextService } from '../../core/PageContextService'
 import { StateUpdater } from '../../core/StateUpdater'
-import { UserService } from '../../core/UserService'
 import { ControllerResult } from './ControllerResult'
 
 export class MerkleProofController {
   constructor(
-    private readonly userService: UserService,
-    private readonly stateUpdater: StateUpdater<PositionLeaf | VaultLeaf>,
-    private readonly tradingMode: TradingMode
+    private readonly pageContextService: PageContextService,
+    private readonly stateUpdater: StateUpdater<PositionLeaf | VaultLeaf>
   ) {}
 
   async getMerkleProofPage(
     givenUser: Partial<UserDetails>,
     positionOrVaultId: bigint
   ): Promise<ControllerResult> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const context = await this.pageContextService.getPageContext(givenUser)
     const merkleProof = await this.stateUpdater.generateMerkleProof(
       positionOrVaultId
     )
     const content = renderMerkleProofPage({
+      context,
       positionOrVaultId,
-      user,
-      tradingMode: this.tradingMode,
       merkleProof: {
         rootHash: merkleProof.root,
         path: merkleProof.path,

@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -12,7 +12,7 @@ import {
 } from './components/HomeStateUpdatesTable'
 
 export interface HomeStateUpdatesPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   stateUpdates: HomeStateUpdateEntry[]
   limit: number
   offset: number
@@ -28,7 +28,7 @@ function HomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
     <Page
       path={STATE_UPDATE_TABLE_PROPS.path}
       description="Latest state updates"
-      user={props.user}
+      context={props.context}
     >
       <ContentWrapper>
         <TableWithPagination

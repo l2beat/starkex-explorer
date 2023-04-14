@@ -1,7 +1,8 @@
 import { renderOfferAndForcedTradePage } from '@explorer/frontend'
-import { CollateralAsset } from '@explorer/shared'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
 import { EthereumAddress, Timestamp } from '@explorer/types'
 
+import { PageContextService } from '../../core/PageContextService'
 import { TransactionHistory } from '../../core/TransactionHistory'
 import {
   Accepted,
@@ -24,17 +25,20 @@ import {
 
 export class ForcedTradeOfferController {
   constructor(
-    private offerRepository: ForcedTradeOfferRepository,
-    private positionRepository: PositionRepository,
-    private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private collateralAsset: CollateralAsset,
-    private perpetualAddress: EthereumAddress
+    private readonly pageContextService: PageContextService,
+    private readonly offerRepository: ForcedTradeOfferRepository,
+    private readonly positionRepository: PositionRepository,
+    private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
+    private readonly collateralAsset: CollateralAsset,
+    private readonly perpetualAddress: EthereumAddress
   ) {}
 
   async getOfferDetailsPage(
     id: number,
-    userAddress: EthereumAddress | undefined
+    givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+
     const offer = await this.offerRepository.findById(id)
 
     if (!offer) {
@@ -76,10 +80,12 @@ export class ForcedTradeOfferController {
         : undefined
 
     const [userPositionId, userEvent] = await Promise.all([
-      userAddress &&
-        this.positionRepository.findIdByEthereumAddress(userAddress),
-      userAddress &&
-        this.userRegistrationEventRepository.findByEthereumAddress(userAddress),
+      context.user &&
+        this.positionRepository.findIdByEthereumAddress(context.user.address),
+      context.user &&
+        this.userRegistrationEventRepository.findByEthereumAddress(
+          context.user.address
+        ),
     ])
     const user =
       userPositionId && userEvent
@@ -94,7 +100,7 @@ export class ForcedTradeOfferController {
     })
 
     const content = renderOfferAndForcedTradePage({
-      user,
+      context,
       offerId: id.toString(),
       transactionHash: offer.accepted?.transactionHash,
       maker,

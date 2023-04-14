@@ -17,12 +17,15 @@ import {
 function NewPerpetualForcedActionPage(props: NewForcedActionFormProps) {
   const isWithdrawal = props.asset.hashOrId === AssetId.USDC
   const propsJson = serializeForcedActionsFormProps(props)
-  const instructionParams = getForcedActionInstructionsParams(isWithdrawal)
+  const instructionParams = getForcedActionInstructionsParams(
+    isWithdrawal,
+    props.context.instanceName
+  )
   return (
     <Page
       path="/forced/new/:positionId/:assetId"
       description="Perform forced actions on your assets"
-      user={props.user}
+      context={props.context}
     >
       <main className="mx-auto flex-1 p-16">
         <div className="my-auto flex gap-12">

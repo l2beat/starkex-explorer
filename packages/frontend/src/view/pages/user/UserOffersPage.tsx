@@ -1,4 +1,4 @@
-import { UserDetails } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
@@ -11,7 +11,7 @@ import { getOfferTableProps } from './common'
 import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserOffersPageProps {
-  user: UserDetails | undefined
+  context: PageContext
   starkKey: StarkKey
   offers: OfferEntry[]
   limit: number
@@ -26,7 +26,11 @@ export function renderUserOffersPage(props: UserOffersPageProps) {
 function UserOffersPage(props: UserOffersPageProps) {
   const common = getOfferTableProps(props.starkKey)
   return (
-    <Page path={common.path} description={common.description} user={props.user}>
+    <Page
+      path={common.path}
+      description={common.description}
+      context={props.context}
+    >
       <ContentWrapper>
         <TableWithPagination
           {...common}

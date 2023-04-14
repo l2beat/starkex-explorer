@@ -1,9 +1,9 @@
+import { InstanceName } from '@explorer/shared'
 import React from 'react'
 
-import { getInstanceName } from '../../../../utils/instance'
 import { Link } from '../../../components/Link'
 
-const WITHDRAWAL_INSTRUCTIONS = [
+const getWithdrawalInstructions = (instanceName: InstanceName) => [
   <>
     Using this form you request a withdrawal of your funds. You can only
     withdraw USDC, so to fully exit all funds you should first get rid of your
@@ -14,7 +14,7 @@ const WITHDRAWAL_INSTRUCTIONS = [
     </Link>
     .
   </>,
-  `After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of ${getInstanceName()} to process your request.`,
+  `After submitting a forced withdrawal request you must now wait up to seven days (but usually just several hours) for the operators of ${instanceName} to process your request.`,
   <>
     Once your request has been processed the status will change to{' '}
     <span className="text-yellow-300">’processed’</span> and you will be able to
@@ -22,7 +22,7 @@ const WITHDRAWAL_INSTRUCTIONS = [
   </>,
 ]
 
-const TRADE_INSTRUCTIONS = [
+const getTradeInstructions = (instanceName: InstanceName) => [
   'You create a trade offer using this form. This is fully off-chain and does not require any gas fees.',
   'The trade offer will now be visible to all users of the system. You should seek out another user to accept the offer and become a counterparty to the trade. Accepting the offer is also fully off-chain and does not require any gas fees.',
   <>
@@ -35,20 +35,23 @@ const TRADE_INSTRUCTIONS = [
     </Link>
     .
   </>,
-  `After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the operators of ${getInstanceName()} to process your request. Once this is done the trade will be executed and the funds will be transferred between you and the counterparty.`,
+  `After submitting a forced trade request you must now wait up to seven days (but usually just several hours) for the operators of ${instanceName} to process your request. Once this is done the trade will be executed and the funds will be transferred between you and the counterparty.`,
 ]
 
-export function getForcedActionInstructionsParams(isWithdrawal: boolean) {
+export function getForcedActionInstructionsParams(
+  isWithdrawal: boolean,
+  instanceName: InstanceName
+) {
   if (isWithdrawal) {
     return {
       header: 'Begin withdrawal process',
       description: 'The withdrawal process consists of three steps:',
-      items: WITHDRAWAL_INSTRUCTIONS,
+      items: getWithdrawalInstructions(instanceName),
     }
   }
   return {
     header: 'Begin trade process',
     description: 'The trade process consists of four steps:',
-    items: TRADE_INSTRUCTIONS,
+    items: getTradeInstructions(instanceName),
   }
 }
