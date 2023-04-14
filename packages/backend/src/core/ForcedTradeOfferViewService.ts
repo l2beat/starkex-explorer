@@ -1,6 +1,6 @@
+import { FinalizableOfferEntry, OfferEntry } from '@explorer/frontend'
 import { Hash256, StarkKey } from '@explorer/types'
 
-import { FinalizableOfferEntry, OfferEntry } from '@explorer/frontend'
 import { ForcedTradeOfferRecord } from '../peripherals/database/ForcedTradeOfferRepository'
 import {
   SentTransactionRecord,

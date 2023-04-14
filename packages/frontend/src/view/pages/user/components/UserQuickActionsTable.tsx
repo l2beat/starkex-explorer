@@ -27,8 +27,7 @@ export interface WithdrawableAssetEntry {
   readonly amount: bigint
 }
 
-export interface FinalizableOfferEntry
-  extends Omit<OfferEntry, 'status' | 'role'> {}
+export type FinalizableOfferEntry = Omit<OfferEntry, 'status' | 'role'>
 
 export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   if (

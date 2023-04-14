@@ -199,8 +199,8 @@ export class UserController {
         amount: asset.withdrawableBalance,
       })),
       exchangeAddress: this.exchangeAddress,
-      finalizableOffers: finalizableOffers.map(
-        this.forcedTradeOfferViewService.toFinalizableOfferEntry
+      finalizableOffers: finalizableOffers.map((offer) =>
+        this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
       assets: assetEntries,
       totalAssets,
