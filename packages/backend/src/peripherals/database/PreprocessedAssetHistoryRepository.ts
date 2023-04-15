@@ -211,10 +211,11 @@ export class PreprocessedAssetHistoryRepository<
       // is always the first one in the list, regardless of sorting
       query = query
         .orderByRaw(
-          'position_or_vault_id, CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END',
+          // DO NOT order by position_or_vault_id - it's not indexed
+          // and confuses the query planner and it runs 60 seconds for some users
+          'CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END, asset_hash_or_id',
           assetAtTop.toString()
         )
-        .orderBy('asset_hash_or_id')
     }
 
     const rows = await query.offset(offset).limit(limit)
