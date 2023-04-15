@@ -209,13 +209,12 @@ export class PreprocessedAssetHistoryRepository<
     if (assetAtTop) {
       // Make sure that assetIdAtTop (normally the collateral asset)
       // is always the first one in the list, regardless of sorting
-      query = query
-        .orderByRaw(
-          // DO NOT order by position_or_vault_id - it's not indexed
-          // and confuses the query planner and it runs 60 seconds for some users
-          'CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END, asset_hash_or_id',
-          assetAtTop.toString()
-        )
+      query = query.orderByRaw(
+        // DO NOT order by position_or_vault_id - it's not indexed
+        // and confuses the query planner and it runs 60 seconds for some users
+        'CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END, asset_hash_or_id',
+        assetAtTop.toString()
+      )
     }
 
     const rows = await query.offset(offset).limit(limit)
