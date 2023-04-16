@@ -37,7 +37,7 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
   ): Promise<number> {
     const knex = await this.knex(trx)
     const results = await knex('preprocessed_user_statistics')
-      .insert(toPreprocessedAssetHistoryRow(record))
+      .insert(toPreprocessedUserStatisticsRow(record))
       .returning('id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return results[0]!.id
@@ -50,7 +50,7 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
       .orderBy('state_update_id', 'desc')
       .first()
 
-    if (row) return toPreprocessedAssetHistoryRecord(row)
+    if (row) return toPreprocessedUserStatisticsRecord(row)
   }
 
   async deleteByStateUpdateId(stateUpdateId: number, trx: Knex.Transaction) {
@@ -66,7 +66,7 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
   }
 }
 
-function toPreprocessedAssetHistoryRecord(
+function toPreprocessedUserStatisticsRecord(
   row: PreprocessedUserStatisticsRow
 ): PreprocessedUserStatisticsRecord {
   return {
@@ -81,7 +81,7 @@ function toPreprocessedAssetHistoryRecord(
   }
 }
 
-function toPreprocessedAssetHistoryRow(
+function toPreprocessedUserStatisticsRow(
   record: Omit<PreprocessedUserStatisticsRecord, 'id'>
 ): Omit<PreprocessedUserStatisticsRow, 'id'> {
   return {
