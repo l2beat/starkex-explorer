@@ -26,7 +26,6 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
     this.add = this.wrapAdd(this.add)
     this.findCurrentByStarkKey = this.wrapFind(this.findCurrentByStarkKey)
     this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
-    this.deleteById = this.wrapDelete(this.deleteById)
     this.deleteAll = this.wrapDelete(this.deleteAll)
 
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -52,11 +51,6 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
       .first()
 
     if (row) return toPreprocessedAssetHistoryRecord(row)
-  }
-
-  async deleteById(id: number, trx: Knex.Transaction) {
-    const knex = await this.knex(trx)
-    return knex('preprocessed_user_statistics').where('id', id).delete()
   }
 
   async deleteByStateUpdateId(stateUpdateId: number, trx: Knex.Transaction) {
