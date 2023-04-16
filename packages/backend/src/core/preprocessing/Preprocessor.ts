@@ -151,13 +151,13 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           nextStateUpdate
         )
         // This one needs to be called *after* historyPreprocessor was run
-        // Don't user Promise.all!
+        // Don't use Promise.all!
         await this.stateDetailsPreprocessor.preprocessNextStateUpdate(
           trx,
           nextStateUpdate
         )
         // This one needs to be called *after* historyPreprocessor was run
-        // Don't user Promise.all!
+        // Don't use Promise.all!
         await this.userStatisticsPreprocessor.preprocessNextStateUpdate(
           trx,
           nextStateUpdate
