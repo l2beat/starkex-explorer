@@ -1,5 +1,6 @@
 import {
   FinalizeOfferFormData,
+  serializeCollateralAsset,
   serializeFinalizeOfferData,
 } from '@explorer/shared'
 import React, { ReactNode } from 'react'
@@ -14,6 +15,7 @@ export function FinalizeOfferForm(props: FinalizeOfferFormProps) {
   const { address, perpetualAddress, offerId, collateralAsset, ...offer } =
     props
   const offerJson = serializeFinalizeOfferData(offer)
+  const collateralAssetJson = serializeCollateralAsset(collateralAsset)
   return (
     <form
       className={FINALIZE_OFFER_FORM_ID}
@@ -23,7 +25,7 @@ export function FinalizeOfferForm(props: FinalizeOfferFormProps) {
       data-offer={offerJson}
       data-address={address.toString()}
       data-perpetual-address={perpetualAddress.toString()}
-      data-collateral-asset={collateralAsset}
+      data-collateral-asset={collateralAssetJson}
     >
       {props.children}
     </form>

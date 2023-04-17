@@ -133,6 +133,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
     this.getByMakerOrTakerStarkKey = this.wrapGet(
       this.getByMakerOrTakerStarkKey
     )
+    this.getFinalizableByStarkKey = this.wrapGet(this.getFinalizableByStarkKey)
     this.getInitialAssetIds = this.wrapGet(this.getInitialAssetIds)
     this.getPaginated = this.wrapGet(this.getPaginated)
     this.getAvailablePaginated = this.wrapGet(this.getAvailablePaginated)
@@ -246,6 +247,17 @@ export class ForcedTradeOfferRepository extends BaseRepository {
       query = query.limit(pagination.limit).offset(pagination.offset)
     }
     const rows = await query
+    return rows.map(toRecord)
+  }
+
+  async getFinalizableByStarkKey(starkKey: StarkKey): Promise<Record[]> {
+    const knex = await this.knex()
+    const rows = await knex('forced_trade_offers')
+      .where('stark_key_a', starkKey.toString())
+      .whereNotNull('accepted_at')
+      .where('submission_expiration_time', '>', new Date().getTime())
+      .whereNull('cancelled_at')
+      .whereNull('transaction_hash')
     return rows.map(toRecord)
   }
 
