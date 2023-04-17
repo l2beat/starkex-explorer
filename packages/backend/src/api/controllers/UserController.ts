@@ -10,7 +10,12 @@ import {
   UserAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
-import { CollateralAsset, TradingMode, UserDetails } from '@explorer/shared'
+import {
+  CollateralAsset,
+  ERC20Details,
+  TradingMode,
+  UserDetails,
+} from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
@@ -106,6 +111,7 @@ export class UserController {
       offset: 0,
       limit: 10,
     }
+
     const [
       context,
       registeredUser,
@@ -150,6 +156,10 @@ export class UserController {
       this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
     ])
 
+    if (context.tradingMode === 'perpetual' && !this.collateralAsset) {
+      throw new Error('Collateral asset is not set')
+    }
+
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
       assetHistory: history,
@@ -184,6 +194,7 @@ export class UserController {
         forcedTradeOffers,
         starkKey
       )
+
     const content = renderUserPage({
       context,
       starkKey,
@@ -191,7 +202,24 @@ export class UserController {
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId: asset.assetHash,
-          details: assetDetailsMap?.getByAssetHash(asset.assetHash),
+          details:
+            context.tradingMode === 'perpetual'
+              ? //eslint-disable @typescript-eslint/no-non-null-assertion
+                // TODO: this is a hack to get the regular withdrawals working for perpetuals
+                // This should be mandatory revised in phase 2!
+                ERC20Details.parse({
+                  assetHash: this.collateralAsset!.assetHash,
+                  assetTypeHash: this.collateralAsset!.assetHash,
+                  type: 'ERC20',
+                  quantum: AssetId.decimals(this.collateralAsset!.assetId),
+                  contractError: [],
+                  address: EthereumAddress.ZERO,
+                  name: AssetId.symbol(this.collateralAsset!.assetId),
+                  symbol: AssetId.symbol(this.collateralAsset!.assetId),
+                  decimals: 2,
+                })
+              : //eslint-enable @typescript-eslint/no-non-null-assertion
+                assetDetailsMap?.getByAssetHash(asset.assetHash),
         },
         amount: asset.withdrawableBalance,
       })),
