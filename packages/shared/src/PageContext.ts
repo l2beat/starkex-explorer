@@ -1,25 +1,38 @@
-import { z } from 'zod'
-
+import { CollateralAsset } from './CollateralAsset'
 import { InstanceName } from './InstanceName'
-import { TradingMode } from './TradingMode'
 import { UserDetails } from './UserDetails'
 
-export type PageContext = z.infer<typeof PageContext>
-export const PageContext = z.object({
-  user: UserDetails.optional(),
-  instanceName: InstanceName,
-  tradingMode: TradingMode,
-})
+export interface PerpetualPageContext {
+  user: UserDetails | undefined
+  instanceName: InstanceName
+  tradingMode: 'perpetual'
+  collateralAsset: CollateralAsset
+}
 
-export type PageContextWithUser = z.infer<typeof PageContextWithUser>
-export const PageContextWithUser = PageContext.extend({
-  user: UserDetails,
-})
+export interface SpotPageContext {
+  user: UserDetails | undefined
+  instanceName: InstanceName
+  tradingMode: 'spot'
+}
 
-export type PageContextWithUserAndStarkKey = z.infer<
-  typeof PageContextWithUserAndStarkKey
->
-export const PageContextWithUserAndStarkKey = PageContext.extend({
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  user: UserDetails.transform((o) => ({ ...o, starkKey: o.starkKey! })),
-})
+export type PageContext<
+  T extends PerpetualPageContext | SpotPageContext =
+    | PerpetualPageContext
+    | SpotPageContext
+> = T
+
+export type PageContextWithUser<
+  T extends PerpetualPageContext | SpotPageContext =
+    | PerpetualPageContext
+    | SpotPageContext
+> = PageContext<T> & {
+  user: UserDetails
+}
+
+export type PageContextWithUserAndStarkKey<
+  T extends PerpetualPageContext | SpotPageContext =
+    | PerpetualPageContext
+    | SpotPageContext
+> = T & {
+  user: Required<UserDetails>
+}
