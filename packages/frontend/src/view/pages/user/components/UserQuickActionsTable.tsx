@@ -8,14 +8,14 @@ import {
   formatWithDecimals,
 } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
-import { Button } from '../../../components/Button'
+import { Button, LinkButton } from '../../../components/Button'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { OfferEntry } from '../../../components/tables/OffersTable'
 import { RegularWithdrawalForm } from './RegularWithdrawalForm'
 
 interface UserQuickActionsTableProps {
   readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
-  readonly offersToAccept: readonly OfferEntry[]
+  readonly finalizableOffers: readonly FinalizableOfferEntry[]
   readonly starkKey: StarkKey
   readonly user: UserDetails | undefined
   readonly exchangeAddress: EthereumAddress
@@ -27,54 +27,65 @@ export interface WithdrawableAssetEntry {
   readonly amount: bigint
 }
 
+export type FinalizableOfferEntry = Omit<OfferEntry, 'status' | 'role'>
+
 export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   if (
     props.withdrawableAssets.length === 0 &&
-    props.offersToAccept.length === 0
+    (!props.isMine || props.finalizableOffers.length === 0)
   ) {
     return null
   }
 
   return (
-    <section className="flex w-full flex-col rounded-lg border border-solid border-brand bg-gray-800 p-6">
-      <p className="text-sm font-semibold text-zinc-500">Withdrawable assets</p>
-      {props.withdrawableAssets.map((asset) => {
-        const assetInfo = assetToInfo(asset.asset)
-        return (
-          <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
-            <AssetWithLogo
-              assetInfo={assetInfo}
-              type="symbol"
-              className="w-48"
-            />
-            <p className="flex-1 text-zinc-500">
-              Finalize the withdrawal of{' '}
-              <strong className="text-white">
-                {formatAmount(asset.asset, asset.amount)}{' '}
-                <InlineEllipsis className="max-w-[80px]">
-                  {assetInfo.symbol}
-                </InlineEllipsis>
-              </strong>
-            </p>
-            {props.isMine && props.user && asset.asset.details && (
-              <RegularWithdrawalForm
-                assetDetails={asset.asset.details}
-                account={props.user.address}
-                starkKey={props.starkKey}
-                exchangeAddress={props.exchangeAddress}
-              >
-                <Button className="ml-auto w-32 !px-0">Withdraw now</Button>
-              </RegularWithdrawalForm>
-            )}
-          </div>
-        )
-      })}
-      {props.isMine && (
-        <>
-          <p className="mt-6 text-sm font-semibold text-zinc-500">
-            Offers to accept
+    <section className="flex w-full flex-col gap-6 rounded-lg border border-solid border-brand bg-gray-800 p-6">
+      {props.withdrawableAssets.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-zinc-500">
+            Withdrawable assets
           </p>
-          {props.offersToAccept.map((offer) => {
+          {props.withdrawableAssets.map((asset) => {
+            const assetInfo = assetToInfo(asset.asset)
+            return (
+              <div
+                className="mt-4 flex items-center gap-2"
+                key={assetInfo.symbol}
+              >
+                <AssetWithLogo
+                  assetInfo={assetInfo}
+                  type="symbol"
+                  className="w-48"
+                />
+                <p className="flex-1 text-zinc-500">
+                  Finalize the withdrawal of{' '}
+                  <strong className="text-white">
+                    {formatAmount(asset.asset, asset.amount)}{' '}
+                    <InlineEllipsis className="max-w-[80px]">
+                      {assetInfo.symbol}
+                    </InlineEllipsis>
+                  </strong>
+                </p>
+                {props.isMine && props.user && asset.asset.details && (
+                  <RegularWithdrawalForm
+                    assetDetails={asset.asset.details}
+                    account={props.user.address}
+                    starkKey={props.starkKey}
+                    exchangeAddress={props.exchangeAddress}
+                  >
+                    <Button className="ml-auto w-32 !px-0">Withdraw now</Button>
+                  </RegularWithdrawalForm>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+      {props.isMine && props.finalizableOffers.length > 0 && (
+        <div>
+          <p className="text-sm font-semibold text-zinc-500">
+            Offers to finalize
+          </p>
+          {props.finalizableOffers.map((offer) => {
             const assetInfo = assetToInfo(offer.asset)
             const totalPrice = offer.amount * offer.price
             return (
@@ -100,11 +111,16 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
                     {formatWithDecimals(totalPrice, 6, { suffix: ' USDC' })}
                   </strong>
                 </p>
-                <Button className="ml-auto w-32 !px-0">Accept & sell</Button>
+                <LinkButton
+                  href={`/offers/${offer.id}`}
+                  className="ml-auto w-32 !px-0"
+                >
+                  Go to offer
+                </LinkButton>
               </div>
             )
           })}
-        </>
+        </div>
       )}
     </section>
   )
