@@ -31,6 +31,15 @@ import {
   LogWithdrawalWithTokenIdPerformed,
 } from './events'
 
+// These options are only necessary for software migration
+// which works separately for userTransactions and withdrawableAssets
+// even though they share some logs (that's why they're handled
+// together in this collector)
+interface UserTransactionCollectorOptions {
+  skipUserTransactionRepository: boolean
+  skipWithdrawableAssetRepository: boolean
+}
+
 export class UserTransactionCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
@@ -42,7 +51,8 @@ export class UserTransactionCollector {
 
   async collect(
     blockRange: BlockRange,
-    knownBlockTimestamps?: Map<number, number>
+    knownBlockTimestamps?: Map<number, number>,
+    options?: UserTransactionCollectorOptions
   ) {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.perpetualAddress.toString(),
@@ -66,14 +76,15 @@ export class UserTransactionCollector {
 
     for (const batch of batches) {
       await Promise.all(
-        batch.map((log) => this.processLog(log, knownBlockTimestamps))
+        batch.map((log) => this.processLog(log, knownBlockTimestamps, options))
       )
     }
   }
 
   private async processLog(
     log: providers.Log,
-    knownBlockTimestamps?: Map<number, number>
+    knownBlockTimestamps?: Map<number, number>,
+    options?: UserTransactionCollectorOptions
   ) {
     const event =
       LogForcedWithdrawalRequest.safeParseLog(log) ??
@@ -95,6 +106,9 @@ export class UserTransactionCollector {
     let record
     switch (event.name) {
       case 'LogForcedWithdrawalRequest':
+        if (options?.skipUserTransactionRepository) {
+          return
+        }
         return this.userTransactionRepository.add({
           ...base,
           data: {
@@ -105,6 +119,9 @@ export class UserTransactionCollector {
           },
         })
       case 'LogFullWithdrawalRequest':
+        if (options?.skipUserTransactionRepository) {
+          return
+        }
         return this.userTransactionRepository.add({
           ...base,
           data: {
@@ -114,6 +131,9 @@ export class UserTransactionCollector {
           },
         })
       case 'LogForcedTradeRequest':
+        if (options?.skipUserTransactionRepository) {
+          return
+        }
         if (this.collateralAsset === undefined) {
           throw new Error('Collateral asset is not configured')
         }
@@ -149,8 +169,13 @@ export class UserTransactionCollector {
             recipient: EthereumAddress(event.args.recipient),
           } as WithdrawalPerformedData,
         }
-        await this.withdrawableAssetRepository.add(record)
-        return this.userTransactionRepository.add(record)
+        if (!options?.skipWithdrawableAssetRepository) {
+          await this.withdrawableAssetRepository.add(record)
+        }
+        if (!options?.skipUserTransactionRepository) {
+          await this.userTransactionRepository.add(record)
+        }
+        return
       case 'LogWithdrawalWithTokenIdPerformed':
         record = {
           ...base,
@@ -165,8 +190,13 @@ export class UserTransactionCollector {
             recipient: EthereumAddress(event.args.recipient),
           } as WithdrawWithTokenIdData,
         }
-        await this.withdrawableAssetRepository.add(record)
-        return this.userTransactionRepository.add(record)
+        if (!options?.skipWithdrawableAssetRepository) {
+          await this.withdrawableAssetRepository.add(record)
+        }
+        if (!options?.skipUserTransactionRepository) {
+          await this.userTransactionRepository.add(record)
+        }
+        return
       case 'LogMintWithdrawalPerformed':
         record = {
           ...base,
@@ -179,8 +209,13 @@ export class UserTransactionCollector {
             assetId: AssetHash.from(event.args.assetId),
           } as MintWithdrawData,
         }
-        await this.withdrawableAssetRepository.add(record)
-        return this.userTransactionRepository.add(record)
+        if (!options?.skipWithdrawableAssetRepository) {
+          await this.withdrawableAssetRepository.add(record)
+        }
+        if (!options?.skipUserTransactionRepository) {
+          await this.userTransactionRepository.add(record)
+        }
+        return
       default:
         assertUnreachable(event)
     }

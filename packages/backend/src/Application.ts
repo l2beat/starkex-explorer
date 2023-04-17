@@ -42,6 +42,7 @@ import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
+import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PageContextService } from './core/PageContextService'
 import { PerpetualRollupSyncService } from './core/PerpetualRollupSyncService'
 import { PerpetualRollupUpdater } from './core/PerpetualRollupUpdater'
@@ -386,10 +387,17 @@ export class Application {
       userTransactionRepository,
       sentTransactionRepository,
       userTransactionCollector,
-      withdrawableAssetRepository,
-      withdrawalAllowedCollector,
       ethereumClient,
       collateralAsset,
+      logger
+    )
+
+    const withdrawableAssetMigrator = new WithdrawableAssetMigrator(
+      softwareMigrationRepository,
+      syncStatusRepository,
+      withdrawableAssetRepository,
+      withdrawalAllowedCollector,
+      userTransactionCollector,
       logger
     )
 
@@ -644,7 +652,6 @@ export class Application {
     this.start = async () => {
       logger.for(this).info('Starting')
 
-      await apiServer.listen()
       if (config.freshStart) await database.rollbackAll()
       await database.migrateToLatest()
       await preprocessor.catchUp()
@@ -652,8 +659,10 @@ export class Application {
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
       await userTransactionMigrator.migrate()
+      await withdrawableAssetMigrator.migrate()
       await stateUpdater.initTree()
 
+      await apiServer.listen()
       if (config.enableSync) {
         transactionStatusService.start()
         await syncScheduler.start()
