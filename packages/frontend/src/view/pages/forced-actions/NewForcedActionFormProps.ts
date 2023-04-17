@@ -1,5 +1,4 @@
 import {
-  PageContextWithUser,
   stringAs,
   stringAsBigInt,
   toJsonWithoutBigInts,
@@ -17,7 +16,6 @@ export const NewForcedActionFormAsset = Asset.extend({
 
 export type NewForcedActionFormProps = z.infer<typeof NewForcedActionFormProps>
 export const NewForcedActionFormProps = z.object({
-  context: PageContextWithUser,
   starkExAddress: stringAs(EthereumAddress),
   positionOrVaultId: stringAsBigInt(),
   starkKey: stringAs(StarkKey),

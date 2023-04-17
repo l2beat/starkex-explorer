@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { PageContextWithUser } from '@explorer/shared'
 import { assetToInfo } from '../../../utils/assets'
 import { formatAmount } from '../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../components/AssetWithLogo'
@@ -9,15 +10,20 @@ import { Link } from '../../components/Link'
 import { OrderedList } from '../../components/OrderedList'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
-import { ForcedActionCard } from './components/ForcedActionCard'
 import {
   NewForcedActionFormProps,
   serializeForcedActionsFormProps,
 } from './NewForcedActionFormProps'
+import { ForcedActionCard } from './components/ForcedActionCard'
 
-export const SpotForcedWithdrawalFormId = 'spot-withdraw-form'
+export const SPOT_FORCED_WITHDRAWAL_FORM_ID = 'spot-withdraw-form'
 
-function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
+type Props = NewForcedActionFormProps & {
+  context: PageContextWithUser
+}
+
+function NewSpotForcedWithdrawalPage(props: Props) {
+  const { context, ...formProps } = props
   const instructions = [
     <>
       Using this form you request a withdrawal of your funds. This is achieved
@@ -35,7 +41,8 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
     </>,
   ]
   const assetInfo = assetToInfo(props.asset)
-  const propsJson = serializeForcedActionsFormProps(props)
+  const formPropsJson = serializeForcedActionsFormProps(formProps)
+  const userJson = JSON.stringify(context.user)
   const formattedBalance = formatAmount(props.asset, props.asset.balance)
   return (
     <Page
@@ -61,9 +68,10 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
           </div>
           <Card className="h-min w-[480px]">
             <form
-              id={SpotForcedWithdrawalFormId}
+              id={SPOT_FORCED_WITHDRAWAL_FORM_ID}
               className="flex flex-col gap-6"
-              data-props={propsJson}
+              data-props={formPropsJson}
+              data-user={userJson}
             >
               <div className="flex items-end justify-between">
                 <span className="text-xl font-semibold">Withdrawal</span>
@@ -114,8 +122,6 @@ function NewSpotForcedWithdrawalPage(props: NewForcedActionFormProps) {
   )
 }
 
-export function renderNewSpotForcedWithdrawPage(
-  props: NewForcedActionFormProps
-) {
+export function renderNewSpotForcedWithdrawPage(props: Props) {
   return reactToHtml(<NewSpotForcedWithdrawalPage {...props} />)
 }
