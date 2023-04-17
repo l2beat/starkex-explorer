@@ -74,12 +74,11 @@ export class ForcedTradeOfferViewService {
     return {
       id: forcedTradeOffer.id.toString(),
       timestamp: forcedTradeOffer.createdAt,
-      asset: {
+      syntheticAsset: {
         hashOrId: forcedTradeOffer.syntheticAssetId,
       },
-      amount: forcedTradeOffer.syntheticAmount,
-      price: 0n, //TODO: calculate price
-      totalPrice: 0n * forcedTradeOffer.syntheticAmount,
+      syntheticAmount: forcedTradeOffer.syntheticAmount,
+      collateralAmount: forcedTradeOffer.collateralAmount,
       status,
       type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
       role,
@@ -92,12 +91,11 @@ export class ForcedTradeOfferViewService {
     return {
       timestamp: forcedTradeOffer.createdAt,
       id: forcedTradeOffer.id.toString(),
-      asset: {
+      syntheticAsset: {
         hashOrId: forcedTradeOffer.syntheticAssetId,
       },
-      amount: forcedTradeOffer.syntheticAmount,
-      price: forcedTradeOffer.collateralAmount,
-      totalPrice: forcedTradeOffer.collateralAmount,
+      syntheticAmount: forcedTradeOffer.syntheticAmount,
+      collateralAmount: forcedTradeOffer.collateralAmount,
       type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
     }
   }

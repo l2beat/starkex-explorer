@@ -1,12 +1,9 @@
-import { assertUnreachable } from '@explorer/shared'
+import { assertUnreachable, PageContext } from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
 import { default as React, ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
-import {
-  formatAmount,
-  formatWithDecimals,
-} from '../../../utils/formatting/formatAmount'
+import { formatAmount } from '../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../AssetWithLogo'
 import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
@@ -15,6 +12,7 @@ import { Column } from '../table/types'
 import { TimeCell } from '../TimeCell'
 
 export interface OffersTableProps {
+  context: PageContext
   offers: OfferEntry[]
   showStatus?: boolean
   showRole?: boolean
@@ -23,10 +21,9 @@ export interface OffersTableProps {
 export interface OfferEntry {
   timestamp: Timestamp
   id: string
-  asset: Asset
-  amount: bigint
-  price: bigint
-  totalPrice: bigint
+  syntheticAsset: Asset
+  syntheticAmount: bigint
+  collateralAmount: bigint
   status:
     | 'CREATED'
     | 'ACCEPTED'
@@ -53,18 +50,30 @@ export function OffersTable(props: OffersTableProps) {
     ...(props.showRole ? [{ header: 'Role' }] : []),
     { header: 'Type' },
   ]
-
+  if (props.context.tradingMode !== 'perpetual') {
+    return null
+  }
+  const collateralAsset = props.context.collateralAsset
   return (
     <Table
       columns={columns}
       rows={props.offers.map((offer) => {
+        const amount = formatAmount(offer.syntheticAsset, offer.syntheticAmount)
+        const totalPrice = formatAmount(
+          { hashOrId: collateralAsset.assetId },
+          offer.collateralAmount
+        )
+
         const cells: ReactNode[] = [
           <TimeCell timestamp={offer.timestamp} />,
           <Link>#{offer.id}</Link>,
-          <AssetWithLogo type="small" assetInfo={assetToInfo(offer.asset)} />,
-          formatAmount(offer.asset, offer.amount),
-          formatWithDecimals(offer.price, 6, { prefix: '$' }),
-          formatWithDecimals(offer.totalPrice, 6, { prefix: '$' }),
+          <AssetWithLogo
+            type="small"
+            assetInfo={assetToInfo(offer.syntheticAsset)}
+          />,
+          amount,
+          0, //TODO: price
+          totalPrice,
           ...(props.showStatus
             ? [
                 <StatusBadge type={toStatusType(offer.status)}>

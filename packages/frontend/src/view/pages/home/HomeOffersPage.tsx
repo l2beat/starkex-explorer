@@ -35,7 +35,11 @@ function HomeOffersPage(props: HomeOffersPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <OffersTable showStatus={false} offers={props.offers} />
+          <OffersTable
+            showStatus={false}
+            offers={props.offers}
+            context={props.context}
+          />
         </TableWithPagination>
       </ContentWrapper>
     </Page>
