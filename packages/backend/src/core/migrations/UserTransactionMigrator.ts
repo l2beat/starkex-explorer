@@ -12,11 +12,9 @@ import { SoftwareMigrationRepository } from '../../peripherals/database/Software
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { Logger } from '../../tools/Logger'
 import { UserTransactionCollector } from '../collectors/UserTransactionCollector'
-import { WithdrawalAllowedCollector } from '../collectors/WithdrawalAllowedCollector'
 
 export class UserTransactionMigrator {
   constructor(
@@ -26,8 +24,6 @@ export class UserTransactionMigrator {
     private userTransactionRepository: UserTransactionRepository,
     private sentTransactionRepository: SentTransactionRepository,
     private userTransactionCollector: UserTransactionCollector,
-    private withdrawableAssetRepository: WithdrawableAssetRepository,
-    private withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private ethereumClient: EthereumClient,
     private collateralAsset: CollateralAsset | undefined,
     private logger: Logger
@@ -39,16 +35,11 @@ export class UserTransactionMigrator {
     const migrationNumber =
       await this.softwareMigrationRepository.getMigrationNumber()
 
-    // We want to re-run migration if it was already run when
-    // migrationNumber was 0, because the implementation
-    // of collector has changed (added spot withdrawals),
-    // and later there was a bug in migration (withdrawals
-    // collector cleared table that this migrator populated)
-    if (migrationNumber >= 4) {
+    if (migrationNumber >= 1) {
       return
     }
     await this.migrateUserTransactions()
-    await this.softwareMigrationRepository.setMigrationNumber(4)
+    await this.softwareMigrationRepository.setMigrationNumber(1)
   }
 
   private async migrateUserTransactions() {
@@ -56,9 +47,7 @@ export class UserTransactionMigrator {
     if (lastSyncedBlock === undefined) {
       return
     }
-    this.logger.info(
-      'User transactions and withdrawable assets migration started'
-    )
+    this.logger.info('User transactions migration started')
 
     await this.clearRepositories()
     await this.collectUserTransactions(lastSyncedBlock)
@@ -71,8 +60,7 @@ export class UserTransactionMigrator {
   private async clearRepositories() {
     await this.userTransactionRepository.deleteAll()
     await this.sentTransactionRepository.deleteAll()
-    await this.withdrawableAssetRepository.deleteAll()
-    this.logger.info('Cleared repositories')
+    this.logger.info('Cleared user- and sent- transaction repositories')
   }
 
   private async collectUserTransactions(lastSyncedBlock: number) {
@@ -101,11 +89,11 @@ export class UserTransactionMigrator {
     )
     await this.userTransactionCollector.collect(
       blockRange,
-      knownBlockTimestamps
-    )
-    await this.withdrawalAllowedCollector.collect(
-      blockRange,
-      knownBlockTimestamps
+      knownBlockTimestamps,
+      {
+        skipUserTransactionRepository: false,
+        skipWithdrawableAssetRepository: true,
+      }
     )
   }
 
