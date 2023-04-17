@@ -650,4 +650,250 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     // Order by hash id desc
     expect(page2Records.map((r) => r.historyId)).toEqual([id4, id3])
   })
+
+  it('gets count by state update id grouped by stark key', async () => {
+    const starkKey1 = StarkKey.fake('000fab1')
+    const starkKey2 = StarkKey.fake('000fab2')
+
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
+        starkKey: starkKey1,
+        isCurrent: true,
+      },
+      trx
+    )
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
+        starkKey: starkKey1,
+        isCurrent: false,
+        stateUpdateId: 200,
+      },
+      trx
+    )
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('4'),
+        starkKey: starkKey2,
+        isCurrent: true,
+      },
+      trx
+    )
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('3'),
+        starkKey: starkKey2,
+        isCurrent: true,
+      },
+      trx
+    )
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('5'),
+        starkKey: starkKey2,
+        isCurrent: true,
+        stateUpdateId: 100,
+      },
+      trx
+    )
+
+    const result = await repository.getCountByStateUpdateIdGroupedByStarkKey(
+      1900,
+      trx
+    )
+    expect(result).toEqualUnsorted([
+      {
+        starkKey: starkKey1,
+        count: 1,
+      },
+      {
+        starkKey: starkKey2,
+        count: 2,
+      },
+    ])
+  })
+
+  it('gets count of new and removed assets by state update id grouped by stark key', async () => {
+    const starkKey1 = StarkKey.fake('000fab1')
+    const starkKey2 = StarkKey.fake('000fab2')
+    const starkKey3 = StarkKey.fake('000fab3')
+    const starkKey4 = StarkKey.fake('000fab4')
+
+    // Stark Key 1
+    // new asset
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('1'),
+        starkKey: starkKey1,
+        prevBalance: 0n,
+        balance: -100n,
+        isCurrent: true,
+      },
+      trx
+    )
+    // new asset
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('2'),
+        starkKey: starkKey1,
+        prevBalance: 0n,
+        balance: 100n,
+        isCurrent: true,
+      },
+      trx
+    )
+    // existsing asset
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('3'),
+        starkKey: starkKey1,
+        prevBalance: 50n,
+        balance: 100n,
+        isCurrent: true,
+      },
+      trx
+    )
+    // removed asset
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('4'),
+        starkKey: starkKey1,
+        prevBalance: 70n,
+        balance: 0n,
+        isCurrent: false,
+      },
+      trx
+    )
+    // different state id
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('5'),
+        starkKey: starkKey1,
+        prevBalance: 0n,
+        balance: 500n,
+        isCurrent: true,
+        stateUpdateId: 200, // ignored, different id
+      },
+      trx
+    )
+    // different state id
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('6a'),
+        starkKey: starkKey1,
+        prevBalance: 600n,
+        balance: 0n,
+        isCurrent: false,
+        stateUpdateId: 200, // ignored, different id
+      },
+      trx
+    )
+    // different state id
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('6b'),
+        starkKey: starkKey1,
+        prevBalance: 0n,
+        balance: 800n,
+        isCurrent: true,
+        stateUpdateId: 200, // ignored, different id
+      },
+      trx
+    )
+    // Stark Key 2
+    // new asset
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('7'),
+        starkKey: starkKey2,
+        prevBalance: 0n,
+        balance: -100n,
+        isCurrent: true,
+      },
+      trx
+    )
+    // Stark Key 3
+    // removed asset
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('8'),
+        starkKey: starkKey3,
+        prevBalance: 70n,
+        balance: 0n,
+        isCurrent: false,
+      },
+      trx
+    )
+    // removed asset
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('9'),
+        starkKey: starkKey3,
+        prevBalance: 70n,
+        balance: 0n,
+        isCurrent: false,
+      },
+      trx
+    )
+    // Stark Key 4
+    // existsing asset
+    await repository.add(
+      {
+        ...genericRecord,
+        assetHashOrId: AssetHash.fake('10'),
+        starkKey: starkKey4,
+        prevBalance: 50n,
+        balance: 100n,
+        isCurrent: true,
+      },
+      trx
+    )
+    const newCount =
+      await repository.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey(
+        1900,
+        trx
+      )
+    expect(newCount).toEqualUnsorted([
+      {
+        starkKey: starkKey1,
+        count: 2,
+      },
+      {
+        starkKey: starkKey2,
+        count: 1,
+      },
+    ])
+
+    const removedCount =
+      await repository.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
+        1900,
+        trx
+      )
+    expect(removedCount).toEqualUnsorted([
+      {
+        starkKey: starkKey1,
+        count: 1,
+      },
+      {
+        starkKey: starkKey3,
+        count: 2,
+      },
+    ])
+  })
 })

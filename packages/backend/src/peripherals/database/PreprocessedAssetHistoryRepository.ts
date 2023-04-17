@@ -66,20 +66,17 @@ export class PreprocessedAssetHistoryRepository<
     this.getPrevHistoryByStateUpdateId = this.wrapGet(
       this.getPrevHistoryByStateUpdateId
     )
-    this.getCountByStarkKeysAndStateUpdateId = this.wrapGet(
-      this.getCountByStarkKeysAndStateUpdateId
+    this.getCountByStateUpdateIdGroupedByStarkKey = this.wrapGet(
+      this.getCountByStateUpdateIdGroupedByStarkKey
     )
 
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
-    this.getCountByStarkKeyUntilStateUpdateId = this.wrapAny(
-      this.getCountByStarkKeyUntilStateUpdateId
+    this.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey = this.wrapAny(
+      this.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey
     )
-    this.getCountOfNewAssetsByStarkKeysAndStateUpdateId = this.wrapAny(
-      this.getCountOfNewAssetsByStarkKeysAndStateUpdateId
-    )
-    this.getCountOfRemovedAssetsByStarkKeysAndStateUpdateId = this.wrapAny(
-      this.getCountOfRemovedAssetsByStarkKeysAndStateUpdateId
+    this.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey = this.wrapAny(
+      this.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey
     )
     this.getCountByStateUpdateId = this.wrapAny(this.getCountByStateUpdateId)
     this.getCountOfCurrentByStarkKey = this.wrapAny(
@@ -150,20 +147,6 @@ export class PreprocessedAssetHistoryRepository<
     return Number(result!.count!)
   }
 
-  async getCountByStarkKeyUntilStateUpdateId(
-    starkKey: StarkKey,
-    stateUpdateId: number,
-    trx?: Knex.Transaction
-  ) {
-    const knex = await this.knex(trx)
-    const [result] = await knex('preprocessed_asset_history')
-      .where('state_update_id', '<=', stateUpdateId)
-      .andWhere('stark_key', starkKey)
-      .count()
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count!)
-  }
-
   async deleteByHistoryId(historyId: number, trx: Knex.Transaction) {
     const knex = await this.knex(trx)
     return knex('preprocessed_asset_history').where('id', historyId).delete()
@@ -223,7 +206,7 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getCountByStarkKeysAndStateUpdateId(
+  async getCountByStateUpdateIdGroupedByStarkKey(
     stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<{ starkKey: StarkKey; count: number }[]> {
@@ -238,7 +221,7 @@ export class PreprocessedAssetHistoryRepository<
     return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
   }
 
-  async getCountOfNewAssetsByStarkKeysAndStateUpdateId(
+  async getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey(
     stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<{ starkKey: StarkKey; count: number }[]> {
@@ -255,7 +238,7 @@ export class PreprocessedAssetHistoryRepository<
     return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
   }
 
-  async getCountOfRemovedAssetsByStarkKeysAndStateUpdateId(
+  async getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
     stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<{ starkKey: StarkKey; count: number }[]> {
