@@ -9,6 +9,7 @@ import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepos
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
+import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
 
@@ -19,6 +20,7 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private stateUpdateRepository: StateUpdateRepository,
     private historyPreprocessor: HistoryPreprocessor<T>,
     private stateDetailsPreprocessor: StateDetailsPreprocessor,
+    private userStatisticsPreprocessor: UserStatisticsPreprocessor,
     private logger: Logger,
     private isEnabled: boolean = true
   ) {
@@ -108,6 +110,14 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     return 'stop'
   }
 
+  async catchUp() {
+    await this.preprocessedStateUpdateRepository.runInTransaction(
+      async (trx) => {
+        await this.userStatisticsPreprocessor.catchUp(trx)
+      }
+    )
+  }
+
   async preprocessNextStateUpdate() {
     await this.preprocessedStateUpdateRepository.runInTransaction(
       async (trx) => {
@@ -140,9 +150,15 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           trx,
           nextStateUpdate
         )
-        // This one needs to be called *after* historyPreprocessor  was run
-        // Don't user Promise.all!
+        // This one needs to be called *after* historyPreprocessor was run
+        // Don't use Promise.all!
         await this.stateDetailsPreprocessor.preprocessNextStateUpdate(
+          trx,
+          nextStateUpdate
+        )
+        // This one needs to be called *after* historyPreprocessor was run
+        // Don't use Promise.all!
+        await this.userStatisticsPreprocessor.preprocessNextStateUpdate(
           trx,
           nextStateUpdate
         )
@@ -168,6 +184,11 @@ export class Preprocessor<T extends AssetHash | AssetId> {
 
         this.logger.info(
           `Rolling back preprocessing of state update ${lastProcessedStateUpdate.stateUpdateId}`
+        )
+
+        await this.userStatisticsPreprocessor.rollbackOneStateUpdate(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
         )
         await this.historyPreprocessor.rollbackOneStateUpdate(
           trx,

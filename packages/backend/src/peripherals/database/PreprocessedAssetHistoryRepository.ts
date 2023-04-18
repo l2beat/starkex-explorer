@@ -26,7 +26,7 @@ export interface PreprocessedAssetHistoryRecord<
 }
 
 export class PreprocessedAssetHistoryRepository<
-  T extends AssetHash | AssetId
+  T extends AssetHash | AssetId = AssetHash | AssetId
 > extends BaseRepository {
   private toAssetType: (value: string) => T
 
@@ -66,11 +66,18 @@ export class PreprocessedAssetHistoryRepository<
     this.getPrevHistoryByStateUpdateId = this.wrapGet(
       this.getPrevHistoryByStateUpdateId
     )
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.getCountOfCurrentByStarkKey = this.wrapAny(
-      this.getCountOfCurrentByStarkKey
+    this.getCountByStateUpdateIdGroupedByStarkKey = this.wrapGet(
+      this.getCountByStateUpdateIdGroupedByStarkKey
     )
+
+    this.deleteAll = this.wrapDelete(this.deleteAll)
     this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
+    this.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey = this.wrapAny(
+      this.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey
+    )
+    this.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey = this.wrapAny(
+      this.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey
+    )
     this.getCountByStateUpdateId = this.wrapAny(this.getCountByStateUpdateId)
     this.getCountOfCurrentByStarkKey = this.wrapAny(
       this.getCountOfCurrentByStarkKey
@@ -185,18 +192,67 @@ export class PreprocessedAssetHistoryRepository<
     if (assetAtTop) {
       // Make sure that assetIdAtTop (normally the collateral asset)
       // is always the first one in the list, regardless of sorting
-      query = query
-        .orderByRaw(
-          'position_or_vault_id, CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END',
-          assetAtTop.toString()
-        )
-        .orderBy('asset_hash_or_id')
+      query = query.orderByRaw(
+        // DO NOT order by position_or_vault_id - it's not indexed
+        // and confuses the query planner and it runs 60 seconds for some users
+        'CASE WHEN asset_hash_or_id = ? THEN 0 ELSE 1 END, asset_hash_or_id',
+        assetAtTop.toString()
+      )
     }
 
     const rows = await query.offset(offset).limit(limit)
     return rows.map((r) =>
       toPreprocessedAssetHistoryRecord(r, this.toAssetType)
     )
+  }
+
+  async getCountByStateUpdateIdGroupedByStarkKey(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<{ starkKey: StarkKey; count: number }[]> {
+    const knex = await this.knex(trx)
+    const rows: { starkKey: StarkKey; count: bigint }[] = await knex(
+      'preprocessed_asset_history'
+    )
+      .select('stark_key as starkKey')
+      .count('* as count')
+      .where('state_update_id', stateUpdateId)
+      .groupBy('stark_key')
+    return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
+  }
+
+  async getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<{ starkKey: StarkKey; count: number }[]> {
+    const knex = await this.knex(trx)
+    const rows: { starkKey: StarkKey; count: bigint }[] = await knex(
+      'preprocessed_asset_history'
+    )
+      .select('stark_key as starkKey')
+      .count('* as count')
+      .where('state_update_id', stateUpdateId)
+      .where('prev_balance', 0)
+      .where('balance', '<>', 0)
+      .groupBy('stark_key')
+    return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
+  }
+
+  async getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<{ starkKey: StarkKey; count: number }[]> {
+    const knex = await this.knex(trx)
+    const rows: { starkKey: StarkKey; count: bigint }[] = await knex(
+      'preprocessed_asset_history'
+    )
+      .select('stark_key as starkKey')
+      .count('* as count')
+      .where('state_update_id', stateUpdateId)
+      .where('prev_balance', '<>', 0)
+      .where('balance', 0)
+      .groupBy('stark_key')
+    return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
   }
 
   async getCountByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {

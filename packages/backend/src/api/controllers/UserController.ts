@@ -28,6 +28,7 @@ import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   SentTransactionRecord,
   SentTransactionRepository,
@@ -47,16 +48,16 @@ export class UserController {
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly assetDetailsService: AssetDetailsService,
-    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
-      AssetHash | AssetId
-    >,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
-    private readonly exchangeAddress: EthereumAddress
+    private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
+    private readonly exchangeAddress: EthereumAddress,
+    private readonly collateralAsset?: CollateralAsset
   ) {}
 
   async getUserRegisterPage(
@@ -116,9 +117,7 @@ export class UserController {
     const [
       registeredUser,
       userAssets,
-      totalAssets,
       history,
-      historyCount,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
@@ -126,6 +125,7 @@ export class UserController {
       forcedTradeOffersCount,
       finalizableOffers,
       withdrawableAssets,
+      userStatistics,
     ] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
@@ -133,14 +133,10 @@ export class UserController {
         paginationOpts,
         collateralAsset?.assetId
       ),
-      this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
-        starkKey
-      ),
       this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
         starkKey,
         paginationOpts
       ),
-      this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
@@ -155,7 +151,12 @@ export class UserController {
       this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
       this.forcedTradeOfferRepository.getFinalizableByStarkKey(starkKey),
       this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
+      this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
+
+    if (!userStatistics) {
+      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+    }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
@@ -184,7 +185,7 @@ export class UserController {
       collateralAsset,
       assetDetailsMap
     )
-    // TODO: include the count of sentTransactions
+
     const totalTransactions = userTransactionsCount
     const offers =
       await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
@@ -228,9 +229,9 @@ export class UserController {
         this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
       assets: assetEntries,
-      totalAssets,
+      totalAssets: userStatistics.assetCount,
       balanceChanges: balanceChangesEntries,
-      totalBalanceChanges: historyCount,
+      totalBalanceChanges: Number(userStatistics.balanceChangeCount), // TODO: don't cast
       transactions,
       totalTransactions,
       offers,
@@ -247,16 +248,18 @@ export class UserController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
-    const [userAssets, total] = await Promise.all([
+    const [userAssets, userStatistics] = await Promise.all([
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         pagination,
         collateralAsset?.assetId
       ),
-      this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
-        starkKey
-      ),
+      this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
+
+    if (!userStatistics) {
+      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+    }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
@@ -276,7 +279,7 @@ export class UserController {
       starkKey,
       assets,
       ...pagination,
-      total,
+      total: userStatistics.assetCount,
     })
     return { type: 'success', content }
   }
@@ -286,14 +289,18 @@ export class UserController {
     starkKey: StarkKey,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const [context, history, total] = await Promise.all([
+    const [context, history, userStatistics] = await Promise.all([
       this.pageContextService.getPageContext(givenUser),
       this.preprocessedAssetHistoryRepository.getByStarkKeyPaginated(
         starkKey,
         pagination
       ),
-      this.preprocessedAssetHistoryRepository.getCountByStarkKey(starkKey),
+      this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
+
+    if (!userStatistics) {
+      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+    }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       assetHistory: history,
@@ -308,7 +315,7 @@ export class UserController {
       starkKey,
       balanceChanges,
       ...pagination,
-      total,
+      total: userStatistics.balanceChangeCount,
     })
 
     return { type: 'success', content }

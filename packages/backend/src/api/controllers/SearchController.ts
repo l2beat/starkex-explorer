@@ -1,10 +1,4 @@
-import {
-  AssetHash,
-  AssetId,
-  EthereumAddress,
-  PedersenHash,
-  StarkKey,
-} from '@explorer/types'
+import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
 
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
@@ -18,9 +12,7 @@ export class SearchController {
     private stateUpdateRepository: StateUpdateRepository,
     private positionOrVaultRepository: PositionRepository | VaultRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
-      AssetHash | AssetId
-    >
+    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository
   ) {}
 
   async getSearchRedirect(query: string): Promise<ControllerResult> {

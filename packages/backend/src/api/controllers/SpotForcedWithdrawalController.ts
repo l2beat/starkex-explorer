@@ -1,6 +1,6 @@
 import { renderNewSpotForcedWithdrawPage } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
+import { AssetHash, EthereumAddress } from '@explorer/types'
 
 import { PageContextService } from '../../core/PageContextService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
@@ -10,9 +10,7 @@ import { ControllerResult } from './ControllerResult'
 export class SpotForcedWithdrawalController {
   constructor(
     private readonly pageContextService: PageContextService,
-    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
-      AssetHash | AssetId
-    >,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private readonly assetRepository: AssetRepository
   ) {}
 

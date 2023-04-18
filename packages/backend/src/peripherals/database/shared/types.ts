@@ -259,6 +259,17 @@ declare module 'knex/types/tables' {
     data: WithdrawalAllowedJSON | WithdrawalPerformedJSON
   }
 
+  interface PreprocessedUserStatisticsRow {
+    id: number
+    state_update_id: number
+    block_number: number
+    timestamp: bigint
+    stark_key: string
+    asset_count: number
+    balance_change_count: number
+    prev_history_id: number | null
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -287,6 +298,7 @@ declare module 'knex/types/tables' {
     preprocessed_asset_history: PreprocessedAssetHistoryRow
     preprocessed_state_details: PreprocessedStateDetailsRow
     withdrawable_assets: WithdrawableAssetRow
+    preprocessed_user_statistics: PreprocessedUserStatisticsRow
   }
 }
 

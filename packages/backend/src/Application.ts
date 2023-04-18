@@ -52,6 +52,7 @@ import { PerpetualHistoryPreprocessor } from './core/preprocessing/PerpetualHist
 import { Preprocessor } from './core/preprocessing/Preprocessor'
 import { SpotHistoryPreprocessor } from './core/preprocessing/SpotHistoryPreprocessor'
 import { StateDetailsPreprocessor } from './core/preprocessing/StateDetailsPreprocessor'
+import { UserStatisticsPreprocessor } from './core/preprocessing/UserStatisticsPreprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
 import { StatusService } from './core/StatusService'
@@ -70,6 +71,7 @@ import { PositionRepository } from './peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateDetailsRepository } from './peripherals/database/PreprocessedStateDetailsRepository'
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
+import { PreprocessedUserStatisticsRepository } from './peripherals/database/PreprocessedUserStatisticsRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
@@ -405,6 +407,9 @@ export class Application {
     const preprocessedStateDetailsRepository =
       new PreprocessedStateDetailsRepository(database, logger)
 
+    const preprocessedUserStatisticsRepository =
+      new PreprocessedUserStatisticsRepository(database, logger)
+
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
 
@@ -428,12 +433,22 @@ export class Application {
         logger
       )
 
+      const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
+        preprocessedUserStatisticsRepository,
+        preprocessedAssetHistoryRepository,
+        preprocessedStateUpdateRepository,
+        stateUpdateRepository,
+        kvStore,
+        logger
+      )
+
       preprocessor = new Preprocessor(
         preprocessedStateUpdateRepository,
         syncStatusRepository,
         stateUpdateRepository,
         perpetualHistoryPreprocessor,
         stateDetailsPreprocessor,
+        userStatisticsPreprocessor,
         logger,
         isPreprocessorEnabled
       )
@@ -454,12 +469,22 @@ export class Application {
         logger
       )
 
+      const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
+        preprocessedUserStatisticsRepository,
+        preprocessedAssetHistoryRepository,
+        preprocessedStateUpdateRepository,
+        stateUpdateRepository,
+        kvStore,
+        logger
+      )
+
       preprocessor = new Preprocessor(
         preprocessedStateUpdateRepository,
         syncStatusRepository,
         stateUpdateRepository,
         spotHistoryPreprocessor,
         stateDetailsPreprocessor,
+        userStatisticsPreprocessor,
         logger,
         isPreprocessorEnabled
       )
@@ -509,7 +534,9 @@ export class Application {
       userRegistrationEventRepository,
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
-      config.starkex.contracts.perpetual
+      preprocessedUserStatisticsRepository,
+      config.starkex.contracts.perpetual,
+      collateralAsset
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,
@@ -624,6 +651,7 @@ export class Application {
 
       if (config.freshStart) await database.rollbackAll()
       await database.migrateToLatest()
+      await preprocessor.catchUp()
 
       await ethereumClient.assertChainId(config.starkex.blockchain.chainId)
 
