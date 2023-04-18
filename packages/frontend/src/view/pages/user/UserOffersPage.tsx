@@ -11,7 +11,7 @@ import { getOfferTableProps } from './common'
 import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserOffersPageProps {
-  context: PageContext
+  context: PageContext<'perpetual'>
   starkKey: StarkKey
   offers: OfferEntry[]
   limit: number
@@ -40,7 +40,12 @@ function UserOffersPage(props: UserOffersPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <OffersTable showStatus showRole offers={props.offers} />
+          <OffersTable
+            showStatus
+            showRole
+            offers={props.offers}
+            context={props.context}
+          />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

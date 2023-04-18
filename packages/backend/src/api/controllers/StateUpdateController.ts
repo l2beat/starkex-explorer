@@ -3,7 +3,7 @@ import {
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
-import { CollateralAsset, UserDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
@@ -35,8 +35,7 @@ export class StateUpdateController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository<
       AssetHash | AssetId
-    >,
-    private readonly collateralAsset?: CollateralAsset
+    >
   ) {}
 
   async getStateUpdatePage(
@@ -44,6 +43,7 @@ export class StateUpdateController {
     stateUpdateId: number
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
+    const collateralAsset = this.pageContextService.getCollateralAsset(context)
 
     const [
       stateUpdate,
@@ -90,7 +90,7 @@ export class StateUpdateController {
     })
 
     const transactions = forcedUserTransactions.map((t) =>
-      userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
+      userTransactionToEntry(t, collateralAsset, assetDetailsMap)
     )
 
     const content = renderStateUpdatePage({
@@ -161,6 +161,7 @@ export class StateUpdateController {
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
+    const collateralAsset = this.pageContextService.getCollateralAsset(context)
 
     const [includedTransactions, includedTransactionsCount] = await Promise.all(
       [
@@ -180,7 +181,7 @@ export class StateUpdateController {
     })
 
     const transactions = includedTransactions.map((t) =>
-      userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
+      userTransactionToEntry(t, collateralAsset, assetDetailsMap)
     )
 
     const content = renderStateUpdateTransactionsPage({

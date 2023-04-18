@@ -27,7 +27,7 @@ export function initFinalizeForm() {
         collateralAsset
       )
       await Api.submitPerpetualForcedTrade(offerId, hash)
-      window.location.href = `/forced/${hash.toString()}`
+      window.location.href = `/transactions/${hash.toString()}`
     })
   })
 }

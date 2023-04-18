@@ -1,4 +1,4 @@
-import { OfferEntry } from '@explorer/frontend'
+import { FinalizableOfferEntry, OfferEntry } from '@explorer/frontend'
 import { Hash256, StarkKey } from '@explorer/types'
 
 import { ForcedTradeOfferRecord } from '../peripherals/database/ForcedTradeOfferRepository'
@@ -17,7 +17,7 @@ export class ForcedTradeOfferViewService {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly sentTransactionRepository: SentTransactionRepository
   ) {}
-  async forcedTradeOffersToEntriesWithFullHistory(
+  async ToEntriesWithFullHistory(
     forcedTradeOffers: ForcedTradeOfferRecord[],
     userStarkKey?: StarkKey
   ) {
@@ -42,7 +42,7 @@ export class ForcedTradeOfferViewService {
           sentTransaction.transactionHash ===
           forcedTradeOffer.accepted?.transactionHash
       )
-      return this.forcedTradeOfferToEntry(
+      return this.toOfferEntry(
         forcedTradeOffer,
         sentTransaction,
         userTransaction,
@@ -51,7 +51,7 @@ export class ForcedTradeOfferViewService {
     })
   }
 
-  forcedTradeOfferToEntry(
+  toOfferEntry(
     forcedTradeOffer: ForcedTradeOfferRecord,
     sentTransaction?: SentTransactionRecord,
     userTransaction?: UserTransactionRecord,
@@ -74,15 +74,29 @@ export class ForcedTradeOfferViewService {
     return {
       id: forcedTradeOffer.id.toString(),
       timestamp: forcedTradeOffer.createdAt,
-      asset: {
+      syntheticAsset: {
         hashOrId: forcedTradeOffer.syntheticAssetId,
       },
-      amount: forcedTradeOffer.syntheticAmount,
-      price: 0n, //TODO: calculate price
-      totalPrice: 0n * forcedTradeOffer.syntheticAmount,
+      syntheticAmount: forcedTradeOffer.syntheticAmount,
+      collateralAmount: forcedTradeOffer.collateralAmount,
       status,
       type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
       role,
+    }
+  }
+
+  toFinalizableOfferEntry(
+    forcedTradeOffer: ForcedTradeOfferRecord
+  ): FinalizableOfferEntry {
+    return {
+      timestamp: forcedTradeOffer.createdAt,
+      id: forcedTradeOffer.id.toString(),
+      syntheticAsset: {
+        hashOrId: forcedTradeOffer.syntheticAssetId,
+      },
+      syntheticAmount: forcedTradeOffer.syntheticAmount,
+      collateralAmount: forcedTradeOffer.collateralAmount,
+      type: forcedTradeOffer.isABuyingSynthetic ? 'BUY' : 'SELL',
     }
   }
 }

@@ -26,6 +26,7 @@ import {
 } from './components/UserBalanceChangesTable'
 import { UserProfile } from './components/UserProfile'
 import {
+  FinalizableOfferEntry,
   UserQuickActionsTable,
   WithdrawableAssetEntry,
 } from './components/UserQuickActionsTable'
@@ -36,7 +37,7 @@ export interface UserPageProps {
   ethereumAddress?: EthereumAddress
   exchangeAddress: EthereumAddress
   withdrawableAssets: WithdrawableAssetEntry[]
-  offersToAccept: OfferEntry[]
+  finalizableOffers: FinalizableOfferEntry[]
   assets: UserAssetEntry[]
   totalAssets: number
   balanceChanges: UserBalanceChangeEntry[]
@@ -71,11 +72,11 @@ function UserPage(props: UserPageProps) {
             />
             <UserQuickActionsTable
               withdrawableAssets={props.withdrawableAssets}
-              offersToAccept={props.offersToAccept}
+              finalizableOffers={props.finalizableOffers}
               isMine={isMine}
+              context={props.context}
               exchangeAddress={props.exchangeAddress}
               starkKey={props.starkKey}
-              user={props.context.user}
             />
           </div>
         </section>
@@ -114,7 +115,12 @@ function UserPage(props: UserPageProps) {
             visible={props.offers.length}
             total={props.totalOffers}
           >
-            <OffersTable showStatus showRole offers={props.offers} />
+            <OffersTable
+              showStatus
+              showRole
+              offers={props.offers}
+              context={props.context}
+            />
           </TablePreview>
         )}
       </ContentWrapper>

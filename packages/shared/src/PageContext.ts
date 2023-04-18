@@ -1,25 +1,47 @@
-import { z } from 'zod'
-
+import { CollateralAsset } from './CollateralAsset'
 import { InstanceName } from './InstanceName'
 import { TradingMode } from './TradingMode'
 import { UserDetails } from './UserDetails'
 
-export type PageContext = z.infer<typeof PageContext>
-export const PageContext = z.object({
-  user: UserDetails.optional(),
-  instanceName: InstanceName,
-  tradingMode: TradingMode,
-})
+type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
+  T['tradingMode'],
+  TradingMode
+> extends never
+  ? T
+  : never
 
-export type PageContextWithUser = z.infer<typeof PageContextWithUser>
-export const PageContextWithUser = PageContext.extend({
-  user: UserDetails,
-})
+interface PerpetualPageContext {
+  user: UserDetails | undefined
+  instanceName: InstanceName
+  tradingMode: 'perpetual'
+  collateralAsset: CollateralAsset
+}
 
-export type PageContextWithUserAndStarkKey = z.infer<
-  typeof PageContextWithUserAndStarkKey
+interface SpotPageContext {
+  user: UserDetails | undefined
+  instanceName: InstanceName
+  tradingMode: 'spot'
+}
+
+export type PageContext<T extends TradingMode = TradingMode> = CheckTradingMode<
+  T extends 'perpetual'
+    ? PerpetualPageContext
+    : T extends 'spot'
+    ? SpotPageContext
+    : PerpetualPageContext | SpotPageContext
 >
-export const PageContextWithUserAndStarkKey = PageContext.extend({
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  user: UserDetails.transform((o) => ({ ...o, starkKey: o.starkKey! })),
-})
+
+export type PageContextWithUser<T extends TradingMode = TradingMode> =
+  CheckTradingMode<
+    PageContext<T> & {
+      user: UserDetails
+    }
+  >
+
+export type PageContextWithUserAndStarkKey<
+  T extends TradingMode = TradingMode
+> = CheckTradingMode<
+  PageContextWithUser<T> & {
+    user: Required<UserDetails>
+  }
+>

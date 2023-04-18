@@ -56,8 +56,7 @@ export class UserController {
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
-    private readonly exchangeAddress: EthereumAddress,
-    private readonly collateralAsset?: CollateralAsset
+    private readonly exchangeAddress: EthereumAddress
   ) {}
 
   async getUserRegisterPage(
@@ -107,13 +106,14 @@ export class UserController {
     givenUser: Partial<UserDetails>,
     starkKey: StarkKey
   ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+    const collateralAsset = this.pageContextService.getCollateralAsset(context)
     const paginationOpts = {
       offset: 0,
       limit: 10,
     }
 
     const [
-      context,
       registeredUser,
       userAssets,
       totalAssets,
@@ -124,14 +124,14 @@ export class UserController {
       userTransactionsCount,
       forcedTradeOffers,
       forcedTradeOffersCount,
+      finalizableOffers,
       withdrawableAssets,
     ] = await Promise.all([
-      this.pageContextService.getPageContext(givenUser),
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         paginationOpts,
-        this.collateralAsset?.assetId
+        collateralAsset?.assetId
       ),
       this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
         starkKey
@@ -153,6 +153,7 @@ export class UserController {
         paginationOpts
       ),
       this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
+      this.forcedTradeOfferRepository.getFinalizableByStarkKey(starkKey),
       this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
     ])
 
@@ -172,7 +173,7 @@ export class UserController {
       toUserAssetEntry(
         a,
         context.tradingMode,
-        this.collateralAsset?.assetId,
+        collateralAsset?.assetId,
         assetDetailsMap
       )
     )
@@ -184,13 +185,13 @@ export class UserController {
     const transactions = buildUserTransactions(
       sentTransactions,
       userTransactions,
-      this.collateralAsset,
+      collateralAsset,
       assetDetailsMap
     )
     // TODO: include the count of sentTransactions
     const totalTransactions = userTransactionsCount
     const offers =
-      await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
+      await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
       )
@@ -224,7 +225,9 @@ export class UserController {
         amount: asset.withdrawableBalance,
       })),
       exchangeAddress: this.exchangeAddress,
-      offersToAccept: [],
+      finalizableOffers: finalizableOffers.map((offer) =>
+        this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
+      ),
       assets: assetEntries,
       totalAssets,
       balanceChanges: balanceChangesEntries,
@@ -243,12 +246,13 @@ export class UserController {
     starkKey: StarkKey,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const [context, userAssets, total] = await Promise.all([
-      this.pageContextService.getPageContext(givenUser),
+    const context = await this.pageContextService.getPageContext(givenUser)
+    const collateralAsset = this.pageContextService.getCollateralAsset(context)
+    const [userAssets, total] = await Promise.all([
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         pagination,
-        this.collateralAsset?.assetId
+        collateralAsset?.assetId
       ),
       this.preprocessedAssetHistoryRepository.getCountOfCurrentByStarkKey(
         starkKey
@@ -263,7 +267,7 @@ export class UserController {
       toUserAssetEntry(
         a,
         context.tradingMode,
-        this.collateralAsset?.assetId,
+        collateralAsset?.assetId,
         assetDetailsMap
       )
     )
@@ -316,9 +320,10 @@ export class UserController {
     starkKey: StarkKey,
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
-    const [context, sentTransactions, userTransactions, userTransactionsCount] =
+    const context = await this.pageContextService.getPageContext(givenUser)
+    const collateralAsset = this.pageContextService.getCollateralAsset(context)
+    const [sentTransactions, userTransactions, userTransactionsCount] =
       await Promise.all([
-        this.pageContextService.getPageContext(givenUser),
         this.sentTransactionRepository.getByStarkKey(starkKey),
         this.userTransactionRepository.getByStarkKey(
           starkKey,
@@ -336,7 +341,7 @@ export class UserController {
     const transactions = buildUserTransactions(
       pagination.offset === 0 ? sentTransactions : [], // display sent transactions only on the first page
       userTransactions,
-      this.collateralAsset,
+      collateralAsset,
       assetDetailsMap
     )
     const totalTransactions =
@@ -369,9 +374,12 @@ export class UserController {
         ),
         this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
       ])
+    if (context.tradingMode !== 'perpetual') {
+      return { type: 'not found', content: 'Page not found' }
+    }
 
     const offers =
-      await this.forcedTradeOfferViewService.forcedTradeOffersToEntriesWithFullHistory(
+      await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
       )

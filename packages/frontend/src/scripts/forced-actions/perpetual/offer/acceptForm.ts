@@ -1,7 +1,7 @@
 import {
   deserializeAcceptedData,
   deserializeCollateralAsset,
-  deserializeFinalizeOfferData,
+  deserializeCreateOfferData,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
@@ -41,7 +41,7 @@ function getFormData(form: HTMLFormElement) {
 
   return {
     address: EthereumAddress(address),
-    offer: deserializeFinalizeOfferData(offer),
+    offer: deserializeCreateOfferData(offer),
     offerId: Number(offerId),
     accepted: deserializeAcceptedData(accepted),
     collateralAsset: deserializeCollateralAsset(collateralAsset),
