@@ -28,12 +28,12 @@ export class ForcedActionController {
       givenUser
     )
 
-    if (context?.tradingMode !== 'spot') {
-      return { type: 'not found', content: 'Page not found' }
-    }
-
     if (!context) {
       return { type: 'not found', content: 'User not found' }
+    }
+
+    if (context.tradingMode !== 'spot') {
+      return { type: 'not found', content: 'Page not found' }
     }
 
     const assets =
@@ -79,12 +79,12 @@ export class ForcedActionController {
       givenUser
     )
 
-    if (context?.tradingMode !== 'perpetual') {
-      return { type: 'not found', content: 'Page not found' }
-    }
-
     if (!context) {
       return { type: 'not found', content: 'User not found' }
+    }
+
+    if (context.tradingMode !== 'perpetual') {
+      return { type: 'not found', content: 'Page not found' }
     }
 
     const assets =
@@ -129,12 +129,12 @@ export class ForcedActionController {
       givenUser
     )
 
-    if (context?.tradingMode !== 'perpetual') {
-      return { type: 'not found', content: 'Page not found' }
-    }
-
     if (!context) {
       return { type: 'not found', content: 'User not found' }
+    }
+
+    if (context.tradingMode !== 'perpetual') {
+      return { type: 'not found', content: 'Page not found' }
     }
 
     const assets =
