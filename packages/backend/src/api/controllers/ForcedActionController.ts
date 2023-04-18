@@ -9,6 +9,7 @@ import { PageContextService } from '../../core/PageContextService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { ControllerResult } from './ControllerResult'
+import { getAssetPriceUSDCents } from './utils/toPositionAssetEntries'
 
 export class ForcedActionController {
   constructor(
@@ -105,6 +106,10 @@ export class ForcedActionController {
       return { type: 'not found', content: 'Position does not belong to user' }
     }
 
+    if (!asset.price) {
+      return { type: 'not found', content: 'Asset price is not available' }
+    }
+
     const content = renderNewPerpetualForcedActionPage({
       context,
       starkExAddress: this.starkExAddress,
@@ -113,7 +118,10 @@ export class ForcedActionController {
       asset: {
         hashOrId: asset.assetHashOrId,
         balance: asset.balance,
-        priceUSDCents: 0n,
+        priceUSDCents: getAssetPriceUSDCents(
+          asset.price,
+          asset.assetHashOrId as AssetId
+        ),
       },
     })
 
@@ -151,6 +159,10 @@ export class ForcedActionController {
       return { type: 'not found', content: 'Position does not belong to user' }
     }
 
+    if (!asset.price) {
+      return { type: 'not found', content: 'Asset price is not available' }
+    }
+
     const content = renderNewPerpetualForcedActionPage({
       context,
       starkExAddress: this.starkExAddress,
@@ -159,7 +171,10 @@ export class ForcedActionController {
       asset: {
         hashOrId: asset.assetHashOrId,
         balance: asset.balance,
-        priceUSDCents: 0n,
+        priceUSDCents: getAssetPriceUSDCents(
+          asset.price,
+          asset.assetHashOrId as AssetId
+        ),
       },
     })
     return { type: 'success', content }
