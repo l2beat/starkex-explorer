@@ -347,6 +347,9 @@ export class UserController {
         ),
         this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
       ])
+    if (context.tradingMode !== 'perpetual') {
+      return { type: 'not found', content: 'Page not found' }
+    }
 
     const offers =
       await this.forcedTradeOfferViewService.ToEntriesWithFullHistory(

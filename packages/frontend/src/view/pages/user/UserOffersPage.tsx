@@ -11,7 +11,7 @@ import { getOfferTableProps } from './common'
 import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserOffersPageProps {
-  context: PageContext
+  context: PageContext<'perpetual'>
   starkKey: StarkKey
   offers: OfferEntry[]
   limit: number

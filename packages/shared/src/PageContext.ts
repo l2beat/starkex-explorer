@@ -10,31 +10,38 @@ type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
   ? T
   : never
 
-export interface PerpetualPageContext {
+interface PerpetualPageContext {
   user: UserDetails | undefined
   instanceName: InstanceName
   tradingMode: 'perpetual'
   collateralAsset: CollateralAsset
 }
 
-export interface SpotPageContext {
+interface SpotPageContext {
   user: UserDetails | undefined
   instanceName: InstanceName
   tradingMode: 'spot'
 }
 
-export type PageContext = CheckTradingMode<
-  PerpetualPageContext | SpotPageContext
+export type PageContext<T extends TradingMode = TradingMode> = CheckTradingMode<
+  T extends 'perpetual'
+    ? PerpetualPageContext
+    : T extends 'spot'
+    ? SpotPageContext
+    : PerpetualPageContext | SpotPageContext
 >
 
-export type PageContextWithUser = CheckTradingMode<
-  PageContext & {
-    user: UserDetails
-  }
->
+export type PageContextWithUser<T extends TradingMode = TradingMode> =
+  CheckTradingMode<
+    PageContext<T> & {
+      user: UserDetails
+    }
+  >
 
-export type PageContextWithUserAndStarkKey = CheckTradingMode<
-  PageContextWithUser & {
+export type PageContextWithUserAndStarkKey<
+  T extends TradingMode = TradingMode
+> = CheckTradingMode<
+  PageContextWithUser<T> & {
     user: Required<UserDetails>
   }
 >

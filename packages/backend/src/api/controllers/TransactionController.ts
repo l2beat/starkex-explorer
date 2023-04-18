@@ -104,6 +104,10 @@ export class TransactionController {
         return { type: 'success', content }
       }
       case 'FullWithdrawal': {
+        if (context.tradingMode !== 'spot') {
+          return { type: 'not found', content: 'Page not found' }
+        }
+
         const txUser =
           await this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKey

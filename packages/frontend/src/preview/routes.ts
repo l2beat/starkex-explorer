@@ -3,8 +3,6 @@ import {
   CollateralAsset,
   PageContext,
   PageContextWithUser,
-  PerpetualPageContext,
-  SpotPageContext,
   UserDetails,
 } from '@explorer/shared'
 import {
@@ -1085,17 +1083,15 @@ const fakeCollateralAsset: CollateralAsset = {
 function getPerpetualPageContext(
   ctx: Koa.Context,
   fallbackToFakeUser: true
-): PageContextWithUser<PerpetualPageContext>
+): PageContextWithUser<'perpetual'>
 function getPerpetualPageContext(
   ctx: Koa.Context,
   fallbackToFakeUser?: false
-): PageContext<PerpetualPageContext>
+): PageContext<'perpetual'>
 function getPerpetualPageContext(
   ctx: Koa.Context,
   fallbackToFakeUser?: boolean
-):
-  | PageContextWithUser<PerpetualPageContext>
-  | PageContext<PerpetualPageContext> {
+): PageContextWithUser<'perpetual'> | PageContext<'perpetual'> {
   const user = getUser(ctx) ?? (fallbackToFakeUser ? getFakeUser() : undefined)
 
   return {
@@ -1109,15 +1105,15 @@ function getPerpetualPageContext(
 function getSpotPageContext(
   ctx: Koa.Context,
   fallbackToFakeUser: true
-): PageContextWithUser<SpotPageContext>
+): PageContextWithUser<'spot'>
 function getSpotPageContext(
   ctx: Koa.Context,
   fallbackToFakeUser?: false
-): PageContext<SpotPageContext>
+): PageContext<'spot'>
 function getSpotPageContext(
   ctx: Koa.Context,
   fallbackToFakeUser?: boolean
-): PageContextWithUser<SpotPageContext> | PageContext<SpotPageContext> {
+): PageContextWithUser<'spot'> | PageContext<'spot'> {
   const user = getUser(ctx) ?? (fallbackToFakeUser ? getFakeUser() : undefined)
 
   return {

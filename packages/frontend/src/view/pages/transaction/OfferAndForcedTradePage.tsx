@@ -2,7 +2,7 @@ import {
   AcceptOfferFormData,
   CancelOfferFormData,
   FinalizeOfferFormData,
-  PerpetualPageContext,
+  PageContext,
 } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
@@ -31,7 +31,7 @@ import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface OfferAndForcedTradePageProps {
-  context: PerpetualPageContext
+  context: PageContext<'perpetual'>
   offerId: string | undefined
   transactionHash?: Hash256
   maker: {

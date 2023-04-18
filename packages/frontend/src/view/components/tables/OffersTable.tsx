@@ -12,7 +12,7 @@ import { Column } from '../table/types'
 import { TimeCell } from '../TimeCell'
 
 export interface OffersTableProps {
-  context: PageContext
+  context: PageContext<'perpetual'>
   offers: OfferEntry[]
   showStatus?: boolean
   showRole?: boolean

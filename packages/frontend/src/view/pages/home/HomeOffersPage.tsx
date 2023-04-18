@@ -9,7 +9,7 @@ import { reactToHtml } from '../../reactToHtml'
 import { OFFER_TABLE_PROPS } from './common'
 
 export interface HomeOffersPageProps {
-  context: PageContext
+  context: PageContext<'perpetual'>
   offers: OfferEntry[]
   limit: number
   offset: number

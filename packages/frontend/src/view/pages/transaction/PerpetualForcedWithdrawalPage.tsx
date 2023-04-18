@@ -1,4 +1,4 @@
-import { PerpetualPageContext } from '@explorer/shared'
+import { PageContext } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
@@ -21,7 +21,7 @@ import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface PerpetualForcedWithdrawalPageProps {
-  context: PerpetualPageContext
+  context: PageContext<'perpetual'>
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey
