@@ -3,7 +3,7 @@ import {
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
 } from '@explorer/frontend'
-import { CollateralAsset, UserDetails } from '@explorer/shared'
+import { UserDetails } from '@explorer/shared'
 
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
@@ -29,8 +29,7 @@ export class HomeController {
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
-    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
-    private readonly collateralAsset?: CollateralAsset
+    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository
   ) {}
 
   async getHomePage(
@@ -61,8 +60,9 @@ export class HomeController {
       userTransactions: forcedUserTransactions,
     })
 
+    const collateralAsset = this.pageContextService.getCollateralAsset(context)
     const transactions = forcedUserTransactions.map((t) =>
-      userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
+      userTransactionToEntry(t, collateralAsset, assetDetailsMap)
     )
 
     const content = renderHomePage({
@@ -133,8 +133,9 @@ export class HomeController {
       userTransactions: forcedUserTransactions,
     })
 
+    const collateralAsset = this.pageContextService.getCollateralAsset(context)
     const transactions = forcedUserTransactions.map((t) =>
-      userTransactionToEntry(t, this.collateralAsset, assetDetailsMap)
+      userTransactionToEntry(t, collateralAsset, assetDetailsMap)
     )
 
     const content = renderHomeTransactionsPage({

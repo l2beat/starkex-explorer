@@ -1,12 +1,14 @@
-import { assertUnreachable } from '@explorer/shared'
+import {
+  assertUnreachable,
+  CollateralAsset,
+  PageContext,
+} from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
 import { default as React, ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
-import {
-  formatAmount,
-  formatWithDecimals,
-} from '../../../utils/formatting/formatAmount'
+import { formatAmount } from '../../../utils/formatting/formatAmount'
+import { ArrowRightIcon } from '../../assets/icons/ArrowIcon'
 import { AssetWithLogo } from '../AssetWithLogo'
 import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
@@ -15,6 +17,7 @@ import { Column } from '../table/types'
 import { TimeCell } from '../TimeCell'
 
 export interface OffersTableProps {
+  context: PageContext<'perpetual'>
   offers: OfferEntry[]
   showStatus?: boolean
   showRole?: boolean
@@ -23,10 +26,9 @@ export interface OffersTableProps {
 export interface OfferEntry {
   timestamp: Timestamp
   id: string
-  asset: Asset
-  amount: bigint
-  price: bigint
-  totalPrice: bigint
+  syntheticAsset: Asset
+  syntheticAmount: bigint
+  collateralAmount: bigint
   status:
     | 'CREATED'
     | 'ACCEPTED'
@@ -45,10 +47,7 @@ export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
     { header: 'Time' },
     { header: 'Id' },
-    { header: 'Asset' },
-    { header: 'Amount', numeric: true },
-    { header: 'Price', numeric: true },
-    { header: 'Total price', numeric: true },
+    { header: 'Trade', align: 'center' },
     ...(props.showStatus ? [{ header: 'Status' }] : []),
     ...(props.showRole ? [{ header: 'Role' }] : []),
     { header: 'Type' },
@@ -61,10 +60,10 @@ export function OffersTable(props: OffersTableProps) {
         const cells: ReactNode[] = [
           <TimeCell timestamp={offer.timestamp} />,
           <Link>#{offer.id}</Link>,
-          <AssetWithLogo type="small" assetInfo={assetToInfo(offer.asset)} />,
-          formatAmount(offer.asset, offer.amount),
-          formatWithDecimals(offer.price, 6, { prefix: '$' }),
-          formatWithDecimals(offer.totalPrice, 6, { prefix: '$' }),
+          <TradeColumn
+            offer={offer}
+            collateralAsset={props.context.collateralAsset}
+          />,
           ...(props.showStatus
             ? [
                 <StatusBadge type={toStatusType(offer.status)}>
@@ -84,6 +83,54 @@ export function OffersTable(props: OffersTableProps) {
         }
       })}
     />
+  )
+}
+
+interface Props {
+  offer: OfferEntry
+  collateralAsset: CollateralAsset
+}
+
+function TradeColumn({ offer, collateralAsset }: Props) {
+  const trade =
+    offer.type === 'SELL'
+      ? {
+          offeredAmount: offer.syntheticAmount,
+          offeredAsset: offer.syntheticAsset,
+          receivedAmount: offer.collateralAmount,
+          receivedAsset: {
+            hashOrId: collateralAsset.assetId,
+          },
+        }
+      : {
+          offeredAmount: offer.collateralAmount,
+          offeredAsset: {
+            hashOrId: collateralAsset.assetId,
+          },
+          receivedAmount: offer.syntheticAmount,
+          receivedAsset: offer.syntheticAsset,
+        }
+
+  return (
+    <div className="flex flex-1 items-center">
+      <div className="flex items-center gap-2">
+        {formatAmount(trade.offeredAsset, trade.offeredAmount)}
+        <AssetWithLogo
+          type="small"
+          assetInfo={assetToInfo(trade.offeredAsset)}
+          symbolClassName="max-w-[60px]"
+        />
+      </div>
+      <ArrowRightIcon className="mx-1 flex-1" />
+      <div className="flex items-center gap-2">
+        {formatAmount(trade.receivedAsset, trade.receivedAmount)}
+        <AssetWithLogo
+          type="small"
+          assetInfo={assetToInfo(trade.receivedAsset)}
+          symbolClassName="max-w-[60px]"
+        />
+      </div>
+    </div>
   )
 }
 

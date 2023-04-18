@@ -31,7 +31,7 @@ import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface OfferAndForcedTradePageProps {
-  context: PageContext
+  context: PageContext<'perpetual'>
   offerId: string | undefined
   transactionHash?: Hash256
   maker: {
@@ -45,7 +45,6 @@ export interface OfferAndForcedTradePageProps {
     positionId: string
   }
   type: 'BUY' | 'SELL'
-  collateralAsset: Asset
   collateralAmount: bigint
   syntheticAsset: Asset
   syntheticAmount: bigint
@@ -147,11 +146,15 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
                     offeredAmount: props.syntheticAmount,
                     offeredAsset: props.syntheticAsset,
                     receivedAmount: props.collateralAmount,
-                    receivedAsset: props.collateralAsset,
+                    receivedAsset: {
+                      hashOrId: props.context.collateralAsset.assetId,
+                    },
                   }
                 : {
                     offeredAmount: props.collateralAmount,
-                    offeredAsset: props.collateralAsset,
+                    offeredAsset: {
+                      hashOrId: props.context.collateralAsset.assetId,
+                    },
                     receivedAmount: props.syntheticAmount,
                     receivedAsset: props.syntheticAsset,
                   }

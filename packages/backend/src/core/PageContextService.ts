@@ -1,4 +1,5 @@
 import {
+  CollateralAsset,
   PageContext,
   PageContextWithUser,
   PageContextWithUserAndStarkKey,
@@ -16,6 +17,15 @@ export class PageContextService {
 
   async getPageContext(givenUser: Partial<UserDetails>): Promise<PageContext> {
     const user = await this.userService.getUserDetails(givenUser)
+
+    if (this.config.starkex.tradingMode === 'perpetual') {
+      return {
+        user,
+        tradingMode: this.config.starkex.tradingMode,
+        instanceName: this.config.starkex.instanceName,
+        collateralAsset: this.config.starkex.collateralAsset,
+      }
+    }
 
     return {
       user,
@@ -46,5 +56,13 @@ export class PageContextService {
     }
 
     return context as PageContextWithUserAndStarkKey
+  }
+
+  getCollateralAsset(context: PageContext): CollateralAsset | undefined {
+    if (context.tradingMode === 'perpetual') {
+      return context.collateralAsset
+    }
+
+    return undefined
   }
 }
