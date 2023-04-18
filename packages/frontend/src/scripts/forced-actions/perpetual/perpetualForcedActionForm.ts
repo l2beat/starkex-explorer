@@ -1,6 +1,7 @@
 import { UserDetails } from '@explorer/shared'
-import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+
 import { FormId } from '../../../view/pages/forced-actions/components/form/ids'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormElements, getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
@@ -23,6 +24,7 @@ export function initPerpetualForcedActionForm() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
   const props = NewForcedActionFormProps.parse(propsJson)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const userJson = JSON.parse(form.dataset.user ?? '{}')
   const user = UserDetails.parse(userJson)
 

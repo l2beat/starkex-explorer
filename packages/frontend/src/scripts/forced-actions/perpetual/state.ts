@@ -1,10 +1,10 @@
+import { UserDetails } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
-import { UserDetails } from '@explorer/shared'
 import { formatCurrencyInput } from '../../../utils/formatting/formatCurrencyInput'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormAction, FormState } from './types'
 import { getFormType, parseCurrencyInput } from './utils'
-import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 
 export function getInitialState(
   props: NewForcedActionFormProps,

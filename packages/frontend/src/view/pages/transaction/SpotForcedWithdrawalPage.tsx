@@ -1,4 +1,4 @@
-import { PageContext, SpotPageContext } from '@explorer/shared'
+import { SpotPageContext } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 

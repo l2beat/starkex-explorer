@@ -1,6 +1,6 @@
+import { PageContextWithUser } from '@explorer/shared'
 import React from 'react'
 
-import { PageContextWithUser } from '@explorer/shared'
 import { assetToInfo } from '../../../utils/assets'
 import { formatAmount } from '../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../components/AssetWithLogo'
@@ -10,11 +10,11 @@ import { Link } from '../../components/Link'
 import { OrderedList } from '../../components/OrderedList'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
+import { ForcedActionCard } from './components/ForcedActionCard'
 import {
   NewForcedActionFormProps,
   serializeForcedActionsFormProps,
 } from './NewForcedActionFormProps'
-import { ForcedActionCard } from './components/ForcedActionCard'
 
 export const SPOT_FORCED_WITHDRAWAL_FORM_ID = 'spot-withdraw-form'
 

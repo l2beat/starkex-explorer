@@ -1,19 +1,19 @@
+import { PageContextWithUser } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 import React from 'react'
 
-import { PageContextWithUser } from '@explorer/shared'
 import { Card } from '../../components/Card'
 import { OrderedList } from '../../components/OrderedList'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
+import { getForcedActionInstructionsParams } from './components/common'
+import { FormId } from './components/form/ids'
+import { NewPerpetualForcedTradeFormContent } from './components/NewPerpetualForcedTradeFormContent'
+import { NewPerpetualForcedWithdrawalFormContent } from './components/NewPerpetualForcedWithdrawalFormContent'
 import {
   NewForcedActionFormProps,
   serializeForcedActionsFormProps,
 } from './NewForcedActionFormProps'
-import { NewPerpetualForcedTradeFormContent } from './components/NewPerpetualForcedTradeFormContent'
-import { NewPerpetualForcedWithdrawalFormContent } from './components/NewPerpetualForcedWithdrawalFormContent'
-import { getForcedActionInstructionsParams } from './components/common'
-import { FormId } from './components/form/ids'
 
 type NewPerpetualForcedActionPageProps = NewForcedActionFormProps & {
   context: PageContextWithUser

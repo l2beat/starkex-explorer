@@ -1,6 +1,6 @@
+import { UserDetails } from '@explorer/shared'
 import { AssetHash } from '@explorer/types'
 
-import { UserDetails } from '@explorer/shared'
 import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { SPOT_FORCED_WITHDRAWAL_FORM_ID } from '../../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
 import { Api } from '../../peripherals/api'
@@ -14,6 +14,7 @@ export function initSpotForcedWithdrawalForm() {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
   const props = NewForcedActionFormProps.parse(propsJson)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const userJson = JSON.parse(form.dataset.user ?? '{}')
   const user = UserDetails.parse(userJson)
   if (!AssetHash.check(props.asset.hashOrId.toString())) {

@@ -40,7 +40,7 @@ export class TransactionController {
     txHash: Hash256
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const collateralAsset = this.pageContextService.getCollateralAsset(context)
+
     const [sentTransaction, forcedTradeOffer, userTransaction] =
       await Promise.all([
         this.sentTransactionRepository.findByTransactionHash(txHash),

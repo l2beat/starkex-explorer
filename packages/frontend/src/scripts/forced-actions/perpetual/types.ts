@@ -1,6 +1,6 @@
+import { UserDetails } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
-import { UserDetails } from '@explorer/shared'
 import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 
 export interface FormState {
