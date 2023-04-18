@@ -9,5 +9,6 @@ export interface Column {
   header: ReactNode
   numeric?: boolean
   monospace?: boolean
+  align?: 'center'
   className?: string
 }

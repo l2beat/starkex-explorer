@@ -1,6 +1,7 @@
 import cx from 'classnames'
 import React from 'react'
 
+import classNames from 'classnames'
 import { AssetInfo } from '../../utils/assets'
 import { InlineEllipsis } from './InlineEllipsis'
 
@@ -8,12 +9,14 @@ interface AssetWithLogoProps {
   assetInfo: AssetInfo
   type?: 'full' | 'regular' | 'small' | 'symbol'
   className?: string
+  symbolClassName?: string
 }
 
 export function AssetWithLogo({
   type = 'regular',
   assetInfo,
   className,
+  symbolClassName,
 }: AssetWithLogoProps) {
   return (
     <div className={cx('flex items-center', className)}>
@@ -36,7 +39,12 @@ export function AssetWithLogo({
         {type === 'full' && (
           <div>
             <div>{assetInfo.name}</div>
-            <InlineEllipsis className="mt-2 max-w-[80px] !py-0 text-xs text-zinc-500">
+            <InlineEllipsis
+              className={classNames(
+                'mt-2 max-w-[80px] !py-0 text-xs text-zinc-500',
+                symbolClassName
+              )}
+            >
               {assetInfo.symbol}
             </InlineEllipsis>
           </div>
@@ -45,7 +53,9 @@ export function AssetWithLogo({
           (assetInfo.isUnknownHash ? (
             <div>
               <div>{assetInfo.name}</div>
-              <InlineEllipsis className="max-w-[100px] !py-0">
+              <InlineEllipsis
+                className={classNames('max-w-[100px] !py-0', symbolClassName)}
+              >
                 {assetInfo.symbol}
               </InlineEllipsis>
             </div>
@@ -53,7 +63,9 @@ export function AssetWithLogo({
             assetInfo.symbol
           ))}
         {(type === 'small' || type === 'symbol') && (
-          <InlineEllipsis className="max-w-[160px] !py-0">
+          <InlineEllipsis
+            className={classNames('max-w-[160px] !py-0', symbolClassName)}
+          >
             {assetInfo.symbol}
           </InlineEllipsis>
         )}

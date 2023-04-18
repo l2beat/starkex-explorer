@@ -1,9 +1,14 @@
-import { assertUnreachable, PageContext } from '@explorer/shared'
+import {
+  assertUnreachable,
+  CollateralAsset,
+  PageContext,
+} from '@explorer/shared'
 import { Timestamp } from '@explorer/types'
 import { default as React, ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../utils/assets'
 import { formatAmount } from '../../../utils/formatting/formatAmount'
+import { ArrowRightIcon } from '../../assets/icons/ArrowIcon'
 import { AssetWithLogo } from '../AssetWithLogo'
 import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
@@ -42,38 +47,23 @@ export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
     { header: 'Time' },
     { header: 'Id' },
-    { header: 'Asset' },
-    { header: 'Amount', numeric: true },
-    { header: 'Price', numeric: true },
-    { header: 'Total price', numeric: true },
+    { header: 'Trade', align: 'center' },
     ...(props.showStatus ? [{ header: 'Status' }] : []),
     ...(props.showRole ? [{ header: 'Role' }] : []),
     { header: 'Type' },
   ]
-  if (props.context.tradingMode !== 'perpetual') {
-    return null
-  }
-  const collateralAsset = props.context.collateralAsset
+
   return (
     <Table
       columns={columns}
       rows={props.offers.map((offer) => {
-        const amount = formatAmount(offer.syntheticAsset, offer.syntheticAmount)
-        const totalPrice = formatAmount(
-          { hashOrId: collateralAsset.assetId },
-          offer.collateralAmount
-        )
-
         const cells: ReactNode[] = [
           <TimeCell timestamp={offer.timestamp} />,
           <Link>#{offer.id}</Link>,
-          <AssetWithLogo
-            type="small"
-            assetInfo={assetToInfo(offer.syntheticAsset)}
+          <TradeColumn
+            offer={offer}
+            collateralAsset={props.context.collateralAsset}
           />,
-          amount,
-          0, //TODO: price
-          totalPrice,
           ...(props.showStatus
             ? [
                 <StatusBadge type={toStatusType(offer.status)}>
@@ -93,6 +83,54 @@ export function OffersTable(props: OffersTableProps) {
         }
       })}
     />
+  )
+}
+
+interface Props {
+  offer: OfferEntry
+  collateralAsset: CollateralAsset
+}
+
+function TradeColumn({ offer, collateralAsset }: Props) {
+  const trade =
+    offer.type === 'SELL'
+      ? {
+          offeredAmount: offer.syntheticAmount,
+          offeredAsset: offer.syntheticAsset,
+          receivedAmount: offer.collateralAmount,
+          receivedAsset: {
+            hashOrId: collateralAsset.assetId,
+          },
+        }
+      : {
+          offeredAmount: offer.collateralAmount,
+          offeredAsset: {
+            hashOrId: collateralAsset.assetId,
+          },
+          receivedAmount: offer.syntheticAmount,
+          receivedAsset: offer.syntheticAsset,
+        }
+
+  return (
+    <div className="flex flex-1 items-center">
+      <div className="flex items-center gap-2">
+        {formatAmount(trade.offeredAsset, trade.offeredAmount)}
+        <AssetWithLogo
+          type="small"
+          assetInfo={assetToInfo(trade.offeredAsset)}
+          symbolClassName="max-w-[60px]"
+        />
+      </div>
+      <ArrowRightIcon className="mx-1 flex-1" />
+      <div className="flex items-center gap-2">
+        {formatAmount(trade.receivedAsset, trade.receivedAmount)}
+        <AssetWithLogo
+          type="small"
+          assetInfo={assetToInfo(trade.receivedAsset)}
+          symbolClassName="max-w-[60px]"
+        />
+      </div>
+    </div>
   )
 }
 
