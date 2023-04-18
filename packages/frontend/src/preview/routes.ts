@@ -480,7 +480,7 @@ const routes: Route[] = [
     path: '/forced/new/spot/withdraw',
     description: 'Form to create a new spot forced withdrawal.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getSpotPageContext(ctx, true)
       ctx.body = renderNewSpotForcedWithdrawPage({
         context,
         starkKey: StarkKey.fake(),

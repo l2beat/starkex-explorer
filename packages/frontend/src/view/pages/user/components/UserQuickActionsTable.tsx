@@ -29,9 +29,11 @@ export type FinalizableOfferEntry = Omit<OfferEntry, 'status' | 'role'>
 export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   if (
     props.withdrawableAssets.length === 0 &&
-    (!props.isMine ||
-      props.context.tradingMode !== 'perpetual' ||
-      props.finalizableOffers.length === 0)
+    !(
+      props.context.tradingMode === 'perpetual' &&
+      props.isMine &&
+      props.finalizableOffers.length
+    )
   ) {
     return null
   }
@@ -41,7 +43,12 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
       {props.withdrawableAssets.length > 0 && <WithdrawableAssets {...props} />}
       {props.context.tradingMode === 'perpetual' &&
         props.isMine &&
-        props.finalizableOffers.length > 0 && <OffersToFinalize {...props} />}
+        props.finalizableOffers.length > 0 && (
+          <OffersToFinalize
+            finalizableOffers={props.finalizableOffers}
+            context={props.context}
+          />
+        )}
     </section>
   )
 }
@@ -91,14 +98,13 @@ function WithdrawableAssets(
 }
 
 function OffersToFinalize(
-  props: Pick<UserQuickActionsTableProps, 'finalizableOffers' | 'context'>
-) {
-  if (props.context.tradingMode !== 'perpetual') {
-    return null
+  props: Pick<UserQuickActionsTableProps, 'finalizableOffers'> & {
+    context: PageContext<'perpetual'>
   }
-
-  const collateralAsset = props.context.collateralAsset
-  const collateralAssetInfo = assetToInfo({ hashOrId: collateralAsset.assetId })
+) {
+  const collateralAssetInfo = assetToInfo({
+    hashOrId: props.context.collateralAsset.assetId,
+  })
 
   return (
     <div>
@@ -126,7 +132,7 @@ function OffersToFinalize(
               in exchange for{' '}
               <strong className="text-white">
                 {formatAmount(
-                  { hashOrId: collateralAsset.assetId },
+                  { hashOrId: props.context.collateralAsset.assetId },
                   offer.collateralAmount
                 )}{' '}
                 <InlineEllipsis className="max-w-[80px]">

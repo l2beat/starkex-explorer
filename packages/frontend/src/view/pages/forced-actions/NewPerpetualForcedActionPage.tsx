@@ -16,7 +16,7 @@ import {
 } from './NewForcedActionFormProps'
 
 type NewPerpetualForcedActionPageProps = NewForcedActionFormProps & {
-  context: PageContextWithUser
+  context: PageContextWithUser<'perpetual'>
 }
 
 function NewPerpetualForcedActionPage(

@@ -19,7 +19,7 @@ import {
 export const SPOT_FORCED_WITHDRAWAL_FORM_ID = 'spot-withdraw-form'
 
 type Props = NewForcedActionFormProps & {
-  context: PageContextWithUser
+  context: PageContextWithUser<'spot'>
 }
 
 function NewSpotForcedWithdrawalPage(props: Props) {
