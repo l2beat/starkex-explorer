@@ -88,10 +88,9 @@ export function randomUserOfferEntry(): OfferEntry {
   return {
     timestamp: randomTimestamp(),
     id: randomId(),
-    asset: assetBucket.pick(),
-    amount: amountBucket.pick(),
-    price: amountBucket.pick(),
-    totalPrice: amountBucket.pick(),
+    syntheticAsset: assetBucket.pick(),
+    syntheticAmount: amountBucket.pick(),
+    collateralAmount: amountBucket.pick(),
     status: offerStatusBucket.pick(),
     type: offerTypeBucket.pick(),
   }

@@ -521,8 +521,7 @@ export class Application {
       forcedTradeOfferViewService,
       userTransactionRepository,
       forcedTradeOfferRepository,
-      preprocessedStateDetailsRepository,
-      collateralAsset
+      preprocessedStateDetailsRepository
     )
 
     const userController = new UserController(
@@ -544,8 +543,7 @@ export class Application {
       assetDetailsService,
       stateUpdateRepository,
       userTransactionRepository,
-      preprocessedAssetHistoryRepository,
-      collateralAsset
+      preprocessedAssetHistoryRepository
     )
     const transactionController = new TransactionController(
       pageContextService,
@@ -553,8 +551,7 @@ export class Application {
       forcedTradeOfferRepository,
       userTransactionRepository,
       userRegistrationEventRepository,
-      assetRepository,
-      collateralAsset
+      assetRepository
     )
     const merkleProofController = new MerkleProofController(
       pageContextService,

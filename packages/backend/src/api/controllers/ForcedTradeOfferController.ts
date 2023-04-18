@@ -39,6 +39,10 @@ export class ForcedTradeOfferController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
+    if (context.tradingMode != 'perpetual') {
+      return { type: 'not found', content: 'Page not found.' }
+    }
+
     const offer = await this.offerRepository.findById(id)
 
     if (!offer) {
@@ -106,14 +110,13 @@ export class ForcedTradeOfferController {
       maker,
       taker,
       type: offer.isABuyingSynthetic ? 'BUY' : 'SELL',
-      collateralAsset: { hashOrId: this.collateralAsset.assetId },
       collateralAmount: offer.collateralAmount,
       syntheticAsset: { hashOrId: offer.syntheticAssetId },
       syntheticAmount: offer.syntheticAmount,
       expirationTimestamp: offer.accepted?.submissionExpirationTime,
       history: transactionHistory.getForcedTradeTransactionHistory(),
       acceptOfferFormData:
-        user && getAcceptOfferFormData(offer, user, this.collateralAsset),
+        user && getAcceptOfferFormData(offer, user, context.collateralAsset),
       cancelOfferFormData: user && getCancelOfferFormData(offer, user),
       finalizeOfferFormData:
         user &&
@@ -121,7 +124,7 @@ export class ForcedTradeOfferController {
           offer,
           user,
           this.perpetualAddress,
-          this.collateralAsset
+          context.collateralAsset
         ),
     })
 

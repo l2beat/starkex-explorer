@@ -20,7 +20,7 @@ import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface SpotForcedWithdrawalPageProps {
-  context: PageContext
+  context: PageContext<'spot'>
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey

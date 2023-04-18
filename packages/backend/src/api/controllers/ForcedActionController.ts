@@ -30,6 +30,10 @@ export class ForcedActionController {
       return { type: 'not found', content: 'User not found' }
     }
 
+    if (context.tradingMode !== 'spot') {
+      return { type: 'not found', content: 'Page not found' }
+    }
+
     const assets =
       await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
         vaultId
@@ -77,6 +81,10 @@ export class ForcedActionController {
       return { type: 'not found', content: 'User not found' }
     }
 
+    if (context.tradingMode !== 'perpetual') {
+      return { type: 'not found', content: 'Page not found' }
+    }
+
     const assets =
       await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
         positionId
@@ -121,6 +129,10 @@ export class ForcedActionController {
 
     if (!context) {
       return { type: 'not found', content: 'User not found' }
+    }
+
+    if (context.tradingMode !== 'perpetual') {
+      return { type: 'not found', content: 'Page not found' }
     }
 
     const assets =

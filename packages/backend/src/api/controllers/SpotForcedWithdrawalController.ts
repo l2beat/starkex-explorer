@@ -26,6 +26,10 @@ export class SpotForcedWithdrawalController {
       return { type: 'not found', content: 'User must be logged in' }
     }
 
+    if (context.tradingMode !== 'spot') {
+      return { type: 'not found', content: 'Page not found' }
+    }
+
     const assets =
       await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
         vaultId

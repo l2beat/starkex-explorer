@@ -21,7 +21,7 @@ import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface PerpetualForcedWithdrawalPageProps {
-  context: PageContext
+  context: PageContext<'perpetual'>
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey

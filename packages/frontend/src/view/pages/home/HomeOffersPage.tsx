@@ -9,7 +9,7 @@ import { reactToHtml } from '../../reactToHtml'
 import { OFFER_TABLE_PROPS } from './common'
 
 export interface HomeOffersPageProps {
-  context: PageContext
+  context: PageContext<'perpetual'>
   offers: OfferEntry[]
   limit: number
   offset: number
@@ -35,7 +35,11 @@ function HomeOffersPage(props: HomeOffersPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <OffersTable showStatus={false} offers={props.offers} />
+          <OffersTable
+            showStatus={false}
+            offers={props.offers}
+            context={props.context}
+          />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

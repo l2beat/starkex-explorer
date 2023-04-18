@@ -1,4 +1,7 @@
-import { deserializeFinalizeOfferData } from '@explorer/shared'
+import {
+  deserializeCollateralAsset,
+  deserializeFinalizeOfferData,
+} from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 // eslint-disable-next-line no-restricted-imports
@@ -19,10 +22,14 @@ export function initFinalizeForm() {
       const perpetualAddress = EthereumAddress(
         getAttribute(form, 'perpetual-address')
       )
+      const collateralAsset = deserializeCollateralAsset(
+        getAttribute(form, 'collateral-asset')
+      )
       const hash = await Wallet.sendPerpetualForcedTradeTransaction(
         address,
         offer,
-        perpetualAddress
+        perpetualAddress,
+        collateralAsset
       )
       await Api.submitPerpetualForcedTrade(offerId, hash)
       window.location.href = `/forced/${hash.toString()}`

@@ -74,9 +74,9 @@ function UserPage(props: UserPageProps) {
               withdrawableAssets={props.withdrawableAssets}
               finalizableOffers={props.finalizableOffers}
               isMine={isMine}
+              context={props.context}
               exchangeAddress={props.exchangeAddress}
               starkKey={props.starkKey}
-              user={props.context.user}
             />
           </div>
         </section>
@@ -115,7 +115,12 @@ function UserPage(props: UserPageProps) {
             visible={props.offers.length}
             total={props.totalOffers}
           >
-            <OffersTable showStatus showRole offers={props.offers} />
+            <OffersTable
+              showStatus
+              showRole
+              offers={props.offers}
+              context={props.context}
+            />
           </TablePreview>
         )}
       </ContentWrapper>

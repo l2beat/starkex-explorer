@@ -16,7 +16,7 @@ export async function submit(state: FormState) {
 
 async function submitExit(state: FormState) {
   const hash = await Wallet.sendPerpetualForcedWithdrawalTransaction(
-    state.props.context.user.address,
+    state.user.address,
     state.props.starkKey,
     state.props.positionOrVaultId,
     state.amountInputValue,
@@ -38,10 +38,7 @@ async function submitOffer(state: FormState) {
     isABuyingSynthetic: isBuyable(state.assetId, state.balance),
   }
 
-  const signature = await Wallet.signOfferCreate(
-    state.props.context.user.address,
-    offer
-  )
+  const signature = await Wallet.signOfferCreate(state.user.address, offer)
 
   const offerId = await Api.createOffer(offer, signature)
   window.location.href = `/offers/${offerId}`
