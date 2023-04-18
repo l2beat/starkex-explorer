@@ -133,11 +133,7 @@ export class Application {
       logger
     )
     const userService = new UserService(userRegistrationEventRepository)
-    const pageContextService = new PageContextService(
-      config,
-      userService,
-      collateralAsset
-    )
+    const pageContextService = new PageContextService(config, userService)
     const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
       database,
       logger

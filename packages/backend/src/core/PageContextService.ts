@@ -12,23 +12,18 @@ import { UserService } from './UserService'
 export class PageContextService {
   constructor(
     private readonly config: Config,
-    private readonly userService: UserService,
-    private readonly collateralAsset: CollateralAsset | undefined
+    private readonly userService: UserService
   ) {}
 
   async getPageContext(givenUser: Partial<UserDetails>): Promise<PageContext> {
     const user = await this.userService.getUserDetails(givenUser)
 
     if (this.config.starkex.tradingMode === 'perpetual') {
-      if (!this.collateralAsset) {
-        throw new Error('Collateral asset not set for perpetuals')
-      }
-
       return {
         user,
         tradingMode: this.config.starkex.tradingMode,
         instanceName: this.config.starkex.instanceName,
-        collateralAsset: this.collateralAsset,
+        collateralAsset: this.config.starkex.collateralAsset,
       }
     }
 
