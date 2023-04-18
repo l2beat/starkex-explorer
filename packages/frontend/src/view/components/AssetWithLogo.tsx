@@ -1,7 +1,6 @@
-import cx from 'classnames'
+import classNames from 'classnames'
 import React from 'react'
 
-import classNames from 'classnames'
 import { AssetInfo } from '../../utils/assets'
 import { InlineEllipsis } from './InlineEllipsis'
 
@@ -19,10 +18,10 @@ export function AssetWithLogo({
   symbolClassName,
 }: AssetWithLogoProps) {
   return (
-    <div className={cx('flex items-center', className)}>
+    <div className={classNames('flex items-center', className)}>
       <img
         data-src={assetInfo.imageUrl}
-        className={cx(
+        className={classNames(
           'rounded-full',
           type === 'small' && 'h-[20px] w-[20px]',
           type === 'regular' && 'h-6 w-6',
@@ -31,7 +30,7 @@ export function AssetWithLogo({
         data-fallback="/images/unknown-asset.svg"
       />
       <span
-        className={cx(
+        className={classNames(
           'ml-2',
           type === 'small' ? 'text-sm font-medium' : 'text-lg font-semibold'
         )}
