@@ -63,12 +63,7 @@ function WithdrawableAssets(
     <div>
       <p className="text-sm font-semibold text-zinc-500">Withdrawable assets</p>
       {props.withdrawableAssets.map((asset) => {
-        const collateralAsset =
-          props.context.tradingMode === 'perpetual'
-            ? props.context.collateralAsset
-            : undefined
-
-        const assetInfo = assetToInfo(asset.asset, collateralAsset)
+        const assetInfo = assetToInfo(asset.asset)
         return (
           <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
             <AssetWithLogo

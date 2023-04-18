@@ -1,4 +1,4 @@
-import { AssetDetails, CollateralAsset, stringAs } from '@explorer/shared'
+import { AssetDetails, stringAs } from '@explorer/shared'
 import { AssetHash, AssetId } from '@explorer/types'
 import { z } from 'zod'
 
@@ -15,19 +15,10 @@ export interface AssetInfo {
   imageUrl: string
 }
 
-export function assetToInfo(
-  asset: Asset,
-  collateralAsset?: CollateralAsset
-): AssetInfo {
-  //There is the case where the collateral asset is represented by a hash
-  //I.e. in LogWithdrawalAllowed
-  const hashOrId =
-    asset.details && asset.details.assetHash === collateralAsset?.assetHash
-      ? collateralAsset.assetId
-      : asset.hashOrId
-  return AssetId.check(hashOrId)
-    ? assetIdToInfo(hashOrId)
-    : assetHashToInfo(hashOrId, asset.details)
+export function assetToInfo(asset: Asset): AssetInfo {
+  return AssetId.check(asset.hashOrId)
+    ? assetIdToInfo(asset.hashOrId)
+    : assetHashToInfo(asset.hashOrId, asset.details)
 }
 
 function assetIdToInfo(assetId: AssetId): AssetInfo {
