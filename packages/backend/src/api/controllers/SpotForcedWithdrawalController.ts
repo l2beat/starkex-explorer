@@ -24,6 +24,10 @@ export class SpotForcedWithdrawalController {
       givenUser
     )
 
+    if (context?.tradingMode !== 'spot') {
+      return { type: 'not found', content: 'Page not found' }
+    }
+
     if (!context) {
       return { type: 'not found', content: 'User must be logged in' }
     }

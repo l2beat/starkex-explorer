@@ -28,6 +28,10 @@ export class ForcedActionController {
       givenUser
     )
 
+    if (context?.tradingMode !== 'spot') {
+      return { type: 'not found', content: 'Page not found' }
+    }
+
     if (!context) {
       return { type: 'not found', content: 'User not found' }
     }
@@ -75,6 +79,10 @@ export class ForcedActionController {
       givenUser
     )
 
+    if (context?.tradingMode !== 'perpetual') {
+      return { type: 'not found', content: 'Page not found' }
+    }
+
     if (!context) {
       return { type: 'not found', content: 'User not found' }
     }
@@ -120,6 +128,10 @@ export class ForcedActionController {
     const context = await this.pageContextService.getPageContextWithUser(
       givenUser
     )
+
+    if (context?.tradingMode !== 'perpetual') {
+      return { type: 'not found', content: 'Page not found' }
+    }
 
     if (!context) {
       return { type: 'not found', content: 'User not found' }
