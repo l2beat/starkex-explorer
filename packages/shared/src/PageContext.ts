@@ -1,6 +1,14 @@
 import { CollateralAsset } from './CollateralAsset'
 import { InstanceName } from './InstanceName'
+import { TradingMode } from './TradingMode'
 import { UserDetails } from './UserDetails'
+
+type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
+  T['tradingMode'],
+  TradingMode
+> extends never
+  ? T
+  : never
 
 export interface PerpetualPageContext {
   user: UserDetails | undefined
@@ -15,24 +23,18 @@ export interface SpotPageContext {
   tradingMode: 'spot'
 }
 
-export type PageContext<
-  T extends PerpetualPageContext | SpotPageContext =
-    | PerpetualPageContext
-    | SpotPageContext
-> = T
+export type PageContext = CheckTradingMode<
+  PerpetualPageContext | SpotPageContext
+>
 
-export type PageContextWithUser<
-  T extends PerpetualPageContext | SpotPageContext =
-    | PerpetualPageContext
-    | SpotPageContext
-> = PageContext<T> & {
-  user: UserDetails
-}
+export type PageContextWithUser = CheckTradingMode<
+  PageContext & {
+    user: UserDetails
+  }
+>
 
-export type PageContextWithUserAndStarkKey<
-  T extends PerpetualPageContext | SpotPageContext =
-    | PerpetualPageContext
-    | SpotPageContext
-> = T & {
-  user: Required<UserDetails>
-}
+export type PageContextWithUserAndStarkKey = CheckTradingMode<
+  PageContextWithUser & {
+    user: Required<UserDetails>
+  }
+>
