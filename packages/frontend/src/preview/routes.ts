@@ -4,6 +4,7 @@ import {
   PageContext,
   PageContextWithUser,
   PerpetualPageContext,
+  SpotPageContext,
   UserDetails,
 } from '@explorer/shared'
 import {
@@ -580,7 +581,7 @@ const routes: Route[] = [
     description: 'Transaction view of a sent spot forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
+      const context = getSpotPageContext(ctx)
       ctx.body = renderSpotForcedWithdrawalPage({
         context,
         transactionHash: Hash256.fake(),
@@ -595,7 +596,7 @@ const routes: Route[] = [
     description: 'Transaction view of a mined spot forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
+      const context = getSpotPageContext(ctx)
       ctx.body = renderSpotForcedWithdrawalPage({
         context,
         transactionHash: Hash256.fake(),
@@ -613,7 +614,7 @@ const routes: Route[] = [
     description: 'Transaction view of a reverted spot forced withdrawal.',
     isTransactionPage: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
+      const context = getSpotPageContext(ctx)
       ctx.body = renderSpotForcedWithdrawalPage({
         context,
         transactionHash: Hash256.fake(),
@@ -632,7 +633,7 @@ const routes: Route[] = [
     isTransactionPage: true,
     breakAfter: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
+      const context = getSpotPageContext(ctx)
       ctx.body = renderSpotForcedWithdrawalPage({
         context,
         transactionHash: Hash256.fake(),
@@ -1102,5 +1103,26 @@ function getPerpetualPageContext(
     instanceName: 'dYdX',
     tradingMode: 'perpetual',
     collateralAsset: fakeCollateralAsset,
+  } as const
+}
+
+function getSpotPageContext(
+  ctx: Koa.Context,
+  fallbackToFakeUser: true
+): PageContextWithUser<SpotPageContext>
+function getSpotPageContext(
+  ctx: Koa.Context,
+  fallbackToFakeUser?: false
+): PageContext<SpotPageContext>
+function getSpotPageContext(
+  ctx: Koa.Context,
+  fallbackToFakeUser?: boolean
+): PageContextWithUser<SpotPageContext> | PageContext<SpotPageContext> {
+  const user = getUser(ctx) ?? (fallbackToFakeUser ? getFakeUser() : undefined)
+
+  return {
+    user,
+    instanceName: 'Myria',
+    tradingMode: 'spot',
   } as const
 }
