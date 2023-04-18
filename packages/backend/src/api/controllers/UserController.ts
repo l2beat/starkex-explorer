@@ -10,7 +10,12 @@ import {
   UserAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
-import { CollateralAsset, TradingMode, UserDetails } from '@explorer/shared'
+import {
+  CollateralAsset,
+  ERC20Details,
+  TradingMode,
+  UserDetails,
+} from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
@@ -197,7 +202,22 @@ export class UserController {
             collateralAsset?.assetHash === asset.assetHash
               ? collateralAsset.assetId
               : asset.assetHash,
-          details: assetDetailsMap?.getByAssetHash(asset.assetHash),
+          details:
+            context.tradingMode === 'perpetual'
+              ? // TODO: this is a hack to get the regular withdrawals working for perpetuals
+                // This should be revised mandatory in phase 2!
+                ERC20Details.parse({
+                  assetHash: context.collateralAsset.assetHash,
+                  assetTypeHash: context.collateralAsset.assetHash,
+                  type: 'ERC20',
+                  quantum: AssetId.decimals(context.collateralAsset.assetId),
+                  contractError: [],
+                  address: EthereumAddress.ZERO,
+                  name: AssetId.symbol(context.collateralAsset.assetId),
+                  symbol: AssetId.symbol(context.collateralAsset.assetId),
+                  decimals: 2,
+                })
+              : assetDetailsMap?.getByAssetHash(asset.assetHash),
         },
         amount: asset.withdrawableBalance,
       })),
