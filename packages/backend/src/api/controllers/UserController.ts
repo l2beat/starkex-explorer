@@ -210,9 +210,9 @@ export class UserController {
                   assetHash: context.collateralAsset.assetHash,
                   assetTypeHash: context.collateralAsset.assetHash,
                   type: 'ERC20',
-                  quantum: BigInt(
-                    AssetId.decimals(context.collateralAsset.assetId)
-                  ),
+                  quantum: AssetId.decimals(
+                    context.collateralAsset.assetId
+                  ).toString(),
                   contractError: [],
                   address: EthereumAddress.ZERO,
                   name: AssetId.symbol(context.collateralAsset.assetId),
