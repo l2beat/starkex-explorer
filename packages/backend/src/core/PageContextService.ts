@@ -62,4 +62,12 @@ export class PageContextService {
 
     return context as PageContextWithUserAndStarkKey
   }
+
+  getCollateralAsset(context: PageContext): CollateralAsset | undefined {
+    if (context.tradingMode === 'perpetual') {
+      return context.collateralAsset
+    }
+
+    return undefined
+  }
 }

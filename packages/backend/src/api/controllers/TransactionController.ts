@@ -4,12 +4,7 @@ import {
   renderRegularWithdrawalPage,
   renderSpotForcedWithdrawalPage,
 } from '@explorer/frontend'
-import {
-  assertUnreachable,
-  CollateralAsset,
-  PageContext,
-  UserDetails,
-} from '@explorer/shared'
+import { assertUnreachable, PageContext, UserDetails } from '@explorer/shared'
 import { Hash256 } from '@explorer/types'
 
 import { PageContextService } from '../../core/PageContextService'
@@ -37,40 +32,37 @@ export class TransactionController {
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
-    private readonly assetRepository: AssetRepository,
-    private readonly collateralAsset?: CollateralAsset
+    private readonly assetRepository: AssetRepository
   ) {}
 
   async getTransactionPage(
     givenUser: Partial<UserDetails>,
     txHash: Hash256
   ): Promise<ControllerResult> {
-    const [context, sentTransaction, forcedTradeOffer, userTransaction] =
+    const context = await this.pageContextService.getPageContext(givenUser)
+    const collateralAsset = this.pageContextService.getCollateralAsset(context)
+    const [sentTransaction, forcedTradeOffer, userTransaction] =
       await Promise.all([
-        await this.pageContextService.getPageContext(givenUser),
         this.sentTransactionRepository.findByTransactionHash(txHash),
         this.forcedTradeOfferRepository.findByTransactionHash(txHash),
         this.userTransactionRepository.findByTransactionHash(txHash),
       ])
 
     if (sentTransaction && !userTransaction) {
-      const content = await this.getTransactionPageForSentTransaction(
+      return await this.getTransactionPageForSentTransaction(
         context,
         sentTransaction,
         forcedTradeOffer
       )
-      return { type: 'success', content }
     }
 
     if (userTransaction) {
-      const content = await this.getTransactionPageForUserTransaction(
+      return await this.getTransactionPageForUserTransaction(
         context,
         userTransaction,
         sentTransaction,
         forcedTradeOffer
       )
-
-      return { type: 'success', content }
     }
 
     return { type: 'not found', content: 'Transaction not found' }
@@ -81,13 +73,11 @@ export class TransactionController {
     userTransaction: UserTransactionRecord,
     sentTransaction: SentTransactionRecord | undefined,
     forcedTradeOffer: ForcedTradeOfferRecord | undefined
-  ) {
+  ): Promise<ControllerResult> {
     switch (userTransaction.data.type) {
       case 'ForcedWithdrawal': {
-        if (!this.collateralAsset) {
-          throw new Error(
-            'Collateral asset not passed when displaying ForcedWithdrawal'
-          )
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found', content: 'Page not found' }
         }
         const txUser =
           await this.userRegistrationEventRepository.findByStarkKey(
@@ -98,19 +88,20 @@ export class TransactionController {
           userTransaction: userTransaction,
         })
 
-        return renderPerpetualForcedWithdrawalPage({
+        const content = renderPerpetualForcedWithdrawalPage({
           context,
           transactionHash: userTransaction.transactionHash,
           recipient: {
             starkKey: userTransaction.data.starkKey,
             ethereumAddress: txUser?.ethAddress,
           },
-          asset: { hashOrId: this.collateralAsset.assetId },
+          asset: { hashOrId: context.collateralAsset.assetId },
           amount: userTransaction.data.quantizedAmount,
           positionId: userTransaction.data.positionId.toString(),
           history: transactionHistory.getForcedTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
+        return { type: 'success', content }
       }
       case 'FullWithdrawal': {
         const txUser =
@@ -121,7 +112,7 @@ export class TransactionController {
           sentTransaction,
           userTransaction,
         })
-        return renderSpotForcedWithdrawalPage({
+        const content = renderSpotForcedWithdrawalPage({
           context,
           transactionHash: userTransaction.transactionHash,
           recipient: {
@@ -132,8 +123,12 @@ export class TransactionController {
           history: transactionHistory.getForcedTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
+        return { type: 'success', content }
       }
       case 'ForcedTrade': {
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found', content: 'Page not found' }
+        }
         const [userA, userB] = await Promise.all([
           this.userRegistrationEventRepository.findByStarkKey(
             userTransaction.data.starkKeyA
@@ -143,7 +138,7 @@ export class TransactionController {
           ),
         ])
         if (!userA) {
-          throw new Error('User A not found')
+          return { type: 'not found', content: 'User not found' }
         }
         const maker = {
           starkKey: userA.starkKey,
@@ -163,14 +158,13 @@ export class TransactionController {
           sentTransaction,
           userTransaction,
         })
-        return renderOfferAndForcedTradePage({
+        const content = renderOfferAndForcedTradePage({
           context,
           transactionHash: userTransaction.transactionHash,
           offerId: forcedTradeOffer?.id.toString(),
           maker,
           taker,
           type: userTransaction.data.isABuyingSynthetic ? 'BUY' : 'SELL',
-          collateralAsset: { hashOrId: userTransaction.data.collateralAssetId },
           collateralAmount: userTransaction.data.collateralAmount,
           syntheticAsset: { hashOrId: userTransaction.data.syntheticAssetId },
           syntheticAmount: userTransaction.data.syntheticAmount,
@@ -180,6 +174,7 @@ export class TransactionController {
           history: transactionHistory.getForcedTradeTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
+        return { type: 'success', content }
       }
       case 'Withdraw':
       case 'WithdrawWithTokenId':
@@ -191,8 +186,8 @@ export class TransactionController {
         const data = userTransaction.data
         const assetHash =
           data.type === 'Withdraw'
-            ? this.collateralAsset
-              ? this.collateralAsset.assetId
+            ? context.tradingMode === 'perpetual'
+              ? context.collateralAsset.assetId
               : data.assetType
             : data.assetId
 
@@ -208,7 +203,7 @@ export class TransactionController {
             )
           recipientEthAddress = recipient?.ethAddress
         }
-        return renderRegularWithdrawalPage({
+        const content = renderRegularWithdrawalPage({
           context,
           transactionHash: userTransaction.transactionHash,
           recipient: {
@@ -220,6 +215,7 @@ export class TransactionController {
           history: transactionHistory.getRegularTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
+        return { type: 'success', content }
       }
       default:
         assertUnreachable(userTransaction.data)
@@ -230,9 +226,13 @@ export class TransactionController {
     context: PageContext,
     sentTransaction: SentTransactionRecord,
     forcedTradeOffer: ForcedTradeOfferRecord | undefined
-  ) {
+  ): Promise<ControllerResult> {
     switch (sentTransaction.data.type) {
       case 'ForcedTrade': {
+        if (context.tradingMode != 'perpetual') {
+          return { type: 'not found', content: 'Page not found' }
+        }
+
         const [userA, userB] = await Promise.all([
           this.userRegistrationEventRepository.findByStarkKey(
             sentTransaction.data.starkKeyA
@@ -241,9 +241,11 @@ export class TransactionController {
             sentTransaction.data.starkKeyB
           ),
         ])
+
         if (!userA) {
-          throw new Error('User A not found')
+          return { type: 'not found', content: 'User not found' }
         }
+
         const maker = {
           starkKey: userA.starkKey,
           ethereumAddress: userA.ethAddress,
@@ -260,26 +262,24 @@ export class TransactionController {
           forcedTradeOffer,
           sentTransaction,
         })
-        return renderOfferAndForcedTradePage({
+        const content = renderOfferAndForcedTradePage({
           context,
           transactionHash: sentTransaction.transactionHash,
           offerId: forcedTradeOffer?.id.toString(),
           maker,
           taker,
           type: sentTransaction.data.isABuyingSynthetic ? 'BUY' : 'SELL',
-          collateralAsset: { hashOrId: sentTransaction.data.collateralAssetId },
           collateralAmount: sentTransaction.data.collateralAmount,
           syntheticAsset: { hashOrId: sentTransaction.data.syntheticAssetId },
           syntheticAmount: sentTransaction.data.syntheticAmount,
           expirationTimestamp: sentTransaction.data.submissionExpirationTime,
           history: transactionHistory.getForcedTradeTransactionHistory(),
         })
+        return { type: 'success', content }
       }
       case 'ForcedWithdrawal': {
-        if (!this.collateralAsset) {
-          throw new Error(
-            'Collateral asset not passed when displaying ForcedWithdrawal'
-          )
+        if (context.tradingMode != 'perpetual') {
+          return { type: 'not found', content: 'Page not found' }
         }
         const txUser =
           await this.userRegistrationEventRepository.findByStarkKey(
@@ -287,18 +287,20 @@ export class TransactionController {
           )
         const transactionHistory = new TransactionHistory({ sentTransaction })
 
-        return renderPerpetualForcedWithdrawalPage({
+        const content = renderPerpetualForcedWithdrawalPage({
           context,
           transactionHash: sentTransaction.transactionHash,
           recipient: {
             starkKey: sentTransaction.data.starkKey,
             ethereumAddress: txUser?.ethAddress,
           },
-          asset: { hashOrId: this.collateralAsset.assetId },
+          asset: { hashOrId: context.collateralAsset.assetId },
           amount: sentTransaction.data.quantizedAmount,
           positionId: sentTransaction.data.positionId.toString(),
           history: transactionHistory.getForcedTransactionHistory(),
         })
+
+        return { type: 'success', content }
       }
 
       case 'Withdraw': {
@@ -306,16 +308,17 @@ export class TransactionController {
           sentTransaction,
         })
         const data = sentTransaction.data
-        const assetHash = this.collateralAsset
-          ? this.collateralAsset.assetId
-          : data.assetType
+        const assetHash =
+          context.tradingMode === 'perpetual'
+            ? context.collateralAsset.assetId
+            : data.assetType
 
         const recipient =
           await this.userRegistrationEventRepository.findByStarkKey(
             sentTransaction.data.starkKey
           )
 
-        return renderRegularWithdrawalPage({
+        const content = renderRegularWithdrawalPage({
           context,
           transactionHash: sentTransaction.transactionHash,
           recipient: {
@@ -325,6 +328,8 @@ export class TransactionController {
           asset: { hashOrId: assetHash },
           history: transactionHistory.getRegularTransactionHistory(),
         })
+
+        return { type: 'success', content }
       }
 
       case 'WithdrawWithTokenId': {
@@ -335,7 +340,7 @@ export class TransactionController {
           )
 
         if (!asset) {
-          throw new Error('Asset not found')
+          return { type: 'not found', content: 'Asset not found' }
         }
 
         const recipient =
@@ -347,7 +352,7 @@ export class TransactionController {
           sentTransaction,
         })
 
-        return renderRegularWithdrawalPage({
+        const content = renderRegularWithdrawalPage({
           context,
           transactionHash: sentTransaction.transactionHash,
           recipient: {
@@ -357,6 +362,8 @@ export class TransactionController {
           asset: { hashOrId: asset.assetHash },
           history: transactionHistory.getRegularTransactionHistory(),
         })
+
+        return { type: 'success', content }
       }
 
       default:

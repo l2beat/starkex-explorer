@@ -11,10 +11,10 @@ import { OfferEntry } from '../../../components/tables/OffersTable'
 import { RegularWithdrawalForm } from './RegularWithdrawalForm'
 
 interface UserQuickActionsTableProps {
+  readonly context: PageContext
   readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
   readonly finalizableOffers: readonly FinalizableOfferEntry[]
   readonly starkKey: StarkKey
-  readonly context: PageContext
   readonly exchangeAddress: EthereumAddress
   readonly isMine?: boolean
 }

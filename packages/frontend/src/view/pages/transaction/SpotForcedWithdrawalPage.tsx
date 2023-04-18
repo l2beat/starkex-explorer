@@ -1,4 +1,4 @@
-import { PageContext } from '@explorer/shared'
+import { PageContext, SpotPageContext } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
@@ -20,7 +20,7 @@ import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
 export interface SpotForcedWithdrawalPageProps {
-  context: PageContext
+  context: SpotPageContext
   transactionHash: Hash256
   recipient: {
     starkKey: StarkKey
