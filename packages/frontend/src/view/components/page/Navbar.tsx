@@ -26,7 +26,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
           <ProjectLogo instanceName={instanceName} />
         </div>
         <span className="py-1 pl-2 text-zinc-500 sm:pl-4">
-          EXPLORER (Development version)
+          {instanceName.toUpperCase()} EXPLORER
         </span>
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4">
