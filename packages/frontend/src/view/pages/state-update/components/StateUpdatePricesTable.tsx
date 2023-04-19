@@ -25,6 +25,7 @@ export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
       {range(tableCount).map((index) => {
         return (
           <Table
+            key={index}
             columns={[{ header: 'Asset' }, { header: 'Price', numeric: true }]}
             rows={props.priceChanges
               .filter((_, txIndex) => txIndex % tableCount === index)
