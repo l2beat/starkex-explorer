@@ -25,7 +25,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
           <ProjectLogo instanceName={instanceName} />
         </div>
-        <span className="py-1 pl-2 text-zinc-500 sm:pl-4">
+        <span className="hidden py-1 pl-2 text-zinc-500 sm:inline sm:pl-4">
           {instanceName.toUpperCase()} EXPLORER
         </span>
       </a>
