@@ -3,9 +3,9 @@ import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
 
-export function getGammaxGoerliConfig(): StarkexConfig {
+export function getApexGoerliConfig(): StarkexConfig {
   return {
-    instanceName: 'GammaX',
+    instanceName: 'ApeX',
     dataAvailabilityMode: 'validium',
     tradingMode: 'perpetual',
     blockchain: {
@@ -13,28 +13,26 @@ export function getGammaxGoerliConfig(): StarkexConfig {
       jsonRpcUrl: getEnv('JSON_RPC_URL'),
       safeBlockDistance: 40,
       syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
-      minBlockNumber: 6934760,
+      minBlockNumber: 7160993,
       maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     contracts: {
-      perpetual: EthereumAddress('0x6E5de338D71af33B57831C5552775f54394d181B'),
+      perpetual: EthereumAddress('0xB0fBAaE46907730D51A50B94704ce5aef13cB993'),
     },
     availabilityGateway: {
-      url: getEnv('GAMMAX_AG_URL'),
-      queryParam: getEnv('GAMMAX_AG_QUERY_PARAM'),
+      url: getEnv('APEX_AG_URL'),
+      queryParam: getEnv('APEX_AG_QUERY_PARAM'),
       auth: {
-        type: 'certificates',
-        serverCertificate: getEnv('GAMMAX_AG_SERVER_CERTIFICATE'),
-        userCertificate: getEnv('GAMMAX_AG_USER_CERTIFICATE'),
-        userKey: getEnv('GAMMAX_AG_USER_KEY'),
+        type: 'bearerToken',
+        bearerToken: getEnv('APEX_AG_BEARER_TOKEN'),
       },
     },
     collateralAsset: {
-      assetId: AssetId('COLLATERAL-1'),
+      assetId: AssetId('SLF-6'),
       assetHash: AssetHash(
-        '0xa21edc9d9997b1b1956f542fe95922518a9e28ace11b7b2972a1974bf5971f'
+        '0x00a21edc9d9997b1b1956f542fe95922518a9e28ace11b7b2972a1974bf5971f'
       ),
-      price: 1n,
+      price: 1_000_000n,
     },
   }
 }

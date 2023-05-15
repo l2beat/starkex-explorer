@@ -86,6 +86,7 @@ function getDydxImageUrl(symbol: string) {
 const perpetualsInfo: Record<string, Omit<AssetInfo, 'imageUrl'>> = {
   ETH: { name: 'Ethereum', symbol: 'ETH' },
   USDC: { name: 'USD Coin', symbol: 'USDC' },
+  SLF: { name: 'Self Service', symbol: 'SLF' },
   BTC: { name: 'Bitcoin', symbol: 'BTC' },
   ADA: { name: 'Cardano', symbol: 'ADA' },
   BCH: { name: 'Bitcoin Cash', symbol: 'BCH' },
