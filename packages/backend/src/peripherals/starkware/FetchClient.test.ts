@@ -4,7 +4,7 @@ import { Response } from 'koa'
 import { Logger } from '../../tools/Logger'
 import { FetchClient } from './FetchClient'
 
-describe.only(FetchClient.name, () => {
+describe(FetchClient.name, () => {
   const fetchClient = new FetchClient(
     mockObject<Logger>({
       for: mockFn(() => Logger.SILENT),
