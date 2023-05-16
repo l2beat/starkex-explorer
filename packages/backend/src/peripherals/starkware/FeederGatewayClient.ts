@@ -4,11 +4,9 @@ import { RequestInit } from 'node-fetch'
 
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { FetchClient } from './FetchClient'
-import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
-import { toPerpetualBatch } from './toPerpetualBatch'
-import { toSpotBatch } from './toSpotBatch'
+import { PerpetualTransactionBatchResponse } from './schema'
 
-export class AvailabilityGatewayClient {
+export class FeederGatewayClient {
   private requestInit: RequestInit
 
   constructor(
@@ -18,19 +16,13 @@ export class AvailabilityGatewayClient {
     this.requestInit = this.getRequestInit(options)
   }
 
-  async getPerpetualBatch(batchId: number) {
-    const data = await this.getBatch(batchId)
-    const parsed = PerpetualBatchResponse.parse(data)
-    return toPerpetualBatch(parsed)
+  async getPerpetualTransactionBatch(batchId: number) {
+    const data = await this.getTransactionBatch(batchId)
+    const parsed = PerpetualTransactionBatchResponse.parse(data)
+    return parsed // TODO: toPerpetualTransactionBatch(parsed)
   }
 
-  async getSpotBatch(batchId: number) {
-    const data = await this.getBatch(batchId)
-    const parsed = SpotBatchResponse.parse(data)
-    return toSpotBatch(parsed)
-  }
-
-  private async getBatch(batchId: number): Promise<unknown> {
+  private async getTransactionBatch(batchId: number): Promise<unknown> {
     const url = `${this.options.url}?${this.options.queryParam}=${batchId}`
 
     const res = await this.fetchClient.fetchRetry(url, this.requestInit)

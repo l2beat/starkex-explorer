@@ -86,6 +86,8 @@ import { WithdrawableAssetRepository } from './peripherals/database/Withdrawable
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
+import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
+import { FetchClient } from './peripherals/starkware/FetchClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
 
@@ -163,6 +165,7 @@ export class Application {
       config.starkex.blockchain.jsonRpcUrl,
       config.starkex.blockchain.safeBlockDistance
     )
+    const fetchClient = new FetchClient(logger)
 
     const tokenInspector = new TokenInspector(ethereumClient)
 
@@ -224,10 +227,15 @@ export class Application {
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
-        config.starkex.availabilityGateway
+        config.starkex.availabilityGateway,
+        fetchClient
       )
 
       if (config.starkex.tradingMode === 'perpetual') {
+        const feederGatewayClient = new FeederGatewayClient(
+          config.starkex.feederGateway,
+          fetchClient
+        )
         const perpetualValidiumStateTransitionCollector =
           new PerpetualValidiumStateTransitionCollector(
             ethereumClient,

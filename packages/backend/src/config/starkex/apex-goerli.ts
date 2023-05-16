@@ -27,6 +27,14 @@ export function getApexGoerliConfig(): StarkexConfig {
         bearerToken: getEnv('APEX_AG_BEARER_TOKEN'),
       },
     },
+    feederGateway: {
+      url: getEnv('APEX_FG_URL'),
+      queryParam: getEnv('APEX_FG_QUERY_PARAM'),
+      auth: {
+        type: 'bearerToken',
+        bearerToken: getEnv('APEX_FG_BEARER_TOKEN'),
+      },
+    },
     collateralAsset: {
       assetId: AssetId('SLF-6'),
       assetHash: AssetHash(
