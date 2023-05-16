@@ -13,6 +13,7 @@ import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
 export class PerpetualValidiumSyncService implements IDataSyncService {
   constructor(
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
+
     private readonly perpetualValidiumStateTransitionCollector: PerpetualValidiumStateTransitionCollector,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly userTransactionCollector: UserTransactionCollector,

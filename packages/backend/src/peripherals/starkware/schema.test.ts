@@ -1,10 +1,18 @@
 import { expect } from 'earl'
+import { it } from 'mocha'
 
 import {
   EXAMPLE_PERPETUAL_BATCH,
+  EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS,
+  EXAMPLE_PERPETUAL_TRANSACTION_BATCH,
   EXAMPLE_SPOT_BATCH,
 } from '../../test/starkwareData'
-import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
+import {
+  PerpetualBatchResponse,
+  PerpetualLiveTransactionResponse,
+  PerpetualTransactionBatchResponse,
+  SpotBatchResponse,
+} from './schema'
 
 describe('PerpetualBatchResponse', () => {
   it('can parse real data', () => {
@@ -25,5 +33,26 @@ describe('SpotBatchResponse', () => {
 
   it('can parse a non-existent update', () => {
     expect(() => SpotBatchResponse.parse({ update: null })).not.toThrow()
+  })
+})
+
+describe('PerpetualTransactionBatchResponse', () => {
+  it('can parse real data', () => {
+    const fn = () =>
+      PerpetualTransactionBatchResponse.parse(
+        EXAMPLE_PERPETUAL_TRANSACTION_BATCH
+      )
+    fn()
+    expect(fn).not.toThrow()
+  })
+})
+
+describe('PerpetualLiveTransactionResponse', () => {
+  it('can parse real data', () => {
+    const fn = () =>
+      PerpetualLiveTransactionResponse.parse(
+        EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS
+      )
+    expect(fn).not.toThrow()
   })
 })

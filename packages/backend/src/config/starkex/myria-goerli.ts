@@ -17,8 +17,9 @@ export function getMyriaGoerliConfig(): StarkexConfig {
       maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     availabilityGateway: {
-      url: getEnv('MYRIA_AG_URL'),
-      queryParam: getEnv('MYRIA_AG_QUERY_PARAM'),
+      getUrl: (batchId: number) => {
+        return `${getEnv('MYRIA_AG_URL')}?batch_id=${batchId}`
+      },
       auth: {
         type: 'certificates',
         serverCertificate: getEnv('MYRIA_AG_SERVER_CERTIFICATE'),

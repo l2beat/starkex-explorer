@@ -4,6 +4,10 @@ import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
 
 export function getApexGoerliConfig(): StarkexConfig {
+  const gatewayAuth = {
+    type: 'bearerToken',
+    bearerToken: getEnv('APEX_BEARER_TOKEN'),
+  } as const
   return {
     instanceName: 'ApeX',
     dataAvailabilityMode: 'validium',
@@ -20,20 +24,24 @@ export function getApexGoerliConfig(): StarkexConfig {
       perpetual: EthereumAddress('0xB0fBAaE46907730D51A50B94704ce5aef13cB993'),
     },
     availabilityGateway: {
-      url: getEnv('APEX_AG_URL'),
-      queryParam: getEnv('APEX_AG_QUERY_PARAM'),
-      auth: {
-        type: 'bearerToken',
-        bearerToken: getEnv('APEX_AG_BEARER_TOKEN'),
+      getUrl: (batchId: number) => {
+        return `${getEnv('APEX_AG_URL')}?batchId=${batchId}`
       },
+      auth: gatewayAuth,
     },
     feederGateway: {
-      url: getEnv('APEX_FG_URL'),
-      queryParam: getEnv('APEX_FG_QUERY_PARAM'),
-      auth: {
-        type: 'bearerToken',
-        bearerToken: getEnv('APEX_FG_BEARER_TOKEN'),
+      getUrl: (batchId: number) => {
+        return `${getEnv('APEX_FG_URL')}?batchId=${batchId}`
       },
+      auth: gatewayAuth,
+    },
+    liveTransactionsGateway: {
+      getUrl: (startId, expectCount) => {
+        return `${getEnv(
+          'APEX_LTG_URL'
+        )}?startApexId=${startId}&expectCount=${expectCount}`
+      },
+      auth: gatewayAuth,
     },
     collateralAsset: {
       assetId: AssetId('SLF-6'),

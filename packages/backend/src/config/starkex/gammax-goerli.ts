@@ -20,8 +20,9 @@ export function getGammaxGoerliConfig(): StarkexConfig {
       perpetual: EthereumAddress('0x6E5de338D71af33B57831C5552775f54394d181B'),
     },
     availabilityGateway: {
-      url: getEnv('GAMMAX_AG_URL'),
-      queryParam: getEnv('GAMMAX_AG_QUERY_PARAM'),
+      getUrl: (batchId: number) => {
+        return `${getEnv('GAMMAX_AG_URL')}?batch_id=${batchId}`
+      },
       auth: {
         type: 'certificates',
         serverCertificate: getEnv('GAMMAX_AG_SERVER_CERTIFICATE'),
@@ -30,6 +31,7 @@ export function getGammaxGoerliConfig(): StarkexConfig {
       },
     },
     feederGateway: undefined,
+    liveTransactionsGateway: undefined,
     collateralAsset: {
       assetId: AssetId('COLLATERAL-1'),
       assetHash: AssetHash(

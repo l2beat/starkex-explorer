@@ -33,6 +33,7 @@ export interface PerpetualValidiumConfig {
   blockchain: BlockchainConfig
   availabilityGateway: GatewayConfig
   feederGateway: GatewayConfig | undefined
+  liveTransactionsGateway: LiveTransactionGatewayConfig | undefined
   contracts: {
     perpetual: EthereumAddress
   }
@@ -59,18 +60,24 @@ export interface BlockchainConfig {
   maxBlockNumber: number
 }
 
+export type GatewayAuth =
+  | {
+      type: 'bearerToken'
+      bearerToken: string
+    }
+  | {
+      type: 'certificates'
+      serverCertificate: string
+      userCertificate: string
+      userKey: string
+    }
+
 export interface GatewayConfig {
-  url: string
-  queryParam: string
-  auth:
-    | {
-        type: 'certificates'
-        serverCertificate: string
-        userCertificate: string
-        userKey: string
-      }
-    | {
-        type: 'bearerToken'
-        bearerToken: string
-      }
+  getUrl: (batchId: number) => string
+  auth: GatewayAuth
+}
+
+export interface LiveTransactionGatewayConfig {
+  getUrl: (startApexId: number, expectCount: number) => string
+  auth: GatewayAuth
 }

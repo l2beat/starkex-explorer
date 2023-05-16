@@ -1,21 +1,16 @@
-import { assertUnreachable } from '@explorer/shared'
-import { Agent } from 'https'
-import { RequestInit } from 'node-fetch'
-
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { FetchClient } from './FetchClient'
+import { GatewayClient } from './GatewayClient'
 import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
 import { toPerpetualBatch } from './toPerpetualBatch'
 import { toSpotBatch } from './toSpotBatch'
 
-export class AvailabilityGatewayClient {
-  private requestInit: RequestInit
-
+export class AvailabilityGatewayClient extends GatewayClient {
   constructor(
-    private options: GatewayConfig,
+    private readonly options: GatewayConfig,
     private readonly fetchClient: FetchClient
   ) {
-    this.requestInit = this.getRequestInit(options)
+    super(options.auth)
   }
 
   async getPerpetualBatch(batchId: number) {
@@ -31,30 +26,9 @@ export class AvailabilityGatewayClient {
   }
 
   private async getBatch(batchId: number): Promise<unknown> {
-    const url = `${this.options.url}?${this.options.queryParam}=${batchId}`
+    const url = this.options.getUrl(batchId)
 
     const res = await this.fetchClient.fetchRetry(url, this.requestInit)
     return res.json()
-  }
-
-  private getRequestInit(options: GatewayConfig): RequestInit {
-    switch (options.auth.type) {
-      case 'certificates':
-        return {
-          agent: new Agent({
-            ca: options.auth.serverCertificate,
-            cert: options.auth.userCertificate,
-            key: options.auth.userKey,
-          }),
-        }
-      case 'bearerToken':
-        return {
-          headers: {
-            Authorization: `Bearer ${options.auth.bearerToken}`,
-          },
-        }
-      default:
-        assertUnreachable(options.auth)
-    }
   }
 }

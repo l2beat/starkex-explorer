@@ -46,9 +46,8 @@ export const PerpetualBatchResponse = z.strictObject({
 // https://github.com/starkware-libs/starkex-data-availability-committee/blob/7d72f8e05d6d9ccda5b99444f313a7248ca479b5/src/starkware/starkware_utils/objects/starkex_state.py
 export type SpotBatchResponse = z.infer<typeof SpotBatchResponse>
 export const SpotBatchResponse = z.strictObject({
-  update: z.union([
-    z.null(),
-    z.strictObject({
+  update: z
+    .strictObject({
       prev_batch_id: z.number(),
       order_root: PedersenHash,
       vault_root: PedersenHash,
@@ -68,8 +67,8 @@ export const SpotBatchResponse = z.strictObject({
           fulfilled_amount: UnsignedIntAsString,
         })
       ),
-    }),
-  ]),
+    })
+    .nullable(),
 })
 
 const OrderType = z.enum(['LIMIT_ORDER_WITH_FEES'])
@@ -296,4 +295,23 @@ export const PerpetualTransactionBatchResponse = z.strictObject({
   order_root: PedersenHash,
   txs_info: z.array(TransactionInfo),
   time_created: UnsignedIntAsString,
+})
+
+const LiveTransactionInfo = z.strictObject({
+  tx: Transaction,
+  tx_id: z.number(),
+})
+const LiveTransaction = z.strictObject({
+  apex_id: z.number(),
+  tx_info: z
+    .string()
+    .transform((s) => LiveTransactionInfo.parse(JSON.parse(s))),
+})
+
+export type PerpetualLiveTransactionResponse = z.infer<
+  typeof PerpetualLiveTransactionResponse
+>
+export const PerpetualLiveTransactionResponse = z.strictObject({
+  count: z.number(),
+  txs: z.array(LiveTransaction),
 })
