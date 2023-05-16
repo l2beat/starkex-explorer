@@ -70,8 +70,6 @@ export class TransactionStatusService {
     }
 
     // this actually waits and polls for the transaction to be mined
-    console.log('DEBUG: transaction', transaction)
-
     const receipt = await this.ethereumClient.getTransactionReceipt(hash)
 
     // The type of getTransactionReceipt() is misdefined in ethers.js.
