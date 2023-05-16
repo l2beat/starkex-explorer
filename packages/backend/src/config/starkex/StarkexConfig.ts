@@ -32,7 +32,7 @@ export interface PerpetualValidiumConfig {
   tradingMode: 'perpetual'
   blockchain: BlockchainConfig
   availabilityGateway: GatewayConfig
-  feederGateway: GatewayConfig
+  feederGateway: GatewayConfig | undefined
   contracts: {
     perpetual: EthereumAddress
   }

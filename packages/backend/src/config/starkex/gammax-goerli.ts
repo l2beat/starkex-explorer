@@ -29,6 +29,7 @@ export function getGammaxGoerliConfig(): StarkexConfig {
         userKey: getEnv('GAMMAX_AG_USER_KEY'),
       },
     },
+    feederGateway: undefined,
     collateralAsset: {
       assetId: AssetId('COLLATERAL-1'),
       assetHash: AssetHash(
