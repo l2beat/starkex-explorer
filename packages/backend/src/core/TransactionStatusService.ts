@@ -71,6 +71,16 @@ export class TransactionStatusService {
 
     // this actually waits and polls for the transaction to be mined
     const receipt = await this.ethereumClient.getTransactionReceipt(hash)
+
+    // The type of getTransactionReceipt() is misdefined in ethers.js.
+    // It returns null when transaction is not mined yet.
+    // See: https://github.com/ethers-io/ethers.js/discussions/3790
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!receipt) {
+      // The transaction has not been mined yet.
+      return
+    }
+
     const blockNumber = receipt.blockNumber
     const block = await this.ethereumClient.getBlock(blockNumber)
 

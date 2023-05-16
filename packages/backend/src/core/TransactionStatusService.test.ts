@@ -113,4 +113,25 @@ describe(TransactionStatusService.name, () => {
     await service.checkTransaction(hash)
     expect(removed).toEqual(true)
   })
+
+  it("doesn't fail when transaction is not mined yet", async () => {
+    const hash = Hash256.fake()
+    const ethereumClient = mockObject<EthereumClient>({
+      async getTransaction(_hash) {
+        return {} as providers.TransactionResponse
+      },
+      async getTransactionReceipt(_hash) {
+        // type is misdefined in ethers.js, this function
+        // return null when transaction is not mined yet.
+        // See: https://github.com/ethers-io/ethers.js/discussions/3790
+        return null as unknown as providers.TransactionReceipt
+      },
+    })
+    const service = new TransactionStatusService(
+      mockObject<SentTransactionRepository>(),
+      ethereumClient,
+      Logger.SILENT
+    )
+    await expect(service.checkTransaction(hash)).not.toBeRejected()
+  })
 })
