@@ -25,7 +25,9 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     protected readonly emptyStateHash: PedersenHash,
     protected readonly emptyLeaf: T,
     public stateTree?: MerkleTree<T>
-  ) {}
+  ) {
+    this.logger = logger.for(this)
+  }
 
   async processStateTransition(
     stateTransitionRecord: StateTransitionRecord,
@@ -72,6 +74,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
         }))
       ),
     ])
+
     this.logger.info('State updated', { id, blockNumber })
   }
 
