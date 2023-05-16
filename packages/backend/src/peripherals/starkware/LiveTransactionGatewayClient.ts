@@ -18,7 +18,10 @@ export class LiveTransactionsGatewayClient extends GatewayClient {
     return parsed // TODO: PerpetualLiveTransactionResponse(parsed)
   }
 
-  private async getLiveTransactions(startApexId: number, expectCount: number) {
+  private async getLiveTransactions(
+    startApexId: number,
+    expectCount: number
+  ): Promise<unknown> {
     const url = this.options.getUrl(startApexId, expectCount)
 
     const res = await this.fetchClient.fetchRetry(url, this.requestInit)

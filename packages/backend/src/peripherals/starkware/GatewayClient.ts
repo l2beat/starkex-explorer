@@ -27,6 +27,8 @@ export abstract class GatewayClient {
             Authorization: `Bearer ${auth.bearerToken}`,
           },
         }
+      default:
+        assertUnreachable(auth)
     }
   }
 }

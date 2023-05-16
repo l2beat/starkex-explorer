@@ -1,6 +1,6 @@
 import { expect, mockFn, mockObject } from 'earl'
 
-import { GatewayAuth, GatewayConfig } from '../../config/starkex/StarkexConfig'
+import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import {
   EXAMPLE_PERPETUAL_BATCH,
   EXAMPLE_SPOT_BATCH,
@@ -15,7 +15,10 @@ describe(AvailabilityGatewayClient.name, () => {
   const getUrl = mockFn().returns('gateway-url')
   const options: GatewayConfig = mockObject({
     getUrl,
-    auth: {} as GatewayAuth,
+    auth: {
+      type: 'bearerToken',
+      bearerToken: 'random-token',
+    },
   })
 
   describe(AvailabilityGatewayClient.prototype.getPerpetualBatch.name, () => {
