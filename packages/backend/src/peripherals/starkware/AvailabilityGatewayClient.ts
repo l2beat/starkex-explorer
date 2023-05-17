@@ -1,26 +1,17 @@
+import { assertUnreachable } from '@explorer/shared'
 import { Agent } from 'https'
-import fetch from 'node-fetch'
+import fetch, { RequestInit } from 'node-fetch'
 
+import { AvailiabilityGatewayConfig } from '../../config/starkex/StarkexConfig'
 import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
 import { toPerpetualBatch } from './toPerpetualBatch'
 import { toSpotBatch } from './toSpotBatch'
 
-export interface AvailabilityGatewayOptions {
-  url: string
-  serverCertificate: string
-  userCertificate: string
-  userKey: string
-}
-
 export class AvailabilityGatewayClient {
-  private agent: Agent
+  private requestInit: RequestInit
 
-  constructor(private options: AvailabilityGatewayOptions) {
-    this.agent = new Agent({
-      ca: options.serverCertificate,
-      cert: options.userCertificate,
-      key: options.userKey,
-    })
+  constructor(private options: AvailiabilityGatewayConfig) {
+    this.requestInit = this.getRequestInit(options)
   }
 
   async getPerpetualBatch(batchId: number) {
@@ -36,9 +27,30 @@ export class AvailabilityGatewayClient {
   }
 
   private async getBatch(batchId: number): Promise<unknown> {
-    const method = 'availability_gateway/get_batch_data'
-    const url = `${this.options.url}/${method}?batch_id=${batchId}`
-    const res = await fetch(url, { agent: this.agent, timeout: 5_000 })
+    const url = `${this.options.url}?${this.options.queryParam}=${batchId}`
+
+    const res = await fetch(url, { ...this.requestInit, timeout: 5_000 })
     return res.json()
+  }
+
+  private getRequestInit(options: AvailiabilityGatewayConfig): RequestInit {
+    switch (options.auth.type) {
+      case 'certificates':
+        return {
+          agent: new Agent({
+            ca: options.auth.serverCertificate,
+            cert: options.auth.userCertificate,
+            key: options.auth.userKey,
+          }),
+        }
+      case 'bearerToken':
+        return {
+          headers: {
+            Authorization: `Bearer ${options.auth.bearerToken}`,
+          },
+        }
+      default:
+        assertUnreachable(options.auth)
+    }
   }
 }

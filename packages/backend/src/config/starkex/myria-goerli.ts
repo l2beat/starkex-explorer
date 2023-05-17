@@ -18,9 +18,13 @@ export function getMyriaGoerliConfig(): StarkexConfig {
     },
     availabilityGateway: {
       url: getEnv('MYRIA_AG_URL'),
-      serverCertificate: getEnv('MYRIA_AG_SERVER_CERTIFICATE'),
-      userCertificate: getEnv('MYRIA_AG_USER_CERTIFICATE'),
-      userKey: getEnv('MYRIA_AG_USER_KEY'),
+      queryParam: getEnv('MYRIA_AG_QUERY_PARAM'),
+      auth: {
+        type: 'certificates',
+        serverCertificate: getEnv('MYRIA_AG_SERVER_CERTIFICATE'),
+        userCertificate: getEnv('MYRIA_AG_USER_CERTIFICATE'),
+        userKey: getEnv('MYRIA_AG_USER_KEY'),
+      },
     },
     contracts: {
       perpetual: EthereumAddress('0xF82C423a30E317f34f9b0997627F2F9c5d239Ad9'),

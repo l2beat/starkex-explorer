@@ -1,4 +1,4 @@
-import { InstanceName } from '@explorer/shared'
+import { assertUnreachable, InstanceName } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 import Cookie from 'js-cookie'
 
@@ -46,10 +46,10 @@ const recoverKeys = (
     case 'Myria':
       return recoverKeysMyria(account)
     case 'GammaX':
+    case 'ApeX':
       //TODO: Implement
       throw new Error('NIY')
     default:
-      // TODO: Use assertUnreachable after merging
-      throw new Error('Unknown instance name')
+      assertUnreachable(instanceName)
   }
 }

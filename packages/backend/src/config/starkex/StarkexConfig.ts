@@ -31,12 +31,7 @@ export interface PerpetualValidiumConfig {
   dataAvailabilityMode: 'validium'
   tradingMode: 'perpetual'
   blockchain: BlockchainConfig
-  availabilityGateway: {
-    url: string
-    serverCertificate: string
-    userCertificate: string
-    userKey: string
-  }
+  availabilityGateway: AvailiabilityGatewayConfig
   contracts: {
     perpetual: EthereumAddress
   }
@@ -48,12 +43,7 @@ export interface SpotValidiumConfig {
   dataAvailabilityMode: 'validium'
   tradingMode: 'spot'
   blockchain: BlockchainConfig
-  availabilityGateway: {
-    url: string
-    serverCertificate: string
-    userCertificate: string
-    userKey: string
-  }
+  availabilityGateway: AvailiabilityGatewayConfig
   contracts: {
     perpetual: EthereumAddress
   }
@@ -66,4 +56,20 @@ export interface BlockchainConfig {
   syncBatchSize: number
   minBlockNumber: number
   maxBlockNumber: number
+}
+
+export interface AvailiabilityGatewayConfig {
+  url: string
+  queryParam: string
+  auth:
+    | {
+        type: 'certificates'
+        serverCertificate: string
+        userCertificate: string
+        userKey: string
+      }
+    | {
+        type: 'bearerToken'
+        bearerToken: string
+      }
 }

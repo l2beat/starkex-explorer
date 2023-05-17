@@ -1,4 +1,4 @@
-import { InstanceName } from '@explorer/shared'
+import { assertUnreachable, InstanceName } from '@explorer/shared'
 import React from 'react'
 
 import { DydxLogo } from './DydxLogo'
@@ -22,5 +22,9 @@ function getProjectLogoComponent(instanceName: InstanceName) {
       return GammaXLogo
     case 'Myria':
       return MyriaLogo
+    case 'ApeX':
+      return MyriaLogo
+    default:
+      assertUnreachable(instanceName)
   }
 }

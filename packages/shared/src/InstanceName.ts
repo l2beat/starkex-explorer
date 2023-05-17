@@ -5,4 +5,5 @@ export const InstanceName = z.union([
   z.literal('dYdX'),
   z.literal('Myria'),
   z.literal('GammaX'),
+  z.literal('ApeX'),
 ])
