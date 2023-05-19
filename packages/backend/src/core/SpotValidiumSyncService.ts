@@ -58,7 +58,7 @@ export class SpotValidiumSyncService implements IDataSyncService {
     for (const transition of stateTransitions) {
       const [spotCairoOutput, batch] = await Promise.all([
         this.spotCairoOutputCollector.collect(transition.transactionHash),
-        this.availabilityGatewayClient.getSpotBatch(transition.batchId),
+        this.availabilityGatewayClient.getSpotBatchData(transition.batchId),
       ])
       if (!batch) {
         throw new Error(`Unable to download batch ${transition.batchId}`)

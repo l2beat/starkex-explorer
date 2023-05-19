@@ -13,7 +13,6 @@ import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
 export class PerpetualValidiumSyncService implements IDataSyncService {
   constructor(
     private readonly availabilityGatewayClient: AvailabilityGatewayClient,
-
     private readonly perpetualValidiumStateTransitionCollector: PerpetualValidiumStateTransitionCollector,
     private readonly userRegistrationCollector: UserRegistrationCollector,
     private readonly userTransactionCollector: UserTransactionCollector,
@@ -46,8 +45,11 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     for (const transition of stateTransitions) {
       const [perpetualCairoOutput, batch] = await Promise.all([
         this.perpetualCairoOutputCollector.collect(transition.transactionHash),
-        this.availabilityGatewayClient.getPerpetualBatch(transition.batchId),
+        this.availabilityGatewayClient.getPerpetualBatchData(
+          transition.batchId
+        ),
       ])
+
       if (!batch) {
         throw new Error(`Unable to download batch ${transition.batchId}`)
       }

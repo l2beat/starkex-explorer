@@ -35,7 +35,7 @@ export function getApexGoerliConfig(): StarkexConfig {
       },
       auth: gatewayAuth,
     },
-    liveTransactionsGateway: {
+    transactionGateway: {
       getUrl: (startId, expectCount) => {
         return `${getEnv(
           'APEX_LTG_URL'

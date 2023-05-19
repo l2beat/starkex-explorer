@@ -160,6 +160,7 @@ function encodeWithdraw(values: WithdrawData): Encoded<WithdrawData> {
     vaultOrPositionId: undefined,
     data: {
       ...values,
+      assetType: values.assetType.toString(),
       starkKey: values.starkKey.toString(),
     },
   }
@@ -168,6 +169,7 @@ function encodeWithdraw(values: WithdrawData): Encoded<WithdrawData> {
 function decodeWithdraw(values: ToJSON<WithdrawData>): WithdrawData {
   return {
     ...values,
+    assetType: AssetHash(values.assetType),
     starkKey: StarkKey(values.starkKey),
   }
 }
@@ -180,6 +182,7 @@ function encodeWithdrawWithTokenId(
     vaultOrPositionId: undefined,
     data: {
       ...values,
+      assetType: values.assetType.toString(),
       starkKey: values.starkKey.toString(),
       tokenId: values.tokenId.toString(),
     },
@@ -191,6 +194,7 @@ function decodeWithdrawWithTokenId(
 ): WithdrawWithTokenIdData {
   return {
     ...values,
+    assetType: AssetHash(values.assetType),
     starkKey: StarkKey(values.starkKey),
     tokenId: BigInt(values.tokenId),
   }

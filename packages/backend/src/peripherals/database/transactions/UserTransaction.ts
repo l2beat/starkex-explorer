@@ -215,6 +215,7 @@ function encodeWithdraw(values: WithdrawData): Encoded<WithdrawData> {
     starkKeyA: values.starkKey,
     data: {
       ...values,
+      assetType: values.assetType.toString(),
       starkKey: values.starkKey.toString(),
       nonQuantizedAmount: values.nonQuantizedAmount.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
@@ -226,6 +227,7 @@ function encodeWithdraw(values: WithdrawData): Encoded<WithdrawData> {
 function decodeWithdraw(values: ToJSON<WithdrawData>): WithdrawData {
   return {
     ...values,
+    assetType: AssetHash(values.assetType),
     starkKey: StarkKey(values.starkKey),
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
@@ -241,9 +243,9 @@ function encodeWithdrawWithTokenId(
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      assetType: values.assetType,
+      assetType: values.assetType.toString(),
       tokenId: values.tokenId.toString(),
-      assetId: values.assetId,
+      assetId: values.assetId.toString(),
       nonQuantizedAmount: values.nonQuantizedAmount.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
       recipient: values.recipient.toString(),
@@ -257,9 +259,9 @@ function decodeWithdrawWithTokenId(
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    assetType: values.assetType,
+    assetType: AssetHash(values.assetType),
     tokenId: BigInt(values.tokenId),
-    assetId: values.assetId,
+    assetId: AssetHash(values.assetId),
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
     recipient: EthereumAddress(values.recipient),
@@ -274,8 +276,8 @@ function encodeMintWithdraw(
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      assetType: values.assetType,
-      assetId: values.assetId,
+      assetType: values.assetType.toString(),
+      assetId: values.assetId.toString(),
       nonQuantizedAmount: values.nonQuantizedAmount.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
     },
@@ -288,8 +290,8 @@ function decodeMintWithdraw(
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    assetType: values.assetType,
-    assetId: values.assetId,
+    assetType: AssetHash(values.assetType),
+    assetId: AssetHash(values.assetId),
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
   }

@@ -1,7 +1,7 @@
 import { decodeAssetId } from '@explorer/encoding'
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 
-import { PerpetualBatchResponse } from './schema'
+import { PerpetualBatchDataResponse } from './schema'
 
 export interface PerpetualBatch {
   previousBatchId: number
@@ -29,8 +29,8 @@ export interface PerpetualBatchOrder {
   amount: bigint
 }
 
-export function toPerpetualBatch(
-  response: PerpetualBatchResponse
+export function toPerpetualBatchData(
+  response: PerpetualBatchDataResponse
 ): PerpetualBatch | undefined {
   if (!response.update) {
     return

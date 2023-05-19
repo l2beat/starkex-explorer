@@ -33,7 +33,7 @@ export interface PerpetualValidiumConfig {
   blockchain: BlockchainConfig
   availabilityGateway: GatewayConfig
   feederGateway: GatewayConfig | undefined
-  liveTransactionsGateway: LiveTransactionGatewayConfig | undefined
+  transactionGateway: TransactionGatewayConfig | undefined
   contracts: {
     perpetual: EthereumAddress
   }
@@ -77,7 +77,7 @@ export interface GatewayConfig {
   auth: GatewayAuth
 }
 
-export interface LiveTransactionGatewayConfig {
+export interface TransactionGatewayConfig {
   getUrl: (startApexId: number, expectCount: number) => string
   auth: GatewayAuth
 }
