@@ -2,7 +2,6 @@ import {
   AssetHash,
   AssetId,
   EthereumAddress,
-  Hash256,
   PedersenHash,
   StarkKey,
   Timestamp,
@@ -471,7 +470,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
           syntheticAssetId: AssetId('ETH-9'),
           signedPrices: [
             {
-              signerStarkKey: Hash256.fake(),
+              signerStarkKey: AssetHash.fake(),
               externalAssetId: AssetHash.fake(),
               timestampedSignature: {
                 signature: {

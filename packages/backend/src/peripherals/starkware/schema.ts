@@ -4,7 +4,6 @@ const UnsignedIntAsString = z.string().regex(/^([1-9]\d*|0)$/)
 const SignedIntAsString = z.string().regex(/^(-?[1-9]\d*|0)$/)
 const PedersenHash = z.string().regex(/^0[a-f\d]{63}$/)
 const PedersenHash0x = z.string().regex(/^0x[a-f\d]{0,64}$/)
-const Hash256 = z.string().regex(/^0x[a-f\d]{0,64}$/)
 const StarkKey = z.string().regex(/^0x0[a-f\d]{63}$/)
 const Bytes32 = z.string().regex(/^[a-f\d]{64}$/)
 const AssetHash0x = z.string().regex(/^0x[a-f\d]{0,63}$/)
@@ -15,7 +14,6 @@ const EthereumAddress = z.string().regex(/^0x[a-fA-F0-9]{40}$/)
 export type PerpetualBatchDataResponse = z.infer<
   typeof PerpetualBatchDataResponse
 >
-
 export const PerpetualBatchDataResponse = z.strictObject({
   update: z
     .strictObject({
@@ -244,7 +242,7 @@ export const SignedOraclePrice = z.strictObject({
 
 export type AssetOraclePrice = z.infer<typeof AssetOraclePrice>
 export const AssetOraclePrice = z.strictObject({
-  signed_prices: z.record(Hash256, SignedOraclePrice),
+  signed_prices: z.record(PedersenHash0x, SignedOraclePrice), // TODO: Revisit this key type
   price: UnsignedIntAsString,
 })
 
