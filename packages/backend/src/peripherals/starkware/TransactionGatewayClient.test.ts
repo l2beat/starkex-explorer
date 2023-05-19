@@ -1,13 +1,13 @@
 import { expect, mockFn, mockObject } from 'earl'
 
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
-import { EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS } from '../../test/starkwareData'
+import { EXAMPLE_PERPETUAL_TRANSACTIONS } from '../../test/starkwareData'
 import { FetchClient } from './FetchClient'
-import { LiveTransactionsGatewayClient } from './LiveTransactionGatewayClient'
-import { PerpetualLiveTransactionResponse } from './schema'
-import { toPerpetualLiveTransactions } from './toPerpetualLiveTransactions'
+import { PerpetualTransactionResponse } from './schema'
+import { toPerpetualTransactions } from './toPerpetualTransactions'
+import { TransactionGatewayClient } from './TransactionGatewayClient'
 
-describe(LiveTransactionsGatewayClient.name, () => {
+describe(TransactionGatewayClient.name, () => {
   const getUrl = mockFn().returns('gateway-url')
   const options: GatewayConfig = mockObject({
     getUrl,
@@ -18,21 +18,21 @@ describe(LiveTransactionsGatewayClient.name, () => {
   })
 
   describe(
-    LiveTransactionsGatewayClient.prototype.getPerpetualLiveTransactions.name,
+    TransactionGatewayClient.prototype.getPerpetualTransactions.name,
     () => {
       const fetchClient = mockObject<FetchClient>({
         fetchRetry: mockFn().resolvesTo({
-          json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS),
+          json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_TRANSACTIONS),
         }),
       })
-      const liveTransactionsGatewayClient = new LiveTransactionsGatewayClient(
+      const transactionGatewayClient = new TransactionGatewayClient(
         options,
         fetchClient
       )
 
       it('should fetch live transactions and parse them', async () => {
         const response =
-          await liveTransactionsGatewayClient.getPerpetualLiveTransactions(0, 0)
+          await transactionGatewayClient.getPerpetualTransactions(0, 0)
 
         expect(getUrl).toHaveBeenCalledWith(0, 0)
         expect(fetchClient.fetchRetry).toHaveBeenCalledWith(
@@ -42,10 +42,8 @@ describe(LiveTransactionsGatewayClient.name, () => {
         expect(fetchClient.fetchRetry).toHaveBeenExhausted()
         expect(getUrl).toHaveBeenExhausted()
         expect(response).toEqual(
-          toPerpetualLiveTransactions(
-            PerpetualLiveTransactionResponse.parse(
-              EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS
-            )
+          toPerpetualTransactions(
+            PerpetualTransactionResponse.parse(EXAMPLE_PERPETUAL_TRANSACTIONS)
           )
         )
       })

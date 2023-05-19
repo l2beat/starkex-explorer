@@ -31,7 +31,7 @@ export function getGammaxGoerliConfig(): StarkexConfig {
       },
     },
     feederGateway: undefined,
-    liveTransactionsGateway: undefined,
+    transactionGateway: undefined,
     collateralAsset: {
       assetId: AssetId('COLLATERAL-1'),
       assetHash: AssetHash(

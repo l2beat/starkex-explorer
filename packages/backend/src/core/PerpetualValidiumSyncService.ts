@@ -45,7 +45,9 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     for (const transition of stateTransitions) {
       const [perpetualCairoOutput, batch] = await Promise.all([
         this.perpetualCairoOutputCollector.collect(transition.transactionHash),
-        this.availabilityGatewayClient.getPerpetualBatch(transition.batchId),
+        this.availabilityGatewayClient.getPerpetualBatchData(
+          transition.batchId
+        ),
       ])
 
       if (!batch) {

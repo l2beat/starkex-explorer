@@ -1,9 +1,9 @@
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { FetchClient } from './FetchClient'
 import { GatewayClient } from './GatewayClient'
-import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
-import { toPerpetualBatch } from './toPerpetualBatch'
-import { toSpotBatch } from './toSpotBatch'
+import { PerpetualBatchDataResponse, SpotBatchDataResponse } from './schema'
+import { toPerpetualBatchData } from './toPerpetualBatch'
+import { toSpotBatchData } from './toSpotBatch'
 
 export class AvailabilityGatewayClient extends GatewayClient {
   constructor(
@@ -13,19 +13,19 @@ export class AvailabilityGatewayClient extends GatewayClient {
     super(options.auth)
   }
 
-  async getPerpetualBatch(batchId: number) {
-    const data = await this.getBatch(batchId)
-    const parsed = PerpetualBatchResponse.parse(data)
-    return toPerpetualBatch(parsed)
+  async getPerpetualBatchData(batchId: number) {
+    const data = await this.getBatchData(batchId)
+    const parsed = PerpetualBatchDataResponse.parse(data)
+    return toPerpetualBatchData(parsed)
   }
 
-  async getSpotBatch(batchId: number) {
-    const data = await this.getBatch(batchId)
-    const parsed = SpotBatchResponse.parse(data)
-    return toSpotBatch(parsed)
+  async getSpotBatchData(batchId: number) {
+    const data = await this.getBatchData(batchId)
+    const parsed = SpotBatchDataResponse.parse(data)
+    return toSpotBatchData(parsed)
   }
 
-  private async getBatch(batchId: number): Promise<unknown> {
+  private async getBatchData(batchId: number): Promise<unknown> {
     const url = this.options.getUrl(batchId)
 
     const res = await this.fetchClient.fetchRetry(url, this.requestInit)

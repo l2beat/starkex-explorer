@@ -328,7 +328,7 @@ const EXAMPLE_MULTI_TRANSACTION = {
   ],
   type: 'MULTI_TRANSACTION',
 }
-const allTransactions = [
+const ALL_EXAMPLE_TRANSACTIONS = [
   EXAMPLE_TRADE_TRANSACTION,
   EXAMPLE_ORACLE_PRICES_TICK_TRANSACTION,
   EXAMPLE_FUNDING_TICK_TRANSACTION,
@@ -354,7 +354,7 @@ export const EXAMPLE_PERPETUAL_TRANSACTION_BATCH = {
     '069e1d10dee11eefd25ec6cb5137af3cf58c8618d19cb614ef26c12375453699',
   order_root:
     '020871c8713281f2966641eb83b02f30235d41f343d9db3ced9115e396e668bc',
-  txs_info: allTransactions.map((transaction, index) => ({
+  txs_info: ALL_EXAMPLE_TRANSACTIONS.map((transaction, index) => ({
     alt_txs: null,
     original_tx_id: 4000 + index,
     was_replaced: false,
@@ -362,9 +362,9 @@ export const EXAMPLE_PERPETUAL_TRANSACTION_BATCH = {
   })),
 }
 
-export const EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS = {
-  count: allTransactions.length,
-  txs: allTransactions.map((transaction, index) => ({
+export const EXAMPLE_PERPETUAL_TRANSACTIONS = {
+  count: ALL_EXAMPLE_TRANSACTIONS.length,
+  txs: ALL_EXAMPLE_TRANSACTIONS.map((transaction, index) => ({
     apex_id: index + 1,
     tx_info: JSON.stringify({
       tx: transaction,

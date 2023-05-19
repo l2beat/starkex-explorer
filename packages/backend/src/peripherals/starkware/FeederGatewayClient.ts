@@ -1,7 +1,7 @@
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { FetchClient } from './FetchClient'
 import { GatewayClient } from './GatewayClient'
-import { PerpetualTransactionBatchResponse } from './schema'
+import { PerpetualBatchInfoResponse } from './schema'
 
 export class FeederGatewayClient extends GatewayClient {
   constructor(
@@ -11,13 +11,13 @@ export class FeederGatewayClient extends GatewayClient {
     super(options.auth)
   }
 
-  async getPerpetualTransactionBatch(batchId: number) {
-    const data = await this.getTransactionBatch(batchId)
-    const parsed = PerpetualTransactionBatchResponse.parse(data)
+  async getPerpetualBatchInfo(batchId: number) {
+    const data = await this.getBatchInfo(batchId)
+    const parsed = PerpetualBatchInfoResponse.parse(data)
     return parsed // TODO: toPerpetualTransactionBatchResponse(parsed)
   }
 
-  private async getTransactionBatch(batchId: number): Promise<unknown> {
+  private async getBatchInfo(batchId: number): Promise<unknown> {
     const url = this.options.getUrl(batchId)
 
     const res = await this.fetchClient.fetchRetry(url, this.requestInit)

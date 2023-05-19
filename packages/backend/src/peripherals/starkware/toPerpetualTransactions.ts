@@ -12,21 +12,21 @@ import { MultiTransactionData, TransactionData } from '../database/Transaction'
 import {
   AssetOraclePrice,
   OrderTypeResponse,
-  PerpetualLiveTransactionResponse,
+  PerpetualTransactionResponse,
   SignatureResponse,
   SignedOraclePrice,
   Transaction as TransactionSchema,
 } from './schema'
 
-export interface PerpetualLiveTransaction {
+export interface PerpetualTransaction {
   thirdPartyId: number
   transactionId: number
   transaction: TransactionData
 }
 
-export function toPerpetualLiveTransactions(
-  response: PerpetualLiveTransactionResponse
-): PerpetualLiveTransaction[] {
+export function toPerpetualTransactions(
+  response: PerpetualTransactionResponse
+): PerpetualTransaction[] {
   return response.txs.map((tx) => {
     return {
       thirdPartyId: tx.apex_id,
