@@ -3,6 +3,7 @@ import {
   AssetHash,
   AssetId,
   EthereumAddress,
+  Hash256,
   PedersenHash,
   StarkKey,
   Timestamp,
@@ -181,8 +182,7 @@ export interface FundingTickTransactionData {
 }
 
 interface SignedOraclePrice {
-  // TODO: Revisit this key type
-  signerStarkKey: AssetHash
+  signerStarkKey: Hash256 // I am not sure about the naming, docs say it is a signer public key, although it does not match StarkKey
   externalAssetId: AssetHash
   timestampedSignature: {
     signature: Signature
@@ -670,7 +670,7 @@ function decodeSignedOraclePrice(
 ): SignedOraclePrice {
   return {
     ...values,
-    signerStarkKey: AssetHash(values.signerStarkKey),
+    signerStarkKey: Hash256(values.signerStarkKey),
     externalAssetId: AssetHash(values.externalAssetId),
     price: BigInt(values.price),
     timestampedSignature: {

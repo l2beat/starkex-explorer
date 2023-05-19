@@ -3,6 +3,7 @@ import { assertUnreachable } from '@explorer/shared'
 import {
   AssetHash,
   EthereumAddress,
+  Hash256,
   PedersenHash,
   StarkKey,
   Timestamp,
@@ -247,7 +248,7 @@ function toPerpetualSignedPrice(
   signedPrice: SignedOraclePrice
 ) {
   return {
-    signerStarkKey: AssetHash(signerStarkKey),
+    signerStarkKey: Hash256(signerStarkKey), // I am not sure about the naming, docs say that this is a signer public key, although it does not look like StarkKey
     externalAssetId: AssetHash(signedPrice.external_asset_id),
     price: BigInt(signedPrice.price),
     timestampedSignature: {

@@ -2,6 +2,7 @@ import {
   AssetHash,
   AssetId,
   EthereumAddress,
+  Hash256,
   PedersenHash,
   StarkKey,
   Timestamp,
@@ -15,6 +16,7 @@ type StringConvertible =
   | EthereumAddress
   | AssetHash
   | PedersenHash
+  | Hash256
 
 export type ToJSON<T> = {
   [K in keyof T]: T[K] extends StringConvertible
