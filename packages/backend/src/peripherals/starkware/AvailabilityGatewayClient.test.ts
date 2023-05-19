@@ -8,8 +8,8 @@ import {
 import { AvailabilityGatewayClient } from './AvailabilityGatewayClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualBatchDataResponse, SpotBatchDataResponse } from './schema'
-import { toPerpetualBatchData } from './toPerpetualBatch'
-import { toSpotBatchData } from './toSpotBatch'
+import { toPerpetualBatchData } from './toPerpetualBatchData'
+import { toSpotBatchData } from './toSpotBatchData'
 
 describe(AvailabilityGatewayClient.name, () => {
   const getUrl = mockFn().returns('gateway-url')

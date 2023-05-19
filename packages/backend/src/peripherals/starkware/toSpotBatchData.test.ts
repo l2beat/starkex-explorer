@@ -3,7 +3,7 @@ import { expect } from 'earl'
 
 import { EXAMPLE_SPOT_BATCH } from '../../test/starkwareData'
 import { SpotBatchDataResponse } from './schema'
-import { toSpotBatchData } from './toSpotBatch'
+import { toSpotBatchData } from './toSpotBatchData'
 
 describe(toSpotBatchData.name, () => {
   it('transforms a null update batch', () => {

@@ -2,8 +2,8 @@ import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { FetchClient } from './FetchClient'
 import { GatewayClient } from './GatewayClient'
 import { PerpetualBatchDataResponse, SpotBatchDataResponse } from './schema'
-import { toPerpetualBatchData } from './toPerpetualBatch'
-import { toSpotBatchData } from './toSpotBatch'
+import { toPerpetualBatchData } from './toPerpetualBatchData'
+import { toSpotBatchData } from './toSpotBatchData'
 
 export class AvailabilityGatewayClient extends GatewayClient {
   constructor(

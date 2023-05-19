@@ -5,7 +5,7 @@ import { Hash256, PedersenHash } from '@explorer/types'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatch'
+import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatchData'
 import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
 

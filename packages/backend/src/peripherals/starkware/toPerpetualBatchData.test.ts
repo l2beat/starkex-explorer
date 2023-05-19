@@ -3,7 +3,7 @@ import { expect } from 'earl'
 
 import { EXAMPLE_PERPETUAL_BATCH } from '../../test/starkwareData'
 import { PerpetualBatchDataResponse } from './schema'
-import { toPerpetualBatchData } from './toPerpetualBatch'
+import { toPerpetualBatchData } from './toPerpetualBatchData'
 
 describe(toPerpetualBatchData.name, () => {
   it('transforms a null update batch', () => {
