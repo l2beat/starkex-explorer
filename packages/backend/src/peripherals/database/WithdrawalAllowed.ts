@@ -97,7 +97,7 @@ function encodeWithdrawalAllowed(
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      assetType: values.assetType,
+      assetType: values.assetType.toString(),
       nonQuantizedAmount: values.nonQuantizedAmount.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
     },
@@ -110,7 +110,7 @@ function decodeWithdrawalAllowed(
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    assetType: values.assetType,
+    assetType: AssetHash(values.assetType),
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
   }
@@ -126,7 +126,7 @@ function encodeMintableWithdrawalAllowed(
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      assetId: values.assetId,
+      assetId: values.assetId.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
     },
   }
@@ -138,7 +138,7 @@ function decodeMintableWithdrawalAllowed(
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    assetId: values.assetId,
+    assetId: AssetHash(values.assetId),
     quantizedAmount: BigInt(values.quantizedAmount),
   }
 }
@@ -153,7 +153,7 @@ function encodeAssetWithdrawalAllowed(
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      assetId: values.assetId,
+      assetId: values.assetId.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
     },
   }
@@ -165,7 +165,7 @@ function decodeAssetWithdrawalAllowed(
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    assetId: values.assetId,
+    assetId: AssetHash(values.assetId),
     quantizedAmount: BigInt(values.quantizedAmount),
   }
 }
@@ -178,7 +178,7 @@ function encodeWithdraw(values: WithdrawData): Encoded<WithdrawData> {
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      assetType: values.assetType,
+      assetType: values.assetType.toString(),
       nonQuantizedAmount: values.nonQuantizedAmount.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
       recipient: values.recipient.toString(),
@@ -190,7 +190,7 @@ function decodeWithdraw(values: ToJSON<WithdrawData>): WithdrawData {
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    assetType: values.assetType,
+    assetType: AssetHash(values.assetType),
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
     recipient: EthereumAddress(values.recipient),
@@ -207,9 +207,9 @@ function encodeWithdrawWithTokenId(
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      assetType: values.assetType,
+      assetType: values.assetType.toString(),
       tokenId: values.tokenId.toString(),
-      assetId: values.assetId,
+      assetId: values.assetId.toString(),
       nonQuantizedAmount: values.nonQuantizedAmount.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
       recipient: values.recipient.toString(),
@@ -223,9 +223,9 @@ function decodeWithdrawWithTokenId(
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    assetType: values.assetType,
+    assetType: AssetHash(values.assetType),
     tokenId: BigInt(values.tokenId),
-    assetId: values.assetId,
+    assetId: AssetHash(values.assetId),
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
     recipient: EthereumAddress(values.recipient),
@@ -242,8 +242,8 @@ function encodeMintWithdraw(
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      assetType: values.assetType,
-      assetId: values.assetId,
+      assetType: values.assetType.toString(),
+      assetId: values.assetId.toString(),
       nonQuantizedAmount: values.nonQuantizedAmount.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
     },
@@ -256,8 +256,8 @@ function decodeMintWithdraw(
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    assetType: values.assetType,
-    assetId: values.assetId,
+    assetType: AssetHash(values.assetType),
+    assetId: AssetHash(values.assetId),
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
   }

@@ -2,6 +2,7 @@ import { LiveTransactionGatewayConfig } from '../../config/starkex/StarkexConfig
 import { FetchClient } from './FetchClient'
 import { GatewayClient } from './GatewayClient'
 import { PerpetualLiveTransactionResponse } from './schema'
+import { toPerpetualLiveTransactions } from './toPerpetualLiveTransactions'
 
 export class LiveTransactionsGatewayClient extends GatewayClient {
   constructor(
@@ -14,8 +15,7 @@ export class LiveTransactionsGatewayClient extends GatewayClient {
   async getPerpetualLiveTransactions(startApexId: number, expectCount: number) {
     const data = await this.getLiveTransactions(startApexId, expectCount)
     const parsed = PerpetualLiveTransactionResponse.parse(data)
-
-    return parsed // TODO: PerpetualLiveTransactionResponse(parsed)
+    return toPerpetualLiveTransactions(parsed)
   }
 
   private async getLiveTransactions(

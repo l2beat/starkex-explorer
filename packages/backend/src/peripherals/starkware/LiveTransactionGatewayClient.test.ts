@@ -5,6 +5,7 @@ import { EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS } from '../../test/starkwareData'
 import { FetchClient } from './FetchClient'
 import { LiveTransactionsGatewayClient } from './LiveTransactionGatewayClient'
 import { PerpetualLiveTransactionResponse } from './schema'
+import { toPerpetualLiveTransactions } from './toPerpetualLiveTransactions'
 
 describe(LiveTransactionsGatewayClient.name, () => {
   const getUrl = mockFn().returns('gateway-url')
@@ -41,8 +42,10 @@ describe(LiveTransactionsGatewayClient.name, () => {
         expect(fetchClient.fetchRetry).toHaveBeenExhausted()
         expect(getUrl).toHaveBeenExhausted()
         expect(response).toEqual(
-          PerpetualLiveTransactionResponse.parse(
-            EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS
+          toPerpetualLiveTransactions(
+            PerpetualLiveTransactionResponse.parse(
+              EXAMPLE_PERPETUAL_LIVE_TRANSACTIONS
+            )
           )
         )
       })

@@ -124,9 +124,9 @@ describe(encodeUserTransactionData.name, () => {
       data: {
         type: 'WithdrawWithTokenId',
         starkKey: data.starkKey.toString(),
-        assetType: data.assetType,
+        assetType: data.assetType.toString(),
         tokenId: data.tokenId.toString(),
-        assetId: data.assetId,
+        assetId: data.assetId.toString(),
         nonQuantizedAmount: data.nonQuantizedAmount.toString(),
         quantizedAmount: data.quantizedAmount.toString(),
         recipient: data.recipient.toString(),
@@ -153,8 +153,8 @@ describe(encodeUserTransactionData.name, () => {
       data: {
         type: 'MintWithdraw',
         starkKey: data.starkKey.toString(),
-        assetType: data.assetType,
-        assetId: data.assetId,
+        assetType: data.assetType.toString(),
+        assetId: data.assetId.toString(),
         nonQuantizedAmount: data.nonQuantizedAmount.toString(),
         quantizedAmount: data.quantizedAmount.toString(),
       },

@@ -1,5 +1,6 @@
 import { json } from '@explorer/types'
 
+import { TransactionDataJson } from '../Transaction'
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import {
   UserTransactionJSON,
@@ -270,6 +271,18 @@ declare module 'knex/types/tables' {
     prev_history_id: number | null
   }
 
+  interface TransactionRow {
+    id: number
+    third_party_id: number
+    transaction_id: number
+    stark_key_a: string | null
+    stark_key_b: string | null
+    data: TransactionDataJson
+    type: string
+    replaced_by: number | null
+    replacement_for: number | null
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -299,6 +312,7 @@ declare module 'knex/types/tables' {
     preprocessed_state_details: PreprocessedStateDetailsRow
     withdrawable_assets: WithdrawableAssetRow
     preprocessed_user_statistics: PreprocessedUserStatisticsRow
+    transactions: TransactionRow
   }
 }
 
