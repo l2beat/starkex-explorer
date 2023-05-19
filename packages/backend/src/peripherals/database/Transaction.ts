@@ -127,7 +127,7 @@ export interface ConditionalTransferTransactionData {
   assetId: AssetHash
   expirationTimestamp: Timestamp
   factRegistryAddress: EthereumAddress
-  fact: bigint
+  fact: string // I am not sure what type it is
   signature: Signature
   type: 'ConditionalTransfer'
 }
@@ -503,7 +503,6 @@ function decodeConditionalTransferTransaction(
     senderStarkKey: StarkKey(values.senderStarkKey),
     receiverStarkKey: StarkKey(values.receiverStarkKey),
     factRegistryAddress: EthereumAddress(values.factRegistryAddress),
-    fact: BigInt(values.fact),
     signature: decodeSignature(values.signature),
   }
 }

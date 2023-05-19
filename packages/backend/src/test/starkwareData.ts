@@ -108,7 +108,7 @@ const EXAMPLE_TRADE_TRANSACTION = {
     amount_synthetic: '1000000',
     amount_fee: '7900',
     public_key:
-      '0x61498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
+      '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
     amount_collateral: '15637500',
   },
   party_a_order: {
@@ -127,7 +127,7 @@ const EXAMPLE_TRADE_TRANSACTION = {
     amount_synthetic: '1000000',
     amount_fee: '7900',
     public_key:
-      '0x7f37955a01978a7be26140ee28fe382964dd36b0bc092bfde64657c4a911a5d',
+      '0x0200787ad74538c33b8aee389d8b4432da1feb9cda733b303b2884316a0caf1d',
     amount_collateral: '15637500',
   },
   type: 'TRADE',
@@ -197,7 +197,7 @@ const EXAMPLE_LIQUIDATE_TRANSACTION = {
     order_type: 'LIMIT_ORDER_WITH_FEES',
     position_id: '11534118754833929857',
     public_key:
-      '0x5db665983e23607de57d6dc068797336bfdcb954238044688bec922ca296d3e',
+      '0x0200787ad74538c33b8aee389d8b4432da1feb9cda733b303b2884316a0caf1d',
     signature: {
       r: '0x4ac8a77f5863238a8bfb8a2e7f2dcc70cb8cad7b45692497b4b2c3ff06f6c94',
       s: '0x6fd86c349a6c6266d34c11da0ff8c0cf211cafbadc39ba4a4c38124344f3bb1',
@@ -213,10 +213,10 @@ const EXAMPLE_TRANSFER_TRANSACTION = {
   nonce: '2195908194',
   receiver_position_id: '6091063652223914538',
   receiver_public_key:
-    '0x259f432e6f4590b9a164106cf6a659eb4862b21fb97d43588561712e8e5216b',
+    '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
   sender_position_id: '9309829342914403545',
   sender_public_key:
-    '0x5b11f6a03410ea710224e3e6250b49816c4def2fa54c83f91762c2445ca5082',
+    '0x0200787ad74538c33b8aee389d8b4432da1feb9cda733b303b2884316a0caf1d',
   signature: {
     r: '0x522c43cf1a31efcfa16a27d8dd5f3e5fe2e93d61cb92c7d29c5786a4673fb8c',
     s: '0x5cc6d720489c336bff1143ce56f2f9795bd6e281410a14c3c00397cccb220eb',
@@ -235,9 +235,9 @@ const EXAMPLE_FORCED_TRADE_TRANSACTION = {
   position_id_party_a: '15544993694147369147',
   position_id_party_b: '7805344658822197847',
   public_key_party_a:
-    '0x4f7e096f22be374f374e2e7f9e366eeecfcc2828ae78ab5fb30dafbe79776b8',
+    '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
   public_key_party_b:
-    '0x4e2db811e2e04a7887cd24903043c4f6cbf679f42727a4b0b3e8e7f50614a6b',
+    '0x0200787ad74538c33b8aee389d8b4432da1feb9cda733b303b2884316a0caf1d',
   synthetic_asset_id: '0x4254432d3130000000000000000000',
   type: 'FORCED_TRADE',
 }
@@ -246,17 +246,17 @@ const EXAMPLE_FORCED_WITHDRAWAL_TRANSACTION = {
   is_valid: true,
   position_id: '10777705002482314164',
   public_key:
-    '0x45de7d62b1512a48254b7cec7844701606652eb0567020155a611603cc3002d',
+    '0x0200787ad74538c33b8aee389d8b4432da1feb9cda733b303b2884316a0caf1d',
   type: 'FORCED_WITHDRAWAL',
 }
 const EXAMPLE_CONDITIONAL_TRANSFER_TRANSACTION = {
   amount: '20000000',
   nonce: '4095157464',
   sender_public_key:
-    '0x4ad4109a1643fd5e7df391c46ef1c5b46825c53483d4b1f4eadc09da16cb93e',
+    '0x0200787ad74538c33b8aee389d8b4432da1feb9cda733b303b2884316a0caf1d',
   sender_position_id: '350215810603549246',
   receiver_public_key:
-    '0x2b74139b5085e36cba7e59f0fdccda639c2e8b3d0df8063feb7d27bcefe7237',
+    '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
   receiver_position_id: '353443241267298871',
   asset_id: '0xa21edc9d9997b1b1956f542fe95922518a9e28ace11b7b2972a1974bf5971f',
   expiration_timestamp: '462148',
@@ -275,7 +275,7 @@ const EXAMPLE_WITHDRAWAL_TO_ADDRESS_TRANSACTION = {
   nonce: '4265854110',
   position_id: '7758176404715800194',
   public_key:
-    '0x1b9e4c42a399f6ce069127df5ad618489aad21b1687acf4d4b09e08744084a7',
+    '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
   signature: {
     r: '0x18326a6181a507f701968f45f56799b890374a1e329c6b9a37ec3292d92b1f8',
     s: '0x66dd6745be06d033149a2bcb686e3ec896fc914ff2cb52dcc1d34bbe220b639',
@@ -285,7 +285,7 @@ const EXAMPLE_WITHDRAWAL_TO_ADDRESS_TRANSACTION = {
 const EXAMPLE_DEPOSIT_TRANSACTION = {
   position_id: '354906804565573997',
   public_key:
-    '0x27030ace07f5aa93bc67449a59fc97fd89d55a57156192545669b31afed576d',
+    '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
   amount: '1000000000',
   type: 'DEPOSIT',
 }
@@ -304,7 +304,7 @@ const EXAMPLE_MULTI_TRANSACTION = {
       amount: '2569146471088859254',
       position_id: '7758176404715800194',
       public_key:
-        '0x37ebdcde87a1613e443df789558867f5ba91faf7a024204f7c1bd874da5e70a',
+        '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
       type: 'DEPOSIT',
     },
     {
@@ -315,10 +315,10 @@ const EXAMPLE_MULTI_TRANSACTION = {
       nonce: '3874773259',
       receiver_position_id: '11534118754833929857',
       receiver_public_key:
-        '0x66194cbd71037d1b83e90ec17e0aa3c03983ca8ea7e9d498c778ea6eb2083e7',
+        '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
       sender_position_id: '10326739782786242647',
       sender_public_key:
-        '0x37f0a10832f7711ecde68eb5f115912487b3ed542a3ec49e2afbd4010ec940f',
+        '0x0200787ad74538c33b8aee389d8b4432da1feb9cda733b303b2884316a0caf1d',
       signature: {
         r: '0x23108408a83c1cd4f80a1d7ce2ea651a3168f4f1ca46282c1081f0ad5417dcb',
         s: '0x6f0004e07550397a51b079e485cd348aab8cc8094c79fb756671a043da9092d',
@@ -342,7 +342,7 @@ const ALL_EXAMPLE_TRANSACTIONS = [
   EXAMPLE_DELEVERAGE_TRANSACTION,
   EXAMPLE_MULTI_TRANSACTION,
 ]
-export const EXAMPLE_PERPETUAL_TRANSACTION_BATCH = {
+export const EXAMPLE_PERPETUAL_BATCH_INFO = {
   previous_batch_id: 12171,
   sequence_number: 10959,
   time_created: '1659603558',

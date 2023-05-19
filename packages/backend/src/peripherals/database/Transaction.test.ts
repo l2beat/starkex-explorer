@@ -298,7 +298,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
         s: PedersenHash.fake(),
       },
       factRegistryAddress: EthereumAddress.fake(),
-      fact: 11111n,
+      fact: '11111',
     }
 
     const encoded = encodeTransactionData(data)

@@ -1,7 +1,7 @@
 import { expect, mockFn, mockObject } from 'earl'
 
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
-import { EXAMPLE_PERPETUAL_TRANSACTION_BATCH } from '../../test/starkwareData'
+import { EXAMPLE_PERPETUAL_BATCH_INFO } from '../../test/starkwareData'
 import { FeederGatewayClient } from './FeederGatewayClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualBatchInfoResponse } from './schema'
@@ -19,18 +19,13 @@ describe(FeederGatewayClient.name, () => {
   describe(FeederGatewayClient.prototype.getPerpetualBatchInfo.name, () => {
     const fetchClient = mockObject<FetchClient>({
       fetchRetry: mockFn().resolvesTo({
-        json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_TRANSACTION_BATCH),
+        json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_BATCH_INFO),
       }),
     })
-    const feederGatFeederGatewayClient = new FeederGatewayClient(
-      options,
-      fetchClient
-    )
+    const feederGatewayClient = new FeederGatewayClient(options, fetchClient)
 
     it('should fetch transaction batch and parse it', async () => {
-      const response = await feederGatFeederGatewayClient.getPerpetualBatchInfo(
-        0
-      )
+      const response = await feederGatewayClient.getPerpetualBatchInfo(0)
       expect(getUrl).toHaveBeenCalledWith(0)
       expect(fetchClient.fetchRetry).toHaveBeenCalledWith(
         'gateway-url',
@@ -39,7 +34,7 @@ describe(FeederGatewayClient.name, () => {
       expect(fetchClient.fetchRetry).toHaveBeenExhausted()
       expect(getUrl).toHaveBeenExhausted()
       expect(response).toEqual(
-        PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_TRANSACTION_BATCH)
+        PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_BATCH_INFO)
       )
     })
   })

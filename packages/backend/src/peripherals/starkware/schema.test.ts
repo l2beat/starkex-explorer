@@ -3,7 +3,7 @@ import { it } from 'mocha'
 
 import {
   EXAMPLE_PERPETUAL_BATCH,
-  EXAMPLE_PERPETUAL_TRANSACTION_BATCH,
+  EXAMPLE_PERPETUAL_BATCH_INFO,
   EXAMPLE_PERPETUAL_TRANSACTIONS,
   EXAMPLE_SPOT_BATCH,
 } from '../../test/starkwareData'
@@ -41,7 +41,7 @@ describe('SpotBatchResponse', () => {
 describe('PerpetualTransactionBatchResponse', () => {
   it('can parse real data', () => {
     const fn = () =>
-      PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_TRANSACTION_BATCH)
+      PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_BATCH_INFO)
     fn()
     expect(fn).not.toThrow()
   })

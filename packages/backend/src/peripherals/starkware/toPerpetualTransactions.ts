@@ -71,8 +71,6 @@ function toPerpetualTransaction(
         type: 'ForcedWithdrawal',
       }
     case 'TRADE':
-      console.log(tx.party_a_order.asset_id_synthetic)
-
       return {
         actualBFee: BigInt(tx.actual_b_fee),
         actualAFee: BigInt(tx.actual_a_fee),
@@ -150,7 +148,7 @@ function toPerpetualTransaction(
         assetId: AssetHash(tx.asset_id),
         expirationTimestamp: Timestamp(tx.expiration_timestamp),
         factRegistryAddress: EthereumAddress(tx.fact_registry_address),
-        fact: BigInt(tx.fact), // Not sure
+        fact: tx.fact, // Not sure
         signature: toPerpetualSignature(tx.signature),
         type: 'ConditionalTransfer',
       }

@@ -30,7 +30,7 @@ describe(TransactionGatewayClient.name, () => {
         fetchClient
       )
 
-      it('should fetch live transactions and parse them', async () => {
+      it('should fetch transactions and parse them', async () => {
         const response =
           await transactionGatewayClient.getPerpetualTransactions(0, 0)
 
