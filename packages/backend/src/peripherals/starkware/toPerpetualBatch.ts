@@ -1,5 +1,6 @@
 import { decodeAssetId } from '@explorer/encoding'
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
+
 import { PerpetualBatchDataResponse } from './schema'
 
 export interface PerpetualBatch {

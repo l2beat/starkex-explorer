@@ -25,7 +25,9 @@ interface Record<T extends TransactionData['type'] = TransactionData['type']> {
 export class TransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
+    /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
+    /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async add(record: {
