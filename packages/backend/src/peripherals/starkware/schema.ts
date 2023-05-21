@@ -4,11 +4,11 @@ const UnsignedIntAsString = z.string().regex(/^([1-9]\d*|0)$/)
 const SignedIntAsString = z.string().regex(/^(-?[1-9]\d*|0)$/)
 const PedersenHash = z.string().regex(/^0[a-f\d]{63}$/)
 const PedersenHash0x = z.string().regex(/^0x[a-f\d]{0,64}$/)
-const StarkKey = z.string().regex(/^0x0[a-f\d]{63}$/)
-const Bytes32 = z.string().regex(/^[a-f\d]{64}$/)
+const StarkKey = z.string().regex(/^0x0*[a-f\d]{0,63}$/)
+const Bytes32 = z.string().regex(/^[a-f\d]{0,64}$/)
 const AssetHash0x = z.string().regex(/^0x[a-f\d]{0,63}$/)
 const AssetId = z.string().regex(/^0x[a-f\d]{30}$/)
-const EthereumAddress = z.string().regex(/^0x[a-fA-F0-9]{40}$/)
+const EthereumAddress = z.string().regex(/^0x[a-fA-F0-9]{1,40}$/)
 
 // https://github.com/starkware-libs/starkex-data-availability-committee/blob/7d72f8e05d6d9ccda5b99444f313a7248ca479b5/src/services/perpetual/public/business_logic/state_objects.py
 export type PerpetualBatchDataResponse = z.infer<
