@@ -1,13 +1,14 @@
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { getEnv } from '../getEnv'
-import { StarkexConfig } from './StarkexConfig'
+import { ClientAuth, StarkexConfig } from './StarkexConfig'
 
 export function getApexGoerliConfig(): StarkexConfig {
-  const gatewayAuth = {
+  const clientAuth: ClientAuth = {
     type: 'bearerToken',
     bearerToken: getEnv('APEX_BEARER_TOKEN'),
-  } as const
+  }
+
   return {
     instanceName: 'ApeX',
     dataAvailabilityMode: 'validium',
@@ -27,21 +28,21 @@ export function getApexGoerliConfig(): StarkexConfig {
       getUrl: (batchId: number) => {
         return `${getEnv('APEX_AG_URL')}?batchId=${batchId}`
       },
-      auth: gatewayAuth,
+      auth: clientAuth,
     },
     feederGateway: {
       getUrl: (batchId: number) => {
         return `${getEnv('APEX_FG_URL')}?batchId=${batchId}`
       },
-      auth: gatewayAuth,
+      auth: clientAuth,
     },
-    transactionGateway: {
+    transactionApi: {
       getUrl: (startId, expectCount) => {
         return `${getEnv(
-          'APEX_LTG_URL'
+          'APEX_TRANSACTION_URL'
         )}?startApexId=${startId}&expectCount=${expectCount}`
       },
-      auth: gatewayAuth,
+      auth: clientAuth,
     },
     collateralAsset: {
       assetId: AssetId('SLF-6'),

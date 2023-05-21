@@ -23,13 +23,10 @@ describe(TransactionClient.name, () => {
         json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_TRANSACTIONS),
       }),
     })
-    const transactionGatewayClient = new TransactionClient(options, fetchClient)
+    const transactionClient = new TransactionClient(options, fetchClient)
 
     it('should fetch transactions and parse them', async () => {
-      const response = await transactionGatewayClient.getPerpetualTransactions(
-        0,
-        0
-      )
+      const response = await transactionClient.getPerpetualTransactions(0, 0)
 
       expect(getUrl).toHaveBeenCalledWith(0, 0)
       expect(fetchClient.fetchRetry).toHaveBeenCalledWith(

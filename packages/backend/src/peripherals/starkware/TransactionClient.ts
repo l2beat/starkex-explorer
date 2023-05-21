@@ -1,4 +1,4 @@
-import { TransactionConfig } from '../../config/starkex/StarkexConfig'
+import { TransactionApiConfig } from '../../config/starkex/StarkexConfig'
 import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualTransactionResponse } from './schema'
@@ -6,7 +6,7 @@ import { toPerpetualTransactions } from './toPerpetualTransactions'
 
 export class TransactionClient extends BaseClient {
   constructor(
-    private readonly options: TransactionConfig,
+    private readonly options: TransactionApiConfig,
     private readonly fetchClient: FetchClient
   ) {
     super(options.auth)
