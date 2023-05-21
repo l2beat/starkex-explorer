@@ -30,7 +30,6 @@ describe(TransactionRepository.name, () => {
       const transaction = await repository.findById(id)
 
       expect(transaction).toEqual({
-        id,
         thirdPartyId: record.thirdPartyId,
         transactionId: record.transactionId,
         starkKeyA: record.data.starkKey,
@@ -71,7 +70,6 @@ describe(TransactionRepository.name, () => {
       const altTransaction = await repository.findById(altId)
 
       expect(transaction).toEqual({
-        id,
         thirdPartyId: record.thirdPartyId,
         transactionId: record.transactionId,
         starkKeyA: record.data.starkKey,
@@ -82,7 +80,6 @@ describe(TransactionRepository.name, () => {
         replacementFor: undefined,
       })
       expect(altTransaction).toEqual({
-        id: altId,
         thirdPartyId: alternativeRecord.thirdPartyId,
         transactionId: alternativeRecord.transactionId,
         starkKeyA: alternativeRecord.data.starkKey,

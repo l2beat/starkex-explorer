@@ -17,8 +17,7 @@ const TRANSACTIONS_TABLE_NAME = 'transactions'
 
 export async function up(knex: Knex) {
   await knex.schema.createTable(TRANSACTIONS_TABLE_NAME, (table) => {
-    table.increments('id').primary()
-    table.integer('third_party_id').unique().notNullable().index()
+    table.integer('third_party_id').primary()
     table.integer('transaction_id').notNullable().index()
     table.string('stark_key_a').nullable().index()
     table.string('stark_key_b').nullable().index()

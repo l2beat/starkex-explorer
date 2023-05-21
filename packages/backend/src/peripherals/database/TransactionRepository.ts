@@ -11,7 +11,6 @@ import {
 } from './Transaction'
 
 interface Record<T extends TransactionData['type'] = TransactionData['type']> {
-  id: number
   thirdPartyId: number
   transactionId: number
   starkKeyA: StarkKey | undefined
@@ -68,14 +67,16 @@ export class TransactionRepository extends BaseRepository {
             : null,
         data,
       })
-      .returning('id')
+      .returning('third_party_id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return results[0]!.id
+    return results[0]!.third_party_id
   }
 
-  async findById(id: number): Promise<Record | undefined> {
+  async findById(thirdPartyId: number): Promise<Record | undefined> {
     const knex = await this.knex()
-    const row = await knex('transactions').where({ id }).first()
+    const row = await knex('transactions')
+      .where({ third_party_id: thirdPartyId })
+      .first()
 
     return row ? toRecord(row) : undefined
   }
@@ -88,7 +89,6 @@ export class TransactionRepository extends BaseRepository {
 
 function toRecord(row: TransactionRow): Record {
   return {
-    id: row.id,
     thirdPartyId: row.third_party_id,
     transactionId: row.transaction_id,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
