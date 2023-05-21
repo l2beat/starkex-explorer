@@ -12,6 +12,11 @@ describe('decodeAssetId', () => {
     )
   })
 
+  it('handles asset ids starting with 0x', () => {
+    const result = decodeAssetId('0x4254432d3130000000000000000000')
+    expect(result).toEqual(AssetId('BTC-10'))
+  })
+
   it('can decode BTC-10', () => {
     const result = decodeAssetId('4254432d3130000000000000000000')
     expect(result).toEqual(AssetId('BTC-10'))
