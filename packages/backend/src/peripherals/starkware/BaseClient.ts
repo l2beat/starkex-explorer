@@ -2,16 +2,16 @@ import { assertUnreachable } from '@explorer/shared'
 import { Agent } from 'https'
 import { RequestInit } from 'node-fetch'
 
-import { GatewayAuth } from '../../config/starkex/StarkexConfig'
+import { ClientAuth } from '../../config/starkex/StarkexConfig'
 
-export abstract class GatewayClient {
+export abstract class BaseClient {
   protected requestInit: RequestInit
 
-  constructor(auth: GatewayAuth) {
+  constructor(auth: ClientAuth) {
     this.requestInit = this.getRequestInit(auth)
   }
 
-  private getRequestInit(auth: GatewayAuth): RequestInit {
+  private getRequestInit(auth: ClientAuth): RequestInit {
     switch (auth.type) {
       case 'certificates':
         return {

@@ -1,9 +1,9 @@
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
+import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
-import { GatewayClient } from './GatewayClient'
 import { PerpetualBatchInfoResponse } from './schema'
 
-export class FeederGatewayClient extends GatewayClient {
+export class FeederGatewayClient extends BaseClient {
   constructor(
     private readonly options: GatewayConfig,
     private readonly fetchClient: FetchClient

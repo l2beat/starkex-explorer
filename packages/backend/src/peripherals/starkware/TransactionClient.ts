@@ -1,12 +1,12 @@
-import { TransactionGatewayConfig } from '../../config/starkex/StarkexConfig'
+import { TransactionConfig } from '../../config/starkex/StarkexConfig'
+import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
-import { GatewayClient } from './GatewayClient'
 import { PerpetualTransactionResponse } from './schema'
 import { toPerpetualTransactions } from './toPerpetualTransactions'
 
-export class TransactionGatewayClient extends GatewayClient {
+export class TransactionClient extends BaseClient {
   constructor(
-    private readonly options: TransactionGatewayConfig,
+    private readonly options: TransactionConfig,
     private readonly fetchClient: FetchClient
   ) {
     super(options.auth)

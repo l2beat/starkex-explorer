@@ -1,11 +1,11 @@
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
+import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
-import { GatewayClient } from './GatewayClient'
 import { PerpetualBatchDataResponse, SpotBatchDataResponse } from './schema'
 import { toPerpetualBatchData } from './toPerpetualBatchData'
 import { toSpotBatchData } from './toSpotBatchData'
 
-export class AvailabilityGatewayClient extends GatewayClient {
+export class AvailabilityGatewayClient extends BaseClient {
   constructor(
     private readonly options: GatewayConfig,
     private readonly fetchClient: FetchClient
