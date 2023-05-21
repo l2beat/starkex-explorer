@@ -12,17 +12,17 @@ export class TransactionClient extends BaseClient {
     super(options.auth)
   }
 
-  async getPerpetualTransactions(startApexId: number, expectCount: number) {
-    const data = await this.getTransactions(startApexId, expectCount)
+  async getPerpetualTransactions(startId: number, pageSize: number) {
+    const data = await this.getTransactions(startId, pageSize)
     const parsed = PerpetualTransactionResponse.parse(data)
     return toPerpetualTransactions(parsed)
   }
 
   private async getTransactions(
-    startApexId: number,
-    expectCount: number
+    startId: number,
+    pageSize: number
   ): Promise<unknown> {
-    const url = this.options.getUrl(startApexId, expectCount)
+    const url = this.options.getUrl(startId, pageSize)
 
     const res = await this.fetchClient.fetchRetry(url, this.requestInit)
     return res.json()
