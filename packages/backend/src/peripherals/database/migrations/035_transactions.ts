@@ -22,7 +22,7 @@ export async function up(knex: Knex) {
     table.string('stark_key_a').nullable().index()
     table.string('stark_key_b').nullable().index()
     table.jsonb('data').notNullable()
-    table.string('type').notNullable().index()
+    table.string('type').notNullable()
     table.integer('replaced_by')
     table.integer('replacement_for')
   })
