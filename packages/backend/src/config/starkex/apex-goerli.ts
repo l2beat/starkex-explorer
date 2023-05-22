@@ -39,7 +39,7 @@ export function getApexGoerliConfig(): StarkexConfig {
     transactionApi: {
       getUrl: (startId, expectCount) => {
         return `${getEnv(
-          'APEX_TRANSACTION_URL'
+          'APEX_TRANSACTION_API_URL'
         )}?startApexId=${startId}&expectCount=${expectCount}`
       },
       auth: clientAuth,
