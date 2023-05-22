@@ -16,5 +16,4 @@ export interface Config {
   freshStart: boolean
   forceHttps: boolean
   starkex: StarkexConfig
-  useOldFrontend: boolean
 }

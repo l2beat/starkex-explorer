@@ -20,6 +20,5 @@ export function getProductionConfig(): Config {
     freshStart: false,
     forceHttps: true,
     starkex: getStarkexConfig(getEnv('STARKEX_INSTANCE')),
-    useOldFrontend: false,
   }
 }

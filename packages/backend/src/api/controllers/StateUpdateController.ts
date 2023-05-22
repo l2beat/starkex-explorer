@@ -17,9 +17,9 @@ import {
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
+import { getAssetPriceUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
 import { userTransactionToEntry } from './userTransactionToEntry'
-import { getAssetPriceUSDCents } from './utils/toPositionAssetEntries'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
   'ForcedWithdrawal',

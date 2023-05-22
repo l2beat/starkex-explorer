@@ -12,21 +12,17 @@ import bodyParser from 'koa-bodyparser'
 import { z } from 'zod'
 
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
-import { OldForcedTradeOfferController } from '../controllers/OldForcedTradeOfferController'
 import { TransactionSubmitController } from '../controllers/TransactionSubmitController'
 import { withTypedContext } from './types'
 import { applyControllerResult } from './utils'
 
 export function createTransactionRouter(
-  offerController:
-    | OldForcedTradeOfferController
-    | ForcedTradeOfferController
-    | undefined,
+  forcedTradeOfferController: ForcedTradeOfferController | undefined,
   transactionSubmitController: TransactionSubmitController
 ) {
   const router = new Router()
 
-  if (offerController) {
+  if (forcedTradeOfferController) {
     router.post(
       '/forced/offers',
       bodyParser(),
@@ -36,7 +32,10 @@ export function createTransactionRouter(
         }),
         async (ctx) => {
           const { offer, signature } = ctx.request.body
-          const result = await offerController.postOffer(offer, signature)
+          const result = await forcedTradeOfferController.postOffer(
+            offer,
+            signature
+          )
           applyControllerResult(ctx, result)
         }
       )
@@ -51,7 +50,7 @@ export function createTransactionRouter(
           request: z.object({ body: AcceptOfferBody }),
         }),
         async (ctx) => {
-          const result = await offerController.acceptOffer(
+          const result = await forcedTradeOfferController.acceptOffer(
             ctx.params.offerId,
             ctx.request.body
           )
@@ -73,7 +72,7 @@ export function createTransactionRouter(
           }),
         }),
         async (ctx) => {
-          const result = await offerController.cancelOffer(
+          const result = await forcedTradeOfferController.cancelOffer(
             ctx.params.offerId,
             ctx.request.body.signature
           )
