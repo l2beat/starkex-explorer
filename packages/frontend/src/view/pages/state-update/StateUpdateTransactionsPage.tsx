@@ -12,7 +12,7 @@ import { reactToHtml } from '../../reactToHtml'
 import { getTransactionTableProps } from './common'
 import { StateUpdatePageTitle } from './components/StateUpdatePageTitle'
 
-export interface StateUpdateTransactionsPageProps {
+interface StateUpdateTransactionsPageProps {
   context: PageContext
   id: string
   transactions: TransactionEntry[]

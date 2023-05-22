@@ -54,7 +54,7 @@ function formatFraction(fraction: bigint, decimals: number): string {
   return '.' + fraction.toString().padStart(decimals, '0').replace(/0+$/, '')
 }
 
-export function formatWithQuantum(
+function formatWithQuantum(
   amount: bigint,
   quantum: bigint,
   options?: FormatOptions

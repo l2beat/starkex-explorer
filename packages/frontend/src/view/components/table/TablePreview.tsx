@@ -5,7 +5,7 @@ import { LinkButton } from '../Button'
 import { Link } from '../Link'
 import { SectionHeading } from '../SectionHeading'
 
-export interface TablePreviewProps {
+interface TablePreviewProps {
   title: ReactNode
   path: string
   entryShortNamePlural: string

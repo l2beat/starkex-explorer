@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React, { ReactNode } from 'react'
 
-export interface PageTitleProps {
+interface PageTitleProps {
   className?: string
   children: ReactNode
 }

@@ -15,7 +15,7 @@ export function getFormType(
   return 'withdraw'
 }
 
-export function isSellable(assetId: AssetId, balance: bigint): boolean {
+function isSellable(assetId: AssetId, balance: bigint): boolean {
   return assetId !== AssetId.USDC && balance > 0n
 }
 

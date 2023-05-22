@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React, { ReactNode } from 'react'
 
-export interface SectionHeadingProps {
+interface SectionHeadingProps {
   title: ReactNode
   description?: ReactNode
   leftAlign?: boolean

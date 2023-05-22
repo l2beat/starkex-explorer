@@ -11,7 +11,7 @@ import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { LinkButton } from '../../../components/Button'
 import { Table } from '../../../components/table/Table'
 
-export interface UserAssetsTableProps {
+interface UserAssetsTableProps {
   assets: UserAssetEntry[]
   starkKey: StarkKey
   tradingMode: TradingMode

@@ -11,7 +11,7 @@ import React from 'react'
 import { ExampleComponent } from '../components/ExampleComponent'
 import { reactToHtml } from '../reactToHtml'
 
-export interface HomePageProps {
+interface HomePageProps {
   title: string
 }
 

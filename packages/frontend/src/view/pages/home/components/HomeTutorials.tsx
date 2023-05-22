@@ -21,7 +21,7 @@ export const DEFAULT_TUTORIALS: HomeTutorialEntry[] = [
   },
 ]
 
-export interface HomeTutorialsProps {
+interface HomeTutorialsProps {
   tutorials: HomeTutorialEntry[]
 }
 

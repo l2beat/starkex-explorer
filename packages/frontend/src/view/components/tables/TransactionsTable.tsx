@@ -11,7 +11,7 @@ import { Table } from '../table/Table'
 import { Column } from '../table/types'
 import { TimeCell } from '../TimeCell'
 
-export interface TransactionsTableProps {
+interface TransactionsTableProps {
   transactions: TransactionEntry[]
   hideTime?: boolean
 }
@@ -78,7 +78,7 @@ export function TransactionsTable(props: TransactionsTableProps) {
   )
 }
 
-export function getStatus(transaction: TransactionEntry): {
+function getStatus(transaction: TransactionEntry): {
   type: StatusType
   text: string
 } {
@@ -119,7 +119,7 @@ export function getStatus(transaction: TransactionEntry): {
   }
 }
 
-export function toTypeText(type: TransactionEntry['type']): string {
+function toTypeText(type: TransactionEntry['type']): string {
   switch (type) {
     case 'FORCED_WITHDRAW':
       return 'F. withdraw'

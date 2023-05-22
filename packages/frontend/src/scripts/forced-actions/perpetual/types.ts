@@ -26,17 +26,17 @@ export type FormAction =
   | ModifyPriceAction
   | ModifyTotalAction
 
-export interface ModifyAmountAction {
+interface ModifyAmountAction {
   type: 'ModifyAmount'
   value: string
 }
 
-export interface ModifyPriceAction {
+interface ModifyPriceAction {
   type: 'ModifyPrice'
   value: string
 }
 
-export interface ModifyTotalAction {
+interface ModifyTotalAction {
   type: 'ModifyTotal'
   value: string
 }

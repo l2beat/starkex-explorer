@@ -3,7 +3,7 @@ import React from 'react'
 import { Favicons } from './Favicons'
 import { MetaTags } from './MetaTags'
 
-export interface HeadProps {
+interface HeadProps {
   title: string
   description: string
   image: string

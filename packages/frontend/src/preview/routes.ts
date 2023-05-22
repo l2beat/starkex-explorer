@@ -23,7 +23,9 @@ import {
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
+  renderMerkleProofPage,
   renderNewPerpetualForcedActionPage,
+  renderNewSpotForcedWithdrawPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
   renderRegularWithdrawalPage,
@@ -36,12 +38,10 @@ import {
   renderUserOffersPage,
   renderUserPage,
   renderUserRecoverPage,
+  renderUserRegisterPage,
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
-import { renderMerkleProofPage } from '../view/pages/MerkleProofPage'
-import { renderUserRegisterPage } from '../view/pages/user/UserRegisterPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
   randomHomeForcedTransactionEntry,

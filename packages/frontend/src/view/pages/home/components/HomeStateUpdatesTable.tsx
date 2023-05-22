@@ -15,7 +15,7 @@ export interface HomeStateUpdateEntry {
   forcedTransactionCount: number
 }
 
-export interface HomeStateUpdatesTableProps {
+interface HomeStateUpdatesTableProps {
   stateUpdates: HomeStateUpdateEntry[]
 }
 

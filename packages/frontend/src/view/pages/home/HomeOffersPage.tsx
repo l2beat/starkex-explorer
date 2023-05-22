@@ -8,7 +8,7 @@ import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import { reactToHtml } from '../../reactToHtml'
 import { OFFER_TABLE_PROPS } from './common'
 
-export interface HomeOffersPageProps {
+interface HomeOffersPageProps {
   context: PageContext<'perpetual'>
   offers: OfferEntry[]
   limit: number

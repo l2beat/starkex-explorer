@@ -11,7 +11,7 @@ import {
 import { reactToHtml } from '../../reactToHtml'
 import { FORCED_TRANSACTION_TABLE_PROPS } from './common'
 
-export interface HomeTransactionsPageProps {
+interface HomeTransactionsPageProps {
   context: PageContext
   forcedTransactions: TransactionEntry[]
   limit: number

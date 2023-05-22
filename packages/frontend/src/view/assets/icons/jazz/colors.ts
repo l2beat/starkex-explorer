@@ -22,7 +22,7 @@ export function colorRotate(hex: string, degrees: number) {
   return HSLToHex(hsl)
 }
 
-export function hexToHSL(hex: string) {
+function hexToHSL(hex: string) {
   // Convert hex to RGB first
   let r = parseInt(hex.slice(1, 3), 16)
   let g = parseInt(hex.slice(3, 5), 16)
@@ -55,7 +55,7 @@ export function hexToHSL(hex: string) {
   return { h, s, l }
 }
 
-export function HSLToHex(hsl: { h: number; s: number; l: number }) {
+function HSLToHex(hsl: { h: number; s: number; l: number }) {
   // eslint-disable-next-line prefer-const
   let { h, s, l } = hsl
   s /= 100

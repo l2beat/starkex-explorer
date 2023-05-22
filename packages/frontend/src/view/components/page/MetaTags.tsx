@@ -1,6 +1,6 @@
 import React from 'react'
 
-export interface MetaTagsProps {
+interface MetaTagsProps {
   title: string
   description: string
   image: string

@@ -14,7 +14,7 @@ import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
-export interface RegularWithdrawalPageProps {
+interface RegularWithdrawalPageProps {
   context: PageContext
   transactionHash: Hash256
   recipient: {

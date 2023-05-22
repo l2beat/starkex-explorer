@@ -5,7 +5,7 @@ import { SectionHeading } from '../SectionHeading'
 import { TableLimitSelect } from './TableLimitSelect'
 import { TablePagination } from './TablePagination'
 
-export interface TableWithPaginationProps {
+interface TableWithPaginationProps {
   title: ReactNode
   path: string
   entryShortNamePlural: string
