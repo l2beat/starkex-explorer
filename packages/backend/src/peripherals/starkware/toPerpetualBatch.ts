@@ -11,20 +11,20 @@ export interface PerpetualBatch {
   orders: PerpetualBatchOrder[]
 }
 
-export interface PerpetualBatchPosition {
+interface PerpetualBatchPosition {
   positionId: bigint
   starkKey: StarkKey
   collateralBalance: bigint
   assets: PerpetualAsset[]
 }
 
-export interface PerpetualAsset {
+interface PerpetualAsset {
   assetId: AssetId
   balance: bigint
   fundingIndex: bigint
 }
 
-export interface PerpetualBatchOrder {
+interface PerpetualBatchOrder {
   orderId: bigint
   amount: bigint
 }

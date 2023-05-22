@@ -1,4 +1,5 @@
 import { expect } from 'earl'
+
 import { getAssetValueUSDCents } from './assets'
 
 describe(getAssetValueUSDCents.name, () => {

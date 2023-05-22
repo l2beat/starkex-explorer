@@ -1,9 +1,4 @@
-import {
-  encodeAssetId,
-  ForcedTrade,
-  ForcedWithdrawal,
-  OnChainData,
-} from '@explorer/encoding'
+import { ForcedTrade, ForcedWithdrawal, OnChainData } from '@explorer/encoding'
 import {
   CollateralAsset,
   ERC20Details,
@@ -21,16 +16,13 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { fakeHexString } from '@explorer/types/src/fake'
-import { BigNumber, providers } from 'ethers'
 
-import { LogWithdrawalPerformed } from '../core/collectors/events'
 import {
   Accepted,
   ForcedTradeOfferRecord,
 } from '../peripherals/database/ForcedTradeOfferRepository'
 import {
   FinalizeExitAction,
-  FinalizeUpdates,
   ForcedTransactionRecord,
   Updates,
 } from '../peripherals/database/ForcedTransactionRepository'
@@ -111,32 +103,6 @@ export function fakeForcedUpdates(updates?: Partial<Updates>): Updates {
     verified: undefined,
     finalized: undefined,
     ...updates,
-  }
-}
-
-export function fakeForcedUpdatesVerified(
-  finalized?: Partial<FinalizeUpdates>
-): Updates {
-  const verifiedAt = fakeTimestamp()
-  const minedAt = fakeTimestamp(Number(verifiedAt))
-  const sentAt = fakeTimestamp(Number(minedAt))
-  return {
-    forgottenAt: null,
-    revertedAt: null,
-    sentAt,
-    minedAt,
-    verified: {
-      at: verifiedAt,
-      stateUpdateId: fakeInt(),
-    },
-    finalized: {
-      hash: Hash256.fake(),
-      forgottenAt: null,
-      minedAt: null,
-      revertedAt: null,
-      sentAt: null,
-      ...finalized,
-    },
   }
 }
 
@@ -250,48 +216,6 @@ export function fakeIncluded(
     timestamp: fakeTimestamp(),
     stateUpdateId: fakeInt(),
     ...included,
-  }
-}
-
-export function fakeBlock(block?: Partial<providers.Block>): providers.Block {
-  return {
-    hash: Hash256.fake().toString(),
-    parentHash: Hash256.fake().toString(),
-    transactions: [Hash256.fake().toString()],
-    number: fakeInt(),
-    timestamp: Number(fakeTimestamp()),
-    nonce: fakeInt().toString(),
-    difficulty: fakeInt(),
-    _difficulty: BigNumber.from(fakeBigInt()),
-    gasLimit: BigNumber.from(fakeBigInt()),
-    gasUsed: BigNumber.from(fakeBigInt()),
-    miner: EthereumAddress.fake().toString(),
-    extraData: '',
-    ...block,
-  }
-}
-
-export function fakeFinalizeLog(log?: Partial<providers.Log>): providers.Log {
-  const amount = fakeBigInt()
-  return {
-    blockNumber: fakeInt(),
-    blockHash: Hash256.fake().toString(),
-    transactionHash: Hash256.fake().toString(),
-    transactionIndex: fakeInt(200),
-    logIndex: fakeInt(10),
-    address: EthereumAddress.fake().toString(),
-    removed: false,
-    ...LogWithdrawalPerformed.abi.encodeEventLog(
-      LogWithdrawalPerformed.abi.getEvent(LogWithdrawalPerformed.topic),
-      [
-        StarkKey.fake().toString(),
-        '0x' + encodeAssetId(AssetId.USDC),
-        amount,
-        amount,
-        EthereumAddress.fake().toString(),
-      ]
-    ),
-    ...log,
   }
 }
 

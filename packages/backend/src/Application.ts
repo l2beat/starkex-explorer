@@ -16,7 +16,6 @@ import { createTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
-import { AccountService } from './core/AccountService'
 import { AssetDetailsService } from './core/AssetDetailsService'
 import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
 import { DepositWithTokenIdCollector } from './core/collectors/DepositWithTokenIdCollector'
@@ -201,12 +200,6 @@ export class Application {
       ethereumClient,
       withdrawableAssetRepository,
       config.starkex.contracts.perpetual
-    )
-
-    const accountService = new AccountService(
-      positionRepository,
-      forcedTradeOfferRepository,
-      sentTransactionRepository
     )
 
     let syncService

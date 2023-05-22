@@ -164,7 +164,7 @@ export class PositionRepository extends BaseRepository {
   }
 }
 
-export function toPositionRecord(
+function toPositionRecord(
   row: PositionRow
 ): PositionRecord & { stateUpdateId: number } {
   return {

@@ -4,14 +4,14 @@ import { BlockTag } from './types'
 
 export type HackFilter = HackFromToFilter | HackBlockHashFilter
 
-export interface HackFromToFilter {
+interface HackFromToFilter {
   address?: string | string[]
   topics?: (string | string[] | null)[]
   fromBlock?: BlockTag
   toBlock?: BlockTag
 }
 
-export interface HackBlockHashFilter {
+interface HackBlockHashFilter {
   address?: string | string[]
   topics?: (string | string[] | null)[]
   blockHash?: string
