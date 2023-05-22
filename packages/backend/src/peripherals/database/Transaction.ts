@@ -127,7 +127,7 @@ export interface ConditionalTransferTransactionData {
   assetId: AssetHash
   expirationTimestamp: Timestamp
   factRegistryAddress: EthereumAddress
-  fact: string // I am not sure what type it is
+  fact: string // TODO: I am not sure what type it is
   signature: Signature
   type: 'ConditionalTransfer'
 }
@@ -211,6 +211,26 @@ export interface MultiTransactionData {
 export function encodeTransactionData(
   values: TransactionData
 ): Encoded<TransactionData> {
+  if (values.type === 'MultiTransaction') {
+    return encodeMultiTransaction(values)
+  }
+
+  return encodeTransaction(values)
+}
+
+export function decodeTransactionData(
+  values: ToJSON<TransactionData>
+): TransactionData {
+  if (values.type === 'MultiTransaction') {
+    return decodeMultiTransaction(values)
+  }
+
+  return decodeTransaction(values)
+}
+
+function encodeTransaction(
+  values: Exclude<TransactionData, MultiTransactionData>
+): Encoded<Exclude<TransactionData, MultiTransactionData>> {
   switch (values.type) {
     case 'Deposit':
       return encodeDepositTransaction(values)
@@ -234,16 +254,14 @@ export function encodeTransactionData(
       return encodeFundingTickTransaction(values)
     case 'OraclePricesTick':
       return encodeOraclePricesTickTransaction(values)
-    case 'MultiTransaction':
-      throw new Error('MultiTransaction is not supported')
     default:
       assertUnreachable(values)
   }
 }
 
-export function decodeTransactionData(
-  values: ToJSON<TransactionData>
-): TransactionData {
+function decodeTransaction(
+  values: ToJSON<Exclude<TransactionData, MultiTransactionData>>
+): Exclude<TransactionData, MultiTransactionData> {
   switch (values.type) {
     case 'Deposit':
       return decodeDepositTransaction(values)
@@ -267,8 +285,6 @@ export function decodeTransactionData(
       return decodeFundingTickTransaction(values)
     case 'OraclePricesTick':
       return decodeOraclePricesTickTransaction(values)
-    case 'MultiTransaction':
-      throw new Error('MultiTransaction is not supported')
     default:
       assertUnreachable(values)
   }
@@ -625,6 +641,29 @@ function decodeOraclePricesTickTransaction(
     ...values,
     oraclePrices: values.oraclePrices.map(decodeAssetOraclePrice),
     timestamp: Timestamp(values.timestamp),
+  }
+}
+
+function encodeMultiTransaction(
+  values: MultiTransactionData
+): Encoded<MultiTransactionData> {
+  return {
+    ...values,
+    starkKeyA: null,
+    starkKeyB: null,
+    data: {
+      transactions: values.transactions.map((tx) => encodeTransaction(tx).data),
+      type: 'MultiTransaction',
+    },
+  }
+}
+
+function decodeMultiTransaction(
+  values: ToJSON<MultiTransactionData>
+): MultiTransactionData {
+  return {
+    ...values,
+    transactions: values.transactions.map((tx) => decodeTransaction(tx)),
   }
 }
 
