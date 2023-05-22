@@ -1,22 +1,6 @@
 import { AssetId } from '@explorer/types'
 
-import { PositionAssetEntry } from '../../../view'
 import { FormState } from './types'
-
-export function getAsset(
-  selected: AssetId,
-  assets: readonly PositionAssetEntry[]
-) {
-  let asset = assets.find((x) => x.assetId === selected)
-  if (!asset) {
-    console.error('Nonexistent asset selected')
-    asset = assets[0]
-    if (!asset) {
-      throw new Error('Programmer error: No assets')
-    }
-  }
-  return asset
-}
 
 export function getFormType(
   assetId: AssetId,
