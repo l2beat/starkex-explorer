@@ -252,7 +252,6 @@ const OraclePricesTickTransaction = z.strictObject({
   type: z.literal('ORACLE_PRICES_TICK'),
 })
 
-type MultiTransaction = z.infer<typeof MultiTransaction>
 const MultiTransaction = z.strictObject({
   txs: z.array(
     z.discriminatedUnion('type', [
