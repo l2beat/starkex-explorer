@@ -215,7 +215,7 @@ describe(StateUpdater.name, () => {
             starkKeyA: StarkKey.fake('aaa'),
             starkKeyB: StarkKey.fake('bbb'),
             collateralAmount: 123n,
-            collateralAssetId: AssetId.USDC,
+            collateralAssetId: AssetId('USDC-6'),
             syntheticAmount: 456n,
             syntheticAssetId: AssetId('ETH-7'),
             isABuyingSynthetic: true,

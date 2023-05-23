@@ -1,13 +1,13 @@
 import React from 'react'
 
 import { Button, LinkButton } from '../../../components/Button'
-import { NewForcedActionFormProps } from '../NewForcedActionFormProps'
+import { NewPerpetualForcedActionFormProps } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
 import { FormId } from './form/ids'
 
 export function NewPerpetualForcedWithdrawalFormContent(
-  props: NewForcedActionFormProps
+  props: NewPerpetualForcedActionFormProps
 ) {
   return (
     <>

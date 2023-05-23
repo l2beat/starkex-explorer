@@ -504,10 +504,12 @@ const routes: Route[] = [
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
-          hashOrId: AssetId.USDC,
+          //TODO: REVIEW
+          hashOrId: AssetId('USDC-6'),
           balance: amountBucket.pick(),
           priceUSDCents: 10000n,
         },
+        collateralAsset: context.collateralAsset,
         positionOrVaultId: 1234n,
       })
     },
@@ -526,6 +528,7 @@ const routes: Route[] = [
           balance: amountBucket.pick() * -1n,
           priceUSDCents: 10000n,
         },
+        collateralAsset: context.collateralAsset,
         positionOrVaultId: 1234n,
       })
     },
@@ -545,6 +548,7 @@ const routes: Route[] = [
           balance: amountBucket.pick(),
           priceUSDCents: 10000n,
         },
+        collateralAsset: context.collateralAsset,
         positionOrVaultId: 1234n,
       })
     },
@@ -658,7 +662,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId.USDC },
+        asset: { hashOrId: AssetId('USDC-6') },
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
@@ -675,7 +679,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId.USDC },
+        asset: { hashOrId: AssetId('USDC-6') },
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [
@@ -695,7 +699,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId.USDC },
+        asset: { hashOrId: AssetId('USDC-6') },
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [
@@ -716,7 +720,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId.USDC },
+        asset: { hashOrId: AssetId('USDC-6') },
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [

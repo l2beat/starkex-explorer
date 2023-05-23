@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ArrowDownIcon } from '../../../assets/icons/ArrowIcon'
 import { Button, LinkButton } from '../../../components/Button'
-import { NewForcedActionFormProps } from '../NewForcedActionFormProps'
+import { NewPerpetualForcedActionFormProps } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
 import { FormId } from './form/ids'
@@ -10,7 +10,7 @@ import { PriceInput } from './form/PriceInput'
 import { TotalInput } from './form/TotalInput'
 
 export function NewPerpetualForcedTradeFormContent(
-  props: NewForcedActionFormProps
+  props: NewPerpetualForcedActionFormProps
 ) {
   const isBuying = props.asset.balance < 0
   const label = isBuying ? 'buy' : 'sell'
@@ -36,7 +36,7 @@ export function NewPerpetualForcedTradeFormContent(
           <ArrowDownIcon className="rounded bg-slate-800 text-zinc-500" />
         </div>
         <ForcedActionCard>
-          <TotalInput />
+          <TotalInput assetId={props.collateralAsset.assetId} />
         </ForcedActionCard>
       </div>
       <div className="flex flex-col gap-2">

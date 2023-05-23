@@ -1,5 +1,4 @@
 import { PageContextWithUser } from '@explorer/shared'
-import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { Card } from '../../components/Card'
@@ -11,11 +10,11 @@ import { FormId } from './components/form/ids'
 import { NewPerpetualForcedTradeFormContent } from './components/NewPerpetualForcedTradeFormContent'
 import { NewPerpetualForcedWithdrawalFormContent } from './components/NewPerpetualForcedWithdrawalFormContent'
 import {
-  NewForcedActionFormProps,
+  NewPerpetualForcedActionFormProps,
   serializeForcedActionsFormProps,
 } from './NewForcedActionFormProps'
 
-type NewPerpetualForcedActionPageProps = NewForcedActionFormProps & {
+type NewPerpetualForcedActionPageProps = NewPerpetualForcedActionFormProps & {
   context: PageContextWithUser<'perpetual'>
 }
 
@@ -23,7 +22,8 @@ function NewPerpetualForcedActionPage(
   props: NewPerpetualForcedActionPageProps
 ) {
   const { context, ...formProps } = props
-  const isWithdrawal = props.asset.hashOrId === AssetId.USDC
+  const isWithdrawal =
+    props.asset.hashOrId === props.context.collateralAsset.assetId
   const propsJson = serializeForcedActionsFormProps(props)
   const userJson = JSON.stringify(context.user)
   const instructionParams = getForcedActionInstructionsParams(

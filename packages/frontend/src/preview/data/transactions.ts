@@ -31,7 +31,7 @@ export function randomOfferDetails() {
   return {
     offerId: randomId(),
     type: Math.random() > 0.5 ? ('BUY' as const) : ('SELL' as const),
-    collateralAsset: { hashOrId: AssetId.USDC },
+    collateralAsset: { hashOrId: AssetId('USDC-6') },
     collateralAmount: amountBucket.pick(),
     syntheticAsset: { hashOrId: AssetId('BTC-10') },
     syntheticAmount: amountBucket.pick(),

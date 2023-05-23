@@ -1,16 +1,18 @@
-import { AssetId } from '@explorer/types'
 import React from 'react'
 
 import { assetToInfo } from '../../../../../utils/assets'
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
-import { NewForcedActionFormProps } from '../../NewForcedActionFormProps'
 import { FormId } from './ids'
+import { NewPerpetualForcedActionFormProps } from '../../NewForcedActionFormProps'
 
-export function PriceInput(props: NewForcedActionFormProps) {
-  const usdcInfo = assetToInfo({ hashOrId: AssetId.USDC })
+export function PriceInput(props: NewPerpetualForcedActionFormProps) {
+  const usdcInfo = assetToInfo({ hashOrId: props.collateralAsset.assetId })
   const price = props.asset.priceUSDCents * 10000n
-  const priceFormatted = formatAmount({ hashOrId: AssetId.USDC }, price)
+  const priceFormatted = formatAmount(
+    { hashOrId: props.collateralAsset.assetId },
+    price
+  )
 
   return (
     <div className="flex gap-2">

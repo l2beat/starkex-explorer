@@ -244,7 +244,7 @@ describe(TransactionSubmitController.name, () => {
         {
           starkKeyA: StarkKey.fake(),
           positionIdA: 0n,
-          syntheticAssetId: AssetId.USDC,
+          syntheticAssetId: AssetId('USDC-6'),
           collateralAmount: 0n,
           syntheticAmount: 0n,
           isABuyingSynthetic: false,

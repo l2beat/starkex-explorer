@@ -39,7 +39,7 @@ describe(encodeSentTransactionData.name, () => {
       positionIdA: 1234n,
       positionIdB: 5678n,
       collateralAmount: 10000n,
-      collateralAssetId: AssetId.USDC,
+      collateralAssetId: AssetId('USDC-6'),
       syntheticAmount: 20000n,
       syntheticAssetId: AssetId('ETH-9'),
       isABuyingSynthetic: true,

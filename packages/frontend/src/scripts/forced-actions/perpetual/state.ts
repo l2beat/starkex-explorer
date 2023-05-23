@@ -2,17 +2,17 @@ import { UserDetails } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
 import { formatCurrencyInput } from '../../../utils/formatting/formatCurrencyInput'
-import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+import { NewPerpetualForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormAction, FormState } from './types'
 import { getFormType, parseCurrencyInput } from './utils'
 
 export function getInitialState(
-  props: NewForcedActionFormProps,
+  props: NewPerpetualForcedActionFormProps,
   user: UserDetails
 ): FormState {
   const { hashOrId, balance, priceUSDCents } = props.asset
   const assetId = AssetId(hashOrId.toString())
-  const type = getFormType(assetId, balance)
+  const type = getFormType(assetId, balance, props.collateralAsset)
   const candidate: FormState = {
     user,
     props,
@@ -60,7 +60,10 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
   }
 
   if (action.type === 'ModifyPrice') {
-    const parsed = parseCurrencyInput(action.value, AssetId.USDC)
+    const parsed = parseCurrencyInput(
+      action.value,
+      state.props.collateralAsset.assetId
+    )
     const priceInputString =
       parsed !== undefined ? action.value : state.priceInputString
     const priceInputValue = parsed ?? state.priceInputValue
@@ -75,7 +78,10 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (action.type === 'ModifyTotal') {
-    const parsed = parseCurrencyInput(action.value, AssetId.USDC)
+    const parsed = parseCurrencyInput(
+      action.value,
+      state.props.collateralAsset.assetId
+    )
     const totalInputString =
       parsed !== undefined ? action.value : state.totalInputString
     const totalInputValue = parsed ?? state.totalInputValue
@@ -120,7 +126,10 @@ function stateFromAmountAndPrice(
     amountInputValue,
     priceInputString,
     priceInputValue,
-    totalInputString: formatCurrencyInput(totalInputValue, AssetId.USDC),
+    totalInputString: formatCurrencyInput(
+      totalInputValue,
+      state.props.collateralAsset.assetId
+    ),
     totalInputValue,
   })
 }
@@ -155,7 +164,10 @@ function stateFromAmountAndTotal(
     amountInputValue,
     totalInputString,
     totalInputValue,
-    priceInputString: formatCurrencyInput(priceInputValue, AssetId.USDC),
+    priceInputString: formatCurrencyInput(
+      priceInputValue,
+      state.props.collateralAsset.assetId
+    ),
     priceInputValue,
   })
 }
@@ -164,7 +176,7 @@ function withChecks(state: FormState): FormState {
   const balance = state.balance
   const absolute = balance < 0 ? -balance : balance
 
-  if (state.assetId === AssetId.USDC && balance < 0) {
+  if (state.assetId === state.props.collateralAsset.assetId && balance < 0) {
     return {
       ...state,
       amountInputError: true,

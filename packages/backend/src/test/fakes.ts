@@ -1,9 +1,9 @@
 import { ForcedTrade, ForcedWithdrawal, OnChainData } from '@explorer/encoding'
 import {
   CollateralAsset,
+  ERC1155Details,
   ERC20Details,
   ERC721Details,
-  ERC1155Details,
   ETHDetails,
 } from '@explorer/shared'
 import {
@@ -68,7 +68,7 @@ export function fakeFinalize(
   const amount = fakeBigInt()
   return {
     starkKey: StarkKey.fake(),
-    assetType: AssetId.USDC,
+    assetType: AssetId('USDC-6'),
     quantizedAmount: amount,
     nonQuantizedAmount: amount,
     recipient: EthereumAddress.fake(),
@@ -89,7 +89,7 @@ export function fakeTrade(
     starkKeyA: StarkKey.fake(),
     starkKeyB: StarkKey.fake(),
     syntheticAmount: fakeBigInt(),
-    syntheticAssetId: AssetId.USDC,
+    syntheticAssetId: AssetId('USDC-6'),
     ...trade,
   }
 }
