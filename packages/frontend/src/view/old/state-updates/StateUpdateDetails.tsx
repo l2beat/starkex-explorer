@@ -94,7 +94,7 @@ export function StateUpdateDetails({
         noRowsText="this update does not include any forced transactions"
         columns={[
           { header: 'Type' },
-          { header: 'Time' },
+          { header: 'Time (UTC)' },
           { header: 'Tx Hash', monospace: true, fullWidth: true },
           { header: 'Amount', numeric: true },
           { header: 'Asset' },

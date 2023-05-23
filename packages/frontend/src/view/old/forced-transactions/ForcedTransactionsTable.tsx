@@ -21,7 +21,7 @@ export function ForcedTransactionsTable({
       noRowsText="no forced transactions have been issued so far"
       columns={[
         { header: 'Type' },
-        { header: 'Time' },
+        { header: 'Time (UTC)' },
         { header: 'Status' },
         { header: 'Tx Hash', monospace: true, fullWidth: true },
         { header: 'Position' },

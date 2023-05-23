@@ -42,7 +42,7 @@ export function PositionTransactionsTable(
 
 const transactionHistoryTableColumns: Column[] = [
   { header: 'Type' },
-  { header: 'Time' },
+  { header: 'Time (UTC)' },
   { header: 'Status' },
   { header: 'Tx Hash', monospace: true, fullWidth: true },
   { header: 'Amount', numeric: true },
