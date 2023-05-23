@@ -1,11 +1,11 @@
 import { UserDetails } from '@explorer/shared'
 
 import { FormId } from '../../../view/pages/forced-actions/components/form/ids'
+import { NewPerpetualForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormElements, getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
 import { FormAction, FormState } from './types'
-import { NewPerpetualForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 
 export function initPerpetualForcedActionForm() {
   if (!document.getElementById(FormId.Form)) {

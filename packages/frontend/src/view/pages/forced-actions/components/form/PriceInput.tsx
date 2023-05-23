@@ -3,8 +3,8 @@ import React from 'react'
 import { assetToInfo } from '../../../../../utils/assets'
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
-import { FormId } from './ids'
 import { NewPerpetualForcedActionFormProps } from '../../NewForcedActionFormProps'
+import { FormId } from './ids'
 
 export function PriceInput(props: NewPerpetualForcedActionFormProps) {
   const usdcInfo = assetToInfo({ hashOrId: props.collateralAsset.assetId })
