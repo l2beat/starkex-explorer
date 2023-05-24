@@ -43,14 +43,14 @@ interface PartyOrder {
   isBuyingSynthetic: boolean
   expirationTimestamp: Timestamp
   signature: Signature
-  assetIdSynthetic: AssetId
+  syntheticAssetId: AssetId
   orderType: OrderType
-  assetIdCollateral: AssetHash
+  collateralAssetId: AssetHash
   positionId: bigint
-  amountSynthetic: bigint
-  amountFee: bigint
+  syntheticAmount: bigint
+  collateralAmount: bigint
+  feeAmount: bigint
   starkKey: StarkKey
-  amountCollateral: bigint
 }
 
 export interface DepositTransactionData {
@@ -140,7 +140,7 @@ interface LiquidateOrder {
   syntheticAmount: bigint
   collateralAssetId: AssetHash
   collateralAmount: bigint
-  amountFee: bigint
+  feeAmount: bigint
   positionId: bigint
   expirationTimestamp: Timestamp
   isBuyingSynthetic: boolean
@@ -728,7 +728,7 @@ function encodeLiquidateOrder(values: LiquidateOrder): ToJSON<LiquidateOrder> {
     syntheticAmount: values.syntheticAmount.toString(),
     collateralAssetId: values.collateralAssetId.toString(),
     collateralAmount: values.collateralAmount.toString(),
-    amountFee: values.amountFee.toString(),
+    feeAmount: values.feeAmount.toString(),
     positionId: values.positionId.toString(),
     expirationTimestamp: values.expirationTimestamp.toString(),
     signature: encodeSignature(values.signature),
@@ -744,7 +744,7 @@ function decodeLiquidateOrder(values: ToJSON<LiquidateOrder>): LiquidateOrder {
     syntheticAmount: BigInt(values.syntheticAmount),
     collateralAssetId: AssetHash(values.collateralAssetId),
     collateralAmount: BigInt(values.collateralAmount),
-    amountFee: BigInt(values.amountFee),
+    feeAmount: BigInt(values.feeAmount),
     positionId: BigInt(values.positionId),
     signature: decodeSignature(values.signature),
     expirationTimestamp: Timestamp(values.expirationTimestamp),
@@ -756,14 +756,14 @@ function encodePartyOrder(values: PartyOrder): ToJSON<PartyOrder> {
     ...values,
     nonce: values.nonce.toString(),
     expirationTimestamp: values.expirationTimestamp.toString(),
-    assetIdSynthetic: values.assetIdSynthetic.toString(),
-    assetIdCollateral: values.assetIdCollateral.toString(),
+    syntheticAssetId: values.syntheticAssetId.toString(),
+    collateralAssetId: values.collateralAssetId.toString(),
     positionId: values.positionId.toString(),
-    amountSynthetic: values.amountSynthetic.toString(),
-    amountFee: values.amountFee.toString(),
+    syntheticAmount: values.syntheticAmount.toString(),
+    feeAmount: values.feeAmount.toString(),
     starkKey: values.starkKey.toString(),
     signature: encodeSignature(values.signature),
-    amountCollateral: values.amountCollateral.toString(),
+    collateralAmount: values.collateralAmount.toString(),
   }
 }
 
@@ -772,14 +772,14 @@ function decodePartyOrder(values: ToJSON<PartyOrder>): PartyOrder {
     ...values,
     nonce: BigInt(values.nonce),
     expirationTimestamp: Timestamp(values.expirationTimestamp),
-    assetIdSynthetic: AssetId(values.assetIdSynthetic),
-    assetIdCollateral: AssetHash(values.assetIdCollateral),
+    syntheticAssetId: AssetId(values.syntheticAssetId),
+    collateralAssetId: AssetHash(values.collateralAssetId),
     positionId: BigInt(values.positionId),
-    amountSynthetic: BigInt(values.amountSynthetic),
-    amountFee: BigInt(values.amountFee),
+    syntheticAmount: BigInt(values.syntheticAmount),
+    feeAmount: BigInt(values.feeAmount),
     starkKey: StarkKey(values.starkKey),
     signature: decodeSignature(values.signature),
-    amountCollateral: BigInt(values.amountCollateral),
+    collateralAmount: BigInt(values.collateralAmount),
   }
 }
 
