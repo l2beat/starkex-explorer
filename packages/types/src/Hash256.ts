@@ -11,7 +11,7 @@ export function Hash256(value: string) {
     value = '0x' + value
   }
   if (!/^0x[a-f\d]{64}$/i.test(value)) {
-    throw new TypeError('Invalid Hash256')
+    throw new TypeError(`Invalid Hash256: ${value}`)
   }
   return value.toLowerCase() as unknown as Hash256
 }

@@ -3,6 +3,7 @@ import { assertUnreachable } from '@explorer/shared'
 import {
   AssetHash,
   EthereumAddress,
+  Hash256,
   PedersenHash,
   StarkKey,
   Timestamp,
@@ -148,7 +149,7 @@ function toPerpetualTransaction(
         assetId: AssetHash(tx.asset_id),
         expirationTimestamp: Timestamp(tx.expiration_timestamp),
         factRegistryAddress: EthereumAddress(tx.fact_registry_address),
-        fact: tx.fact, // Not sure
+        fact: Hash256(tx.fact),
         signature: toPerpetualSignature(tx.signature),
         type: 'ConditionalTransfer',
       }
@@ -243,11 +244,11 @@ export function toPerpetualSignature(signature: SignatureResponse) {
 }
 
 function toPerpetualSignedPrice(
-  signerStarkKey: string,
+  signerPublicKey: string,
   signedPrice: SignedOraclePrice
 ) {
   return {
-    signerStarkKey: AssetHash(signerStarkKey),
+    signerPublicKey: Hash256(signerPublicKey),
     externalAssetId: AssetHash(signedPrice.external_asset_id),
     price: BigInt(signedPrice.price),
     timestampedSignature: {
@@ -267,8 +268,8 @@ function toPerpetualOraclePrice(
     syntheticAssetId: decodeAssetId(syntheticAssetId),
     price: BigInt(oraclePrice.price),
     signedPrices: Object.entries(oraclePrice.signed_prices).map(
-      ([signerStarkKey, signedPrice]) =>
-        toPerpetualSignedPrice(signerStarkKey, signedPrice)
+      ([signerPublicKey, signedPrice]) =>
+        toPerpetualSignedPrice(signerPublicKey, signedPrice)
     ),
   }
 }

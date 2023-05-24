@@ -3,6 +3,7 @@ import {
   AssetHash,
   AssetId,
   EthereumAddress,
+  Hash256,
   PedersenHash,
   StarkKey,
   Timestamp,
@@ -127,7 +128,7 @@ export interface ConditionalTransferTransactionData {
   assetId: AssetHash
   expirationTimestamp: Timestamp
   factRegistryAddress: EthereumAddress
-  fact: string // TODO: I am not sure what type it is
+  fact: Hash256
   signature: Signature
   type: 'ConditionalTransfer'
 }
@@ -181,8 +182,7 @@ export interface FundingTickTransactionData {
 }
 
 interface SignedOraclePrice {
-  // TODO: Revisit this key type
-  signerStarkKey: AssetHash
+  signerPublicKey: Hash256
   externalAssetId: AssetHash
   timestampedSignature: {
     signature: Signature
@@ -518,6 +518,7 @@ function decodeConditionalTransferTransaction(
     expirationTimestamp: Timestamp(values.expirationTimestamp),
     senderStarkKey: StarkKey(values.senderStarkKey),
     receiverStarkKey: StarkKey(values.receiverStarkKey),
+    fact: Hash256(values.fact),
     factRegistryAddress: EthereumAddress(values.factRegistryAddress),
     signature: decodeSignature(values.signature),
   }
@@ -694,7 +695,7 @@ function encodeSignedOraclePrice(
 ): ToJSON<SignedOraclePrice> {
   return {
     ...values,
-    signerStarkKey: values.signerStarkKey.toString(),
+    signerPublicKey: values.signerPublicKey.toString(),
     externalAssetId: values.externalAssetId.toString(),
     price: values.price.toString(),
     timestampedSignature: {
@@ -709,7 +710,7 @@ function decodeSignedOraclePrice(
 ): SignedOraclePrice {
   return {
     ...values,
-    signerStarkKey: AssetHash(values.signerStarkKey),
+    signerPublicKey: Hash256(values.signerPublicKey),
     externalAssetId: AssetHash(values.externalAssetId),
     price: BigInt(values.price),
     timestampedSignature: {

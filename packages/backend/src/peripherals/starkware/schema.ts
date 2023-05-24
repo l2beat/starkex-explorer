@@ -3,12 +3,13 @@ import * as z from 'zod'
 const UnsignedIntAsString = z.string().regex(/^([1-9]\d*|0)$/)
 const SignedIntAsString = z.string().regex(/^(-?[1-9]\d*|0)$/)
 const PedersenHash = z.string().regex(/^0[a-f\d]{63}$/)
-const PedersenHash0x = z.string().regex(/^0x[a-f\d]{0,64}$/)
+const PedersenHash0x = z.string().regex(/^0x[a-f\d]{0,63}$/)
+const Hash256_0x = z.string().regex(/^0x[a-f\d]{1,64}$/)
+const Hash256 = z.string().regex(/^[a-f\d]{1,64}$/)
 const StarkKey = z.string().regex(/^0x0*[a-f\d]{0,63}$/)
-const Bytes32 = z.string().regex(/^[a-f\d]{0,64}$/)
 const AssetHash0x = z.string().regex(/^0x[a-f\d]{0,63}$/)
 const AssetId = z.string().regex(/^0x[a-f\d]{30}$/)
-const EthereumAddress = z.string().regex(/^0x[a-fA-F0-9]{1,40}$/)
+const EthereumAddress = z.string().regex(/^0x[a-fA-F0-9]{40}$/)
 
 // https://github.com/starkware-libs/starkex-data-availability-committee/blob/7d72f8e05d6d9ccda5b99444f313a7248ca479b5/src/services/perpetual/public/business_logic/state_objects.py
 export type PerpetualBatchDataResponse = z.infer<
@@ -185,7 +186,7 @@ const ConditionalTransferTransaction = z.strictObject({
   asset_id: AssetHash0x,
   expiration_timestamp: UnsignedIntAsString,
   fact_registry_address: EthereumAddress,
-  fact: Bytes32,
+  fact: Hash256,
   signature: SignatureResponse,
   type: z.literal('CONDITIONAL_TRANSFER'),
 })
@@ -224,7 +225,7 @@ const DeleverageTransaction = z.strictObject({
 
 const FundingTickTransaction = z.strictObject({
   global_funding_indices: z.strictObject({
-    indices: z.record(AssetId, SignedIntAsString), // value is negative but maybe we need bigint here
+    indices: z.record(AssetId, SignedIntAsString),
     timestamp: UnsignedIntAsString,
   }),
   type: z.literal('FUNDING_TICK'),
@@ -242,7 +243,7 @@ export const SignedOraclePrice = z.strictObject({
 
 export type AssetOraclePrice = z.infer<typeof AssetOraclePrice>
 export const AssetOraclePrice = z.strictObject({
-  signed_prices: z.record(PedersenHash0x, SignedOraclePrice), // TODO: Revisit this key type
+  signed_prices: z.record(Hash256_0x, SignedOraclePrice),
   price: UnsignedIntAsString,
 })
 
@@ -297,6 +298,7 @@ const PerpetualBatchInfoResponseTransactionInfo = z.strictObject({
 export type PerpetualBatchInfoResponse = z.infer<
   typeof PerpetualBatchInfoResponse
 >
+
 export const PerpetualBatchInfoResponse = z.strictObject({
   previous_batch_id: z.number(),
   sequence_number: z.number(),

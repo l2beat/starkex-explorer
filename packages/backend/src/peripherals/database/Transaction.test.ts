@@ -2,6 +2,7 @@ import {
   AssetHash,
   AssetId,
   EthereumAddress,
+  Hash256,
   PedersenHash,
   StarkKey,
   Timestamp,
@@ -298,7 +299,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
         s: PedersenHash.fake(),
       },
       factRegistryAddress: EthereumAddress.fake(),
-      fact: '11111',
+      fact: Hash256.fake(),
     }
 
     const encoded = encodeTransactionData(data)
@@ -470,7 +471,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
           syntheticAssetId: AssetId('ETH-9'),
           signedPrices: [
             {
-              signerStarkKey: AssetHash.fake(),
+              signerPublicKey: Hash256.fake(),
               externalAssetId: AssetHash.fake(),
               timestampedSignature: {
                 signature: {
@@ -498,7 +499,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
         oraclePrices: data.oraclePrices.map((oraclePrice) => ({
           syntheticAssetId: oraclePrice.syntheticAssetId.toString(),
           signedPrices: oraclePrice.signedPrices.map((signedPrice) => ({
-            signerStarkKey: signedPrice.signerStarkKey.toString(),
+            signerPublicKey: signedPrice.signerPublicKey.toString(),
             externalAssetId: signedPrice.externalAssetId.toString(),
             timestampedSignature: {
               signature: {

@@ -138,7 +138,7 @@ const EXAMPLE_ORACLE_PRICES_TICK_TRANSACTION = {
   oracle_prices: {
     '0x4c494e4b2d37000000000000000000': {
       signed_prices: {
-        '0x2af704df5467285c5d1bd7c08ee33c49057fb2a05ecdc4f949293190f28ce7e': {
+        '0x2af704df5467285c5d1bd7c08ee33c49057fb2a05ecdc4f949293190f28ce722': {
           external_asset_id: '0x4c494e4b5553440000000000000000004465787472',
           timestamped_signature: {
             timestamp: '1662509998',
@@ -149,7 +149,7 @@ const EXAMPLE_ORACLE_PRICES_TICK_TRANSACTION = {
           },
           price: '6617000000000000000',
         },
-        '0xcc85afe4ca87f9628370c432c447e569a01dc96d160015c8039959db8521c4': {
+        '0xcc85afe4ca87f9628370c432c447e569a01dc96d160015c8039959db8521c422': {
           external_asset_id: '0x4c494e4b55534400000000000000000053746f726b',
           timestamped_signature: {
             timestamp: '1662510000',
@@ -299,33 +299,7 @@ const EXAMPLE_DELEVERAGE_TRANSACTION = {
   type: 'DELEVERAGE',
 }
 const EXAMPLE_MULTI_TRANSACTION = {
-  txs: [
-    {
-      amount: '2569146471088859254',
-      position_id: '7758176404715800194',
-      public_key:
-        '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
-      type: 'DEPOSIT',
-    },
-    {
-      amount: '13942126818862981423',
-      asset_id:
-        '0x57d05d11b570fd197b55746070ee051c731ee109b07255eab3c9cf8b6c579d',
-      expiration_timestamp: '2628077981',
-      nonce: '3874773259',
-      receiver_position_id: '11534118754833929857',
-      receiver_public_key:
-        '0x0061498afefa6b8b1cd5350bb973afca2ae42f844a5cf6bea556bf6b42adeea8',
-      sender_position_id: '10326739782786242647',
-      sender_public_key:
-        '0x0200787ad74538c33b8aee389d8b4432da1feb9cda733b303b2884316a0caf1d',
-      signature: {
-        r: '0x23108408a83c1cd4f80a1d7ce2ea651a3168f4f1ca46282c1081f0ad5417dcb',
-        s: '0x6f0004e07550397a51b079e485cd348aab8cc8094c79fb756671a043da9092d',
-      },
-      type: 'TRANSFER',
-    },
-  ],
+  txs: [EXAMPLE_DELEVERAGE_TRANSACTION, EXAMPLE_FORCED_TRADE_TRANSACTION],
   type: 'MULTI_TRANSACTION',
 }
 const ALL_EXAMPLE_TRANSACTIONS = [
