@@ -3,7 +3,6 @@ import {
   AssetId,
   EthereumAddress,
   Hash256,
-  PedersenHash,
   StarkKey,
   Timestamp,
 } from '@explorer/types'
@@ -50,8 +49,16 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       nonce: 1234n,
       expirationTimestamp: Timestamp(1234),
       signature: {
-        r: PedersenHash.fake(),
-        s: PedersenHash.fake(),
+        r: Hash256.from(
+          BigInt(
+            '0x33101c1f7ee684e8653d770433c32c7f364f3f7a16a7ede3cf33f8157957085'
+          )
+        ),
+        s: Hash256.from(
+          BigInt(
+            '0x3e603b99dd8e367e3e61ef9cd0125bdcf9061a122cf535c4206553507f28ce5'
+          )
+        ),
       },
     }
     const encoded = encodeTransactionData(data)
@@ -116,8 +123,8 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
         isBuyingSynthetic: true,
         expirationTimestamp: Timestamp(1234),
         signature: {
-          r: PedersenHash.fake(),
-          s: PedersenHash.fake(),
+          r: Hash256.from(BigInt('0x1234')),
+          s: Hash256.from(BigInt('0x1234abcd5678')),
         },
         starkKey: StarkKey.fake(),
         assetIdSynthetic: AssetId('ETH-9'),
@@ -133,8 +140,12 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
         isBuyingSynthetic: false,
         expirationTimestamp: Timestamp(1234),
         signature: {
-          r: PedersenHash.fake(),
-          s: PedersenHash.fake(),
+          r: Hash256(
+            '0x0033101c1f7ee684e8653d770433c32c7f364f3f7a16a7ede3cf33f815795708'
+          ),
+          s: Hash256(
+            '0x003e603b99dd8e367e3e61ef9cd0125bdcf9061a122cf535c4206553507f28ce'
+          ),
         },
         starkKey: StarkKey.fake(),
         assetIdSynthetic: AssetId('ETH-9'),
@@ -252,8 +263,12 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       assetId: AssetHash.fake(),
       expirationTimestamp: Timestamp(1234),
       signature: {
-        r: PedersenHash.fake(),
-        s: PedersenHash.fake(),
+        r: Hash256(
+          '0x033101c1f7ee684e8653d770433c32c7f364f3f7a16a7ede3cf33f8157957085'
+        ),
+        s: Hash256(
+          '0x03e603b99dd8e367e3e61ef9cd0125bdcf9061a122cf535c4206553507f28ce5'
+        ),
       },
     }
 
@@ -295,8 +310,12 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       assetId: AssetHash.fake(),
       expirationTimestamp: Timestamp(1234),
       signature: {
-        r: PedersenHash.fake(),
-        s: PedersenHash.fake(),
+        r: Hash256(
+          '0x033101c1f7ee684e8653d770433c32c7f364f3f7a16a7ede3cf33f8157957085'
+        ),
+        s: Hash256(
+          '0x03e603b99dd8e367e3e61ef9cd0125bdcf9061a122cf535c4206553507f28ce5'
+        ),
       },
       factRegistryAddress: EthereumAddress.fake(),
       fact: Hash256.fake(),
@@ -346,8 +365,12 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
         expirationTimestamp: Timestamp(1234),
         isBuyingSynthetic: true,
         signature: {
-          r: PedersenHash.fake(),
-          s: PedersenHash.fake(),
+          r: Hash256(
+            '0x033101c1f7ee684e8653d770433c32c7f364f3f7a16a7ede3cf33f8157957085'
+          ),
+          s: Hash256(
+            '0x03e603b99dd8e367e3e61ef9cd0125bdcf9061a122cf535c4206553507f28ce5'
+          ),
         },
       },
       liquidatedPositionId: 1234n,
@@ -475,8 +498,12 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
               externalAssetId: AssetHash.fake(),
               timestampedSignature: {
                 signature: {
-                  r: PedersenHash.fake(),
-                  s: PedersenHash.fake(),
+                  r: Hash256(
+                    '0x033101c1f7ee684e8653d770433c32c7f364f3f7a16a7ede3cf33f8157957085'
+                  ),
+                  s: Hash256(
+                    '0x03e603b99dd8e367e3e61ef9cd0125bdcf9061a122cf535c4206553507f28ce5'
+                  ),
                 },
                 timestamp: Timestamp(1234),
               },

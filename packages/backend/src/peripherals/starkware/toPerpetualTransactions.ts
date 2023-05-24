@@ -4,7 +4,6 @@ import {
   AssetHash,
   EthereumAddress,
   Hash256,
-  PedersenHash,
   StarkKey,
   Timestamp,
 } from '@explorer/types'
@@ -132,10 +131,7 @@ function toPerpetualTransaction(
         receiverPositionId: BigInt(tx.receiver_position_id),
         assetId: AssetHash(tx.asset_id),
         expirationTimestamp: Timestamp(tx.expiration_timestamp),
-        signature: {
-          s: PedersenHash(tx.signature.s),
-          r: PedersenHash(tx.signature.r),
-        },
+        signature: toPerpetualSignature(tx.signature),
         type: 'Transfer',
       }
     case 'CONDITIONAL_TRANSFER':
@@ -236,26 +232,19 @@ export function toPerpetualOrderType(orderType: OrderTypeResponse) {
   }
 }
 
-export function toPerpetualSignature(signature: SignatureResponse) {
-  return {
-    s: PedersenHash(signature.s),
-    r: PedersenHash(signature.r),
-  }
-}
-
 function toPerpetualSignedPrice(
   signerPublicKey: string,
   signedPrice: SignedOraclePrice
 ) {
   return {
-    signerPublicKey: Hash256(signerPublicKey),
+    signerPublicKey: Hash256.from(BigInt(signerPublicKey)),
     externalAssetId: AssetHash(signedPrice.external_asset_id),
     price: BigInt(signedPrice.price),
     timestampedSignature: {
-      timestamp: Timestamp(signedPrice.timestamped_signature.timestamp),
       signature: toPerpetualSignature(
         signedPrice.timestamped_signature.signature
       ),
+      timestamp: Timestamp(signedPrice.timestamped_signature.timestamp),
     },
   }
 }
@@ -271,5 +260,12 @@ function toPerpetualOraclePrice(
       ([signerPublicKey, signedPrice]) =>
         toPerpetualSignedPrice(signerPublicKey, signedPrice)
     ),
+  }
+}
+
+export function toPerpetualSignature(signature: SignatureResponse) {
+  return {
+    s: Hash256.from(BigInt(signature.s)),
+    r: Hash256.from(BigInt(signature.r)),
   }
 }

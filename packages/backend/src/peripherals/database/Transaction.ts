@@ -4,7 +4,6 @@ import {
   AssetId,
   EthereumAddress,
   Hash256,
-  PedersenHash,
   StarkKey,
   Timestamp,
 } from '@explorer/types'
@@ -35,8 +34,8 @@ export type TransactionDataJson = ToJSON<TransactionData>
 type OrderType = 'LimitOrderWithFees'
 
 interface Signature {
-  s: PedersenHash
-  r: PedersenHash
+  s: Hash256
+  r: Hash256
 }
 
 interface PartyOrder {
@@ -324,12 +323,12 @@ function encodeWithdrawToAddressTransaction(
     data: {
       ...values,
       positionId: values.positionId.toString(),
-      signature: encodeSignature(values.signature),
       starkKey: values.starkKey.toString(),
       ethereumAddress: values.ethereumAddress.toString(),
       amount: values.amount.toString(),
       nonce: values.nonce.toString(),
       expirationTimestamp: values.expirationTimestamp.toString(),
+      signature: encodeSignature(values.signature),
     },
   }
 }
@@ -344,8 +343,8 @@ function decodeWithdrawToAddressTransaction(
     ethereumAddress: EthereumAddress(values.ethereumAddress),
     amount: BigInt(values.amount),
     nonce: BigInt(values.nonce),
-    signature: decodeSignature(values.signature),
     expirationTimestamp: Timestamp(values.expirationTimestamp),
+    signature: decodeSignature(values.signature),
   }
 }
 
@@ -519,8 +518,8 @@ function decodeConditionalTransferTransaction(
     senderStarkKey: StarkKey(values.senderStarkKey),
     receiverStarkKey: StarkKey(values.receiverStarkKey),
     fact: Hash256(values.fact),
-    factRegistryAddress: EthereumAddress(values.factRegistryAddress),
     signature: decodeSignature(values.signature),
+    factRegistryAddress: EthereumAddress(values.factRegistryAddress),
   }
 }
 
@@ -714,8 +713,8 @@ function decodeSignedOraclePrice(
     externalAssetId: AssetHash(values.externalAssetId),
     price: BigInt(values.price),
     timestampedSignature: {
-      timestamp: Timestamp(values.timestampedSignature.timestamp),
       signature: decodeSignature(values.timestampedSignature.signature),
+      timestamp: Timestamp(values.timestampedSignature.timestamp),
     },
   }
 }
@@ -747,8 +746,8 @@ function decodeLiquidateOrder(values: ToJSON<LiquidateOrder>): LiquidateOrder {
     collateralAmount: BigInt(values.collateralAmount),
     amountFee: BigInt(values.amountFee),
     positionId: BigInt(values.positionId),
-    expirationTimestamp: Timestamp(values.expirationTimestamp),
     signature: decodeSignature(values.signature),
+    expirationTimestamp: Timestamp(values.expirationTimestamp),
   }
 }
 
@@ -757,13 +756,13 @@ function encodePartyOrder(values: PartyOrder): ToJSON<PartyOrder> {
     ...values,
     nonce: values.nonce.toString(),
     expirationTimestamp: values.expirationTimestamp.toString(),
-    signature: encodeSignature(values.signature),
     assetIdSynthetic: values.assetIdSynthetic.toString(),
     assetIdCollateral: values.assetIdCollateral.toString(),
     positionId: values.positionId.toString(),
     amountSynthetic: values.amountSynthetic.toString(),
     amountFee: values.amountFee.toString(),
     starkKey: values.starkKey.toString(),
+    signature: encodeSignature(values.signature),
     amountCollateral: values.amountCollateral.toString(),
   }
 }
@@ -773,13 +772,13 @@ function decodePartyOrder(values: ToJSON<PartyOrder>): PartyOrder {
     ...values,
     nonce: BigInt(values.nonce),
     expirationTimestamp: Timestamp(values.expirationTimestamp),
-    signature: decodeSignature(values.signature),
     assetIdSynthetic: AssetId(values.assetIdSynthetic),
     assetIdCollateral: AssetHash(values.assetIdCollateral),
     positionId: BigInt(values.positionId),
     amountSynthetic: BigInt(values.amountSynthetic),
     amountFee: BigInt(values.amountFee),
     starkKey: StarkKey(values.starkKey),
+    signature: decodeSignature(values.signature),
     amountCollateral: BigInt(values.amountCollateral),
   }
 }
@@ -793,7 +792,7 @@ function encodeSignature(values: Signature): ToJSON<Signature> {
 
 function decodeSignature(values: ToJSON<Signature>): Signature {
   return {
-    r: PedersenHash(values.r),
-    s: PedersenHash(values.s),
+    r: Hash256(values.r),
+    s: Hash256(values.s),
   }
 }

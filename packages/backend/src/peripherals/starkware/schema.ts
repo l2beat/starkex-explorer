@@ -3,10 +3,10 @@ import * as z from 'zod'
 const UnsignedIntAsString = z.string().regex(/^([1-9]\d*|0)$/)
 const SignedIntAsString = z.string().regex(/^(-?[1-9]\d*|0)$/)
 const PedersenHash = z.string().regex(/^0[a-f\d]{63}$/)
-const PedersenHash0x = z.string().regex(/^0x[a-f\d]{0,63}$/)
 const Hash256_0x = z.string().regex(/^0x[a-f\d]{1,64}$/)
 const Hash256 = z.string().regex(/^[a-f\d]{1,64}$/)
-const StarkKey = z.string().regex(/^0x0*[a-f\d]{0,63}$/)
+const StarkKey0x = z.string().regex(/^0x[a-f\d]{1,64}$/)
+const StarkKey0x0 = z.string().regex(/^0x0[a-f\d]{63}$/)
 const AssetHash0x = z.string().regex(/^0x[a-f\d]{0,63}$/)
 const AssetId = z.string().regex(/^0x[a-f\d]{30}$/)
 const EthereumAddress = z.string().regex(/^0x[a-fA-F0-9]{40}$/)
@@ -25,7 +25,7 @@ export const PerpetualBatchDataResponse = z.strictObject({
         // position_id
         UnsignedIntAsString,
         z.strictObject({
-          public_key: PedersenHash0x,
+          public_key: StarkKey0x,
           collateral_balance: SignedIntAsString,
           assets: z.record(
             AssetId,
@@ -61,7 +61,7 @@ export const SpotBatchDataResponse = z.strictObject({
         z.strictObject({
           token: AssetHash0x,
           balance: UnsignedIntAsString,
-          stark_key: PedersenHash0x,
+          stark_key: StarkKey0x,
         })
       ),
       orders: z.record(
@@ -80,20 +80,20 @@ export const OrderTypeResponse = z.enum(['LIMIT_ORDER_WITH_FEES'])
 
 export type SignatureResponse = z.infer<typeof SignatureResponse>
 export const SignatureResponse = z.strictObject({
-  s: PedersenHash0x,
-  r: PedersenHash0x,
+  s: Hash256_0x,
+  r: Hash256_0x,
 })
 
 const DepositTransaction = z.strictObject({
   position_id: UnsignedIntAsString,
-  public_key: StarkKey,
+  public_key: StarkKey0x0,
   amount: UnsignedIntAsString,
   type: z.literal('DEPOSIT'),
 })
 
 const WithdrawalToAddresTransaction = z.strictObject({
   position_id: UnsignedIntAsString,
-  public_key: StarkKey,
+  public_key: StarkKey0x0,
   eth_address: EthereumAddress,
   amount: UnsignedIntAsString,
   nonce: UnsignedIntAsString,
@@ -104,7 +104,7 @@ const WithdrawalToAddresTransaction = z.strictObject({
 
 const ForcedWithdrawalTransaction = z.strictObject({
   position_id: UnsignedIntAsString,
-  public_key: StarkKey,
+  public_key: StarkKey0x0,
   amount: UnsignedIntAsString,
   is_valid: z.boolean(),
   type: z.literal('FORCED_WITHDRAWAL'),
@@ -126,7 +126,7 @@ const TradeTransaction = z.strictObject({
     position_id: UnsignedIntAsString,
     amount_synthetic: UnsignedIntAsString,
     amount_fee: UnsignedIntAsString,
-    public_key: StarkKey,
+    public_key: StarkKey0x0,
     amount_collateral: UnsignedIntAsString,
   }),
   party_a_order: z.strictObject({
@@ -140,15 +140,15 @@ const TradeTransaction = z.strictObject({
     position_id: UnsignedIntAsString,
     amount_synthetic: UnsignedIntAsString,
     amount_fee: UnsignedIntAsString,
-    public_key: StarkKey,
+    public_key: StarkKey0x0,
     amount_collateral: UnsignedIntAsString,
   }),
   type: z.literal('TRADE'),
 })
 
 const ForcedTradeTransaction = z.strictObject({
-  public_key_party_a: StarkKey,
-  public_key_party_b: StarkKey,
+  public_key_party_a: StarkKey0x0,
+  public_key_party_b: StarkKey0x0,
   position_id_party_a: UnsignedIntAsString,
   position_id_party_b: UnsignedIntAsString,
   collateral_asset_id: AssetHash0x,
@@ -164,9 +164,9 @@ const ForcedTradeTransaction = z.strictObject({
 const TransferTransaction = z.strictObject({
   amount: UnsignedIntAsString,
   nonce: UnsignedIntAsString,
-  sender_public_key: StarkKey,
+  sender_public_key: StarkKey0x0,
   sender_position_id: UnsignedIntAsString,
-  receiver_public_key: StarkKey,
+  receiver_public_key: StarkKey0x0,
   receiver_position_id: UnsignedIntAsString,
   // From docs: asset_id - The unique asset ID (as registered on the contract) to transfer. Currently only the collateral asset is supported.
   asset_id: AssetHash0x,
@@ -178,9 +178,9 @@ const TransferTransaction = z.strictObject({
 const ConditionalTransferTransaction = z.strictObject({
   amount: UnsignedIntAsString,
   nonce: UnsignedIntAsString,
-  sender_public_key: StarkKey,
+  sender_public_key: StarkKey0x0,
   sender_position_id: UnsignedIntAsString,
-  receiver_public_key: StarkKey,
+  receiver_public_key: StarkKey0x0,
   receiver_position_id: UnsignedIntAsString,
   // From docs: asset_id - The unique asset ID (as registered on the contract) to transfer. Currently only the collateral asset is supported.
   asset_id: AssetHash0x,
@@ -195,7 +195,7 @@ const LiquidateTransaction = z.strictObject({
   liquidator_order: z.strictObject({
     order_type: OrderTypeResponse,
     nonce: UnsignedIntAsString,
-    public_key: StarkKey,
+    public_key: StarkKey0x0,
     amount_synthetic: UnsignedIntAsString,
     amount_collateral: UnsignedIntAsString,
     amount_fee: UnsignedIntAsString,
