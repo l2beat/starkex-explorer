@@ -15,15 +15,15 @@ describe(nextFormState.name, () => {
         balance: 69420_654321n,
         priceUSDCents: 100n,
       },
-      collateralAsset: {
-        assetId: AssetId('USDC-6'),
-        assetHash: AssetHash.fake(),
-        price: 1_000_000n,
-      },
     },
     {
       starkKey: StarkKey.fake(),
       address: EthereumAddress.fake(),
+    },
+    {
+      assetId: AssetId('USDC-6'),
+      assetHash: AssetHash.fake(),
+      price: 1_000_000n,
     }
   )
 

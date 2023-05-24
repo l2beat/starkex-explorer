@@ -121,7 +121,6 @@ export class ForcedActionController {
           asset.assetHashOrId as AssetId
         ),
       },
-      collateralAsset: context.collateralAsset,
     })
 
     return { type: 'success', content }
@@ -175,7 +174,6 @@ export class ForcedActionController {
           asset.assetHashOrId as AssetId
         ),
       },
-      collateralAsset: context.collateralAsset,
     })
     return { type: 'success', content }
   }

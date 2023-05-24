@@ -1,12 +1,18 @@
+import { CollateralAsset } from '@explorer/shared'
 import React from 'react'
 
 import { assetToInfo } from '../../../../../utils/assets'
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
-import { NewPerpetualForcedActionFormProps } from '../../NewForcedActionFormProps'
+import { NewForcedActionFormAsset } from '../../NewForcedActionFormProps'
 import { FormId } from './ids'
 
-export function PriceInput(props: NewPerpetualForcedActionFormProps) {
+interface PriceInputProps {
+  collateralAsset: CollateralAsset
+  asset: NewForcedActionFormAsset
+}
+
+export function PriceInput(props: PriceInputProps) {
   const usdcInfo = assetToInfo({ hashOrId: props.collateralAsset.assetId })
   const price = props.asset.priceUSDCents * 10000n
   const priceFormatted = formatAmount(

@@ -1,11 +1,12 @@
-import { UserDetails } from '@explorer/shared'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
-import { NewPerpetualForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 
 export interface FormState {
   user: UserDetails
-  props: NewPerpetualForcedActionFormProps
+  collateralAsset: CollateralAsset
+  props: NewForcedActionFormProps
   assetId: AssetId
   balance: bigint
   priceUSDCents: bigint

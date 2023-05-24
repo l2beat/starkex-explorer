@@ -1,7 +1,7 @@
-import { UserDetails } from '@explorer/shared'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
 
 import { FormId } from '../../../view/pages/forced-actions/components/form/ids'
-import { NewPerpetualForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormElements, getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
@@ -23,10 +23,13 @@ export function initPerpetualForcedActionForm() {
   } = formElements
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
-  const props = NewPerpetualForcedActionFormProps.parse(propsJson)
+  const props = NewForcedActionFormProps.parse(propsJson)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const userJson = JSON.parse(form.dataset.user ?? '{}')
   const user = UserDetails.parse(userJson)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const collateralAssetJson = JSON.parse(form.dataset.collateralAsset ?? '{}')
+  const collateralAsset = CollateralAsset.parse(collateralAssetJson)
 
   amountInput.addEventListener('input', () =>
     dispatch({ type: 'ModifyAmount', value: amountInput.value })
@@ -53,7 +56,7 @@ export function initPerpetualForcedActionForm() {
   })
 
   let state: FormState | undefined
-  updateUI(getInitialState(props, user))
+  updateUI(getInitialState(props, user, collateralAsset))
 
   function dispatch(action: FormAction) {
     if (state) {

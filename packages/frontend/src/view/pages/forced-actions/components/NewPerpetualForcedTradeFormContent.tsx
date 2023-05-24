@@ -1,16 +1,25 @@
+import { CollateralAsset } from '@explorer/shared'
+import { StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { ArrowDownIcon } from '../../../assets/icons/ArrowIcon'
 import { Button, LinkButton } from '../../../components/Button'
-import { NewPerpetualForcedActionFormProps } from '../NewForcedActionFormProps'
+import { NewForcedActionFormAsset } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
 import { FormId } from './form/ids'
 import { PriceInput } from './form/PriceInput'
 import { TotalInput } from './form/TotalInput'
 
+interface NewPerpetualForcedTradeFormContentProps {
+  positionOrVaultId: bigint
+  starkKey: StarkKey
+  asset: NewForcedActionFormAsset
+  collateralAsset: CollateralAsset
+}
+
 export function NewPerpetualForcedTradeFormContent(
-  props: NewPerpetualForcedActionFormProps
+  props: NewPerpetualForcedTradeFormContentProps
 ) {
   const isBuying = props.asset.balance < 0
   const label = isBuying ? 'buy' : 'sell'
@@ -27,10 +36,13 @@ export function NewPerpetualForcedTradeFormContent(
       </div>
       <div className="flex flex-col gap-2">
         <ForcedActionCard>
-          <AmountInput {...props} />
+          <AmountInput asset={props.asset} />
         </ForcedActionCard>
         <ForcedActionCard>
-          <PriceInput {...props} />
+          <PriceInput
+            asset={props.asset}
+            collateralAsset={props.collateralAsset}
+          />
         </ForcedActionCard>
         <div className="flex items-center justify-center">
           <ArrowDownIcon className="rounded bg-slate-800 text-zinc-500" />

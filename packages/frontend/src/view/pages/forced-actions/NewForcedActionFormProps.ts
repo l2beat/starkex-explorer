@@ -1,5 +1,4 @@
 import {
-  CollateralAsset,
   stringAs,
   stringAsBigInt,
   toJsonWithoutBigInts,
@@ -15,29 +14,16 @@ export const NewForcedActionFormAsset = Asset.extend({
   priceUSDCents: stringAsBigInt(),
 })
 
-export type NewSpotForcedActionFormProps = z.infer<
-  typeof NewSpotForcedActionFormProps
->
-export const NewSpotForcedActionFormProps = z.object({
+export type NewForcedActionFormProps = z.infer<typeof NewForcedActionFormProps>
+export const NewForcedActionFormProps = z.object({
   starkExAddress: stringAs(EthereumAddress),
   positionOrVaultId: stringAsBigInt(),
   starkKey: stringAs(StarkKey),
   asset: NewForcedActionFormAsset,
-})
-
-export type NewPerpetualForcedActionFormProps = z.infer<
-  typeof NewPerpetualForcedActionFormProps
->
-export const NewPerpetualForcedActionFormProps = z.object({
-  starkExAddress: stringAs(EthereumAddress),
-  positionOrVaultId: stringAsBigInt(),
-  starkKey: stringAs(StarkKey),
-  asset: NewForcedActionFormAsset,
-  collateralAsset: CollateralAsset,
 })
 
 export function serializeForcedActionsFormProps(
-  props: NewSpotForcedActionFormProps | NewPerpetualForcedActionFormProps
+  props: NewForcedActionFormProps | NewForcedActionFormProps
 ) {
   return toJsonWithoutBigInts(props)
 }

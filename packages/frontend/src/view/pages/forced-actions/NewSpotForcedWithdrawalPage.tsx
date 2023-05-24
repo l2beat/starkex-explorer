@@ -12,13 +12,13 @@ import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 import { ForcedActionCard } from './components/ForcedActionCard'
 import {
-  NewSpotForcedActionFormProps,
+  NewForcedActionFormProps,
   serializeForcedActionsFormProps,
 } from './NewForcedActionFormProps'
 
 export const SPOT_FORCED_WITHDRAWAL_FORM_ID = 'spot-withdraw-form'
 
-type Props = NewSpotForcedActionFormProps & {
+type Props = NewForcedActionFormProps & {
   context: PageContextWithUser<'spot'>
 }
 

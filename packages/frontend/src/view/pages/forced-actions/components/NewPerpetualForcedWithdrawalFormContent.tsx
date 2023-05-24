@@ -1,13 +1,20 @@
 import React from 'react'
 
+import { StarkKey } from '@explorer/types'
 import { Button, LinkButton } from '../../../components/Button'
-import { NewPerpetualForcedActionFormProps } from '../NewForcedActionFormProps'
+import { NewForcedActionFormAsset } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
 import { FormId } from './form/ids'
 
+interface NewPerpetualForcedWithdrawalFormContentProps {
+  positionOrVaultId: bigint
+  asset: NewForcedActionFormAsset
+  starkKey: StarkKey
+}
+
 export function NewPerpetualForcedWithdrawalFormContent(
-  props: NewPerpetualForcedActionFormProps
+  props: NewPerpetualForcedWithdrawalFormContentProps
 ) {
   return (
     <>
@@ -22,7 +29,7 @@ export function NewPerpetualForcedWithdrawalFormContent(
       </div>
       <div className="flex flex-col gap-2">
         <ForcedActionCard>
-          <AmountInput {...props} />
+          <AmountInput asset={props.asset} />
         </ForcedActionCard>
       </div>
       <div className="flex flex-col gap-2">

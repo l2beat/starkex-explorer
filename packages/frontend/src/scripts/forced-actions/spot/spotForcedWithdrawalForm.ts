@@ -2,7 +2,7 @@ import { UserDetails } from '@explorer/shared'
 import { AssetHash } from '@explorer/types'
 
 import { SPOT_FORCED_WITHDRAWAL_FORM_ID } from '../../../view'
-import { NewSpotForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 
@@ -13,7 +13,7 @@ export function initSpotForcedWithdrawalForm() {
   }
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')
-  const props = NewSpotForcedActionFormProps.parse(propsJson)
+  const props = NewForcedActionFormProps.parse(propsJson)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const userJson = JSON.parse(form.dataset.user ?? '{}')
   const user = UserDetails.parse(userJson)
@@ -26,10 +26,7 @@ export function initSpotForcedWithdrawalForm() {
   })
 }
 
-async function submitExit(
-  props: NewSpotForcedActionFormProps,
-  user: UserDetails
-) {
+async function submitExit(props: NewForcedActionFormProps, user: UserDetails) {
   const hash = await Wallet.sendSpotForcedWithdrawalTransaction(
     user.address,
     props.starkKey,

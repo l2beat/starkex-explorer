@@ -6,7 +6,7 @@ import { FormState } from './types'
 import { isBuyable } from './utils'
 
 export async function submit(state: FormState) {
-  if (state.assetId === state.props.collateralAsset.assetId) {
+  if (state.assetId === state.collateralAsset.assetId) {
     return submitExit(state)
   } else {
     return submitOffer(state)
@@ -37,7 +37,7 @@ async function submitOffer(state: FormState) {
     isABuyingSynthetic: isBuyable(
       state.assetId,
       state.balance,
-      state.props.collateralAsset
+      state.collateralAsset
     ),
   }
 

@@ -1,20 +1,22 @@
-import { UserDetails } from '@explorer/shared'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
 import { formatCurrencyInput } from '../../../utils/formatting/formatCurrencyInput'
-import { NewPerpetualForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { FormAction, FormState } from './types'
 import { getFormType, parseCurrencyInput } from './utils'
 
 export function getInitialState(
-  props: NewPerpetualForcedActionFormProps,
-  user: UserDetails
+  props: NewForcedActionFormProps,
+  user: UserDetails,
+  collateralAsset: CollateralAsset
 ): FormState {
   const { hashOrId, balance, priceUSDCents } = props.asset
   const assetId = AssetId(hashOrId.toString())
-  const type = getFormType(assetId, balance, props.collateralAsset)
+  const type = getFormType(assetId, balance, collateralAsset)
   const candidate: FormState = {
     user,
+    collateralAsset,
     props,
     assetId,
     balance,
@@ -62,7 +64,7 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
   if (action.type === 'ModifyPrice') {
     const parsed = parseCurrencyInput(
       action.value,
-      state.props.collateralAsset.assetId
+      state.collateralAsset.assetId
     )
     const priceInputString =
       parsed !== undefined ? action.value : state.priceInputString
@@ -80,7 +82,7 @@ export function nextFormState(state: FormState, action: FormAction): FormState {
   if (action.type === 'ModifyTotal') {
     const parsed = parseCurrencyInput(
       action.value,
-      state.props.collateralAsset.assetId
+      state.collateralAsset.assetId
     )
     const totalInputString =
       parsed !== undefined ? action.value : state.totalInputString
@@ -128,7 +130,7 @@ function stateFromAmountAndPrice(
     priceInputValue,
     totalInputString: formatCurrencyInput(
       totalInputValue,
-      state.props.collateralAsset.assetId
+      state.collateralAsset.assetId
     ),
     totalInputValue,
   })
@@ -166,7 +168,7 @@ function stateFromAmountAndTotal(
     totalInputValue,
     priceInputString: formatCurrencyInput(
       priceInputValue,
-      state.props.collateralAsset.assetId
+      state.collateralAsset.assetId
     ),
     priceInputValue,
   })
@@ -176,7 +178,7 @@ function withChecks(state: FormState): FormState {
   const balance = state.balance
   const absolute = balance < 0 ? -balance : balance
 
-  if (state.assetId === state.props.collateralAsset.assetId && balance < 0) {
+  if (state.assetId === state.collateralAsset.assetId && balance < 0) {
     return {
       ...state,
       amountInputError: true,

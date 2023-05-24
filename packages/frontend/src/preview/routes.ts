@@ -504,12 +504,10 @@ const routes: Route[] = [
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
-          //TODO: REVIEW
           hashOrId: AssetId('USDC-6'),
           balance: amountBucket.pick(),
           priceUSDCents: 10000n,
         },
-        collateralAsset: context.collateralAsset,
         positionOrVaultId: 1234n,
       })
     },
@@ -528,7 +526,6 @@ const routes: Route[] = [
           balance: amountBucket.pick() * -1n,
           priceUSDCents: 10000n,
         },
-        collateralAsset: context.collateralAsset,
         positionOrVaultId: 1234n,
       })
     },
@@ -548,7 +545,6 @@ const routes: Route[] = [
           balance: amountBucket.pick(),
           priceUSDCents: 10000n,
         },
-        collateralAsset: context.collateralAsset,
         positionOrVaultId: 1234n,
       })
     },
