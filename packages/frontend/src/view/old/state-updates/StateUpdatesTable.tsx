@@ -15,7 +15,7 @@ export function StateUpdatesTable({ stateUpdates }: StateUpdatesTableProps) {
       columns={[
         { header: 'No.' },
         { header: 'Tx Hash', monospace: true, fullWidth: true },
-        { header: 'Time' },
+        { header: 'Time (UTC)' },
         { header: 'Position updates', numeric: true },
         { header: 'Forced txs', numeric: true },
       ]}

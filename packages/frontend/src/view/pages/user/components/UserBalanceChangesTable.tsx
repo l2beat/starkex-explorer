@@ -28,7 +28,7 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
   return (
     <Table
       columns={[
-        { header: 'Time' },
+        { header: 'Time (UTC)' },
         { header: 'Update' },
         { header: 'Asset' },
         { header: 'Change', numeric: true },
