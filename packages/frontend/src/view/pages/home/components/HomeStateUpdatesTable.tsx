@@ -23,7 +23,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
   return (
     <Table
       columns={[
-        { header: 'Time' },
+        { header: 'Time (UTC)' },
         { header: 'Id' },
         { header: 'Tx Hash' },
         { header: 'Updates', numeric: true },

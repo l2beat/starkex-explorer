@@ -45,7 +45,7 @@ export interface OfferEntry {
 
 export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
-    { header: 'Time' },
+    { header: 'Time (UTC)' },
     { header: 'Id' },
     { header: 'Trade', align: 'center' },
     ...(props.showStatus ? [{ header: 'Status' }] : []),

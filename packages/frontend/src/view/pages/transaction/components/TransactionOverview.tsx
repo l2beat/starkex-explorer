@@ -51,7 +51,7 @@ export function TransactionOverview(props: TransactionOverviewProps) {
             label={props.timestamp.label}
             className="text-right"
           >
-            {formatTimestamp(props.timestamp.timestamp, 'utc')} UTC{' '}
+            {formatTimestamp(props.timestamp.timestamp)} UTC{' '}
             <span className="text-zinc-500">
               ({delayDays} {delayDays === 1 ? 'day' : 'days'})
             </span>

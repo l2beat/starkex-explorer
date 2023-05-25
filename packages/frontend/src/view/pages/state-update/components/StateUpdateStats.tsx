@@ -45,7 +45,7 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
             </Link>
           </ValueItem>
           <ValueItem label="Ethereum block timestamp">
-            {formatTimestamp(props.ethereumTimestamp, 'utc')} UTC
+            {formatTimestamp(props.ethereumTimestamp)} UTC
           </ValueItem>
 
           {/* Disabled until StarkEx timestamp will be fixed

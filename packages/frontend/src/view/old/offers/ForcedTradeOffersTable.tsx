@@ -23,7 +23,7 @@ export function ForcedTradeOffersTable({
       columns={[
         { header: 'No.' },
         { header: 'Type' },
-        { header: 'Time' },
+        { header: 'Time (UTC)' },
         { header: 'Position' },
         { header: 'Amount', numeric: true, fullWidth: true },
         { header: 'Asset' },

@@ -8,7 +8,7 @@ export interface TimeCellProps {
 }
 
 export function TimeCell({ timestamp }: TimeCellProps) {
-  const { datePart, timePart } = formatTimestampParts(timestamp, 'local')
+  const { datePart, timePart } = formatTimestampParts(timestamp)
 
   return (
     <div className="relative top-0.5 flex flex-col sm:top-0 sm:flex-row sm:gap-1">
