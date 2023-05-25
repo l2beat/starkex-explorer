@@ -2,6 +2,7 @@ import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualBatchInfoResponse } from './schema'
+import { toPerpetualBatchInfo } from './toPerpetualBatchInfo'
 
 export class FeederGatewayClient extends BaseClient {
   constructor(
@@ -14,7 +15,7 @@ export class FeederGatewayClient extends BaseClient {
   async getPerpetualBatchInfo(batchId: number) {
     const data = await this.getBatchInfo(batchId)
     const parsed = PerpetualBatchInfoResponse.parse(data)
-    return parsed // TODO: toPerpetualTransactionBatchResponse(parsed)
+    return toPerpetualBatchInfo(parsed)
   }
 
   private async getBatchInfo(batchId: number): Promise<unknown> {

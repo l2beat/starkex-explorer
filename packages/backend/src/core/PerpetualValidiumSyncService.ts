@@ -1,6 +1,7 @@
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
+import { TransactionDownloader } from '../peripherals/starkware/TransactionDownloader'
 import { Logger } from '../tools/Logger'
 import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
@@ -19,6 +20,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     private readonly perpetualCairoOutputCollector: PerpetualCairoOutputCollector,
     private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
     private readonly withdrawalAllowedCollector: WithdrawalAllowedCollector,
+    private readonly transactionDownloader: TransactionDownloader | undefined,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -58,6 +60,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
         perpetualCairoOutput,
         batch
       )
+      await this.transactionDownloader?.sync(transition.batchId)
     }
   }
 
@@ -69,5 +72,6 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     await this.userRegistrationCollector.discardAfter(blockNumber)
     await this.userTransactionCollector.discardAfter(blockNumber)
     await this.withdrawalAllowedCollector.discardAfter(blockNumber)
+    await this.transactionDownloader?.discardAfter(blockNumber)
   }
 }

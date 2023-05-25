@@ -69,6 +69,7 @@ import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigr
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
+import { TransactionRepository } from './peripherals/database/TransactionRepository'
 import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
@@ -78,7 +79,9 @@ import { WithdrawableAssetRepository } from './peripherals/database/Withdrawable
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
+import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
+import { TransactionDownloader } from './peripherals/starkware/TransactionDownloader'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
 
@@ -210,6 +213,8 @@ export class Application {
       | PerpetualValidiumUpdater
       | PerpetualRollupUpdater
 
+    let transactionDownloader: TransactionDownloader | undefined
+
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
         config.starkex.availabilityGateway,
@@ -223,6 +228,22 @@ export class Application {
             stateTransitionRepository,
             config.starkex.contracts.perpetual
           )
+        const transactionRepository = new TransactionRepository(
+          database,
+          logger
+        )
+        const feederGatewayClient = config.starkex.feederGateway
+          ? new FeederGatewayClient(config.starkex.feederGateway, fetchClient)
+          : undefined
+        transactionDownloader = feederGatewayClient
+          ? new TransactionDownloader(
+              feederGatewayClient,
+              stateUpdateRepository,
+              transactionRepository,
+              logger
+            )
+          : undefined
+
         const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
           ethereumClient
         )
@@ -248,6 +269,7 @@ export class Application {
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
+          transactionDownloader,
           logger
         )
       } else {

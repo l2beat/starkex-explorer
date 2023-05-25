@@ -17,14 +17,13 @@ const TRANSACTIONS_TABLE_NAME = 'transactions'
 
 export async function up(knex: Knex) {
   await knex.schema.createTable(TRANSACTIONS_TABLE_NAME, (table) => {
-    table.integer('third_party_id').primary()
-    table.integer('transaction_id').notNullable().index()
+    table.integer('transaction_id').primary()
+    table.integer('state_update_id').index()
+    table.integer('block_number').index()
     table.string('stark_key_a').nullable().index()
     table.string('stark_key_b').nullable().index()
     table.jsonb('data').notNullable()
     table.string('type').notNullable()
-    table.integer('replaced_by')
-    table.integer('replacement_for')
   })
 }
 
