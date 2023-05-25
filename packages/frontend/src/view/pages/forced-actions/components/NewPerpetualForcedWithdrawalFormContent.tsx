@@ -1,6 +1,6 @@
+import { StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { StarkKey } from '@explorer/types'
 import { Button, LinkButton } from '../../../components/Button'
 import { NewForcedActionFormAsset } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
