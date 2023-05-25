@@ -3,7 +3,7 @@ import React from 'react'
 
 import { Column, Row } from './types'
 
-export interface TableRowProps extends Row {
+interface TableRowProps extends Row {
   i: number
   columns: Column[]
   fullBackground?: boolean

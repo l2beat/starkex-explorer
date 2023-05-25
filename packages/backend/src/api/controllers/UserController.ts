@@ -39,10 +39,10 @@ import {
 } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from '../../peripherals/database/UserRegistrationEventRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
+import { getAssetValueUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
-import { getAssetValueUSDCents } from './utils/toPositionAssetEntries'
 
 export class UserController {
   constructor(

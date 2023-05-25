@@ -1,7 +1,7 @@
 import { curves, ec as EllipticCurve } from 'elliptic'
 import { sha256 } from 'hash.js'
 
-export const EC_ORDER =
+const EC_ORDER =
   '800000000000010ffffffffffffffffb781126dcae7b2321e66a241adc64d2f'
 export const EC_ORDER_INT = BigInt('0x' + EC_ORDER)
 

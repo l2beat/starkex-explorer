@@ -9,7 +9,7 @@ import { Page } from '../components/page/Page'
 import { PageTitle } from '../components/PageTitle'
 import { reactToHtml } from '../reactToHtml'
 
-export interface MerkleProofPageProps {
+interface MerkleProofPageProps {
   positionOrVaultId: bigint
   context: PageContext
   merkleProof: MerkleProof
@@ -21,7 +21,7 @@ interface MerkleProof {
   leaf: string
 }
 
-export interface MerkleProofPath {
+interface MerkleProofPath {
   left: PedersenHash
   right: PedersenHash
 }

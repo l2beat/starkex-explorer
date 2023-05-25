@@ -1,4 +1,4 @@
-import { AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import { expect } from 'earl'
 
 import { getInitialState, nextFormState } from './state'
@@ -11,7 +11,7 @@ describe(nextFormState.name, () => {
       starkExAddress: EthereumAddress.fake(),
       starkKey: StarkKey.fake(),
       asset: {
-        hashOrId: AssetId('USDC-9'),
+        hashOrId: AssetId('ETH-9'),
         balance: 69420_654321n,
         priceUSDCents: 100n,
       },
@@ -19,6 +19,11 @@ describe(nextFormState.name, () => {
     {
       starkKey: StarkKey.fake(),
       address: EthereumAddress.fake(),
+    },
+    {
+      assetId: AssetId('USDC-6'),
+      assetHash: AssetHash.fake(),
+      price: 1_000_000n,
     }
   )
 

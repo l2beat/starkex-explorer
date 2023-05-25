@@ -7,7 +7,7 @@ import { formatWithDecimals } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Table } from '../../../components/table/Table'
 
-export interface StateUpdatePricesTableProps {
+interface StateUpdatePricesTableProps {
   priceChanges: StateUpdatePriceEntry[]
 }
 

@@ -8,7 +8,7 @@ import { colorRotate, COLORS } from './colors'
 const SHAPE_COUNT = 4
 const WOBBLE = 30
 
-export function jsNumberForAddress(address: EthereumAddress) {
+function jsNumberForAddress(address: EthereumAddress) {
   const addr = address.slice(2, 10)
   const seed = parseInt(addr, 16)
   return seed

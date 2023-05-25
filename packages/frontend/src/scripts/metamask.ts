@@ -5,8 +5,8 @@ import { z } from 'zod'
 
 import { Registration } from './keys/keys'
 
-export type UsersInfo = z.infer<typeof UsersInfo>
-export const UsersInfo = z.record(
+type UsersInfo = z.infer<typeof UsersInfo>
+const UsersInfo = z.record(
   z.object({ starkKey: stringAs(StarkKey), registration: Registration })
 )
 

@@ -29,10 +29,6 @@ export function ArrowRightIcon(props: ArrowProps) {
   return <ArrowLeftIcon className={cx(props.className, 'rotate-180')} />
 }
 
-export function ArrowUpIcon(props: ArrowProps) {
-  return <ArrowLeftIcon className={cx(props.className, 'rotate-90')} />
-}
-
 export function ArrowDownIcon(props: ArrowProps) {
   return <ArrowLeftIcon className={cx(props.className, '-rotate-90')} />
 }

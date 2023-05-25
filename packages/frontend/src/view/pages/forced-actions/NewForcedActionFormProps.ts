@@ -23,7 +23,7 @@ export const NewForcedActionFormProps = z.object({
 })
 
 export function serializeForcedActionsFormProps(
-  props: NewForcedActionFormProps
+  props: NewForcedActionFormProps | NewForcedActionFormProps
 ) {
   return toJsonWithoutBigInts(props)
 }

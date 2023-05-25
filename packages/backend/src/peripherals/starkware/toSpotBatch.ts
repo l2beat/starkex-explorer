@@ -10,14 +10,14 @@ export interface SpotBatch {
   orders: SpotBatchOrder[]
 }
 
-export interface SpotBatchVault {
+interface SpotBatchVault {
   vaultId: bigint
   starkKey: StarkKey
   assetHash: AssetHash
   balance: bigint
 }
 
-export interface SpotBatchOrder {
+interface SpotBatchOrder {
   orderId: bigint
   amount: bigint
 }

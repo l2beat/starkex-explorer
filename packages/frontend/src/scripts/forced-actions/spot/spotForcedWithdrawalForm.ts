@@ -1,8 +1,8 @@
 import { UserDetails } from '@explorer/shared'
 import { AssetHash } from '@explorer/types'
 
+import { SPOT_FORCED_WITHDRAWAL_FORM_ID } from '../../../view'
 import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
-import { SPOT_FORCED_WITHDRAWAL_FORM_ID } from '../../../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 

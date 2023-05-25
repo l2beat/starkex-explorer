@@ -1,6 +1,6 @@
 import React from 'react'
 
-export interface TableLimitSelectProps {
+interface TableLimitSelectProps {
   link: string
   limit: number
 }

@@ -31,7 +31,7 @@ import {
   WithdrawableAssetEntry,
 } from './components/UserQuickActionsTable'
 
-export interface UserPageProps {
+interface UserPageProps {
   context: PageContext
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress

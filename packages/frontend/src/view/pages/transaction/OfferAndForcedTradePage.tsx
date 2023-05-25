@@ -30,7 +30,7 @@ import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
-export interface OfferAndForcedTradePageProps {
+interface OfferAndForcedTradePageProps {
   context: PageContext<'perpetual'>
   offerId: string | undefined
   transactionHash?: Hash256

@@ -12,7 +12,7 @@ import {
 } from './components/StateUpdateBalanceChangesTable'
 import { StateUpdatePageTitle } from './components/StateUpdatePageTitle'
 
-export interface StateUpdateBalanceChangesPageProps {
+interface StateUpdateBalanceChangesPageProps {
   context: PageContext
   id: string
   balanceChanges: StateUpdateBalanceChangeEntry[]

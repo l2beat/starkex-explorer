@@ -11,7 +11,7 @@ import {
   HomeStateUpdatesTable,
 } from './components/HomeStateUpdatesTable'
 
-export interface HomeStateUpdatesPageProps {
+interface HomeStateUpdatesPageProps {
   context: PageContext
   stateUpdates: HomeStateUpdateEntry[]
   limit: number

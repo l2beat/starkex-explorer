@@ -4,7 +4,7 @@ import { Asset } from '../../utils/assets'
 import { Bucket } from './bucket'
 
 export const assetBucket = new Bucket<Asset>()
-assetBucket.add({ hashOrId: AssetId.USDC })
+assetBucket.add({ hashOrId: AssetId('USDC-6') })
 assetBucket.add({ hashOrId: AssetId('ETH-9') })
 assetBucket.add({ hashOrId: AssetId('BTC-10') })
 assetBucket.add({ hashOrId: AssetHash.fake() })

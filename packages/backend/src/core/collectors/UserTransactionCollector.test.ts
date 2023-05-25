@@ -473,7 +473,7 @@ describe(UserTransactionCollector.name, () => {
         positionIdA,
         positionIdB,
         collateralAmount,
-        collateralAssetId: AssetId.USDC,
+        collateralAssetId: AssetId('USDC-6'),
         syntheticAmount,
         syntheticAssetId,
         isABuyingSynthetic,

@@ -1,19 +1,5 @@
 export type { OfferEntry } from './components/tables/OffersTable'
 export type { TransactionEntry } from './components/tables/TransactionsTable'
-/* eslint-disable-next-line no-restricted-imports */
-export * from './old/forced-transactions'
-/* eslint-disable-next-line no-restricted-imports */
-export * from './old/home'
-/* eslint-disable-next-line no-restricted-imports */
-export * from './old/not-found'
-/* eslint-disable-next-line no-restricted-imports */
-export * from './old/offers'
-/* eslint-disable-next-line no-restricted-imports */
-export * from './old/positions'
-/* eslint-disable-next-line no-restricted-imports */
-export * from './old/state-updates'
-/* eslint-disable-next-line no-restricted-imports */
-export * from './old/transaction-form'
 export * from './pages/forced-actions/NewPerpetualForcedActionPage'
 export * from './pages/forced-actions/NewSpotForcedWithdrawalPage'
 export type { HomeStateUpdateEntry } from './pages/home/components/HomeStateUpdatesTable'

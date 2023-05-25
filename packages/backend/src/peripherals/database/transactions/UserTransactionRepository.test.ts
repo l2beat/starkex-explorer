@@ -45,7 +45,7 @@ describe(UserTransactionRepository.name, () => {
       starkKeyA: StarkKey.fake(),
       starkKeyB: StarkKey.fake(),
       collateralAmount: 123n,
-      collateralAssetId: AssetId.USDC,
+      collateralAssetId: AssetId('USDC-6'),
       syntheticAmount: 123n,
       syntheticAssetId: AssetId('ETH-9'),
       isABuyingSynthetic: true,

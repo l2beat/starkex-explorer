@@ -1,5 +1,4 @@
 import { CreateOfferData } from '@explorer/shared'
-import { AssetId } from '@explorer/types'
 
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
@@ -7,7 +6,7 @@ import { FormState } from './types'
 import { isBuyable } from './utils'
 
 export async function submit(state: FormState) {
-  if (state.assetId === AssetId.USDC) {
+  if (state.assetId === state.collateralAsset.assetId) {
     return submitExit(state)
   } else {
     return submitOffer(state)
@@ -35,7 +34,11 @@ async function submitOffer(state: FormState) {
     collateralAmount: state.totalInputValue,
     syntheticAmount: state.amountInputValue,
     syntheticAssetId: state.assetId,
-    isABuyingSynthetic: isBuyable(state.assetId, state.balance),
+    isABuyingSynthetic: isBuyable(
+      state.assetId,
+      state.balance,
+      state.collateralAsset
+    ),
   }
 
   const signature = await Wallet.signOfferCreate(state.user.address, offer)

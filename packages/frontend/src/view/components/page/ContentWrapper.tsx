@@ -1,7 +1,7 @@
 import cx from 'classnames'
 import React, { ReactNode } from 'react'
 
-export interface ContentWrapperProps {
+interface ContentWrapperProps {
   children: ReactNode
   className?: string
 }

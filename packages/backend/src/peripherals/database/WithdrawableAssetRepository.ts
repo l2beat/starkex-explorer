@@ -11,7 +11,7 @@ import {
   WithdrawalAllowedData,
 } from './WithdrawalAllowed'
 
-export interface WithdrawableAssetRecord {
+interface WithdrawableAssetRecord {
   id?: number
   starkKey: StarkKey
   assetHash: AssetHash

@@ -5,8 +5,12 @@ import { assetToInfo } from '../../../../../utils/assets'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
 import { FormId } from './ids'
 
-export function TotalInput() {
-  const usdcInfo = assetToInfo({ hashOrId: AssetId.USDC })
+interface TotalInputProps {
+  assetId: AssetId
+}
+
+export function TotalInput({ assetId }: TotalInputProps) {
+  const usdcInfo = assetToInfo({ hashOrId: assetId })
 
   return (
     <div className="flex gap-2">

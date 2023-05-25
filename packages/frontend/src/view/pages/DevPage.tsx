@@ -4,7 +4,7 @@ import React from 'react'
 import { Link } from '../components/Link'
 import { reactToHtml } from '../reactToHtml'
 
-export interface DevPageProps {
+interface DevPageProps {
   routes: {
     path: string
     description: string

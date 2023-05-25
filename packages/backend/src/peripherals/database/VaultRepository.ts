@@ -106,9 +106,7 @@ export class VaultRepository extends BaseRepository {
   }
 }
 
-export function toVaultRecord(
-  row: VaultRow
-): VaultRecord & { stateUpdateId: number } {
+function toVaultRecord(row: VaultRow): VaultRecord & { stateUpdateId: number } {
   return {
     stateUpdateId: row.state_update_id,
     vaultId: BigInt(row.vault_id),

@@ -3,7 +3,7 @@ import React from 'react'
 
 import { ArrowLeftIcon, ArrowRightIcon } from '../../assets/icons/ArrowIcon'
 
-export interface TablePaginationProps {
+interface TablePaginationProps {
   surroundingPages: number
   className?: string
   link: string

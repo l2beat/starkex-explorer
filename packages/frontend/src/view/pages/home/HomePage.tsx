@@ -26,7 +26,7 @@ import {
   HomeTutorials,
 } from './components/HomeTutorials'
 
-export interface HomePageProps {
+interface HomePageProps {
   context: PageContext
   // TODO: statistics
   tutorials?: HomeTutorialEntry[]

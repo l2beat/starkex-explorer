@@ -6,13 +6,7 @@ import {
   decodeWithdrawalWithTokenId,
   PerpetualForcedTradeRequest,
 } from '@explorer/shared'
-import {
-  AssetHash,
-  AssetId,
-  EthereumAddress,
-  Hash256,
-  Timestamp,
-} from '@explorer/types'
+import { AssetHash, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
 
 import {
   ForcedTradeOfferRecord,
@@ -178,7 +172,7 @@ export class TransactionSubmitController {
         positionIdA: data.positionIdA,
         positionIdB: data.positionIdB,
         collateralAmount: data.collateralAmount,
-        collateralAssetId: AssetId.USDC,
+        collateralAssetId: this.collateralAsset.assetId,
         syntheticAmount: data.syntheticAmount,
         syntheticAssetId: data.syntheticAssetId,
         isABuyingSynthetic: data.isABuyingSynthetic,

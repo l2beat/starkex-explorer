@@ -13,7 +13,7 @@ import {
 } from './components/UserBalanceChangesTable'
 import { UserPageTitle } from './components/UserPageTitle'
 
-export interface UserBalanceChangesPageProps {
+interface UserBalanceChangesPageProps {
   context: PageContext
   starkKey: StarkKey
   balanceChanges: UserBalanceChangeEntry[]

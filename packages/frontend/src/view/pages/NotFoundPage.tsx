@@ -4,7 +4,7 @@ import React from 'react'
 import { Page } from '../components/page/Page'
 import { reactToHtml } from '../reactToHtml'
 
-export interface NotFoundPageProps {
+interface NotFoundPageProps {
   context: PageContext
 }
 

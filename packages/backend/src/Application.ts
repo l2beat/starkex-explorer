@@ -4,14 +4,8 @@ import { AssetHash, AssetId } from '@explorer/types'
 import { ApiServer } from './api/ApiServer'
 import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
-import { ForcedTransactionController } from './api/controllers/ForcedTransactionController'
 import { HomeController } from './api/controllers/HomeController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
-import { OldForcedTradeOfferController } from './api/controllers/OldForcedTradeOfferController'
-import { OldHomeController } from './api/controllers/OldHomeController'
-import { OldSearchController } from './api/controllers/OldSearchController'
-import { OldStateUpdateController } from './api/controllers/OldStateUpdateController'
-import { PositionController } from './api/controllers/PositionController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionController } from './api/controllers/TransactionController'
@@ -20,10 +14,8 @@ import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
-import { createOldFrontendRouter } from './api/routers/OldFrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
 import { Config } from './config'
-import { AccountService } from './core/AccountService'
 import { AssetDetailsService } from './core/AssetDetailsService'
 import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
 import { DepositWithTokenIdCollector } from './core/collectors/DepositWithTokenIdCollector'
@@ -210,12 +202,6 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
-    const accountService = new AccountService(
-      positionRepository,
-      forcedTradeOfferRepository,
-      sentTransactionRepository
-    )
-
     let syncService
     let stateUpdater:
       | SpotValidiumUpdater
@@ -347,28 +333,6 @@ export class Application {
       )
     }
 
-    let forcedTradeOfferController: ForcedTradeOfferController | undefined
-    let oldForcedTradeOfferController: OldForcedTradeOfferController | undefined
-
-    if (config.starkex.tradingMode === 'perpetual') {
-      forcedTradeOfferController = new ForcedTradeOfferController(
-        pageContextService,
-        forcedTradeOfferRepository,
-        positionRepository,
-        userRegistrationEventRepository,
-        config.starkex.collateralAsset,
-        config.starkex.contracts.perpetual
-      )
-      oldForcedTradeOfferController = new OldForcedTradeOfferController(
-        accountService,
-        forcedTradeOfferRepository,
-        positionRepository,
-        userRegistrationEventRepository,
-        config.starkex.collateralAsset,
-        config.starkex.contracts.perpetual
-      )
-    }
-
     const transactionStatusService = new TransactionStatusService(
       sentTransactionRepository,
       ethereumClient,
@@ -414,7 +378,16 @@ export class Application {
     const isPreprocessorEnabled = config.enablePreprocessing
 
     let preprocessedAssetHistoryRepository
+    let forcedTradeOfferController: ForcedTradeOfferController | undefined
     if (config.starkex.tradingMode === 'perpetual') {
+      forcedTradeOfferController = new ForcedTradeOfferController(
+        pageContextService,
+        forcedTradeOfferRepository,
+        positionRepository,
+        userRegistrationEventRepository,
+        config.starkex.collateralAsset,
+        config.starkex.contracts.perpetual
+      )
       preprocessedAssetHistoryRepository =
         new PreprocessedAssetHistoryRepository(database, AssetId, logger)
 
@@ -504,17 +477,6 @@ export class Application {
 
     // #endregion core
     // #region api
-
-    const positionController = new PositionController(
-      accountService,
-      stateUpdateRepository,
-      positionRepository,
-      userRegistrationEventRepository,
-      sentTransactionRepository,
-      userTransactionRepository,
-      forcedTradeOfferRepository
-    )
-
     const homeController = new HomeController(
       pageContextService,
       assetDetailsService,
@@ -558,32 +520,6 @@ export class Application {
       stateUpdater
     )
 
-    const oldHomeController = new OldHomeController(
-      accountService,
-      stateUpdateRepository,
-      positionRepository,
-      userTransactionRepository,
-      forcedTradeOfferRepository
-    )
-    const forcedTransactionController = new ForcedTransactionController(
-      accountService,
-      userRegistrationEventRepository,
-      positionRepository,
-      userTransactionRepository,
-      sentTransactionRepository,
-      forcedTradeOfferRepository,
-      config.starkex.contracts.perpetual
-    )
-    const oldStateUpdateController = new OldStateUpdateController(
-      accountService,
-      stateUpdateRepository,
-      userTransactionRepository
-    )
-    const oldSearchController = new OldSearchController(
-      stateUpdateRepository,
-      positionRepository,
-      userRegistrationEventRepository
-    )
     const searchController = new SearchController(
       stateUpdateRepository,
       config.starkex.tradingMode === 'perpetual'
@@ -610,31 +546,20 @@ export class Application {
     const apiServer = new ApiServer(config.port, logger, {
       routers: [
         createStatusRouter(statusService),
-        config.useOldFrontend
-          ? createOldFrontendRouter(
-              positionController,
-              oldHomeController,
-              oldForcedTradeOfferController,
-              forcedTransactionController,
-              oldStateUpdateController,
-              oldSearchController
-            )
-          : createFrontendRouter(
-              homeController,
-              userController,
-              stateUpdateController,
-              transactionController,
-              forcedActionsController,
-              forcedTradeOfferController,
-              merkleProofController,
-              collateralAsset,
-              config.starkex.tradingMode,
-              searchController
-            ),
+        createFrontendRouter(
+          homeController,
+          userController,
+          stateUpdateController,
+          transactionController,
+          forcedActionsController,
+          forcedTradeOfferController,
+          merkleProofController,
+          collateralAsset,
+          config.starkex.tradingMode,
+          searchController
+        ),
         createTransactionRouter(
-          config.useOldFrontend
-            ? oldForcedTradeOfferController
-            : forcedTradeOfferController,
+          forcedTradeOfferController,
           userTransactionController
         ),
       ],

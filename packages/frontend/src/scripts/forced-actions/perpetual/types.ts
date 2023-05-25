@@ -1,10 +1,11 @@
-import { UserDetails } from '@explorer/shared'
+import { CollateralAsset, UserDetails } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
 import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 
 export interface FormState {
   user: UserDetails
+  collateralAsset: CollateralAsset
   props: NewForcedActionFormProps
   assetId: AssetId
   balance: bigint
@@ -26,17 +27,17 @@ export type FormAction =
   | ModifyPriceAction
   | ModifyTotalAction
 
-export interface ModifyAmountAction {
+interface ModifyAmountAction {
   type: 'ModifyAmount'
   value: string
 }
 
-export interface ModifyPriceAction {
+interface ModifyPriceAction {
   type: 'ModifyPrice'
   value: string
 }
 
-export interface ModifyTotalAction {
+interface ModifyTotalAction {
   type: 'ModifyTotal'
   value: string
 }
