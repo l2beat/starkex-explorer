@@ -39,14 +39,14 @@ export function toPerpetualTransactions(
   })
 }
 
-function toPerpetualTransaction(
+export function toPerpetualTransaction(
   tx: Exclude<TransactionSchema, { type: 'MULTI_TRANSACTION' }>
 ): Exclude<TransactionData, MultiTransactionData> {
   switch (tx.type) {
     case 'DEPOSIT': {
       return {
         positionId: BigInt(tx.position_id),
-        starkKey: StarkKey(tx.public_key),
+        starkKey: StarkKey.from(BigInt(tx.public_key)),
         amount: BigInt(tx.amount),
         type: 'Deposit',
       }
@@ -54,7 +54,7 @@ function toPerpetualTransaction(
     case 'WITHDRAWAL_TO_ADDRESS':
       return {
         positionId: BigInt(tx.position_id),
-        starkKey: StarkKey(tx.public_key),
+        starkKey: StarkKey.from(BigInt(tx.public_key)),
         ethereumAddress: EthereumAddress(tx.eth_address),
         amount: BigInt(tx.amount),
         nonce: BigInt(tx.nonce),
@@ -65,7 +65,7 @@ function toPerpetualTransaction(
     case 'FORCED_WITHDRAWAL':
       return {
         positionId: BigInt(tx.position_id),
-        starkKey: StarkKey(tx.public_key),
+        starkKey: StarkKey.from(BigInt(tx.public_key)),
         amount: BigInt(tx.amount),
         isValid: tx.is_valid,
         type: 'ForcedWithdrawal',
@@ -87,7 +87,7 @@ function toPerpetualTransaction(
           positionId: BigInt(tx.party_a_order.position_id),
           syntheticAmount: BigInt(tx.party_a_order.amount_synthetic),
           feeAmount: BigInt(tx.party_a_order.amount_fee),
-          starkKey: StarkKey(tx.party_a_order.public_key),
+          starkKey: StarkKey.from(BigInt(tx.party_a_order.public_key)),
           collateralAmount: BigInt(tx.party_a_order.amount_collateral),
         },
         partyBOrder: {
@@ -101,15 +101,15 @@ function toPerpetualTransaction(
           positionId: BigInt(tx.party_b_order.position_id),
           syntheticAmount: BigInt(tx.party_b_order.amount_synthetic),
           feeAmount: BigInt(tx.party_b_order.amount_fee),
-          starkKey: StarkKey(tx.party_b_order.public_key),
+          starkKey: StarkKey.from(BigInt(tx.party_b_order.public_key)),
           collateralAmount: BigInt(tx.party_b_order.amount_collateral),
         },
         type: 'Trade',
       }
     case 'FORCED_TRADE':
       return {
-        starkKeyA: StarkKey(tx.public_key_party_a),
-        starkKeyB: StarkKey(tx.public_key_party_b),
+        starkKeyA: StarkKey.from(BigInt(tx.public_key_party_a)),
+        starkKeyB: StarkKey.from(BigInt(tx.public_key_party_b)),
         positionIdA: BigInt(tx.position_id_party_a),
         positionIdB: BigInt(tx.position_id_party_b),
         collateralAssetId: AssetHash(tx.collateral_asset_id),
@@ -125,8 +125,8 @@ function toPerpetualTransaction(
       return {
         amount: BigInt(tx.amount),
         nonce: BigInt(tx.nonce),
-        senderStarkKey: StarkKey(tx.sender_public_key),
-        receiverStarkKey: StarkKey(tx.receiver_public_key),
+        senderStarkKey: StarkKey.from(BigInt(tx.sender_public_key)),
+        receiverStarkKey: StarkKey.from(BigInt(tx.receiver_public_key)),
         senderPositionId: BigInt(tx.sender_position_id),
         receiverPositionId: BigInt(tx.receiver_position_id),
         assetId: AssetHash(tx.asset_id),
@@ -138,8 +138,8 @@ function toPerpetualTransaction(
       return {
         amount: BigInt(tx.amount),
         nonce: BigInt(tx.nonce),
-        senderStarkKey: StarkKey(tx.sender_public_key),
-        receiverStarkKey: StarkKey(tx.receiver_public_key),
+        senderStarkKey: StarkKey.from(BigInt(tx.sender_public_key)),
+        receiverStarkKey: StarkKey.from(BigInt(tx.receiver_public_key)),
         senderPositionId: BigInt(tx.sender_position_id),
         receiverPositionId: BigInt(tx.receiver_position_id),
         assetId: AssetHash(tx.asset_id),
@@ -154,7 +154,7 @@ function toPerpetualTransaction(
         liquidatorOrder: {
           orderType: toPerpetualOrderType(tx.liquidator_order.order_type),
           nonce: BigInt(tx.liquidator_order.nonce),
-          starkKey: StarkKey(tx.liquidator_order.public_key),
+          starkKey: StarkKey.from(BigInt(tx.liquidator_order.public_key)),
           syntheticAmount: BigInt(tx.liquidator_order.amount_synthetic),
           syntheticAssetId: decodeAssetId(
             tx.liquidator_order.asset_id_synthetic
