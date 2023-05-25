@@ -28,7 +28,7 @@ export interface TransactionEntry {
 export function TransactionsTable(props: TransactionsTableProps) {
   const columns: Column[] = []
   if (!props.hideTime) {
-    columns.push({ header: 'Time' })
+    columns.push({ header: 'Time (UTC)' })
   }
   columns.push(
     { header: 'Tx Hash' },

@@ -23,7 +23,7 @@ export function TransactionHistoryTable(props: TransactionHistoryTableProps) {
       <SectionHeading title="History" />
       <Table
         columns={[
-          { header: 'Time' },
+          { header: 'Time (UTC)' },
           { header: 'Status' },
           { header: 'Description' },
         ]}
