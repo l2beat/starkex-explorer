@@ -31,15 +31,18 @@ export function toPerpetualTransactions(
     return {
       thirdPartyId: tx.apex_id,
       transactionId: tx.tx_info.tx_id,
-      transaction:
-        tx.tx_info.tx.type === 'MULTI_TRANSACTION'
-          ? toPerpetualMultiTransaction(tx.tx_info.tx)
-          : toPerpetualTransaction(tx.tx_info.tx),
+      transaction: toPerpetualTransaction(tx.tx_info.tx),
     }
   })
 }
 
-export function toPerpetualTransaction(
+export function toPerpetualTransaction(tx: TransactionSchema): TransactionData {
+  return tx.type === 'MULTI_TRANSACTION'
+    ? toPerpetualMultiTransaction(tx)
+    : toPerpetualNonMultiTransaction(tx)
+}
+
+export function toPerpetualNonMultiTransaction(
   tx: Exclude<TransactionSchema, { type: 'MULTI_TRANSACTION' }>
 ): Exclude<TransactionData, MultiTransactionData> {
   switch (tx.type) {
@@ -219,7 +222,7 @@ export function toPerpetualMultiTransaction(
 ): MultiTransactionData {
   return {
     type: 'MultiTransaction',
-    transactions: tx.txs.map(toPerpetualTransaction),
+    transactions: tx.txs.map(toPerpetualNonMultiTransaction),
   }
 }
 

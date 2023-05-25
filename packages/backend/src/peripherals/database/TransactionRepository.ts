@@ -11,8 +11,9 @@ import {
 } from './Transaction'
 
 interface Record<T extends TransactionData['type'] = TransactionData['type']> {
-  thirdPartyId: number
   transactionId: number
+  stateUpdateId: number
+  blockNumber: number
   starkKeyA: StarkKey | undefined
   starkKeyB: StarkKey | undefined
   type: T
@@ -30,55 +31,51 @@ export class TransactionRepository extends BaseRepository {
   }
 
   async add(record: {
-    thirdPartyId: number
     transactionId: number
+    stateUpdateId: number
+    blockNumber: number
     data: TransactionData
   }): Promise<number> {
     const knex = await this.knex()
     const { starkKeyA, starkKeyB, data } = encodeTransactionData(record.data)
-    const replacedTransaction = await knex('transactions')
-      .where({
-        transaction_id: record.transactionId,
-        replaced_by: null,
-      })
-      .first()
-
-    if (replacedTransaction) {
-      await knex('transactions')
-        .where({
-          transaction_id: record.transactionId,
-          replaced_by: null,
-        })
-        .update({
-          replaced_by: record.thirdPartyId,
-        })
-    }
 
     const results = await knex('transactions')
       .insert({
-        third_party_id: record.thirdPartyId,
         transaction_id: record.transactionId,
+        state_update_id: record.stateUpdateId,
+        block_number: record.blockNumber,
         stark_key_a: starkKeyA?.toString(),
         stark_key_b: starkKeyB?.toString(),
         type: record.data.type,
-        replacement_for:
-          replacedTransaction !== undefined
-            ? replacedTransaction.third_party_id
-            : null,
         data,
       })
-      .returning('third_party_id')
+      .returning('transaction_id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return results[0]!.third_party_id
+    return results[0]!.transaction_id
   }
 
-  async findById(thirdPartyId: number): Promise<Record | undefined> {
+  async findById(transactionId: number): Promise<Record | undefined> {
     const knex = await this.knex()
     const row = await knex('transactions')
-      .where({ third_party_id: thirdPartyId })
+      .where({ transaction_id: transactionId })
       .first()
 
     return row ? toRecord(row) : undefined
+  }
+
+  async findLatestStateUpdateId(): Promise<number | undefined> {
+    const knex = await this.knex()
+    const results = await knex('transactions')
+      .select('state_update_id')
+      .orderBy('state_update_id', 'desc')
+      .limit(1)
+      .first()
+    return results?.state_update_id
+  }
+
+  async deleteAfterBlock(blockNumber: number) {
+    const knex = await this.knex()
+    return knex('transactions').where('block_number', '>', blockNumber).delete()
   }
 
   async deleteAll() {
@@ -98,8 +95,9 @@ export class TransactionRepository extends BaseRepository {
 
 function toRecord(row: TransactionRow): Record {
   return {
-    thirdPartyId: row.third_party_id,
     transactionId: row.transaction_id,
+    stateUpdateId: row.state_update_id,
+    blockNumber: row.block_number,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
     type: row.type as TransactionData['type'],

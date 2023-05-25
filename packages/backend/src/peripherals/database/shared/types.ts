@@ -272,9 +272,9 @@ declare module 'knex/types/tables' {
   }
 
   interface TransactionRow {
-    id: number
-    third_party_id: number
     transaction_id: number
+    state_update_id: number
+    block_number: number
     stark_key_a: string | null
     stark_key_b: string | null
     data: TransactionDataJson
