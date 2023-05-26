@@ -71,6 +71,7 @@ declare module 'knex/types/tables' {
 
   interface StateUpdateRow {
     id: number
+    batch_id: number
     block_number: number
     state_transition_hash: string
     root_hash: string

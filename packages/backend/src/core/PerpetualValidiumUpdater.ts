@@ -65,6 +65,7 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
         blockNumber: transition.blockNumber,
         stateTransitionHash: transition.stateTransitionHash,
       },
+      transition.batchId,
       perpetualCairoOutput.newState.positionRoot,
       perpetualCairoOutput.forcedActions,
       perpetualCairoOutput.newState.oraclePrices,

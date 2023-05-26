@@ -144,6 +144,7 @@ describe(PerpetualRollupUpdater.name, () => {
         mockProcessStateTransition.resolvesTo(undefined)
         updater.processStateTransition = mockProcessStateTransition
 
+        const batchId = 0
         const update = {
           id: 1,
           stateTransitionHash: Hash256.fake('123'),
@@ -181,9 +182,14 @@ describe(PerpetualRollupUpdater.name, () => {
             value: new PositionLeaf(StarkKey.fake('5'), 555n, []),
           },
         ]
-        await updater.processOnChainStateTransition(update, mockOnChainData)
+        await updater.processOnChainStateTransition(
+          update,
+          batchId,
+          mockOnChainData
+        )
         expect(mockProcessStateTransition).toHaveBeenOnlyCalledWith(
           update,
+          batchId,
           PedersenHash.fake('987'),
           testForcedActions,
           mockOnChainData.newState.oraclePrices,

@@ -149,6 +149,7 @@ describe(PerpetualValidiumUpdater.name, () => {
         )
         expect(mockProcessStateTransition).toHaveBeenOnlyCalledWith(
           update,
+          transition.batchId,
           mockProgramOutput.newState.positionRoot,
           testForcedActions,
           mockProgramOutput.newState.oraclePrices,

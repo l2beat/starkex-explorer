@@ -82,15 +82,6 @@ export class TransactionRepository extends BaseRepository {
     const knex = await this.knex()
     return knex('transactions').delete()
   }
-
-  async getLatestThirdPartyId(): Promise<number | undefined> {
-    const knex = await this.knex()
-    const results = await knex('transactions')
-      .select('third_party_id')
-      .orderBy('third_party_id', 'desc')
-      .limit(1)
-    return results[0]?.third_party_id
-  }
 }
 
 function toRecord(row: TransactionRow): Record {

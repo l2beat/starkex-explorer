@@ -37,7 +37,7 @@ export class ValidiumStateTransitionCollector<T extends StateUpdateEvent> {
       throw new Error('Some events have no pair')
     }
 
-    const validiumStateTransitions = []
+    const validiumStateTransitions: ValidiumStateTransition[] = []
     const records: Omit<StateTransitionRecord, 'id'>[] = []
     for (let i = 0; i < parsed.length; i += 2) {
       const stateTransitionFact = parsed[i]

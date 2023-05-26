@@ -70,6 +70,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
         blockNumber: transition.blockNumber,
         stateTransitionHash: transition.stateTransitionHash,
       },
+      transition.batchId,
       spotCairoOutput.finalValidiumVaultRoot,
       forcedActions,
       [], // There are no oracle prices for Spot

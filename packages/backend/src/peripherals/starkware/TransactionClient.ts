@@ -14,8 +14,6 @@ export class TransactionClient extends BaseClient {
 
   async getPerpetualTransactions(startId: number, pageSize: number) {
     const data = await this.getTransactions(startId, pageSize)
-    console.log(data)
-
     const parsed = PerpetualTransactionResponse.parse(data)
     return toPerpetualTransactions(parsed)
   }

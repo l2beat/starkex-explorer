@@ -21,7 +21,11 @@ export class FeederGatewayClient extends BaseClient {
   private async getBatchInfo(batchId: number): Promise<unknown> {
     const url = this.options.getUrl(batchId)
 
-    const res = await this.fetchClient.fetchRetry(url, this.requestInit)
+    const res = await this.fetchClient.fetchRetry(url, {
+      ...this.requestInit,
+      // Some of the requests can take a long time to complete e.g. batchId = 1914
+      timeout: 15_000,
+    })
     return res.json()
   }
 }

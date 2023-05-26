@@ -10,7 +10,7 @@ import range from 'lodash/range'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../test/fakes'
-import { Logger, LogLevel } from '../../tools/Logger'
+import { Logger,LogLevel } from '../../tools/Logger'
 import { ForcedTransactionRepository } from './ForcedTransactionRepository'
 import {
   StateUpdateRecord,
@@ -31,6 +31,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: 10_000,
+        batchId: 9_999,
         blockNumber: 10_000,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -55,6 +56,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: 1,
+        batchId: 0,
         blockNumber: 1,
         rootHash,
         stateTransitionHash: Hash256.fake(),
@@ -67,6 +69,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: 2,
+        batchId: 1,
         blockNumber: 2,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -91,6 +94,7 @@ describe(StateUpdateRepository.name, () => {
   it('gets all state updates', async () => {
     const stateUpdate: StateUpdateRecord = {
       id: 10_002,
+      batchId: 10_001,
       blockNumber: 10_002,
       rootHash: PedersenHash.fake(),
       stateTransitionHash: Hash256.fake(),
@@ -106,6 +110,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: 900,
+        batchId: 899,
         blockNumber: 10_000,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -126,6 +131,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: 10_000,
+        batchId: 9_999,
         blockNumber: 10_000,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -168,6 +174,7 @@ describe(StateUpdateRepository.name, () => {
       await repository.add({
         stateUpdate: {
           id: blockNumber * 1000,
+          batchId: blockNumber * 1000 - 1,
           blockNumber,
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
@@ -179,6 +186,7 @@ describe(StateUpdateRepository.name, () => {
     }
     const stateUpdate = {
       id: 30_004_000,
+      batchId: 30_004_399,
       blockNumber: 30_004,
       rootHash: PedersenHash.fake(),
       stateTransitionHash: Hash256.fake(),
@@ -197,6 +205,7 @@ describe(StateUpdateRepository.name, () => {
 
     const stateUpdate1 = {
       id: 30_001_000,
+      batchId: 30_000_999,
       blockNumber: 30_001,
       rootHash: PedersenHash.fake(),
       stateTransitionHash: Hash256.fake(),
@@ -204,6 +213,7 @@ describe(StateUpdateRepository.name, () => {
     }
     const stateUpdate2 = {
       id: 30_002_000,
+      batchId: 30_001_999,
       blockNumber: 30_002,
       rootHash: PedersenHash.fake(),
       stateTransitionHash: Hash256.fake(),
@@ -239,6 +249,7 @@ describe(StateUpdateRepository.name, () => {
 
     const stateUpdate1 = {
       id: 30_001_000,
+      batchId: 30_000_999,
       blockNumber: 30_001,
       rootHash: PedersenHash.fake(),
       stateTransitionHash: Hash256.fake(),
@@ -246,6 +257,7 @@ describe(StateUpdateRepository.name, () => {
     }
     const stateUpdate2 = {
       id: 30_002_000,
+      batchId: 30_001_999,
       blockNumber: 30_002,
       rootHash: PedersenHash.fake(),
       stateTransitionHash: Hash256.fake(),
@@ -274,6 +286,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: 1000,
+        batchId: 999,
         blockNumber: 123,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -286,6 +299,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: 1001,
+        batchId: 1000,
         blockNumber: 123,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -305,6 +319,7 @@ describe(StateUpdateRepository.name, () => {
       await repository.add({
         stateUpdate: {
           id: blockNumber,
+          batchId: blockNumber - 1,
           blockNumber,
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
@@ -343,6 +358,7 @@ describe(StateUpdateRepository.name, () => {
       await repository.add({
         stateUpdate: {
           id: blockNumber,
+          batchId: blockNumber - 1,
           blockNumber,
           rootHash: PedersenHash.fake(blockNumber.toString()),
           stateTransitionHash: Hash256.fake(),
@@ -361,6 +377,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: 20_005,
+        batchId: 20_004,
         blockNumber: 20_005,
         rootHash: PedersenHash.fake('20005'),
         stateTransitionHash: Hash256.fake(),
@@ -445,6 +462,7 @@ describe(StateUpdateRepository.name, () => {
         await repository.add({
           stateUpdate: {
             id: blockNumber,
+            batchId: blockNumber - 1,
             blockNumber,
             rootHash: PedersenHash.fake(blockNumber.toString()),
             stateTransitionHash: Hash256.fake(),
@@ -463,6 +481,7 @@ describe(StateUpdateRepository.name, () => {
       await repository.add({
         stateUpdate: {
           id: 20_005,
+          batchId: 20_004,
           blockNumber: 20_005,
           rootHash: PedersenHash.fake('20005'),
           stateTransitionHash: Hash256.fake(),
@@ -516,6 +535,7 @@ describe(StateUpdateRepository.name, () => {
     await repository.add({
       stateUpdate: {
         id: blockNumber,
+        batchId: blockNumber - 1,
         blockNumber,
         rootHash,
         stateTransitionHash,
@@ -555,6 +575,7 @@ describe(StateUpdateRepository.name, () => {
       await repository.add({
         stateUpdate: {
           id: blockNumber,
+          batchId: blockNumber - 1,
           blockNumber,
           rootHash: PedersenHash.fake(blockNumber.toString()),
           stateTransitionHash: Hash256.fake(),

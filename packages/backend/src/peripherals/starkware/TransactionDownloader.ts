@@ -11,31 +11,28 @@ export class TransactionDownloader {
     private readonly logger: Logger
   ) {}
 
-  async sync(syncToBatchId: number) {
+  async sync(syncToStateUpdateId: number) {
     const latestSyncedTransactionStateUpdateId =
-      await this.transactionRepository.findLatestStateUpdateId()
-    const startSyncFromBatchId = latestSyncedTransactionStateUpdateId
-      ? latestSyncedTransactionStateUpdateId // - 1 (to get batchId) + 1 (to get where to start from)
-      : 0
+      (await this.transactionRepository.findLatestStateUpdateId()) ?? 0
 
     for (
-      let batchId = startSyncFromBatchId;
-      batchId <= syncToBatchId;
-      batchId++
+      let stateUpdateId = latestSyncedTransactionStateUpdateId + 1;
+      stateUpdateId <= syncToStateUpdateId;
+      stateUpdateId++
     ) {
-      const stateUpdateId = batchId + 1
       this.logger.info(`Syncing transactions...`, {
         stateUpdateId,
       })
-
-      const data = await this.feederGatewayClient.getPerpetualBatchInfo(batchId)
-
       const stateUpdate = await this.stateUpdateRepository.findById(
         stateUpdateId
       )
       if (!stateUpdate) {
         throw new Error(`State update ${stateUpdateId} not found`)
       }
+
+      const data = await this.feederGatewayClient.getPerpetualBatchInfo(
+        stateUpdate.batchId
+      )
 
       for (const transactionInfo of data.transactionsInfo) {
         await this.transactionRepository.add({

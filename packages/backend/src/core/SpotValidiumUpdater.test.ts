@@ -154,6 +154,7 @@ describe(SpotValidiumUpdater.name, () => {
             blockNumber: validiumStateTransition.blockNumber,
             stateTransitionHash: validiumStateTransition.stateTransitionHash,
           },
+          validiumStateTransition.batchId,
           mockSpotCairoOutput.finalValidiumVaultRoot,
           [fullWithdrawalModification],
           [],

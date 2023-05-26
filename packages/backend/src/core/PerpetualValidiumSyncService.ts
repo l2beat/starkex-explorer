@@ -51,7 +51,6 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
           transition.batchId
         ),
       ])
-
       if (!batch) {
         throw new Error(`Unable to download batch ${transition.batchId}`)
       }
@@ -60,7 +59,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
         perpetualCairoOutput,
         batch
       )
-      await this.transactionDownloader?.sync(transition.batchId)
+      await this.transactionDownloader?.sync(transition.sequenceNumber)
     }
   }
 

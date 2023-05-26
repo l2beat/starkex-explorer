@@ -69,6 +69,7 @@ export class PerpetualRollupSyncService implements IDataSyncService {
           blockNumber: record.blockNumber,
           stateTransitionHash: record.stateTransitionHash,
         },
+        record.batchId,
         onChainData
       )
     }

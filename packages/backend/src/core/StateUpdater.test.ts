@@ -374,6 +374,7 @@ describe(StateUpdater.name, () => {
       await expect(
         stateUpdater.processStateTransition(
           mockObject<StateTransitionRecord>(),
+          0,
           PedersenHash.fake('987'),
           [],
           [],

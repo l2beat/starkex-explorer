@@ -5,6 +5,7 @@ import { EXAMPLE_PERPETUAL_BATCH_INFO } from '../../test/starkwareData'
 import { FeederGatewayClient } from './FeederGatewayClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualBatchInfoResponse } from './schema'
+import { toPerpetualBatchInfo } from './toPerpetualBatchInfo'
 
 describe(FeederGatewayClient.name, () => {
   const getUrl = mockFn().returns('gateway-url')
@@ -34,7 +35,9 @@ describe(FeederGatewayClient.name, () => {
       expect(fetchClient.fetchRetry).toHaveBeenExhausted()
       expect(getUrl).toHaveBeenExhausted()
       expect(response).toEqual(
-        PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_BATCH_INFO)
+        toPerpetualBatchInfo(
+          PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_BATCH_INFO)
+        )
       )
     })
   })

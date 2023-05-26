@@ -31,6 +31,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
 
   async processStateTransition(
     stateTransitionRecord: StateTransitionRecord,
+    batchId: number,
     expectedPositionRoot: PedersenHash,
     forcedActions: ForcedAction[],
     oraclePrices: OraclePrice[],
@@ -55,6 +56,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
       this.stateUpdateRepository.add({
         stateUpdate: {
           id,
+          batchId,
           blockNumber,
           stateTransitionHash,
           rootHash,

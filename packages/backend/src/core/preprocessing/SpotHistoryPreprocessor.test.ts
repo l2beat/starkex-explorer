@@ -19,6 +19,7 @@ import { SpotHistoryPreprocessor } from './SpotHistoryPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {
   id: 200,
+  batchId: 199,
   blockNumber: 1_000,
   stateTransitionHash: Hash256.fake(),
   rootHash: PedersenHash.fake(),

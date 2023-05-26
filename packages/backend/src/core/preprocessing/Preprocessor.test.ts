@@ -18,6 +18,7 @@ const generateFakeStateUpdate = (
   state_update_id: number
 ): StateUpdateRecord => ({
   id: state_update_id,
+  batchId: state_update_id - 1,
   blockNumber: 10_000 + state_update_id,
   rootHash: PedersenHash.fake(),
   stateTransitionHash: Hash256.fake(),
