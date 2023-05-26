@@ -23,7 +23,9 @@ import {
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
+  renderMerkleProofPage,
   renderNewPerpetualForcedActionPage,
+  renderNewSpotForcedWithdrawPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
   renderRegularWithdrawalPage,
@@ -36,12 +38,10 @@ import {
   renderUserOffersPage,
   renderUserPage,
   renderUserRecoverPage,
+  renderUserRegisterPage,
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderNewSpotForcedWithdrawPage } from '../view/pages/forced-actions/NewSpotForcedWithdrawalPage'
-import { renderMerkleProofPage } from '../view/pages/MerkleProofPage'
-import { renderUserRegisterPage } from '../view/pages/user/UserRegisterPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
   randomHomeForcedTransactionEntry,
@@ -504,7 +504,7 @@ const routes: Route[] = [
         starkKey: StarkKey.fake(),
         starkExAddress: EthereumAddress.fake(),
         asset: {
-          hashOrId: AssetId.USDC,
+          hashOrId: AssetId('USDC-6'),
           balance: amountBucket.pick(),
           priceUSDCents: 10000n,
         },
@@ -658,7 +658,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId.USDC },
+        asset: { hashOrId: AssetId('USDC-6') },
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
@@ -675,7 +675,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId.USDC },
+        asset: { hashOrId: AssetId('USDC-6') },
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [
@@ -695,7 +695,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId.USDC },
+        asset: { hashOrId: AssetId('USDC-6') },
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [
@@ -716,7 +716,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId.USDC },
+        asset: { hashOrId: AssetId('USDC-6') },
         amount: amountBucket.pick(),
         positionId: randomId(),
         history: [

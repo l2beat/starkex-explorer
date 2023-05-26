@@ -10,7 +10,7 @@ import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
 import { TimeCell } from '../../../components/TimeCell'
 
-export interface UserBalanceChangesTableProps {
+interface UserBalanceChangesTableProps {
   balanceChanges: UserBalanceChangeEntry[]
   tradingMode: TradingMode
 }

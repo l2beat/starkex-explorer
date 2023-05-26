@@ -3,10 +3,14 @@ import React from 'react'
 import { assetToInfo } from '../../../../../utils/assets'
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
-import { NewForcedActionFormProps } from '../../NewForcedActionFormProps'
+import { NewForcedActionFormAsset } from '../../NewForcedActionFormProps'
 import { FormId } from './ids'
 
-export function AmountInput(props: NewForcedActionFormProps) {
+interface AmountInputProps {
+  asset: NewForcedActionFormAsset
+}
+
+export function AmountInput(props: AmountInputProps) {
   const assetInfo = assetToInfo({ hashOrId: props.asset.hashOrId })
   const formattedBalance = formatAmount(
     { hashOrId: props.asset.hashOrId },

@@ -10,7 +10,7 @@ import { createEventEmitter } from '../../tools/EventEmitter'
 import { JobQueue } from '../../tools/JobQueue'
 import { Logger } from '../../tools/Logger'
 
-export interface BlockDownloaderEvents {
+interface BlockDownloaderEvents {
   newBlock: BlockRecord
   reorg: BlockRecord[]
 }

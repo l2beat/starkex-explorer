@@ -1,5 +1,4 @@
-import { PageContextWithUser } from '@explorer/shared'
-import { AssetId } from '@explorer/types'
+import { PageContextWithUser, serializeCollateralAsset } from '@explorer/shared'
 import React from 'react'
 
 import { Card } from '../../components/Card'
@@ -22,14 +21,20 @@ type NewPerpetualForcedActionPageProps = NewForcedActionFormProps & {
 function NewPerpetualForcedActionPage(
   props: NewPerpetualForcedActionPageProps
 ) {
-  const { context, ...formProps } = props
-  const isWithdrawal = props.asset.hashOrId === AssetId.USDC
-  const propsJson = serializeForcedActionsFormProps(props)
-  const userJson = JSON.stringify(context.user)
+  const { context } = props
+  const isWithdrawal =
+    props.asset.hashOrId === props.context.collateralAsset.assetId
   const instructionParams = getForcedActionInstructionsParams(
     isWithdrawal,
     context.instanceName
   )
+
+  const propsJson = serializeForcedActionsFormProps(props)
+  const userJson = JSON.stringify(context.user)
+  const collateralAssetJson = serializeCollateralAsset(
+    props.context.collateralAsset
+  )
+
   return (
     <Page
       path="/forced/new/:positionId/:assetId"
@@ -58,11 +63,21 @@ function NewPerpetualForcedActionPage(
               className="flex flex-col gap-6"
               data-props={propsJson}
               data-user={userJson}
+              data-collateral-asset={collateralAssetJson}
             >
               {isWithdrawal ? (
-                <NewPerpetualForcedWithdrawalFormContent {...formProps} />
+                <NewPerpetualForcedWithdrawalFormContent
+                  positionOrVaultId={props.positionOrVaultId}
+                  asset={props.asset}
+                  starkKey={props.starkKey}
+                />
               ) : (
-                <NewPerpetualForcedTradeFormContent {...formProps} />
+                <NewPerpetualForcedTradeFormContent
+                  positionOrVaultId={props.positionOrVaultId}
+                  asset={props.asset}
+                  starkKey={props.starkKey}
+                  collateralAsset={props.context.collateralAsset}
+                />
               )}
             </form>
           </Card>

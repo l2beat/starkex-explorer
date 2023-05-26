@@ -30,5 +30,3 @@ AssetId.decimals = function decimals(assetId: AssetId) {
 AssetId.symbol = function symbol(assetId: AssetId) {
   return assetId.replace(/-\d+$/, '')
 }
-
-AssetId.USDC = AssetId('USDC-6')

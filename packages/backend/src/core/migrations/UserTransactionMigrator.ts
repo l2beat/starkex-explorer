@@ -4,7 +4,7 @@ import {
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
 } from '@explorer/shared'
-import { AssetHash, AssetId, Hash256, Timestamp } from '@explorer/types'
+import { AssetHash, Hash256, Timestamp } from '@explorer/types'
 
 import { BlockRange } from '../../model'
 import { Database } from '../../peripherals/database/shared/Database'
@@ -212,7 +212,7 @@ export class UserTransactionMigrator {
               positionIdA: data.positionIdA,
               positionIdB: data.positionIdB,
               collateralAmount: data.collateralAmount,
-              collateralAssetId: AssetId.USDC,
+              collateralAssetId: this.collateralAsset.assetId,
               syntheticAmount: data.syntheticAmount,
               syntheticAssetId: data.syntheticAssetId,
               isABuyingSynthetic: data.isABuyingSynthetic,

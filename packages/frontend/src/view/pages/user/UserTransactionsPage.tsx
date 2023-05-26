@@ -13,7 +13,7 @@ import { reactToHtml } from '../../reactToHtml'
 import { getTransactionTableProps } from './common'
 import { UserPageTitle } from './components/UserPageTitle'
 
-export interface UserTransactionsPageProps {
+interface UserTransactionsPageProps {
   context: PageContext
   starkKey: StarkKey
   transactions: TransactionEntry[]

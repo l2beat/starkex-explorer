@@ -4,7 +4,7 @@ import React from 'react'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { PageTitle } from '../../../components/PageTitle'
 
-export interface TransactionPageTitleProps {
+interface TransactionPageTitleProps {
   title: string
   transactionHash: Hash256
 }

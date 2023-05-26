@@ -20,7 +20,7 @@ import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
-export interface PerpetualForcedWithdrawalPageProps {
+interface PerpetualForcedWithdrawalPageProps {
   context: PageContext<'perpetual'>
   transactionHash: Hash256
   recipient: {

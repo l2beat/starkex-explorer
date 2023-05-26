@@ -10,7 +10,7 @@ import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
 
-export interface StateUpdateBalanceChangesTableProps {
+interface StateUpdateBalanceChangesTableProps {
   balanceChanges: StateUpdateBalanceChangeEntry[]
   tradingMode: TradingMode
 }

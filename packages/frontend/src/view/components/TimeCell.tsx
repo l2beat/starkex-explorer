@@ -3,7 +3,7 @@ import React from 'react'
 
 import { formatTimestampParts } from '../../utils/formatting/formatTimestamp'
 
-export interface TimeCellProps {
+interface TimeCellProps {
   timestamp: Timestamp
 }
 

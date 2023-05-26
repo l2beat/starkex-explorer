@@ -4,7 +4,7 @@ import React from 'react'
 
 import { generateJazzIcon } from './generateJazzIcon'
 
-export interface JazzIconProps {
+interface JazzIconProps {
   address: EthereumAddress
   size: number
   className?: string

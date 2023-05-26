@@ -7,7 +7,7 @@ import { ProjectLogo } from '../../assets/logos/ProjectLogo'
 import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
 
-export interface NavbarProps {
+interface NavbarProps {
   readonly context: PageContext
   readonly searchBar: boolean
 }

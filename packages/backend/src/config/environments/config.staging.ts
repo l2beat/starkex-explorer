@@ -10,6 +10,5 @@ export function getStagingConfig(): Config {
     ...getProductionConfig(),
     name: 'StarkexExplorer/Staging',
     enablePreprocessing: getEnv.boolean('ENABLE_PREPROCESSING', true),
-    useOldFrontend: false,
   }
 }

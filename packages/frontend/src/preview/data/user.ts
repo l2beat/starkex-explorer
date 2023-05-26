@@ -35,7 +35,7 @@ const transactionTypeBucket = new Bucket([
   'WITHDRAW',
 ] as const)
 
-export function randomTransactionTypeAndStatus(): Pick<
+function randomTransactionTypeAndStatus(): Pick<
   TransactionEntry,
   'type' | 'status'
 > {

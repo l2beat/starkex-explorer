@@ -13,7 +13,7 @@ export const INITIAL_SYNC_STATE: SyncState = {
   discardAfter: undefined,
 }
 
-export const SYNC_BATCH_SIZE = 6000
+const SYNC_BATCH_SIZE = 6000
 
 export interface SyncState {
   readonly isProcessing: boolean

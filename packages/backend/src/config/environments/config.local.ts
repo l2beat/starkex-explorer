@@ -20,6 +20,5 @@ export function getLocalConfig(): Config {
     freshStart: getEnv.boolean('FRESH_START', false),
     forceHttps: false,
     starkex: getStarkexConfig(getEnv('STARKEX_INSTANCE')),
-    useOldFrontend: false,
   }
 }

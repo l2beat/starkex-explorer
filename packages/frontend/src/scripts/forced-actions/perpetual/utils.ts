@@ -1,42 +1,36 @@
+import { CollateralAsset } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 
-import { PositionAssetEntry } from '../../../view'
 import { FormState } from './types'
-
-export function getAsset(
-  selected: AssetId,
-  assets: readonly PositionAssetEntry[]
-) {
-  let asset = assets.find((x) => x.assetId === selected)
-  if (!asset) {
-    console.error('Nonexistent asset selected')
-    asset = assets[0]
-    if (!asset) {
-      throw new Error('Programmer error: No assets')
-    }
-  }
-  return asset
-}
 
 export function getFormType(
   assetId: AssetId,
-  balance: bigint
+  balance: bigint,
+  collateralAsset: CollateralAsset
 ): FormState['type'] {
-  if (isSellable(assetId, balance)) {
+  if (isSellable(assetId, balance, collateralAsset)) {
     return 'sell'
   }
-  if (isBuyable(assetId, balance)) {
+  if (isBuyable(assetId, balance, collateralAsset)) {
     return 'buy'
   }
   return 'withdraw'
 }
 
-export function isSellable(assetId: AssetId, balance: bigint): boolean {
-  return assetId !== AssetId.USDC && balance > 0n
+function isSellable(
+  assetId: AssetId,
+  balance: bigint,
+  collateralAsset: CollateralAsset
+): boolean {
+  return assetId !== collateralAsset.assetId && balance > 0n
 }
 
-export function isBuyable(assetId: AssetId, balance: bigint): boolean {
-  return assetId !== AssetId.USDC && balance < 0n
+export function isBuyable(
+  assetId: AssetId,
+  balance: bigint,
+  collateralAsset: CollateralAsset
+): boolean {
+  return assetId !== collateralAsset.assetId && balance < 0n
 }
 
 export function parseCurrencyInput(

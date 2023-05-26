@@ -10,7 +10,7 @@ import { getAssetsTableProps } from './common'
 import { UserAssetEntry, UserAssetsTable } from './components/UserAssetTable'
 import { UserPageTitle } from './components/UserPageTitle'
 
-export interface UserAssetsPageProps {
+interface UserAssetsPageProps {
   context: PageContext
   starkKey: StarkKey
   assets: UserAssetEntry[]

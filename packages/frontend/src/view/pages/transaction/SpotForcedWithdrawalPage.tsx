@@ -19,7 +19,7 @@ import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
-export interface SpotForcedWithdrawalPageProps {
+interface SpotForcedWithdrawalPageProps {
   context: PageContext<'spot'>
   transactionHash: Hash256
   recipient: {

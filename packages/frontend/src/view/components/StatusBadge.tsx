@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react'
 
 export type StatusType = 'BEGIN' | 'MIDDLE' | 'END' | 'ERROR' | 'CANCEL'
 
-export interface StatusBadgeProps {
+interface StatusBadgeProps {
   type: StatusType
   children: ReactNode
 }

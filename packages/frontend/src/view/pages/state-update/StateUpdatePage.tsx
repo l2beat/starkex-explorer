@@ -24,19 +24,13 @@ import {
   StateUpdateStatsProps,
 } from './components/StateUpdateStats'
 
-export interface StateUpdatePageProps extends StateUpdateStatsProps {
+interface StateUpdatePageProps extends StateUpdateStatsProps {
   context: PageContext
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
   priceChanges?: StateUpdatePriceEntry[]
   transactions: TransactionEntry[]
   totalTransactions: number
-}
-
-export interface StateUpdateTutorialEntry {
-  title: string
-  imageUrl: string
-  href: string
 }
 
 export function renderStateUpdatePage(props: StateUpdatePageProps) {

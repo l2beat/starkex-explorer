@@ -1,53 +1,6 @@
-import { AssetId } from '@explorer/types'
 import { expect } from 'earl'
 
-import {
-  getAssetValueUSDCents,
-  toPositionAssetEntries,
-} from '../../../../src/api/controllers/utils/toPositionAssetEntries'
-
-describe(toPositionAssetEntries.name, () => {
-  it('correctly calculates asset entries', () => {
-    const result = toPositionAssetEntries(
-      [
-        { assetId: AssetId('1INCH-7'), balance: -277300000000n },
-        { assetId: AssetId('AAVE-8'), balance: 215396000000n },
-        { assetId: AssetId('ETH-9'), balance: 0n },
-      ],
-      1234567n,
-      [
-        { assetId: AssetId('1INCH-7'), price: 1255126913n },
-        { assetId: AssetId('AAVE-8'), price: 14052211116n },
-        { assetId: AssetId('ETH-9'), price: 14488213180n },
-      ]
-    )
-    expect(result).toEqual([
-      {
-        assetId: AssetId('AAVE-8'),
-        balance: 215396000000n,
-        priceUSDCents: 32717n,
-        totalUSDCents: 70472947n,
-      },
-      {
-        assetId: AssetId('1INCH-7'),
-        balance: -277300000000n,
-        priceUSDCents: 292n,
-        totalUSDCents: -8103593n,
-      },
-      {
-        assetId: AssetId.USDC,
-        balance: 1234567n,
-        priceUSDCents: 100n,
-        totalUSDCents: 123n,
-      },
-    ])
-  })
-
-  it('can return nothing', () => {
-    const result = toPositionAssetEntries([], 0n, [])
-    expect(result).toEqual([])
-  })
-})
+import { getAssetValueUSDCents } from './assets'
 
 describe(getAssetValueUSDCents.name, () => {
   const cases = [

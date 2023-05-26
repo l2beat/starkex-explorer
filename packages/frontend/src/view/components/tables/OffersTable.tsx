@@ -16,7 +16,7 @@ import { Table } from '../table/Table'
 import { Column } from '../table/types'
 import { TimeCell } from '../TimeCell'
 
-export interface OffersTableProps {
+interface OffersTableProps {
   context: PageContext<'perpetual'>
   offers: OfferEntry[]
   showStatus?: boolean

@@ -10,7 +10,7 @@ import { reactToHtml } from '../../reactToHtml'
 import { getOfferTableProps } from './common'
 import { UserPageTitle } from './components/UserPageTitle'
 
-export interface UserOffersPageProps {
+interface UserOffersPageProps {
   context: PageContext<'perpetual'>
   starkKey: StarkKey
   offers: OfferEntry[]

@@ -8,8 +8,8 @@ import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 import { PageContextService } from '../../core/PageContextService'
 import { AssetRepository } from '../../peripherals/database/AssetRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import { getAssetPriceUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
-import { getAssetPriceUSDCents } from './utils/toPositionAssetEntries'
 
 export class ForcedActionController {
   constructor(
