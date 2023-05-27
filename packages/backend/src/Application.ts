@@ -33,6 +33,9 @@ import {
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
+import { IDataSyncService } from './core/IDataSyncService'
+import { IStateTransitionCollector } from './core/IStateTransitionCollector'
+import { StateUpdateMigrator } from './core/migrations/StateUpdateMigrator'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
 import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PageContextService } from './core/PageContextService'
@@ -207,11 +210,12 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
-    let syncService
+    let syncService: IDataSyncService
     let stateUpdater:
       | SpotValidiumUpdater
       | PerpetualValidiumUpdater
       | PerpetualRollupUpdater
+    let stateTransitionCollector: IStateTransitionCollector
 
     let transactionDownloader: TransactionDownloader | undefined
 
@@ -228,6 +232,7 @@ export class Application {
             stateTransitionRepository,
             config.starkex.contracts.perpetual
           )
+        stateTransitionCollector = perpetualValidiumStateTransitionCollector
         const transactionRepository = new TransactionRepository(
           database,
           logger
@@ -279,6 +284,7 @@ export class Application {
             stateTransitionRepository,
             config.starkex.contracts.perpetual
           )
+        stateTransitionCollector = spotValidiumStateTransitionCollector
         const spotCairoOutputCollector = new SpotCairoOutputCollector(
           ethereumClient
         )
@@ -325,12 +331,13 @@ export class Application {
         pageRepository,
         config.starkex.contracts.registry
       )
-      const stateTransitionCollector =
+      const perpetualRollupStateTransitionCollector =
         new PerpetualRollupStateTransitionCollector(
           ethereumClient,
           stateTransitionRepository,
           config.starkex.contracts.perpetual
         )
+      stateTransitionCollector = perpetualRollupStateTransitionCollector
       const rollupStateRepository = new MerkleTreeRepository(
         database,
         logger,
@@ -349,7 +356,7 @@ export class Application {
         verifierCollector,
         pageMappingCollector,
         pageCollector,
-        stateTransitionCollector,
+        perpetualRollupStateTransitionCollector,
         perpetualRollupUpdater,
         userRegistrationCollector,
         userTransactionCollector,
@@ -387,6 +394,15 @@ export class Application {
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
       userTransactionCollector,
+      logger
+    )
+
+    const stateUpdateMigrator = new StateUpdateMigrator(
+      softwareMigrationRepository,
+      stateUpdateRepository,
+      syncStatusRepository,
+      syncService,
+      stateTransitionCollector,
       logger
     )
 
@@ -608,6 +624,7 @@ export class Application {
 
       await userTransactionMigrator.migrate()
       await withdrawableAssetMigrator.migrate()
+      await stateUpdateMigrator.migrate()
       await stateUpdater.initTree()
 
       if (config.enableSync) {

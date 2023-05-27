@@ -10,7 +10,10 @@ import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { IDataSyncService } from './IDataSyncService'
-import { SpotValidiumUpdater } from './SpotValidiumUpdater'
+import {
+  SpotValidiumUpdater,
+  ValidiumStateTransition,
+} from './SpotValidiumUpdater'
 
 export class SpotValidiumSyncService implements IDataSyncService {
   constructor(
@@ -55,6 +58,10 @@ export class SpotValidiumSyncService implements IDataSyncService {
       depositsWithTokenId: depositsWithTokenId.length,
     })
 
+    await this.processStateUpdates(stateTransitions)
+  }
+
+  async processStateUpdates(stateTransitions: ValidiumStateTransition[]) {
     for (const transition of stateTransitions) {
       const [spotCairoOutput, batch] = await Promise.all([
         this.spotCairoOutputCollector.collect(transition.transactionHash),

@@ -8,12 +8,15 @@ import {
 } from '../../peripherals/database/StateTransitionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
+import { IStateTransitionCollector } from '../IStateTransitionCollector'
 import { ValidiumStateTransition } from '../PerpetualValidiumUpdater'
 import { LogRootUpdate, LogStateTransitionFact, LogUpdateState } from './events'
 
 type StateUpdateEvent = typeof LogRootUpdate | typeof LogUpdateState
 
-export class ValidiumStateTransitionCollector<T extends StateUpdateEvent> {
+export class ValidiumStateTransitionCollector<T extends StateUpdateEvent>
+  implements IStateTransitionCollector
+{
   constructor(
     protected readonly ethereumClient: EthereumClient,
     protected readonly stateTransitionRepository: StateTransitionRepository,
@@ -21,7 +24,10 @@ export class ValidiumStateTransitionCollector<T extends StateUpdateEvent> {
     protected readonly stateUpdateEvent: T
   ) {}
 
-  async collect(blockRange: BlockRange): Promise<ValidiumStateTransition[]> {
+  async collect(
+    blockRange: BlockRange,
+    skipAddingToDb = false
+  ): Promise<ValidiumStateTransition[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.starkExAddress.toString(),
       topics: [[LogStateTransitionFact.topic, this.stateUpdateEvent.topic]],
@@ -75,7 +81,9 @@ export class ValidiumStateTransitionCollector<T extends StateUpdateEvent> {
       })
     }
 
-    await this.stateTransitionRepository.addMany(records)
+    if (!skipAddingToDb) {
+      await this.stateTransitionRepository.addMany(records)
+    }
     return validiumStateTransitions
   }
 

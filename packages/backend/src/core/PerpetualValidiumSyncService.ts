@@ -9,7 +9,10 @@ import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { IDataSyncService } from './IDataSyncService'
-import { PerpetualValidiumUpdater } from './PerpetualValidiumUpdater'
+import {
+  PerpetualValidiumUpdater,
+  ValidiumStateTransition,
+} from './PerpetualValidiumUpdater'
 
 export class PerpetualValidiumSyncService implements IDataSyncService {
   constructor(
@@ -44,6 +47,16 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
       userRegistrations: userRegistrations.length,
     })
 
+    await this.processStateUpdates(stateTransitions)
+
+    const lastStateTransition = stateTransitions[stateTransitions.length - 1]
+    if (!lastStateTransition) return
+    await this.transactionDownloader?.sync(lastStateTransition.sequenceNumber)
+  }
+
+  async processStateUpdates(
+    stateTransitions: ValidiumStateTransition[]
+  ): Promise<void> {
     for (const transition of stateTransitions) {
       const [perpetualCairoOutput, batch] = await Promise.all([
         this.perpetualCairoOutputCollector.collect(transition.transactionHash),
@@ -59,7 +72,6 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
         perpetualCairoOutput,
         batch
       )
-      await this.transactionDownloader?.sync(transition.sequenceNumber)
     }
   }
 

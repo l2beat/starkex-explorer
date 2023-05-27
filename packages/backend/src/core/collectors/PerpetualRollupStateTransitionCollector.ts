@@ -8,10 +8,13 @@ import {
 } from '../../peripherals/database/StateTransitionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../../peripherals/ethereum/types'
+import { IStateTransitionCollector } from '../IStateTransitionCollector'
 import { PerpetualRollupStateTransition } from '../PerpetualRollupUpdater'
 import { LogStateTransitionFact, LogUpdateState } from './events'
 
-export class PerpetualRollupStateTransitionCollector {
+export class PerpetualRollupStateTransitionCollector
+  implements IStateTransitionCollector
+{
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly stateTransitionRepository: StateTransitionRepository,
@@ -19,7 +22,8 @@ export class PerpetualRollupStateTransitionCollector {
   ) {}
 
   async collect(
-    blockRange: BlockRange
+    blockRange: BlockRange,
+    skipAddingToDb = false
   ): Promise<PerpetualRollupStateTransition[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.perpetualAddress.toString(),
@@ -69,7 +73,10 @@ export class PerpetualRollupStateTransitionCollector {
       })
     }
 
-    await this.stateTransitionRepository.addMany(records)
+    if (!skipAddingToDb) {
+      await this.stateTransitionRepository.addMany(records)
+    }
+
     return perpetualRollupStateTransitions
   }
 
