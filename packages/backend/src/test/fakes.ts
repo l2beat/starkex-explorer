@@ -1,9 +1,9 @@
 import { ForcedTrade, ForcedWithdrawal, OnChainData } from '@explorer/encoding'
 import {
   CollateralAsset,
+  ERC1155Details,
   ERC20Details,
   ERC721Details,
-  ERC1155Details,
   ETHDetails,
 } from '@explorer/shared'
 import {
@@ -222,8 +222,10 @@ export function fakeIncluded(
 export function fakeStateUpdate(
   stateUpdate?: Partial<StateUpdateRecord>
 ): StateUpdateRecord {
+  const batchId = fakeInt()
   return {
-    id: fakeInt(),
+    id: batchId + 1,
+    batchId,
     blockNumber: fakeInt(),
     stateTransitionHash: Hash256.fake(),
     rootHash: PedersenHash.fake(),

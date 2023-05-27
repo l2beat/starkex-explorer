@@ -67,7 +67,13 @@ describe(PerpetualRollupUpdater.name, () => {
       )
       await expect(
         stateUpdater.loadRequiredPages([
-          { stateTransitionHash: Hash256.fake('a'), blockNumber: 1 },
+          {
+            stateTransitionHash: Hash256.fake('a'),
+            blockNumber: 1,
+            transactionHash: Hash256.fake('b'),
+            sequenceNumber: 1,
+            batchId: 1,
+          },
         ])
       ).toBeRejectedWith('Missing pages for state transitions in database')
     })
@@ -79,14 +85,16 @@ describe(PerpetualRollupUpdater.name, () => {
           ['ba', 'bb'],
         ],
       })
+      const lastStateUpdate = {
+        rootHash: PedersenHash.fake('1234'),
+        id: 567,
+        batchId: 566,
+        timestamp: Timestamp(1),
+        blockNumber: Math.random(),
+        stateTransitionHash: Hash256.fake(),
+      }
       const stateUpdateRepository = mockObject<StateUpdateRepository>({
-        findLast: async () => ({
-          rootHash: PedersenHash.fake('1234'),
-          id: 567,
-          timestamp: Timestamp(1),
-          blockNumber: Math.random(),
-          stateTransitionHash: Hash256.fake(),
-        }),
+        findLast: async () => lastStateUpdate,
       })
       const stateUpdater = new PerpetualRollupUpdater(
         pageRepository,
@@ -98,19 +106,37 @@ describe(PerpetualRollupUpdater.name, () => {
       )
 
       const stateTransitions = await stateUpdater.loadRequiredPages([
-        { blockNumber: 123, stateTransitionHash: Hash256.fake('123') },
-        { blockNumber: 456, stateTransitionHash: Hash256.fake('456') },
+        {
+          blockNumber: 123,
+          stateTransitionHash: Hash256.fake('123'),
+          transactionHash: Hash256.fake('b'),
+          sequenceNumber: 1,
+          batchId: 0,
+        },
+        {
+          blockNumber: 456,
+          stateTransitionHash: Hash256.fake('456'),
+          transactionHash: Hash256.fake('c'),
+          sequenceNumber: 2,
+          batchId: 1,
+        },
       ])
       expect(stateTransitions).toEqual([
         {
-          id: 567 + 1,
+          id: lastStateUpdate.id + 1,
+          sequenceNumber: 1,
+          batchId: 0,
+          transactionHash: Hash256.fake('b'),
           blockNumber: 123,
           stateTransitionHash: Hash256.fake('123'),
           pages: ['aa', 'ab', 'ac'],
         },
         {
-          id: 567 + 2,
+          id: lastStateUpdate.id + 2,
           blockNumber: 456,
+          sequenceNumber: 2,
+          batchId: 1,
+          transactionHash: Hash256.fake('c'),
           stateTransitionHash: Hash256.fake('456'),
           pages: ['ba', 'bb'],
         },
