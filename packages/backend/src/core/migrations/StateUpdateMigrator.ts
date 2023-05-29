@@ -3,7 +3,6 @@ import { SoftwareMigrationRepository } from '../../peripherals/database/Software
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { Logger } from '../../tools/Logger'
-import { IDataSyncService } from '../IDataSyncService'
 import { IStateTransitionCollector } from '../IStateTransitionCollector'
 
 export class StateUpdateMigrator {
@@ -11,7 +10,6 @@ export class StateUpdateMigrator {
     private softwareMigrationRepository: SoftwareMigrationRepository,
     private stateUpdateRepository: StateUpdateRepository,
     private syncStatusRepository: SyncStatusRepository,
-    private syncService: IDataSyncService,
     private transitionCollector: IStateTransitionCollector,
     private logger: Logger
   ) {
@@ -35,15 +33,9 @@ export class StateUpdateMigrator {
     }
     this.logger.info('State update migration started')
 
-    await this.clearRepositories()
     await this.collectStateUpdateEvents(lastSyncedBlock)
 
     this.logger.info('Migration finished')
-  }
-
-  private async clearRepositories() {
-    await this.stateUpdateRepository.deleteAll()
-    this.logger.info('Cleared ')
   }
 
   private async collectStateUpdateEvents(lastSyncedBlock: number) {
@@ -66,6 +58,11 @@ export class StateUpdateMigrator {
       blockRange,
       true
     )
-    await this.syncService.processStateUpdates(stateTransitions)
+    for (const stateTransition of stateTransitions) {
+      await this.stateUpdateRepository.update({
+        id: stateTransition.sequenceNumber + 1,
+        batchId: stateTransition.batchId,
+      })
+    }
   }
 }

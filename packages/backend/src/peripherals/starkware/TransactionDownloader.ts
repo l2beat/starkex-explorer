@@ -1,4 +1,5 @@
 import { Logger } from '../../tools/Logger'
+import { StateUpdateRecord } from '../database/StateUpdateRepository'
 import { TransactionRepository } from '../database/TransactionRepository'
 import { FeederGatewayClient } from './FeederGatewayClient'
 
@@ -10,7 +11,7 @@ export class TransactionDownloader {
   ) {}
 
   async sync(
-    stateUpdates: { batchId: number; id: number; blockNumber: number }[]
+    stateUpdates: Pick<StateUpdateRecord, 'id' | 'batchId' | 'blockNumber'>[]
   ) {
     const latestSyncedTransactionStateUpdateId =
       (await this.transactionRepository.findLatestStateUpdateId()) ?? 0

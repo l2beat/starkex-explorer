@@ -400,7 +400,6 @@ export class Application {
       softwareMigrationRepository,
       stateUpdateRepository,
       syncStatusRepository,
-      syncService,
       stateTransitionCollector,
       logger
     )

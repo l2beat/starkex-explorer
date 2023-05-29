@@ -35,6 +35,7 @@ export class StateUpdateRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
 
     this.add = this.wrapAdd(this.add)
+    this.update = this.wrapUpdate(this.update)
     this.findLast = this.wrapFind(this.findLast)
     this.findLastUntilBlockNumber = this.wrapFind(this.findLastUntilBlockNumber)
     this.findById = this.wrapFind(this.findById)
@@ -81,6 +82,14 @@ export class StateUpdateRepository extends BaseRepository {
           .whereIn('hash', transactionHashes.map(String))
     })
     return stateUpdate.id
+  }
+
+  async update(
+    record: Pick<StateUpdateRecord, 'id'> & Partial<StateUpdateRecord>
+  ) {
+    const knex = await this.knex()
+    const row = toPartialStateUpdateRow(record)
+    return await knex('state_updates').where('id', row.id).update(row)
   }
 
   async findLast(): Promise<StateUpdateRecord | undefined> {
@@ -250,6 +259,19 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
     state_transition_hash: record.stateTransitionHash.toString(),
     root_hash: record.rootHash.toString(),
     timestamp: BigInt(Number(record.timestamp)),
+  }
+}
+
+function toPartialStateUpdateRow(
+  record: Pick<StateUpdateRecord, 'id'> & Partial<StateUpdateRecord>
+): Pick<StateUpdateRow, 'id'> & Partial<StateUpdateRow> {
+  return {
+    id: record.id,
+    block_number: record.blockNumber,
+    batch_id: record.batchId,
+    state_transition_hash: record.stateTransitionHash?.toString(),
+    root_hash: record.rootHash?.toString(),
+    timestamp: record.timestamp && BigInt(Number(record.timestamp)),
   }
 }
 
