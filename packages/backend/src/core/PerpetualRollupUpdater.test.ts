@@ -15,7 +15,10 @@ import { expect, mockFn, mockObject } from 'earl'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { PageRepository } from '../peripherals/database/PageRepository'
-import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import {
+  StateUpdateRecord,
+  StateUpdateRepository,
+} from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import type { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { Logger } from '../tools/Logger'
@@ -167,7 +170,7 @@ describe(PerpetualRollupUpdater.name, () => {
 
         const mockProcessStateTransition =
           mockFn<typeof updater.processStateTransition>()
-        mockProcessStateTransition.resolvesTo(undefined)
+        mockProcessStateTransition.resolvesTo({} as StateUpdateRecord)
         updater.processStateTransition = mockProcessStateTransition
 
         const batchId = 0

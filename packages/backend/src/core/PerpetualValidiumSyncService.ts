@@ -1,4 +1,5 @@
 import { BlockRange } from '../model'
+import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { TransactionDownloader } from '../peripherals/starkware/TransactionDownloader'
@@ -47,32 +48,34 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
       userRegistrations: userRegistrations.length,
     })
 
-    await this.processStateUpdates(stateTransitions)
-
-    const lastStateTransition = stateTransitions[stateTransitions.length - 1]
-    if (!lastStateTransition) return
-    await this.transactionDownloader?.sync(lastStateTransition.sequenceNumber)
+    const stateUpdates = await this.processStateUpdates(stateTransitions)
+    await this.transactionDownloader?.sync(stateUpdates)
   }
 
-  async processStateUpdates(
-    stateTransitions: ValidiumStateTransition[]
-  ): Promise<void> {
-    for (const transition of stateTransitions) {
+  async processStateUpdates(stateTransitions: ValidiumStateTransition[]) {
+    const stateUpdates: StateUpdateRecord[] = []
+
+    for (const stateTransition of stateTransitions) {
       const [perpetualCairoOutput, batch] = await Promise.all([
-        this.perpetualCairoOutputCollector.collect(transition.transactionHash),
+        this.perpetualCairoOutputCollector.collect(
+          stateTransition.transactionHash
+        ),
         this.availabilityGatewayClient.getPerpetualBatchData(
-          transition.batchId
+          stateTransition.batchId
         ),
       ])
       if (!batch) {
-        throw new Error(`Unable to download batch ${transition.batchId}`)
+        throw new Error(`Unable to download batch ${stateTransition.batchId}`)
       }
-      await this.perpetualValidiumUpdater.processValidiumStateTransition(
-        transition,
-        perpetualCairoOutput,
-        batch
-      )
+      const stateUpdate =
+        await this.perpetualValidiumUpdater.processValidiumStateTransition(
+          stateTransition,
+          perpetualCairoOutput,
+          batch
+        )
+      stateUpdates.push(stateUpdate)
     }
+    return stateUpdates
   }
 
   async discardAfter(blockNumber: BlockNumber) {

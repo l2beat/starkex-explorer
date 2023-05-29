@@ -1,8 +1,9 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect, mockObject } from 'earl'
+import { expect, mockFn, mockObject } from 'earl'
 
 import { BlockRange } from '../model'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
+import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { decodedFakePages, fakePages } from '../test/fakes'
 import { Logger } from '../tools/Logger'
 import type { PageCollector } from './collectors/PageCollector'
@@ -71,7 +72,9 @@ describe(PerpetualRollupSyncService.name, () => {
     }
     const perpetualRollupUpdater = mockObject<PerpetualRollupUpdater>({
       loadRequiredPages: async () => [stateTransitionRecordWithPages],
-      processOnChainStateTransition: noop,
+      processOnChainStateTransition: mockFn(
+        async () => ({} as StateUpdateRecord)
+      ),
     })
 
     const stateTransitionRecord: StateTransitionRecord = {

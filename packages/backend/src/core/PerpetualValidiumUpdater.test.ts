@@ -77,9 +77,17 @@ describe(PerpetualValidiumUpdater.name, () => {
           stateTree
         )
 
+        const processedStateUpdate = {
+          id: 1,
+          batchId: 0,
+          blockNumber: 1111,
+          stateTransitionHash: Hash256.fake('456'),
+          rootHash: PedersenHash.fake('789'),
+          timestamp: Timestamp(0),
+        }
         const mockProcessStateTransition =
           mockFn<typeof updater.processStateTransition>()
-        mockProcessStateTransition.resolvesTo(undefined)
+        mockProcessStateTransition.resolvesTo(processedStateUpdate)
         updater.processStateTransition = mockProcessStateTransition
 
         const mockReadLastUpdate = mockFn()
@@ -142,7 +150,7 @@ describe(PerpetualValidiumUpdater.name, () => {
           stateTransitionHash: transition.stateTransitionHash,
         }
 
-        await updater.processValidiumStateTransition(
+        const result = await updater.processValidiumStateTransition(
           transition,
           mockProgramOutput,
           testPerpetualBatch
@@ -155,6 +163,7 @@ describe(PerpetualValidiumUpdater.name, () => {
           mockProgramOutput.newState.oraclePrices,
           updatedPositions
         )
+        expect(result).toEqual(processedStateUpdate)
       })
     }
   )

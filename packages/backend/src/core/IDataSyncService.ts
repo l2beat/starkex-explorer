@@ -1,4 +1,5 @@
 import { BlockRange } from '../model'
+import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { PerpetualRollupStateTransition } from './PerpetualRollupUpdater'
 import { ValidiumStateTransition } from './PerpetualValidiumUpdater'
@@ -9,6 +10,6 @@ export interface IDataSyncService {
     stateTransitions:
       | ValidiumStateTransition[]
       | PerpetualRollupStateTransition[]
-  ): Promise<void>
+  ): Promise<StateUpdateRecord[]>
   discardAfter(blockNumber: BlockNumber): Promise<void>
 }

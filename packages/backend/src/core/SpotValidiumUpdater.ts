@@ -64,7 +64,7 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
         (modification) => modification.type === 'fullWithdrawal'
       ) as FullWithdrawal[]
 
-    await this.processStateTransition(
+    return await this.processStateTransition(
       {
         id: id + 1,
         blockNumber: transition.blockNumber,

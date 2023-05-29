@@ -243,7 +243,6 @@ export class Application {
         transactionDownloader = feederGatewayClient
           ? new TransactionDownloader(
               feederGatewayClient,
-              stateUpdateRepository,
               transactionRepository,
               logger
             )

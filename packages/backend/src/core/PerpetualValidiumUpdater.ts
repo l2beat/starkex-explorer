@@ -58,8 +58,7 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
     await this.ensureStateTree(oldHash, positionTreeHeight)
 
     const newPositions = buildNewPositionLeaves(batch)
-
-    await this.processStateTransition(
+    return await this.processStateTransition(
       {
         id: id + 1,
         blockNumber: transition.blockNumber,

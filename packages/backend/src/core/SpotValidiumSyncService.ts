@@ -1,4 +1,5 @@
 import { BlockRange } from '../model'
+import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { Logger } from '../tools/Logger'
@@ -62,20 +63,26 @@ export class SpotValidiumSyncService implements IDataSyncService {
   }
 
   async processStateUpdates(stateTransitions: ValidiumStateTransition[]) {
-    for (const transition of stateTransitions) {
+    const stateUpdates: StateUpdateRecord[] = []
+    for (const stateTransition of stateTransitions) {
       const [spotCairoOutput, batch] = await Promise.all([
-        this.spotCairoOutputCollector.collect(transition.transactionHash),
-        this.availabilityGatewayClient.getSpotBatchData(transition.batchId),
+        this.spotCairoOutputCollector.collect(stateTransition.transactionHash),
+        this.availabilityGatewayClient.getSpotBatchData(
+          stateTransition.batchId
+        ),
       ])
       if (!batch) {
-        throw new Error(`Unable to download batch ${transition.batchId}`)
+        throw new Error(`Unable to download batch ${stateTransition.batchId}`)
       }
-      await this.spotValidiumUpdater.processSpotValidiumStateTransition(
-        transition,
-        spotCairoOutput,
-        batch
-      )
+      const stateUpdate =
+        await this.spotValidiumUpdater.processSpotValidiumStateTransition(
+          stateTransition,
+          spotCairoOutput,
+          batch
+        )
+      stateUpdates.push(stateUpdate)
     }
+    return stateUpdates
   }
 
   async discardAfter(blockNumber: BlockNumber) {
