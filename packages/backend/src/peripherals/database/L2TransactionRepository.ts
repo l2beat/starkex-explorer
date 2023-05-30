@@ -44,7 +44,7 @@ export class L2TransactionRepository extends BaseRepository {
     const { starkKeyA, starkKeyB, data } = encodeL2TransactionData(record.data)
 
     const count = await this.countByTransactionId(record.transactionId)
-    const altIndex = count - 1
+    const altIndex = count - 1 >= 0 ? count - 1 : undefined
 
     if (altIndex === 0) {
       await knex('l2_transactions')
