@@ -4,8 +4,8 @@ import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { EXAMPLE_PERPETUAL_TRANSACTIONS } from '../../test/starkwareData'
 import { FetchClient } from './FetchClient'
 import { L2TransactionClient } from './L2TransactionClient'
-import { PerpetualTransactionResponse } from './schema'
-import { toPerpetualTransactions } from './toPerpetualTransactions'
+import { PerpetualL2TransactionResponse } from './schema'
+import { toPerpetualL2Transactions } from './toPerpetualTransactions'
 
 describe(L2TransactionClient.name, () => {
   const getUrl = mockFn().returns('gateway-url')
@@ -36,8 +36,8 @@ describe(L2TransactionClient.name, () => {
       expect(fetchClient.fetchRetry).toHaveBeenExhausted()
       expect(getUrl).toHaveBeenExhausted()
       expect(response).toEqual(
-        toPerpetualTransactions(
-          PerpetualTransactionResponse.parse(EXAMPLE_PERPETUAL_TRANSACTIONS)
+        toPerpetualL2Transactions(
+          PerpetualL2TransactionResponse.parse(EXAMPLE_PERPETUAL_TRANSACTIONS)
         )
       )
     })

@@ -113,49 +113,44 @@ describe(L2TransactionRepository.name, () => {
     })
   })
 
-  describe.only(
-    L2TransactionRepository.prototype.countByTransactionId.name,
-    () => {
-      it('returns 0 if there are no transactions', async () => {
-        const count = await repository.countByTransactionId(1234)
+  describe(L2TransactionRepository.prototype.countByTransactionId.name, () => {
+    it('returns 0 if there are no transactions', async () => {
+      const count = await repository.countByTransactionId(1234)
 
-        expect(count).toEqual(0)
-      })
+      expect(count).toEqual(0)
+    })
 
-      it('returns the number of transactions', async () => {
-        const record = {
-          stateUpdateId: 1,
-          transactionId: 1234,
-          blockNumber: 12345,
-          data: {
-            type: 'Deposit',
-            starkKey: StarkKey.fake(),
-            positionId: 1234n,
-            amount: 5000n,
-          },
-        } as const
-        const record2 = {
-          stateUpdateId: 2,
-          transactionId: 1234,
-          blockNumber: 123456,
-          data: {
-            type: 'Deposit',
-            starkKey: StarkKey.fake(),
-            positionId: 1234n,
-            amount: 5000n,
-          },
-        } as const
-        await repository.add(record)
-        await repository.add(record2)
+    it('returns the number of transactions', async () => {
+      const record = {
+        stateUpdateId: 1,
+        transactionId: 1234,
+        blockNumber: 12345,
+        data: {
+          type: 'Deposit',
+          starkKey: StarkKey.fake(),
+          positionId: 1234n,
+          amount: 5000n,
+        },
+      } as const
+      const record2 = {
+        stateUpdateId: 2,
+        transactionId: 1234,
+        blockNumber: 123456,
+        data: {
+          type: 'Deposit',
+          starkKey: StarkKey.fake(),
+          positionId: 1234n,
+          amount: 5000n,
+        },
+      } as const
+      await repository.add(record)
+      await repository.add(record2)
 
-        const count = await repository.countByTransactionId(
-          record.transactionId
-        )
+      const count = await repository.countByTransactionId(record.transactionId)
 
-        expect(count).toEqual(2)
-      })
-    }
-  )
+      expect(count).toEqual(2)
+    })
+  })
 
   describe(
     L2TransactionRepository.prototype.findLatestStateUpdateId.name,

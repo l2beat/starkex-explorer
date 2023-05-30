@@ -271,8 +271,8 @@ const MultiTransaction = z.strictObject({
   type: z.literal('MULTI_TRANSACTION'),
 })
 
-export type Transaction = z.infer<typeof Transaction>
-export const Transaction = z.discriminatedUnion('type', [
+export type L2Transaction = z.infer<typeof L2Transaction>
+export const L2Transaction = z.discriminatedUnion('type', [
   DepositTransaction,
   WithdrawalToAddresTransaction,
   ForcedWithdrawalTransaction,
@@ -288,8 +288,8 @@ export const Transaction = z.discriminatedUnion('type', [
 ])
 
 const PerpetualBatchInfoResponseTransactionInfo = z.strictObject({
-  original_tx: Transaction,
-  alt_txs: z.array(Transaction).nullable(),
+  original_tx: L2Transaction,
+  alt_txs: z.array(L2Transaction).nullable(),
   original_tx_id: z.number(),
   was_replaced: z.boolean(),
 })
@@ -309,23 +309,23 @@ export const PerpetualBatchInfoResponse = z.strictObject({
   time_created: UnsignedIntAsString,
 })
 
-const PerpetualTransactionResponseTransactionInfo = z.strictObject({
-  tx: Transaction,
+const PerpetualL2TransactionResponseTransactionInfo = z.strictObject({
+  tx: L2Transaction,
   tx_id: z.number(),
 })
-const PerpetualTransactionResponseTransaction = z.strictObject({
+const PerpetualL2TransactionResponseTransaction = z.strictObject({
   apex_id: z.number(),
   tx_info: z
     .string()
     .transform((s) =>
-      PerpetualTransactionResponseTransactionInfo.parse(JSON.parse(s))
+      PerpetualL2TransactionResponseTransactionInfo.parse(JSON.parse(s))
     ),
 })
 
-export type PerpetualTransactionResponse = z.infer<
-  typeof PerpetualTransactionResponse
+export type PerpetualL2TransactionResponse = z.infer<
+  typeof PerpetualL2TransactionResponse
 >
-export const PerpetualTransactionResponse = z.strictObject({
+export const PerpetualL2TransactionResponse = z.strictObject({
   count: z.number(),
-  txs: z.array(PerpetualTransactionResponseTransaction),
+  txs: z.array(PerpetualL2TransactionResponseTransaction),
 })

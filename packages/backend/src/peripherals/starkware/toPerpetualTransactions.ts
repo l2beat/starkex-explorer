@@ -8,43 +8,48 @@ import {
   Timestamp,
 } from '@explorer/types'
 
-import { MultiTransactionData, TransactionData } from '../database/Transaction'
+import {
+  L2TransactionData,
+  MultiL2TransactionData,
+} from '../database/L2Transaction'
 import {
   AssetOraclePrice,
+  L2Transaction as TransactionSchema,
   OrderTypeResponse,
-  PerpetualTransactionResponse,
+  PerpetualL2TransactionResponse,
   SignatureResponse,
   SignedOraclePrice,
-  Transaction as TransactionSchema,
 } from './schema'
 
-export interface PerpetualTransaction {
+export interface PerpetualL2Transaction {
   thirdPartyId: number
   transactionId: number
-  transaction: TransactionData
+  transaction: L2TransactionData
 }
 
-export function toPerpetualTransactions(
-  response: PerpetualTransactionResponse
-): PerpetualTransaction[] {
+export function toPerpetualL2Transactions(
+  response: PerpetualL2TransactionResponse
+): PerpetualL2Transaction[] {
   return response.txs.map((tx) => {
     return {
       thirdPartyId: tx.apex_id,
       transactionId: tx.tx_info.tx_id,
-      transaction: toPerpetualTransaction(tx.tx_info.tx),
+      transaction: toPerpetualL2TransactionData(tx.tx_info.tx),
     }
   })
 }
 
-export function toPerpetualTransaction(tx: TransactionSchema): TransactionData {
+export function toPerpetualL2TransactionData(
+  tx: TransactionSchema
+): L2TransactionData {
   return tx.type === 'MULTI_TRANSACTION'
     ? toPerpetualMultiTransaction(tx)
-    : toPerpetualNonMultiTransaction(tx)
+    : toPerpetualTransaction(tx)
 }
 
-export function toPerpetualNonMultiTransaction(
+export function toPerpetualTransaction(
   tx: Exclude<TransactionSchema, { type: 'MULTI_TRANSACTION' }>
-): Exclude<TransactionData, MultiTransactionData> {
+): Exclude<L2TransactionData, MultiL2TransactionData> {
   switch (tx.type) {
     case 'DEPOSIT': {
       return {
@@ -219,10 +224,10 @@ export function toPerpetualNonMultiTransaction(
 
 export function toPerpetualMultiTransaction(
   tx: Extract<TransactionSchema, { type: 'MULTI_TRANSACTION' }>
-): MultiTransactionData {
+): MultiL2TransactionData {
   return {
     type: 'MultiTransaction',
-    transactions: tx.txs.map(toPerpetualNonMultiTransaction),
+    transactions: tx.txs.map(toPerpetualTransaction),
   }
 }
 

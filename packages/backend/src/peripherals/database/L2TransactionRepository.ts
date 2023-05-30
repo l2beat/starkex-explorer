@@ -2,22 +2,24 @@ import { StarkKey } from '@explorer/types'
 import { L2TransactionRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
-import { Database } from './shared/Database'
 import {
   decodeTransactionData,
-  encodeTransactionData,
-  TransactionData,
-} from './Transaction'
+  encodeL2TransactionData,
+  L2TransactionData,
+} from './L2Transaction'
+import { BaseRepository } from './shared/BaseRepository'
+import { Database } from './shared/Database'
 
-interface Record<T extends TransactionData['type'] = TransactionData['type']> {
+interface Record<
+  T extends L2TransactionData['type'] = L2TransactionData['type']
+> {
   transactionId: number
   stateUpdateId: number
   blockNumber: number
   starkKeyA: StarkKey | undefined
   starkKeyB: StarkKey | undefined
   type: T
-  data: Extract<TransactionData, { type: T }>
+  data: Extract<L2TransactionData, { type: T }>
   altIndex: number | undefined
   isReplaced: boolean
 }
@@ -36,10 +38,10 @@ export class L2TransactionRepository extends BaseRepository {
     transactionId: number
     stateUpdateId: number
     blockNumber: number
-    data: TransactionData
+    data: L2TransactionData
   }): Promise<number> {
     const knex = await this.knex()
-    const { starkKeyA, starkKeyB, data } = encodeTransactionData(record.data)
+    const { starkKeyA, starkKeyB, data } = encodeL2TransactionData(record.data)
 
     const count = await this.countByTransactionId(record.transactionId)
     const altIndex = count - 1
@@ -112,7 +114,7 @@ function toRecord(row: L2TransactionRow): Record {
     blockNumber: row.block_number,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
-    type: row.type as TransactionData['type'],
+    type: row.type as L2TransactionData['type'],
     data: decodeTransactionData(row.data),
     altIndex: row.alt_index !== null ? row.alt_index : undefined,
     isReplaced: row.is_replaced,

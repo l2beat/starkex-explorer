@@ -1,6 +1,6 @@
 import { json } from '@explorer/types'
 
-import { TransactionDataJson } from '../Transaction'
+import { L2TransactionDataJson } from '../L2Transaction'
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import {
   UserTransactionJSON,
@@ -279,7 +279,7 @@ declare module 'knex/types/tables' {
     block_number: number
     stark_key_a: string | null
     stark_key_b: string | null
-    data: TransactionDataJson
+    data: L2TransactionDataJson
     type: string
     alt_index: number | null
     is_replaced: boolean

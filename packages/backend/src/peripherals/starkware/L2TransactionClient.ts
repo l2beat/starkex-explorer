@@ -1,8 +1,8 @@
 import { L2TransactionApiConfig } from '../../config/starkex/StarkexConfig'
 import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
-import { PerpetualTransactionResponse } from './schema'
-import { toPerpetualTransactions } from './toPerpetualTransactions'
+import { PerpetualL2TransactionResponse } from './schema'
+import { toPerpetualL2Transactions } from './toPerpetualTransactions'
 
 export class L2TransactionClient extends BaseClient {
   constructor(
@@ -14,8 +14,8 @@ export class L2TransactionClient extends BaseClient {
 
   async getPerpetualTransactions(startId: number, pageSize: number) {
     const data = await this.getTransactions(startId, pageSize)
-    const parsed = PerpetualTransactionResponse.parse(data)
-    return toPerpetualTransactions(parsed)
+    const parsed = PerpetualL2TransactionResponse.parse(data)
+    return toPerpetualL2Transactions(parsed)
   }
 
   private async getTransactions(
