@@ -2,7 +2,7 @@ import { BlockRange } from '../model'
 import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
-import { TransactionDownloader } from '../peripherals/starkware/TransactionDownloader'
+import { L2TransactionDownloader } from '../peripherals/starkware/L2TransactionDownloader'
 import { Logger } from '../tools/Logger'
 import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
@@ -24,7 +24,9 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     private readonly perpetualCairoOutputCollector: PerpetualCairoOutputCollector,
     private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
     private readonly withdrawalAllowedCollector: WithdrawalAllowedCollector,
-    private readonly transactionDownloader: TransactionDownloader | undefined,
+    private readonly l2TransactionDownloader:
+      | L2TransactionDownloader
+      | undefined,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -49,7 +51,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     })
 
     const stateUpdates = await this.processStateUpdates(stateTransitions)
-    await this.transactionDownloader?.sync(stateUpdates)
+    await this.l2TransactionDownloader?.sync(stateUpdates)
   }
 
   async processStateUpdates(stateTransitions: ValidiumStateTransition[]) {
@@ -86,6 +88,6 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     await this.userRegistrationCollector.discardAfter(blockNumber)
     await this.userTransactionCollector.discardAfter(blockNumber)
     await this.withdrawalAllowedCollector.discardAfter(blockNumber)
-    await this.transactionDownloader?.discardAfter(blockNumber)
+    await this.l2TransactionDownloader?.discardAfter(blockNumber)
   }
 }

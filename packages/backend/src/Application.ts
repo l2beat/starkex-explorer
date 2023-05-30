@@ -59,6 +59,7 @@ import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
+import { L2TransactionRepository } from './peripherals/database/L2TransactionRepository'
 import { MerkleTreeRepository } from './peripherals/database/MerkleTreeRepository'
 import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
@@ -72,7 +73,6 @@ import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigr
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
 import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
-import { TransactionRepository } from './peripherals/database/TransactionRepository'
 import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
@@ -84,7 +84,7 @@ import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
 import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
-import { TransactionDownloader } from './peripherals/starkware/TransactionDownloader'
+import { L2TransactionDownloader } from './peripherals/starkware/L2TransactionDownloader'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
 
@@ -217,7 +217,7 @@ export class Application {
       | PerpetualRollupUpdater
     let stateTransitionCollector: IStateTransitionCollector
 
-    let transactionDownloader: TransactionDownloader | undefined
+    let l2TransactionDownloader: L2TransactionDownloader | undefined
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -233,15 +233,15 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         stateTransitionCollector = perpetualValidiumStateTransitionCollector
-        const transactionRepository = new TransactionRepository(
+        const transactionRepository = new L2TransactionRepository(
           database,
           logger
         )
         const feederGatewayClient = config.starkex.feederGateway
           ? new FeederGatewayClient(config.starkex.feederGateway, fetchClient)
           : undefined
-        transactionDownloader = feederGatewayClient
-          ? new TransactionDownloader(
+        l2TransactionDownloader = feederGatewayClient
+          ? new L2TransactionDownloader(
               feederGatewayClient,
               transactionRepository,
               logger
@@ -273,7 +273,7 @@ export class Application {
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
-          transactionDownloader,
+          l2TransactionDownloader,
           logger
         )
       } else {

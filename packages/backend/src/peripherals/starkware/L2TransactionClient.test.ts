@@ -3,11 +3,11 @@ import { expect, mockFn, mockObject } from 'earl'
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { EXAMPLE_PERPETUAL_TRANSACTIONS } from '../../test/starkwareData'
 import { FetchClient } from './FetchClient'
+import { L2TransactionClient } from './L2TransactionClient'
 import { PerpetualTransactionResponse } from './schema'
 import { toPerpetualTransactions } from './toPerpetualTransactions'
-import { TransactionClient } from './TransactionClient'
 
-describe(TransactionClient.name, () => {
+describe(L2TransactionClient.name, () => {
   const getUrl = mockFn().returns('gateway-url')
   const options: GatewayConfig = mockObject({
     getUrl,
@@ -17,13 +17,13 @@ describe(TransactionClient.name, () => {
     },
   })
 
-  describe(TransactionClient.prototype.getPerpetualTransactions.name, () => {
+  describe(L2TransactionClient.prototype.getPerpetualTransactions.name, () => {
     const fetchClient = mockObject<FetchClient>({
       fetchRetry: mockFn().resolvesTo({
         json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_TRANSACTIONS),
       }),
     })
-    const transactionClient = new TransactionClient(options, fetchClient)
+    const transactionClient = new L2TransactionClient(options, fetchClient)
 
     it('should fetch transactions and parse them', async () => {
       const response = await transactionClient.getPerpetualTransactions(0, 0)

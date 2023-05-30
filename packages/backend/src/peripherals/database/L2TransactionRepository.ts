@@ -1,5 +1,5 @@
 import { StarkKey } from '@explorer/types'
-import { TransactionRow } from 'knex/types/tables'
+import { L2TransactionRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
@@ -18,9 +18,13 @@ interface Record<T extends TransactionData['type'] = TransactionData['type']> {
   starkKeyB: StarkKey | undefined
   type: T
   data: Extract<TransactionData, { type: T }>
+  altIndex: number | undefined
+  isReplaced: boolean
 }
 
-export class TransactionRepository extends BaseRepository {
+export type { Record as L2TransactionRecord }
+
+export class L2TransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
     /* eslint-disable @typescript-eslint/unbound-method */
@@ -37,7 +41,18 @@ export class TransactionRepository extends BaseRepository {
     const knex = await this.knex()
     const { starkKeyA, starkKeyB, data } = encodeTransactionData(record.data)
 
-    const results = await knex('transactions')
+    const [result] = await knex('l2_transactions')
+      .where({ transaction_id: record.transactionId })
+      .count()
+    const altIndex = result?.count ? Number(result.count) - 1 : undefined
+
+    if (altIndex === 0) {
+      await knex('l2_transactions')
+        .update({ is_replaced: true })
+        .where({ transaction_id: record.transactionId })
+    }
+
+    const results = await knex('l2_transactions')
       .insert({
         transaction_id: record.transactionId,
         state_update_id: record.stateUpdateId,
@@ -46,24 +61,23 @@ export class TransactionRepository extends BaseRepository {
         stark_key_b: starkKeyB?.toString(),
         type: record.data.type,
         data,
+        alt_index: altIndex,
       })
-      .returning('transaction_id')
+      .returning('id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return results[0]!.transaction_id
+    return results[0]!.id
   }
 
-  async findById(transactionId: number): Promise<Record | undefined> {
+  async findById(id: number): Promise<Record | undefined> {
     const knex = await this.knex()
-    const row = await knex('transactions')
-      .where({ transaction_id: transactionId })
-      .first()
+    const row = await knex('l2_transactions').where({ id }).first()
 
     return row ? toRecord(row) : undefined
   }
 
   async findLatestStateUpdateId(): Promise<number | undefined> {
     const knex = await this.knex()
-    const results = await knex('transactions')
+    const results = await knex('l2_transactions')
       .select('state_update_id')
       .orderBy('state_update_id', 'desc')
       .limit(1)
@@ -73,16 +87,18 @@ export class TransactionRepository extends BaseRepository {
 
   async deleteAfterBlock(blockNumber: number) {
     const knex = await this.knex()
-    return knex('transactions').where('block_number', '>', blockNumber).delete()
+    return knex('l2_transactions')
+      .where('block_number', '>', blockNumber)
+      .delete()
   }
 
   async deleteAll() {
     const knex = await this.knex()
-    return knex('transactions').delete()
+    return knex('l2_transactions').delete()
   }
 }
 
-function toRecord(row: TransactionRow): Record {
+function toRecord(row: L2TransactionRow): Record {
   return {
     transactionId: row.transaction_id,
     stateUpdateId: row.state_update_id,
@@ -91,5 +107,7 @@ function toRecord(row: TransactionRow): Record {
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
     type: row.type as TransactionData['type'],
     data: decodeTransactionData(row.data),
+    altIndex: row.alt_index !== null ? row.alt_index : undefined,
+    isReplaced: row.is_replaced,
   }
 }

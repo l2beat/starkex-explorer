@@ -13,20 +13,23 @@ should create a new migration file that fixes the issue.
 
 import { Knex } from 'knex'
 
-const TRANSACTIONS_TABLE_NAME = 'transactions'
+const L2_TRANSACTIONS_TABLE_NAME = 'l2_transactions'
 
 export async function up(knex: Knex) {
-  await knex.schema.createTable(TRANSACTIONS_TABLE_NAME, (table) => {
-    table.integer('transaction_id').primary()
+  await knex.schema.createTable(L2_TRANSACTIONS_TABLE_NAME, (table) => {
+    table.increments('id').primary()
+    table.integer('transaction_id').index()
     table.integer('state_update_id').index()
     table.integer('block_number').index()
     table.string('stark_key_a').nullable().index()
     table.string('stark_key_b').nullable().index()
     table.jsonb('data').notNullable()
     table.string('type').notNullable()
+    table.integer('alt_index').nullable()
+    table.boolean('is_replaced').defaultTo(false)
   })
 }
 
 export async function down(knex: Knex) {
-  await knex.schema.dropTable(TRANSACTIONS_TABLE_NAME)
+  await knex.schema.dropTable(L2_TRANSACTIONS_TABLE_NAME)
 }

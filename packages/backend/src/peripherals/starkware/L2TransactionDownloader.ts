@@ -1,12 +1,12 @@
 import { Logger } from '../../tools/Logger'
+import { L2TransactionRepository } from '../database/L2TransactionRepository'
 import { StateUpdateRecord } from '../database/StateUpdateRepository'
-import { TransactionRepository } from '../database/TransactionRepository'
 import { FeederGatewayClient } from './FeederGatewayClient'
 
-export class TransactionDownloader {
+export class L2TransactionDownloader {
   constructor(
     private readonly feederGatewayClient: FeederGatewayClient,
-    private readonly transactionRepository: TransactionRepository,
+    private readonly transactionRepository: L2TransactionRepository,
     private readonly logger: Logger
   ) {}
 
@@ -35,6 +35,17 @@ export class TransactionDownloader {
           transactionId: transactionInfo.originalTransactionId,
           data: transactionInfo.originalTransaction,
         })
+        if (!transactionInfo.alternativeTransactions) {
+          continue
+        }
+        for (const alternativeTransaction of transactionInfo.alternativeTransactions) {
+          await this.transactionRepository.add({
+            stateUpdateId: stateUpdate.id,
+            blockNumber: stateUpdate.blockNumber,
+            transactionId: transactionInfo.originalTransactionId,
+            data: alternativeTransaction,
+          })
+        }
       }
     }
   }
