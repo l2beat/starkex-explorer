@@ -41,10 +41,8 @@ export class L2TransactionRepository extends BaseRepository {
     const knex = await this.knex()
     const { starkKeyA, starkKeyB, data } = encodeTransactionData(record.data)
 
-    const [result] = await knex('l2_transactions')
-      .where({ transaction_id: record.transactionId })
-      .count()
-    const altIndex = result?.count ? Number(result.count) - 1 : undefined
+    const count = await this.countByTransactionId(record.transactionId)
+    const altIndex = count - 1
 
     if (altIndex === 0) {
       await knex('l2_transactions')
@@ -66,6 +64,15 @@ export class L2TransactionRepository extends BaseRepository {
       .returning('id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return results[0]!.id
+  }
+
+  async countByTransactionId(transactionId: number): Promise<number> {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions')
+      .where({ transaction_id: transactionId })
+      .count()
+
+    return Number(result?.count ?? 0)
   }
 
   async findById(id: number): Promise<Record | undefined> {
