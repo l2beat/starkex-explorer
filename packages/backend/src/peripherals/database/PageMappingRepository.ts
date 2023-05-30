@@ -2,7 +2,7 @@ import { Hash256 } from '@explorer/types'
 import { PageMappingRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface PageMappingRecord {
@@ -17,14 +17,7 @@ export class PageMappingRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.addMany = this.wrapAddMany(this.addMany)
-    this.getAll = this.wrapGet(this.getAll)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.deleteAllAfter = this.wrapDelete(this.deleteAllAfter)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<PageMappingRepository>>(this)
   }
 
   async addMany(records: Omit<PageMappingRecord, 'id'>[]) {

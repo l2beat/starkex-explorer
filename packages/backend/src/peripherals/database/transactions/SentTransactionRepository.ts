@@ -2,12 +2,12 @@ import { Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { SentTransactionRow } from 'knex/types/tables'
 
 import { Logger } from '../../../tools/Logger'
-import { BaseRepository } from '../shared/BaseRepository'
+import { BaseRepository, CheckConvention } from '../shared/BaseRepository'
 import { Database } from '../shared/Database'
 import {
+  SentTransactionData,
   decodeSentTransactionData,
   encodeSentTransactionData,
-  SentTransactionData,
 } from './SentTransaction'
 
 export interface SentTransactionRecord {
@@ -27,21 +27,7 @@ export class SentTransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.add = this.wrapAdd(this.add)
-    this.updateMined = this.wrapUpdate(this.updateMined)
-    this.getNotMinedHashes = this.wrapGet(this.getNotMinedHashes)
-    this.getByStarkKey = this.wrapGet(this.getByStarkKey)
-    this.getByPositionId = this.wrapGet(this.getByPositionId)
-    this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
-    this.findFirstWithdrawByStarkKeyAfter = this.wrapFind(
-      this.findFirstWithdrawByStarkKeyAfter
-    )
-    this.deleteByTransactionHash = this.wrapDelete(this.deleteByTransactionHash)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<SentTransactionRepository>>(this)
   }
 
   async add(record: {

@@ -26,11 +26,11 @@ describe(StateDetailsPreprocessor.name, () => {
         const mockPreprocessedAssetHistoryRepository = mockObject<
           PreprocessedAssetHistoryRepository<AssetHash>
         >({
-          getCountByStateUpdateId: mockFn().resolvesTo(10),
+          countByStateUpdateId: mockFn().resolvesTo(10),
         })
         const mockUserTransactionRepository =
           mockObject<UserTransactionRepository>({
-            getCountOfIncludedByStateUpdateId: mockFn().resolvesTo(20),
+            countOfIncludedByStateUpdateId: mockFn().resolvesTo(20),
           })
         const mockPreprocessedStateDetailsRepository =
           mockObject<PreprocessedStateDetailsRepository>({

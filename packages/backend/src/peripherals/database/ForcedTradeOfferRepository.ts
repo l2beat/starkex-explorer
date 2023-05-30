@@ -4,7 +4,7 @@ import { ForcedTradeOfferRow as Row } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface Accepted {
@@ -123,29 +123,7 @@ export class ForcedTradeOfferRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-    this.add = this.wrapAdd(this.add)
-    this.update = this.wrapUpdate(this.update)
-    this.updateTransactionHash = this.wrapUpdate(this.updateTransactionHash)
-    this.findById = this.wrapFind(this.findById)
-    this.getInitial = this.wrapGet(this.getInitial)
-    this.getByPositionId = this.wrapGet(this.getByPositionId)
-    this.getByMakerOrTakerStarkKey = this.wrapGet(
-      this.getByMakerOrTakerStarkKey
-    )
-    this.getFinalizableByStarkKey = this.wrapGet(this.getFinalizableByStarkKey)
-    this.getInitialAssetIds = this.wrapGet(this.getInitialAssetIds)
-    this.getPaginated = this.wrapGet(this.getPaginated)
-    this.getAvailablePaginated = this.wrapGet(this.getAvailablePaginated)
-    this.countAll = this.wrapAny(this.countAll)
-    this.countAvailable = this.wrapAny(this.countAvailable)
-    this.countInitial = this.wrapAny(this.countInitial)
-    this.countByMakerOrTakerStarkKey = this.wrapAny(
-      this.countByMakerOrTakerStarkKey
-    )
-    this.countActiveByPositionId = this.wrapAny(this.countActiveByPositionId)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<ForcedTradeOfferRepository>>(this)
   }
 
   async add(record: RecordCandidate): Promise<Record['id']> {

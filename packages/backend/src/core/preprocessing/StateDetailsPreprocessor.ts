@@ -19,11 +19,11 @@ export class StateDetailsPreprocessor {
     stateUpdate: StateUpdateRecord
   ) {
     const [assetUpdateCount, forcedTransactionCount] = await Promise.all([
-      this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
+      this.preprocessedAssetHistoryRepository.countByStateUpdateId(
         stateUpdate.id,
         trx
       ),
-      this.userTransactionRepository.getCountOfIncludedByStateUpdateId(
+      this.userTransactionRepository.countOfIncludedByStateUpdateId(
         stateUpdate.id,
         trx
       ),

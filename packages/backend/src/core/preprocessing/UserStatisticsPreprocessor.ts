@@ -68,15 +68,15 @@ export class UserStatisticsPreprocessor {
     // We must get by state update id and not "current" because we use this function in catchUp()
     const [starkKeyCounts, newAssetCounts, removedAssetCounts] =
       await Promise.all([
-        this.preprocessedAssetHistoryRepository.getCountByStateUpdateIdGroupedByStarkKey(
+        this.preprocessedAssetHistoryRepository.countByStateUpdateIdGroupedByStarkKey(
           stateUpdate.id,
           trx
         ),
-        this.preprocessedAssetHistoryRepository.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey(
+        this.preprocessedAssetHistoryRepository.countOfNewAssetsByStateUpdateIdGroupedByStarkKey(
           stateUpdate.id,
           trx
         ),
-        this.preprocessedAssetHistoryRepository.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
+        this.preprocessedAssetHistoryRepository.countOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
           stateUpdate.id,
           trx
         ),

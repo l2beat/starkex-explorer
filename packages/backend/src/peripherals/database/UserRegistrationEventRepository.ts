@@ -2,7 +2,7 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import { UserRegistrationEventRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface UserRegistrationEventRecord {
@@ -16,15 +16,7 @@ export class UserRegistrationEventRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.addMany = this.wrapAddMany(this.addMany)
-    this.getAll = this.wrapGet(this.getAll)
-    this.deleteAfter = this.wrapDelete(this.deleteAfter)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.findByStarkKey = this.wrapFind(this.findByStarkKey)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<UserRegistrationEventRepository>>(this)
   }
 
   async addMany(records: Omit<UserRegistrationEventRecord, 'id'>[]) {

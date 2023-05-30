@@ -3,7 +3,7 @@ import { Knex } from 'knex'
 import { PreprocessedStateUpdateRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface PreprocessedStateUpdateRecord {
@@ -15,12 +15,7 @@ export class PreprocessedStateUpdateRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-    this.add = this.wrapAdd(this.add)
-    this.findLast = this.wrapFind(this.findLast)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<PreprocessedStateUpdateRepository>>(this)
   }
 
   async findLast(

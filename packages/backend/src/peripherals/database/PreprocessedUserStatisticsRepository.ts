@@ -3,7 +3,7 @@ import { Knex } from 'knex'
 import { PreprocessedUserStatisticsRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface PreprocessedUserStatisticsRecord {
@@ -21,14 +21,7 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.add = this.wrapAdd(this.add)
-    this.findCurrentByStarkKey = this.wrapFind(this.findCurrentByStarkKey)
-    this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<PreprocessedUserStatisticsRepository>>(this)
   }
 
   async add(

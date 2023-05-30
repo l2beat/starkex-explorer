@@ -4,7 +4,7 @@ import { PreprocessedAssetHistoryRow } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface PreprocessedAssetHistoryRecord<
@@ -38,52 +38,7 @@ export class PreprocessedAssetHistoryRepository<
     super(database, logger)
     this.toAssetType = toAssetType
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.add = this.wrapAdd(this.add)
-    this.addMany = this.wrapAddMany(this.addMany)
-    this.findByHistoryId = this.wrapFind(this.findByHistoryId)
-    this.getByStateUpdateIdPaginated = this.wrapGet(
-      this.getByStateUpdateIdPaginated
-    )
-    this.deleteByHistoryId = this.wrapDelete(this.deleteByHistoryId)
-    this.findCurrentByStarkKeyAndAsset = this.wrapFind(
-      this.findCurrentByStarkKeyAndAsset
-    )
-    this.getByStarkKeyPaginated = this.wrapGet(this.getByStarkKeyPaginated)
-    this.getCurrentByStarkKey = this.wrapGet(this.getCurrentByStarkKey)
-    this.getCurrentByStarkKeyPaginated = this.wrapGet(
-      this.getCurrentByStarkKeyPaginated
-    )
-    this.getCurrentByPositionOrVaultId = this.wrapGet(
-      this.getCurrentByPositionOrVaultId
-    )
-    this.setAsCurrentByHistoryId = this.wrapUpdate(this.setAsCurrentByHistoryId)
-    this.unsetCurrentByPositionOrVaultIdAndAsset = this.wrapUpdate(
-      this.unsetCurrentByPositionOrVaultIdAndAsset
-    )
-
-    this.getPrevHistoryByStateUpdateId = this.wrapGet(
-      this.getPrevHistoryByStateUpdateId
-    )
-    this.getCountByStateUpdateIdGroupedByStarkKey = this.wrapGet(
-      this.getCountByStateUpdateIdGroupedByStarkKey
-    )
-
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
-    this.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey = this.wrapAny(
-      this.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey
-    )
-    this.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey = this.wrapAny(
-      this.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey
-    )
-    this.getCountByStateUpdateId = this.wrapAny(this.getCountByStateUpdateId)
-    this.getCountOfCurrentByStarkKey = this.wrapAny(
-      this.getCountOfCurrentByStarkKey
-    )
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<PreprocessedAssetHistoryRepository>>(this)
   }
 
   async add(
@@ -96,20 +51,6 @@ export class PreprocessedAssetHistoryRepository<
       .returning('id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return results[0]!.id
-  }
-
-  async addMany(
-    rows: Omit<PreprocessedAssetHistoryRow, 'id'>[],
-    trx: Knex.Transaction
-  ) {
-    throw new Error(
-      "This method doesn't respect transaction! Don't use until reviewed!"
-    )
-    const knex = await this.knex(trx)
-    const ids = await knex('preprocessed_asset_history')
-      .insert(rows)
-      .returning('id')
-    return ids.map((x) => x.id)
   }
 
   async findByHistoryId(
@@ -138,7 +79,7 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getCountByStateUpdateId(stateUpdateId: number, trx?: Knex.Transaction) {
+  async countByStateUpdateId(stateUpdateId: number, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where('state_update_id', stateUpdateId)
@@ -163,10 +104,7 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getCountOfCurrentByStarkKey(
-    starkKey: StarkKey,
-    trx?: Knex.Transaction
-  ) {
+  async countOfCurrentByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where({
@@ -206,7 +144,7 @@ export class PreprocessedAssetHistoryRepository<
     )
   }
 
-  async getCountByStateUpdateIdGroupedByStarkKey(
+  async countByStateUpdateIdGroupedByStarkKey(
     stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<{ starkKey: StarkKey; count: number }[]> {
@@ -221,7 +159,7 @@ export class PreprocessedAssetHistoryRepository<
     return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
   }
 
-  async getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey(
+  async countOfNewAssetsByStateUpdateIdGroupedByStarkKey(
     stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<{ starkKey: StarkKey; count: number }[]> {
@@ -238,7 +176,7 @@ export class PreprocessedAssetHistoryRepository<
     return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
   }
 
-  async getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
+  async countOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
     stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<{ starkKey: StarkKey; count: number }[]> {
@@ -255,7 +193,7 @@ export class PreprocessedAssetHistoryRepository<
     return rows.map((r) => ({ starkKey: r.starkKey, count: Number(r.count) }))
   }
 
-  async getCountByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
+  async countByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_asset_history')
       .where('stark_key', starkKey.toString())
@@ -311,22 +249,32 @@ export class PreprocessedAssetHistoryRepository<
     return row && toPreprocessedAssetHistoryRecord(row, this.toAssetType)
   }
 
-  async setAsCurrentByHistoryId(historyId: number, trx: Knex.Transaction) {
+  async updateAsCurrentByHistoryId(
+    { historyId, isCurrent }: { historyId: number; isCurrent: boolean },
+    trx: Knex.Transaction
+  ) {
     const knex = await this.knex(trx)
     const updates = await knex('preprocessed_asset_history')
-      .update('is_current', true)
+      .update('is_current', isCurrent)
       .where('id', historyId)
     return updates
   }
 
-  async unsetCurrentByPositionOrVaultIdAndAsset(
-    positionOrVaultId: bigint,
-    asset: AssetHash | AssetId,
+  async updateCurrentByPositionOrVaultIdAndAsset(
+    {
+      isCurrent,
+      positionOrVaultId,
+      asset,
+    }: {
+      isCurrent: boolean
+      positionOrVaultId: bigint
+      asset: AssetHash | AssetId
+    },
     trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
     const updates = await knex('preprocessed_asset_history')
-      .update('is_current', false)
+      .update('is_current', isCurrent)
       .where({
         position_or_vault_id: positionOrVaultId,
         is_current: true,

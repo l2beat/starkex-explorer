@@ -4,7 +4,7 @@ import {
   MerkleValue,
   NodeOrLeaf,
 } from '@explorer/state'
-import { json, PedersenHash } from '@explorer/types'
+import { PedersenHash, json } from '@explorer/types'
 import partition from 'lodash/partition'
 
 import { Logger } from '../../tools/Logger'
@@ -32,7 +32,6 @@ export class MerkleTreeRepository<T extends MerkleLeaf>
     this.persist = this.wrapAny(this.persist)
     this.recover = this.wrapAny(this.recover)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 

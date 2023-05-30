@@ -17,7 +17,7 @@ import { MD5 as hashData } from 'object-hash'
 
 import { Logger } from '../../tools/Logger'
 import { toSerializableJson } from '../../utils/toSerializableJson'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface FinalizeExitAction {
@@ -163,17 +163,7 @@ export class ForcedTransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.getAll = this.wrapGet(this.getAll)
-    this.getLatest = this.wrapGet(this.getLatest)
-    this.getIncludedInStateUpdate = this.wrapGet(this.getIncludedInStateUpdate)
-    this.getByPositionId = this.wrapGet(this.getByPositionId)
-    this.countPendingByPositionId = this.wrapAny(this.countPendingByPositionId)
-    this.findByHash = this.wrapFind(this.findByHash)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<ForcedTransactionRepository>>(this)
   }
 
   private joinQuery(knex: Knex) {

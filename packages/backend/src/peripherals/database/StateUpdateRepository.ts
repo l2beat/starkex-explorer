@@ -10,7 +10,7 @@ import {
   toPositionRow,
   toPositionWithPricesRecord,
 } from './PositionRepository'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 import { toVaultRow, VaultRecord } from './VaultRepository'
 
@@ -31,21 +31,7 @@ export class StateUpdateRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.add = this.wrapAdd(this.add)
-    this.findLast = this.wrapFind(this.findLast)
-    this.findLastUntilBlockNumber = this.wrapFind(this.findLastUntilBlockNumber)
-    this.findById = this.wrapFind(this.findById)
-    this.findIdByRootHash = this.wrapFind(this.findIdByRootHash)
-    this.getAll = this.wrapGet(this.getAll)
-    this.getPaginated = this.wrapGet(this.getPaginated)
-    this.count = this.wrapAny(this.count)
-    this.findByIdWithPositions = this.wrapFind(this.findByIdWithPositions)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.deleteAfter = this.wrapDelete(this.deleteAfter)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<StateUpdateRepository>>(this)
   }
 
   async add({

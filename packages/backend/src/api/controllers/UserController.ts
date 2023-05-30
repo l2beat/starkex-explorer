@@ -143,7 +143,7 @@ export class UserController {
         undefined,
         paginationOpts
       ),
-      this.userTransactionRepository.getCountByStarkKey(starkKey),
+      this.userTransactionRepository.countByStarkKey(starkKey),
       this.forcedTradeOfferRepository.getByMakerOrTakerStarkKey(
         starkKey,
         paginationOpts
@@ -336,7 +336,7 @@ export class UserController {
           undefined,
           pagination
         ),
-        this.userTransactionRepository.getCountByStarkKey(starkKey),
+        this.userTransactionRepository.countByStarkKey(starkKey),
       ])
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({

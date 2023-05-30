@@ -507,7 +507,7 @@ describe(UserTransactionRepository.name, () => {
   })
 
   describe(
-    UserTransactionRepository.prototype.getCountOfIncludedByStateUpdateId.name,
+    UserTransactionRepository.prototype.countOfIncludedByStateUpdateId.name,
     () => {
       it('returns the number of forced transactions included in state update', async () => {
         const transactionHash = Hash256.fake()
@@ -550,16 +550,14 @@ describe(UserTransactionRepository.name, () => {
           },
         ])
 
-        expect(await repository.getCountOfIncludedByStateUpdateId(123)).toEqual(
-          1
-        )
+        expect(await repository.countOfIncludedByStateUpdateId(123)).toEqual(1)
       })
     }
   )
 
-  describe(UserTransactionRepository.prototype.getCountByStarkKey.name, () => {
+  describe(UserTransactionRepository.prototype.countByStarkKey.name, () => {
     it('returns 0 for an empty database', async () => {
-      expect(await repository.getCountByStarkKey(StarkKey.fake())).toEqual(0)
+      expect(await repository.countByStarkKey(StarkKey.fake())).toEqual(0)
     })
 
     it('returns the number of transactions', async () => {
@@ -595,7 +593,7 @@ describe(UserTransactionRepository.name, () => {
         data: fakeForcedWithdrawal({ starkKey: StarkKey.fake('abc') }),
       })
 
-      expect(await repository.getCountByStarkKey(starkKey)).toEqual(2)
+      expect(await repository.countByStarkKey(starkKey)).toEqual(2)
     })
 
     it('accepts an optional type parameter', async () => {
@@ -620,10 +618,10 @@ describe(UserTransactionRepository.name, () => {
       })
 
       expect(
-        await repository.getCountByStarkKey(starkKey, ['ForcedTrade'])
+        await repository.countByStarkKey(starkKey, ['ForcedTrade'])
       ).toEqual(2)
       expect(
-        await repository.getCountByStarkKey(starkKey, [
+        await repository.countByStarkKey(starkKey, [
           'ForcedTrade',
           'ForcedWithdrawal',
         ])

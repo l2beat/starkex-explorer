@@ -66,9 +66,12 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
     >[]
   ) {
     for (const record of newRecords) {
-      await this.preprocessedAssetHistoryRepository.unsetCurrentByPositionOrVaultIdAndAsset(
-        record.positionOrVaultId,
-        record.assetHashOrId,
+      await this.preprocessedAssetHistoryRepository.updateCurrentByPositionOrVaultIdAndAsset(
+        {
+          isCurrent: false,
+          positionOrVaultId: record.positionOrVaultId,
+          asset: record.assetHashOrId,
+        },
         trx
       )
 
@@ -109,8 +112,11 @@ export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
         // Notice that when rolling back a closed vault (with balance 0 and
         // isCurrent=false) this call will "resurrect" the previous non-empty
         // record and mark it as current, which is exactly what we want.
-        await this.preprocessedAssetHistoryRepository.setAsCurrentByHistoryId(
-          record.prevHistoryId,
+        await this.preprocessedAssetHistoryRepository.updateAsCurrentByHistoryId(
+          {
+            isCurrent: true,
+            historyId: record.prevHistoryId,
+          },
           trx
         )
       }

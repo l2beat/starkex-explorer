@@ -3,7 +3,7 @@ import { AssetHash, EthereumAddress, Hash256 } from '@explorer/types'
 import { AssetDetailsRow, AssetRegistrationRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface AssetRegistrationRecord {
@@ -21,24 +21,7 @@ export class AssetRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.addManyDetails = this.wrapAddMany(this.addManyDetails)
-    this.addManyRegistrations = this.wrapAddMany(this.addManyRegistrations)
-    this.findDetailsByAssetHash = this.wrapFind(this.findDetailsByAssetHash)
-    this.findDetailsByAssetTypeAndTokenId = this.wrapFind(
-      this.findDetailsByAssetTypeAndTokenId
-    )
-    this.getDetailsByAssetHashes = this.wrapGet(this.getDetailsByAssetHashes)
-    this.getDetailsByAssetTypeAndTokenIds = this.wrapGet(
-      this.getDetailsByAssetTypeAndTokenIds
-    )
-    this.findRegistrationByAssetTypeHash = this.wrapFind(
-      this.findRegistrationByAssetTypeHash
-    )
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<AssetRepository>>(this)
   }
 
   async addManyDetails(records: AssetDetails[]): Promise<AssetHash[]> {

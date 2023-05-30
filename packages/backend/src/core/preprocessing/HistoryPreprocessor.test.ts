@@ -145,7 +145,7 @@ describe(HistoryPreprocessor.name, () => {
         const historyRepo = mockObject<
           PreprocessedAssetHistoryRepository<AssetId>
         >({
-          unsetCurrentByPositionOrVaultIdAndAsset: async () => 2,
+          updateCurrentByPositionOrVaultIdAndAsset: async () => 2,
           add: async () => 2,
         })
         const preprocessor = new NonAbstractHistoryPreprocessor(
@@ -182,11 +182,27 @@ describe(HistoryPreprocessor.name, () => {
         ])
         // Check that current records where set as isCurrent = false
         expect(
-          historyRepo.unsetCurrentByPositionOrVaultIdAndAsset
-        ).toHaveBeenNthCalledWith(1, 5n, AssetId('ETH-9'), trx)
+          historyRepo.updateCurrentByPositionOrVaultIdAndAsset
+        ).toHaveBeenNthCalledWith(
+          1,
+          {
+            isCurrent: true,
+            positionOrVaultId: 5n,
+            asset: AssetId('ETH-9'),
+          },
+          trx
+        )
         expect(
-          historyRepo.unsetCurrentByPositionOrVaultIdAndAsset
-        ).toHaveBeenNthCalledWith(2, 5n, AssetId('WBTC-9'), trx)
+          historyRepo.updateCurrentByPositionOrVaultIdAndAsset
+        ).toHaveBeenNthCalledWith(
+          2,
+          {
+            isCurrent: true,
+            positionOrVaultId: 5n,
+            asset: AssetId('WBTC-9'),
+          },
+          trx
+        )
 
         expect(historyRepo.add).toHaveBeenCalledTimes(2)
         // Check that new records where added with correct isCurrent
@@ -244,7 +260,7 @@ describe(HistoryPreprocessor.name, () => {
           { historyId: 10000, prevHistoryId: undefined },
         ],
         deleteByHistoryId: async () => 1,
-        setAsCurrentByHistoryId: async () => 1,
+        updateAsCurrentByHistoryId: async () => 1,
       })
       const preprocessor = new NonAbstractHistoryPreprocessor(
         historyRepo,
@@ -271,20 +287,20 @@ describe(HistoryPreprocessor.name, () => {
         trx
       )
 
-      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenCalledTimes(3)
-      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenNthCalledWith(
+      expect(historyRepo.updateAsCurrentByHistoryId).toHaveBeenCalledTimes(3)
+      expect(historyRepo.updateAsCurrentByHistoryId).toHaveBeenNthCalledWith(
         1,
-        9,
+        { historyId: 9, isCurrent: true },
         trx
       )
-      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenNthCalledWith(
+      expect(historyRepo.updateAsCurrentByHistoryId).toHaveBeenNthCalledWith(
         2,
-        90,
+        { historyId: 90, isCurrent: true },
         trx
       )
-      expect(historyRepo.setAsCurrentByHistoryId).toHaveBeenNthCalledWith(
+      expect(historyRepo.updateAsCurrentByHistoryId).toHaveBeenNthCalledWith(
         3,
-        900,
+        { historyId: 900, isCurrent: true },
         trx
       )
     })

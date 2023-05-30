@@ -3,7 +3,7 @@ import { Knex } from 'knex'
 import { VaultRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface VaultRecord {
@@ -17,16 +17,7 @@ export class VaultRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.findById = this.wrapFind(this.findById)
-    this.findIdByStarkKey = this.wrapFind(this.findIdByStarkKey)
-    this.findIdByEthereumAddress = this.wrapFind(this.findIdByEthereumAddress)
-    this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
-    this.getPreviousStates = this.wrapGet(this.getPreviousStates)
-    this.count = this.wrapAny(this.count)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<VaultRepository>>(this)
   }
 
   async findById(vaultId: bigint) {

@@ -56,7 +56,7 @@ export class StateUpdateController {
         stateUpdateId,
         { offset: 0, limit: 10 }
       ),
-      this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
+      this.preprocessedAssetHistoryRepository.countByStateUpdateId(
         stateUpdateId
       ),
       this.stateUpdateRepository.getPricesByStateUpdateId(stateUpdateId),
@@ -65,7 +65,7 @@ export class StateUpdateController {
         FORCED_TRANSACTION_TYPES,
         { offset: 0, limit: 6 }
       ),
-      this.userTransactionRepository.getCountOfIncludedByStateUpdateId(
+      this.userTransactionRepository.countOfIncludedByStateUpdateId(
         stateUpdateId
       ),
     ])
@@ -128,7 +128,7 @@ export class StateUpdateController {
         stateUpdateId,
         pagination
       ),
-      this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
+      this.preprocessedAssetHistoryRepository.countByStateUpdateId(
         stateUpdateId
       ),
     ])
@@ -168,7 +168,7 @@ export class StateUpdateController {
           FORCED_TRANSACTION_TYPES,
           pagination
         ),
-        this.userTransactionRepository.getCountOfIncludedByStateUpdateId(
+        this.userTransactionRepository.countOfIncludedByStateUpdateId(
           stateUpdateId
         ),
       ]

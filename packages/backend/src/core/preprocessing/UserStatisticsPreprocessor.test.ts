@@ -71,19 +71,19 @@ describe(UserStatisticsPreprocessor.name, () => {
 
         const mockPreprocessedAssetHistoryRepository =
           mockObject<PreprocessedAssetHistoryRepository>({
-            getCountByStateUpdateIdGroupedByStarkKey: mockFn().resolvesTo([
+            countByStateUpdateIdGroupedByStarkKey: mockFn().resolvesTo([
               { starkKey: sk1, count: 5 },
               { starkKey: sk2, count: 10 },
               { starkKey: sk3, count: 15 },
               { starkKey: sk4, count: 20 },
             ]),
-            getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey:
+            countOfNewAssetsByStateUpdateIdGroupedByStarkKey:
               mockFn().resolvesTo([
                 { starkKey: sk2, count: 100 },
                 { starkKey: sk3, count: 150 },
                 { starkKey: sk4, count: 200 },
               ]),
-            getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey:
+            countOfRemovedAssetsByStateUpdateIdGroupedByStarkKey:
               mockFn().resolvesTo([
                 { starkKey: sk1, count: 200 },
                 { starkKey: sk2, count: 100 },

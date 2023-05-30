@@ -326,7 +326,13 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
 
-    await repository.setAsCurrentByHistoryId(id1, trx)
+    await repository.updateAsCurrentByHistoryId(
+      {
+        historyId: id1,
+        isCurrent: true,
+      },
+      trx
+    )
 
     const record1 = await repository.findByHistoryId(id1, trx)
     const record2 = await repository.findByHistoryId(id2, trx)
@@ -374,9 +380,12 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
 
-    await repository.unsetCurrentByPositionOrVaultIdAndAsset(
-      positionId,
-      assetHash2,
+    await repository.updateCurrentByPositionOrVaultIdAndAsset(
+      {
+        isCurrent: false,
+        positionOrVaultId: positionId,
+        asset: assetHash2,
+      },
       trx
     )
 
@@ -499,7 +508,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
 
-    const count = await repository.getCountByStateUpdateId(stateUpdateId, trx)
+    const count = await repository.countByStateUpdateId(stateUpdateId, trx)
     expect(count).toEqual(4)
 
     const page1Records = await repository.getByStateUpdateIdPaginated(
@@ -561,7 +570,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
 
-    const count = await repository.getCountByStarkKey(starkKey, trx)
+    const count = await repository.countByStarkKey(starkKey, trx)
     expect(count).toEqual(4)
 
     const page1Records = await repository.getByStarkKeyPaginated(
@@ -630,7 +639,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
 
-    const count = await repository.getCountOfCurrentByStarkKey(starkKey, trx)
+    const count = await repository.countOfCurrentByStarkKey(starkKey, trx)
     expect(count).toEqual(4)
 
     const page1Records = await repository.getCurrentByStarkKeyPaginated(
@@ -703,7 +712,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
 
-    const result = await repository.getCountByStateUpdateIdGroupedByStarkKey(
+    const result = await repository.countByStateUpdateIdGroupedByStarkKey(
       1900,
       trx
     )
@@ -865,7 +874,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
     const newCount =
-      await repository.getCountOfNewAssetsByStateUpdateIdGroupedByStarkKey(
+      await repository.countOfNewAssetsByStateUpdateIdGroupedByStarkKey(
         1900,
         trx
       )
@@ -881,7 +890,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
     ])
 
     const removedCount =
-      await repository.getCountOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
+      await repository.countOfRemovedAssetsByStateUpdateIdGroupedByStarkKey(
         1900,
         trx
       )

@@ -4,7 +4,7 @@ import { PreprocessedStateDetailsRow } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 export interface PreprocessedStateDetailsRecord {
@@ -22,13 +22,7 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-    this.add = this.wrapAdd(this.add)
-    this.countAll = this.wrapAny(this.countAll)
-    this.getPaginated = this.wrapGet(this.getPaginated)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-    this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<PreprocessedStateDetailsRepository>>(this)
   }
 
   async add(

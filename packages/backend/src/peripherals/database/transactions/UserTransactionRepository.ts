@@ -4,12 +4,12 @@ import { UserTransactionRow } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../../model/PaginationOptions'
 import { Logger } from '../../../tools/Logger'
-import { BaseRepository } from '../shared/BaseRepository'
+import { BaseRepository, CheckConvention } from '../shared/BaseRepository'
 import { Database } from '../shared/Database'
 import {
+  UserTransactionData,
   decodeUserTransactionData,
   encodeUserTransactionData,
-  UserTransactionData,
 } from './UserTransaction'
 
 export interface UserTransactionRecord<
@@ -54,25 +54,7 @@ export class UserTransactionRepository extends BaseRepository {
 
     /* eslint-disable @typescript-eslint/unbound-method */
 
-    this.add = this.wrapAdd(this.add)
-    this.addManyIncluded = this.wrapAddMany(this.addManyIncluded)
-    this.getByStarkKey = this.wrapGet(this.getByStarkKey)
-    this.getByPositionId = this.wrapGet(this.getByPositionId)
-    this.getByStateUpdateId = this.wrapGet(this.getByStateUpdateId)
-    this.getByStateUpdateIdAndPositionId = this.wrapGet(
-      this.getByStateUpdateIdAndPositionId
-    )
-    this.getPaginated = this.wrapGet(this.getPaginated)
-    this.getNotIncluded = this.wrapGet(this.getNotIncluded)
-    this.countAll = this.wrapAny(this.countAll)
-    this.getCountByStarkKey = this.wrapAny(this.getCountByStarkKey)
-    this.getCountOfIncludedByStateUpdateId = this.wrapAny(
-      this.getCountOfIncludedByStateUpdateId
-    )
-    this.findById = this.wrapFind(this.findById)
-    this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
-    this.deleteAfter = this.wrapDelete(this.deleteAfter)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.autoWrap<CheckConvention<UserTransactionRepository>>(this)
 
     /* eslint-enable @typescript-eslint/unbound-method */
   }
@@ -137,7 +119,7 @@ export class UserTransactionRepository extends BaseRepository {
     return toRecords<T>(await query)
   }
 
-  async getCountByStarkKey(
+  async countByStarkKey(
     starkKey: StarkKey,
     types?: UserTransactionData['type'][]
   ): Promise<number> {
@@ -154,7 +136,7 @@ export class UserTransactionRepository extends BaseRepository {
     return Number(result!.count)
   }
 
-  async getCountOfIncludedByStateUpdateId(
+  async countOfIncludedByStateUpdateId(
     stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<number> {

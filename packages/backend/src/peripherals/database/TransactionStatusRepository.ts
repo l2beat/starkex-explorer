@@ -2,7 +2,7 @@ import { Hash256, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 
 import { Logger } from '../../tools/Logger'
-import { BaseRepository } from './shared/BaseRepository'
+import { BaseRepository, CheckConvention } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 interface Row {
@@ -87,13 +87,7 @@ export class TransactionStatusRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
 
-    /* eslint-disable @typescript-eslint/unbound-method */
-
-    this.getWaitingToBeMined = this.wrapGet(this.getWaitingToBeMined)
-    this.add = this.wrapAdd(this.add)
-    this.deleteAll = this.wrapDelete(this.deleteAll)
-
-    /* eslint-enable @typescript-eslint/unbound-method */
+    this.autoWrap<CheckConvention<TransactionStatusRepository>>(this)
   }
 
   private waitingToBeMinedQuery(knex: Knex) {
