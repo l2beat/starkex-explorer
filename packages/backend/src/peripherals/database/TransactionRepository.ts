@@ -18,8 +18,6 @@ interface Record<T extends TransactionData['type'] = TransactionData['type']> {
   starkKeyB: StarkKey | undefined
   type: T
   data: Extract<TransactionData, { type: T }>
-  replacedBy: number | undefined
-  replacementFor: number | undefined
 }
 
 export class TransactionRepository extends BaseRepository {
@@ -93,7 +91,5 @@ function toRecord(row: TransactionRow): Record {
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
     type: row.type as TransactionData['type'],
     data: decodeTransactionData(row.data),
-    replacedBy: row.replaced_by ? row.replaced_by : undefined,
-    replacementFor: row.replacement_for ? row.replacement_for : undefined,
   }
 }
