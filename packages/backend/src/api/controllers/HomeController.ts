@@ -32,7 +32,8 @@ export class HomeController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
-    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository
+    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
+    private readonly showL2Transactions: boolean
   ) {}
 
   async getHomePage(
@@ -75,11 +76,15 @@ export class HomeController {
     const content = renderHomePage({
       context,
       tutorials: [], // explicitly no tutorials
-      l2Transactions: l2Transactions.map((t) => ({
-        ...t,
-        status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
-      })),
-      totalL2Transactions: l2TransactionsCount,
+      l2Transactions: this.showL2Transactions
+        ? {
+            data: l2Transactions.map((t) => ({
+              ...t,
+              status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
+            })),
+            total: l2TransactionsCount,
+          }
+        : undefined,
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.stateUpdateId.toString(),

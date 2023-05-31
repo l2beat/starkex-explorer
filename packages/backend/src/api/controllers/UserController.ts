@@ -59,7 +59,8 @@ export class UserController {
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
-    private readonly exchangeAddress: EthereumAddress
+    private readonly exchangeAddress: EthereumAddress,
+    private readonly showL2Transactions: boolean
   ) {}
 
   async getUserRegisterPage(
@@ -206,11 +207,15 @@ export class UserController {
       context,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
-      l2Transactions: l2Transactions.map((t) => ({
-        ...t,
-        status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
-      })),
-      totalL2Transactions: l2TransactionsCount,
+      l2Transactions: this.showL2Transactions
+        ? {
+            data: l2Transactions.map((t) => ({
+              ...t,
+              status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
+            })),
+            total: l2TransactionsCount,
+          }
+        : undefined,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId:

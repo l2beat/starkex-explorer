@@ -87,6 +87,7 @@ import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient
 import { FetchClient } from './peripherals/starkware/FetchClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
+import { shouldShowL2Transactions } from './utils/shouldShowL2Transactions'
 
 export class Application {
   start: () => Promise<void>
@@ -520,6 +521,7 @@ export class Application {
 
     // #endregion core
     // #region api
+    const showL2Transactions = shouldShowL2Transactions(config)
     const homeController = new HomeController(
       pageContextService,
       assetDetailsService,
@@ -527,7 +529,8 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository,
       transactionRepository,
-      preprocessedStateDetailsRepository
+      preprocessedStateDetailsRepository,
+      showL2Transactions
     )
 
     const userController = new UserController(
@@ -542,7 +545,8 @@ export class Application {
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
-      config.starkex.contracts.perpetual
+      config.starkex.contracts.perpetual,
+      showL2Transactions
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,
@@ -598,9 +602,8 @@ export class Application {
           forcedActionsController,
           forcedTradeOfferController,
           merkleProofController,
-          collateralAsset,
-          config.starkex.tradingMode,
-          searchController
+          searchController,
+          config
         ),
         createTransactionRouter(
           forcedTradeOfferController,

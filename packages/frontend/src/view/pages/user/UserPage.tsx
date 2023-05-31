@@ -49,8 +49,10 @@ interface UserPageProps {
   totalBalanceChanges: number
   transactions: TransactionEntry[]
   totalTransactions: number
-  l2Transactions: L2TransactionEntry[]
-  totalL2Transactions: number
+  l2Transactions?: {
+    data: L2TransactionEntry[]
+    total: number
+  }
   offers?: OfferEntry[]
   totalOffers: number
 }
@@ -99,13 +101,15 @@ function UserPage(props: UserPageProps) {
             isMine={isMine}
           />
         </TablePreview>
-        <TablePreview
-          {...getL2TransactionTableProps(props.starkKey)}
-          visible={props.l2Transactions.length}
-          total={props.totalL2Transactions}
-        >
-          <L2TransactionsTable transactions={props.l2Transactions} />
-        </TablePreview>
+        {props.l2Transactions && (
+          <TablePreview
+            {...getL2TransactionTableProps(props.starkKey)}
+            visible={props.l2Transactions.data.length}
+            total={props.l2Transactions.total}
+          >
+            <L2TransactionsTable transactions={props.l2Transactions.data} />
+          </TablePreview>
+        )}
         <TablePreview
           {...getBalanceChangeTableProps(props.starkKey)}
           visible={props.balanceChanges.length}

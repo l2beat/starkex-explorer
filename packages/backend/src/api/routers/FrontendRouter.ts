@@ -1,14 +1,10 @@
-import {
-  CollateralAsset,
-  stringAs,
-  stringAsBigInt,
-  stringAsPositiveInt,
-  TradingMode,
-} from '@explorer/shared'
+import { stringAs, stringAsBigInt, stringAsPositiveInt } from '@explorer/shared'
 import { Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import * as z from 'zod'
 
+import { Config } from '../../config'
+import { shouldShowL2Transactions } from '../../utils/shouldShowL2Transactions'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'
@@ -30,9 +26,8 @@ export function createFrontendRouter(
   forcedActionController: ForcedActionController,
   forcedTradeOfferController: ForcedTradeOfferController | undefined,
   merkleProofController: MerkleProofController,
-  collateralAsset: CollateralAsset | undefined,
-  tradingMode: TradingMode,
-  searchController: SearchController
+  searchController: SearchController,
+  config: Config
 ) {
   const router = new Router()
 
@@ -53,27 +48,6 @@ export function createFrontendRouter(
       async (ctx) => {
         const { query } = ctx.query
         const result = await searchController.getSearchRedirect(query)
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
-    '/l2-transactions',
-    withTypedContext(
-      z.object({
-        query: z.object({
-          page: z.optional(stringAsPositiveInt()),
-          perPage: z.optional(stringAsPositiveInt()),
-        }),
-      }),
-      async (ctx) => {
-        const givenUser = getGivenUser(ctx)
-        const pagination = getPagination(ctx.query)
-        const result = await homeController.getHomeL2TransactionsPage(
-          givenUser,
-          pagination
-        )
         applyControllerResult(ctx, result)
       }
     )
@@ -251,31 +225,6 @@ export function createFrontendRouter(
   )
 
   router.get(
-    '/users/:starkKey/l2-transactions',
-    withTypedContext(
-      z.object({
-        params: z.object({
-          starkKey: stringAs(StarkKey),
-        }),
-        query: z.object({
-          page: z.optional(stringAsPositiveInt()),
-          perPage: z.optional(stringAsPositiveInt()),
-        }),
-      }),
-      async (ctx) => {
-        const givenUser = getGivenUser(ctx)
-        const pagination = getPagination(ctx.query)
-        const result = await userController.getUserL2TransactionsPage(
-          givenUser,
-          ctx.params.starkKey,
-          pagination
-        )
-        applyControllerResult(ctx, result)
-      }
-    )
-  )
-
-  router.get(
     '/users/:starkKey/balance-changes',
     withTypedContext(
       z.object({
@@ -390,16 +339,58 @@ export function createFrontendRouter(
     )
   )
 
-  if (tradingMode === 'perpetual') {
+  if (shouldShowL2Transactions(config)) {
+    router.get(
+      '/l2-transactions',
+      withTypedContext(
+        z.object({
+          query: z.object({
+            page: z.optional(stringAsPositiveInt()),
+            perPage: z.optional(stringAsPositiveInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const pagination = getPagination(ctx.query)
+          const result = await homeController.getHomeL2TransactionsPage(
+            givenUser,
+            pagination
+          )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+
+    router.get(
+      '/users/:starkKey/l2-transactions',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            starkKey: stringAs(StarkKey),
+          }),
+          query: z.object({
+            page: z.optional(stringAsPositiveInt()),
+            perPage: z.optional(stringAsPositiveInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const pagination = getPagination(ctx.query)
+          const result = await userController.getUserL2TransactionsPage(
+            givenUser,
+            ctx.params.starkKey,
+            pagination
+          )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+  }
+
+  if (config.starkex.tradingMode === 'perpetual') {
     if (!forcedTradeOfferController) {
       throw new Error(
         'forcedTradeOfferController is required in perpetual trading mode'
-      )
-    }
-
-    if (!collateralAsset) {
-      throw new Error(
-        'Collateral asset must be defined in perpetual trading mode'
       )
     }
 
@@ -407,7 +398,7 @@ export function createFrontendRouter(
       router,
       forcedTradeOfferController,
       forcedActionController,
-      collateralAsset
+      config.starkex.collateralAsset
     )
   } else {
     addSpotTradingRoutes(router, forcedActionController)
