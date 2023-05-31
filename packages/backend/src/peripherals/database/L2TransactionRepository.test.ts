@@ -1,6 +1,13 @@
-import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 import { expect } from 'earl'
-import { it } from 'mocha'
+import { beforeEach, it } from 'mocha'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
@@ -32,6 +39,7 @@ describe(L2TransactionRepository.name, () => {
       const transaction = await repository.findById(id)
 
       expect(transaction).toEqual({
+        id,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -72,6 +80,7 @@ describe(L2TransactionRepository.name, () => {
       const transaction = await repository.findById(id)
 
       expect(transaction).toEqual({
+        id,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -89,6 +98,7 @@ describe(L2TransactionRepository.name, () => {
       const altTransaction = await repository.findById(altId)
 
       expect(transactionAfterAlternative).toEqual({
+        id,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -101,6 +111,7 @@ describe(L2TransactionRepository.name, () => {
       })
 
       expect(altTransaction).toEqual({
+        id: altId,
         stateUpdateId: alternativeRecord.stateUpdateId,
         transactionId: alternativeRecord.transactionId,
         blockNumber: alternativeRecord.blockNumber,
@@ -150,6 +161,7 @@ describe(L2TransactionRepository.name, () => {
       const firstTransactionOfMulti = await repository.findById(id + 1)
       const secondTransactionOfMulti = await repository.findById(id + 2)
       expect(multiTransaction).toEqual({
+        id: id,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -161,6 +173,7 @@ describe(L2TransactionRepository.name, () => {
         data: record.data,
       })
       expect(firstTransactionOfMulti).toEqual({
+        id: id + 1,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -172,6 +185,7 @@ describe(L2TransactionRepository.name, () => {
         data: record.data.transactions[0]!,
       })
       expect(secondTransactionOfMulti).toEqual({
+        id: id + 2,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -256,6 +270,7 @@ describe(L2TransactionRepository.name, () => {
         await repository.findById(id + 2)
 
       expect(multiAfterAlternative).toEqual({
+        id: id,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -267,6 +282,7 @@ describe(L2TransactionRepository.name, () => {
         parentId: undefined,
       })
       expect(firstTransactionOfMultiAfterAlternative).toEqual({
+        id: id + 1,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -278,6 +294,7 @@ describe(L2TransactionRepository.name, () => {
         parentId: id,
       })
       expect(secondTransactionOfMultiAfterAlternative).toEqual({
+        id: id + 2,
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
@@ -294,6 +311,7 @@ describe(L2TransactionRepository.name, () => {
       const secondTransactionOfMultiAlt = await repository.findById(altId + 2)
 
       expect(multiAltTransaction).toEqual({
+        id: altId,
         stateUpdateId: alternativeRecord.stateUpdateId,
         transactionId: alternativeRecord.transactionId,
         blockNumber: alternativeRecord.blockNumber,
@@ -306,6 +324,7 @@ describe(L2TransactionRepository.name, () => {
       })
 
       expect(firstTransactionOfMultiAlt).toEqual({
+        id: altId + 1,
         stateUpdateId: alternativeRecord.stateUpdateId,
         transactionId: alternativeRecord.transactionId,
         blockNumber: alternativeRecord.blockNumber,
@@ -317,6 +336,7 @@ describe(L2TransactionRepository.name, () => {
         parentId: altId,
       })
       expect(secondTransactionOfMultiAlt).toEqual({
+        id: altId + 2,
         stateUpdateId: alternativeRecord.stateUpdateId,
         transactionId: alternativeRecord.transactionId,
         blockNumber: alternativeRecord.blockNumber,
@@ -327,6 +347,90 @@ describe(L2TransactionRepository.name, () => {
         state: 'alternative',
         parentId: altId,
       })
+    })
+  })
+
+  describe(L2TransactionRepository.prototype.countAll.name, () => {
+    it('returns the number of transactions', async () => {
+      const record = {
+        stateUpdateId: 1,
+        transactionId: 1234,
+        blockNumber: 12345,
+        data: {
+          type: 'Deposit',
+          starkKey: StarkKey.fake(),
+          positionId: 1234n,
+          amount: 5000n,
+        },
+      } as const
+      const record2 = {
+        stateUpdateId: 2,
+        transactionId: 1234,
+        blockNumber: 123456,
+        data: {
+          type: 'Deposit',
+          starkKey: StarkKey.fake(),
+          positionId: 1234n,
+          amount: 5000n,
+        },
+      } as const
+      await repository.add(record)
+
+      expect(await repository.countAll()).toEqual(1)
+
+      await repository.add(record2)
+
+      expect(await repository.countAll()).toEqual(2)
+    })
+
+    it('returns 0 if there are no transactions', async () => {
+      const count = await repository.countAll()
+
+      expect(count).toEqual(0)
+    })
+  })
+
+  describe(L2TransactionRepository.prototype.countAllUserSpecific.name, () => {
+    const starkKey = StarkKey.fake()
+
+    it('returns the number of transactions', async () => {
+      await repository.add({
+        stateUpdateId: 2,
+        transactionId: 1234,
+        blockNumber: 123456,
+        data: {
+          type: 'Deposit',
+          starkKey: starkKey,
+          positionId: 1234n,
+          amount: 5000n,
+        },
+      })
+
+      expect(await repository.countAllUserSpecific(starkKey)).toEqual(1)
+    })
+
+    it('returns 0 if there are no user specific transactions', async () => {
+      await repository.add({
+        transactionId: 1235,
+        stateUpdateId: 1,
+        blockNumber: 12345,
+        data: {
+          type: 'FundingTick',
+          globalFundingIndices: {
+            indices: [
+              {
+                syntheticAssetId: AssetId('BTC-10'),
+                quantizedFundingIndex: 137263953,
+              },
+            ],
+            timestamp: Timestamp(1657926000),
+          },
+        },
+      })
+
+      const count = await repository.countAllUserSpecific(starkKey)
+
+      expect(count).toEqual(0)
     })
   })
 
@@ -414,6 +518,160 @@ describe(L2TransactionRepository.name, () => {
       expect(count).toEqual(0)
     })
   })
+
+  describe(L2TransactionRepository.prototype.getPaginated.name, () => {
+    it('returns the transactions', async () => {
+      it('respects the limit parameter', async () => {
+        const ids = []
+        for (let i = 0; i < 10; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1234 + i,
+              stateUpdateId: 1,
+              blockNumber: 12345,
+              data: {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+            })
+          )
+        }
+        const records = await repository.getPaginated({
+          limit: 5,
+          offset: 0,
+        })
+
+        expect(records.map((x) => x.id)).toEqual(ids.slice(0, 5))
+      })
+
+      it('respects the offset parameter', async () => {
+        const ids = []
+        for (let i = 0; i < 10; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1234 + i,
+              stateUpdateId: 1,
+              blockNumber: 12345,
+              data: {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+            })
+          )
+        }
+        const records = await repository.getPaginated({
+          limit: 5,
+          offset: 2,
+        })
+        expect(records.map((x) => x.id)).toEqual(ids.slice(2, 5 + 2))
+      })
+    })
+  })
+
+  describe(
+    L2TransactionRepository.prototype.getUserSpecificPaginated.name,
+    () => {
+      const starkKey = StarkKey.fake()
+      const ids: number[] = []
+
+      beforeEach(async () => {
+        for (let i = 0; i < 5; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1239 + i,
+              stateUpdateId: 2,
+              blockNumber: 12345,
+              data: {
+                type: 'Deposit',
+                starkKey: starkKey,
+                positionId: 1234n,
+                amount: 5000n,
+              },
+            })
+          )
+        }
+        for (let i = 0; i < 5; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1244 + i,
+              stateUpdateId: 3,
+              blockNumber: 12345,
+              data: {
+                type: 'Transfer',
+                nonce: 3558046632n,
+                amount: 20000000n,
+                assetId: AssetHash(
+                  '0x00a21edc9d9997b1b1956f542fe95922518a9e28ace11b7b2972a1974bf5971f'
+                ),
+                signature: {
+                  r: Hash256(
+                    '0x01c3706776f6f18aa6d05d8d2a87c31e607ccaace868a64991b30b9513aca555'
+                  ),
+                  s: Hash256(
+                    '0x03cbadc127bef81556c214bd4442fae6dead4f7cd140fb3ccebdd537c9c09bdd'
+                  ),
+                },
+                senderStarkKey: StarkKey(
+                  '0x0023ad6ee122e6294891270906198ab03ea16a66df5655d062c93ed1ac22be42'
+                ),
+                receiverStarkKey: starkKey,
+                senderPositionId: 337140350554472514n,
+                receiverPositionId: 331764625462788454n,
+                expirationTimestamp: Timestamp(460858),
+              },
+            })
+          )
+        }
+        for (let i = 0; i < 5; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1234 + i,
+              stateUpdateId: 1,
+              blockNumber: 12345,
+              data: {
+                type: 'FundingTick',
+                globalFundingIndices: {
+                  indices: [
+                    {
+                      syntheticAssetId: AssetId('BTC-10'),
+                      quantizedFundingIndex: 137263953,
+                    },
+                  ],
+                  timestamp: Timestamp(1657926000),
+                },
+              },
+            })
+          )
+        }
+      })
+
+      afterEach(() => {
+        ids.splice(0, ids.length)
+      })
+
+      it('respects the limit parameter', async () => {
+        const records = await repository.getUserSpecificPaginated(starkKey, {
+          limit: 6,
+          offset: 0,
+        })
+
+        expect(records.map((x) => x.id)).toEqual(ids.slice(4, 10).reverse())
+      })
+
+      it('respects the offset parameter', async () => {
+        const records = await repository.getUserSpecificPaginated(starkKey, {
+          limit: 6,
+          offset: 2,
+        })
+
+        expect(records.map((x) => x.id)).toEqual(ids.slice(2, 8).reverse())
+      })
+    }
+  )
 
   describe(
     L2TransactionRepository.prototype.findLatestStateUpdateId.name,

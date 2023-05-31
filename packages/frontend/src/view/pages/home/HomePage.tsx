@@ -5,6 +5,10 @@ import React from 'react'
 import { Page } from '../../components/page/Page'
 import { SearchBar } from '../../components/SearchBar'
 import { TablePreview } from '../../components/table/TablePreview'
+import {
+  L2TransactionEntry,
+  L2TransactionsTable,
+} from '../../components/tables/L2TransactionsTable'
 import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import {
   TransactionEntry,
@@ -13,6 +17,7 @@ import {
 import { reactToHtml } from '../../reactToHtml'
 import {
   FORCED_TRANSACTION_TABLE_PROPS,
+  L2_TRANSACTIONS_TABLE_PROPS,
   OFFER_TABLE_PROPS,
   STATE_UPDATE_TABLE_PROPS,
 } from './common'
@@ -32,7 +37,9 @@ interface HomePageProps {
   tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
   totalStateUpdates: number
-  transactions: TransactionEntry[]
+  l2Transactions: L2TransactionEntry[]
+  totalL2Transactions: number
+  forcedTransactions: TransactionEntry[]
   totalForcedTransactions: number
   offers?: OfferEntry[]
   totalOffers: number
@@ -62,6 +69,13 @@ function HomePage(props: HomePageProps) {
         <div className="flex flex-col gap-8">
           <SearchBar tradingMode={props.context.tradingMode} />
           <TablePreview
+            {...L2_TRANSACTIONS_TABLE_PROPS}
+            visible={props.l2Transactions.length}
+            total={props.totalL2Transactions}
+          >
+            <L2TransactionsTable transactions={props.l2Transactions} />
+          </TablePreview>
+          <TablePreview
             {...STATE_UPDATE_TABLE_PROPS}
             visible={props.stateUpdates.length}
             total={props.totalStateUpdates}
@@ -70,10 +84,10 @@ function HomePage(props: HomePageProps) {
           </TablePreview>
           <TablePreview
             {...FORCED_TRANSACTION_TABLE_PROPS}
-            visible={props.transactions.length}
+            visible={props.forcedTransactions.length}
             total={props.totalForcedTransactions}
           >
-            <TransactionsTable transactions={props.transactions} />
+            <TransactionsTable transactions={props.forcedTransactions} />
           </TablePreview>
           {props.offers && props.context.tradingMode === 'perpetual' && (
             <TablePreview

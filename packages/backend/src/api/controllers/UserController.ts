@@ -1,6 +1,7 @@
 import {
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
+  renderUserL2TransactionsPage,
   renderUserOffersPage,
   renderUserPage,
   renderUserRecoverPage,
@@ -24,6 +25,7 @@ import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewServ
 import { PageContextService } from '../../core/PageContextService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -52,12 +54,12 @@ export class UserController {
     private readonly sentTransactionRepository: SentTransactionRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
+    private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly userRegistrationEventRepository: UserRegistrationEventRepository,
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
-    private readonly exchangeAddress: EthereumAddress,
-    private readonly collateralAsset?: CollateralAsset
+    private readonly exchangeAddress: EthereumAddress
   ) {}
 
   async getUserRegisterPage(
@@ -118,6 +120,8 @@ export class UserController {
       registeredUser,
       userAssets,
       history,
+      l2Transactions,
+      l2TransactionsCount,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
@@ -137,6 +141,11 @@ export class UserController {
         starkKey,
         paginationOpts
       ),
+      this.l2TransactionRepository.getUserSpecificPaginated(
+        starkKey,
+        paginationOpts
+      ),
+      this.l2TransactionRepository.countAllUserSpecific(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
@@ -197,6 +206,11 @@ export class UserController {
       context,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
+      l2Transactions: l2Transactions.map((t) => ({
+        ...t,
+        status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
+      })),
+      totalL2Transactions: l2TransactionsCount,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId:
@@ -280,6 +294,33 @@ export class UserController {
       assets,
       ...pagination,
       total: userStatistics.assetCount,
+    })
+    return { type: 'success', content }
+  }
+
+  async getUserL2TransactionsPage(
+    givenUser: Partial<UserDetails>,
+    starkKey: StarkKey,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+    const [l2Transactions, l2TransactionsCount] = await Promise.all([
+      this.l2TransactionRepository.getUserSpecificPaginated(
+        starkKey,
+        pagination
+      ),
+      this.l2TransactionRepository.countAllUserSpecific(starkKey),
+    ])
+
+    const content = renderUserL2TransactionsPage({
+      context,
+      starkKey,
+      l2Transactions: l2Transactions.map((t) => ({
+        ...t,
+        status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
+      })),
+      ...pagination,
+      total: l2TransactionsCount,
     })
     return { type: 'success', content }
   }

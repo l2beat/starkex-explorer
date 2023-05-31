@@ -59,6 +59,27 @@ export function createFrontendRouter(
   )
 
   router.get(
+    '/l2-transactions',
+    withTypedContext(
+      z.object({
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result = await homeController.getHomeL2TransactionsPage(
+          givenUser,
+          pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
     '/state-updates',
     withTypedContext(
       z.object({
@@ -220,6 +241,31 @@ export function createFrontendRouter(
         const givenUser = getGivenUser(ctx)
         const pagination = getPagination(ctx.query)
         const result = await userController.getUserAssetsPage(
+          givenUser,
+          ctx.params.starkKey,
+          pagination
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get(
+    '/users/:starkKey/l2-transactions',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          starkKey: stringAs(StarkKey),
+        }),
+        query: z.object({
+          page: z.optional(stringAsPositiveInt()),
+          perPage: z.optional(stringAsPositiveInt()),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+        const pagination = getPagination(ctx.query)
+        const result = await userController.getUserL2TransactionsPage(
           givenUser,
           ctx.params.starkKey,
           pagination

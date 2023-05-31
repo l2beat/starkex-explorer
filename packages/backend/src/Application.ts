@@ -158,6 +158,8 @@ export class Application {
       logger
     )
 
+    const transactionRepository = new L2TransactionRepository(database, logger)
+
     const ethereumClient = new EthereumClient(
       config.starkex.blockchain.jsonRpcUrl,
       config.starkex.blockchain.safeBlockDistance
@@ -233,10 +235,7 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         stateTransitionCollector = perpetualValidiumStateTransitionCollector
-        const transactionRepository = new L2TransactionRepository(
-          database,
-          logger
-        )
+
         const feederGatewayClient = config.starkex.feederGateway
           ? new FeederGatewayClient(
               config.starkex.feederGateway,
@@ -527,6 +526,7 @@ export class Application {
       forcedTradeOfferViewService,
       userTransactionRepository,
       forcedTradeOfferRepository,
+      transactionRepository,
       preprocessedStateDetailsRepository
     )
 
@@ -537,12 +537,12 @@ export class Application {
       sentTransactionRepository,
       userTransactionRepository,
       forcedTradeOfferRepository,
+      transactionRepository,
       userRegistrationEventRepository,
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
-      config.starkex.contracts.perpetual,
-      collateralAsset
+      config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,
