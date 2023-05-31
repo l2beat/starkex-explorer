@@ -38,6 +38,11 @@ export class L2TransactionRepository extends BaseRepository {
     this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
     this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
     this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.countByTransactionId = this.wrapAny(this.countByTransactionId)
+    this.findById = this.wrapFind(this.findById)
+    this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
+    this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
