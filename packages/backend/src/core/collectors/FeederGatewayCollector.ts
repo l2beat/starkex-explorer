@@ -52,6 +52,5 @@ export class FeederGatewayCollector {
 
   async discardAfter(blockNumber: number) {
     await this.transactionRepository.deleteAfterBlock(blockNumber)
-    //TODO: delete all that have blockNumber undefined (from live API)
   }
 }
