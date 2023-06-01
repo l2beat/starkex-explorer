@@ -5,7 +5,7 @@ import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepos
 import { Logger } from '../../tools/Logger'
 import { IStateTransitionCollector } from '../IStateTransitionCollector'
 
-export class StateUpdateMigrator {
+export class StateUpdateWithBatchIdMigrator {
   constructor(
     private softwareMigrationRepository: SoftwareMigrationRepository,
     private stateUpdateRepository: StateUpdateRepository,
@@ -31,7 +31,7 @@ export class StateUpdateMigrator {
     if (lastSyncedBlock === undefined) {
       return
     }
-    this.logger.info('State update migration started')
+    this.logger.info('Migration assigning batch ids to state updates started')
 
     await this.collectStateUpdateEvents(lastSyncedBlock)
 

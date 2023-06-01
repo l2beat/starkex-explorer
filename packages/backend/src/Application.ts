@@ -35,7 +35,7 @@ import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedC
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
 import { IDataSyncService } from './core/IDataSyncService'
 import { IStateTransitionCollector } from './core/IStateTransitionCollector'
-import { StateUpdateMigrator } from './core/migrations/StateUpdateMigrator'
+import { StateUpdateWithBatchIdMigrator } from './core/migrations/StateUpdateWithBatchIdMigrator'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
 import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PageContextService } from './core/PageContextService'
@@ -396,7 +396,7 @@ export class Application {
       logger
     )
 
-    const stateUpdateMigrator = new StateUpdateMigrator(
+    const stateUpdateWithBatchIdMigrator = new StateUpdateWithBatchIdMigrator(
       softwareMigrationRepository,
       stateUpdateRepository,
       syncStatusRepository,
@@ -622,7 +622,7 @@ export class Application {
 
       await userTransactionMigrator.migrate()
       await withdrawableAssetMigrator.migrate()
-      await stateUpdateMigrator.migrate()
+      await stateUpdateWithBatchIdMigrator.migrate()
       await stateUpdater.initTree()
 
       if (config.enableSync) {
