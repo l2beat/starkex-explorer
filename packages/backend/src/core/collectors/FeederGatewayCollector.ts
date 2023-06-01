@@ -1,16 +1,16 @@
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
+import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
+import { FeederGatewayClient } from '../../peripherals/starkware/FeederGatewayClient'
 import { Logger } from '../../tools/Logger'
-import { L2TransactionRepository } from '../database/L2TransactionRepository'
-import { StateUpdateRecord } from '../database/StateUpdateRepository'
-import { FeederGatewayClient } from './FeederGatewayClient'
 
-export class L2TransactionDownloader {
+export class FeederGatewayCollector {
   constructor(
     private readonly feederGatewayClient: FeederGatewayClient,
     private readonly transactionRepository: L2TransactionRepository,
     private readonly logger: Logger
   ) {}
 
-  async sync(
+  async collect(
     stateUpdates: Pick<StateUpdateRecord, 'id' | 'batchId' | 'blockNumber'>[]
   ) {
     const latestSyncedTransactionStateUpdateId =
@@ -20,7 +20,7 @@ export class L2TransactionDownloader {
       if (stateUpdate.id <= latestSyncedTransactionStateUpdateId) {
         continue
       }
-      this.logger.info(`Syncing transactions...`, {
+      this.logger.info(`Collecting transactions from Feeder Gateway...`, {
         stateUpdateId: stateUpdate.id,
       })
 

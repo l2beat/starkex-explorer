@@ -2,18 +2,18 @@ import { BlockRange } from '../model'
 import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
-import { L2TransactionDownloader } from '../peripherals/starkware/L2TransactionDownloader'
 import { Logger } from '../tools/Logger'
-import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
-import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
-import { UserTransactionCollector } from './collectors/UserTransactionCollector'
-import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
-import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { IDataSyncService } from './IDataSyncService'
 import {
   PerpetualValidiumUpdater,
   ValidiumStateTransition,
 } from './PerpetualValidiumUpdater'
+import { FeederGatewayCollector } from './collectors/FeederGatewayCollector'
+import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
+import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
+import { UserTransactionCollector } from './collectors/UserTransactionCollector'
+import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
+import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 
 export class PerpetualValidiumSyncService implements IDataSyncService {
   constructor(
@@ -24,9 +24,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     private readonly perpetualCairoOutputCollector: PerpetualCairoOutputCollector,
     private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
     private readonly withdrawalAllowedCollector: WithdrawalAllowedCollector,
-    private readonly l2TransactionDownloader:
-      | L2TransactionDownloader
-      | undefined,
+    private readonly feederGatewayCollector: FeederGatewayCollector | undefined,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
@@ -51,7 +49,7 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     })
 
     const stateUpdates = await this.processStateUpdates(stateTransitions)
-    await this.l2TransactionDownloader?.sync(stateUpdates)
+    await this.feederGatewayCollector?.collect(stateUpdates)
   }
 
   async processStateUpdates(stateTransitions: ValidiumStateTransition[]) {
@@ -88,6 +86,6 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     await this.userRegistrationCollector.discardAfter(blockNumber)
     await this.userTransactionCollector.discardAfter(blockNumber)
     await this.withdrawalAllowedCollector.discardAfter(blockNumber)
-    await this.l2TransactionDownloader?.discardAfter(blockNumber)
+    await this.feederGatewayCollector?.discardAfter(blockNumber)
   }
 }

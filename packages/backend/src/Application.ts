@@ -19,6 +19,7 @@ import { Config } from './config'
 import { AssetDetailsService } from './core/AssetDetailsService'
 import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
 import { DepositWithTokenIdCollector } from './core/collectors/DepositWithTokenIdCollector'
+import { FeederGatewayCollector } from './core/collectors/FeederGatewayCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
@@ -84,7 +85,6 @@ import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
 import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
-import { L2TransactionDownloader } from './peripherals/starkware/L2TransactionDownloader'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
 
@@ -217,7 +217,7 @@ export class Application {
       | PerpetualRollupUpdater
     let stateTransitionCollector: IStateTransitionCollector
 
-    let l2TransactionDownloader: L2TransactionDownloader | undefined
+    let feederGatewayCollector: FeederGatewayCollector | undefined
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -240,8 +240,8 @@ export class Application {
         const feederGatewayClient = config.starkex.feederGateway
           ? new FeederGatewayClient(config.starkex.feederGateway, fetchClient)
           : undefined
-        l2TransactionDownloader = feederGatewayClient
-          ? new L2TransactionDownloader(
+        feederGatewayCollector = feederGatewayClient
+          ? new FeederGatewayCollector(
               feederGatewayClient,
               transactionRepository,
               logger
@@ -273,7 +273,7 @@ export class Application {
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
-          l2TransactionDownloader,
+          feederGatewayCollector,
           logger
         )
       } else {
