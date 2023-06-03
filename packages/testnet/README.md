@@ -19,7 +19,7 @@ yarn
 yarn build
 ```
 
-Assumming that you already have setted up backend before, you should create a separate database for using testnet.
+Assuming that you already have set up backend before, you should create a separate database for using testnet.
 
 ```
 docker exec -it state_explorer_postgres psql -U postgres -c 'CREATE DATABASE testnet'
@@ -32,7 +32,7 @@ Once you have everything, modify a `.env` file of backend package with the follo
 +LOCAL_DB_URL=postgresql://postgres:password@localhost:5432/testnet
 ```
 
-After everything is setted up, you should add testnet network to metamask. To do so, log in to your metamask, click current connected network and click "Add network", then scroll down and select "Add network manually". Paste these values:
+After everything is set up, you should add testnet network to metamask. To do so, log in to your metamask, click current connected network and click "Add network", then scroll down and select "Add network manually". Paste these values:
 
 ```
 New RPC URL: http://127.0.0.1:8545

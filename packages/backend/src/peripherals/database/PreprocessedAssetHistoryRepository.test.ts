@@ -750,7 +750,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       },
       trx
     )
-    // existsing asset
+    // existing asset
     await repository.add(
       {
         ...genericRecord,
@@ -852,7 +852,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
       trx
     )
     // Stark Key 4
-    // existsing asset
+    // existing asset
     await repository.add(
       {
         ...genericRecord,

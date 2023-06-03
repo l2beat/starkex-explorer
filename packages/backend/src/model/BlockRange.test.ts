@@ -6,25 +6,25 @@ import { BlockRange, getMaxItem, getMinItem } from './BlockRange'
 
 describe(BlockRange.name, () => {
   describe('constructor', () => {
-    it('can crate a zero blocks block range', () => {
+    it('can create a zero blocks block range', () => {
       const blockRange = new BlockRange([])
       expect(blockRange.start).toEqual(0)
       expect(blockRange.end).toEqual(0)
     })
 
-    it('can crate a zero blocks block range with a given start', () => {
+    it('can create a zero blocks block range with a given start', () => {
       const blockRange = new BlockRange([], 1000)
       expect(blockRange.start).toEqual(1000)
       expect(blockRange.end).toEqual(1000)
     })
 
-    it('can crate a block range with a given span', () => {
+    it('can create a block range with a given span', () => {
       const blockRange = new BlockRange([], 1000, 1500)
       expect(blockRange.start).toEqual(1000)
       expect(blockRange.end).toEqual(1500)
     })
 
-    it('can crate a block range from a map', () => {
+    it('can create a block range from a map', () => {
       const rangeA = new BlockRange([
         { number: 10, hash: Hash256.fake('10') },
         { number: 11, hash: Hash256.fake('11') },
@@ -40,7 +40,7 @@ describe(BlockRange.name, () => {
       expect(rangeA).toEqual(rangeB)
     })
 
-    it('can crate a block range from a block range', () => {
+    it('can create a block range from a block range', () => {
       const rangeA = new BlockRange([
         { number: 10, hash: Hash256.fake('10') },
         { number: 11, hash: Hash256.fake('11') },
@@ -100,7 +100,7 @@ describe(BlockRange.name, () => {
       )
       expect(blockRange.start).toEqual(11)
       expect(blockRange.end).toEqual(13)
-      // @ts-expect-error acccess private member
+      // @ts-expect-error access private member
       expect(blockRange.hashes).toEqual(
         new Map([
           [11, Hash256.fake('11')],

@@ -278,7 +278,7 @@ describe(TransactionHistory.name, () => {
         },
         { status: 'SENT', timestamp: sentTransaction.sentTimestamp },
       ]
-      // Basicly for the next two describes we want to test all possible combinations of sentTransaction and userTransaction.
+      // Basically for the next two describes we want to test all possible combinations of sentTransaction and userTransaction.
       // Even though they do not make any difference as only the forced trade offer matters.
       // To prevent code duplication we use the following array of tuples.
       const additionalTransactionConfiguration = [
