@@ -1,19 +1,18 @@
 import { BlockRange } from '../model'
-import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { Logger } from '../tools/Logger'
-import { IDataSyncService } from './IDataSyncService'
-import {
-  PerpetualValidiumUpdater,
-  ValidiumStateTransition,
-} from './PerpetualValidiumUpdater'
 import { FeederGatewayCollector } from './collectors/FeederGatewayCollector'
 import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'
 import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { PerpetualValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
+import { IDataSyncService } from './IDataSyncService'
+import {
+  PerpetualValidiumUpdater,
+  ValidiumStateTransition,
+} from './PerpetualValidiumUpdater'
 
 export class PerpetualValidiumSyncService implements IDataSyncService {
   constructor(
@@ -48,13 +47,10 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
       userRegistrations: userRegistrations.length,
     })
 
-    const stateUpdates = await this.processStateUpdates(stateTransitions)
-    await this.feederGatewayCollector?.collect(stateUpdates)
+    await this.processStateTransitions(stateTransitions)
   }
 
-  async processStateUpdates(stateTransitions: ValidiumStateTransition[]) {
-    const stateUpdates: StateUpdateRecord[] = []
-
+  async processStateTransitions(stateTransitions: ValidiumStateTransition[]) {
     for (const stateTransition of stateTransitions) {
       const [perpetualCairoOutput, batch] = await Promise.all([
         this.perpetualCairoOutputCollector.collect(
@@ -73,9 +69,8 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
           perpetualCairoOutput,
           batch
         )
-      stateUpdates.push(stateUpdate)
+      await this.feederGatewayCollector?.collect(stateUpdate.id)
     }
-    return stateUpdates
   }
 
   async discardAfter(blockNumber: BlockNumber) {

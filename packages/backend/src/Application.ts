@@ -244,6 +244,7 @@ export class Application {
           ? new FeederGatewayCollector(
               feederGatewayClient,
               transactionRepository,
+              stateUpdateRepository,
               logger
             )
           : undefined

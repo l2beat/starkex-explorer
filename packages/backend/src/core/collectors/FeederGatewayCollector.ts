@@ -1,5 +1,5 @@
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
-import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { FeederGatewayClient } from '../../peripherals/starkware/FeederGatewayClient'
 import { Logger } from '../../tools/Logger'
 
@@ -7,20 +7,32 @@ export class FeederGatewayCollector {
   constructor(
     private readonly feederGatewayClient: FeederGatewayClient,
     private readonly transactionRepository: L2TransactionRepository,
+    private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly logger: Logger
   ) {}
 
-  async collect(
-    stateUpdates: Pick<StateUpdateRecord, 'id' | 'batchId' | 'blockNumber'>[]
-  ) {
+  async collect(syncToStateUpdateId: number) {
     const latestSyncedTransactionStateUpdateId =
-      (await this.transactionRepository.findLatestStateUpdateId()) ?? 0
+      await this.transactionRepository.findLatestStateUpdateId()
 
-    for (const stateUpdate of stateUpdates) {
-      if (stateUpdate.id <= latestSyncedTransactionStateUpdateId) {
-        continue
+    for (
+      let stateUpdateId = latestSyncedTransactionStateUpdateId
+        ? latestSyncedTransactionStateUpdateId + 1
+        : 1;
+      stateUpdateId <= syncToStateUpdateId;
+      stateUpdateId++
+    ) {
+      const stateUpdate = await this.stateUpdateRepository.findById(
+        stateUpdateId
+      )
+
+      if (!stateUpdate) {
+        throw new Error(
+          `State update with id ${stateUpdateId} not found in database`
+        )
       }
-      this.logger.info(`Collecting transactions from Feeder Gateway...`, {
+
+      this.logger.info(`Collecting transactions from Feeder Gateway`, {
         stateUpdateId: stateUpdate.id,
       })
 

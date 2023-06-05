@@ -1,5 +1,4 @@
 import { BlockRange } from '../model'
-import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
 import { Logger } from '../tools/Logger'
@@ -59,11 +58,10 @@ export class SpotValidiumSyncService implements IDataSyncService {
       depositsWithTokenId: depositsWithTokenId.length,
     })
 
-    await this.processStateUpdates(stateTransitions)
+    await this.processStateTransitions(stateTransitions)
   }
 
-  async processStateUpdates(stateTransitions: ValidiumStateTransition[]) {
-    const stateUpdates: StateUpdateRecord[] = []
+  async processStateTransitions(stateTransitions: ValidiumStateTransition[]) {
     for (const stateTransition of stateTransitions) {
       const [spotCairoOutput, batch] = await Promise.all([
         this.spotCairoOutputCollector.collect(stateTransition.transactionHash),
@@ -74,15 +72,12 @@ export class SpotValidiumSyncService implements IDataSyncService {
       if (!batch) {
         throw new Error(`Unable to download batch ${stateTransition.batchId}`)
       }
-      const stateUpdate =
-        await this.spotValidiumUpdater.processSpotValidiumStateTransition(
-          stateTransition,
-          spotCairoOutput,
-          batch
-        )
-      stateUpdates.push(stateUpdate)
+      await this.spotValidiumUpdater.processSpotValidiumStateTransition(
+        stateTransition,
+        spotCairoOutput,
+        batch
+      )
     }
-    return stateUpdates
   }
 
   async discardAfter(blockNumber: BlockNumber) {

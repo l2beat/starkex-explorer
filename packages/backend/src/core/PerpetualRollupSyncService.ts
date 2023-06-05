@@ -1,7 +1,6 @@
 import { decodeOnChainData } from '@explorer/encoding'
 
 import { BlockRange } from '../model'
-import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 import { PageCollector } from './collectors/PageCollector'
@@ -60,32 +59,27 @@ export class PerpetualRollupSyncService implements IDataSyncService {
       userRegistrations: userRegistrations.length,
     })
 
-    await this.processStateUpdates(stateTransitionRecords)
+    await this.processStateTransitions(stateTransitionRecords)
   }
 
-  async processStateUpdates(
+  async processStateTransitions(
     stateTransitions: PerpetualRollupStateTransition[]
-  ): Promise<StateUpdateRecord[]> {
-    const stateUpdates: StateUpdateRecord[] = []
+  ) {
     const recordsWithPages =
       await this.perpetualRollupUpdater.loadRequiredPages(stateTransitions)
 
     for (const record of recordsWithPages) {
       const onChainData = decodeOnChainData(record.pages)
-      const stateUpdate =
-        await this.perpetualRollupUpdater.processOnChainStateTransition(
-          {
-            id: record.id,
-            blockNumber: record.blockNumber,
-            stateTransitionHash: record.stateTransitionHash,
-          },
-          record.batchId,
-          onChainData
-        )
-      stateUpdates.push(stateUpdate)
+      await this.perpetualRollupUpdater.processOnChainStateTransition(
+        {
+          id: record.id,
+          blockNumber: record.blockNumber,
+          stateTransitionHash: record.stateTransitionHash,
+        },
+        record.batchId,
+        onChainData
+      )
     }
-
-    return stateUpdates
   }
   async discardAfter(blockNumber: BlockNumber) {
     await this.verifierCollector.discardAfter(blockNumber)
