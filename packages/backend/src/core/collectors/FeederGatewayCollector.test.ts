@@ -11,7 +11,7 @@ import { PerpetualBatchInfo } from '../../peripherals/starkware/toPerpetualBatch
 import { Logger } from '../../tools/Logger'
 import { FeederGatewayCollector } from './FeederGatewayCollector'
 
-describe.only(FeederGatewayCollector.name, () => {
+describe(FeederGatewayCollector.name, () => {
   describe(FeederGatewayCollector.prototype.collect.name, () => {
     it('should collect transactions from scratch if no transactions were synced before', async () => {
       const mockFeederGatewayClient = mockObject<FeederGatewayClient>({

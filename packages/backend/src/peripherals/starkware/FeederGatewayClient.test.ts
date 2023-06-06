@@ -18,71 +18,68 @@ describe(FeederGatewayClient.name, () => {
     },
   })
 
-  describe.only(
-    FeederGatewayClient.prototype.getPerpetualBatchInfo.name,
-    () => {
+  describe(FeederGatewayClient.prototype.getPerpetualBatchInfo.name, () => {
+    const fetchClient = mockObject<FetchClient>({
+      fetchRetry: mockFn().resolvesTo({
+        json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_BATCH_INFO),
+      }),
+    })
+    const feederGatewayClient = new FeederGatewayClient(
+      options,
+      fetchClient,
+      Logger.SILENT
+    )
+
+    it('should fetch transaction batch and parse it', async () => {
+      const response = await feederGatewayClient.getPerpetualBatchInfo(0)
+      expect(getUrl).toHaveBeenCalledWith(0)
+      expect(fetchClient.fetchRetry).toHaveBeenCalledWith(
+        'gateway-url',
+        expect.anything()
+      )
+      expect(fetchClient.fetchRetry).toHaveBeenExhausted()
+      expect(getUrl).toHaveBeenExhausted()
+      expect(response).toEqual(
+        toPerpetualBatchInfo(
+          PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_BATCH_INFO)
+        )
+      )
+    })
+
+    it('should return undefined if fetch fails', async () => {
       const fetchClient = mockObject<FetchClient>({
         fetchRetry: mockFn().resolvesTo({
-          json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_BATCH_INFO),
+          json: mockFn().throws(new Error('fetch error')),
         }),
       })
+
       const feederGatewayClient = new FeederGatewayClient(
         options,
         fetchClient,
         Logger.SILENT
       )
 
-      it('should fetch transaction batch and parse it', async () => {
-        const response = await feederGatewayClient.getPerpetualBatchInfo(0)
-        expect(getUrl).toHaveBeenCalledWith(0)
-        expect(fetchClient.fetchRetry).toHaveBeenCalledWith(
-          'gateway-url',
-          expect.anything()
-        )
-        expect(fetchClient.fetchRetry).toHaveBeenExhausted()
-        expect(getUrl).toHaveBeenExhausted()
-        expect(response).toEqual(
-          toPerpetualBatchInfo(
-            PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_BATCH_INFO)
-          )
-        )
+      const response = await feederGatewayClient.getPerpetualBatchInfo(0)
+
+      expect(response).toBeNullish()
+    })
+
+    it('should return undefined if response is custom starkex error response (contains code field)', async () => {
+      const fetchClient = mockObject<FetchClient>({
+        fetchRetry: mockFn().resolvesTo({
+          json: mockFn().resolvesTo({ code: 'any code' }),
+        }),
       })
 
-      it('should return undefined if fetch fails', async () => {
-        const fetchClient = mockObject<FetchClient>({
-          fetchRetry: mockFn().resolvesTo({
-            json: mockFn().throws(new Error('fetch error')),
-          }),
-        })
+      const feederGatewayClient = new FeederGatewayClient(
+        options,
+        fetchClient,
+        Logger.SILENT
+      )
 
-        const feederGatewayClient = new FeederGatewayClient(
-          options,
-          fetchClient,
-          Logger.SILENT
-        )
+      const response = await feederGatewayClient.getPerpetualBatchInfo(0)
 
-        const response = await feederGatewayClient.getPerpetualBatchInfo(0)
-
-        expect(response).toBeNullish()
-      })
-
-      it('should return undefined if response is custom starkex error response (contains code field)', async () => {
-        const fetchClient = mockObject<FetchClient>({
-          fetchRetry: mockFn().resolvesTo({
-            json: mockFn().resolvesTo({ code: 'any code' }),
-          }),
-        })
-
-        const feederGatewayClient = new FeederGatewayClient(
-          options,
-          fetchClient,
-          Logger.SILENT
-        )
-
-        const response = await feederGatewayClient.getPerpetualBatchInfo(0)
-
-        expect(response).toBeNullish()
-      })
-    }
-  )
+      expect(response).toBeNullish()
+    })
+  })
 })
