@@ -41,6 +41,8 @@ export class FeederGatewayCollector {
       )
 
       // We stop collecting transactions if there is no batch data.
+      // It will not stop the sync process, but it will stop the transaction collection.
+      // We will try to collect unsynced transactions on the next state update sync.
       if (!data) {
         return
       }
