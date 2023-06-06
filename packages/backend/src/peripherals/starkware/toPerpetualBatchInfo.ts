@@ -4,7 +4,7 @@ import { L2TransactionData } from '../database/L2Transaction'
 import { PerpetualBatchInfoResponse } from './schema'
 import { toPerpetualL2TransactionData } from './toPerpetualTransactions'
 
-interface PerpetualBatchInfo {
+export interface PerpetualBatchInfo {
   sequenceNumber: number
   previousPositionRoot: PedersenHash
   positionRoot: PedersenHash

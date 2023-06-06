@@ -6,14 +6,14 @@ import { Logger } from '../../tools/Logger'
 export class FeederGatewayCollector {
   constructor(
     private readonly feederGatewayClient: FeederGatewayClient,
-    private readonly transactionRepository: L2TransactionRepository,
+    private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly logger: Logger
   ) {}
 
   async collect(syncToStateUpdateId: number) {
     const latestSyncedTransactionStateUpdateId =
-      await this.transactionRepository.findLatestStateUpdateId()
+      await this.l2TransactionRepository.findLatestStateUpdateId()
 
     for (
       let stateUpdateId = latestSyncedTransactionStateUpdateId
@@ -26,10 +26,11 @@ export class FeederGatewayCollector {
         stateUpdateId
       )
 
+      // We stop collecting transactions if there is no state update in db.
+      // It will not stop the sync process, but it will stop the transaction collection.
+      // We will try to collect unsynced transactions on the next state update sync.
       if (!stateUpdate) {
-        throw new Error(
-          `State update with id ${stateUpdateId} not found in database`
-        )
+        return
       }
 
       this.logger.info(`Collecting transactions from Feeder Gateway`, {
@@ -48,7 +49,7 @@ export class FeederGatewayCollector {
       }
 
       for (const transactionInfo of data.transactionsInfo) {
-        await this.transactionRepository.add({
+        await this.l2TransactionRepository.add({
           stateUpdateId: stateUpdate.id,
           blockNumber: stateUpdate.blockNumber,
           transactionId: transactionInfo.originalTransactionId,
@@ -58,7 +59,7 @@ export class FeederGatewayCollector {
           continue
         }
         for (const alternativeTransaction of transactionInfo.alternativeTransactions) {
-          await this.transactionRepository.add({
+          await this.l2TransactionRepository.add({
             stateUpdateId: stateUpdate.id,
             blockNumber: stateUpdate.blockNumber,
             transactionId: transactionInfo.originalTransactionId,
@@ -70,6 +71,6 @@ export class FeederGatewayCollector {
   }
 
   async discardAfter(blockNumber: number) {
-    await this.transactionRepository.deleteAfterBlock(blockNumber)
+    await this.l2TransactionRepository.deleteAfterBlock(blockNumber)
   }
 }
