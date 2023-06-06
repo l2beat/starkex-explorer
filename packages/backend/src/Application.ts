@@ -238,7 +238,11 @@ export class Application {
           logger
         )
         const feederGatewayClient = config.starkex.feederGateway
-          ? new FeederGatewayClient(config.starkex.feederGateway, fetchClient)
+          ? new FeederGatewayClient(
+              config.starkex.feederGateway,
+              fetchClient,
+              logger
+            )
           : undefined
         feederGatewayCollector = feederGatewayClient
           ? new FeederGatewayCollector(

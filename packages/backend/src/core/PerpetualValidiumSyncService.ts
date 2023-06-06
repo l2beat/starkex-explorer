@@ -51,6 +51,8 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
   }
 
   async processStateTransitions(stateTransitions: ValidiumStateTransition[]) {
+    let lastStateUpdateId: number | undefined
+
     for (const stateTransition of stateTransitions) {
       const [perpetualCairoOutput, batch] = await Promise.all([
         this.perpetualCairoOutputCollector.collect(
@@ -69,7 +71,11 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
           perpetualCairoOutput,
           batch
         )
-      await this.feederGatewayCollector?.collect(stateUpdate.id)
+      lastStateUpdateId = stateUpdate.id
+    }
+
+    if (lastStateUpdateId) {
+      await this.feederGatewayCollector?.collect(lastStateUpdateId)
     }
   }
 

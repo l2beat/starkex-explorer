@@ -40,6 +40,11 @@ export class FeederGatewayCollector {
         stateUpdate.batchId
       )
 
+      // We stop collecting transactions if there is no batch data.
+      if (!data) {
+        return
+      }
+
       for (const transactionInfo of data.transactionsInfo) {
         await this.transactionRepository.add({
           stateUpdateId: stateUpdate.id,

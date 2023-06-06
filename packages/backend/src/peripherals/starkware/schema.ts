@@ -329,3 +329,9 @@ export const PerpetualL2TransactionResponse = z.strictObject({
   count: z.number(),
   txs: z.array(PerpetualL2TransactionResponseTransaction),
 })
+
+export type InvalidBatchIdResponse = z.infer<typeof InvalidBatchIdResponse>
+export const InvalidBatchIdResponse = z.strictObject({
+  code: z.literal('StarkErrorCode.INVALID_BATCH_ID'),
+  message: z.string(),
+})
