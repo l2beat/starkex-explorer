@@ -277,12 +277,12 @@ declare module 'knex/types/tables' {
     transaction_id: number
     state_update_id: number
     block_number: number
+    parent_id: number | null
+    status: 'alternative' | 'replaced' | null
     stark_key_a: string | null
     stark_key_b: string | null
     data: L2TransactionDataJson
     type: string
-    alt_index: number | null
-    is_replaced: boolean
   }
 
   interface Tables {

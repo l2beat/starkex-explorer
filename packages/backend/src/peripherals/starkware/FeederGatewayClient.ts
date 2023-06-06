@@ -35,8 +35,10 @@ export class FeederGatewayClient extends BaseClient {
         // Some of the requests can take a long time to complete e.g. batchId = 1914
         timeout: 15_000,
       })
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const data = await res.json()
       // Starkex instead of 404 returns 200 with code and message, thats why we need to handle it this way.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (data.code) {
         this.logger.error(
           `Failed to fetch batch info from FeederGateway for batchId: ${batchId} | ${JSON.stringify(
@@ -45,7 +47,7 @@ export class FeederGatewayClient extends BaseClient {
         )
         return undefined
       }
-      return data
+      return data as unknown
     } catch (err) {
       this.logger.error(
         `Failed to fetch batch info from FeederGateway for batchId: ${batchId}`,

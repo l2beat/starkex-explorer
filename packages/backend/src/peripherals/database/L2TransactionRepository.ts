@@ -1,4 +1,5 @@
 import { StarkKey } from '@explorer/types'
+import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
@@ -6,6 +7,7 @@ import {
   decodeTransactionData,
   encodeL2TransactionData,
   L2TransactionData,
+  MultiL2TransactionData,
 } from './L2Transaction'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
@@ -16,12 +18,12 @@ interface Record<
   transactionId: number
   stateUpdateId: number
   blockNumber: number
+  parentId: number | undefined
+  status: 'alternative' | 'replaced' | undefined
   starkKeyA: StarkKey | undefined
   starkKeyB: StarkKey | undefined
   type: T
   data: Extract<L2TransactionData, { type: T }>
-  altIndex: number | undefined
-  isReplaced: boolean
 }
 
 export type { Record as L2TransactionRecord }
@@ -46,37 +48,108 @@ export class L2TransactionRepository extends BaseRepository {
     data: L2TransactionData
   }): Promise<number> {
     const knex = await this.knex()
-    const { starkKeyA, starkKeyB, data } = encodeL2TransactionData(record.data)
 
     const count = await this.countByTransactionId(record.transactionId)
-    const altIndex = count > 0 ? count - 1 : undefined
+    const isAlternative = count > 0
 
-    if (altIndex === 0) {
+    if (count === 1) {
       await knex('l2_transactions')
-        .update({ is_replaced: true })
+        .update({ status: 'replaced' })
         .where({ transaction_id: record.transactionId })
     }
+
+    if (record.data.type === 'MultiTransaction') {
+      return await this.addMultiTransaction(
+        { ...record, data: record.data, isAlternative },
+        knex
+      )
+    } else {
+      return await this.addSingleTransaction(
+        { ...record, data: record.data, isAlternative },
+        knex
+      )
+    }
+  }
+
+  private async addSingleTransaction(
+    record: {
+      transactionId: number
+      stateUpdateId: number
+      blockNumber: number
+      isAlternative: boolean
+      data: Exclude<L2TransactionData, MultiL2TransactionData>
+      parentId?: number
+    },
+    knex: Knex
+  ) {
+    const { starkKeyA, starkKeyB, data } = encodeL2TransactionData(record.data)
 
     const results = await knex('l2_transactions')
       .insert({
         transaction_id: record.transactionId,
         state_update_id: record.stateUpdateId,
         block_number: record.blockNumber,
+        parent_id: record.parentId,
+        status: record.isAlternative ? 'alternative' : null,
         stark_key_a: starkKeyA?.toString(),
         stark_key_b: starkKeyB?.toString(),
         type: record.data.type,
         data,
-        alt_index: altIndex,
       })
       .returning('id')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return results[0]!.id
   }
 
+  private async addMultiTransaction(
+    record: {
+      transactionId: number
+      stateUpdateId: number
+      blockNumber: number
+      isAlternative: boolean
+      data: MultiL2TransactionData
+    },
+    knex: Knex
+  ) {
+    console.log('addMultiTransaction', record)
+
+    const { data } = encodeL2TransactionData(record.data)
+
+    const results = await knex('l2_transactions')
+      .insert({
+        transaction_id: record.transactionId,
+        state_update_id: record.stateUpdateId,
+        block_number: record.blockNumber,
+        type: record.data.type,
+        status: record.isAlternative ? 'alternative' : null,
+        data,
+      })
+      .returning('id')
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const parentId = results[0]!.id
+
+    for (const transaction of record.data.transactions) {
+      await this.addSingleTransaction(
+        {
+          transactionId: record.transactionId,
+          stateUpdateId: record.stateUpdateId,
+          blockNumber: record.blockNumber,
+          isAlternative: record.isAlternative,
+          data: transaction,
+          parentId,
+        },
+        knex
+      )
+    }
+    return parentId
+  }
+
   async countByTransactionId(transactionId: number): Promise<number> {
     const knex = await this.knex()
     const [result] = await knex('l2_transactions')
-      .where({ transaction_id: transactionId })
+      // We filter out the child transactions because they should not be counted as separate transactions
+      .where({ transaction_id: transactionId, parent_id: null })
       .count()
 
     return Number(result?.count ?? 0)
@@ -117,11 +190,11 @@ function toRecord(row: L2TransactionRow): Record {
     transactionId: row.transaction_id,
     stateUpdateId: row.state_update_id,
     blockNumber: row.block_number,
+    parentId: row.parent_id ? row.parent_id : undefined,
+    status: row.status ? row.status : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
     type: row.type as L2TransactionData['type'],
     data: decodeTransactionData(row.data),
-    altIndex: row.alt_index !== null ? row.alt_index : undefined,
-    isReplaced: row.is_replaced,
   }
 }

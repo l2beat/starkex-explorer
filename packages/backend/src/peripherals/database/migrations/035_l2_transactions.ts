@@ -21,12 +21,12 @@ export async function up(knex: Knex) {
     table.integer('transaction_id').index()
     table.integer('state_update_id').index()
     table.integer('block_number').index()
+    table.integer('parent_id').nullable().defaultTo(null)
+    table.string('status').nullable().defaultTo(null)
     table.string('stark_key_a').nullable().index()
     table.string('stark_key_b').nullable().index()
     table.jsonb('data').notNullable()
     table.string('type').notNullable()
-    table.integer('alt_index').nullable()
-    table.boolean('is_replaced').defaultTo(false)
   })
 }
 

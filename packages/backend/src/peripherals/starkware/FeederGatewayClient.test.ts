@@ -2,6 +2,7 @@ import { expect, mockFn, mockObject } from 'earl'
 
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { EXAMPLE_PERPETUAL_BATCH_INFO } from '../../test/starkwareData'
+import { Logger } from '../../tools/Logger'
 import { FeederGatewayClient } from './FeederGatewayClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualBatchInfoResponse } from './schema'
@@ -23,7 +24,11 @@ describe(FeederGatewayClient.name, () => {
         json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_BATCH_INFO),
       }),
     })
-    const feederGatewayClient = new FeederGatewayClient(options, fetchClient)
+    const feederGatewayClient = new FeederGatewayClient(
+      options,
+      fetchClient,
+      Logger.SILENT
+    )
 
     it('should fetch transaction batch and parse it', async () => {
       const response = await feederGatewayClient.getPerpetualBatchInfo(0)
