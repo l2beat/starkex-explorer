@@ -19,6 +19,7 @@ import { Config } from './config'
 import { AssetDetailsService } from './core/AssetDetailsService'
 import { AssetRegistrationCollector } from './core/collectors/AssetRegistrationCollector'
 import { DepositWithTokenIdCollector } from './core/collectors/DepositWithTokenIdCollector'
+import { FeederGatewayCollector } from './core/collectors/FeederGatewayCollector'
 import { PageCollector } from './core/collectors/PageCollector'
 import { PageMappingCollector } from './core/collectors/PageMappingCollector'
 import { PerpetualCairoOutputCollector } from './core/collectors/PerpetualCairoOutputCollector'
@@ -33,6 +34,9 @@ import {
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
+import { IDataSyncService } from './core/IDataSyncService'
+import { IStateTransitionCollector } from './core/IStateTransitionCollector'
+import { StateUpdateWithBatchIdMigrator } from './core/migrations/StateUpdateWithBatchIdMigrator'
 import { UserTransactionMigrator } from './core/migrations/UserTransactionMigrator'
 import { WithdrawableAssetMigrator } from './core/migrations/WithdrawableAssetMigrator'
 import { PageContextService } from './core/PageContextService'
@@ -56,6 +60,7 @@ import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
 import { ForcedTradeOfferRepository } from './peripherals/database/ForcedTradeOfferRepository'
 import { KeyValueStore } from './peripherals/database/KeyValueStore'
+import { L2TransactionRepository } from './peripherals/database/L2TransactionRepository'
 import { MerkleTreeRepository } from './peripherals/database/MerkleTreeRepository'
 import { PageMappingRepository } from './peripherals/database/PageMappingRepository'
 import { PageRepository } from './peripherals/database/PageRepository'
@@ -78,6 +83,7 @@ import { WithdrawableAssetRepository } from './peripherals/database/Withdrawable
 import { EthereumClient } from './peripherals/ethereum/EthereumClient'
 import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
+import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
@@ -204,11 +210,14 @@ export class Application {
       config.starkex.contracts.perpetual
     )
 
-    let syncService
+    let syncService: IDataSyncService
     let stateUpdater:
       | SpotValidiumUpdater
       | PerpetualValidiumUpdater
       | PerpetualRollupUpdater
+    let stateTransitionCollector: IStateTransitionCollector
+
+    let feederGatewayCollector: FeederGatewayCollector | undefined
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -223,6 +232,27 @@ export class Application {
             stateTransitionRepository,
             config.starkex.contracts.perpetual
           )
+        stateTransitionCollector = perpetualValidiumStateTransitionCollector
+        const transactionRepository = new L2TransactionRepository(
+          database,
+          logger
+        )
+        const feederGatewayClient = config.starkex.feederGateway
+          ? new FeederGatewayClient(
+              config.starkex.feederGateway,
+              fetchClient,
+              logger
+            )
+          : undefined
+        feederGatewayCollector = feederGatewayClient
+          ? new FeederGatewayCollector(
+              feederGatewayClient,
+              transactionRepository,
+              stateUpdateRepository,
+              logger
+            )
+          : undefined
+
         const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
           ethereumClient
         )
@@ -248,6 +278,7 @@ export class Application {
           perpetualCairoOutputCollector,
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
+          feederGatewayCollector,
           logger
         )
       } else {
@@ -257,6 +288,7 @@ export class Application {
             stateTransitionRepository,
             config.starkex.contracts.perpetual
           )
+        stateTransitionCollector = spotValidiumStateTransitionCollector
         const spotCairoOutputCollector = new SpotCairoOutputCollector(
           ethereumClient
         )
@@ -303,12 +335,13 @@ export class Application {
         pageRepository,
         config.starkex.contracts.registry
       )
-      const stateTransitionCollector =
+      const perpetualRollupStateTransitionCollector =
         new PerpetualRollupStateTransitionCollector(
           ethereumClient,
           stateTransitionRepository,
           config.starkex.contracts.perpetual
         )
+      stateTransitionCollector = perpetualRollupStateTransitionCollector
       const rollupStateRepository = new MerkleTreeRepository(
         database,
         logger,
@@ -327,7 +360,7 @@ export class Application {
         verifierCollector,
         pageMappingCollector,
         pageCollector,
-        stateTransitionCollector,
+        perpetualRollupStateTransitionCollector,
         perpetualRollupUpdater,
         userRegistrationCollector,
         userTransactionCollector,
@@ -365,6 +398,14 @@ export class Application {
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
       userTransactionCollector,
+      logger
+    )
+
+    const stateUpdateWithBatchIdMigrator = new StateUpdateWithBatchIdMigrator(
+      softwareMigrationRepository,
+      stateUpdateRepository,
+      syncStatusRepository,
+      stateTransitionCollector,
       logger
     )
 
@@ -586,6 +627,7 @@ export class Application {
 
       await userTransactionMigrator.migrate()
       await withdrawableAssetMigrator.migrate()
+      await stateUpdateWithBatchIdMigrator.migrate()
       await stateUpdater.initTree()
 
       if (config.enableSync) {

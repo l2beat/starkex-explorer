@@ -2,9 +2,11 @@ import { expect, mockFn, mockObject } from 'earl'
 
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { EXAMPLE_PERPETUAL_BATCH_INFO } from '../../test/starkwareData'
+import { Logger } from '../../tools/Logger'
 import { FeederGatewayClient } from './FeederGatewayClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualBatchInfoResponse } from './schema'
+import { toPerpetualBatchInfo } from './toPerpetualBatchInfo'
 
 describe(FeederGatewayClient.name, () => {
   const getUrl = mockFn().returns('gateway-url')
@@ -22,7 +24,11 @@ describe(FeederGatewayClient.name, () => {
         json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_BATCH_INFO),
       }),
     })
-    const feederGatewayClient = new FeederGatewayClient(options, fetchClient)
+    const feederGatewayClient = new FeederGatewayClient(
+      options,
+      fetchClient,
+      Logger.SILENT
+    )
 
     it('should fetch transaction batch and parse it', async () => {
       const response = await feederGatewayClient.getPerpetualBatchInfo(0)
@@ -34,8 +40,46 @@ describe(FeederGatewayClient.name, () => {
       expect(fetchClient.fetchRetry).toHaveBeenExhausted()
       expect(getUrl).toHaveBeenExhausted()
       expect(response).toEqual(
-        PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_BATCH_INFO)
+        toPerpetualBatchInfo(
+          PerpetualBatchInfoResponse.parse(EXAMPLE_PERPETUAL_BATCH_INFO)
+        )
       )
+    })
+
+    it('should return undefined if fetch fails', async () => {
+      const fetchClient = mockObject<FetchClient>({
+        fetchRetry: mockFn().resolvesTo({
+          json: mockFn().throws(new Error('fetch error')),
+        }),
+      })
+
+      const feederGatewayClient = new FeederGatewayClient(
+        options,
+        fetchClient,
+        Logger.SILENT
+      )
+
+      const response = await feederGatewayClient.getPerpetualBatchInfo(0)
+
+      expect(response).toBeNullish()
+    })
+
+    it('should return undefined if response is custom starkex error response (contains code field)', async () => {
+      const fetchClient = mockObject<FetchClient>({
+        fetchRetry: mockFn().resolvesTo({
+          json: mockFn().resolvesTo({ code: 'any code' }),
+        }),
+      })
+
+      const feederGatewayClient = new FeederGatewayClient(
+        options,
+        fetchClient,
+        Logger.SILENT
+      )
+
+      const response = await feederGatewayClient.getPerpetualBatchInfo(0)
+
+      expect(response).toBeNullish()
     })
   })
 })

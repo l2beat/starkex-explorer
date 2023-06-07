@@ -10,19 +10,19 @@ import { expect } from 'earl'
 
 import {
   decodeTransactionData,
-  encodeTransactionData,
-  TransactionData,
-} from './Transaction'
+  encodeL2TransactionData,
+  L2TransactionData,
+} from './L2Transaction'
 
-describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () => {
+describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, () => {
   it('can handle a Deposit transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'Deposit',
       starkKey: StarkKey.fake(),
       positionId: 1234n,
       amount: 5000n,
     }
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: data.starkKey,
@@ -40,7 +40,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a WithdrawToAddress transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'WithdrawToAddress',
       positionId: 1234n,
       starkKey: StarkKey.fake(),
@@ -61,7 +61,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
         ),
       },
     }
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: data.starkKey,
@@ -86,14 +86,14 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a ForcedWithdrawal transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'ForcedWithdrawal',
       positionId: 1234n,
       starkKey: StarkKey.fake(),
       amount: 1234n,
       isValid: true,
     }
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: data.starkKey,
@@ -112,7 +112,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a Trade transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'Trade',
       actualAFee: 1234n,
       actualBFee: 1235n,
@@ -157,7 +157,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
         feeAmount: 1234n,
       },
     }
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: data.partyAOrder.starkKey,
@@ -210,7 +210,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a ForcedTrade transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'ForcedTrade',
       starkKeyA: StarkKey.fake(),
       starkKeyB: StarkKey.fake(),
@@ -225,7 +225,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       isValid: true,
     }
 
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: data.starkKeyA,
@@ -252,7 +252,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
   })
 
   it('can handle a Transfer transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'Transfer',
       amount: 1234n,
       nonce: 1234n,
@@ -272,7 +272,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       },
     }
 
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: data.senderStarkKey,
@@ -299,7 +299,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a ConditionalTransfer transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'ConditionalTransfer',
       amount: 1234n,
       nonce: 1234n,
@@ -321,7 +321,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       fact: Hash256.fake(),
     }
 
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: data.senderStarkKey,
@@ -350,7 +350,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a Liquidate transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'Liquidate',
       liquidatorOrder: {
         orderType: 'LimitOrderWithFees',
@@ -379,7 +379,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       actualLiquidatorFee: 1234n,
     }
 
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: data.liquidatorOrder.starkKey,
@@ -416,7 +416,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a Deleverage transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'Deleverage',
       syntheticAssetId: AssetId('ETH-9'),
       collateralAmount: 1234n,
@@ -426,7 +426,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       deleveragerPositionId: 1234n,
     }
 
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: null,
@@ -447,7 +447,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a FundingTick transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'FundingTick',
       globalFundingIndices: {
         indices: [
@@ -460,7 +460,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       },
     }
 
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: null,
@@ -487,7 +487,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
     expect(decoded).toEqual(data)
   })
   it('can handle a OraclePricesTick transaction', () => {
-    const data: TransactionData = {
+    const data: L2TransactionData = {
       type: 'OraclePricesTick',
       oraclePrices: [
         {
@@ -516,7 +516,7 @@ describe(`${encodeTransactionData.name} and ${decodeTransactionData.name}`, () =
       timestamp: Timestamp(1234),
     }
 
-    const encoded = encodeTransactionData(data)
+    const encoded = encodeL2TransactionData(data)
 
     expect(encoded).toEqual({
       starkKeyA: null,

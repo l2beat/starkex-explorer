@@ -11,7 +11,10 @@ import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { VerifierCollector } from './collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { IDataSyncService } from './IDataSyncService'
-import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
+import {
+  PerpetualRollupStateTransition,
+  PerpetualRollupUpdater,
+} from './PerpetualRollupUpdater'
 
 export class PerpetualRollupSyncService implements IDataSyncService {
   constructor(
@@ -56,10 +59,14 @@ export class PerpetualRollupSyncService implements IDataSyncService {
       userRegistrations: userRegistrations.length,
     })
 
+    await this.processStateTransitions(stateTransitionRecords)
+  }
+
+  async processStateTransitions(
+    stateTransitions: PerpetualRollupStateTransition[]
+  ) {
     const recordsWithPages =
-      await this.perpetualRollupUpdater.loadRequiredPages(
-        stateTransitionRecords
-      )
+      await this.perpetualRollupUpdater.loadRequiredPages(stateTransitions)
 
     for (const record of recordsWithPages) {
       const onChainData = decodeOnChainData(record.pages)
@@ -69,11 +76,11 @@ export class PerpetualRollupSyncService implements IDataSyncService {
           blockNumber: record.blockNumber,
           stateTransitionHash: record.stateTransitionHash,
         },
+        record.batchId,
         onChainData
       )
     }
   }
-
   async discardAfter(blockNumber: BlockNumber) {
     await this.verifierCollector.discardAfter(blockNumber)
     await this.pageMappingCollector.discardAfter(blockNumber)

@@ -15,6 +15,7 @@ import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {
   id: 200,
+  batchId: 199,
   blockNumber: 1_000,
   stateTransitionHash: Hash256.fake(),
   rootHash: PedersenHash.fake(),

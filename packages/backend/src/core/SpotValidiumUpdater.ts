@@ -64,12 +64,13 @@ export class SpotValidiumUpdater extends StateUpdater<VaultLeaf> {
         (modification) => modification.type === 'fullWithdrawal'
       ) as FullWithdrawal[]
 
-    await this.processStateTransition(
+    return await this.processStateTransition(
       {
         id: id + 1,
         blockNumber: transition.blockNumber,
         stateTransitionHash: transition.stateTransitionHash,
       },
+      transition.batchId,
       spotCairoOutput.finalValidiumVaultRoot,
       forcedActions,
       [], // There are no oracle prices for Spot

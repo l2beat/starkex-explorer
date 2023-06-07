@@ -26,6 +26,7 @@ describe(PositionRepository.name, () => {
 
   const mockStateUpdate = (id: number) => ({
     id,
+    batchId: id - 1,
     blockNumber: id * 1000,
     rootHash: PedersenHash.fake(),
     stateTransitionHash: Hash256.fake(),
@@ -61,6 +62,7 @@ describe(PositionRepository.name, () => {
     await stateUpdateRepository.add({
       stateUpdate: {
         id: 1,
+        batchId: 0,
         blockNumber: 1,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -80,6 +82,7 @@ describe(PositionRepository.name, () => {
     await stateUpdateRepository.add({
       stateUpdate: {
         id: 2,
+        batchId: 1,
         blockNumber: 2,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -111,6 +114,7 @@ describe(PositionRepository.name, () => {
     await stateUpdateRepository.add({
       stateUpdate: {
         id: 1,
+        batchId: 0,
         blockNumber: 1,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -130,6 +134,7 @@ describe(PositionRepository.name, () => {
     await stateUpdateRepository.add({
       stateUpdate: {
         id: 2,
+        batchId: 1,
         blockNumber: 2,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -181,6 +186,7 @@ describe(PositionRepository.name, () => {
     await stateUpdateRepository.add({
       stateUpdate: {
         id: 1,
+        batchId: 0,
         blockNumber: 1,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -200,6 +206,7 @@ describe(PositionRepository.name, () => {
     await stateUpdateRepository.add({
       stateUpdate: {
         id: 2,
+        batchId: 1,
         blockNumber: 2,
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
@@ -318,6 +325,7 @@ describe(PositionRepository.name, () => {
       await stateUpdateRepository.add({
         stateUpdate: {
           id: 1,
+          batchId: 0,
           blockNumber: 1,
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
@@ -337,6 +345,7 @@ describe(PositionRepository.name, () => {
       await stateUpdateRepository.add({
         stateUpdate: {
           id: 2,
+          batchId: 1,
           blockNumber: 2,
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),

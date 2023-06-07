@@ -10,7 +10,7 @@ import {
 import {
   PerpetualBatchDataResponse,
   PerpetualBatchInfoResponse,
-  PerpetualTransactionResponse,
+  PerpetualL2TransactionResponse,
   SpotBatchDataResponse,
 } from './schema'
 
@@ -50,7 +50,7 @@ describe('PerpetualTransactionBatchResponse', () => {
 describe('PerpetualTransactionResponse', () => {
   it('can parse real data', () => {
     const fn = () =>
-      PerpetualTransactionResponse.parse(EXAMPLE_PERPETUAL_TRANSACTIONS)
+      PerpetualL2TransactionResponse.parse(EXAMPLE_PERPETUAL_TRANSACTIONS)
     expect(fn).not.toThrow()
   })
 })

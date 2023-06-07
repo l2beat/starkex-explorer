@@ -36,7 +36,7 @@ export function getApexGoerliConfig(): StarkexConfig {
       },
       auth: clientAuth,
     },
-    transactionApi: {
+    l2TransactionApi: {
       getUrl: (startId, expectCount) => {
         return `${getEnv(
           'APEX_TRANSACTION_API_URL'
