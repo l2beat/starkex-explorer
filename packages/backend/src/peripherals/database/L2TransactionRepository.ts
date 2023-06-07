@@ -111,8 +111,6 @@ export class L2TransactionRepository extends BaseRepository {
     },
     knex: Knex
   ) {
-    console.log('addMultiTransaction', record)
-
     const { data } = encodeL2TransactionData(record.data)
 
     const results = await knex('l2_transactions')

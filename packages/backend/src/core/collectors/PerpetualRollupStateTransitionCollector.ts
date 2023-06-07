@@ -27,7 +27,7 @@ export class PerpetualRollupStateTransitionCollector
   ): Promise<PerpetualRollupStateTransition[]> {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
       address: this.perpetualAddress.toString(),
-      topics: [LogStateTransitionFact.topic, LogUpdateState.topic],
+      topics: [[LogStateTransitionFact.topic, LogUpdateState.topic]],
     })
 
     const parsed = logs.map((log) => ({

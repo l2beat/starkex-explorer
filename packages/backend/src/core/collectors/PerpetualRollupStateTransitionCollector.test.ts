@@ -110,7 +110,7 @@ describe(PerpetualRollupStateTransitionCollector.name, () => {
     expect(transitions).toEqual(expectedTransitions)
     expect(ethereumClient.getLogsInRange).toHaveBeenOnlyCalledWith(blockRange, {
       address: PERPETUAL_ADDRESS.toString(),
-      topics: [LogStateTransitionFact.topic, LogUpdateState.topic],
+      topics: [[LogStateTransitionFact.topic, LogUpdateState.topic]],
     })
     expect(stateTransitionRepository.addMany).toHaveBeenOnlyCalledWith(
       expectedStateTransitionRecords
