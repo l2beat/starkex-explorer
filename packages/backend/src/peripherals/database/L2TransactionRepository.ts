@@ -19,7 +19,7 @@ interface Record<
   stateUpdateId: number
   blockNumber: number
   parentId: number | undefined
-  status: 'alternative' | 'replaced' | undefined
+  state: 'alternative' | 'replaced' | undefined
   starkKeyA: StarkKey | undefined
   starkKeyB: StarkKey | undefined
   type: T
@@ -54,7 +54,7 @@ export class L2TransactionRepository extends BaseRepository {
 
     if (count === 1) {
       await knex('l2_transactions')
-        .update({ status: 'replaced' })
+        .update({ state: 'replaced' })
         .where({ transaction_id: record.transactionId })
     }
 
@@ -90,7 +90,7 @@ export class L2TransactionRepository extends BaseRepository {
         state_update_id: record.stateUpdateId,
         block_number: record.blockNumber,
         parent_id: record.parentId,
-        status: record.isAlternative ? 'alternative' : null,
+        state: record.isAlternative ? 'alternative' : null,
         stark_key_a: starkKeyA?.toString(),
         stark_key_b: starkKeyB?.toString(),
         type: record.data.type,
@@ -119,7 +119,7 @@ export class L2TransactionRepository extends BaseRepository {
         state_update_id: record.stateUpdateId,
         block_number: record.blockNumber,
         type: record.data.type,
-        status: record.isAlternative ? 'alternative' : null,
+        state: record.isAlternative ? 'alternative' : null,
         data,
       })
       .returning('id')
@@ -189,7 +189,7 @@ function toRecord(row: L2TransactionRow): Record {
     stateUpdateId: row.state_update_id,
     blockNumber: row.block_number,
     parentId: row.parent_id ? row.parent_id : undefined,
-    status: row.status ? row.status : undefined,
+    state: row.state ? row.state : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
     type: row.type as L2TransactionData['type'],

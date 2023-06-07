@@ -278,7 +278,7 @@ declare module 'knex/types/tables' {
     state_update_id: number
     block_number: number
     parent_id: number | null
-    status: 'alternative' | 'replaced' | null
+    state: 'alternative' | 'replaced' | null
     stark_key_a: string | null
     stark_key_b: string | null
     data: L2TransactionDataJson

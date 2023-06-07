@@ -22,7 +22,7 @@ export async function up(knex: Knex) {
     table.integer('state_update_id').index()
     table.integer('block_number').index()
     table.integer('parent_id').nullable().defaultTo(null)
-    table.string('status').nullable().defaultTo(null)
+    table.string('state').nullable().defaultTo(null)
     table.string('stark_key_a').nullable().index()
     table.string('stark_key_b').nullable().index()
     table.jsonb('data').notNullable()

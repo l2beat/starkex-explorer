@@ -39,7 +39,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: record.data.type,
         data: record.data,
-        status: undefined,
+        state: undefined,
         parentId: undefined,
       })
     })
@@ -79,7 +79,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: record.data.type,
         data: record.data,
-        status: undefined,
+        state: undefined,
         parentId: undefined,
       })
 
@@ -96,7 +96,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: record.data.type,
         data: record.data,
-        status: 'replaced',
+        state: 'replaced',
         parentId: undefined,
       })
 
@@ -108,7 +108,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: alternativeRecord.data.type,
         data: alternativeRecord.data,
-        status: 'alternative',
+        state: 'alternative',
         parentId: undefined,
       })
     })
@@ -153,7 +153,7 @@ describe(L2TransactionRepository.name, () => {
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
-        status: undefined,
+        state: undefined,
         parentId: undefined,
         starkKeyA: undefined,
         starkKeyB: undefined,
@@ -164,7 +164,7 @@ describe(L2TransactionRepository.name, () => {
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
-        status: undefined,
+        state: undefined,
         parentId: id,
         starkKeyA: StarkKey.fake('1'),
         starkKeyB: undefined,
@@ -175,7 +175,7 @@ describe(L2TransactionRepository.name, () => {
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
-        status: undefined,
+        state: undefined,
         parentId: id,
         starkKeyA: StarkKey.fake('2'),
         starkKeyB: undefined,
@@ -263,7 +263,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: record.data.type,
         data: record.data,
-        status: 'replaced',
+        state: 'replaced',
         parentId: undefined,
       })
       expect(firstTransactionOfMultiAfterAlternative).toEqual({
@@ -274,7 +274,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: record.data.transactions[0]!.type,
         data: record.data.transactions[0]!,
-        status: 'replaced',
+        state: 'replaced',
         parentId: id,
       })
       expect(secondTransactionOfMultiAfterAlternative).toEqual({
@@ -285,7 +285,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: record.data.transactions[1]!.type,
         data: record.data.transactions[1]!,
-        status: 'replaced',
+        state: 'replaced',
         parentId: id,
       })
 
@@ -301,7 +301,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: alternativeRecord.data.type,
         data: alternativeRecord.data,
-        status: 'alternative',
+        state: 'alternative',
         parentId: undefined,
       })
 
@@ -313,7 +313,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: alternativeRecord.data.transactions[0]!.type,
         data: alternativeRecord.data.transactions[0]!,
-        status: 'alternative',
+        state: 'alternative',
         parentId: altId,
       })
       expect(secondTransactionOfMultiAlt).toEqual({
@@ -324,7 +324,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyB: undefined,
         type: alternativeRecord.data.transactions[1]!.type,
         data: alternativeRecord.data.transactions[1]!,
-        status: 'alternative',
+        state: 'alternative',
         parentId: altId,
       })
     })
