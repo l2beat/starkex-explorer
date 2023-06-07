@@ -12,7 +12,7 @@ import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRep
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { SpotBatch } from '../peripherals/starkware/toSpotBatch'
+import { SpotBatch } from '../peripherals/starkware/toSpotBatchData'
 import { Logger } from '../tools/Logger'
 import { EMPTY_STATE_HASH, SpotValidiumUpdater } from './SpotValidiumUpdater'
 
@@ -154,6 +154,7 @@ describe(SpotValidiumUpdater.name, () => {
             blockNumber: validiumStateTransition.blockNumber,
             stateTransitionHash: validiumStateTransition.stateTransitionHash,
           },
+          validiumStateTransition.batchId,
           mockSpotCairoOutput.finalValidiumVaultRoot,
           [fullWithdrawalModification],
           [],

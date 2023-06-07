@@ -1,8 +1,9 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { expect, mockObject } from 'earl'
+import { expect, mockFn, mockObject } from 'earl'
 
 import { BlockRange } from '../model'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
+import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { decodedFakePages, fakePages } from '../test/fakes'
 import { Logger } from '../tools/Logger'
 import type { PageCollector } from './collectors/PageCollector'
@@ -13,7 +14,10 @@ import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import type { VerifierCollector } from './collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { PerpetualRollupSyncService } from './PerpetualRollupSyncService'
-import { PerpetualRollupUpdater } from './PerpetualRollupUpdater'
+import {
+  PerpetualRollupStateTransition,
+  PerpetualRollupUpdater,
+} from './PerpetualRollupUpdater'
 const noop = async () => {}
 
 describe(PerpetualRollupSyncService.name, () => {
@@ -29,8 +33,14 @@ describe(PerpetualRollupSyncService.name, () => {
       collect: async (_blockRange) => [],
     })
 
-    const stateTransitionsRecords: Omit<StateTransitionRecord, 'id'>[] = [
-      { stateTransitionHash: Hash256.fake('abcd'), blockNumber: 1 },
+    const stateTransitionsRecords: PerpetualRollupStateTransition[] = [
+      {
+        stateTransitionHash: Hash256.fake('abcd'),
+        blockNumber: 1,
+        transactionHash: Hash256.fake(),
+        sequenceNumber: 10,
+        batchId: 9,
+      },
     ]
 
     const stateTransitionCollector =
@@ -48,23 +58,29 @@ describe(PerpetualRollupSyncService.name, () => {
       collect: async () => {},
     })
 
-    const stateTransitionRecordWithPages: StateTransitionRecord & {
+    const stateTransitionRecordWithPages: PerpetualRollupStateTransition & {
       pages: string[]
+      id: number
     } = {
-      id: 23,
-      stateTransitionHash: Hash256.fake('abcd'),
-      blockNumber: 1,
+      id: stateTransitionsRecords[0]!.batchId + 1,
+      batchId: stateTransitionsRecords[0]!.batchId,
+      stateTransitionHash: stateTransitionsRecords[0]!.stateTransitionHash,
+      blockNumber: stateTransitionsRecords[0]!.blockNumber,
+      sequenceNumber: stateTransitionsRecords[0]!.sequenceNumber,
+      transactionHash: stateTransitionsRecords[0]!.transactionHash,
       pages: fakePages,
     }
     const perpetualRollupUpdater = mockObject<PerpetualRollupUpdater>({
       loadRequiredPages: async () => [stateTransitionRecordWithPages],
-      processOnChainStateTransition: noop,
+      processOnChainStateTransition: mockFn(
+        async () => ({} as StateUpdateRecord)
+      ),
     })
 
     const stateTransitionRecord: StateTransitionRecord = {
-      id: 23,
-      stateTransitionHash: Hash256.fake('abcd'),
-      blockNumber: 1,
+      id: stateTransitionRecordWithPages.id,
+      stateTransitionHash: stateTransitionRecordWithPages.stateTransitionHash,
+      blockNumber: stateTransitionRecordWithPages.blockNumber,
     }
 
     const service = new PerpetualRollupSyncService(
@@ -103,7 +119,11 @@ describe(PerpetualRollupSyncService.name, () => {
       )
       expect(
         perpetualRollupUpdater.processOnChainStateTransition
-      ).toHaveBeenOnlyCalledWith(stateTransitionRecord, decodedFakePages)
+      ).toHaveBeenOnlyCalledWith(
+        stateTransitionRecord,
+        stateTransitionsRecords[0]!.batchId,
+        decodedFakePages
+      )
     })
   })
 

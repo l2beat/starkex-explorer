@@ -1,5 +1,6 @@
 import { json } from '@explorer/types'
 
+import { L2TransactionDataJson } from '../L2Transaction'
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import {
   UserTransactionJSON,
@@ -70,6 +71,7 @@ declare module 'knex/types/tables' {
 
   interface StateUpdateRow {
     id: number
+    batch_id: number
     block_number: number
     state_transition_hash: string
     root_hash: string
@@ -270,6 +272,19 @@ declare module 'knex/types/tables' {
     prev_history_id: number | null
   }
 
+  interface L2TransactionRow {
+    id: number
+    transaction_id: number
+    state_update_id: number
+    block_number: number
+    parent_id: number | null
+    state: 'alternative' | 'replaced' | null
+    stark_key_a: string | null
+    stark_key_b: string | null
+    data: L2TransactionDataJson
+    type: string
+  }
+
   interface Tables {
     key_values: KeyValueRow
     verifier_events: VerifierEventRow
@@ -299,6 +314,7 @@ declare module 'knex/types/tables' {
     preprocessed_state_details: PreprocessedStateDetailsRow
     withdrawable_assets: WithdrawableAssetRow
     preprocessed_user_statistics: PreprocessedUserStatisticsRow
+    l2_transactions: L2TransactionRow
   }
 }
 

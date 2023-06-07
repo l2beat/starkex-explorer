@@ -31,7 +31,9 @@ export interface PerpetualValidiumConfig {
   dataAvailabilityMode: 'validium'
   tradingMode: 'perpetual'
   blockchain: BlockchainConfig
-  availabilityGateway: AvailiabilityGatewayConfig
+  availabilityGateway: GatewayConfig
+  feederGateway: GatewayConfig | undefined
+  l2TransactionApi: L2TransactionApiConfig | undefined
   contracts: {
     perpetual: EthereumAddress
   }
@@ -43,7 +45,7 @@ export interface SpotValidiumConfig {
   dataAvailabilityMode: 'validium'
   tradingMode: 'spot'
   blockchain: BlockchainConfig
-  availabilityGateway: AvailiabilityGatewayConfig
+  availabilityGateway: GatewayConfig
   contracts: {
     perpetual: EthereumAddress
   }
@@ -58,18 +60,24 @@ export interface BlockchainConfig {
   maxBlockNumber: number
 }
 
-export interface AvailiabilityGatewayConfig {
-  url: string
-  queryParam: string
-  auth:
-    | {
-        type: 'certificates'
-        serverCertificate: string
-        userCertificate: string
-        userKey: string
-      }
-    | {
-        type: 'bearerToken'
-        bearerToken: string
-      }
+export type ClientAuth =
+  | {
+      type: 'bearerToken'
+      bearerToken: string
+    }
+  | {
+      type: 'certificates'
+      serverCertificate: string
+      userCertificate: string
+      userKey: string
+    }
+
+export interface GatewayConfig {
+  getUrl: (batchId: number) => string
+  auth: ClientAuth
+}
+
+export interface L2TransactionApiConfig {
+  getUrl: (startApexId: number, expectCount: number) => string
+  auth: ClientAuth
 }

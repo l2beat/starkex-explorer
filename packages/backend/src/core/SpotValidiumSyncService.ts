@@ -10,7 +10,10 @@ import { UserTransactionCollector } from './collectors/UserTransactionCollector'
 import { SpotValidiumStateTransitionCollector } from './collectors/ValidiumStateTransitionCollector'
 import { WithdrawalAllowedCollector } from './collectors/WithdrawalAllowedCollector'
 import { IDataSyncService } from './IDataSyncService'
-import { SpotValidiumUpdater } from './SpotValidiumUpdater'
+import {
+  SpotValidiumUpdater,
+  ValidiumStateTransition,
+} from './SpotValidiumUpdater'
 
 export class SpotValidiumSyncService implements IDataSyncService {
   constructor(
@@ -55,16 +58,22 @@ export class SpotValidiumSyncService implements IDataSyncService {
       depositsWithTokenId: depositsWithTokenId.length,
     })
 
-    for (const transition of stateTransitions) {
+    await this.processStateTransitions(stateTransitions)
+  }
+
+  async processStateTransitions(stateTransitions: ValidiumStateTransition[]) {
+    for (const stateTransition of stateTransitions) {
       const [spotCairoOutput, batch] = await Promise.all([
-        this.spotCairoOutputCollector.collect(transition.transactionHash),
-        this.availabilityGatewayClient.getSpotBatch(transition.batchId),
+        this.spotCairoOutputCollector.collect(stateTransition.transactionHash),
+        this.availabilityGatewayClient.getSpotBatchData(
+          stateTransition.batchId
+        ),
       ])
       if (!batch) {
-        throw new Error(`Unable to download batch ${transition.batchId}`)
+        throw new Error(`Unable to download batch ${stateTransition.batchId}`)
       }
       await this.spotValidiumUpdater.processSpotValidiumStateTransition(
-        transition,
+        stateTransition,
         spotCairoOutput,
         batch
       )

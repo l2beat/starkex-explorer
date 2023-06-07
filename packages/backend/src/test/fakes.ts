@@ -222,8 +222,10 @@ export function fakeIncluded(
 export function fakeStateUpdate(
   stateUpdate?: Partial<StateUpdateRecord>
 ): StateUpdateRecord {
+  const batchId = fakeInt()
   return {
-    id: fakeInt(),
+    id: batchId + 1,
+    batchId,
     blockNumber: fakeInt(),
     stateTransitionHash: Hash256.fake(),
     rootHash: PedersenHash.fake(),

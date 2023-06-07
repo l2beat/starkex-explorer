@@ -9,7 +9,10 @@ import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 
 import { PositionRecord } from '../peripherals/database/PositionRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
-import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
+import {
+  StateUpdateRecord,
+  StateUpdateRepository,
+} from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
@@ -25,10 +28,13 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     protected readonly emptyStateHash: PedersenHash,
     protected readonly emptyLeaf: T,
     public stateTree?: MerkleTree<T>
-  ) {}
+  ) {
+    this.logger = logger.for(this)
+  }
 
   async processStateTransition(
     stateTransitionRecord: StateTransitionRecord,
+    batchId: number,
     expectedPositionRoot: PedersenHash,
     forcedActions: ForcedAction[],
     oraclePrices: OraclePrice[],
@@ -48,16 +54,17 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     const { id, blockNumber, stateTransitionHash } = stateTransitionRecord
     const block = await this.ethereumClient.getBlock(blockNumber)
     const timestamp = Timestamp.fromSeconds(block.timestamp)
-
+    const stateUpdate: StateUpdateRecord = {
+      id,
+      batchId,
+      blockNumber,
+      stateTransitionHash,
+      rootHash,
+      timestamp,
+    }
     await Promise.all([
       this.stateUpdateRepository.add({
-        stateUpdate: {
-          id,
-          blockNumber,
-          stateTransitionHash,
-          rootHash,
-          timestamp,
-        },
+        stateUpdate,
         positions: this.getPositionUpdates(newLeaves),
         vaults: this.getVaultUpdates(newLeaves),
         prices: oraclePrices,
@@ -73,6 +80,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
       ),
     ])
     this.logger.info('State updated', { id, blockNumber })
+    return stateUpdate
   }
 
   getPositionUpdates(newLeaves: { index: bigint; value: T }[]) {

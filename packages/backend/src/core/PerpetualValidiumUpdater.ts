@@ -5,7 +5,7 @@ import { Hash256, PedersenHash } from '@explorer/types'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatch'
+import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatchData'
 import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
 
@@ -58,13 +58,13 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
     await this.ensureStateTree(oldHash, positionTreeHeight)
 
     const newPositions = buildNewPositionLeaves(batch)
-
-    await this.processStateTransition(
+    return await this.processStateTransition(
       {
         id: id + 1,
         blockNumber: transition.blockNumber,
         stateTransitionHash: transition.stateTransitionHash,
       },
+      transition.batchId,
       perpetualCairoOutput.newState.positionRoot,
       perpetualCairoOutput.forcedActions,
       perpetualCairoOutput.newState.oraclePrices,

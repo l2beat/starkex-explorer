@@ -1,6 +1,6 @@
 import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
 
-import { SpotBatchResponse } from './schema'
+import { SpotBatchDataResponse } from './schema'
 
 export interface SpotBatch {
   previousBatchId: number
@@ -22,8 +22,8 @@ interface SpotBatchOrder {
   amount: bigint
 }
 
-export function toSpotBatch(
-  response: SpotBatchResponse
+export function toSpotBatchData(
+  response: SpotBatchDataResponse
 ): SpotBatch | undefined {
   if (!response.update) {
     return

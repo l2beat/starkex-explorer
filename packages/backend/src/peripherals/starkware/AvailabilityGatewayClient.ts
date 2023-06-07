@@ -1,56 +1,34 @@
-import { assertUnreachable } from '@explorer/shared'
-import { Agent } from 'https'
-import fetch, { RequestInit } from 'node-fetch'
+import { GatewayConfig } from '../../config/starkex/StarkexConfig'
+import { BaseClient } from './BaseClient'
+import { FetchClient } from './FetchClient'
+import { PerpetualBatchDataResponse, SpotBatchDataResponse } from './schema'
+import { toPerpetualBatchData } from './toPerpetualBatchData'
+import { toSpotBatchData } from './toSpotBatchData'
 
-import { AvailiabilityGatewayConfig } from '../../config/starkex/StarkexConfig'
-import { PerpetualBatchResponse, SpotBatchResponse } from './schema'
-import { toPerpetualBatch } from './toPerpetualBatch'
-import { toSpotBatch } from './toSpotBatch'
-
-export class AvailabilityGatewayClient {
-  private requestInit: RequestInit
-
-  constructor(private options: AvailiabilityGatewayConfig) {
-    this.requestInit = this.getRequestInit(options)
+export class AvailabilityGatewayClient extends BaseClient {
+  constructor(
+    private readonly options: GatewayConfig,
+    private readonly fetchClient: FetchClient
+  ) {
+    super(options.auth)
   }
 
-  async getPerpetualBatch(batchId: number) {
-    const data = await this.getBatch(batchId)
-    const parsed = PerpetualBatchResponse.parse(data)
-    return toPerpetualBatch(parsed)
+  async getPerpetualBatchData(batchId: number) {
+    const data = await this.getBatchData(batchId)
+    const parsed = PerpetualBatchDataResponse.parse(data)
+    return toPerpetualBatchData(parsed)
   }
 
-  async getSpotBatch(batchId: number) {
-    const data = await this.getBatch(batchId)
-    const parsed = SpotBatchResponse.parse(data)
-    return toSpotBatch(parsed)
+  async getSpotBatchData(batchId: number) {
+    const data = await this.getBatchData(batchId)
+    const parsed = SpotBatchDataResponse.parse(data)
+    return toSpotBatchData(parsed)
   }
 
-  private async getBatch(batchId: number): Promise<unknown> {
-    const url = `${this.options.url}?${this.options.queryParam}=${batchId}`
+  private async getBatchData(batchId: number): Promise<unknown> {
+    const url = this.options.getUrl(batchId)
 
-    const res = await fetch(url, { ...this.requestInit, timeout: 5_000 })
+    const res = await this.fetchClient.fetchRetry(url, this.requestInit)
     return res.json()
-  }
-
-  private getRequestInit(options: AvailiabilityGatewayConfig): RequestInit {
-    switch (options.auth.type) {
-      case 'certificates':
-        return {
-          agent: new Agent({
-            ca: options.auth.serverCertificate,
-            cert: options.auth.userCertificate,
-            key: options.auth.userKey,
-          }),
-        }
-      case 'bearerToken':
-        return {
-          headers: {
-            Authorization: `Bearer ${options.auth.bearerToken}`,
-          },
-        }
-      default:
-        assertUnreachable(options.auth)
-    }
   }
 }

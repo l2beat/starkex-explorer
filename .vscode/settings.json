@@ -1,0 +1,24 @@
+{
+  "eslint.workingDirectories": [
+    "./packages/backend",
+    "./packages/frontend",
+    "./packages/types",
+    "./packages/update-monitor",
+    "./packages/config",
+    "./packages/common"
+  ],
+  "eslint.rules.customizations": [
+    { "rule": "*", "severity": "off" },
+    { "rule": "@typescript-eslint/no-floating-promises", "severity": "error" },
+    { "rule": "@typescript-eslint/await-thenable", "severity": "error" }
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/node_modules": true
+  }
+}

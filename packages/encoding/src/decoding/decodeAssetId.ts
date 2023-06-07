@@ -11,6 +11,10 @@ export function decodeAssetId(value: string | BigNumerLike): AssetId {
     return decodeAssetId(value.toHexString().slice(2))
   }
 
+  if (value.startsWith('0x')) {
+    return decodeAssetId(value.slice(2))
+  }
+
   if (value.length !== 30) {
     throw new DecodingError('Invalid AssetId length')
   }

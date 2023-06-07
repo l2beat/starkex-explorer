@@ -5,7 +5,7 @@ import {
   MerkleTree,
   PositionLeaf,
 } from '@explorer/state'
-import { PedersenHash } from '@explorer/types'
+import { Hash256, PedersenHash } from '@explorer/types'
 
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
@@ -20,6 +20,14 @@ export const EMPTY_STATE_HASH = PedersenHash(
 )
 
 const positionTreeHeight = 64n
+
+export interface PerpetualRollupStateTransition {
+  blockNumber: number
+  transactionHash: Hash256
+  stateTransitionHash: Hash256
+  sequenceNumber: number
+  batchId: number
+}
 
 export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
   constructor(
@@ -49,8 +57,10 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
   }
 
   async loadRequiredPages(
-    stateTransitions: Omit<StateTransitionRecord, 'id'>[]
-  ): Promise<(StateTransitionRecord & { pages: string[] })[]> {
+    stateTransitions: PerpetualRollupStateTransition[]
+  ): Promise<
+    (PerpetualRollupStateTransition & { pages: string[]; id: number })[]
+  > {
     if (stateTransitions.length === 0) {
       return []
     }
@@ -80,6 +90,7 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
 
   async processOnChainStateTransition(
     stateTransitionRecord: StateTransitionRecord,
+    batchId: number,
     onChainData: OnChainData
   ) {
     if (!this.stateTree) {
@@ -91,6 +102,7 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
     )
     return this.processStateTransition(
       stateTransitionRecord,
+      batchId,
       onChainData.newState.positionRoot,
       onChainData.forcedActions,
       onChainData.newState.oraclePrices,
