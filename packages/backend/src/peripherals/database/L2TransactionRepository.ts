@@ -2,6 +2,7 @@ import { StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
 
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
 import {
   decodeTransactionData,
@@ -15,6 +16,7 @@ import { Database } from './shared/Database'
 interface Record<
   T extends L2TransactionData['type'] = L2TransactionData['type']
 > {
+  id: number
   transactionId: number
   stateUpdateId: number
   blockNumber: number
@@ -33,6 +35,11 @@ export class L2TransactionRepository extends BaseRepository {
     super(database, logger)
     /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
+    this.countByTransactionId = this.wrapAny(this.countByTransactionId)
+    this.findById = this.wrapFind(this.findById)
+    this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
+    this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
+    this.deleteAll = this.wrapDelete(this.deleteAll)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
     this.findById = this.wrapFind(this.findById)
     this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
@@ -143,6 +150,27 @@ export class L2TransactionRepository extends BaseRepository {
     return parentId
   }
 
+  async countAll() {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions').count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async countAllUserSpecific(starkKey: StarkKey) {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions')
+      .where({
+        stark_key_a: starkKey.toString(),
+      })
+      .orWhere({
+        stark_key_b: starkKey.toString(),
+      })
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
   async countByTransactionId(transactionId: number): Promise<number> {
     const knex = await this.knex()
     const [result] = await knex('l2_transactions')
@@ -150,7 +178,36 @@ export class L2TransactionRepository extends BaseRepository {
       .where({ transaction_id: transactionId, parent_id: null })
       .count()
 
-    return Number(result?.count ?? 0)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async getPaginated({ offset, limit }: PaginationOptions) {
+    const knex = await this.knex()
+    const rows = await knex('l2_transactions')
+      .orderBy('id', 'desc')
+      .offset(offset)
+      .limit(limit)
+
+    return rows.map(toRecord)
+  }
+
+  async getUserSpecificPaginated(
+    starkKey: StarkKey,
+    { offset, limit }: PaginationOptions
+  ) {
+    const knex = await this.knex()
+    const rows = await knex('l2_transactions')
+      .where({
+        stark_key_a: starkKey.toString(),
+      })
+      .orWhere({
+        stark_key_b: starkKey.toString(),
+      })
+      .orderBy('id', 'desc')
+      .limit(limit)
+      .offset(offset)
+    return rows.map(toRecord)
   }
 
   async findById(id: number): Promise<Record | undefined> {
@@ -185,6 +242,7 @@ export class L2TransactionRepository extends BaseRepository {
 
 function toRecord(row: L2TransactionRow): Record {
   return {
+    id: row.id,
     transactionId: row.transaction_id,
     stateUpdateId: row.state_update_id,
     blockNumber: row.block_number,

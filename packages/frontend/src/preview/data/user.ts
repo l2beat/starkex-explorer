@@ -6,10 +6,11 @@ import {
   UserAssetEntry,
   UserBalanceChangeEntry,
 } from '../../view'
+import { L2TransactionEntry } from '../../view/components/tables/L2TransactionsTable'
 import { WithdrawableAssetEntry } from '../../view/pages/user/components/UserQuickActionsTable'
-import { Bucket } from './bucket'
+import { Bucket } from './Bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
-import { randomId, randomTimestamp } from './utils'
+import { randomId, randomInt, randomTimestamp } from './utils'
 
 export function randomUserBalanceChangeEntry(): UserBalanceChangeEntry {
   return {
@@ -33,6 +34,16 @@ const transactionTypeBucket = new Bucket([
   'FORCED_BUY',
   'FORCED_SELL',
   'WITHDRAW',
+] as const)
+
+const userL2TypeBucket = new Bucket([
+  'Deposit',
+  'WithdrawToAddress',
+  'ForcedWithdrawal',
+  'Trade',
+  'ForcedTrade',
+  'Transfer',
+  'ConditionalTransfer',
 ] as const)
 
 function randomTransactionTypeAndStatus(): Pick<
@@ -100,5 +111,15 @@ export function randomWithdrawableAssetEntry(): WithdrawableAssetEntry {
   return {
     asset: assetBucket.pick(),
     amount: amountBucket.pick(),
+  }
+}
+
+export function randomUserL2TransactionEntry(): L2TransactionEntry {
+  const stateUpdateId = randomInt(0, 100) > 80 ? randomInt(0, 10000) : undefined
+  return {
+    transactionId: randomInt(0, 10000),
+    stateUpdateId: stateUpdateId,
+    type: userL2TypeBucket.pick(),
+    status: stateUpdateId ? 'INCLUDED' : 'PENDING',
   }
 }

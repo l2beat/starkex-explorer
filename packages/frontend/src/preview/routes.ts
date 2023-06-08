@@ -19,6 +19,7 @@ import { randomInt } from 'crypto'
 import Koa from 'koa'
 
 import {
+  renderHomeL2TransactionsPage,
   renderHomeOffersPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
@@ -42,9 +43,11 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
   randomHomeForcedTransactionEntry,
+  randomHomeL2TransactionEntry,
   randomHomeOfferEntry,
   randomHomeStateUpdateEntry,
 } from './data/home'
@@ -105,7 +108,29 @@ const routes: Route[] = [
         context,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        transactions: repeat(6, randomHomeForcedTransactionEntry),
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        totalForcedTransactions: 68,
+        offers: repeat(6, randomHomeOfferEntry),
+        totalOffers: 7,
+      })
+    },
+  },
+  {
+    path: '/home/with-l2-transactions',
+    description:
+      'The home page for project that shared feeder gateway with us.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+
+      ctx.body = renderHomePage({
+        context,
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        totalStateUpdates: 5123,
+        l2Transactions: {
+          data: repeat(6, randomHomeL2TransactionEntry),
+          total: 5123,
+        },
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
@@ -122,10 +147,27 @@ const routes: Route[] = [
         tutorials: [],
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        transactions: repeat(6, randomHomeForcedTransactionEntry),
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
+      })
+    },
+  },
+  {
+    path: '/l2-transactions',
+    link: '/l2-transactions',
+    description: 'L2 transaction list. Supports pagination.',
+    render: (ctx) => {
+      const total = 5123
+      const { limit, offset, visible } = getPagination(ctx, total)
+
+      ctx.body = renderHomeL2TransactionsPage({
+        context: getPerpetualPageContext(ctx),
+        l2Transactions: repeat(visible, randomHomeL2TransactionEntry),
+        total: total,
+        limit: limit,
+        offset: offset,
       })
     },
   },
@@ -316,6 +358,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx, true)
       const starkKey = context.user.starkKey ?? StarkKey.fake()
+
       ctx.body = renderUserPage({
         context: {
           ...context,
@@ -391,6 +434,40 @@ const routes: Route[] = [
         totalBalanceChanges: 3367,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
+        l2Transactions: {
+          data: repeat(6, randomHomeL2TransactionEntry),
+          total: 5123,
+        },
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+      })
+    },
+  },
+  {
+    path: '/users/:starkKey/with-l2-transactions',
+    link: '/users/someone/with-l2-transactions',
+    description:
+      'Someone else’s user page for project that feeder gateway with us.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+
+      ctx.body = renderUserPage({
+        context,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
+        finalizableOffers: repeat(2, randomUserOfferEntry),
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 7,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: {
+          data: repeat(6, randomHomeL2TransactionEntry),
+          total: 5123,
+        },
         offers: repeat(6, randomUserOfferEntry),
         totalOffers: 6,
       })
@@ -411,6 +488,25 @@ const routes: Route[] = [
         context,
         starkKey: StarkKey.fake(),
         assets: repeat(visible, randomUserAssetEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
+  },
+  {
+    path: '/users/:starkKey/l2-transactions',
+    link: '/users/someone/l2-transactions',
+    description:
+      'L2 transaction list accessible from someone else’s user page. Supports pagination.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      const total = 5123
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserL2TransactionsPage({
+        context,
+        starkKey: StarkKey.fake(),
+        l2Transactions: repeat(visible, randomHomeL2TransactionEntry),
         limit,
         offset,
         total,

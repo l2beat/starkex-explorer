@@ -1,4 +1,5 @@
 import {
+  renderHomeL2TransactionsPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
   renderHomeTransactionsPage,
@@ -10,6 +11,7 @@ import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewServ
 import { PageContextService } from '../../core/PageContextService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
@@ -29,7 +31,9 @@ export class HomeController {
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
-    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository
+    private readonly l2TransactionRepository: L2TransactionRepository,
+    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
+    private readonly showL2Transactions: boolean
   ) {}
 
   async getHomePage(
@@ -38,13 +42,17 @@ export class HomeController {
     const context = await this.pageContextService.getPageContext(givenUser)
     const paginationOpts = { offset: 0, limit: 6 }
     const [
+      l2Transactions,
+      l2TransactionsCount,
       stateUpdates,
-      totalStateUpdates,
+      stateUpdatesCount,
       forcedUserTransactions,
       forcedUserTransactionsCount,
       availableOffers,
       availableOffersCount,
     ] = await Promise.all([
+      this.l2TransactionRepository.getPaginated(paginationOpts),
+      this.l2TransactionRepository.countAll(),
       this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
       this.userTransactionRepository.getPaginated({
@@ -61,13 +69,22 @@ export class HomeController {
     })
 
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
-    const transactions = forcedUserTransactions.map((t) =>
+    const forcedTransactions = forcedUserTransactions.map((t) =>
       userTransactionToEntry(t, collateralAsset, assetDetailsMap)
     )
 
     const content = renderHomePage({
       context,
       tutorials: [], // explicitly no tutorials
+      l2Transactions: this.showL2Transactions
+        ? {
+            data: l2Transactions.map((t) => ({
+              ...t,
+              status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
+            })),
+            total: l2TransactionsCount,
+          }
+        : undefined,
       stateUpdates: stateUpdates.map((update) => ({
         timestamp: update.timestamp,
         id: update.stateUpdateId.toString(),
@@ -75,8 +92,8 @@ export class HomeController {
         updateCount: update.assetUpdateCount,
         forcedTransactionCount: update.forcedTransactionCount,
       })),
-      totalStateUpdates,
-      transactions,
+      totalStateUpdates: stateUpdatesCount,
+      forcedTransactions,
       totalForcedTransactions: forcedUserTransactionsCount,
       // We use forcedTradeOfferToEntry here because we only need status from the offer,
       // as we do not show other statuses on this page
@@ -84,6 +101,29 @@ export class HomeController {
         this.forcedTradeOfferViewService.toOfferEntry(offer)
       ),
       totalOffers: availableOffersCount,
+    })
+    return { type: 'success', content }
+  }
+
+  async getHomeL2TransactionsPage(
+    givenUser: Partial<UserDetails>,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+
+    const [total, l2Transactions] = await Promise.all([
+      this.l2TransactionRepository.countAll(),
+      this.l2TransactionRepository.getPaginated(pagination),
+    ])
+
+    const content = renderHomeL2TransactionsPage({
+      context,
+      l2Transactions: l2Transactions.map((t) => ({
+        ...t,
+        status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
+      })),
+      ...pagination,
+      total,
     })
     return { type: 'success', content }
   }

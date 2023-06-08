@@ -5,7 +5,7 @@ import {
   StateUpdatePriceEntry,
   TransactionEntry,
 } from '../../view'
-import { Bucket } from './bucket'
+import { Bucket } from './Bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
 import { randomId, randomTimestamp } from './utils'
 
