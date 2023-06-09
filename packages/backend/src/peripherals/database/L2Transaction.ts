@@ -1,4 +1,24 @@
-import { assertUnreachable } from '@explorer/shared'
+import {
+  assertUnreachable,
+  ConditionalTransferL2TransactionData,
+  DeleverageL2TransactionData,
+  DepositL2TransactionData,
+  ForcedTradeL2TransactionData,
+  ForcedWithdrawalL2TransactionData,
+  FundingTickL2TransactionData,
+  L2TransactionAssetOraclePrice,
+  L2TransactionData,
+  L2TransactionLiquidateOrder,
+  L2TransactionPartyOrder,
+  L2TransactionSignature,
+  L2TransactionSignedOraclePrice,
+  LiquidateL2TransactionData,
+  MultiL2TransactionData,
+  OraclePricesTickL2TransactionData,
+  TradeL2TransactionData,
+  TransferL2TransactionData,
+  WithdrawToAddressL2TransactionData,
+} from '@explorer/shared'
 import {
   AssetHash,
   AssetId,
@@ -10,20 +30,6 @@ import {
 
 import { ToJSON } from './transactions/ToJSON'
 
-export type L2TransactionData =
-  | DepositL2TransactionData
-  | WithdrawToAddressL2TransactionData
-  | ForcedWithdrawalL2TransactionData
-  | TradeL2TransactionData
-  | ForcedTradeL2TransactionData
-  | TransferL2TransactionData
-  | ConditionalTransferL2TransactionData
-  | LiquidateL2TransactionData
-  | DeleverageL2TransactionData
-  | FundingTickL2TransactionData
-  | OraclePricesTickL2TransactionData
-  | MultiL2TransactionData
-
 interface Encoded<T> {
   starkKeyA: StarkKey | null
   starkKeyB: StarkKey | null
@@ -31,181 +37,6 @@ interface Encoded<T> {
 }
 
 export type L2TransactionDataJson = ToJSON<L2TransactionData>
-type OrderType = 'LimitOrderWithFees'
-
-interface Signature {
-  s: Hash256
-  r: Hash256
-}
-
-interface PartyOrder {
-  nonce: bigint
-  isBuyingSynthetic: boolean
-  expirationTimestamp: Timestamp
-  signature: Signature
-  syntheticAssetId: AssetId
-  orderType: OrderType
-  collateralAssetId: AssetHash
-  positionId: bigint
-  syntheticAmount: bigint
-  collateralAmount: bigint
-  feeAmount: bigint
-  starkKey: StarkKey
-}
-
-export interface DepositL2TransactionData {
-  positionId: bigint
-  starkKey: StarkKey
-  amount: bigint
-  type: 'Deposit'
-}
-
-export interface WithdrawToAddressL2TransactionData {
-  positionId: bigint
-  starkKey: StarkKey
-  ethereumAddress: EthereumAddress
-  amount: bigint
-  nonce: bigint
-  expirationTimestamp: Timestamp
-  signature: Signature
-  type: 'WithdrawToAddress'
-}
-
-export interface ForcedWithdrawalL2TransactionData {
-  positionId: bigint
-  starkKey: StarkKey
-  amount: bigint
-  isValid: boolean
-  type: 'ForcedWithdrawal'
-}
-
-export interface TradeL2TransactionData {
-  actualBFee: bigint
-  actualAFee: bigint
-  actualSynthetic: bigint
-  actualCollateral: bigint
-  partyAOrder: PartyOrder
-  partyBOrder: PartyOrder
-  type: 'Trade'
-}
-
-export interface ForcedTradeL2TransactionData {
-  starkKeyA: StarkKey
-  starkKeyB: StarkKey
-  positionIdA: bigint
-  positionIdB: bigint
-  collateralAssetId: AssetHash
-  syntheticAssetId: AssetId
-  collateralAmount: bigint
-  syntheticAmount: bigint
-  isABuyingSynthetic: boolean
-  nonce: bigint
-  isValid: boolean
-  type: 'ForcedTrade'
-}
-
-export interface TransferL2TransactionData {
-  amount: bigint
-  nonce: bigint
-  senderStarkKey: StarkKey
-  receiverStarkKey: StarkKey
-  senderPositionId: bigint
-  receiverPositionId: bigint
-  assetId: AssetHash
-  expirationTimestamp: Timestamp
-  signature: Signature
-  type: 'Transfer'
-}
-
-export interface ConditionalTransferL2TransactionData {
-  amount: bigint
-  nonce: bigint
-  senderStarkKey: StarkKey
-  receiverStarkKey: StarkKey
-  senderPositionId: bigint
-  receiverPositionId: bigint
-  assetId: AssetHash
-  expirationTimestamp: Timestamp
-  factRegistryAddress: EthereumAddress
-  fact: Hash256
-  signature: Signature
-  type: 'ConditionalTransfer'
-}
-
-interface LiquidateOrder {
-  orderType: OrderType
-  nonce: bigint
-  starkKey: StarkKey
-  syntheticAssetId: AssetId
-  syntheticAmount: bigint
-  collateralAssetId: AssetHash
-  collateralAmount: bigint
-  feeAmount: bigint
-  positionId: bigint
-  expirationTimestamp: Timestamp
-  isBuyingSynthetic: boolean
-  signature: Signature
-}
-
-export interface LiquidateL2TransactionData {
-  liquidatorOrder: LiquidateOrder
-  liquidatedPositionId: bigint
-  actualCollateral: bigint
-  actualSynthetic: bigint
-  actualLiquidatorFee: bigint
-  type: 'Liquidate'
-}
-
-export interface DeleverageL2TransactionData {
-  syntheticAssetId: AssetId
-  collateralAmount: bigint
-  syntheticAmount: bigint
-  deleveragedPositionId: bigint
-  isDeleveragerBuyingSynthetic: boolean
-  deleveragerPositionId: bigint
-  type: 'Deleverage'
-}
-
-interface FundingIndex {
-  syntheticAssetId: AssetId
-  quantizedFundingIndex: number
-}
-
-interface FundingIndicesState {
-  indices: FundingIndex[]
-  timestamp: Timestamp
-}
-export interface FundingTickL2TransactionData {
-  globalFundingIndices: FundingIndicesState
-  type: 'FundingTick'
-}
-
-interface SignedOraclePrice {
-  signerPublicKey: Hash256
-  externalAssetId: AssetHash
-  timestampedSignature: {
-    signature: Signature
-    timestamp: Timestamp
-  }
-  price: bigint
-}
-
-interface AssetOraclePrice {
-  syntheticAssetId: AssetId
-  signedPrices: SignedOraclePrice[]
-  price: bigint
-}
-
-export interface OraclePricesTickL2TransactionData {
-  timestamp: Timestamp
-  oraclePrices: AssetOraclePrice[]
-  type: 'OraclePricesTick'
-}
-
-export interface MultiL2TransactionData {
-  transactions: Exclude<L2TransactionData, MultiL2TransactionData>[]
-  type: 'MultiTransaction'
-}
 
 export function encodeL2TransactionData(
   values: L2TransactionData
@@ -670,8 +501,8 @@ function decodeMultiTransaction(
 }
 
 function encodeAssetOraclePrice(
-  values: AssetOraclePrice
-): ToJSON<AssetOraclePrice> {
+  values: L2TransactionAssetOraclePrice
+): ToJSON<L2TransactionAssetOraclePrice> {
   return {
     ...values,
     syntheticAssetId: values.syntheticAssetId.toString(),
@@ -681,8 +512,8 @@ function encodeAssetOraclePrice(
 }
 
 function decodeAssetOraclePrice(
-  values: ToJSON<AssetOraclePrice>
-): AssetOraclePrice {
+  values: ToJSON<L2TransactionAssetOraclePrice>
+): L2TransactionAssetOraclePrice {
   return {
     ...values,
     syntheticAssetId: AssetId(values.syntheticAssetId),
@@ -692,8 +523,8 @@ function decodeAssetOraclePrice(
 }
 
 function encodeSignedOraclePrice(
-  values: SignedOraclePrice
-): ToJSON<SignedOraclePrice> {
+  values: L2TransactionSignedOraclePrice
+): ToJSON<L2TransactionSignedOraclePrice> {
   return {
     ...values,
     signerPublicKey: values.signerPublicKey.toString(),
@@ -707,8 +538,8 @@ function encodeSignedOraclePrice(
 }
 
 function decodeSignedOraclePrice(
-  values: ToJSON<SignedOraclePrice>
-): SignedOraclePrice {
+  values: ToJSON<L2TransactionSignedOraclePrice>
+): L2TransactionSignedOraclePrice {
   return {
     ...values,
     signerPublicKey: Hash256(values.signerPublicKey),
@@ -721,7 +552,9 @@ function decodeSignedOraclePrice(
   }
 }
 
-function encodeLiquidateOrder(values: LiquidateOrder): ToJSON<LiquidateOrder> {
+function encodeLiquidateOrder(
+  values: L2TransactionLiquidateOrder
+): ToJSON<L2TransactionLiquidateOrder> {
   return {
     ...values,
     nonce: values.nonce.toString(),
@@ -737,7 +570,9 @@ function encodeLiquidateOrder(values: LiquidateOrder): ToJSON<LiquidateOrder> {
   }
 }
 
-function decodeLiquidateOrder(values: ToJSON<LiquidateOrder>): LiquidateOrder {
+function decodeLiquidateOrder(
+  values: ToJSON<L2TransactionLiquidateOrder>
+): L2TransactionLiquidateOrder {
   return {
     ...values,
     nonce: BigInt(values.nonce),
@@ -753,7 +588,9 @@ function decodeLiquidateOrder(values: ToJSON<LiquidateOrder>): LiquidateOrder {
   }
 }
 
-function encodePartyOrder(values: PartyOrder): ToJSON<PartyOrder> {
+function encodePartyOrder(
+  values: L2TransactionPartyOrder
+): ToJSON<L2TransactionPartyOrder> {
   return {
     ...values,
     nonce: values.nonce.toString(),
@@ -769,7 +606,9 @@ function encodePartyOrder(values: PartyOrder): ToJSON<PartyOrder> {
   }
 }
 
-function decodePartyOrder(values: ToJSON<PartyOrder>): PartyOrder {
+function decodePartyOrder(
+  values: ToJSON<L2TransactionPartyOrder>
+): L2TransactionPartyOrder {
   return {
     ...values,
     nonce: BigInt(values.nonce),
@@ -785,14 +624,18 @@ function decodePartyOrder(values: ToJSON<PartyOrder>): PartyOrder {
   }
 }
 
-function encodeSignature(values: Signature): ToJSON<Signature> {
+function encodeSignature(
+  values: L2TransactionSignature
+): ToJSON<L2TransactionSignature> {
   return {
     r: values.r.toString(),
     s: values.s.toString(),
   }
 }
 
-function decodeSignature(values: ToJSON<Signature>): Signature {
+function decodeSignature(
+  values: ToJSON<L2TransactionSignature>
+): L2TransactionSignature {
   return {
     r: Hash256(values.r),
     s: Hash256(values.s),

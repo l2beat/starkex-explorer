@@ -1,6 +1,6 @@
 import { PedersenHash, Timestamp } from '@explorer/types'
 
-import { L2TransactionData } from '../database/L2Transaction'
+import { L2TransactionData } from '@explorer/shared'
 import { PerpetualBatchInfoResponse } from './schema'
 import { toPerpetualL2TransactionData } from './toPerpetualTransactions'
 

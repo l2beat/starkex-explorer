@@ -1,5 +1,9 @@
 import { decodeAssetId } from '@explorer/encoding'
-import { assertUnreachable } from '@explorer/shared'
+import {
+  L2TransactionData,
+  MultiL2TransactionData,
+  assertUnreachable,
+} from '@explorer/shared'
 import {
   AssetHash,
   EthereumAddress,
@@ -9,16 +13,12 @@ import {
 } from '@explorer/types'
 
 import {
-  L2TransactionData,
-  MultiL2TransactionData,
-} from '../database/L2Transaction'
-import {
   AssetOraclePrice,
-  L2Transaction as TransactionSchema,
   OrderTypeResponse,
   PerpetualL2TransactionResponse,
   SignatureResponse,
   SignedOraclePrice,
+  L2Transaction as TransactionSchema,
 } from './schema'
 
 export interface PerpetualL2Transaction {

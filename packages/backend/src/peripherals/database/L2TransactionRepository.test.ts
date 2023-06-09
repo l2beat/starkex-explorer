@@ -9,9 +9,9 @@ import {
 import { expect } from 'earl'
 import { beforeEach, it } from 'mocha'
 
+import { MultiL2TransactionData } from '@explorer/shared'
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
-import { MultiL2TransactionData } from './L2Transaction'
 import { L2TransactionRepository } from './L2TransactionRepository'
 
 describe(L2TransactionRepository.name, () => {

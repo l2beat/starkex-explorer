@@ -9,7 +9,12 @@ import {
 import { L2TransactionEntry } from '../../view/components/tables/L2TransactionsTable'
 import { WithdrawableAssetEntry } from '../../view/pages/user/components/UserQuickActionsTable'
 import { Bucket } from './Bucket'
-import { amountBucket, assetBucket, changeBucket } from './buckets'
+import {
+  amountBucket,
+  assetBucket,
+  changeBucket,
+  l2TransactionsBucket,
+} from './buckets'
 import { randomId, randomInt, randomTimestamp } from './utils'
 
 export function randomUserBalanceChangeEntry(): UserBalanceChangeEntry {
@@ -115,11 +120,9 @@ export function randomWithdrawableAssetEntry(): WithdrawableAssetEntry {
 }
 
 export function randomUserL2TransactionEntry(): L2TransactionEntry {
-  const stateUpdateId = randomInt(0, 100) > 80 ? randomInt(0, 10000) : undefined
   return {
     transactionId: randomInt(0, 10000),
-    stateUpdateId: stateUpdateId,
-    type: userL2TypeBucket.pick(),
-    status: stateUpdateId ? 'INCLUDED' : 'PENDING',
+    data: l2TransactionsBucket.pick(),
+    status: randomInt(0, 100) > 80 ? 'INCLUDED' : 'PENDING',
   }
 }

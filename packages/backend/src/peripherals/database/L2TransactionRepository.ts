@@ -2,14 +2,10 @@ import { StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
 
+import { L2TransactionData, MultiL2TransactionData } from '@explorer/shared'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
-import {
-  decodeTransactionData,
-  encodeL2TransactionData,
-  L2TransactionData,
-  MultiL2TransactionData,
-} from './L2Transaction'
+import { decodeTransactionData, encodeL2TransactionData } from './L2Transaction'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 

@@ -3,7 +3,7 @@ import { Hash256 } from '@explorer/types'
 import { HomeStateUpdateEntry, OfferEntry, TransactionEntry } from '../../view'
 import { L2TransactionEntry } from '../../view/components/tables/L2TransactionsTable'
 import { Bucket } from './Bucket'
-import { amountBucket, assetBucket } from './buckets'
+import { amountBucket, assetBucket, l2TransactionsBucket } from './buckets'
 import { randomId, randomInt, randomTimestamp } from './utils'
 
 export function randomHomeStateUpdateEntry(): HomeStateUpdateEntry {
@@ -26,20 +26,6 @@ const transactionTypeBucket = new Bucket([
   'FORCED_WITHDRAW',
 ] as const)
 
-const l2TransactionTypeBucket = new Bucket([
-  'Deposit',
-  'WithdrawToAddress',
-  'ForcedWithdrawal',
-  'Trade',
-  'ForcedTrade',
-  'Transfer',
-  'ConditionalTransfer',
-  'Liquidate',
-  'Deleverage',
-  'FundingTick',
-  'OraclePricesTick',
-] as const)
-
 export function randomHomeForcedTransactionEntry(): TransactionEntry {
   return {
     timestamp: randomTimestamp(),
@@ -52,13 +38,10 @@ export function randomHomeForcedTransactionEntry(): TransactionEntry {
 }
 
 export function randomHomeL2TransactionEntry(): L2TransactionEntry {
-  const stateUpdateId = randomInt(0, 100) > 20 ? randomInt(0, 10000) : undefined
-
   return {
     transactionId: randomInt(0, 10000),
-    stateUpdateId,
-    type: l2TransactionTypeBucket.pick(),
-    status: stateUpdateId ? 'INCLUDED' : 'PENDING',
+    data: l2TransactionsBucket.pick(),
+    status: randomInt(0, 100) > 20 ? 'INCLUDED' : 'PENDING',
   }
 }
 

@@ -8,11 +8,8 @@ import {
 } from '@explorer/types'
 import { expect } from 'earl'
 
-import {
-  decodeTransactionData,
-  encodeL2TransactionData,
-  L2TransactionData,
-} from './L2Transaction'
+import { L2TransactionData } from '@explorer/shared'
+import { decodeTransactionData, encodeL2TransactionData } from './L2Transaction'
 
 describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, () => {
   it('can handle a Deposit transaction', () => {

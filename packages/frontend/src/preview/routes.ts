@@ -130,6 +130,7 @@ const routes: Route[] = [
           data: repeat(6, randomHomeL2TransactionEntry),
           total: 5123,
         },
+        tutorials: [],
         forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
@@ -434,10 +435,6 @@ const routes: Route[] = [
         totalBalanceChanges: 3367,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
-        l2Transactions: {
-          data: repeat(6, randomHomeL2TransactionEntry),
-          total: 5123,
-        },
         offers: repeat(6, randomUserOfferEntry),
         totalOffers: 6,
       })
