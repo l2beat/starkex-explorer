@@ -1,4 +1,4 @@
-import { L2TransactionData } from '@explorer/shared'
+import { PerpetualL2TransactionData } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
@@ -6,8 +6,9 @@ import { assetToInfo } from '../../../utils/assets'
 import { formatAmount } from '../../../utils/formatting/formatAmount'
 import { ArrowRightIcon } from '../../assets/icons/ArrowIcon'
 import {
-  getL2StatusBadgeValues,
-  l2TransactionTypeToText,
+  getL2TransactionStatusBadgeValues,
+  PerpetualL2TransactionEntry,
+  perpetualL2TransactionTypeToText,
 } from '../../pages/l2-transaction/common'
 import { AssetWithLogo } from '../AssetWithLogo'
 import { InlineEllipsis } from '../InlineEllipsis'
@@ -17,15 +18,7 @@ import { Table } from '../table/Table'
 import { Column } from '../table/types'
 
 export interface L2TransactionsTableProps {
-  transactions: L2TransactionEntry[]
-}
-
-export interface L2TransactionEntry<
-  T extends L2TransactionData['type'] = L2TransactionData['type']
-> {
-  transactionId: number
-  data: Extract<L2TransactionData, { type: T }>
-  stateUpdateId: number | undefined
+  transactions: PerpetualL2TransactionEntry[]
 }
 
 export function L2TransactionsTable(props: L2TransactionsTableProps) {
@@ -39,7 +32,7 @@ export function L2TransactionsTable(props: L2TransactionsTableProps) {
     <Table
       columns={columns}
       rows={props.transactions.map((transaction) => {
-        const statusBadgeValues = getL2StatusBadgeValues(
+        const statusBadgeValues = getL2TransactionStatusBadgeValues(
           transaction.stateUpdateId
         )
         const cells: ReactNode[] = [
@@ -60,12 +53,12 @@ export function L2TransactionsTable(props: L2TransactionsTableProps) {
 }
 
 interface TypeCellProps {
-  data: L2TransactionData
+  data: PerpetualL2TransactionData
 }
 function TypeCell({ data }: TypeCellProps) {
   return (
     <span className="flex items-center gap-3">
-      {l2TransactionTypeToText(data.type)}
+      {perpetualL2TransactionTypeToText(data.type)}
       <FreeForm data={data} />
     </span>
   )

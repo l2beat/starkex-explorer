@@ -2,7 +2,7 @@ import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earl'
 
 import { EXAMPLE_PERPETUAL_BATCH_DATA } from '../../test/starkwareData'
-import { PerpetualBatchDataResponse } from './schema'
+import { PerpetualBatchDataResponse } from './schema/PerpetualBatchDataResponse'
 import { toPerpetualBatchData } from './toPerpetualBatchData'
 
 describe(toPerpetualBatchData.name, () => {

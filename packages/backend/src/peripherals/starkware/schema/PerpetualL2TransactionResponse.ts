@@ -1,8 +1,9 @@
 import { z } from 'zod'
-import { L2Transaction } from './perpetualBatchInfoResponse'
+
+import { PerpetualL2Transaction } from './PerpetualBatchInfoResponse'
 
 const PerpetualL2TransactionResponseTransactionInfo = z.strictObject({
-  tx: L2Transaction,
+  tx: PerpetualL2Transaction,
   tx_id: z.number(),
 })
 const PerpetualL2TransactionResponseTransaction = z.strictObject({

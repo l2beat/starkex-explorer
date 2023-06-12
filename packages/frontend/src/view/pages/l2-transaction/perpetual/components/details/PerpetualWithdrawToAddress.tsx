@@ -1,25 +1,21 @@
-import { CollateralAsset, L2TransactionData } from '@explorer/shared'
 import React from 'react'
 
-import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
-import { AssetAmount } from '../../../components/AssetAmount'
-import { Card } from '../../../components/Card'
-import { EtherscanLink } from '../../../components/EtherscanLink'
-import { Link } from '../../../components/Link'
-import { TransactionField } from '../../transaction/components/TransactionField'
-import { L2CurrentStatusValue } from '../L2TransactionDetailsPage'
+import { formatTimestamp } from '../../../../../../utils/formatting/formatTimestamp'
+import { AssetAmount } from '../../../../../components/AssetAmount'
+import { Card } from '../../../../../components/Card'
+import { EtherscanLink } from '../../../../../components/EtherscanLink'
+import { Link } from '../../../../../components/Link'
+import { TransactionField } from '../../../../transaction/components/TransactionField'
+import { PerpetualTransactionDetailsProps } from '../../../common'
+import { CurrentStatusField } from '../CurrentStatusField'
 
-interface WithdrawToAddressDetailsProps {
-  stateUpdateId: number | undefined
-  data: Extract<L2TransactionData, { type: 'WithdrawToAddress' }>
-  collateralAsset: CollateralAsset
-}
-
-export function WithdrawToAddressDetails(props: WithdrawToAddressDetailsProps) {
+export function PerpetualWithdrawToAddressDetails(
+  props: PerpetualTransactionDetailsProps<'WithdrawToAddress'>
+) {
   return (
     <Card className="flex flex-col gap-6">
       <TransactionField label="Current status">
-        <L2CurrentStatusValue stateUpdateId={props.stateUpdateId} />
+        <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
       <TransactionField label="Position ID">
         {props.data.positionId.toString()}
@@ -42,11 +38,11 @@ export function WithdrawToAddressDetails(props: WithdrawToAddressDetailsProps) {
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}
       />
-      <TransactionField label="Nonce">
-        {props.data.nonce.toString()}
-      </TransactionField>
       <TransactionField label="Expiration date (UTC)">
         {formatTimestamp(props.data.expirationTimestamp)}
+      </TransactionField>
+      <TransactionField label="Nonce">
+        {props.data.nonce.toString()}
       </TransactionField>
     </Card>
   )

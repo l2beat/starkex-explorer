@@ -1,7 +1,7 @@
 import { L2TransactionApiConfig } from '../../config/starkex/StarkexConfig'
 import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
-import { PerpetualL2TransactionResponse } from './schema'
+import { PerpetualL2TransactionResponse } from './schema/PerpetualL2TransactionResponse'
 import { toPerpetualL2Transactions } from './toPerpetualTransactions'
 
 export class L2TransactionClient extends BaseClient {

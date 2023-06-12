@@ -209,8 +209,8 @@ const MultiTransaction = z.strictObject({
   type: z.literal('MULTI_TRANSACTION'),
 })
 
-export type L2Transaction = z.infer<typeof L2Transaction>
-export const L2Transaction = z.discriminatedUnion('type', [
+export type PerpetualL2Transaction = z.infer<typeof PerpetualL2Transaction>
+export const PerpetualL2Transaction = z.discriminatedUnion('type', [
   DepositTransaction,
   WithdrawalToAddresTransaction,
   ForcedWithdrawalTransaction,
@@ -226,8 +226,8 @@ export const L2Transaction = z.discriminatedUnion('type', [
 ])
 
 const PerpetualBatchInfoResponseTransactionInfo = z.strictObject({
-  original_tx: L2Transaction,
-  alt_txs: z.array(L2Transaction).nullable(),
+  original_tx: PerpetualL2Transaction,
+  alt_txs: z.array(PerpetualL2Transaction).nullable(),
   original_tx_id: z.number(),
   was_replaced: z.boolean(),
 })

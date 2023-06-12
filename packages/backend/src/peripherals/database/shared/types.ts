@@ -1,6 +1,6 @@
 import { json } from '@explorer/types'
 
-import { L2TransactionDataJson } from '../L2Transaction'
+import { L2TransactionDataJson } from '../PerpetualL2Transaction'
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import {
   UserTransactionJSON,

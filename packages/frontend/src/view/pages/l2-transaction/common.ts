@@ -1,10 +1,29 @@
-import { assertUnreachable } from '@explorer/shared'
+import {
+  assertUnreachable,
+  CollateralAsset,
+  PerpetualL2TransactionData,
+} from '@explorer/shared'
 
 import { StatusType } from '../../components/StatusBadge'
-import { L2TransactionEntry } from '../../components/tables/L2TransactionsTable'
 
-export function l2TransactionTypeToText(
-  type: L2TransactionEntry['data']['type']
+export interface PerpetualTransactionDetailsProps<
+  T extends PerpetualL2TransactionData['type']
+> {
+  stateUpdateId: number | undefined
+  data: Extract<PerpetualL2TransactionData, { type: T }>
+  collateralAsset: CollateralAsset
+}
+
+export interface PerpetualL2TransactionEntry<
+  T extends PerpetualL2TransactionData['type'] = PerpetualL2TransactionData['type']
+> {
+  transactionId: number
+  data: Extract<PerpetualL2TransactionData, { type: T }>
+  stateUpdateId: number | undefined
+}
+
+export function perpetualL2TransactionTypeToText(
+  type: PerpetualL2TransactionData['type']
 ): string {
   switch (type) {
     case 'Deposit':
@@ -32,7 +51,9 @@ export function l2TransactionTypeToText(
   }
 }
 
-export function getL2StatusBadgeValues(stateUpdateId: number | undefined): {
+export function getL2TransactionStatusBadgeValues(
+  stateUpdateId: number | undefined
+): {
   type: StatusType
   text: string
 } {

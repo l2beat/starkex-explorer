@@ -5,16 +5,14 @@ import React from 'react'
 import { Page } from '../../components/page/Page'
 import { SearchBar } from '../../components/SearchBar'
 import { TablePreview } from '../../components/table/TablePreview'
-import {
-  L2TransactionEntry,
-  L2TransactionsTable,
-} from '../../components/tables/L2TransactionsTable'
+import { L2TransactionsTable } from '../../components/tables/L2TransactionsTable'
 import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import {
   TransactionEntry,
   TransactionsTable,
 } from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
+import { PerpetualL2TransactionEntry } from '../l2-transaction/common'
 import {
   FORCED_TRANSACTION_TABLE_PROPS,
   L2_TRANSACTIONS_TABLE_PROPS,
@@ -38,7 +36,7 @@ interface HomePageProps {
   stateUpdates: HomeStateUpdateEntry[]
   totalStateUpdates: number
   l2Transactions?: {
-    data: L2TransactionEntry[]
+    data: PerpetualL2TransactionEntry[]
     total: number
   }
   forcedTransactions: TransactionEntry[]

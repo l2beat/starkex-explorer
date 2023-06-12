@@ -7,7 +7,8 @@ import {
 } from '../../test/starkwareData'
 import { AvailabilityGatewayClient } from './AvailabilityGatewayClient'
 import { FetchClient } from './FetchClient'
-import { PerpetualBatchDataResponse, SpotBatchDataResponse } from './schema'
+import { PerpetualBatchDataResponse } from './schema/PerpetualBatchDataResponse'
+import { SpotBatchDataResponse } from './schema/SpotBatchDataResponse'
 import { toPerpetualBatchData } from './toPerpetualBatchData'
 import { toSpotBatchData } from './toSpotBatchData'
 

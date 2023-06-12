@@ -1,20 +1,20 @@
 import {
-  ConditionalTransferL2TransactionData,
-  DeleverageL2TransactionData,
-  DepositL2TransactionData,
-  ForcedTradeL2TransactionData,
-  ForcedWithdrawalL2TransactionData,
-  FundingTickL2TransactionData,
-  L2TransactionData,
-  LiquidateL2TransactionData,
-  OraclePricesTickL2TransactionData,
-  TradeL2TransactionData,
-  TransferL2TransactionData,
-  WithdrawToAddressL2TransactionData,
+  PerpetualL2ConditionalTransferTransactionData,
+  PerpetualL2DeleverageTransactionData,
+  PerpetualL2DepositTransactionData,
+  PerpetualL2ForcedTradeTransactionData,
+  PerpetualL2ForcedWithdrawalTransactionData,
+  PerpetualL2FundingTickTransactionData,
+  PerpetualL2LiquidateTransactionData,
+  PerpetualL2OraclePricesTickTransactionData,
+  PerpetualL2TradeTransactionData,
+  PerpetualL2TransactionData,
+  PerpetualL2TransferTransactionData,
+  PerpetualL2WithdrawToAddressTransactionData,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
-import { L2TransactionEntry } from '../../view/components/tables/L2TransactionsTable'
+import { PerpetualL2TransactionEntry } from '../../view/pages/l2-transaction/common'
 import { Bucket } from './Bucket'
 import { amountBucket, assetIdBucket } from './buckets'
 import {
@@ -47,38 +47,61 @@ const randomFundingIndex = () => ({
   quantizedFundingIndex: randomInt(0, 1000000),
 })
 
-export const l2TransactionsBucket = new Bucket<L2TransactionData>()
-l2TransactionsBucket.addMany(repeat(5, randomL2DepositTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2WithdrawToAddressTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2ForcedWithdrawalTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2TradeTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2ForcedTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2TransferTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2ConditionalTransferTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2LiquidateTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2DeleverageTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2FundingTickTransaction))
-l2TransactionsBucket.addMany(repeat(5, randomL2OraclePricesTickTransaction))
+export const perpetualL2TransactionsBucket =
+  new Bucket<PerpetualL2TransactionData>()
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2DepositTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2WithdrawToAddressTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2ForcedWithdrawalTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2TradeTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2ForcedTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2TransferTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2ConditionalTransferTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2LiquidateTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2DeleverageTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2FundingTickTransaction)
+)
+perpetualL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2OraclePricesTickTransaction)
+)
 
-export function randomHomeL2TransactionEntry(): L2TransactionEntry {
+export function randomHomePerpetualL2TransactionEntry(): PerpetualL2TransactionEntry {
   return {
     transactionId: randomInt(0, 10000),
-    data: l2TransactionsBucket.pick(),
+    data: perpetualL2TransactionsBucket.pick(),
+    stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 10000),
+  }
+}
+
+export function randomUserPerpetualL2TransactionEntry(): PerpetualL2TransactionEntry {
+  return {
+    transactionId: randomInt(0, 10000),
+    data: perpetualL2TransactionsBucket.pick(),
     stateUpdateId: randomInt(0, 100) > 20 ? undefined : randomInt(0, 10000),
   }
 }
 
-export function randomUserL2TransactionEntry(): L2TransactionEntry {
-  return {
-    transactionId: randomInt(0, 10000),
-    data: l2TransactionsBucket.pick(),
-    stateUpdateId: randomInt(0, 100) > 20 ? undefined : randomInt(0, 10000),
-  }
-}
-
-export function randomL2TransactionEntry(
-  data: L2TransactionEntry['data']
-): L2TransactionEntry {
+export function randomPerpetualL2TransactionEntry(
+  data: PerpetualL2TransactionEntry['data']
+): PerpetualL2TransactionEntry {
   return {
     transactionId: randomInt(0, 100000),
     stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
@@ -86,7 +109,7 @@ export function randomL2TransactionEntry(
   }
 }
 
-export function randomL2DepositTransaction(): DepositL2TransactionData {
+export function randomPerpetualL2DepositTransaction(): PerpetualL2DepositTransactionData {
   return {
     type: 'Deposit',
     positionId: randomBigInt(0, 100000),
@@ -95,7 +118,7 @@ export function randomL2DepositTransaction(): DepositL2TransactionData {
   }
 }
 
-export function randomL2WithdrawToAddressTransaction(): WithdrawToAddressL2TransactionData {
+export function randomPerpetualL2WithdrawToAddressTransaction(): PerpetualL2WithdrawToAddressTransactionData {
   return {
     type: 'WithdrawToAddress',
     positionId: randomBigInt(0, 100000),
@@ -111,7 +134,7 @@ export function randomL2WithdrawToAddressTransaction(): WithdrawToAddressL2Trans
   }
 }
 
-export function randomL2ForcedWithdrawalTransaction(): ForcedWithdrawalL2TransactionData {
+export function randomPerpetualL2ForcedWithdrawalTransaction(): PerpetualL2ForcedWithdrawalTransactionData {
   return {
     type: 'ForcedWithdrawal',
     positionId: randomBigInt(0, 100000),
@@ -120,7 +143,7 @@ export function randomL2ForcedWithdrawalTransaction(): ForcedWithdrawalL2Transac
     isValid: true,
   }
 }
-export function randomL2TradeTransaction(): TradeL2TransactionData {
+export function randomPerpetualL2TradeTransaction(): PerpetualL2TradeTransactionData {
   return {
     type: 'Trade',
     actualAFee: amountBucket.pick(),
@@ -164,7 +187,7 @@ export function randomL2TradeTransaction(): TradeL2TransactionData {
   }
 }
 
-export function randomL2OraclePricesTickTransaction(): OraclePricesTickL2TransactionData {
+export function randomPerpetualL2OraclePricesTickTransaction(): PerpetualL2OraclePricesTickTransactionData {
   return {
     type: 'OraclePricesTick',
     timestamp: randomTimestamp(),
@@ -172,7 +195,7 @@ export function randomL2OraclePricesTickTransaction(): OraclePricesTickL2Transac
   }
 }
 
-export function randomL2FundingTickTransaction(): FundingTickL2TransactionData {
+export function randomPerpetualL2FundingTickTransaction(): PerpetualL2FundingTickTransactionData {
   return {
     type: 'FundingTick',
     globalFundingIndices: {
@@ -182,7 +205,7 @@ export function randomL2FundingTickTransaction(): FundingTickL2TransactionData {
   }
 }
 
-export function randomL2DeleverageTransaction(): DeleverageL2TransactionData {
+export function randomPerpetualL2DeleverageTransaction(): PerpetualL2DeleverageTransactionData {
   return {
     type: 'Deleverage',
     syntheticAssetId: assetIdBucket.pick(),
@@ -194,7 +217,7 @@ export function randomL2DeleverageTransaction(): DeleverageL2TransactionData {
   }
 }
 
-export function randomL2LiquidateTransaction(): LiquidateL2TransactionData {
+export function randomPerpetualL2LiquidateTransaction(): PerpetualL2LiquidateTransactionData {
   return {
     type: 'Liquidate',
     liquidatorOrder: {
@@ -221,7 +244,7 @@ export function randomL2LiquidateTransaction(): LiquidateL2TransactionData {
   }
 }
 
-export function randomL2ConditionalTransferTransaction(): ConditionalTransferL2TransactionData {
+export function randomPerpetualL2ConditionalTransferTransaction(): PerpetualL2ConditionalTransferTransactionData {
   return {
     type: 'ConditionalTransfer',
     amount: amountBucket.pick(),
@@ -241,7 +264,7 @@ export function randomL2ConditionalTransferTransaction(): ConditionalTransferL2T
   }
 }
 
-export function randomL2TransferTransaction(): TransferL2TransactionData {
+export function randomPerpetualL2TransferTransaction(): PerpetualL2TransferTransactionData {
   return {
     type: 'Transfer',
     amount: amountBucket.pick(),
@@ -259,7 +282,7 @@ export function randomL2TransferTransaction(): TransferL2TransactionData {
   }
 }
 
-export function randomL2ForcedTransaction(): ForcedTradeL2TransactionData {
+export function randomPerpetualL2ForcedTransaction(): PerpetualL2ForcedTradeTransactionData {
   return {
     type: 'ForcedTrade',
     starkKeyA: StarkKey.fake(),

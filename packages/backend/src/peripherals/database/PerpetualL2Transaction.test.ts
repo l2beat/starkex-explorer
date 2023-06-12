@@ -1,3 +1,4 @@
+import { PerpetualL2TransactionData } from '@explorer/shared'
 import {
   AssetHash,
   AssetId,
@@ -8,12 +9,14 @@ import {
 } from '@explorer/types'
 import { expect } from 'earl'
 
-import { L2TransactionData } from '@explorer/shared'
-import { decodeTransactionData, encodeL2TransactionData } from './L2Transaction'
+import {
+  decodeTransactionData,
+  encodeL2TransactionData,
+} from './PerpetualL2Transaction'
 
 describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, () => {
   it('can handle a Deposit transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'Deposit',
       starkKey: StarkKey.fake(),
       positionId: 1234n,
@@ -37,7 +40,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a WithdrawToAddress transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'WithdrawToAddress',
       positionId: 1234n,
       starkKey: StarkKey.fake(),
@@ -83,7 +86,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a ForcedWithdrawal transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'ForcedWithdrawal',
       positionId: 1234n,
       starkKey: StarkKey.fake(),
@@ -109,7 +112,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a Trade transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'Trade',
       actualAFee: 1234n,
       actualBFee: 1235n,
@@ -207,7 +210,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a ForcedTrade transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'ForcedTrade',
       starkKeyA: StarkKey.fake(),
       starkKeyB: StarkKey.fake(),
@@ -249,7 +252,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
   })
 
   it('can handle a Transfer transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'Transfer',
       amount: 1234n,
       nonce: 1234n,
@@ -296,7 +299,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a ConditionalTransfer transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'ConditionalTransfer',
       amount: 1234n,
       nonce: 1234n,
@@ -347,7 +350,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a Liquidate transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'Liquidate',
       liquidatorOrder: {
         orderType: 'LimitOrderWithFees',
@@ -413,7 +416,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a Deleverage transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'Deleverage',
       syntheticAssetId: AssetId('ETH-9'),
       collateralAmount: 1234n,
@@ -444,7 +447,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a FundingTick transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'FundingTick',
       globalFundingIndices: {
         indices: [
@@ -484,7 +487,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     expect(decoded).toEqual(data)
   })
   it('can handle a OraclePricesTick transaction', () => {
-    const data: L2TransactionData = {
+    const data: PerpetualL2TransactionData = {
       type: 'OraclePricesTick',
       oraclePrices: [
         {

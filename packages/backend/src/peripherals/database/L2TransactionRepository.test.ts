@@ -1,3 +1,4 @@
+import { PerpetualL2MultiTransactionData } from '@explorer/shared'
 import {
   AssetHash,
   AssetId,
@@ -9,7 +10,6 @@ import {
 import { expect } from 'earl'
 import { beforeEach, it } from 'mocha'
 
-import { MultiL2TransactionData } from '@explorer/shared'
 import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
 import { L2TransactionRepository } from './L2TransactionRepository'
@@ -152,7 +152,7 @@ describe(L2TransactionRepository.name, () => {
               type: 'WithdrawToAddress',
             },
           ],
-        } as MultiL2TransactionData,
+        } as PerpetualL2MultiTransactionData,
       }
 
       const id = await repository.add(record)
@@ -226,7 +226,7 @@ describe(L2TransactionRepository.name, () => {
               type: 'WithdrawToAddress',
             },
           ],
-        } as MultiL2TransactionData,
+        } as PerpetualL2MultiTransactionData,
       }
 
       const alternativeRecord = {
@@ -256,7 +256,7 @@ describe(L2TransactionRepository.name, () => {
               type: 'WithdrawToAddress',
             },
           ],
-        } as MultiL2TransactionData,
+        } as PerpetualL2MultiTransactionData,
       }
 
       const id = await repository.add(record)
@@ -494,7 +494,7 @@ describe(L2TransactionRepository.name, () => {
               type: 'WithdrawToAddress',
             },
           ],
-        } as MultiL2TransactionData,
+        } as PerpetualL2MultiTransactionData,
       })
       await repository.add({
         stateUpdateId: 2,

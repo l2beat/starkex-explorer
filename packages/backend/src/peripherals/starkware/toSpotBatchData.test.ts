@@ -2,7 +2,7 @@ import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earl'
 
 import { EXAMPLE_SPOT_BATCH_DATA } from '../../test/starkwareData'
-import { SpotBatchDataResponse } from './schema'
+import { SpotBatchDataResponse } from './schema/SpotBatchDataResponse'
 import { toSpotBatchData } from './toSpotBatchData'
 
 describe(toSpotBatchData.name, () => {

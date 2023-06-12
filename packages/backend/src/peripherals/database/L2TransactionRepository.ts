@@ -1,16 +1,22 @@
+import {
+  PerpetualL2MultiTransactionData,
+  PerpetualL2TransactionData,
+} from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
 
-import { L2TransactionData, MultiL2TransactionData } from '@explorer/shared'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
-import { decodeTransactionData, encodeL2TransactionData } from './L2Transaction'
+import {
+  decodeTransactionData,
+  encodeL2TransactionData,
+} from './PerpetualL2Transaction'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 interface Record<
-  T extends L2TransactionData['type'] = L2TransactionData['type']
+  T extends PerpetualL2TransactionData['type'] = PerpetualL2TransactionData['type']
 > {
   id: number
   transactionId: number
@@ -21,7 +27,7 @@ interface Record<
   starkKeyA: StarkKey | undefined
   starkKeyB: StarkKey | undefined
   type: T
-  data: Extract<L2TransactionData, { type: T }>
+  data: Extract<PerpetualL2TransactionData, { type: T }>
 }
 
 export type { Record as L2TransactionRecord }
@@ -48,7 +54,7 @@ export class L2TransactionRepository extends BaseRepository {
     transactionId: number
     stateUpdateId: number
     blockNumber: number
-    data: L2TransactionData
+    data: PerpetualL2TransactionData
   }): Promise<number> {
     const knex = await this.knex()
 
@@ -80,7 +86,7 @@ export class L2TransactionRepository extends BaseRepository {
       stateUpdateId: number
       blockNumber: number
       isAlternative: boolean
-      data: Exclude<L2TransactionData, MultiL2TransactionData>
+      data: Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
       parentId?: number
     },
     knex: Knex
@@ -110,7 +116,7 @@ export class L2TransactionRepository extends BaseRepository {
       stateUpdateId: number
       blockNumber: number
       isAlternative: boolean
-      data: MultiL2TransactionData
+      data: PerpetualL2MultiTransactionData
     },
     knex: Knex
   ) {
@@ -246,7 +252,7 @@ function toRecord(row: L2TransactionRow): Record {
     state: row.state ? row.state : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
-    type: row.type as L2TransactionData['type'],
+    type: row.type as PerpetualL2TransactionData['type'],
     data: decodeTransactionData(row.data),
   }
 }

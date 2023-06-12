@@ -43,7 +43,7 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderL2TransactionDetailsPage } from '../view/pages/l2-transaction/L2TransactionDetailsPage'
+import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/perpetual/PerpetualL2TransactionDetailsPage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
@@ -52,13 +52,13 @@ import {
   randomHomeStateUpdateEntry,
 } from './data/home'
 import {
-  randomHomeL2TransactionEntry,
-  randomL2ConditionalTransferTransaction,
-  randomL2DepositTransaction,
-  randomL2ForcedWithdrawalTransaction,
-  randomL2TransactionEntry,
-  randomL2TransferTransaction,
-  randomL2WithdrawToAddressTransaction,
+  randomHomePerpetualL2TransactionEntry,
+  randomPerpetualL2ConditionalTransferTransaction,
+  randomPerpetualL2DepositTransaction,
+  randomPerpetualL2ForcedWithdrawalTransaction,
+  randomPerpetualL2TransactionEntry,
+  randomPerpetualL2TransferTransaction,
+  randomPerpetualL2WithdrawToAddressTransaction,
 } from './data/l2Transactions'
 import {
   randomStateUpdateBalanceChangeEntry,
@@ -136,7 +136,7 @@ const routes: Route[] = [
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
         l2Transactions: {
-          data: repeat(6, randomHomeL2TransactionEntry),
+          data: repeat(6, randomHomePerpetualL2TransactionEntry),
           total: 5123,
         },
         tutorials: [],
@@ -174,7 +174,7 @@ const routes: Route[] = [
 
       ctx.body = renderHomeL2TransactionsPage({
         context: getPerpetualPageContext(ctx),
-        l2Transactions: repeat(visible, randomHomeL2TransactionEntry),
+        l2Transactions: repeat(visible, randomHomePerpetualL2TransactionEntry),
         total: total,
         limit: limit,
         offset: offset,
@@ -471,7 +471,7 @@ const routes: Route[] = [
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
         l2Transactions: {
-          data: repeat(6, randomHomeL2TransactionEntry),
+          data: repeat(6, randomHomePerpetualL2TransactionEntry),
           total: 5123,
         },
         offers: repeat(6, randomUserOfferEntry),
@@ -512,7 +512,7 @@ const routes: Route[] = [
       ctx.body = renderUserL2TransactionsPage({
         context,
         starkKey: StarkKey.fake(),
-        l2Transactions: repeat(visible, randomHomeL2TransactionEntry),
+        l2Transactions: repeat(visible, randomHomePerpetualL2TransactionEntry),
         limit,
         offset,
         total,
@@ -579,72 +579,76 @@ const routes: Route[] = [
   // #endregion
   // #region L2 transactions
   {
-    path: '/l2-transactions/deposit',
-    link: '/l2-transactions/deposit',
-    description: 'L2 transaction page.',
+    path: '/l2-transactions/perpetual/deposit',
+    link: '/l2-transactions/perpetual/deposit',
+    description: 'Perpetual L2 deposit transaction page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
-      ctx.body = renderL2TransactionDetailsPage({
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomL2TransactionEntry(randomL2DepositTransaction()),
-      })
-    },
-  },
-  {
-    path: '/l2-transactions/forced-withdrawal',
-    link: '/l2-transactions/forced-withdrawal',
-    description: 'L2 transaction page.',
-    render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
-      ctx.body = renderL2TransactionDetailsPage({
-        context,
-        transaction: randomL2TransactionEntry(
-          randomL2ForcedWithdrawalTransaction()
+        transaction: randomPerpetualL2TransactionEntry(
+          randomPerpetualL2DepositTransaction()
         ),
       })
     },
   },
   {
-    path: '/l2-transactions/transfer',
-    link: '/l2-transactions/transfer',
-    description: 'L2 transaction page.',
+    path: '/l2-transactions/perpetual/forced-withdrawal',
+    link: '/l2-transactions/perpetual/forced-withdrawal',
+    description: 'Perpetual L2 forced withdrawal transaction page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
-      ctx.body = renderL2TransactionDetailsPage({
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomL2TransactionEntry(randomL2TransferTransaction()),
-      })
-    },
-  },
-  {
-    path: '/l2-transactions/conditional-transfer',
-    link: '/l2-transactions/conditional-transfer',
-    description: 'L2 transaction page.',
-    render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
-      ctx.body = renderL2TransactionDetailsPage({
-        context,
-        transaction: randomL2TransactionEntry(
-          randomL2ConditionalTransferTransaction()
+        transaction: randomPerpetualL2TransactionEntry(
+          randomPerpetualL2ForcedWithdrawalTransaction()
         ),
       })
     },
   },
   {
-    path: '/l2-transactions/withdraw-to-address',
-    link: '/l2-transactions/withdraw-to-address',
-    description: 'L2 transaction page.',
+    path: '/l2-transactions/perpetual/transfer',
+    link: '/l2-transactions/perpetual/transfer',
+    description: 'Perpetual L2 transfer transaction page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
-      ctx.body = renderL2TransactionDetailsPage({
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomL2TransactionEntry(
-          randomL2WithdrawToAddressTransaction()
+        transaction: randomPerpetualL2TransactionEntry(
+          randomPerpetualL2TransferTransaction()
         ),
       })
     },
   },
-
+  {
+    path: '/l2-transactions/perpetual/conditional-transfer',
+    link: '/l2-transactions/perpetual/conditional-transfer',
+    description: 'Perpetual L2 conditional transfer transaction page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomPerpetualL2TransactionEntry(
+          randomPerpetualL2ConditionalTransferTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/withdraw-to-address',
+    link: '/l2-transactions/perpetual/withdraw-to-address',
+    description: 'Perpetual L2 withdraw to address transaction page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomPerpetualL2TransactionEntry(
+          randomPerpetualL2WithdrawToAddressTransaction()
+        ),
+      })
+    },
+    breakAfter: true,
+  },
   // #endregion
   // #region Forced actions
   {

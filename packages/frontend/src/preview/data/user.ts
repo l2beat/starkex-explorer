@@ -35,16 +35,6 @@ const transactionTypeBucket = new Bucket([
   'WITHDRAW',
 ] as const)
 
-const userL2TypeBucket = new Bucket([
-  'Deposit',
-  'WithdrawToAddress',
-  'ForcedWithdrawal',
-  'Trade',
-  'ForcedTrade',
-  'Transfer',
-  'ConditionalTransfer',
-] as const)
-
 function randomTransactionTypeAndStatus(): Pick<
   TransactionEntry,
   'type' | 'status'

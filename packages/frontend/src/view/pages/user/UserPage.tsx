@@ -6,16 +6,14 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
 import { TablePreview } from '../../components/table/TablePreview'
-import {
-  L2TransactionEntry,
-  L2TransactionsTable,
-} from '../../components/tables/L2TransactionsTable'
+import { L2TransactionsTable } from '../../components/tables/L2TransactionsTable'
 import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import {
   TransactionEntry,
   TransactionsTable,
 } from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
+import { PerpetualL2TransactionEntry } from '../l2-transaction/common'
 import {
   getAssetsTableProps,
   getBalanceChangeTableProps,
@@ -50,7 +48,7 @@ interface UserPageProps {
   transactions: TransactionEntry[]
   totalTransactions: number
   l2Transactions?: {
-    data: L2TransactionEntry[]
+    data: PerpetualL2TransactionEntry[]
     total: number
   }
   offers?: OfferEntry[]

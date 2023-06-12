@@ -1,4 +1,5 @@
 import { expect } from 'earl'
+
 import { EXAMPLE_PERPETUAL_BATCH_DATA } from '../../../test/starkwareData'
 import { PerpetualBatchDataResponse } from './PerpetualBatchDataResponse'
 

@@ -7,32 +7,32 @@ import {
   Timestamp,
 } from '@explorer/types'
 
-export type L2TransactionData =
-  | DepositL2TransactionData
-  | WithdrawToAddressL2TransactionData
-  | ForcedWithdrawalL2TransactionData
-  | TradeL2TransactionData
-  | ForcedTradeL2TransactionData
-  | TransferL2TransactionData
-  | ConditionalTransferL2TransactionData
-  | LiquidateL2TransactionData
-  | DeleverageL2TransactionData
-  | FundingTickL2TransactionData
-  | OraclePricesTickL2TransactionData
-  | MultiL2TransactionData
+export type PerpetualL2TransactionData =
+  | PerpetualL2DepositTransactionData
+  | PerpetualL2WithdrawToAddressTransactionData
+  | PerpetualL2ForcedWithdrawalTransactionData
+  | PerpetualL2TradeTransactionData
+  | PerpetualL2ForcedTradeTransactionData
+  | PerpetualL2TransferTransactionData
+  | PerpetualL2ConditionalTransferTransactionData
+  | PerpetualL2LiquidateTransactionData
+  | PerpetualL2DeleverageTransactionData
+  | PerpetualL2FundingTickTransactionData
+  | PerpetualL2OraclePricesTickTransactionData
+  | PerpetualL2MultiTransactionData
 
 type OrderType = 'LimitOrderWithFees'
 
-export interface L2TransactionSignature {
+export interface PerpetualL2TransactionSignature {
   s: Hash256
   r: Hash256
 }
 
-export interface L2TransactionPartyOrder {
+export interface PerpetualL2TransactionPartyOrder {
   nonce: bigint
   isBuyingSynthetic: boolean
   expirationTimestamp: Timestamp
-  signature: L2TransactionSignature
+  signature: PerpetualL2TransactionSignature
   syntheticAssetId: AssetId
   orderType: OrderType
   collateralAssetId: AssetHash
@@ -43,25 +43,25 @@ export interface L2TransactionPartyOrder {
   starkKey: StarkKey
 }
 
-export interface DepositL2TransactionData {
+export interface PerpetualL2DepositTransactionData {
   positionId: bigint
   starkKey: StarkKey
   amount: bigint
   type: 'Deposit'
 }
 
-export interface WithdrawToAddressL2TransactionData {
+export interface PerpetualL2WithdrawToAddressTransactionData {
   positionId: bigint
   starkKey: StarkKey
   ethereumAddress: EthereumAddress
   amount: bigint
   nonce: bigint
   expirationTimestamp: Timestamp
-  signature: L2TransactionSignature
+  signature: PerpetualL2TransactionSignature
   type: 'WithdrawToAddress'
 }
 
-export interface ForcedWithdrawalL2TransactionData {
+export interface PerpetualL2ForcedWithdrawalTransactionData {
   positionId: bigint
   starkKey: StarkKey
   amount: bigint
@@ -69,17 +69,17 @@ export interface ForcedWithdrawalL2TransactionData {
   type: 'ForcedWithdrawal'
 }
 
-export interface TradeL2TransactionData {
+export interface PerpetualL2TradeTransactionData {
   actualBFee: bigint
   actualAFee: bigint
   actualSynthetic: bigint
   actualCollateral: bigint
-  partyAOrder: L2TransactionPartyOrder
-  partyBOrder: L2TransactionPartyOrder
+  partyAOrder: PerpetualL2TransactionPartyOrder
+  partyBOrder: PerpetualL2TransactionPartyOrder
   type: 'Trade'
 }
 
-export interface ForcedTradeL2TransactionData {
+export interface PerpetualL2ForcedTradeTransactionData {
   starkKeyA: StarkKey
   starkKeyB: StarkKey
   positionIdA: bigint
@@ -94,7 +94,7 @@ export interface ForcedTradeL2TransactionData {
   type: 'ForcedTrade'
 }
 
-export interface TransferL2TransactionData {
+export interface PerpetualL2TransferTransactionData {
   amount: bigint
   nonce: bigint
   senderStarkKey: StarkKey
@@ -103,11 +103,11 @@ export interface TransferL2TransactionData {
   receiverPositionId: bigint
   assetId: AssetHash
   expirationTimestamp: Timestamp
-  signature: L2TransactionSignature
+  signature: PerpetualL2TransactionSignature
   type: 'Transfer'
 }
 
-export interface ConditionalTransferL2TransactionData {
+export interface PerpetualL2ConditionalTransferTransactionData {
   amount: bigint
   nonce: bigint
   senderStarkKey: StarkKey
@@ -118,11 +118,11 @@ export interface ConditionalTransferL2TransactionData {
   expirationTimestamp: Timestamp
   factRegistryAddress: EthereumAddress
   fact: Hash256
-  signature: L2TransactionSignature
+  signature: PerpetualL2TransactionSignature
   type: 'ConditionalTransfer'
 }
 
-export interface L2TransactionLiquidateOrder {
+export interface PerpetualL2TransactionLiquidateOrder {
   orderType: OrderType
   nonce: bigint
   starkKey: StarkKey
@@ -134,11 +134,11 @@ export interface L2TransactionLiquidateOrder {
   positionId: bigint
   expirationTimestamp: Timestamp
   isBuyingSynthetic: boolean
-  signature: L2TransactionSignature
+  signature: PerpetualL2TransactionSignature
 }
 
-export interface LiquidateL2TransactionData {
-  liquidatorOrder: L2TransactionLiquidateOrder
+export interface PerpetualL2LiquidateTransactionData {
+  liquidatorOrder: PerpetualL2TransactionLiquidateOrder
   liquidatedPositionId: bigint
   actualCollateral: bigint
   actualSynthetic: bigint
@@ -146,7 +146,7 @@ export interface LiquidateL2TransactionData {
   type: 'Liquidate'
 }
 
-export interface DeleverageL2TransactionData {
+export interface PerpetualL2DeleverageTransactionData {
   syntheticAssetId: AssetId
   collateralAmount: bigint
   syntheticAmount: bigint
@@ -165,34 +165,37 @@ interface FundingIndicesState {
   indices: FundingIndex[]
   timestamp: Timestamp
 }
-export interface FundingTickL2TransactionData {
+export interface PerpetualL2FundingTickTransactionData {
   globalFundingIndices: FundingIndicesState
   type: 'FundingTick'
 }
 
-export interface L2TransactionSignedOraclePrice {
+export interface PerpetualL2TransactionSignedOraclePrice {
   signerPublicKey: Hash256
   externalAssetId: AssetHash
   timestampedSignature: {
-    signature: L2TransactionSignature
+    signature: PerpetualL2TransactionSignature
     timestamp: Timestamp
   }
   price: bigint
 }
 
-export interface L2TransactionAssetOraclePrice {
+export interface PerpetualL2TransactionAssetOraclePrice {
   syntheticAssetId: AssetId
-  signedPrices: L2TransactionSignedOraclePrice[]
+  signedPrices: PerpetualL2TransactionSignedOraclePrice[]
   price: bigint
 }
 
-export interface OraclePricesTickL2TransactionData {
+export interface PerpetualL2OraclePricesTickTransactionData {
   timestamp: Timestamp
-  oraclePrices: L2TransactionAssetOraclePrice[]
+  oraclePrices: PerpetualL2TransactionAssetOraclePrice[]
   type: 'OraclePricesTick'
 }
 
-export interface MultiL2TransactionData {
-  transactions: Exclude<L2TransactionData, MultiL2TransactionData>[]
+export interface PerpetualL2MultiTransactionData {
+  transactions: Exclude<
+    PerpetualL2TransactionData,
+    PerpetualL2MultiTransactionData
+  >[]
   type: 'MultiTransaction'
 }

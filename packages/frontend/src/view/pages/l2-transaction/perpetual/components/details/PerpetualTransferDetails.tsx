@@ -1,30 +1,22 @@
-import { CollateralAsset, L2TransactionData } from '@explorer/shared'
 import React from 'react'
 
-import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
-import { AssetAmount } from '../../../components/AssetAmount'
-import { Card } from '../../../components/Card'
-import { EtherscanLink } from '../../../components/EtherscanLink'
-import { InlineEllipsis } from '../../../components/InlineEllipsis'
-import { Link } from '../../../components/Link'
-import { TransactionField } from '../../transaction/components/TransactionField'
-import { L2CurrentStatusValue } from '../L2TransactionDetailsPage'
+import { formatTimestamp } from '../../../../../../utils/formatting/formatTimestamp'
+import { AssetAmount } from '../../../../../components/AssetAmount'
+import { Card } from '../../../../../components/Card'
+import { InlineEllipsis } from '../../../../../components/InlineEllipsis'
+import { Link } from '../../../../../components/Link'
+import { TransactionField } from '../../../../transaction/components/TransactionField'
+import { PerpetualTransactionDetailsProps } from '../../../common'
+import { CurrentStatusField } from '../CurrentStatusField'
 
-interface ConditionalTransferDetailsProps {
-  stateUpdateId: number | undefined
-  data: Extract<L2TransactionData, { type: 'ConditionalTransfer' }>
-  collateralAsset: CollateralAsset
-}
-
-export function ConditionalTransferDetails(
-  props: ConditionalTransferDetailsProps
+export function PerpetualTransferDetails(
+  props: PerpetualTransactionDetailsProps<'Transfer'>
 ) {
   return (
     <Card className="flex flex-col gap-6">
       <TransactionField label="Current status">
-        <L2CurrentStatusValue stateUpdateId={props.stateUpdateId} />
+        <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
-
       <div className="grid grid-cols-2 gap-x-2">
         <TransactionField label="Sender Position ID">
           {props.data.senderPositionId.toString()}
@@ -54,17 +46,6 @@ export function ConditionalTransferDetails(
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}
       />
-      <TransactionField label="Fact registry address">
-        <EtherscanLink
-          type="address"
-          address={props.data.factRegistryAddress.toString()}
-        >
-          {props.data.factRegistryAddress.toString()}
-        </EtherscanLink>
-      </TransactionField>
-      <TransactionField label="Fact">
-        {props.data.fact.toString()}
-      </TransactionField>
       <TransactionField label="Expiration date (UTC)">
         {formatTimestamp(props.data.expirationTimestamp)}
       </TransactionField>

@@ -5,18 +5,16 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { TableWithPagination } from '../../components/table/TableWithPagination'
-import {
-  L2TransactionEntry,
-  L2TransactionsTable,
-} from '../../components/tables/L2TransactionsTable'
+import { L2TransactionsTable } from '../../components/tables/L2TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
+import { PerpetualL2TransactionEntry } from '../l2-transaction/common'
 import { getL2TransactionTableProps } from './common'
 import { UserPageTitle } from './components/UserPageTitle'
 
 export interface UserL2TransactionsPageProps {
   context: PageContext
   starkKey: StarkKey
-  l2Transactions: L2TransactionEntry[]
+  l2Transactions: PerpetualL2TransactionEntry[]
   limit: number
   offset: number
   total: number
