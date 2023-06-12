@@ -1,9 +1,8 @@
 import { Hash256 } from '@explorer/types'
 
 import { HomeStateUpdateEntry, OfferEntry, TransactionEntry } from '../../view'
-import { L2TransactionEntry } from '../../view/components/tables/L2TransactionsTable'
 import { Bucket } from './Bucket'
-import { amountBucket, assetBucket, l2TransactionsBucket } from './buckets'
+import { amountBucket, assetBucket } from './buckets'
 import { randomId, randomInt, randomTimestamp } from './utils'
 
 export function randomHomeStateUpdateEntry(): HomeStateUpdateEntry {
@@ -34,14 +33,6 @@ export function randomHomeForcedTransactionEntry(): TransactionEntry {
     amount: amountBucket.pick(),
     status: transactionStatusBucket.pick(),
     type: transactionTypeBucket.pick(),
-  }
-}
-
-export function randomHomeL2TransactionEntry(): L2TransactionEntry {
-  return {
-    transactionId: randomInt(0, 10000),
-    data: l2TransactionsBucket.pick(),
-    status: randomInt(0, 100) > 20 ? 'INCLUDED' : 'PENDING',
   }
 }
 

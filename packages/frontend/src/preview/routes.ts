@@ -43,14 +43,23 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderL2TransactionDetailsPage } from '../view/pages/l2-transaction/L2TransactionDetailsPage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import {
   randomHomeForcedTransactionEntry,
-  randomHomeL2TransactionEntry,
   randomHomeOfferEntry,
   randomHomeStateUpdateEntry,
 } from './data/home'
+import {
+  randomHomeL2TransactionEntry,
+  randomL2ConditionalTransferTransaction,
+  randomL2DepositTransaction,
+  randomL2ForcedWithdrawalTransaction,
+  randomL2TransactionEntry,
+  randomL2TransferTransaction,
+  randomL2WithdrawToAddressTransaction,
+} from './data/l2Transactions'
 import {
   randomStateUpdateBalanceChangeEntry,
   randomStateUpdatePriceEntry,
@@ -567,6 +576,75 @@ const routes: Route[] = [
     },
     breakAfter: true,
   },
+  // #endregion
+  // #region L2 transactions
+  {
+    path: '/l2-transactions/deposit',
+    link: '/l2-transactions/deposit',
+    description: 'L2 transaction page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderL2TransactionDetailsPage({
+        context,
+        transaction: randomL2TransactionEntry(randomL2DepositTransaction()),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/forced-withdrawal',
+    link: '/l2-transactions/forced-withdrawal',
+    description: 'L2 transaction page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderL2TransactionDetailsPage({
+        context,
+        transaction: randomL2TransactionEntry(
+          randomL2ForcedWithdrawalTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/transfer',
+    link: '/l2-transactions/transfer',
+    description: 'L2 transaction page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderL2TransactionDetailsPage({
+        context,
+        transaction: randomL2TransactionEntry(randomL2TransferTransaction()),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/conditional-transfer',
+    link: '/l2-transactions/conditional-transfer',
+    description: 'L2 transaction page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderL2TransactionDetailsPage({
+        context,
+        transaction: randomL2TransactionEntry(
+          randomL2ConditionalTransferTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/withdraw-to-address',
+    link: '/l2-transactions/withdraw-to-address',
+    description: 'L2 transaction page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderL2TransactionDetailsPage({
+        context,
+        transaction: randomL2TransactionEntry(
+          randomL2WithdrawToAddressTransaction()
+        ),
+      })
+    },
+  },
+
   // #endregion
   // #region Forced actions
   {

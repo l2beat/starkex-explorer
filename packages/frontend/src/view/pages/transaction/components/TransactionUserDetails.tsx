@@ -2,6 +2,7 @@ import { TradingMode } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { EtherscanLink } from '../../../components/EtherscanLink'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { Link } from '../../../components/Link'
 import { SectionHeading } from '../../../components/SectionHeading'
@@ -36,13 +37,14 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
         </TransactionField>
         <TransactionField label="Ethereum Address">
           {props.ethereumAddress ? (
-            <Link
-              href={`https://etherscan.io/address/${props.ethereumAddress.toString()}`}
+            <EtherscanLink
+              type="address"
+              address={props.ethereumAddress.toString()}
             >
               <InlineEllipsis className="max-w-[300px]">
                 {props.ethereumAddress.toString()}
               </InlineEllipsis>
-            </Link>
+            </EtherscanLink>
           ) : (
             'Unknown'
           )}
