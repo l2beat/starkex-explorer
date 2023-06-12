@@ -2,7 +2,7 @@ import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { Logger } from '../../tools/Logger'
 import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
-import { PerpetualBatchInfoResponse } from './schema'
+import { PerpetualBatchInfoResponse } from './schema/perpetualBatchInfoResponse'
 import { toPerpetualBatchInfo } from './toPerpetualBatchInfo'
 
 export class FeederGatewayClient extends BaseClient {

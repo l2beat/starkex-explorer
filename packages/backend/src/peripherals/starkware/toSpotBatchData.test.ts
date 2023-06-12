@@ -1,7 +1,7 @@
 import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earl'
 
-import { EXAMPLE_SPOT_BATCH } from '../../test/starkwareData'
+import { EXAMPLE_SPOT_BATCH_DATA } from '../../test/starkwareData'
 import { SpotBatchDataResponse } from './schema'
 import { toSpotBatchData } from './toSpotBatchData'
 
@@ -11,7 +11,7 @@ describe(toSpotBatchData.name, () => {
   })
 
   it('transforms the parsed batch', () => {
-    const parsed = SpotBatchDataResponse.parse(EXAMPLE_SPOT_BATCH)
+    const parsed = SpotBatchDataResponse.parse(EXAMPLE_SPOT_BATCH_DATA)
     expect(toSpotBatchData(parsed)).toEqual({
       previousBatchId: 2129,
       vaultRoot: PedersenHash(
