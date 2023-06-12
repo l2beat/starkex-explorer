@@ -39,6 +39,9 @@ export function PerpetualL2TransactionDetailsPage(
             {perpetualL2TransactionTypeToText(props.transaction.data.type)}{' '}
             transaction #{props.transaction.transactionId}
           </PageTitle>
+          <span className="h-min rounded-full bg-fuchsia-400 py-2 px-2.5 text-sm font-bold text-black">
+            L2 TRANSACTION
+          </span>
         </div>
         <PerpetualTransactionDetails
           stateUpdateId={props.transaction.stateUpdateId}
