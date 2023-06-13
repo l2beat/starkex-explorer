@@ -44,7 +44,7 @@ export function L2TransactionsTable(props: L2TransactionsTableProps) {
         ]
 
         return {
-          link: `/live-transactions/${transaction.transactionId.toString()}`,
+          link: `/l2-transactions/${transaction.transactionId.toString()}`,
           cells,
         }
       })}
