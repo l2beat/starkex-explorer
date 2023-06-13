@@ -48,7 +48,10 @@ function UserL2TransactionsPage(props: UserL2TransactionsPageProps) {
           offset={props.offset}
           total={props.total}
         >
-          <L2TransactionsTable transactions={props.l2Transactions} />
+          <L2TransactionsTable
+            transactions={props.l2Transactions}
+            context={props.context}
+          />
         </TableWithPagination>
       </ContentWrapper>
     </Page>

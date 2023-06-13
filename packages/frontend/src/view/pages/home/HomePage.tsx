@@ -74,7 +74,10 @@ function HomePage(props: HomePageProps) {
               visible={props.l2Transactions.data.length}
               total={props.l2Transactions.total}
             >
-              <L2TransactionsTable transactions={props.l2Transactions.data} />
+              <L2TransactionsTable
+                transactions={props.l2Transactions.data}
+                context={props.context}
+              />
             </TablePreview>
           )}
           <TablePreview
