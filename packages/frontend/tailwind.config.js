@@ -21,7 +21,7 @@ module.exports = {
         500: '#F7931A',
       },
       fuchsia: {
-        400: '#F770F1'
+        400: '#F770F1',
       },
       zinc: {
         500: '#70737D',
@@ -58,7 +58,7 @@ module.exports = {
       },
       yellow: {
         300: '#FFEF5A',
-        700: '#CB9800'
+        700: '#CB9800',
       },
       sky: {
         400: '#38BDF8',

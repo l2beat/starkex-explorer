@@ -28,7 +28,7 @@ export function PerpetualL2TransactionFreeForm({
           amount={data.amount}
         />
       )
-    case 'Trade':
+    case 'Trade': {
       const buyer = data.partyAOrder.isBuyingSynthetic
         ? data.partyAOrder
         : data.partyBOrder
@@ -54,6 +54,8 @@ export function PerpetualL2TransactionFreeForm({
           />
         </>
       )
+    }
+
     case 'Transfer':
     case 'ConditionalTransfer':
       return (

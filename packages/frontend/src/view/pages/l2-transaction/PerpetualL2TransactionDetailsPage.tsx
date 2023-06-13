@@ -58,7 +58,7 @@ export function PerpetualL2TransactionDetailsPage(
           <div className="mt-12">
             <PageTitle>Alternative transactions</PageTitle>
             {props.transaction.alternativeTransactions.map((tx, index) => (
-              <div className="mb-4" key={tx.type + index}>
+              <div className="mb-4" key={`${tx.type}${index}`}>
                 <span className="text-lg font-semibold">
                   {l2TransactionTypeToText(tx.type)} alternative transaction #
                   {index}
