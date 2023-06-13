@@ -11,6 +11,7 @@ import { Link } from '../../../Link'
 import { StatusBadge } from '../../../StatusBadge'
 import { Table } from '../../../table/Table'
 import { Column } from '../../../table/types'
+import { TooltipWrapper } from '../../../Tooltip'
 import { PerpetualL2TransactionFreeForm } from './PerpetualL2TransactionFreeForm'
 
 export interface PerpetualL2TransactionsTableProps {
@@ -67,18 +68,28 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
         collateralAsset={collateralAsset}
       />
       <div className="ml-auto flex gap-2">
-        {transaction.state === 'alternative' && (
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">
-            A
-          </span>
-        )}
+        <TooltipWrapper
+          content={`This transaction alternative or one of alternatives of alternative transaction #${transaction.transactionId}`}
+        >
+          {transaction.state === 'alternative' && (
+            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">
+              A
+            </span>
+          )}
+        </TooltipWrapper>
         {transaction.state === 'replaced' && (
-          <ReplacedIcon className="fill-yellow-300" />
+          <TooltipWrapper content="This transaction has been replaced">
+            <ReplacedIcon className="fill-yellow-300" />
+          </TooltipWrapper>
         )}
         {transaction.isPartOfMulti && (
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">
-            M
-          </span>
+          <TooltipWrapper
+            content={`This transaction is included in multi transaction #${transaction.transactionId}`}
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">
+              M
+            </span>
+          </TooltipWrapper>
         )}
       </div>
     </span>
