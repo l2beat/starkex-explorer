@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import React from 'react'
+import React, { SVGAttributes } from 'react'
 
 interface ArrowProps {
   className?: string
@@ -31,4 +31,22 @@ export function ArrowRightIcon(props: ArrowProps) {
 
 export function ArrowDownIcon(props: ArrowProps) {
   return <ArrowLeftIcon className={cx(props.className, '-rotate-90')} />
+}
+
+export function HorizontalBidirectionalArrow(props: SVGAttributes<SVGElement>) {
+  return (
+    <svg
+      width="18"
+      height="12"
+      viewBox="0 0 18 12"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M5.71561 0.863763C5.49907 0.888895 5.29934 0.977695 5.14813 1.11843L0.221899 5.54003C-0.0342449 5.76993 -0.0342446 6.17126 0.2219 6.40117L5.14813 10.8228C5.38707 11.0473 5.74174 11.1394 6.07775 11.0623C6.41189 10.9853 6.67509 10.7524 6.76469 10.4525C6.85429 10.1526 6.75536 9.83255 6.50709 9.61642L3.40091 6.82844H14.5978L11.5065 9.61642C11.2209 9.8225 11.0921 10.1559 11.1742 10.4759C11.2564 10.7976 11.5345 11.0473 11.8929 11.121C12.2495 11.1947 12.6209 11.0791 12.8505 10.8228L17.7768 6.40117C18.0329 6.17126 18.0329 5.76993 17.7768 5.54002L12.8505 1.11843C12.6489 0.932457 12.3633 0.83863 12.074 0.863763C11.7081 0.900623 11.3982 1.12179 11.2788 1.43342C11.1574 1.74506 11.2452 2.09188 11.5065 2.32477L14.5978 5.11275H3.40091L6.50709 2.32477C6.79829 2.06675 6.87296 1.66966 6.69376 1.3396C6.51455 1.00953 6.12255 0.818525 5.71561 0.863763Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
 }

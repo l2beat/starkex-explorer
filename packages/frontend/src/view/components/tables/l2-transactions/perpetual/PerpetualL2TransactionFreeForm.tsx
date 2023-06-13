@@ -3,7 +3,10 @@ import React, { ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../../../utils/assets'
 import { formatAmount } from '../../../../../utils/formatting/formatAmount'
-import { ArrowRightIcon } from '../../../../assets/icons/ArrowIcon'
+import {
+  ArrowRightIcon,
+  HorizontalBidirectionalArrow,
+} from '../../../../assets/icons/ArrowIcon'
 import { PerpetualL2TransactionEntry } from '../../../../pages/l2-transaction/common'
 import { AssetWithLogo } from '../../../AssetWithLogo'
 import { InlineEllipsis } from '../../../InlineEllipsis'
@@ -26,21 +29,28 @@ export function PerpetualL2TransactionFreeForm({
         />
       )
     case 'Trade':
+      const buyer = data.partyAOrder.isBuyingSynthetic
+        ? data.partyAOrder
+        : data.partyBOrder
+      const seller = data.partyAOrder.isBuyingSynthetic
+        ? data.partyBOrder
+        : data.partyAOrder
       return (
         <>
-          <FreeFormAssetExchange
-            from={{
-              asset: { hashOrId: data.partyAOrder.syntheticAssetId },
-              amount: data.partyAOrder.syntheticAmount,
-            }}
-            to={{
-              asset: { hashOrId: data.partyBOrder.syntheticAssetId },
-              amount: data.partyBOrder.syntheticAmount,
-            }}
+          <FreeFormTradeAssets
+            exchange={[
+              {
+                asset: { hashOrId: collateralAsset.assetId },
+                amount: data.actualCollateral,
+              },
+              {
+                asset: { hashOrId: buyer.syntheticAssetId },
+                amount: data.actualSynthetic,
+              },
+            ]}
           />
-          <FreeFormAddressExchange
-            from={data.partyAOrder.starkKey.toString()}
-            to={data.partyBOrder.starkKey.toString()}
+          <FreeFormTradeAddresses
+            addresses={[buyer.starkKey.toString(), seller.starkKey.toString()]}
           />
         </>
       )
@@ -86,20 +96,32 @@ function FreeFormAddressExchange({ from, to }: { from: string; to: string }) {
   )
 }
 
-function FreeFormAssetExchange({
-  from,
-  to,
+function FreeFormTradeAddresses({
+  addresses,
 }: {
-  from: { asset: Asset; amount: bigint }
-  to: { asset: Asset; amount: bigint }
+  addresses: [string, string]
 }) {
   return (
     <FreeFormCard>
-      {formatAmount(from.asset, from.amount)}
-      <AssetWithLogo type="small" assetInfo={assetToInfo(from.asset)} />
-      <ArrowRightIcon />
-      {formatAmount(to.asset, to.amount)}
-      <AssetWithLogo type="small" assetInfo={assetToInfo(to.asset)} />
+      <FreeFormLink>{addresses[0]}</FreeFormLink>
+      <HorizontalBidirectionalArrow />
+      <FreeFormLink>{addresses[1]}</FreeFormLink>
+    </FreeFormCard>
+  )
+}
+
+function FreeFormTradeAssets({
+  exchange,
+}: {
+  exchange: [{ asset: Asset; amount: bigint }, { asset: Asset; amount: bigint }]
+}) {
+  return (
+    <FreeFormCard>
+      {formatAmount(exchange[0].asset, exchange[0].amount)}
+      <AssetWithLogo type="small" assetInfo={assetToInfo(exchange[0].asset)} />
+      <HorizontalBidirectionalArrow />
+      {formatAmount(exchange[1].asset, exchange[1].amount)}
+      <AssetWithLogo type="small" assetInfo={assetToInfo(exchange[1].asset)} />
     </FreeFormCard>
   )
 }

@@ -1,6 +1,7 @@
 import { CollateralAsset } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
+import { ReplacedIcon } from '../../../../assets/icons/ReplacedIcon'
 import {
   getL2TransactionStatusBadgeValues,
   l2TransactionTypeToText,
@@ -10,7 +11,6 @@ import { Link } from '../../../Link'
 import { StatusBadge } from '../../../StatusBadge'
 import { Table } from '../../../table/Table'
 import { Column } from '../../../table/types'
-import { ReplacedBadge } from '../ReplacedBadge'
 import { PerpetualL2TransactionFreeForm } from './PerpetualL2TransactionFreeForm'
 
 export interface PerpetualL2TransactionsTableProps {
@@ -72,7 +72,9 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
             A
           </span>
         )}
-        {transaction.state === 'replaced' && <ReplacedBadge />}
+        {transaction.state === 'replaced' && (
+          <ReplacedIcon className="fill-yellow-700" />
+        )}
         {transaction.isPartOfMulti && (
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">
             M
