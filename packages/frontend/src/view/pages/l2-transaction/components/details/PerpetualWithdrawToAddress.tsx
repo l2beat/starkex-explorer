@@ -17,8 +17,8 @@ export function PerpetualWithdrawToAddressDetails(
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
-      <TransactionField label="Position ID">
-        {props.data.positionId.toString()}
+      <TransactionField label="Position">
+        #{props.data.positionId.toString()}
       </TransactionField>
       <TransactionField label="Stark key">
         <Link href={`/users/${props.data.starkKey.toString()}`}>

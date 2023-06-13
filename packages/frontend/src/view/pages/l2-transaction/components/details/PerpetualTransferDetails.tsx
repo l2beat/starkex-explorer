@@ -18,22 +18,22 @@ export function PerpetualTransferDetails(
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
       <div className="grid grid-cols-2 gap-x-2">
-        <TransactionField label="Sender Position ID">
-          {props.data.senderPositionId.toString()}
+        <TransactionField label="Sender position">
+          #{props.data.senderPositionId.toString()}
         </TransactionField>
-        <TransactionField label="Receiver Position ID">
-          {props.data.receiverPositionId.toString()}
+        <TransactionField label="Receiver position">
+          #{props.data.receiverPositionId.toString()}
         </TransactionField>
       </div>
       <div className="grid grid-cols-2 gap-x-2">
-        <TransactionField label="Sender Stark key">
+        <TransactionField label="Sender stark key">
           <Link href={`/users/${props.data.senderStarkKey.toString()}`}>
             <InlineEllipsis className="max-w-[400px]">
               {props.data.senderStarkKey.toString()}
             </InlineEllipsis>
           </Link>
         </TransactionField>
-        <TransactionField label="Receiver Stark key">
+        <TransactionField label="Receiver stark key">
           <Link href={`/users/${props.data.receiverStarkKey.toString()}`}>
             <InlineEllipsis className="max-w-[400px]">
               {props.data.receiverStarkKey.toString()}
