@@ -28,14 +28,14 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
             #{props.vaultOrPositionId}
           </TransactionField>
         )}
-        <TransactionField label="Stark Key">
+        <TransactionField label="Stark key">
           <Link href={`/users/${props.starkKey.toString()}`}>
             <InlineEllipsis className="max-w-[300px]">
               {props.starkKey.toString()}
             </InlineEllipsis>
           </Link>
         </TransactionField>
-        <TransactionField label="Ethereum Address">
+        <TransactionField label="Ethereum address">
           {props.ethereumAddress ? (
             <EtherscanLink
               type="address"
