@@ -69,7 +69,7 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
       />
       <div className="ml-auto flex gap-2">
         <TooltipWrapper
-          content={`This transaction alternative or one of alternatives of alternative transaction #${transaction.transactionId}`}
+          content={`This transaction is alternative or one of the alternatives of transaction #${transaction.transactionId}`}
         >
           {transaction.state === 'alternative' && (
             <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">
