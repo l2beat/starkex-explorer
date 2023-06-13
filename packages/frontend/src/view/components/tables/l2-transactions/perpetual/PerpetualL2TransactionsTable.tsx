@@ -73,7 +73,7 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
           </span>
         )}
         {transaction.state === 'replaced' && (
-          <ReplacedIcon className="fill-yellow-700" />
+          <ReplacedIcon className="fill-yellow-300" />
         )}
         {transaction.isPartOfMulti && (
           <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">

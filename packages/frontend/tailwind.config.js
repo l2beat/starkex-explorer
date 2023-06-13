@@ -58,7 +58,6 @@ module.exports = {
       },
       yellow: {
         300: '#FFEF5A',
-        700: '#CB9800',
       },
       sky: {
         400: '#38BDF8',
