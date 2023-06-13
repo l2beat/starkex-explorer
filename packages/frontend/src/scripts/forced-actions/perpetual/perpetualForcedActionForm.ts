@@ -2,13 +2,16 @@ import { CollateralAsset, UserDetails } from '@explorer/shared'
 
 import { FormId } from '../../../view/pages/forced-actions/components/form/ids'
 import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
+import { makeQuery } from '../../utils/query'
 import { FormElements, getFormElements } from './getFormElements'
 import { getInitialState, nextFormState } from './state'
 import { submit } from './submit'
 import { FormAction, FormState } from './types'
 
 export function initPerpetualForcedActionForm() {
-  if (!document.getElementById(FormId.Form)) {
+  const { $ } = makeQuery(document.body)
+
+  if (!$.maybe(`#${FormId.Form}`)) {
     return
   }
 

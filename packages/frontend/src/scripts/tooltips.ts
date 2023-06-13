@@ -63,9 +63,7 @@ export function initTooltips() {
   }
 
   window.addEventListener('resize', hide)
-  document
-    .querySelectorAll('.TableView')
-    .forEach((x) => x.addEventListener('scroll', hide))
+  $$('.TableView').forEach((x) => x.addEventListener('scroll', hide))
   document.body.addEventListener('scroll', hide)
   document.body.addEventListener('click', (e) => {
     if (e.currentTarget !== tooltip) {
