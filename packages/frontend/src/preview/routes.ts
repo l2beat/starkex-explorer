@@ -578,6 +578,18 @@ const routes: Route[] = [
   // #endregion
   // #region L2 transactions
   {
+    path: '/l2-transactions/:transactionId',
+    link: '/l2-transactions/1234',
+    description: 'Perpetual L2 transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomPerpetualL2TransactionEntry(),
+      })
+    },
+  },
+  {
     path: '/l2-transactions/perpetual/deposit',
     link: '/l2-transactions/perpetual/deposit',
     description: 'Perpetual L2 deposit transaction page.',
