@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { formatTimestamp } from '../../../../../../utils/formatting/formatTimestamp'
-import { AssetAmount } from '../../../../../components/AssetAmount'
-import { Card } from '../../../../../components/Card'
-import { EtherscanLink } from '../../../../../components/EtherscanLink'
-import { Link } from '../../../../../components/Link'
-import { TransactionField } from '../../../../transaction/components/TransactionField'
-import { PerpetualTransactionDetailsProps } from '../../../common'
+import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
+import { AssetAmount } from '../../../../components/AssetAmount'
+import { Card } from '../../../../components/Card'
+import { EtherscanLink } from '../../../../components/EtherscanLink'
+import { Link } from '../../../../components/Link'
+import { TransactionField } from '../../../transaction/components/TransactionField'
+import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
 
 export function PerpetualWithdrawToAddressDetails(

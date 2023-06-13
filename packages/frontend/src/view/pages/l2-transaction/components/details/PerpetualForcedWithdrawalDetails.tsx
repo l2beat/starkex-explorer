@@ -1,14 +1,14 @@
 import React from 'react'
 
-import { AssetAmount } from '../../../../../components/AssetAmount'
-import { Card } from '../../../../../components/Card'
-import { Link } from '../../../../../components/Link'
-import { TransactionField } from '../../../../transaction/components/TransactionField'
-import { PerpetualTransactionDetailsProps } from '../../../common'
+import { AssetAmount } from '../../../../components/AssetAmount'
+import { Card } from '../../../../components/Card'
+import { Link } from '../../../../components/Link'
+import { TransactionField } from '../../../transaction/components/TransactionField'
+import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
 
-export function PerpetualDepositDetails(
-  props: PerpetualTransactionDetailsProps<'Deposit'>
+export function PerpetualForcedWithdrawalDetails(
+  props: PerpetualTransactionDetailsProps<'ForcedWithdrawal'>
 ) {
   return (
     <Card className="flex flex-col gap-6">
@@ -18,7 +18,6 @@ export function PerpetualDepositDetails(
       <TransactionField label="Position ID">
         {props.data.positionId.toString()}
       </TransactionField>
-
       <TransactionField label="Stark key">
         <Link href={`/users/${props.data.starkKey.toString()}`}>
           {props.data.starkKey.toString()}

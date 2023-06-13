@@ -1,16 +1,16 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
-import { ContentWrapper } from '../../../components/page/ContentWrapper'
-import { Page } from '../../../components/page/Page'
-import { PageTitle } from '../../../components/PageTitle'
-import { reactToHtml } from '../../../reactToHtml'
+import { ContentWrapper } from '../../components/page/ContentWrapper'
+import { Page } from '../../components/page/Page'
+import { PageTitle } from '../../components/PageTitle'
+import { reactToHtml } from '../../reactToHtml'
 import {
   AggregatedPerpetualL2TransactionEntry,
   l2TransactionTypeToText,
-} from '../common'
-import { ReplacedTransactionNote } from '../components/ReplacedTransactionNote'
+} from './common'
 import { PerpetualTransactionDetails } from './components/details'
+import { ReplacedTransactionNote } from './components/ReplacedTransactionNote'
 
 interface PerpetualL2TransactionDetailsPageProps {
   context: PageContext<'perpetual'>

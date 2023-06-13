@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { Link } from '../../../../components/Link'
-import { StatusBadge } from '../../../../components/StatusBadge'
-import { getL2TransactionStatusBadgeValues } from '../../common'
+import { Link } from '../../../components/Link'
+import { StatusBadge } from '../../../components/StatusBadge'
+import { getL2TransactionStatusBadgeValues } from '../common'
 
 export function CurrentStatusField(props: {
   stateUpdateId: number | undefined

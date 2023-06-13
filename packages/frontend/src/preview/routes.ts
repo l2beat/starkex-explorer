@@ -43,7 +43,7 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
-import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/perpetual/PerpetualL2TransactionDetailsPage'
+import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import {

@@ -4,8 +4,8 @@ import {
 } from '@explorer/shared'
 import React from 'react'
 
-import { Card } from '../../../../../components/Card'
-import { PerpetualTransactionDetailsProps } from '../../../common'
+import { Card } from '../../../../components/Card'
+import { PerpetualTransactionDetailsProps } from '../../common'
 import { PerpetualConditionalTransferDetails } from './PerpetualConditionalTransferDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
 import { PerpetualForcedWithdrawalDetails } from './PerpetualForcedWithdrawalDetails'

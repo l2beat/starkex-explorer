@@ -90,7 +90,7 @@ function FreeFormAddressExchange({ from, to }: { from: string; to: string }) {
   return (
     <FreeFormCard>
       <FreeFormLink>{from}</FreeFormLink>
-      <ArrowRightIcon />
+      <ArrowRightIcon className="fill-zinc-500" />
       <FreeFormLink>{to}</FreeFormLink>
     </FreeFormCard>
   )
@@ -104,7 +104,7 @@ function FreeFormTradeAddresses({
   return (
     <FreeFormCard>
       <FreeFormLink>{addresses[0]}</FreeFormLink>
-      <HorizontalBidirectionalArrow />
+      <HorizontalBidirectionalArrow className="mr-1 fill-zinc-500" />
       <FreeFormLink>{addresses[1]}</FreeFormLink>
     </FreeFormCard>
   )
@@ -119,7 +119,7 @@ function FreeFormTradeAssets({
     <FreeFormCard>
       {formatAmount(exchange[0].asset, exchange[0].amount)}
       <AssetWithLogo type="small" assetInfo={assetToInfo(exchange[0].asset)} />
-      <HorizontalBidirectionalArrow />
+      <HorizontalBidirectionalArrow className="fill-zinc-500" />
       {formatAmount(exchange[1].asset, exchange[1].amount)}
       <AssetWithLogo type="small" assetInfo={assetToInfo(exchange[1].asset)} />
     </FreeFormCard>
