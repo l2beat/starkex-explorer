@@ -396,33 +396,12 @@ export function createFrontendRouter(
       )
     }
 
-    if (shouldShowL2Transactions(config)) {
-      router.get(
-        '/l2-transactions/:transactionId',
-        withTypedContext(
-          z.object({
-            params: z.object({
-              transactionId: stringAsPositiveInt(),
-            }),
-          }),
-          async (ctx) => {
-            const givenUser = getGivenUser(ctx)
-            const result =
-              await l2TransactionController.getPerpetualL2TransactionDetailsPage(
-                givenUser,
-                ctx.params.transactionId
-              )
-            applyControllerResult(ctx, result)
-          }
-        )
-      )
-    }
-
     addPerpetualTradingRoutes(
       router,
       forcedTradeOfferController,
       forcedActionController,
-      config.starkex.collateralAsset
+      l2TransactionController,
+      config
     )
   } else {
     addSpotTradingRoutes(router, forcedActionController)
