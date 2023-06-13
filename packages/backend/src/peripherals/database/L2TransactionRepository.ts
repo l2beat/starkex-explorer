@@ -26,8 +26,16 @@ interface Record<
   state: 'alternative' | 'replaced' | undefined
   starkKeyA: StarkKey | undefined
   starkKeyB: StarkKey | undefined
-  type: T
   data: Extract<PerpetualL2TransactionData, { type: T }>
+}
+
+interface AggregatedRecord {
+  id: number
+  transactionId: number
+  stateUpdateId: number
+  blockNumber: number
+  transaction: PerpetualL2TransactionData
+  alternativeTransactions: PerpetualL2TransactionData[]
 }
 
 export type { Record as L2TransactionRecord }
@@ -44,6 +52,7 @@ export class L2TransactionRepository extends BaseRepository {
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
     this.findById = this.wrapFind(this.findById)
+    this.findByTransactionId = this.wrapFind(this.findByTransactionId)
     this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
     this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -219,6 +228,27 @@ export class L2TransactionRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
+  async findByTransactionId(id: number): Promise<AggregatedRecord | undefined> {
+    const knex = await this.knex()
+    const originalTransaction = await knex('l2_transactions')
+      .where({ transaction_id: id, parent_id: null })
+      .first()
+
+    if (!originalTransaction) {
+      return undefined
+    }
+
+    const alternativeTransactions = await knex('l2_transactions')
+      .where({
+        transaction_id: id,
+        parent_id: null,
+        state: 'alternative',
+      })
+      .orderBy('id', 'asc')
+
+    return toAggregatedRecord(originalTransaction, alternativeTransactions)
+  }
+
   async findLatestStateUpdateId(): Promise<number | undefined> {
     const knex = await this.knex()
     const results = await knex('l2_transactions')
@@ -252,7 +282,22 @@ function toRecord(row: L2TransactionRow): Record {
     state: row.state ? row.state : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
-    type: row.type as PerpetualL2TransactionData['type'],
     data: decodeTransactionData(row.data),
+  }
+}
+
+function toAggregatedRecord(
+  transaction: L2TransactionRow,
+  alternatives: L2TransactionRow[]
+): AggregatedRecord {
+  return {
+    id: transaction.id,
+    transactionId: transaction.transaction_id,
+    stateUpdateId: transaction.state_update_id,
+    blockNumber: transaction.block_number,
+    transaction: decodeTransactionData(transaction.data),
+    alternativeTransactions: alternatives.map((alternative) =>
+      decodeTransactionData(alternative.data)
+    ),
   }
 }
