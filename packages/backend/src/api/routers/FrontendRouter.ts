@@ -8,6 +8,7 @@ import { shouldShowL2Transactions } from '../../utils/shouldShowL2Transactions'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'
+import { L2TransactionController } from '../controllers/L2TransactionController'
 import { MerkleProofController } from '../controllers/MerkleProofController'
 import { SearchController } from '../controllers/SearchController'
 import { StateUpdateController } from '../controllers/StateUpdateController'
@@ -27,6 +28,7 @@ export function createFrontendRouter(
   forcedTradeOfferController: ForcedTradeOfferController | undefined,
   merkleProofController: MerkleProofController,
   searchController: SearchController,
+  l2TransactionController: L2TransactionController,
   config: Config
 ) {
   const router = new Router()
@@ -391,6 +393,28 @@ export function createFrontendRouter(
     if (!forcedTradeOfferController) {
       throw new Error(
         'forcedTradeOfferController is required in perpetual trading mode'
+      )
+    }
+
+    if (shouldShowL2Transactions(config)) {
+      router.get(
+        '/l2-transactions/:transactionId',
+        withTypedContext(
+          z.object({
+            params: z.object({
+              transactionId: stringAsPositiveInt(),
+            }),
+          }),
+          async (ctx) => {
+            const givenUser = getGivenUser(ctx)
+            const result =
+              await l2TransactionController.getPerpetualL2TransactionDetailsPage(
+                givenUser,
+                ctx.params.transactionId
+              )
+            applyControllerResult(ctx, result)
+          }
+        )
       )
     }
 

@@ -5,6 +5,7 @@ import { ApiServer } from './api/ApiServer'
 import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { HomeController } from './api/controllers/HomeController'
+import { L2TransactionController } from './api/controllers/L2TransactionController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
@@ -159,7 +160,10 @@ export class Application {
       logger
     )
 
-    const transactionRepository = new L2TransactionRepository(database, logger)
+    const l2TransactionRepository = new L2TransactionRepository(
+      database,
+      logger
+    )
 
     const ethereumClient = new EthereumClient(
       config.starkex.blockchain.jsonRpcUrl,
@@ -247,7 +251,7 @@ export class Application {
         feederGatewayCollector = feederGatewayClient
           ? new FeederGatewayCollector(
               feederGatewayClient,
-              transactionRepository,
+              l2TransactionRepository,
               stateUpdateRepository,
               logger
             )
@@ -528,7 +532,7 @@ export class Application {
       forcedTradeOfferViewService,
       userTransactionRepository,
       forcedTradeOfferRepository,
-      transactionRepository,
+      l2TransactionRepository,
       preprocessedStateDetailsRepository,
       showL2Transactions
     )
@@ -540,7 +544,7 @@ export class Application {
       sentTransactionRepository,
       userTransactionRepository,
       forcedTradeOfferRepository,
-      transactionRepository,
+      l2TransactionRepository,
       userRegistrationEventRepository,
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
@@ -577,6 +581,11 @@ export class Application {
       preprocessedAssetHistoryRepository
     )
 
+    const l2TransactionController = new L2TransactionController(
+      pageContextService,
+      l2TransactionRepository
+    )
+
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
       sentTransactionRepository,
@@ -603,6 +612,7 @@ export class Application {
           forcedTradeOfferController,
           merkleProofController,
           searchController,
+          l2TransactionController,
           config
         ),
         createTransactionRouter(

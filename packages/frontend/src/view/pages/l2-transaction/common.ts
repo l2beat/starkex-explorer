@@ -4,7 +4,6 @@ import {
   PerpetualL2TransactionData,
 } from '@explorer/shared'
 
-import console from 'console'
 import { StatusType } from '../../components/StatusBadge'
 
 export interface PerpetualTransactionDetailsProps<
@@ -25,7 +24,14 @@ export interface PerpetualL2TransactionEntry<
   state?: 'alternative' | 'replaced'
 }
 
-export function perpetualL2TransactionTypeToText(
+export interface AggregatedPerpetualL2TransactionEntry {
+  transactionId: number
+  stateUpdateId: number | undefined
+  originalTransaction: PerpetualL2TransactionData
+  alternativeTransactions: PerpetualL2TransactionData[]
+}
+
+export function l2TransactionTypeToText(
   type: PerpetualL2TransactionData['type']
 ): string {
   switch (type) {

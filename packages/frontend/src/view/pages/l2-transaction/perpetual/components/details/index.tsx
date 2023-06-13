@@ -1,6 +1,10 @@
-import { PerpetualL2TransactionData } from '@explorer/shared'
+import {
+  PerpetualL2TransactionData,
+  toJsonWithoutBigInts,
+} from '@explorer/shared'
 import React from 'react'
 
+import { Card } from '../../../../../components/Card'
 import { PerpetualTransactionDetailsProps } from '../../../common'
 import { PerpetualConditionalTransferDetails } from './PerpetualConditionalTransferDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
@@ -53,6 +57,16 @@ export function PerpetualTransactionDetails(
         />
       )
     default:
-      return null
+      return (
+        <Card>
+          <span className="whitespace-normal">
+            {JSON.stringify(
+              JSON.parse(toJsonWithoutBigInts(props.data)),
+              null,
+              2
+            )}
+          </span>
+        </Card>
+      )
   }
 }

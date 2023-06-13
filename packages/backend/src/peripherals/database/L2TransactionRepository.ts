@@ -34,7 +34,7 @@ interface AggregatedRecord {
   transactionId: number
   stateUpdateId: number
   blockNumber: number
-  transaction: PerpetualL2TransactionData
+  originalTransaction: PerpetualL2TransactionData
   alternativeTransactions: PerpetualL2TransactionData[]
 }
 
@@ -295,7 +295,7 @@ function toAggregatedRecord(
     transactionId: transaction.transaction_id,
     stateUpdateId: transaction.state_update_id,
     blockNumber: transaction.block_number,
-    transaction: decodeTransactionData(transaction.data),
+    originalTransaction: decodeTransactionData(transaction.data),
     alternativeTransactions: alternatives.map((alternative) =>
       decodeTransactionData(alternative.data)
     ),

@@ -6,8 +6,8 @@ import { formatAmount } from '../../../../utils/formatting/formatAmount'
 import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
 import {
   getL2TransactionStatusBadgeValues,
+  l2TransactionTypeToText,
   PerpetualL2TransactionEntry,
-  perpetualL2TransactionTypeToText,
 } from '../../../pages/l2-transaction/common'
 import { AssetWithLogo } from '../../AssetWithLogo'
 import { InlineEllipsis } from '../../InlineEllipsis'
@@ -58,7 +58,7 @@ interface TypeCellProps {
 function TypeCell({ transaction }: TypeCellProps) {
   return (
     <span className="flex items-center gap-3">
-      {perpetualL2TransactionTypeToText(transaction.data.type)}
+      {l2TransactionTypeToText(transaction.data.type)}
       <FreeForm data={transaction.data} />
       <div className="ml-auto flex gap-2">
         {transaction.state === 'alternative' && (

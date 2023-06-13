@@ -43,6 +43,7 @@ import { UserRegistrationEventRepository } from '../../peripherals/database/User
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { getAssetValueUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
+import { l2TransactionToEntry } from './l2TransactionToEntry'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
@@ -209,10 +210,7 @@ export class UserController {
       ethereumAddress: registeredUser?.ethAddress,
       l2Transactions: this.showL2Transactions
         ? {
-            data: l2Transactions.map((t) => ({
-              ...t,
-              status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
-            })),
+            data: l2Transactions.map(l2TransactionToEntry),
             total: l2TransactionsCount,
           }
         : undefined,
@@ -320,12 +318,9 @@ export class UserController {
     const content = renderUserL2TransactionsPage({
       context,
       starkKey,
-      l2Transactions: l2Transactions.map((t) => ({
-        ...t,
-        status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
-      })),
-      ...pagination,
+      l2Transactions: l2Transactions.map(l2TransactionToEntry),
       total: l2TransactionsCount,
+      ...pagination,
     })
     return { type: 'success', content }
   }

@@ -531,7 +531,7 @@ describe(L2TransactionRepository.name, () => {
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
-        transaction: record.data,
+        originalTransaction: record.data,
         alternativeTransactions: [],
       })
     })
@@ -578,7 +578,7 @@ describe(L2TransactionRepository.name, () => {
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
-        transaction: record.data,
+        originalTransaction: record.data,
         alternativeTransactions: [],
       })
     })
@@ -663,7 +663,7 @@ describe(L2TransactionRepository.name, () => {
         stateUpdateId: record.stateUpdateId,
         transactionId: record.transactionId,
         blockNumber: record.blockNumber,
-        transaction: record.data,
+        originalTransaction: record.data,
         alternativeTransactions: [alt1.data, alt2.data, alt3.data],
       })
     })

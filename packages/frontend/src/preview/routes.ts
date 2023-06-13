@@ -52,6 +52,7 @@ import {
   randomHomeStateUpdateEntry,
 } from './data/home'
 import {
+  randomAggregatedPerpetualL2TransactionEntry,
   randomPerpetualL2ConditionalTransferTransaction,
   randomPerpetualL2DepositTransaction,
   randomPerpetualL2ForcedWithdrawalTransaction,
@@ -585,7 +586,7 @@ const routes: Route[] = [
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomPerpetualL2TransactionEntry(),
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
       })
     },
   },
@@ -597,7 +598,7 @@ const routes: Route[] = [
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomPerpetualL2TransactionEntry(
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
           randomPerpetualL2DepositTransaction()
         ),
       })
@@ -611,7 +612,7 @@ const routes: Route[] = [
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomPerpetualL2TransactionEntry(
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
           randomPerpetualL2ForcedWithdrawalTransaction()
         ),
       })
@@ -625,7 +626,7 @@ const routes: Route[] = [
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomPerpetualL2TransactionEntry(
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
           randomPerpetualL2TransferTransaction()
         ),
       })
@@ -639,7 +640,7 @@ const routes: Route[] = [
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomPerpetualL2TransactionEntry(
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
           randomPerpetualL2ConditionalTransferTransaction()
         ),
       })
@@ -653,7 +654,7 @@ const routes: Route[] = [
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: randomPerpetualL2TransactionEntry(
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
           randomPerpetualL2WithdrawToAddressTransaction()
         ),
       })

@@ -14,7 +14,10 @@ import {
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
-import { PerpetualL2TransactionEntry } from '../../view/pages/l2-transaction/common'
+import {
+  AggregatedPerpetualL2TransactionEntry,
+  PerpetualL2TransactionEntry,
+} from '../../view/pages/l2-transaction/common'
 import { Bucket } from './Bucket'
 import { amountBucket, assetIdBucket } from './buckets'
 import {
@@ -99,6 +102,20 @@ export function randomPerpetualL2TransactionEntry(
         ? perpetualL2TransactionStateBucket.pick()
         : undefined,
     isPartOfMulti: randomInt(0, 10) > 9 ? true : false,
+  }
+}
+
+export function randomAggregatedPerpetualL2TransactionEntry(
+  data?: PerpetualL2TransactionData
+): AggregatedPerpetualL2TransactionEntry {
+  return {
+    transactionId: randomInt(0, 100000),
+    stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
+    originalTransaction: data ? data : perpetualL2TransactionsBucket.pick(),
+    alternativeTransactions:
+      randomInt(0, 10) > 8
+        ? repeat(randomInt(1, 5), () => perpetualL2TransactionsBucket.pick())
+        : [],
   }
 }
 
