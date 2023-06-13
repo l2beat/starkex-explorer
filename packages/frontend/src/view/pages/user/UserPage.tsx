@@ -6,7 +6,7 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
 import { TablePreview } from '../../components/table/TablePreview'
-import { L2TransactionsTable } from '../../components/tables/L2TransactionsTable'
+import { L2TransactionsTable } from '../../components/tables/l2-transactions/L2TransactionsTable'
 import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import {
   TransactionEntry,

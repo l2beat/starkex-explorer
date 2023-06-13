@@ -52,7 +52,6 @@ import {
   randomHomeStateUpdateEntry,
 } from './data/home'
 import {
-  randomHomePerpetualL2TransactionEntry,
   randomPerpetualL2ConditionalTransferTransaction,
   randomPerpetualL2DepositTransaction,
   randomPerpetualL2ForcedWithdrawalTransaction,
@@ -136,7 +135,7 @@ const routes: Route[] = [
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
         l2Transactions: {
-          data: repeat(6, randomHomePerpetualL2TransactionEntry),
+          data: repeat(6, randomPerpetualL2TransactionEntry),
           total: 5123,
         },
         tutorials: [],
@@ -174,7 +173,7 @@ const routes: Route[] = [
 
       ctx.body = renderHomeL2TransactionsPage({
         context: getPerpetualPageContext(ctx),
-        l2Transactions: repeat(visible, randomHomePerpetualL2TransactionEntry),
+        l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
         total: total,
         limit: limit,
         offset: offset,
@@ -471,7 +470,7 @@ const routes: Route[] = [
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
         l2Transactions: {
-          data: repeat(6, randomHomePerpetualL2TransactionEntry),
+          data: repeat(6, randomPerpetualL2TransactionEntry),
           total: 5123,
         },
         offers: repeat(6, randomUserOfferEntry),
@@ -512,7 +511,7 @@ const routes: Route[] = [
       ctx.body = renderUserL2TransactionsPage({
         context,
         starkKey: StarkKey.fake(),
-        l2Transactions: repeat(visible, randomHomePerpetualL2TransactionEntry),
+        l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
         limit,
         offset,
         total,

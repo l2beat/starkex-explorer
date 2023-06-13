@@ -83,29 +83,22 @@ perpetualL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2OraclePricesTickTransaction)
 )
 
-export function randomHomePerpetualL2TransactionEntry(): PerpetualL2TransactionEntry {
-  return {
-    transactionId: randomInt(0, 10000),
-    data: perpetualL2TransactionsBucket.pick(),
-    stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 10000),
-  }
-}
-
-export function randomUserPerpetualL2TransactionEntry(): PerpetualL2TransactionEntry {
-  return {
-    transactionId: randomInt(0, 10000),
-    data: perpetualL2TransactionsBucket.pick(),
-    stateUpdateId: randomInt(0, 100) > 20 ? undefined : randomInt(0, 10000),
-  }
-}
+const perpetualL2TransactionStateBucket = new Bucket<
+  PerpetualL2TransactionEntry['state']
+>(['alternative', 'replaced'])
 
 export function randomPerpetualL2TransactionEntry(
-  data: PerpetualL2TransactionEntry['data']
+  data?: PerpetualL2TransactionEntry['data']
 ): PerpetualL2TransactionEntry {
   return {
     transactionId: randomInt(0, 100000),
     stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
-    data,
+    data: data ? data : perpetualL2TransactionsBucket.pick(),
+    state:
+      randomInt(0, 10) > 8
+        ? perpetualL2TransactionStateBucket.pick()
+        : undefined,
+    isPartOfMulti: randomInt(0, 10) > 9 ? true : false,
   }
 }
 

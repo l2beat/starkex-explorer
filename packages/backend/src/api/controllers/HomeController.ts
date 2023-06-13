@@ -16,6 +16,7 @@ import { PreprocessedStateDetailsRepository } from '../../peripherals/database/P
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
+import { l2TransactionToEntry } from './l2TransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
@@ -69,31 +70,30 @@ export class HomeController {
     })
 
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
-    const forcedTransactions = forcedUserTransactions.map((t) =>
+    const forcedTransactionEntries = forcedUserTransactions.map((t) =>
       userTransactionToEntry(t, collateralAsset, assetDetailsMap)
     )
+
+    const stateUpdateEntries = stateUpdates.map((update) => ({
+      timestamp: update.timestamp,
+      id: update.stateUpdateId.toString(),
+      hash: update.stateTransitionHash,
+      updateCount: update.assetUpdateCount,
+      forcedTransactionCount: update.forcedTransactionCount,
+    }))
 
     const content = renderHomePage({
       context,
       tutorials: [], // explicitly no tutorials
       l2Transactions: this.showL2Transactions
         ? {
-            data: l2Transactions.map((t) => ({
-              ...t,
-              status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
-            })),
+            data: l2Transactions.map(l2TransactionToEntry),
             total: l2TransactionsCount,
           }
         : undefined,
-      stateUpdates: stateUpdates.map((update) => ({
-        timestamp: update.timestamp,
-        id: update.stateUpdateId.toString(),
-        hash: update.stateTransitionHash,
-        updateCount: update.assetUpdateCount,
-        forcedTransactionCount: update.forcedTransactionCount,
-      })),
+      stateUpdates: stateUpdateEntries,
       totalStateUpdates: stateUpdatesCount,
-      forcedTransactions,
+      forcedTransactions: forcedTransactionEntries,
       totalForcedTransactions: forcedUserTransactionsCount,
       // We use forcedTradeOfferToEntry here because we only need status from the offer,
       // as we do not show other statuses on this page
@@ -118,10 +118,7 @@ export class HomeController {
 
     const content = renderHomeL2TransactionsPage({
       context,
-      l2Transactions: l2Transactions.map((t) => ({
-        ...t,
-        status: t.stateUpdateId ? 'INCLUDED' : 'PENDING',
-      })),
+      l2Transactions: l2Transactions.map(l2TransactionToEntry),
       ...pagination,
       total,
     })
@@ -139,15 +136,17 @@ export class HomeController {
       this.preprocessedStateDetailsRepository.getPaginated(pagination),
     ])
 
+    const stateUpdateEntries = stateUpdates.map((update) => ({
+      timestamp: update.timestamp,
+      id: update.stateUpdateId.toString(),
+      hash: update.stateTransitionHash,
+      updateCount: update.assetUpdateCount,
+      forcedTransactionCount: update.forcedTransactionCount,
+    }))
+
     const content = renderHomeStateUpdatesPage({
       context,
-      stateUpdates: stateUpdates.map((update) => ({
-        timestamp: update.timestamp,
-        id: update.stateUpdateId.toString(),
-        hash: update.stateTransitionHash,
-        updateCount: update.assetUpdateCount,
-        forcedTransactionCount: update.forcedTransactionCount,
-      })),
+      stateUpdates: stateUpdateEntries,
       ...pagination,
       total,
     })
