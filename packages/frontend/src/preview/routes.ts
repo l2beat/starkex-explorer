@@ -59,6 +59,7 @@ import {
   randomPerpetualL2TransactionEntry,
   randomPerpetualL2TransferTransaction,
   randomPerpetualL2WithdrawToAddressTransaction,
+  randomPerpetualUserL2TransactionEntry,
 } from './data/l2Transactions'
 import {
   randomStateUpdateBalanceChangeEntry,
@@ -471,7 +472,7 @@ const routes: Route[] = [
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
         l2Transactions: {
-          data: repeat(6, randomPerpetualL2TransactionEntry),
+          data: repeat(6, randomPerpetualUserL2TransactionEntry),
           total: 5123,
         },
         offers: repeat(6, randomUserOfferEntry),
@@ -512,7 +513,7 @@ const routes: Route[] = [
       ctx.body = renderUserL2TransactionsPage({
         context,
         starkKey: StarkKey.fake(),
-        l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
+        l2Transactions: repeat(visible, randomPerpetualUserL2TransactionEntry),
         limit,
         offset,
         total,

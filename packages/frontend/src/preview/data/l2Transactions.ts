@@ -86,6 +86,30 @@ perpetualL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2OraclePricesTickTransaction)
 )
 
+export const perpetualUserL2TransactionsBucket =
+  new Bucket<PerpetualL2TransactionData>()
+perpetualUserL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2DepositTransaction)
+)
+perpetualUserL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2WithdrawToAddressTransaction)
+)
+perpetualUserL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2ForcedWithdrawalTransaction)
+)
+perpetualUserL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2TradeTransaction)
+)
+perpetualUserL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2ForcedTransaction)
+)
+perpetualUserL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2TransferTransaction)
+)
+perpetualUserL2TransactionsBucket.addMany(
+  repeat(5, randomPerpetualL2ConditionalTransferTransaction)
+)
+
 const perpetualL2TransactionStateBucket = new Bucket<
   PerpetualL2TransactionEntry['state']
 >(['alternative', 'replaced'])
@@ -97,6 +121,21 @@ export function randomPerpetualL2TransactionEntry(
     transactionId: randomInt(0, 100000),
     stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
     data: data ? data : perpetualL2TransactionsBucket.pick(),
+    state:
+      randomInt(0, 10) > 8
+        ? perpetualL2TransactionStateBucket.pick()
+        : undefined,
+    isPartOfMulti: randomInt(0, 10) > 9 ? true : false,
+  }
+}
+
+export function randomPerpetualUserL2TransactionEntry(
+  data?: PerpetualL2TransactionEntry['data']
+): PerpetualL2TransactionEntry {
+  return {
+    transactionId: randomInt(0, 100000),
+    stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
+    data: data ? data : perpetualUserL2TransactionsBucket.pick(),
     state:
       randomInt(0, 10) > 8
         ? perpetualL2TransactionStateBucket.pick()
