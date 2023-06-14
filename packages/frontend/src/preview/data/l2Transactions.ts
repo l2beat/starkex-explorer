@@ -26,6 +26,7 @@ import {
 } from '../../view/pages/l2-transaction/common'
 import { Bucket } from './Bucket'
 import { amountBucket, assetIdBucket } from './buckets'
+import { fakeCollateralAsset } from './collateralAsset'
 import {
   randomBigInt,
   randomFutureTimestamp,
@@ -71,7 +72,7 @@ perpetualL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2TradeTransaction)
 )
 perpetualL2TransactionsBucket.addMany(
-  repeat(5, randomPerpetualL2ForcedTransaction)
+  repeat(5, randomPerpetualL2ForcedTradeTransaction)
 )
 perpetualL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2TransferTransaction)
@@ -107,7 +108,7 @@ perpetualUserL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2TradeTransaction)
 )
 perpetualUserL2TransactionsBucket.addMany(
-  repeat(5, randomPerpetualL2ForcedTransaction)
+  repeat(5, randomPerpetualL2ForcedTradeTransaction)
 )
 perpetualUserL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2TransferTransaction)
@@ -215,7 +216,7 @@ export function randomPerpetualL2TradeTransaction(): PerpetualL2TradeTransaction
       },
       syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
       orderType: 'LimitOrderWithFees',
-      collateralAssetId: AssetHash.fake(),
+      collateralAssetId: fakeCollateralAsset.assetHash,
       positionId: randomBigInt(0, 100000),
       syntheticAmount: amountBucket.pick(),
       collateralAmount: amountBucket.pick(),
@@ -232,7 +233,7 @@ export function randomPerpetualL2TradeTransaction(): PerpetualL2TradeTransaction
       },
       syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
       orderType: 'LimitOrderWithFees',
-      collateralAssetId: AssetHash.fake(),
+      collateralAssetId: fakeCollateralAsset.assetHash,
       positionId: randomBigInt(0, 100000),
       syntheticAmount: amountBucket.pick(),
       collateralAmount: amountBucket.pick(),
@@ -281,7 +282,7 @@ export function randomPerpetualL2LiquidateTransaction(): PerpetualL2LiquidateTra
       starkKey: StarkKey.fake(),
       syntheticAssetId: assetIdBucket.pick(),
       syntheticAmount: amountBucket.pick(),
-      collateralAssetId: AssetHash.fake(),
+      collateralAssetId: fakeCollateralAsset.assetHash,
       collateralAmount: amountBucket.pick(),
       feeAmount: amountBucket.pick(),
       positionId: randomBigInt(0, 100000),
@@ -337,14 +338,14 @@ export function randomPerpetualL2TransferTransaction(): PerpetualL2TransferTrans
   }
 }
 
-export function randomPerpetualL2ForcedTransaction(): PerpetualL2ForcedTradeTransactionData {
+export function randomPerpetualL2ForcedTradeTransaction(): PerpetualL2ForcedTradeTransactionData {
   return {
     type: 'ForcedTrade',
     starkKeyA: StarkKey.fake(),
     starkKeyB: StarkKey.fake(),
     positionIdA: randomBigInt(0, 100000),
     positionIdB: randomBigInt(0, 100000),
-    collateralAssetId: AssetHash.fake(),
+    collateralAssetId: fakeCollateralAsset.assetHash,
     syntheticAssetId: assetIdBucket.pick(),
     collateralAmount: amountBucket.pick(),
     syntheticAmount: amountBucket.pick(),

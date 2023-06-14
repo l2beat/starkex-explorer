@@ -1,4 +1,4 @@
-import { CollateralAsset } from '@explorer/shared'
+import { getCollateralAssetIdFromHash } from '@explorer/shared'
 import React from 'react'
 
 import { Asset } from '../../../../../utils/assets'
@@ -20,7 +20,10 @@ export function PerpetualTradeDetails(
   const syntheticSeller = props.data.partyAOrder.isBuyingSynthetic
     ? props.data.partyBOrder
     : props.data.partyAOrder
-
+  const collateralAssetId = getCollateralAssetIdFromHash(
+    props.data.partyAOrder.collateralAssetId,
+    props.collateralAsset
+  )
   return (
     <Card className="flex flex-col gap-6">
       <TransactionField label="Current status">
@@ -62,7 +65,7 @@ export function PerpetualTradeDetails(
           amount: props.data.actualSynthetic,
         }}
         collateral={{
-          asset: props.collateralAsset,
+          asset: { hashOrId: collateralAssetId },
           amount: props.data.actualCollateral,
         }}
       />
@@ -76,7 +79,7 @@ interface AssetExchangeProps {
     amount: bigint
   }
   collateral: {
-    asset: CollateralAsset
+    asset: Asset
     amount: bigint
   }
 }
@@ -94,7 +97,7 @@ function AssetExchange(props: AssetExchangeProps) {
       </div>
       <AssetAmount
         className="flex-1"
-        asset={{ hashOrId: props.collateral.asset.assetId }}
+        asset={props.collateral.asset}
         amount={props.collateral.amount}
       />
     </div>

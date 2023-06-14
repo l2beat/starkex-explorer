@@ -1,10 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import {
-  CollateralAsset,
-  PageContext,
-  PageContextWithUser,
-  UserDetails,
-} from '@explorer/shared'
+import { PageContext, PageContextWithUser, UserDetails } from '@explorer/shared'
 import {
   AssetHash,
   AssetId,
@@ -46,6 +41,7 @@ import { renderDevPage } from '../view/pages/DevPage'
 import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
+import { fakeCollateralAsset } from './data/collateralAsset'
 import {
   randomHomeForcedTransactionEntry,
   randomHomeOfferEntry,
@@ -1275,12 +1271,6 @@ function getFakeUser() {
     address: EthereumAddress.fake(),
     starkKey: StarkKey.fake(),
   }
-}
-
-const fakeCollateralAsset: CollateralAsset = {
-  assetId: AssetId('USDC-6'),
-  assetHash: AssetHash.fake(),
-  price: 1_000_000n,
 }
 
 function getPerpetualPageContext(
