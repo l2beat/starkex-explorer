@@ -21,7 +21,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
         className="flex items-center justify-center gap-2 divide-x sm:gap-4"
         href="/"
       >
-        <div className="flex gap-2 sm:gap-4">
+        <div className="flex items-center justify-center gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
           <ProjectLogo instanceName={instanceName} />
         </div>
