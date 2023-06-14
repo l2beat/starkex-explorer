@@ -9,6 +9,7 @@ import { PerpetualTransactionDetailsProps } from '../../common'
 import { PerpetualConditionalTransferDetails } from './PerpetualConditionalTransferDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
 import { PerpetualForcedWithdrawalDetails } from './PerpetualForcedWithdrawalDetails'
+import { PerpetualTradeDetails } from './PerpetualTradeDetails'
 import { PerpetualTransferDetails } from './PerpetualTransferDetails'
 import { PerpetualWithdrawToAddressDetails } from './PerpetualWithdrawToAddress'
 
@@ -51,6 +52,14 @@ export function PerpetualTransactionDetails(
     case 'ForcedWithdrawal':
       return (
         <PerpetualForcedWithdrawalDetails
+          stateUpdateId={props.stateUpdateId}
+          collateralAsset={props.collateralAsset}
+          data={props.data}
+        />
+      )
+    case 'Trade':
+      return (
+        <PerpetualTradeDetails
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}

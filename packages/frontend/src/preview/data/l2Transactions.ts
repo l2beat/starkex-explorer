@@ -12,7 +12,13 @@ import {
   PerpetualL2TransferTransactionData,
   PerpetualL2WithdrawToAddressTransactionData,
 } from '@explorer/shared'
-import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+} from '@explorer/types'
 
 import {
   AggregatedPerpetualL2TransactionEntry,
@@ -207,7 +213,7 @@ export function randomPerpetualL2TradeTransaction(): PerpetualL2TradeTransaction
         r: Hash256.fake(),
         s: Hash256.fake(),
       },
-      syntheticAssetId: assetIdBucket.pick(),
+      syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
       orderType: 'LimitOrderWithFees',
       collateralAssetId: AssetHash.fake(),
       positionId: randomBigInt(0, 100000),
@@ -218,13 +224,13 @@ export function randomPerpetualL2TradeTransaction(): PerpetualL2TradeTransaction
     },
     partyBOrder: {
       nonce: randomBigInt(0, 100000),
-      isBuyingSynthetic: true,
+      isBuyingSynthetic: false,
       expirationTimestamp: randomFutureTimestamp(),
       signature: {
         r: Hash256.fake(),
         s: Hash256.fake(),
       },
-      syntheticAssetId: assetIdBucket.pick(),
+      syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
       orderType: 'LimitOrderWithFees',
       collateralAssetId: AssetHash.fake(),
       positionId: randomBigInt(0, 100000),
