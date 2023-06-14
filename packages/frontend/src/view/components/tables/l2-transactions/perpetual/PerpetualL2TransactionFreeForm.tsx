@@ -21,6 +21,7 @@ export function PerpetualL2TransactionFreeForm({
   collateralAsset,
 }: L2TransactionFreeFormProps) {
   switch (data.type) {
+    case 'ForcedWithdrawal':
     case 'Deposit':
       return (
         <FreeFormAssetWithAmount
