@@ -28,31 +28,31 @@ export function PerpetualTradeDetails(
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
       <div className="grid grid-cols-3 gap-x-2">
-        <TransactionField label="Synthetic buyer position">
-          #{syntheticBuyer.positionId.toString()}
+        <TransactionField label="Synthetic seller position">
+          #{syntheticSeller.positionId.toString()}
         </TransactionField>
         <TransactionField
-          label="Synthetic seller position"
+          label="Synthetic buyer position"
           className="col-start-3"
         >
-          #{syntheticSeller.positionId.toString()}
+          #{syntheticBuyer.positionId.toString()}
         </TransactionField>
       </div>
       <div className="grid grid-cols-3 gap-x-2">
-        <TransactionField label="Synthetic buyer stark key">
-          <Link href={`/users/${syntheticBuyer.starkKey.toString()}`}>
+        <TransactionField label="Synthetic seller stark key">
+          <Link href={`/users/${syntheticSeller.starkKey.toString()}`}>
             <InlineEllipsis className="max-w-[250px]">
-              {syntheticBuyer.starkKey.toString()}
+              {syntheticSeller.starkKey.toString()}
             </InlineEllipsis>
           </Link>
         </TransactionField>
         <TransactionField
-          label="Synthetic seller stark key"
+          label="Synthetic buyer stark key"
           className="col-start-3"
         >
-          <Link href={`/users/${syntheticSeller.starkKey.toString()}`}>
+          <Link href={`/users/${syntheticBuyer.starkKey.toString()}`}>
             <InlineEllipsis className="max-w-[250px]">
-              {syntheticSeller.starkKey.toString()}
+              {syntheticBuyer.starkKey.toString()}
             </InlineEllipsis>
           </Link>
         </TransactionField>
