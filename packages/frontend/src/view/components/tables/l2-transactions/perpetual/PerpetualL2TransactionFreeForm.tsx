@@ -30,10 +30,10 @@ export function PerpetualL2TransactionFreeForm({
         />
       )
     case 'Trade': {
-      const buyer = data.partyAOrder.isBuyingSynthetic
+      const syntheticBuyer = data.partyAOrder.isBuyingSynthetic
         ? data.partyAOrder
         : data.partyBOrder
-      const seller = data.partyAOrder.isBuyingSynthetic
+      const syntheticSeller = data.partyAOrder.isBuyingSynthetic
         ? data.partyBOrder
         : data.partyAOrder
       return (
@@ -41,17 +41,20 @@ export function PerpetualL2TransactionFreeForm({
           <FreeFormTradeAssets
             exchange={[
               {
-                asset: { hashOrId: collateralAsset.assetId },
-                amount: data.actualCollateral,
+                asset: { hashOrId: syntheticBuyer.syntheticAssetId },
+                amount: data.actualSynthetic,
               },
               {
-                asset: { hashOrId: buyer.syntheticAssetId },
-                amount: data.actualSynthetic,
+                asset: { hashOrId: collateralAsset.assetId },
+                amount: data.actualCollateral,
               },
             ]}
           />
           <FreeFormTradeAddresses
-            addresses={[buyer.starkKey.toString(), seller.starkKey.toString()]}
+            addresses={[
+              syntheticSeller.starkKey.toString(),
+              syntheticBuyer.starkKey.toString(),
+            ]}
           />
         </>
       )
