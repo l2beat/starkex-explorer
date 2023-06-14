@@ -9,17 +9,21 @@ import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
 
-export function PerpetualTradeDetails(
-  props: PerpetualTransactionDetailsProps<'Trade'>
+export function PerpetualForcedTradeDetails(
+  props: PerpetualTransactionDetailsProps<'ForcedTrade'>
 ) {
-  const syntheticBuyer = props.data.partyAOrder.isBuyingSynthetic
-    ? props.data.partyAOrder
-    : props.data.partyBOrder
-  const syntheticSeller = props.data.partyAOrder.isBuyingSynthetic
-    ? props.data.partyBOrder
-    : props.data.partyAOrder
+  const partyA = {
+    positionId: props.data.positionIdA,
+    starkKey: props.data.starkKeyA,
+  }
+  const partyB = {
+    positionId: props.data.positionIdB,
+    starkKey: props.data.starkKeyB,
+  }
+  const syntheticBuyer = props.data.isABuyingSynthetic ? partyA : partyB
+  const syntheticSeller = props.data.isABuyingSynthetic ? partyB : partyA
   const collateralAssetId = getCollateralAssetIdFromHash(
-    props.data.partyAOrder.collateralAssetId,
+    props.data.collateralAssetId,
     props.collateralAsset
   )
   return (
@@ -59,12 +63,12 @@ export function PerpetualTradeDetails(
       </div>
       <AssetTradeCard
         synthetic={{
-          asset: { hashOrId: syntheticBuyer.syntheticAssetId },
-          amount: props.data.actualSynthetic,
+          asset: { hashOrId: props.data.syntheticAssetId },
+          amount: props.data.syntheticAmount,
         }}
         collateral={{
           asset: { hashOrId: collateralAssetId },
-          amount: props.data.actualCollateral,
+          amount: props.data.collateralAmount,
         }}
       />
     </Card>

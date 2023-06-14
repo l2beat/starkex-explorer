@@ -51,6 +51,7 @@ import {
   randomAggregatedPerpetualL2TransactionEntry,
   randomPerpetualL2ConditionalTransferTransaction,
   randomPerpetualL2DepositTransaction,
+  randomPerpetualL2ForcedTradeTransaction,
   randomPerpetualL2ForcedWithdrawalTransaction,
   randomPerpetualL2TradeTransaction,
   randomPerpetualL2TransactionEntry,
@@ -654,6 +655,20 @@ const routes: Route[] = [
         context,
         transaction: randomAggregatedPerpetualL2TransactionEntry(
           randomPerpetualL2TradeTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/forced-trade',
+    link: '/l2-transactions/perpetual/forced-trade',
+    description: 'Perpetual L2 forced trade transaction page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2ForcedTradeTransaction()
         ),
       })
     },

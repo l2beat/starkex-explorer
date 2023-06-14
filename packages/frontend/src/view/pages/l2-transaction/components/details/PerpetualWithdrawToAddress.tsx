@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
-import { AssetAmount } from '../../../../components/AssetAmount'
+import { AssetWithAmountCard } from '../../../../components/AssetWithAmountCard'
 import { Card } from '../../../../components/Card'
 import { EtherscanLink } from '../../../../components/EtherscanLink'
 import { Link } from '../../../../components/Link'
@@ -33,7 +33,7 @@ export function PerpetualWithdrawToAddressDetails(
           {props.data.ethereumAddress.toString()}
         </EtherscanLink>
       </TransactionField>
-      <AssetAmount
+      <AssetWithAmountCard
         className="w-1/2"
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}

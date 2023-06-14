@@ -4,7 +4,7 @@ import React from 'react'
 import { Asset } from '../../../../utils/assets'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
-import { AssetAmount } from '../../../components/AssetAmount'
+import { AssetWithAmountCard } from '../../../components/AssetWithAmountCard'
 import { EtherscanLink } from '../../../components/EtherscanLink'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
 import { TransactionField } from './TransactionField'
@@ -66,7 +66,7 @@ export function TransactionOverview(props: TransactionOverviewProps) {
         </TransactionField>
       )}
       {props.value && (
-        <AssetAmount
+        <AssetWithAmountCard
           className="w-1/2"
           amount={props.value.amount}
           asset={props.value.asset}
@@ -74,14 +74,14 @@ export function TransactionOverview(props: TransactionOverviewProps) {
       )}
       {props.trade && (
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <AssetAmount
+          <AssetWithAmountCard
             amountLabel="Offered amount"
             amount={props.trade.offeredAmount}
             assetLabel="Offered asset"
             asset={props.trade.offeredAsset}
           />
           <ArrowRightIcon className="rounded bg-slate-800 text-zinc-500" />
-          <AssetAmount
+          <AssetWithAmountCard
             amountLabel="Received amount"
             amount={props.trade.receivedAmount}
             assetLabel="Received asset"

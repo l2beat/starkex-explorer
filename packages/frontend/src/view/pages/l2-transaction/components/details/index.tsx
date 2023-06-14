@@ -8,6 +8,7 @@ import { Card } from '../../../../components/Card'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { PerpetualConditionalTransferDetails } from './PerpetualConditionalTransferDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
+import { PerpetualForcedTradeDetails } from './PerpetualForcedTradeDetails'
 import { PerpetualForcedWithdrawalDetails } from './PerpetualForcedWithdrawalDetails'
 import { PerpetualTradeDetails } from './PerpetualTradeDetails'
 import { PerpetualTransferDetails } from './PerpetualTransferDetails'
@@ -60,6 +61,14 @@ export function PerpetualTransactionDetails(
     case 'Trade':
       return (
         <PerpetualTradeDetails
+          stateUpdateId={props.stateUpdateId}
+          collateralAsset={props.collateralAsset}
+          data={props.data}
+        />
+      )
+    case 'ForcedTrade':
+      return (
+        <PerpetualForcedTradeDetails
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
