@@ -45,7 +45,9 @@ export class L2TransactionRepository extends BaseRepository {
     super(database, logger)
     /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
-    this.countAll = this.wrapAny(this.countAll)
+    this.countAllDistinctTransactionIds = this.wrapAny(
+      this.countAllDistinctTransactionIds
+    )
     this.countAllUserSpecific = this.wrapAny(this.countAllUserSpecific)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
     this.getPaginated = this.wrapGet(this.getPaginated)
@@ -160,9 +162,11 @@ export class L2TransactionRepository extends BaseRepository {
     return parentId
   }
 
-  async countAll() {
+  async countAllDistinctTransactionIds() {
     const knex = await this.knex()
-    const [result] = await knex('l2_transactions').count()
+    const [result] = await knex('l2_transactions').countDistinct(
+      'transaction_id'
+    )
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
   }
