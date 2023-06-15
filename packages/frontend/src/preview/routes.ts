@@ -580,8 +580,8 @@ const routes: Route[] = [
   // #endregion
   // #region L2 transactions
   {
-    path: '/l2-transactions/perpetual/:transactionId',
-    link: '/l2-transactions/perpetual/1234',
+    path: '/l2-transactions/perpetual/random',
+    link: '/l2-transactions/perpetual/random',
     description: 'Perpetual L2 random transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
@@ -592,8 +592,8 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/l2-transactions/perpetual/:transactionId/with-alternatives',
-    link: '/l2-transactions/perpetual/1234/with-alternatives',
+    path: '/l2-transactions/perpetual/random/with-alternatives',
+    link: '/l2-transactions/perpetual/random/with-alternatives',
     description:
       'Perpetual L2 random transaction details with alternatives details page.',
     render: (ctx) => {
@@ -606,6 +606,49 @@ const routes: Route[] = [
             perpetualL2TransactionsBucket.pick()
           ),
         },
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-alternative',
+    link: '/l2-transactions/perpetual/random/as-alternative',
+    description:
+      'Perpetual L2 random transaction details as alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        altIndex: randomInt(1, 10),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-part-of-multi',
+    link: '/l2-transactions/perpetual/random/as-part-of-multi',
+    description:
+      'Perpetual L2 random transaction details as part of multi details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        multiIndex: randomInt(1, 10),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-alternative/as-part-of-multi',
+    link: '/l2-transactions/perpetual/random/as-alternative/as-part-of-multi',
+    description:
+      'Perpetual L2 random transaction details as part of multi transaction that is alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        multiIndex: randomInt(1, 10),
+        altIndex: randomInt(1, 10),
       })
     },
   },
