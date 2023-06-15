@@ -52,7 +52,7 @@ export class HomeController {
       availableOffers,
       availableOffersCount,
     ] = await Promise.all([
-      this.l2TransactionRepository.getPaginated(paginationOpts),
+      this.l2TransactionRepository.getPaginatedWithoutMulti(paginationOpts),
       this.l2TransactionRepository.countAllDistinctTransactionIds(),
       this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
@@ -113,7 +113,7 @@ export class HomeController {
 
     const [total, l2Transactions] = await Promise.all([
       this.l2TransactionRepository.countAllDistinctTransactionIds(),
-      this.l2TransactionRepository.getPaginated(pagination),
+      this.l2TransactionRepository.getPaginatedWithoutMulti(pagination),
     ])
 
     const content = renderHomeL2TransactionsPage({

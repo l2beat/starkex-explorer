@@ -1,9 +1,11 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
+import { ReplacedIcon } from '../../assets/icons/ReplacedIcon'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
+import { L2MultiOrAlternativeTransactionsTable } from '../../components/tables/l2-transactions/L2MultiOrAlternativeTransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
   AggregatedPerpetualL2TransactionEntry,
@@ -15,6 +17,8 @@ import { ReplacedTransactionNote } from './components/ReplacedTransactionNote'
 interface PerpetualL2TransactionDetailsPageProps {
   context: PageContext<'perpetual'>
   transaction: AggregatedPerpetualL2TransactionEntry
+  altIndex?: number
+  multiIndex?: number
 }
 
 export function renderPerpetualL2TransactionDetailsPage(
@@ -49,27 +53,42 @@ export function PerpetualL2TransactionDetailsPage(
         {props.transaction.alternativeTransactions.length > 0 && (
           <ReplacedTransactionNote />
         )}
+        {props.altIndex !== undefined && (
+          <div className="mb-4 flex rounded-lg bg-yellow-300 bg-opacity-25 px-6 py-5 text-lg font-semibold">
+            <ReplacedIcon className="scale-150 fill-yellow-300" />
+            <span className="ml-2 text-yellow-300">Alternative</span>
+            <span className="ml-auto">
+              Please mind, this transaction is #{props.altIndex} alternative
+              transaction of #{props.transaction.transactionId} transaction.
+            </span>
+          </div>
+        )}
+        {props.multiIndex !== undefined && (
+          <div className="mb-4 flex rounded-lg bg-yellow-300 bg-opacity-25 px-6 py-5 text-lg font-semibold">
+            <ReplacedIcon className="scale-150 fill-yellow-300" />
+            <span className="ml-2 text-yellow-300">Multi</span>
+            <span className="ml-auto">
+              This transaction is #{props.multiIndex} transaction of multi
+              transaction.
+            </span>
+          </div>
+        )}
         <PerpetualTransactionDetails
-          stateUpdateId={props.transaction.stateUpdateId}
+          transactionId={props.transaction.transactionId}
           data={props.transaction.originalTransaction}
+          stateUpdateId={props.transaction.stateUpdateId}
           collateralAsset={props.context.collateralAsset}
+          altIndex={props.altIndex}
         />
         {props.transaction.alternativeTransactions.length > 0 && (
           <div className="mt-12">
             <PageTitle>Alternative transactions</PageTitle>
-            {props.transaction.alternativeTransactions.map((tx, index) => (
-              <div className="mb-4" key={`${tx.type}${index}`}>
-                <span className="text-lg font-semibold">
-                  {l2TransactionTypeToText(tx.type)} alternative transaction #
-                  {index}
-                </span>
-                <PerpetualTransactionDetails
-                  stateUpdateId={props.transaction.stateUpdateId}
-                  data={tx}
-                  collateralAsset={props.context.collateralAsset}
-                />
-              </div>
-            ))}
+            <L2MultiOrAlternativeTransactionsTable
+              transactions={props.transaction.alternativeTransactions}
+              transactionId={props.transaction.transactionId}
+              collateralAsset={props.context.collateralAsset}
+              contentState="alternative"
+            />
           </div>
         )}
       </ContentWrapper>

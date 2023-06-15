@@ -1,4 +1,4 @@
-import { stringAs, stringAsBigInt, stringAsPositiveInt } from '@explorer/shared'
+import { stringAs, stringAsBigInt, stringAsInt } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 import Router from '@koa/router'
 import { z } from 'zod'
@@ -70,11 +70,12 @@ export function addPerpetualTradingRoutes(
 
   if (shouldShowL2Transactions(config)) {
     router.get(
-      '/l2-transactions/:transactionId',
+      '/l2-transactions/:transactionId{/:multiIndex}?',
       withTypedContext(
         z.object({
           params: z.object({
-            transactionId: stringAsPositiveInt(),
+            transactionId: stringAsInt(),
+            multiIndex: z.optional(stringAsInt()),
           }),
         }),
         async (ctx) => {
@@ -82,7 +83,32 @@ export function addPerpetualTradingRoutes(
           const result =
             await l2TransactionController.getPerpetualL2TransactionDetailsPage(
               givenUser,
-              ctx.params.transactionId
+              ctx.params.transactionId,
+              ctx.params.multiIndex
+            )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+
+    router.get(
+      '/l2-transactions/:transactionId/alternatives/:altIndex{/:multiIndex}?',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            transactionId: stringAsInt(),
+            altIndex: z.optional(stringAsInt()),
+            multiIndex: z.optional(stringAsInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const result =
+            await l2TransactionController.getPerpetualL2TransactionDetailsPage(
+              givenUser,
+              ctx.params.transactionId,
+              ctx.params.multiIndex,
+              ctx.params.altIndex
             )
           applyControllerResult(ctx, result)
         }

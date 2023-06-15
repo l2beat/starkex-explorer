@@ -6,6 +6,7 @@ import {
   PerpetualL2ForcedWithdrawalTransactionData,
   PerpetualL2FundingTickTransactionData,
   PerpetualL2LiquidateTransactionData,
+  PerpetualL2MultiTransactionData,
   PerpetualL2OraclePricesTickTransactionData,
   PerpetualL2TradeTransactionData,
   PerpetualL2TransactionData,
@@ -57,8 +58,9 @@ const randomFundingIndex = () => ({
   quantizedFundingIndex: randomInt(0, 1000000),
 })
 
-export const perpetualL2TransactionsBucket =
-  new Bucket<PerpetualL2TransactionData>()
+export const perpetualL2TransactionsBucket = new Bucket<
+  Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
+>()
 perpetualL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2DepositTransaction)
 )
@@ -158,10 +160,7 @@ export function randomAggregatedPerpetualL2TransactionEntry(
     transactionId: randomInt(0, 100000),
     stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
     originalTransaction: data ? data : perpetualL2TransactionsBucket.pick(),
-    alternativeTransactions:
-      randomInt(0, 10) > 8
-        ? repeat(randomInt(1, 5), () => perpetualL2TransactionsBucket.pick())
-        : [],
+    alternativeTransactions: [],
   }
 }
 
@@ -352,5 +351,14 @@ export function randomPerpetualL2ForcedTradeTransaction(): PerpetualL2ForcedTrad
     isABuyingSynthetic: randomInt(0, 1) === 1,
     nonce: randomBigInt(0, 100000),
     isValid: true,
+  }
+}
+
+export function randomPerpetualL2MultiTransaction(): PerpetualL2MultiTransactionData {
+  return {
+    type: 'MultiTransaction',
+    transactions: repeat(randomInt(2, 10), () =>
+      perpetualL2TransactionsBucket.pick()
+    ),
   }
 }

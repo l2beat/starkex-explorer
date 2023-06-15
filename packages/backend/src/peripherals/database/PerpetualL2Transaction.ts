@@ -36,7 +36,7 @@ interface Encoded<T> {
   data: ToJSON<T>
 }
 
-export type L2TransactionDataJson = ToJSON<PerpetualL2TransactionData>
+export type PerpetualL2TransactionDataJson = ToJSON<PerpetualL2TransactionData>
 
 export function encodeL2TransactionData(
   values: PerpetualL2TransactionData

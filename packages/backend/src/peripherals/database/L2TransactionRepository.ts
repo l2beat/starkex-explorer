@@ -38,7 +38,10 @@ interface AggregatedRecord {
   alternativeTransactions: PerpetualL2TransactionData[]
 }
 
-export type { Record as L2TransactionRecord }
+export type {
+  AggregatedRecord as AggregatedL2TransactionRecord,
+  Record as L2TransactionRecord,
+}
 
 export class L2TransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
@@ -50,7 +53,7 @@ export class L2TransactionRepository extends BaseRepository {
     )
     this.countAllUserSpecific = this.wrapAny(this.countAllUserSpecific)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
-    this.getPaginated = this.wrapGet(this.getPaginated)
+    this.getPaginatedWithoutMulti = this.wrapGet(this.getPaginatedWithoutMulti)
     this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
     this.findById = this.wrapFind(this.findById)
     this.findByTransactionId = this.wrapFind(this.findByTransactionId)
@@ -196,9 +199,11 @@ export class L2TransactionRepository extends BaseRepository {
     return Number(result!.count)
   }
 
-  async getPaginated({ offset, limit }: PaginationOptions) {
+  async getPaginatedWithoutMulti({ offset, limit }: PaginationOptions) {
     const knex = await this.knex()
     const rows = await knex('l2_transactions')
+      // We filter out the multi transactions because we show the child transactions instead
+      .whereNot({ type: 'MultiTransaction' })
       .orderBy('id', 'desc')
       .offset(offset)
       .limit(limit)
@@ -211,6 +216,7 @@ export class L2TransactionRepository extends BaseRepository {
     { offset, limit }: PaginationOptions
   ) {
     const knex = await this.knex()
+    // We do not need to filter multi transactions because they are not user specific
     const rows = await knex('l2_transactions')
       .where({
         stark_key_a: starkKey.toString(),
@@ -235,6 +241,7 @@ export class L2TransactionRepository extends BaseRepository {
     const knex = await this.knex()
     const originalTransaction = await knex('l2_transactions')
       .where({ transaction_id: id, parent_id: null })
+      .orderBy('id', 'asc')
       .first()
 
     if (!originalTransaction) {

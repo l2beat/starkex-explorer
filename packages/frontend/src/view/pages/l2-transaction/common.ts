@@ -54,7 +54,7 @@ export function l2TransactionTypeToText(
     case 'OraclePricesTick':
       return 'Oracle prices tick'
     case 'MultiTransaction':
-      return 'Multi transaction'
+      return 'Multi'
     default:
       assertUnreachable(type)
   }

@@ -1,6 +1,6 @@
 import { json } from '@explorer/types'
 
-import { L2TransactionDataJson } from '../PerpetualL2Transaction'
+import { PerpetualL2TransactionDataJson } from '../PerpetualL2Transaction'
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import {
   UserTransactionJSON,
@@ -281,7 +281,7 @@ declare module 'knex/types/tables' {
     state: 'alternative' | 'replaced' | null
     stark_key_a: string | null
     stark_key_b: string | null
-    data: L2TransactionDataJson
+    data: PerpetualL2TransactionDataJson
     type: string
   }
 

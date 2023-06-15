@@ -2,7 +2,10 @@ import { renderPerpetualL2TransactionDetailsPage } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
 
 import { PageContextService } from '../../core/PageContextService'
-import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
+import {
+  AggregatedL2TransactionRecord,
+  L2TransactionRepository,
+} from '../../peripherals/database/L2TransactionRepository'
 import { ControllerResult } from './ControllerResult'
 
 export class L2TransactionController {
@@ -13,20 +16,28 @@ export class L2TransactionController {
 
   async getPerpetualL2TransactionDetailsPage(
     givenUser: Partial<UserDetails>,
-    transactionId: number
+    transactionId: number,
+    multiIndex?: number,
+    altIndex?: number
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
     if (context.tradingMode != 'perpetual') {
       return { type: 'not found', content: 'Page not found.' }
     }
-    const l2Transaction =
+    const aggregatedL2Transaction =
       await this.l2TransactionRepository.findByTransactionId(transactionId)
 
-    if (!l2Transaction) {
+    const transaction = this.extractTransactionByMultiAndAltIndex(
+      aggregatedL2Transaction,
+      multiIndex,
+      altIndex
+    )
+
+    if (!transaction) {
       return {
         type: 'not found',
-        content: `L2 transaction #${transactionId} not found`,
+        content: `L2 transaction #${transactionId} with given parameters was not found`,
       }
     }
 
@@ -34,8 +45,74 @@ export class L2TransactionController {
       type: 'success',
       content: renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: l2Transaction,
+        transaction: transaction,
+        altIndex,
+        multiIndex,
       }),
     }
+  }
+
+  extractTransactionByMultiAndAltIndex(
+    aggregatedL2Transaction: AggregatedL2TransactionRecord | undefined,
+    multiIndex: number | undefined,
+    altIndex: number | undefined
+  ) {
+    if (multiIndex !== undefined && altIndex !== undefined) {
+      const altTransaction =
+        aggregatedL2Transaction?.alternativeTransactions[altIndex]
+      if (!altTransaction) {
+        return
+      }
+      if (altTransaction.type !== 'MultiTransaction') {
+        return
+      }
+
+      const multiTransaction = altTransaction.transactions[multiIndex]
+      if (!multiTransaction) {
+        return
+      }
+
+      return {
+        ...aggregatedL2Transaction,
+        originalTransaction: multiTransaction,
+        alternativeTransactions: [],
+      }
+    }
+
+    if (multiIndex !== undefined && altIndex === undefined) {
+      if (
+        aggregatedL2Transaction?.originalTransaction.type !== 'MultiTransaction'
+      ) {
+        return
+      }
+
+      const multiTransaction =
+        aggregatedL2Transaction.originalTransaction.transactions[multiIndex]
+      if (!multiTransaction) {
+        return
+      }
+
+      return {
+        ...aggregatedL2Transaction,
+        originalTransaction: multiTransaction,
+        alternativeTransactions: [],
+      }
+    }
+
+    if (altIndex !== undefined && multiIndex === undefined) {
+      const altTransaction =
+        aggregatedL2Transaction?.alternativeTransactions[altIndex]
+      if (!altTransaction) {
+        return
+      }
+
+      return {
+        ...aggregatedL2Transaction,
+        originalTransaction: altTransaction,
+        alternativeTransactions: [],
+      }
+    }
+
+    return aggregatedL2Transaction
   }
 }

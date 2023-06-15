@@ -1,21 +1,30 @@
 import {
+  CollateralAsset,
   PerpetualL2TransactionData,
   toJsonWithoutBigInts,
 } from '@explorer/shared'
 import React from 'react'
 
 import { Card } from '../../../../components/Card'
-import { PerpetualTransactionDetailsProps } from '../../common'
 import { PerpetualConditionalTransferDetails } from './PerpetualConditionalTransferDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
 import { PerpetualForcedTradeDetails } from './PerpetualForcedTradeDetails'
 import { PerpetualForcedWithdrawalDetails } from './PerpetualForcedWithdrawalDetails'
+import { PerpetualMultiTransactionDetails } from './PerpetualMultiTransactionDetails'
 import { PerpetualTradeDetails } from './PerpetualTradeDetails'
 import { PerpetualTransferDetails } from './PerpetualTransferDetails'
 import { PerpetualWithdrawToAddressDetails } from './PerpetualWithdrawToAddress'
 
+interface PerpetualTransactionDetailsProps {
+  stateUpdateId: number | undefined
+  data: PerpetualL2TransactionData
+  collateralAsset: CollateralAsset
+  transactionId: number
+  altIndex: number | undefined
+}
+
 export function PerpetualTransactionDetails(
-  props: PerpetualTransactionDetailsProps<PerpetualL2TransactionData['type']>
+  props: PerpetualTransactionDetailsProps
 ) {
   switch (props.data.type) {
     case 'Deposit':
@@ -72,6 +81,15 @@ export function PerpetualTransactionDetails(
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
+        />
+      )
+    case 'MultiTransaction':
+      return (
+        <PerpetualMultiTransactionDetails
+          data={props.data}
+          collateralAsset={props.collateralAsset}
+          transactionId={props.transactionId}
+          altIndex={props.altIndex}
         />
       )
     default:

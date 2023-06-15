@@ -48,11 +48,13 @@ import {
   randomHomeStateUpdateEntry,
 } from './data/home'
 import {
+  perpetualL2TransactionsBucket,
   randomAggregatedPerpetualL2TransactionEntry,
   randomPerpetualL2ConditionalTransferTransaction,
   randomPerpetualL2DepositTransaction,
   randomPerpetualL2ForcedTradeTransaction,
   randomPerpetualL2ForcedWithdrawalTransaction,
+  randomPerpetualL2MultiTransaction,
   randomPerpetualL2TradeTransaction,
   randomPerpetualL2TransactionEntry,
   randomPerpetualL2TransferTransaction,
@@ -578,9 +580,9 @@ const routes: Route[] = [
   // #endregion
   // #region L2 transactions
   {
-    path: '/l2-transactions/:transactionId',
-    link: '/l2-transactions/1234',
-    description: 'Perpetual L2 transaction details page.',
+    path: '/l2-transactions/perpetual/:transactionId',
+    link: '/l2-transactions/perpetual/1234',
+    description: 'Perpetual L2 random transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
@@ -590,9 +592,27 @@ const routes: Route[] = [
     },
   },
   {
+    path: '/l2-transactions/perpetual/:transactionId/with-alternatives',
+    link: '/l2-transactions/perpetual/1234/with-alternatives',
+    description:
+      'Perpetual L2 random transaction details with alternatives details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: {
+          ...randomAggregatedPerpetualL2TransactionEntry(),
+          alternativeTransactions: repeat(randomInt(1, 10), () =>
+            perpetualL2TransactionsBucket.pick()
+          ),
+        },
+      })
+    },
+  },
+  {
     path: '/l2-transactions/perpetual/deposit',
     link: '/l2-transactions/perpetual/deposit',
-    description: 'Perpetual L2 deposit transaction page.',
+    description: 'Perpetual L2 deposit transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
@@ -606,7 +626,7 @@ const routes: Route[] = [
   {
     path: '/l2-transactions/perpetual/forced-withdrawal',
     link: '/l2-transactions/perpetual/forced-withdrawal',
-    description: 'Perpetual L2 forced withdrawal transaction page.',
+    description: 'Perpetual L2 forced withdrawal transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
@@ -620,7 +640,7 @@ const routes: Route[] = [
   {
     path: '/l2-transactions/perpetual/transfer',
     link: '/l2-transactions/perpetual/transfer',
-    description: 'Perpetual L2 transfer transaction page.',
+    description: 'Perpetual L2 transfer transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
@@ -634,7 +654,7 @@ const routes: Route[] = [
   {
     path: '/l2-transactions/perpetual/conditional-transfer',
     link: '/l2-transactions/perpetual/conditional-transfer',
-    description: 'Perpetual L2 conditional transfer transaction page.',
+    description: 'Perpetual L2 conditional transfer transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
@@ -648,7 +668,7 @@ const routes: Route[] = [
   {
     path: '/l2-transactions/perpetual/trade',
     link: '/l2-transactions/perpetual/trade',
-    description: 'Perpetual L2 trade transaction page.',
+    description: 'Perpetual L2 trade transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
@@ -662,7 +682,7 @@ const routes: Route[] = [
   {
     path: '/l2-transactions/perpetual/forced-trade',
     link: '/l2-transactions/perpetual/forced-trade',
-    description: 'Perpetual L2 forced trade transaction page.',
+    description: 'Perpetual L2 forced trade transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
@@ -673,10 +693,11 @@ const routes: Route[] = [
       })
     },
   },
+
   {
     path: '/l2-transactions/perpetual/withdraw-to-address',
     link: '/l2-transactions/perpetual/withdraw-to-address',
-    description: 'Perpetual L2 withdraw to address transaction page.',
+    description: 'Perpetual L2 withdraw to address transaction details page.',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderPerpetualL2TransactionDetailsPage({
@@ -684,6 +705,40 @@ const routes: Route[] = [
         transaction: randomAggregatedPerpetualL2TransactionEntry(
           randomPerpetualL2WithdrawToAddressTransaction()
         ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi',
+    link: '/l2-transactions/perpetual/multi',
+    description: 'Perpetual L2 multi transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2MultiTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi/with-alternatives',
+    link: '/l2-transactions/perpetual/multi/with-alternatives',
+    description:
+      'Perpetual L2 multi transaction with alternatives details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: {
+          ...randomAggregatedPerpetualL2TransactionEntry(
+            randomPerpetualL2MultiTransaction()
+          ),
+          alternativeTransactions: repeat(randomInt(1, 10), () =>
+            perpetualL2TransactionsBucket.pick()
+          ),
+        },
       })
     },
     breakAfter: true,

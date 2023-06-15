@@ -754,8 +754,9 @@ describe(L2TransactionRepository.name, () => {
     })
   })
 
-  describe(L2TransactionRepository.prototype.getPaginated.name, () => {
-    it('returns the transactions', async () => {
+  describe(
+    L2TransactionRepository.prototype.getPaginatedWithoutMulti.name,
+    () => {
       it('respects the limit parameter', async () => {
         const ids = []
         for (let i = 0; i < 10; i++) {
@@ -773,12 +774,12 @@ describe(L2TransactionRepository.name, () => {
             })
           )
         }
-        const records = await repository.getPaginated({
+        const records = await repository.getPaginatedWithoutMulti({
           limit: 5,
           offset: 0,
         })
 
-        expect(records.map((x) => x.id)).toEqual(ids.slice(0, 5))
+        expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(0, 5))
       })
 
       it('respects the offset parameter', async () => {
@@ -798,14 +799,75 @@ describe(L2TransactionRepository.name, () => {
             })
           )
         }
-        const records = await repository.getPaginated({
+        const records = await repository.getPaginatedWithoutMulti({
           limit: 5,
           offset: 2,
         })
-        expect(records.map((x) => x.id)).toEqual(ids.slice(2, 5 + 2))
+        expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(2, 5 + 2))
       })
-    })
-  })
+
+      it('filters out multi transactions', async () => {
+        const ids = []
+
+        for (let i = 0; i < 10; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1234 + i,
+              stateUpdateId: 1,
+              blockNumber: 12345,
+              data: {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+            })
+          )
+        }
+        const multiTransaction = {
+          transactionId: 1234,
+          stateUpdateId: 1,
+          blockNumber: 12345,
+          data: {
+            type: 'MultiTransaction',
+            transactions: [
+              {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+              {
+                positionId: 1234n,
+                starkKey: StarkKey.fake(),
+                ethereumAddress: EthereumAddress.fake(),
+                amount: 12345n,
+                nonce: 10n,
+                expirationTimestamp: Timestamp(1234),
+                signature: {
+                  r: Hash256.fake(),
+                  s: Hash256.fake(),
+                },
+                type: 'WithdrawToAddress',
+              },
+            ],
+          } as PerpetualL2MultiTransactionData,
+        }
+        const multiId = await repository.add(multiTransaction)
+        multiTransaction.data.transactions.forEach((_, index) =>
+          ids.push(multiId + index + 1)
+        )
+
+        const records = await repository.getPaginatedWithoutMulti({
+          limit: 5,
+          offset: 0,
+        })
+        console.log(records)
+
+        expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(0, 5))
+      })
+    }
+  )
 
   describe(
     L2TransactionRepository.prototype.getUserSpecificPaginated.name,
