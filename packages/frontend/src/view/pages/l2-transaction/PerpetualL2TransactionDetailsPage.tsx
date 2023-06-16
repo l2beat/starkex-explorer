@@ -1,7 +1,6 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
-import { ReplacedIcon } from '../../assets/icons/ReplacedIcon'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -11,7 +10,9 @@ import {
   AggregatedPerpetualL2TransactionEntry,
   l2TransactionTypeToText,
 } from './common'
+import { AlternativeTransactionNote } from './components/AlternativeTransactionNote'
 import { PerpetualTransactionDetails } from './components/details'
+import { MultiTransactionNote } from './components/MultiTransactionNote'
 import { ReplacedTransactionNote } from './components/ReplacedTransactionNote'
 
 interface PerpetualL2TransactionDetailsPageProps {
@@ -54,24 +55,13 @@ export function PerpetualL2TransactionDetailsPage(
           <ReplacedTransactionNote />
         )}
         {props.altIndex !== undefined && (
-          <div className="mb-4 flex rounded-lg bg-yellow-300 bg-opacity-25 px-6 py-5 text-lg font-semibold">
-            <ReplacedIcon className="scale-150 fill-yellow-300" />
-            <span className="ml-2 text-yellow-300">Alternative</span>
-            <span className="ml-auto">
-              Please mind, this transaction is #{props.altIndex} alternative
-              transaction of #{props.transaction.transactionId} transaction.
-            </span>
-          </div>
+          <AlternativeTransactionNote
+            transactionId={props.transaction.transactionId}
+            altIndex={props.altIndex}
+          />
         )}
         {props.multiIndex !== undefined && (
-          <div className="mb-4 flex rounded-lg bg-yellow-300 bg-opacity-25 px-6 py-5 text-lg font-semibold">
-            <ReplacedIcon className="scale-150 fill-yellow-300" />
-            <span className="ml-2 text-yellow-300">Multi</span>
-            <span className="ml-auto">
-              This transaction is #{props.multiIndex} transaction of multi
-              transaction.
-            </span>
-          </div>
+          <MultiTransactionNote multiIndex={props.multiIndex} />
         )}
         <PerpetualTransactionDetails
           transactionId={props.transaction.transactionId}

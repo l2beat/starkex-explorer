@@ -43,9 +43,14 @@ export function L2MultiOrAlternativeTransactionsTable(
           (props.contentState === 'alternative' ? index : undefined)
 
         const multiIndex = props.contentState === 'multi' ? index : undefined
-        const query = getQuery(props.contentState, altIndex, multiIndex)
+        const link = getLink(
+          props.contentState,
+          props.transactionId,
+          altIndex,
+          multiIndex
+        )
         return {
-          link: `/l2-transactions/${props.transactionId.toString()}` + query,
+          link,
           cells,
         }
       })}
@@ -69,19 +74,27 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
   )
 }
 
-const getQuery = (
+const getLink = (
   contentState: L2MultiOrAlternativeTransactionsTableProps['contentState'],
+  transactionId: number,
   altIndex?: number,
   multiIndex?: number
 ) => {
+  const base = `/l2-transactions/${transactionId.toString()}`
+  let suffix: string
   switch (contentState) {
     case 'multi':
-      return altIndex !== undefined
-        ? `/alternatives/${altIndex}/${multiIndex}`
-        : `/${multiIndex}`
+      suffix =
+        altIndex !== undefined
+          ? `/alternatives/${altIndex}/${multiIndex}`
+          : `/${multiIndex}`
+      break
     case 'alternative':
-      return `/alternatives/${altIndex}`
+      suffix = `/alternatives/${altIndex}`
+      break
     default:
       assertUnreachable(contentState)
   }
+
+  return base + suffix
 }
