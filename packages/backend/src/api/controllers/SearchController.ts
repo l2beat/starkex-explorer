@@ -65,9 +65,10 @@ export class SearchController {
   private async searchForStarkKey(
     starkKey: StarkKey
   ): Promise<ControllerResult> {
-    if (
-      !(await this.preprocessedAssetHistoryRepository.starkKeyExists(starkKey))
-    ) {
+    const assetHistoryExistsForStarkKey =
+      await this.preprocessedAssetHistoryRepository.starkKeyExists(starkKey)
+
+    if (!assetHistoryExistsForStarkKey) {
       return {
         type: 'not found',
         message: `No user with Stark key ${starkKey} was found`,

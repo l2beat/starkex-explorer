@@ -155,7 +155,10 @@ export class UserController {
     ])
 
     if (!userStatistics) {
-      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+      return {
+        type: 'not found',
+        message: `User with starkKey ${starkKey.toString()} not found`,
+      }
     }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -258,7 +261,10 @@ export class UserController {
     ])
 
     if (!userStatistics) {
-      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+      return {
+        type: 'not found',
+        message: `User with starkKey ${starkKey.toString()} not found`,
+      }
     }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -299,7 +305,10 @@ export class UserController {
     ])
 
     if (!userStatistics) {
-      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+      return {
+        type: 'not found',
+        message: `User with starkKey ${starkKey.toString()} not found`,
+      }
     }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({

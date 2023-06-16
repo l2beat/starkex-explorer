@@ -40,6 +40,7 @@ export class PositionRepository extends BaseRepository {
     const knex = await this.knex()
     const row = await knex('positions')
       .where('position_id', positionId)
+      .andWhereNot('stark_key', StarkKey.ZERO.toString())
       .orderBy('state_update_id', 'desc')
       .first()
 
