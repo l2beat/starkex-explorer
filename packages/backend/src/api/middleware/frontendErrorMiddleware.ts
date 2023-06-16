@@ -21,7 +21,7 @@ export async function frontendErrorMiddleware(
       ctx.body = renderErrorPage({
         context,
         statusCode: ctx.status,
-        message: ctx.customMessage,
+        message: ctx.customMessage as string,
       })
       break
     case 500:

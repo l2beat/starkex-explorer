@@ -44,16 +44,16 @@ export class SearchController {
   }
 
   private async searchForEthereumAddress(
-    ethereumAddr: EthereumAddress
+    ethereumAddress: EthereumAddress
   ): Promise<ControllerResult> {
     const userRegistrationEvent =
       await this.userRegistrationEventRepository.findByEthereumAddress(
-        ethereumAddr
+        ethereumAddress
       )
     if (userRegistrationEvent === undefined) {
       return {
         type: 'not found',
-        message: `No registered user with Ethereum address ${ethereumAddr} was found`,
+        message: `No registered user with Ethereum address ${ethereumAddress.toString()} was found`,
       }
     }
 
@@ -71,7 +71,7 @@ export class SearchController {
     if (!assetHistoryExistsForStarkKey) {
       return {
         type: 'not found',
-        message: `No user with Stark key ${starkKey} was found`,
+        message: `No user with Stark key ${starkKey.toString()} was found`,
       }
     }
 
@@ -87,7 +87,7 @@ export class SearchController {
     if (stateUpdateId === undefined) {
       return {
         type: 'not found',
-        message: `No state update with root hash ${hash} was found`,
+        message: `No state update with root hash ${hash.toString()} was found`,
       }
     }
 

@@ -150,7 +150,7 @@ export class ForcedTradeOfferController {
     if (!userA) {
       return {
         type: 'not found',
-        message: `User with stark key ${offer.starkKeyA} does not exist`,
+        message: `User with stark key ${offer.starkKeyA.toString()} does not exist`,
       }
     }
 
@@ -192,7 +192,7 @@ export class ForcedTradeOfferController {
     if (!userB) {
       return {
         type: 'not found',
-        message: `User with stark key ${accepted.starkKeyB} does not exist`,
+        message: `User with stark key ${accepted.starkKeyB.toString()} does not exist`,
       }
     }
 
@@ -262,7 +262,7 @@ export class ForcedTradeOfferController {
     if (!userA) {
       return {
         type: 'not found',
-        message: `User with stark key ${offer.starkKeyA} does not exist`,
+        message: `User with stark key ${offer.starkKeyA.toString()} does not exist`,
       }
     }
     const requestValid = validateCancel(offer.id, userA.ethAddress, signature)

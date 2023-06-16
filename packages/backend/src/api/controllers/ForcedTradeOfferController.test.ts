@@ -572,7 +572,7 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request)
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'not found',
-        message: `User with stark key ${accepted.starkKeyA} does not exist`,
+        message: `User with stark key ${accepted.starkKeyA.toString()} does not exist`,
       })
     })
 
