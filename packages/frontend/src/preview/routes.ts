@@ -26,6 +26,7 @@ import {
   renderMerkleProofPage,
   renderNewPerpetualForcedActionPage,
   renderNewSpotForcedWithdrawPage,
+  renderNotFoundPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
   renderRegularWithdrawalPage,
@@ -1025,6 +1026,20 @@ const routes: Route[] = [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
           { timestamp: randomTimestamp(), status: 'SENT' },
         ],
+      })
+    },
+    breakAfter: true,
+  },
+  // #endregion
+  // #region Miscellaneous
+  {
+    path: '/not-found',
+    description: 'Not found page',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderNotFoundPage({
+        context,
+        message: "We couldn't find the page you were looking for.",
       })
     },
   },

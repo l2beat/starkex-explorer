@@ -40,13 +40,13 @@ export class ForcedTradeOfferController {
     const context = await this.pageContextService.getPageContext(givenUser)
 
     if (context.tradingMode != 'perpetual') {
-      return { type: 'not found', content: 'Page not found.' }
+      return { type: 'not found', message: 'Page not found.' }
     }
 
     const offer = await this.offerRepository.findById(id)
 
     if (!offer) {
-      return { type: 'not found', content: 'Offer not found.' }
+      return { type: 'not found', message: 'Offer not found.' }
     }
 
     if (offer.accepted?.transactionHash) {
@@ -141,7 +141,7 @@ export class ForcedTradeOfferController {
     )
 
     if (!positionA || !userA) {
-      return { type: 'not found', content: 'Position does not exist.' }
+      return { type: 'not found', message: 'Position does not exist.' }
     }
     const requestValid = validateCreate(
       offer,
@@ -172,11 +172,11 @@ export class ForcedTradeOfferController {
       accepted.starkKeyB
     )
     if (!positionB || !userB) {
-      return { type: 'not found', content: 'Position does not exist.' }
+      return { type: 'not found', message: 'Position does not exist.' }
     }
     const offer = await this.offerRepository.findById(offerId)
     if (!offer) {
-      return { type: 'not found', content: 'Offer does not exist.' }
+      return { type: 'not found', message: 'Offer does not exist.' }
     }
     if (offer.accepted) {
       return {
@@ -219,7 +219,7 @@ export class ForcedTradeOfferController {
     if (!offer) {
       return {
         type: 'not found',
-        content: 'Offer does not exist.',
+        message: 'Offer does not exist.',
       }
     }
     if (offer.cancelledAt) {
@@ -238,7 +238,7 @@ export class ForcedTradeOfferController {
       offer.starkKeyA
     )
     if (!userA) {
-      return { type: 'not found', content: 'Position does not exist.' }
+      return { type: 'not found', message: 'Position does not exist.' }
     }
     const requestValid = validateCancel(offer.id, userA.ethAddress, signature)
     if (!requestValid) {

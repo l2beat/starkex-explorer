@@ -132,7 +132,7 @@ export class TransactionSubmitController {
     const timestamp = Timestamp.now()
     const offer = await this.offersRepository.findById(offerId)
     if (!offer) {
-      return { type: 'not found', content: `Offer ${offerId} not found` }
+      return { type: 'not found', message: `Offer ${offerId} not found` }
     }
     if (
       !offer.accepted ||

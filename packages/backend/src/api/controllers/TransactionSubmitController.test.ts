@@ -154,7 +154,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'not found',
-        content: `Offer ${offerId} not found`,
+        message: `Offer ${offerId} not found`,
       })
     })
 

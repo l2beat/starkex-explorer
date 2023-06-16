@@ -21,7 +21,8 @@ export function applyControllerResult(ctx: Context, result: ControllerResult) {
       break
     case 'not found':
       ctx.status = 404
-      break
+      ctx.message = result.message
+      return
     default:
       assertUnreachable(result)
   }

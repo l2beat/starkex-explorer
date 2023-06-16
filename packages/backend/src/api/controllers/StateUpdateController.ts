@@ -71,7 +71,7 @@ export class StateUpdateController {
     ])
 
     if (!stateUpdate) {
-      return { type: 'not found', content: 'State update not found' }
+      return { type: 'not found', message: 'State update not found' }
     }
 
     const balanceChangeEntries = toBalanceChangeEntries(balanceChanges)

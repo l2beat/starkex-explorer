@@ -27,7 +27,7 @@ const BAD_REQUEST_RESULT: ControllerBadRequestResult = {
 
 const NOT_FOUND_RESULT: ControllerNotFoundResult = {
   type: 'not found',
-  content: 'content',
+  message: 'content',
 }
 
 const REDIRECT_RESULT: ControllerRedirectResult = {
@@ -61,7 +61,7 @@ describe(applyControllerResult.name, () => {
   it('handles not found result', () => {
     applyControllerResult(ctx, NOT_FOUND_RESULT)
     expect(ctx.status).toEqual(404)
-    expect(ctx.body).toEqual(NOT_FOUND_RESULT.content)
+    expect(ctx.body).toEqual(NOT_FOUND_RESULT.message)
   })
 
   it('handles redirect result', () => {

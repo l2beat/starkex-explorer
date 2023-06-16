@@ -65,7 +65,7 @@ export class TransactionController {
       )
     }
 
-    return { type: 'not found', content: 'Transaction not found' }
+    return { type: 'not found', message: 'Transaction not found' }
   }
 
   async getTransactionPageForUserTransaction(
@@ -77,7 +77,7 @@ export class TransactionController {
     switch (userTransaction.data.type) {
       case 'ForcedWithdrawal': {
         if (context.tradingMode !== 'perpetual') {
-          return { type: 'not found', content: 'Page not found' }
+          return { type: 'not found', message: 'Page not found' }
         }
         const txUser =
           await this.userRegistrationEventRepository.findByStarkKey(
@@ -105,7 +105,7 @@ export class TransactionController {
       }
       case 'FullWithdrawal': {
         if (context.tradingMode !== 'spot') {
-          return { type: 'not found', content: 'Page not found' }
+          return { type: 'not found', message: 'Page not found' }
         }
 
         const txUser =
@@ -131,7 +131,7 @@ export class TransactionController {
       }
       case 'ForcedTrade': {
         if (context.tradingMode !== 'perpetual') {
-          return { type: 'not found', content: 'Page not found' }
+          return { type: 'not found', message: 'Page not found' }
         }
         const [userA, userB] = await Promise.all([
           this.userRegistrationEventRepository.findByStarkKey(
@@ -142,7 +142,7 @@ export class TransactionController {
           ),
         ])
         if (!userA) {
-          return { type: 'not found', content: 'User not found' }
+          return { type: 'not found', message: 'User not found' }
         }
         const maker = {
           starkKey: userA.starkKey,
@@ -234,7 +234,7 @@ export class TransactionController {
     switch (sentTransaction.data.type) {
       case 'ForcedTrade': {
         if (context.tradingMode != 'perpetual') {
-          return { type: 'not found', content: 'Page not found' }
+          return { type: 'not found', message: 'Page not found' }
         }
 
         const [userA, userB] = await Promise.all([
@@ -247,7 +247,7 @@ export class TransactionController {
         ])
 
         if (!userA) {
-          return { type: 'not found', content: 'User not found' }
+          return { type: 'not found', message: 'User not found' }
         }
 
         const maker = {
@@ -283,7 +283,7 @@ export class TransactionController {
       }
       case 'ForcedWithdrawal': {
         if (context.tradingMode != 'perpetual') {
-          return { type: 'not found', content: 'Page not found' }
+          return { type: 'not found', message: 'Page not found' }
         }
         const txUser =
           await this.userRegistrationEventRepository.findByStarkKey(
@@ -344,7 +344,7 @@ export class TransactionController {
           )
 
         if (!asset) {
-          return { type: 'not found', content: 'Asset not found' }
+          return { type: 'not found', message: 'Asset not found' }
         }
 
         const recipient =

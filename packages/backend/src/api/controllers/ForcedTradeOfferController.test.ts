@@ -142,7 +142,7 @@ describe(ForcedTradeOfferController.name, () => {
         await controller.postOffer(tradeMock.offer, invalidSignature)
       ).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: 'Position does not exist.',
       })
     })
 
@@ -167,7 +167,7 @@ describe(ForcedTradeOfferController.name, () => {
         await controller.postOffer(tradeMock.offer, invalidSignature)
       ).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: 'Position does not exist.',
       })
     })
 
@@ -249,7 +249,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: 'Position does not exist.',
       })
     })
 
@@ -272,7 +272,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: 'Position does not exist.',
       })
     })
 
@@ -297,7 +297,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
-        content: 'Offer does not exist.',
+        message: 'Offer does not exist.',
       })
     })
 
@@ -495,7 +495,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.cancelOffer(1, '123')).toEqual({
         type: 'not found',
-        content: 'Offer does not exist.',
+        message: 'Offer does not exist.',
       })
     })
 
@@ -572,7 +572,7 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request)
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: 'Position does not exist.',
       })
     })
 
