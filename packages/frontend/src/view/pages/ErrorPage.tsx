@@ -8,11 +8,7 @@ type ErrorPageProps = {
   context: PageContext
 } & (
   | {
-      statusCode: 404
-      message: string
-    }
-  | {
-      statusCode: 400
+      statusCode: 400 | 404
       message?: string
     }
   | {

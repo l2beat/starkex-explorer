@@ -86,7 +86,10 @@ export class UserController {
     )
 
     if (!context) {
-      return { type: 'not found', message: 'Wallet not connect' }
+      return {
+        type: 'not found',
+        message: 'You have to connect a wallet to access this page',
+      }
     }
 
     if (context.user.starkKey) {
@@ -390,7 +393,7 @@ export class UserController {
         this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
       ])
     if (context.tradingMode !== 'perpetual') {
-      return { type: 'not found', message: 'Page not found' }
+      return { type: 'not found' }
     }
 
     const offers =

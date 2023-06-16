@@ -35,7 +35,7 @@ export class ForcedActionController {
     }
 
     if (context.tradingMode !== 'spot') {
-      return { type: 'not found', message: 'Page not found' }
+      return { type: 'not found' }
     }
 
     const assets =
@@ -49,7 +49,7 @@ export class ForcedActionController {
     }
 
     if (asset.starkKey != context.user.starkKey) {
-      return { type: 'not found', message: 'Vault does not belong to user' }
+      return { type: 'not found', message: 'Vault does not belong to you' }
     }
 
     const assetDetails = await this.assetRepository.findDetailsByAssetHash(
@@ -82,11 +82,14 @@ export class ForcedActionController {
     )
 
     if (!context) {
-      return { type: 'not found', message: 'User not found' }
+      return {
+        type: 'not found',
+        message: 'You have to connect your wallet to access this page',
+      }
     }
 
     if (context.tradingMode !== 'perpetual') {
-      return { type: 'not found', message: 'Page not found' }
+      return { type: 'not found' }
     }
 
     const assets =
@@ -104,7 +107,7 @@ export class ForcedActionController {
     }
 
     if (asset.starkKey != context.user.starkKey) {
-      return { type: 'not found', message: 'Position does not belong to user' }
+      return { type: 'not found', message: 'Position does not belong to you' }
     }
 
     if (!asset.price) {
@@ -139,11 +142,14 @@ export class ForcedActionController {
     )
 
     if (!context) {
-      return { type: 'not found', message: 'User not found' }
+      return {
+        type: 'not found',
+        message: 'You have to connect your wallet to access this page',
+      }
     }
 
     if (context.tradingMode !== 'perpetual') {
-      return { type: 'not found', message: 'Page not found' }
+      return { type: 'not found' }
     }
 
     const assets =
@@ -157,7 +163,7 @@ export class ForcedActionController {
     }
 
     if (asset.starkKey != context.user.starkKey) {
-      return { type: 'not found', message: 'Position does not belong to user' }
+      return { type: 'not found', message: 'Position does not belong to you' }
     }
 
     if (!asset.price) {

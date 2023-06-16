@@ -154,7 +154,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'not found',
-        message: `Offer ${offerId} not found`,
+        message: `Offer #${offerId} not found`,
       })
     })
 
@@ -173,7 +173,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        message: `Offer cannot be finalized`,
+        message: `Offer #${offer.id} cannot be finalized`,
       })
     })
 
@@ -192,7 +192,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        message: `Offer cannot be finalized`,
+        message: `Offer #${offer.id} cannot be finalized`,
       })
     })
 
@@ -213,7 +213,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        message: `Offer cannot be finalized`,
+        message: `Offer #${offer.id} cannot be finalized`,
       })
     })
 

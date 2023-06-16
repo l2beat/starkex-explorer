@@ -12,7 +12,7 @@ export interface ControllerSuccessResult {
 
 export interface ControllerNotFoundResult {
   type: 'not found'
-  message: string
+  message?: string
 }
 
 export interface ControllerRedirectResult {
@@ -28,5 +28,5 @@ export interface ControllerCreatedResult {
 
 export interface ControllerBadRequestResult {
   type: 'bad request'
-  message: string
+  message?: string
 }

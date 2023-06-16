@@ -69,7 +69,7 @@ describe('ForcedTransactionRouter', () => {
         mockObject<ForcedTradeOfferController>({
           acceptOffer: async () => ({
             type: 'not found',
-            message: 'Offer does not exist.',
+            message: 'Offer does not exist',
           }),
         }),
         mockObject<TransactionSubmitController>()

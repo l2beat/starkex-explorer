@@ -132,14 +132,17 @@ export class TransactionSubmitController {
     const timestamp = Timestamp.now()
     const offer = await this.offersRepository.findById(offerId)
     if (!offer) {
-      return { type: 'not found', message: `Offer ${offerId} not found` }
+      return { type: 'not found', message: `Offer #${offerId} not found` }
     }
     if (
       !offer.accepted ||
       offer.cancelledAt ||
       offer.accepted.transactionHash
     ) {
-      return { type: 'bad request', message: `Offer cannot be finalized` }
+      return {
+        type: 'bad request',
+        message: `Offer #${offerId} cannot be finalized`,
+      }
     }
     const tx = await this.getTransaction(transactionHash)
     if (!tx) {
