@@ -44,7 +44,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Transaction ${hash.toString()} not found`,
+        message: `Transaction ${hash.toString()} not found`,
       })
     })
 
@@ -74,7 +74,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Invalid transaction`,
+        message: `Invalid transaction`,
       })
     })
 
@@ -98,7 +98,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Invalid transaction`,
+        message: `Invalid transaction`,
       })
     })
 
@@ -173,7 +173,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Offer cannot be finalized`,
+        message: `Offer cannot be finalized`,
       })
     })
 
@@ -192,7 +192,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Offer cannot be finalized`,
+        message: `Offer cannot be finalized`,
       })
     })
 
@@ -213,7 +213,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Offer cannot be finalized`,
+        message: `Offer cannot be finalized`,
       })
     })
 
@@ -235,7 +235,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Transaction ${hash.toString()} not found`,
+        message: `Transaction ${hash.toString()} not found`,
       })
     })
 
@@ -277,7 +277,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Invalid transaction`,
+        message: `Invalid transaction`,
       })
     })
 
@@ -313,7 +313,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Invalid transaction`,
+        message: `Invalid transaction`,
       })
     })
 
@@ -380,7 +380,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Transaction ${finalizeHash.toString()} not found`,
+        message: `Transaction ${finalizeHash.toString()} not found`,
       })
     })
 
@@ -408,7 +408,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Invalid transaction`,
+        message: `Invalid transaction`,
       })
     })
 
@@ -432,7 +432,7 @@ describe(TransactionSubmitController.name, () => {
 
       expect(result).toEqual({
         type: 'bad request',
-        content: `Invalid transaction`,
+        message: `Invalid transaction`,
       })
     })
 

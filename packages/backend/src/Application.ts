@@ -12,7 +12,7 @@ import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { UserController } from './api/controllers/UserController'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
-import { notFoundMiddleware } from './api/middleware/notFoundMiddleware'
+import { frontendErrorMiddleware } from './api/middleware/frontendErrorMiddleware'
 import { createTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
 import { createStatusRouter } from './api/routers/StatusRouter'
@@ -611,7 +611,7 @@ export class Application {
       ],
       middleware: [
         createFrontendMiddleware(),
-        (ctx, next) => notFoundMiddleware(ctx, next, pageContextService),
+        (ctx, next) => frontendErrorMiddleware(ctx, next, pageContextService),
       ],
       forceHttps: config.forceHttps,
       handleServerError,

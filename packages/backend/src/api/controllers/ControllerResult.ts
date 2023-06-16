@@ -28,5 +28,5 @@ export interface ControllerCreatedResult {
 
 export interface ControllerBadRequestResult {
   type: 'bad request'
-  content: string
+  message: string
 }

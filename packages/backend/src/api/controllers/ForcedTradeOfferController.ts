@@ -141,7 +141,10 @@ export class ForcedTradeOfferController {
     )
 
     if (!positionA || !userA) {
-      return { type: 'not found', message: 'Position does not exist.' }
+      return {
+        type: 'not found',
+        message: `Position #${positionA} does not exist`,
+      }
     }
     const requestValid = validateCreate(
       offer,
@@ -150,7 +153,7 @@ export class ForcedTradeOfferController {
       userA.ethAddress
     )
     if (!requestValid) {
-      return { type: 'bad request', content: 'Your offer is invalid.' }
+      return { type: 'bad request', message: 'Your offer is invalid' }
     }
 
     const id = await this.offerRepository.add({
@@ -181,13 +184,13 @@ export class ForcedTradeOfferController {
     if (offer.accepted) {
       return {
         type: 'bad request',
-        content: 'Offer already accepted.',
+        message: 'Offer already accepted.',
       }
     }
     if (offer.cancelledAt) {
       return {
         type: 'bad request',
-        content: 'Offer already cancelled.',
+        message: 'Offer already cancelled.',
       }
     }
     const signatureValid = validateAcceptSignature(
@@ -197,7 +200,7 @@ export class ForcedTradeOfferController {
       this.collateralAsset
     )
     if (!signatureValid) {
-      return { type: 'bad request', content: 'Invalid signature.' }
+      return { type: 'bad request', message: 'Invalid signature.' }
     }
 
     await this.offerRepository.update({
@@ -225,13 +228,13 @@ export class ForcedTradeOfferController {
     if (offer.cancelledAt) {
       return {
         type: 'bad request',
-        content: 'Offer already cancelled.',
+        message: 'Offer already cancelled.',
       }
     }
     if (offer.accepted?.transactionHash) {
       return {
         type: 'bad request',
-        content: 'Offer already submitted.',
+        message: 'Offer already submitted.',
       }
     }
     const userA = await this.userRegistrationEventRepository.findByStarkKey(
@@ -244,7 +247,7 @@ export class ForcedTradeOfferController {
     if (!requestValid) {
       return {
         type: 'bad request',
-        content: 'Signature does not match.',
+        message: 'Signature does not match.',
       }
     }
 

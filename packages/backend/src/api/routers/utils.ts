@@ -12,21 +12,23 @@ export function applyControllerResult(ctx: Context, result: ControllerResult) {
       return
     case 'success':
       ctx.status = 200
-      break
+      ctx.body = result.content
+      return
     case 'created':
       ctx.status = 201
-      break
+      ctx.body = result.content
+      return
     case 'bad request':
       ctx.status = 400
-      break
+      ctx.customMessage = result.message
+      return
     case 'not found':
       ctx.status = 404
-      ctx.message = result.message
+      ctx.customMessage = result.message
       return
     default:
       assertUnreachable(result)
   }
-  ctx.body = result.content
 }
 
 export function getGivenUser(ctx: Context): Partial<UserDetails> {

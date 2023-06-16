@@ -22,7 +22,7 @@ const CREATED_RESULT: ControllerCreatedResult = {
 
 const BAD_REQUEST_RESULT: ControllerBadRequestResult = {
   type: 'bad request',
-  content: 'content',
+  message: 'content',
 }
 
 const NOT_FOUND_RESULT: ControllerNotFoundResult = {
@@ -55,7 +55,7 @@ describe(applyControllerResult.name, () => {
   it('handles bad request result', () => {
     applyControllerResult(ctx, BAD_REQUEST_RESULT)
     expect(ctx.status).toEqual(400)
-    expect(ctx.body).toEqual(BAD_REQUEST_RESULT.content)
+    expect(ctx.body).toEqual(BAD_REQUEST_RESULT.message)
   })
 
   it('handles not found result', () => {

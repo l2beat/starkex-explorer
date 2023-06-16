@@ -117,7 +117,7 @@ describe(ForcedTradeOfferController.name, () => {
         await controller.postOffer(tradeMock.offer, invalidSignature)
       ).toEqual({
         type: 'bad request',
-        content: 'Your offer is invalid.',
+        message: 'Your offer is invalid.',
       })
     })
 
@@ -192,7 +192,7 @@ describe(ForcedTradeOfferController.name, () => {
         await controller.postOffer(tradeMock.offer, invalidSignature)
       ).toEqual({
         type: 'bad request',
-        content: 'Your offer is invalid.',
+        message: 'Your offer is invalid.',
       })
     })
 
@@ -330,7 +330,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'bad request',
-        content: 'Offer already accepted.',
+        message: 'Offer already accepted.',
       })
     })
 
@@ -360,7 +360,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'bad request',
-        content: 'Offer already cancelled.',
+        message: 'Offer already cancelled.',
       })
     })
 
@@ -410,7 +410,7 @@ describe(ForcedTradeOfferController.name, () => {
         })
       ).toEqual({
         type: 'bad request',
-        content: 'Invalid signature.',
+        message: 'Invalid signature.',
       })
     })
 
@@ -520,7 +520,7 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request)
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'bad request',
-        content: 'Offer already cancelled.',
+        message: 'Offer already cancelled.',
       })
     })
 
@@ -548,7 +548,7 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request)
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'bad request',
-        content: 'Offer already submitted.',
+        message: 'Offer already submitted.',
       })
     })
 
@@ -596,7 +596,7 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request + 'tampered')
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'bad request',
-        content: 'Signature does not match.',
+        message: 'Signature does not match.',
       })
     })
 
