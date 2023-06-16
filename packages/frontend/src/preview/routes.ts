@@ -1051,7 +1051,7 @@ const routes: Route[] = [
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderErrorPage({
         context,
-        statusCode: 500,
+        statusCode: 400,
       })
     },
   },
@@ -1062,7 +1062,7 @@ const routes: Route[] = [
       const context = getPerpetualPageContext(ctx)
       ctx.body = renderErrorPage({
         context,
-        statusCode: 400,
+        statusCode: 500,
       })
     },
   },
