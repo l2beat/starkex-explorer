@@ -53,13 +53,15 @@ function ErrorPage(props: ErrorPageProps) {
       withoutSearch
     >
       <ContentWrapper className="flex flex-1 flex-col items-center justify-center">
-        <span className="text-[128px] font-extrabold leading-none text-brand">
+        <span className="text-[80px] font-extrabold  leading-tight text-brand md:text-[160px]">
           {props.statusCode}
         </span>
-        <span className="text-[64px] font-bold leading-none">
+        <span className="text-center text-xl font-bold leading-none md:text-[64px]">
           {ERROR_TITLES[props.statusCode]}
         </span>
-        <span className="mt-12 text-center text-xl">{errorMessage}</span>
+        <span className="text-l mt-12 text-center md:text-xl">
+          {errorMessage}
+        </span>
       </ContentWrapper>
     </Page>
   )
