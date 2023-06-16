@@ -33,7 +33,9 @@ const getErrorMessages = (pageProps: ErrorPageProps) => {
         pageProps.message || 'Oops! Something went wrong. Please try again.'
       )
     case 404:
-      return pageProps.message
+      return (
+        pageProps.message || "We couldn't find the page you were looking for."
+      )
     case 500:
       return 'Oops! Something went wrong. Please try again.'
   }
