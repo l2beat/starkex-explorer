@@ -5,6 +5,7 @@ import { ReplacedIcon } from '../../../assets/icons/ReplacedIcon'
 interface AlternativeTransactionNoteProps {
   transactionId: number
   altIndex: number
+  multiIndex: number | undefined
 }
 
 export function AlternativeTransactionNote(
@@ -15,8 +16,9 @@ export function AlternativeTransactionNote(
       <ReplacedIcon className="scale-150 fill-blue-300" />
       <span className="ml-2 text-blue-300">Alternative</span>
       <span className="ml-auto">
-        Please mind, this transaction is #{props.altIndex} alternative
-        transaction of #{props.transactionId} transaction.
+        Please mind, this transaction is{' '}
+        {props.multiIndex !== undefined ? 'part of' : ''} #{props.altIndex}{' '}
+        alternative transaction of #{props.transactionId} transaction.
       </span>
     </div>
   )

@@ -54,14 +54,15 @@ export function PerpetualL2TransactionDetailsPage(
         {props.transaction.alternativeTransactions.length > 0 && (
           <ReplacedTransactionNote />
         )}
+        {props.multiIndex !== undefined && (
+          <MultiTransactionNote multiIndex={props.multiIndex} />
+        )}
         {props.altIndex !== undefined && (
           <AlternativeTransactionNote
             transactionId={props.transaction.transactionId}
             altIndex={props.altIndex}
+            multiIndex={props.multiIndex}
           />
-        )}
-        {props.multiIndex !== undefined && (
-          <MultiTransactionNote multiIndex={props.multiIndex} />
         )}
         <PerpetualTransactionDetails
           transactionId={props.transaction.transactionId}
