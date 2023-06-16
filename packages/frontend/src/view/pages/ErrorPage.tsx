@@ -1,6 +1,7 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
+import { ContentWrapper } from '../components/page/ContentWrapper'
 import { Page } from '../components/page/Page'
 import { reactToHtml } from '../reactToHtml'
 
@@ -51,15 +52,15 @@ function ErrorPage(props: ErrorPageProps) {
       context={props.context}
       withoutSearch
     >
-      <div className="flex flex-1 flex-col items-center justify-center">
+      <ContentWrapper className="flex flex-1 flex-col items-center justify-center">
         <span className="text-[128px] font-extrabold leading-none text-brand">
           {props.statusCode}
         </span>
         <span className="text-[64px] font-bold leading-none">
           {ERROR_TITLES[props.statusCode]}
         </span>
-        <span className="mt-12 text-xl">{errorMessage}</span>
-      </div>
+        <span className="mt-12 text-center text-xl">{errorMessage}</span>
+      </ContentWrapper>
     </Page>
   )
 }
