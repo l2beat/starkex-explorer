@@ -54,9 +54,12 @@ const getLink = (
   const base = `/l2-transactions/${transactionId.toString()}`
   switch (contentState) {
     case 'multi':
-      return base + altIndex !== undefined
-        ? `/alternatives/${altIndex}/${multiIndex}`
-        : `/${multiIndex}`
+      return (
+        base +
+        (altIndex !== undefined
+          ? `/alternatives/${altIndex}/${multiIndex}`
+          : `/${multiIndex}`)
+      )
     case 'alternative':
       return base + `/alternatives/${altIndex}`
     default:
