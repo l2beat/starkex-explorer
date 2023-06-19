@@ -1,7 +1,7 @@
 import { CollateralAsset, PerpetualL2TransactionData } from '@explorer/shared'
 import React from 'react'
 
-import { L2MultiOrAlternativeTransactionsTable } from '../../../../components/tables/l2-transactions/L2MultiOrAlternativeTransactionsTable'
+import { L2TransactionsList } from '../L2TransactionsList'
 
 export interface PerpetualMultiTransactionDetailsProps {
   transactionId: number
@@ -14,7 +14,7 @@ export function PerpetualMultiTransactionDetails(
   props: PerpetualMultiTransactionDetailsProps
 ) {
   return (
-    <L2MultiOrAlternativeTransactionsTable
+    <L2TransactionsList
       transactions={props.data.transactions}
       contentState="multi"
       collateralAsset={props.collateralAsset}

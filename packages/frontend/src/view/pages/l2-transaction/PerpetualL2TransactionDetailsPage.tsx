@@ -4,7 +4,6 @@ import React from 'react'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
-import { L2MultiOrAlternativeTransactionsTable } from '../../components/tables/l2-transactions/L2MultiOrAlternativeTransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
 import {
   AggregatedPerpetualL2TransactionEntry,
@@ -12,6 +11,7 @@ import {
 } from './common'
 import { AlternativeTransactionNote } from './components/AlternativeTransactionNote'
 import { PerpetualTransactionDetails } from './components/details'
+import { L2TransactionsList } from './components/L2TransactionsList'
 import { MultiTransactionNote } from './components/MultiTransactionNote'
 import { ReplacedTransactionNote } from './components/ReplacedTransactionNote'
 
@@ -74,7 +74,7 @@ export function PerpetualL2TransactionDetailsPage(
         {props.transaction.alternativeTransactions.length > 0 && (
           <div className="mt-12">
             <PageTitle>Alternative transactions</PageTitle>
-            <L2MultiOrAlternativeTransactionsTable
+            <L2TransactionsList
               transactions={props.transaction.alternativeTransactions}
               transactionId={props.transaction.transactionId}
               collateralAsset={props.context.collateralAsset}
