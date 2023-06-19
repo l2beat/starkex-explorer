@@ -12,7 +12,7 @@ import { ToJSON } from './transactions/ToJSON'
 
 export type L2TransactionData =
   | DepositL2TransactionData
-  | WithdrawToAddressL2TransactionData
+  | WithdrawalToAddressL2TransactionData
   | ForcedWithdrawalL2TransactionData
   | TradeL2TransactionData
   | ForcedTradeL2TransactionData
@@ -60,7 +60,7 @@ export interface DepositL2TransactionData {
   type: 'Deposit'
 }
 
-export interface WithdrawToAddressL2TransactionData {
+export interface WithdrawalToAddressL2TransactionData {
   positionId: bigint
   starkKey: StarkKey
   ethereumAddress: EthereumAddress
@@ -68,7 +68,7 @@ export interface WithdrawToAddressL2TransactionData {
   nonce: bigint
   expirationTimestamp: Timestamp
   signature: Signature
-  type: 'WithdrawToAddress'
+  type: 'WithdrawalToAddress'
 }
 
 export interface ForcedWithdrawalL2TransactionData {
@@ -233,8 +233,8 @@ function encodeL2Transaction(
   switch (values.type) {
     case 'Deposit':
       return encodeDepositTransaction(values)
-    case 'WithdrawToAddress':
-      return encodeWithdrawToAddressTransaction(values)
+    case 'WithdrawalToAddress':
+      return encodeWithdrawalToAddressTransaction(values)
     case 'ForcedWithdrawal':
       return encodeForcedWithdrawalTransaction(values)
     case 'Trade':
@@ -264,8 +264,8 @@ function decodeTransaction(
   switch (values.type) {
     case 'Deposit':
       return decodeDepositTransaction(values)
-    case 'WithdrawToAddress':
-      return decodeWithdrawToAddressTransaction(values)
+    case 'WithdrawalToAddress':
+      return decodeWithdrawalToAddressTransaction(values)
     case 'ForcedWithdrawal':
       return decodeForcedWithdrawalTransaction(values)
     case 'Trade':
@@ -314,9 +314,9 @@ function decodeDepositTransaction(
     amount: BigInt(values.amount),
   }
 }
-function encodeWithdrawToAddressTransaction(
-  values: WithdrawToAddressL2TransactionData
-): Encoded<WithdrawToAddressL2TransactionData> {
+function encodeWithdrawalToAddressTransaction(
+  values: WithdrawalToAddressL2TransactionData
+): Encoded<WithdrawalToAddressL2TransactionData> {
   return {
     starkKeyA: values.starkKey,
     starkKeyB: null,
@@ -333,9 +333,9 @@ function encodeWithdrawToAddressTransaction(
   }
 }
 
-function decodeWithdrawToAddressTransaction(
-  values: ToJSON<WithdrawToAddressL2TransactionData>
-): WithdrawToAddressL2TransactionData {
+function decodeWithdrawalToAddressTransaction(
+  values: ToJSON<WithdrawalToAddressL2TransactionData>
+): WithdrawalToAddressL2TransactionData {
   return {
     ...values,
     positionId: BigInt(values.positionId),
