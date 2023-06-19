@@ -11,6 +11,7 @@ import { PerpetualDeleverageDetails } from './PerpetualDeleverageDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
 import { PerpetualForcedTradeDetails } from './PerpetualForcedTradeDetails'
 import { PerpetualForcedWithdrawalDetails } from './PerpetualForcedWithdrawalDetails'
+import { PerpetualLiquidateDetails } from './PerpetualLiquidateDetails'
 import { PerpetualMultiTransactionDetails } from './PerpetualMultiTransactionDetails'
 import { PerpetualTradeDetails } from './PerpetualTradeDetails'
 import { PerpetualTransferDetails } from './PerpetualTransferDetails'
@@ -87,6 +88,14 @@ export function PerpetualTransactionDetails(
     case 'Deleverage':
       return (
         <PerpetualDeleverageDetails
+          stateUpdateId={props.stateUpdateId}
+          collateralAsset={props.collateralAsset}
+          data={props.data}
+        />
+      )
+    case 'Liquidate':
+      return (
+        <PerpetualLiquidateDetails
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
