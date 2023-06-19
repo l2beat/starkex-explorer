@@ -7,6 +7,7 @@ import React from 'react'
 
 import { Card } from '../../../../components/Card'
 import { PerpetualConditionalTransferDetails } from './PerpetualConditionalTransferDetails'
+import { PerpetualDeleverageDetails } from './PerpetualDeleverageDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
 import { PerpetualForcedTradeDetails } from './PerpetualForcedTradeDetails'
 import { PerpetualForcedWithdrawalDetails } from './PerpetualForcedWithdrawalDetails'
@@ -78,6 +79,14 @@ export function PerpetualTransactionDetails(
     case 'ForcedTrade':
       return (
         <PerpetualForcedTradeDetails
+          stateUpdateId={props.stateUpdateId}
+          collateralAsset={props.collateralAsset}
+          data={props.data}
+        />
+      )
+    case 'Deleverage':
+      return (
+        <PerpetualDeleverageDetails
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
