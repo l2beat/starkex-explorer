@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ReplacedIcon } from '../../../assets/icons/ReplacedIcon'
+import { AlternativeTransactionIcon } from '../../../assets/icons/AlternativeTransactionIcon'
 
 interface AlternativeTransactionNoteProps {
   transactionId: number
@@ -12,9 +12,9 @@ export function AlternativeTransactionNote(
   props: AlternativeTransactionNoteProps
 ) {
   return (
-    <div className="mb-4 flex rounded-lg bg-blue-300 bg-opacity-20 px-6 py-5 text-lg font-semibold">
-      <ReplacedIcon className="scale-150 fill-blue-300" />
-      <span className="ml-2 text-blue-300">Alternative</span>
+    <div className="mb-4 flex items-center rounded-lg bg-cyan-400 bg-opacity-20 px-6 py-5 text-lg font-semibold">
+      <AlternativeTransactionIcon className="fill-cyan-400" />
+      <span className="ml-2 mr-12 text-cyan-400">Alternative</span>
       <span className="ml-auto">
         Please mind, this transaction is{' '}
         {props.multiIndex !== undefined ? 'part of' : ''} #{props.altIndex}{' '}

@@ -1,7 +1,7 @@
 import { CollateralAsset } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
-import { ReplacedIcon } from '../../../../assets/icons/ReplacedIcon'
+import { ReplacedTransactionIcon } from '../../../../assets/icons/ReplacedTransactionIcon'
 import {
   getL2TransactionStatusBadgeValues,
   l2TransactionTypeToText,
@@ -79,7 +79,7 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
         </TooltipWrapper>
         {transaction.state === 'replaced' && (
           <TooltipWrapper content="This transaction has been replaced">
-            <ReplacedIcon className="fill-yellow-300" />
+            <ReplacedTransactionIcon className="fill-yellow-300" />
           </TooltipWrapper>
         )}
         {transaction.isPartOfMulti && (
