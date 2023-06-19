@@ -55,7 +55,7 @@ const randomAssetOraclePrice = () => ({
 
 const randomFundingIndex = () => ({
   syntheticAssetId: assetIdBucket.pick(),
-  quantizedFundingIndex: randomInt(0, 1000000),
+  quantizedFundingIndex: randomInt(-100000000, 100000000),
 })
 
 export const perpetualL2TransactionsBucket = new Bucket<

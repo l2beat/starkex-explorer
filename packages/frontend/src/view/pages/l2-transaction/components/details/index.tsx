@@ -11,6 +11,7 @@ import { PerpetualDeleverageDetails } from './PerpetualDeleverageDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
 import { PerpetualForcedTradeDetails } from './PerpetualForcedTradeDetails'
 import { PerpetualForcedWithdrawalDetails } from './PerpetualForcedWithdrawalDetails'
+import { PerpetualFundingTickDetails } from './PerpetualFundingTickDetails'
 import { PerpetualLiquidateDetails } from './PerpetualLiquidateDetails'
 import { PerpetualMultiTransactionDetails } from './PerpetualMultiTransactionDetails'
 import { PerpetualTradeDetails } from './PerpetualTradeDetails'
@@ -101,6 +102,14 @@ export function PerpetualTransactionDetails(
           data={props.data}
         />
       )
+    case 'FundingTick':
+      return (
+        <PerpetualFundingTickDetails
+          stateUpdateId={props.stateUpdateId}
+          collateralAsset={props.collateralAsset}
+          data={props.data}
+        />
+      )
     case 'MultiTransaction':
       return (
         <PerpetualMultiTransactionDetails
@@ -110,6 +119,7 @@ export function PerpetualTransactionDetails(
           altIndex={props.altIndex}
         />
       )
+
     default:
       return (
         <Card>

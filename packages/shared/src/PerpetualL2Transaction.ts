@@ -156,13 +156,13 @@ export interface PerpetualL2DeleverageTransactionData {
   type: 'Deleverage'
 }
 
-interface FundingIndex {
+export interface PerpetualFundingIndex {
   syntheticAssetId: AssetId
   quantizedFundingIndex: number
 }
 
 interface FundingIndicesState {
-  indices: FundingIndex[]
+  indices: PerpetualFundingIndex[]
   timestamp: Timestamp
 }
 export interface PerpetualL2FundingTickTransactionData {
