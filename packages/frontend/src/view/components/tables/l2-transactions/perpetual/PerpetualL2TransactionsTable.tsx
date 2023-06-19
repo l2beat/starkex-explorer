@@ -1,6 +1,8 @@
 import { CollateralAsset } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
+import { AlternativeTransactionIcon } from '../../../../assets/icons/AlternativeTransactionIcon'
+import { MultiTransactionIcon } from '../../../../assets/icons/MultiTransactionIcon'
 import { ReplacedTransactionIcon } from '../../../../assets/icons/ReplacedTransactionIcon'
 import {
   getL2TransactionStatusBadgeValues,
@@ -69,26 +71,22 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
       />
       <div className="ml-auto flex gap-2">
         <TooltipWrapper
-          content={`This transaction is alternative or one of the alternatives of transaction #${transaction.transactionId}`}
+          content={`This transaction is an alternative or one of the alternatives of transaction #${transaction.transactionId}`}
         >
           {transaction.state === 'alternative' && (
-            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">
-              A
-            </span>
+            <AlternativeTransactionIcon className="scale-75 fill-cyan-400" />
           )}
         </TooltipWrapper>
         {transaction.state === 'replaced' && (
           <TooltipWrapper content="This transaction has been replaced">
-            <ReplacedTransactionIcon className="fill-yellow-300" />
+            <ReplacedTransactionIcon className="scale-75 fill-yellow-300" />
           </TooltipWrapper>
         )}
         {transaction.isPartOfMulti && (
           <TooltipWrapper
             content={`This transaction is included in multi transaction #${transaction.transactionId}`}
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-fuchsia-400">
-              M
-            </span>
+            <MultiTransactionIcon className="scale-75 fill-orange-500" />
           </TooltipWrapper>
         )}
       </div>
