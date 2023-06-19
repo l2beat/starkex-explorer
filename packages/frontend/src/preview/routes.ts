@@ -51,10 +51,14 @@ import {
   perpetualL2TransactionsBucket,
   randomAggregatedPerpetualL2TransactionEntry,
   randomPerpetualL2ConditionalTransferTransaction,
+  randomPerpetualL2DeleverageTransaction,
   randomPerpetualL2DepositTransaction,
   randomPerpetualL2ForcedTradeTransaction,
   randomPerpetualL2ForcedWithdrawalTransaction,
+  randomPerpetualL2FundingTickTransaction,
+  randomPerpetualL2LiquidateTransaction,
   randomPerpetualL2MultiTransaction,
+  randomPerpetualL2OraclePricesTickTransaction,
   randomPerpetualL2TradeTransaction,
   randomPerpetualL2TransactionEntry,
   randomPerpetualL2TransferTransaction,
@@ -736,7 +740,6 @@ const routes: Route[] = [
       })
     },
   },
-
   {
     path: '/l2-transactions/perpetual/withdraw-to-address',
     link: '/l2-transactions/perpetual/withdraw-to-address',
@@ -747,6 +750,62 @@ const routes: Route[] = [
         context,
         transaction: randomAggregatedPerpetualL2TransactionEntry(
           randomPerpetualL2WithdrawToAddressTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/deleverage',
+    link: '/l2-transactions/perpetual/deleverage',
+    description: 'Perpetual L2 deleverage transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2DeleverageTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/liquidate',
+    link: '/l2-transactions/perpetual/liquidate',
+    description: 'Perpetual L2 liquidate transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2LiquidateTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/funding-tick',
+    link: '/l2-transactions/perpetual/funding-tick',
+    description: 'Perpetual L2 funding tick transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2FundingTickTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/oracle-prices-tick',
+    link: '/l2-transactions/perpetual/oracle-prices-tick',
+    description: 'Perpetual L2 oracle prices tick transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2OraclePricesTickTransaction()
         ),
       })
     },
