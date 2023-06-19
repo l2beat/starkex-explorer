@@ -19,16 +19,11 @@ export function L2TransactionsList(props: L2TransactionsListProps) {
   return (
     <div className="rounded-lg bg-gray-800">
       {props.transactions.map((transaction, index) => {
-        const altIndex =
-          props.altIndex ??
-          (props.contentState === 'alternative' ? index : undefined)
-
-        const multiIndex = props.contentState === 'multi' ? index : undefined
         const link = getLink(
           props.contentState,
           props.transactionId,
-          altIndex,
-          multiIndex
+          index,
+          props.altIndex
         )
         return (
           <a
@@ -48,8 +43,8 @@ export function L2TransactionsList(props: L2TransactionsListProps) {
 const getLink = (
   contentState: L2TransactionsListProps['contentState'],
   transactionId: number,
-  altIndex?: number,
-  multiIndex?: number
+  index: number,
+  altIndex?: number
 ) => {
   const base = `/l2-transactions/${transactionId.toString()}`
   switch (contentState) {
@@ -57,11 +52,11 @@ const getLink = (
       return (
         base +
         (altIndex !== undefined
-          ? `/alternatives/${altIndex}/${multiIndex}`
-          : `/${multiIndex}`)
+          ? `/alternatives/${altIndex}/${index}`
+          : `/${index}`)
       )
     case 'alternative':
-      return base + `/alternatives/${altIndex}`
+      return base + `/alternatives/${index}`
     default:
       assertUnreachable(contentState)
   }
