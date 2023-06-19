@@ -5,7 +5,6 @@ import {
 } from '@explorer/shared'
 import React from 'react'
 
-import { L2MultiOrAlternativeTransactionsTableProps } from '../../../components/tables/l2-transactions/L2MultiOrAlternativeTransactionsTable'
 import { l2TransactionTypeToText } from '../common'
 
 export interface L2TransactionsListProps {
@@ -47,7 +46,7 @@ export function L2TransactionsList(props: L2TransactionsListProps) {
 }
 
 const getLink = (
-  contentState: L2MultiOrAlternativeTransactionsTableProps['contentState'],
+  contentState: L2TransactionsListProps['contentState'],
   transactionId: number,
   altIndex?: number,
   multiIndex?: number
