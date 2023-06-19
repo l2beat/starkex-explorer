@@ -5,6 +5,7 @@ import {
 } from '@explorer/shared'
 import React from 'react'
 
+import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
 import { l2TransactionTypeToText } from '../common'
 
 export interface L2TransactionsListProps {
@@ -28,11 +29,12 @@ export function L2TransactionsList(props: L2TransactionsListProps) {
         return (
           <a
             href={link}
-            className="flex gap-6 rounded-lg py-3 px-4 hover:bg-slate-800"
+            className="group flex gap-6 rounded-lg py-3 px-4 transition-colors hover:bg-slate-800"
             key={`${transaction.type}-${index}`}
           >
             <span className="opacity-40">#{index}</span>
             <span>{l2TransactionTypeToText(transaction.type)}</span>
+            <ArrowRightIcon className="ml-auto scale-125 fill-brand opacity-0 transition-opacity group-hover:opacity-100" />
           </a>
         )
       })}
