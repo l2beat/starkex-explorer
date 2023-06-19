@@ -13,11 +13,11 @@ export async function frontendErrorMiddleware(
 
   const givenUser = getGivenUser(ctx)
   const context = await pageContextService.getPageContext(givenUser)
-  ctx.set({ 'Content-Type': 'text/html' })
 
   switch (ctx.status) {
     case 400:
     case 404:
+      ctx.set({ 'Content-Type': 'text/html' })
       ctx.body = renderErrorPage({
         context,
         statusCode: ctx.status,
@@ -25,12 +25,11 @@ export async function frontendErrorMiddleware(
       })
       break
     case 500:
+      ctx.set({ 'Content-Type': 'text/html' })
       ctx.body = renderErrorPage({
         context,
         statusCode: ctx.status,
       })
-      break
-    default:
       break
   }
 }
