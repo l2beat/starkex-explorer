@@ -1,3 +1,4 @@
+import { assertUnreachable, TradingMode } from '@explorer/shared'
 import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
 
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
@@ -12,51 +13,48 @@ export class SearchController {
     private stateUpdateRepository: StateUpdateRepository,
     private positionOrVaultRepository: PositionRepository | VaultRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
-    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository
+    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    private tradingMode: TradingMode
   ) {}
 
   async getSearchRedirect(query: string): Promise<ControllerResult> {
     const parsed = parseSearchQuery(query.trim())
 
-    let response: ControllerResult | undefined
-
-    if (!response && parsed.ethereumAddress) {
-      response = await this.searchForEthereumAddress(parsed.ethereumAddress)
+    if (!parsed) {
+      return { type: 'not found', message: 'No results found for your query' }
     }
 
-    if (!response && parsed.starkKey) {
-      response = await this.searchForStarkKey(parsed.starkKey)
+    switch (parsed.type) {
+      case 'ethereumAddress':
+        return await this.searchForEthereumAddress(parsed.ethereumAddress)
+      case 'starkKey':
+        return await this.searchForStarkKey(parsed.starkKey)
+      case 'positionOrVaultId':
+        return await this.searchForPositionOrVaultId(
+          parsed.positionOrVaultId,
+          this.tradingMode
+        )
+      case 'stateUpdateId':
+        return await this.searchForStateUpdateId(parsed.stateUpdateId)
+      case 'stateUpdateRootHash':
+        return await this.searchForRootHash(parsed.stateUpdateRootHash)
+      default:
+        assertUnreachable(parsed)
     }
-
-    if (!response && parsed.positionOrVaultId) {
-      response = await this.searchForPositionOrVaultId(parsed.positionOrVaultId)
-    }
-
-    if (!response && parsed.stateUpdateId) {
-      response = await this.searchForStateUpdateId(parsed.stateUpdateId)
-    }
-
-    if (!response && parsed.stateUpdateRootHash) {
-      response = await this.searchForRootHash(parsed.stateUpdateRootHash)
-    }
-
-    if (!response) {
-      const content = 'No results found for your query'
-      return { type: 'not found', content }
-    }
-
-    return response
   }
 
   private async searchForEthereumAddress(
-    ethereumAddr: EthereumAddress
-  ): Promise<ControllerResult | undefined> {
+    ethereumAddress: EthereumAddress
+  ): Promise<ControllerResult> {
     const userRegistrationEvent =
       await this.userRegistrationEventRepository.findByEthereumAddress(
-        ethereumAddr
+        ethereumAddress
       )
     if (userRegistrationEvent === undefined) {
-      return
+      return {
+        type: 'not found',
+        message: `No registered user with Ethereum address ${ethereumAddress.toString()} was found`,
+      }
     }
 
     const starkKey = userRegistrationEvent.starkKey.toString()
@@ -64,39 +62,52 @@ export class SearchController {
     return { type: 'redirect', url: `/users/${starkKey}` }
   }
 
-  private async searchForRootHash(
-    hash: PedersenHash
-  ): Promise<ControllerResult | undefined> {
-    const stateUpdateId = await this.stateUpdateRepository.findIdByRootHash(
-      hash
-    )
-    if (stateUpdateId === undefined) {
-      return
-    }
-
-    return { type: 'redirect', url: `/state-updates/${stateUpdateId}` }
-  }
-
   private async searchForStarkKey(
     starkKey: StarkKey
-  ): Promise<ControllerResult | undefined> {
-    if (
-      !(await this.preprocessedAssetHistoryRepository.starkKeyExists(starkKey))
-    ) {
-      return
+  ): Promise<ControllerResult> {
+    const assetHistoryExistsForStarkKey =
+      await this.preprocessedAssetHistoryRepository.starkKeyExists(starkKey)
+
+    if (!assetHistoryExistsForStarkKey) {
+      return {
+        type: 'not found',
+        message: `No user with Stark key ${starkKey.toString()} was found`,
+      }
     }
 
     return { type: 'redirect', url: `/users/${starkKey.toString()}` }
   }
 
+  private async searchForRootHash(
+    hash: PedersenHash
+  ): Promise<ControllerResult> {
+    const stateUpdateId = await this.stateUpdateRepository.findIdByRootHash(
+      hash
+    )
+    if (stateUpdateId === undefined) {
+      return {
+        type: 'not found',
+        message: `No state update with root hash ${hash.toString()} was found`,
+      }
+    }
+
+    return { type: 'redirect', url: `/state-updates/${stateUpdateId}` }
+  }
+
   private async searchForPositionOrVaultId(
-    positionOrVaultId: bigint
-  ): Promise<ControllerResult | undefined> {
+    positionOrVaultId: bigint,
+    tradingMode: TradingMode
+  ): Promise<ControllerResult> {
     const positionOrVault = await this.positionOrVaultRepository.findById(
       positionOrVaultId
     )
     if (positionOrVault === undefined) {
-      return
+      return {
+        type: 'not found',
+        message: `No ${
+          tradingMode === 'perpetual' ? 'position' : 'vault'
+        } ID #${positionOrVaultId} was found`,
+      }
     }
 
     const starkKey = positionOrVault.starkKey.toString()
@@ -106,36 +117,86 @@ export class SearchController {
 
   private async searchForStateUpdateId(
     stateUpdateId: number
-  ): Promise<ControllerResult | undefined> {
+  ): Promise<ControllerResult> {
     const stateUpdate = await this.stateUpdateRepository.findById(stateUpdateId)
     if (stateUpdate === undefined) {
-      return
+      return {
+        type: 'not found',
+        message: `No state update with ID ${stateUpdateId} was found`,
+      }
     }
 
     return { type: 'redirect', url: `/state-updates/${stateUpdateId}` }
   }
 }
 
-interface ParsedQuery {
-  ethereumAddress?: EthereumAddress
-  starkKey?: StarkKey
-  positionOrVaultId?: bigint
-  stateUpdateId?: number
-  stateUpdateRootHash?: PedersenHash
-}
+type ParsedQuery =
+  | {
+      type: 'ethereumAddress'
+      ethereumAddress: EthereumAddress
+    }
+  | {
+      type: 'starkKey'
+      starkKey: StarkKey
+    }
+  | {
+      type: 'positionOrVaultId'
+      positionOrVaultId: bigint
+    }
+  | {
+      type: 'stateUpdateId'
+      stateUpdateId: number
+    }
+  | {
+      type: 'stateUpdateRootHash'
+      stateUpdateRootHash: PedersenHash
+    }
 
-export function parseSearchQuery(query: string): ParsedQuery {
-  const parsed: ParsedQuery = {}
-  parsed.starkKey = tryOrUndefined(() => StarkKey(query))
-  parsed.ethereumAddress = tryOrUndefined(() => EthereumAddress(query))
-  parsed.positionOrVaultId = query.startsWith('#')
+export function parseSearchQuery(query: string): ParsedQuery | undefined {
+  const starkKey = tryOrUndefined(() => StarkKey(query))
+  if (starkKey) {
+    return {
+      type: 'starkKey',
+      starkKey,
+    }
+  }
+
+  const ethereumAddress = tryOrUndefined(() => EthereumAddress(query))
+  if (ethereumAddress) {
+    return {
+      type: 'ethereumAddress',
+      ethereumAddress,
+    }
+  }
+
+  const positionOrVaultId = query.startsWith('#')
     ? BigInt(query.slice(1))
     : undefined
-  parsed.stateUpdateId = query.startsWith('@')
+  if (positionOrVaultId) {
+    return {
+      type: 'positionOrVaultId',
+      positionOrVaultId,
+    }
+  }
+
+  const stateUpdateId = query.startsWith('@')
     ? parseInt(query.slice(1))
     : undefined
-  parsed.stateUpdateRootHash = tryOrUndefined(() => PedersenHash(query))
-  return parsed
+
+  if (stateUpdateId) {
+    return {
+      type: 'stateUpdateId',
+      stateUpdateId,
+    }
+  }
+
+  const stateUpdateRootHash = tryOrUndefined(() => PedersenHash(query))
+  if (stateUpdateRootHash) {
+    return {
+      type: 'stateUpdateRootHash',
+      stateUpdateRootHash,
+    }
+  }
 }
 
 function tryOrUndefined<T>(fn: () => T): T | undefined {

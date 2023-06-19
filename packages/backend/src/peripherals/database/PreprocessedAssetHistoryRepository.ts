@@ -355,11 +355,11 @@ export class PreprocessedAssetHistoryRepository<
 
   async starkKeyExists(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
-    const rows = await knex('preprocessed_asset_history')
+    const [result] = await knex('preprocessed_asset_history')
       .where('stark_key', starkKey.toString())
       .count()
 
-    return rows.length > 0
+    return Number(result?.count ?? 0) > 0
   }
 
   async deleteAll(trx: Knex.Transaction) {

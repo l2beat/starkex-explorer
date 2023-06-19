@@ -22,12 +22,12 @@ const CREATED_RESULT: ControllerCreatedResult = {
 
 const BAD_REQUEST_RESULT: ControllerBadRequestResult = {
   type: 'bad request',
-  content: 'content',
+  message: 'content',
 }
 
 const NOT_FOUND_RESULT: ControllerNotFoundResult = {
   type: 'not found',
-  content: 'content',
+  message: 'content',
 }
 
 const REDIRECT_RESULT: ControllerRedirectResult = {
@@ -55,13 +55,13 @@ describe(applyControllerResult.name, () => {
   it('handles bad request result', () => {
     applyControllerResult(ctx, BAD_REQUEST_RESULT)
     expect(ctx.status).toEqual(400)
-    expect(ctx.body).toEqual(BAD_REQUEST_RESULT.content)
+    expect(ctx.customMessage).toEqual(BAD_REQUEST_RESULT.message)
   })
 
   it('handles not found result', () => {
     applyControllerResult(ctx, NOT_FOUND_RESULT)
     expect(ctx.status).toEqual(404)
-    expect(ctx.body).toEqual(NOT_FOUND_RESULT.content)
+    expect(ctx.customMessage).toEqual(NOT_FOUND_RESULT.message)
   })
 
   it('handles redirect result', () => {

@@ -19,6 +19,7 @@ import { randomInt } from 'crypto'
 import Koa from 'koa'
 
 import {
+  renderErrorPage,
   renderHomeOffersPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
@@ -1025,6 +1026,43 @@ const routes: Route[] = [
           { timestamp: randomTimestamp(), status: 'REVERTED' },
           { timestamp: randomTimestamp(), status: 'SENT' },
         ],
+      })
+    },
+    breakAfter: true,
+  },
+  // #endregion
+  // #region Error pages
+  {
+    path: '/error/not-found',
+    description: 'Not found error page',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderErrorPage({
+        context,
+        statusCode: 404,
+        message: "We couldn't find the page you were looking for.",
+      })
+    },
+  },
+  {
+    path: '/error/bad-request',
+    description: 'Bad request error page',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderErrorPage({
+        context,
+        statusCode: 400,
+      })
+    },
+  },
+  {
+    path: '/error/internal-server-error',
+    description: 'Internal server error page',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderErrorPage({
+        context,
+        statusCode: 500,
       })
     },
   },

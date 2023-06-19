@@ -40,13 +40,13 @@ export class ForcedTradeOfferController {
     const context = await this.pageContextService.getPageContext(givenUser)
 
     if (context.tradingMode != 'perpetual') {
-      return { type: 'not found', content: 'Page not found.' }
+      return { type: 'not found' }
     }
 
     const offer = await this.offerRepository.findById(id)
 
     if (!offer) {
-      return { type: 'not found', content: 'Offer not found.' }
+      return { type: 'not found', message: `Offer ${id} not found` }
     }
 
     if (offer.accepted?.transactionHash) {
@@ -140,9 +140,20 @@ export class ForcedTradeOfferController {
       offer.starkKeyA
     )
 
-    if (!positionA || !userA) {
-      return { type: 'not found', content: 'Position does not exist.' }
+    if (!positionA) {
+      return {
+        type: 'not found',
+        message: `Position #${offer.positionIdA} does not exist`,
+      }
     }
+
+    if (!userA) {
+      return {
+        type: 'not found',
+        message: `User with stark key ${offer.starkKeyA.toString()} does not exist`,
+      }
+    }
+
     const requestValid = validateCreate(
       offer,
       positionA,
@@ -150,7 +161,7 @@ export class ForcedTradeOfferController {
       userA.ethAddress
     )
     if (!requestValid) {
-      return { type: 'bad request', content: 'Your offer is invalid.' }
+      return { type: 'bad request', message: 'Your offer is invalid' }
     }
 
     const id = await this.offerRepository.add({
@@ -171,23 +182,34 @@ export class ForcedTradeOfferController {
     const userB = await this.userRegistrationEventRepository.findByStarkKey(
       accepted.starkKeyB
     )
-    if (!positionB || !userB) {
-      return { type: 'not found', content: 'Position does not exist.' }
+    if (!positionB) {
+      return {
+        type: 'not found',
+        message: `Position #${accepted.positionIdB} does not exist`,
+      }
     }
+
+    if (!userB) {
+      return {
+        type: 'not found',
+        message: `User with stark key ${accepted.starkKeyB.toString()} does not exist`,
+      }
+    }
+
     const offer = await this.offerRepository.findById(offerId)
     if (!offer) {
-      return { type: 'not found', content: 'Offer does not exist.' }
+      return { type: 'not found', message: 'Offer does not exist' }
     }
     if (offer.accepted) {
       return {
         type: 'bad request',
-        content: 'Offer already accepted.',
+        message: `Offer #${offerId} already accepted`,
       }
     }
     if (offer.cancelledAt) {
       return {
         type: 'bad request',
-        content: 'Offer already cancelled.',
+        message: `Offer #${offerId} already cancelled`,
       }
     }
     const signatureValid = validateAcceptSignature(
@@ -197,7 +219,7 @@ export class ForcedTradeOfferController {
       this.collateralAsset
     )
     if (!signatureValid) {
-      return { type: 'bad request', content: 'Invalid signature.' }
+      return { type: 'bad request', message: 'Invalid signature' }
     }
 
     await this.offerRepository.update({
@@ -208,7 +230,7 @@ export class ForcedTradeOfferController {
       },
     })
 
-    return { type: 'success', content: 'Accept offer was submitted.' }
+    return { type: 'success', content: 'Accept offer was submitted' }
   }
 
   async cancelOffer(
@@ -219,32 +241,35 @@ export class ForcedTradeOfferController {
     if (!offer) {
       return {
         type: 'not found',
-        content: 'Offer does not exist.',
+        message: `Offer #${offerId} does not exist`,
       }
     }
     if (offer.cancelledAt) {
       return {
         type: 'bad request',
-        content: 'Offer already cancelled.',
+        message: `Offer #${offerId} already cancelled`,
       }
     }
     if (offer.accepted?.transactionHash) {
       return {
         type: 'bad request',
-        content: 'Offer already submitted.',
+        message: `Offer #${offerId} already submitted`,
       }
     }
     const userA = await this.userRegistrationEventRepository.findByStarkKey(
       offer.starkKeyA
     )
     if (!userA) {
-      return { type: 'not found', content: 'Position does not exist.' }
+      return {
+        type: 'not found',
+        message: `User with stark key ${offer.starkKeyA.toString()} does not exist`,
+      }
     }
     const requestValid = validateCancel(offer.id, userA.ethAddress, signature)
     if (!requestValid) {
       return {
         type: 'bad request',
-        content: 'Signature does not match.',
+        message: 'Signature does not match',
       }
     }
 
@@ -253,6 +278,6 @@ export class ForcedTradeOfferController {
       cancelledAt: Timestamp.now(),
     })
 
-    return { type: 'success', content: 'Offer cancelled.' }
+    return { type: 'success', content: 'Offer cancelled' }
   }
 }
