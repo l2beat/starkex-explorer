@@ -1,11 +1,10 @@
 import {
+  assertUnreachable,
   CollateralAsset,
   PerpetualL2TransactionData,
-  toJsonWithoutBigInts,
 } from '@explorer/shared'
 import React from 'react'
 
-import { Card } from '../../../../components/Card'
 import { PerpetualConditionalTransferDetails } from './PerpetualConditionalTransferDetails'
 import { PerpetualDeleverageDetails } from './PerpetualDeleverageDetails'
 import { PerpetualDepositDetails } from './PerpetualDepositDetails'
@@ -14,6 +13,7 @@ import { PerpetualForcedWithdrawalDetails } from './PerpetualForcedWithdrawalDet
 import { PerpetualFundingTickDetails } from './PerpetualFundingTickDetails'
 import { PerpetualLiquidateDetails } from './PerpetualLiquidateDetails'
 import { PerpetualMultiTransactionDetails } from './PerpetualMultiTransactionDetails'
+import { PerpetualOraclePricesTickDetails } from './PerpetualOraclePricesTickDetails'
 import { PerpetualTradeDetails } from './PerpetualTradeDetails'
 import { PerpetualTransferDetails } from './PerpetualTransferDetails'
 import { PerpetualWithdrawToAddressDetails } from './PerpetualWithdrawToAddress'
@@ -110,6 +110,14 @@ export function PerpetualTransactionDetails(
           data={props.data}
         />
       )
+    case 'OraclePricesTick':
+      return (
+        <PerpetualOraclePricesTickDetails
+          stateUpdateId={props.stateUpdateId}
+          collateralAsset={props.collateralAsset}
+          data={props.data}
+        />
+      )
     case 'MultiTransaction':
       return (
         <PerpetualMultiTransactionDetails
@@ -121,16 +129,6 @@ export function PerpetualTransactionDetails(
       )
 
     default:
-      return (
-        <Card>
-          <span className="whitespace-normal">
-            {JSON.stringify(
-              JSON.parse(toJsonWithoutBigInts(props.data)),
-              null,
-              2
-            )}
-          </span>
-        </Card>
-      )
+      assertUnreachable(props.data)
   }
 }
