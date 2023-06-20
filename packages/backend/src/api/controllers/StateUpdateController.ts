@@ -80,9 +80,7 @@ export class StateUpdateController {
     const balanceChangeEntries = toBalanceChangeEntries(balanceChanges)
     const priceEntries = prices.map((p) => ({
       asset: { hashOrId: p.assetId },
-      price: getAssetPriceUSDCents(p.price, p.assetId),
-      // TODO: Don't display, or correctly calculate this:
-      change: 0n,
+      priceInCents: getAssetPriceUSDCents(p.price, p.assetId),
     }))
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({

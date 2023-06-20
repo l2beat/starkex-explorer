@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Asset } from '../../../../utils/assets'
 import { HorizontalBidirectionalArrow } from '../../../assets/icons/ArrowIcon'
-import { AssetWithAmountCard } from '../../../components/AssetWithAmountCard'
+import { AssetAmountCard } from '../../../components/AssetAmountCard'
 
 interface AssetTradeCardProps {
   synthetic: {
@@ -18,7 +18,7 @@ interface AssetTradeCardProps {
 export function AssetTradeCard(props: AssetTradeCardProps) {
   return (
     <div className="flex items-center justify-center gap-4">
-      <AssetWithAmountCard
+      <AssetAmountCard
         className="flex-1"
         asset={props.synthetic.asset}
         amount={props.synthetic.amount}
@@ -26,7 +26,7 @@ export function AssetTradeCard(props: AssetTradeCardProps) {
       <div className="flex h-8 w-8 items-center justify-center rounded bg-slate-800">
         <HorizontalBidirectionalArrow className="fill-zinc-500" />
       </div>
-      <AssetWithAmountCard
+      <AssetAmountCard
         className="flex-1"
         asset={props.collateral.asset}
         amount={props.collateral.amount}

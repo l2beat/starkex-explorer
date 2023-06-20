@@ -6,6 +6,7 @@ import {
   AggregatedL2TransactionRecord,
   L2TransactionRepository,
 } from '../../peripherals/database/L2TransactionRepository'
+import { getAssetPriceUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
 
 export class L2TransactionController {
@@ -28,7 +29,7 @@ export class L2TransactionController {
     const aggregatedL2Transaction =
       await this.l2TransactionRepository.findByTransactionId(transactionId)
 
-    const transaction = this.extractTransactionByMultiAndAltIndex(
+    let transaction = this.extractTransactionByMultiAndAltIndex(
       aggregatedL2Transaction,
       multiIndex,
       altIndex
@@ -41,11 +42,31 @@ export class L2TransactionController {
       }
     }
 
+    if (transaction.originalTransaction.type === 'OraclePricesTick') {
+      transaction = {
+        ...transaction,
+        originalTransaction: {
+          ...transaction.originalTransaction,
+          oraclePrices: transaction.originalTransaction.oraclePrices.map(
+            (oraclePrice) => {
+              return {
+                ...oraclePrice,
+                price: getAssetPriceUSDCents(
+                  oraclePrice.price,
+                  oraclePrice.syntheticAssetId
+                ),
+              }
+            }
+          ),
+        },
+      }
+    }
+
     return {
       type: 'success',
       content: renderPerpetualL2TransactionDetailsPage({
         context,
-        transaction: transaction,
+        transaction,
         altIndex,
         multiIndex,
       }),

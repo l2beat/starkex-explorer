@@ -5,6 +5,7 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { SectionHeading } from '../../components/SectionHeading'
 import { TablePreview } from '../../components/table/TablePreview'
+import { PriceEntry, PricesTable } from '../../components/tables/PricesTable'
 import {
   TransactionEntry,
   TransactionsTable,
@@ -16,10 +17,6 @@ import {
   StateUpdateBalanceChangesTable,
 } from './components/StateUpdateBalanceChangesTable'
 import {
-  StateUpdatePriceEntry,
-  StateUpdatePricesTable,
-} from './components/StateUpdatePricesTable'
-import {
   StateUpdateStats,
   StateUpdateStatsProps,
 } from './components/StateUpdateStats'
@@ -28,7 +25,7 @@ interface StateUpdatePageProps extends StateUpdateStatsProps {
   context: PageContext
   balanceChanges: StateUpdateBalanceChangeEntry[]
   totalBalanceChanges: number
-  priceChanges?: StateUpdatePriceEntry[]
+  priceChanges?: PriceEntry[]
   transactions: TransactionEntry[]
   totalTransactions: number
 }
@@ -66,7 +63,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
         {props.priceChanges && (
           <section>
             <SectionHeading title="Prices at state update" />
-            <StateUpdatePricesTable priceChanges={props.priceChanges} />
+            <PricesTable prices={props.priceChanges} />
           </section>
         )}
       </ContentWrapper>

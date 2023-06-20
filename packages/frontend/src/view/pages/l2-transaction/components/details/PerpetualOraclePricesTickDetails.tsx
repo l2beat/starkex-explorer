@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
-import { AssetWithAmountCard } from '../../../../components/AssetWithAmountCard'
+import { AssetPriceCard } from '../../../../components/AssetPriceCard'
 import { Card } from '../../../../components/Card'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
@@ -20,13 +20,12 @@ export function PerpetualOraclePricesTickDetails(
       </TransactionField>
       <TransactionField label="Oracle prices">
         <div className="grid grid-cols-2 gap-6">
-          {props.data.oraclePrices.map((oraclePrice, i) => {
+          {props.data.oraclePrices.map((oraclePrice, index) => {
             return (
-              <AssetWithAmountCard
-                amountLabel="Price"
+              <AssetPriceCard
                 asset={{ hashOrId: oraclePrice.syntheticAssetId }}
-                amount={oraclePrice.price}
-                key={`${oraclePrice.syntheticAssetId.toString()}-${i}`}
+                priceInCents={oraclePrice.price}
+                key={`${oraclePrice.syntheticAssetId.toString()}-${index}`}
               />
             )
           })}

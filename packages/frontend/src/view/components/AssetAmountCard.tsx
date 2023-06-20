@@ -5,7 +5,7 @@ import { Asset, assetToInfo } from '../../utils/assets'
 import { formatAmount } from '../../utils/formatting/formatAmount'
 import { AssetWithLogo } from './AssetWithLogo'
 
-interface AssetWithAmountCardProps {
+interface AssetAmountCardProps {
   className?: string
   assetLabel?: string
   asset: Asset
@@ -13,13 +13,13 @@ interface AssetWithAmountCardProps {
   amount?: bigint
 }
 
-export function AssetWithAmountCard({
+export function AssetAmountCard({
   className,
   assetLabel = 'Asset',
   asset,
   amountLabel = 'Amount',
   amount,
-}: AssetWithAmountCardProps) {
+}: AssetAmountCardProps) {
   const assetInfo = assetToInfo(asset)
   return (
     <div

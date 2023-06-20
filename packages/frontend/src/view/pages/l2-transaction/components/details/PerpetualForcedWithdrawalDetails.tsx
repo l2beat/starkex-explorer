@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { AssetWithAmountCard } from '../../../../components/AssetWithAmountCard'
+import { AssetAmountCard } from '../../../../components/AssetAmountCard'
 import { Card } from '../../../../components/Card'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
@@ -23,7 +23,7 @@ export function PerpetualForcedWithdrawalDetails(
           {props.data.starkKey.toString()}
         </Link>
       </TransactionField>
-      <AssetWithAmountCard
+      <AssetAmountCard
         className="w-1/2"
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}

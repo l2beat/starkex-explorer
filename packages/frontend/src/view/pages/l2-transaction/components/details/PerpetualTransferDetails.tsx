@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
-import { AssetWithAmountCard } from '../../../../components/AssetWithAmountCard'
+import { AssetAmountCard } from '../../../../components/AssetAmountCard'
 import { Card } from '../../../../components/Card'
 import { InlineEllipsis } from '../../../../components/InlineEllipsis'
 import { Link } from '../../../../components/Link'
@@ -41,7 +41,7 @@ export function PerpetualTransferDetails(
           </Link>
         </TransactionField>
       </div>
-      <AssetWithAmountCard
+      <AssetAmountCard
         className="w-1/2"
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}
