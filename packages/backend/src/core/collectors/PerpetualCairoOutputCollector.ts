@@ -34,7 +34,8 @@ export class PerpetualCairoOutputCollector {
 
     const skipDataAvailabilityModeField = shouldSkipDataAvailabilityModeField(
       blockNumber,
-      this.starkexConfig
+      this.starkexConfig.instanceName,
+      this.starkexConfig.blockchain.chainId
     )
 
     return decodePerpetualCairoOutput(hexData, skipDataAvailabilityModeField)
