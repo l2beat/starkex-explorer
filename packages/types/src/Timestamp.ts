@@ -2,7 +2,9 @@ export interface Timestamp extends BigInt {
   _TimestampBrand: string
 }
 
-export function Timestamp(milliseconds: Parameters<BigIntConstructor>[0]) {
+type TimestampParameters = Parameters<BigIntConstructor>[0]
+
+export function Timestamp(milliseconds: TimestampParameters) {
   const bigIntMilliseconds = BigInt(milliseconds)
   return bigIntMilliseconds as unknown as Timestamp
 }
@@ -11,11 +13,11 @@ Timestamp.now = function now() {
   return Timestamp(Date.now())
 }
 
-Timestamp.fromSeconds = function fromSeconds(seconds: number | bigint) {
+Timestamp.fromSeconds = function fromSeconds(seconds: TimestampParameters) {
   return Timestamp(BigInt(seconds) * 1000n)
 }
 
-Timestamp.fromHours = function fromHours(hours: number | bigint) {
+Timestamp.fromHours = function fromHours(hours: TimestampParameters) {
   return Timestamp(BigInt(hours) * 1000n * 3600n)
 }
 

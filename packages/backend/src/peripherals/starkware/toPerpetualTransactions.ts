@@ -66,9 +66,9 @@ export function toPerpetualTransaction(
         ethereumAddress: EthereumAddress(tx.eth_address),
         amount: BigInt(tx.amount),
         nonce: BigInt(tx.nonce),
-        expirationTimestamp: Timestamp(tx.expiration_timestamp),
+        expirationTimestamp: Timestamp.fromHours(tx.expiration_timestamp),
         signature: toPerpetualSignature(tx.signature),
-        type: 'WithdrawToAddress',
+        type: 'WithdrawalToAddress',
       }
     case 'FORCED_WITHDRAWAL':
       return {
@@ -87,7 +87,9 @@ export function toPerpetualTransaction(
         partyAOrder: {
           nonce: BigInt(tx.party_a_order.nonce),
           isBuyingSynthetic: tx.party_a_order.is_buying_synthetic,
-          expirationTimestamp: Timestamp(tx.party_a_order.expiration_timestamp),
+          expirationTimestamp: Timestamp.fromHours(
+            tx.party_a_order.expiration_timestamp
+          ),
           signature: toPerpetualSignature(tx.party_a_order.signature),
           syntheticAssetId: decodeAssetId(tx.party_a_order.asset_id_synthetic),
           orderType: toPerpetualOrderType(tx.party_a_order.order_type),
@@ -101,7 +103,9 @@ export function toPerpetualTransaction(
         partyBOrder: {
           nonce: BigInt(tx.party_b_order.nonce),
           isBuyingSynthetic: tx.party_b_order.is_buying_synthetic,
-          expirationTimestamp: Timestamp(tx.party_b_order.expiration_timestamp),
+          expirationTimestamp: Timestamp.fromHours(
+            tx.party_b_order.expiration_timestamp
+          ),
           signature: toPerpetualSignature(tx.party_b_order.signature),
           syntheticAssetId: decodeAssetId(tx.party_b_order.asset_id_synthetic),
           orderType: toPerpetualOrderType(tx.party_b_order.order_type),
@@ -138,7 +142,7 @@ export function toPerpetualTransaction(
         senderPositionId: BigInt(tx.sender_position_id),
         receiverPositionId: BigInt(tx.receiver_position_id),
         assetId: AssetHash(tx.asset_id),
-        expirationTimestamp: Timestamp(tx.expiration_timestamp),
+        expirationTimestamp: Timestamp.fromHours(tx.expiration_timestamp),
         signature: toPerpetualSignature(tx.signature),
         type: 'Transfer',
       }
@@ -151,7 +155,7 @@ export function toPerpetualTransaction(
         senderPositionId: BigInt(tx.sender_position_id),
         receiverPositionId: BigInt(tx.receiver_position_id),
         assetId: AssetHash(tx.asset_id),
-        expirationTimestamp: Timestamp(tx.expiration_timestamp),
+        expirationTimestamp: Timestamp.fromHours(tx.expiration_timestamp),
         factRegistryAddress: EthereumAddress(tx.fact_registry_address),
         fact: Hash256(tx.fact),
         signature: toPerpetualSignature(tx.signature),
@@ -172,7 +176,7 @@ export function toPerpetualTransaction(
           feeAmount: BigInt(tx.liquidator_order.amount_fee),
           positionId: BigInt(tx.liquidator_order.position_id),
           isBuyingSynthetic: tx.liquidator_order.is_buying_synthetic,
-          expirationTimestamp: Timestamp(
+          expirationTimestamp: Timestamp.fromHours(
             tx.liquidator_order.expiration_timestamp
           ),
           signature: toPerpetualSignature(tx.liquidator_order.signature),
@@ -204,14 +208,14 @@ export function toPerpetualTransaction(
               }
             }
           ),
-          timestamp: Timestamp(tx.global_funding_indices.timestamp),
+          timestamp: Timestamp.fromSeconds(tx.global_funding_indices.timestamp),
         },
         type: 'FundingTick',
       }
     case 'ORACLE_PRICES_TICK':
       return {
         type: 'OraclePricesTick',
-        timestamp: Timestamp(tx.timestamp),
+        timestamp: Timestamp.fromSeconds(tx.timestamp),
         oraclePrices: Object.entries(tx.oracle_prices).map(
           ([syntheticAssetId, oraclePrice]) =>
             toPerpetualOraclePrice(syntheticAssetId, oraclePrice)
@@ -252,7 +256,9 @@ function toPerpetualSignedPrice(
       signature: toPerpetualSignature(
         signedPrice.timestamped_signature.signature
       ),
-      timestamp: Timestamp(signedPrice.timestamped_signature.timestamp),
+      timestamp: Timestamp.fromSeconds(
+        signedPrice.timestamped_signature.timestamp
+      ),
     },
   }
 }

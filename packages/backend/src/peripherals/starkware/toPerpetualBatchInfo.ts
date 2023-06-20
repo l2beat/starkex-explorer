@@ -38,6 +38,6 @@ export function toPerpetualBatchInfo(
       ),
     })),
     previousOrderRoot: PedersenHash(response.previous_order_root),
-    timeCreated: Timestamp(response.time_created),
+    timeCreated: Timestamp.fromSeconds(response.time_created),
   }
 }
