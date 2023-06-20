@@ -23,7 +23,7 @@ export class L2TransactionController {
     const context = await this.pageContextService.getPageContext(givenUser)
 
     if (context.tradingMode != 'perpetual') {
-      return { type: 'not found', content: 'Page not found.' }
+      return { type: 'not found' }
     }
     const aggregatedL2Transaction =
       await this.l2TransactionRepository.findByTransactionId(transactionId)
@@ -37,7 +37,7 @@ export class L2TransactionController {
     if (!transaction) {
       return {
         type: 'not found',
-        content: `L2 transaction #${transactionId} with given parameters was not found`,
+        message: `L2 transaction #${transactionId} with given parameters was not found`,
       }
     }
 
