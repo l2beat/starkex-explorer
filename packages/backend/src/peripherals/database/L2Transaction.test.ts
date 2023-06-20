@@ -39,9 +39,9 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     const decoded = decodeTransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
-  it('can handle a WithdrawToAddress transaction', () => {
+  it('can handle a WithdrawalToAddress transaction', () => {
     const data: L2TransactionData = {
-      type: 'WithdrawToAddress',
+      type: 'WithdrawalToAddress',
       positionId: 1234n,
       starkKey: StarkKey.fake(),
       ethereumAddress: EthereumAddress.fake(),
@@ -67,7 +67,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
       starkKeyA: data.starkKey,
       starkKeyB: null,
       data: {
-        type: 'WithdrawToAddress',
+        type: 'WithdrawalToAddress',
         positionId: data.positionId.toString(),
         starkKey: data.starkKey.toString(),
         ethereumAddress: data.ethereumAddress.toString(),

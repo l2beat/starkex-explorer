@@ -276,7 +276,7 @@ const fakeTransactionsInfo = (
           r: Hash256.fake(`4${batchId}`),
           s: Hash256.fake(`5${batchId}`),
         },
-        type: 'WithdrawToAddress',
+        type: 'WithdrawalToAddress',
       },
       alternativeTransactions: [
         {
