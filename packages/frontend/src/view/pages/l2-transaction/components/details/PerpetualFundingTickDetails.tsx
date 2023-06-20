@@ -26,7 +26,7 @@ export function PerpetualFundingTickDetails(
             return (
               <FundingIndexCard
                 {...index}
-                key={`${index.syntheticAssetId}-${i}`}
+                key={`${index.syntheticAssetId.toString()}-${i}`}
               />
             )
           })}
