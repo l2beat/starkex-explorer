@@ -14,11 +14,11 @@ import {
 } from '../database/L2Transaction'
 import {
   AssetOraclePrice,
+  L2Transaction as TransactionSchema,
   OrderTypeResponse,
   PerpetualL2TransactionResponse,
   SignatureResponse,
   SignedOraclePrice,
-  L2Transaction as TransactionSchema,
 } from './schema'
 
 export interface PerpetualL2Transaction {
