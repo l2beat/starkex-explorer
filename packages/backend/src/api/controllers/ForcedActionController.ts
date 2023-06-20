@@ -28,11 +28,14 @@ export class ForcedActionController {
     )
 
     if (!context) {
-      return { type: 'not found', content: 'User not found' }
+      return {
+        type: 'not found',
+        message: 'You have to connect your wallet to access this page',
+      }
     }
 
     if (context.tradingMode !== 'spot') {
-      return { type: 'not found', content: 'Page not found' }
+      return { type: 'not found' }
     }
 
     const assets =
@@ -42,11 +45,11 @@ export class ForcedActionController {
 
     const asset = assets[0]
     if (!asset) {
-      return { type: 'not found', content: 'Vault is empty' }
+      return { type: 'not found', message: 'Vault is empty' }
     }
 
     if (asset.starkKey != context.user.starkKey) {
-      return { type: 'not found', content: 'Vault does not belong to user' }
+      return { type: 'not found', message: 'Vault does not belong to you' }
     }
 
     const assetDetails = await this.assetRepository.findDetailsByAssetHash(
@@ -79,11 +82,14 @@ export class ForcedActionController {
     )
 
     if (!context) {
-      return { type: 'not found', content: 'User not found' }
+      return {
+        type: 'not found',
+        message: 'You have to connect your wallet to access this page',
+      }
     }
 
     if (context.tradingMode !== 'perpetual') {
-      return { type: 'not found', content: 'Page not found' }
+      return { type: 'not found' }
     }
 
     const assets =
@@ -95,17 +101,17 @@ export class ForcedActionController {
     if (!asset) {
       return {
         type: 'not found',
-        content:
+        message:
           'Position is empty or does not contain asset with given assetId',
       }
     }
 
     if (asset.starkKey != context.user.starkKey) {
-      return { type: 'not found', content: 'Position does not belong to user' }
+      return { type: 'not found', message: 'Position does not belong to you' }
     }
 
     if (!asset.price) {
-      return { type: 'not found', content: 'Asset price is not available' }
+      return { type: 'not found', message: 'Asset price is not available' }
     }
 
     const content = renderNewPerpetualForcedActionPage({
@@ -136,11 +142,14 @@ export class ForcedActionController {
     )
 
     if (!context) {
-      return { type: 'not found', content: 'User not found' }
+      return {
+        type: 'not found',
+        message: 'You have to connect your wallet to access this page',
+      }
     }
 
     if (context.tradingMode !== 'perpetual') {
-      return { type: 'not found', content: 'Page not found' }
+      return { type: 'not found' }
     }
 
     const assets =
@@ -150,15 +159,15 @@ export class ForcedActionController {
 
     const asset = assets.find((asset) => asset.assetHashOrId === assetId)
     if (!asset) {
-      return { type: 'not found', content: 'Position is empty' }
+      return { type: 'not found', message: 'Position is empty' }
     }
 
     if (asset.starkKey != context.user.starkKey) {
-      return { type: 'not found', content: 'Position does not belong to user' }
+      return { type: 'not found', message: 'Position does not belong to you' }
     }
 
     if (!asset.price) {
-      return { type: 'not found', content: 'Asset price is not available' }
+      return { type: 'not found', message: 'Asset price is not available' }
     }
 
     const content = renderNewPerpetualForcedActionPage({

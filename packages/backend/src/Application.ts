@@ -12,6 +12,7 @@ import { StateUpdateController } from './api/controllers/StateUpdateController'
 import { TransactionController } from './api/controllers/TransactionController'
 import { TransactionSubmitController } from './api/controllers/TransactionSubmitController'
 import { UserController } from './api/controllers/UserController'
+import { frontendErrorMiddleware } from './api/middleware/frontendErrorMiddleware'
 import { createFrontendMiddleware } from './api/middleware/FrontendMiddleware'
 import { createTransactionRouter } from './api/routers/ForcedTransactionRouter'
 import { createFrontendRouter } from './api/routers/FrontendRouter'
@@ -578,7 +579,8 @@ export class Application {
         ? positionRepository
         : vaultRepository,
       userRegistrationEventRepository,
-      preprocessedAssetHistoryRepository
+      preprocessedAssetHistoryRepository,
+      config.starkex.tradingMode
     )
 
     const l2TransactionController = new L2TransactionController(
@@ -620,7 +622,10 @@ export class Application {
           userTransactionController
         ),
       ],
-      middleware: [createFrontendMiddleware()],
+      middleware: [
+        createFrontendMiddleware(),
+        (ctx, next) => frontendErrorMiddleware(ctx, next, pageContextService),
+      ],
       forceHttps: config.forceHttps,
       handleServerError,
     })

@@ -33,12 +33,12 @@ export class TransactionSubmitController {
     if (!tx) {
       return {
         type: 'bad request',
-        content: `Transaction ${transactionHash.toString()} not found`,
+        message: `Transaction ${transactionHash.toString()} not found`,
       }
     }
     const data = decodePerpetualForcedWithdrawalRequest(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
-      return { type: 'bad request', content: `Invalid transaction` }
+      return { type: 'bad request', message: `Invalid transaction` }
     }
     await this.sentTransactionRepository.add({
       transactionHash,
@@ -60,12 +60,12 @@ export class TransactionSubmitController {
     if (!tx) {
       return {
         type: 'bad request',
-        content: `Transaction ${transactionHash.toString()} not found`,
+        message: `Transaction ${transactionHash.toString()} not found`,
       }
     }
     const data = decodeWithdrawal(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
-      return { type: 'bad request', content: `Invalid transaction` }
+      return { type: 'bad request', message: `Invalid transaction` }
     }
     await this.sentTransactionRepository.add({
       transactionHash,
@@ -87,12 +87,12 @@ export class TransactionSubmitController {
     if (!tx) {
       return {
         type: 'bad request',
-        content: `Transaction ${transactionHash.toString()} not found`,
+        message: `Transaction ${transactionHash.toString()} not found`,
       }
     }
     const data = decodeWithdrawalWithTokenId(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
-      return { type: 'bad request', content: `Invalid transaction` }
+      return { type: 'bad request', message: `Invalid transaction` }
     }
     await this.sentTransactionRepository.add({
       transactionHash,
@@ -132,20 +132,23 @@ export class TransactionSubmitController {
     const timestamp = Timestamp.now()
     const offer = await this.offersRepository.findById(offerId)
     if (!offer) {
-      return { type: 'not found', content: `Offer ${offerId} not found` }
+      return { type: 'not found', message: `Offer #${offerId} not found` }
     }
     if (
       !offer.accepted ||
       offer.cancelledAt ||
       offer.accepted.transactionHash
     ) {
-      return { type: 'bad request', content: `Offer cannot be finalized` }
+      return {
+        type: 'bad request',
+        message: `Offer #${offerId} cannot be finalized`,
+      }
     }
     const tx = await this.getTransaction(transactionHash)
     if (!tx) {
       return {
         type: 'bad request',
-        content: `Transaction ${transactionHash.toString()} not found`,
+        message: `Transaction ${transactionHash.toString()} not found`,
       }
     }
     const data = decodePerpetualForcedTradeRequest(
@@ -158,7 +161,7 @@ export class TransactionSubmitController {
       !data ||
       !tradeMatchesOffer(offer, data)
     ) {
-      return { type: 'bad request', content: `Invalid transaction` }
+      return { type: 'bad request', message: `Invalid transaction` }
     }
     // TODO: cross repository transaction
     await this.offersRepository.updateTransactionHash(offerId, transactionHash)

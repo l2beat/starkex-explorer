@@ -90,7 +90,10 @@ export class UserController {
     )
 
     if (!context) {
-      return { type: 'not found', content: 'Wallet not connect' }
+      return {
+        type: 'not found',
+        message: 'You have to connect a wallet to access this page',
+      }
     }
 
     if (context.user.starkKey) {
@@ -166,7 +169,10 @@ export class UserController {
     ])
 
     if (!userStatistics) {
-      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+      return {
+        type: 'not found',
+        message: `User with starkKey ${starkKey.toString()} not found`,
+      }
     }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -275,7 +281,10 @@ export class UserController {
     ])
 
     if (!userStatistics) {
-      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+      return {
+        type: 'not found',
+        message: `User with starkKey ${starkKey.toString()} not found`,
+      }
     }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -340,7 +349,10 @@ export class UserController {
     ])
 
     if (!userStatistics) {
-      throw new Error(`Statistics for user ${starkKey.toString()} not found!`)
+      return {
+        type: 'not found',
+        message: `User with starkKey ${starkKey.toString()} not found`,
+      }
     }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -422,7 +434,7 @@ export class UserController {
         this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
       ])
     if (context.tradingMode !== 'perpetual') {
-      return { type: 'not found', content: 'Page not found' }
+      return { type: 'not found' }
     }
 
     const offers =

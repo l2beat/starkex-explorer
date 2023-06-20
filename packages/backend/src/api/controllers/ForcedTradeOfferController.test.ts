@@ -117,7 +117,7 @@ describe(ForcedTradeOfferController.name, () => {
         await controller.postOffer(tradeMock.offer, invalidSignature)
       ).toEqual({
         type: 'bad request',
-        content: 'Your offer is invalid.',
+        message: 'Your offer is invalid',
       })
     })
 
@@ -142,7 +142,7 @@ describe(ForcedTradeOfferController.name, () => {
         await controller.postOffer(tradeMock.offer, invalidSignature)
       ).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: `Position #${tradeMock.offer.positionIdA} does not exist`,
       })
     })
 
@@ -167,7 +167,7 @@ describe(ForcedTradeOfferController.name, () => {
         await controller.postOffer(tradeMock.offer, invalidSignature)
       ).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: `User with stark key ${tradeMock.offer.starkKeyA.toString()} does not exist`,
       })
     })
 
@@ -192,7 +192,7 @@ describe(ForcedTradeOfferController.name, () => {
         await controller.postOffer(tradeMock.offer, invalidSignature)
       ).toEqual({
         type: 'bad request',
-        content: 'Your offer is invalid.',
+        message: 'Your offer is invalid',
       })
     })
 
@@ -249,7 +249,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: `Position #${tradeMock.accepted.positionIdB} does not exist`,
       })
     })
 
@@ -272,7 +272,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: `User with stark key ${tradeMock.accepted.starkKeyB.toString()} does not exist`,
       })
     })
 
@@ -297,7 +297,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'not found',
-        content: 'Offer does not exist.',
+        message: 'Offer does not exist',
       })
     })
 
@@ -330,7 +330,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'bad request',
-        content: 'Offer already accepted.',
+        message: 'Offer #1 already accepted',
       })
     })
 
@@ -360,7 +360,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(1, tradeMock.accepted)).toEqual({
         type: 'bad request',
-        content: 'Offer already cancelled.',
+        message: 'Offer #1 already cancelled',
       })
     })
 
@@ -410,7 +410,7 @@ describe(ForcedTradeOfferController.name, () => {
         })
       ).toEqual({
         type: 'bad request',
-        content: 'Invalid signature.',
+        message: 'Invalid signature',
       })
     })
 
@@ -456,7 +456,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.acceptOffer(id, tradeMock.accepted)).toEqual({
         type: 'success',
-        content: 'Accept offer was submitted.',
+        content: 'Accept offer was submitted',
       })
     })
   })
@@ -495,7 +495,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.cancelOffer(1, '123')).toEqual({
         type: 'not found',
-        content: 'Offer does not exist.',
+        message: `Offer #1 does not exist`,
       })
     })
 
@@ -520,7 +520,7 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request)
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'bad request',
-        content: 'Offer already cancelled.',
+        message: `Offer #${id} already cancelled`,
       })
     })
 
@@ -548,11 +548,11 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request)
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'bad request',
-        content: 'Offer already submitted.',
+        message: `Offer #${id} already submitted`,
       })
     })
 
-    it('blocks missing position', async () => {
+    it('blocks missing user', async () => {
       const pageContextService = mockObject<PageContextService>({
         getPageContext: mockFn(async () => pageContext),
       })
@@ -572,7 +572,7 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request)
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'not found',
-        content: 'Position does not exist.',
+        message: `User with stark key ${accepted.starkKeyA.toString()} does not exist`,
       })
     })
 
@@ -596,7 +596,7 @@ describe(ForcedTradeOfferController.name, () => {
       const signature = await wallet.signMessage(request + 'tampered')
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'bad request',
-        content: 'Signature does not match.',
+        message: 'Signature does not match',
       })
     })
 
@@ -624,7 +624,7 @@ describe(ForcedTradeOfferController.name, () => {
 
       expect(await controller.cancelOffer(id, signature)).toEqual({
         type: 'success',
-        content: 'Offer cancelled.',
+        content: 'Offer cancelled',
       })
     })
   })
