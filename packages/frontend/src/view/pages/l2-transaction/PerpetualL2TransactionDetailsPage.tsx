@@ -1,6 +1,7 @@
 import { PageContext } from '@explorer/shared'
 import React from 'react'
 
+import { AlternativeTransactionIcon } from '../../assets/icons/AlternativeTransactionIcon'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -51,19 +52,21 @@ export function PerpetualL2TransactionDetailsPage(
             L2 TRANSACTION
           </span>
         </div>
-        {props.transaction.alternativeTransactions.length > 0 && (
-          <ReplacedTransactionNote />
-        )}
-        {props.multiIndex !== undefined && (
-          <MultiTransactionNote multiIndex={props.multiIndex} />
-        )}
-        {props.altIndex !== undefined && (
-          <AlternativeTransactionNote
-            transactionId={props.transaction.transactionId}
-            altIndex={props.altIndex}
-            multiIndex={props.multiIndex}
-          />
-        )}
+        <div className="mb-6 flex flex-col gap-1">
+          {props.transaction.alternativeTransactions.length > 0 && (
+            <ReplacedTransactionNote />
+          )}
+          {props.multiIndex !== undefined && (
+            <MultiTransactionNote multiIndex={props.multiIndex} />
+          )}
+          {props.altIndex !== undefined && (
+            <AlternativeTransactionNote
+              transactionId={props.transaction.transactionId}
+              altIndex={props.altIndex}
+              multiIndex={props.multiIndex}
+            />
+          )}
+        </div>
         <PerpetualTransactionDetails
           transactionId={props.transaction.transactionId}
           data={props.transaction.originalTransaction}
@@ -72,8 +75,13 @@ export function PerpetualL2TransactionDetailsPage(
           altIndex={props.altIndex}
         />
         {props.transaction.alternativeTransactions.length > 0 && (
-          <div className="mt-12">
-            <PageTitle>Alternative transactions</PageTitle>
+          <div className="mt-8">
+            <div className="mb-6 flex items-center gap-2">
+              <AlternativeTransactionIcon className="fill-cyan-400" />
+              <span className="text-xl font-semibold">
+                Alternative transactions
+              </span>
+            </div>
             <L2TransactionsList
               transactions={props.transaction.alternativeTransactions}
               transactionId={props.transaction.transactionId}
