@@ -63,7 +63,7 @@ import {
   randomPerpetualL2TradeTransaction,
   randomPerpetualL2TransactionEntry,
   randomPerpetualL2TransferTransaction,
-  randomPerpetualL2WithdrawToAddressTransaction,
+  randomPerpetualL2WithdrawalToAddressTransaction,
   randomPerpetualUserL2TransactionEntry,
 } from './data/l2Transactions'
 import {
@@ -750,7 +750,7 @@ const routes: Route[] = [
       ctx.body = renderPerpetualL2TransactionDetailsPage({
         context,
         transaction: randomAggregatedPerpetualL2TransactionEntry(
-          randomPerpetualL2WithdrawToAddressTransaction()
+          randomPerpetualL2WithdrawalToAddressTransaction()
         ),
       })
     },

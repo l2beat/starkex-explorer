@@ -74,7 +74,7 @@ export function PerpetualL2TransactionFreeForm({
           />
         </>
       )
-    case 'WithdrawToAddress':
+    case 'WithdrawalToAddress':
       return (
         <>
           <FreeFormAssetWithAmount

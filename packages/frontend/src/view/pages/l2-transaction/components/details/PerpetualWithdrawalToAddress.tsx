@@ -9,8 +9,8 @@ import { TransactionField } from '../../../transaction/components/TransactionFie
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
 
-export function PerpetualWithdrawToAddressDetails(
-  props: PerpetualTransactionDetailsProps<'WithdrawToAddress'>
+export function PerpetualWithdrawalToAddressDetails(
+  props: PerpetualTransactionDetailsProps<'WithdrawalToAddress'>
 ) {
   return (
     <Card className="flex flex-col gap-6">

@@ -17,7 +17,7 @@ import {
   PerpetualL2TransactionSignature,
   PerpetualL2TransactionSignedOraclePrice,
   PerpetualL2TransferTransactionData,
-  PerpetualL2WithdrawToAddressTransactionData,
+  PerpetualL2WithdrawalToAddressTransactionData,
 } from '@explorer/shared'
 import {
   AssetHash,
@@ -66,8 +66,8 @@ function encodeL2Transaction(
   switch (values.type) {
     case 'Deposit':
       return encodeDepositTransaction(values)
-    case 'WithdrawToAddress':
-      return encodeWithdrawToAddressTransaction(values)
+    case 'WithdrawalToAddress':
+      return encodeWithdrawalToAddressTransaction(values)
     case 'ForcedWithdrawal':
       return encodeForcedWithdrawalTransaction(values)
     case 'Trade':
@@ -99,8 +99,8 @@ function decodeTransaction(
   switch (values.type) {
     case 'Deposit':
       return decodeDepositTransaction(values)
-    case 'WithdrawToAddress':
-      return decodeWithdrawToAddressTransaction(values)
+    case 'WithdrawalToAddress':
+      return decodeWithdrawalToAddressTransaction(values)
     case 'ForcedWithdrawal':
       return decodeForcedWithdrawalTransaction(values)
     case 'Trade':
@@ -149,9 +149,9 @@ function decodeDepositTransaction(
     amount: BigInt(values.amount),
   }
 }
-function encodeWithdrawToAddressTransaction(
-  values: PerpetualL2WithdrawToAddressTransactionData
-): Encoded<PerpetualL2WithdrawToAddressTransactionData> {
+function encodeWithdrawalToAddressTransaction(
+  values: PerpetualL2WithdrawalToAddressTransactionData
+): Encoded<PerpetualL2WithdrawalToAddressTransactionData> {
   return {
     starkKeyA: values.starkKey,
     starkKeyB: null,
@@ -168,9 +168,9 @@ function encodeWithdrawToAddressTransaction(
   }
 }
 
-function decodeWithdrawToAddressTransaction(
-  values: ToJSON<PerpetualL2WithdrawToAddressTransactionData>
-): PerpetualL2WithdrawToAddressTransactionData {
+function decodeWithdrawalToAddressTransaction(
+  values: ToJSON<PerpetualL2WithdrawalToAddressTransactionData>
+): PerpetualL2WithdrawalToAddressTransactionData {
   return {
     ...values,
     positionId: BigInt(values.positionId),

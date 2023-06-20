@@ -43,8 +43,8 @@ export function l2TransactionTypeToText(
       return type
     case 'ConditionalTransfer':
       return 'Conditional transfer'
-    case 'WithdrawToAddress':
-      return 'Withdraw to address'
+    case 'WithdrawalToAddress':
+      return 'Withdrawal to address'
     case 'ForcedWithdrawal':
       return 'Forced withdrawal'
     case 'ForcedTrade':

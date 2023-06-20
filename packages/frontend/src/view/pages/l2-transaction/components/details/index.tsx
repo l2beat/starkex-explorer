@@ -16,7 +16,7 @@ import { PerpetualMultiTransactionDetails } from './PerpetualMultiTransactionDet
 import { PerpetualOraclePricesTickDetails } from './PerpetualOraclePricesTickDetails'
 import { PerpetualTradeDetails } from './PerpetualTradeDetails'
 import { PerpetualTransferDetails } from './PerpetualTransferDetails'
-import { PerpetualWithdrawToAddressDetails } from './PerpetualWithdrawToAddress'
+import { PerpetualWithdrawalToAddressDetails } from './PerpetualWithdrawalToAddress'
 
 interface PerpetualTransactionDetailsProps {
   stateUpdateId: number | undefined
@@ -38,9 +38,9 @@ export function PerpetualTransactionDetails(
           data={props.data}
         />
       )
-    case 'WithdrawToAddress':
+    case 'WithdrawalToAddress':
       return (
-        <PerpetualWithdrawToAddressDetails
+        <PerpetualWithdrawalToAddressDetails
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}

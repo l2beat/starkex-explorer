@@ -11,7 +11,7 @@ import {
   PerpetualL2TradeTransactionData,
   PerpetualL2TransactionData,
   PerpetualL2TransferTransactionData,
-  PerpetualL2WithdrawToAddressTransactionData,
+  PerpetualL2WithdrawalToAddressTransactionData,
 } from '@explorer/shared'
 import {
   AssetHash,
@@ -65,7 +65,7 @@ perpetualL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2DepositTransaction)
 )
 perpetualL2TransactionsBucket.addMany(
-  repeat(5, randomPerpetualL2WithdrawToAddressTransaction)
+  repeat(5, randomPerpetualL2WithdrawalToAddressTransaction)
 )
 perpetualL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2ForcedWithdrawalTransaction)
@@ -101,7 +101,7 @@ perpetualUserL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2DepositTransaction)
 )
 perpetualUserL2TransactionsBucket.addMany(
-  repeat(5, randomPerpetualL2WithdrawToAddressTransaction)
+  repeat(5, randomPerpetualL2WithdrawalToAddressTransaction)
 )
 perpetualUserL2TransactionsBucket.addMany(
   repeat(5, randomPerpetualL2ForcedWithdrawalTransaction)
@@ -173,9 +173,9 @@ export function randomPerpetualL2DepositTransaction(): PerpetualL2DepositTransac
   }
 }
 
-export function randomPerpetualL2WithdrawToAddressTransaction(): PerpetualL2WithdrawToAddressTransactionData {
+export function randomPerpetualL2WithdrawalToAddressTransaction(): PerpetualL2WithdrawalToAddressTransactionData {
   return {
-    type: 'WithdrawToAddress',
+    type: 'WithdrawalToAddress',
     positionId: randomBigInt(0, 100000),
     amount: amountBucket.pick(),
     starkKey: StarkKey.fake(),

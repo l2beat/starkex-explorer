@@ -9,7 +9,7 @@ import {
 
 export type PerpetualL2TransactionData =
   | PerpetualL2DepositTransactionData
-  | PerpetualL2WithdrawToAddressTransactionData
+  | PerpetualL2WithdrawalToAddressTransactionData
   | PerpetualL2ForcedWithdrawalTransactionData
   | PerpetualL2TradeTransactionData
   | PerpetualL2ForcedTradeTransactionData
@@ -50,7 +50,7 @@ export interface PerpetualL2DepositTransactionData {
   type: 'Deposit'
 }
 
-export interface PerpetualL2WithdrawToAddressTransactionData {
+export interface PerpetualL2WithdrawalToAddressTransactionData {
   positionId: bigint
   starkKey: StarkKey
   ethereumAddress: EthereumAddress
@@ -58,7 +58,7 @@ export interface PerpetualL2WithdrawToAddressTransactionData {
   nonce: bigint
   expirationTimestamp: Timestamp
   signature: PerpetualL2TransactionSignature
-  type: 'WithdrawToAddress'
+  type: 'WithdrawalToAddress'
 }
 
 export interface PerpetualL2ForcedWithdrawalTransactionData {
