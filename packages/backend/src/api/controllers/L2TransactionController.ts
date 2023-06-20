@@ -29,7 +29,14 @@ export class L2TransactionController {
     const aggregatedL2Transaction =
       await this.l2TransactionRepository.findByTransactionId(transactionId)
 
-    let transaction = this.extractTransactionByMultiAndAltIndex(
+    if (!aggregatedL2Transaction) {
+      return {
+        type: 'not found',
+        message: `L2 transaction #${transactionId} was not found`,
+      }
+    }
+    let transaction: AggregatedL2TransactionRecord | undefined
+    transaction = this.extractTransactionByMultiAndAltIndex(
       aggregatedL2Transaction,
       multiIndex,
       altIndex
@@ -42,25 +49,7 @@ export class L2TransactionController {
       }
     }
 
-    if (transaction.originalTransaction.type === 'OraclePricesTick') {
-      transaction = {
-        ...transaction,
-        originalTransaction: {
-          ...transaction.originalTransaction,
-          oraclePrices: transaction.originalTransaction.oraclePrices.map(
-            (oraclePrice) => {
-              return {
-                ...oraclePrice,
-                price: getAssetPriceUSDCents(
-                  oraclePrice.price,
-                  oraclePrice.syntheticAssetId
-                ),
-              }
-            }
-          ),
-        },
-      }
-    }
+    transaction = this.convertPricesToUSDCents(transaction)
 
     return {
       type: 'success',
@@ -74,13 +63,13 @@ export class L2TransactionController {
   }
 
   extractTransactionByMultiAndAltIndex(
-    aggregatedL2Transaction: AggregatedL2TransactionRecord | undefined,
+    aggregatedL2Transaction: AggregatedL2TransactionRecord,
     multiIndex: number | undefined,
     altIndex: number | undefined
   ) {
     if (multiIndex !== undefined && altIndex !== undefined) {
       const altTransaction =
-        aggregatedL2Transaction?.alternativeTransactions[altIndex]
+        aggregatedL2Transaction.alternativeTransactions[altIndex]
       if (!altTransaction) {
         return
       }
@@ -102,7 +91,7 @@ export class L2TransactionController {
 
     if (multiIndex !== undefined && altIndex === undefined) {
       if (
-        aggregatedL2Transaction?.originalTransaction.type !== 'MultiTransaction'
+        aggregatedL2Transaction.originalTransaction.type !== 'MultiTransaction'
       ) {
         return
       }
@@ -122,7 +111,7 @@ export class L2TransactionController {
 
     if (altIndex !== undefined && multiIndex === undefined) {
       const altTransaction =
-        aggregatedL2Transaction?.alternativeTransactions[altIndex]
+        aggregatedL2Transaction.alternativeTransactions[altIndex]
       if (!altTransaction) {
         return
       }
@@ -131,6 +120,35 @@ export class L2TransactionController {
         ...aggregatedL2Transaction,
         originalTransaction: altTransaction,
         alternativeTransactions: [],
+      }
+    }
+
+    return aggregatedL2Transaction
+  }
+
+  convertPricesToUSDCents(
+    aggregatedL2Transaction: AggregatedL2TransactionRecord
+  ): AggregatedL2TransactionRecord {
+    if (
+      aggregatedL2Transaction.originalTransaction.type === 'OraclePricesTick'
+    ) {
+      return {
+        ...aggregatedL2Transaction,
+        originalTransaction: {
+          ...aggregatedL2Transaction.originalTransaction,
+          oraclePrices:
+            aggregatedL2Transaction.originalTransaction.oraclePrices.map(
+              (oraclePrice) => {
+                return {
+                  ...oraclePrice,
+                  price: getAssetPriceUSDCents(
+                    oraclePrice.price,
+                    oraclePrice.syntheticAssetId
+                  ),
+                }
+              }
+            ),
+        },
       }
     }
 
