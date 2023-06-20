@@ -8,6 +8,7 @@ import { BigNumber, utils } from 'ethers'
 import { StarkexConfig } from '../../config/starkex/StarkexConfig'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { toHexData } from '../../utils/toHexData'
+import { shouldSkipDataAvailabilityModeField } from './shouldSkipDataAvailabilityModeField'
 
 const ABI = new utils.Interface([
   'function updateState(uint256[] calldata programOutput, uint256[] calldata applicationData)',
@@ -31,13 +32,10 @@ export class PerpetualCairoOutputCollector {
     const programOutputValues = decoded.programOutput as BigNumber[]
     const hexData = toHexData(programOutputValues)
 
-    // This is a fix for Apex Goerli testnet, which switches
-    // to a different program output (one more field) at block 8056029.
-    // See: https://github.com/starkware-libs/stark-perpetual/blob/eaa284683deec190407fece98b96546d10f6ad67/src/services/perpetual/cairo/output/program_output.cairo#L36
-    const skipDataAvailabilityModeField =
-      this.starkexConfig.instanceName === 'ApeX' &&
-      this.starkexConfig.blockchain.chainId === 5 && // it's goerli
-      blockNumber >= 8056029
+    const skipDataAvailabilityModeField = shouldSkipDataAvailabilityModeField(
+      blockNumber,
+      this.starkexConfig
+    )
 
     return decodePerpetualCairoOutput(hexData, skipDataAvailabilityModeField)
   }
