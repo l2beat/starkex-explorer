@@ -843,6 +843,21 @@ const routes: Route[] = [
         },
       })
     },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi/as-alternative',
+    link: '/l2-transactions/perpetual/multi/as-alternative',
+    description: 'Perpetual L2 multi transaction as alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2MultiTransaction()
+        ),
+        altIndex: randomInt(0, 10),
+      })
+    },
     breakAfter: true,
   },
   // #endregion
