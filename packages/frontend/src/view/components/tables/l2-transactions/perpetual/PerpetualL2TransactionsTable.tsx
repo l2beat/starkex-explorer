@@ -65,18 +65,14 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
   return (
     <span className="flex items-center gap-3">
       {l2TransactionTypeToText(transaction.data.type)}
-      <PerpetualL2TransactionFreeForm
-        data={transaction.data}
-        collateralAsset={collateralAsset}
-      />
-      <div className="ml-auto flex gap-2">
-        <TooltipWrapper
-          content={`This transaction is an alternative or one of the alternatives of transaction #${transaction.transactionId}`}
-        >
-          {transaction.state === 'alternative' && (
+      <div className="flex gap-1">
+        {transaction.state === 'alternative' && (
+          <TooltipWrapper
+            content={`This transaction is an alternative or one of the alternatives of transaction #${transaction.transactionId}`}
+          >
             <AlternativeTransactionIcon className="scale-75 fill-cyan-400" />
-          )}
-        </TooltipWrapper>
+          </TooltipWrapper>
+        )}
         {transaction.state === 'replaced' && (
           <TooltipWrapper content="This transaction has been replaced">
             <ReplacedTransactionIcon className="scale-75 fill-yellow-300" />
@@ -90,6 +86,10 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
           </TooltipWrapper>
         )}
       </div>
+      <PerpetualL2TransactionFreeForm
+        data={transaction.data}
+        collateralAsset={collateralAsset}
+      />
     </span>
   )
 }
