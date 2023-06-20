@@ -1,0 +1,440 @@
+{
+  "configurationHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "assetConfigHashes": [
+    {
+      "assetId": "1INCH-5",
+      "hash": "022f1e30537bc1799a0bdf000b3de4a386ba82f7543703e549ea8b1847650ecf"
+    },
+    {
+      "assetId": "ADA-5",
+      "hash": "0102c8fa9019cea5c5c94055f6919d18f97cd293a0750f6cf7724c68198b3eab"
+    },
+    {
+      "assetId": "ALGO-5",
+      "hash": "010ca1c758280c1f1a5a610d17ba73671e09aa804027f45da957604e84376cd3"
+    },
+    {
+      "assetId": "APE-6",
+      "hash": "06eb16bed522ae6e9e9d3c1cb5b7a8811c6ea14e9eeab40899ba572ae5e63f02"
+    },
+    {
+      "assetId": "APT-6",
+      "hash": "016568b339b324863dfe2ba8070ee7bbf0435763dec6c7685edfd4b5696e8dcc"
+    },
+    {
+      "assetId": "ATOM-7",
+      "hash": "079af1de66e0f52d9bf523427eb3291d18b37c59eba2ed245e52b3bf1d72a825"
+    },
+    {
+      "assetId": "AVAX-7",
+      "hash": "05d9d9c10d034f24f404f240dfdce9576d94460cd30cfe5fb5dec3c58bdb2872"
+    },
+    {
+      "assetId": "AXS-7",
+      "hash": "04d33ff813d2dff82b8c90a4444cf461a22d6576db1472f43fe7a98ea7c98b15"
+    },
+    {
+      "assetId": "BCH-8",
+      "hash": "051d9a0c4fa479418a530c7f7ac9b6761948d050e27faa71fe098a3a1558d1bf"
+    },
+    {
+      "assetId": "BNB-8",
+      "hash": "04a71858480c036f5fd2ccc575d9ff6ec0f42668e1439dba2b72b56e2c81000c"
+    },
+    {
+      "assetId": "BTC-10",
+      "hash": "03887cc593699c636091ef65133cfe5153de50ca103c6cbc75269054c1ff1116"
+    },
+    {
+      "assetId": "CHZ-5",
+      "hash": "043b15cc35bcfb57558c9f31aae847acf32c6d8a61040619693d3b7363375c19"
+    },
+    {
+      "assetId": "CRV-5",
+      "hash": "01a41a81ede64a810349af6938ded87aa98f8c75761267ec7b695a5d0d1b3a3b"
+    },
+    {
+      "assetId": "DOGE-5",
+      "hash": "067596f3e90a607e0c6a9ecbf1e1c84e7aecb64ee777821daafb596baa23c54d"
+    },
+    {
+      "assetId": "DOT-6",
+      "hash": "04459cc5c7e30f88c147313f33710d108163b4c1e4dcca5447e18da9313ccf89"
+    },
+    {
+      "assetId": "ENJ-5",
+      "hash": "035327f807b7d10828ec12969036cf74db46b46bc64b79c3e2dede6cc1aac525"
+    },
+    {
+      "assetId": "ETC-7",
+      "hash": "06066f6f44e278ff8a0886d0a729a9e23a90d0db5e689adeb8e50d02e393165d"
+    },
+    {
+      "assetId": "ETH-9",
+      "hash": "011ad16a1827de9bd742112d7512bc0ca98bf5f9127e2b32e4bc63cd24708cf3"
+    },
+    {
+      "assetId": "FIL-6",
+      "hash": "02e0cddbfc11ec6584a858a0951434cad8dc146f4ed9786692719711b8079b4d"
+    },
+    {
+      "assetId": "GMT-5",
+      "hash": "0193bfb01ff0d83a966c077bf4b5c824906cc76269729b44310632bc65545fa2"
+    },
+    {
+      "assetId": "LINK-7",
+      "hash": "02ec256004f6bddef46df3b1f8002f5ca22b8777b21a305b6a5a44ca3645fdda"
+    },
+    {
+      "assetId": "LTC-7",
+      "hash": "023b19ac1053463f519da8052ec3320d42728459108fde51c06673a64e3c90d5"
+    },
+    {
+      "assetId": "MATIC-6",
+      "hash": "02509fce9099db46e6d9d79868fc20d016ec1d3d71d3978d5e8954e7b603b91d"
+    },
+    {
+      "assetId": "NEAR-6",
+      "hash": "028f6cf36b99beec3fab92d2c5f134741aae4fa9fe34065a5cb0415ac7fd1638"
+    },
+    {
+      "assetId": "OP-6",
+      "hash": "0583c8a526f5cdd3404f44351564e948e62bccd3a083150f56dafba2bee025c4"
+    },
+    {
+      "assetId": "SOL-7",
+      "hash": "069c0fa754df552cbdf4495c9e2784fcd9004a1d9f5e209920e5b2aaa924a4ce"
+    },
+    {
+      "assetId": "SUSHI-6",
+      "hash": "022b892cb916d0ee9a43a07b84a37f56afa119901ffe2df9db4f40ab224dea30"
+    },
+    {
+      "assetId": "UNI-6",
+      "hash": "017723326254a52f2fcdcb77e5f3f5407ec4f879bad939baae7ec38957da99e9"
+    },
+    {
+      "assetId": "XRP-6",
+      "hash": "05d321c440bca697358b86af0b8108d57daabbad5516c6346b980b20a7a00001"
+    }
+  ],
+  "oldState": {
+    "positionRoot": "0492b38972b931853172ee4cb9b4475dc9d077e5220714544db754804dd6a452",
+    "positionHeight": 64,
+    "orderRoot": "01c3b9f8e4623bd784e477601176ec5e6dac5759f450addf29db022dfcfdf60a",
+    "orderHeight": 64,
+    "indices": [
+      {
+        "assetId": "ADA-5",
+        "value": 51173697
+      },
+      {
+        "assetId": "APT-6",
+        "value": 717784504
+      },
+      {
+        "assetId": "ATOM-7",
+        "value": 1139694040
+      },
+      {
+        "assetId": "AVAX-7",
+        "value": 213530564
+      },
+      {
+        "assetId": "BNB-8",
+        "value": 430246272
+      },
+      {
+        "assetId": "BTC-10",
+        "value": -457283798
+      },
+      {
+        "assetId": "DOGE-5",
+        "value": 2486842237
+      },
+      {
+        "assetId": "DOT-6",
+        "value": 2583927287
+      },
+      {
+        "assetId": "ETC-7",
+        "value": 1471855602
+      },
+      {
+        "assetId": "ETH-9",
+        "value": -4207427334
+      },
+      {
+        "assetId": "LINK-7",
+        "value": -277915376
+      },
+      {
+        "assetId": "MATIC-6",
+        "value": -6049659
+      },
+      {
+        "assetId": "XRP-6",
+        "value": 217597790
+      }
+    ],
+    "timestamp": 1671602400000,
+    "oraclePrices": [
+      {
+        "assetId": "ADA-5",
+        "price": 10823317586
+      },
+      {
+        "assetId": "APT-6",
+        "price": 16313037409
+      },
+      {
+        "assetId": "ATOM-7",
+        "price": 3840237634
+      },
+      {
+        "assetId": "AVAX-7",
+        "price": 5068061409
+      },
+      {
+        "assetId": "BNB-8",
+        "price": 10688026116
+      },
+      {
+        "assetId": "BTC-10",
+        "price": 7237588977
+      },
+      {
+        "assetId": "DOGE-5",
+        "price": 3124373959
+      },
+      {
+        "assetId": "DOT-6",
+        "price": 19381576794
+      },
+      {
+        "assetId": "ETC-7",
+        "price": 6760278524
+      },
+      {
+        "assetId": "ETH-9",
+        "price": 52077122709
+      },
+      {
+        "assetId": "LINK-7",
+        "price": 2555714384
+      },
+      {
+        "assetId": "MATIC-6",
+        "price": 3410848278
+      },
+      {
+        "assetId": "XRP-6",
+        "price": 1470596802
+      }
+    ],
+    "systemTime": 1671604661000
+  },
+  "newState": {
+    "positionRoot": "05be559f50e6d4fcfa267c3e88ebe7cf10f2fda3ec1d4ca11a896b879269a2b1",
+    "positionHeight": 64,
+    "orderRoot": "0366adcd6fb53c63d8b013debea460d6d7392cb7462e075cde587f23ded47ecc",
+    "orderHeight": 64,
+    "indices": [
+      {
+        "assetId": "ADA-5",
+        "value": 51308666
+      },
+      {
+        "assetId": "APT-6",
+        "value": 718270280
+      },
+      {
+        "assetId": "ATOM-7",
+        "value": 1139741880
+      },
+      {
+        "assetId": "AVAX-7",
+        "value": 218281268
+      },
+      {
+        "assetId": "BNB-8",
+        "value": 430379885
+      },
+      {
+        "assetId": "BTC-10",
+        "value": -457193420
+      },
+      {
+        "assetId": "DOGE-5",
+        "value": 2487907777
+      },
+      {
+        "assetId": "DOT-6",
+        "value": 2584169469
+      },
+      {
+        "assetId": "ETC-7",
+        "value": 1471939783
+      },
+      {
+        "assetId": "ETH-9",
+        "value": -4206777236
+      },
+      {
+        "assetId": "LINK-7",
+        "value": -277883481
+      },
+      {
+        "assetId": "MATIC-6",
+        "value": -6007107
+      },
+      {
+        "assetId": "XRP-6",
+        "value": 217616218
+      }
+    ],
+    "timestamp": 1671606000000,
+    "oraclePrices": [
+      {
+        "assetId": "ADA-5",
+        "price": 10836202488
+      },
+      {
+        "assetId": "APT-6",
+        "price": 16250438261
+      },
+      {
+        "assetId": "ATOM-7",
+        "price": 3834332054
+      },
+      {
+        "assetId": "AVAX-7",
+        "price": 5064840184
+      },
+      {
+        "assetId": "BNB-8",
+        "price": 10670846247
+      },
+      {
+        "assetId": "BTC-10",
+        "price": 7228528743
+      },
+      {
+        "assetId": "DOGE-5",
+        "price": 3122441224
+      },
+      {
+        "assetId": "DOT-6",
+        "price": 19403803250
+      },
+      {
+        "assetId": "ETC-7",
+        "price": 6768868458
+      },
+      {
+        "assetId": "ETH-9",
+        "price": 52040615487
+      },
+      {
+        "assetId": "LINK-7",
+        "price": 2555505541
+      },
+      {
+        "assetId": "MATIC-6",
+        "price": 3412244142
+      },
+      {
+        "assetId": "XRP-6",
+        "price": 1462436364
+      }
+    ],
+    "systemTime": 1671608332000
+  },
+  "minimumExpirationTimestamp": 464671,
+  "modifications": [
+    {
+      "starkKey": "0x05352fb2daff0bfa2a0602d5e08d0f0bc87270b4afa8d97ea2cf46853d6d94ec",
+      "positionId": 393290825267675800,
+      "difference": 10000000000
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x007a3406cdb257b67950dfcdb317625086e28f904349a70b2ad8246810af9154",
+      "positionId": 393294832111452740,
+      "difference": 1000000000
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    },
+    {
+      "starkKey": "0x05d08ae9202f9e19ffa0211676536ba3e4c5f1e433a4c01d60fceae00a095100",
+      "positionId": 10240000,
+      "difference": 0
+    }
+  ],
+  "forcedActions": [],
+  "conditions": [
+    "00df9c498ba32715a4e3f9162377876e8b7e476dd84fb69c3f8fa044078b7689"
+  ]
+}
