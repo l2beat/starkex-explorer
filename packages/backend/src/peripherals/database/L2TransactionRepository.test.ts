@@ -462,6 +462,164 @@ describe(L2TransactionRepository.name, () => {
     }
   )
 
+  describe.only(
+    L2TransactionRepository.prototype
+      .countAllDistinctTransactionIdsByStateUpdateId.name,
+    () => {
+      it('returns the number of distinct transactions by stateUpdateId', async () => {
+        const record = {
+          stateUpdateId: 1,
+          transactionId: 1234,
+          blockNumber: 12345,
+          data: {
+            type: 'Deposit',
+            starkKey: StarkKey.fake(),
+            positionId: 1234n,
+            amount: 5000n,
+          },
+        } as const
+        const multiAltForRecord = {
+          stateUpdateId: 1,
+          transactionId: 1234,
+          blockNumber: 12345,
+          data: {
+            type: 'MultiTransaction',
+            transactions: [
+              {
+                type: 'Deposit',
+                starkKey: StarkKey.fake('1'),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+              {
+                positionId: 1234n,
+                starkKey: StarkKey.fake('2'),
+                ethereumAddress: EthereumAddress.fake(),
+                amount: 12345n,
+                nonce: 10n,
+                expirationTimestamp: Timestamp(1234),
+                signature: {
+                  r: Hash256.fake(),
+                  s: Hash256.fake(),
+                },
+                type: 'WithdrawalToAddress',
+              },
+            ],
+          } as PerpetualL2MultiTransactionData,
+        }
+        const record2 = {
+          stateUpdateId: 1,
+          transactionId: 1235,
+          blockNumber: 123456,
+          data: {
+            type: 'Deposit',
+            starkKey: StarkKey.fake(),
+            positionId: 1234n,
+            amount: 5000n,
+          },
+        } as const
+        const altForRecord2 = {
+          stateUpdateId: 1,
+          transactionId: 1235,
+          blockNumber: 123456,
+          data: {
+            type: 'Deposit',
+            starkKey: StarkKey.fake(),
+            positionId: 1234n,
+            amount: 2500n,
+          },
+        } as const
+        const multiRecord = {
+          stateUpdateId: 1,
+          transactionId: 1237,
+          blockNumber: 12345,
+          data: {
+            type: 'MultiTransaction',
+            transactions: [
+              {
+                type: 'Deposit',
+                starkKey: StarkKey.fake('1'),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+              {
+                positionId: 1234n,
+                starkKey: StarkKey.fake('2'),
+                ethereumAddress: EthereumAddress.fake(),
+                amount: 12345n,
+                nonce: 10n,
+                expirationTimestamp: Timestamp(1234),
+                signature: {
+                  r: Hash256.fake(),
+                  s: Hash256.fake(),
+                },
+                type: 'WithdrawalToAddress',
+              },
+            ],
+          } as PerpetualL2MultiTransactionData,
+        }
+
+        const recordForSecondStateUpdate = {
+          stateUpdateId: 2,
+          transactionId: 1234,
+          blockNumber: 12345,
+          data: {
+            type: 'Deposit',
+            starkKey: StarkKey.fake(),
+            positionId: 1234n,
+            amount: 5000n,
+          },
+        } as const
+
+        await repository.add(record)
+
+        expect(
+          await repository.countAllDistinctTransactionIdsByStateUpdateId(1)
+        ).toEqual(1)
+
+        await repository.add(multiAltForRecord)
+
+        expect(
+          await repository.countAllDistinctTransactionIdsByStateUpdateId(1)
+        ).toEqual(1)
+
+        await repository.add(record2)
+
+        expect(
+          await repository.countAllDistinctTransactionIdsByStateUpdateId(1)
+        ).toEqual(2)
+
+        await repository.add(altForRecord2)
+
+        expect(
+          await repository.countAllDistinctTransactionIdsByStateUpdateId(1)
+        ).toEqual(2)
+
+        await repository.add(multiRecord)
+
+        expect(
+          await repository.countAllDistinctTransactionIdsByStateUpdateId(1)
+        ).toEqual(3)
+
+        await repository.add(recordForSecondStateUpdate)
+
+        expect(
+          await repository.countAllDistinctTransactionIdsByStateUpdateId(1)
+        ).toEqual(3)
+        expect(
+          await repository.countAllDistinctTransactionIdsByStateUpdateId(2)
+        ).toEqual(1)
+      })
+
+      it('returns 0 if there are no transactions', async () => {
+        const count =
+          await repository.countAllDistinctTransactionIdsByStateUpdateId(123)
+
+        expect(count).toEqual(0)
+      })
+    }
+  )
+
   describe(L2TransactionRepository.prototype.countAllUserSpecific.name, () => {
     const starkKey = StarkKey.fake()
 

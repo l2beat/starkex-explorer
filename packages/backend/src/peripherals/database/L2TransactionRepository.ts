@@ -174,6 +174,15 @@ export class L2TransactionRepository extends BaseRepository {
     return Number(result!.count)
   }
 
+  async countAllDistinctTransactionIdsByStateUpdateId(stateUpdateId: number) {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions')
+      .where({ state_update_id: stateUpdateId })
+      .countDistinct('transaction_id')
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
   async countAllUserSpecific(starkKey: StarkKey) {
     const knex = await this.knex()
     const [result] = await knex('l2_transactions')
