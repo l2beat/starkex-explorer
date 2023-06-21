@@ -40,6 +40,7 @@ import {
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
 import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
+import { renderStateUpdateL2TransactionsPage } from '../view/pages/state-update/StateUpdateL2TransactionsPage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import { fakeCollateralAsset } from './data/collateralAsset'
@@ -330,6 +331,25 @@ const routes: Route[] = [
         },
         transactions: repeat(5, randomStateUpdateTransactionEntry),
         totalTransactions: 5,
+      })
+    },
+  },
+  {
+    path: '/state-updates/:id/l2-transactions',
+    link: '/state-updates/xyz/l2-transactions',
+    description:
+      'L2 transactions list included in specific state update. Supports pagination.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      const total = 231
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderStateUpdateL2TransactionsPage({
+        context,
+        id: '1534',
+        l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
+        total: total,
+        limit: limit,
+        offset: offset,
       })
     },
   },
