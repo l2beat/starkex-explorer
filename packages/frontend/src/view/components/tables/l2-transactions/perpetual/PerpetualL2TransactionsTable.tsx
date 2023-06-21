@@ -65,27 +65,29 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
   return (
     <span className="flex items-center gap-3">
       {l2TransactionTypeToText(transaction.data.type)}
-      <div className="flex gap-1">
-        {transaction.state === 'alternative' && (
-          <TooltipWrapper
-            content={`This transaction is an alternative or one of the alternatives of transaction #${transaction.transactionId}`}
-          >
-            <AlternativeTransactionIcon className="scale-75 fill-cyan-400" />
-          </TooltipWrapper>
-        )}
-        {transaction.state === 'replaced' && (
-          <TooltipWrapper content="This transaction has been replaced">
-            <ReplacedTransactionIcon className="scale-75 fill-yellow-300" />
-          </TooltipWrapper>
-        )}
-        {transaction.isPartOfMulti && (
-          <TooltipWrapper
-            content={`This transaction is included in multi transaction #${transaction.transactionId}`}
-          >
-            <MultiTransactionIcon className="scale-75 fill-orange-500" />
-          </TooltipWrapper>
-        )}
-      </div>
+      {(transaction.state || transaction.isPartOfMulti) && (
+        <div className="flex gap-1">
+          {transaction.state === 'alternative' && (
+            <TooltipWrapper
+              content={`This transaction is an alternative or one of the alternatives of transaction #${transaction.transactionId}`}
+            >
+              <AlternativeTransactionIcon className="scale-75 fill-cyan-400" />
+            </TooltipWrapper>
+          )}
+          {transaction.state === 'replaced' && (
+            <TooltipWrapper content="This transaction has been replaced">
+              <ReplacedTransactionIcon className="scale-75 fill-yellow-300" />
+            </TooltipWrapper>
+          )}
+          {transaction.isPartOfMulti && (
+            <TooltipWrapper
+              content={`This transaction is included in multi transaction #${transaction.transactionId}`}
+            >
+              <MultiTransactionIcon className="scale-75 fill-orange-500" />
+            </TooltipWrapper>
+          )}
+        </div>
+      )}
       <PerpetualL2TransactionFreeForm
         data={transaction.data}
         collateralAsset={collateralAsset}
