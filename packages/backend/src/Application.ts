@@ -559,7 +559,9 @@ export class Application {
       assetDetailsService,
       stateUpdateRepository,
       userTransactionRepository,
-      preprocessedAssetHistoryRepository
+      l2TransactionRepository,
+      preprocessedAssetHistoryRepository,
+      showL2Transactions
     )
     const transactionController = new TransactionController(
       pageContextService,
