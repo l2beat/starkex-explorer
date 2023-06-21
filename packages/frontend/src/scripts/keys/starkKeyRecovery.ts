@@ -4,7 +4,12 @@ import Cookie from 'js-cookie'
 
 import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
 import { getUsersInfo } from '../metamask'
-import { RecoveredKeys, recoverKeysDydx, recoverKeysMyria } from './recovery'
+import {
+  RecoveredKeys,
+  recoverKeysApex,
+  recoverKeysDydx,
+  recoverKeysMyria,
+} from './recovery'
 
 export function initStarkKeyRecovery() {
   const registerButton = document.getElementById(RECOVER_STARK_KEY_BUTTON_ID)
@@ -45,8 +50,9 @@ const recoverKeys = (
       return recoverKeysDydx(account)
     case 'Myria':
       return recoverKeysMyria(account)
-    case 'GammaX':
     case 'ApeX':
+      return recoverKeysApex(account)
+    case 'GammaX':
       //TODO: Implement
       throw new Error('NIY')
     default:

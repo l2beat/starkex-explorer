@@ -62,6 +62,17 @@ export const Wallet = {
     return result as string
   },
 
+  async signApexKey(account: EthereumAddress): Promise<string> {
+    const message =
+      'name: ApeX\nversion: 1.0\nenvId: 1\naction: L2 Key\nonlySignOn: https://pro.apex.exchange'
+
+    const result = await getProvider().request({
+      method: 'personal_sign',
+      params: [message, account.toString()],
+    })
+    return result as string
+  },
+
   async sendRegistrationTransaction(
     account: EthereumAddress,
     starkKey: StarkKey,

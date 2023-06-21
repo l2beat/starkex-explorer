@@ -1,12 +1,12 @@
 import { EthereumAddress } from '@explorer/types'
 import { expect } from 'earl'
 
-import { getDydxStarkExKeyPairFromData } from './keys'
+import { getGenericStarkExKeyPairFromData } from './keys'
 import { signRegistration } from './recovery'
 
 describe(signRegistration.name, () => {
   it('returns correct data', () => {
-    const pair = getDydxStarkExKeyPairFromData('0x1234')
+    const pair = getGenericStarkExKeyPairFromData('0x1234')
     const ethKey = EthereumAddress('0xdeadbeef12345678deadbeef12345678deadbeef')
 
     const data = signRegistration(ethKey, pair)

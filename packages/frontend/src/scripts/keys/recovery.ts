@@ -3,7 +3,7 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 
 import { Wallet } from '../peripherals/wallet'
 import {
-  getDydxStarkExKeyPairFromData,
+  getGenericStarkExKeyPairFromData,
   getMyriaStarkExKeyPairFromData,
   Registration,
   signStarkMessage,
@@ -20,7 +20,7 @@ export async function recoverKeysDydx(
   account: EthereumAddress
 ): Promise<RecoveredKeys> {
   const ethSignature = await Wallet.signDydxKey(account)
-  const keyPair = getDydxStarkExKeyPairFromData(ethSignature + '00')
+  const keyPair = getGenericStarkExKeyPairFromData(ethSignature + '00')
   const registration = signRegistration(account, keyPair)
   return { account, starkKey: StarkKey(keyPair.publicKey), registration }
 }
@@ -29,7 +29,7 @@ export async function recoverKeysDydxLegacy(
   account: EthereumAddress
 ): Promise<RecoveredKeys> {
   const ethSignature = await Wallet.signDydxKeyLegacy(account)
-  const keyPair = getDydxStarkExKeyPairFromData(ethSignature + '03')
+  const keyPair = getGenericStarkExKeyPairFromData(ethSignature + '03')
   const registration = signRegistration(account, keyPair)
   return { account, starkKey: StarkKey(keyPair.publicKey), registration }
 }
@@ -39,6 +39,15 @@ export async function recoverKeysMyria(
 ): Promise<RecoveredKeys> {
   const ethSignature = await Wallet.signMyriaKey(account)
   const keyPair = getMyriaStarkExKeyPairFromData(ethSignature)
+  const registration = signRegistration(account, keyPair)
+  return { account, starkKey: StarkKey(keyPair.publicKey), registration }
+}
+
+export async function recoverKeysApex(
+  account: EthereumAddress
+): Promise<RecoveredKeys> {
+  const ethSignature = await Wallet.signApexKey(account)
+  const keyPair = getGenericStarkExKeyPairFromData(ethSignature + '03')
   const registration = signRegistration(account, keyPair)
   return { account, starkKey: StarkKey(keyPair.publicKey), registration }
 }
