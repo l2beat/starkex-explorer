@@ -144,7 +144,7 @@ export class StateUpdateController {
     givenUser: Partial<UserDetails>,
     stateUpdateId: number,
     pagination: PaginationOptions
-  ) {
+  ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
     const [l2Transactions, total] = await Promise.all([
