@@ -298,6 +298,42 @@ const routes: Route[] = [
     },
   },
   {
+    path: '/state-updates/:id/with-l2-transactions',
+    link: '/state-updates/xyz/with-l2-transactions',
+    description: 'State update page with l2 transacitons.',
+    render: (ctx) => {
+      const ethereumTimestamp = randomTimestamp()
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderStateUpdatePage({
+        context,
+        id: randomId(),
+        hashes: {
+          factHash: Hash256.fake(),
+          positionTreeRoot: PedersenHash.fake(),
+          onChainVaultTreeRoot: PedersenHash.fake(),
+          offChainVaultTreeRoot: PedersenHash.fake(),
+          orderRoot: PedersenHash.fake(),
+        },
+        blockNumber: randomInt(14_000_000, 17_000_000),
+        ethereumTimestamp,
+        starkExTimestamp: Timestamp(
+          Math.floor(
+            Number(ethereumTimestamp) - Math.random() * 12 * 60 * 60 * 1000
+          )
+        ),
+        balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
+        priceChanges: repeat(15, randomStateUpdatePriceEntry),
+        totalBalanceChanges: 231,
+        l2Transactions: {
+          data: repeat(5, randomPerpetualL2TransactionEntry),
+          total: 1000,
+        },
+        transactions: repeat(5, randomStateUpdateTransactionEntry),
+        totalTransactions: 5,
+      })
+    },
+  },
+  {
     path: '/state-updates/:id/balance-changes',
     link: '/state-updates/xyz/balance-changes',
     description:

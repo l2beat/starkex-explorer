@@ -5,13 +5,19 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { SectionHeading } from '../../components/SectionHeading'
 import { TablePreview } from '../../components/table/TablePreview'
+import { L2TransactionsTable } from '../../components/tables/l2-transactions/L2TransactionsTable'
 import { PriceEntry, PricesTable } from '../../components/tables/PricesTable'
 import {
   TransactionEntry,
   TransactionsTable,
 } from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
-import { getBalanceChangeTableProps, getTransactionTableProps } from './common'
+import { PerpetualL2TransactionEntry } from '../l2-transaction/common'
+import {
+  getBalanceChangeTableProps,
+  getL2TransactionTableProps,
+  getTransactionTableProps,
+} from './common'
 import {
   StateUpdateBalanceChangeEntry,
   StateUpdateBalanceChangesTable,
@@ -27,6 +33,10 @@ interface StateUpdatePageProps extends StateUpdateStatsProps {
   totalBalanceChanges: number
   priceChanges?: PriceEntry[]
   transactions: TransactionEntry[]
+  l2Transactions?: {
+    data: PerpetualL2TransactionEntry[]
+    total: number
+  }
   totalTransactions: number
 }
 
@@ -43,6 +53,18 @@ function StateUpdatePage(props: StateUpdatePageProps) {
     >
       <ContentWrapper className="flex flex-col gap-12">
         <StateUpdateStats {...props} />
+        {props.l2Transactions && (
+          <TablePreview
+            {...getL2TransactionTableProps(props.id)}
+            visible={props.l2Transactions.data.length}
+            total={props.l2Transactions.total}
+          >
+            <L2TransactionsTable
+              transactions={props.l2Transactions.data}
+              context={props.context}
+            />
+          </TablePreview>
+        )}
         <TablePreview
           {...getBalanceChangeTableProps(props.id)}
           visible={props.balanceChanges.length}
