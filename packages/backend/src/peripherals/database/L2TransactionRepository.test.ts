@@ -970,6 +970,128 @@ describe(L2TransactionRepository.name, () => {
     }
   )
 
+  describe.only(
+    L2TransactionRepository.prototype.getPaginatedWithoutMultiByStateUpdateId
+      .name,
+    () => {
+      it('respects the limit parameter', async () => {
+        const ids = []
+        for (let i = 0; i < 20; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1234 + i,
+              stateUpdateId: i < 10 ? 1 : 2,
+              blockNumber: 12345,
+              data: {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+            })
+          )
+        }
+        const records =
+          await repository.getPaginatedWithoutMultiByStateUpdateId(1, {
+            limit: 5,
+            offset: 0,
+          })
+
+        expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(10, 15))
+      })
+
+      it('respects the offset parameter', async () => {
+        const ids = []
+        for (let i = 0; i < 20; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1234 + i,
+              stateUpdateId: i < 10 ? 1 : 2,
+              blockNumber: 12345,
+              data: {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+            })
+          )
+        }
+        const records =
+          await repository.getPaginatedWithoutMultiByStateUpdateId(1, {
+            limit: 5,
+            offset: 2,
+          })
+        expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(12, 17))
+      })
+
+      it('filters out multi transactions', async () => {
+        const ids = []
+
+        for (let i = 0; i < 20; i++) {
+          ids.push(
+            await repository.add({
+              transactionId: 1234 + i,
+              stateUpdateId: i < 10 ? 1 : 2,
+              blockNumber: 12345,
+              data: {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+            })
+          )
+        }
+        const multiTransaction = {
+          transactionId: 1254,
+          stateUpdateId: 1,
+          blockNumber: 12345,
+          data: {
+            type: 'MultiTransaction',
+            transactions: [
+              {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+              {
+                positionId: 1234n,
+                starkKey: StarkKey.fake(),
+                ethereumAddress: EthereumAddress.fake(),
+                amount: 12345n,
+                nonce: 10n,
+                expirationTimestamp: Timestamp(1234),
+                signature: {
+                  r: Hash256.fake(),
+                  s: Hash256.fake(),
+                },
+                type: 'WithdrawalToAddress',
+              },
+            ],
+          } as PerpetualL2MultiTransactionData,
+        }
+        const multiId = await repository.add(multiTransaction)
+        multiTransaction.data.transactions.forEach((_, index) =>
+          ids.push(multiId + index + 1)
+        )
+
+        const records =
+          await repository.getPaginatedWithoutMultiByStateUpdateId(1, {
+            limit: 5,
+            offset: 0,
+          })
+
+        ids.reverse()
+        expect(records.map((x) => x.id)).toEqual([
+          ...ids.slice(0, 2),
+          ...ids.slice(12, 15),
+        ])
+      })
+    }
+  )
+
   describe(
     L2TransactionRepository.prototype.findLatestStateUpdateId.name,
     () => {

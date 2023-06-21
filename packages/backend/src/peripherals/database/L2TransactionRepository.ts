@@ -230,6 +230,22 @@ export class L2TransactionRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
+  async getPaginatedWithoutMultiByStateUpdateId(
+    stateUpdateId: number,
+    { offset, limit }: PaginationOptions
+  ) {
+    const knex = await this.knex()
+    const rows = await knex('l2_transactions')
+      .where({ state_update_id: stateUpdateId })
+      // We filter out the multi transactions because we show the child transactions instead
+      .andWhereNot({ type: 'MultiTransaction' })
+      .orderBy('id', 'desc')
+      .offset(offset)
+      .limit(limit)
+
+    return rows.map(toRecord)
+  }
+
   async findById(id: number): Promise<Record | undefined> {
     const knex = await this.knex()
     const row = await knex('l2_transactions').where({ id }).first()
