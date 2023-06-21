@@ -462,7 +462,7 @@ describe(L2TransactionRepository.name, () => {
     }
   )
 
-  describe.only(
+  describe(
     L2TransactionRepository.prototype
       .countAllDistinctTransactionIdsByStateUpdateId.name,
     () => {
@@ -1128,7 +1128,7 @@ describe(L2TransactionRepository.name, () => {
     }
   )
 
-  describe.only(
+  describe(
     L2TransactionRepository.prototype.getPaginatedWithoutMultiByStateUpdateId
       .name,
     () => {
