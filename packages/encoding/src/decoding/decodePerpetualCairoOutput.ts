@@ -8,8 +8,15 @@ import { readForcedActions } from './readForcedActions'
 import { readModifications } from './readModifications'
 import { readState } from './readState'
 
-export function decodePerpetualCairoOutput(data: string): PerpetualCairoOutput {
+export function decodePerpetualCairoOutput(
+  data: string,
+  skipDataAvailabilityModeField?: boolean
+): PerpetualCairoOutput {
   const reader = new ByteReader(data)
+
+  if (skipDataAvailabilityModeField) {
+    const _dataAvailabilityMode = reader.readBigInt(32)
+  }
 
   const configurationHash = Hash256(reader.readHex(32))
   const assetConfigHashes = readAssetConfigHashes(reader)

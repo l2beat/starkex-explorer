@@ -259,7 +259,8 @@ export class Application {
           : undefined
 
         const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
-          ethereumClient
+          ethereumClient,
+          config.starkex
         )
         const rollupStateRepository = new MerkleTreeRepository(
           database,
