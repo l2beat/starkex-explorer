@@ -1,4 +1,4 @@
-import { PageContext } from '@explorer/shared'
+import { PageContext, PerpetualL2TransactionData } from '@explorer/shared'
 import React from 'react'
 
 import { AlternativeTransactionIcon } from '../../assets/icons/AlternativeTransactionIcon'
@@ -33,6 +33,10 @@ export function renderPerpetualL2TransactionDetailsPage(
 export function PerpetualL2TransactionDetailsPage(
   props: PerpetualL2TransactionDetailsPageProps
 ) {
+  const isMultiOrAlt =
+    props.altIndex !== undefined || props.multiIndex !== undefined
+  const isReplaced = props.transaction.alternativeTransactions.length > 0
+
   return (
     <Page
       context={props.context}
@@ -44,30 +48,35 @@ export function PerpetualL2TransactionDetailsPage(
       <ContentWrapper className="flex flex-col">
         <div className="flex gap-3">
           <PageTitle>
-            {l2TransactionTypeToText(
-              props.transaction.originalTransaction.type
-            )}{' '}
-            transaction #{props.transaction.transactionId}
+            {getPageTitle(
+              props.transaction.originalTransaction.type,
+              props.transaction.transactionId,
+              isMultiOrAlt
+            )}
           </PageTitle>
           <span className="h-min rounded-full bg-fuchsia-400 py-2 px-2.5 text-sm font-bold text-black">
             L2 TRANSACTION
           </span>
         </div>
-        <div className="mb-6 flex flex-col gap-1">
-          {props.transaction.alternativeTransactions.length > 0 && (
-            <ReplacedTransactionBanner />
-          )}
-          {props.multiIndex !== undefined && (
-            <MultiTransactionBanner multiIndex={props.multiIndex} />
-          )}
-          {props.altIndex !== undefined && (
-            <AlternativeTransactionBanner
-              transactionId={props.transaction.transactionId}
-              altIndex={props.altIndex}
-              multiIndex={props.multiIndex}
-            />
-          )}
-        </div>
+        {(isMultiOrAlt || isReplaced) && (
+          <div className="mb-6 flex flex-col gap-1">
+            {props.transaction.alternativeTransactions.length > 0 && (
+              <ReplacedTransactionBanner />
+            )}
+            {props.multiIndex !== undefined && (
+              <MultiTransactionBanner
+                multiIndex={props.multiIndex}
+                transactionId={props.transaction.transactionId}
+              />
+            )}
+            {props.altIndex !== undefined && (
+              <AlternativeTransactionBanner
+                transactionId={props.transaction.transactionId}
+                altIndex={props.altIndex}
+              />
+            )}
+          </div>
+        )}
         <PerpetualTransactionDetails
           transactionId={props.transaction.transactionId}
           data={props.transaction.originalTransaction}
@@ -75,7 +84,7 @@ export function PerpetualL2TransactionDetailsPage(
           collateralAsset={props.context.collateralAsset}
           altIndex={props.altIndex}
         />
-        {props.transaction.alternativeTransactions.length > 0 && (
+        {isReplaced && (
           <div className="mt-8">
             <div className="mb-6 flex items-center gap-2">
               <AlternativeTransactionIcon className="fill-cyan-400" />
@@ -96,4 +105,14 @@ export function PerpetualL2TransactionDetailsPage(
       </ContentWrapper>
     </Page>
   )
+}
+
+function getPageTitle(
+  type: PerpetualL2TransactionData['type'],
+  transactionId: number,
+  isMultiOrAlt: boolean
+) {
+  const base = `${l2TransactionTypeToText(type)} transaction `
+
+  return isMultiOrAlt ? base : `${base} #${transactionId}`
 }

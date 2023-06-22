@@ -1,11 +1,11 @@
 import React from 'react'
 
 import { AlternativeTransactionIcon } from '../../../assets/icons/AlternativeTransactionIcon'
+import { Link } from '../../../components/Link'
 
 interface AlternativeTransactionNoteProps {
   transactionId: number
   altIndex: number
-  multiIndex: number | undefined
 }
 
 export function AlternativeTransactionBanner(
@@ -16,9 +16,12 @@ export function AlternativeTransactionBanner(
       <AlternativeTransactionIcon className="fill-cyan-400" />
       <span className="ml-2 mr-12 text-cyan-400">Alternative</span>
       <span className="ml-auto">
-        Please mind, this transaction is{' '}
-        {props.multiIndex !== undefined ? 'part of' : ''} #{props.altIndex}{' '}
-        alternative transaction.
+        Please mind, this transaction is alternative transaction #
+        {props.altIndex} of transaction{' '}
+        <Link href={`/l2-transactions/${props.transactionId}`}>
+          #{props.transactionId}
+        </Link>
+        .
       </span>
     </div>
   )
