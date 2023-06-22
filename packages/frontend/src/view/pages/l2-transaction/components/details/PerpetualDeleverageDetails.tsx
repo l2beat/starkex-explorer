@@ -1,7 +1,10 @@
 import React from 'react'
 
 import { Card } from '../../../../components/Card'
-import { TransactionField } from '../../../transaction/components/TransactionField'
+import {
+  TransactionField,
+  TransactionYesOrNoField,
+} from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
@@ -22,9 +25,10 @@ export function PerpetualDeleverageDetails(
           #{props.data.deleveragedPositionId.toString()}
         </TransactionField>
       </div>
-      <TransactionField label="Is deleverager buying synthetic?">
-        {props.data.isDeleveragerBuyingSynthetic ? 'Yes' : 'No'}
-      </TransactionField>
+      <TransactionYesOrNoField
+        label="Is deleverager buying synthetic?"
+        value={props.data.isDeleveragerBuyingSynthetic}
+      />
       <AssetTradeCard
         synthetic={{
           asset: { hashOrId: props.data.syntheticAssetId },

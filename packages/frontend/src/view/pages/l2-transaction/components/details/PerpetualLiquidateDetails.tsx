@@ -1,7 +1,10 @@
 import React from 'react'
 
 import { Card } from '../../../../components/Card'
-import { TransactionField } from '../../../transaction/components/TransactionField'
+import {
+  TransactionField,
+  TransactionYesOrNoField,
+} from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
@@ -25,6 +28,11 @@ export function PerpetualLiquidateDetails(
           #{props.data.liquidatedPositionId.toString()}
         </TransactionField>
       </div>
+      <TransactionYesOrNoField
+        label="Is liquidator buying synthetic"
+        value={props.data.liquidatorOrder.isBuyingSynthetic}
+      />
+
       <AssetTradeCard
         synthetic={{
           asset: { hashOrId: props.data.liquidatorOrder.syntheticAssetId },

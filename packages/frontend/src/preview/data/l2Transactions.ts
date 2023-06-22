@@ -37,7 +37,7 @@ import {
 } from './utils'
 
 const randomAssetOraclePrice = () => ({
-  syntheticAssetId: assetIdBucket.pick(),
+  syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
   signedPrices: repeat(randomInt(1, 10), () => ({
     signerPublicKey: Hash256.fake(),
     externalAssetId: AssetHash.fake(),
@@ -54,7 +54,7 @@ const randomAssetOraclePrice = () => ({
 })
 
 const randomFundingIndex = () => ({
-  syntheticAssetId: assetIdBucket.pick(),
+  syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
   quantizedFundingIndex: randomInt(-100000000, 100000000),
 })
 
@@ -263,7 +263,7 @@ export function randomPerpetualL2FundingTickTransaction(): PerpetualL2FundingTic
 export function randomPerpetualL2DeleverageTransaction(): PerpetualL2DeleverageTransactionData {
   return {
     type: 'Deleverage',
-    syntheticAssetId: assetIdBucket.pick(),
+    syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
     collateralAmount: amountBucket.pick(),
     syntheticAmount: amountBucket.pick(),
     deleveragedPositionId: randomBigInt(0, 100000),
@@ -279,7 +279,7 @@ export function randomPerpetualL2LiquidateTransaction(): PerpetualL2LiquidateTra
       orderType: 'LimitOrderWithFees',
       nonce: randomBigInt(0, 100000),
       starkKey: StarkKey.fake(),
-      syntheticAssetId: assetIdBucket.pick(),
+      syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
       syntheticAmount: amountBucket.pick(),
       collateralAssetId: fakeCollateralAsset.assetHash,
       collateralAmount: amountBucket.pick(),
@@ -345,7 +345,7 @@ export function randomPerpetualL2ForcedTradeTransaction(): PerpetualL2ForcedTrad
     positionIdA: randomBigInt(0, 100000),
     positionIdB: randomBigInt(0, 100000),
     collateralAssetId: fakeCollateralAsset.assetHash,
-    syntheticAssetId: assetIdBucket.pick(),
+    syntheticAssetId: assetIdBucket.pickExcept(AssetId('USDC-6')),
     collateralAmount: amountBucket.pick(),
     syntheticAmount: amountBucket.pick(),
     isABuyingSynthetic: randomInt(0, 1) === 1,
