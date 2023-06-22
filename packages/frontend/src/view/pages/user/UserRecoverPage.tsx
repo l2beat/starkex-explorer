@@ -64,6 +64,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
             <Button
               id={RECOVER_STARK_KEY_BUTTON_ID}
               data-instance-name={props.context.instanceName}
+              data-is-mainnet={props.context.isMainnet}
             >
               Recover
             </Button>

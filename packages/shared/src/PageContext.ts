@@ -13,6 +13,7 @@ type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
 interface PerpetualPageContext {
   user: UserDetails | undefined
   instanceName: InstanceName
+  isMainnet: boolean
   tradingMode: 'perpetual'
   collateralAsset: CollateralAsset
 }
@@ -20,6 +21,7 @@ interface PerpetualPageContext {
 interface SpotPageContext {
   user: UserDetails | undefined
   instanceName: InstanceName
+  isMainnet: boolean
   tradingMode: 'spot'
 }
 

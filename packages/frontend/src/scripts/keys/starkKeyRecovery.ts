@@ -6,6 +6,7 @@ import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
 import { getUsersInfo } from '../metamask'
 import {
   RecoveredKeys,
+  recoverKeysApexMainnet,
   recoverKeysApexTestnet,
   recoverKeysDydx,
   recoverKeysMyria,
@@ -19,15 +20,25 @@ export function initStarkKeyRecovery() {
   if (!registerButton || !account) {
     return
   }
-  const instanceName = InstanceName.parse(registerButton.dataset.instanceName)
-
+  const { instanceName, isMainnet } = getDataFromButton(registerButton)
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   registerButton.addEventListener('click', async () => {
-    const keys = await recoverKeys(account, instanceName)
+    const keys = await recoverKeys(account, instanceName, isMainnet)
     Cookie.set('starkKey', keys.starkKey.toString())
     setToLocalStorage(account, keys)
     window.location.href = `/users/${keys.starkKey.toString()}`
   })
+}
+
+const getDataFromButton = (button: HTMLElement) => {
+  const instanceName = InstanceName.parse(button.dataset.instanceName)
+  if (button.dataset.isMainnet === undefined) {
+    throw new Error('isMainnet is undefined')
+  }
+
+  const isMainnet = button.dataset.isMainnet === 'true'
+
+  return { instanceName, isMainnet }
 }
 
 const setToLocalStorage = (account: EthereumAddress, keys: RecoveredKeys) => {
@@ -43,7 +54,8 @@ const setToLocalStorage = (account: EthereumAddress, keys: RecoveredKeys) => {
 
 const recoverKeys = (
   account: EthereumAddress,
-  instanceName: InstanceName
+  instanceName: InstanceName,
+  isMainnet: boolean
 ): Promise<RecoveredKeys> => {
   switch (instanceName) {
     case 'dYdX':
@@ -51,7 +63,9 @@ const recoverKeys = (
     case 'Myria':
       return recoverKeysMyria(account)
     case 'ApeX':
-      return recoverKeysApexTestnet(account)
+      return isMainnet
+        ? recoverKeysApexMainnet(account)
+        : recoverKeysApexTestnet(account)
     case 'GammaX':
       //TODO: Implement
       throw new Error('NIY')

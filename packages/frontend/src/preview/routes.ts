@@ -1135,6 +1135,7 @@ function getPerpetualPageContext(
   return {
     user,
     instanceName: 'dYdX',
+    isMainnet: false,
     tradingMode: 'perpetual',
     collateralAsset: fakeCollateralAsset,
   } as const
@@ -1157,6 +1158,7 @@ function getSpotPageContext(
   return {
     user,
     instanceName: 'Myria',
+    isMainnet: false,
     tradingMode: 'spot',
   } as const
 }
