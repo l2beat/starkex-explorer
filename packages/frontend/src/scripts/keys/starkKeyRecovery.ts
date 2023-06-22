@@ -6,7 +6,7 @@ import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
 import { getUsersInfo } from '../metamask'
 import {
   RecoveredKeys,
-  recoverKeysApex,
+  recoverKeysApexTestnet,
   recoverKeysDydx,
   recoverKeysMyria,
 } from './recovery'
@@ -51,7 +51,7 @@ const recoverKeys = (
     case 'Myria':
       return recoverKeysMyria(account)
     case 'ApeX':
-      return recoverKeysApex(account)
+      return recoverKeysApexTestnet(account)
     case 'GammaX':
       //TODO: Implement
       throw new Error('NIY')

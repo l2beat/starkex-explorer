@@ -43,10 +43,19 @@ export async function recoverKeysMyria(
   return { account, starkKey: StarkKey(keyPair.publicKey), registration }
 }
 
-export async function recoverKeysApex(
+export async function recoverKeysApexMainnet(
   account: EthereumAddress
 ): Promise<RecoveredKeys> {
-  const ethSignature = await Wallet.signApexKey(account)
+  const ethSignature = await Wallet.signApexMainnetKey(account)
+  const keyPair = getGenericStarkExKeyPairFromData(ethSignature + '03')
+  const registration = signRegistration(account, keyPair)
+  return { account, starkKey: StarkKey(keyPair.publicKey), registration }
+}
+
+export async function recoverKeysApexTestnet(
+  account: EthereumAddress
+): Promise<RecoveredKeys> {
+  const ethSignature = await Wallet.signApexTestnetKey(account)
   const keyPair = getGenericStarkExKeyPairFromData(ethSignature + '03')
   const registration = signRegistration(account, keyPair)
   return { account, starkKey: StarkKey(keyPair.publicKey), registration }
