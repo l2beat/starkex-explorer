@@ -32,7 +32,6 @@ export function PerpetualLiquidateDetails(
         label="Is liquidator buying synthetic"
         value={props.data.liquidatorOrder.isBuyingSynthetic}
       />
-
       <AssetTradeCard
         synthetic={{
           asset: { hashOrId: props.data.liquidatorOrder.syntheticAssetId },
@@ -43,9 +42,6 @@ export function PerpetualLiquidateDetails(
           amount: props.data.actualCollateral,
         }}
       />
-      <TransactionField label="Liquidator fee">
-        {props.data.actualLiquidatorFee.toString()}
-      </TransactionField>
     </Card>
   )
 }
