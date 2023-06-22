@@ -2,6 +2,7 @@ import { PageContext } from '@explorer/shared'
 import React from 'react'
 
 import { AlternativeTransactionIcon } from '../../assets/icons/AlternativeTransactionIcon'
+import { Card } from '../../components/Card'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -10,11 +11,11 @@ import {
   AggregatedPerpetualL2TransactionEntry,
   l2TransactionTypeToText,
 } from './common'
-import { AlternativeTransactionNote } from './components/AlternativeTransactionNote'
+import { AlternativeTransactionBanner } from './components/AlternativeTransactionBanner'
 import { PerpetualTransactionDetails } from './components/details'
 import { L2TransactionsList } from './components/L2TransactionsList'
-import { MultiTransactionNote } from './components/MultiTransactionNote'
-import { ReplacedTransactionNote } from './components/ReplacedTransactionNote'
+import { MultiTransactionBanner } from './components/MultiTransactionBanner'
+import { ReplacedTransactionBanner } from './components/ReplacedTransactionBanner'
 
 interface PerpetualL2TransactionDetailsPageProps {
   context: PageContext<'perpetual'>
@@ -54,13 +55,13 @@ export function PerpetualL2TransactionDetailsPage(
         </div>
         <div className="mb-6 flex flex-col gap-1">
           {props.transaction.alternativeTransactions.length > 0 && (
-            <ReplacedTransactionNote />
+            <ReplacedTransactionBanner />
           )}
           {props.multiIndex !== undefined && (
-            <MultiTransactionNote multiIndex={props.multiIndex} />
+            <MultiTransactionBanner multiIndex={props.multiIndex} />
           )}
           {props.altIndex !== undefined && (
-            <AlternativeTransactionNote
+            <AlternativeTransactionBanner
               transactionId={props.transaction.transactionId}
               altIndex={props.altIndex}
               multiIndex={props.multiIndex}
@@ -82,12 +83,14 @@ export function PerpetualL2TransactionDetailsPage(
                 Alternative transactions
               </span>
             </div>
-            <L2TransactionsList
-              transactions={props.transaction.alternativeTransactions}
-              transactionId={props.transaction.transactionId}
-              collateralAsset={props.context.collateralAsset}
-              contentState="alternative"
-            />
+            <Card>
+              <L2TransactionsList
+                transactions={props.transaction.alternativeTransactions}
+                transactionId={props.transaction.transactionId}
+                collateralAsset={props.context.collateralAsset}
+                contentState="alternative"
+              />
+            </Card>
           </div>
         )}
       </ContentWrapper>

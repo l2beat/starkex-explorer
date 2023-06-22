@@ -8,7 +8,7 @@ interface AlternativeTransactionNoteProps {
   multiIndex: number | undefined
 }
 
-export function AlternativeTransactionNote(
+export function AlternativeTransactionBanner(
   props: AlternativeTransactionNoteProps
 ) {
   return (

@@ -6,9 +6,9 @@ interface MultiTransactionNoteProps {
   multiIndex: number
 }
 
-export function MultiTransactionNote(props: MultiTransactionNoteProps) {
+export function MultiTransactionBanner(props: MultiTransactionNoteProps) {
   return (
-    <div className="mb-4 flex items-center rounded-lg bg-orange-500 bg-opacity-25 px-6 py-5 text-lg font-semibold">
+    <div className="flex items-center rounded-lg bg-orange-500 bg-opacity-25 px-6 py-5 text-lg font-semibold">
       <MultiTransactionIcon className="fill-orange-500" />
       <span className="ml-2 mr-12 text-orange-500">Multi transaction</span>
       <span className="ml-auto">

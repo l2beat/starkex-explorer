@@ -29,7 +29,7 @@ export function L2TransactionsList(props: L2TransactionsListProps) {
         return (
           <a
             href={link}
-            className="group flex gap-6 rounded-lg py-3 px-4 transition-colors hover:bg-slate-800"
+            className="group flex items-center gap-6 rounded-lg py-3 px-4 transition-colors hover:bg-slate-800"
             key={`${transaction.type}-${index}`}
           >
             <span className="opacity-40">#{index}</span>

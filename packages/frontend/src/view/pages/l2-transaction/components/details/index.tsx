@@ -123,6 +123,7 @@ export function PerpetualTransactionDetails(
         <PerpetualMultiTransactionDetails
           data={props.data}
           collateralAsset={props.collateralAsset}
+          stateUpdateId={props.stateUpdateId}
           transactionId={props.transactionId}
           altIndex={props.altIndex}
         />
