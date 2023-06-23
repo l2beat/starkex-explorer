@@ -9,12 +9,8 @@ export function getFormElements() {
   return {
     form: $<HTMLFormElement>(`#${FormId.Form}`),
     amountInput: $<HTMLInputElement>(`#${FormId.AmountInput}`),
-    priceInput: document.getElementById(`#${FormId.PriceInput}`) as
-      | HTMLInputElement
-      | undefined,
-    totalInput: document.getElementById(`#${FormId.TotalInput}`) as
-      | HTMLInputElement
-      | undefined,
+    priceInput: $.maybe<HTMLInputElement>(`#${FormId.PriceInput}`),
+    totalInput: $.maybe<HTMLInputElement>(`#${FormId.TotalInput}`),
     submitButton: $<HTMLButtonElement>(`#${FormId.SubmitButton}`),
     amountErrorView: $(`#${FormId.AmountErrorView}`),
   }
