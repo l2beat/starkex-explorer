@@ -1,9 +1,9 @@
 import { stringAs } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
-import Cookie from 'js-cookie'
 import { z } from 'zod'
 
 import { Registration } from './keys/keys'
+import { MetamaskClient } from './MetamaskClient'
 
 type UsersInfo = z.infer<typeof UsersInfo>
 const UsersInfo = z.record(
@@ -26,81 +26,35 @@ export function initMetamask() {
   const connectButton = document.querySelector<HTMLButtonElement>(
     '#connect-with-metamask'
   )
-  if (connectButton) {
-    connectButton.addEventListener('click', () => {
-      if (provider) {
-        provider.request({ method: 'eth_requestAccounts' }).catch(console.error)
-      } else {
-        window.open('https://metamask.io/download/')
-      }
-    })
-  }
+  const instanceChainId = getInstanceChainId()
 
   if (!provider) {
+    connectButton?.addEventListener('click', async () => {
+      window.open('https://metamask.io/download/')
+    })
     return
   }
 
-  provider.request({ method: 'eth_accounts' }).catch(console.error)
+  const metamaskClient = new MetamaskClient(provider, instanceChainId)
 
-  provider
-    .request({ method: 'eth_chainId' })
-    .then((chainId) => {
-      updateChainId(chainId as string)
-    })
-    .catch(console.error)
-
-  provider.on('accountsChanged', (accounts) => {
-    updateAccounts(accounts)
-  })
-
-  provider.on('chainChanged', (chainId) => {
-    updateChainId(chainId)
-  })
-
-  function updateAccounts(accounts: string[]) {
-    deleteDisconnectedAccountsFromUsersInfo(accounts)
-    const connectedAccount = accounts.at(0)
-    const currentAccount = Cookie.get('account')
-
-    const accountsMap = getUsersInfo()
-
-    if (connectedAccount !== currentAccount) {
-      if (connectedAccount) {
-        Cookie.set('account', connectedAccount.toString())
-        const accountMap = accountsMap[connectedAccount]
-        if (accountMap?.starkKey) {
-          Cookie.set('starkKey', accountMap.starkKey.toString())
-        } else {
-          Cookie.remove('starkKey')
-        }
-      } else {
-        localStorage.removeItem('accountsMap')
-        Cookie.remove('account')
-        Cookie.remove('starkKey')
-      }
-      location.reload()
+  connectButton?.addEventListener('click', async () => {
+    const chainId = await metamaskClient.getChainId()
+    if (instanceChainId !== Number(chainId)) {
+      metamaskClient
+        .switchToInstanceNetwork()
+        .then(() => metamaskClient.requestAccounts())
+        .catch(console.error)
+      return
     }
-  }
 
-  function deleteDisconnectedAccountsFromUsersInfo(
-    connectedAccounts: string[]
-  ) {
-    const usersInfo = getUsersInfo()
-    Object.keys(usersInfo).forEach((userAccount) => {
-      if (!connectedAccounts.includes(userAccount)) {
-        //eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete usersInfo[userAccount]
-      }
-    })
+    await metamaskClient.requestAccounts()
+  })
+}
 
-    localStorage.setItem('accountsMap', JSON.stringify(usersInfo))
+const getInstanceChainId = () => {
+  const instanceChainId = document.querySelector('html')?.dataset.chainId
+  if (!instanceChainId) {
+    throw new Error('Chain id not found')
   }
-
-  const MAINNET_CHAIN_ID = '0x1'
-  const GANACHE_CHAIN_ID = '0x539'
-  function updateChainId(chainId: string) {
-    if (chainId !== MAINNET_CHAIN_ID && chainId !== GANACHE_CHAIN_ID) {
-      alert('Please change your metamask to mainnet')
-    }
-  }
+  return Number(instanceChainId)
 }
