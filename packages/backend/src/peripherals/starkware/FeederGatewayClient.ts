@@ -33,7 +33,7 @@ export class FeederGatewayClient extends BaseClient {
       const res = await this.fetchClient.fetchRetry(url, {
         ...this.requestInit,
         // Some of the requests can take a long time to complete e.g. batchId = 1914
-        timeout: 15_000,
+        timeout: 60_000,
       })
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const data = await res.json()
