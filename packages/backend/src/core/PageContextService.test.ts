@@ -45,7 +45,7 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'perpetual',
-        isMainnet: true,
+        chainId: 1,
         instanceName: perpetualConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
       })
@@ -69,7 +69,7 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'spot',
-        isMainnet: false,
+        chainId: 1,
         instanceName: spotConfig.starkex.instanceName,
       })
       expect(mockedUserService.getUserDetails).toHaveBeenCalledWith(givenUser)
@@ -89,7 +89,7 @@ describe(PageContextService.name, () => {
       const pageContext = {
         user: givenUser,
         tradingMode: 'perpetual',
-        isMainnet: true,
+        chainId: 1,
         instanceName: spotConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
       } as const
@@ -110,7 +110,7 @@ describe(PageContextService.name, () => {
           ({
             user: undefined,
             tradingMode: 'perpetual',
-            isMainnet: true,
+            chainId: 1,
             instanceName: spotConfig.starkex.instanceName,
             collateralAsset: fakeCollateralAsset,
           } as const)
@@ -137,7 +137,7 @@ describe(PageContextService.name, () => {
         const pageContext = {
           user: givenUser,
           tradingMode: 'perpetual',
-          isMainnet: true,
+          chainId: 1,
           instanceName: spotConfig.starkex.instanceName,
           collateralAsset: fakeCollateralAsset,
         } as const
@@ -177,7 +177,7 @@ describe(PageContextService.name, () => {
         const pageContext = {
           user: givenUser,
           tradingMode: 'perpetual',
-          isMainnet: true,
+          chainId: 1,
           instanceName: spotConfig.starkex.instanceName,
           collateralAsset: fakeCollateralAsset,
         } as const
@@ -200,7 +200,7 @@ describe(PageContextService.name, () => {
       const pageContext = {
         user: undefined,
         tradingMode: 'perpetual',
-        isMainnet: false,
+        chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
       } as const
@@ -218,7 +218,7 @@ describe(PageContextService.name, () => {
       const pageContext = {
         user: undefined,
         tradingMode: 'spot',
-        isMainnet: false,
+        chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
       } as const
 

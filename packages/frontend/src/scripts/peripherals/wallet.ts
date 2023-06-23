@@ -62,9 +62,11 @@ export const Wallet = {
     return result as string
   },
 
-  async signApexMainnetKey(account: EthereumAddress): Promise<string> {
-    const message =
-      'name: ApeX\nversion: 1.0\nenvId: 1\naction: L2 Key\nonlySignOn: https://pro.apex.exchange'
+  async signApexKey(
+    account: EthereumAddress,
+    chainId: number
+  ): Promise<string> {
+    const message = `name: ApeX\nversion: 1.0\nenvId: ${chainId}\naction: L2 Key\nonlySignOn: https://pro.apex.exchange`
 
     const result = await getProvider().request({
       method: 'personal_sign',

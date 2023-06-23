@@ -17,13 +17,13 @@ export class PageContextService {
 
   async getPageContext(givenUser: Partial<UserDetails>): Promise<PageContext> {
     const user = await this.userService.getUserDetails(givenUser)
-    const isMainnet = this.config.starkex.blockchain.chainId === 1
+
     if (this.config.starkex.tradingMode === 'perpetual') {
       return {
         user,
         tradingMode: this.config.starkex.tradingMode,
         instanceName: this.config.starkex.instanceName,
-        isMainnet,
+        chainId: this.config.starkex.blockchain.chainId,
         collateralAsset: this.config.starkex.collateralAsset,
       }
     }
@@ -31,7 +31,7 @@ export class PageContextService {
     return {
       user,
       tradingMode: this.config.starkex.tradingMode,
-      isMainnet,
+      chainId: this.config.starkex.blockchain.chainId,
       instanceName: this.config.starkex.instanceName,
     }
   }

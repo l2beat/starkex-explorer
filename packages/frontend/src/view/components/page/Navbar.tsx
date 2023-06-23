@@ -13,8 +13,8 @@ interface NavbarProps {
 }
 
 export function Navbar({ searchBar = true, context }: NavbarProps) {
-  const { user, instanceName, tradingMode, isMainnet } = context
-
+  const { user, instanceName, tradingMode, chainId } = context
+  const isMainnet = chainId === 1
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
       <a

@@ -6,8 +6,7 @@ import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
 import { getUsersInfo } from '../metamask'
 import {
   RecoveredKeys,
-  recoverKeysApexMainnet,
-  recoverKeysApexTestnet,
+  recoverKeysApex,
   recoverKeysDydx,
   recoverKeysMyria,
 } from './recovery'
@@ -20,10 +19,10 @@ export function initStarkKeyRecovery() {
   if (!registerButton || !account) {
     return
   }
-  const { instanceName, isMainnet } = getDataFromButton(registerButton)
+  const { instanceName, chainId } = getDataFromButton(registerButton)
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   registerButton.addEventListener('click', async () => {
-    const keys = await recoverKeys(account, instanceName, isMainnet)
+    const keys = await recoverKeys(account, instanceName, chainId)
     Cookie.set('starkKey', keys.starkKey.toString())
     setToLocalStorage(account, keys)
     window.location.href = `/users/${keys.starkKey.toString()}`
@@ -32,13 +31,11 @@ export function initStarkKeyRecovery() {
 
 const getDataFromButton = (button: HTMLElement) => {
   const instanceName = InstanceName.parse(button.dataset.instanceName)
-  if (button.dataset.isMainnet === undefined) {
-    throw new Error('isMainnet is undefined')
+  if (button.dataset.chainId === undefined) {
+    throw new Error('chainId not passed to stark key recovery button')
   }
 
-  const isMainnet = button.dataset.isMainnet === 'true'
-
-  return { instanceName, isMainnet }
+  return { instanceName, chainId: Number(button.dataset.chainId) }
 }
 
 const setToLocalStorage = (account: EthereumAddress, keys: RecoveredKeys) => {
@@ -55,7 +52,7 @@ const setToLocalStorage = (account: EthereumAddress, keys: RecoveredKeys) => {
 const recoverKeys = (
   account: EthereumAddress,
   instanceName: InstanceName,
-  isMainnet: boolean
+  chainId: number
 ): Promise<RecoveredKeys> => {
   switch (instanceName) {
     case 'dYdX':
@@ -63,9 +60,7 @@ const recoverKeys = (
     case 'Myria':
       return recoverKeysMyria(account)
     case 'ApeX':
-      return isMainnet
-        ? recoverKeysApexMainnet(account)
-        : recoverKeysApexTestnet(account)
+      return recoverKeysApex(account, chainId)
     case 'GammaX':
       //TODO: Implement
       throw new Error('NIY')
