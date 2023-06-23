@@ -69,7 +69,7 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'spot',
-        chainId: 1,
+        chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
       })
       expect(mockedUserService.getUserDetails).toHaveBeenCalledWith(givenUser)
