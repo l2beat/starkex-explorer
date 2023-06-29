@@ -11,7 +11,10 @@ export class FeederGatewayCollector {
     private readonly logger: Logger
   ) {}
 
-  async collect(syncToStateUpdateId: number) {
+  async collect() {
+    const latestStateUpdate = await this.stateUpdateRepository.findLast()
+    if (!latestStateUpdate) return
+
     const latestSyncedTransactionStateUpdateId =
       await this.l2TransactionRepository.findLatestStateUpdateId()
 
@@ -19,18 +22,18 @@ export class FeederGatewayCollector {
       let stateUpdateId = latestSyncedTransactionStateUpdateId
         ? latestSyncedTransactionStateUpdateId + 1
         : 1;
-      stateUpdateId <= syncToStateUpdateId;
+      stateUpdateId <= latestStateUpdate.id;
       stateUpdateId++
     ) {
       const stateUpdate = await this.stateUpdateRepository.findById(
         stateUpdateId
       )
 
-      // We stop collecting transactions if there is no state update in db.
-      // It will not stop the sync process, but it will stop the transaction collection.
-      // We will try to collect unsynced transactions on the next state update sync.
+      // We throw an error if the state update is not found.
+      // It's a critical error and we should stop the sync process, becasue
+      // latestStateUpdate was found, but the state update before it was not.
       if (!stateUpdate) {
-        return
+        throw new Error(`State update ${stateUpdateId} not found`)
       }
 
       this.logger.info(`Collecting transactions from Feeder Gateway`, {
