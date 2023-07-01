@@ -16,7 +16,7 @@ export async function getLastSyncedBlock(knex: Knex): Promise<number> {
     .where('key', 'lastBlockNumberSynced')
     .first()
   if (!lastSyncedBlock) {
-    throw new Error('lastBlockNumberSynced not found key_values table')
+    throw new Error('lastBlockNumberSynced not found in key_values table')
   }
   return parseInt(lastSyncedBlock?.value)
 }
