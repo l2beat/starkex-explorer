@@ -453,7 +453,7 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
-        logger
+        l2TransactionRepository
       )
 
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
@@ -489,7 +489,7 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
-        logger
+        l2TransactionRepository
       )
 
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(

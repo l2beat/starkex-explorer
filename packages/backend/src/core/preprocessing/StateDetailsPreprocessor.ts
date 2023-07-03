@@ -1,17 +1,17 @@
 import { Knex } from 'knex'
 
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { Logger } from '../../tools/Logger'
 
 export class StateDetailsPreprocessor {
   constructor(
-    protected readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
-    protected readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
-    protected readonly userTransactionRepository: UserTransactionRepository,
-    protected readonly logger: Logger
+    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    private readonly userTransactionRepository: UserTransactionRepository,
+    private readonly l2TransactionRepository: L2TransactionRepository
   ) {}
 
   async preprocessNextStateUpdate(
@@ -41,6 +41,52 @@ export class StateDetailsPreprocessor {
       },
       trx
     )
+  }
+
+  async catchUpL2Transactions(trx: Knex.Transaction, stateUpdateId: number) {
+    const lastWithL2TransactionCount =
+      await this.preprocessedStateDetailsRepository.findLastWithL2TransactionCount(
+        trx
+      )
+
+    const lastL2TransactionStateUpdateId =
+      await this.l2TransactionRepository.findLatestStateUpdateId(trx)
+
+    const preprocessTo = lastL2TransactionStateUpdateId
+      ? Math.min(lastL2TransactionStateUpdateId, stateUpdateId)
+      : stateUpdateId
+
+    for (
+      let id = lastWithL2TransactionCount?.stateUpdateId
+        ? lastWithL2TransactionCount.stateUpdateId + 1
+        : 0;
+      id <= preprocessTo;
+      id++
+    ) {
+      const preprocessedRecord =
+        await this.preprocessedStateDetailsRepository.findByStateUpdateId(
+          id,
+          trx
+        )
+
+      if (!preprocessedRecord)
+        throw new Error(
+          `PreprocessedStateDetails not found for stateUpdateId: ${id}`
+        )
+
+      const statistics =
+        await this.l2TransactionRepository.getStatisticsByStateUpdateId(id, trx)
+
+      await this.preprocessedStateDetailsRepository.update(
+        {
+          id: preprocessedRecord.id,
+          l2TransactionCount: statistics.l2TransactionCount,
+          l2ReplacedTransactionCount: statistics.l2ReplacedTransactionCount,
+          l2MultiTransactionCount: statistics.l2MultiTransactionCount,
+        },
+        trx
+      )
+    }
   }
 
   async rollbackOneStateUpdate(

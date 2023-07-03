@@ -913,6 +913,81 @@ describe(L2TransactionRepository.name, () => {
   })
 
   describe(
+    L2TransactionRepository.prototype.getStatisticsByStateUpdateId.name,
+    () => {
+      it('returns correct statistics', async () => {
+        const stateUpdateId = 1
+        const transactionIds = []
+        for (let i = 0; i < 10; i++) {
+          transactionIds.push(
+            await repository.add({
+              transactionId: 1234 + i,
+              stateUpdateId,
+              blockNumber: 12345,
+              data: {
+                type: 'Deposit',
+                starkKey: StarkKey.fake(),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+            })
+          )
+        }
+        await repository.add({
+          transactionId: 1234,
+          stateUpdateId,
+          blockNumber: 12345,
+          data: {
+            type: 'Deposit',
+            starkKey: StarkKey.fake(),
+            positionId: 1234n,
+            amount: 5000n,
+          },
+        })
+        await repository.add({
+          stateUpdateId: 1,
+          transactionId: 123456,
+          blockNumber: 12345,
+          data: {
+            type: 'MultiTransaction',
+            transactions: [
+              {
+                type: 'Deposit',
+                starkKey: StarkKey.fake('1'),
+                positionId: 1234n,
+                amount: 5000n,
+              },
+              {
+                positionId: 1234n,
+                starkKey: StarkKey.fake('2'),
+                ethereumAddress: EthereumAddress.fake(),
+                amount: 12345n,
+                nonce: 10n,
+                expirationTimestamp: Timestamp(1234),
+                signature: {
+                  r: Hash256.fake(),
+                  s: Hash256.fake(),
+                },
+                type: 'WithdrawalToAddress',
+              },
+            ],
+          } as PerpetualL2MultiTransactionData,
+        })
+
+        const statistics = await repository.getStatisticsByStateUpdateId(
+          stateUpdateId
+        )
+
+        expect(statistics).toEqual({
+          l2TransactionCount: 14,
+          l2ReplacedTransactionCount: 1,
+          l2MultiTransactionCount: 1,
+        })
+      })
+    }
+  )
+
+  describe(
     L2TransactionRepository.prototype.getPaginatedWithoutMulti.name,
     () => {
       it('respects the limit parameter', async () => {
@@ -1020,7 +1095,6 @@ describe(L2TransactionRepository.name, () => {
           limit: 5,
           offset: 0,
         })
-        console.log(records)
 
         expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(0, 5))
       })

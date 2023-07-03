@@ -183,6 +183,36 @@ export class L2TransactionRepository extends BaseRepository {
     return Number(result!.count)
   }
 
+  async getStatisticsByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<{
+    l2TransactionCount: number
+    l2ReplacedTransactionCount: number
+    l2MultiTransactionCount: number
+  }> {
+    const knex = await this.knex(trx)
+    const [all] = await knex('l2_transactions')
+      .where({ state_update_id: stateUpdateId })
+      .count()
+
+    const [replaced] = await knex('l2_transactions')
+      .where({ state_update_id: stateUpdateId })
+      .andWhere({ state: 'replaced' })
+      .count()
+
+    const [multi] = await knex('l2_transactions')
+      .where({ state_update_id: stateUpdateId })
+      .andWhere({ type: 'MultiTransaction' })
+      .count()
+
+    return {
+      l2TransactionCount: Number(all?.count ?? 0),
+      l2ReplacedTransactionCount: Number(replaced?.count ?? 0),
+      l2MultiTransactionCount: Number(multi?.count ?? 0),
+    }
+  }
+
   async countAllUserSpecific(starkKey: StarkKey) {
     const knex = await this.knex()
     const [result] = await knex('l2_transactions')
@@ -284,8 +314,10 @@ export class L2TransactionRepository extends BaseRepository {
     return toAggregatedRecord(originalTransaction, alternativeTransactions)
   }
 
-  async findLatestStateUpdateId(): Promise<number | undefined> {
-    const knex = await this.knex()
+  async findLatestStateUpdateId(
+    trx?: Knex.Transaction
+  ): Promise<number | undefined> {
+    const knex = await this.knex(trx)
     const results = await knex('l2_transactions')
       .select('state_update_id')
       .orderBy('state_update_id', 'desc')
