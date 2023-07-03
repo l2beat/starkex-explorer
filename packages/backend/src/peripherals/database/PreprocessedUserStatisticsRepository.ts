@@ -14,6 +14,9 @@ export interface PreprocessedUserStatisticsRecord {
   starkKey: StarkKey
   assetCount: number
   balanceChangeCount: number
+  l2TransactionCount?: number
+  l2ReplacedTransactionCount?: number
+  l2MultiTransactionCount?: number
   prevHistoryId?: number
 }
 
@@ -78,6 +81,9 @@ function toPreprocessedUserStatisticsRecord(
     balanceChangeCount: row.balance_change_count,
     starkKey: StarkKey(row.stark_key),
     prevHistoryId: row.prev_history_id ?? undefined,
+    l2TransactionCount: row.l2_transaction_count ?? undefined,
+    l2ReplacedTransactionCount: row.l2_replaced_transaction_count ?? undefined,
+    l2MultiTransactionCount: row.l2_multi_transaction_count ?? undefined,
   }
 }
 
@@ -92,5 +98,8 @@ function toPreprocessedUserStatisticsRow(
     asset_count: record.assetCount,
     balance_change_count: record.balanceChangeCount,
     prev_history_id: record.prevHistoryId ?? null,
+    l2_transaction_count: record.l2TransactionCount ?? null,
+    l2_replaced_transaction_count: record.l2ReplacedTransactionCount ?? null,
+    l2_multi_transaction_count: record.l2MultiTransactionCount ?? null,
   }
 }

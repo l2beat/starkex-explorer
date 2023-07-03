@@ -221,6 +221,9 @@ declare module 'knex/types/tables' {
   interface PreprocessedStateUpdateRow {
     state_update_id: number
     state_transition_hash: string
+    l2_transaction_count: number | null
+    l2_replaced_transaction_count: number | null
+    l2_multi_transaction_count: number | null
   }
 
   interface PreprocessedAssetHistoryRow {
@@ -248,6 +251,9 @@ declare module 'knex/types/tables' {
     timestamp: bigint
     asset_update_count: number
     forced_transaction_count: number
+    l2_transaction_count: number | null
+    l2_replaced_transaction_count: number | null
+    l2_multi_transaction_count: number | null
   }
 
   interface WithdrawableAssetRow {
@@ -269,6 +275,9 @@ declare module 'knex/types/tables' {
     stark_key: string
     asset_count: number
     balance_change_count: number
+    l2_transaction_count: number | null
+    l2_replaced_transaction_count: number | null
+    l2_multi_transaction_count: number | null
     prev_history_id: number | null
   }
 

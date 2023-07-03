@@ -16,8 +16,10 @@ export interface PreprocessedStateDetailsRecord {
   timestamp: Timestamp
   assetUpdateCount: number
   forcedTransactionCount: number
+  l2TransactionCount?: number
+  l2ReplacedTransactionCount?: number
+  l2MultiTransactionCount?: number
 }
-
 export class PreprocessedStateDetailsRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
@@ -100,5 +102,8 @@ function toPreprocessedStateDetailsRow(
     timestamp: BigInt(record.timestamp.toString()),
     asset_update_count: record.assetUpdateCount,
     forced_transaction_count: record.forcedTransactionCount,
+    l2_transaction_count: record.l2TransactionCount ?? null,
+    l2_replaced_transaction_count: record.l2ReplacedTransactionCount ?? null,
+    l2_multi_transaction_count: record.l2MultiTransactionCount ?? null,
   }
 }
