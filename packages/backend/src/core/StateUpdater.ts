@@ -1,6 +1,7 @@
 import { ForcedAction, OraclePrice } from '@explorer/encoding'
 import {
   IMerkleStorage,
+  MerkleProof,
   MerkleTree,
   PositionLeaf,
   VaultLeaf,
@@ -195,11 +196,55 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     return { oldHash: this.emptyStateHash, id: 0 }
   }
 
+  async formatMerkleProofForEscape(positionOrVaultId: bigint, proof: MerkleProof<T>): Promise<bigint[]> {
+    // See the format of the proof here: 
+    // https://vscode.dev/github/starkware-libs/starkex-contracts/blob/master/scalable-dex/contracts/src/components/PedersenMerkleVerifier.sol#L25
+    // Important: for perpetuals, there are values additionally appended to the proof, see:
+    // https://vscode.dev/github/starkware-libs/starkex-contracts/blob/master/scalable-dex/contracts/src/perpetual/components/PerpetualEscapeVerifier.sol#L137
+    const result: bigint[] = []
+
+    for (const step of proof.path) {
+      // +-------------------------------+---------------------------+-----------+
+      // | left_node_n (252)             | right_node_n (252)        | zeros (8) |
+      // +-------------------------------+-----------+---------------+-----------+
+      const leftBigInt = BigInt('0x' + step.left.toString())
+      const rightBigInt = BigInt('0x' + step.right.toString())
+      const leftTrimmed = leftBigInt & ((1n << 252n) - 1n)
+      const rightTrimmed = rightBigInt & ((1n << 252n) - 1n)
+      const entry = ((leftTrimmed << 252n) | rightTrimmed) << 8n
+      // Split into 2 256-bit chunks and add to result
+      result.push(entry >> 256n)
+      result.push(entry & ((1n << 256n) - 1n))
+    }
+
+    // Add root and leaf index
+    // +-------------------------------+-----------+---------------+-----------+
+    // | root (252)                    | zeros (4) | nodeIdx (248) | zeros (8) |
+    // +-------------------------------+-----------+---------------+-----------+
+    const rootBigInt = BigInt('0x' + proof.root.toString())
+    const rootTrimmed = rootBigInt & ((1n << 252n) - 1n)
+    // index needs to be adjusted due to increased tree height
+    // stemming from including the leaf values in the proof
+    const adjustedIndex = positionOrVaultId << BigInt(proof.leafPrefixLength)
+    const indexTrimmed = adjustedIndex & ((1n << 248n) - 1n)
+    const entry = (((rootTrimmed << 4n) << 248n) | indexTrimmed) << 8n
+    // Split into 2 256-bit chunks and add to result
+    result.push(entry >> 256n)
+    result.push(entry & ((1n << 256n) - 1n))
+
+    console.log('Merkle proof for escape:')
+    console.log(result.map(x => bigIntToHex64(x)).join('\n'))
+
+    return result
+  }
+
   async generateMerkleProof(positionOrVaultId: bigint) {
     if (!this.stateTree) {
       throw new Error('State tree not initialized')
     }
-    return await this.stateTree.getMerkleProofForLeaf(positionOrVaultId)
+    const proof = await this.stateTree.getMerkleProofForLeaf(positionOrVaultId)
+    await this.formatMerkleProofForEscape(positionOrVaultId, proof)
+    return proof
   }
 
   async ensureStateTree(hash: PedersenHash, height: bigint) {
@@ -218,4 +263,14 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     }
     return this.stateTree
   }
+}
+
+function bigIntToHex64(bigInt: BigInt): string {
+  let hexString = bigInt.toString(16);
+
+  while (hexString.length < 64) {
+    hexString = '0' + hexString;
+  }
+
+  return '"0x'+hexString+'"';
 }

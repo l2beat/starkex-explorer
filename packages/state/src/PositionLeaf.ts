@@ -2,7 +2,7 @@ import { pedersen } from '@explorer/crypto'
 import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, json, PedersenHash, StarkKey } from '@explorer/types'
 
-import { MerkleValue } from './MerkleValue'
+import { MerkleProofPrefix, MerkleValue } from './MerkleValue'
 import { packBytes } from './packBytes'
 
 const MIN_INT_64 = -(2n ** 63n)
@@ -23,6 +23,29 @@ export class PositionLeaf extends MerkleValue {
     protected knownHash?: PedersenHash
   ) {
     super()
+  }
+
+  // TODO: use this function inside calculateHash()
+  async calculateMerkleProofPrefix(): Promise<MerkleProofPrefix> {
+    const packedPosition = packBytes([
+      { bytes: 8, value: this.collateralBalance - MIN_INT_64 },
+      { bytes: 2, value: this.assets.length },
+    ])
+    const items = [
+      ...this.assets.map(packAsset).sort(),
+      this.starkKey.substring(2),
+      packedPosition,
+    ]
+    const proofNodes = []
+    let hash = PedersenHash.ZERO
+    for (const item of items) {
+      proofNodes.push({ left: hash, right: PedersenHash(item) })
+      hash = await pedersen(hash, PedersenHash(item))
+    }
+    return {
+      nodes: proofNodes,
+      finalHash: hash,
+    }
   }
 
   async calculateHash() {

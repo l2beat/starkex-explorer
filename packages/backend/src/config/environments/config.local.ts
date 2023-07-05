@@ -15,7 +15,7 @@ export function getLocalConfig(): Config {
     },
     port: getEnv.integer('PORT', 3000),
     databaseConnection: getEnv('LOCAL_DB_URL'),
-    enableSync: true,
+    enableSync: getEnv.boolean('ENABLE_SYNC', true),
     enablePreprocessing: getEnv.boolean('ENABLE_PREPROCESSING', true),
     freshStart: getEnv.boolean('FRESH_START', false),
     forceHttps: false,
