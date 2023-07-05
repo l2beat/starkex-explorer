@@ -221,9 +221,6 @@ declare module 'knex/types/tables' {
   interface PreprocessedStateUpdateRow {
     state_update_id: number
     state_transition_hash: string
-    l2_transaction_count: number | null
-    l2_replaced_transaction_count: number | null
-    l2_multi_transaction_count: number | null
   }
 
   interface PreprocessedAssetHistoryRow {

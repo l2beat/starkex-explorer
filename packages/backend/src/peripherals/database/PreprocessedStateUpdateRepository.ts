@@ -9,9 +9,6 @@ import { Database } from './shared/Database'
 export interface PreprocessedStateUpdateRecord {
   stateUpdateId: number
   stateTransitionHash: Hash256
-  l2TransactionCount?: number
-  l2ReplacedTransactionCount?: number
-  l2MultiTransactionCount?: number
 }
 
 export class PreprocessedStateUpdateRepository extends BaseRepository {
@@ -66,9 +63,6 @@ function toPreprocessedStateUpdateRecord(
   return {
     stateUpdateId: row.state_update_id,
     stateTransitionHash: Hash256(row.state_transition_hash),
-    l2TransactionCount: row.l2_transaction_count ?? undefined,
-    l2ReplacedTransactionCount: row.l2_replaced_transaction_count ?? undefined,
-    l2MultiTransactionCount: row.l2_multi_transaction_count ?? undefined,
   }
 }
 
@@ -78,8 +72,5 @@ function toPreprocessedStateUpdateRow(
   return {
     state_update_id: record.stateUpdateId,
     state_transition_hash: record.stateTransitionHash.toString(),
-    l2_transaction_count: record.l2TransactionCount ?? null,
-    l2_replaced_transaction_count: record.l2ReplacedTransactionCount ?? null,
-    l2_multi_transaction_count: record.l2MultiTransactionCount ?? null,
   }
 }

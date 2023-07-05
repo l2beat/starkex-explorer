@@ -14,7 +14,6 @@ import { Knex } from 'knex'
 
 const tableNames = [
   'preprocessed_state_details',
-  'preprocessed_state_updates',
   'preprocessed_user_statistics',
 ]
 const columnNames = [
