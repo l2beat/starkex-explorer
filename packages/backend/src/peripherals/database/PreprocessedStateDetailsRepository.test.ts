@@ -139,7 +139,7 @@ describe(PreprocessedStateDetailsRepository.name, () => {
   describe(
     PreprocessedStateDetailsRepository.prototype.findLastWithL2TransactionCount
       .name,
-    async () => {
+    () => {
       it('finds last with l2 transaction count', async () => {
         const id = await repository.add(genericRecord, trx)
         await repository.add(

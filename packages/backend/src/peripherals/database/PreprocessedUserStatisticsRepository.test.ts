@@ -91,7 +91,14 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
     )
 
     const current = await repository.findCurrentByStarkKey(starkKey, trx)
-    expect(current).toEqual({ ...mostRecent, id, prevHistoryId: undefined })
+    expect(current).toEqual({
+      ...mostRecent,
+      id,
+      prevHistoryId: undefined,
+      l2MultiTransactionCount: undefined,
+      l2ReplacedTransactionCount: undefined,
+      l2TransactionCount: undefined,
+    })
   })
 
   it('removes by state update id', async () => {

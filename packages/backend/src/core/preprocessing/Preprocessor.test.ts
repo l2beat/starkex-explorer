@@ -1,5 +1,5 @@
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { expect, mockObject } from 'earl'
+import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
@@ -369,6 +369,7 @@ describe(Preprocessor.name, () => {
       const mockStateDetailsPreprocessor = mockObject<StateDetailsPreprocessor>(
         {
           preprocessNextStateUpdate: async () => undefined,
+          catchUpL2Transactions: mockFn(async () => {}),
         }
       )
       const mockUserStatisticsPreprocessor =
@@ -412,6 +413,9 @@ describe(Preprocessor.name, () => {
       expect(
         mockUserStatisticsPreprocessor.preprocessNextStateUpdate
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2)
+      expect(
+        mockStateDetailsPreprocessor.catchUpL2Transactions
+      ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2.id)
     })
 
     it('throws when next state update is missing', async () => {

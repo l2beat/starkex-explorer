@@ -47,6 +47,8 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     const results = await knex('preprocessed_state_details')
       .insert(toPreprocessedStateDetailsRow(row))
       .returning('id')
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return results[0]!.id
   }
 
