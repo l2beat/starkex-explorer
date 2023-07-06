@@ -7,6 +7,8 @@ import { getKnex, getLastSyncedBlock } from '../src/utils'
 dotenv()
 
 const FORK_BLOCK_NUMBER = 17605965
+const USDC_CONTRACT = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+const USDC_ASSET_TYPE = '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d'
 
 async function forkNetworkAtBlock(blockNumber: number) {
     const url = getEnv('JSON_RPC_URL')
@@ -31,6 +33,7 @@ describe("freeze functionality", function () {
       "function forcedWithdrawalRequest(uint256,uint256,uint256,bool) external",
       "function freezeRequest(uint256,uint256,uint256) external",
       "function escape(uint256,uint256,uint256) external",
+      "function withdraw(uint256,uint256) external",
       "event LogWithdrawalAllowed(uint256 ownerKey, uint256 assetType, uint256 nonQuantizedAmount, uint256 quantizedAmount)"
     ]
     const perpetualContract = new ethers.Contract(perpetualAddress, abi, provider)
@@ -122,9 +125,31 @@ describe("freeze functionality", function () {
     const parsedEscapeLog = perpetualContractWithSigner.interface.parseLog(escapeLog!) 
     expect(parsedEscapeLog.args.ownerKey.toHexString()).toEqual(starkKey)
     expect(parsedEscapeLog.args.quantizedAmount.toBigInt()).toEqual(escapeWithdrawalAmount)
+    expect(parsedEscapeLog.args.assetType.toHexString()).toEqual(USDC_ASSET_TYPE)
 
     // Make sure the same escape can't be repeated
     await expect(perpetualContractWithSigner.escape(starkKey, positionId, escapeWithdrawalAmount)).toBeRejected()
+
+    // Get USDC balance of ethereumAddress
+    const usdcContract = new ethers.Contract(USDC_CONTRACT, [
+      "function balanceOf(address) external view returns (uint256)"
+    ], provider)
+    const usdcBalanceBefore = (await usdcContract.balanceOf(ethereumAddress)).toBigInt()
+    expect(usdcBalanceBefore).toEqual(0n)
+
+    // Withdraw the funds to the user's account
+    await perpetualContractWithSigner.withdraw(starkKey, USDC_ASSET_TYPE)
+
+    // Make sure the funds were transfered
+    const usdcBalanceAfter = (await usdcContract.balanceOf(ethereumAddress)).toBigInt()
+    expect(usdcBalanceAfter).toEqual(escapeWithdrawalAmount)
+
+    // Try to withdraw again, it should not transfer any funds
+    await perpetualContractWithSigner.withdraw(starkKey, USDC_ASSET_TYPE)
+    
+    // Make sure balance hasn't changed
+    const usdcBalanceAfterAgain = (await usdcContract.balanceOf(ethereumAddress)).toBigInt()
+    expect(usdcBalanceAfterAgain).toEqual(escapeWithdrawalAmount)
   });
 });
 
