@@ -71,7 +71,7 @@ describe("freeze functionality", function () {
     // The exchange should be frozen now!
     expect(await perpetualContract.isFrozen()).toEqual(true)
 
-    // Send an escape request for position #1
+    // Send a verifyEscape request for position #1
     const escapeVerifierAbi = [
       "function identify() external pure returns (string)",
       "function verifyEscape(uint256[],uint256,uint256[]) external",
@@ -103,6 +103,8 @@ describe("freeze functionality", function () {
     const wrongMerkleProof = [...merkleProofForPos1] // make a copy
     wrongMerkleProof[20] = '0x1234' // change a random element
     await expect(escapeVerifierWithSigner.verifyEscape(wrongMerkleProof, 0, newStateFromCairoOutput)).toBeRejected()
+
+    // Now that verifyEscape() is done, we can call escape()
 
     // Make sure escape with wrong params (amount) fails
     await expect(perpetualContractWithSigner.escape(starkKey, positionId, escapeWithdrawalAmount-1n)).toBeRejected()
