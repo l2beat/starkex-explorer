@@ -30,12 +30,13 @@ describe("freeze functionality", function () {
       "function isFrozen() public view returns (bool)",
       "function forcedWithdrawalRequest(uint256,uint256,uint256,bool) external",
       "function freezeRequest(uint256,uint256,uint256) external",
-      "function escape(uint256,uint256,uint256) external"
+      "function escape(uint256,uint256,uint256) external",
+      "event LogWithdrawalAllowed(uint256 ownerKey, uint256 assetType, uint256 nonQuantizedAmount, uint256 quantizedAmount)"
     ]
-    const contract = new ethers.Contract(perpetualAddress, abi, provider)
+    const perpetualContract = new ethers.Contract(perpetualAddress, abi, provider)
 
     // The exchange should not be frozen
-    expect(await contract.isFrozen()).toEqual(false)
+    expect(await perpetualContract.isFrozen()).toEqual(false)
 
     // Forced withdrawal data (for user at Position #1)
     const starkKey = '0x027cda895fbaa174bf10c8e0f57561fa9aa6a93cfec32b87f1bdfe55a161e358'
@@ -52,20 +53,20 @@ describe("freeze functionality", function () {
 
     // Send forcedWithdrawalRequiest
     const signer = provider.getSigner(ethereumAddress); // Use the correct signer here
-    const contractWithSigner = contract.connect(signer);
-    await contractWithSigner.forcedWithdrawalRequest(starkKey, positionId, quantizedAmount, premiumCost);
+    const perpetualContractWithSigner = perpetualContract.connect(signer);
+    await perpetualContractWithSigner.forcedWithdrawalRequest(starkKey, positionId, quantizedAmount, premiumCost);
 
     // Send freeze request (it should fail, it's too soon)
-    await expect(contractWithSigner.freezeRequest(starkKey, positionId, quantizedAmount)).toBeRejected()
+    await expect(perpetualContractWithSigner.freezeRequest(starkKey, positionId, quantizedAmount)).toBeRejected()
 
     // Mine 20 blocks with 1 day interval (7 days is the limit to freeze)
     await helpers.mine(20, { interval: 24 * 60 * 60 })
 
     // Send freeze request (it should work now)
-    await contractWithSigner.freezeRequest(starkKey, positionId, quantizedAmount)
+    await perpetualContractWithSigner.freezeRequest(starkKey, positionId, quantizedAmount)
     
     // The exchange should be frozen now!
-    expect(await contract.isFrozen()).toEqual(true)
+    expect(await perpetualContract.isFrozen()).toEqual(true)
 
     // Send an escape request for position #1
     const escapeVerifierAbi = [
@@ -75,26 +76,24 @@ describe("freeze functionality", function () {
     ]
     const escapeVerifierWithSigner = new ethers.Contract(escapeVerifierAddress, escapeVerifierAbi, signer)
     await escapeVerifierWithSigner.verifyEscape(merkleProofForPos1, 0, newStateFromCairoOutput)
-    const escapeBlockNumber = await provider.getBlockNumber()
+    const verifyEscapeBlockNumber = await provider.getBlockNumber()
 
-    // Calling verifyEscape above should have emitted this event
-    // emit LogEscapeVerified(publicKey, withdrawalAmount, sharedStateHash, positionId);
-    // Verify the event was emited:
-    const logs = await provider.getLogs({
-      fromBlock: escapeBlockNumber,
-      toBlock: escapeBlockNumber,
+    // Verify the LogEscapeVerified event was emited:
+    const verifyEscapeLogs = await provider.getLogs({
+      fromBlock: verifyEscapeBlockNumber,
+      toBlock: verifyEscapeBlockNumber,
       address: escapeVerifierAddress,
       topics: [
         ethers.utils.id("LogEscapeVerified(uint256,int256,bytes32,uint256)")
       ]
     })
-    expect(logs.length).toEqual(1)
-    const log = logs[0]
-    const parsedLog = escapeVerifierWithSigner.interface.parseLog(log!) 
-    expect(parsedLog.args.publicKey.toHexString()).toEqual(starkKey)
-    expect(parsedLog.args.positionId.toNumber()).toEqual(positionId)
+    expect(verifyEscapeLogs.length).toEqual(1)
+    const verifyEscapeLog = verifyEscapeLogs[0]
+    const parsedVerifyEscapeLog = escapeVerifierWithSigner.interface.parseLog(verifyEscapeLog!) 
+    expect(parsedVerifyEscapeLog.args.publicKey.toHexString()).toEqual(starkKey)
+    expect(parsedVerifyEscapeLog.args.positionId.toNumber()).toEqual(positionId)
 
-    const escapeWithdrawalAmount = parsedLog.args.withdrawalAmount.toBigInt()
+    const escapeWithdrawalAmount: bigint = parsedVerifyEscapeLog.args.withdrawalAmount.toBigInt()
     expect(escapeWithdrawalAmount).toEqual(21899778005454n) // this is the amount at block number 17605965
 
     // Just make sure that sending wrong merkle proof fails
@@ -102,9 +101,30 @@ describe("freeze functionality", function () {
     wrongMerkleProof[20] = '0x1234' // change a random element
     await expect(escapeVerifierWithSigner.verifyEscape(wrongMerkleProof, 0, newStateFromCairoOutput)).toBeRejected()
 
-    // Perform the escape
-    await contractWithSigner.escape(starkKey, positionId, escapeWithdrawalAmount)
+    // Make sure escape with wrong params (amount) fails
+    await expect(perpetualContractWithSigner.escape(starkKey, positionId, escapeWithdrawalAmount-1n)).toBeRejected()
 
+    // Perform the correct escape
+    await perpetualContractWithSigner.escape(starkKey, positionId, escapeWithdrawalAmount)
+    const escapeBlockNumber = await provider.getBlockNumber()
+
+    // Calling escape above should have emitted this event
+    const escapeLogs = await provider.getLogs({
+      fromBlock: escapeBlockNumber,
+      toBlock: escapeBlockNumber,
+      address: perpetualAddress,
+      topics: [
+        ethers.utils.id("LogWithdrawalAllowed(uint256,uint256,uint256,uint256)")
+      ]
+    })
+    expect(escapeLogs.length).toEqual(1)
+    const escapeLog = escapeLogs[0]
+    const parsedEscapeLog = perpetualContractWithSigner.interface.parseLog(escapeLog!) 
+    expect(parsedEscapeLog.args.ownerKey.toHexString()).toEqual(starkKey)
+    expect(parsedEscapeLog.args.quantizedAmount.toBigInt()).toEqual(escapeWithdrawalAmount)
+
+    // Make sure the same escape can't be repeated
+    await expect(perpetualContractWithSigner.escape(starkKey, positionId, escapeWithdrawalAmount)).toBeRejected()
   });
 });
 
