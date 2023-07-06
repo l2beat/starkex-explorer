@@ -6,8 +6,6 @@ import { config as dotenv } from 'dotenv'
 import { getKnex, getLastSyncedBlock } from '../src/utils'
 dotenv()
 
-const knex = getKnex()
-
 const SYNCED_BLOCK_NUMBER = 17605965
 
 async function forkNetworkAtBlock(blockNumber: number) {
@@ -16,8 +14,10 @@ async function forkNetworkAtBlock(blockNumber: number) {
 }
 
 describe("freeze functionality", function () {
-  it("should trigger freeze", async function () {
+  it("should trigger freeze and escape successfully", async function () {
     const perpetualAddress = getEnv('PERPETUAL_ADDRESS')
+    const escapeVerifierAddress = getEnv('ESCAPE_VERIFIER_ADDRESS')
+    // const knex = getKnex()
     // const blockNumber = await getLastSyncedBlock(knex)
     const blockNumber = SYNCED_BLOCK_NUMBER
 
@@ -67,36 +67,18 @@ describe("freeze functionality", function () {
     // The exchange should be frozen now!
     expect(await contract.isFrozen()).toEqual(true)
 
-
-  });
-
-  it("should be able to call verifyEscape", async function () {
-    const escapeVerifierAddress = getEnv('ESCAPE_VERIFIER_ADDRESS')
-    const blockNumber = SYNCED_BLOCK_NUMBER
-
-    // Fork the mainnet at the block to which explorer is synced
-    await forkNetworkAtBlock(blockNumber)
-
-    // Prepare the perpetual contract
-    const provider = new ethers.providers.Web3Provider(network.provider as any)
-
-    // Impersonate the user
-    const ethereumAddress = '0x271bdA3c58B9C1e6016d1256Dad1C8C3Ca0590eF'
-    await helpers.impersonateAccount(ethereumAddress)
-
-    // Give them some eth for gas
-    await helpers.setBalance(ethereumAddress, 5n * (10n ** 18n))
-
-    // Prepare an escape request for position #1
+    // Send an escape request for position #1
     const escapeVerifierAbi = [
       "function identify() external pure returns (string)",
       "function verifyEscape(uint256[],uint256,uint256[]) external"
     ]
-    const escapeVerifier = new ethers.Contract(escapeVerifierAddress, escapeVerifierAbi, provider)
-    const signer = provider.getSigner(ethereumAddress); // Use the correct signer here
-    const contractWithSigner = escapeVerifier.connect(signer);
-    // console.log(await contractWithSigner.identify())
-    await contractWithSigner.verifyEscape(merkleProofForPos1, 0, programOutput, { gasLimit: 10000000n})//programOutput)
+    const escapeVerifierWithSigner = new ethers.Contract(escapeVerifierAddress, escapeVerifierAbi, signer)
+    await escapeVerifierWithSigner.verifyEscape(merkleProofForPos1, 0, programOutput)
+
+    // Just make sure that sending wrong merkle proof fails
+    const wrongMerkleProof = [...merkleProofForPos1] // make a copy
+    wrongMerkleProof[20] = '0x1234' // change a random element
+    await expect(escapeVerifierWithSigner.verifyEscape(wrongMerkleProof, 0, programOutput)).toBeRejected()
   });
 });
 
