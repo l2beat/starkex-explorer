@@ -45,6 +45,7 @@ describe("freeze functionality", function () {
       "function freezeRequest(uint256,uint256,uint256) external",
       "function escape(uint256,uint256,uint256) external",
       "function withdraw(uint256,uint256) external",
+      "function FREEZE_GRACE_PERIOD() view returns (uint256)",
       "event LogWithdrawalAllowed(uint256 ownerKey, uint256 assetType, uint256 nonQuantizedAmount, uint256 quantizedAmount)"
     ]
     const perpetualContract = new ethers.Contract(perpetualAddress, abi, provider)
@@ -73,8 +74,13 @@ describe("freeze functionality", function () {
     // Send freeze request (it should fail, it's too soon)
     await expect(perpetualContractWithSigner.freezeRequest(starkKey, positionId, quantizedAmount)).toBeRejected()
 
-    // Mine 20 blocks with 1 day interval (7 days is the limit to freeze)
-    await helpers.mine(20, { interval: 24 * 60 * 60 })
+    // Make sure the freeze grace period is 14 days
+    const freezeGracePeriod = (await perpetualContract.FREEZE_GRACE_PERIOD()).toNumber()
+    expect(freezeGracePeriod).toEqual(14 * 24 * 60 * 60)
+
+    // Mine 15 blocks with 1 day interval (14 days is the limit to freeze)
+    // (the first block is mined with standard interval, so we mine +1)
+    await helpers.mine(15, { interval: 24 * 60 * 60 })
 
     // Send freeze request (it should work now)
     await perpetualContractWithSigner.freezeRequest(starkKey, positionId, quantizedAmount)
