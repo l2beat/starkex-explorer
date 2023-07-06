@@ -15,6 +15,17 @@ async function forkNetworkAtBlock(blockNumber: number) {
     await helpers.reset(url, blockNumber);
 }
 
+// This test triggers a starkex freeze and funds escape by:
+// - forking the mainnet
+// - impersonating owner of position #1
+// - sending forcedWithdrawalRequest
+// - waiting over 7 days (by mining blocks on the fork) to trigger freeze conditions
+// - sending freezeRequest()
+// - sending verifyEscape()
+// - sending escape()
+// - sending withdraw()
+// - checking that the funds were transfered to the user's account
+// and performs some additional checks along the way
 describe("freeze functionality", function () {
   it("should trigger freeze and escape successfully", async function () {
     const perpetualAddress = getEnv('PERPETUAL_ADDRESS')
