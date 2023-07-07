@@ -50,6 +50,6 @@ export function getApexMainnetConfig(): StarkexConfig {
         '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d'
       ),
       price: 1_000_000n,
-    }
+    },
   }
 }
