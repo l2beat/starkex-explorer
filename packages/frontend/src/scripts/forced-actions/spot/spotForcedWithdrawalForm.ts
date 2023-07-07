@@ -5,9 +5,12 @@ import { SPOT_FORCED_WITHDRAWAL_FORM_ID } from '../../../view'
 import { NewForcedActionFormProps } from '../../../view/pages/forced-actions/NewForcedActionFormProps'
 import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
+import { makeQuery } from '../../utils/query'
 
 export function initSpotForcedWithdrawalForm() {
-  const form = document.getElementById(SPOT_FORCED_WITHDRAWAL_FORM_ID)
+  const { $ } = makeQuery(document.body)
+
+  const form = $.maybe(`#${SPOT_FORCED_WITHDRAWAL_FORM_ID}`)
   if (!form) {
     return
   }

@@ -36,6 +36,7 @@ export function Table(props: TableProps) {
                   'bg-gray-800 px-2 first:rounded-l first:pl-4 last:rounded-r last:pr-4 sm:px-2.5 sm:first:pl-5 sm:last:pr-5',
                   column.numeric && 'text-right',
                   column.align === 'center' && 'text-center',
+                  column.minimalWidth && 'w-0',
                   alignLastColumnRight && 'last:w-0'
                 )}
               >

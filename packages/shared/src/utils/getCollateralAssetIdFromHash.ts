@@ -3,7 +3,7 @@ import { AssetHash } from '@explorer/types'
 import { CollateralAsset } from '../CollateralAsset'
 
 export function getCollateralAssetIdFromHash(
-  hash: string,
+  hash: string | AssetHash,
   collateralAsset: CollateralAsset
 ) {
   if (AssetHash(hash.toString()) !== collateralAsset.assetHash) {

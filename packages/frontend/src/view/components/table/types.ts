@@ -10,5 +10,6 @@ export interface Column {
   numeric?: boolean
   monospace?: boolean
   align?: 'center'
+  minimalWidth?: boolean
   className?: string
 }

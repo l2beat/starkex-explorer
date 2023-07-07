@@ -1,20 +1,24 @@
+import {
+  PerpetualL2MultiTransactionData,
+  PerpetualL2TransactionData,
+} from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
 
+import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
 import {
   decodeTransactionData,
   encodeL2TransactionData,
-  L2TransactionData,
-  MultiL2TransactionData,
-} from './L2Transaction'
+} from './PerpetualL2Transaction'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
 interface Record<
-  T extends L2TransactionData['type'] = L2TransactionData['type']
+  T extends PerpetualL2TransactionData['type'] = PerpetualL2TransactionData['type']
 > {
+  id: number
   transactionId: number
   stateUpdateId: number
   blockNumber: number
@@ -22,19 +26,37 @@ interface Record<
   state: 'alternative' | 'replaced' | undefined
   starkKeyA: StarkKey | undefined
   starkKeyB: StarkKey | undefined
-  type: T
-  data: Extract<L2TransactionData, { type: T }>
+  data: Extract<PerpetualL2TransactionData, { type: T }>
 }
 
-export type { Record as L2TransactionRecord }
+interface AggregatedRecord {
+  id: number
+  transactionId: number
+  stateUpdateId: number
+  blockNumber: number
+  originalTransaction: PerpetualL2TransactionData
+  alternativeTransactions: PerpetualL2TransactionData[]
+}
+
+export type {
+  AggregatedRecord as AggregatedL2TransactionRecord,
+  Record as L2TransactionRecord,
+}
 
 export class L2TransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
     /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
+    this.countAllDistinctTransactionIds = this.wrapAny(
+      this.countAllDistinctTransactionIds
+    )
+    this.countAllUserSpecific = this.wrapAny(this.countAllUserSpecific)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
+    this.getPaginatedWithoutMulti = this.wrapGet(this.getPaginatedWithoutMulti)
+    this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
     this.findById = this.wrapFind(this.findById)
+    this.findByTransactionId = this.wrapFind(this.findByTransactionId)
     this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
     this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -45,7 +67,7 @@ export class L2TransactionRepository extends BaseRepository {
     transactionId: number
     stateUpdateId: number
     blockNumber: number
-    data: L2TransactionData
+    data: PerpetualL2TransactionData
   }): Promise<number> {
     const knex = await this.knex()
 
@@ -77,7 +99,7 @@ export class L2TransactionRepository extends BaseRepository {
       stateUpdateId: number
       blockNumber: number
       isAlternative: boolean
-      data: Exclude<L2TransactionData, MultiL2TransactionData>
+      data: Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
       parentId?: number
     },
     knex: Knex
@@ -107,7 +129,7 @@ export class L2TransactionRepository extends BaseRepository {
       stateUpdateId: number
       blockNumber: number
       isAlternative: boolean
-      data: MultiL2TransactionData
+      data: PerpetualL2MultiTransactionData
     },
     knex: Knex
   ) {
@@ -143,6 +165,38 @@ export class L2TransactionRepository extends BaseRepository {
     return parentId
   }
 
+  async countAllDistinctTransactionIds() {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions').countDistinct(
+      'transaction_id'
+    )
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async countAllDistinctTransactionIdsByStateUpdateId(stateUpdateId: number) {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions')
+      .where({ state_update_id: stateUpdateId })
+      .countDistinct('transaction_id')
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async countAllUserSpecific(starkKey: StarkKey) {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions')
+      .where({
+        stark_key_a: starkKey.toString(),
+      })
+      .orWhere({
+        stark_key_b: starkKey.toString(),
+      })
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
   async countByTransactionId(transactionId: number): Promise<number> {
     const knex = await this.knex()
     const [result] = await knex('l2_transactions')
@@ -150,7 +204,55 @@ export class L2TransactionRepository extends BaseRepository {
       .where({ transaction_id: transactionId, parent_id: null })
       .count()
 
-    return Number(result?.count ?? 0)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async getPaginatedWithoutMulti({ offset, limit }: PaginationOptions) {
+    const knex = await this.knex()
+    const rows = await knex('l2_transactions')
+      // We filter out the multi transactions because we show the child transactions instead
+      .whereNot({ type: 'MultiTransaction' })
+      .orderBy('id', 'desc')
+      .offset(offset)
+      .limit(limit)
+
+    return rows.map(toRecord)
+  }
+
+  async getUserSpecificPaginated(
+    starkKey: StarkKey,
+    { offset, limit }: PaginationOptions
+  ) {
+    const knex = await this.knex()
+    // We do not need to filter multi transactions because they are not user specific
+    const rows = await knex('l2_transactions')
+      .where({
+        stark_key_a: starkKey.toString(),
+      })
+      .orWhere({
+        stark_key_b: starkKey.toString(),
+      })
+      .orderBy('id', 'desc')
+      .limit(limit)
+      .offset(offset)
+    return rows.map(toRecord)
+  }
+
+  async getPaginatedWithoutMultiByStateUpdateId(
+    stateUpdateId: number,
+    { offset, limit }: PaginationOptions
+  ) {
+    const knex = await this.knex()
+    const rows = await knex('l2_transactions')
+      .where({ state_update_id: stateUpdateId })
+      // We filter out the multi transactions because we show the child transactions instead
+      .andWhereNot({ type: 'MultiTransaction' })
+      .orderBy('id', 'desc')
+      .offset(offset)
+      .limit(limit)
+
+    return rows.map(toRecord)
   }
 
   async findById(id: number): Promise<Record | undefined> {
@@ -158,6 +260,28 @@ export class L2TransactionRepository extends BaseRepository {
     const row = await knex('l2_transactions').where({ id }).first()
 
     return row ? toRecord(row) : undefined
+  }
+
+  async findByTransactionId(id: number): Promise<AggregatedRecord | undefined> {
+    const knex = await this.knex()
+    const originalTransaction = await knex('l2_transactions')
+      .where({ transaction_id: id, parent_id: null })
+      .orderBy('id', 'asc')
+      .first()
+
+    if (!originalTransaction) {
+      return undefined
+    }
+
+    const alternativeTransactions = await knex('l2_transactions')
+      .where({
+        transaction_id: id,
+        parent_id: null,
+        state: 'alternative',
+      })
+      .orderBy('id', 'asc')
+
+    return toAggregatedRecord(originalTransaction, alternativeTransactions)
   }
 
   async findLatestStateUpdateId(): Promise<number | undefined> {
@@ -185,6 +309,7 @@ export class L2TransactionRepository extends BaseRepository {
 
 function toRecord(row: L2TransactionRow): Record {
   return {
+    id: row.id,
     transactionId: row.transaction_id,
     stateUpdateId: row.state_update_id,
     blockNumber: row.block_number,
@@ -192,7 +317,22 @@ function toRecord(row: L2TransactionRow): Record {
     state: row.state ? row.state : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
-    type: row.type as L2TransactionData['type'],
     data: decodeTransactionData(row.data),
+  }
+}
+
+function toAggregatedRecord(
+  transaction: L2TransactionRow,
+  alternatives: L2TransactionRow[]
+): AggregatedRecord {
+  return {
+    id: transaction.id,
+    transactionId: transaction.transaction_id,
+    stateUpdateId: transaction.state_update_id,
+    blockNumber: transaction.block_number,
+    originalTransaction: decodeTransactionData(transaction.data),
+    alternativeTransactions: alternatives.map((alternative) =>
+      decodeTransactionData(alternative.data)
+    ),
   }
 }

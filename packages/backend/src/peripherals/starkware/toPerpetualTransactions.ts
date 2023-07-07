@@ -1,5 +1,9 @@
 import { decodeAssetId } from '@explorer/encoding'
-import { assertUnreachable } from '@explorer/shared'
+import {
+  assertUnreachable,
+  PerpetualL2MultiTransactionData,
+  PerpetualL2TransactionData,
+} from '@explorer/shared'
 import {
   AssetHash,
   EthereumAddress,
@@ -9,22 +13,17 @@ import {
 } from '@explorer/types'
 
 import {
-  L2TransactionData,
-  MultiL2TransactionData,
-} from '../database/L2Transaction'
-import {
   AssetOraclePrice,
-  L2Transaction as TransactionSchema,
   OrderTypeResponse,
-  PerpetualL2TransactionResponse,
+  PerpetualL2Transaction as TransactionSchema,
   SignatureResponse,
   SignedOraclePrice,
-} from './schema'
-
+} from './schema/PerpetualBatchInfoResponse'
+import { PerpetualL2TransactionResponse } from './schema/PerpetualL2TransactionResponse'
 export interface PerpetualL2Transaction {
   thirdPartyId: number
   transactionId: number
-  transaction: L2TransactionData
+  transaction: PerpetualL2TransactionData
 }
 
 export function toPerpetualL2Transactions(
@@ -41,7 +40,7 @@ export function toPerpetualL2Transactions(
 
 export function toPerpetualL2TransactionData(
   tx: TransactionSchema
-): L2TransactionData {
+): PerpetualL2TransactionData {
   return tx.type === 'MULTI_TRANSACTION'
     ? toPerpetualMultiTransaction(tx)
     : toPerpetualTransaction(tx)
@@ -49,7 +48,7 @@ export function toPerpetualL2TransactionData(
 
 export function toPerpetualTransaction(
   tx: Exclude<TransactionSchema, { type: 'MULTI_TRANSACTION' }>
-): Exclude<L2TransactionData, MultiL2TransactionData> {
+): Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData> {
   switch (tx.type) {
     case 'DEPOSIT': {
       return {
@@ -228,7 +227,7 @@ export function toPerpetualTransaction(
 
 export function toPerpetualMultiTransaction(
   tx: Extract<TransactionSchema, { type: 'MULTI_TRANSACTION' }>
-): MultiL2TransactionData {
+): PerpetualL2MultiTransactionData {
   return {
     type: 'MultiTransaction',
     transactions: tx.txs.map(toPerpetualTransaction),

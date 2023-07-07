@@ -2,12 +2,13 @@ import { expect, mockFn, mockObject } from 'earl'
 
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import {
-  EXAMPLE_PERPETUAL_BATCH,
-  EXAMPLE_SPOT_BATCH,
+  EXAMPLE_PERPETUAL_BATCH_DATA,
+  EXAMPLE_SPOT_BATCH_DATA,
 } from '../../test/starkwareData'
 import { AvailabilityGatewayClient } from './AvailabilityGatewayClient'
 import { FetchClient } from './FetchClient'
-import { PerpetualBatchDataResponse, SpotBatchDataResponse } from './schema'
+import { PerpetualBatchDataResponse } from './schema/PerpetualBatchDataResponse'
+import { SpotBatchDataResponse } from './schema/SpotBatchDataResponse'
 import { toPerpetualBatchData } from './toPerpetualBatchData'
 import { toSpotBatchData } from './toSpotBatchData'
 
@@ -27,7 +28,7 @@ describe(AvailabilityGatewayClient.name, () => {
       it('should fetch batch and parse it to perpetual batch', async () => {
         const fetchClient = mockObject<FetchClient>({
           fetchRetry: mockFn().resolvesTo({
-            json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_BATCH),
+            json: mockFn().resolvesTo(EXAMPLE_PERPETUAL_BATCH_DATA),
           }),
         })
         const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -47,7 +48,7 @@ describe(AvailabilityGatewayClient.name, () => {
         expect(getUrl).toHaveBeenExhausted()
         expect(response).toEqual(
           toPerpetualBatchData(
-            PerpetualBatchDataResponse.parse(EXAMPLE_PERPETUAL_BATCH)
+            PerpetualBatchDataResponse.parse(EXAMPLE_PERPETUAL_BATCH_DATA)
           )
         )
       })
@@ -55,7 +56,7 @@ describe(AvailabilityGatewayClient.name, () => {
       it('should fetch batch and parse it to spot batch', async () => {
         const fetchClient = mockObject<FetchClient>({
           fetchRetry: mockFn().resolvesTo({
-            json: mockFn().resolvesTo(EXAMPLE_SPOT_BATCH),
+            json: mockFn().resolvesTo(EXAMPLE_SPOT_BATCH_DATA),
           }),
         })
         const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -72,7 +73,7 @@ describe(AvailabilityGatewayClient.name, () => {
         expect(fetchClient.fetchRetry).toHaveBeenExhausted()
         expect(getUrl).toHaveBeenExhausted()
         expect(response).toEqual(
-          toSpotBatchData(SpotBatchDataResponse.parse(EXAMPLE_SPOT_BATCH))
+          toSpotBatchData(SpotBatchDataResponse.parse(EXAMPLE_SPOT_BATCH_DATA))
         )
       })
     }

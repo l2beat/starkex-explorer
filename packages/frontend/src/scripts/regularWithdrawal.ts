@@ -4,11 +4,11 @@ import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
 import { REGULAR_WITHDRAWAL_FORM_ID } from '../view/pages/user/components/RegularWithdrawalForm'
 import { Api } from './peripherals/api'
 import { Wallet } from './peripherals/wallet'
+import { makeQuery } from './utils/query'
 
 export function initRegularWithdrawalForm() {
-  const form = document.querySelector<HTMLFormElement>(
-    `#${REGULAR_WITHDRAWAL_FORM_ID}`
-  )
+  const { $ } = makeQuery(document.body)
+  const form = $.maybe<HTMLFormElement>(`#${REGULAR_WITHDRAWAL_FORM_ID}`)
 
   form?.addEventListener('submit', (e) => {
     e.preventDefault()
