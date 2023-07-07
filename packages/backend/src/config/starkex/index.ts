@@ -1,4 +1,5 @@
 import { getApexGoerliConfig } from './apex-goerli'
+import { getApexMainnetConfig } from './apex-mainnet'
 import { getDydxLocalConfig } from './dydx-local'
 import { getDydxMainnetConfig } from './dydx-mainnet'
 import { getGammaxGoerliConfig } from './gammax-goerli'
@@ -17,6 +18,8 @@ export function getStarkexConfig(chain: string): StarkexConfig {
       return getMyriaGoerliConfig()
     case 'apex-goerli':
       return getApexGoerliConfig()
+    case 'apex-mainnet':
+      return getApexMainnetConfig()
   }
   throw new Error(`Unrecognized chain: ${chain}`)
 }
