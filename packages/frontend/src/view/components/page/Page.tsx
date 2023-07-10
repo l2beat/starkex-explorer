@@ -22,7 +22,11 @@ interface Props {
 
 export function Page(props: Props) {
   return (
-    <html lang="en" className="h-full bg-neutral-900 text-white">
+    <html
+      lang="en"
+      className="h-full bg-neutral-900 text-white"
+      data-chain-id={props.context.chainId}
+    >
       <Head
         description={props.description}
         image={props.image ?? '/images/meta-image.png'}
