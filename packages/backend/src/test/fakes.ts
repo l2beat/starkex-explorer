@@ -1,9 +1,9 @@
 import { ForcedTrade, ForcedWithdrawal, OnChainData } from '@explorer/encoding'
 import {
   CollateralAsset,
+  ERC1155Details,
   ERC20Details,
   ERC721Details,
-  ERC1155Details,
   ETHDetails,
 } from '@explorer/shared'
 import {
@@ -383,21 +383,22 @@ export const fakeCollateralAsset: CollateralAsset = {
   price: 1_000_000n,
 }
 
-export const fakePreprocessedL2TransactionsStatistics =
-  (): PreprocessedL2TransactionsStatistics => {
-    return {
-      depositCount: randomInt(0, 100),
-      withdrawalToAddressCount: randomInt(0, 100),
-      forcedWithdrawalCount: randomInt(0, 100),
-      tradeCount: randomInt(0, 100),
-      forcedTradeCount: randomInt(0, 100),
-      transferCount: randomInt(0, 100),
-      conditionalTransferCount: randomInt(0, 100),
-      liquidateCount: randomInt(0, 100),
-      deleverageCount: randomInt(0, 100),
-      fundingTickCount: randomInt(0, 100),
-      oraclePricesTickCount: randomInt(0, 100),
-      multiTransactionCount: randomInt(0, 100),
-      replacedTransactionsCount: randomInt(0, 100),
-    }
+export const fakePreprocessedL2TransactionsStatistics = (
+  count?: number
+): PreprocessedL2TransactionsStatistics => {
+  return {
+    depositCount: count ?? randomInt(0, 100),
+    withdrawalToAddressCount: count ?? randomInt(0, 100),
+    forcedWithdrawalCount: count ?? randomInt(0, 100),
+    tradeCount: count ?? randomInt(0, 100),
+    forcedTradeCount: count ?? randomInt(0, 100),
+    transferCount: count ?? randomInt(0, 100),
+    conditionalTransferCount: count ?? randomInt(0, 100),
+    liquidateCount: count ?? randomInt(0, 100),
+    deleverageCount: count ?? randomInt(0, 100),
+    fundingTickCount: count ?? randomInt(0, 100),
+    oraclePricesTickCount: count ?? randomInt(0, 100),
+    multiTransactionCount: count ?? randomInt(0, 100),
+    replacedTransactionsCount: count ?? randomInt(0, 100),
   }
+}

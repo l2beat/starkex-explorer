@@ -75,21 +75,33 @@ export class StateDetailsPreprocessor {
           `PreprocessedStateDetails not found for stateUpdateId: ${id}`
         )
 
-      const statistics =
-        await this.l2TransactionRepository.getStatisticsByStateUpdateId(id, trx)
-
-      const prevStatistics =
-        await this.l2TransactionRepository.getStatisticsByStateUpdateId(
+      const previousPreprocessedRecord =
+        await this.preprocessedStateDetailsRepository.findByStateUpdateId(
           id - 1,
           trx
         )
+
+      // Sanity check: previousPreprocessedRecord should exist if it does not exist then something is wrong
+      if (id > 1 && !previousPreprocessedRecord) {
+        throw new Error(
+          `PreprocessedStateDetails not found for stateUpdateId: ${id - 1}`
+        )
+      }
+
+      const statistics =
+        await this.l2TransactionRepository.getStatisticsByStateUpdateId(id, trx)
 
       await this.preprocessedStateDetailsRepository.update(
         {
           id: preprocessedRecord.id,
           l2TransactionsStatistics: statistics,
           cumulativeL2TransactionsStatistics:
-            sumPreprocessedL2TransactionsStatistics(prevStatistics, statistics),
+            previousPreprocessedRecord?.cumulativeL2TransactionsStatistics
+              ? sumPreprocessedL2TransactionsStatistics(
+                  previousPreprocessedRecord.cumulativeL2TransactionsStatistics,
+                  statistics
+                )
+              : statistics,
         },
         trx
       )

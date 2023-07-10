@@ -282,8 +282,11 @@ export class L2TransactionRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async findById(id: number): Promise<Record | undefined> {
-    const knex = await this.knex()
+  async findById(
+    id: number,
+    trx?: Knex.Transaction
+  ): Promise<Record | undefined> {
+    const knex = await this.knex(trx)
     const row = await knex('l2_transactions').where({ id }).first()
 
     return row ? toRecord(row) : undefined
