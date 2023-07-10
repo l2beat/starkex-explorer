@@ -12,6 +12,10 @@ export class Bucket<T> {
     }
   }
 
+  addMany(items: T[]) {
+    this.items.push(...items)
+  }
+
   pick(): T {
     if (this.items.length === 0) {
       this.items = this.picked

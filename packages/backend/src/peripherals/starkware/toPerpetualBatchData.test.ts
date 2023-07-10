@@ -1,8 +1,8 @@
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
 import { expect } from 'earl'
 
-import { EXAMPLE_PERPETUAL_BATCH } from '../../test/starkwareData'
-import { PerpetualBatchDataResponse } from './schema'
+import { EXAMPLE_PERPETUAL_BATCH_DATA } from '../../test/starkwareData'
+import { PerpetualBatchDataResponse } from './schema/PerpetualBatchDataResponse'
 import { toPerpetualBatchData } from './toPerpetualBatchData'
 
 describe(toPerpetualBatchData.name, () => {
@@ -11,7 +11,9 @@ describe(toPerpetualBatchData.name, () => {
   })
 
   it('transforms the parsed batch', () => {
-    const parsed = PerpetualBatchDataResponse.parse(EXAMPLE_PERPETUAL_BATCH)
+    const parsed = PerpetualBatchDataResponse.parse(
+      EXAMPLE_PERPETUAL_BATCH_DATA
+    )
     expect(toPerpetualBatchData(parsed)).toEqual({
       previousBatchId: 1205,
       positionRoot: PedersenHash(

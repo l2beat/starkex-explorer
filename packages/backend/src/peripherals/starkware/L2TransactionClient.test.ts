@@ -4,7 +4,7 @@ import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { EXAMPLE_PERPETUAL_TRANSACTIONS } from '../../test/starkwareData'
 import { FetchClient } from './FetchClient'
 import { L2TransactionClient } from './L2TransactionClient'
-import { PerpetualL2TransactionResponse } from './schema'
+import { PerpetualL2TransactionResponse } from './schema/PerpetualL2TransactionResponse'
 import { toPerpetualL2Transactions } from './toPerpetualTransactions'
 
 describe(L2TransactionClient.name, () => {

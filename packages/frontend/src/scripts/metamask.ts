@@ -4,6 +4,7 @@ import Cookie from 'js-cookie'
 import { z } from 'zod'
 
 import { Registration } from './keys/keys'
+import { makeQuery } from './utils/query'
 
 type UsersInfo = z.infer<typeof UsersInfo>
 const UsersInfo = z.record(
@@ -22,10 +23,9 @@ export const getUsersInfo = (): UsersInfo => {
 
 export function initMetamask() {
   const provider = window.ethereum
+  const { $ } = makeQuery(document.body)
 
-  const connectButton = document.querySelector<HTMLButtonElement>(
-    '#connect-with-metamask'
-  )
+  const connectButton = $.maybe<HTMLButtonElement>('#connect-with-metamask')
   if (connectButton) {
     connectButton.addEventListener('click', () => {
       if (provider) {

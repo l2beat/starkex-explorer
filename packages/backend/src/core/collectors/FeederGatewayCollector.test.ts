@@ -27,6 +27,7 @@ describe(FeederGatewayCollector.name, () => {
       })
       const mockStateUpdateRepository = mockObject<StateUpdateRepository>({
         findById: mockFn(async (id: number) => fakeStateUpdateRecord(id)),
+        findLast: mockFn().resolvesTo(fakeStateUpdateRecord(5)),
       })
       const feederGatewayCollector = new FeederGatewayCollector(
         mockFeederGatewayClient,
@@ -35,7 +36,7 @@ describe(FeederGatewayCollector.name, () => {
         Logger.SILENT
       )
 
-      await feederGatewayCollector.collect(5)
+      await feederGatewayCollector.collect()
 
       expect(
         mockL2TransactionRepository.findLatestStateUpdateId
@@ -106,6 +107,7 @@ describe(FeederGatewayCollector.name, () => {
       })
       const mockStateUpdateRepository = mockObject<StateUpdateRepository>({
         findById: mockFn(async (id: number) => fakeStateUpdateRecord(id)),
+        findLast: mockFn().resolvesTo(fakeStateUpdateRecord(10)),
       })
       const feederGatewayCollector = new FeederGatewayCollector(
         mockFeederGatewayClient,
@@ -114,7 +116,7 @@ describe(FeederGatewayCollector.name, () => {
         Logger.SILENT
       )
 
-      await feederGatewayCollector.collect(10)
+      await feederGatewayCollector.collect()
 
       expect(
         mockL2TransactionRepository.findLatestStateUpdateId
@@ -188,11 +190,12 @@ describe(FeederGatewayCollector.name, () => {
         mockedL2TransactionRepository,
         mockObject<StateUpdateRepository>({
           findById: mockFn().resolvesTo({} as StateUpdateRecord),
+          findLast: mockFn().resolvesTo(fakeStateUpdateRecord(10)),
         }),
         Logger.SILENT
       )
 
-      await feederGatewayCollector.collect(1)
+      await feederGatewayCollector.collect()
 
       expect(mockedL2TransactionRepository.add).not.toHaveBeenCalled()
     })
@@ -200,23 +203,48 @@ describe(FeederGatewayCollector.name, () => {
     it('should stop collecting transactions if there is no state update in db', async () => {
       const mockedL2TransactionRepository = mockObject<L2TransactionRepository>(
         {
-          findLatestStateUpdateId: mockFn().resolvesTo(undefined),
+          findLatestStateUpdateId: mockFn(),
           add: mockFn(),
         }
       )
+      const mockedStateUpdateRepository = mockObject<StateUpdateRepository>({
+        findLast: mockFn().resolvesTo(undefined),
+      })
       const feederGatewayCollector = new FeederGatewayCollector(
         mockObject<FeederGatewayClient>(),
         mockedL2TransactionRepository,
-        mockObject<StateUpdateRepository>({
-          findById: mockFn().resolvesTo(undefined),
-        }),
+        mockedStateUpdateRepository,
         Logger.SILENT
       )
 
-      await feederGatewayCollector.collect(1)
+      await feederGatewayCollector.collect()
 
+      expect(
+        mockedL2TransactionRepository.findLatestStateUpdateId
+      ).not.toHaveBeenCalled()
       expect(mockedL2TransactionRepository.add).not.toHaveBeenCalled()
     })
+  })
+
+  it('should throw error if there is no state update in db for given stateUpdateId', async () => {
+    const mockedL2TransactionRepository = mockObject<L2TransactionRepository>({
+      findLatestStateUpdateId: mockFn().resolvesTo(5),
+      add: mockFn(),
+    })
+    const feederGatewayCollector = new FeederGatewayCollector(
+      mockObject<FeederGatewayClient>(),
+      mockedL2TransactionRepository,
+      mockObject<StateUpdateRepository>({
+        findById: mockFn().resolvesTo(undefined),
+        findLast: mockFn().resolvesTo(fakeStateUpdateRecord(10)),
+      }),
+      Logger.SILENT
+    )
+
+    await expect(feederGatewayCollector.collect()).toBeRejectedWith(
+      `State update 6 not found`
+    )
+    expect(mockedL2TransactionRepository.add).not.toHaveBeenCalled()
   })
 
   describe(FeederGatewayCollector.prototype.discardAfter.name, () => {

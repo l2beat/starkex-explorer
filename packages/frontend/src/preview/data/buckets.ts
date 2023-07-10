@@ -1,7 +1,13 @@
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
 
 import { Asset } from '../../utils/assets'
-import { Bucket } from './bucket'
+import { Bucket } from './Bucket'
+
+export const assetIdBucket = new Bucket<AssetId>()
+assetIdBucket.add(AssetId('USDC-6'))
+assetIdBucket.add(AssetId('ETH-9'))
+assetIdBucket.add(AssetId('BTC-10'))
+assetIdBucket.add(AssetId('LINK-7'))
 
 export const assetBucket = new Bucket<Asset>()
 assetBucket.add({ hashOrId: AssetId('USDC-6') })

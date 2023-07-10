@@ -48,11 +48,10 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     })
 
     await this.processStateTransitions(stateTransitions)
+    await this.feederGatewayCollector?.collect()
   }
 
   async processStateTransitions(stateTransitions: ValidiumStateTransition[]) {
-    let lastStateUpdateId: number | undefined
-
     for (const stateTransition of stateTransitions) {
       const [perpetualCairoOutput, batch] = await Promise.all([
         this.perpetualCairoOutputCollector.collect(
@@ -66,17 +65,11 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
       if (!batch) {
         throw new Error(`Unable to download batch ${stateTransition.batchId}`)
       }
-      const stateUpdate =
-        await this.perpetualValidiumUpdater.processValidiumStateTransition(
-          stateTransition,
-          perpetualCairoOutput,
-          batch
-        )
-      lastStateUpdateId = stateUpdate.id
-    }
-
-    if (lastStateUpdateId) {
-      await this.feederGatewayCollector?.collect(lastStateUpdateId)
+      await this.perpetualValidiumUpdater.processValidiumStateTransition(
+        stateTransition,
+        perpetualCairoOutput,
+        batch
+      )
     }
   }
 

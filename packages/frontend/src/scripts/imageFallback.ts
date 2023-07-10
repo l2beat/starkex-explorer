@@ -1,6 +1,8 @@
+import { makeQuery } from './utils/query'
+
 export function initImageFallback() {
-  const imagesWithFallback =
-    document.querySelectorAll<HTMLImageElement>('img[data-fallback]')
+  const { $$ } = makeQuery(document.body)
+  const imagesWithFallback = $$<HTMLImageElement>('img[data-fallback]')
 
   imagesWithFallback.forEach((image) => {
     image.addEventListener('error', () => {

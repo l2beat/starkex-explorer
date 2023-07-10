@@ -1,6 +1,7 @@
 import { PageContext, PageContextWithUser } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
+import { Tooltip } from '../Tooltip'
 import { Footer } from './Footer'
 import { Head } from './Head'
 import { Navbar } from './Navbar'
@@ -40,6 +41,7 @@ export function Page(props: Props) {
         <Navbar searchBar={!props.withoutSearch} context={props.context} />
         {props.children}
         <Footer />
+        <Tooltip />
         {(props.scripts ?? ['/scripts/main.js']).map((src, i) => (
           <script key={i} src={src} />
         ))}

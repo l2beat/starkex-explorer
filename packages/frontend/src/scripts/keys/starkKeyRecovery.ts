@@ -4,10 +4,13 @@ import Cookie from 'js-cookie'
 
 import { RECOVER_STARK_KEY_BUTTON_ID } from '../../view'
 import { getUsersInfo } from '../metamask'
+import { makeQuery } from '../utils/query'
 import { RecoveredKeys, recoverKeysDydx, recoverKeysMyria } from './recovery'
 
 export function initStarkKeyRecovery() {
-  const registerButton = document.getElementById(RECOVER_STARK_KEY_BUTTON_ID)
+  const { $ } = makeQuery(document.body)
+
+  const registerButton = $.maybe(`#${RECOVER_STARK_KEY_BUTTON_ID}`)
   const cookieAccount = Cookie.get('account')
   const account = cookieAccount ? EthereumAddress(cookieAccount) : undefined
 

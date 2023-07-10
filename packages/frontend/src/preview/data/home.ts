@@ -1,7 +1,7 @@
 import { Hash256 } from '@explorer/types'
 
 import { HomeStateUpdateEntry, OfferEntry, TransactionEntry } from '../../view'
-import { Bucket } from './bucket'
+import { Bucket } from './Bucket'
 import { amountBucket, assetBucket } from './buckets'
 import { randomId, randomInt, randomTimestamp } from './utils'
 

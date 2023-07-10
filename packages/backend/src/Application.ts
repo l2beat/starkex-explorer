@@ -5,6 +5,7 @@ import { ApiServer } from './api/ApiServer'
 import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { HomeController } from './api/controllers/HomeController'
+import { L2TransactionController } from './api/controllers/L2TransactionController'
 import { MerkleProofController } from './api/controllers/MerkleProofController'
 import { SearchController } from './api/controllers/SearchController'
 import { StateUpdateController } from './api/controllers/StateUpdateController'
@@ -88,6 +89,7 @@ import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient
 import { FetchClient } from './peripherals/starkware/FetchClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
+import { shouldShowL2Transactions } from './utils/shouldShowL2Transactions'
 
 export class Application {
   start: () => Promise<void>
@@ -155,6 +157,11 @@ export class Application {
     )
     const assetRepository = new AssetRepository(database, logger)
     const withdrawableAssetRepository = new WithdrawableAssetRepository(
+      database,
+      logger
+    )
+
+    const l2TransactionRepository = new L2TransactionRepository(
       database,
       logger
     )
@@ -234,10 +241,7 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         stateTransitionCollector = perpetualValidiumStateTransitionCollector
-        const transactionRepository = new L2TransactionRepository(
-          database,
-          logger
-        )
+
         const feederGatewayClient = config.starkex.feederGateway
           ? new FeederGatewayClient(
               config.starkex.feederGateway,
@@ -248,7 +252,7 @@ export class Application {
         feederGatewayCollector = feederGatewayClient
           ? new FeederGatewayCollector(
               feederGatewayClient,
-              transactionRepository,
+              l2TransactionRepository,
               stateUpdateRepository,
               logger
             )
@@ -523,13 +527,16 @@ export class Application {
 
     // #endregion core
     // #region api
+    const showL2Transactions = shouldShowL2Transactions(config)
     const homeController = new HomeController(
       pageContextService,
       assetDetailsService,
       forcedTradeOfferViewService,
       userTransactionRepository,
       forcedTradeOfferRepository,
-      preprocessedStateDetailsRepository
+      l2TransactionRepository,
+      preprocessedStateDetailsRepository,
+      showL2Transactions
     )
 
     const userController = new UserController(
@@ -539,19 +546,22 @@ export class Application {
       sentTransactionRepository,
       userTransactionRepository,
       forcedTradeOfferRepository,
+      l2TransactionRepository,
       userRegistrationEventRepository,
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
       config.starkex.contracts.perpetual,
-      collateralAsset
+      showL2Transactions
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,
       assetDetailsService,
       stateUpdateRepository,
       userTransactionRepository,
-      preprocessedAssetHistoryRepository
+      l2TransactionRepository,
+      preprocessedAssetHistoryRepository,
+      showL2Transactions
     )
     const transactionController = new TransactionController(
       pageContextService,
@@ -574,6 +584,11 @@ export class Application {
       userRegistrationEventRepository,
       preprocessedAssetHistoryRepository,
       config.starkex.tradingMode
+    )
+
+    const l2TransactionController = new L2TransactionController(
+      pageContextService,
+      l2TransactionRepository
     )
 
     const userTransactionController = new TransactionSubmitController(
@@ -601,9 +616,9 @@ export class Application {
           forcedActionsController,
           forcedTradeOfferController,
           merkleProofController,
-          collateralAsset,
-          config.starkex.tradingMode,
-          searchController
+          searchController,
+          l2TransactionController,
+          config
         ),
         createTransactionRouter(
           forcedTradeOfferController,

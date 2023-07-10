@@ -4,9 +4,9 @@ import React from 'react'
 import { Asset } from '../../../../utils/assets'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { ArrowRightIcon } from '../../../assets/icons/ArrowIcon'
-import { Link } from '../../../components/Link'
+import { AssetAmountCard } from '../../../components/AssetAmountCard'
+import { EtherscanLink } from '../../../components/EtherscanLink'
 import { StatusBadge, StatusType } from '../../../components/StatusBadge'
-import { AmountContainer } from './AmountContainer'
 import { TransactionField } from './TransactionField'
 
 interface TransactionOverviewProps {
@@ -60,32 +60,28 @@ export function TransactionOverview(props: TransactionOverviewProps) {
       </div>
       {props.transactionHash && (
         <TransactionField label="Transaction hash">
-          <Link
-            href={`https://etherscan.io/tx/${props.transactionHash.toString()}`}
-          >
+          <EtherscanLink txHash={props.transactionHash.toString()} type="tx">
             {props.transactionHash.toString()}
-          </Link>
+          </EtherscanLink>
         </TransactionField>
       )}
       {props.value && (
-        <AmountContainer
+        <AssetAmountCard
           className="w-1/2"
-          amountLabel="Amount"
           amount={props.value.amount}
-          assetLabel="Asset"
           asset={props.value.asset}
         />
       )}
       {props.trade && (
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <AmountContainer
+          <AssetAmountCard
             amountLabel="Offered amount"
             amount={props.trade.offeredAmount}
             assetLabel="Offered asset"
             asset={props.trade.offeredAsset}
           />
           <ArrowRightIcon className="rounded bg-slate-800 text-zinc-500" />
-          <AmountContainer
+          <AssetAmountCard
             amountLabel="Received amount"
             amount={props.trade.receivedAmount}
             assetLabel="Received asset"

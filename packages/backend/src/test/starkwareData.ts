@@ -1,4 +1,4 @@
-export const EXAMPLE_PERPETUAL_BATCH = {
+export const EXAMPLE_PERPETUAL_BATCH_DATA = {
   update: {
     orders: {
       '33763544854418327': { fulfilled_amount: '10000000' },
@@ -44,7 +44,7 @@ export const EXAMPLE_PERPETUAL_BATCH = {
   },
 }
 
-export const EXAMPLE_SPOT_BATCH = {
+export const EXAMPLE_SPOT_BATCH_DATA = {
   update: {
     vaults: {
       '272051': {

@@ -13,3 +13,11 @@ export const getTransactionTableProps = (id: string) => ({
   path: `/state-updates/${id}/transactions`,
   description: `Transactions included in #${id} state update`,
 })
+
+export const getL2TransactionTableProps = (id: string) => ({
+  title: 'L2 transactions',
+  entryShortNamePlural: 'transactions',
+  entryLongNamePlural: 'L2 transactions',
+  path: `/state-updates/${id}/l2-transactions`,
+  description: `L2 transactions included in #${id} state update`,
+})
