@@ -4,6 +4,7 @@ import { PreprocessedStateDetailsRow } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
+import { PreprocessedL2TransactionsStatistics } from './PreprocessedL2TransactionsStatistics'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -16,10 +17,10 @@ export interface PreprocessedStateDetailsRecord {
   timestamp: Timestamp
   assetUpdateCount: number
   forcedTransactionCount: number
-  l2TransactionCount?: number
-  l2ReplacedTransactionCount?: number
-  l2MultiTransactionCount?: number
+  l2TransactionsStatistics?: PreprocessedL2TransactionsStatistics
+  cumulativeL2TransactionsStatistics?: PreprocessedL2TransactionsStatistics
 }
+
 export class PreprocessedStateDetailsRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
@@ -29,8 +30,8 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     this.countAll = this.wrapAny(this.countAll)
     this.findById = this.wrapFind(this.findById)
     this.findByStateUpdateId = this.wrapFind(this.findByStateUpdateId)
-    this.findLastWithL2TransactionCount = this.wrapFind(
-      this.findLastWithL2TransactionCount
+    this.findLastWithL2TransactionsStatistics = this.wrapFind(
+      this.findLastWithL2TransactionsStatistics
     )
     this.getPaginated = this.wrapGet(this.getPaginated)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -95,10 +96,10 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     return rows.map((r) => toPreprocessedStateDetailsRecord(r))
   }
 
-  async findLastWithL2TransactionCount(trx: Knex.Transaction) {
+  async findLastWithL2TransactionsStatistics(trx: Knex.Transaction) {
     const knex = await this.knex(trx)
     const [result] = await knex('preprocessed_state_details')
-      .whereNotNull('l2_transaction_count')
+      .whereNotNull('l2_transactions_statistics')
       .orderBy('state_update_id', 'desc')
       .limit(1)
 
@@ -142,9 +143,9 @@ function toPreprocessedStateDetailsRecord(
     timestamp: Timestamp(row.timestamp),
     assetUpdateCount: row.asset_update_count,
     forcedTransactionCount: row.forced_transaction_count,
-    l2TransactionCount: row.l2_transaction_count ?? undefined,
-    l2ReplacedTransactionCount: row.l2_replaced_transaction_count ?? undefined,
-    l2MultiTransactionCount: row.l2_multi_transaction_count ?? undefined,
+    l2TransactionsStatistics: row.l2_transactions_statistics ?? undefined,
+    cumulativeL2TransactionsStatistics:
+      row.cumulative_l2_transactions_statistics ?? undefined,
   }
 }
 
@@ -159,9 +160,9 @@ function toPreprocessedStateDetailsRow(
     timestamp: BigInt(record.timestamp.toString()),
     asset_update_count: record.assetUpdateCount,
     forced_transaction_count: record.forcedTransactionCount,
-    l2_transaction_count: record.l2TransactionCount ?? null,
-    l2_replaced_transaction_count: record.l2ReplacedTransactionCount ?? null,
-    l2_multi_transaction_count: record.l2MultiTransactionCount ?? null,
+    l2_transactions_statistics: record.l2TransactionsStatistics ?? null,
+    cumulative_l2_transactions_statistics:
+      record.cumulativeL2TransactionsStatistics ?? null,
   }
 }
 
@@ -183,8 +184,8 @@ function toPartialPreprocessedStateDetailsRow(
       : undefined,
     asset_update_count: record.assetUpdateCount,
     forced_transaction_count: record.forcedTransactionCount,
-    l2_transaction_count: record.l2TransactionCount ?? null,
-    l2_replaced_transaction_count: record.l2ReplacedTransactionCount ?? null,
-    l2_multi_transaction_count: record.l2MultiTransactionCount ?? null,
+    l2_transactions_statistics: record.l2TransactionsStatistics,
+    cumulative_l2_transactions_statistics:
+      record.cumulativeL2TransactionsStatistics,
   }
 }

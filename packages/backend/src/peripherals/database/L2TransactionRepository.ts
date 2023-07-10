@@ -12,6 +12,7 @@ import {
   decodeTransactionData,
   encodeL2TransactionData,
 } from './PerpetualL2Transaction'
+import { PreprocessedL2TransactionsStatistics } from './PreprocessedL2TransactionsStatistics'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -186,31 +187,27 @@ export class L2TransactionRepository extends BaseRepository {
   async getStatisticsByStateUpdateId(
     stateUpdateId: number,
     trx?: Knex.Transaction
-  ): Promise<{
-    l2TransactionCount: number
-    l2ReplacedTransactionCount: number
-    l2MultiTransactionCount: number
-  }> {
+  ): Promise<PreprocessedL2TransactionsStatistics> {
     const knex = await this.knex(trx)
-    const [all] = await knex('l2_transactions')
+
+    const countGroupedByType = (await knex('l2_transactions')
+      .select('type')
       .where({ state_update_id: stateUpdateId })
       .count()
+      .groupBy('type')) as {
+      type: PerpetualL2TransactionData['type']
+      count: number
+    }[]
 
     const [replaced] = await knex('l2_transactions')
       .where({ state_update_id: stateUpdateId })
       .andWhere({ state: 'replaced' })
       .count()
 
-    const [multi] = await knex('l2_transactions')
-      .where({ state_update_id: stateUpdateId })
-      .andWhere({ type: 'MultiTransaction' })
-      .count()
-
-    return {
-      l2TransactionCount: Number(all?.count ?? 0),
-      l2ReplacedTransactionCount: Number(replaced?.count ?? 0),
-      l2MultiTransactionCount: Number(multi?.count ?? 0),
-    }
+    return toPreprocessedL2TransactionsStatistics(
+      countGroupedByType,
+      Number(replaced?.count ?? 0)
+    )
   }
 
   async countAllUserSpecific(starkKey: StarkKey) {
@@ -366,5 +363,55 @@ function toAggregatedRecord(
     alternativeTransactions: alternatives.map((alternative) =>
       decodeTransactionData(alternative.data)
     ),
+  }
+}
+
+function toPreprocessedL2TransactionsStatistics(
+  countGroupedByType: {
+    type: PerpetualL2TransactionData['type']
+    count: number
+  }[],
+  replacedCount: number
+): PreprocessedL2TransactionsStatistics {
+  return {
+    depositCount: Number(
+      countGroupedByType.find((x) => x.type === 'Deposit')?.count ?? 0
+    ),
+    withdrawalToAddressCount: Number(
+      countGroupedByType.find((x) => x.type === 'WithdrawalToAddress')?.count ??
+        0
+    ),
+    forcedWithdrawalCount: Number(
+      countGroupedByType.find((x) => x.type === 'ForcedWithdrawal')?.count ?? 0
+    ),
+    tradeCount: Number(
+      countGroupedByType.find((x) => x.type === 'Trade')?.count ?? 0
+    ),
+    forcedTradeCount: Number(
+      countGroupedByType.find((x) => x.type === 'ForcedTrade')?.count ?? 0
+    ),
+    transferCount: Number(
+      countGroupedByType.find((x) => x.type === 'Transfer')?.count ?? 0
+    ),
+    conditionalTransferCount: Number(
+      countGroupedByType.find((x) => x.type === 'ConditionalTransfer')?.count ??
+        0
+    ),
+    liquidateCount: Number(
+      countGroupedByType.find((x) => x.type === 'Liquidate')?.count ?? 0
+    ),
+    deleverageCount: Number(
+      countGroupedByType.find((x) => x.type === 'Deleverage')?.count ?? 0
+    ),
+    fundingTickCount: Number(
+      countGroupedByType.find((x) => x.type === 'FundingTick')?.count ?? 0
+    ),
+    oraclePricesTickCount: Number(
+      countGroupedByType.find((x) => x.type === 'OraclePricesTick')?.count ?? 0
+    ),
+    multiTransactionCount: Number(
+      countGroupedByType.find((x) => x.type === 'MultiTransaction')?.count ?? 0
+    ),
+    replacedTransactionsCount: replacedCount,
   }
 }

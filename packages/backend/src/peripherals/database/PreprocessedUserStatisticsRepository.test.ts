@@ -95,9 +95,7 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
       ...mostRecent,
       id,
       prevHistoryId: undefined,
-      l2MultiTransactionCount: undefined,
-      l2ReplacedTransactionCount: undefined,
-      l2TransactionCount: undefined,
+      l2TransactionsStatistics: undefined,
     })
   })
 

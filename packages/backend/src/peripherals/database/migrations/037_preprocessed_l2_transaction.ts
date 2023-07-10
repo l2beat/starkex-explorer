@@ -12,30 +12,26 @@ should create a new migration file that fixes the issue.
 */
 import { Knex } from 'knex'
 
-const tableNames = [
-  'preprocessed_state_details',
-  'preprocessed_user_statistics',
-]
-const columnNames = [
-  'l2_transaction_count',
-  'l2_replaced_transaction_count',
-  'l2_multi_transaction_count',
-]
-
 export async function up(knex: Knex) {
-  for (const tableName of tableNames) {
-    await knex.schema.alterTable(tableName, (table) => {
-      columnNames.forEach((columnName) => {
-        table.integer(columnName).nullable()
-      })
-    })
-  }
+  await knex.schema.alterTable('preprocessed_state_details', (table) => {
+    table.jsonb('l2_transactions_statistics')
+    table.jsonb('cumulative_l2_transactions_statistics')
+  })
+
+  await knex.schema.alterTable('preprocessed_user_statistics', (table) => {
+    table.jsonb('l2_transactions_statistics')
+  })
 }
 
 export async function down(knex: Knex) {
-  for (const tableName of tableNames) {
-    await knex.schema.alterTable(tableName, (table) => {
-      table.dropColumns(...columnNames)
-    })
-  }
+  await knex.schema.alterTable('preprocessed_state_details', (table) => {
+    table.dropColumns(
+      'l2_transactions_statistics',
+      'cumulative_l2_transactions_statistics'
+    )
+  })
+
+  await knex.schema.alterTable('preprocessed_user_statistics', (table) => {
+    table.dropColumn('l2_transactions_statistics')
+  })
 }

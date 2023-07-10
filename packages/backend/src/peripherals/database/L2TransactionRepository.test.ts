@@ -945,7 +945,7 @@ describe(L2TransactionRepository.name, () => {
           },
         })
         await repository.add({
-          stateUpdateId: 1,
+          stateUpdateId,
           transactionId: 123456,
           blockNumber: 12345,
           data: {
@@ -979,9 +979,19 @@ describe(L2TransactionRepository.name, () => {
         )
 
         expect(statistics).toEqual({
-          l2TransactionCount: 14,
-          l2ReplacedTransactionCount: 1,
-          l2MultiTransactionCount: 1,
+          depositCount: 12,
+          withdrawalToAddressCount: 1,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 0,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          multiTransactionCount: 1,
+          replacedTransactionsCount: 1,
         })
       })
     }

@@ -2,6 +2,7 @@ import { Knex } from 'knex'
 
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import { sumPreprocessedL2TransactionsStatistics } from '../../peripherals/database/PreprocessedL2TransactionsStatistics'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
@@ -45,7 +46,7 @@ export class StateDetailsPreprocessor {
 
   async catchUpL2Transactions(trx: Knex.Transaction, stateUpdateId: number) {
     const lastWithL2TransactionCount =
-      await this.preprocessedStateDetailsRepository.findLastWithL2TransactionCount(
+      await this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(
         trx
       )
 
@@ -77,12 +78,18 @@ export class StateDetailsPreprocessor {
       const statistics =
         await this.l2TransactionRepository.getStatisticsByStateUpdateId(id, trx)
 
+      const prevStatistics =
+        await this.l2TransactionRepository.getStatisticsByStateUpdateId(
+          id - 1,
+          trx
+        )
+
       await this.preprocessedStateDetailsRepository.update(
         {
           id: preprocessedRecord.id,
-          l2TransactionCount: statistics.l2TransactionCount,
-          l2ReplacedTransactionCount: statistics.l2ReplacedTransactionCount,
-          l2MultiTransactionCount: statistics.l2MultiTransactionCount,
+          l2TransactionsStatistics: statistics,
+          cumulativeL2TransactionsStatistics:
+            sumPreprocessedL2TransactionsStatistics(prevStatistics, statistics),
         },
         trx
       )

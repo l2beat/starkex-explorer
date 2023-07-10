@@ -3,6 +3,7 @@ import { expect } from 'earl'
 import { Knex } from 'knex'
 
 import { setupDatabaseTestSuite } from '../../test/database'
+import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
 import { Logger, LogLevel } from '../../tools/Logger'
 import {
   PreprocessedStateDetailsRecord,
@@ -17,9 +18,6 @@ const genericRecord: Omit<PreprocessedStateDetailsRecord, 'id'> = {
   blockNumber: 1_000_000,
   timestamp: Timestamp(900_000_000n),
   assetUpdateCount: 30,
-  l2TransactionCount: 500,
-  l2ReplacedTransactionCount: 1,
-  l2MultiTransactionCount: 3,
   forcedTransactionCount: 2,
 }
 
@@ -137,24 +135,24 @@ describe(PreprocessedStateDetailsRepository.name, () => {
   )
 
   describe(
-    PreprocessedStateDetailsRepository.prototype.findLastWithL2TransactionCount
-      .name,
+    PreprocessedStateDetailsRepository.prototype
+      .findLastWithL2TransactionsStatistics.name,
     () => {
       it('finds last with l2 transaction count', async () => {
-        const id = await repository.add(genericRecord, trx)
-        await repository.add(
-          {
-            ...genericRecord,
-            l2TransactionCount: undefined,
-            l2ReplacedTransactionCount: undefined,
-            l2MultiTransactionCount: undefined,
-          },
+        const lastWithL2TransactionCountRecord = {
+          ...genericRecord,
+          l2TransactionsStatistics: fakePreprocessedL2TransactionsStatistics(),
+          cumulativeL2TransactionsStatistics:
+            fakePreprocessedL2TransactionsStatistics(),
+        }
+        const id = await repository.add(lastWithL2TransactionCountRecord, trx)
+        await repository.add(genericRecord, trx)
+
+        const result = await repository.findLastWithL2TransactionsStatistics(
           trx
         )
 
-        const result = await repository.findLastWithL2TransactionCount(trx)
-
-        expect(result).toEqual({ id, ...genericRecord })
+        expect(result).toEqual({ id, ...lastWithL2TransactionCountRecord })
       })
     }
   )
@@ -163,9 +161,9 @@ describe(PreprocessedStateDetailsRepository.name, () => {
     it('adds, updates, finds by id and state update id', async () => {
       const id = await repository.add(genericRecord, trx)
       const fieldsToUpdate = {
-        l2TransactionCount: 610,
-        l2ReplacedTransactionCount: 5,
-        l2MultiTransactionCount: 10,
+        l2TransactionsStatistics: fakePreprocessedL2TransactionsStatistics(),
+        cumulativeL2TransactionsStatistics:
+          fakePreprocessedL2TransactionsStatistics(),
       }
       const updatedRecord = {
         ...genericRecord,
