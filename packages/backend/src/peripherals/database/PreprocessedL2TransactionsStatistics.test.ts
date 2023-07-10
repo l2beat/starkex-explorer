@@ -1,4 +1,5 @@
 import { expect } from 'earl'
+
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
 import { sumPreprocessedL2TransactionsStatistics } from './PreprocessedL2TransactionsStatistics'
 

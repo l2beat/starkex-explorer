@@ -19,11 +19,9 @@ export function sumPreprocessedL2TransactionsStatistics(
   const res = [a, b].reduce<PreprocessedL2TransactionsStatistics>(
     (result, obj) => {
       for (const k in obj) {
-        if (obj.hasOwnProperty(k)) {
-          result[k as keyof PreprocessedL2TransactionsStatistics] =
-            (result[k as keyof PreprocessedL2TransactionsStatistics] || 0) +
-            obj[k as keyof PreprocessedL2TransactionsStatistics]
-        }
+        result[k as keyof PreprocessedL2TransactionsStatistics] =
+          (result[k as keyof PreprocessedL2TransactionsStatistics] || 0) +
+          obj[k as keyof PreprocessedL2TransactionsStatistics]
       }
       return result
     },
