@@ -59,7 +59,7 @@ export class StateDetailsPreprocessor {
     for (
       let id = lastWithL2TransactionCount?.stateUpdateId
         ? lastWithL2TransactionCount.stateUpdateId + 1
-        : 0;
+        : 1;
       id <= preprocessTo;
       id++
     ) {
