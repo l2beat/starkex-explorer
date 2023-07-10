@@ -46,12 +46,7 @@ function ErrorPage(props: ErrorPageProps) {
   const errorMessage = getErrorMessages(props)
 
   return (
-    <Page
-      path="/"
-      description="Not found page"
-      context={props.context}
-      withoutSearch
-    >
+    <Page path="/" description="Not found page" context={props.context}>
       <ContentWrapper className="flex flex-1 flex-col items-center justify-center">
         <span className="text-[80px] font-extrabold  leading-tight text-brand md:text-[160px]">
           {props.statusCode}
