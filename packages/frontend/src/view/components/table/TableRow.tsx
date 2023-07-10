@@ -18,7 +18,8 @@ export function TableRow(props: TableRowProps) {
       )}
     >
       {props.cells.map((cell, col) => {
-        const { numeric, monospace, className } = props.columns[col] ?? {}
+        const { numeric, monospace, className, minimalWidth } =
+          props.columns[col] ?? {}
 
         return (
           <td
@@ -27,6 +28,7 @@ export function TableRow(props: TableRowProps) {
               !props.link && 'px-2 sm:px-2.5',
               !props.link && col === 0 && 'pl-4 sm:pl-5',
               !props.link && col === props.cells.length - 1 && 'pr-4 sm:pr-5',
+              minimalWidth && 'w-0',
               (numeric || monospace) && 'font-mono',
               numeric && 'text-right',
               props.link &&

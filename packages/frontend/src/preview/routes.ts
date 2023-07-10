@@ -1,10 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import {
-  CollateralAsset,
-  PageContext,
-  PageContextWithUser,
-  UserDetails,
-} from '@explorer/shared'
+import { PageContext, PageContextWithUser, UserDetails } from '@explorer/shared'
 import {
   AssetHash,
   AssetId,
@@ -20,6 +15,7 @@ import Koa from 'koa'
 
 import {
   renderErrorPage,
+  renderHomeL2TransactionsPage,
   renderHomeOffersPage,
   renderHomePage,
   renderHomeStateUpdatesPage,
@@ -43,12 +39,34 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
+import { renderStateUpdateL2TransactionsPage } from '../view/pages/state-update/StateUpdateL2TransactionsPage'
+import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
+import { fakeCollateralAsset } from './data/collateralAsset'
 import {
   randomHomeForcedTransactionEntry,
   randomHomeOfferEntry,
   randomHomeStateUpdateEntry,
 } from './data/home'
+import {
+  perpetualL2TransactionsBucket,
+  randomAggregatedPerpetualL2TransactionEntry,
+  randomPerpetualL2ConditionalTransferTransaction,
+  randomPerpetualL2DeleverageTransaction,
+  randomPerpetualL2DepositTransaction,
+  randomPerpetualL2ForcedTradeTransaction,
+  randomPerpetualL2ForcedWithdrawalTransaction,
+  randomPerpetualL2FundingTickTransaction,
+  randomPerpetualL2LiquidateTransaction,
+  randomPerpetualL2MultiTransaction,
+  randomPerpetualL2OraclePricesTickTransaction,
+  randomPerpetualL2TradeTransaction,
+  randomPerpetualL2TransactionEntry,
+  randomPerpetualL2TransferTransaction,
+  randomPerpetualL2WithdrawalToAddressTransaction,
+  randomPerpetualUserL2TransactionEntry,
+} from './data/l2Transactions'
 import {
   randomStateUpdateBalanceChangeEntry,
   randomStateUpdatePriceEntry,
@@ -106,7 +124,30 @@ const routes: Route[] = [
         context,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        transactions: repeat(6, randomHomeForcedTransactionEntry),
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        totalForcedTransactions: 68,
+        offers: repeat(6, randomHomeOfferEntry),
+        totalOffers: 7,
+      })
+    },
+  },
+  {
+    path: '/home/with-l2-transactions',
+    description:
+      'The home page for project that shared feeder gateway with us.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+
+      ctx.body = renderHomePage({
+        context,
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        totalStateUpdates: 5123,
+        l2Transactions: {
+          data: repeat(6, randomPerpetualL2TransactionEntry),
+          total: 5123,
+        },
+        tutorials: [],
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
@@ -123,10 +164,27 @@ const routes: Route[] = [
         tutorials: [],
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        transactions: repeat(6, randomHomeForcedTransactionEntry),
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
+      })
+    },
+  },
+  {
+    path: '/l2-transactions',
+    link: '/l2-transactions',
+    description: 'L2 transaction list. Supports pagination.',
+    render: (ctx) => {
+      const total = 5123
+      const { limit, offset, visible } = getPagination(ctx, total)
+
+      ctx.body = renderHomeL2TransactionsPage({
+        context: getPerpetualPageContext(ctx),
+        l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
+        total: total,
+        limit: limit,
+        offset: offset,
       })
     },
   },
@@ -241,6 +299,61 @@ const routes: Route[] = [
     },
   },
   {
+    path: '/state-updates/:id/with-l2-transactions',
+    link: '/state-updates/xyz/with-l2-transactions',
+    description: 'State update page with l2 transacitons.',
+    render: (ctx) => {
+      const ethereumTimestamp = randomTimestamp()
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderStateUpdatePage({
+        context,
+        id: randomId(),
+        hashes: {
+          factHash: Hash256.fake(),
+          positionTreeRoot: PedersenHash.fake(),
+          onChainVaultTreeRoot: PedersenHash.fake(),
+          offChainVaultTreeRoot: PedersenHash.fake(),
+          orderRoot: PedersenHash.fake(),
+        },
+        blockNumber: randomInt(14_000_000, 17_000_000),
+        ethereumTimestamp,
+        starkExTimestamp: Timestamp(
+          Math.floor(
+            Number(ethereumTimestamp) - Math.random() * 12 * 60 * 60 * 1000
+          )
+        ),
+        balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
+        priceChanges: repeat(15, randomStateUpdatePriceEntry),
+        totalBalanceChanges: 231,
+        l2Transactions: {
+          data: repeat(5, randomPerpetualL2TransactionEntry),
+          total: 1000,
+        },
+        transactions: repeat(5, randomStateUpdateTransactionEntry),
+        totalTransactions: 5,
+      })
+    },
+  },
+  {
+    path: '/state-updates/:id/l2-transactions',
+    link: '/state-updates/xyz/l2-transactions',
+    description:
+      'L2 transactions list included in specific state update. Supports pagination.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      const total = 231
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderStateUpdateL2TransactionsPage({
+        context,
+        id: '1534',
+        l2Transactions: repeat(visible, randomPerpetualL2TransactionEntry),
+        total: total,
+        limit: limit,
+        offset: offset,
+      })
+    },
+  },
+  {
     path: '/state-updates/:id/balance-changes',
     link: '/state-updates/xyz/balance-changes',
     description:
@@ -317,6 +430,7 @@ const routes: Route[] = [
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx, true)
       const starkKey = context.user.starkKey ?? StarkKey.fake()
+
       ctx.body = renderUserPage({
         context: {
           ...context,
@@ -397,6 +511,36 @@ const routes: Route[] = [
       })
     },
   },
+  {
+    path: '/users/:starkKey/with-l2-transactions',
+    link: '/users/someone/with-l2-transactions',
+    description:
+      'Someone else’s user page for project that feeder gateway with us.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+
+      ctx.body = renderUserPage({
+        context,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
+        finalizableOffers: repeat(2, randomUserOfferEntry),
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 7,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: {
+          data: repeat(6, randomPerpetualUserL2TransactionEntry),
+          total: 5123,
+        },
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+      })
+    },
+  },
   // #endregion
   // #region User lists
   {
@@ -412,6 +556,25 @@ const routes: Route[] = [
         context,
         starkKey: StarkKey.fake(),
         assets: repeat(visible, randomUserAssetEntry),
+        limit,
+        offset,
+        total,
+      })
+    },
+  },
+  {
+    path: '/users/:starkKey/l2-transactions',
+    link: '/users/someone/l2-transactions',
+    description:
+      'L2 transaction list accessible from someone else’s user page. Supports pagination.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      const total = 5123
+      const { limit, offset, visible } = getPagination(ctx, total)
+      ctx.body = renderUserL2TransactionsPage({
+        context,
+        starkKey: StarkKey.fake(),
+        l2Transactions: repeat(visible, randomPerpetualUserL2TransactionEntry),
         limit,
         offset,
         total,
@@ -471,6 +634,285 @@ const routes: Route[] = [
         limit,
         offset,
         total,
+      })
+    },
+    breakAfter: true,
+  },
+  // #endregion
+  // #region L2 transactions
+  {
+    path: '/l2-transactions/:id',
+    link: '/l2-transactions/random',
+    description: 'Perpetual L2 random transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/with-alternatives',
+    link: '/l2-transactions/perpetual/random/with-alternatives',
+    description:
+      'Perpetual L2 random transaction details with alternatives details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: {
+          ...randomAggregatedPerpetualL2TransactionEntry(),
+          alternativeTransactions: repeat(randomInt(1, 10), () =>
+            perpetualL2TransactionsBucket.pick()
+          ),
+        },
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-alternative',
+    link: '/l2-transactions/perpetual/random/as-alternative',
+    description:
+      'Perpetual L2 random transaction details as alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        altIndex: randomInt(1, 10),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-part-of-multi',
+    link: '/l2-transactions/perpetual/random/as-part-of-multi',
+    description:
+      'Perpetual L2 random transaction details as part of multi details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        multiIndex: randomInt(1, 10),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/random/as-alternative/as-part-of-multi',
+    link: '/l2-transactions/perpetual/random/as-alternative/as-part-of-multi',
+    description:
+      'Perpetual L2 random transaction details as part of multi transaction that is alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
+        multiIndex: randomInt(1, 10),
+        altIndex: randomInt(1, 10),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/deposit',
+    link: '/l2-transactions/perpetual/deposit',
+    description: 'Perpetual L2 deposit transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2DepositTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/forced-withdrawal',
+    link: '/l2-transactions/perpetual/forced-withdrawal',
+    description: 'Perpetual L2 forced withdrawal transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2ForcedWithdrawalTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/transfer',
+    link: '/l2-transactions/perpetual/transfer',
+    description: 'Perpetual L2 transfer transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2TransferTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/conditional-transfer',
+    link: '/l2-transactions/perpetual/conditional-transfer',
+    description: 'Perpetual L2 conditional transfer transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2ConditionalTransferTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/trade',
+    link: '/l2-transactions/perpetual/trade',
+    description: 'Perpetual L2 trade transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2TradeTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/forced-trade',
+    link: '/l2-transactions/perpetual/forced-trade',
+    description: 'Perpetual L2 forced trade transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2ForcedTradeTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/withdraw-to-address',
+    link: '/l2-transactions/perpetual/withdraw-to-address',
+    description: 'Perpetual L2 withdraw to address transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2WithdrawalToAddressTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/deleverage',
+    link: '/l2-transactions/perpetual/deleverage',
+    description: 'Perpetual L2 deleverage transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2DeleverageTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/liquidate',
+    link: '/l2-transactions/perpetual/liquidate',
+    description: 'Perpetual L2 liquidate transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2LiquidateTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/funding-tick',
+    link: '/l2-transactions/perpetual/funding-tick',
+    description: 'Perpetual L2 funding tick transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2FundingTickTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/oracle-prices-tick',
+    link: '/l2-transactions/perpetual/oracle-prices-tick',
+    description: 'Perpetual L2 oracle prices tick transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2OraclePricesTickTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi',
+    link: '/l2-transactions/perpetual/multi',
+    description: 'Perpetual L2 multi transaction details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2MultiTransaction()
+        ),
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi/with-alternatives',
+    link: '/l2-transactions/perpetual/multi/with-alternatives',
+    description:
+      'Perpetual L2 multi transaction with alternatives details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: {
+          ...randomAggregatedPerpetualL2TransactionEntry(
+            randomPerpetualL2MultiTransaction()
+          ),
+          alternativeTransactions: repeat(randomInt(1, 10), () =>
+            perpetualL2TransactionsBucket.pick()
+          ),
+        },
+      })
+    },
+  },
+  {
+    path: '/l2-transactions/perpetual/multi/as-alternative',
+    link: '/l2-transactions/perpetual/multi/as-alternative',
+    description: 'Perpetual L2 multi transaction as alternative details page.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderPerpetualL2TransactionDetailsPage({
+        context,
+        transaction: randomAggregatedPerpetualL2TransactionEntry(
+          randomPerpetualL2MultiTransaction()
+        ),
+        altIndex: randomInt(0, 10),
       })
     },
     breakAfter: true,
@@ -1110,12 +1552,6 @@ function getFakeUser() {
     address: EthereumAddress.fake(),
     starkKey: StarkKey.fake(),
   }
-}
-
-const fakeCollateralAsset: CollateralAsset = {
-  assetId: AssetId('USDC-6'),
-  assetHash: AssetHash.fake(),
-  price: 1_000_000n,
 }
 
 function getPerpetualPageContext(

@@ -6,15 +6,18 @@ import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
 import { TablePreview } from '../../components/table/TablePreview'
+import { L2TransactionsTable } from '../../components/tables/l2-transactions/L2TransactionsTable'
 import { OfferEntry, OffersTable } from '../../components/tables/OffersTable'
 import {
   TransactionEntry,
   TransactionsTable,
 } from '../../components/tables/TransactionsTable'
 import { reactToHtml } from '../../reactToHtml'
+import { PerpetualL2TransactionEntry } from '../l2-transaction/common'
 import {
   getAssetsTableProps,
   getBalanceChangeTableProps,
+  getL2TransactionTableProps,
   getOfferTableProps,
   getTransactionTableProps,
   getUserPageProps,
@@ -44,6 +47,10 @@ interface UserPageProps {
   totalBalanceChanges: number
   transactions: TransactionEntry[]
   totalTransactions: number
+  l2Transactions?: {
+    data: PerpetualL2TransactionEntry[]
+    total: number
+  }
   offers?: OfferEntry[]
   totalOffers: number
 }
@@ -92,6 +99,18 @@ function UserPage(props: UserPageProps) {
             isMine={isMine}
           />
         </TablePreview>
+        {props.l2Transactions && (
+          <TablePreview
+            {...getL2TransactionTableProps(props.starkKey)}
+            visible={props.l2Transactions.data.length}
+            total={props.l2Transactions.total}
+          >
+            <L2TransactionsTable
+              transactions={props.l2Transactions.data}
+              context={props.context}
+            />
+          </TablePreview>
+        )}
         <TablePreview
           {...getBalanceChangeTableProps(props.starkKey)}
           visible={props.balanceChanges.length}

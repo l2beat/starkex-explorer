@@ -8,9 +8,14 @@ type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
   ? T
   : never
 
-export type StarkexConfig = CheckTradingMode<
-  PerpetualRollupConfig | PerpetualValidiumConfig | SpotValidiumConfig
->
+export type StarkexConfig<T extends TradingMode = TradingMode> =
+  CheckTradingMode<
+    T extends 'perpetual'
+      ? PerpetualRollupConfig | PerpetualValidiumConfig
+      : T extends 'spot'
+      ? SpotValidiumConfig
+      : PerpetualRollupConfig | PerpetualValidiumConfig | SpotValidiumConfig
+  >
 
 export interface PerpetualRollupConfig {
   instanceName: InstanceName

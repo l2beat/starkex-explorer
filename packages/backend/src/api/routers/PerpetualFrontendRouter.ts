@@ -1,10 +1,13 @@
-import { CollateralAsset, stringAs, stringAsBigInt } from '@explorer/shared'
+import { stringAs, stringAsBigInt, stringAsInt } from '@explorer/shared'
 import { AssetId } from '@explorer/types'
 import Router from '@koa/router'
 import { z } from 'zod'
 
+import { Config } from '../../config'
+import { shouldShowL2Transactions } from '../../utils/shouldShowL2Transactions'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
+import { L2TransactionController } from '../controllers/L2TransactionController'
 import { withTypedContext } from './types'
 import { applyControllerResult, getGivenUser } from './utils'
 
@@ -12,7 +15,8 @@ export function addPerpetualTradingRoutes(
   router: Router,
   forcedTradeOfferController: ForcedTradeOfferController,
   forcedActionController: ForcedActionController,
-  collateralAsset: CollateralAsset
+  l2TransactionController: L2TransactionController,
+  config: Config<'perpetual'>
 ) {
   router.get(
     '/forced/new/:positionId/:assetId',
@@ -28,7 +32,7 @@ export function addPerpetualTradingRoutes(
         const givenUser = getGivenUser(ctx)
 
         const result =
-          assetId === collateralAsset.assetId
+          assetId === config.starkex.collateralAsset.assetId
             ? await forcedActionController.getPerpetualForcedWithdrawalPage(
                 givenUser,
                 positionId,
@@ -63,4 +67,52 @@ export function addPerpetualTradingRoutes(
       }
     )
   )
+
+  if (shouldShowL2Transactions(config)) {
+    router.get(
+      '/l2-transactions/:transactionId{/:multiIndex}?',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            transactionId: stringAsInt(),
+            multiIndex: z.optional(stringAsInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const result =
+            await l2TransactionController.getPerpetualL2TransactionDetailsPage(
+              givenUser,
+              ctx.params.transactionId,
+              ctx.params.multiIndex
+            )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+
+    router.get(
+      '/l2-transactions/:transactionId/alternatives/:altIndex{/:multiIndex}?',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            transactionId: stringAsInt(),
+            altIndex: z.optional(stringAsInt()),
+            multiIndex: z.optional(stringAsInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const result =
+            await l2TransactionController.getPerpetualL2TransactionDetailsPage(
+              givenUser,
+              ctx.params.transactionId,
+              ctx.params.multiIndex,
+              ctx.params.altIndex
+            )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+  }
 }

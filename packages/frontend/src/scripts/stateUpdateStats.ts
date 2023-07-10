@@ -1,7 +1,9 @@
+import { makeQuery } from './utils/query'
+
 export function initStateUpdateStats() {
-  const components = document.querySelectorAll(
-    '[data-component="StateUpdateStats"]'
-  )
+  const { $$ } = makeQuery(document.body)
+  const components = $$('[data-component="StateUpdateStats"]')
+
   components.forEach((component) => {
     const button = component.querySelector('button')
     const advanced = component.querySelector(

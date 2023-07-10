@@ -2,23 +2,22 @@ import classNames from 'classnames'
 import range from 'lodash/range'
 import React from 'react'
 
-import { Asset, assetToInfo } from '../../../../utils/assets'
-import { formatWithDecimals } from '../../../../utils/formatting/formatAmount'
-import { AssetWithLogo } from '../../../components/AssetWithLogo'
-import { Table } from '../../../components/table/Table'
+import { Asset, assetToInfo } from '../../../utils/assets'
+import { formatWithDecimals } from '../../../utils/formatting/formatAmount'
+import { AssetWithLogo } from '../AssetWithLogo'
+import { Table } from '../table/Table'
 
-interface StateUpdatePricesTableProps {
-  priceChanges: StateUpdatePriceEntry[]
+interface PricesTableProps {
+  prices: PriceEntry[]
 }
 
-export interface StateUpdatePriceEntry {
+export interface PriceEntry {
   asset: Asset
-  price: bigint
-  change: bigint
+  priceInCents: bigint
 }
 
-export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
-  const tableCount = props.priceChanges.length == 1 ? 1 : 2
+export function PricesTable(props: PricesTableProps) {
+  const tableCount = props.prices.length == 1 ? 1 : 2
 
   return (
     <div className={classNames('flex', tableCount === 2 && 'gap-12')}>
@@ -27,7 +26,7 @@ export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
           <Table
             key={index}
             columns={[{ header: 'Asset' }, { header: 'Price', numeric: true }]}
-            rows={props.priceChanges
+            rows={props.prices
               .filter((_, txIndex) => txIndex % tableCount === index)
               .map((transaction) => {
                 return {
@@ -36,7 +35,9 @@ export function StateUpdatePricesTable(props: StateUpdatePricesTableProps) {
                       type="small"
                       assetInfo={assetToInfo(transaction.asset)}
                     />,
-                    formatWithDecimals(transaction.price, 2, { prefix: '$' }),
+                    formatWithDecimals(transaction.priceInCents, 2, {
+                      prefix: '$',
+                    }),
                   ],
                 }
               })}

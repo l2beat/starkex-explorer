@@ -5,7 +5,7 @@ import { EXAMPLE_PERPETUAL_BATCH_INFO } from '../../test/starkwareData'
 import { Logger } from '../../tools/Logger'
 import { FeederGatewayClient } from './FeederGatewayClient'
 import { FetchClient } from './FetchClient'
-import { PerpetualBatchInfoResponse } from './schema'
+import { PerpetualBatchInfoResponse } from './schema/PerpetualBatchInfoResponse'
 import { toPerpetualBatchInfo } from './toPerpetualBatchInfo'
 
 describe(FeederGatewayClient.name, () => {

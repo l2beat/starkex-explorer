@@ -6,6 +6,7 @@ import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import { ChevronDownIcon } from '../../../assets/icons/ChevronDownIcon'
 import { ChevronUpIcon } from '../../../assets/icons/ChevronUpIcon'
 import { Button } from '../../../components/Button'
+import { EtherscanLink } from '../../../components/EtherscanLink'
 import { Link } from '../../../components/Link'
 import { PageTitle } from '../../../components/PageTitle'
 
@@ -40,9 +41,9 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
       <div className="mb-6 flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
         <div className="flex justify-between gap-6">
           <ValueItem label="Ethereum block number">
-            <Link href={`https://etherscan.io/block/${props.blockNumber}`}>
+            <EtherscanLink type="block" blockNumber={props.blockNumber}>
               {formatInt(props.blockNumber)}
-            </Link>
+            </EtherscanLink>
           </ValueItem>
           <ValueItem label="Ethereum block timestamp">
             {formatTimestamp(props.ethereumTimestamp)} UTC

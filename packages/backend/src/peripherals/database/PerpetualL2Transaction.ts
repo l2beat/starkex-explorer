@@ -1,4 +1,24 @@
-import { assertUnreachable } from '@explorer/shared'
+import {
+  assertUnreachable,
+  PerpetualL2ConditionalTransferTransactionData,
+  PerpetualL2DeleverageTransactionData,
+  PerpetualL2DepositTransactionData,
+  PerpetualL2ForcedTradeTransactionData,
+  PerpetualL2ForcedWithdrawalTransactionData,
+  PerpetualL2FundingTickTransactionData,
+  PerpetualL2LiquidateTransactionData,
+  PerpetualL2MultiTransactionData,
+  PerpetualL2OraclePricesTickTransactionData,
+  PerpetualL2TradeTransactionData,
+  PerpetualL2TransactionAssetOraclePrice,
+  PerpetualL2TransactionData,
+  PerpetualL2TransactionLiquidateOrder,
+  PerpetualL2TransactionPartyOrder,
+  PerpetualL2TransactionSignature,
+  PerpetualL2TransactionSignedOraclePrice,
+  PerpetualL2TransferTransactionData,
+  PerpetualL2WithdrawalToAddressTransactionData,
+} from '@explorer/shared'
 import {
   AssetHash,
   AssetId,
@@ -10,206 +30,17 @@ import {
 
 import { ToJSON } from './transactions/ToJSON'
 
-export type L2TransactionData =
-  | DepositL2TransactionData
-  | WithdrawalToAddressL2TransactionData
-  | ForcedWithdrawalL2TransactionData
-  | TradeL2TransactionData
-  | ForcedTradeL2TransactionData
-  | TransferL2TransactionData
-  | ConditionalTransferL2TransactionData
-  | LiquidateL2TransactionData
-  | DeleverageL2TransactionData
-  | FundingTickL2TransactionData
-  | OraclePricesTickL2TransactionData
-  | MultiL2TransactionData
-
 interface Encoded<T> {
   starkKeyA: StarkKey | null
   starkKeyB: StarkKey | null
   data: ToJSON<T>
 }
 
-export type L2TransactionDataJson = ToJSON<L2TransactionData>
-type OrderType = 'LimitOrderWithFees'
-
-interface Signature {
-  s: Hash256
-  r: Hash256
-}
-
-interface PartyOrder {
-  nonce: bigint
-  isBuyingSynthetic: boolean
-  expirationTimestamp: Timestamp
-  signature: Signature
-  syntheticAssetId: AssetId
-  orderType: OrderType
-  collateralAssetId: AssetHash
-  positionId: bigint
-  syntheticAmount: bigint
-  collateralAmount: bigint
-  feeAmount: bigint
-  starkKey: StarkKey
-}
-
-export interface DepositL2TransactionData {
-  positionId: bigint
-  starkKey: StarkKey
-  amount: bigint
-  type: 'Deposit'
-}
-
-export interface WithdrawalToAddressL2TransactionData {
-  positionId: bigint
-  starkKey: StarkKey
-  ethereumAddress: EthereumAddress
-  amount: bigint
-  nonce: bigint
-  expirationTimestamp: Timestamp
-  signature: Signature
-  type: 'WithdrawalToAddress'
-}
-
-export interface ForcedWithdrawalL2TransactionData {
-  positionId: bigint
-  starkKey: StarkKey
-  amount: bigint
-  isValid: boolean
-  type: 'ForcedWithdrawal'
-}
-
-export interface TradeL2TransactionData {
-  actualBFee: bigint
-  actualAFee: bigint
-  actualSynthetic: bigint
-  actualCollateral: bigint
-  partyAOrder: PartyOrder
-  partyBOrder: PartyOrder
-  type: 'Trade'
-}
-
-export interface ForcedTradeL2TransactionData {
-  starkKeyA: StarkKey
-  starkKeyB: StarkKey
-  positionIdA: bigint
-  positionIdB: bigint
-  collateralAssetId: AssetHash
-  syntheticAssetId: AssetId
-  collateralAmount: bigint
-  syntheticAmount: bigint
-  isABuyingSynthetic: boolean
-  nonce: bigint
-  isValid: boolean
-  type: 'ForcedTrade'
-}
-
-export interface TransferL2TransactionData {
-  amount: bigint
-  nonce: bigint
-  senderStarkKey: StarkKey
-  receiverStarkKey: StarkKey
-  senderPositionId: bigint
-  receiverPositionId: bigint
-  assetId: AssetHash
-  expirationTimestamp: Timestamp
-  signature: Signature
-  type: 'Transfer'
-}
-
-export interface ConditionalTransferL2TransactionData {
-  amount: bigint
-  nonce: bigint
-  senderStarkKey: StarkKey
-  receiverStarkKey: StarkKey
-  senderPositionId: bigint
-  receiverPositionId: bigint
-  assetId: AssetHash
-  expirationTimestamp: Timestamp
-  factRegistryAddress: EthereumAddress
-  fact: Hash256
-  signature: Signature
-  type: 'ConditionalTransfer'
-}
-
-interface LiquidateOrder {
-  orderType: OrderType
-  nonce: bigint
-  starkKey: StarkKey
-  syntheticAssetId: AssetId
-  syntheticAmount: bigint
-  collateralAssetId: AssetHash
-  collateralAmount: bigint
-  feeAmount: bigint
-  positionId: bigint
-  expirationTimestamp: Timestamp
-  isBuyingSynthetic: boolean
-  signature: Signature
-}
-
-export interface LiquidateL2TransactionData {
-  liquidatorOrder: LiquidateOrder
-  liquidatedPositionId: bigint
-  actualCollateral: bigint
-  actualSynthetic: bigint
-  actualLiquidatorFee: bigint
-  type: 'Liquidate'
-}
-
-export interface DeleverageL2TransactionData {
-  syntheticAssetId: AssetId
-  collateralAmount: bigint
-  syntheticAmount: bigint
-  deleveragedPositionId: bigint
-  isDeleveragerBuyingSynthetic: boolean
-  deleveragerPositionId: bigint
-  type: 'Deleverage'
-}
-
-interface FundingIndex {
-  syntheticAssetId: AssetId
-  quantizedFundingIndex: number
-}
-
-interface FundingIndicesState {
-  indices: FundingIndex[]
-  timestamp: Timestamp
-}
-export interface FundingTickL2TransactionData {
-  globalFundingIndices: FundingIndicesState
-  type: 'FundingTick'
-}
-
-interface SignedOraclePrice {
-  signerPublicKey: Hash256
-  externalAssetId: AssetHash
-  timestampedSignature: {
-    signature: Signature
-    timestamp: Timestamp
-  }
-  price: bigint
-}
-
-interface AssetOraclePrice {
-  syntheticAssetId: AssetId
-  signedPrices: SignedOraclePrice[]
-  price: bigint
-}
-
-export interface OraclePricesTickL2TransactionData {
-  timestamp: Timestamp
-  oraclePrices: AssetOraclePrice[]
-  type: 'OraclePricesTick'
-}
-
-export interface MultiL2TransactionData {
-  transactions: Exclude<L2TransactionData, MultiL2TransactionData>[]
-  type: 'MultiTransaction'
-}
+export type PerpetualL2TransactionDataJson = ToJSON<PerpetualL2TransactionData>
 
 export function encodeL2TransactionData(
-  values: L2TransactionData
-): Encoded<L2TransactionData> {
+  values: PerpetualL2TransactionData
+): Encoded<PerpetualL2TransactionData> {
   if (values.type === 'MultiTransaction') {
     return encodeL2MultiTransaction(values)
   }
@@ -218,8 +49,8 @@ export function encodeL2TransactionData(
 }
 
 export function decodeTransactionData(
-  values: ToJSON<L2TransactionData>
-): L2TransactionData {
+  values: ToJSON<PerpetualL2TransactionData>
+): PerpetualL2TransactionData {
   if (values.type === 'MultiTransaction') {
     return decodeMultiTransaction(values)
   }
@@ -228,8 +59,10 @@ export function decodeTransactionData(
 }
 
 function encodeL2Transaction(
-  values: Exclude<L2TransactionData, MultiL2TransactionData>
-): Encoded<Exclude<L2TransactionData, MultiL2TransactionData>> {
+  values: Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
+): Encoded<
+  Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
+> {
   switch (values.type) {
     case 'Deposit':
       return encodeDepositTransaction(values)
@@ -259,8 +92,10 @@ function encodeL2Transaction(
 }
 
 function decodeTransaction(
-  values: ToJSON<Exclude<L2TransactionData, MultiL2TransactionData>>
-): Exclude<L2TransactionData, MultiL2TransactionData> {
+  values: ToJSON<
+    Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
+  >
+): Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData> {
   switch (values.type) {
     case 'Deposit':
       return decodeDepositTransaction(values)
@@ -290,8 +125,8 @@ function decodeTransaction(
 }
 
 function encodeDepositTransaction(
-  values: DepositL2TransactionData
-): Encoded<DepositL2TransactionData> {
+  values: PerpetualL2DepositTransactionData
+): Encoded<PerpetualL2DepositTransactionData> {
   return {
     starkKeyA: values.starkKey,
     starkKeyB: null,
@@ -305,8 +140,8 @@ function encodeDepositTransaction(
 }
 
 function decodeDepositTransaction(
-  values: ToJSON<DepositL2TransactionData>
-): DepositL2TransactionData {
+  values: ToJSON<PerpetualL2DepositTransactionData>
+): PerpetualL2DepositTransactionData {
   return {
     ...values,
     positionId: BigInt(values.positionId),
@@ -315,8 +150,8 @@ function decodeDepositTransaction(
   }
 }
 function encodeWithdrawalToAddressTransaction(
-  values: WithdrawalToAddressL2TransactionData
-): Encoded<WithdrawalToAddressL2TransactionData> {
+  values: PerpetualL2WithdrawalToAddressTransactionData
+): Encoded<PerpetualL2WithdrawalToAddressTransactionData> {
   return {
     starkKeyA: values.starkKey,
     starkKeyB: null,
@@ -334,8 +169,8 @@ function encodeWithdrawalToAddressTransaction(
 }
 
 function decodeWithdrawalToAddressTransaction(
-  values: ToJSON<WithdrawalToAddressL2TransactionData>
-): WithdrawalToAddressL2TransactionData {
+  values: ToJSON<PerpetualL2WithdrawalToAddressTransactionData>
+): PerpetualL2WithdrawalToAddressTransactionData {
   return {
     ...values,
     positionId: BigInt(values.positionId),
@@ -349,8 +184,8 @@ function decodeWithdrawalToAddressTransaction(
 }
 
 function encodeForcedWithdrawalTransaction(
-  values: ForcedWithdrawalL2TransactionData
-): Encoded<ForcedWithdrawalL2TransactionData> {
+  values: PerpetualL2ForcedWithdrawalTransactionData
+): Encoded<PerpetualL2ForcedWithdrawalTransactionData> {
   return {
     starkKeyA: values.starkKey,
     starkKeyB: null,
@@ -363,8 +198,8 @@ function encodeForcedWithdrawalTransaction(
   }
 }
 function decodeForcedWithdrawalTransaction(
-  values: ToJSON<ForcedWithdrawalL2TransactionData>
-): ForcedWithdrawalL2TransactionData {
+  values: ToJSON<PerpetualL2ForcedWithdrawalTransactionData>
+): PerpetualL2ForcedWithdrawalTransactionData {
   return {
     ...values,
     positionId: BigInt(values.positionId),
@@ -374,8 +209,8 @@ function decodeForcedWithdrawalTransaction(
 }
 
 function encodeForcedTradeTransaction(
-  values: ForcedTradeL2TransactionData
-): Encoded<ForcedTradeL2TransactionData> {
+  values: PerpetualL2ForcedTradeTransactionData
+): Encoded<PerpetualL2ForcedTradeTransactionData> {
   return {
     starkKeyA: values.starkKeyA,
     starkKeyB: values.starkKeyB,
@@ -395,8 +230,8 @@ function encodeForcedTradeTransaction(
 }
 
 function decodeForcedTradeTransaction(
-  values: ToJSON<ForcedTradeL2TransactionData>
-): ForcedTradeL2TransactionData {
+  values: ToJSON<PerpetualL2ForcedTradeTransactionData>
+): PerpetualL2ForcedTradeTransactionData {
   return {
     ...values,
     positionIdA: BigInt(values.positionIdA),
@@ -412,8 +247,8 @@ function decodeForcedTradeTransaction(
 }
 
 function encodeTradeTransaction(
-  values: TradeL2TransactionData
-): Encoded<TradeL2TransactionData> {
+  values: PerpetualL2TradeTransactionData
+): Encoded<PerpetualL2TradeTransactionData> {
   return {
     starkKeyA: values.partyAOrder.starkKey,
     starkKeyB: values.partyBOrder.starkKey,
@@ -430,8 +265,8 @@ function encodeTradeTransaction(
 }
 
 function decodeTradeTransaction(
-  values: ToJSON<TradeL2TransactionData>
-): TradeL2TransactionData {
+  values: ToJSON<PerpetualL2TradeTransactionData>
+): PerpetualL2TradeTransactionData {
   return {
     ...values,
     partyAOrder: decodePartyOrder(values.partyAOrder),
@@ -444,8 +279,8 @@ function decodeTradeTransaction(
 }
 
 function encodeTransferTransaction(
-  values: TransferL2TransactionData
-): Encoded<TransferL2TransactionData> {
+  values: PerpetualL2TransferTransactionData
+): Encoded<PerpetualL2TransferTransactionData> {
   return {
     starkKeyA: values.senderStarkKey,
     starkKeyB: values.receiverStarkKey,
@@ -465,8 +300,8 @@ function encodeTransferTransaction(
 }
 
 function decodeTransferTransaction(
-  values: ToJSON<TransferL2TransactionData>
-): TransferL2TransactionData {
+  values: ToJSON<PerpetualL2TransferTransactionData>
+): PerpetualL2TransferTransactionData {
   return {
     ...values,
     amount: BigInt(values.amount),
@@ -482,8 +317,8 @@ function decodeTransferTransaction(
 }
 
 function encodeConditionalTransferTransaction(
-  values: ConditionalTransferL2TransactionData
-): Encoded<ConditionalTransferL2TransactionData> {
+  values: PerpetualL2ConditionalTransferTransactionData
+): Encoded<PerpetualL2ConditionalTransferTransactionData> {
   return {
     starkKeyA: values.senderStarkKey,
     starkKeyB: values.receiverStarkKey,
@@ -505,8 +340,8 @@ function encodeConditionalTransferTransaction(
 }
 
 function decodeConditionalTransferTransaction(
-  values: ToJSON<ConditionalTransferL2TransactionData>
-): ConditionalTransferL2TransactionData {
+  values: ToJSON<PerpetualL2ConditionalTransferTransactionData>
+): PerpetualL2ConditionalTransferTransactionData {
   return {
     ...values,
     amount: BigInt(values.amount),
@@ -524,8 +359,8 @@ function decodeConditionalTransferTransaction(
 }
 
 function encodeLiquidateTransaction(
-  values: LiquidateL2TransactionData
-): Encoded<LiquidateL2TransactionData> {
+  values: PerpetualL2LiquidateTransactionData
+): Encoded<PerpetualL2LiquidateTransactionData> {
   return {
     starkKeyA: values.liquidatorOrder.starkKey,
     starkKeyB: null,
@@ -541,8 +376,8 @@ function encodeLiquidateTransaction(
 }
 
 function decodeLiquidateTransaction(
-  values: ToJSON<LiquidateL2TransactionData>
-): LiquidateL2TransactionData {
+  values: ToJSON<PerpetualL2LiquidateTransactionData>
+): PerpetualL2LiquidateTransactionData {
   return {
     ...values,
     liquidatorOrder: decodeLiquidateOrder(values.liquidatorOrder),
@@ -554,8 +389,8 @@ function decodeLiquidateTransaction(
 }
 
 function encodeDeleverageTransaction(
-  values: DeleverageL2TransactionData
-): Encoded<DeleverageL2TransactionData> {
+  values: PerpetualL2DeleverageTransactionData
+): Encoded<PerpetualL2DeleverageTransactionData> {
   return {
     starkKeyA: null,
     starkKeyB: null,
@@ -571,8 +406,8 @@ function encodeDeleverageTransaction(
 }
 
 function decodeDeleverageTransaction(
-  values: ToJSON<DeleverageL2TransactionData>
-): DeleverageL2TransactionData {
+  values: ToJSON<PerpetualL2DeleverageTransactionData>
+): PerpetualL2DeleverageTransactionData {
   return {
     ...values,
     syntheticAmount: BigInt(values.syntheticAmount),
@@ -584,8 +419,8 @@ function decodeDeleverageTransaction(
 }
 
 function encodeFundingTickTransaction(
-  values: FundingTickL2TransactionData
-): Encoded<FundingTickL2TransactionData> {
+  values: PerpetualL2FundingTickTransactionData
+): Encoded<PerpetualL2FundingTickTransactionData> {
   return {
     starkKeyA: null,
     starkKeyB: null,
@@ -604,8 +439,8 @@ function encodeFundingTickTransaction(
 }
 
 function decodeFundingTickTransaction(
-  values: ToJSON<FundingTickL2TransactionData>
-): FundingTickL2TransactionData {
+  values: ToJSON<PerpetualL2FundingTickTransactionData>
+): PerpetualL2FundingTickTransactionData {
   return {
     ...values,
     globalFundingIndices: {
@@ -621,8 +456,8 @@ function decodeFundingTickTransaction(
 }
 
 function encodeOraclePricesTickTransaction(
-  values: OraclePricesTickL2TransactionData
-): Encoded<OraclePricesTickL2TransactionData> {
+  values: PerpetualL2OraclePricesTickTransactionData
+): Encoded<PerpetualL2OraclePricesTickTransactionData> {
   return {
     starkKeyA: null,
     starkKeyB: null,
@@ -635,8 +470,8 @@ function encodeOraclePricesTickTransaction(
 }
 
 function decodeOraclePricesTickTransaction(
-  values: ToJSON<OraclePricesTickL2TransactionData>
-): OraclePricesTickL2TransactionData {
+  values: ToJSON<PerpetualL2OraclePricesTickTransactionData>
+): PerpetualL2OraclePricesTickTransactionData {
   return {
     ...values,
     oraclePrices: values.oraclePrices.map(decodeAssetOraclePrice),
@@ -645,8 +480,8 @@ function decodeOraclePricesTickTransaction(
 }
 
 function encodeL2MultiTransaction(
-  values: MultiL2TransactionData
-): Encoded<MultiL2TransactionData> {
+  values: PerpetualL2MultiTransactionData
+): Encoded<PerpetualL2MultiTransactionData> {
   return {
     ...values,
     starkKeyA: null,
@@ -661,8 +496,8 @@ function encodeL2MultiTransaction(
 }
 
 function decodeMultiTransaction(
-  values: ToJSON<MultiL2TransactionData>
-): MultiL2TransactionData {
+  values: ToJSON<PerpetualL2MultiTransactionData>
+): PerpetualL2MultiTransactionData {
   return {
     ...values,
     transactions: values.transactions.map((tx) => decodeTransaction(tx)),
@@ -670,8 +505,8 @@ function decodeMultiTransaction(
 }
 
 function encodeAssetOraclePrice(
-  values: AssetOraclePrice
-): ToJSON<AssetOraclePrice> {
+  values: PerpetualL2TransactionAssetOraclePrice
+): ToJSON<PerpetualL2TransactionAssetOraclePrice> {
   return {
     ...values,
     syntheticAssetId: values.syntheticAssetId.toString(),
@@ -681,8 +516,8 @@ function encodeAssetOraclePrice(
 }
 
 function decodeAssetOraclePrice(
-  values: ToJSON<AssetOraclePrice>
-): AssetOraclePrice {
+  values: ToJSON<PerpetualL2TransactionAssetOraclePrice>
+): PerpetualL2TransactionAssetOraclePrice {
   return {
     ...values,
     syntheticAssetId: AssetId(values.syntheticAssetId),
@@ -692,8 +527,8 @@ function decodeAssetOraclePrice(
 }
 
 function encodeSignedOraclePrice(
-  values: SignedOraclePrice
-): ToJSON<SignedOraclePrice> {
+  values: PerpetualL2TransactionSignedOraclePrice
+): ToJSON<PerpetualL2TransactionSignedOraclePrice> {
   return {
     ...values,
     signerPublicKey: values.signerPublicKey.toString(),
@@ -707,8 +542,8 @@ function encodeSignedOraclePrice(
 }
 
 function decodeSignedOraclePrice(
-  values: ToJSON<SignedOraclePrice>
-): SignedOraclePrice {
+  values: ToJSON<PerpetualL2TransactionSignedOraclePrice>
+): PerpetualL2TransactionSignedOraclePrice {
   return {
     ...values,
     signerPublicKey: Hash256(values.signerPublicKey),
@@ -721,7 +556,9 @@ function decodeSignedOraclePrice(
   }
 }
 
-function encodeLiquidateOrder(values: LiquidateOrder): ToJSON<LiquidateOrder> {
+function encodeLiquidateOrder(
+  values: PerpetualL2TransactionLiquidateOrder
+): ToJSON<PerpetualL2TransactionLiquidateOrder> {
   return {
     ...values,
     nonce: values.nonce.toString(),
@@ -737,7 +574,9 @@ function encodeLiquidateOrder(values: LiquidateOrder): ToJSON<LiquidateOrder> {
   }
 }
 
-function decodeLiquidateOrder(values: ToJSON<LiquidateOrder>): LiquidateOrder {
+function decodeLiquidateOrder(
+  values: ToJSON<PerpetualL2TransactionLiquidateOrder>
+): PerpetualL2TransactionLiquidateOrder {
   return {
     ...values,
     nonce: BigInt(values.nonce),
@@ -753,7 +592,9 @@ function decodeLiquidateOrder(values: ToJSON<LiquidateOrder>): LiquidateOrder {
   }
 }
 
-function encodePartyOrder(values: PartyOrder): ToJSON<PartyOrder> {
+function encodePartyOrder(
+  values: PerpetualL2TransactionPartyOrder
+): ToJSON<PerpetualL2TransactionPartyOrder> {
   return {
     ...values,
     nonce: values.nonce.toString(),
@@ -769,7 +610,9 @@ function encodePartyOrder(values: PartyOrder): ToJSON<PartyOrder> {
   }
 }
 
-function decodePartyOrder(values: ToJSON<PartyOrder>): PartyOrder {
+function decodePartyOrder(
+  values: ToJSON<PerpetualL2TransactionPartyOrder>
+): PerpetualL2TransactionPartyOrder {
   return {
     ...values,
     nonce: BigInt(values.nonce),
@@ -785,14 +628,18 @@ function decodePartyOrder(values: ToJSON<PartyOrder>): PartyOrder {
   }
 }
 
-function encodeSignature(values: Signature): ToJSON<Signature> {
+function encodeSignature(
+  values: PerpetualL2TransactionSignature
+): ToJSON<PerpetualL2TransactionSignature> {
   return {
     r: values.r.toString(),
     s: values.s.toString(),
   }
 }
 
-function decodeSignature(values: ToJSON<Signature>): Signature {
+function decodeSignature(
+  values: ToJSON<PerpetualL2TransactionSignature>
+): PerpetualL2TransactionSignature {
   return {
     r: Hash256(values.r),
     s: Hash256(values.s),

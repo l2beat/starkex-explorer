@@ -5,14 +5,15 @@ import {
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
-import { ACCEPT_OFFER_FORM_ID } from '../../../../view/pages/transaction/components/AcceptOfferForm'
+import { ACCEPT_OFFER_FORM_CLASS } from '../../../../view/pages/transaction/components/AcceptOfferForm'
 import { Api } from '../../../peripherals/api'
 import { Wallet } from '../../../peripherals/wallet'
+import { makeQuery } from '../../../utils/query'
 
 export function initAcceptOfferForm() {
-  const forms = document.querySelectorAll<HTMLFormElement>(
-    `.${ACCEPT_OFFER_FORM_ID}`
-  )
+  const { $$ } = makeQuery(document.body)
+
+  const forms = $$<HTMLFormElement>(`.${ACCEPT_OFFER_FORM_CLASS}`)
   forms.forEach((form) => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     form.addEventListener('submit', async (e) => {
