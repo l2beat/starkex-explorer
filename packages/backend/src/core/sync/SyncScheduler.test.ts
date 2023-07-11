@@ -5,6 +5,7 @@ import waitForExpect from 'wait-for-expect'
 import { BlockRange } from '../../model'
 import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { Logger } from '../../tools/Logger'
+import { FreezeCheckService } from '../FreezeCheckService'
 import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
 import { BlockDownloader } from './BlockDownloader'
@@ -33,11 +34,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -48,7 +53,8 @@ describe(SyncScheduler.name, () => {
       expect(blockDownloader.getKnownBlocks).toHaveBeenOnlyCalledWith(1_000_000)
       expect(blockDownloader.onNewBlock).toHaveBeenCalledTimes(1)
       expect(blockDownloader.onReorg).toHaveBeenCalledTimes(1)
-      expect(preprocessor.sync).toHaveBeenCalled()
+      expect(preprocessor.sync).toHaveBeenCalledTimes(1)
+      expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
     })
 
     it('starts from the middle', async () => {
@@ -66,11 +72,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -88,7 +98,8 @@ describe(SyncScheduler.name, () => {
         lastSynced: 2_000_000,
         knownBlocks: [block(2_000_100), block(2_000_101)],
       })
-      expect(preprocessor.sync).toHaveBeenCalled()
+      expect(preprocessor.sync).toHaveBeenCalledTimes(1)
+      expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -105,11 +116,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -129,6 +144,7 @@ describe(SyncScheduler.name, () => {
           1_000_002
         )
         expect(preprocessor.sync).toHaveBeenCalled()
+        expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })
     })
 
@@ -144,11 +160,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -184,11 +204,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -223,6 +247,7 @@ describe(SyncScheduler.name, () => {
         )
 
         expect(preprocessor.sync).toHaveBeenCalled()
+        expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalled()
       })
     })
 
@@ -238,11 +263,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -263,6 +292,7 @@ describe(SyncScheduler.name, () => {
         )
         expect(dataSyncService.discardAfter).toHaveBeenOnlyCalledWith(999_999)
         expect(preprocessor.sync).toHaveBeenCalled()
+        expect(freezeCheckService.updateFreezeStatus).not.toHaveBeenCalled()
       })
 
       // allow the jobQueue to finish
@@ -283,11 +313,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         syncStatusRepository,
         mockObject<BlockDownloader>(),
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1, maxBlockNumber }
       )
@@ -300,7 +334,8 @@ describe(SyncScheduler.name, () => {
         expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(1)
         expect(dataSyncService.sync).toHaveBeenCalledTimes(1)
         expect(syncStatusRepository.setLastSynced).toHaveBeenCalledTimes(1)
-        expect(preprocessor.sync).toHaveBeenCalled()
+        expect(preprocessor.sync).toHaveBeenCalledTimes(1)
+        expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })
 
       await syncScheduler.handleSync(
@@ -311,7 +346,8 @@ describe(SyncScheduler.name, () => {
         expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(1)
         expect(dataSyncService.sync).toHaveBeenCalledTimes(1)
         expect(syncStatusRepository.setLastSynced).toHaveBeenCalledTimes(1)
-        expect(preprocessor.sync).toHaveBeenCalled()
+        expect(preprocessor.sync).toHaveBeenCalledTimes(1)
+        expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })
     })
   })

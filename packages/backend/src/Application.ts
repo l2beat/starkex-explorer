@@ -36,6 +36,7 @@ import {
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
+import { FreezeCheckService } from './core/FreezeCheckService'
 import { IDataSyncService } from './core/IDataSyncService'
 import { IStateTransitionCollector } from './core/IStateTransitionCollector'
 import { StateUpdateWithBatchIdMigrator } from './core/migrations/StateUpdateWithBatchIdMigrator'
@@ -513,11 +514,20 @@ export class Application {
       )
     }
 
+    const freezeCheckService = new FreezeCheckService(
+      config.starkex.contracts.perpetual,
+      ethereumClient,
+      syncStatusRepository,
+      userTransactionRepository,
+      logger
+    )
+
     const syncScheduler = new SyncScheduler(
       syncStatusRepository,
       blockDownloader,
       syncService,
       preprocessor,
+      freezeCheckService,
       logger,
       {
         earliestBlock: config.starkex.blockchain.minBlockNumber,

@@ -1020,7 +1020,6 @@ describe(L2TransactionRepository.name, () => {
           limit: 5,
           offset: 0,
         })
-        console.log(records)
 
         expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(0, 5))
       })
