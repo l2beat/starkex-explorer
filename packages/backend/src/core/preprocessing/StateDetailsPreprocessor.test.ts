@@ -189,11 +189,3 @@ describe(StateDetailsPreprocessor.name, () => {
     }
   )
 })
-
-function fakePreprocessedStateDetailsRecord(id: number) {
-  return {
-    id: id + 1,
-    cumulativeL2TransactionsStatistics:
-      fakePreprocessedL2TransactionsStatistics(id),
-  } as PreprocessedStateDetailsRecord
-}

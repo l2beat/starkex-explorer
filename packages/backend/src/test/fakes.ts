@@ -1,9 +1,9 @@
 import { ForcedTrade, ForcedWithdrawal, OnChainData } from '@explorer/encoding'
 import {
   CollateralAsset,
-  ERC1155Details,
   ERC20Details,
   ERC721Details,
+  ERC1155Details,
   ETHDetails,
 } from '@explorer/shared'
 import {

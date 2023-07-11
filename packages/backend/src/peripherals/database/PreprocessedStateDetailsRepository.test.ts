@@ -107,7 +107,7 @@ describe(PreprocessedStateDetailsRepository.name, () => {
     }
   )
 
-  describe.only(
+  describe(
     PreprocessedStateDetailsRepository.prototype
       .getAllWithoutL2TransactionStatisticsUpToStateUpdateId.name,
     () => {
