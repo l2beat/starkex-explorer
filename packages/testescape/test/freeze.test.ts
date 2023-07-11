@@ -3,7 +3,6 @@ import { ethers, network } from 'hardhat'
 import * as helpers from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { getEnv } from '../src/getEnv'
 import { config as dotenv } from 'dotenv'
-import { getKnex, getLastSyncedBlock } from '../src/utils'
 dotenv()
 
 const FORK_BLOCK_NUMBER = 17605965
@@ -15,11 +14,11 @@ async function forkNetworkAtBlock(blockNumber: number) {
     await helpers.reset(url, blockNumber);
 }
 
-// This test triggers a starkex freeze and funds escape by:
+// This test triggers a DYDX freeze and funds escape by:
 // - forking the mainnet
 // - impersonating owner of position #1
 // - sending forcedWithdrawalRequest
-// - waiting over 7 days (by mining blocks on the fork) to trigger freeze conditions
+// - waiting over 14 days (by mining blocks on the fork) to trigger freeze conditions
 // - sending freezeRequest()
 // - sending verifyEscape()
 // - sending escape()
@@ -30,8 +29,6 @@ describe("freeze functionality", function () {
   it("should trigger freeze and escape successfully", async function () {
     const perpetualAddress = getEnv('PERPETUAL_ADDRESS')
     const escapeVerifierAddress = getEnv('ESCAPE_VERIFIER_ADDRESS')
-    // const knex = getKnex()
-    // const blockNumber = await getLastSyncedBlock(knex)
     const blockNumber = FORK_BLOCK_NUMBER
 
     // Fork the mainnet at the block to which explorer is synced

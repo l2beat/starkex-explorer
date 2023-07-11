@@ -7,10 +7,13 @@
     "yarn": ">=1.22.0"
   },
   "scripts": {
-    "escapetest": "npx hardhat test"
+    "escapetest": "npx hardhat test",
+    "startfork": "env-cmd -f ./.env scripts/startfork.sh",
+    "console": "npx hardhat console --network localhost"
   },
   "dependencies": {
     "@explorer/backend": "*",
+    "env-cmd": "^10.1.0",
     "knex": "^2.4.0",
     "pg": "^8.7.3"
   },
