@@ -10,11 +10,11 @@ import {
 import { expect } from 'earl'
 
 import {
-  decodeTransactionData,
+  decodeL2TransactionData,
   encodeL2TransactionData,
 } from './PerpetualL2Transaction'
 
-describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, () => {
+describe(`${encodeL2TransactionData.name} and ${decodeL2TransactionData.name}`, () => {
   it('can handle a Deposit transaction', () => {
     const data: PerpetualL2TransactionData = {
       type: 'Deposit',
@@ -36,7 +36,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a WithdrawalToAddress transaction', () => {
@@ -82,7 +82,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a ForcedWithdrawal transaction', () => {
@@ -108,7 +108,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a Trade transaction', () => {
@@ -206,7 +206,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a ForcedTrade transaction', () => {
@@ -247,7 +247,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
 
@@ -295,7 +295,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a ConditionalTransfer transaction', () => {
@@ -346,7 +346,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a Liquidate transaction', () => {
@@ -412,7 +412,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a Deleverage transaction', () => {
@@ -443,7 +443,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a FundingTick transaction', () => {
@@ -483,7 +483,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
 
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
   it('can handle a OraclePricesTick transaction', () => {
@@ -545,7 +545,7 @@ describe(`${encodeL2TransactionData.name} and ${decodeTransactionData.name}`, ()
 
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
 
-    const decoded = decodeTransactionData(encoded.data)
+    const decoded = decodeL2TransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
 })

@@ -9,7 +9,7 @@ import { L2TransactionRow } from 'knex/types/tables'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
 import {
-  decodeTransactionData,
+  decodeL2TransactionData,
   encodeL2TransactionData,
 } from './PerpetualL2Transaction'
 import {
@@ -397,7 +397,7 @@ function toRecord(row: L2TransactionRow): Record {
     state: row.state ? row.state : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
-    data: decodeTransactionData(row.data),
+    data: decodeL2TransactionData(row.data),
   }
 }
 
@@ -410,9 +410,9 @@ function toAggregatedRecord(
     transactionId: transaction.transaction_id,
     stateUpdateId: transaction.state_update_id,
     blockNumber: transaction.block_number,
-    originalTransaction: decodeTransactionData(transaction.data),
+    originalTransaction: decodeL2TransactionData(transaction.data),
     alternativeTransactions: alternatives.map((alternative) =>
-      decodeTransactionData(alternative.data)
+      decodeL2TransactionData(alternative.data)
     ),
   }
 }
