@@ -1,14 +1,14 @@
 import { expect } from 'earl'
 
 import {
-  getDydxStarkExKeyPairFromData,
+  getGenericStarkExKeyPairFromData,
   getMyriaStarkExKeyPairFromData,
 } from './keys'
 
-describe(getDydxStarkExKeyPairFromData.name, () => {
-  it('correctly calculates the keys', () => {
+describe(getGenericStarkExKeyPairFromData.name, () => {
+  it('correctly calculates the keys for dydx', () => {
     const data = '0x12345678'
-    const pair = getDydxStarkExKeyPairFromData(data)
+    const pair = getGenericStarkExKeyPairFromData(data)
 
     // Derived using:
     // const x = require('@dydxprotocol/starkex-lib')
@@ -20,6 +20,21 @@ describe(getDydxStarkExKeyPairFromData.name, () => {
         '05e28c1979ed37753e5b5f6dd3bb9babeabf561c7214fd01fcf4434745107b1f',
       privateKey:
         '0186532eaed1aa913e4bffc1b64e338cd7ce9c1afe35e395eee28777660dd959',
+    })
+  })
+
+  it('correctly calculates the keys for apex', () => {
+    const signature =
+      '0xde864c207981b865c601a77cda6d669169a20a17980c38f151a4302432efb8013ec02c74c2bf4fb111dadcd9924ea023d6f690512cde22edbb5213487a43ae031c03'
+    const pair = getGenericStarkExKeyPairFromData(signature)
+
+    expect(pair).toEqual({
+      publicKey:
+        '07e6d96a3ed5152d2686edc1429b82404135698008d5722bd065df8d0020c447',
+      publicKeyYCoordinate:
+        '0356cfb50aa20e625c9b82e2fbadcf3c93dbd8ac8f5d738354f7dc53b522d105',
+      privateKey:
+        '0381ed01dd751a7a16f09802527fe85176aed3ab4ca22b1e19592bf64dfd05d6',
     })
   })
 })

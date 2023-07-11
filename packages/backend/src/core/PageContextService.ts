@@ -23,6 +23,7 @@ export class PageContextService {
         user,
         tradingMode: this.config.starkex.tradingMode,
         instanceName: this.config.starkex.instanceName,
+        chainId: this.config.starkex.blockchain.chainId,
         collateralAsset: this.config.starkex.collateralAsset,
       }
     }
@@ -30,6 +31,7 @@ export class PageContextService {
     return {
       user,
       tradingMode: this.config.starkex.tradingMode,
+      chainId: this.config.starkex.blockchain.chainId,
       instanceName: this.config.starkex.instanceName,
     }
   }

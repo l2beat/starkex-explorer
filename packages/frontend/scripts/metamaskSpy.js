@@ -5,11 +5,29 @@
 
 const oldRequest = window.ethereum.request
 window.ethereum.request = function (...args) {
-  console.log('request.args', args)
-  return Promise.resolve(oldRequest.apply(this, args)).then((value) => {
-    console.log('request.result', value)
+  console.log('[REQUEST] args', args)
+  return Promise.resolve(olDRequest.apply(this, args)).then((value) => {
+    console.log('[REQUEST] result', value)
     return value
   })
 }
 
-// TODO: add send, sendAsync support for dYdX
+const oldSend = window.ethereum.send
+window.ethereum.send = function (...args) {
+  console.log('[SEND] args', args)
+  return Promise.resolve(
+    oldSend.apply(this, args).then((value) => {
+      console.log('[SEND] result', value)
+      return value
+    })
+  )
+}
+
+const oldSendAsync = window.ethereum.sendAsync
+window.ethereum.sendAsync = function (...args) {
+  console.log('[SEND ASYNC] args', args)
+  return Promise.resolve(oldSendAsync.apply(this, args)).then((value) => {
+    console.log('[SEND ASYNC] result', value)
+    return value
+  })
+}
