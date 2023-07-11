@@ -63,11 +63,8 @@ export class L2TransactionRepository extends BaseRepository {
     this.getStatisticsByStateUpdateId = this.wrapAny(
       this.getStatisticsByStateUpdateId
     )
-    this.getStatisticsUpToStateUpdateId = this.wrapAny(
-      this.getStatisticsUpToStateUpdateId
-    )
-    this.getStatisticsByStarkKeyUpToStateUpdateId = this.wrapAny(
-      this.getStatisticsByStarkKeyUpToStateUpdateId
+    this.getStatisticsByStateUpdateIdAndStarkKey = this.wrapAny(
+      this.getStatisticsByStateUpdateIdAndStarkKey
     )
     this.getPaginatedWithoutMulti = this.wrapGet(this.getPaginatedWithoutMulti)
     this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
@@ -250,43 +247,21 @@ export class L2TransactionRepository extends BaseRepository {
     )
   }
 
-  async getStatisticsUpToStateUpdateId(
+  async getStatisticsByStateUpdateIdAndStarkKey(
     stateUpdateId: number,
-    trx?: Knex.Transaction
-  ): Promise<PreprocessedL2TransactionsStatistics> {
-    const knex = await this.knex(trx)
-
-    const countGroupedByType = (await knex('l2_transactions')
-      .select('type')
-      .where('state_update_id', '<=', stateUpdateId)
-      .count()
-      .groupBy('type')) as {
-      type: PerpetualL2TransactionData['type']
-      count: number
-    }[]
-
-    const [replaced] = await knex('l2_transactions')
-      .where('state_update_id', '<=', stateUpdateId)
-      .andWhere({ state: 'replaced' })
-      .count()
-
-    return toPreprocessedL2TransactionsStatistics(
-      countGroupedByType,
-      Number(replaced?.count ?? 0)
-    )
-  }
-
-  async getStatisticsByStarkKeyUpToStateUpdateId(
     starkKey: StarkKey,
-    stateUpdateId: number,
     trx?: Knex.Transaction
   ): Promise<PreprocessedUserL2TransactionsStatistics> {
     const knex = await this.knex(trx)
     const countGroupedByType = (await knex('l2_transactions')
       .select('type')
-      .where({ stark_key_a: starkKey.toString() })
-      .orWhere({ stark_key_b: starkKey.toString() })
-      .andWhere('state_update_id', '<=', stateUpdateId)
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      .where((qB) =>
+        qB
+          .where({ stark_key_a: starkKey.toString() })
+          .orWhere({ stark_key_b: starkKey.toString() })
+      )
+      .andWhere({ state_update_id: stateUpdateId })
       .count()
       .groupBy('type')) as {
       type: Exclude<PerpetualL2TransactionData['type'], 'MultiTransaction'>
@@ -301,9 +276,8 @@ export class L2TransactionRepository extends BaseRepository {
           .where({ stark_key_a: starkKey.toString() })
           .orWhere({ stark_key_b: starkKey.toString() })
       )
-      .andWhere('state_update_id', '<=', stateUpdateId)
+      .andWhere({ state_update_id: stateUpdateId })
       .count()
-
     return toPreprocessedUserL2TransactionsStatistics(
       countGroupedByType,
       Number(replaced?.count ?? 0)

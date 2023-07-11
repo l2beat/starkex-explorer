@@ -5,13 +5,16 @@ import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/P
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
+import { Logger } from '../../tools/Logger'
+import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 
 export class StateDetailsPreprocessor {
   constructor(
     private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
-    private readonly l2TransactionRepository: L2TransactionRepository
+    private readonly l2TransactionRepository: L2TransactionRepository,
+    private readonly logger: Logger
   ) {}
 
   async preprocessNextStateUpdate(
@@ -54,22 +57,31 @@ export class StateDetailsPreprocessor {
       )
 
     for (const recordToUpdate of recordsToUpdate) {
+      this.logger.info(
+        `Catching up L2 transaction statistics for state update ${recordToUpdate.stateUpdateId}`
+      )
+
       const statisticsForStateUpdate =
         await this.l2TransactionRepository.getStatisticsByStateUpdateId(
           recordToUpdate.stateUpdateId,
           trx
         )
-
-      const statisticsUpToStateUpdate =
-        await this.l2TransactionRepository.getStatisticsUpToStateUpdateId(
-          recordToUpdate.stateUpdateId,
+      const mostRecentPreprocessedStateDetails =
+        await this.preprocessedStateDetailsRepository.findMostRecentWithL2TransactionStatistics(
           trx
         )
+
       await this.preprocessedStateDetailsRepository.update(
         {
           id: recordToUpdate.id,
           l2TransactionsStatistics: statisticsForStateUpdate,
-          cumulativeL2TransactionsStatistics: statisticsUpToStateUpdate,
+          cumulativeL2TransactionsStatistics:
+            mostRecentPreprocessedStateDetails?.cumulativeL2TransactionsStatistics
+              ? sumNumericValuesByKey(
+                  mostRecentPreprocessedStateDetails.cumulativeL2TransactionsStatistics,
+                  statisticsForStateUpdate
+                )
+              : statisticsForStateUpdate,
         },
         trx
       )

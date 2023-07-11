@@ -10,6 +10,7 @@ import {
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
 import { Logger } from '../../tools/Logger'
+import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 
 export class UserStatisticsPreprocessor {
   constructor(
@@ -130,17 +131,32 @@ export class UserStatisticsPreprocessor {
       )
 
     for (const recordToUpdate of recordsToUpdate) {
+      this.logger.info(
+        `Preprocessing l2 transactions user statistics for state update ${recordToUpdate.stateUpdateId}, ${recordToUpdate.starkKey}`
+      )
       const l2TransactionsStatistics =
-        await this.l2TransactionRepository.getStatisticsByStarkKeyUpToStateUpdateId(
-          recordToUpdate.starkKey,
+        await this.l2TransactionRepository.getStatisticsByStateUpdateIdAndStarkKey(
           recordToUpdate.stateUpdateId,
+          recordToUpdate.starkKey,
+          trx
+        )
+
+      const mostRecentPreprocessedUserStatistics =
+        await this.preprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+          recordToUpdate.starkKey,
           trx
         )
 
       await this.preprocessedUserStatisticsRepository.update(
         {
           id: recordToUpdate.id,
-          l2TransactionsStatistics,
+          l2TransactionsStatistics:
+            mostRecentPreprocessedUserStatistics?.l2TransactionsStatistics
+              ? sumNumericValuesByKey(
+                  mostRecentPreprocessedUserStatistics.l2TransactionsStatistics,
+                  l2TransactionsStatistics
+                )
+              : l2TransactionsStatistics,
         },
         trx
       )

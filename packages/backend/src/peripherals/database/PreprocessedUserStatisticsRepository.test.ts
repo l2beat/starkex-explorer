@@ -146,6 +146,58 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
 
   describe(
     PreprocessedUserStatisticsRepository.prototype
+      .findMostRecentWithL2TransactionsStatisticsByStarkKey.name,
+    async () => {
+      it('returns undefined when no records found', async () => {
+        await repository.add(
+          {
+            ...mockRecord,
+            stateUpdateId: 100,
+          },
+          trx
+        )
+        const result =
+          await repository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+            mockRecord.starkKey,
+            trx
+          )
+
+        expect(result).toEqual(undefined)
+      })
+
+      it('finds most recent with l2 transactions statistics by stark key', async () => {
+        const l2TransactionsStatistics =
+          fakePreprocessedL2TransactionsStatistics()
+        const id = await repository.add(
+          {
+            ...mockRecord,
+            stateUpdateId: 100,
+            l2TransactionsStatistics,
+          },
+          trx
+        )
+        await repository.add({ ...mockRecord, stateUpdateId: 200 }, trx)
+        await repository.add({ ...mockRecord, stateUpdateId: 1900 }, trx)
+
+        const result =
+          await repository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+            mockRecord.starkKey,
+            trx
+          )
+
+        expect(result).toEqual({
+          ...mockRecord,
+          id,
+          stateUpdateId: 100,
+          l2TransactionsStatistics,
+          prevHistoryId: undefined,
+        })
+      })
+    }
+  )
+
+  describe(
+    PreprocessedUserStatisticsRepository.prototype
       .getAllWithoutL2TransactionStatisticsUpToStateUpdateId.name,
     () => {
       it('returns empty array when no records', async () => {

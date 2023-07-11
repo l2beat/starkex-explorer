@@ -16,6 +16,7 @@ import {
 } from '../../peripherals/database/StateUpdateRepository'
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
 import { Logger } from '../../tools/Logger'
+import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {
@@ -229,20 +230,29 @@ describe(UserStatisticsPreprocessor.name, () => {
         } as PreprocessedUserStatisticsRecord,
       ]
 
-      it('catches up', async () => {
-        const fakeL2Statistics = fakePreprocessedL2TransactionsStatistics()
-        const preprocessTo = 120
+      const getStatisticsByStateUpdateIdAndStarkKeyResult =
+        fakePreprocessedL2TransactionsStatistics()
+      const findMostRecentWithL2TransactionsStatisticsByStarkKeyResult = {
+        l2TransactionsStatistics: fakePreprocessedL2TransactionsStatistics(),
+      }
+      const preprocessTo = 120
 
+      it('catches up using sum of latest preprocessed record statistics and current statistics as l2 transaction statistics', async () => {
         const mockPreprocessedUserStatisticsRepository =
           mockObject<PreprocessedUserStatisticsRepository>({
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
+            findMostRecentWithL2TransactionsStatisticsByStarkKey:
+              mockFn().resolvesTo(
+                findMostRecentWithL2TransactionsStatisticsByStarkKeyResult
+              ),
             update: mockFn().resolvesTo(1),
           })
         const mockL2TransactionRepository = mockObject<L2TransactionRepository>(
           {
-            getStatisticsByStarkKeyUpToStateUpdateId:
-              mockFn().resolvesTo(fakeL2Statistics),
+            getStatisticsByStateUpdateIdAndStarkKey: mockFn().resolvesTo(
+              getStatisticsByStateUpdateIdAndStarkKeyResult
+            ),
           }
         )
 
@@ -267,19 +277,88 @@ describe(UserStatisticsPreprocessor.name, () => {
 
         for (const recordToUpdate of recordsToUpdate) {
           expect(
-            mockL2TransactionRepository.getStatisticsByStarkKeyUpToStateUpdateId
+            mockL2TransactionRepository.getStatisticsByStateUpdateIdAndStarkKey
           ).toHaveBeenCalledWith(
-            recordToUpdate.starkKey,
             recordToUpdate.stateUpdateId,
+            recordToUpdate.starkKey,
             trx
           )
+
+          expect(
+            mockPreprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey
+          ).toHaveBeenCalledWith(recordToUpdate.starkKey, trx)
 
           expect(
             mockPreprocessedUserStatisticsRepository.update
           ).toHaveBeenCalledWith(
             {
               id: recordToUpdate.id,
-              l2TransactionsStatistics: fakeL2Statistics,
+              l2TransactionsStatistics: sumNumericValuesByKey(
+                findMostRecentWithL2TransactionsStatisticsByStarkKeyResult.l2TransactionsStatistics,
+                getStatisticsByStateUpdateIdAndStarkKeyResult
+              ),
+            },
+            trx
+          )
+        }
+      })
+
+      it('catches up using current statistics as l2 transaction statistics if no previous statistics', async () => {
+        const mockPreprocessedUserStatisticsRepository =
+          mockObject<PreprocessedUserStatisticsRepository>({
+            getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
+              mockFn().resolvesTo(recordsToUpdate),
+            findMostRecentWithL2TransactionsStatisticsByStarkKey:
+              mockFn().resolvesTo(undefined),
+            update: mockFn().resolvesTo(1),
+          })
+        const mockL2TransactionRepository = mockObject<L2TransactionRepository>(
+          {
+            getStatisticsByStateUpdateIdAndStarkKey: mockFn().resolvesTo(
+              getStatisticsByStateUpdateIdAndStarkKeyResult
+            ),
+          }
+        )
+
+        const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
+          mockPreprocessedUserStatisticsRepository,
+          mockObject<PreprocessedAssetHistoryRepository>(),
+          mockObject<PreprocessedStateUpdateRepository>(),
+          mockObject<StateUpdateRepository>(),
+          mockL2TransactionRepository,
+          mockObject<KeyValueStore>(),
+          Logger.SILENT
+        )
+
+        await userStatisticsPreprocessor.catchUpL2Transactions(
+          trx,
+          preprocessTo
+        )
+
+        expect(
+          mockPreprocessedUserStatisticsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId
+        ).toHaveBeenCalledWith(preprocessTo, trx)
+
+        for (const recordToUpdate of recordsToUpdate) {
+          expect(
+            mockL2TransactionRepository.getStatisticsByStateUpdateIdAndStarkKey
+          ).toHaveBeenCalledWith(
+            recordToUpdate.stateUpdateId,
+            recordToUpdate.starkKey,
+            trx
+          )
+
+          expect(
+            mockPreprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey
+          ).toHaveBeenCalledWith(recordToUpdate.starkKey, trx)
+
+          expect(
+            mockPreprocessedUserStatisticsRepository.update
+          ).toHaveBeenCalledWith(
+            {
+              id: recordToUpdate.id,
+              l2TransactionsStatistics:
+                getStatisticsByStateUpdateIdAndStarkKeyResult,
             },
             trx
           )

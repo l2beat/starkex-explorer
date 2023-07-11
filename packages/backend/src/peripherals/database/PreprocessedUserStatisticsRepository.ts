@@ -59,6 +59,20 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
     return row ? toPreprocessedUserStatisticsRecord(row) : undefined
   }
 
+  async findMostRecentWithL2TransactionsStatisticsByStarkKey(
+    starkKey: StarkKey,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const row = await knex('preprocessed_user_statistics')
+      .whereNotNull('l2_transactions_statistics')
+      .andWhere('stark_key', starkKey.toString())
+      .orderBy('state_update_id', 'desc')
+      .first()
+
+    return row ? toPreprocessedUserStatisticsRecord(row) : undefined
+  }
+
   async getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
     stateUpdateId: number,
     trx: Knex.Transaction
