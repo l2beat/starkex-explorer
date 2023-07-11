@@ -12,7 +12,10 @@ import {
   decodeTransactionData,
   encodeL2TransactionData,
 } from './PerpetualL2Transaction'
-import { PreprocessedL2TransactionsStatistics } from './PreprocessedL2TransactionsStatistics'
+import {
+  PreprocessedL2TransactionsStatistics,
+  PreprocessedUserL2TransactionsStatistics,
+} from './PreprocessedL2TransactionsStatistics'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -52,8 +55,17 @@ export class L2TransactionRepository extends BaseRepository {
     this.countAllDistinctTransactionIds = this.wrapAny(
       this.countAllDistinctTransactionIds
     )
+    this.countAllDistinctTransactionIdsByStateUpdateId = this.wrapAny(
+      this.countAllDistinctTransactionIdsByStateUpdateId
+    )
     this.countAllUserSpecific = this.wrapAny(this.countAllUserSpecific)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
+    this.getStatisticsByStateUpdateId = this.wrapAny(
+      this.getStatisticsByStateUpdateId
+    )
+    this.getStatisticsByStarkKeyUpToStateUpdateId = this.wrapAny(
+      this.getStatisticsByStarkKeyUpToStateUpdateId
+    )
     this.getPaginatedWithoutMulti = this.wrapGet(this.getPaginatedWithoutMulti)
     this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
     this.findById = this.wrapFind(this.findById)
@@ -184,6 +196,31 @@ export class L2TransactionRepository extends BaseRepository {
     return Number(result!.count)
   }
 
+  async countAllUserSpecific(starkKey: StarkKey) {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions')
+      .where({
+        stark_key_a: starkKey.toString(),
+      })
+      .orWhere({
+        stark_key_b: starkKey.toString(),
+      })
+      .count()
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
+  async countByTransactionId(transactionId: number): Promise<number> {
+    const knex = await this.knex()
+    const [result] = await knex('l2_transactions')
+      // We filter out the child transactions because they should not be counted as separate transactions
+      .where({ transaction_id: transactionId, parent_id: null })
+      .count()
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return Number(result!.count)
+  }
+
   async getStatisticsByStateUpdateId(
     stateUpdateId: number,
     trx?: Knex.Transaction
@@ -210,29 +247,40 @@ export class L2TransactionRepository extends BaseRepository {
     )
   }
 
-  async countAllUserSpecific(starkKey: StarkKey) {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions')
-      .where({
-        stark_key_a: starkKey.toString(),
-      })
-      .orWhere({
-        stark_key_b: starkKey.toString(),
-      })
+  async getStatisticsByStarkKeyUpToStateUpdateId(
+    starkKey: StarkKey,
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<PreprocessedUserL2TransactionsStatistics> {
+    const knex = await this.knex(trx)
+    const countGroupedByType = (await knex('l2_transactions')
+      .select('type')
+      .where((qB) =>
+        qB
+          .where({ stark_key_a: starkKey.toString() })
+          .orWhere({ stark_key_b: starkKey.toString() })
+      )
+      .andWhere('state_update_id', '<=', stateUpdateId)
       .count()
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
-  }
+      .groupBy('type')) as {
+      type: Exclude<PerpetualL2TransactionData['type'], 'MultiTransaction'>
+      count: number
+    }[]
 
-  async countByTransactionId(transactionId: number): Promise<number> {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions')
-      // We filter out the child transactions because they should not be counted as separate transactions
-      .where({ transaction_id: transactionId, parent_id: null })
+    const [replaced] = await knex('l2_transactions')
+      .where({ state: 'replaced' })
+      .andWhere((qB) =>
+        qB
+          .where({ stark_key_a: starkKey.toString() })
+          .orWhere({ stark_key_b: starkKey.toString() })
+      )
+      .andWhere('state_update_id', '<=', stateUpdateId)
       .count()
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
+    return toPreprocessedUserL2TransactionsStatistics(
+      countGroupedByType,
+      Number(replaced?.count ?? 0)
+    )
   }
 
   async getPaginatedWithoutMulti({ offset, limit }: PaginationOptions) {
@@ -366,6 +414,53 @@ function toAggregatedRecord(
     alternativeTransactions: alternatives.map((alternative) =>
       decodeTransactionData(alternative.data)
     ),
+  }
+}
+
+function toPreprocessedUserL2TransactionsStatistics(
+  countGroupedByType: {
+    type: Exclude<PerpetualL2TransactionData['type'], 'MultiTransaction'>
+    count: number
+  }[],
+  replacedCount: number
+): PreprocessedUserL2TransactionsStatistics {
+  return {
+    depositCount: Number(
+      countGroupedByType.find((x) => x.type === 'Deposit')?.count ?? 0
+    ),
+    withdrawalToAddressCount: Number(
+      countGroupedByType.find((x) => x.type === 'WithdrawalToAddress')?.count ??
+        0
+    ),
+    forcedWithdrawalCount: Number(
+      countGroupedByType.find((x) => x.type === 'ForcedWithdrawal')?.count ?? 0
+    ),
+    tradeCount: Number(
+      countGroupedByType.find((x) => x.type === 'Trade')?.count ?? 0
+    ),
+    forcedTradeCount: Number(
+      countGroupedByType.find((x) => x.type === 'ForcedTrade')?.count ?? 0
+    ),
+    transferCount: Number(
+      countGroupedByType.find((x) => x.type === 'Transfer')?.count ?? 0
+    ),
+    conditionalTransferCount: Number(
+      countGroupedByType.find((x) => x.type === 'ConditionalTransfer')?.count ??
+        0
+    ),
+    liquidateCount: Number(
+      countGroupedByType.find((x) => x.type === 'Liquidate')?.count ?? 0
+    ),
+    deleverageCount: Number(
+      countGroupedByType.find((x) => x.type === 'Deleverage')?.count ?? 0
+    ),
+    fundingTickCount: Number(
+      countGroupedByType.find((x) => x.type === 'FundingTick')?.count ?? 0
+    ),
+    oraclePricesTickCount: Number(
+      countGroupedByType.find((x) => x.type === 'OraclePricesTick')?.count ?? 0
+    ),
+    replacedTransactionsCount: replacedCount,
   }
 }
 

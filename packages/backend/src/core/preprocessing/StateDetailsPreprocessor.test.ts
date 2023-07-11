@@ -5,7 +5,6 @@ import range from 'lodash/range'
 
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import { sumPreprocessedL2TransactionsStatistics } from '../../peripherals/database/PreprocessedL2TransactionsStatistics'
 import {
   PreprocessedStateDetailsRecord,
   PreprocessedStateDetailsRepository,
@@ -13,6 +12,7 @@ import {
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
+import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {
@@ -200,18 +200,16 @@ describe(StateDetailsPreprocessor.name, () => {
                     i +
                     1
                 ),
-              cumulativeL2TransactionsStatistics:
-                sumPreprocessedL2TransactionsStatistics(
-                  fakePreprocessedL2TransactionsStatistics(
-                    lastPreprocessedRecordWithL2TransactionCount.stateUpdateId +
-                      i
-                  ),
-                  fakePreprocessedL2TransactionsStatistics(
-                    lastPreprocessedRecordWithL2TransactionCount.stateUpdateId +
-                      i +
-                      1
-                  )
+              cumulativeL2TransactionsStatistics: sumNumericValuesByKey(
+                fakePreprocessedL2TransactionsStatistics(
+                  lastPreprocessedRecordWithL2TransactionCount.stateUpdateId + i
                 ),
+                fakePreprocessedL2TransactionsStatistics(
+                  lastPreprocessedRecordWithL2TransactionCount.stateUpdateId +
+                    i +
+                    1
+                )
+              ),
             },
             trx
           )
@@ -280,12 +278,11 @@ describe(StateDetailsPreprocessor.name, () => {
               id: i + 2,
               l2TransactionsStatistics:
                 fakePreprocessedL2TransactionsStatistics(i + 1),
-              cumulativeL2TransactionsStatistics:
-                sumPreprocessedL2TransactionsStatistics(
-                  fakePreprocessedStateDetailsRecord(i)
-                    .cumulativeL2TransactionsStatistics!,
-                  fakePreprocessedL2TransactionsStatistics(i + 1)
-                ),
+              cumulativeL2TransactionsStatistics: sumNumericValuesByKey(
+                fakePreprocessedStateDetailsRecord(i)
+                  .cumulativeL2TransactionsStatistics!,
+                fakePreprocessedL2TransactionsStatistics(i + 1)
+              ),
             },
             trx
           )

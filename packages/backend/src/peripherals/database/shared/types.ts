@@ -1,7 +1,10 @@
 import { json } from '@explorer/types'
 
 import { PerpetualL2TransactionDataJson } from '../PerpetualL2Transaction'
-import { PreprocessedL2TransactionsStatistics } from '../PreprocessedL2TransactionsStatistics'
+import {
+  PreprocessedL2TransactionsStatistics,
+  PreprocessedUserL2TransactionsStatistics,
+} from '../PreprocessedL2TransactionsStatistics'
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import {
   UserTransactionJSON,
@@ -272,7 +275,7 @@ declare module 'knex/types/tables' {
     stark_key: string
     asset_count: number
     balance_change_count: number
-    l2_transactions_statistics: PreprocessedL2TransactionsStatistics | null
+    l2_transactions_statistics: PreprocessedUserL2TransactionsStatistics | null
     prev_history_id: number | null
   }
 

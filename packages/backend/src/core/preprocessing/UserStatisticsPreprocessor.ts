@@ -1,6 +1,7 @@
 import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
@@ -12,12 +13,13 @@ import { Logger } from '../../tools/Logger'
 
 export class UserStatisticsPreprocessor {
   constructor(
-    private preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
-    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
-    private preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
-    private stateUpdateRepository: StateUpdateRepository,
+    private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    private readonly preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
+    private readonly stateUpdateRepository: StateUpdateRepository,
+    private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly kvStore: KeyValueStore,
-    protected logger: Logger
+    private readonly logger: Logger
   ) {}
 
   async catchUp(trx: Knex.Transaction) {
@@ -115,6 +117,51 @@ export class UserStatisticsPreprocessor {
         trx
       )
     }
+  }
+
+  async catchUpL2Transactions(
+    trx: Knex.Transaction,
+    processedStateUpdateId: number
+  ) {
+    const preprocessTo = await this.getStateUpdateIdToCatchUpTo(
+      trx,
+      processedStateUpdateId
+    )
+
+    const recordsToUpdate =
+      await this.preprocessedUserStatisticsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
+        preprocessTo,
+        trx
+      )
+
+    for (const recordToUpdate of recordsToUpdate) {
+      const l2TransactionsStatistics =
+        await this.l2TransactionRepository.getStatisticsByStarkKeyUpToStateUpdateId(
+          recordToUpdate.starkKey,
+          recordToUpdate.stateUpdateId,
+          trx
+        )
+
+      await this.preprocessedUserStatisticsRepository.update(
+        {
+          id: recordToUpdate.id,
+          l2TransactionsStatistics,
+        },
+        trx
+      )
+    }
+  }
+
+  async getStateUpdateIdToCatchUpTo(
+    trx: Knex.Transaction,
+    processedStateUpdateId: number
+  ) {
+    const lastL2TransactionStateUpdateId =
+      await this.l2TransactionRepository.findLatestStateUpdateId(trx)
+
+    return lastL2TransactionStateUpdateId
+      ? Math.min(lastL2TransactionStateUpdateId, processedStateUpdateId)
+      : processedStateUpdateId
   }
 
   async rollbackOneStateUpdate(

@@ -165,8 +165,12 @@ export class Preprocessor<T extends AssetHash | AssetId> {
 
         // We cannot assume that Feeder and Availability Gateway are in sync
         // with the state updates. We need to catch up with L2 transactions
-        // before we can move on.
+        // after each state update to make sure it is preprocessed as far as possible.
         await this.stateDetailsPreprocessor.catchUpL2Transactions(
+          trx,
+          nextStateUpdate.id
+        )
+        await this.userStatisticsPreprocessor.catchUpL2Transactions(
           trx,
           nextStateUpdate.id
         )

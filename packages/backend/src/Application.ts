@@ -461,6 +461,7 @@ export class Application {
         preprocessedAssetHistoryRepository,
         preprocessedStateUpdateRepository,
         stateUpdateRepository,
+        l2TransactionRepository,
         kvStore,
         logger
       )
@@ -497,6 +498,7 @@ export class Application {
         preprocessedAssetHistoryRepository,
         preprocessedStateUpdateRepository,
         stateUpdateRepository,
+        l2TransactionRepository,
         kvStore,
         logger
       )

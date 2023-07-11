@@ -375,6 +375,7 @@ describe(Preprocessor.name, () => {
       const mockUserStatisticsPreprocessor =
         mockObject<UserStatisticsPreprocessor>({
           preprocessNextStateUpdate: async () => undefined,
+          catchUpL2Transactions: mockFn(async () => {}),
         })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async (id: number) => ({ [2]: fakeStateUpdate2 }[id]),
@@ -415,6 +416,9 @@ describe(Preprocessor.name, () => {
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2)
       expect(
         mockStateDetailsPreprocessor.catchUpL2Transactions
+      ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2.id)
+      expect(
+        mockUserStatisticsPreprocessor.catchUpL2Transactions
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2.id)
     })
 

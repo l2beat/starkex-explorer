@@ -998,6 +998,104 @@ describe(L2TransactionRepository.name, () => {
   )
 
   describe(
+    L2TransactionRepository.prototype.getStatisticsByStarkKeyUpToStateUpdateId
+      .name,
+    () => {
+      it('returns correct statistics', async () => {
+        const stateUpdateId = 1
+        const transactionIds = []
+        const starkKeys = [StarkKey.fake(), StarkKey.fake()] as const
+        for (const [index, starkKey] of starkKeys.entries()) {
+          for (let i = 0; i < 10; i++) {
+            transactionIds.push(
+              await repository.add({
+                transactionId: (1234 + i) * (index + 1),
+                stateUpdateId,
+                blockNumber: 12345,
+                data: {
+                  type: 'Deposit',
+                  starkKey: starkKey,
+                  positionId: 1234n,
+                  amount: 5000n,
+                },
+              })
+            )
+          }
+          await repository.add({
+            transactionId: 1234 * (index + 1),
+            stateUpdateId,
+            blockNumber: 12345,
+            data: {
+              type: 'ForcedTrade',
+              starkKeyA: StarkKey.fake(),
+              starkKeyB: starkKey,
+              positionIdA: 123n,
+              positionIdB: 1234n,
+              collateralAssetId: AssetHash.fake(),
+              syntheticAssetId: AssetId('BTC-10'),
+              collateralAmount: 1234n,
+              syntheticAmount: 1234n,
+              isABuyingSynthetic: true,
+              nonce: 1222n,
+              isValid: true,
+            },
+          })
+          await repository.add({
+            stateUpdateId: 1,
+            transactionId: 123456 * (index + 1),
+            blockNumber: 12345,
+            data: {
+              type: 'MultiTransaction',
+              transactions: [
+                {
+                  type: 'Deposit',
+                  starkKey: starkKey,
+                  positionId: 1234n,
+                  amount: 5000n,
+                },
+                {
+                  positionId: 1234n,
+                  starkKey: starkKey,
+                  ethereumAddress: EthereumAddress.fake(),
+                  amount: 12345n,
+                  nonce: 10n,
+                  expirationTimestamp: Timestamp(1234),
+                  signature: {
+                    r: Hash256.fake(),
+                    s: Hash256.fake(),
+                  },
+                  type: 'WithdrawalToAddress',
+                },
+              ],
+            } as PerpetualL2MultiTransactionData,
+          })
+        }
+
+        const statistics =
+          await repository.getStatisticsByStarkKeyUpToStateUpdateId(
+            starkKeys[0],
+            stateUpdateId
+          )
+
+        expect(statistics).toEqual({
+          depositCount: 11,
+          withdrawalToAddressCount: 1,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 1,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          replacedTransactionsCount: 1,
+        })
+      })
+    }
+  )
+
+  describe(
     L2TransactionRepository.prototype.getPaginatedWithoutMulti.name,
     () => {
       it('respects the limit parameter', async () => {

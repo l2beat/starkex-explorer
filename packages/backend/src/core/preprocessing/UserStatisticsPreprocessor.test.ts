@@ -3,13 +3,18 @@ import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
-import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
+import {
+  PreprocessedUserStatisticsRecord,
+  PreprocessedUserStatisticsRepository,
+} from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
+import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
 import { Logger } from '../../tools/Logger'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
@@ -97,6 +102,7 @@ describe(UserStatisticsPreprocessor.name, () => {
           mockPreprocessedAssetHistoryRepository,
           mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
+          mockObject<L2TransactionRepository>(),
           mockObject<KeyValueStore>(),
           Logger.SILENT
         )
@@ -184,6 +190,7 @@ describe(UserStatisticsPreprocessor.name, () => {
           mockObject<PreprocessedAssetHistoryRepository>(),
           mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
+          mockObject<L2TransactionRepository>(),
           mockObject<KeyValueStore>(),
           Logger.SILENT
         )
@@ -196,6 +203,130 @@ describe(UserStatisticsPreprocessor.name, () => {
         expect(
           mockPreprocessedUserStatisticsRepository.deleteByStateUpdateId
         ).toHaveBeenOnlyCalledWith(stateUpdate.id, trx)
+      })
+    }
+  )
+
+  describe(
+    UserStatisticsPreprocessor.prototype.catchUpL2Transactions.name,
+    () => {
+      const trx = mockObject<Knex.Transaction>()
+      const recordsToUpdate: PreprocessedUserStatisticsRecord[] = []
+
+      it('catches up', async () => {
+        const fakeL2Statistics = fakePreprocessedL2TransactionsStatistics()
+        const processedStateUpdateId = 150
+        const preprocessTo = 120
+
+        const mockPreprocessedUserStatisticsRepository =
+          mockObject<PreprocessedUserStatisticsRepository>({
+            getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
+              mockFn().resolvesTo(recordsToUpdate),
+          })
+        const mockL2TransactionRepository = mockObject<L2TransactionRepository>(
+          {
+            getStatisticsByStarkKeyUpToStateUpdateId:
+              mockFn().resolvesTo(fakeL2Statistics),
+          }
+        )
+
+        const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
+          mockPreprocessedUserStatisticsRepository,
+          mockObject<PreprocessedAssetHistoryRepository>(),
+          mockObject<PreprocessedStateUpdateRepository>(),
+          mockObject<StateUpdateRepository>(),
+          mockL2TransactionRepository,
+          mockObject<KeyValueStore>(),
+          Logger.SILENT
+        )
+
+        const mockGetStateUpdateIdToCatchUpTo =
+          mockFn().resolvesTo(preprocessTo)
+        userStatisticsPreprocessor.getStateUpdateIdToCatchUpTo =
+          mockGetStateUpdateIdToCatchUpTo
+
+        await userStatisticsPreprocessor.catchUpL2Transactions(
+          trx,
+          processedStateUpdateId
+        )
+
+        expect(mockGetStateUpdateIdToCatchUpTo).toHaveBeenCalledWith(
+          trx,
+          processedStateUpdateId
+        )
+        expect(
+          mockPreprocessedUserStatisticsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId
+        ).toHaveBeenCalledWith(preprocessTo, trx)
+
+        for (const recordToUpdate of recordsToUpdate) {
+          expect(
+            mockL2TransactionRepository.getStatisticsByStarkKeyUpToStateUpdateId
+          ).toHaveBeenCalledWith(
+            recordToUpdate.starkKey,
+            recordToUpdate.stateUpdateId,
+            trx
+          )
+
+          expect(
+            mockPreprocessedUserStatisticsRepository.update
+          ).toHaveBeenCalledWith(
+            {
+              id: recordToUpdate.id,
+              l2TransactionsStatistics: fakeL2Statistics,
+            },
+            trx
+          )
+        }
+      })
+    }
+  )
+
+  describe(
+    UserStatisticsPreprocessor.prototype.getStateUpdateIdToCatchUpTo.name,
+    () => {
+      const trx = mockObject<Knex.Transaction>()
+      const lastL2TransactionStateUpdateId = 100
+      const mockedL2TransactionRepository = mockObject<L2TransactionRepository>(
+        {
+          findLatestStateUpdateId: mockFn().resolvesTo(
+            lastL2TransactionStateUpdateId
+          ),
+        }
+      )
+      const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
+        mockObject<PreprocessedUserStatisticsRepository>(),
+        mockObject<PreprocessedAssetHistoryRepository>(),
+        mockObject<PreprocessedStateUpdateRepository>(),
+        mockObject<StateUpdateRepository>(),
+        mockedL2TransactionRepository,
+        mockObject<KeyValueStore>(),
+        Logger.SILENT
+      )
+
+      it('returns the latest l2 transaction state update id if it is smaller than processed state update id', async () => {
+        const preprocessTo =
+          await userStatisticsPreprocessor.getStateUpdateIdToCatchUpTo(
+            trx,
+            lastL2TransactionStateUpdateId + 1
+          )
+
+        expect(
+          mockedL2TransactionRepository.findLatestStateUpdateId
+        ).toHaveBeenCalledWith(trx)
+        expect(preprocessTo).toEqual(lastL2TransactionStateUpdateId)
+      })
+
+      it('returns the processed state update id if it is smaller than latest l2 transaction state update id', async () => {
+        const preprocessTo =
+          await userStatisticsPreprocessor.getStateUpdateIdToCatchUpTo(
+            trx,
+            lastL2TransactionStateUpdateId - 1
+          )
+
+        expect(
+          mockedL2TransactionRepository.findLatestStateUpdateId
+        ).toHaveBeenCalledWith(trx)
+        expect(preprocessTo).toEqual(lastL2TransactionStateUpdateId - 1)
       })
     }
   )
