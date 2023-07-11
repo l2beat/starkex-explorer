@@ -13,20 +13,20 @@ interface NavbarProps {
 }
 
 export function Navbar({ searchBar = true, context }: NavbarProps) {
-  const { user, instanceName, tradingMode } = context
-
+  const { user, instanceName, tradingMode, chainId } = context
+  const isMainnet = chainId === 1
   return (
     <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
       <a
         className="flex items-center justify-center gap-2 divide-x sm:gap-4"
         href="/"
       >
-        <div className="flex gap-2 sm:gap-4">
+        <div className="flex items-center justify-center gap-2 sm:gap-4">
           <L2BeatMinimalLogo className="h-[30px] sm:h-[36px]" />
           <ProjectLogo instanceName={instanceName} />
         </div>
         <span className="hidden py-1 pl-2 text-zinc-500 sm:inline sm:pl-4">
-          {instanceName.toUpperCase()} EXPLORER
+          {instanceName.toUpperCase()} {isMainnet ? '' : 'TESTNET'} EXPLORER
         </span>
       </a>
       <div className="flex flex-wrap gap-y-2 gap-x-4">

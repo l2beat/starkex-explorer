@@ -20,6 +20,12 @@ module.exports = {
       amber: {
         500: '#F7931A',
       },
+      orange: {
+        500: '#FF7425',
+      },
+      fuchsia: {
+        400: '#F770F1',
+      },
       zinc: {
         500: '#70737D',
         800: '#272A31',
@@ -35,6 +41,7 @@ module.exports = {
         900: '#0C0C0E',
       },
       blue: {
+        300: '#5AC4FF',
         400: '#3e8fef',
         500: '#3B82F6',
         600: '#2166FF',
@@ -52,6 +59,7 @@ module.exports = {
       },
       cyan: {
         600: '#1595B1',
+        400: '#25FFD8',
       },
       yellow: {
         300: '#FFEF5A',

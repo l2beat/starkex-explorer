@@ -1,6 +1,6 @@
 import { AssetHash, PedersenHash, StarkKey } from '@explorer/types'
 
-import { SpotBatchDataResponse } from './schema'
+import { SpotBatchDataResponse } from './schema/SpotBatchDataResponse'
 
 export interface SpotBatch {
   previousBatchId: number

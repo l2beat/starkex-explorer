@@ -6,7 +6,7 @@ import {
 } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
-export const ACCEPT_OFFER_FORM_ID = 'accept-offer-form'
+export const ACCEPT_OFFER_FORM_CLASS = 'accept-offer-form'
 
 interface AcceptOfferFormProps extends AcceptOfferFormData {
   children: ReactNode
@@ -31,7 +31,7 @@ export function AcceptOfferForm(props: AcceptOfferFormProps) {
   const collateralAssetJson = serializeCollateralAsset(props.collateralAsset)
   return (
     <form
-      className={ACCEPT_OFFER_FORM_ID}
+      className={ACCEPT_OFFER_FORM_CLASS}
       action={`/offers/${props.id}/accept`}
       method="POST"
       data-offer={createdJson}

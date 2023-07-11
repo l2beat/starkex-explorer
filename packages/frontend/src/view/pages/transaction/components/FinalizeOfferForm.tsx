@@ -5,7 +5,7 @@ import {
 } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
-export const FINALIZE_OFFER_FORM_ID = 'finalize-offer-form'
+export const FINALIZE_OFFER_FORM_CLASS = 'finalize-offer-form'
 
 interface FinalizeOfferFormProps extends FinalizeOfferFormData {
   children: ReactNode
@@ -18,7 +18,7 @@ export function FinalizeOfferForm(props: FinalizeOfferFormProps) {
   const collateralAssetJson = serializeCollateralAsset(collateralAsset)
   return (
     <form
-      className={FINALIZE_OFFER_FORM_ID}
+      className={FINALIZE_OFFER_FORM_CLASS}
       action="/forced/trades"
       method="POST"
       data-offer-id={offerId.toString()}

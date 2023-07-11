@@ -1,9 +1,10 @@
+import { TradingMode } from '@explorer/shared'
 import { Knex } from 'knex'
 
 import { LogLevel } from '../tools/Logger'
 import { StarkexConfig } from './starkex/StarkexConfig'
 
-export interface Config {
+export interface Config<T extends TradingMode = TradingMode> {
   name: string
   logger: {
     logLevel: LogLevel
@@ -15,5 +16,5 @@ export interface Config {
   enablePreprocessing: boolean
   freshStart: boolean
   forceHttps: boolean
-  starkex: StarkexConfig
+  starkex: StarkexConfig<T>
 }

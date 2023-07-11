@@ -1,5 +1,6 @@
 import {
   renderStateUpdateBalanceChangesPage,
+  renderStateUpdateL2TransactionsPage,
   renderStateUpdatePage,
   renderStateUpdateTransactionsPage,
 } from '@explorer/frontend'
@@ -10,6 +11,7 @@ import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { PageContextService } from '../../core/PageContextService'
 import { PaginationOptions } from '../../model/PaginationOptions'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -19,6 +21,7 @@ import { UserTransactionData } from '../../peripherals/database/transactions/Use
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { getAssetPriceUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
+import { l2TransactionToEntry } from './l2TransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
 
 const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
@@ -33,7 +36,9 @@ export class StateUpdateController {
     private readonly assetDetailsService: AssetDetailsService,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
-    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository
+    private readonly l2TransactionRepository: L2TransactionRepository,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    private readonly showL2Transactions: boolean
   ) {}
 
   async getStateUpdatePage(
@@ -49,7 +54,9 @@ export class StateUpdateController {
       totalBalanceChanges,
       prices,
       forcedUserTransactions,
-      forcedUserTransactionsCount,
+      totalForcedUserTransactions,
+      l2Transactions,
+      totalL2Transactions,
     ] = await Promise.all([
       this.stateUpdateRepository.findById(stateUpdateId),
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
@@ -68,6 +75,16 @@ export class StateUpdateController {
       this.userTransactionRepository.getCountOfIncludedByStateUpdateId(
         stateUpdateId
       ),
+      this.l2TransactionRepository.getPaginatedWithoutMultiByStateUpdateId(
+        stateUpdateId,
+        {
+          offset: 0,
+          limit: 6,
+        }
+      ),
+      this.l2TransactionRepository.countAllDistinctTransactionIdsByStateUpdateId(
+        stateUpdateId
+      ),
     ])
 
     if (!stateUpdate) {
@@ -80,9 +97,7 @@ export class StateUpdateController {
     const balanceChangeEntries = toBalanceChangeEntries(balanceChanges)
     const priceEntries = prices.map((p) => ({
       asset: { hashOrId: p.assetId },
-      price: getAssetPriceUSDCents(p.price, p.assetId),
-      // TODO: Don't display, or correctly calculate this:
-      change: 0n,
+      priceInCents: getAssetPriceUSDCents(p.price, p.assetId),
     }))
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -112,8 +127,42 @@ export class StateUpdateController {
       balanceChanges: balanceChangeEntries,
       totalBalanceChanges,
       priceChanges: priceEntries,
+      l2Transactions: this.showL2Transactions
+        ? {
+            data: l2Transactions.map(l2TransactionToEntry),
+            total: totalL2Transactions,
+          }
+        : undefined,
       transactions,
-      totalTransactions: forcedUserTransactionsCount,
+      totalTransactions: totalForcedUserTransactions,
+    })
+
+    return { type: 'success', content }
+  }
+
+  async getStateUpdateL2TransactionsPage(
+    givenUser: Partial<UserDetails>,
+    stateUpdateId: number,
+    pagination: PaginationOptions
+  ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+
+    const [l2Transactions, total] = await Promise.all([
+      this.l2TransactionRepository.getPaginatedWithoutMultiByStateUpdateId(
+        stateUpdateId,
+        pagination
+      ),
+      this.l2TransactionRepository.countAllDistinctTransactionIdsByStateUpdateId(
+        stateUpdateId
+      ),
+    ])
+
+    const content = renderStateUpdateL2TransactionsPage({
+      context,
+      id: stateUpdateId.toString(),
+      l2Transactions: l2Transactions.map(l2TransactionToEntry),
+      ...pagination,
+      total,
     })
 
     return { type: 'success', content }

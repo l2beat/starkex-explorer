@@ -33,7 +33,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
               registered account for this address. This is because StarkEx
               systems use Stark keys and not Ethereum addresses as user ids. If
               you are a user of this system please recover your Stark key with
-              your Ethereum Address.
+              your Ethereum address.
             </span>
             <span>
               To obtain the key we will ask you to sign a message with metamask.
@@ -64,6 +64,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
             <Button
               id={RECOVER_STARK_KEY_BUTTON_ID}
               data-instance-name={props.context.instanceName}
+              data-chain-id={props.context.chainId}
             >
               Recover
             </Button>

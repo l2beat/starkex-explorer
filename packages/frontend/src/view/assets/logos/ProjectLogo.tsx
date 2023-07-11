@@ -1,6 +1,7 @@
 import { assertUnreachable, InstanceName } from '@explorer/shared'
 import React from 'react'
 
+import { ApexLogo } from './ApexLogo'
 import { DydxLogo } from './DydxLogo'
 import { GammaXLogo } from './GammaXLogo'
 import { MyriaLogo } from './MyriaLogo'
@@ -23,7 +24,7 @@ function getProjectLogoComponent(instanceName: InstanceName) {
     case 'Myria':
       return MyriaLogo
     case 'ApeX':
-      return MyriaLogo
+      return ApexLogo
     default:
       assertUnreachable(instanceName)
   }

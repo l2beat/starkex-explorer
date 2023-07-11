@@ -1,7 +1,7 @@
+import { PerpetualL2TransactionData } from '@explorer/shared'
 import { PedersenHash, Timestamp } from '@explorer/types'
 
-import { L2TransactionData } from '../database/L2Transaction'
-import { PerpetualBatchInfoResponse } from './schema'
+import { PerpetualBatchInfoResponse } from './schema/PerpetualBatchInfoResponse'
 import { toPerpetualL2TransactionData } from './toPerpetualTransactions'
 
 export interface PerpetualBatchInfo {
@@ -13,8 +13,8 @@ export interface PerpetualBatchInfo {
   transactionsInfo: {
     wasReplaced: boolean
     originalTransactionId: number
-    originalTransaction: L2TransactionData
-    alternativeTransactions?: L2TransactionData[]
+    originalTransaction: PerpetualL2TransactionData
+    alternativeTransactions?: PerpetualL2TransactionData[]
   }[]
   previousOrderRoot: PedersenHash
   timeCreated: Timestamp

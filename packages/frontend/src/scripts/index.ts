@@ -7,6 +7,7 @@ import { initMetamask } from './metamask'
 import { initPagination } from './pagination'
 import { initRegularWithdrawalForm } from './regularWithdrawal'
 import { initStateUpdateStats } from './stateUpdateStats'
+import { initTooltips } from './tooltips'
 
 initMetamask()
 initForcedActionForms()
@@ -17,3 +18,4 @@ initStarkKeyRecovery()
 initForcedTradeOfferForms()
 initRegularWithdrawalForm()
 initStarkKeyRegistration()
+initTooltips()
