@@ -3,6 +3,7 @@ import { Knex } from 'knex'
 import { PreprocessedUserStatisticsRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
+import { PreprocessedUserL2TransactionsStatistics } from './PreprocessedL2TransactionsStatistics'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -14,6 +15,7 @@ export interface PreprocessedUserStatisticsRecord {
   starkKey: StarkKey
   assetCount: number
   balanceChangeCount: number
+  l2TransactionsStatistics?: PreprocessedUserL2TransactionsStatistics
   prevHistoryId?: number
 }
 
@@ -25,6 +27,10 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
 
     this.add = this.wrapAdd(this.add)
     this.findCurrentByStarkKey = this.wrapFind(this.findCurrentByStarkKey)
+    this.getAllWithoutL2TransactionStatisticsUpToStateUpdateId = this.wrapGet(
+      this.getAllWithoutL2TransactionStatisticsUpToStateUpdateId
+    )
+    this.update = this.wrapUpdate(this.update)
     this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
 
@@ -50,7 +56,47 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
       .orderBy('state_update_id', 'desc')
       .first()
 
-    if (row) return toPreprocessedUserStatisticsRecord(row)
+    return row ? toPreprocessedUserStatisticsRecord(row) : undefined
+  }
+
+  async findMostRecentWithL2TransactionsStatisticsByStarkKey(
+    starkKey: StarkKey,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const row = await knex('preprocessed_user_statistics')
+      .whereNotNull('l2_transactions_statistics')
+      .andWhere('stark_key', starkKey.toString())
+      .orderBy('state_update_id', 'desc')
+      .first()
+
+    return row ? toPreprocessedUserStatisticsRecord(row) : undefined
+  }
+
+  async getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
+    stateUpdateId: number,
+    trx: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const results = await knex('preprocessed_user_statistics')
+      .whereNull('l2_transactions_statistics')
+      .andWhere('state_update_id', '<=', stateUpdateId)
+      .orderBy('state_update_id', 'asc')
+
+    return results.map(toPreprocessedUserStatisticsRecord)
+  }
+
+  async update(
+    record: Pick<PreprocessedUserStatisticsRecord, 'id'> &
+      Partial<PreprocessedUserStatisticsRecord>,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const row = toPartialPreprocessedUserStatisticsRecord(record)
+
+    return await knex('preprocessed_user_statistics')
+      .where({ id: record.id })
+      .update(row)
   }
 
   async deleteByStateUpdateId(stateUpdateId: number, trx: Knex.Transaction) {
@@ -78,6 +124,27 @@ function toPreprocessedUserStatisticsRecord(
     balanceChangeCount: row.balance_change_count,
     starkKey: StarkKey(row.stark_key),
     prevHistoryId: row.prev_history_id ?? undefined,
+    l2TransactionsStatistics: row.l2_transactions_statistics ?? undefined,
+  }
+}
+
+function toPartialPreprocessedUserStatisticsRecord(
+  record: Pick<PreprocessedUserStatisticsRecord, 'id'> &
+    Partial<PreprocessedUserStatisticsRecord>
+): Pick<PreprocessedUserStatisticsRow, 'id'> &
+  Partial<PreprocessedUserStatisticsRow> {
+  return {
+    id: record.id,
+    state_update_id: record.stateUpdateId,
+    block_number: record.blockNumber,
+    timestamp: record.timestamp
+      ? BigInt(record.timestamp.toString())
+      : undefined,
+    stark_key: record.starkKey?.toString(),
+    asset_count: record.assetCount,
+    balance_change_count: record.balanceChangeCount,
+    l2_transactions_statistics: record.l2TransactionsStatistics ?? null,
+    prev_history_id: record.prevHistoryId ?? null,
   }
 }
 
@@ -92,5 +159,6 @@ function toPreprocessedUserStatisticsRow(
     asset_count: record.assetCount,
     balance_change_count: record.balanceChangeCount,
     prev_history_id: record.prevHistoryId ?? null,
+    l2_transactions_statistics: record.l2TransactionsStatistics ?? null,
   }
 }

@@ -1,6 +1,7 @@
 import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
@@ -9,15 +10,17 @@ import {
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
 import { Logger } from '../../tools/Logger'
+import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 
 export class UserStatisticsPreprocessor {
   constructor(
-    private preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
-    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
-    private preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
-    private stateUpdateRepository: StateUpdateRepository,
+    private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    private readonly preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
+    private readonly stateUpdateRepository: StateUpdateRepository,
+    private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly kvStore: KeyValueStore,
-    protected logger: Logger
+    private readonly logger: Logger
   ) {}
 
   async catchUp(trx: Knex.Transaction) {
@@ -111,6 +114,49 @@ export class UserStatisticsPreprocessor {
           balanceChangeCount,
           assetCount,
           prevHistoryId: currentStatisticsRecord?.id,
+        },
+        trx
+      )
+    }
+  }
+
+  async catchUpL2Transactions(
+    trx: Knex.Transaction,
+    preprocessToStateUpdateId: number
+  ) {
+    const recordsToUpdate =
+      await this.preprocessedUserStatisticsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
+        preprocessToStateUpdateId,
+        trx
+      )
+
+    for (const recordToUpdate of recordsToUpdate) {
+      this.logger.info(
+        `Preprocessing l2 transactions user statistics for state update ${recordToUpdate.stateUpdateId}, ${recordToUpdate.starkKey}`
+      )
+      const l2TransactionsStatistics =
+        await this.l2TransactionRepository.getStatisticsByStateUpdateIdAndStarkKey(
+          recordToUpdate.stateUpdateId,
+          recordToUpdate.starkKey,
+          trx
+        )
+
+      const mostRecentPreprocessedUserStatistics =
+        await this.preprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+          recordToUpdate.starkKey,
+          trx
+        )
+
+      await this.preprocessedUserStatisticsRepository.update(
+        {
+          id: recordToUpdate.id,
+          l2TransactionsStatistics:
+            mostRecentPreprocessedUserStatistics?.l2TransactionsStatistics
+              ? sumNumericValuesByKey(
+                  mostRecentPreprocessedUserStatistics.l2TransactionsStatistics,
+                  l2TransactionsStatistics
+                )
+              : l2TransactionsStatistics,
         },
         trx
       )

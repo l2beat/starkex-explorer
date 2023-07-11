@@ -453,6 +453,7 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
+        l2TransactionRepository,
         logger
       )
 
@@ -461,6 +462,7 @@ export class Application {
         preprocessedAssetHistoryRepository,
         preprocessedStateUpdateRepository,
         stateUpdateRepository,
+        l2TransactionRepository,
         kvStore,
         logger
       )
@@ -472,6 +474,7 @@ export class Application {
         perpetualHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        l2TransactionRepository,
         logger,
         isPreprocessorEnabled
       )
@@ -489,6 +492,7 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
+        l2TransactionRepository,
         logger
       )
 
@@ -497,6 +501,7 @@ export class Application {
         preprocessedAssetHistoryRepository,
         preprocessedStateUpdateRepository,
         stateUpdateRepository,
+        l2TransactionRepository,
         kvStore,
         logger
       )
@@ -508,6 +513,7 @@ export class Application {
         spotHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        l2TransactionRepository,
         logger,
         isPreprocessorEnabled
       )

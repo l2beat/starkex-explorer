@@ -1,6 +1,10 @@
 import { json } from '@explorer/types'
 
 import { PerpetualL2TransactionDataJson } from '../PerpetualL2Transaction'
+import {
+  PreprocessedL2TransactionsStatistics,
+  PreprocessedUserL2TransactionsStatistics,
+} from '../PreprocessedL2TransactionsStatistics'
 import { SentTransactionJSON } from '../transactions/SentTransaction'
 import {
   UserTransactionJSON,
@@ -248,6 +252,8 @@ declare module 'knex/types/tables' {
     timestamp: bigint
     asset_update_count: number
     forced_transaction_count: number
+    l2_transactions_statistics: PreprocessedL2TransactionsStatistics | null
+    cumulative_l2_transactions_statistics: PreprocessedL2TransactionsStatistics | null
   }
 
   interface WithdrawableAssetRow {
@@ -269,6 +275,7 @@ declare module 'knex/types/tables' {
     stark_key: string
     asset_count: number
     balance_change_count: number
+    l2_transactions_statistics: PreprocessedUserL2TransactionsStatistics | null
     prev_history_id: number | null
   }
 

@@ -16,6 +16,7 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { fakeHexString } from '@explorer/types/src/fake'
+import { randomInt } from 'crypto'
 
 import {
   Accepted,
@@ -26,6 +27,7 @@ import {
   ForcedTransactionRecord,
   Updates,
 } from '../peripherals/database/ForcedTransactionRepository'
+import { PreprocessedL2TransactionsStatistics } from '../peripherals/database/PreprocessedL2TransactionsStatistics'
 import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { SentTransactionData } from '../peripherals/database/transactions/SentTransaction'
 import { SentTransactionRecord } from '../peripherals/database/transactions/SentTransactionRepository'
@@ -379,4 +381,24 @@ export const fakeCollateralAsset: CollateralAsset = {
     '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d'
   ),
   price: 1_000_000n,
+}
+
+export const fakePreprocessedL2TransactionsStatistics = (
+  count?: number
+): PreprocessedL2TransactionsStatistics => {
+  return {
+    depositCount: count ?? randomInt(0, 100),
+    withdrawalToAddressCount: count ?? randomInt(0, 100),
+    forcedWithdrawalCount: count ?? randomInt(0, 100),
+    tradeCount: count ?? randomInt(0, 100),
+    forcedTradeCount: count ?? randomInt(0, 100),
+    transferCount: count ?? randomInt(0, 100),
+    conditionalTransferCount: count ?? randomInt(0, 100),
+    liquidateCount: count ?? randomInt(0, 100),
+    deleverageCount: count ?? randomInt(0, 100),
+    fundingTickCount: count ?? randomInt(0, 100),
+    oraclePricesTickCount: count ?? randomInt(0, 100),
+    multiTransactionCount: count ?? randomInt(0, 100),
+    replacedTransactionsCount: count ?? randomInt(0, 100),
+  }
 }
