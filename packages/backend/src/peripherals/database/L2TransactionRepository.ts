@@ -63,6 +63,9 @@ export class L2TransactionRepository extends BaseRepository {
     this.getStatisticsByStateUpdateId = this.wrapAny(
       this.getStatisticsByStateUpdateId
     )
+    this.getStatisticsUpToStateUpdateId = this.wrapAny(
+      this.getStatisticsUpToStateUpdateId
+    )
     this.getStatisticsByStarkKeyUpToStateUpdateId = this.wrapAny(
       this.getStatisticsByStarkKeyUpToStateUpdateId
     )
@@ -238,6 +241,32 @@ export class L2TransactionRepository extends BaseRepository {
 
     const [replaced] = await knex('l2_transactions')
       .where({ state_update_id: stateUpdateId })
+      .andWhere({ state: 'replaced' })
+      .count()
+
+    return toPreprocessedL2TransactionsStatistics(
+      countGroupedByType,
+      Number(replaced?.count ?? 0)
+    )
+  }
+
+  async getStatisticsUpToStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<PreprocessedL2TransactionsStatistics> {
+    const knex = await this.knex(trx)
+
+    const countGroupedByType = (await knex('l2_transactions')
+      .select('type')
+      .where('state_update_id', '<=', stateUpdateId)
+      .count()
+      .groupBy('type')) as {
+      type: PerpetualL2TransactionData['type']
+      count: number
+    }[]
+
+    const [replaced] = await knex('l2_transactions')
+      .where('state_update_id', '<=', stateUpdateId)
       .andWhere({ state: 'replaced' })
       .count()
 

@@ -60,7 +60,7 @@ const genericWithdrawalToAddressTransaction = {
   },
 } as const
 
-describe.only(L2TransactionRepository.name, () => {
+describe(L2TransactionRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
 
   const repository = new L2TransactionRepository(database, Logger.SILENT)
@@ -636,6 +636,59 @@ describe.only(L2TransactionRepository.name, () => {
         const statistics = await repository.getStatisticsByStateUpdateId(
           stateUpdateId
         )
+
+        expect(statistics).toEqual({
+          depositCount: 12,
+          withdrawalToAddressCount: 1,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 0,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          multiTransactionCount: 1,
+          replacedTransactionsCount: 1,
+        })
+      })
+    }
+  )
+
+  describe(
+    L2TransactionRepository.prototype.getStatisticsUpToStateUpdateId.name,
+    () => {
+      it('returns correct statistics', async () => {
+        const transactionIds = []
+        for (let i = 0; i < 10; i++) {
+          transactionIds.push(
+            await repository.add({
+              ...genericDepositTransaction,
+              transactionId: 1234 + i,
+              stateUpdateId: 10,
+            })
+          )
+        }
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 1234,
+          stateUpdateId: 30,
+        })
+        await repository.add({
+          ...genericMultiTransaction([
+            genericDepositTransaction.data,
+            genericWithdrawalToAddressTransaction.data,
+          ]),
+          stateUpdateId: 20,
+        })
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 12,
+          stateUpdateId: 60,
+        })
+
+        const statistics = await repository.getStatisticsUpToStateUpdateId(59)
 
         expect(statistics).toEqual({
           depositCount: 12,

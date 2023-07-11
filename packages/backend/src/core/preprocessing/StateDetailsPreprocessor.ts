@@ -5,7 +5,6 @@ import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/P
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 
 export class StateDetailsPreprocessor {
   constructor(
@@ -44,64 +43,33 @@ export class StateDetailsPreprocessor {
     )
   }
 
-  async catchUpL2Transactions(trx: Knex.Transaction, stateUpdateId: number) {
-    const lastWithL2TransactionCount =
-      await this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(
+  async catchUpL2Transactions(
+    trx: Knex.Transaction,
+    preprocessToStateUpdateId: number
+  ) {
+    const recordsToUpdate =
+      await this.preprocessedStateDetailsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
+        preprocessToStateUpdateId,
         trx
       )
 
-    const lastL2TransactionStateUpdateId =
-      await this.l2TransactionRepository.findLatestStateUpdateId(trx)
-
-    const preprocessTo = lastL2TransactionStateUpdateId
-      ? Math.min(lastL2TransactionStateUpdateId, stateUpdateId)
-      : stateUpdateId
-
-    for (
-      let id = lastWithL2TransactionCount?.stateUpdateId
-        ? lastWithL2TransactionCount.stateUpdateId + 1
-        : 1;
-      id <= preprocessTo;
-      id++
-    ) {
-      const preprocessedRecord =
-        await this.preprocessedStateDetailsRepository.findByStateUpdateId(
-          id,
+    for (const recordToUpdate of recordsToUpdate) {
+      const statisticsForStateUpdate =
+        await this.l2TransactionRepository.getStatisticsByStateUpdateId(
+          recordToUpdate.stateUpdateId,
           trx
         )
 
-      if (!preprocessedRecord)
-        throw new Error(
-          `PreprocessedStateDetails not found for stateUpdateId: ${id}`
-        )
-
-      const previousPreprocessedRecord =
-        await this.preprocessedStateDetailsRepository.findByStateUpdateId(
-          id - 1,
+      const statisticsUpToStateUpdate =
+        await this.l2TransactionRepository.getStatisticsUpToStateUpdateId(
+          recordToUpdate.stateUpdateId,
           trx
         )
-
-      // Sanity check: previousPreprocessedRecord should exist if it does not exist then something is wrong
-      if (id > 1 && !previousPreprocessedRecord) {
-        throw new Error(
-          `PreprocessedStateDetails not found for stateUpdateId: ${id - 1}`
-        )
-      }
-
-      const statistics =
-        await this.l2TransactionRepository.getStatisticsByStateUpdateId(id, trx)
-
       await this.preprocessedStateDetailsRepository.update(
         {
-          id: preprocessedRecord.id,
-          l2TransactionsStatistics: statistics,
-          cumulativeL2TransactionsStatistics:
-            previousPreprocessedRecord?.cumulativeL2TransactionsStatistics
-              ? sumNumericValuesByKey(
-                  previousPreprocessedRecord.cumulativeL2TransactionsStatistics,
-                  statistics
-                )
-              : statistics,
+          id: recordToUpdate.id,
+          l2TransactionsStatistics: statisticsForStateUpdate,
+          cumulativeL2TransactionsStatistics: statisticsUpToStateUpdate,
         },
         trx
       )

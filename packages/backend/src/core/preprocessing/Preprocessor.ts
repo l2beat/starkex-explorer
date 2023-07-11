@@ -1,5 +1,7 @@
 import { AssetHash, AssetId } from '@explorer/types'
+import { Knex } from 'knex'
 
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import {
   StateUpdateRecord,
@@ -21,6 +23,7 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private historyPreprocessor: HistoryPreprocessor<T>,
     private stateDetailsPreprocessor: StateDetailsPreprocessor,
     private userStatisticsPreprocessor: UserStatisticsPreprocessor,
+    private l2TransactionRepository: L2TransactionRepository,
     private logger: Logger,
     private isEnabled: boolean = true
   ) {
@@ -166,13 +169,19 @@ export class Preprocessor<T extends AssetHash | AssetId> {
         // We cannot assume that Feeder and Availability Gateway are in sync
         // with the state updates. We need to catch up with L2 transactions
         // after each state update to make sure it is preprocessed as far as possible.
+        const preprocessL2TransactionTo =
+          await this.getStateUpdateIdToCatchUpL2TransactionsTo(
+            trx,
+            nextStateUpdate.id
+          )
+
         await this.stateDetailsPreprocessor.catchUpL2Transactions(
           trx,
-          nextStateUpdate.id
+          preprocessL2TransactionTo
         )
         await this.userStatisticsPreprocessor.catchUpL2Transactions(
           trx,
-          nextStateUpdate.id
+          preprocessL2TransactionTo
         )
         // END TRANSACTION
       }
@@ -218,5 +227,17 @@ export class Preprocessor<T extends AssetHash | AssetId> {
         // END TRANSACTION
       }
     )
+  }
+
+  async getStateUpdateIdToCatchUpL2TransactionsTo(
+    trx: Knex.Transaction,
+    processedStateUpdateId: number
+  ) {
+    const lastL2TransactionStateUpdateId =
+      await this.l2TransactionRepository.findLatestStateUpdateId(trx)
+
+    return lastL2TransactionStateUpdateId
+      ? Math.min(lastL2TransactionStateUpdateId, processedStateUpdateId)
+      : processedStateUpdateId
   }
 }

@@ -1,7 +1,6 @@
 import { AssetHash, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
-import range from 'lodash/range'
 
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
@@ -12,7 +11,6 @@ import {
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
-import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {
@@ -111,256 +109,82 @@ describe(StateDetailsPreprocessor.name, () => {
   describe(
     StateDetailsPreprocessor.prototype.catchUpL2Transactions.name,
     () => {
-      it('should catch up preprocessed records with l2 transaction data from lastPreprocessedRecordWithL2TransactionCount to the currently preprocessed state update', async () => {
+      it('catches up', async () => {
         const trx = mockObject<Knex.Transaction>()
-        const catchUpToStateUpdateId = 200
-        const lastPreprocessedRecordWithL2TransactionCount = {
-          stateUpdateId: 195,
+        const recordsToUpdate: PreprocessedStateDetailsRecord[] = [
+          {
+            id: 1,
+            stateUpdateId: 200,
+          } as PreprocessedStateDetailsRecord,
+          {
+            id: 3,
+            stateUpdateId: 250,
+          } as PreprocessedStateDetailsRecord,
+          {
+            id: 5,
+            stateUpdateId: 400,
+          } as PreprocessedStateDetailsRecord,
+        ]
+        const preprocessToStateUpdateId = 200
+        const mockedPreprocessedStateDetailsRepository =
+          mockObject<PreprocessedStateDetailsRepository>({
+            getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
+              mockFn().resolvesTo(recordsToUpdate),
+            update: mockFn().resolvesTo(1),
+          })
+        const mockedL2TransactionRepository =
+          mockObject<L2TransactionRepository>({
+            getStatisticsByStateUpdateId: mockFn(
+              async (stateUpdateId: number) =>
+                fakePreprocessedL2TransactionsStatistics(stateUpdateId)
+            ),
+            getStatisticsUpToStateUpdateId: mockFn(
+              async (stateUpdateId: number) =>
+                fakePreprocessedL2TransactionsStatistics(stateUpdateId + 1)
+            ),
+          })
+        const stateDetailsPreprocessor = new StateDetailsPreprocessor(
+          mockedPreprocessedStateDetailsRepository,
+          mockObject<PreprocessedAssetHistoryRepository<AssetHash>>(),
+          mockObject<UserTransactionRepository>(),
+          mockedL2TransactionRepository
+        )
+
+        await stateDetailsPreprocessor.catchUpL2Transactions(
+          trx,
+          preprocessToStateUpdateId
+        )
+
+        expect(
+          mockedPreprocessedStateDetailsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId
+        ).toHaveBeenCalledWith(preprocessToStateUpdateId, trx)
+
+        for (const recordToUpdate of recordsToUpdate) {
+          expect(
+            mockedL2TransactionRepository.getStatisticsByStateUpdateId
+          ).toHaveBeenCalledWith(recordToUpdate.stateUpdateId, trx)
+
+          expect(
+            mockedL2TransactionRepository.getStatisticsUpToStateUpdateId
+          ).toHaveBeenCalledWith(recordToUpdate.stateUpdateId, trx)
+
+          expect(
+            mockedPreprocessedStateDetailsRepository.update(
+              {
+                id: recordToUpdate.id,
+                l2TransactionsStatistics:
+                  fakePreprocessedL2TransactionsStatistics(
+                    recordToUpdate.stateUpdateId
+                  ),
+                cumulativeL2TransactionsStatistics:
+                  fakePreprocessedL2TransactionsStatistics(
+                    recordToUpdate.stateUpdateId + 1
+                  ),
+              },
+              trx
+            )
+          )
         }
-        const lastL2TransactionStateUpdateId = 210
-        const mockedPreprocessedStateDetailsRepository =
-          mockObject<PreprocessedStateDetailsRepository>({
-            findLastWithL2TransactionsStatistics: mockFn().resolvesTo(
-              lastPreprocessedRecordWithL2TransactionCount
-            ),
-            findByStateUpdateId: mockFn(async (id: number) =>
-              fakePreprocessedStateDetailsRecord(id)
-            ),
-            update: mockFn().resolvesTo(1),
-          })
-        const mockedL2TransactionRepository =
-          mockObject<L2TransactionRepository>({
-            findLatestStateUpdateId: mockFn().resolvesTo(
-              lastL2TransactionStateUpdateId
-            ),
-            getStatisticsByStateUpdateId: mockFn(
-              async (stateUpdateId: number) =>
-                fakePreprocessedL2TransactionsStatistics(stateUpdateId)
-            ),
-          })
-        const stateDetailsPreprocessor = new StateDetailsPreprocessor(
-          mockedPreprocessedStateDetailsRepository,
-          mockObject<PreprocessedAssetHistoryRepository<AssetHash>>(),
-          mockObject<UserTransactionRepository>(),
-          mockedL2TransactionRepository
-        )
-
-        await stateDetailsPreprocessor.catchUpL2Transactions(
-          trx,
-          catchUpToStateUpdateId
-        )
-
-        expect(
-          mockedPreprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics
-        ).toHaveBeenCalledWith(trx)
-        expect(
-          mockedL2TransactionRepository.findLatestStateUpdateId
-        ).toHaveBeenCalledWith(trx)
-
-        range(
-          catchUpToStateUpdateId -
-            lastPreprocessedRecordWithL2TransactionCount.stateUpdateId
-        ).forEach((i) => {
-          expect(
-            mockedPreprocessedStateDetailsRepository.findByStateUpdateId
-          ).toHaveBeenNthCalledWith(
-            2 * i + 1,
-            lastPreprocessedRecordWithL2TransactionCount.stateUpdateId + i + 1,
-            trx
-          )
-
-          expect(
-            mockedL2TransactionRepository.getStatisticsByStateUpdateId
-          ).toHaveBeenNthCalledWith(
-            i + 1,
-            lastPreprocessedRecordWithL2TransactionCount.stateUpdateId + i + 1,
-            trx
-          )
-
-          expect(
-            mockedPreprocessedStateDetailsRepository.findByStateUpdateId
-          ).toHaveBeenNthCalledWith(
-            2 * i + 2,
-            lastPreprocessedRecordWithL2TransactionCount.stateUpdateId + i,
-            trx
-          )
-
-          expect(
-            mockedPreprocessedStateDetailsRepository.update
-          ).toHaveBeenNthCalledWith(
-            i + 1,
-            {
-              id:
-                lastPreprocessedRecordWithL2TransactionCount.stateUpdateId +
-                i +
-                2,
-              l2TransactionsStatistics:
-                fakePreprocessedL2TransactionsStatistics(
-                  lastPreprocessedRecordWithL2TransactionCount.stateUpdateId +
-                    i +
-                    1
-                ),
-              cumulativeL2TransactionsStatistics: sumNumericValuesByKey(
-                fakePreprocessedL2TransactionsStatistics(
-                  lastPreprocessedRecordWithL2TransactionCount.stateUpdateId + i
-                ),
-                fakePreprocessedL2TransactionsStatistics(
-                  lastPreprocessedRecordWithL2TransactionCount.stateUpdateId +
-                    i +
-                    1
-                )
-              ),
-            },
-            trx
-          )
-        })
-      })
-
-      it('should catch up preprocessed records with l2 transaction data from 0 (if no record was preprocessed before) to the latest l2 transaction state update id', async () => {
-        const trx = mockObject<Knex.Transaction>()
-        const catchUpToStateUpdateId = 10
-        const lastL2TransactionStateUpdateId = 5
-        const mockedPreprocessedStateDetailsRepository =
-          mockObject<PreprocessedStateDetailsRepository>({
-            findLastWithL2TransactionsStatistics:
-              mockFn().resolvesTo(undefined),
-            findByStateUpdateId: mockFn(async (stateUpdateId: number) =>
-              fakePreprocessedStateDetailsRecord(stateUpdateId)
-            ),
-            update: mockFn().resolvesTo(1),
-          })
-        const mockedL2TransactionRepository =
-          mockObject<L2TransactionRepository>({
-            findLatestStateUpdateId: mockFn().resolvesTo(
-              lastL2TransactionStateUpdateId
-            ),
-            getStatisticsByStateUpdateId: mockFn(
-              async (stateUpdateId: number) =>
-                fakePreprocessedL2TransactionsStatistics(stateUpdateId)
-            ),
-          })
-        const stateDetailsPreprocessor = new StateDetailsPreprocessor(
-          mockedPreprocessedStateDetailsRepository,
-          mockObject<PreprocessedAssetHistoryRepository<AssetHash>>(),
-          mockObject<UserTransactionRepository>(),
-          mockedL2TransactionRepository
-        )
-
-        await stateDetailsPreprocessor.catchUpL2Transactions(
-          trx,
-          catchUpToStateUpdateId
-        )
-
-        expect(
-          mockedPreprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics
-        ).toHaveBeenCalledWith(trx)
-        expect(
-          mockedL2TransactionRepository.findLatestStateUpdateId
-        ).toHaveBeenCalledWith(trx)
-
-        range(lastL2TransactionStateUpdateId).forEach((i) => {
-          expect(
-            mockedPreprocessedStateDetailsRepository.findByStateUpdateId
-          ).toHaveBeenNthCalledWith(i * 2 + 1, i + 1, trx)
-
-          expect(
-            mockedPreprocessedStateDetailsRepository.findByStateUpdateId
-          ).toHaveBeenNthCalledWith(i * 2 + 2, i, trx)
-          expect(
-            mockedL2TransactionRepository.getStatisticsByStateUpdateId
-          ).toHaveBeenNthCalledWith(i + 1, i + 1, trx)
-
-          expect(
-            mockedPreprocessedStateDetailsRepository.update
-          ).toHaveBeenNthCalledWith(
-            i + 1,
-            {
-              id: i + 2,
-              l2TransactionsStatistics:
-                fakePreprocessedL2TransactionsStatistics(i + 1),
-              cumulativeL2TransactionsStatistics: sumNumericValuesByKey(
-                fakePreprocessedStateDetailsRecord(i)
-                  .cumulativeL2TransactionsStatistics!,
-                fakePreprocessedL2TransactionsStatistics(i + 1)
-              ),
-            },
-            trx
-          )
-        })
-      })
-
-      it('should throw an error if no preprocessed state details record was found', async () => {
-        const trx = mockObject<Knex.Transaction>()
-        const catchUpToStateUpdateId = 10
-        const lastL2TransactionStateUpdateId = 5
-        const mockedPreprocessedStateDetailsRepository =
-          mockObject<PreprocessedStateDetailsRepository>({
-            findLastWithL2TransactionsStatistics:
-              mockFn().resolvesTo(undefined),
-            findByStateUpdateId: mockFn().resolvesTo(undefined),
-            update: mockFn().resolvesTo(1),
-          })
-        const mockedL2TransactionRepository =
-          mockObject<L2TransactionRepository>({
-            findLatestStateUpdateId: mockFn().resolvesTo(
-              lastL2TransactionStateUpdateId
-            ),
-            getStatisticsByStateUpdateId: mockFn().resolvesTo(
-              fakePreprocessedL2TransactionsStatistics()
-            ),
-          })
-        const stateDetailsPreprocessor = new StateDetailsPreprocessor(
-          mockedPreprocessedStateDetailsRepository,
-          mockObject<PreprocessedAssetHistoryRepository<AssetHash>>(),
-          mockObject<UserTransactionRepository>(),
-          mockedL2TransactionRepository
-        )
-
-        await expect(() =>
-          stateDetailsPreprocessor.catchUpL2Transactions(
-            trx,
-            catchUpToStateUpdateId
-          )
-        ).toBeRejectedWith(Error)
-      })
-
-      it('should throw an error if no previous preprocessed state details record was found and id > 1', async () => {
-        const trx = mockObject<Knex.Transaction>()
-        const catchUpToStateUpdateId = 10
-        const lastL2TransactionStateUpdateId = 5
-        const mockedPreprocessedStateDetailsRepository =
-          mockObject<PreprocessedStateDetailsRepository>({
-            findLastWithL2TransactionsStatistics:
-              mockFn().resolvesTo(undefined),
-            findByStateUpdateId: mockFn()
-              .resolvesToOnce({ id: 1 } as
-                | PreprocessedStateDetailsRecord
-                | undefined)
-              .resolvesToOnce(undefined),
-            update: mockFn().resolvesTo(1),
-          })
-        const mockedL2TransactionRepository =
-          mockObject<L2TransactionRepository>({
-            findLatestStateUpdateId: mockFn().resolvesTo(
-              lastL2TransactionStateUpdateId
-            ),
-            getStatisticsByStateUpdateId: mockFn().resolvesTo(
-              fakePreprocessedL2TransactionsStatistics()
-            ),
-          })
-        const stateDetailsPreprocessor = new StateDetailsPreprocessor(
-          mockedPreprocessedStateDetailsRepository,
-          mockObject<PreprocessedAssetHistoryRepository<AssetHash>>(),
-          mockObject<UserTransactionRepository>(),
-          mockedL2TransactionRepository
-        )
-
-        await expect(() =>
-          stateDetailsPreprocessor.catchUpL2Transactions(
-            trx,
-            catchUpToStateUpdateId
-          )
-        ).toBeRejectedWith(Error)
       })
     }
   )

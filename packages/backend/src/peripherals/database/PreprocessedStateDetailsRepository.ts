@@ -29,10 +29,6 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     this.add = this.wrapAdd(this.add)
     this.countAll = this.wrapAny(this.countAll)
     this.findById = this.wrapFind(this.findById)
-    this.findByStateUpdateId = this.wrapFind(this.findByStateUpdateId)
-    this.findLastWithL2TransactionsStatistics = this.wrapFind(
-      this.findLastWithL2TransactionsStatistics
-    )
     this.getPaginated = this.wrapGet(this.getPaginated)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
@@ -72,16 +68,17 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     return record ? toPreprocessedStateDetailsRecord(record) : undefined
   }
 
-  async findByStateUpdateId(
+  async getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
     stateUpdateId: number,
-    trx?: Knex.Transaction
-  ): Promise<PreprocessedStateDetailsRecord | undefined> {
+    trx: Knex.Transaction
+  ) {
     const knex = await this.knex(trx)
-    const record = await knex('preprocessed_state_details')
-      .where({ state_update_id: stateUpdateId })
-      .first()
+    const results = await knex('preprocessed_state_details')
+      .whereNull('l2_transactions_statistics')
+      .andWhere('state_update_id', '<=', stateUpdateId)
+      .orderBy('state_update_id', 'asc')
 
-    return record ? toPreprocessedStateDetailsRecord(record) : undefined
+    return results.map(toPreprocessedStateDetailsRecord)
   }
 
   async getPaginated(
@@ -94,16 +91,6 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
       .offset(offset)
       .limit(limit)
     return rows.map((r) => toPreprocessedStateDetailsRecord(r))
-  }
-
-  async findLastWithL2TransactionsStatistics(trx: Knex.Transaction) {
-    const knex = await this.knex(trx)
-    const [result] = await knex('preprocessed_state_details')
-      .whereNotNull('l2_transactions_statistics')
-      .orderBy('state_update_id', 'desc')
-      .limit(1)
-
-    return result ? toPreprocessedStateDetailsRecord(result) : undefined
   }
 
   async deleteAll(trx: Knex.Transaction) {

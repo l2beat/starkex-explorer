@@ -211,17 +211,33 @@ describe(UserStatisticsPreprocessor.name, () => {
     UserStatisticsPreprocessor.prototype.catchUpL2Transactions.name,
     () => {
       const trx = mockObject<Knex.Transaction>()
-      const recordsToUpdate: PreprocessedUserStatisticsRecord[] = []
+      const recordsToUpdate: PreprocessedUserStatisticsRecord[] = [
+        {
+          id: 1,
+          stateUpdateId: 200,
+          starkKey: StarkKey.fake(),
+        } as PreprocessedUserStatisticsRecord,
+        {
+          id: 2,
+          stateUpdateId: 300,
+          starkKey: StarkKey.fake(),
+        } as PreprocessedUserStatisticsRecord,
+        {
+          id: 3,
+          stateUpdateId: 400,
+          starkKey: StarkKey.fake(),
+        } as PreprocessedUserStatisticsRecord,
+      ]
 
       it('catches up', async () => {
         const fakeL2Statistics = fakePreprocessedL2TransactionsStatistics()
-        const processedStateUpdateId = 150
         const preprocessTo = 120
 
         const mockPreprocessedUserStatisticsRepository =
           mockObject<PreprocessedUserStatisticsRepository>({
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
+            update: mockFn().resolvesTo(1),
           })
         const mockL2TransactionRepository = mockObject<L2TransactionRepository>(
           {
@@ -240,20 +256,11 @@ describe(UserStatisticsPreprocessor.name, () => {
           Logger.SILENT
         )
 
-        const mockGetStateUpdateIdToCatchUpTo =
-          mockFn().resolvesTo(preprocessTo)
-        userStatisticsPreprocessor.getStateUpdateIdToCatchUpTo =
-          mockGetStateUpdateIdToCatchUpTo
-
         await userStatisticsPreprocessor.catchUpL2Transactions(
           trx,
-          processedStateUpdateId
+          preprocessTo
         )
 
-        expect(mockGetStateUpdateIdToCatchUpTo).toHaveBeenCalledWith(
-          trx,
-          processedStateUpdateId
-        )
         expect(
           mockPreprocessedUserStatisticsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId
         ).toHaveBeenCalledWith(preprocessTo, trx)
@@ -277,56 +284,6 @@ describe(UserStatisticsPreprocessor.name, () => {
             trx
           )
         }
-      })
-    }
-  )
-
-  describe(
-    UserStatisticsPreprocessor.prototype.getStateUpdateIdToCatchUpTo.name,
-    () => {
-      const trx = mockObject<Knex.Transaction>()
-      const lastL2TransactionStateUpdateId = 100
-      const mockedL2TransactionRepository = mockObject<L2TransactionRepository>(
-        {
-          findLatestStateUpdateId: mockFn().resolvesTo(
-            lastL2TransactionStateUpdateId
-          ),
-        }
-      )
-      const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
-        mockObject<PreprocessedUserStatisticsRepository>(),
-        mockObject<PreprocessedAssetHistoryRepository>(),
-        mockObject<PreprocessedStateUpdateRepository>(),
-        mockObject<StateUpdateRepository>(),
-        mockedL2TransactionRepository,
-        mockObject<KeyValueStore>(),
-        Logger.SILENT
-      )
-
-      it('returns the latest l2 transaction state update id if it is smaller than processed state update id', async () => {
-        const preprocessTo =
-          await userStatisticsPreprocessor.getStateUpdateIdToCatchUpTo(
-            trx,
-            lastL2TransactionStateUpdateId + 1
-          )
-
-        expect(
-          mockedL2TransactionRepository.findLatestStateUpdateId
-        ).toHaveBeenCalledWith(trx)
-        expect(preprocessTo).toEqual(lastL2TransactionStateUpdateId)
-      })
-
-      it('returns the processed state update id if it is smaller than latest l2 transaction state update id', async () => {
-        const preprocessTo =
-          await userStatisticsPreprocessor.getStateUpdateIdToCatchUpTo(
-            trx,
-            lastL2TransactionStateUpdateId - 1
-          )
-
-        expect(
-          mockedL2TransactionRepository.findLatestStateUpdateId
-        ).toHaveBeenCalledWith(trx)
-        expect(preprocessTo).toEqual(lastL2TransactionStateUpdateId - 1)
       })
     }
   )

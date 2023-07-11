@@ -107,6 +107,66 @@ describe(PreprocessedStateDetailsRepository.name, () => {
     }
   )
 
+  describe.only(
+    PreprocessedStateDetailsRepository.prototype
+      .getAllWithoutL2TransactionStatisticsUpToStateUpdateId.name,
+    () => {
+      it('returns empty array when no records', async () => {
+        const result =
+          await repository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
+            1000,
+            trx
+          )
+
+        expect(result).toEqual([])
+      })
+
+      it('returns all records without L2 transaction statistics up to state update id', async () => {
+        const id1 = await repository.add(
+          { ...genericRecord, stateUpdateId: 100 },
+          trx
+        )
+        const id2 = await repository.add(
+          { ...genericRecord, stateUpdateId: 200 },
+          trx
+        )
+        await repository.add(
+          {
+            ...genericRecord,
+            stateUpdateId: 100,
+            l2TransactionsStatistics:
+              fakePreprocessedL2TransactionsStatistics(),
+          },
+          trx
+        )
+        await repository.add({ ...genericRecord, stateUpdateId: 1900 }, trx)
+
+        const results =
+          await repository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
+            1899,
+            trx
+          )
+
+        expect(results).toEqual([
+          {
+            ...genericRecord,
+            stateUpdateId: 100,
+            id: id1,
+            l2TransactionsStatistics: undefined,
+            cumulativeL2TransactionsStatistics: undefined,
+          },
+          {
+            ...genericRecord,
+            stateUpdateId: 200,
+            id: id2,
+            l2TransactionsStatistics: undefined,
+            cumulativeL2TransactionsStatistics: undefined,
+          },
+        ])
+      })
+    }
+  )
+
   describe(
     PreprocessedStateDetailsRepository.prototype.getPaginated.name,
     () => {
@@ -134,31 +194,8 @@ describe(PreprocessedStateDetailsRepository.name, () => {
     }
   )
 
-  describe(
-    PreprocessedStateDetailsRepository.prototype
-      .findLastWithL2TransactionsStatistics.name,
-    () => {
-      it('finds last with l2 transaction count', async () => {
-        const lastWithL2TransactionCountRecord = {
-          ...genericRecord,
-          l2TransactionsStatistics: fakePreprocessedL2TransactionsStatistics(),
-          cumulativeL2TransactionsStatistics:
-            fakePreprocessedL2TransactionsStatistics(),
-        }
-        const id = await repository.add(lastWithL2TransactionCountRecord, trx)
-        await repository.add(genericRecord, trx)
-
-        const result = await repository.findLastWithL2TransactionsStatistics(
-          trx
-        )
-
-        expect(result).toEqual({ id, ...lastWithL2TransactionCountRecord })
-      })
-    }
-  )
-
-  describe(`${PreprocessedStateDetailsRepository.prototype.add.name}, ${PreprocessedStateDetailsRepository.prototype.update.name}, ${PreprocessedStateDetailsRepository.prototype.findById.name} and ${PreprocessedStateDetailsRepository.prototype.findByStateUpdateId.name}`, () => {
-    it('adds, updates, finds by id and state update id', async () => {
+  describe(`${PreprocessedStateDetailsRepository.prototype.add.name}, ${PreprocessedStateDetailsRepository.prototype.update.name} and ${PreprocessedStateDetailsRepository.prototype.findById.name}`, () => {
+    it('adds, updates, finds by id', async () => {
       const id = await repository.add(genericRecord, trx)
       const fieldsToUpdate = {
         l2TransactionsStatistics: fakePreprocessedL2TransactionsStatistics(),
@@ -175,13 +212,7 @@ describe(PreprocessedStateDetailsRepository.name, () => {
 
       const recordById = await repository.findById(id, trx)
 
-      const recordByStateUpdateId = await repository.findByStateUpdateId(
-        updatedRecord.stateUpdateId,
-        trx
-      )
-
       expect(recordById).toEqual(updatedRecord)
-      expect(recordByStateUpdateId).toEqual(updatedRecord)
     })
   })
 })

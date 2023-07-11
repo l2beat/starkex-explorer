@@ -473,6 +473,7 @@ export class Application {
         perpetualHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        l2TransactionRepository,
         logger,
         isPreprocessorEnabled
       )
@@ -510,6 +511,7 @@ export class Application {
         spotHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        l2TransactionRepository,
         logger,
         isPreprocessorEnabled
       )

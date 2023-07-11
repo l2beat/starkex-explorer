@@ -121,16 +121,11 @@ export class UserStatisticsPreprocessor {
 
   async catchUpL2Transactions(
     trx: Knex.Transaction,
-    processedStateUpdateId: number
+    preprocessToStateUpdateId: number
   ) {
-    const preprocessTo = await this.getStateUpdateIdToCatchUpTo(
-      trx,
-      processedStateUpdateId
-    )
-
     const recordsToUpdate =
       await this.preprocessedUserStatisticsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
-        preprocessTo,
+        preprocessToStateUpdateId,
         trx
       )
 
@@ -150,18 +145,6 @@ export class UserStatisticsPreprocessor {
         trx
       )
     }
-  }
-
-  async getStateUpdateIdToCatchUpTo(
-    trx: Knex.Transaction,
-    processedStateUpdateId: number
-  ) {
-    const lastL2TransactionStateUpdateId =
-      await this.l2TransactionRepository.findLatestStateUpdateId(trx)
-
-    return lastL2TransactionStateUpdateId
-      ? Math.min(lastL2TransactionStateUpdateId, processedStateUpdateId)
-      : processedStateUpdateId
   }
 
   async rollbackOneStateUpdate(
