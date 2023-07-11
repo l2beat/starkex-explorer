@@ -68,9 +68,22 @@ export class MerkleTreeRepository<T extends MerkleLeaf>
     const knex = await this.knex()
     const queries = []
     if (filteredNodeRows.length > 0) {
-      queries.push(
-        knex('merkle_nodes').insert(filteredNodeRows).onConflict('hash').merge()
-      )
+      // We can't just insert all filteredNodeRows like this:
+      //  queries.push(
+      //    knex('merkle_nodes').insert(filteredNodeRows).onConflict('hash').merge()
+      //  )
+      // ... because there is a limit to the amount of placeholders in the query.
+      // To get around that, we insert in chunks:
+
+      const chunkSize = 10000
+      for (let i = 0; i < filteredNodeRows.length; i += chunkSize) {
+        queries.push(
+          knex('merkle_nodes')
+            .insert(filteredNodeRows.slice(i, i + chunkSize))
+            .onConflict('hash')
+            .merge()
+        )
+      }
     }
     if (filteredLeafRows.length > 0) {
       queries.push(
