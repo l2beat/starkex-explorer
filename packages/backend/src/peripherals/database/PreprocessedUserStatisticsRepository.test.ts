@@ -147,7 +147,7 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
   describe(
     PreprocessedUserStatisticsRepository.prototype
       .findMostRecentWithL2TransactionsStatisticsByStarkKey.name,
-    async () => {
+    () => {
       it('returns undefined when no records found', async () => {
         await repository.add(
           {

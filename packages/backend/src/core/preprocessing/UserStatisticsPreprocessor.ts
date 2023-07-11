@@ -132,7 +132,9 @@ export class UserStatisticsPreprocessor {
 
     for (const recordToUpdate of recordsToUpdate) {
       this.logger.info(
-        `Preprocessing l2 transactions user statistics for state update ${recordToUpdate.stateUpdateId}, ${recordToUpdate.starkKey}`
+        `Preprocessing l2 transactions user (${recordToUpdate.starkKey.toString()}) statistics for state update ${
+          recordToUpdate.stateUpdateId
+        }`
       )
       const l2TransactionsStatistics =
         await this.l2TransactionRepository.getStatisticsByStateUpdateIdAndStarkKey(
