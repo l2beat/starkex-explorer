@@ -533,7 +533,6 @@ export class Application {
 
     // #endregion core
     // #region api
-    const showL2Transactions = shouldShowL2Transactions(config)
     const homeController = new HomeController(
       pageContextService,
       assetDetailsService,
@@ -541,8 +540,7 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository,
       l2TransactionRepository,
-      preprocessedStateDetailsRepository,
-      showL2Transactions
+      preprocessedStateDetailsRepository
     )
 
     const userController = new UserController(
@@ -557,8 +555,7 @@ export class Application {
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
-      config.starkex.contracts.perpetual,
-      showL2Transactions
+      config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,
@@ -567,7 +564,7 @@ export class Application {
       userTransactionRepository,
       l2TransactionRepository,
       preprocessedAssetHistoryRepository,
-      showL2Transactions
+      preprocessedStateDetailsRepository
     )
     const transactionController = new TransactionController(
       pageContextService,

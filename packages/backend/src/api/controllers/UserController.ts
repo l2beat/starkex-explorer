@@ -30,6 +30,7 @@ import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
+import { sumUpTransactionCount } from '../../peripherals/database/PreprocessedL2TransactionsStatistics'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   SentTransactionRecord,
@@ -60,8 +61,7 @@ export class UserController {
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
-    private readonly exchangeAddress: EthereumAddress,
-    private readonly showL2Transactions: boolean
+    private readonly exchangeAddress: EthereumAddress
   ) {}
 
   async getUserRegisterPage(
@@ -175,6 +175,16 @@ export class UserController {
       }
     }
 
+    let l2TransactionsStatistics = userStatistics.l2TransactionsStatistics
+    if (!l2TransactionsStatistics) {
+      const mostRecentUserStatisticsWithL2TransactionsStatistics =
+        await this.preprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+          starkKey
+        )
+      l2TransactionsStatistics =
+        mostRecentUserStatisticsWithL2TransactionsStatistics?.l2TransactionsStatistics
+    }
+
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
       assetHistory: history,
@@ -214,12 +224,8 @@ export class UserController {
       context,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
-      l2Transactions: this.showL2Transactions
-        ? {
-            data: l2Transactions.map(l2TransactionToEntry),
-            total: l2TransactionsCount,
-          }
-        : undefined,
+      l2Transactions: l2Transactions.map(l2TransactionToEntry),
+      totalL2Transactions: sumUpTransactionCount(l2TransactionsStatistics),
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId:
@@ -316,19 +322,23 @@ export class UserController {
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const [l2Transactions, l2TransactionsCount] = await Promise.all([
+    const [l2Transactions, mostRecentUserStatistics] = await Promise.all([
       this.l2TransactionRepository.getUserSpecificPaginated(
         starkKey,
         pagination
       ),
-      this.l2TransactionRepository.countAllUserSpecific(starkKey),
+      this.preprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+        starkKey
+      ),
     ])
 
     const content = renderUserL2TransactionsPage({
       context,
       starkKey,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      total: l2TransactionsCount,
+      total: sumUpTransactionCount(
+        mostRecentUserStatistics?.l2TransactionsStatistics
+      ),
       ...pagination,
     })
     return { type: 'success', content }

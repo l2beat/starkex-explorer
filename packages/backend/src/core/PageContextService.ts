@@ -7,6 +7,7 @@ import {
 } from '@explorer/shared'
 
 import { Config } from '../config'
+import { shouldShowL2Transactions } from '../utils/shouldShowL2Transactions'
 import { UserService } from './UserService'
 
 export class PageContextService {
@@ -25,6 +26,7 @@ export class PageContextService {
         instanceName: this.config.starkex.instanceName,
         chainId: this.config.starkex.blockchain.chainId,
         collateralAsset: this.config.starkex.collateralAsset,
+        showL2Transactions: shouldShowL2Transactions(this.config),
       }
     }
 
@@ -33,6 +35,7 @@ export class PageContextService {
       tradingMode: this.config.starkex.tradingMode,
       chainId: this.config.starkex.blockchain.chainId,
       instanceName: this.config.starkex.instanceName,
+      showL2Transactions: shouldShowL2Transactions(this.config),
     }
   }
 

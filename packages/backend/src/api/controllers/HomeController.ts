@@ -12,6 +12,7 @@ import { PageContextService } from '../../core/PageContextService'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
+import { sumUpTransactionCount } from '../../peripherals/database/PreprocessedL2TransactionsStatistics'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { UserTransactionData } from '../../peripherals/database/transactions/UserTransaction'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
@@ -33,8 +34,7 @@ export class HomeController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
-    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
-    private readonly showL2Transactions: boolean
+    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository
   ) {}
 
   async getHomePage(
@@ -44,7 +44,7 @@ export class HomeController {
     const paginationOpts = { offset: 0, limit: 6 }
     const [
       l2Transactions,
-      l2TransactionsCount,
+      stateDetails,
       stateUpdates,
       stateUpdatesCount,
       forcedUserTransactions,
@@ -53,7 +53,7 @@ export class HomeController {
       availableOffersCount,
     ] = await Promise.all([
       this.l2TransactionRepository.getPaginatedWithoutMulti(paginationOpts),
-      this.l2TransactionRepository.countAllDistinctTransactionIds(),
+      this.preprocessedStateDetailsRepository.findMostRecentWithL2TransactionStatistics(),
       this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
       this.userTransactionRepository.getPaginated({
@@ -85,12 +85,10 @@ export class HomeController {
     const content = renderHomePage({
       context,
       tutorials: [], // explicitly no tutorials
-      l2Transactions: this.showL2Transactions
-        ? {
-            data: l2Transactions.map(l2TransactionToEntry),
-            total: l2TransactionsCount,
-          }
-        : undefined,
+      l2Transactions: l2Transactions.map(l2TransactionToEntry),
+      totalL2Transactions: sumUpTransactionCount(
+        stateDetails?.cumulativeL2TransactionsStatistics
+      ),
       stateUpdates: stateUpdateEntries,
       totalStateUpdates: stateUpdatesCount,
       forcedTransactions: forcedTransactionEntries,
@@ -111,16 +109,18 @@ export class HomeController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
-    const [total, l2Transactions] = await Promise.all([
-      this.l2TransactionRepository.countAllDistinctTransactionIds(),
+    const [preprocessedStateDetails, l2Transactions] = await Promise.all([
+      this.preprocessedStateDetailsRepository.findMostRecentWithL2TransactionStatistics(),
       this.l2TransactionRepository.getPaginatedWithoutMulti(pagination),
     ])
 
     const content = renderHomeL2TransactionsPage({
       context,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
+      total: sumUpTransactionCount(
+        preprocessedStateDetails?.cumulativeL2TransactionsStatistics
+      ),
       ...pagination,
-      total,
     })
     return { type: 'success', content }
   }

@@ -21,6 +21,12 @@ export interface PreprocessedStateDetailsRecord {
   cumulativeL2TransactionsStatistics?: PreprocessedL2TransactionsStatistics
 }
 
+export interface PreprocessedStateDetailsRecordWithL2TransactionsStatistics
+  extends PreprocessedStateDetailsRecord {
+  l2TransactionsStatistics: PreprocessedL2TransactionsStatistics
+  cumulativeL2TransactionsStatistics: PreprocessedL2TransactionsStatistics
+}
+
 export class PreprocessedStateDetailsRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
@@ -75,7 +81,11 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
       .orderBy('state_update_id', 'desc')
       .first()
 
-    return record ? toPreprocessedStateDetailsRecord(record) : undefined
+    return record
+      ? (toPreprocessedStateDetailsRecord(
+          record
+        ) as PreprocessedStateDetailsRecordWithL2TransactionsStatistics)
+      : undefined
   }
 
   async getAllWithoutL2TransactionStatisticsUpToStateUpdateId(

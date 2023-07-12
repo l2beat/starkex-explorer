@@ -1,3 +1,4 @@
+import { isNumber } from 'lodash'
 import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../utils/formatting/formatAmount'
@@ -11,7 +12,7 @@ interface TablePreviewProps {
   entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
-  total: number
+  total: number | 'processing'
   children: ReactNode
 }
 
@@ -21,13 +22,15 @@ export function TablePreview(props: TablePreviewProps) {
       <SectionHeading
         title={props.title}
         description={
-          props.total > 0 && (
-            <>
-              You're viewing {formatInt(props.visible)} out of{' '}
-              <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
-              {props.entryShortNamePlural}
-            </>
-          )
+          props.total === 'processing'
+            ? `${props.entryLongNamePlural} are being processed...`
+            : props.total > 0 && (
+                <>
+                  You're viewing {formatInt(props.visible)} out of{' '}
+                  <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
+                  {props.entryShortNamePlural}
+                </>
+              )
         }
       />
       {props.children}
@@ -36,7 +39,7 @@ export function TablePreview(props: TablePreviewProps) {
           There are no {props.entryLongNamePlural} to view.
         </div>
       )}
-      {props.total > props.visible && (
+      {isNumber(props.total) && props.total > props.visible && (
         <div className="mt-6 flex items-center justify-center">
           <LinkButton variant="outlined" href={props.path}>
             View all {props.entryLongNamePlural}
