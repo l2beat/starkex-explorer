@@ -3,7 +3,7 @@ import { it } from 'mocha'
 
 import { sumUpTransactionCount } from './PreprocessedL2TransactionsStatistics'
 
-describe.only(sumUpTransactionCount.name, () => {
+describe(sumUpTransactionCount.name, () => {
   it('returns 0 when statistics is undefined', () => {
     const result = sumUpTransactionCount(undefined)
 

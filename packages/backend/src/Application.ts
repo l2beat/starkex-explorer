@@ -89,7 +89,6 @@ import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient
 import { FetchClient } from './peripherals/starkware/FetchClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
-import { shouldShowL2Transactions } from './utils/shouldShowL2Transactions'
 
 export class Application {
   start: () => Promise<void>
