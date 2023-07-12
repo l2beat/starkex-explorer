@@ -177,12 +177,12 @@ export class UserController {
 
     let l2TransactionsStatistics = userStatistics.l2TransactionsStatistics
     if (!l2TransactionsStatistics) {
-      const mostRecentUserStatisticsWithL2TransactionsStatistics =
-        await this.preprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+      const lastUserStatisticsWithL2TransactionsStatistics =
+        await this.preprocessedUserStatisticsRepository.findLastWithL2TransactionsStatisticsByStarkKey(
           starkKey
         )
       l2TransactionsStatistics =
-        mostRecentUserStatisticsWithL2TransactionsStatistics?.l2TransactionsStatistics
+        lastUserStatisticsWithL2TransactionsStatistics?.l2TransactionsStatistics
     }
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -322,22 +322,23 @@ export class UserController {
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const [l2Transactions, mostRecentUserStatistics] = await Promise.all([
-      this.l2TransactionRepository.getUserSpecificPaginated(
-        starkKey,
-        pagination
-      ),
-      this.preprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
-        starkKey
-      ),
-    ])
+    const [l2Transactions, lastUserStatisticsWithL2TransactionsStatistics] =
+      await Promise.all([
+        this.l2TransactionRepository.getUserSpecificPaginated(
+          starkKey,
+          pagination
+        ),
+        this.preprocessedUserStatisticsRepository.findLastWithL2TransactionsStatisticsByStarkKey(
+          starkKey
+        ),
+      ])
 
     const content = renderUserL2TransactionsPage({
       context,
       starkKey,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       total: sumUpTransactionCount(
-        mostRecentUserStatistics?.l2TransactionsStatistics
+        lastUserStatisticsWithL2TransactionsStatistics?.l2TransactionsStatistics
       ),
       ...pagination,
     })

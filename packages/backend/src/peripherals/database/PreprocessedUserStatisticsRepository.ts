@@ -59,7 +59,7 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
     return row ? toPreprocessedUserStatisticsRecord(row) : undefined
   }
 
-  async findMostRecentWithL2TransactionsStatisticsByStarkKey(
+  async findLastWithL2TransactionsStatisticsByStarkKey(
     starkKey: StarkKey,
     trx?: Knex.Transaction
   ) {

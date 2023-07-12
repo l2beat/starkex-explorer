@@ -146,7 +146,7 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
 
   describe(
     PreprocessedUserStatisticsRepository.prototype
-      .findMostRecentWithL2TransactionsStatisticsByStarkKey.name,
+      .findLastWithL2TransactionsStatisticsByStarkKey.name,
     () => {
       it('returns undefined when no records found', async () => {
         await repository.add(
@@ -157,7 +157,7 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
           trx
         )
         const result =
-          await repository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+          await repository.findLastWithL2TransactionsStatisticsByStarkKey(
             mockRecord.starkKey,
             trx
           )
@@ -180,7 +180,7 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
         await repository.add({ ...mockRecord, stateUpdateId: 1900 }, trx)
 
         const result =
-          await repository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+          await repository.findLastWithL2TransactionsStatisticsByStarkKey(
             mockRecord.starkKey,
             trx
           )

@@ -141,7 +141,7 @@ describe(StateDetailsPreprocessor.name, () => {
           mockObject<PreprocessedStateDetailsRepository>({
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
-            findMostRecentWithL2TransactionStatistics: mockFn().resolvesTo(
+            findLastWithL2TransactionsStatistics: mockFn().resolvesTo(
               findMostRecentWithL2TransactionStatisticsResult
             ),
             update: mockFn().resolvesTo(1),
@@ -175,7 +175,7 @@ describe(StateDetailsPreprocessor.name, () => {
           ).toHaveBeenCalledWith(recordToUpdate.stateUpdateId, trx)
 
           expect(
-            mockedPreprocessedStateDetailsRepository.findMostRecentWithL2TransactionStatistics
+            mockedPreprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics
           ).toHaveBeenCalledWith(trx)
 
           expect(
@@ -199,7 +199,7 @@ describe(StateDetailsPreprocessor.name, () => {
           mockObject<PreprocessedStateDetailsRepository>({
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
-            findMostRecentWithL2TransactionStatistics:
+            findLastWithL2TransactionsStatistics:
               mockFn().resolvesTo(undefined),
             update: mockFn().resolvesTo(1),
           })
@@ -232,7 +232,7 @@ describe(StateDetailsPreprocessor.name, () => {
           ).toHaveBeenCalledWith(recordToUpdate.stateUpdateId, trx)
 
           expect(
-            mockedPreprocessedStateDetailsRepository.findMostRecentWithL2TransactionStatistics
+            mockedPreprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics
           ).toHaveBeenCalledWith(trx)
 
           expect(

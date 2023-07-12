@@ -74,7 +74,7 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     return record ? toPreprocessedStateDetailsRecord(record) : undefined
   }
 
-  async findMostRecentWithL2TransactionStatistics(trx?: Knex.Transaction) {
+  async findLastWithL2TransactionsStatistics(trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const record = await knex('preprocessed_state_details')
       .whereNotNull('l2_transactions_statistics')

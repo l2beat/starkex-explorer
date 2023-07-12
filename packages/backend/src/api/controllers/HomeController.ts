@@ -44,7 +44,7 @@ export class HomeController {
     const paginationOpts = { offset: 0, limit: 6 }
     const [
       l2Transactions,
-      stateDetails,
+      lastStateDetailsWithL2TransactionsStatistics,
       stateUpdates,
       stateUpdatesCount,
       forcedUserTransactions,
@@ -53,7 +53,7 @@ export class HomeController {
       availableOffersCount,
     ] = await Promise.all([
       this.l2TransactionRepository.getPaginatedWithoutMulti(paginationOpts),
-      this.preprocessedStateDetailsRepository.findMostRecentWithL2TransactionStatistics(),
+      this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
       this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
       this.userTransactionRepository.getPaginated({
@@ -87,7 +87,7 @@ export class HomeController {
       tutorials: [], // explicitly no tutorials
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       totalL2Transactions: sumUpTransactionCount(
-        stateDetails?.cumulativeL2TransactionsStatistics
+        lastStateDetailsWithL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
       ),
       stateUpdates: stateUpdateEntries,
       totalStateUpdates: stateUpdatesCount,
@@ -109,16 +109,17 @@ export class HomeController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
-    const [preprocessedStateDetails, l2Transactions] = await Promise.all([
-      this.preprocessedStateDetailsRepository.findMostRecentWithL2TransactionStatistics(),
-      this.l2TransactionRepository.getPaginatedWithoutMulti(pagination),
-    ])
+    const [l2Transactions, lastStateDetailsWithL2TransactionsStatistics] =
+      await Promise.all([
+        this.l2TransactionRepository.getPaginatedWithoutMulti(pagination),
+        this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
+      ])
 
     const content = renderHomeL2TransactionsPage({
       context,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       total: sumUpTransactionCount(
-        preprocessedStateDetails?.cumulativeL2TransactionsStatistics
+        lastStateDetailsWithL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
       ),
       ...pagination,
     })

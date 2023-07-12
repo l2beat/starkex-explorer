@@ -58,7 +58,7 @@ export class StateUpdateController {
       forcedUserTransactions,
       totalForcedUserTransactions,
       l2Transactions,
-      preprocessedStateDetails,
+      stateDetails,
     ] = await Promise.all([
       this.stateUpdateRepository.findById(stateUpdateId),
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
@@ -128,10 +128,8 @@ export class StateUpdateController {
       totalBalanceChanges,
       priceChanges: priceEntries,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions: preprocessedStateDetails?.l2TransactionsStatistics
-        ? sumUpTransactionCount(
-            preprocessedStateDetails.l2TransactionsStatistics
-          )
+      totalL2Transactions: stateDetails?.l2TransactionsStatistics
+        ? sumUpTransactionCount(stateDetails.l2TransactionsStatistics)
         : 'processing',
       transactions,
       totalTransactions: totalForcedUserTransactions,
@@ -147,7 +145,7 @@ export class StateUpdateController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
-    const [l2Transactions, preprocessedStateDetails] = await Promise.all([
+    const [l2Transactions, stateDetails] = await Promise.all([
       this.l2TransactionRepository.getPaginatedWithoutMultiByStateUpdateId(
         stateUpdateId,
         pagination
@@ -160,10 +158,8 @@ export class StateUpdateController {
       id: stateUpdateId.toString(),
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       ...pagination,
-      total: preprocessedStateDetails?.l2TransactionsStatistics
-        ? sumUpTransactionCount(
-            preprocessedStateDetails.l2TransactionsStatistics
-          )
+      total: stateDetails?.l2TransactionsStatistics
+        ? sumUpTransactionCount(stateDetails.l2TransactionsStatistics)
         : 'processing',
     })
 

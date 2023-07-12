@@ -143,8 +143,8 @@ export class UserStatisticsPreprocessor {
           trx
         )
 
-      const mostRecentPreprocessedUserStatistics =
-        await this.preprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey(
+      const lastPreprocessedUserStatistics =
+        await this.preprocessedUserStatisticsRepository.findLastWithL2TransactionsStatisticsByStarkKey(
           recordToUpdate.starkKey,
           trx
         )
@@ -153,9 +153,9 @@ export class UserStatisticsPreprocessor {
         {
           id: recordToUpdate.id,
           l2TransactionsStatistics:
-            mostRecentPreprocessedUserStatistics?.l2TransactionsStatistics
+            lastPreprocessedUserStatistics?.l2TransactionsStatistics
               ? sumNumericValuesByKey(
-                  mostRecentPreprocessedUserStatistics.l2TransactionsStatistics,
+                  lastPreprocessedUserStatistics.l2TransactionsStatistics,
                   l2TransactionsStatistics
                 )
               : l2TransactionsStatistics,

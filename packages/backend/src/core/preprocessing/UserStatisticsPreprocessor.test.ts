@@ -242,10 +242,9 @@ describe(UserStatisticsPreprocessor.name, () => {
           mockObject<PreprocessedUserStatisticsRepository>({
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
-            findMostRecentWithL2TransactionsStatisticsByStarkKey:
-              mockFn().resolvesTo(
-                findMostRecentWithL2TransactionsStatisticsByStarkKeyResult
-              ),
+            findLastWithL2TransactionsStatisticsByStarkKey: mockFn().resolvesTo(
+              findMostRecentWithL2TransactionsStatisticsByStarkKeyResult
+            ),
             update: mockFn().resolvesTo(1),
           })
         const mockL2TransactionRepository = mockObject<L2TransactionRepository>(
@@ -285,7 +284,7 @@ describe(UserStatisticsPreprocessor.name, () => {
           )
 
           expect(
-            mockPreprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey
+            mockPreprocessedUserStatisticsRepository.findLastWithL2TransactionsStatisticsByStarkKey
           ).toHaveBeenCalledWith(recordToUpdate.starkKey, trx)
 
           expect(
@@ -308,7 +307,7 @@ describe(UserStatisticsPreprocessor.name, () => {
           mockObject<PreprocessedUserStatisticsRepository>({
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
-            findMostRecentWithL2TransactionsStatisticsByStarkKey:
+            findLastWithL2TransactionsStatisticsByStarkKey:
               mockFn().resolvesTo(undefined),
             update: mockFn().resolvesTo(1),
           })
@@ -349,7 +348,7 @@ describe(UserStatisticsPreprocessor.name, () => {
           )
 
           expect(
-            mockPreprocessedUserStatisticsRepository.findMostRecentWithL2TransactionsStatisticsByStarkKey
+            mockPreprocessedUserStatisticsRepository.findLastWithL2TransactionsStatisticsByStarkKey
           ).toHaveBeenCalledWith(recordToUpdate.starkKey, trx)
 
           expect(

@@ -66,8 +66,8 @@ export class StateDetailsPreprocessor {
           recordToUpdate.stateUpdateId,
           trx
         )
-      const mostRecentPreprocessedStateDetails =
-        await this.preprocessedStateDetailsRepository.findMostRecentWithL2TransactionStatistics(
+      const lastStateDetailsWithL2TransactionsStatistics =
+        await this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(
           trx
         )
 
@@ -76,9 +76,9 @@ export class StateDetailsPreprocessor {
           id: recordToUpdate.id,
           l2TransactionsStatistics: statisticsForStateUpdate,
           cumulativeL2TransactionsStatistics:
-            mostRecentPreprocessedStateDetails?.cumulativeL2TransactionsStatistics
+            lastStateDetailsWithL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
               ? sumNumericValuesByKey(
-                  mostRecentPreprocessedStateDetails.cumulativeL2TransactionsStatistics,
+                  lastStateDetailsWithL2TransactionsStatistics.cumulativeL2TransactionsStatistics,
                   statisticsForStateUpdate
                 )
               : statisticsForStateUpdate,

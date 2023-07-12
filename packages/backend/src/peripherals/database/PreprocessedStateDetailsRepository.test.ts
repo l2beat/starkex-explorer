@@ -109,13 +109,14 @@ describe(PreprocessedStateDetailsRepository.name, () => {
 
   describe(
     PreprocessedStateDetailsRepository.prototype
-      .findMostRecentWithL2TransactionStatistics.name,
+      .findLastWithL2TransactionsStatistics.name,
     () => {
       it('returns undefined when no records', async () => {
         await repository.add(genericRecord, trx)
 
-        const result =
-          await repository.findMostRecentWithL2TransactionStatistics(trx)
+        const result = await repository.findLastWithL2TransactionsStatistics(
+          trx
+        )
 
         expect(result).toEqual(undefined)
       })
@@ -149,8 +150,9 @@ describe(PreprocessedStateDetailsRepository.name, () => {
           trx
         )
 
-        const result =
-          await repository.findMostRecentWithL2TransactionStatistics(trx)
+        const result = await repository.findLastWithL2TransactionsStatistics(
+          trx
+        )
 
         expect(result).toEqual({
           ...genericRecord,
