@@ -52,13 +52,6 @@ export class L2TransactionRepository extends BaseRepository {
     super(database, logger)
     /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
-    this.countAllDistinctTransactionIds = this.wrapAny(
-      this.countAllDistinctTransactionIds
-    )
-    this.countAllDistinctTransactionIdsByStateUpdateId = this.wrapAny(
-      this.countAllDistinctTransactionIdsByStateUpdateId
-    )
-    this.countAllUserSpecific = this.wrapAny(this.countAllUserSpecific)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
     this.getStatisticsByStateUpdateId = this.wrapAny(
       this.getStatisticsByStateUpdateId
@@ -176,38 +169,6 @@ export class L2TransactionRepository extends BaseRepository {
       )
     }
     return parentId
-  }
-
-  async countAllDistinctTransactionIds() {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions').countDistinct(
-      'transaction_id'
-    )
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
-  }
-
-  async countAllDistinctTransactionIdsByStateUpdateId(stateUpdateId: number) {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions')
-      .where({ state_update_id: stateUpdateId })
-      .countDistinct('transaction_id')
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
-  }
-
-  async countAllUserSpecific(starkKey: StarkKey) {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions')
-      .where({
-        stark_key_a: starkKey.toString(),
-      })
-      .orWhere({
-        stark_key_b: starkKey.toString(),
-      })
-      .count()
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
   }
 
   async countByTransactionId(transactionId: number): Promise<number> {
