@@ -40,7 +40,9 @@ export function TableWithPagination(props: TableWithPaginationProps) {
       {props.children}
       {props.visible === 0 && (
         <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
-          There are no {props.entryLongNamePlural} to view.
+          {props.total === 'processing'
+            ? `${props.entryLongNamePlural} are being processed...`
+            : `There are no ${props.entryLongNamePlural} to view.`}
         </div>
       )}
       {totalPages && (
@@ -77,7 +79,7 @@ function getDescription(
   entryShortNamePlural: string
 ) {
   if (total === 'processing') {
-    return `${entryShortNamePlural} are being processed...`
+    return undefined
   }
 
   const start = formatInt(1 + offset)

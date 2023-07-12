@@ -22,21 +22,22 @@ export function TablePreview(props: TablePreviewProps) {
       <SectionHeading
         title={props.title}
         description={
-          props.total === 'processing'
-            ? `${props.entryLongNamePlural} are being processed...`
-            : props.total > 0 && (
-                <>
-                  You're viewing {formatInt(props.visible)} out of{' '}
-                  <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
-                  {props.entryShortNamePlural}
-                </>
-              )
+          props.total !== 'processing' &&
+          props.total > 0 && (
+            <>
+              You're viewing {formatInt(props.visible)} out of{' '}
+              <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
+              {props.entryShortNamePlural}
+            </>
+          )
         }
       />
       {props.children}
       {props.visible === 0 && (
         <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
-          There are no {props.entryLongNamePlural} to view.
+          {props.total === 'processing'
+            ? `${props.entryLongNamePlural} are being processed...`
+            : `There are no ${props.entryLongNamePlural} to view.`}
         </div>
       )}
       {isNumber(props.total) && props.total > props.visible && (
