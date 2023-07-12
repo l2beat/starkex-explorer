@@ -45,7 +45,7 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'perpetual',
-        showL2Transactions: true,
+        showL2Transactions: false,
         chainId: 1,
         instanceName: perpetualConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
@@ -70,7 +70,7 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'spot',
-        showL2Transactions: true,
+        showL2Transactions: false,
         chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
       })
@@ -92,7 +92,7 @@ describe(PageContextService.name, () => {
         user: givenUser,
         tradingMode: 'perpetual',
         chainId: 1,
-        showL2Transactions: true,
+        showL2Transactions: false,
         instanceName: spotConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
       } as const
@@ -113,7 +113,7 @@ describe(PageContextService.name, () => {
           ({
             user: undefined,
             tradingMode: 'perpetual',
-            showL2Transactions: true,
+            showL2Transactions: false,
             chainId: 1,
             instanceName: spotConfig.starkex.instanceName,
             collateralAsset: fakeCollateralAsset,
@@ -142,7 +142,7 @@ describe(PageContextService.name, () => {
           user: givenUser,
           tradingMode: 'perpetual',
           chainId: 1,
-          showL2Transactions: true,
+          showL2Transactions: false,
           instanceName: spotConfig.starkex.instanceName,
           collateralAsset: fakeCollateralAsset,
         } as const
@@ -183,7 +183,7 @@ describe(PageContextService.name, () => {
           user: givenUser,
           tradingMode: 'perpetual',
           chainId: 1,
-          showL2Transactions: true,
+          showL2Transactions: false,
           instanceName: spotConfig.starkex.instanceName,
           collateralAsset: fakeCollateralAsset,
         } as const
@@ -206,7 +206,7 @@ describe(PageContextService.name, () => {
       const pageContext = {
         user: undefined,
         tradingMode: 'perpetual',
-        showL2Transactions: true,
+        showL2Transactions: false,
         chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
@@ -225,7 +225,7 @@ describe(PageContextService.name, () => {
       const pageContext = {
         user: undefined,
         tradingMode: 'spot',
-        showL2Transactions: true,
+        showL2Transactions: false,
         chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
       } as const

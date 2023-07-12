@@ -3,8 +3,8 @@ import { UserDetails } from '@explorer/shared'
 
 import { PageContextService } from '../../core/PageContextService'
 import {
-    AggregatedL2TransactionRecord,
-    L2TransactionRepository,
+  AggregatedL2TransactionRecord,
+  L2TransactionRepository,
 } from '../../peripherals/database/L2TransactionRepository'
 import { getAssetPriceUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
@@ -27,7 +27,9 @@ export class L2TransactionController {
       return { type: 'not found' }
     }
     const aggregatedL2Transaction =
-      await this.l2TransactionRepository.findAggregatedByTransactionId(transactionId)
+      await this.l2TransactionRepository.findAggregatedByTransactionId(
+        transactionId
+      )
 
     if (!aggregatedL2Transaction) {
       return {
