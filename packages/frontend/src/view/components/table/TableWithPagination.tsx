@@ -45,7 +45,7 @@ export function TableWithPagination(props: TableWithPaginationProps) {
             : `There are no ${props.entryLongNamePlural} to view.`}
         </div>
       )}
-      {totalPages && (
+      {totalPages !== undefined && totalPages !== 0 && (
         <div className="mt-6 flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex-1">
             <TablePagination
