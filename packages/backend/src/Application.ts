@@ -517,6 +517,7 @@ export class Application {
     const freezeCheckService = new FreezeCheckService(
       config.starkex.contracts.perpetual,
       ethereumClient,
+      kvStore,
       syncStatusRepository,
       userTransactionRepository,
       logger

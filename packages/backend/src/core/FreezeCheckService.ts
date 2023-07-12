@@ -1,6 +1,7 @@
 import { EthereumAddress, Timestamp } from '@explorer/types'
 import { ethers } from 'ethers'
 
+import { KeyValueStore } from '../peripherals/database/KeyValueStore'
 import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
@@ -10,6 +11,7 @@ export class FreezeCheckService {
   constructor(
     private readonly perpatualContractAddress: EthereumAddress,
     private readonly ethereumClient: EthereumClient,
+    private readonly keyValueStore: KeyValueStore,
     private readonly syncStatusRepository: SyncStatusRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly logger: Logger
@@ -24,18 +26,19 @@ export class FreezeCheckService {
       this.logger.error(
         'Ignoring freeze-check - no last synced block number found'
       )
+      await this.keyValueStore.setFreezeStatus('not-frozen')
       return
     }
 
     const [isFrozen, freezeGracePeriod, curBlockTimestamp] = await Promise.all([
-      this.checkIsFrozen(),
+      this.callIsFrozen(),
       this.fetchFreezeGracePeriod(),
       this.ethereumClient.getBlockTimestamp('latest'),
     ])
 
     if (isFrozen) {
-      // TODO: update db!!
-      console.log('Were FROZEN!')
+      this.logger.info('StarkEx is frozen!')
+      await this.keyValueStore.setFreezeStatus('frozen')
       return
     }
 
@@ -46,6 +49,7 @@ export class FreezeCheckService {
         'FullWithdrawal',
       ])
     if (!oldestNotIncludedForcedAction) {
+      await this.keyValueStore.setFreezeStatus('not-frozen')
       return
     }
 
@@ -54,13 +58,16 @@ export class FreezeCheckService {
       BigInt(freezeGracePeriod)
 
     if (latestNonFreezableTimestamp > curBlockTimestamp) {
+      await this.keyValueStore.setFreezeStatus('not-frozen')
       return // We're still in the grace period
     }
 
-    console.log('We are FREEZABLE!')
+    // TODO: check if we're truly synced (lastSyncedBlockNumber is not further than an hour(?) behind)
+    this.logger.info('StarkEx is freezable!')
+    await this.keyValueStore.setFreezeStatus('freezable')
   }
 
-  private async checkIsFrozen(): Promise<boolean> {
+  private async callIsFrozen(): Promise<boolean> {
     const [isFrozen, err] = await this.ethereumClient.call<boolean>(
       this.perpatualContractAddress,
       'isFrozen',

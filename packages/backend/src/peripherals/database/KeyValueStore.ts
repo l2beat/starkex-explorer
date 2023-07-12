@@ -10,6 +10,9 @@ export interface KeyValueRecord {
   value: string
 }
 
+const FreezeStatuses = ['not-frozen', 'freezable', 'frozen'] as const
+type FreezeStatus = typeof FreezeStatuses[number]
+
 export class KeyValueStore extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
@@ -54,5 +57,20 @@ export class KeyValueStore extends BaseRepository {
   async deleteByKey(key: string) {
     const knex = await this.knex()
     return knex('key_values').where({ key }).delete()
+  }
+
+  async getFreezeStatus(): Promise<FreezeStatus> {
+    const value = await this.findByKey('freezeStatus')
+    if (!value) {
+      return 'not-frozen'
+    }
+    if (!FreezeStatuses.includes(value as FreezeStatus)) {
+      throw new Error(`Invalid freeze status: ${value}`)
+    }
+    return value as FreezeStatus
+  }
+
+  async setFreezeStatus(status: FreezeStatus) {
+    await this.addOrUpdate({ key: 'freezeStatus', value: status })
   }
 }
