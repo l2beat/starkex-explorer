@@ -126,7 +126,6 @@ export class UserController {
       userAssets,
       history,
       l2Transactions,
-      l2TransactionsCount,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
@@ -150,7 +149,6 @@ export class UserController {
         starkKey,
         paginationOpts
       ),
-      this.l2TransactionRepository.countAllUserSpecific(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
