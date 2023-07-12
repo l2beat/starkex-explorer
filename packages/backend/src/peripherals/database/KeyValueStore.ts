@@ -4,14 +4,12 @@ import { KeyValueRow } from 'knex/types/tables'
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
+import { FreezeStatus, FreezeStatuses } from '@explorer/shared/build/FreezeStatus'
 
 export interface KeyValueRecord {
   key: string
   value: string
 }
-
-const FreezeStatuses = ['not-frozen', 'freezable', 'frozen'] as const
-type FreezeStatus = typeof FreezeStatuses[number]
 
 export class KeyValueStore extends BaseRepository {
   constructor(database: Database, logger: Logger) {

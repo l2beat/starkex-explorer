@@ -8,15 +8,20 @@ import {
 
 import { Config } from '../config'
 import { UserService } from './UserService'
+import { KeyValueStore } from '../peripherals/database/KeyValueStore'
 
 export class PageContextService {
   constructor(
     private readonly config: Config,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly keyValueStore: KeyValueStore
   ) {}
 
   async getPageContext(givenUser: Partial<UserDetails>): Promise<PageContext> {
-    const user = await this.userService.getUserDetails(givenUser)
+    const [user, freezeStatus] = await Promise.all([
+      this.userService.getUserDetails(givenUser),
+      this.keyValueStore.getFreezeStatus()
+    ])
 
     if (this.config.starkex.tradingMode === 'perpetual') {
       return {
@@ -25,6 +30,7 @@ export class PageContextService {
         instanceName: this.config.starkex.instanceName,
         chainId: this.config.starkex.blockchain.chainId,
         collateralAsset: this.config.starkex.collateralAsset,
+        freezeStatus,
       }
     }
 
@@ -33,6 +39,7 @@ export class PageContextService {
       tradingMode: this.config.starkex.tradingMode,
       chainId: this.config.starkex.blockchain.chainId,
       instanceName: this.config.starkex.instanceName,
+      freezeStatus,
     }
   }
 

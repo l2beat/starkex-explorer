@@ -1,4 +1,5 @@
 import { CollateralAsset } from './CollateralAsset'
+import { FreezeStatus } from './FreezeStatus'
 import { InstanceName } from './InstanceName'
 import { TradingMode } from './TradingMode'
 import { UserDetails } from './UserDetails'
@@ -16,6 +17,7 @@ interface PerpetualPageContext {
   chainId: number
   tradingMode: 'perpetual'
   collateralAsset: CollateralAsset
+  freezeStatus: FreezeStatus
 }
 
 interface SpotPageContext {
@@ -23,6 +25,7 @@ interface SpotPageContext {
   instanceName: InstanceName
   chainId: number
   tradingMode: 'spot'
+  freezeStatus: FreezeStatus
 }
 
 export type PageContext<T extends TradingMode = TradingMode> = CheckTradingMode<
