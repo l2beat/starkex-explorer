@@ -325,90 +325,93 @@ describe(L2TransactionRepository.name, () => {
     })
   })
 
-  describe(L2TransactionRepository.prototype.findByTransactionId.name, () => {
-    it('returns correct object for transaction', async () => {
-      const record = genericDepositTransaction
+  describe(
+    L2TransactionRepository.prototype.findAggregatedByTransactionId.name,
+    () => {
+      it('returns correct object for transaction', async () => {
+        const record = genericDepositTransaction
 
-      const id = await repository.add(record)
+        const id = await repository.add(record)
 
-      const transaction = await repository.findByTransactionId(
-        record.transactionId
-      )
+        const transaction = await repository.findAggregatedByTransactionId(
+          record.transactionId
+        )
 
-      expect(transaction).toEqual({
-        id,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        originalTransaction: record.data,
-        alternativeTransactions: [],
+        expect(transaction).toEqual({
+          id,
+          stateUpdateId: record.stateUpdateId,
+          transactionId: record.transactionId,
+          blockNumber: record.blockNumber,
+          originalTransaction: record.data,
+          alternativeTransactions: [],
+        })
       })
-    })
 
-    it('returns correct object for multi transaction', async () => {
-      const record = genericMultiTransaction([
-        genericDepositTransaction.data,
-        genericWithdrawalToAddressTransaction.data,
-      ])
+      it('returns correct object for multi transaction', async () => {
+        const record = genericMultiTransaction([
+          genericDepositTransaction.data,
+          genericWithdrawalToAddressTransaction.data,
+        ])
 
-      const id = await repository.add(record)
+        const id = await repository.add(record)
 
-      const transaction = await repository.findByTransactionId(
-        record.transactionId
-      )
+        const transaction = await repository.findAggregatedByTransactionId(
+          record.transactionId
+        )
 
-      expect(transaction).toEqual({
-        id,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        originalTransaction: record.data,
-        alternativeTransactions: [],
+        expect(transaction).toEqual({
+          id,
+          stateUpdateId: record.stateUpdateId,
+          transactionId: record.transactionId,
+          blockNumber: record.blockNumber,
+          originalTransaction: record.data,
+          alternativeTransactions: [],
+        })
       })
-    })
 
-    it('returns correct object for transaction with alts', async () => {
-      const record = genericDepositTransaction
-      const alt1 = {
-        ...record,
-        data: {
-          ...record.data,
-          amount: 2500n,
-        },
-      } as const
+      it('returns correct object for transaction with alts', async () => {
+        const record = genericDepositTransaction
+        const alt1 = {
+          ...record,
+          data: {
+            ...record.data,
+            amount: 2500n,
+          },
+        } as const
 
-      const alt2 = genericMultiTransaction([
-        genericDepositTransaction.data,
-        genericWithdrawalToAddressTransaction.data,
-      ])
+        const alt2 = genericMultiTransaction([
+          genericDepositTransaction.data,
+          genericWithdrawalToAddressTransaction.data,
+        ])
 
-      const alt3 = {
-        ...record,
-        data: {
-          ...record.data,
-          amount: 1000n,
-        },
-      } as const
+        const alt3 = {
+          ...record,
+          data: {
+            ...record.data,
+            amount: 1000n,
+          },
+        } as const
 
-      const id = await repository.add(record)
-      await repository.add(alt1)
-      await repository.add(alt2)
-      await repository.add(alt3)
+        const id = await repository.add(record)
+        await repository.add(alt1)
+        await repository.add(alt2)
+        await repository.add(alt3)
 
-      const transaction = await repository.findByTransactionId(
-        record.transactionId
-      )
+        const transaction = await repository.findAggregatedByTransactionId(
+          record.transactionId
+        )
 
-      expect(transaction).toEqual({
-        id,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        originalTransaction: record.data,
-        alternativeTransactions: [alt1.data, alt2.data, alt3.data],
+        expect(transaction).toEqual({
+          id,
+          stateUpdateId: record.stateUpdateId,
+          transactionId: record.transactionId,
+          blockNumber: record.blockNumber,
+          originalTransaction: record.data,
+          alternativeTransactions: [alt1.data, alt2.data, alt3.data],
+        })
       })
-    })
-  })
+    }
+  )
 
   describe(
     L2TransactionRepository.prototype.getStatisticsByStateUpdateId.name,

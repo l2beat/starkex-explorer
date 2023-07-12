@@ -62,7 +62,9 @@ export class L2TransactionRepository extends BaseRepository {
     this.getPaginatedWithoutMulti = this.wrapGet(this.getPaginatedWithoutMulti)
     this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
     this.findById = this.wrapFind(this.findById)
-    this.findByTransactionId = this.wrapFind(this.findByTransactionId)
+    this.findAggregatedByTransactionId = this.wrapFind(
+      this.findAggregatedByTransactionId
+    )
     this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
     this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -302,7 +304,9 @@ export class L2TransactionRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
-  async findByTransactionId(id: number): Promise<AggregatedRecord | undefined> {
+  async findAggregatedByTransactionId(
+    id: number
+  ): Promise<AggregatedRecord | undefined> {
     const knex = await this.knex()
     const originalTransaction = await knex('l2_transactions')
       .where({ transaction_id: id, parent_id: null })
