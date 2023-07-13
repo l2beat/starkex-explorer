@@ -63,13 +63,16 @@ export class L2TransactionRepository extends BaseRepository {
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async add(record: {
-    transactionId: number
-    data: PerpetualL2TransactionData
-    stateUpdateId?: number
-    blockNumber?: number
-  }): Promise<number> {
-    const knex = await this.knex()
+  async add(
+    trx: Knex.Transaction,
+    record: {
+      transactionId: number
+      data: PerpetualL2TransactionData
+      stateUpdateId?: number
+      blockNumber?: number
+    }
+  ): Promise<number> {
+    const knex = await this.knex(trx)
 
     const count = await this.countByTransactionId(record.transactionId)
     const isAlternative = count > 0
@@ -312,9 +315,33 @@ export class L2TransactionRepository extends BaseRepository {
       .delete()
   }
 
+  async deleteByTransactionId(
+    trx?: Knex.Transaction,
+    ...transactionIds: number[]
+  ) {
+    const knex = await this.knex(trx)
+    return knex('l2_transactions')
+      .whereIn('transaction_id', transactionIds)
+      .delete()
+  }
+
   async deleteAll() {
     const knex = await this.knex()
     return knex('l2_transactions').delete()
+  }
+
+  async runInTransactionWithLockedTable(
+    fun: Parameters<typeof this.runInTransaction>[0]
+  ) {
+    await this.runInTransaction(async (trx) => {
+      await this.lockTable(trx)
+      await fun(trx)
+    })
+  }
+
+  private async lockTable(trx: Knex.Transaction) {
+    const knex = await this.knex(trx)
+    await knex.raw('LOCK TABLE l2_transactions IN ROW EXCLUSIVE MODE;')
   }
 }
 
