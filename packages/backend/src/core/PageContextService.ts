@@ -7,8 +7,8 @@ import {
 } from '@explorer/shared'
 
 import { Config } from '../config'
-import { UserService } from './UserService'
 import { KeyValueStore } from '../peripherals/database/KeyValueStore'
+import { UserService } from './UserService'
 
 export class PageContextService {
   constructor(
@@ -20,7 +20,7 @@ export class PageContextService {
   async getPageContext(givenUser: Partial<UserDetails>): Promise<PageContext> {
     const [user, freezeStatus] = await Promise.all([
       this.userService.getUserDetails(givenUser),
-      this.keyValueStore.getFreezeStatus()
+      this.keyValueStore.getFreezeStatus(),
     ])
 
     if (this.config.starkex.tradingMode === 'perpetual') {

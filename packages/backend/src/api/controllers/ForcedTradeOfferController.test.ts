@@ -57,6 +57,7 @@ describe(ForcedTradeOfferController.name, () => {
     chainId: 1,
     instanceName: 'dYdX',
     collateralAsset: fakeCollateralAsset,
+    freezeStatus: 'not-frozen',
   }
 
   describe(

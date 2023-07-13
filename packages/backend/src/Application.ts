@@ -139,7 +139,11 @@ export class Application {
       logger
     )
     const userService = new UserService(userRegistrationEventRepository)
-    const pageContextService = new PageContextService(config, userService)
+    const pageContextService = new PageContextService(
+      config,
+      userService,
+      kvStore
+    )
     const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
       database,
       logger

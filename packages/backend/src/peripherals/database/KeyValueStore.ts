@@ -1,10 +1,13 @@
+import {
+  FreezeStatus,
+  FreezeStatuses,
+} from '@explorer/shared/build/FreezeStatus'
 import { Knex } from 'knex'
 import { KeyValueRow } from 'knex/types/tables'
 
 import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
-import { FreezeStatus, FreezeStatuses } from '@explorer/shared/build/FreezeStatus'
 
 export interface KeyValueRecord {
   key: string
