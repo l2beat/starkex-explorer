@@ -20,8 +20,8 @@ interface Record<
 > {
   id: number
   transactionId: number
-  stateUpdateId: number
-  blockNumber: number
+  stateUpdateId: number | undefined
+  blockNumber: number | undefined
   parentId: number | undefined
   state: 'alternative' | 'replaced' | undefined
   starkKeyA: StarkKey | undefined
@@ -32,8 +32,8 @@ interface Record<
 interface AggregatedRecord {
   id: number
   transactionId: number
-  stateUpdateId: number
-  blockNumber: number
+  stateUpdateId: number | undefined
+  blockNumber: number | undefined
   originalTransaction: PerpetualL2TransactionData
   alternativeTransactions: PerpetualL2TransactionData[]
 }
@@ -65,9 +65,9 @@ export class L2TransactionRepository extends BaseRepository {
 
   async add(record: {
     transactionId: number
-    stateUpdateId: number
-    blockNumber: number
     data: PerpetualL2TransactionData
+    stateUpdateId?: number
+    blockNumber?: number
   }): Promise<number> {
     const knex = await this.knex()
 
@@ -96,11 +96,11 @@ export class L2TransactionRepository extends BaseRepository {
   private async addSingleTransaction(
     record: {
       transactionId: number
-      stateUpdateId: number
-      blockNumber: number
       isAlternative: boolean
       data: Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
       parentId?: number
+      stateUpdateId?: number
+      blockNumber?: number
     },
     knex: Knex
   ) {
@@ -126,10 +126,10 @@ export class L2TransactionRepository extends BaseRepository {
   private async addMultiTransaction(
     record: {
       transactionId: number
-      stateUpdateId: number
-      blockNumber: number
       isAlternative: boolean
       data: PerpetualL2MultiTransactionData
+      stateUpdateId?: number
+      blockNumber?: number
     },
     knex: Knex
   ) {
@@ -291,7 +291,18 @@ export class L2TransactionRepository extends BaseRepository {
       .orderBy('state_update_id', 'desc')
       .limit(1)
       .first()
-    return results?.state_update_id
+    return results?.state_update_id ? results.state_update_id : undefined
+  }
+
+  async findLatestIncluded(): Promise<Record | undefined> {
+    const knex = await this.knex()
+    const row = await knex('l2_transactions')
+      .whereNotNull('state_update_id')
+      .orderBy('transaction_id', 'desc')
+      .limit(1)
+      .first()
+
+    return row ? toRecord(row) : undefined
   }
 
   async deleteAfterBlock(blockNumber: number) {
@@ -311,8 +322,8 @@ function toRecord(row: L2TransactionRow): Record {
   return {
     id: row.id,
     transactionId: row.transaction_id,
-    stateUpdateId: row.state_update_id,
-    blockNumber: row.block_number,
+    stateUpdateId: row.state_update_id ? row.state_update_id : undefined,
+    blockNumber: row.block_number ? row.block_number : undefined,
     parentId: row.parent_id ? row.parent_id : undefined,
     state: row.state ? row.state : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
@@ -328,8 +339,12 @@ function toAggregatedRecord(
   return {
     id: transaction.id,
     transactionId: transaction.transaction_id,
-    stateUpdateId: transaction.state_update_id,
-    blockNumber: transaction.block_number,
+    stateUpdateId: transaction.state_update_id
+      ? transaction.state_update_id
+      : undefined,
+    blockNumber: transaction.block_number
+      ? transaction.block_number
+      : undefined,
     originalTransaction: decodeTransactionData(transaction.data),
     alternativeTransactions: alternatives.map((alternative) =>
       decodeTransactionData(alternative.data)

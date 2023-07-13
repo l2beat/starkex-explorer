@@ -12,8 +12,22 @@ export class L2TransactionClient extends BaseClient {
     super(options.auth)
   }
 
+  async getThirdPartyIdByTransactionId(transactionId: number) {
+    const url = this.options.getThirdPartyIdByTransactionIdUrl(transactionId)
+
+    const res = await this.fetchClient.fetch(url, this.requestInit)
+    const text = await res.text()
+    const thirdPartyId = Number(text)
+    // thirdPartyId is equal 0 if the transaction is not found
+    return thirdPartyId !== 0 ? thirdPartyId : undefined
+  }
+
   async getPerpetualTransactions(startId: number, pageSize: number) {
     const data = await this.getTransactions(startId, pageSize)
+    //TODO: remove this
+    if (JSON.stringify(data) === '{}') {
+      return undefined
+    }
     const parsed = PerpetualL2TransactionResponse.parse(data)
     return toPerpetualL2Transactions(parsed)
   }
@@ -22,7 +36,7 @@ export class L2TransactionClient extends BaseClient {
     startId: number,
     pageSize: number
   ): Promise<unknown> {
-    const url = this.options.getUrl(startId, pageSize)
+    const url = this.options.getTransactionsUrl(startId, pageSize)
 
     const res = await this.fetchClient.fetchRetry(url, this.requestInit)
     return res.json()

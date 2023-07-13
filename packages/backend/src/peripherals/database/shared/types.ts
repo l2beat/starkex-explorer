@@ -275,8 +275,8 @@ declare module 'knex/types/tables' {
   interface L2TransactionRow {
     id: number
     transaction_id: number
-    state_update_id: number
-    block_number: number
+    state_update_id: number | null
+    block_number: number | null
     parent_id: number | null
     state: 'alternative' | 'replaced' | null
     stark_key_a: string | null

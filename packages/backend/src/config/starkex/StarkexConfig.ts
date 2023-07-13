@@ -83,6 +83,7 @@ export interface GatewayConfig {
 }
 
 export interface L2TransactionApiConfig {
-  getUrl: (startApexId: number, expectCount: number) => string
+  getTransactionsUrl: (startApexId: number, expectCount: number) => string
+  getThirdPartyIdByTransactionIdUrl: (transactionId: number) => string
   auth: ClientAuth
 }
