@@ -59,18 +59,22 @@ export class L2TransactionRepository extends BaseRepository {
     this.findByTransactionId = this.wrapFind(this.findByTransactionId)
     this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
     this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
+    this.deleteByTransactionIds = this.wrapDelete(this.deleteByTransactionIds)
     this.deleteAll = this.wrapDelete(this.deleteAll)
+    this.runInTransactionWithLockedTable = this.wrapAny(
+      this.runInTransactionWithLockedTable
+    )
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
   async add(
-    trx: Knex.Transaction,
     record: {
       transactionId: number
       data: PerpetualL2TransactionData
       stateUpdateId?: number
       blockNumber?: number
-    }
+    },
+    trx?: Knex.Transaction
   ): Promise<number> {
     const knex = await this.knex(trx)
 
@@ -315,9 +319,9 @@ export class L2TransactionRepository extends BaseRepository {
       .delete()
   }
 
-  async deleteByTransactionId(
-    trx?: Knex.Transaction,
-    ...transactionIds: number[]
+  async deleteByTransactionIds(
+    transactionIds: number[],
+    trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
     return knex('l2_transactions')
@@ -331,15 +335,15 @@ export class L2TransactionRepository extends BaseRepository {
   }
 
   async runInTransactionWithLockedTable(
-    fun: Parameters<typeof this.runInTransaction>[0]
+    fn: (trx: Knex.Transaction) => Promise<void>
   ) {
     await this.runInTransaction(async (trx) => {
       await this.lockTable(trx)
-      await fun(trx)
+      await fn(trx)
     })
   }
 
-  private async lockTable(trx: Knex.Transaction) {
+  async lockTable(trx: Knex.Transaction) {
     const knex = await this.knex(trx)
     await knex.raw('LOCK TABLE l2_transactions IN ROW EXCLUSIVE MODE;')
   }

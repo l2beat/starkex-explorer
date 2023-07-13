@@ -89,10 +89,13 @@ export class L2TransactionDownloader {
     await this.l2TransactionRepository.runInTransactionWithLockedTable(
       async (trx) => {
         for (const transaction of transactions) {
-          await this.l2TransactionRepository.add(trx, {
-            transactionId: transaction.transactionId,
-            data: transaction.transaction,
-          })
+          await this.l2TransactionRepository.add(
+            {
+              transactionId: transaction.transactionId,
+              data: transaction.transaction,
+            },
+            trx
+          )
         }
       }
     )

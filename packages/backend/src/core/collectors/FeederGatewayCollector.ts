@@ -51,33 +51,38 @@ export class FeederGatewayCollector {
         return
       }
 
-      const transactionIds = data.transactionsInfo.map(
-        (tx) => tx.originalTransactionId
-      )
-
       await this.l2TransactionRepository.runInTransactionWithLockedTable(
         async (trx) => {
-          await this.l2TransactionRepository.deleteByTransactionId(
-            trx,
-            ...transactionIds
+          const transactionIds = data.transactionsInfo.map(
+            (tx) => tx.originalTransactionId
+          )
+          await this.l2TransactionRepository.deleteByTransactionIds(
+            transactionIds,
+            trx
           )
           for (const transactionInfo of data.transactionsInfo) {
-            await this.l2TransactionRepository.add(trx, {
-              stateUpdateId: stateUpdate.id,
-              blockNumber: stateUpdate.blockNumber,
-              transactionId: transactionInfo.originalTransactionId,
-              data: transactionInfo.originalTransaction,
-            })
+            await this.l2TransactionRepository.add(
+              {
+                stateUpdateId: stateUpdate.id,
+                blockNumber: stateUpdate.blockNumber,
+                transactionId: transactionInfo.originalTransactionId,
+                data: transactionInfo.originalTransaction,
+              },
+              trx
+            )
             if (!transactionInfo.alternativeTransactions) {
               continue
             }
             for (const alternativeTransaction of transactionInfo.alternativeTransactions) {
-              await this.l2TransactionRepository.add(trx, {
-                stateUpdateId: stateUpdate.id,
-                blockNumber: stateUpdate.blockNumber,
-                transactionId: transactionInfo.originalTransactionId,
-                data: alternativeTransaction,
-              })
+              await this.l2TransactionRepository.add(
+                {
+                  stateUpdateId: stateUpdate.id,
+                  blockNumber: stateUpdate.blockNumber,
+                  transactionId: transactionInfo.originalTransactionId,
+                  data: alternativeTransaction,
+                },
+                trx
+              )
             }
           }
         }

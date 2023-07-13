@@ -1,3 +1,5 @@
+import { isEmpty } from 'lodash'
+
 import { L2TransactionApiConfig } from '../../config/starkex/StarkexConfig'
 import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
@@ -15,7 +17,7 @@ export class L2TransactionClient extends BaseClient {
   async getThirdPartyIdByTransactionId(transactionId: number) {
     const url = this.options.getThirdPartyIdByTransactionIdUrl(transactionId)
 
-    const res = await this.fetchClient.fetch(url, this.requestInit)
+    const res = await this.fetchClient.fetchRetry(url, this.requestInit)
     const text = await res.text()
     const thirdPartyId = Number(text)
     // thirdPartyId is equal 0 if the transaction is not found
@@ -24,10 +26,11 @@ export class L2TransactionClient extends BaseClient {
 
   async getPerpetualTransactions(startId: number, pageSize: number) {
     const data = await this.getTransactions(startId, pageSize)
-    //TODO: remove this
-    if (JSON.stringify(data) === '{}') {
+
+    if (isEmpty(data)) {
       return undefined
     }
+
     const parsed = PerpetualL2TransactionResponse.parse(data)
     return toPerpetualL2Transactions(parsed)
   }
@@ -37,7 +40,6 @@ export class L2TransactionClient extends BaseClient {
     pageSize: number
   ): Promise<unknown> {
     const url = this.options.getTransactionsUrl(startId, pageSize)
-
     const res = await this.fetchClient.fetchRetry(url, this.requestInit)
     return res.json()
   }

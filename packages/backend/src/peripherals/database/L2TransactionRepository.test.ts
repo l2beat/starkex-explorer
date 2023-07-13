@@ -7,7 +7,8 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect } from 'earl'
+import { expect, mockFn } from 'earl'
+import { Knex } from 'knex'
 import { beforeEach, it } from 'mocha'
 
 import { setupDatabaseTestSuite } from '../../test/database'
@@ -1330,4 +1331,76 @@ describe(L2TransactionRepository.name, () => {
       expect(deletedTransaction).toBeNullish()
     })
   })
+
+  describe(
+    L2TransactionRepository.prototype.deleteByTransactionIds.name,
+    () => {
+      const record = {
+        stateUpdateId: 1,
+        transactionId: 1234,
+        blockNumber: 12345,
+        data: {
+          type: 'Deposit',
+          starkKey: StarkKey.fake(),
+          positionId: 1234n,
+          amount: 5000n,
+        },
+      } as const
+      const recordToBeDeleted = {
+        stateUpdateId: 2,
+        transactionId: 12345,
+        blockNumber: 123456,
+        data: {
+          type: 'Deposit',
+          starkKey: StarkKey.fake(),
+          positionId: 1234n,
+          amount: 5000n,
+        },
+      } as const
+      const recordToBeDeleted2 = {
+        stateUpdateId: 3,
+        transactionId: 123453,
+        blockNumber: 1234565,
+        data: {
+          type: 'Deposit',
+          starkKey: StarkKey.fake(),
+          positionId: 1234n,
+          amount: 5000n,
+        },
+      } as const
+
+      it('deletes a transaction by transaction id', async () => {
+        const id = await repository.add(record)
+        const deletedId = await repository.add(recordToBeDeleted)
+        const deletedId2 = await repository.add(recordToBeDeleted2)
+        await repository.deleteByTransactionIds([
+          recordToBeDeleted.transactionId,
+          recordToBeDeleted2.transactionId,
+        ])
+
+        const transaction = await repository.findById(id)
+        const deletedTransaction = await repository.findById(deletedId)
+        const deletedTransaction2 = await repository.findById(deletedId2)
+
+        expect(transaction).not.toBeNullish()
+        expect(deletedTransaction).toBeNullish()
+        expect(deletedTransaction2).toBeNullish()
+      })
+    }
+  )
+
+  describe(
+    L2TransactionRepository.prototype.runInTransactionWithLockedTable.name,
+    () => {
+      it('runs a function in a transaction with a locked table', async () => {
+        const mockedLockTableFn = mockFn(async () => {})
+        repository.lockTable = mockedLockTableFn
+        const fn = mockFn(async (trx: Knex.Transaction) => {})
+        await repository.runInTransactionWithLockedTable(fn)
+
+        expect(mockedLockTableFn).toHaveBeenCalledTimes(1)
+        expect(fn).toHaveBeenCalledTimes(1)
+      })
+    }
+  )
 })
