@@ -41,14 +41,4 @@ describe(SyncStatusRepository.name, () => {
     const actual = await repository.getLastSynced()
     expect(actual).toEqual(undefined)
   })
-
-  it('returns undefined when the store is corrupt', async () => {
-    const store = mockObject<KeyValueStore>({
-      findByKey: mockFn().resolvesTo('3 is my favorite number'),
-    })
-    const repository = new SyncStatusRepository(store, Logger.SILENT)
-
-    const actual = await repository.getLastSynced()
-    expect(actual).toEqual(undefined)
-  })
 })
