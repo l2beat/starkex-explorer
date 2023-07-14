@@ -1,4 +1,4 @@
-import { stringAs, stringAsInt } from '@explorer/shared'
+import { stringAsBoolean, stringAsInt } from '@explorer/shared'
 import { Knex } from 'knex'
 import { KeyValueRow } from 'knex/types/tables'
 import { z } from 'zod'
@@ -13,7 +13,7 @@ export const KeyValueRecord = z.union([
   z.object({ key: z.literal('lastBlockNumberSynced'), value: stringAsInt() }),
   z.object({
     key: z.literal('userStatisticsPreprocessorCaughtUp'),
-    value: stringAs(Boolean),
+    value: stringAsBoolean(),
   }),
 ])
 
