@@ -49,6 +49,7 @@ export function stringAsBoolean() {
     (v) =>
       z
         .enum(['true', 'false'])
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         .transform((v) => JSON.parse(v))
         .parse(v),
     z.boolean()
