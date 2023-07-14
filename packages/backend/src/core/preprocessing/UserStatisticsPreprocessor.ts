@@ -23,7 +23,7 @@ export class UserStatisticsPreprocessor {
   async catchUp(trx: Knex.Transaction) {
     const kvKey = 'userStatisticsPreprocessorCaughtUp'
     const isCaughtUp = await this.kvStore.findByKey(kvKey, trx)
-    if (isCaughtUp === 'true') {
+    if (isCaughtUp) {
       return
     }
     this.logger.info('Catching up UserStatisticsPreprocessor...')
@@ -55,7 +55,7 @@ export class UserStatisticsPreprocessor {
     await this.kvStore.addOrUpdate(
       {
         key: kvKey,
-        value: 'true',
+        value: true,
       },
       trx
     )
