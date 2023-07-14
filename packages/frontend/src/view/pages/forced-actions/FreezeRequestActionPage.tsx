@@ -1,20 +1,48 @@
-import { PageContextWithUser } from '@explorer/shared'
+import {
+  PageContextWithUser,
+  stringAs,
+  stringAsBigInt,
+  toJsonWithoutBigInts,
+} from '@explorer/shared'
+import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import React from 'react'
+import { z } from 'zod'
 
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 
-export const FREEZE_REQUEST_FORM_ID = 'free-request-form'
+export const FREEZE_REQUEST_FORM_ID = 'freeze-request-form'
 
 interface Props {
   context: PageContextWithUser
+  transactionHash: Hash256
+  starkExAddress: EthereumAddress
+  starkKey: StarkKey
+  positionOrVaultId: bigint
+  quantizedAmount: bigint
+}
+
+export type FreezeRequestActionFormProps = z.infer<
+  typeof FreezeRequestActionFormProps
+>
+export const FreezeRequestActionFormProps = z.object({
+  starkExAddress: stringAs(EthereumAddress),
+  starkKey: stringAs(StarkKey),
+  positionOrVaultId: stringAsBigInt(),
+  quantizedAmount: stringAsBigInt(),
+})
+
+export function serializeFreezeRequestActionFormProps(
+  props: FreezeRequestActionFormProps
+) {
+  return toJsonWithoutBigInts(props)
 }
 
 function FreezeRequestActionPage(props: Props) {
-  const { context } = props
-  // const formPropsJson = serializeForcedActionsFormProps(formProps)
+  const { context, ...formProps } = props
+  const formPropsJson = serializeFreezeRequestActionFormProps(formProps)
   const userJson = JSON.stringify(context.user)
   return (
     <Page
@@ -34,6 +62,12 @@ function FreezeRequestActionPage(props: Props) {
               the exchange can be frozen (essentially "shut down").
             </span>
             <span className="mt-3 text-sm font-semibold text-zinc-500">
+              You can see the ignored forced action:
+              <a href={`/transactions/${props.transactionHash.toString()}`}>
+                here
+              </a>
+            </span>
+            <span className="mt-3 text-sm font-semibold text-zinc-500">
               In the frozen state, the only possible operation is for users to
               withdraw their funds using so called "escape hatch", which
               interacts with the Ethereum blockchain directly.
@@ -43,10 +77,10 @@ function FreezeRequestActionPage(props: Props) {
             <form
               id={FREEZE_REQUEST_FORM_ID}
               className="flex flex-col gap-6"
-              // data-props={formPropsJson}
+              data-props={formPropsJson}
               data-user={userJson}
             >
-              <Button className="w-full">Perform Freeze Request</Button>
+              <Button className="w-full">Request Freeze</Button>
             </form>
           </Card>
         </div>

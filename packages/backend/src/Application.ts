@@ -608,7 +608,9 @@ export class Application {
     )
 
     const escapeActionController = new EscapeActionController(
-      pageContextService
+      pageContextService,
+      freezeCheckService,
+      config.starkex.contracts.perpetual
     )
 
     const userTransactionController = new TransactionSubmitController(

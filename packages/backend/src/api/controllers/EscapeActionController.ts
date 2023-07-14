@@ -1,11 +1,17 @@
 import { renderFreezeRequestActionPage } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
+import { EthereumAddress } from '@explorer/types'
 
+import { FreezeCheckService } from '../../core/FreezeCheckService'
 import { PageContextService } from '../../core/PageContextService'
 import { ControllerResult } from './ControllerResult'
 
 export class EscapeActionController {
-  constructor(private readonly pageContextService: PageContextService) {}
+  constructor(
+    private readonly pageContextService: PageContextService,
+    private readonly freezeCheckService: FreezeCheckService,
+    private readonly starkExAddress: EthereumAddress
+  ) {}
 
   async getFreezeRequestActionPage(
     givenUser: Partial<UserDetails>
@@ -28,8 +34,30 @@ export class EscapeActionController {
       }
     }
 
+    const oldestNotIncludedForcedAction =
+      await this.freezeCheckService.findOldestNotIncludedForcedAction()
+    if (!oldestNotIncludedForcedAction) {
+      return {
+        type: 'not found',
+        message: 'Freeze is no longer possible',
+      }
+    }
+
+    if (oldestNotIncludedForcedAction.data.type !== 'ForcedWithdrawal') {
+      return {
+        type: 'not found',
+        message: 'Functionality not yet supported',
+      }
+    }
+
+    const data = oldestNotIncludedForcedAction.data
     const content = renderFreezeRequestActionPage({
       context,
+      transactionHash: oldestNotIncludedForcedAction.transactionHash,
+      starkKey: data.starkKey,
+      positionOrVaultId: data.positionId,
+      quantizedAmount: data.quantizedAmount,
+      starkExAddress: this.starkExAddress,
     })
 
     return { type: 'success', content }

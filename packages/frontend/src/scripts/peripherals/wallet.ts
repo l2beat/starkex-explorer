@@ -4,6 +4,7 @@ import {
   CollateralAsset,
   CreateOfferData,
   encodeFinalizeExitRequest,
+  encodeFreezeRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
@@ -209,6 +210,31 @@ export const Wallet = {
   },
 
   // #endregion
+
+  // #region Escape
+  async sendFreezeRequestTransaction(
+    account: EthereumAddress,
+    ownerKey: StarkKey,
+    positionOrVaultId: bigint,
+    quantizedAmount: bigint,
+    exchangeAddress: EthereumAddress
+  ) {
+    const data = encodeFreezeRequest({
+      ownerKey,
+      positionOrVaultId,
+      quantizedAmount,
+    })
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        { from: account.toString(), to: exchangeAddress.toString(), data },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  // #endregion
+
   // #region Withdrawals
 
   async sendOldWithdrawalTransaction(

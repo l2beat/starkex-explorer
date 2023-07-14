@@ -43,11 +43,7 @@ export class FreezeCheckService {
     }
 
     const oldestNotIncludedForcedAction =
-      await this.userTransactionRepository.findOldestNotIncluded([
-        'ForcedTrade',
-        'ForcedWithdrawal',
-        'FullWithdrawal',
-      ])
+      await this.findOldestNotIncludedForcedAction()
     if (!oldestNotIncludedForcedAction) {
       await this.keyValueStore.setFreezeStatus('not-frozen')
       return
@@ -65,6 +61,14 @@ export class FreezeCheckService {
     // TODO: check if we're truly synced (lastSyncedBlockNumber is not further than an hour(?) behind)
     this.logger.info('StarkEx is freezable!')
     await this.keyValueStore.setFreezeStatus('freezable')
+  }
+
+  public async findOldestNotIncludedForcedAction() {
+    return this.userTransactionRepository.findOldestNotIncluded([
+      'ForcedTrade',
+      'ForcedWithdrawal',
+      'FullWithdrawal',
+    ])
   }
 
   private async callIsFrozen(): Promise<boolean> {
