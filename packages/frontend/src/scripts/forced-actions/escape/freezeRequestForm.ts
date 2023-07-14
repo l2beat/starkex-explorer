@@ -30,7 +30,8 @@ async function submitFreezeRequest(
   props: FreezeRequestActionFormProps,
   user: UserDetails
 ) {
-  const hash = await Wallet.sendFreezeRequestTransaction(
+  // const hash = await Wallet.sendFreezeRequestTransaction(
+  await Wallet.sendFreezeRequestTransaction(
     user.address,
     props.starkKey,
     props.positionOrVaultId,
