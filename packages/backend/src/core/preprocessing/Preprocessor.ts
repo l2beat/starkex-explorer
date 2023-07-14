@@ -116,7 +116,24 @@ export class Preprocessor<T extends AssetHash | AssetId> {
   async catchUp() {
     await this.preprocessedStateUpdateRepository.runInTransaction(
       async (trx) => {
-        await this.userStatisticsPreprocessor.catchUp(trx)
+        const lastProcessedStateUpdate =
+          await this.preprocessedStateUpdateRepository.findLast(trx)
+        if (!lastProcessedStateUpdate) {
+          return
+        }
+
+        await this.userStatisticsPreprocessor.catchUp(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
+        await this.stateDetailsPreprocessor.catchUpL2Transactions(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
+        await this.userStatisticsPreprocessor.catchUpL2Transactions(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
       }
     )
   }

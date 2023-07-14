@@ -3,7 +3,6 @@ import { Knex } from 'knex'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   StateUpdateRecord,
@@ -16,14 +15,13 @@ export class UserStatisticsPreprocessor {
   constructor(
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
-    private readonly preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly kvStore: KeyValueStore,
     private readonly logger: Logger
   ) {}
 
-  async catchUp(trx: Knex.Transaction) {
+  async catchUp(trx: Knex.Transaction, lastProcessedStateUpdateId: number) {
     const kvKey = 'userStatisticsPreprocessorCaughtUp'
     const isCaughtUp = await this.kvStore.findByKey(kvKey, trx)
     if (isCaughtUp === 'true') {
@@ -32,12 +30,10 @@ export class UserStatisticsPreprocessor {
     this.logger.info('Catching up UserStatisticsPreprocessor...')
 
     await this.preprocessedUserStatisticsRepository.deleteAll(trx)
-    const lastProcessedStateUpdate =
-      await this.preprocessedStateUpdateRepository.findLast(trx)
 
     for (
       let stateUpdateId = 1;
-      stateUpdateId <= (lastProcessedStateUpdate?.stateUpdateId ?? 0);
+      stateUpdateId <= lastProcessedStateUpdateId;
       stateUpdateId++
     ) {
       const stateUpdate = await this.stateUpdateRepository.findById(

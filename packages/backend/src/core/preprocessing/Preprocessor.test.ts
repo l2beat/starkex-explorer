@@ -66,6 +66,110 @@ describe(Preprocessor.name, () => {
     })
   })
 
+  describe(Preprocessor.prototype.catchUp.name, () => {
+    it('catches up', async () => {
+      const mockKnexTransaction = mockObject<Knex.Transaction>()
+      const lastPreprocessedStateUpdateId = 10
+      const mockUserStatisticsPreprocessor =
+        mockObject<UserStatisticsPreprocessor>({
+          catchUp: mockFn().resolvesTo(undefined),
+          catchUpL2Transactions: mockFn().resolvesTo(undefined),
+        })
+      const mockStateDetailsPreprocessor = mockObject<StateDetailsPreprocessor>(
+        {
+          catchUpL2Transactions: mockFn().resolvesTo(undefined),
+        }
+      )
+
+      const mockPreprocessedStateUpdateRepository =
+        mockObject<PreprocessedStateUpdateRepository>({
+          findLast: mockFn().resolvesTo({
+            stateUpdateId: lastPreprocessedStateUpdateId,
+          }),
+          runInTransaction: mockFn(async (fn) => fn(mockKnexTransaction)),
+        })
+
+      const preprocessor = new Preprocessor(
+        mockPreprocessedStateUpdateRepository,
+        mockObject<SyncStatusRepository>(),
+        mockObject<StateUpdateRepository>(),
+        mockObject<PerpetualHistoryPreprocessor>(),
+        mockStateDetailsPreprocessor,
+        mockUserStatisticsPreprocessor,
+        mockObject<L2TransactionRepository>(),
+        Logger.SILENT
+      )
+
+      await preprocessor.catchUp()
+
+      expect(
+        mockPreprocessedStateUpdateRepository.runInTransaction
+      ).toHaveBeenCalled()
+      expect(
+        mockPreprocessedStateUpdateRepository.findLast
+      ).toHaveBeenCalledWith(mockKnexTransaction)
+
+      expect(mockUserStatisticsPreprocessor.catchUp).toHaveBeenCalledWith(
+        mockKnexTransaction,
+        lastPreprocessedStateUpdateId
+      )
+      expect(
+        mockStateDetailsPreprocessor.catchUpL2Transactions
+      ).toHaveBeenCalledWith(mockKnexTransaction, lastPreprocessedStateUpdateId)
+      expect(
+        mockUserStatisticsPreprocessor.catchUpL2Transactions
+      ).toHaveBeenCalledWith(mockKnexTransaction, lastPreprocessedStateUpdateId)
+    })
+
+    it('does nothing when there is nothing to catch up', async () => {
+      const mockKnexTransaction = mockObject<Knex.Transaction>()
+      const mockPreprocessedStateUpdateRepository =
+        mockObject<PreprocessedStateUpdateRepository>({
+          findLast: mockFn().resolvesTo(undefined),
+          runInTransaction: mockFn(async (fn) => fn(mockKnexTransaction)),
+        })
+
+      const mockUserStatisticsPreprocessor =
+        mockObject<UserStatisticsPreprocessor>({
+          catchUp: mockFn(),
+          catchUpL2Transactions: mockFn(),
+        })
+      const mockStateDetailsPreprocessor = mockObject<StateDetailsPreprocessor>(
+        {
+          catchUpL2Transactions: mockFn(),
+        }
+      )
+
+      const preprocessor = new Preprocessor(
+        mockPreprocessedStateUpdateRepository,
+        mockObject<SyncStatusRepository>(),
+        mockObject<StateUpdateRepository>(),
+        mockObject<PerpetualHistoryPreprocessor>(),
+        mockStateDetailsPreprocessor,
+        mockUserStatisticsPreprocessor,
+        mockObject<L2TransactionRepository>(),
+        Logger.SILENT
+      )
+
+      await preprocessor.catchUp()
+
+      expect(
+        mockPreprocessedStateUpdateRepository.runInTransaction
+      ).toHaveBeenCalled()
+      expect(
+        mockPreprocessedStateUpdateRepository.findLast
+      ).toHaveBeenCalledWith(mockKnexTransaction)
+
+      expect(mockUserStatisticsPreprocessor.catchUp).not.toHaveBeenCalled()
+      expect(
+        mockStateDetailsPreprocessor.catchUpL2Transactions
+      ).not.toHaveBeenCalled()
+      expect(
+        mockUserStatisticsPreprocessor.catchUpL2Transactions
+      ).not.toHaveBeenCalled()
+    })
+  })
+
   describe(Preprocessor.prototype.getLastSyncedStateUpdate.name, () => {
     it('handles sync status returning undefined', async () => {
       const syncStatusRepo = mockObject<SyncStatusRepository>({

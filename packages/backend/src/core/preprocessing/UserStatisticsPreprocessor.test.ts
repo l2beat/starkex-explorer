@@ -5,7 +5,6 @@ import { Knex } from 'knex'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import {
   PreprocessedUserStatisticsRecord,
   PreprocessedUserStatisticsRepository,
@@ -101,7 +100,6 @@ describe(UserStatisticsPreprocessor.name, () => {
         const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
           mockPreprocessedUserStatisticsRepository,
           mockPreprocessedAssetHistoryRepository,
-          mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
           mockObject<L2TransactionRepository>(),
           mockObject<KeyValueStore>(),
@@ -189,7 +187,6 @@ describe(UserStatisticsPreprocessor.name, () => {
         const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
           mockPreprocessedUserStatisticsRepository,
           mockObject<PreprocessedAssetHistoryRepository>(),
-          mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
           mockObject<L2TransactionRepository>(),
           mockObject<KeyValueStore>(),
@@ -258,7 +255,6 @@ describe(UserStatisticsPreprocessor.name, () => {
         const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
           mockPreprocessedUserStatisticsRepository,
           mockObject<PreprocessedAssetHistoryRepository>(),
-          mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
           mockL2TransactionRepository,
           mockObject<KeyValueStore>(),
@@ -322,7 +318,6 @@ describe(UserStatisticsPreprocessor.name, () => {
         const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
           mockPreprocessedUserStatisticsRepository,
           mockObject<PreprocessedAssetHistoryRepository>(),
-          mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
           mockL2TransactionRepository,
           mockObject<KeyValueStore>(),
