@@ -1,6 +1,6 @@
 import { expect } from 'earl'
 
-import { stringAsBigInt, stringAsInt } from './types'
+import { stringAsBigInt, stringAsBoolean, stringAsInt } from './types'
 
 describe(stringAsInt.name, () => {
   describe('parses correct input', () => {
@@ -44,6 +44,28 @@ describe(stringAsBigInt.name, () => {
     inputs.forEach((input) => {
       it(`${input}`, () =>
         expect(parser.safeParse(input).success).toEqual(false))
+    })
+  })
+})
+
+describe('stringAsBoolean', () => {
+  const parser = stringAsBoolean()
+
+  describe('parses correct input', () => {
+    it('returns true for "true"', () => {
+      expect(parser.parse('true')).toEqual(true)
+    })
+
+    it('returns false for "false"', () => {
+      expect(parser.parse('false')).toEqual(false)
+    })
+  })
+
+  describe('parses incorrect input', () => {
+    const inputs = ['foo', '123foo', '', '1.2']
+
+    inputs.forEach((input) => {
+      it(`${input}`, () => expect(() => parser.parse(input)).toThrow())
     })
   })
 })
