@@ -2,6 +2,7 @@ import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { AssetHash, AssetId } from '@explorer/types'
 
 import { ApiServer } from './api/ApiServer'
+import { EscapeActionController } from './api/controllers/EscapeActionController'
 import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { HomeController } from './api/controllers/HomeController'
@@ -606,6 +607,10 @@ export class Application {
       l2TransactionRepository
     )
 
+    const escapeActionController = new EscapeActionController(
+      pageContextService
+    )
+
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
       sentTransactionRepository,
@@ -633,6 +638,7 @@ export class Application {
           merkleProofController,
           searchController,
           l2TransactionController,
+          escapeActionController,
           config
         ),
         createTransactionRouter(

@@ -39,6 +39,7 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderFreezeRequestActionPage } from '../view/pages/forced-actions/FreezeRequestActionPage'
 import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
 import { renderStateUpdateL2TransactionsPage } from '../view/pages/state-update/StateUpdateL2TransactionsPage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
@@ -992,6 +993,16 @@ const routes: Route[] = [
       })
     },
   },
+  {
+    path: '/freeze',
+    description: 'Request to freeze the exchange.',
+    render: (ctx) => {
+      const context = getSpotPageContext(ctx, true)
+      ctx.body = renderFreezeRequestActionPage({
+        context,
+      })
+    },
+  },
   // #endregion
   // #region Offers and transactions
   {
@@ -1574,6 +1585,7 @@ function getPerpetualPageContext(
     chainId: 1,
     tradingMode: 'perpetual',
     collateralAsset: fakeCollateralAsset,
+    freezeStatus: 'not-frozen',
   } as const
 }
 
@@ -1596,5 +1608,6 @@ function getSpotPageContext(
     instanceName: 'Myria',
     chainId: 1,
     tradingMode: 'spot',
+    freezeStatus: 'not-frozen',
   } as const
 }
