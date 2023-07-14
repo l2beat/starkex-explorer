@@ -4,7 +4,7 @@ import { setupDatabaseTestSuite } from '../../test/database'
 import { Logger } from '../../tools/Logger'
 import { KeyValueStore } from './KeyValueStore'
 
-describe(KeyValueStore.name, () => {
+describe.only(KeyValueStore.name, () => {
   const { database } = setupDatabaseTestSuite()
   const kvStore = new KeyValueStore(database, Logger.SILENT)
 
@@ -14,7 +14,11 @@ describe(KeyValueStore.name, () => {
     await kvStore.addOrUpdate({ key: 'softwareMigrationNumber', value: 1 })
     const actual = await kvStore.findByKey('softwareMigrationNumber')
     expect(actual).toEqual(1)
-    await kvStore.deleteByKey('lastBlockNumberSynced')
+    await kvStore.deleteByKey('softwareMigrationNumber')
+    const actualAfterDelete = await kvStore.findByKey(
+      'softwareMigrationNumber'
+    )
+    expect(actualAfterDelete).toEqual(undefined)
   })
 
   it('reads and removes all values', async () => {
