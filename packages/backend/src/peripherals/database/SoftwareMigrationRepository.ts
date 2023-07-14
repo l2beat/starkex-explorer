@@ -11,19 +11,13 @@ export class SoftwareMigrationRepository {
 
   async getMigrationNumber(): Promise<number> {
     const valueInDb = await this.store.findByKey('softwareMigrationNumber')
-    if (valueInDb) {
-      const result = Number(valueInDb)
-      if (!isNaN(result)) {
-        return result
-      }
-    }
-    return 0
+    return valueInDb ?? 0
   }
 
   async setMigrationNumber(number: number): Promise<void> {
     await this.store.addOrUpdate({
       key: 'softwareMigrationNumber',
-      value: String(number),
+      value: number,
     })
     this.logger.debug({ method: this.setMigrationNumber.name, number })
   }

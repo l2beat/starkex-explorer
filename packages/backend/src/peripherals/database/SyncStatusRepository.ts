@@ -12,19 +12,13 @@ export class SyncStatusRepository {
   }
 
   async getLastSynced(trx?: Knex.Transaction): Promise<number | undefined> {
-    const valueInDb = await this.store.findByKey('lastBlockNumberSynced', trx)
-    if (valueInDb) {
-      const result = Number(valueInDb)
-      if (!isNaN(result)) {
-        return result
-      }
-    }
+    return await this.store.findByKey('lastBlockNumberSynced', trx)
   }
 
   async setLastSynced(blockNumber: number): Promise<void> {
     await this.store.addOrUpdate({
       key: 'lastBlockNumberSynced',
-      value: String(blockNumber),
+      value: blockNumber,
     })
     this.logger.info({ method: this.setLastSynced.name, blockNumber })
   }

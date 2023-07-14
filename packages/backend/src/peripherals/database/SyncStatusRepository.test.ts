@@ -1,4 +1,4 @@
-import { expect, mockObject } from 'earl'
+import { expect, mockFn, mockObject } from 'earl'
 
 import { Logger } from '../../tools/Logger'
 import { KeyValueStore } from './KeyValueStore'
@@ -14,13 +14,13 @@ describe(SyncStatusRepository.name, () => {
     await repository.setLastSynced(20)
     expect(store.addOrUpdate).toHaveBeenOnlyCalledWith({
       key: 'lastBlockNumberSynced',
-      value: '20',
+      value: 20,
     })
   })
 
   it('reads value from store', async () => {
     const store = mockObject<KeyValueStore>({
-      findByKey: async () => '20',
+      findByKey: mockFn().resolvesTo(20),
     })
     const repository = new SyncStatusRepository(store, Logger.SILENT)
 
@@ -44,7 +44,7 @@ describe(SyncStatusRepository.name, () => {
 
   it('returns undefined when the store is corrupt', async () => {
     const store = mockObject<KeyValueStore>({
-      findByKey: async () => '3 is my favorite number',
+      findByKey: mockFn().resolvesTo('3 is my favorite number'),
     })
     const repository = new SyncStatusRepository(store, Logger.SILENT)
 
