@@ -88,7 +88,9 @@ function UserPage(props: UserPageProps) {
             />
           </div>
         </section>
-        <EscapeHatchPanel starkKey={props.starkKey} />
+        {props.context.freezeStatus === 'frozen' && (
+          <EscapeHatchPanel starkKey={props.starkKey} />
+        )}
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
           visible={props.assets.length}

@@ -542,6 +542,37 @@ const routes: Route[] = [
       })
     },
   },
+  {
+    path: '/users/:starkKey/exchange-frozen',
+    link: '/users/someone/exchange-frozen',
+    description:
+      'Someone else’s user page when exchange is in frozen state, so escape functionality is available.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      context.freezeStatus = 'frozen'
+
+      ctx.body = renderUserPage({
+        context,
+        starkKey: StarkKey.fake(),
+        ethereumAddress: EthereumAddress.fake(),
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
+        finalizableOffers: repeat(2, randomUserOfferEntry),
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 7,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: {
+          data: repeat(6, randomPerpetualUserL2TransactionEntry),
+          total: 5123,
+        },
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+      })
+    },
+  },
   // #endregion
   // #region User lists
   {
@@ -998,8 +1029,14 @@ const routes: Route[] = [
     description: 'Request to freeze the exchange.',
     render: (ctx) => {
       const context = getSpotPageContext(ctx, true)
+      context.freezeStatus = 'freezable'
       ctx.body = renderFreezeRequestActionPage({
         context,
+        transactionHash: Hash256.fake(),
+        starkExAddress: EthereumAddress.fake(),
+        starkKey: StarkKey.fake(),
+        positionOrVaultId: 1n,
+        quantizedAmount: 1000000000000000n,
       })
     },
   },
