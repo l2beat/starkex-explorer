@@ -15,27 +15,27 @@ export function EscapeHatchPanel(_props: EscapeHatchPanelProps) {
       <section className="flex w-full rounded-lg bg-gray-800 p-6">
         <div className="max-w flex flex-col">
           <span className="mb-3">
-            The exchange is frozen, which means that it doesn't operate normally
-            and doesn't support any regular actions.
+            The exchange is frozen, preventing it from executing regular
+            operations or supporting standard actions.
           </span>
           <span className="mb-3">
-            You can request withdrawal of full value of this position by
-            triggering an "escape hatch". This is done by interacting with
-            Ethereum contract which also calculates the full value of this
-            position (including open trades and funding rates).
+            You have the option to request a withdrawal of the entire value of
+            this position by activating an 'escape hatch.' This process involves
+            interacting with an Ethereum contract, which calculates the total
+            value of the position, including any open trades and funding rates.
           </span>
           <span className="mb-3">
-            Escaping is a 3-step process: requesting (verifying) the escape,
-            finalizing the escape, and withdrawing the funds. The last step must
-            be performed by this position's owner.
+            The escape process consists of three steps: initiating (verifying)
+            the escape, finalizing the escape, and withdrawing the funds. The
+            final step can only be carried out by the owner of this position.
           </span>
           <span className="mb-3">
-            Be aware that performing an Escape may be expensive due to Ethereum
-            gas cost.
+            Please note, the execution of an Escape can be expensive due to
+            Ethereum gas cost.
           </span>
         </div>
         <div className="mx-8">
-          <LinkButton href="/">Request Escape</LinkButton>
+          <LinkButton href="/">Initiate Escape</LinkButton>
         </div>
       </section>
     </div>
