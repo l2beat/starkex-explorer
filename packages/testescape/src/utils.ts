@@ -69,6 +69,12 @@ export class HardhatUtils {
     await helpers.mine(1)
   }
 
+  async mineGracePeriod() {
+    const perpetualContract = this.getPerpetualContract();
+    const freezeGracePeriod = (await perpetualContract.FREEZE_GRACE_PERIOD()).toNumber()
+    await helpers.mine(2, { interval: freezeGracePeriod })
+  }
+
   async freeze() {
     const signer = this.provider.getSigner(this.FORCED_WITHDRAWAL.ethereumAddress); // Use the correct signer here
     const perpetualContract = this.getPerpetualContract();
