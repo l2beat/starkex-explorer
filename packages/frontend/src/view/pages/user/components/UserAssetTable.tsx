@@ -16,6 +16,7 @@ interface UserAssetsTableProps {
   starkKey: StarkKey
   tradingMode: TradingMode
   isMine?: boolean
+  isFrozen?: boolean
 }
 
 export interface UserAssetEntry {
@@ -41,7 +42,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
         { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
-        ...(props.isMine ? [{ header: 'Action' }] : []),
+        ...(props.isMine && !props.isFrozen ? [{ header: 'Action' }] : []),
       ]}
       alignLastColumnRight={true}
       rows={props.assets.map((entry) => {
@@ -65,7 +66,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
-            props.isMine && (
+            props.isMine && !props.isFrozen && (
               <LinkButton
                 className="w-32"
                 href={forcedActionLink(entry)}

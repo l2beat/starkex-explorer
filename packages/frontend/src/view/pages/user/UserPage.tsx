@@ -97,6 +97,7 @@ function UserPage(props: UserPageProps) {
             starkKey={props.starkKey}
             assets={props.assets}
             isMine={isMine}
+            isFrozen={props.context.freezeStatus === 'frozen'}
           />
         </TablePreview>
         {props.l2Transactions && (
