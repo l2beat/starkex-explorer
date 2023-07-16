@@ -1,7 +1,7 @@
 import { pedersen } from '@explorer/crypto'
 import { AssetHash, json, PedersenHash, StarkKey } from '@explorer/types'
 
-import { MerkleValue } from './MerkleValue'
+import { MerkleProofPrefix, MerkleValue } from './MerkleValue'
 import { packBytes } from './packBytes'
 
 export class VaultLeaf extends MerkleValue {
@@ -30,6 +30,13 @@ export class VaultLeaf extends MerkleValue {
       PedersenHash(packBytes([{ bytes: 32, value: this.balance }]))
     )
     return hash
+  }
+
+  async calculateMerkleProofPrefix(): Promise<MerkleProofPrefix> {
+    return {
+      nodes: [], // TODO: implement
+      finalHash: await this.hash(),
+    }
   }
 
   getData() {
