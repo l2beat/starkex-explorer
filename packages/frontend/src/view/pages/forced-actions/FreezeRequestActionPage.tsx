@@ -9,7 +9,7 @@ import React from 'react'
 import { z } from 'zod'
 
 import { Button } from '../../components/Button'
-import { Card } from '../../components/Card'
+import { Link } from '../../components/Link'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
 
@@ -51,39 +51,34 @@ function FreezeRequestActionPage(props: Props) {
       context={props.context}
     >
       <main className="mx-auto flex-1 p-16">
-        <div className="my-auto flex gap-12">
-          <div className="mt-6 flex max-w-md flex-col">
-            <span className="text-xl font-semibold">
-              Request Exchange Freeze
-            </span>
-            <span className="mt-3 text-sm font-semibold text-zinc-500">
-              The exchange operators have not fulfilled their obligation to
-              included a "forced action" of one of the users. This means that
-              the exchange can be frozen (essentially "shut down").
-            </span>
-            <span className="mt-3 text-sm font-semibold text-zinc-500">
-              You can see the ignored forced action:
-              <a href={`/transactions/${props.transactionHash.toString()}`}>
-                here
-              </a>
-            </span>
-            <span className="mt-3 text-sm font-semibold text-zinc-500">
-              In the frozen state, the only possible operation is for users to
-              withdraw their funds using so called "escape hatch", which
-              interacts with the Ethereum blockchain directly.
-            </span>
-          </div>
-          <Card className="h-min w-[480px]">
-            <form
-              id={FREEZE_REQUEST_FORM_ID}
-              className="flex flex-col gap-6"
-              data-props={formPropsJson}
-              data-user={userJson}
-            >
-              <Button className="w-full">Request Freeze</Button>
-            </form>
-          </Card>
+        <div className="mt-6 flex max-w-md flex-col">
+          <span className="text-xl font-semibold">Request Exchange Freeze</span>
+          <span className="mt-3">
+            The exchange operators have not fulfilled their obligation to
+            included a "forced action" of one of the users. This means that the
+            exchange can be frozen (essentially "shut down").
+          </span>
+          <span className="mt-3">
+            You can see the ignored forced action{' '}
+            <Link href={`/transactions/${props.transactionHash.toString()}`}>
+              here
+            </Link>
+            .
+          </span>
+          <span className="mt-3">
+            In the frozen state, the only possible operation is for users to
+            withdraw their funds using so called "escape hatch", which interacts
+            with the Ethereum blockchain directly.
+          </span>
         </div>
+        <form
+          id={FREEZE_REQUEST_FORM_ID}
+          className="flex flex-col items-center"
+          data-props={formPropsJson}
+          data-user={userJson}
+        >
+          <Button className="mt-6 w-fit">Request Freeze</Button>
+        </form>
       </main>
     </Page>
   )

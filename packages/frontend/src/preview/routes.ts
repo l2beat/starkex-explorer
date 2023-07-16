@@ -39,6 +39,7 @@ import {
   renderUserTransactionsPage,
 } from '../view'
 import { renderDevPage } from '../view/pages/DevPage'
+import { renderEscapeHatchActionPage } from '../view/pages/forced-actions/EscapeHatchActionPage'
 import { renderFreezeRequestActionPage } from '../view/pages/forced-actions/FreezeRequestActionPage'
 import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
 import { renderStateUpdateL2TransactionsPage } from '../view/pages/state-update/StateUpdateL2TransactionsPage'
@@ -1037,6 +1038,19 @@ const routes: Route[] = [
         starkKey: StarkKey.fake(),
         positionOrVaultId: 1n,
         quantizedAmount: 1000000000000000n,
+      })
+    },
+  },
+  {
+    path: '/escape',
+    description: 'Initiate withdrawal via Escape Hatch',
+    render: (ctx) => {
+      const context = getSpotPageContext(ctx, true)
+      context.freezeStatus = 'frozen'
+      ctx.body = renderEscapeHatchActionPage({
+        context,
+        escapeVerifierAddress: EthereumAddress.fake(),
+        positionOrVaultId: 1n,
       })
     },
   },
