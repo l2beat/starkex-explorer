@@ -49,9 +49,9 @@ export class PositionLeaf extends MerkleValue {
     const proofNodes: { left: PedersenHash; right: PedersenHash }[] = []
     let hash = PedersenHash.ZERO
     for (const item of items) {
-      const itemPedersenHash = PedersenHash(item)
-      proofNodes.push({ left: hash, right: itemPedersenHash })
-      hash = await pedersen(hash, itemPedersenHash)
+      const itemAsPedersenHash = PedersenHash(item) // This is only casting, not hashing
+      proofNodes.push({ left: hash, right: itemAsPedersenHash })
+      hash = await pedersen(hash, itemAsPedersenHash)
     }
     return {
       nodes: proofNodes,
