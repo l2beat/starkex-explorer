@@ -610,7 +610,8 @@ export class Application {
     const escapeActionController = new EscapeHatchController(
       pageContextService,
       freezeCheckService,
-      config.starkex.contracts.perpetual
+      config.starkex.contracts.perpetual,
+      config.starkex.contracts.escapeVerifier
     )
 
     const userTransactionController = new TransactionSubmitController(

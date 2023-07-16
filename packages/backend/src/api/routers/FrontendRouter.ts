@@ -377,6 +377,26 @@ export function createFrontendRouter(
     applyControllerResult(ctx, result)
   })
 
+  router.get(
+    '/escape/:positionOrVaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionOrVaultId: stringAsBigInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+
+        const result = await escapeActionController.getEscapeHatchActionPage(
+          givenUser,
+          ctx.params.positionOrVaultId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
   if (shouldShowL2Transactions(config)) {
     router.get(
       '/l2-transactions',

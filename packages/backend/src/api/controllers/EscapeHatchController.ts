@@ -1,4 +1,7 @@
-import { renderFreezeRequestActionPage } from '@explorer/frontend'
+import {
+  renderEscapeHatchActionPage,
+  renderFreezeRequestActionPage,
+} from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
@@ -10,7 +13,8 @@ export class EscapeHatchController {
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly freezeCheckService: FreezeCheckService,
-    private readonly starkExAddress: EthereumAddress
+    private readonly starkExAddress: EthereumAddress,
+    private readonly escapeVerifierAddress: EthereumAddress
   ) {}
 
   async getFreezeRequestActionPage(
@@ -58,6 +62,37 @@ export class EscapeHatchController {
       positionOrVaultId: data.positionId,
       quantizedAmount: data.quantizedAmount,
       starkExAddress: this.starkExAddress,
+    })
+
+    return { type: 'success', content }
+  }
+
+  async getEscapeHatchActionPage(
+    givenUser: Partial<UserDetails>,
+    positionOrVaultId: bigint
+  ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContextWithUser(
+      givenUser
+    )
+
+    if (!context) {
+      return {
+        type: 'not found',
+        message: 'You have to connect your wallet to access this page',
+      }
+    }
+
+    if (context.freezeStatus !== 'frozen') {
+      return {
+        type: 'not found',
+        message: 'Exchange is not frozen',
+      }
+    }
+
+    const content = renderEscapeHatchActionPage({
+      context,
+      escapeVerifierAddress: this.escapeVerifierAddress,
+      positionOrVaultId,
     })
 
     return { type: 'success', content }
