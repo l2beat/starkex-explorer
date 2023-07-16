@@ -22,28 +22,26 @@ interface Props {
   escapeVerifierAddress: EthereumAddress
   positionOrVaultId: bigint
   serializedMerkleProof: bigint[]
+  assetCount: number
   serializedState: bigint[]
 }
 
-export type EscapeHatchActionFormProps = z.infer<
-  typeof EscapeHatchActionFormProps
->
-export const EscapeHatchActionFormProps = z.object({
+export type VerifyEscapeFormProps = z.infer<typeof VerifyEscapeFormProps>
+export const VerifyEscapeFormProps = z.object({
   escapeVerifierAddress: stringAs(EthereumAddress),
   positionOrVaultId: stringAsBigInt(),
   serializedMerkleProof: z.array(stringAsBigInt()),
+  assetCount: z.number(),
   serializedState: z.array(stringAsBigInt()),
 })
 
-export function serializeEscapeHatchActionFormProps(
-  props: EscapeHatchActionFormProps
-) {
+export function serializeVerifyEscapeFormProps(props: VerifyEscapeFormProps) {
   return toJsonWithoutBigInts(props)
 }
 
 function EscapeHatchActionPage(props: Props) {
   const { context, ...formProps } = props
-  const formPropsJson = serializeEscapeHatchActionFormProps(formProps)
+  const formPropsJson = serializeVerifyEscapeFormProps(formProps)
   const userJson = JSON.stringify(context.user)
   const steps = [
     <> initiating (verifying) the escape (on this page)</>,

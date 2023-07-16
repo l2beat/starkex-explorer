@@ -8,6 +8,7 @@ import {
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
+  encodeVerifyEscapeRequest,
   encodeWithdrawal,
   encodeWithdrawalWithTokenId,
   FinalizeOfferData,
@@ -233,6 +234,30 @@ export const Wallet = {
     return Hash256(result as string)
   },
 
+  async sendVerifyEscapeTransaction(
+    account: EthereumAddress,
+    serializedMerkleProof: bigint[],
+    assetCount: number,
+    serializedState: bigint[],
+    escapeVerifierAddress: EthereumAddress
+  ) {
+    const data = encodeVerifyEscapeRequest({
+      serializedMerkleProof,
+      assetCount,
+      serializedState,
+    })
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account.toString(),
+          to: escapeVerifierAddress.toString(),
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
   // #endregion
 
   // #region Withdrawals

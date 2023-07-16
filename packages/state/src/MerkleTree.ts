@@ -17,6 +17,7 @@ export interface MerkleProof<T extends MerkleValue> {
   }[]
   leafPrefixLength: number
   leafIndex: bigint
+  perpetualAssetCount: number
   leaf: T
 }
 
@@ -116,10 +117,12 @@ export class MerkleTree<T extends MerkleValue> {
     // and intermediate hashes are prefixed to the merkle proof (in practice
     // making the tree higher)
     let leafPrefixLength = 0
+    let perpetualAssetCount = 0
     if (node instanceof PositionLeaf) {
       const prefix = await node.calculateMerkleProofPrefix()
       path.unshift(...prefix.nodes)
       leafPrefixLength = prefix.nodes.length
+      perpetualAssetCount = node.assets.length
     }
 
     return {
@@ -128,6 +131,7 @@ export class MerkleTree<T extends MerkleValue> {
       leafPrefixLength,
       leaf: node,
       leafIndex: index,
+      perpetualAssetCount,
     }
   }
 

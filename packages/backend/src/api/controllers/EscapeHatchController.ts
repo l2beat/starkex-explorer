@@ -120,6 +120,7 @@ export class EscapeHatchController {
       escapeVerifierAddress: this.escapeVerifierAddress,
       positionOrVaultId,
       serializedMerkleProof,
+      assetCount: merkleProof.perpetualAssetCount,
       serializedState,
     })
 
