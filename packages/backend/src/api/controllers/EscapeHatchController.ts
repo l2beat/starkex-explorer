@@ -7,12 +7,15 @@ import { EthereumAddress } from '@explorer/types'
 
 import { FreezeCheckService } from '../../core/FreezeCheckService'
 import { PageContextService } from '../../core/PageContextService'
+import { StateUpdater } from '../../core/StateUpdater'
 import { ControllerResult } from './ControllerResult'
+import { formatMerkleProofForEscape } from './formatMerkleProofForEscape'
 
 export class EscapeHatchController {
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly freezeCheckService: FreezeCheckService,
+    private readonly stateUpdater: StateUpdater,
     private readonly starkExAddress: EthereumAddress,
     private readonly escapeVerifierAddress: EthereumAddress
   ) {}
@@ -88,6 +91,12 @@ export class EscapeHatchController {
         message: 'Exchange is not frozen',
       }
     }
+
+    const merkleProof = await this.stateUpdater.generateMerkleProof(
+      positionOrVaultId
+    )
+    const formattedProof = formatMerkleProofForEscape(merkleProof)
+    console.log(formattedProof)
 
     const content = renderEscapeHatchActionPage({
       context,

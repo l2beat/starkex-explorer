@@ -1,6 +1,5 @@
 import { renderMerkleProofPage } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
-import { PositionLeaf, VaultLeaf } from '@explorer/state'
 
 import { PageContextService } from '../../core/PageContextService'
 import { StateUpdater } from '../../core/StateUpdater'
@@ -9,7 +8,7 @@ import { ControllerResult } from './ControllerResult'
 export class MerkleProofController {
   constructor(
     private readonly pageContextService: PageContextService,
-    private readonly stateUpdater: StateUpdater<PositionLeaf | VaultLeaf>
+    private readonly stateUpdater: StateUpdater
   ) {}
 
   async getMerkleProofPage(

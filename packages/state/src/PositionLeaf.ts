@@ -13,6 +13,14 @@ export interface PositionAsset {
   readonly fundingIndex: bigint
 }
 
+export interface MerkleProofPrefix {
+  nodes: {
+    left: PedersenHash
+    right: PedersenHash
+  }[]
+  finalHash: PedersenHash
+}
+
 export class PositionLeaf extends MerkleValue {
   static EMPTY = new PositionLeaf(StarkKey.ZERO, 0n, [])
 
@@ -25,7 +33,10 @@ export class PositionLeaf extends MerkleValue {
     super()
   }
 
-  async calculateHash() {
+  // This is a special solution in Perpetual StarkEx, where the leaf values
+  // and intermediate hashes are prefixed to the merkle proof (in practice
+  // making the tree higher)
+  async calculateMerkleProofPrefix(): Promise<MerkleProofPrefix> {
     const packedPosition = packBytes([
       { bytes: 8, value: this.collateralBalance - MIN_INT_64 },
       { bytes: 2, value: this.assets.length },
@@ -35,11 +46,22 @@ export class PositionLeaf extends MerkleValue {
       this.starkKey.substring(2),
       packedPosition,
     ]
+    const proofNodes: { left: PedersenHash; right: PedersenHash }[] = []
     let hash = PedersenHash.ZERO
     for (const item of items) {
-      hash = await pedersen(hash, PedersenHash(item))
+      const itemPedersenHash = PedersenHash(item)
+      proofNodes.push({ left: hash, right: itemPedersenHash })
+      hash = await pedersen(hash, itemPedersenHash)
     }
-    return hash
+    return {
+      nodes: proofNodes,
+      finalHash: hash,
+    }
+  }
+
+  async calculateHash(): Promise<PedersenHash> {
+    const MerkleProofPrefix = await this.calculateMerkleProofPrefix()
+    return MerkleProofPrefix.finalHash
   }
 
   getData() {

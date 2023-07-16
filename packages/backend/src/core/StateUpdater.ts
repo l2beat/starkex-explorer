@@ -1,6 +1,7 @@
 import { ForcedAction, OraclePrice } from '@explorer/encoding'
 import {
   IMerkleStorage,
+  MerkleProof,
   MerkleTree,
   PositionLeaf,
   VaultLeaf,
@@ -18,7 +19,9 @@ import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { Logger } from '../tools/Logger'
 
-export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
+export class StateUpdater<
+  T extends PositionLeaf | VaultLeaf = PositionLeaf | VaultLeaf
+> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
     protected readonly merkleStorage: IMerkleStorage<T>,
@@ -195,7 +198,9 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     return { oldHash: this.emptyStateHash, id: 0 }
   }
 
-  async generateMerkleProof(positionOrVaultId: bigint) {
+  async generateMerkleProof(
+    positionOrVaultId: bigint
+  ): Promise<MerkleProof<T>> {
     if (!this.stateTree) {
       throw new Error('State tree not initialized')
     }

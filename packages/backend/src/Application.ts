@@ -610,6 +610,7 @@ export class Application {
     const escapeActionController = new EscapeHatchController(
       pageContextService,
       freezeCheckService,
+      stateUpdater,
       config.starkex.contracts.perpetual,
       config.starkex.contracts.escapeVerifier
     )
