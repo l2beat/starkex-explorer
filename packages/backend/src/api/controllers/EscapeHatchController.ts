@@ -6,7 +6,7 @@ import { FreezeCheckService } from '../../core/FreezeCheckService'
 import { PageContextService } from '../../core/PageContextService'
 import { ControllerResult } from './ControllerResult'
 
-export class EscapeActionController {
+export class EscapeHatchController {
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly freezeCheckService: FreezeCheckService,

@@ -5,7 +5,7 @@ import * as z from 'zod'
 
 import { Config } from '../../config'
 import { shouldShowL2Transactions } from '../../utils/shouldShowL2Transactions'
-import { EscapeActionController } from '../controllers/EscapeActionController'
+import { EscapeHatchController } from '../controllers/EscapeHatchController'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'
@@ -30,7 +30,7 @@ export function createFrontendRouter(
   merkleProofController: MerkleProofController,
   searchController: SearchController,
   l2TransactionController: L2TransactionController,
-  escapeActionController: EscapeActionController,
+  escapeActionController: EscapeHatchController,
   config: Config
 ) {
   const router = new Router()
