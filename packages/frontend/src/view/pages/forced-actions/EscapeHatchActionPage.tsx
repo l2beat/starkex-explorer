@@ -52,7 +52,7 @@ function EscapeHatchActionPage(props: Props) {
   ]
   return (
     <Page
-      path="/escape"
+      path="/escape/:positionOrVaultId"
       description="Withdraw funds via Escape Hatch"
       context={props.context}
     >

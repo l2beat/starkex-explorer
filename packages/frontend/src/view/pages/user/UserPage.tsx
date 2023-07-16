@@ -22,7 +22,6 @@ import {
   getTransactionTableProps,
   getUserPageProps,
 } from './common'
-import { EscapeHatchPanel } from './components/EscapeHatchPanel'
 import { UserAssetEntry, UserAssetsTable } from './components/UserAssetTable'
 import {
   UserBalanceChangeEntry,
@@ -88,9 +87,6 @@ function UserPage(props: UserPageProps) {
             />
           </div>
         </section>
-        {props.context.freezeStatus === 'frozen' && (
-          <EscapeHatchPanel starkKey={props.starkKey} />
-        )}
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
           visible={props.assets.length}

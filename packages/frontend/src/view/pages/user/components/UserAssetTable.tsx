@@ -35,6 +35,15 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         }/${entry.asset.hashOrId.toString()}`
       : `/forced/new/${entry.vaultOrPositionId}`
 
+  const escapeHatchElem = (entry: UserAssetEntry) =>
+    entry.action === 'WITHDRAW' ? (
+      <LinkButton href={`/escape/${entry.vaultOrPositionId}`}>
+        ESCAPE
+      </LinkButton>
+    ) : (
+      <span className="text-zinc-500">use collateral escape</span>
+    )
+
   return (
     <Table
       fullBackground
@@ -42,7 +51,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
         { header: <span className="pl-10">Name</span> },
         { header: 'Balance' },
         { header: props.tradingMode === 'perpetual' ? 'Position' : 'Vault' },
-        ...(props.isMine && !props.isFrozen ? [{ header: 'Action' }] : []),
+        ...(props.isMine ? [{ header: 'Action' }] : []),
       ]}
       alignLastColumnRight={true}
       rows={props.assets.map((entry) => {
@@ -66,15 +75,18 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                 <a href={`/proof/${entry.vaultOrPositionId}`}>(proof)</a>
               )}
             </span>,
-            props.isMine && !props.isFrozen && (
-              <LinkButton
-                className="w-32"
-                href={forcedActionLink(entry)}
-                disabled={isDisabled}
-              >
-                {entry.action}
-              </LinkButton>
-            ),
+            props.isMine &&
+              (!props.isFrozen ? (
+                <LinkButton
+                  className="w-32"
+                  href={forcedActionLink(entry)}
+                  disabled={isDisabled}
+                >
+                  {entry.action}
+                </LinkButton>
+              ) : (
+                escapeHatchElem(entry)
+              )),
           ],
         }
       })}

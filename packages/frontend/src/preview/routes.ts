@@ -457,6 +457,38 @@ const routes: Route[] = [
     },
   },
   {
+    path: '/users/me/unregistered/exchange-frozen',
+    description:
+      'My user page, exchange frozen, the stark key is known, but it’s not registered.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, true)
+      context.freezeStatus = 'frozen'
+      const starkKey = context.user.starkKey ?? StarkKey.fake()
+
+      ctx.body = renderUserPage({
+        context: {
+          ...context,
+          user: {
+            ...context.user,
+            starkKey,
+          },
+        },
+        starkKey: starkKey,
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
+        finalizableOffers: [],
+        assets: repeat(7, randomUserAssetEntry),
+        totalAssets: 7,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+      })
+    },
+  },
+  {
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
@@ -543,6 +575,7 @@ const routes: Route[] = [
       })
     },
   },
+
   {
     path: '/users/:starkKey/exchange-frozen',
     link: '/users/someone/exchange-frozen',
@@ -1036,13 +1069,13 @@ const routes: Route[] = [
         transactionHash: Hash256.fake(),
         starkExAddress: EthereumAddress.fake(),
         starkKey: StarkKey.fake(),
-        positionOrVaultId: 1n,
+        positionOrVaultId: 12345n,
         quantizedAmount: 1000000000000000n,
       })
     },
   },
   {
-    path: '/escape',
+    path: '/escape/:positionOrVaultId',
     description: 'Initiate withdrawal via Escape Hatch',
     render: (ctx) => {
       const context = getSpotPageContext(ctx, true)
@@ -1050,7 +1083,7 @@ const routes: Route[] = [
       ctx.body = renderEscapeHatchActionPage({
         context,
         escapeVerifierAddress: EthereumAddress.fake(),
-        positionOrVaultId: 1n,
+        positionOrVaultId: 12345n,
       })
     },
   },
