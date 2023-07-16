@@ -23,6 +23,7 @@ export function getApexGoerliConfig(): StarkexConfig {
     },
     contracts: {
       perpetual: EthereumAddress('0xB0fBAaE46907730D51A50B94704ce5aef13cB993'),
+      escapeVerifier: EthereumAddress.ZERO, // it actually is ZERO
     },
     availabilityGateway: {
       getUrl: (batchId: number) => {

@@ -29,6 +29,7 @@ export function getMyriaGoerliConfig(): StarkexConfig {
     },
     contracts: {
       perpetual: EthereumAddress('0xF82C423a30E317f34f9b0997627F2F9c5d239Ad9'),
+      escapeVerifier: EthereumAddress.ZERO, // it actually is ZERO
     },
   }
 }

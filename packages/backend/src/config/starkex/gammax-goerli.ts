@@ -18,6 +18,7 @@ export function getGammaxGoerliConfig(): StarkexConfig {
     },
     contracts: {
       perpetual: EthereumAddress('0x6E5de338D71af33B57831C5552775f54394d181B'),
+      escapeVerifier: EthereumAddress.ZERO, // it actually is ZERO
     },
     availabilityGateway: {
       getUrl: (batchId: number) => {

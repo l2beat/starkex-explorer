@@ -18,6 +18,9 @@ export function getDydxMainnetConfig(): StarkexConfig {
     },
     contracts: {
       perpetual: EthereumAddress('0xD54f502e184B6B739d7D27a6410a67dc462D69c8'),
+      escapeVerifier: EthereumAddress(
+        '0x626211C1e9BC633f4D342Af99f4E8bc93f11F3DD'
+      ),
       registry: EthereumAddress('0xEfbCcE4659db72eC6897F46783303708cf9ACef8'),
       proxy: EthereumAddress('0xC8c212f11f6ACca77A7afeB7282dEBa5530eb46C'),
       verifiers: [

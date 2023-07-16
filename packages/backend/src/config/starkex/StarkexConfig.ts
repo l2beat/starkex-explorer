@@ -24,6 +24,7 @@ export interface PerpetualRollupConfig {
   blockchain: BlockchainConfig
   contracts: {
     perpetual: EthereumAddress
+    escapeVerifier: EthereumAddress
     registry: EthereumAddress
     proxy: EthereumAddress
     verifiers: EthereumAddress[]
@@ -41,6 +42,7 @@ export interface PerpetualValidiumConfig {
   l2TransactionApi: L2TransactionApiConfig | undefined
   contracts: {
     perpetual: EthereumAddress
+    escapeVerifier: EthereumAddress
   }
   collateralAsset: CollateralAsset
 }
@@ -53,6 +55,7 @@ export interface SpotValidiumConfig {
   availabilityGateway: GatewayConfig
   contracts: {
     perpetual: EthereumAddress
+    escapeVerifier: EthereumAddress
   }
 }
 
