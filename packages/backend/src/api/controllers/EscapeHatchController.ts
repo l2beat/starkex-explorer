@@ -1,3 +1,4 @@
+import { encodeState } from '@explorer/encoding'
 import {
   renderEscapeHatchActionPage,
   renderFreezeRequestActionPage,
@@ -8,14 +9,16 @@ import { EthereumAddress } from '@explorer/types'
 import { FreezeCheckService } from '../../core/FreezeCheckService'
 import { PageContextService } from '../../core/PageContextService'
 import { StateUpdater } from '../../core/StateUpdater'
+import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { ControllerResult } from './ControllerResult'
-import { formatMerkleProofForEscape } from './formatMerkleProofForEscape'
+import { serializeMerkleProofForEscape } from './serializeMerkleProofForEscape'
 
 export class EscapeHatchController {
   constructor(
     private readonly pageContextService: PageContextService,
     private readonly freezeCheckService: FreezeCheckService,
     private readonly stateUpdater: StateUpdater,
+    private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly starkExAddress: EthereumAddress,
     private readonly escapeVerifierAddress: EthereumAddress
   ) {}
@@ -95,13 +98,29 @@ export class EscapeHatchController {
     const merkleProof = await this.stateUpdater.generateMerkleProof(
       positionOrVaultId
     )
-    const formattedProof = formatMerkleProofForEscape(merkleProof)
-    console.log(formattedProof)
+    const serializedMerkleProof = serializeMerkleProofForEscape(merkleProof)
+
+    const latestStateUpdate = await this.stateUpdateRepository.findLast()
+    if (!latestStateUpdate) {
+      throw new Error('No state update found to perform escape')
+    }
+    if (!latestStateUpdate.perpetualState) {
+      throw new Error('No perpetual state recorded to perform escape')
+    }
+    const encodedState = encodeState(latestStateUpdate.perpetualState)
+    const serializedState: bigint[] = []
+    for (let i = 0; i < encodedState.length / 2 / 32; i++) {
+      serializedState.push(
+        BigInt('0x' + encodedState.slice(64 * i, 64 * (i + 1)))
+      )
+    }
 
     const content = renderEscapeHatchActionPage({
       context,
       escapeVerifierAddress: this.escapeVerifierAddress,
       positionOrVaultId,
+      serializedMerkleProof,
+      serializedState,
     })
 
     return { type: 'success', content }

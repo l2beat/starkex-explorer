@@ -84,6 +84,7 @@ describe(PerpetualValidiumUpdater.name, () => {
           stateTransitionHash: Hash256.fake('456'),
           rootHash: PedersenHash.fake('789'),
           timestamp: Timestamp(0),
+          perpetualState: undefined,
         }
         const mockProcessStateTransition =
           mockFn<typeof updater.processStateTransition>()
@@ -161,7 +162,8 @@ describe(PerpetualValidiumUpdater.name, () => {
           mockProgramOutput.newState.positionRoot,
           testForcedActions,
           mockProgramOutput.newState.oraclePrices,
-          updatedPositions
+          updatedPositions,
+          mockProgramOutput.newState
         )
         expect(result).toEqual(processedStateUpdate)
       })

@@ -1,4 +1,4 @@
-import { OraclePrice } from '@explorer/encoding'
+import { OraclePrice, State } from '@explorer/encoding'
 import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import { Knex } from 'knex'
 import { PriceRow, StateUpdateRow } from 'knex/types/tables'
@@ -12,6 +12,7 @@ import {
 } from './PositionRepository'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
+import { ToJSON } from './transactions/ToJSON'
 import { toVaultRow, VaultRecord } from './VaultRepository'
 
 export interface StateUpdateRecord {
@@ -21,6 +22,7 @@ export interface StateUpdateRecord {
   stateTransitionHash: Hash256
   rootHash: PedersenHash
   timestamp: Timestamp
+  perpetualState?: State
 }
 
 export interface StateUpdatePriceRecord {
@@ -238,6 +240,7 @@ export interface StateUpdateBundle {
   prices: OraclePrice[]
   transactionHashes?: Hash256[]
   vaults?: VaultRecord[]
+  perpetualState?: State
 }
 
 function toStateUpdateRecord(row: StateUpdateRow): StateUpdateRecord {
@@ -248,6 +251,10 @@ function toStateUpdateRecord(row: StateUpdateRow): StateUpdateRecord {
     stateTransitionHash: Hash256(row.state_transition_hash),
     rootHash: PedersenHash(row.root_hash),
     timestamp: Timestamp(row.timestamp),
+    perpetualState:
+      row.perpetual_state !== null
+        ? decodeState(row.perpetual_state)
+        : undefined,
   }
 }
 
@@ -259,6 +266,10 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
     state_transition_hash: record.stateTransitionHash.toString(),
     root_hash: record.rootHash.toString(),
     timestamp: BigInt(Number(record.timestamp)),
+    perpetual_state:
+      record.perpetualState !== undefined
+        ? encodeState(record.perpetualState)
+        : null,
   }
 }
 
@@ -289,5 +300,43 @@ function toStateUpdatePriceRecord(
   return {
     assetId: AssetId(record.asset_id),
     price: record.price,
+  }
+}
+
+function encodeState(state: State): ToJSON<State> {
+  return {
+    positionRoot: state.positionRoot.toString(),
+    positionHeight: state.positionHeight,
+    orderRoot: state.orderRoot.toString(),
+    orderHeight: state.orderHeight,
+    indices: state.indices.map((x) => ({
+      assetId: x.assetId.toString(),
+      value: x.value.toString(),
+    })),
+    timestamp: Timestamp.toSeconds(state.timestamp).toString(),
+    oraclePrices: state.oraclePrices.map((x) => ({
+      assetId: x.assetId.toString(),
+      price: x.price.toString(),
+    })),
+    systemTime: Timestamp.toSeconds(state.systemTime).toString(),
+  }
+}
+
+function decodeState(values: ToJSON<State>): State {
+  return {
+    positionRoot: PedersenHash(values.positionRoot),
+    positionHeight: values.positionHeight,
+    orderRoot: PedersenHash(values.orderRoot),
+    orderHeight: values.orderHeight,
+    indices: values.indices.map((x) => ({
+      assetId: AssetId(x.assetId),
+      value: BigInt(x.value),
+    })),
+    timestamp: Timestamp.fromSeconds(values.timestamp),
+    oraclePrices: values.oraclePrices.map((x) => ({
+      assetId: AssetId(x.assetId),
+      price: BigInt(x.price),
+    })),
+    systemTime: Timestamp.fromSeconds(values.systemTime),
   }
 }

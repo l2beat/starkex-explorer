@@ -1,6 +1,6 @@
 import { MerkleProof, MerkleValue } from '@explorer/state'
 
-export function formatMerkleProofForEscape(
+export function serializeMerkleProofForEscape(
   proof: MerkleProof<MerkleValue>
 ): bigint[] {
   // See the format of the proof here:

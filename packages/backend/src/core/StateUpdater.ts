@@ -1,4 +1,4 @@
-import { ForcedAction, OraclePrice } from '@explorer/encoding'
+import { ForcedAction, OraclePrice, State } from '@explorer/encoding'
 import {
   IMerkleStorage,
   MerkleProof,
@@ -41,7 +41,8 @@ export class StateUpdater<
     expectedPositionRoot: PedersenHash,
     forcedActions: ForcedAction[],
     oraclePrices: OraclePrice[],
-    newLeaves: { index: bigint; value: T }[]
+    newLeaves: { index: bigint; value: T }[],
+    perpetualState?: State
   ) {
     if (!this.stateTree) {
       throw new Error('State tree not initialized')
@@ -64,6 +65,7 @@ export class StateUpdater<
       stateTransitionHash,
       rootHash,
       timestamp,
+      perpetualState,
     }
     await Promise.all([
       this.stateUpdateRepository.add({

@@ -68,7 +68,8 @@ export class PerpetualValidiumUpdater extends StateUpdater<PositionLeaf> {
       perpetualCairoOutput.newState.positionRoot,
       perpetualCairoOutput.forcedActions,
       perpetualCairoOutput.newState.oraclePrices,
-      newPositions
+      newPositions,
+      perpetualCairoOutput.newState
     )
   }
 }

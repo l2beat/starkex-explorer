@@ -611,6 +611,7 @@ export class Application {
       pageContextService,
       freezeCheckService,
       stateUpdater,
+      stateUpdateRepository,
       config.starkex.contracts.perpetual,
       config.starkex.contracts.escapeVerifier
     )

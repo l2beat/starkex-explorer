@@ -1,7 +1,9 @@
+import { State } from '@explorer/encoding'
 import { json } from '@explorer/types'
 
 import { PerpetualL2TransactionDataJson } from '../PerpetualL2Transaction'
 import { SentTransactionJSON } from '../transactions/SentTransaction'
+import { ToJSON } from '../transactions/ToJSON'
 import {
   UserTransactionJSON,
   WithdrawalPerformedJSON,
@@ -76,6 +78,7 @@ declare module 'knex/types/tables' {
     state_transition_hash: string
     root_hash: string
     timestamp: bigint
+    perpetual_state: ToJSON<State> | null
   }
 
   interface PositionUpdateRow {

@@ -222,7 +222,8 @@ describe(PerpetualRollupUpdater.name, () => {
           PedersenHash.fake('987'),
           testForcedActions,
           mockOnChainData.newState.oraclePrices,
-          updatedPositions
+          updatedPositions,
+          mockOnChainData.newState
         )
       })
     }

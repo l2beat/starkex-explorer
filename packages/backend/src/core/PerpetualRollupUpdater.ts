@@ -106,7 +106,8 @@ export class PerpetualRollupUpdater extends StateUpdater<PositionLeaf> {
       onChainData.newState.positionRoot,
       onChainData.forcedActions,
       onChainData.newState.oraclePrices,
-      newPositions
+      newPositions,
+      onChainData.newState
     )
   }
 }

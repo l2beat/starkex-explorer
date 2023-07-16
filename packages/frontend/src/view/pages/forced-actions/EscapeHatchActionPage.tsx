@@ -21,6 +21,8 @@ interface Props {
   context: PageContextWithUser
   escapeVerifierAddress: EthereumAddress
   positionOrVaultId: bigint
+  serializedMerkleProof: bigint[]
+  serializedState: bigint[]
 }
 
 export type EscapeHatchActionFormProps = z.infer<
@@ -29,6 +31,8 @@ export type EscapeHatchActionFormProps = z.infer<
 export const EscapeHatchActionFormProps = z.object({
   escapeVerifierAddress: stringAs(EthereumAddress),
   positionOrVaultId: stringAsBigInt(),
+  serializedMerkleProof: z.array(stringAsBigInt()),
+  serializedState: z.array(stringAsBigInt()),
 })
 
 export function serializeEscapeHatchActionFormProps(
