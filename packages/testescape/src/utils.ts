@@ -38,9 +38,21 @@ export class HardhatUtils {
     return new ethers.Contract(this.perpetualAddress, this.PERPETUAL_ABI, this.provider)
   }
 
+  async getTxReceipt(txId: string) {
+    return this.provider.getTransactionReceipt(txId)
+  }
+
   async isFrozen() {
     const contract = this.getPerpetualContract()
     return contract.isFrozen()
+  }
+
+  async impersonateAccount(address: string) {
+    await helpers.impersonateAccount(address)
+  }
+
+  async setBalanceOf(address: string, ethAmount: bigint) {
+    await helpers.setBalance(address, ethAmount * (10n ** 18n))
   }
 
   async triggerFreezable() {
