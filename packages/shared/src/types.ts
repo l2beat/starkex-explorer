@@ -44,6 +44,18 @@ export function stringAs<T>(Brand: (s: string) => T) {
     .transform(Brand)
 }
 
+export function stringAsBoolean() {
+  return z.preprocess(
+    (v) =>
+      z
+        .enum(['true', 'false'])
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        .transform((v) => JSON.parse(v))
+        .parse(v),
+    z.boolean()
+  )
+}
+
 export function numberAs<T>(Brand: (n: number | bigint) => T) {
   return z
     .number()
