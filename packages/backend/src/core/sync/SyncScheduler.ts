@@ -75,7 +75,6 @@ export class SyncScheduler {
         name: 'action',
         execute: async () => {
           this.logger.debug({ method: 'effect', effect: effect.type })
-
           if (effect.type === 'sync') {
             await this.handleSync(effect.blocks)
           } else {
@@ -84,6 +83,10 @@ export class SyncScheduler {
         },
       })
     }
+  }
+
+  isTip(syncedBlockNumber: number) {
+    return this.state.remaining.end === syncedBlockNumber
   }
 
   async handleSync(blocks: BlockRange) {
@@ -102,8 +105,9 @@ export class SyncScheduler {
       return
     }
     try {
+      const isTip = this.isTip(blocks.end)
       await this.dataSyncService.discardAfter(blocks.start - 1)
-      await this.dataSyncService.sync(blocks)
+      await this.dataSyncService.sync(blocks, isTip)
       await this.kvStore.addOrUpdate({
         key: 'lastBlockNumberSynced',
         value: blocks.end - 1,

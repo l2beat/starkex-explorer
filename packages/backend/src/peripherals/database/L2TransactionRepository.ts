@@ -295,6 +295,7 @@ export class L2TransactionRepository extends BaseRepository {
     const knex = await this.knex()
     const results = await knex('l2_transactions')
       .select('state_update_id')
+      .whereNotNull('state_update_id')
       .orderBy('state_update_id', 'desc')
       .limit(1)
       .first()

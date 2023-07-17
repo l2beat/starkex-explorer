@@ -11,6 +11,7 @@ export type KeyValueRecord = z.infer<typeof KeyValueRecord>
 export const KeyValueRecord = z.union([
   z.object({ key: z.literal('softwareMigrationNumber'), value: stringAsInt() }),
   z.object({ key: z.literal('lastBlockNumberSynced'), value: stringAsInt() }),
+  z.object({ key: z.literal('lastSyncedThirdPartyId'), value: stringAsInt() }),
   z.object({
     key: z.literal('userStatisticsPreprocessorCaughtUp'),
     value: stringAsBoolean(),

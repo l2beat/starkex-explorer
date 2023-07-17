@@ -37,10 +37,13 @@ export function getApexMainnetConfig(): StarkexConfig {
       auth: clientAuth,
     },
     l2TransactionApi: {
-      getUrl: (startId, expectCount) => {
+      getTransactionsUrl: (startId, expectCount) => {
         return `${getEnv(
           'APEX_TRANSACTION_API_URL'
         )}?startApexId=${startId}&expectCount=${expectCount}`
+      },
+      getThirdPartyIdByTransactionIdUrl: (transactionId) => {
+        return `${getEnv('APEX_THIRD_PARTY_ID_API_URL')}?txId=${transactionId}`
       },
       auth: clientAuth,
     },
