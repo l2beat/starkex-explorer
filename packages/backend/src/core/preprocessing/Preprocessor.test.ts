@@ -90,8 +90,8 @@ describe(Preprocessor.name, () => {
         })
 
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         mockPreprocessedStateUpdateRepository,
-        mockObject<SyncStatusRepository>(),
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockStateDetailsPreprocessor,
@@ -141,8 +141,8 @@ describe(Preprocessor.name, () => {
       )
 
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         mockPreprocessedStateUpdateRepository,
-        mockObject<SyncStatusRepository>(),
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockStateDetailsPreprocessor,
@@ -686,8 +686,8 @@ describe(Preprocessor.name, () => {
       )
 
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         mockObject<PreprocessedStateUpdateRepository>(),
-        mockObject<SyncStatusRepository>(),
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),

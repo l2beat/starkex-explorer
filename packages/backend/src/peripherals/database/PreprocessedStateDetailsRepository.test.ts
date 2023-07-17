@@ -267,10 +267,10 @@ describe(PreprocessedStateDetailsRepository.name, () => {
       }
 
       await repository.update(updatedRecord, trx)
-
       const recordById = await repository.findById(id, trx)
       const recordByStateUpdateId = await repository.findByStateUpdateId(
-        updatedRecord.stateUpdateId
+        updatedRecord.stateUpdateId,
+        trx
       )
 
       expect(recordById).toEqual(updatedRecord)
