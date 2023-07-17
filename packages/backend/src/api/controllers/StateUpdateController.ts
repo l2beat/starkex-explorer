@@ -58,7 +58,7 @@ export class StateUpdateController {
       forcedUserTransactions,
       totalForcedUserTransactions,
       l2Transactions,
-      stateDetails,
+      preprocessedStateDetails,
     ] = await Promise.all([
       this.stateUpdateRepository.findById(stateUpdateId),
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
@@ -84,7 +84,9 @@ export class StateUpdateController {
           limit: 6,
         }
       ),
-      this.preprocessedStateDetailsRepository.findById(stateUpdateId),
+      this.preprocessedStateDetailsRepository.findByStateUpdateId(
+        stateUpdateId
+      ),
     ])
 
     if (!stateUpdate) {
@@ -128,8 +130,10 @@ export class StateUpdateController {
       totalBalanceChanges,
       priceChanges: priceEntries,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions: stateDetails?.l2TransactionsStatistics
-        ? sumUpTransactionCount(stateDetails.l2TransactionsStatistics)
+      totalL2Transactions: preprocessedStateDetails?.l2TransactionsStatistics
+        ? sumUpTransactionCount(
+            preprocessedStateDetails.l2TransactionsStatistics
+          )
         : 'processing',
       transactions,
       totalTransactions: totalForcedUserTransactions,
@@ -145,12 +149,14 @@ export class StateUpdateController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
-    const [l2Transactions, stateDetails] = await Promise.all([
+    const [l2Transactions, preprocessedStateDetails] = await Promise.all([
       this.l2TransactionRepository.getPaginatedWithoutMultiByStateUpdateId(
         stateUpdateId,
         pagination
       ),
-      this.preprocessedStateDetailsRepository.findById(stateUpdateId),
+      this.preprocessedStateDetailsRepository.findByStateUpdateId(
+        stateUpdateId
+      ),
     ])
 
     const content = renderStateUpdateL2TransactionsPage({
@@ -158,8 +164,10 @@ export class StateUpdateController {
       id: stateUpdateId.toString(),
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       ...pagination,
-      total: stateDetails?.l2TransactionsStatistics
-        ? sumUpTransactionCount(stateDetails.l2TransactionsStatistics)
+      total: preprocessedStateDetails?.l2TransactionsStatistics
+        ? sumUpTransactionCount(
+            preprocessedStateDetails.l2TransactionsStatistics
+          )
         : 'processing',
     })
 

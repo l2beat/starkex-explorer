@@ -253,7 +253,7 @@ describe(PreprocessedStateDetailsRepository.name, () => {
   )
 
   describe(`${PreprocessedStateDetailsRepository.prototype.add.name}, ${PreprocessedStateDetailsRepository.prototype.update.name} and ${PreprocessedStateDetailsRepository.prototype.findById.name}`, () => {
-    it('adds, updates, finds by id', async () => {
+    it('adds, updates, finds by id and state update id', async () => {
       const id = await repository.add(genericRecord, trx)
       const fieldsToUpdate = {
         l2TransactionsStatistics: fakePreprocessedL2TransactionsStatistics(),
@@ -269,8 +269,12 @@ describe(PreprocessedStateDetailsRepository.name, () => {
       await repository.update(updatedRecord, trx)
 
       const recordById = await repository.findById(id, trx)
+      const recordByStateUpdateId = await repository.findByStateUpdateId(
+        updatedRecord.stateUpdateId
+      )
 
       expect(recordById).toEqual(updatedRecord)
+      expect(recordByStateUpdateId).toEqual(updatedRecord)
     })
   })
 })

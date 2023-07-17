@@ -74,6 +74,18 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     return record ? toPreprocessedStateDetailsRecord(record) : undefined
   }
 
+  async findByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<PreprocessedStateDetailsRecord | undefined> {
+    const knex = await this.knex(trx)
+    const record = await knex('preprocessed_state_details')
+      .where({ state_update_id: stateUpdateId })
+      .first()
+
+    return record ? toPreprocessedStateDetailsRecord(record) : undefined
+  }
+
   async findLastWithL2TransactionsStatistics(trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const record = await knex('preprocessed_state_details')
