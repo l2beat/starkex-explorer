@@ -26,9 +26,10 @@ export class LiveL2TransactionDownloader {
   }
 
   async start() {
-    this.logger.info('Starting L2 transaction downloader')
-
     await this.initialize()
+    this.logger.info('Starting L2 transaction downloader', {
+      enabled: this.enabled,
+    })
     this.clock.onEvery('5s', () => this.sync())
   }
 
