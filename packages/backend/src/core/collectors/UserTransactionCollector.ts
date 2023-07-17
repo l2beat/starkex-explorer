@@ -47,6 +47,7 @@ export class UserTransactionCollector {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly perpetualAddress: EthereumAddress,
+    private readonly escapeVerifierAddress: EthereumAddress,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -63,7 +64,6 @@ export class UserTransactionCollector {
           LogForcedWithdrawalRequest.topic,
           LogForcedTradeRequest.topic,
           LogFullWithdrawalRequest.topic,
-          LogEscapeVerified.topic,
 
           // Assets being withdrawn from L2:
           LogWithdrawalPerformed.topic,
@@ -72,6 +72,16 @@ export class UserTransactionCollector {
         ],
       ],
     })
+
+    const escapeVerifierLogs = await this.ethereumClient.getLogsInRange(
+      blockRange,
+      {
+        address: this.escapeVerifierAddress.toString(),
+        topics: [[LogEscapeVerified.topic]],
+      }
+    )
+
+    logs.push(...escapeVerifierLogs)
 
     // we need to batch because of UserTransactionMigrator that collects all logs at once
     const batches = toBatches(logs, 20)
@@ -171,7 +181,7 @@ export class UserTransactionCollector {
             starkKey: StarkKey.from(event.args.starkKey),
             withdrawalAmount: event.args.withdrawalAmount.toBigInt(),
             positionId: event.args.positionId.toBigInt(),
-            sharedStateHash: Hash256(event.args.sharedStateHash.toHexString()),
+            sharedStateHash: Hash256(event.args.sharedStateHash.toString()),
           },
         })
       case 'LogWithdrawalPerformed':

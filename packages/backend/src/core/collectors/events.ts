@@ -55,7 +55,12 @@ export const LogEscapeVerified = EthereumEvent<
     positionId: BigNumber
   }
 >(
-  `event LogEscapeVerified(uint256 publicKey, int256 withdrawalAmount, bytes32 sharedStateHash, uint256 positionId)`
+  `event LogEscapeVerified(
+    uint256 starkKey,
+    int256 withdrawalAmount,
+    bytes32 sharedStateHash,
+    uint256 positionId
+)`
 )
 
 export const LogMemoryPagesHashes = EthereumEvent<

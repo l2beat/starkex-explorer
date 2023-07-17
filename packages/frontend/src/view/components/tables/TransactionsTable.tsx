@@ -111,6 +111,18 @@ function getStatus(transaction: TransactionEntry): {
         throw new Error('WITHDRAW transaction cannot be INCLUDED')
     }
   }
+  if (transaction.type === 'INITIATE_ESCAPE') {
+    switch (transaction.status) {
+      case 'SENT':
+        return { type: 'BEGIN', text: 'SENT (1/2)' }
+      case 'MINED':
+        return { type: 'END', text: 'MINED (2/2)' }
+      default:
+        throw new Error(
+          'INITIATE_ESCAPE transaction cannot be ${transaction.status}'
+        )
+    }
+  }
   // FORCED_BUY and FORCED_SELL
   switch (transaction.status) {
     case 'SENT':

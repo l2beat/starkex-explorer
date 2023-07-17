@@ -203,6 +203,7 @@ export class Application {
       userTransactionRepository,
       withdrawableAssetRepository,
       config.starkex.contracts.perpetual,
+      config.starkex.contracts.escapeVerifier,
       collateralAsset
     )
 
