@@ -23,6 +23,7 @@ import { UserTransactionRepository } from '../../peripherals/database/transactio
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import {
+  LogEscapeVerified,
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
   LogFullWithdrawalRequest,
@@ -62,6 +63,7 @@ export class UserTransactionCollector {
           LogForcedWithdrawalRequest.topic,
           LogForcedTradeRequest.topic,
           LogFullWithdrawalRequest.topic,
+          LogEscapeVerified.topic,
 
           // Assets being withdrawn from L2:
           LogWithdrawalPerformed.topic,
@@ -90,6 +92,7 @@ export class UserTransactionCollector {
       LogForcedWithdrawalRequest.safeParseLog(log) ??
       LogFullWithdrawalRequest.safeParseLog(log) ??
       LogForcedTradeRequest.safeParseLog(log) ??
+      LogEscapeVerified.safeParseLog(log) ??
       LogWithdrawalPerformed.safeParseLog(log) ??
       LogWithdrawalWithTokenIdPerformed.safeParseLog(log) ??
       LogMintWithdrawalPerformed.parseLog(log)
@@ -155,6 +158,20 @@ export class UserTransactionCollector {
             syntheticAssetId: decodeAssetId(event.args.syntheticAssetId),
             isABuyingSynthetic: event.args.isABuyingSynthetic,
             nonce: event.args.nonce.toBigInt(),
+          },
+        })
+      case 'LogEscapeVerified':
+        if (options?.skipUserTransactionRepository) {
+          return
+        }
+        return this.userTransactionRepository.add({
+          ...base,
+          data: {
+            type: 'EscapeVerified',
+            starkKey: StarkKey.from(event.args.starkKey),
+            withdrawalAmount: event.args.withdrawalAmount.toBigInt(),
+            positionId: event.args.positionId.toBigInt(),
+            sharedStateHash: Hash256(event.args.sharedStateHash.toHexString()),
           },
         })
       case 'LogWithdrawalPerformed':

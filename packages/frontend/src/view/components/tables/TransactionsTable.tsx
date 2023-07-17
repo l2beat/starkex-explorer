@@ -22,7 +22,12 @@ export interface TransactionEntry {
   asset?: Asset
   amount?: bigint
   status: 'SENT' | 'MINED' | 'INCLUDED' | 'REVERTED'
-  type: 'FORCED_WITHDRAW' | 'FORCED_BUY' | 'FORCED_SELL' | 'WITHDRAW'
+  type:
+    | 'FORCED_WITHDRAW'
+    | 'FORCED_BUY'
+    | 'FORCED_SELL'
+    | 'WITHDRAW'
+    | 'INITIATE_ESCAPE'
 }
 
 export function TransactionsTable(props: TransactionsTableProps) {
@@ -127,6 +132,8 @@ function toTypeText(type: TransactionEntry['type']): string {
       return 'F. buy'
     case 'FORCED_SELL':
       return 'F. sell'
+    case 'INITIATE_ESCAPE':
+      return 'Init. escape'
     case 'WITHDRAW':
       return 'Withdraw'
   }
