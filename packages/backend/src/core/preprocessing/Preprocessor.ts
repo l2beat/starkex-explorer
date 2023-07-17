@@ -1,13 +1,13 @@
 import { AssetHash, AssetId } from '@explorer/types'
 import { Knex } from 'knex'
 
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
@@ -17,8 +17,8 @@ export type SyncDirection = 'forward' | 'backward' | 'stop'
 
 export class Preprocessor<T extends AssetHash | AssetId> {
   constructor(
+    private kvStore: KeyValueStore,
     private preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
-    private syncStatusRepository: SyncStatusRepository,
     private stateUpdateRepository: StateUpdateRepository,
     private historyPreprocessor: HistoryPreprocessor<T>,
     private stateDetailsPreprocessor: StateDetailsPreprocessor,
@@ -48,7 +48,9 @@ export class Preprocessor<T extends AssetHash | AssetId> {
   }
 
   async getLastSyncedStateUpdate(): Promise<StateUpdateRecord | undefined> {
-    const lastSyncedBlock = await this.syncStatusRepository.getLastSynced()
+    const lastSyncedBlock = await this.kvStore.findByKey(
+      'lastBlockNumberSynced'
+    )
     if (lastSyncedBlock === undefined) {
       return
     }

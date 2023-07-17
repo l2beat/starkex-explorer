@@ -72,10 +72,8 @@ import { PreprocessedStateDetailsRepository } from './peripherals/database/Prepr
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
 import { PreprocessedUserStatisticsRepository } from './peripherals/database/PreprocessedUserStatisticsRepository'
 import { Database } from './peripherals/database/shared/Database'
-import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
-import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
@@ -112,11 +110,6 @@ export class Application {
         : undefined
 
     const kvStore = new KeyValueStore(database, logger)
-    const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
-    const softwareMigrationRepository = new SoftwareMigrationRepository(
-      kvStore,
-      logger
-    )
 
     const verifierEventRepository = new VerifierEventRepository(
       database,
@@ -387,8 +380,7 @@ export class Application {
 
     const userTransactionMigrator = new UserTransactionMigrator(
       database,
-      softwareMigrationRepository,
-      syncStatusRepository,
+      kvStore,
       userTransactionRepository,
       sentTransactionRepository,
       userTransactionCollector,
@@ -398,8 +390,7 @@ export class Application {
     )
 
     const withdrawableAssetMigrator = new WithdrawableAssetMigrator(
-      softwareMigrationRepository,
-      syncStatusRepository,
+      kvStore,
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
       userTransactionCollector,
@@ -407,9 +398,8 @@ export class Application {
     )
 
     const stateUpdateWithBatchIdMigrator = new StateUpdateWithBatchIdMigrator(
-      softwareMigrationRepository,
+      kvStore,
       stateUpdateRepository,
-      syncStatusRepository,
       stateTransitionCollector,
       logger
     )
@@ -466,8 +456,8 @@ export class Application {
       )
 
       preprocessor = new Preprocessor(
+        kvStore,
         preprocessedStateUpdateRepository,
-        syncStatusRepository,
         stateUpdateRepository,
         perpetualHistoryPreprocessor,
         stateDetailsPreprocessor,
@@ -504,8 +494,8 @@ export class Application {
       )
 
       preprocessor = new Preprocessor(
+        kvStore,
         preprocessedStateUpdateRepository,
-        syncStatusRepository,
         stateUpdateRepository,
         spotHistoryPreprocessor,
         stateDetailsPreprocessor,
@@ -517,7 +507,7 @@ export class Application {
     }
 
     const syncScheduler = new SyncScheduler(
-      syncStatusRepository,
+      kvStore,
       blockDownloader,
       syncService,
       preprocessor,
