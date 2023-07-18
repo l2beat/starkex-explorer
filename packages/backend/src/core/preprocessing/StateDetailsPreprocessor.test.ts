@@ -1,4 +1,5 @@
 import { AssetHash, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
@@ -6,7 +7,6 @@ import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/P
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { Logger } from '../../tools/Logger'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {

@@ -1,8 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 import waitForExpect from 'wait-for-expect'
 
 import { JobQueue } from './JobQueue'
-import { Logger } from './Logger'
 
 describe(JobQueue.name, () => {
   const sleep = (ms: number) =>

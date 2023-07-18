@@ -1,5 +1,5 @@
-import { Env } from '@l2beat/backend-tools'
-import { LogLevel } from '../../tools/Logger'
+import { Env, LoggerOptions } from '@l2beat/backend-tools'
+
 import { Config } from '../Config'
 import { getStarkexConfig } from '../starkex'
 
@@ -7,8 +7,9 @@ export function getLocalConfig(env: Env): Config {
   return {
     name: 'StarkexExplorer/Local',
     logger: {
-      logLevel: env.integer('LOG_LEVEL', LogLevel.INFO),
+      logLevel: env.string('LOG_LEVEL', 'INFO') as LoggerOptions['logLevel'],
       format: 'pretty',
+      colors: true,
     },
     port: env.integer('PORT', 3000),
     databaseConnection: env.string('LOCAL_DB_URL'),

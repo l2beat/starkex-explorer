@@ -1,5 +1,6 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
-import { Logger } from '../../tools/Logger'
 import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualBatchInfoResponse } from './schema/PerpetualBatchInfoResponse'

@@ -5,13 +5,13 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 import range from 'lodash/range'
 import { it } from 'mocha'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../test/fakes'
-import { Logger, LogLevel } from '../../tools/Logger'
 import { ForcedTransactionRepository } from './ForcedTransactionRepository'
 import {
   StateUpdateRecord,
@@ -23,7 +23,7 @@ describe(StateUpdateRepository.name, () => {
 
   const repository = new StateUpdateRepository(
     database,
-    new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+    new Logger({ format: 'pretty', logLevel: 'ERROR' })
   )
 
   afterEach(() => repository.deleteAll())
@@ -504,7 +504,7 @@ describe(StateUpdateRepository.name, () => {
       beforeEach(async () => {
         const forcedTransactionRepository = new ForcedTransactionRepository(
           database,
-          new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+          new Logger({ format: 'pretty', logLevel: 'ERROR' })
         )
 
         await forcedTransactionRepository.add(tx1, sentAt1)

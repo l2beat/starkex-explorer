@@ -5,11 +5,11 @@ import {
   ERC721Details,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 import { BigNumber } from 'ethers'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger } from '../../tools/Logger'
 import { AssetRegistrationRecord, AssetRepository } from './AssetRepository'
 
 describe(AssetRepository.name, () => {

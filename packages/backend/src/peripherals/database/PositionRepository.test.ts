@@ -6,10 +6,10 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger, LogLevel } from '../../tools/Logger'
 import { PositionRepository } from './PositionRepository'
 import { StateUpdateRepository } from './StateUpdateRepository'
 import { UserRegistrationEventRepository } from './UserRegistrationEventRepository'
@@ -17,7 +17,7 @@ import { UserRegistrationEventRepository } from './UserRegistrationEventReposito
 describe(PositionRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
 
-  const logger = new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+  const logger = new Logger({ format: 'pretty', logLevel: 'ERROR' })
   const stateUpdateRepository = new StateUpdateRepository(database, logger)
   const positionRepository = new PositionRepository(database, logger)
 

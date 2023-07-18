@@ -1,4 +1,5 @@
 import { Env } from '@l2beat/backend-tools'
+
 import { Config } from '../Config'
 import { getProductionConfig } from './config.production'
 

@@ -1,4 +1,5 @@
 import { AssetId, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
@@ -9,7 +10,6 @@ import {
   fakeOffer,
   fakeTimestamp,
 } from '../../test/fakes'
-import { Logger } from '../../tools/Logger'
 import { ForcedTradeOfferRepository } from './ForcedTradeOfferRepository'
 
 describe(ForcedTradeOfferRepository.name, () => {

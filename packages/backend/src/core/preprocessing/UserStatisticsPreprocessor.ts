@@ -1,3 +1,4 @@
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
@@ -8,7 +9,6 @@ import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 
 export class UserStatisticsPreprocessor {
   constructor(

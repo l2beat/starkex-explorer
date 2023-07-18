@@ -1,8 +1,8 @@
 import { decodeOnChainData } from '@explorer/encoding'
+import { Logger } from '@l2beat/backend-tools'
 
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
-import { Logger } from '../tools/Logger'
 import { PageCollector } from './collectors/PageCollector'
 import { PageMappingCollector } from './collectors/PageMappingCollector'
 import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualRollupStateTransitionCollector'

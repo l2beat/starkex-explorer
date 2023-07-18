@@ -1,4 +1,5 @@
 import { Env } from '@l2beat/backend-tools'
+
 import { Config } from './Config'
 import { getLocalConfig } from './environments/config.local'
 import { getProductionConfig } from './environments/config.production'
@@ -16,5 +17,5 @@ export function getConfig(env: Env): Config {
     case 'production':
       return getProductionConfig(env)
   }
-  throw new TypeError(`Unrecognized env: ${env}!`)
+  throw new TypeError(`Unrecognized deployment env: ${deploymentEnv}!`)
 }

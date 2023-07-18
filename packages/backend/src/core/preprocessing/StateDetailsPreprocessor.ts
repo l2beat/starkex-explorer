@@ -1,10 +1,10 @@
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { Logger } from '../../tools/Logger'
 
 export class StateDetailsPreprocessor {
   constructor(

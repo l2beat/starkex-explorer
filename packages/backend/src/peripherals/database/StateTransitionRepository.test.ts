@@ -1,8 +1,8 @@
 import { Hash256 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger } from '../../tools/Logger'
 import {
   StateTransitionRecord,
   StateTransitionRepository,

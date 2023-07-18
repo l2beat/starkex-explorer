@@ -1,4 +1,5 @@
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
@@ -6,7 +7,6 @@ import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'

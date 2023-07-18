@@ -1,4 +1,4 @@
-import { Logger } from './Logger'
+import { Logger } from '@l2beat/backend-tools'
 
 export interface Job {
   readonly name: string

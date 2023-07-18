@@ -1,4 +1,5 @@
 import { getEnv } from '@l2beat/backend-tools'
+
 import { Application } from './Application'
 import { getConfig } from './config'
 import { reportError } from './tools/ErrorReporter'

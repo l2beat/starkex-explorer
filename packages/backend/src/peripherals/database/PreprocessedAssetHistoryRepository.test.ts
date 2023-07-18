@@ -1,9 +1,9 @@
 import { AssetHash, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 import { Knex } from 'knex'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger, LogLevel } from '../../tools/Logger'
 import {
   PreprocessedAssetHistoryRecord,
   PreprocessedAssetHistoryRepository,
@@ -35,7 +35,7 @@ describe(PreprocessedAssetHistoryRepository.name, () => {
   const repository = new PreprocessedAssetHistoryRepository(
     database,
     AssetHash,
-    new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+    new Logger({ format: 'pretty', logLevel: 'ERROR' })
   )
   const preprocessedStateUpdateRepository =
     new PreprocessedStateUpdateRepository(database, Logger.SILENT)

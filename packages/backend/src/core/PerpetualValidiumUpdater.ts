@@ -1,12 +1,12 @@
 import { PerpetualCairoOutput } from '@explorer/encoding'
 import { IMerkleStorage, MerkleTree, PositionLeaf } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { PerpetualBatch } from '../peripherals/starkware/toPerpetualBatchData'
-import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
 
 export interface ValidiumStateTransition {

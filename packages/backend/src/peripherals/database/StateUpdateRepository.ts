@@ -1,10 +1,10 @@
 import { OraclePrice } from '@explorer/encoding'
 import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { PriceRow, StateUpdateRow } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { Logger } from '../../tools/Logger'
 import {
   PositionRecord,
   toPositionRow,
@@ -12,7 +12,7 @@ import {
 } from './PositionRepository'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
-import { toVaultRow, VaultRecord } from './VaultRepository'
+import { toVaultRow,VaultRecord } from './VaultRepository'
 
 export interface StateUpdateRecord {
   id: number
