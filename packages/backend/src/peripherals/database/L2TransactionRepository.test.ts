@@ -1404,7 +1404,7 @@ describe(L2TransactionRepository.name, () => {
       it('runs a function in a transaction with a locked table', async () => {
         const mockedLockTableFn = mockFn(async () => {})
         repository.lockTable = mockedLockTableFn
-        const fn = mockFn(async (trx: Knex.Transaction) => {})
+        const fn = mockFn(async (_: Knex.Transaction) => {})
         await repository.runInTransactionWithLockedTable(fn)
 
         expect(mockedLockTableFn).toHaveBeenCalledTimes(1)

@@ -30,6 +30,8 @@ export class LiveL2TransactionDownloader {
     this.logger.info('Starting L2 transaction downloader', {
       enabled: this.isEnabled,
     })
+
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.clock.onEvery('5s', () => this.sync())
   }
 

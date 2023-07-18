@@ -2,8 +2,6 @@ type IntervalUnit = 's' | 'm' | 'h' | 'd'
 type Interval = `${number}${IntervalUnit}`
 
 export class Clock {
-  constructor() {}
-
   onEvery(interval: Interval, callback: () => void) {
     callback()
     setInterval(() => {

@@ -1,4 +1,4 @@
-import { isEmpty } from 'lodash'
+import isEmpty from 'lodash/isEmpty'
 
 import { L2TransactionApiConfig } from '../../config/starkex/StarkexConfig'
 import { BaseClient } from './BaseClient'

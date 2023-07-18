@@ -2,7 +2,7 @@ import { StarkKey } from '@explorer/types'
 import { randomInt } from 'crypto'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
-import { range } from 'lodash'
+import range from 'lodash/range'
 import waitForExpect from 'wait-for-expect'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'

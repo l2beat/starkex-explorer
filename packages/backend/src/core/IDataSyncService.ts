@@ -10,6 +10,6 @@ export interface IDataSyncService {
     stateTransitions:
       | ValidiumStateTransition[]
       | PerpetualRollupStateTransition[]
-  ): Promise<number | void>
+  ): Promise<void>
   discardAfter(blockNumber: BlockNumber): Promise<void>
 }
