@@ -914,6 +914,15 @@ describe(L2TransactionRepository.name, () => {
   })
 
   describe(
+    L2TransactionRepository.prototype.findOldestByTransactionId.name,
+    () => {
+      it('returns oldest transaction', async () => {
+        throw Error('Add implementation after merge with preprocessing')
+      })
+    }
+  )
+
+  describe(
     L2TransactionRepository.prototype.getPaginatedWithoutMulti.name,
     () => {
       it('respects the limit parameter', async () => {

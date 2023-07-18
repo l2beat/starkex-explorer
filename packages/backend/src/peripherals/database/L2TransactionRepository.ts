@@ -78,10 +78,26 @@ export class L2TransactionRepository extends BaseRepository {
   ): Promise<number> {
     const knex = await this.knex(trx)
 
-    const count = await this.countByTransactionId(record.transactionId)
-    const isAlternative = count > 0
+    const existingRecord = await this.findOldestByTransactionId(
+      record.transactionId
+    )
+    const isLive = record.stateUpdateId === undefined
 
-    if (count === 1) {
+    const isAlternative = !!existingRecord
+
+    /*
+      If live transactions are somehow behind the transactions from feeder gateway, we should not add them
+      Although we should add them if transaction in database is not included as it is alternative to the one in database
+    */
+    if (
+      isLive &&
+      existingRecord?.transactionId === record.transactionId &&
+      existingRecord.stateUpdateId !== undefined
+    ) {
+      return 0
+    }
+
+    if (existingRecord && existingRecord.state === undefined) {
       await knex('l2_transactions')
         .update({ state: 'replaced' })
         .where({ transaction_id: record.transactionId })
@@ -289,6 +305,16 @@ export class L2TransactionRepository extends BaseRepository {
       .orderBy('id', 'asc')
 
     return toAggregatedRecord(originalTransaction, alternativeTransactions)
+  }
+
+  async findOldestByTransactionId(id: number): Promise<Record | undefined> {
+    const knex = await this.knex()
+    const row = await knex('l2_transactions')
+      .where({ transaction_id: id })
+      .orderBy('id', 'asc')
+      .first()
+
+    return row ? toRecord(row) : undefined
   }
 
   async findLatestStateUpdateId(): Promise<number | undefined> {
