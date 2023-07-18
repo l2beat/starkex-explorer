@@ -28,7 +28,7 @@ const fakeL2Transaction = (
   ...transaction,
 })
 
-describe.only(LiveL2TransactionDownloader.name, () => {
+describe(LiveL2TransactionDownloader.name, () => {
   describe(LiveL2TransactionDownloader.prototype.start.name, () => {
     it('should initialize, start and sync', async () => {
       const thirdPartyId = 1200005
