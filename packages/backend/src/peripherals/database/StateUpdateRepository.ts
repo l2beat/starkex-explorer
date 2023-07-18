@@ -12,7 +12,7 @@ import {
 } from './PositionRepository'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
-import { toVaultRow,VaultRecord } from './VaultRepository'
+import { toVaultRow, VaultRecord } from './VaultRepository'
 
 export interface StateUpdateRecord {
   id: number
