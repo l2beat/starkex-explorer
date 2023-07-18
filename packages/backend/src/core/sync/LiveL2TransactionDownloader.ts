@@ -10,9 +10,9 @@ import { Clock } from './Clock'
 
 export class LiveL2TransactionDownloader {
   private PAGE_SIZE = 100
-  private isRunning = false
   private lastSyncedThirdPartyId: number | undefined
-  private enabled = false
+  isRunning = false
+  isEnabled = false
 
   constructor(
     private readonly l2TransactionClient: L2TransactionClient,
@@ -28,7 +28,7 @@ export class LiveL2TransactionDownloader {
   async start() {
     await this.initialize()
     this.logger.info('Starting L2 transaction downloader', {
-      enabled: this.enabled,
+      enabled: this.isEnabled,
     })
     this.clock.onEvery('5s', () => this.sync())
   }
@@ -41,12 +41,12 @@ export class LiveL2TransactionDownloader {
       return
     }
 
-    this.enabled = true
+    this.isEnabled = true
     this.lastSyncedThirdPartyId = lastSyncedThirdPartyId
   }
 
   async enableSync() {
-    if (this.enabled) {
+    if (this.isEnabled) {
       return
     }
 
@@ -72,13 +72,14 @@ export class LiveL2TransactionDownloader {
     }
     this.logger.info('Enabling L2 transaction downloader')
     await this.updateLastSyncedThirdPartyId(lastSyncedThirdPartyId)
-    this.enabled = true
+    this.isEnabled = true
   }
 
   private async sync() {
-    if (this.isRunning) {
+    if (this.isRunning || !this.isEnabled) {
       return
     }
+
     this.isRunning = true
 
     const lastSyncedThirdPartyId = this.lastSyncedThirdPartyId
@@ -86,7 +87,6 @@ export class LiveL2TransactionDownloader {
       this.isRunning = false
       return
     }
-
     await this.l2TransactionRepository.runInTransactionWithLockedTable(
       async (trx) => {
         await this.downloadAndAddTransactions(lastSyncedThirdPartyId + 1, trx)
@@ -107,14 +107,13 @@ export class LiveL2TransactionDownloader {
       )
 
     if (!transactions) {
-      this.logger.info('No transactions found')
       this.isRunning = false
       return
     }
 
     await this.addTransactions(transactions, trx)
 
-    const lastSyncedThirdPartyId = thirdPartyId + this.PAGE_SIZE
+    const lastSyncedThirdPartyId = thirdPartyId + transactions.length
     await this.updateLastSyncedThirdPartyId(lastSyncedThirdPartyId, trx)
 
     if (transactions.length === this.PAGE_SIZE) {
@@ -150,6 +149,7 @@ export class LiveL2TransactionDownloader {
       },
       trx
     )
+
     this.lastSyncedThirdPartyId = lastSyncedThirdPartyId
   }
 }

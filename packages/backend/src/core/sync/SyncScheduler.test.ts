@@ -12,7 +12,7 @@ import { BlockDownloader } from './BlockDownloader'
 import { SyncScheduler } from './SyncScheduler'
 import { Block } from './syncSchedulerReducer'
 
-describe.only(SyncScheduler.name, () => {
+describe(SyncScheduler.name, () => {
   const block = (number: number): Block => ({
     number,
     hash: Hash256.fake(number.toString()),
