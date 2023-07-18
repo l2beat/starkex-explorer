@@ -1,25 +1,28 @@
+import { Env } from '@l2beat/backend-tools'
+import { chain } from 'lodash'
+import { StarkexConfig } from './StarkexConfig'
 import { getApexGoerliConfig } from './apex-goerli'
 import { getApexMainnetConfig } from './apex-mainnet'
 import { getDydxLocalConfig } from './dydx-local'
 import { getDydxMainnetConfig } from './dydx-mainnet'
 import { getGammaxGoerliConfig } from './gammax-goerli'
 import { getMyriaGoerliConfig } from './myria-goerli'
-import { StarkexConfig } from './StarkexConfig'
 
-export function getStarkexConfig(chain: string): StarkexConfig {
-  switch (chain) {
+export function getStarkexConfig(env: Env): StarkexConfig {
+  const instance = env.string('STARKEX_INSTANCE')
+  switch (instance) {
     case 'dydx-mainnet':
-      return getDydxMainnetConfig()
+      return getDydxMainnetConfig(env)
     case 'dydx-local':
-      return getDydxLocalConfig()
+      return getDydxLocalConfig(env)
     case 'gammax-goerli':
-      return getGammaxGoerliConfig()
+      return getGammaxGoerliConfig(env)
     case 'myria-goerli':
-      return getMyriaGoerliConfig()
+      return getMyriaGoerliConfig(env)
     case 'apex-goerli':
-      return getApexGoerliConfig()
+      return getApexGoerliConfig(env)
     case 'apex-mainnet':
-      return getApexMainnetConfig()
+      return getApexMainnetConfig(env)
   }
   throw new Error(`Unrecognized chain: ${chain}`)
 }

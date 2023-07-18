@@ -1,24 +1,24 @@
+import { Env } from '@l2beat/backend-tools'
 import { LogLevel } from '../../tools/Logger'
 import { Config } from '../Config'
-import { getEnv } from '../getEnv'
 import { getStarkexConfig } from '../starkex'
 
-export function getProductionConfig(): Config {
+export function getProductionConfig(env: Env): Config {
   return {
     name: 'StarkexExplorer/Production',
     logger: {
       logLevel: LogLevel.INFO,
       format: 'json',
     },
-    port: getEnv.integer('PORT'),
+    port: env.integer('PORT'),
     databaseConnection: {
-      connectionString: getEnv('DATABASE_URL'),
+      connectionString: env.string('DATABASE_URL'),
       ssl: { rejectUnauthorized: false },
     },
     enableSync: true,
-    enablePreprocessing: getEnv.boolean('ENABLE_PREPROCESSING', true),
+    enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
     freshStart: false,
     forceHttps: true,
-    starkex: getStarkexConfig(getEnv('STARKEX_INSTANCE')),
+    starkex: getStarkexConfig(env),
   }
 }

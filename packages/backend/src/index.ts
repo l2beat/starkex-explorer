@@ -1,10 +1,10 @@
+import { getEnv } from '@l2beat/backend-tools'
 import { Application } from './Application'
 import { getConfig } from './config'
 import { reportError } from './tools/ErrorReporter'
 
-const env = process.env.DEPLOYMENT_ENV ?? 'local'
-
 try {
+  const env = getEnv()
   const config = getConfig(env)
   const app = new Application(config)
   app.start().catch(onError)
