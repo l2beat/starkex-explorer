@@ -3,7 +3,6 @@ import { expect } from 'earl'
 import { Knex } from 'knex'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
 import { Logger, LogLevel } from '../../tools/Logger'
 import { PreprocessedStateUpdateRepository } from './PreprocessedStateUpdateRepository'
 import { PreprocessedUserStatisticsRepository } from './PreprocessedUserStatisticsRepository'
@@ -76,15 +75,11 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
         id,
         ...mockRecord,
         prevHistoryId: undefined,
-        l2TransactionsStatistics: undefined,
       })
 
-      const l2TransactionsStatistics =
-        fakePreprocessedL2TransactionsStatistics()
       const updatedRecord = {
         ...mockRecord,
         id,
-        l2TransactionsStatistics,
       }
 
       await repository.update(updatedRecord, trx)
@@ -96,7 +91,6 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
 
       expect(updated).toEqual({
         ...updatedRecord,
-        l2TransactionsStatistics,
         prevHistoryId: undefined,
       })
     })
@@ -138,120 +132,7 @@ describe(PreprocessedUserStatisticsRepository.name, () => {
           ...mostRecent,
           id,
           prevHistoryId: undefined,
-          l2TransactionsStatistics: undefined,
         })
-      })
-    }
-  )
-
-  describe(
-    PreprocessedUserStatisticsRepository.prototype
-      .findLastWithL2TransactionsStatisticsByStarkKey.name,
-    () => {
-      it('returns undefined when no records found', async () => {
-        await repository.add(
-          {
-            ...mockRecord,
-            stateUpdateId: 100,
-          },
-          trx
-        )
-        const result =
-          await repository.findLastWithL2TransactionsStatisticsByStarkKey(
-            mockRecord.starkKey,
-            trx
-          )
-
-        expect(result).toEqual(undefined)
-      })
-
-      it('finds most recent with l2 transactions statistics by stark key', async () => {
-        const l2TransactionsStatistics =
-          fakePreprocessedL2TransactionsStatistics()
-        const id = await repository.add(
-          {
-            ...mockRecord,
-            stateUpdateId: 100,
-            l2TransactionsStatistics,
-          },
-          trx
-        )
-        await repository.add({ ...mockRecord, stateUpdateId: 200 }, trx)
-        await repository.add({ ...mockRecord, stateUpdateId: 1900 }, trx)
-
-        const result =
-          await repository.findLastWithL2TransactionsStatisticsByStarkKey(
-            mockRecord.starkKey,
-            trx
-          )
-
-        expect(result).toEqual({
-          ...mockRecord,
-          id,
-          stateUpdateId: 100,
-          l2TransactionsStatistics,
-          prevHistoryId: undefined,
-        })
-      })
-    }
-  )
-
-  describe(
-    PreprocessedUserStatisticsRepository.prototype
-      .getAllWithoutL2TransactionStatisticsUpToStateUpdateId.name,
-    () => {
-      it('returns empty array when no records', async () => {
-        const result =
-          await repository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
-            1000,
-            trx
-          )
-
-        expect(result).toEqual([])
-      })
-
-      it('returns all records without L2 transaction statistics up to state update id', async () => {
-        const id1 = await repository.add(
-          { ...mockRecord, stateUpdateId: 100 },
-          trx
-        )
-        const id2 = await repository.add(
-          { ...mockRecord, stateUpdateId: 200 },
-          trx
-        )
-        await repository.add(
-          {
-            ...mockRecord,
-            stateUpdateId: 100,
-            l2TransactionsStatistics:
-              fakePreprocessedL2TransactionsStatistics(),
-          },
-          trx
-        )
-        await repository.add({ ...mockRecord, stateUpdateId: 1900 }, trx)
-
-        const results =
-          await repository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
-            1899,
-            trx
-          )
-
-        expect(results).toEqual([
-          {
-            ...mockRecord,
-            stateUpdateId: 100,
-            id: id1,
-            l2TransactionsStatistics: undefined,
-            prevHistoryId: undefined,
-          },
-          {
-            ...mockRecord,
-            stateUpdateId: 200,
-            id: id2,
-            l2TransactionsStatistics: undefined,
-            prevHistoryId: undefined,
-          },
-        ])
       })
     }
   )

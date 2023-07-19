@@ -11,6 +11,7 @@ import {
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
+import { UserL2TransactionsPreprocessor } from './UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
@@ -23,6 +24,7 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private historyPreprocessor: HistoryPreprocessor<T>,
     private stateDetailsPreprocessor: StateDetailsPreprocessor,
     private userStatisticsPreprocessor: UserStatisticsPreprocessor,
+    private userL2TransactionsPreprocessor: UserL2TransactionsPreprocessor,
     private l2TransactionRepository: L2TransactionRepository,
     private logger: Logger,
     private isEnabled: boolean = true
@@ -132,7 +134,7 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           trx,
           lastProcessedStateUpdate.stateUpdateId
         )
-        await this.userStatisticsPreprocessor.catchUpL2Transactions(
+        await this.userL2TransactionsPreprocessor.catchUp(
           trx,
           lastProcessedStateUpdate.stateUpdateId
         )
@@ -198,10 +200,11 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           trx,
           preprocessL2TransactionTo
         )
-        await this.userStatisticsPreprocessor.catchUpL2Transactions(
+        await this.userL2TransactionsPreprocessor.catchUp(
           trx,
           preprocessL2TransactionTo
         )
+
         // END TRANSACTION
       }
     )
@@ -242,7 +245,10 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           lastProcessedStateUpdate.stateUpdateId,
           trx
         )
-
+        await this.userL2TransactionsPreprocessor.rollbackOneStateUpdate(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
         // END TRANSACTION
       }
     )

@@ -1,7 +1,6 @@
 import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
-import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
@@ -9,14 +8,12 @@ import {
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
 import { Logger } from '../../tools/Logger'
-import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 
 export class UserStatisticsPreprocessor {
   constructor(
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
     private readonly stateUpdateRepository: StateUpdateRepository,
-    private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly kvStore: KeyValueStore,
     private readonly logger: Logger
   ) {}
@@ -110,51 +107,6 @@ export class UserStatisticsPreprocessor {
           balanceChangeCount,
           assetCount,
           prevHistoryId: currentStatisticsRecord?.id,
-        },
-        trx
-      )
-    }
-  }
-
-  async catchUpL2Transactions(
-    trx: Knex.Transaction,
-    preprocessToStateUpdateId: number
-  ) {
-    const recordsToUpdate =
-      await this.preprocessedUserStatisticsRepository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
-        preprocessToStateUpdateId,
-        trx
-      )
-
-    for (const recordToUpdate of recordsToUpdate) {
-      this.logger.info(
-        `Preprocessing l2 transactions user (${recordToUpdate.starkKey.toString()}) statistics for state update ${
-          recordToUpdate.stateUpdateId
-        }`
-      )
-      const l2TransactionsStatistics =
-        await this.l2TransactionRepository.getStatisticsByStateUpdateIdAndStarkKey(
-          recordToUpdate.stateUpdateId,
-          recordToUpdate.starkKey,
-          trx
-        )
-
-      const lastPreprocessedUserStatistics =
-        await this.preprocessedUserStatisticsRepository.findLastWithL2TransactionsStatisticsByStarkKey(
-          recordToUpdate.starkKey,
-          trx
-        )
-
-      await this.preprocessedUserStatisticsRepository.update(
-        {
-          id: recordToUpdate.id,
-          l2TransactionsStatistics:
-            lastPreprocessedUserStatistics?.l2TransactionsStatistics
-              ? sumNumericValuesByKey(
-                  lastPreprocessedUserStatistics.l2TransactionsStatistics,
-                  l2TransactionsStatistics
-                )
-              : l2TransactionsStatistics,
         },
         trx
       )

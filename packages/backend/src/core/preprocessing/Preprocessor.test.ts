@@ -13,6 +13,7 @@ import { Logger } from '../../tools/Logger'
 import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
 import { Preprocessor, SyncDirection } from './Preprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
+import { UserL2TransactionsPreprocessor } from './UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 const generateFakeStateUpdate = (
@@ -36,6 +37,8 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
+
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -73,7 +76,10 @@ describe(Preprocessor.name, () => {
       const mockUserStatisticsPreprocessor =
         mockObject<UserStatisticsPreprocessor>({
           catchUp: mockFn().resolvesTo(undefined),
-          catchUpL2Transactions: mockFn().resolvesTo(undefined),
+        })
+      const mockUserL2TransactionsPreprocessor =
+        mockObject<UserL2TransactionsPreprocessor>({
+          catchUp: mockFn().resolvesTo(undefined),
         })
       const mockStateDetailsPreprocessor = mockObject<StateDetailsPreprocessor>(
         {
@@ -96,6 +102,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockStateDetailsPreprocessor,
         mockUserStatisticsPreprocessor,
+        mockUserL2TransactionsPreprocessor,
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -116,9 +123,10 @@ describe(Preprocessor.name, () => {
       expect(
         mockStateDetailsPreprocessor.catchUpL2Transactions
       ).toHaveBeenCalledWith(mockKnexTransaction, lastPreprocessedStateUpdateId)
-      expect(
-        mockUserStatisticsPreprocessor.catchUpL2Transactions
-      ).toHaveBeenCalledWith(mockKnexTransaction, lastPreprocessedStateUpdateId)
+      expect(mockUserStatisticsPreprocessor.catchUp).toHaveBeenCalledWith(
+        mockKnexTransaction,
+        lastPreprocessedStateUpdateId
+      )
     })
 
     it('does nothing when there is nothing to catch up', async () => {
@@ -132,7 +140,10 @@ describe(Preprocessor.name, () => {
       const mockUserStatisticsPreprocessor =
         mockObject<UserStatisticsPreprocessor>({
           catchUp: mockFn(),
-          catchUpL2Transactions: mockFn(),
+        })
+      const mockUserL2TransactionsPreprocessor =
+        mockObject<UserL2TransactionsPreprocessor>({
+          catchUp: mockFn(),
         })
       const mockStateDetailsPreprocessor = mockObject<StateDetailsPreprocessor>(
         {
@@ -147,6 +158,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockStateDetailsPreprocessor,
         mockUserStatisticsPreprocessor,
+        mockUserL2TransactionsPreprocessor,
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -164,9 +176,7 @@ describe(Preprocessor.name, () => {
       expect(
         mockStateDetailsPreprocessor.catchUpL2Transactions
       ).not.toHaveBeenCalled()
-      expect(
-        mockUserStatisticsPreprocessor.catchUpL2Transactions
-      ).not.toHaveBeenCalled()
+      expect(mockUserStatisticsPreprocessor.catchUp).not.toHaveBeenCalled()
     })
   })
 
@@ -182,6 +192,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -207,6 +218,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -233,6 +245,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -258,6 +271,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -286,6 +300,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -316,6 +331,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -347,6 +363,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -380,6 +397,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -412,6 +430,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -445,6 +464,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -479,6 +499,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -512,7 +533,10 @@ describe(Preprocessor.name, () => {
       const mockUserStatisticsPreprocessor =
         mockObject<UserStatisticsPreprocessor>({
           preprocessNextStateUpdate: async () => undefined,
-          catchUpL2Transactions: mockFn(async () => {}),
+        })
+      const mockUserL2TransactionsPreprocessor =
+        mockObject<UserL2TransactionsPreprocessor>({
+          catchUp: mockFn(async () => {}),
         })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async (id: number) => ({ [2]: fakeStateUpdate2 }[id]),
@@ -532,6 +556,7 @@ describe(Preprocessor.name, () => {
         mockPerpetualHistoryPreprocessor,
         mockStateDetailsPreprocessor,
         mockUserStatisticsPreprocessor,
+        mockUserL2TransactionsPreprocessor,
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -565,7 +590,7 @@ describe(Preprocessor.name, () => {
         mockStateDetailsPreprocessor.catchUpL2Transactions
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, preprocessL2TransactionTo)
       expect(
-        mockUserStatisticsPreprocessor.catchUpL2Transactions
+        mockUserL2TransactionsPreprocessor.catchUp
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, preprocessL2TransactionTo)
     })
 
@@ -590,6 +615,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -624,6 +650,10 @@ describe(Preprocessor.name, () => {
         runInTransaction: async (fn) => fn(mockKnexTransaction),
         deleteByStateUpdateId: async () => 1,
       })
+      const mockUserL2TransactionsPreprocessor =
+        mockObject<UserL2TransactionsPreprocessor>({
+          rollbackOneStateUpdate: mockFn().resolvesTo(undefined),
+        })
       const preprocessor = new Preprocessor(
         mockObject<KeyValueStore>(),
         preprocessedRepo,
@@ -631,6 +661,7 @@ describe(Preprocessor.name, () => {
         mockPerpetualHistoryPreprocessor,
         mockStateDetailsPreprocessor,
         mockUserStatisticsPreprocessor,
+        mockUserL2TransactionsPreprocessor,
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -648,6 +679,9 @@ describe(Preprocessor.name, () => {
       expect(
         mockUserStatisticsPreprocessor.rollbackOneStateUpdate
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate.id)
+      expect(
+        mockUserL2TransactionsPreprocessor.rollbackOneStateUpdate
+      ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate.id)
     })
 
     it('throws when there are no preprocessings to roll back', async () => {
@@ -663,6 +697,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
@@ -692,6 +727,7 @@ describe(Preprocessor.name, () => {
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsPreprocessor>(),
         mockedL2TransactionRepository,
         Logger.SILENT
       )

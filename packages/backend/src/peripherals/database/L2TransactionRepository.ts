@@ -5,6 +5,7 @@ import {
 import { StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
+import { uniq } from 'lodash'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'
@@ -182,6 +183,33 @@ export class L2TransactionRepository extends BaseRepository {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
+  }
+
+  async getStarkKeysByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const starkKeyARows = (await knex('l2_transactions')
+      .distinct('stark_key_a')
+      .whereNotNull('stark_key_a')
+      .andWhere({ state_update_id: stateUpdateId })) as {
+      stark_key_a: string
+    }[]
+
+    const starkKeyBRows = (await knex('l2_transactions')
+      .distinct('stark_key_b')
+      .whereNotNull('stark_key_b')
+      .andWhere({ state_update_id: stateUpdateId })) as {
+      stark_key_b: string
+    }[]
+
+    const uniqStarkKeys = uniq([
+      ...starkKeyARows.map((row) => row.stark_key_a),
+      ...starkKeyBRows.map((row) => row.stark_key_b),
+    ])
+
+    return uniqStarkKeys.map((starkKey) => StarkKey(starkKey))
   }
 
   async getStatisticsByStateUpdateId(

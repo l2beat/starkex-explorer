@@ -11,6 +11,7 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { expect } from 'earl'
+import { range } from 'lodash'
 import { beforeEach, it } from 'mocha'
 
 import { setupDatabaseTestSuite } from '../../test/database'
@@ -409,6 +410,65 @@ describe(L2TransactionRepository.name, () => {
           originalTransaction: record.data,
           alternativeTransactions: [alt1.data, alt2.data, alt3.data],
         })
+      })
+    }
+  )
+
+  describe.only(
+    L2TransactionRepository.prototype.getStarkKeysByStateUpdateId.name,
+    () => {
+      it('returns correct stark keys', async () => {
+        const stateUpdateId = 10
+        for (const i of range(4)) {
+          await repository.add({
+            ...genericDepositTransaction,
+            stateUpdateId,
+            transactionId: 123 + i,
+            data: {
+              ...genericDepositTransaction.data,
+              starkKey: StarkKey.fake(i.toString()),
+            },
+          })
+        }
+
+        await repository.add({
+          transactionId: 12345,
+          stateUpdateId,
+          blockNumber: 12345,
+          data: {
+            type: 'ForcedTrade',
+            starkKeyA: StarkKey.fake('f1'),
+            starkKeyB: StarkKey.fake('f2'),
+            positionIdA: 123n,
+            positionIdB: 1234n,
+            collateralAssetId: AssetHash.fake(),
+            syntheticAssetId: AssetId('BTC-10'),
+            collateralAmount: 1234n,
+            syntheticAmount: 1234n,
+            isABuyingSynthetic: true,
+            nonce: 1222n,
+            isValid: true,
+          },
+        })
+
+        const starkKeys = await repository.getStarkKeysByStateUpdateId(
+          stateUpdateId
+        )
+
+        expect(starkKeys).toEqualUnsorted([
+          StarkKey.fake('f1'),
+          StarkKey.fake('f2'),
+          StarkKey.fake('0'),
+          StarkKey.fake('1'),
+          StarkKey.fake('2'),
+          StarkKey.fake('3'),
+        ])
+      })
+
+      it('returns empty array if there are no transactions', async () => {
+        const starkKeys = await repository.getStarkKeysByStateUpdateId(1234)
+
+        expect(starkKeys).toEqual([])
       })
     }
   )

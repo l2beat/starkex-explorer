@@ -24,7 +24,7 @@ const stateUpdate: StateUpdateRecord = {
   timestamp: Timestamp(1_000_000_000),
 }
 
-describe.only(StateDetailsPreprocessor.name, () => {
+describe(StateDetailsPreprocessor.name, () => {
   describe(
     StateDetailsPreprocessor.prototype.preprocessNextStateUpdate.name,
     () => {
