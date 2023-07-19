@@ -152,7 +152,7 @@ export class UserController {
         starkKey,
         paginationOpts
       ),
-      this.preprocessedUserL2TransactionsStatisticsRepository.findCurrentByStarkKey(
+      this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
         starkKey
       ),
       this.sentTransactionRepository.getByStarkKey(starkKey),
@@ -324,7 +324,7 @@ export class UserController {
           starkKey,
           pagination
         ),
-        this.preprocessedUserL2TransactionsStatisticsRepository.findCurrentByStarkKey(
+        this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
           starkKey
         ),
       ])

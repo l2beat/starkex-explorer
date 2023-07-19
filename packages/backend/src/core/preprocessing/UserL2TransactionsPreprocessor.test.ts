@@ -34,7 +34,7 @@ describe(UserL2TransactionsStatisticsPreprocessor.name, () => {
             findLast: mockFn().resolvesTo({
               stateUpdateId: start,
             }),
-            findCurrentByStarkKey: mockFn().resolvesTo({
+            findLatestByStarkKey: mockFn().resolvesTo({
               cumulativeL2TransactionsStatistics: fakeStatistics,
             }),
             add: mockFn().resolvesTo(1),
@@ -82,7 +82,7 @@ describe(UserL2TransactionsStatisticsPreprocessor.name, () => {
               mockKnexTransaction
             )
             expect(
-              mockPreprocessedUserL2TransactionsRepository.findCurrentByStarkKey
+              mockPreprocessedUserL2TransactionsRepository.findLatestByStarkKey
             ).toHaveBeenNthCalledWith(index + 1, starkKey, mockKnexTransaction)
             expect(
               mockPreprocessedUserL2TransactionsRepository.add
@@ -120,7 +120,7 @@ describe(UserL2TransactionsStatisticsPreprocessor.name, () => {
         const mockPreprocessedUserL2TransactionsRepository =
           mockObject<PreprocessedUserL2TransactionsStatisticsRepository>({
             findLast: mockFn().resolvesTo(undefined),
-            findCurrentByStarkKey: mockFn().resolvesTo({
+            findLatestByStarkKey: mockFn().resolvesTo({
               cumulativeL2TransactionsStatistics: fakeStatistics,
             }),
             add: mockFn().resolvesTo(1),
@@ -168,7 +168,7 @@ describe(UserL2TransactionsStatisticsPreprocessor.name, () => {
               mockKnexTransaction
             )
             expect(
-              mockPreprocessedUserL2TransactionsRepository.findCurrentByStarkKey
+              mockPreprocessedUserL2TransactionsRepository.findLatestByStarkKey
             ).toHaveBeenNthCalledWith(index + 1, starkKey, mockKnexTransaction)
             expect(
               mockPreprocessedUserL2TransactionsRepository.add

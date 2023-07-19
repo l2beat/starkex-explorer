@@ -42,7 +42,7 @@ export class UserL2TransactionsStatisticsPreprocessor {
           )
 
         const lastPreprocessedUserL2TransactionsStatistics =
-          await this.preprocessedUserL2TransactionsStatisticsRepository.findCurrentByStarkKey(
+          await this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
             starkKey,
             trx
           )

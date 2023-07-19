@@ -21,7 +21,7 @@ export class PreprocessedUserL2TransactionsStatisticsRepository extends BaseRepo
     /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
     this.findLast = this.wrapFind(this.findLast)
-    this.findCurrentByStarkKey = this.wrapFind(this.findCurrentByStarkKey)
+    this.findLatestByStarkKey = this.wrapFind(this.findLatestByStarkKey)
     this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     /* eslint-enable @typescript-eslint/unbound-method */
@@ -50,7 +50,7 @@ export class PreprocessedUserL2TransactionsStatisticsRepository extends BaseRepo
       : undefined
   }
 
-  async findCurrentByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
+  async findLatestByStarkKey(starkKey: StarkKey, trx?: Knex.Transaction) {
     const knex = await this.knex(trx)
     const row = await knex('preprocessed_user_l2_transactions_statistics')
       .where('stark_key', starkKey.toString())

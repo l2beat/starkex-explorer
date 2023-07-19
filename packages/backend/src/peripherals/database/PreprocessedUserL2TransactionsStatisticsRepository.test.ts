@@ -62,11 +62,11 @@ describe(PreprocessedUserL2TransactionsStatisticsRepository.name, () => {
     await trx.rollback()
   })
 
-  describe(`${PreprocessedUserL2TransactionsStatisticsRepository.prototype.add.name}, ${PreprocessedUserL2TransactionsStatisticsRepository.prototype.findLast.name}, ${PreprocessedUserL2TransactionsStatisticsRepository.prototype.findCurrentByStarkKey.name}`, () => {
+  describe(`${PreprocessedUserL2TransactionsStatisticsRepository.prototype.add.name}, ${PreprocessedUserL2TransactionsStatisticsRepository.prototype.findLast.name}, ${PreprocessedUserL2TransactionsStatisticsRepository.prototype.findLatestByStarkKey.name}`, () => {
     it('adds, finds current by stark key and finds last ', async () => {
       const id = await repository.add(mockRecord, trx)
 
-      const current = await repository.findCurrentByStarkKey(
+      const current = await repository.findLatestByStarkKey(
         mockRecord.starkKey,
         trx
       )
@@ -100,7 +100,7 @@ describe(PreprocessedUserL2TransactionsStatisticsRepository.name, () => {
 
         await repository.deleteByStateUpdateId(1900, trx)
         expect(
-          (await repository.findCurrentByStarkKey(starkKey, trx))?.stateUpdateId
+          (await repository.findLatestByStarkKey(starkKey, trx))?.stateUpdateId
         ).toEqual(200)
       })
     }
