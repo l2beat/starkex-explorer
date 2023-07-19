@@ -75,9 +75,9 @@ export class StateDetailsPreprocessor {
           trx
         )
 
-      if (recordToUpdate.stateUpdateId > 1 && !previousStateUpdateDetails) {
+      if (recordToUpdate.stateUpdateId > 1 && !previousStateUpdateDetails?.cumulativeL2TransactionsStatistics) {
         throw new Error(
-          'Something wrong went when catching up L2 transactions for state details!'
+          'Statistics for previous state update where not preprocessed. This should never happen.'
         )
       }
 

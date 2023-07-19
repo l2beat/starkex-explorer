@@ -118,6 +118,8 @@ describe(StateDetailsPreprocessor.name, () => {
         fakePreprocessedL2TransactionsStatistics()
       const findMostRecentWithL2TransactionStatisticsResult = {
         l2TransactionsStatistics: fakePreprocessedL2TransactionsStatistics(),
+        cumulativeL2TransactionsStatistics:
+          fakePreprocessedL2TransactionsStatistics(),
       }
 
       const recordsToUpdate: PreprocessedStateDetailsRecord[] = [
@@ -261,6 +263,37 @@ describe(StateDetailsPreprocessor.name, () => {
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
             findByStateUpdateId: mockFn().resolvesTo(undefined),
+          })
+        const mockedL2TransactionRepository =
+          mockObject<L2TransactionRepository>({
+            getStatisticsByStateUpdateId: mockFn().resolvesTo(
+              getStatisticsByStateUpdateIdResult
+            ),
+          })
+        const stateDetailsPreprocessor = new StateDetailsPreprocessor(
+          mockedPreprocessedStateDetailsRepository,
+          mockObject<PreprocessedAssetHistoryRepository<AssetHash>>(),
+          mockObject<UserTransactionRepository>(),
+          mockedL2TransactionRepository,
+          Logger.SILENT
+        )
+
+        await expect(() =>
+          stateDetailsPreprocessor.catchUpL2Transactions(
+            trx,
+            preprocessToStateUpdateId
+          )
+        ).toBeRejected()
+      })
+
+      it('throws an error if previous state update statistics found without statistics and stateUpdateId > 1', async () => {
+        const mockedPreprocessedStateDetailsRepository =
+          mockObject<PreprocessedStateDetailsRepository>({
+            getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
+              mockFn().resolvesTo(recordsToUpdate),
+            findByStateUpdateId: mockFn().resolvesTo({
+              cumulativeL2TransactionsStatistics: undefined,
+            }),
           })
         const mockedL2TransactionRepository =
           mockObject<L2TransactionRepository>({
