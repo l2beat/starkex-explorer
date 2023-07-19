@@ -24,6 +24,9 @@ export class UserL2TransactionsStatisticsPreprocessor {
       stateUpdateId <= preprocessToStateUpdateId;
       stateUpdateId++
     ) {
+      this.logger.info(
+        `Preprocessing user l2 transactions statistics for state update ${stateUpdateId}`
+      )
       const starkKeys =
         await this.l2TransactionRepository.getStarkKeysByStateUpdateId(
           stateUpdateId,
@@ -31,9 +34,6 @@ export class UserL2TransactionsStatisticsPreprocessor {
         )
 
       for (const starkKey of starkKeys) {
-        this.logger.info(
-          `Preprocessing user (${starkKey.toString()}) l2 transactions for state update ${stateUpdateId}`
-        )
         const l2TransactionsStatistics =
           await this.l2TransactionRepository.getStatisticsByStateUpdateIdAndStarkKey(
             stateUpdateId,
