@@ -66,19 +66,27 @@ export class StateDetailsPreprocessor {
           recordToUpdate.stateUpdateId,
           trx
         )
-      const lastStateDetailsWithL2TransactionsStatistics =
-        await this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(
+
+      const previousStateUpdateDetails =
+        await this.preprocessedStateDetailsRepository.findByStateUpdateId(
+          recordToUpdate.stateUpdateId - 1,
           trx
         )
+
+      if (recordToUpdate.stateUpdateId > 1 && !previousStateUpdateDetails) {
+        throw new Error(
+          'Something wrong went when catching up L2 transactions for state details!'
+        )
+      }
 
       await this.preprocessedStateDetailsRepository.update(
         {
           id: recordToUpdate.id,
           l2TransactionsStatistics: statisticsForStateUpdate,
           cumulativeL2TransactionsStatistics:
-            lastStateDetailsWithL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
+            previousStateUpdateDetails?.cumulativeL2TransactionsStatistics
               ? sumNumericValuesByKey(
-                  lastStateDetailsWithL2TransactionsStatistics.cumulativeL2TransactionsStatistics,
+                  previousStateUpdateDetails.cumulativeL2TransactionsStatistics,
                   statisticsForStateUpdate
                 )
               : statisticsForStateUpdate,

@@ -24,7 +24,7 @@ const stateUpdate: StateUpdateRecord = {
   timestamp: Timestamp(1_000_000_000),
 }
 
-describe(StateDetailsPreprocessor.name, () => {
+describe.only(StateDetailsPreprocessor.name, () => {
   describe(
     StateDetailsPreprocessor.prototype.preprocessNextStateUpdate.name,
     () => {
@@ -141,7 +141,7 @@ describe(StateDetailsPreprocessor.name, () => {
           mockObject<PreprocessedStateDetailsRepository>({
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
-            findLastWithL2TransactionsStatistics: mockFn().resolvesTo(
+            findByStateUpdateId: mockFn().resolvesTo(
               findMostRecentWithL2TransactionStatisticsResult
             ),
             update: mockFn().resolvesTo(1),
@@ -175,8 +175,8 @@ describe(StateDetailsPreprocessor.name, () => {
           ).toHaveBeenCalledWith(recordToUpdate.stateUpdateId, trx)
 
           expect(
-            mockedPreprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics
-          ).toHaveBeenCalledWith(trx)
+            mockedPreprocessedStateDetailsRepository.findByStateUpdateId
+          ).toHaveBeenCalledWith(recordToUpdate.stateUpdateId - 1, trx)
 
           expect(
             mockedPreprocessedStateDetailsRepository.update(
@@ -194,13 +194,19 @@ describe(StateDetailsPreprocessor.name, () => {
         }
       })
 
-      it('catches up using current statistics as l2 transaction statistics if no previous statistics', async () => {
+      it('catches up using current statistics as l2 transaction statistics if no previous statistics and stateUpdateId = 1', async () => {
+        const recordsToUpdate: PreprocessedStateDetailsRecord[] = [
+          {
+            id: 1,
+            stateUpdateId: 1,
+          } as PreprocessedStateDetailsRecord,
+        ]
+
         const mockedPreprocessedStateDetailsRepository =
           mockObject<PreprocessedStateDetailsRepository>({
             getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
               mockFn().resolvesTo(recordsToUpdate),
-            findLastWithL2TransactionsStatistics:
-              mockFn().resolvesTo(undefined),
+            findByStateUpdateId: mockFn().resolvesTo(undefined),
             update: mockFn().resolvesTo(1),
           })
         const mockedL2TransactionRepository =
@@ -232,8 +238,8 @@ describe(StateDetailsPreprocessor.name, () => {
           ).toHaveBeenCalledWith(recordToUpdate.stateUpdateId, trx)
 
           expect(
-            mockedPreprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics
-          ).toHaveBeenCalledWith(trx)
+            mockedPreprocessedStateDetailsRepository.findByStateUpdateId
+          ).toHaveBeenCalledWith(recordToUpdate.stateUpdateId - 1, trx)
 
           expect(
             mockedPreprocessedStateDetailsRepository.update(
@@ -247,6 +253,35 @@ describe(StateDetailsPreprocessor.name, () => {
             )
           )
         }
+      })
+
+      it('throws an error if no previous state update statistics found and stateUpdateId > 1', async () => {
+        const mockedPreprocessedStateDetailsRepository =
+          mockObject<PreprocessedStateDetailsRepository>({
+            getAllWithoutL2TransactionStatisticsUpToStateUpdateId:
+              mockFn().resolvesTo(recordsToUpdate),
+            findByStateUpdateId: mockFn().resolvesTo(undefined),
+          })
+        const mockedL2TransactionRepository =
+          mockObject<L2TransactionRepository>({
+            getStatisticsByStateUpdateId: mockFn().resolvesTo(
+              getStatisticsByStateUpdateIdResult
+            ),
+          })
+        const stateDetailsPreprocessor = new StateDetailsPreprocessor(
+          mockedPreprocessedStateDetailsRepository,
+          mockObject<PreprocessedAssetHistoryRepository<AssetHash>>(),
+          mockObject<UserTransactionRepository>(),
+          mockedL2TransactionRepository,
+          Logger.SILENT
+        )
+
+        await expect(() =>
+          stateDetailsPreprocessor.catchUpL2Transactions(
+            trx,
+            preprocessToStateUpdateId
+          )
+        ).toBeRejected()
       })
     }
   )

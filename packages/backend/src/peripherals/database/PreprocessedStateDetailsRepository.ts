@@ -35,6 +35,13 @@ export class PreprocessedStateDetailsRepository extends BaseRepository {
     this.add = this.wrapAdd(this.add)
     this.countAll = this.wrapAny(this.countAll)
     this.findById = this.wrapFind(this.findById)
+    this.findByStateUpdateId = this.wrapFind(this.findByStateUpdateId)
+    this.findLastWithL2TransactionsStatistics = this.wrapFind(
+      this.findLastWithL2TransactionsStatistics
+    )
+    this.getAllWithoutL2TransactionStatisticsUpToStateUpdateId = this.wrapGet(
+      this.getAllWithoutL2TransactionStatisticsUpToStateUpdateId
+    )
     this.getPaginated = this.wrapGet(this.getPaginated)
     this.deleteAll = this.wrapDelete(this.deleteAll)
     this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
