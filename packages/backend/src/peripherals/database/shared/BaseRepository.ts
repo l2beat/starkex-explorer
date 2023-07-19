@@ -1,6 +1,6 @@
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
-import { Logger } from '../../../tools/Logger'
 import { Database } from './Database'
 
 type AnyMethod<A extends unknown[], R> = (...args: A) => Promise<R>

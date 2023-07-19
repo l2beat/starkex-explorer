@@ -1,9 +1,9 @@
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { BlockRange } from '../../model'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { JobQueue } from '../../tools/JobQueue'
-import { Logger } from '../../tools/Logger'
 import { IDataSyncService } from '../IDataSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
 import { BlockDownloader } from './BlockDownloader'

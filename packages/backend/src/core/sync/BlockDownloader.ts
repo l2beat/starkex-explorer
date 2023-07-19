@@ -1,4 +1,5 @@
 import { Hash256, json } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { providers } from 'ethers'
 
 import {
@@ -8,7 +9,6 @@ import {
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { createEventEmitter } from '../../tools/EventEmitter'
 import { JobQueue } from '../../tools/JobQueue'
-import { Logger } from '../../tools/Logger'
 
 interface BlockDownloaderEvents {
   newBlock: BlockRecord

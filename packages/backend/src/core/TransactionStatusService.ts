@@ -1,8 +1,8 @@
 import { Hash256, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { SentTransactionRepository } from '../peripherals/database/transactions/SentTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 
 const MINUTE = 1000 * 60
 const DEFAULT_MAX_MISSING = 10

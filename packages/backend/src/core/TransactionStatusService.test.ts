@@ -1,10 +1,10 @@
 import { Hash256, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockObject } from 'earl'
 import { providers } from 'ethers'
 
 import { SentTransactionRepository } from '../peripherals/database/transactions/SentTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 import { TransactionStatusService } from './TransactionStatusService'
 
 describe(TransactionStatusService.name, () => {

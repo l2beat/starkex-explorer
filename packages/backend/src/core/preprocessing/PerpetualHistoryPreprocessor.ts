@@ -1,5 +1,6 @@
 import { CollateralAsset } from '@explorer/shared'
 import { AssetId, StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
 import {
@@ -14,7 +15,6 @@ import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 
 export class PerpetualHistoryPreprocessor extends HistoryPreprocessor<AssetId> {

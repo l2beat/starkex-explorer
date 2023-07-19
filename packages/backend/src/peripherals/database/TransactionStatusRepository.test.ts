@@ -1,8 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
 import { fakeTimestamp, fakeTransactionStatus } from '../../test/fakes'
-import { Logger } from '../../tools/Logger'
 import { TransactionStatusRepository } from './TransactionStatusRepository'
 
 describe(TransactionStatusRepository.name, () => {

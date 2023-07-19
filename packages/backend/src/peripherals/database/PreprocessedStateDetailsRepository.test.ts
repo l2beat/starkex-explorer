@@ -1,9 +1,9 @@
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 import { Knex } from 'knex'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger, LogLevel } from '../../tools/Logger'
 import {
   PreprocessedStateDetailsRecord,
   PreprocessedStateDetailsRepository,
@@ -26,7 +26,7 @@ describe(PreprocessedStateDetailsRepository.name, () => {
 
   const repository = new PreprocessedStateDetailsRepository(
     database,
-    new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+    new Logger({ format: 'pretty', logLevel: 'ERROR' })
   )
   const preprocessedStateUpdateRepository =
     new PreprocessedStateUpdateRepository(database, Logger.SILENT)
