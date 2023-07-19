@@ -2,9 +2,9 @@ import { Hash256, StarkKey } from '@explorer/types'
 import { expect } from 'earl'
 import { Knex } from 'knex'
 
+import { Logger } from '@l2beat/backend-tools'
 import { setupDatabaseTestSuite } from '../../test/database'
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
-import { Logger, LogLevel } from '../../tools/Logger'
 import { PreprocessedStateUpdateRepository } from './PreprocessedStateUpdateRepository'
 import { PreprocessedUserL2TransactionsStatisticsRepository } from './PreprocessedUserL2TransactionsStatisticsRepository'
 
@@ -22,7 +22,7 @@ describe(PreprocessedUserL2TransactionsStatisticsRepository.name, () => {
 
   const repository = new PreprocessedUserL2TransactionsStatisticsRepository(
     database,
-    new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+    new Logger({ format: 'pretty', logLevel: 'ERROR' })
   )
 
   const preprocessedStateUpdateRepository =

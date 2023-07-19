@@ -1,8 +1,8 @@
 import { Knex } from 'knex'
 
+import { Logger } from '@l2beat/backend-tools'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedUserL2TransactionsStatisticsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
-import { Logger } from '../../tools/Logger'
 import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 
 export class UserL2TransactionsStatisticsPreprocessor {

@@ -2,10 +2,10 @@ import { StarkKey } from '@explorer/types'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
+import { Logger } from '@l2beat/backend-tools'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedUserL2TransactionsStatisticsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
-import { Logger } from '../../tools/Logger'
 import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 import { UserL2TransactionsStatisticsPreprocessor } from './UserL2TransactionsPreprocessor'
 
