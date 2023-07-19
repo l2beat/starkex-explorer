@@ -1,8 +1,8 @@
 import { Hash256, StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 import { Knex } from 'knex'
 
-import { Logger } from '@l2beat/backend-tools'
 import { setupDatabaseTestSuite } from '../../test/database'
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
 import { PreprocessedStateUpdateRepository } from './PreprocessedStateUpdateRepository'

@@ -1,6 +1,6 @@
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
-import { Logger } from '@l2beat/backend-tools'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedUserL2TransactionsStatisticsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
@@ -10,7 +10,9 @@ export class UserL2TransactionsStatisticsPreprocessor {
     private readonly preprocessedUserL2TransactionsStatisticsRepository: PreprocessedUserL2TransactionsStatisticsRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly logger: Logger
-  ) {}
+  ) {
+    this.logger = logger.for(this)
+  }
 
   async catchUp(trx: Knex.Transaction, preprocessToStateUpdateId: number) {
     const lastPreprocessed =

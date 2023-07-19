@@ -1,8 +1,8 @@
 import { StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { PreprocessedUserL2TransactionsStatisticsRow } from 'knex/types/tables'
 
-import { Logger } from '@l2beat/backend-tools'
 import { PreprocessedUserL2TransactionsStatistics } from './PreprocessedL2TransactionsStatistics'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'

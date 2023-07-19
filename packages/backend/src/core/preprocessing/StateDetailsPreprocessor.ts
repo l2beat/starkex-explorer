@@ -15,7 +15,9 @@ export class StateDetailsPreprocessor {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly logger: Logger
-  ) {}
+  ) {
+    this.logger = logger.for(this)
+  }
 
   async preprocessNextStateUpdate(
     trx: Knex.Transaction,
