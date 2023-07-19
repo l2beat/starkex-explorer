@@ -31,7 +31,7 @@ import {
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { sumUpTransactionCount } from '../../peripherals/database/PreprocessedL2TransactionsStatistics'
-import { PreprocessedUserL2TransactionsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsRepository'
+import { PreprocessedUserL2TransactionsStatisticsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   SentTransactionRecord,
@@ -62,7 +62,7 @@ export class UserController {
     private readonly forcedTradeOfferViewService: ForcedTradeOfferViewService,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
-    private readonly preprocessedUserL2TransactionsRepository: PreprocessedUserL2TransactionsRepository,
+    private readonly preprocessedUserL2TransactionsStatisticsRepository: PreprocessedUserL2TransactionsStatisticsRepository,
     private readonly exchangeAddress: EthereumAddress
   ) {}
 
@@ -128,7 +128,7 @@ export class UserController {
       userAssets,
       history,
       l2Transactions,
-      preprocessedUserL2Transactions,
+      preprocessedUserL2TransactionsStatistics,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
@@ -152,7 +152,7 @@ export class UserController {
         starkKey,
         paginationOpts
       ),
-      this.preprocessedUserL2TransactionsRepository.findCurrentByStarkKey(
+      this.preprocessedUserL2TransactionsStatisticsRepository.findCurrentByStarkKey(
         starkKey
       ),
       this.sentTransactionRepository.getByStarkKey(starkKey),
@@ -220,7 +220,7 @@ export class UserController {
       ethereumAddress: registeredUser?.ethAddress,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       totalL2Transactions: sumUpTransactionCount(
-        preprocessedUserL2Transactions?.cumulativeL2TransactionsStatistics
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
       ),
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
@@ -318,22 +318,23 @@ export class UserController {
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const [l2Transactions, preprocessedUserL2Transactions] = await Promise.all([
-      this.l2TransactionRepository.getUserSpecificPaginated(
-        starkKey,
-        pagination
-      ),
-      this.preprocessedUserL2TransactionsRepository.findCurrentByStarkKey(
-        starkKey
-      ),
-    ])
+    const [l2Transactions, preprocessedUserL2TransactionsStatistics] =
+      await Promise.all([
+        this.l2TransactionRepository.getUserSpecificPaginated(
+          starkKey,
+          pagination
+        ),
+        this.preprocessedUserL2TransactionsStatisticsRepository.findCurrentByStarkKey(
+          starkKey
+        ),
+      ])
 
     const content = renderUserL2TransactionsPage({
       context,
       starkKey,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       total: sumUpTransactionCount(
-        preprocessedUserL2Transactions?.cumulativeL2TransactionsStatistics
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
       ),
       ...pagination,
     })

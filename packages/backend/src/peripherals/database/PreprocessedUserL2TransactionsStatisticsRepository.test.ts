@@ -6,7 +6,7 @@ import { setupDatabaseTestSuite } from '../../test/database'
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
 import { Logger, LogLevel } from '../../tools/Logger'
 import { PreprocessedStateUpdateRepository } from './PreprocessedStateUpdateRepository'
-import { PreprocessedUserL2TransactionsRepository } from './PreprocessedUserL2TransactionsRepository'
+import { PreprocessedUserL2TransactionsStatisticsRepository } from './PreprocessedUserL2TransactionsStatisticsRepository'
 
 const mockRecord = {
   stateUpdateId: 1900,
@@ -16,11 +16,11 @@ const mockRecord = {
     fakePreprocessedL2TransactionsStatistics(),
 }
 
-describe(PreprocessedUserL2TransactionsRepository.name, () => {
+describe(PreprocessedUserL2TransactionsStatisticsRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
   let trx: Knex.Transaction
 
-  const repository = new PreprocessedUserL2TransactionsRepository(
+  const repository = new PreprocessedUserL2TransactionsStatisticsRepository(
     database,
     new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
   )
@@ -62,7 +62,7 @@ describe(PreprocessedUserL2TransactionsRepository.name, () => {
     await trx.rollback()
   })
 
-  describe(`${PreprocessedUserL2TransactionsRepository.prototype.add.name}, ${PreprocessedUserL2TransactionsRepository.prototype.findLast.name}, ${PreprocessedUserL2TransactionsRepository.prototype.findCurrentByStarkKey.name}`, () => {
+  describe(`${PreprocessedUserL2TransactionsStatisticsRepository.prototype.add.name}, ${PreprocessedUserL2TransactionsStatisticsRepository.prototype.findLast.name}, ${PreprocessedUserL2TransactionsStatisticsRepository.prototype.findCurrentByStarkKey.name}`, () => {
     it('adds, finds current by stark key and finds last ', async () => {
       const id = await repository.add(mockRecord, trx)
 
@@ -82,8 +82,8 @@ describe(PreprocessedUserL2TransactionsRepository.name, () => {
   })
 
   describe(
-    PreprocessedUserL2TransactionsRepository.prototype.deleteByStateUpdateId
-      .name,
+    PreprocessedUserL2TransactionsStatisticsRepository.prototype
+      .deleteByStateUpdateId.name,
     () => {
       it('removes by state update id', async () => {
         const starkKey = StarkKey.fake('1234aa')

@@ -11,7 +11,7 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { expect } from 'earl'
-import { range } from 'lodash'
+import range from 'lodash/range'
 import { beforeEach, it } from 'mocha'
 
 import { setupDatabaseTestSuite } from '../../test/database'
@@ -414,7 +414,7 @@ describe(L2TransactionRepository.name, () => {
     }
   )
 
-  describe.only(
+  describe(
     L2TransactionRepository.prototype.getStarkKeysByStateUpdateId.name,
     () => {
       it('returns correct stark keys', async () => {

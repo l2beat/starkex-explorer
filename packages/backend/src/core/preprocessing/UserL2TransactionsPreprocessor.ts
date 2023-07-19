@@ -1,20 +1,20 @@
 import { Knex } from 'knex'
 
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
-import { PreprocessedUserL2TransactionsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsRepository'
+import { PreprocessedUserL2TransactionsStatisticsRepository } from '../../peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { Logger } from '../../tools/Logger'
 import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 
-export class UserL2TransactionsPreprocessor {
+export class UserL2TransactionsStatisticsPreprocessor {
   constructor(
-    private readonly preprocessedUserL2TransactionsRepository: PreprocessedUserL2TransactionsRepository,
+    private readonly preprocessedUserL2TransactionsStatisticsRepository: PreprocessedUserL2TransactionsStatisticsRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly logger: Logger
   ) {}
 
   async catchUp(trx: Knex.Transaction, preprocessToStateUpdateId: number) {
     const lastPreprocessed =
-      await this.preprocessedUserL2TransactionsRepository.findLast()
+      await this.preprocessedUserL2TransactionsStatisticsRepository.findLast()
 
     const start = lastPreprocessed ? lastPreprocessed.stateUpdateId + 1 : 1
     for (
@@ -39,21 +39,21 @@ export class UserL2TransactionsPreprocessor {
             trx
           )
 
-        const lastPreprocessedUserStatistics =
-          await this.preprocessedUserL2TransactionsRepository.findCurrentByStarkKey(
+        const lastPreprocessedUserL2TransactionsStatistics =
+          await this.preprocessedUserL2TransactionsStatisticsRepository.findCurrentByStarkKey(
             starkKey,
             trx
           )
 
         const cumulativeL2TransactionsStatistics =
-          lastPreprocessedUserStatistics
+          lastPreprocessedUserL2TransactionsStatistics
             ? sumNumericValuesByKey(
-                lastPreprocessedUserStatistics.cumulativeL2TransactionsStatistics,
+                lastPreprocessedUserL2TransactionsStatistics.cumulativeL2TransactionsStatistics,
                 l2TransactionsStatistics
               )
             : l2TransactionsStatistics
 
-        await this.preprocessedUserL2TransactionsRepository.add(
+        await this.preprocessedUserL2TransactionsStatisticsRepository.add(
           {
             stateUpdateId,
             starkKey,
@@ -70,7 +70,7 @@ export class UserL2TransactionsPreprocessor {
     trx: Knex.Transaction,
     lastProcessedStateUpdateId: number
   ) {
-    await this.preprocessedUserL2TransactionsRepository.deleteByStateUpdateId(
+    await this.preprocessedUserL2TransactionsStatisticsRepository.deleteByStateUpdateId(
       lastProcessedStateUpdateId,
       trx
     )

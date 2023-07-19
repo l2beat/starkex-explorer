@@ -11,7 +11,7 @@ import {
 import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
-import { UserL2TransactionsPreprocessor } from './UserL2TransactionsPreprocessor'
+import { UserL2TransactionsStatisticsPreprocessor } from './UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
@@ -24,7 +24,7 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private historyPreprocessor: HistoryPreprocessor<T>,
     private stateDetailsPreprocessor: StateDetailsPreprocessor,
     private userStatisticsPreprocessor: UserStatisticsPreprocessor,
-    private userL2TransactionsPreprocessor: UserL2TransactionsPreprocessor,
+    private userL2TransactionsPreprocessor: UserL2TransactionsStatisticsPreprocessor,
     private l2TransactionRepository: L2TransactionRepository,
     private logger: Logger,
     private isEnabled: boolean = true

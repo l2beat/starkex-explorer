@@ -278,7 +278,7 @@ declare module 'knex/types/tables' {
     prev_history_id: number | null
   }
 
-  interface PreprocessedUserL2TransactionsRow {
+  interface PreprocessedUserL2TransactionsStatisticsRow {
     id: number
     state_update_id: number
     stark_key: string
@@ -328,7 +328,7 @@ declare module 'knex/types/tables' {
     preprocessed_state_details: PreprocessedStateDetailsRow
     withdrawable_assets: WithdrawableAssetRow
     preprocessed_user_statistics: PreprocessedUserStatisticsRow
-    preprocessed_user_l2_transactions: PreprocessedUserL2TransactionsRow
+    preprocessed_user_l2_transactions_statistics: PreprocessedUserL2TransactionsStatisticsRow
     l2_transactions: L2TransactionRow
   }
 }

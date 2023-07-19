@@ -5,7 +5,7 @@ import {
 import { StarkKey } from '@explorer/types'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
-import { uniq } from 'lodash'
+import uniq from 'lodash/uniq'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
 import { Logger } from '../../tools/Logger'

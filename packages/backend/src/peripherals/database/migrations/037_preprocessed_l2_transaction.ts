@@ -19,7 +19,7 @@ export async function up(knex: Knex) {
   })
 
   await knex.schema.createTable(
-    'preprocessed_user_l2_transactions',
+    'preprocessed_user_l2_transactions_statistics',
     (table) => {
       table.increments('id').primary()
       table
@@ -31,7 +31,6 @@ export async function up(knex: Knex) {
       table.jsonb('l2_transactions_statistics').notNullable()
       table.jsonb('cumulative_l2_transactions_statistics').notNullable()
       table.index(['stark_key', 'state_update_id'])
-      table.unique(['stark_key', 'state_update_id'])
     }
   )
 }
@@ -44,5 +43,5 @@ export async function down(knex: Knex) {
     )
   })
 
-  await knex.schema.dropTable('preprocessed_user_l2_transactions')
+  await knex.schema.dropTable('preprocessed_user_l2_transactions_statistics')
 }

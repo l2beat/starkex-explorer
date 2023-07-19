@@ -50,7 +50,7 @@ import { PerpetualHistoryPreprocessor } from './core/preprocessing/PerpetualHist
 import { Preprocessor } from './core/preprocessing/Preprocessor'
 import { SpotHistoryPreprocessor } from './core/preprocessing/SpotHistoryPreprocessor'
 import { StateDetailsPreprocessor } from './core/preprocessing/StateDetailsPreprocessor'
-import { UserL2TransactionsPreprocessor } from './core/preprocessing/UserL2TransactionsPreprocessor'
+import { UserL2TransactionsStatisticsPreprocessor } from './core/preprocessing/UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './core/preprocessing/UserStatisticsPreprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
@@ -71,7 +71,7 @@ import { PositionRepository } from './peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateDetailsRepository } from './peripherals/database/PreprocessedStateDetailsRepository'
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
-import { PreprocessedUserL2TransactionsRepository } from './peripherals/database/PreprocessedUserL2TransactionsRepository'
+import { PreprocessedUserL2TransactionsStatisticsRepository } from './peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { PreprocessedUserStatisticsRepository } from './peripherals/database/PreprocessedUserStatisticsRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
@@ -415,14 +415,15 @@ export class Application {
     const preprocessedUserStatisticsRepository =
       new PreprocessedUserStatisticsRepository(database, logger)
 
-    const preprocessedUserL2TransactionsRepository =
-      new PreprocessedUserL2TransactionsRepository(database, logger)
+    const preprocessedUserL2TransactionsStatisticsRepository =
+      new PreprocessedUserL2TransactionsStatisticsRepository(database, logger)
 
-    const userL2TransactionsPreprocessor = new UserL2TransactionsPreprocessor(
-      preprocessedUserL2TransactionsRepository,
-      l2TransactionRepository,
-      logger
-    )
+    const userL2TransactionsPreprocessor =
+      new UserL2TransactionsStatisticsPreprocessor(
+        preprocessedUserL2TransactionsStatisticsRepository,
+        l2TransactionRepository,
+        logger
+      )
 
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
@@ -553,7 +554,7 @@ export class Application {
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
-      preprocessedUserL2TransactionsRepository,
+      preprocessedUserL2TransactionsStatisticsRepository,
       config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
