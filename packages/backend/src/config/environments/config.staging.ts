@@ -1,14 +1,12 @@
-import { config as dotenv } from 'dotenv'
+import { Env } from '@l2beat/backend-tools'
 
 import { Config } from '../Config'
-import { getEnv } from '../getEnv'
 import { getProductionConfig } from './config.production'
 
-export function getStagingConfig(): Config {
-  dotenv()
+export function getStagingConfig(env: Env): Config {
   return {
-    ...getProductionConfig(),
+    ...getProductionConfig(env),
     name: 'StarkexExplorer/Staging',
-    enablePreprocessing: getEnv.boolean('ENABLE_PREPROCESSING', true),
+    enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
   }
 }

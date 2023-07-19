@@ -1,3 +1,4 @@
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
@@ -5,7 +6,6 @@ import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/P
 import { PreprocessedStateDetailsRepository } from '../../peripherals/database/PreprocessedStateDetailsRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { Logger } from '../../tools/Logger'
 import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 
 export class StateDetailsPreprocessor {

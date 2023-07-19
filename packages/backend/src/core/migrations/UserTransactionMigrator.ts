@@ -5,6 +5,7 @@ import {
   decodeWithdrawal,
 } from '@explorer/shared'
 import { AssetHash, Hash256, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { BlockRange } from '../../model'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
@@ -12,7 +13,6 @@ import { Database } from '../../peripherals/database/shared/Database'
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { Logger } from '../../tools/Logger'
 import { UserTransactionCollector } from '../collectors/UserTransactionCollector'
 
 export class UserTransactionMigrator {

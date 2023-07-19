@@ -1,7 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
-import { Logger } from '../tools/Logger'
 import { AssetRegistrationCollector } from './collectors/AssetRegistrationCollector'
 import { DepositWithTokenIdCollector } from './collectors/DepositWithTokenIdCollector'
 import { SpotCairoOutputCollector } from './collectors/SpotCairoOutputCollector'

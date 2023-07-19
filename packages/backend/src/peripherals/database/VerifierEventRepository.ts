@@ -1,6 +1,6 @@
+import { Logger } from '@l2beat/backend-tools'
 import { VerifierEventRow } from 'knex/types/tables'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 

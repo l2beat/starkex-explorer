@@ -1,4 +1,5 @@
 import { Hash256, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
@@ -9,7 +10,6 @@ import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {

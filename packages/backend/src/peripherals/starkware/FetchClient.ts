@@ -1,6 +1,5 @@
+import { Logger } from '@l2beat/backend-tools'
 import _fetch, { RequestInit, Response } from 'node-fetch'
-
-import { Logger } from '../../tools/Logger'
 
 export class FetchClient {
   constructor(private readonly logger: Logger) {

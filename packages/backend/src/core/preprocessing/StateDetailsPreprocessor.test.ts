@@ -1,4 +1,5 @@
 import { AssetHash, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
@@ -11,7 +12,6 @@ import {
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
-import { Logger } from '../../tools/Logger'
 import { sumNumericValuesByKey } from '../../utils/sumNumericValuesByKey'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
 

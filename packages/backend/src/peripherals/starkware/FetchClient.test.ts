@@ -1,7 +1,7 @@
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Response } from 'koa'
 
-import { Logger } from '../../tools/Logger'
 import { FetchClient } from './FetchClient'
 
 describe(FetchClient.name, () => {

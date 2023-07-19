@@ -1,9 +1,9 @@
 import { MerkleNode, PositionLeaf } from '@explorer/state'
 import { AssetId, PedersenHash, StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger } from '../../tools/Logger'
 import { MerkleTreeRepository } from './MerkleTreeRepository'
 
 describe(MerkleTreeRepository.name, () => {

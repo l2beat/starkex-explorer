@@ -1,7 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { BlockRange } from '../model'
 import { BlockNumber } from '../peripherals/ethereum/types'
 import { AvailabilityGatewayClient } from '../peripherals/starkware/AvailabilityGatewayClient'
-import { Logger } from '../tools/Logger'
 import { FeederGatewayCollector } from './collectors/FeederGatewayCollector'
 import { PerpetualCairoOutputCollector } from './collectors/PerpetualCairoOutputCollector'
 import { UserRegistrationCollector } from './collectors/UserRegistrationCollector'

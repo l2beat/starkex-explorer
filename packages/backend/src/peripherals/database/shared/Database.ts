@@ -1,8 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
 import KnexConstructor, { Knex } from 'knex'
 import path from 'path'
 import { types as pgTypes } from 'pg'
 
-import { Logger } from '../../../tools/Logger'
 import { PolyglotMigrationSource } from './PolyglotMigrationSource'
 
 export class Database {

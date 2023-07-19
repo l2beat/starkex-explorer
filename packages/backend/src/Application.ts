@@ -1,5 +1,6 @@
 import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { ApiServer } from './api/ApiServer'
 import { ForcedActionController } from './api/controllers/ForcedActionController'
@@ -88,7 +89,6 @@ import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityG
 import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
-import { Logger } from './tools/Logger'
 
 export class Application {
   start: () => Promise<void>

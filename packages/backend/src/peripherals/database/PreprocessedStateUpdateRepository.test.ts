@@ -1,8 +1,8 @@
 import { Hash256 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger, LogLevel } from '../../tools/Logger'
 import { PreprocessedStateUpdateRepository } from './PreprocessedStateUpdateRepository'
 
 describe(PreprocessedStateUpdateRepository.name, () => {
@@ -10,7 +10,7 @@ describe(PreprocessedStateUpdateRepository.name, () => {
 
   const repository = new PreprocessedStateUpdateRepository(
     database,
-    new Logger({ format: 'pretty', logLevel: LogLevel.ERROR })
+    new Logger({ format: 'pretty', logLevel: 'ERROR' })
   )
 
   beforeEach(() => repository.deleteAll())

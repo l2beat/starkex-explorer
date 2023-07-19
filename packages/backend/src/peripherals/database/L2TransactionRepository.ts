@@ -3,12 +3,12 @@ import {
   PerpetualL2TransactionData,
 } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
 import uniq from 'lodash/uniq'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { Logger } from '../../tools/Logger'
 import {
   decodeL2TransactionData,
   encodeL2TransactionData,

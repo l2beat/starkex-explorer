@@ -1,7 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { BlockRange } from '../../model'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
-import { Logger } from '../../tools/Logger'
 import { UserTransactionCollector } from '../collectors/UserTransactionCollector'
 import { WithdrawalAllowedCollector } from '../collectors/WithdrawalAllowedCollector'
 

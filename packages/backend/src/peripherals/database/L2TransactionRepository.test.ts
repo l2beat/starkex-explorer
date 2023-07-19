@@ -10,12 +10,12 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 import range from 'lodash/range'
 import { beforeEach, it } from 'mocha'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { Logger } from '../../tools/Logger'
 import { L2TransactionRepository } from './L2TransactionRepository'
 
 const genericMultiTransaction = (
