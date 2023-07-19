@@ -30,7 +30,7 @@ export async function up(knex: Knex) {
       table.string('stark_key').notNullable()
       table.jsonb('l2_transactions_statistics').notNullable()
       table.jsonb('cumulative_l2_transactions_statistics').notNullable()
-      table.index(['stark_key', 'state_update_id'])
+      table.index(['state_update_id', 'stark_key'])
     }
   )
 }
