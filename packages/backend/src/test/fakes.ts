@@ -1,9 +1,9 @@
 import { ForcedTrade, ForcedWithdrawal, OnChainData } from '@explorer/encoding'
 import {
   CollateralAsset,
+  ERC1155Details,
   ERC20Details,
   ERC721Details,
-  ERC1155Details,
   ETHDetails,
 } from '@explorer/shared'
 import {
@@ -16,7 +16,6 @@ import {
   Timestamp,
 } from '@explorer/types'
 import { fakeHexString } from '@explorer/types/src/fake'
-import { randomInt } from 'crypto'
 
 import {
   Accepted,
@@ -384,21 +383,22 @@ export const fakeCollateralAsset: CollateralAsset = {
 }
 
 export const fakePreprocessedL2TransactionsStatistics = (
-  count?: number
+  obj?: PreprocessedL2TransactionsStatistics
 ): PreprocessedL2TransactionsStatistics => {
   return {
-    depositCount: count ?? randomInt(0, 100),
-    withdrawalToAddressCount: count ?? randomInt(0, 100),
-    forcedWithdrawalCount: count ?? randomInt(0, 100),
-    tradeCount: count ?? randomInt(0, 100),
-    forcedTradeCount: count ?? randomInt(0, 100),
-    transferCount: count ?? randomInt(0, 100),
-    conditionalTransferCount: count ?? randomInt(0, 100),
-    liquidateCount: count ?? randomInt(0, 100),
-    deleverageCount: count ?? randomInt(0, 100),
-    fundingTickCount: count ?? randomInt(0, 100),
-    oraclePricesTickCount: count ?? randomInt(0, 100),
-    multiTransactionCount: count ?? randomInt(0, 100),
-    replacedTransactionsCount: count ?? randomInt(0, 100),
+    depositCount: 12,
+    withdrawalToAddressCount: 55,
+    forcedWithdrawalCount: 32,
+    tradeCount: 11,
+    forcedTradeCount: 52,
+    transferCount: 24,
+    conditionalTransferCount: 65,
+    liquidateCount: 19,
+    deleverageCount: 10,
+    fundingTickCount: 1,
+    oraclePricesTickCount: 99,
+    multiTransactionCount: 5,
+    replacedTransactionsCount: 2,
+    ...obj,
   }
 }
