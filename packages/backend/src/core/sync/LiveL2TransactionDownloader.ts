@@ -3,7 +3,7 @@ import { Knex } from 'knex'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
-import { L2TransactionClient } from '../../peripherals/starkware/L2TransactionClient'
+import { LiveL2TransactionClient } from '../../peripherals/starkware/LiveL2TransactionClient'
 import { PerpetualL2Transaction } from '../../peripherals/starkware/toPerpetualTransactions'
 import { Logger } from '../../tools/Logger'
 import { Clock } from './Clock'
@@ -15,7 +15,7 @@ export class LiveL2TransactionDownloader {
   isEnabled = false
 
   constructor(
-    private readonly l2TransactionClient: L2TransactionClient,
+    private readonly l2TransactionClient: LiveL2TransactionClient,
     private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly keyValueStore: KeyValueStore,
@@ -103,7 +103,7 @@ export class LiveL2TransactionDownloader {
     this.logger.info(`Downloading live transactions from ${thirdPartyId}`)
 
     const transactions =
-      await this.l2TransactionClient.getPerpetualTransactions(
+      await this.l2TransactionClient.getPerpetualLiveTransactions(
         thirdPartyId,
         this.PAGE_SIZE
       )

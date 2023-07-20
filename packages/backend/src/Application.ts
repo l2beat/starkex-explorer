@@ -87,7 +87,7 @@ import { TokenInspector } from './peripherals/ethereum/TokenInspector'
 import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityGatewayClient'
 import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
-import { L2TransactionClient } from './peripherals/starkware/L2TransactionClient'
+import { LiveL2TransactionClient } from './peripherals/starkware/LiveL2TransactionClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
 import { Logger } from './tools/Logger'
 import { shouldShowL2Transactions } from './utils/shouldShowL2Transactions'
@@ -242,7 +242,7 @@ export class Application {
         stateTransitionCollector = perpetualValidiumStateTransitionCollector
 
         const l2TransactionClient = config.starkex.l2TransactionApi
-          ? new L2TransactionClient(
+          ? new LiveL2TransactionClient(
               config.starkex.l2TransactionApi,
               fetchClient
             )

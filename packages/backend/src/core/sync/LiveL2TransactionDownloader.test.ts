@@ -7,7 +7,7 @@ import waitForExpect from 'wait-for-expect'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
-import { L2TransactionClient } from '../../peripherals/starkware/L2TransactionClient'
+import { LiveL2TransactionClient } from '../../peripherals/starkware/LiveL2TransactionClient'
 import { PerpetualL2Transaction } from '../../peripherals/starkware/toPerpetualTransactions'
 import { Logger } from '../../tools/Logger'
 import { Clock } from './Clock'
@@ -42,8 +42,8 @@ describe(LiveL2TransactionDownloader.name, () => {
         findByKey: mockFn().resolvesTo(thirdPartyId),
         addOrUpdate: mockFn().resolvesTo('lastSyncedThirdPartyId'),
       })
-      const mockLiveL2TransactionClient = mockObject<L2TransactionClient>({
-        getPerpetualTransactions: mockFn()
+      const mockLiveL2TransactionClient = mockObject<LiveL2TransactionClient>({
+        getPerpetualLiveTransactions: mockFn()
           .resolvesToOnce(firstTxs)
           .resolvesToOnce(secondTxs),
       })
@@ -76,7 +76,7 @@ describe(LiveL2TransactionDownloader.name, () => {
         expect.a(Function)
       )
       expect(
-        mockLiveL2TransactionClient.getPerpetualTransactions
+        mockLiveL2TransactionClient.getPerpetualLiveTransactions
       ).toHaveBeenNthCalledWith(1, thirdPartyId + 1, 100)
 
       await waitForExpect(() => {
@@ -102,7 +102,7 @@ describe(LiveL2TransactionDownloader.name, () => {
       })
 
       expect(
-        mockLiveL2TransactionClient.getPerpetualTransactions
+        mockLiveL2TransactionClient.getPerpetualLiveTransactions
       ).toHaveBeenNthCalledWith(2, thirdPartyId + firstTxs.length + 1, 100)
       await waitForExpect(() => {
         secondTxs.forEach((tx, i) => {
@@ -127,7 +127,7 @@ describe(LiveL2TransactionDownloader.name, () => {
       })
 
       expect(
-        mockLiveL2TransactionClient.getPerpetualTransactions
+        mockLiveL2TransactionClient.getPerpetualLiveTransactions
       ).toHaveBeenExhausted()
     })
 
@@ -143,7 +143,7 @@ describe(LiveL2TransactionDownloader.name, () => {
       })
 
       const liveL2TransactionDownloader = new LiveL2TransactionDownloader(
-        mockObject<L2TransactionClient>(),
+        mockObject<LiveL2TransactionClient>(),
         mockL2TransactionRepository,
         mockObject<StateUpdateRepository>(),
         mockKeyValueStore,
@@ -178,7 +178,7 @@ describe(LiveL2TransactionDownloader.name, () => {
       })
 
       const liveL2TransactionDownloader = new LiveL2TransactionDownloader(
-        mockObject<L2TransactionClient>(),
+        mockObject<LiveL2TransactionClient>(),
         mockL2TransactionRepository,
         mockObject<StateUpdateRepository>(),
         mockKeyValueStore,
@@ -210,7 +210,7 @@ describe(LiveL2TransactionDownloader.name, () => {
       })
 
       const liveL2TransactionDownloader = new LiveL2TransactionDownloader(
-        mockObject<L2TransactionClient>(),
+        mockObject<LiveL2TransactionClient>(),
         mockObject<L2TransactionRepository>(),
         mockStateUpdateRepository,
         mockObject<KeyValueStore>(),
@@ -234,7 +234,7 @@ describe(LiveL2TransactionDownloader.name, () => {
       })
 
       const liveL2TransactionDownloader = new LiveL2TransactionDownloader(
-        mockObject<L2TransactionClient>(),
+        mockObject<LiveL2TransactionClient>(),
         mockObject<L2TransactionRepository>(),
         mockStateUpdateRepository,
         mockObject<KeyValueStore>(),
@@ -258,12 +258,12 @@ describe(LiveL2TransactionDownloader.name, () => {
       const mockL2TransactionRepository = mockObject<L2TransactionRepository>({
         findLatestIncluded: mockFn().resolvesTo(undefined),
       })
-      const mockL2TransactionClient = mockObject<L2TransactionClient>({
+      const mockL2TransactionClient = mockObject<LiveL2TransactionClient>({
         getThirdPartyIdByTransactionId: mockFn(),
       })
 
       const liveL2TransactionDownloader = new LiveL2TransactionDownloader(
-        mockObject<L2TransactionClient>(),
+        mockObject<LiveL2TransactionClient>(),
         mockL2TransactionRepository,
         mockStateUpdateRepository,
         mockObject<KeyValueStore>(),
@@ -288,12 +288,12 @@ describe(LiveL2TransactionDownloader.name, () => {
       const mockL2TransactionRepository = mockObject<L2TransactionRepository>({
         findLatestIncluded: mockFn().resolvesTo({ stateUpdateId: 10 }),
       })
-      const mockL2TransactionClient = mockObject<L2TransactionClient>({
+      const mockL2TransactionClient = mockObject<LiveL2TransactionClient>({
         getThirdPartyIdByTransactionId: mockFn(),
       })
 
       const liveL2TransactionDownloader = new LiveL2TransactionDownloader(
-        mockObject<L2TransactionClient>(),
+        mockObject<LiveL2TransactionClient>(),
         mockL2TransactionRepository,
         mockStateUpdateRepository,
         mockObject<KeyValueStore>(),
@@ -323,7 +323,7 @@ describe(LiveL2TransactionDownloader.name, () => {
           transactionId,
         }),
       })
-      const mockL2TransactionClient = mockObject<L2TransactionClient>({
+      const mockL2TransactionClient = mockObject<LiveL2TransactionClient>({
         getThirdPartyIdByTransactionId: mockFn().resolvesTo(undefined),
       })
       const mockKeyValueStore = mockObject<KeyValueStore>({
@@ -364,7 +364,7 @@ describe(LiveL2TransactionDownloader.name, () => {
           transactionId,
         }),
       })
-      const mockL2TransactionClient = mockObject<L2TransactionClient>({
+      const mockL2TransactionClient = mockObject<LiveL2TransactionClient>({
         getThirdPartyIdByTransactionId: mockFn().resolvesTo(thirdPartyId),
       })
       const mockKeyValueStore = mockObject<KeyValueStore>({

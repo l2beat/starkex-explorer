@@ -1,14 +1,14 @@
 import isEmpty from 'lodash/isEmpty'
 
-import { L2TransactionApiConfig } from '../../config/starkex/StarkexConfig'
+import { LiveL2TransactionApiConfig } from '../../config/starkex/StarkexConfig'
 import { BaseClient } from './BaseClient'
 import { FetchClient } from './FetchClient'
-import { PerpetualL2TransactionResponse } from './schema/PerpetualL2TransactionResponse'
+import { PerpetualLiveL2TransactionResponse } from './schema/PerpetualLiveL2TransactionResponse'
 import { toPerpetualL2Transactions } from './toPerpetualTransactions'
 
-export class L2TransactionClient extends BaseClient {
+export class LiveL2TransactionClient extends BaseClient {
   constructor(
-    private readonly options: L2TransactionApiConfig,
+    private readonly options: LiveL2TransactionApiConfig,
     private readonly fetchClient: FetchClient
   ) {
     super(options.auth)
@@ -24,14 +24,14 @@ export class L2TransactionClient extends BaseClient {
     return thirdPartyId !== 0 ? thirdPartyId : undefined
   }
 
-  async getPerpetualTransactions(startId: number, pageSize: number) {
+  async getPerpetualLiveTransactions(startId: number, pageSize: number) {
     const data = await this.getTransactions(startId, pageSize)
 
     if (isEmpty(data)) {
       return undefined
     }
 
-    const parsed = PerpetualL2TransactionResponse.parse(data)
+    const parsed = PerpetualLiveL2TransactionResponse.parse(data)
     return toPerpetualL2Transactions(parsed)
   }
 
