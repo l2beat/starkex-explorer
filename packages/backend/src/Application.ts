@@ -641,6 +641,7 @@ export class Application {
 
     this.start = async () => {
       logger.for(this).info('Starting')
+      await apiServer.listen()
 
       if (config.freshStart) await database.rollbackAll()
       await database.migrateToLatest()
@@ -652,8 +653,6 @@ export class Application {
       await withdrawableAssetMigrator.migrate()
       await stateUpdateWithBatchIdMigrator.migrate()
       await stateUpdater.initTree()
-
-      await apiServer.listen()
 
       if (config.enableSync) {
         transactionStatusService.start()
