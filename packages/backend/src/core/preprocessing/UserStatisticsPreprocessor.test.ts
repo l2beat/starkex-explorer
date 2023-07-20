@@ -5,7 +5,6 @@ import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   StateUpdateRecord,
@@ -95,7 +94,6 @@ describe(UserStatisticsPreprocessor.name, () => {
         const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
           mockPreprocessedUserStatisticsRepository,
           mockPreprocessedAssetHistoryRepository,
-          mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
           mockObject<KeyValueStore>(),
           Logger.SILENT
@@ -182,7 +180,6 @@ describe(UserStatisticsPreprocessor.name, () => {
         const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
           mockPreprocessedUserStatisticsRepository,
           mockObject<PreprocessedAssetHistoryRepository>(),
-          mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
           mockObject<KeyValueStore>(),
           Logger.SILENT

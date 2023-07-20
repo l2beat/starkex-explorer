@@ -35,10 +35,8 @@ interface HomePageProps {
   tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
   totalStateUpdates: number
-  l2Transactions?: {
-    data: PerpetualL2TransactionEntry[]
-    total: number
-  }
+  l2Transactions: PerpetualL2TransactionEntry[]
+  totalL2Transactions: number
   forcedTransactions: TransactionEntry[]
   totalForcedTransactions: number
   offers?: OfferEntry[]
@@ -68,14 +66,14 @@ function HomePage(props: HomePageProps) {
       >
         <div className="flex flex-col gap-8">
           <SearchBar tradingMode={props.context.tradingMode} />
-          {props.l2Transactions && (
+          {props.context.showL2Transactions && (
             <TablePreview
               {...L2_TRANSACTIONS_TABLE_PROPS}
-              visible={props.l2Transactions.data.length}
-              total={props.l2Transactions.total}
+              visible={props.l2Transactions.length}
+              total={props.totalL2Transactions}
             >
               <L2TransactionsTable
-                transactions={props.l2Transactions.data}
+                transactions={props.l2Transactions}
                 context={props.context}
               />
             </TablePreview>

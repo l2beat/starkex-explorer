@@ -51,6 +51,7 @@ import { PerpetualHistoryPreprocessor } from './core/preprocessing/PerpetualHist
 import { Preprocessor } from './core/preprocessing/Preprocessor'
 import { SpotHistoryPreprocessor } from './core/preprocessing/SpotHistoryPreprocessor'
 import { StateDetailsPreprocessor } from './core/preprocessing/StateDetailsPreprocessor'
+import { UserL2TransactionsStatisticsPreprocessor } from './core/preprocessing/UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './core/preprocessing/UserStatisticsPreprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
@@ -71,6 +72,7 @@ import { PositionRepository } from './peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateDetailsRepository } from './peripherals/database/PreprocessedStateDetailsRepository'
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
+import { PreprocessedUserL2TransactionsStatisticsRepository } from './peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { PreprocessedUserStatisticsRepository } from './peripherals/database/PreprocessedUserStatisticsRepository'
 import { Database } from './peripherals/database/shared/Database'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
@@ -87,7 +89,6 @@ import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityG
 import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
-import { shouldShowL2Transactions } from './utils/shouldShowL2Transactions'
 
 export class Application {
   start: () => Promise<void>
@@ -414,6 +415,16 @@ export class Application {
     const preprocessedUserStatisticsRepository =
       new PreprocessedUserStatisticsRepository(database, logger)
 
+    const preprocessedUserL2TransactionsStatisticsRepository =
+      new PreprocessedUserL2TransactionsStatisticsRepository(database, logger)
+
+    const userL2TransactionsPreprocessor =
+      new UserL2TransactionsStatisticsPreprocessor(
+        preprocessedUserL2TransactionsStatisticsRepository,
+        l2TransactionRepository,
+        logger
+      )
+
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
 
@@ -443,13 +454,13 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
+        l2TransactionRepository,
         logger
       )
 
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
         preprocessedUserStatisticsRepository,
         preprocessedAssetHistoryRepository,
-        preprocessedStateUpdateRepository,
         stateUpdateRepository,
         kvStore,
         logger
@@ -462,6 +473,8 @@ export class Application {
         perpetualHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        userL2TransactionsPreprocessor,
+        l2TransactionRepository,
         logger,
         isPreprocessorEnabled
       )
@@ -479,13 +492,13 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
+        l2TransactionRepository,
         logger
       )
 
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
         preprocessedUserStatisticsRepository,
         preprocessedAssetHistoryRepository,
-        preprocessedStateUpdateRepository,
         stateUpdateRepository,
         kvStore,
         logger
@@ -498,6 +511,8 @@ export class Application {
         spotHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        userL2TransactionsPreprocessor,
+        l2TransactionRepository,
         logger,
         isPreprocessorEnabled
       )
@@ -517,7 +532,6 @@ export class Application {
 
     // #endregion core
     // #region api
-    const showL2Transactions = shouldShowL2Transactions(config)
     const homeController = new HomeController(
       pageContextService,
       assetDetailsService,
@@ -525,8 +539,7 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository,
       l2TransactionRepository,
-      preprocessedStateDetailsRepository,
-      showL2Transactions
+      preprocessedStateDetailsRepository
     )
 
     const userController = new UserController(
@@ -541,8 +554,8 @@ export class Application {
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
-      config.starkex.contracts.perpetual,
-      showL2Transactions
+      preprocessedUserL2TransactionsStatisticsRepository,
+      config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,
@@ -551,7 +564,7 @@ export class Application {
       userTransactionRepository,
       l2TransactionRepository,
       preprocessedAssetHistoryRepository,
-      showL2Transactions
+      preprocessedStateDetailsRepository
     )
     const transactionController = new TransactionController(
       pageContextService,
@@ -629,7 +642,6 @@ export class Application {
     this.start = async () => {
       logger.for(this).info('Starting')
 
-      await apiServer.listen()
       if (config.freshStart) await database.rollbackAll()
       await database.migrateToLatest()
       await preprocessor.catchUp()
@@ -640,6 +652,8 @@ export class Application {
       await withdrawableAssetMigrator.migrate()
       await stateUpdateWithBatchIdMigrator.migrate()
       await stateUpdater.initTree()
+
+      await apiServer.listen()
 
       if (config.enableSync) {
         transactionStatusService.start()

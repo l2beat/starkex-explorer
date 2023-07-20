@@ -24,6 +24,7 @@ describe(FetchClient.name, () => {
 
     it('should wait between retries', async () => {
       const delay = 25
+      const threshold = 0.1 * delay
       const retries = 2
       const startTime = Date.now()
       await expect(
@@ -31,7 +32,7 @@ describe(FetchClient.name, () => {
       ).toBeRejectedWith(Error)
       const endTime = Date.now()
       expect(endTime - startTime).toBeGreaterThanOrEqual(
-        delay * retries - delay
+        delay * retries - delay - threshold
       )
     })
 

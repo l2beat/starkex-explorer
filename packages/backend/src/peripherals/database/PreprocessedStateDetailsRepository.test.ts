@@ -4,6 +4,7 @@ import { expect } from 'earl'
 import { Knex } from 'knex'
 
 import { setupDatabaseTestSuite } from '../../test/database'
+import { fakePreprocessedL2TransactionsStatistics } from '../../test/fakes'
 import {
   PreprocessedStateDetailsRecord,
   PreprocessedStateDetailsRepository,
@@ -65,57 +66,215 @@ describe(PreprocessedStateDetailsRepository.name, () => {
     await trx.rollback()
   })
 
-  it('adds preprocessed state update', async () => {
-    await repository.add(genericRecord, trx)
+  describe(PreprocessedStateDetailsRepository.prototype.countAll.name, () => {
+    it('counts all', async () => {
+      for (const stateUpdateId of [1900, 100, 200]) {
+        await repository.add(
+          {
+            ...genericRecord,
+            stateUpdateId,
+          },
+          trx
+        )
+      }
+      expect(await repository.countAll(trx)).toEqual(3)
+    })
   })
 
-  it('counts all', async () => {
-    for (const stateUpdateId of [1900, 100, 200]) {
-      await repository.add(
-        {
+  describe(
+    PreprocessedStateDetailsRepository.prototype.deleteByStateUpdateId.name,
+    () => {
+      it('removes by state update id', async () => {
+        for (const stateUpdateId of [1900, 100, 200]) {
+          await repository.add(
+            {
+              ...genericRecord,
+              stateUpdateId,
+            },
+            trx
+          )
+        }
+
+        await repository.deleteByStateUpdateId(30_003_000, trx)
+        expect(await repository.countAll(trx)).toEqual(3)
+        await repository.deleteByStateUpdateId(1900, trx)
+        expect(await repository.countAll(trx)).toEqual(2)
+        await repository.deleteByStateUpdateId(100, trx)
+        expect(await repository.countAll(trx)).toEqual(1)
+        await repository.deleteByStateUpdateId(200, trx)
+        expect(await repository.countAll(trx)).toEqual(0)
+      })
+    }
+  )
+
+  describe(
+    PreprocessedStateDetailsRepository.prototype
+      .findLastWithL2TransactionsStatistics.name,
+    () => {
+      it('returns undefined when no records', async () => {
+        await repository.add(genericRecord, trx)
+
+        const result = await repository.findLastWithL2TransactionsStatistics(
+          trx
+        )
+
+        expect(result).toEqual(undefined)
+      })
+
+      it('returns most recent record with L2 transaction statistics', async () => {
+        const l2TransactionsStatistics =
+          fakePreprocessedL2TransactionsStatistics()
+        const cumulativeL2TransactionsStatistics =
+          fakePreprocessedL2TransactionsStatistics()
+        const id = await repository.add(
+          {
+            ...genericRecord,
+            stateUpdateId: 100,
+            l2TransactionsStatistics,
+            cumulativeL2TransactionsStatistics,
+          },
+          trx
+        )
+        await repository.add(
+          {
+            ...genericRecord,
+            stateUpdateId: 200,
+          },
+          trx
+        )
+        await repository.add(
+          {
+            ...genericRecord,
+            stateUpdateId: 1900,
+          },
+          trx
+        )
+
+        const result = await repository.findLastWithL2TransactionsStatistics(
+          trx
+        )
+
+        expect(result).toEqual({
           ...genericRecord,
-          stateUpdateId,
-        },
+          id,
+          stateUpdateId: 100,
+          l2TransactionsStatistics,
+          cumulativeL2TransactionsStatistics,
+        })
+      })
+    }
+  )
+
+  describe(
+    PreprocessedStateDetailsRepository.prototype
+      .getAllWithoutL2TransactionStatisticsUpToStateUpdateId.name,
+    () => {
+      it('returns empty array when no records', async () => {
+        const result =
+          await repository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
+            1000,
+            trx
+          )
+
+        expect(result).toEqual([])
+      })
+
+      it('returns all records without L2 transaction statistics up to state update id', async () => {
+        const id1 = await repository.add(
+          { ...genericRecord, stateUpdateId: 100 },
+          trx
+        )
+        const id2 = await repository.add(
+          { ...genericRecord, stateUpdateId: 200 },
+          trx
+        )
+        await repository.add(
+          {
+            ...genericRecord,
+            stateUpdateId: 100,
+            l2TransactionsStatistics:
+              fakePreprocessedL2TransactionsStatistics(),
+          },
+          trx
+        )
+        await repository.add({ ...genericRecord, stateUpdateId: 1900 }, trx)
+
+        const results =
+          await repository.getAllWithoutL2TransactionStatisticsUpToStateUpdateId(
+            1899,
+            trx
+          )
+
+        expect(results).toEqual([
+          {
+            ...genericRecord,
+            stateUpdateId: 100,
+            id: id1,
+            l2TransactionsStatistics: undefined,
+            cumulativeL2TransactionsStatistics: undefined,
+          },
+          {
+            ...genericRecord,
+            stateUpdateId: 200,
+            id: id2,
+            l2TransactionsStatistics: undefined,
+            cumulativeL2TransactionsStatistics: undefined,
+          },
+        ])
+      })
+    }
+  )
+
+  describe(
+    PreprocessedStateDetailsRepository.prototype.getPaginated.name,
+    () => {
+      it('gets paginated', async () => {
+        for (const stateUpdateId of [1900, 100, 200]) {
+          await repository.add(
+            {
+              ...genericRecord,
+              stateUpdateId,
+            },
+            trx
+          )
+        }
+        const result1 = await repository.getPaginated(
+          { offset: 0, limit: 2 },
+          trx
+        )
+        expect(result1.map((r) => r.stateUpdateId)).toEqual([1900, 200])
+        const result2 = await repository.getPaginated(
+          { offset: 2, limit: 2 },
+          trx
+        )
+        expect(result2.map((r) => r.stateUpdateId)).toEqual([100])
+      })
+    }
+  )
+
+  describe(`${PreprocessedStateDetailsRepository.prototype.add.name}, ${PreprocessedStateDetailsRepository.prototype.update.name} and ${PreprocessedStateDetailsRepository.prototype.findById.name}`, () => {
+    it('adds, updates, finds by id and state update id', async () => {
+      const id = await repository.add(genericRecord, trx)
+      const fieldsToUpdate = {
+        l2TransactionsStatistics: fakePreprocessedL2TransactionsStatistics(),
+        cumulativeL2TransactionsStatistics:
+          fakePreprocessedL2TransactionsStatistics(),
+      }
+      const updatedRecord = {
+        ...genericRecord,
+        ...fieldsToUpdate,
+        id,
+      }
+
+      await repository.update(updatedRecord, trx)
+      const recordById = await repository.findById(id, trx)
+      const recordByStateUpdateId = await repository.findByStateUpdateId(
+        updatedRecord.stateUpdateId,
         trx
       )
-    }
-    expect(await repository.countAll(trx)).toEqual(3)
-  })
 
-  it('removes by state update id', async () => {
-    for (const stateUpdateId of [1900, 100, 200]) {
-      await repository.add(
-        {
-          ...genericRecord,
-          stateUpdateId,
-        },
-        trx
-      )
-    }
-
-    await repository.deleteByStateUpdateId(30_003_000, trx)
-    expect(await repository.countAll(trx)).toEqual(3)
-    await repository.deleteByStateUpdateId(1900, trx)
-    expect(await repository.countAll(trx)).toEqual(2)
-    await repository.deleteByStateUpdateId(100, trx)
-    expect(await repository.countAll(trx)).toEqual(1)
-    await repository.deleteByStateUpdateId(200, trx)
-    expect(await repository.countAll(trx)).toEqual(0)
-  })
-
-  it('gets paginated', async () => {
-    for (const stateUpdateId of [1900, 100, 200]) {
-      await repository.add(
-        {
-          ...genericRecord,
-          stateUpdateId,
-        },
-        trx
-      )
-    }
-    const result1 = await repository.getPaginated({ offset: 0, limit: 2 }, trx)
-    expect(result1.map((r) => r.stateUpdateId)).toEqual([1900, 200])
-    const result2 = await repository.getPaginated({ offset: 2, limit: 2 }, trx)
-    expect(result2.map((r) => r.stateUpdateId)).toEqual([100])
+      expect(recordById).toEqual(updatedRecord)
+      expect(recordByStateUpdateId).toEqual(updatedRecord)
+    })
   })
 })
