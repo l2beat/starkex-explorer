@@ -54,6 +54,9 @@ export class L2TransactionRepository extends BaseRepository {
     /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
+    this.getStarkKeysByStateUpdateId = this.wrapGet(
+      this.getStarkKeysByStateUpdateId
+    )
     this.getStatisticsByStateUpdateId = this.wrapAny(
       this.getStatisticsByStateUpdateId
     )
@@ -61,6 +64,9 @@ export class L2TransactionRepository extends BaseRepository {
       this.getStatisticsByStateUpdateIdAndStarkKey
     )
     this.getPaginatedWithoutMulti = this.wrapGet(this.getPaginatedWithoutMulti)
+    this.getPaginatedWithoutMultiByStateUpdateId = this.wrapGet(
+      this.getPaginatedWithoutMultiByStateUpdateId
+    )
     this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
     this.findById = this.wrapFind(this.findById)
     this.findAggregatedByTransactionId = this.wrapFind(
