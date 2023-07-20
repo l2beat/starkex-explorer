@@ -1,11 +1,11 @@
 import { Knex } from 'knex'
 
+import { Logger } from '@l2beat/backend-tools'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { LiveL2TransactionClient } from '../../peripherals/starkware/LiveL2TransactionClient'
 import { PerpetualL2Transaction } from '../../peripherals/starkware/toPerpetualTransactions'
-import { Logger } from '../../tools/Logger'
 import { Clock } from './Clock'
 
 export class LiveL2TransactionDownloader {

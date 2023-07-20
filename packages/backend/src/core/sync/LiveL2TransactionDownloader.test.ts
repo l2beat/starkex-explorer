@@ -1,10 +1,10 @@
 import { StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 import range from 'lodash/range'
 import waitForExpect from 'wait-for-expect'
 
-import { Logger } from '@l2beat/backend-tools'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'

@@ -15,9 +15,9 @@ import {
 import {
   AssetOraclePrice,
   OrderTypeResponse,
+  PerpetualL2Transaction as TransactionSchema,
   SignatureResponse,
   SignedOraclePrice,
-  PerpetualL2Transaction as TransactionSchema,
 } from './schema/PerpetualBatchInfoResponse'
 import { PerpetualLiveL2TransactionResponse } from './schema/PerpetualLiveL2TransactionResponse'
 export interface PerpetualL2Transaction {
