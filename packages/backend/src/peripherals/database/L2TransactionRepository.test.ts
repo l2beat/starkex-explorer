@@ -741,6 +741,276 @@ describe(L2TransactionRepository.name, () => {
     })
   })
 
+  describe(L2TransactionRepository.prototype.getLiveStatistics.name, () => {
+    it('returns zeros if there are no transactions', async () => {
+      const statistics = await repository.getLiveStatistics()
+
+      expect(statistics).toEqual({
+        depositCount: 0,
+        withdrawalToAddressCount: 0,
+        forcedWithdrawalCount: 0,
+        tradeCount: 0,
+        forcedTradeCount: 0,
+        transferCount: 0,
+        conditionalTransferCount: 0,
+        liquidateCount: 0,
+        deleverageCount: 0,
+        fundingTickCount: 0,
+        oraclePricesTickCount: 0,
+        multiTransactionCount: 0,
+        replacedTransactionsCount: 0,
+      })
+    })
+
+    it('returns correct statistics', async () => {
+      await repository.add(genericDepositTransaction)
+      await repository.add({
+        ...genericDepositTransaction,
+        transactionId: 1222,
+        stateUpdateId: undefined,
+      })
+      await repository.add({
+        ...genericMultiTransaction([genericDepositTransaction.data]),
+        transactionId: 1223,
+        stateUpdateId: undefined,
+      })
+      await repository.add({
+        ...genericDepositTransaction,
+        transactionId: 1222,
+        stateUpdateId: undefined,
+      })
+
+      const statistics = await repository.getLiveStatistics()
+
+      expect(statistics).toEqual({
+        depositCount: 3,
+        withdrawalToAddressCount: 0,
+        forcedWithdrawalCount: 0,
+        tradeCount: 0,
+        forcedTradeCount: 0,
+        transferCount: 0,
+        conditionalTransferCount: 0,
+        liquidateCount: 0,
+        deleverageCount: 0,
+        fundingTickCount: 0,
+        oraclePricesTickCount: 0,
+        multiTransactionCount: 1,
+        replacedTransactionsCount: 1,
+      })
+    })
+  })
+
+  describe(
+    L2TransactionRepository.prototype.getLiveStatisticsByStarkKey.name,
+    () => {
+      it('returns zeros if there are no transactions', async () => {
+        await repository.add(genericDepositTransaction)
+        const statistics = await repository.getLiveStatisticsByStarkKey(
+          StarkKey.fake()
+        )
+
+        expect(statistics).toEqual({
+          depositCount: 0,
+          withdrawalToAddressCount: 0,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 0,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          replacedTransactionsCount: 0,
+        })
+      })
+
+      it('returns correct statistics', async () => {
+        await repository.add(genericDepositTransaction)
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 1292,
+          stateUpdateId: undefined,
+          data: {
+            ...genericDepositTransaction.data,
+            starkKey: StarkKey.fake(),
+          },
+        })
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 1222,
+          stateUpdateId: undefined,
+        })
+        await repository.add({
+          ...genericMultiTransaction([genericDepositTransaction.data]),
+          transactionId: 1223,
+          stateUpdateId: undefined,
+        })
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 1222,
+          stateUpdateId: undefined,
+        })
+
+        const statistics = await repository.getLiveStatisticsByStarkKey(
+          genericDepositTransaction.data.starkKey
+        )
+
+        expect(statistics).toEqual({
+          depositCount: 3,
+          withdrawalToAddressCount: 0,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 0,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          replacedTransactionsCount: 1,
+        })
+      })
+    }
+  )
+
+  describe(
+    L2TransactionRepository.prototype.getStatisticsByStateUpdateId.name,
+    () => {
+      it('returns zeros if there are no transactions', async () => {
+        await repository.add({ ...genericDepositTransaction, stateUpdateId: 1 })
+        const statistics = await repository.getStatisticsByStateUpdateId(2)
+
+        expect(statistics).toEqual({
+          depositCount: 0,
+          withdrawalToAddressCount: 0,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 0,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          multiTransactionCount: 0,
+          replacedTransactionsCount: 0,
+        })
+      })
+
+      it('returns correct statistics', async () => {
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 1199,
+          stateUpdateId: 1,
+        })
+        await repository.add({ ...genericDepositTransaction, stateUpdateId: 2 })
+        await repository.add({ ...genericDepositTransaction, stateUpdateId: 2 })
+        await repository.add({
+          ...genericMultiTransaction([genericDepositTransaction.data]),
+          stateUpdateId: 2,
+        })
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 2000,
+          stateUpdateId: 2,
+        })
+
+        const statistics = await repository.getStatisticsByStateUpdateId(2)
+
+        expect(statistics).toEqual({
+          depositCount: 4,
+          withdrawalToAddressCount: 0,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 0,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          multiTransactionCount: 1,
+          replacedTransactionsCount: 1,
+        })
+      })
+    }
+  )
+
+  describe(
+    L2TransactionRepository.prototype.getStatisticsByStateUpdateIdAndStarkKey
+      .name,
+    () => {
+      it('returns 0 if there are no transactions', async () => {
+        await repository.add({ ...genericDepositTransaction, stateUpdateId: 1 })
+        const statistics =
+          await repository.getStatisticsByStateUpdateIdAndStarkKey(
+            2,
+            StarkKey.fake()
+          )
+
+        expect(statistics).toEqual({
+          depositCount: 0,
+          withdrawalToAddressCount: 0,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 0,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          replacedTransactionsCount: 0,
+        })
+      })
+
+      it('returns correct statistics', async () => {
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 1199,
+          stateUpdateId: 1,
+          data: {
+            ...genericDepositTransaction.data,
+            starkKey: StarkKey.fake(),
+          },
+        })
+        await repository.add({ ...genericDepositTransaction, stateUpdateId: 2 })
+        await repository.add({ ...genericDepositTransaction, stateUpdateId: 2 })
+        await repository.add({
+          ...genericMultiTransaction([genericDepositTransaction.data]),
+          stateUpdateId: 2,
+        })
+        await repository.add({
+          ...genericDepositTransaction,
+          transactionId: 2000,
+          stateUpdateId: 2,
+        })
+
+        const statistics =
+          await repository.getStatisticsByStateUpdateIdAndStarkKey(
+            2,
+            genericDepositTransaction.data.starkKey
+          )
+
+        expect(statistics).toEqual({
+          depositCount: 4,
+          withdrawalToAddressCount: 0,
+          forcedWithdrawalCount: 0,
+          tradeCount: 0,
+          forcedTradeCount: 0,
+          transferCount: 0,
+          conditionalTransferCount: 0,
+          liquidateCount: 0,
+          deleverageCount: 0,
+          fundingTickCount: 0,
+          oraclePricesTickCount: 0,
+          replacedTransactionsCount: 1,
+        })
+      })
+    }
+  )
+
   describe(L2TransactionRepository.prototype.deleteAfterBlock.name, () => {
     it('deletes transactions after a block', async () => {
       const record = {

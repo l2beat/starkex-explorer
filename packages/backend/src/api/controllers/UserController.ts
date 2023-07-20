@@ -129,6 +129,7 @@ export class UserController {
       history,
       l2Transactions,
       preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
@@ -155,6 +156,7 @@ export class UserController {
       this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
         starkKey
       ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
@@ -214,14 +216,16 @@ export class UserController {
         starkKey
       )
 
+    const totalL2Transactions = sumUpTransactionCount(
+      preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
+    ) + sumUpTransactionCount(liveL2TransactionStatistics)
+
     const content = renderUserPage({
       context,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions: sumUpTransactionCount(
-        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-      ),
+      totalL2Transactions,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId:
@@ -318,7 +322,7 @@ export class UserController {
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const [l2Transactions, preprocessedUserL2TransactionsStatistics] =
+    const [l2Transactions, preprocessedUserL2TransactionsStatistics, liveL2TransactionStatistics] =
       await Promise.all([
         this.l2TransactionRepository.getUserSpecificPaginated(
           starkKey,
@@ -327,15 +331,18 @@ export class UserController {
         this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
           starkKey
         ),
+        this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
       ])
+
+    const totalL2Transactions = sumUpTransactionCount(
+      preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
+    ) + sumUpTransactionCount(liveL2TransactionStatistics)
 
     const content = renderUserL2TransactionsPage({
       context,
       starkKey,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      total: sumUpTransactionCount(
-        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-      ),
+      total: totalL2Transactions,
       ...pagination,
     })
     return { type: 'success', content }

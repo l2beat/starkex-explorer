@@ -245,6 +245,64 @@ export class L2TransactionRepository extends BaseRepository {
     return uniqStarkKeys.map((starkKey) => StarkKey(starkKey))
   }
 
+  async getLiveStatistics(): Promise<PreprocessedL2TransactionsStatistics> {
+    const knex = await this.knex()
+
+    const countGroupedByType = (await knex('l2_transactions')
+      .select('type')
+      .whereNull('state_update_id')
+      .count()
+      .groupBy('type')) as {
+      type: PerpetualL2TransactionData['type']
+      count: number
+    }[]
+
+    const [replaced] = await knex('l2_transactions')
+      .whereNull('state_update_id')
+      .andWhere({ state: 'replaced' })
+      .count()
+
+    return toPreprocessedL2TransactionsStatistics(
+      countGroupedByType,
+      Number(replaced?.count ?? 0)
+    )
+  }
+
+  async getLiveStatisticsByStarkKey(
+    starkKey: StarkKey
+  ): Promise<PreprocessedUserL2TransactionsStatistics> {
+    const knex = await this.knex()
+
+    const countGroupedByType = (await knex('l2_transactions')
+      .select('type')
+      .whereNull('state_update_id')
+      .andWhere((qB) =>
+        qB
+          .where({ stark_key_a: starkKey.toString() })
+          .orWhere({ stark_key_b: starkKey.toString() })
+      )
+      .count()
+      .groupBy('type')) as {
+      type: Exclude<PerpetualL2TransactionData['type'], 'MultiTransaction'>
+      count: number
+    }[]
+
+    const [replaced] = await knex('l2_transactions')
+      .whereNull('state_update_id')
+      .andWhere({ state: 'replaced' })
+      .andWhere((qB) =>
+        qB
+          .where({ stark_key_a: starkKey.toString() })
+          .orWhere({ stark_key_b: starkKey.toString() })
+      )
+      .count()
+
+    return toPreprocessedUserL2TransactionsStatistics(
+      countGroupedByType,
+      Number(replaced?.count ?? 0)
+    )
+  }
+
   async getStatisticsByStateUpdateId(
     stateUpdateId: number,
     trx?: Knex.Transaction
