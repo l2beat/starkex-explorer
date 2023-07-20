@@ -399,8 +399,10 @@ export class L2TransactionRepository extends BaseRepository {
     return row ? toRecord(row) : undefined
   }
 
-  async findLatestStateUpdateId(): Promise<number | undefined> {
-    const knex = await this.knex()
+  async findLatestStateUpdateId(
+    trx?: Knex.Transaction
+  ): Promise<number | undefined> {
+    const knex = await this.knex(trx)
     const results = await knex('l2_transactions')
       .select('state_update_id')
       .whereNotNull('state_update_id')
