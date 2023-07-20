@@ -1,5 +1,4 @@
 import { StarkKey } from '@explorer/types'
-import { randomInt } from 'crypto'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 import range from 'lodash/range'
@@ -17,13 +16,13 @@ import { LiveL2TransactionDownloader } from './LiveL2TransactionDownloader'
 const fakeL2Transaction = (
   transaction?: Partial<PerpetualL2Transaction>
 ): PerpetualL2Transaction => ({
-  thirdPartyId: randomInt(100000),
-  transactionId: randomInt(100000),
+  thirdPartyId: 1024,
+  transactionId: 2048,
   transaction: {
     type: 'Deposit',
-    positionId: BigInt(randomInt(100000)),
+    positionId: 4096n,
     starkKey: StarkKey.fake(),
-    amount: BigInt(randomInt(100000)),
+    amount: 8196n,
   },
   ...transaction,
 })
