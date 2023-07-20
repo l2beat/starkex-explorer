@@ -1,4 +1,5 @@
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
@@ -9,7 +10,6 @@ import {
 } from '../../peripherals/database/StateUpdateRepository'
 import { FeederGatewayClient } from '../../peripherals/starkware/FeederGatewayClient'
 import { PerpetualBatchInfo } from '../../peripherals/starkware/toPerpetualBatchInfo'
-import { Logger } from '../../tools/Logger'
 import { FeederGatewayCollector } from './FeederGatewayCollector'
 
 describe(FeederGatewayCollector.name, () => {

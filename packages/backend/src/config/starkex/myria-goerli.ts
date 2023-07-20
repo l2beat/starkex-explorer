@@ -1,30 +1,30 @@
 import { EthereumAddress } from '@explorer/types'
+import { Env } from '@l2beat/backend-tools'
 
-import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
 
-export function getMyriaGoerliConfig(): StarkexConfig {
+export function getMyriaGoerliConfig(env: Env): StarkexConfig {
   return {
     instanceName: 'Myria',
     dataAvailabilityMode: 'validium',
     tradingMode: 'spot',
     blockchain: {
       chainId: 5,
-      jsonRpcUrl: getEnv('JSON_RPC_URL'),
+      jsonRpcUrl: env.string('JSON_RPC_URL'),
       safeBlockDistance: 40,
-      syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
+      syncBatchSize: env.integer('SYNC_BATCH_SIZE', 6_000),
       minBlockNumber: 6948455,
-      maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
+      maxBlockNumber: env.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     availabilityGateway: {
       getUrl: (batchId: number) => {
-        return `${getEnv('MYRIA_AG_URL')}?batch_id=${batchId}`
+        return `${env.string('MYRIA_AG_URL')}?batch_id=${batchId}`
       },
       auth: {
         type: 'certificates',
-        serverCertificate: getEnv('MYRIA_AG_SERVER_CERTIFICATE'),
-        userCertificate: getEnv('MYRIA_AG_USER_CERTIFICATE'),
-        userKey: getEnv('MYRIA_AG_USER_KEY'),
+        serverCertificate: env.string('MYRIA_AG_SERVER_CERTIFICATE'),
+        userCertificate: env.string('MYRIA_AG_USER_CERTIFICATE'),
+        userKey: env.string('MYRIA_AG_USER_KEY'),
       },
     },
     contracts: {

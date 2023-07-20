@@ -1,7 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { BlockRange } from '../../model'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 import { IStateTransitionCollector } from '../IStateTransitionCollector'
 
 export class StateUpdateWithBatchIdMigrator {

@@ -1,9 +1,9 @@
 import { stringAsBoolean, stringAsInt } from '@explorer/shared'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { KeyValueRow } from 'knex/types/tables'
 import { z } from 'zod'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 

@@ -6,10 +6,10 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../../test/database'
-import { Logger } from '../../../tools/Logger'
 import {
   ForcedTradeData,
   ForcedWithdrawalData,

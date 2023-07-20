@@ -27,7 +27,9 @@ export class L2TransactionController {
       return { type: 'not found' }
     }
     const aggregatedL2Transaction =
-      await this.l2TransactionRepository.findByTransactionId(transactionId)
+      await this.l2TransactionRepository.findAggregatedByTransactionId(
+        transactionId
+      )
 
     if (!aggregatedL2Transaction) {
       return {

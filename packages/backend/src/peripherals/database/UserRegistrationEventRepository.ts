@@ -1,7 +1,7 @@
 import { EthereumAddress, StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { UserRegistrationEventRow } from 'knex/types/tables'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 

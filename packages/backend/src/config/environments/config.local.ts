@@ -1,24 +1,22 @@
-import { config as dotenv } from 'dotenv'
+import { Env, LoggerOptions } from '@l2beat/backend-tools'
 
-import { LogLevel } from '../../tools/Logger'
 import { Config } from '../Config'
-import { getEnv } from '../getEnv'
 import { getStarkexConfig } from '../starkex'
 
-export function getLocalConfig(): Config {
-  dotenv()
+export function getLocalConfig(env: Env): Config {
   return {
     name: 'StarkexExplorer/Local',
     logger: {
-      logLevel: getEnv.integer('LOG_LEVEL', LogLevel.INFO),
+      logLevel: env.string('LOG_LEVEL', 'INFO') as LoggerOptions['logLevel'],
       format: 'pretty',
+      colors: true,
     },
-    port: getEnv.integer('PORT', 3000),
-    databaseConnection: getEnv('LOCAL_DB_URL'),
+    port: env.integer('PORT', 3000),
+    databaseConnection: env.string('LOCAL_DB_URL'),
     enableSync: true,
-    enablePreprocessing: getEnv.boolean('ENABLE_PREPROCESSING', true),
-    freshStart: getEnv.boolean('FRESH_START', false),
+    enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
+    freshStart: env.boolean('FRESH_START', false),
     forceHttps: false,
-    starkex: getStarkexConfig(getEnv('STARKEX_INSTANCE')),
+    starkex: getStarkexConfig(env),
   }
 }

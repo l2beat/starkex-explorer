@@ -1,7 +1,7 @@
 import Router from '@koa/router'
+import { Logger } from '@l2beat/backend-tools'
 import Koa, { Context, Middleware } from 'koa'
 
-import { Logger } from '../tools/Logger'
 import { createApiLogger } from './ApiLogger'
 import { forceHerokuHttps } from './middleware/forceHttps'
 

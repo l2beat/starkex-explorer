@@ -1,16 +1,15 @@
 import { Hash256, PedersenHash, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {
@@ -95,7 +94,6 @@ describe(UserStatisticsPreprocessor.name, () => {
         const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
           mockPreprocessedUserStatisticsRepository,
           mockPreprocessedAssetHistoryRepository,
-          mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
           mockObject<KeyValueStore>(),
           Logger.SILENT
@@ -182,7 +180,6 @@ describe(UserStatisticsPreprocessor.name, () => {
         const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
           mockPreprocessedUserStatisticsRepository,
           mockObject<PreprocessedAssetHistoryRepository>(),
-          mockObject<PreprocessedStateUpdateRepository>(),
           mockObject<StateUpdateRepository>(),
           mockObject<KeyValueStore>(),
           Logger.SILENT

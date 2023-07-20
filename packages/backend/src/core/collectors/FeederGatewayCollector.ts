@@ -1,7 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
 import { FeederGatewayClient } from '../../peripherals/starkware/FeederGatewayClient'
-import { Logger } from '../../tools/Logger'
 
 export class FeederGatewayCollector {
   constructor(

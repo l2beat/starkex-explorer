@@ -7,6 +7,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockObject } from 'earl'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
@@ -17,7 +18,6 @@ import {
   UserTransactionRepository,
 } from '../peripherals/database/transactions/UserTransactionRepository'
 import type { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
 
 const EMPTY_STATE_HASH = PedersenHash(

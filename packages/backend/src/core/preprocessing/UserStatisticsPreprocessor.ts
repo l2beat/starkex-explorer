@@ -1,26 +1,24 @@
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
-import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import { PreprocessedUserStatisticsRepository } from '../../peripherals/database/PreprocessedUserStatisticsRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 
 export class UserStatisticsPreprocessor {
   constructor(
-    private preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
-    private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
-    private preprocessedStateUpdateRepository: PreprocessedStateUpdateRepository,
-    private stateUpdateRepository: StateUpdateRepository,
+    private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
+    private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    private readonly stateUpdateRepository: StateUpdateRepository,
     private readonly kvStore: KeyValueStore,
-    protected logger: Logger
+    private readonly logger: Logger
   ) {}
 
-  async catchUp(trx: Knex.Transaction) {
+  async catchUp(trx: Knex.Transaction, lastProcessedStateUpdateId: number) {
     const kvKey = 'userStatisticsPreprocessorCaughtUp'
     const isCaughtUp = await this.kvStore.findByKey(kvKey, trx)
     if (isCaughtUp) {
@@ -29,12 +27,10 @@ export class UserStatisticsPreprocessor {
     this.logger.info('Catching up UserStatisticsPreprocessor...')
 
     await this.preprocessedUserStatisticsRepository.deleteAll(trx)
-    const lastProcessedStateUpdate =
-      await this.preprocessedStateUpdateRepository.findLast(trx)
 
     for (
       let stateUpdateId = 1;
-      stateUpdateId <= (lastProcessedStateUpdate?.stateUpdateId ?? 0);
+      stateUpdateId <= lastProcessedStateUpdateId;
       stateUpdateId++
     ) {
       const stateUpdate = await this.stateUpdateRepository.findById(

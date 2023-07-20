@@ -1,9 +1,9 @@
 import Router from '@koa/router'
+import { Logger } from '@l2beat/backend-tools'
 import { Middleware } from 'koa'
 import { agent } from 'supertest'
 
 import { ApiServer } from '../api/ApiServer'
-import { Logger } from '../tools/Logger'
 
 export function createTestApiServer(
   routers: Router[],

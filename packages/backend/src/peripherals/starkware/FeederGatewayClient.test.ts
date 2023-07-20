@@ -1,8 +1,8 @@
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 
 import { GatewayConfig } from '../../config/starkex/StarkexConfig'
 import { EXAMPLE_PERPETUAL_BATCH_INFO } from '../../test/starkwareData'
-import { Logger } from '../../tools/Logger'
 import { FeederGatewayClient } from './FeederGatewayClient'
 import { FetchClient } from './FetchClient'
 import { PerpetualBatchInfoResponse } from './schema/PerpetualBatchInfoResponse'

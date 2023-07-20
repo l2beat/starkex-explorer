@@ -1,12 +1,12 @@
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
+import { Env } from '@l2beat/backend-tools'
 
-import { getEnv } from '../getEnv'
 import { ClientAuth, StarkexConfig } from './StarkexConfig'
 
-export function getApexMainnetConfig(): StarkexConfig {
+export function getApexMainnetConfig(env: Env): StarkexConfig {
   const clientAuth: ClientAuth = {
     type: 'bearerToken',
-    bearerToken: getEnv('APEX_BEARER_TOKEN'),
+    bearerToken: env.string('APEX_BEARER_TOKEN'),
   }
 
   return {
@@ -15,35 +15,37 @@ export function getApexMainnetConfig(): StarkexConfig {
     tradingMode: 'perpetual',
     blockchain: {
       chainId: 1,
-      jsonRpcUrl: getEnv('JSON_RPC_URL'),
+      jsonRpcUrl: env.string('JSON_RPC_URL'),
       safeBlockDistance: 40,
-      syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
+      syncBatchSize: env.integer('SYNC_BATCH_SIZE', 6_000),
       minBlockNumber: 15322966,
-      maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
+      maxBlockNumber: env.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     contracts: {
       perpetual: EthereumAddress('0xA1D5443F2FB80A5A55ac804C948B45ce4C52DCbb'),
     },
     availabilityGateway: {
       getUrl: (batchId: number) => {
-        return `${getEnv('APEX_AG_URL')}?batchId=${batchId}`
+        return `${env.string('APEX_AG_URL')}?batchId=${batchId}`
       },
       auth: clientAuth,
     },
     feederGateway: {
       getUrl: (batchId: number) => {
-        return `${getEnv('APEX_FG_URL')}?batchId=${batchId}`
+        return `${env.string('APEX_FG_URL')}?batchId=${batchId}`
       },
       auth: clientAuth,
     },
     l2TransactionApi: {
       getTransactionsUrl: (startId, expectCount) => {
-        return `${getEnv(
+        return `${env.string(
           'APEX_TRANSACTION_API_URL'
         )}?startApexId=${startId}&expectCount=${expectCount}`
       },
       getThirdPartyIdByTransactionIdUrl: (transactionId) => {
-        return `${getEnv('APEX_THIRD_PARTY_ID_API_URL')}?txId=${transactionId}`
+        return `${env.string(
+          'APEX_THIRD_PARTY_ID_API_URL'
+        )}?txId=${transactionId}`
       },
       auth: clientAuth,
     },

@@ -1,14 +1,17 @@
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
+import { Knex } from 'knex'
 
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
+import { UserL2TransactionsStatisticsPreprocessor } from './UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 export type SyncDirection = 'forward' | 'backward' | 'stop'
@@ -21,6 +24,8 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private historyPreprocessor: HistoryPreprocessor<T>,
     private stateDetailsPreprocessor: StateDetailsPreprocessor,
     private userStatisticsPreprocessor: UserStatisticsPreprocessor,
+    private userL2TransactionsPreprocessor: UserL2TransactionsStatisticsPreprocessor,
+    private l2TransactionRepository: L2TransactionRepository,
     private logger: Logger,
     private isEnabled: boolean = true
   ) {
@@ -115,7 +120,24 @@ export class Preprocessor<T extends AssetHash | AssetId> {
   async catchUp() {
     await this.preprocessedStateUpdateRepository.runInTransaction(
       async (trx) => {
-        await this.userStatisticsPreprocessor.catchUp(trx)
+        const lastProcessedStateUpdate =
+          await this.preprocessedStateUpdateRepository.findLast(trx)
+        if (!lastProcessedStateUpdate) {
+          return
+        }
+
+        await this.userStatisticsPreprocessor.catchUp(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
+        await this.stateDetailsPreprocessor.catchUpL2Transactions(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
+        await this.userL2TransactionsPreprocessor.catchUp(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
       }
     )
   }
@@ -165,6 +187,24 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           nextStateUpdate
         )
 
+        // We cannot assume that Feeder and Availability Gateway are in sync
+        // with the state updates. We need to catch up with L2 transactions
+        // after each state update to make sure it is preprocessed as far as possible.
+        const preprocessL2TransactionTo =
+          await this.getStateUpdateIdToCatchUpL2TransactionsTo(
+            trx,
+            nextStateUpdate.id
+          )
+
+        await this.stateDetailsPreprocessor.catchUpL2Transactions(
+          trx,
+          preprocessL2TransactionTo
+        )
+        await this.userL2TransactionsPreprocessor.catchUp(
+          trx,
+          preprocessL2TransactionTo
+        )
+
         // END TRANSACTION
       }
     )
@@ -205,9 +245,24 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           lastProcessedStateUpdate.stateUpdateId,
           trx
         )
-
+        await this.userL2TransactionsPreprocessor.rollbackOneStateUpdate(
+          trx,
+          lastProcessedStateUpdate.stateUpdateId
+        )
         // END TRANSACTION
       }
     )
+  }
+
+  async getStateUpdateIdToCatchUpL2TransactionsTo(
+    trx: Knex.Transaction,
+    processedStateUpdateId: number
+  ) {
+    const lastL2TransactionStateUpdateId =
+      await this.l2TransactionRepository.findLatestStateUpdateId(trx)
+
+    return lastL2TransactionStateUpdateId
+      ? Math.min(lastL2TransactionStateUpdateId, processedStateUpdateId)
+      : processedStateUpdateId
   }
 }

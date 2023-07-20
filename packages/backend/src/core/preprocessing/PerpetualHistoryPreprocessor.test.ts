@@ -5,6 +5,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
@@ -19,7 +20,6 @@ import {
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
 import { fakeCollateralAsset } from '../../test/fakes'
-import { Logger } from '../../tools/Logger'
 import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
 
 const stateUpdate: StateUpdateRecord = {

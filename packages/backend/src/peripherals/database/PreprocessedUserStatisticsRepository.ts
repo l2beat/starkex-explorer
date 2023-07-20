@@ -1,8 +1,8 @@
 import { StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { PreprocessedUserStatisticsRow } from 'knex/types/tables'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -25,6 +25,7 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
 
     this.add = this.wrapAdd(this.add)
     this.findCurrentByStarkKey = this.wrapFind(this.findCurrentByStarkKey)
+    this.update = this.wrapUpdate(this.update)
     this.deleteByStateUpdateId = this.wrapDelete(this.deleteByStateUpdateId)
     this.deleteAll = this.wrapDelete(this.deleteAll)
 
@@ -50,7 +51,20 @@ export class PreprocessedUserStatisticsRepository extends BaseRepository {
       .orderBy('state_update_id', 'desc')
       .first()
 
-    if (row) return toPreprocessedUserStatisticsRecord(row)
+    return row ? toPreprocessedUserStatisticsRecord(row) : undefined
+  }
+
+  async update(
+    record: Pick<PreprocessedUserStatisticsRecord, 'id'> &
+      Partial<PreprocessedUserStatisticsRecord>,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const row = toPartialPreprocessedUserStatisticsRecord(record)
+
+    return await knex('preprocessed_user_statistics')
+      .where({ id: record.id })
+      .update(row)
   }
 
   async deleteByStateUpdateId(stateUpdateId: number, trx: Knex.Transaction) {
@@ -78,6 +92,25 @@ function toPreprocessedUserStatisticsRecord(
     balanceChangeCount: row.balance_change_count,
     starkKey: StarkKey(row.stark_key),
     prevHistoryId: row.prev_history_id ?? undefined,
+  }
+}
+
+function toPartialPreprocessedUserStatisticsRecord(
+  record: Pick<PreprocessedUserStatisticsRecord, 'id'> &
+    Partial<PreprocessedUserStatisticsRecord>
+): Pick<PreprocessedUserStatisticsRow, 'id'> &
+  Partial<PreprocessedUserStatisticsRow> {
+  return {
+    id: record.id,
+    state_update_id: record.stateUpdateId,
+    block_number: record.blockNumber,
+    timestamp: record.timestamp
+      ? BigInt(record.timestamp.toString())
+      : undefined,
+    stark_key: record.starkKey?.toString(),
+    asset_count: record.assetCount,
+    balance_change_count: record.balanceChangeCount,
+    prev_history_id: record.prevHistoryId ?? null,
   }
 }
 

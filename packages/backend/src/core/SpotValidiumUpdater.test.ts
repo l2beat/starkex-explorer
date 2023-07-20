@@ -6,6 +6,7 @@ import {
 } from '@explorer/encoding'
 import { InMemoryMerkleStorage, MerkleTree, VaultLeaf } from '@explorer/state'
 import { AssetHash, Hash256, PedersenHash, StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
@@ -13,7 +14,6 @@ import { StateUpdateRepository } from '../peripherals/database/StateUpdateReposi
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { SpotBatch } from '../peripherals/starkware/toSpotBatchData'
-import { Logger } from '../tools/Logger'
 import { EMPTY_STATE_HASH, SpotValidiumUpdater } from './SpotValidiumUpdater'
 
 describe(SpotValidiumUpdater.name, () => {
