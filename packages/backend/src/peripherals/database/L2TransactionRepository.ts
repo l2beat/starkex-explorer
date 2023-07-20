@@ -73,6 +73,10 @@ export class L2TransactionRepository extends BaseRepository {
       this.findAggregatedByTransactionId
     )
     this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
+    this.findOldestByTransactionId = this.wrapFind(
+      this.findOldestByTransactionId
+    )
+    this.findLatestIncluded = this.wrapFind(this.findLatestIncluded)
     this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
     this.deleteByTransactionIds = this.wrapDelete(this.deleteByTransactionIds)
     this.deleteAll = this.wrapDelete(this.deleteAll)

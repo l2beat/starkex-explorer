@@ -691,6 +691,56 @@ describe(L2TransactionRepository.name, () => {
     }
   )
 
+  describe(
+    L2TransactionRepository.prototype.findOldestByTransactionId.name,
+    () => {
+      it('returns undefined if there are no transactions', async () => {
+        const transaction = await repository.findOldestByTransactionId(1234)
+
+        expect(transaction).toBeNullish()
+      })
+
+      it('returns the oldest transaction', async () => {
+        const id = await repository.add(genericDepositTransaction)
+        await repository.add({
+          ...genericDepositTransaction,
+          data: { ...genericDepositTransaction.data, amount: 1000n },
+        })
+
+        const transaction = await repository.findOldestByTransactionId(
+          genericDepositTransaction.transactionId
+        )
+
+        expect(transaction?.id).toEqual(id)
+      })
+    }
+  )
+
+  describe(L2TransactionRepository.prototype.findLatestIncluded.name, () => {
+    it('returns undefined if there are no included transactions', async () => {
+      await repository.add({
+        ...genericDepositTransaction,
+        stateUpdateId: undefined,
+      })
+
+      const transaction = await repository.findLatestIncluded()
+
+      expect(transaction).toBeNullish()
+    })
+
+    it('returns the latest included transaction', async () => {
+      const id = await repository.add(genericWithdrawalToAddressTransaction)
+      await repository.add({
+        ...genericDepositTransaction,
+        stateUpdateId: undefined,
+      })
+
+      const transaction = await repository.findLatestIncluded()
+
+      expect(transaction?.id).toEqual(id)
+    })
+  })
+
   describe(L2TransactionRepository.prototype.deleteAfterBlock.name, () => {
     it('deletes transactions after a block', async () => {
       const record = {
