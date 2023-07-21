@@ -224,8 +224,42 @@ export class Application {
       | PerpetualRollupUpdater
     let stateTransitionCollector: IStateTransitionCollector
 
-    let feederGatewayCollector: FeederGatewayCollector | undefined
-    let l2TransactionDownloader: LiveL2TransactionDownloader | undefined
+    const feederGatewayClient = config.starkex.enableL2Transactions
+      ? new FeederGatewayClient(
+          config.starkex.feederGateway,
+          fetchClient,
+          logger
+        )
+      : undefined
+
+    const feederGatewayCollector = feederGatewayClient
+      ? new FeederGatewayCollector(
+          feederGatewayClient,
+          l2TransactionRepository,
+          stateUpdateRepository,
+          logger,
+          config.starkex.enableL2Transactions
+        )
+      : undefined
+
+    const liveL2TransactionClient =
+      config.starkex.enableL2Transactions && config.starkex.l2TransactionApi
+        ? new LiveL2TransactionClient(
+            config.starkex.l2TransactionApi,
+            fetchClient
+          )
+        : undefined
+
+    const liveL2TransactionDownloader = liveL2TransactionClient
+      ? new LiveL2TransactionDownloader(
+          liveL2TransactionClient,
+          l2TransactionRepository,
+          stateUpdateRepository,
+          kvStore,
+          clock,
+          logger
+        )
+      : undefined
 
     if (config.starkex.dataAvailabilityMode === 'validium') {
       const availabilityGatewayClient = new AvailabilityGatewayClient(
@@ -241,40 +275,6 @@ export class Application {
             config.starkex.contracts.perpetual
           )
         stateTransitionCollector = perpetualValidiumStateTransitionCollector
-
-        const l2TransactionClient = config.starkex.l2TransactionApi
-          ? new LiveL2TransactionClient(
-              config.starkex.l2TransactionApi,
-              fetchClient
-            )
-          : undefined
-
-        l2TransactionDownloader = l2TransactionClient
-          ? new LiveL2TransactionDownloader(
-              l2TransactionClient,
-              l2TransactionRepository,
-              stateUpdateRepository,
-              kvStore,
-              clock,
-              logger
-            )
-          : undefined
-
-        const feederGatewayClient = config.starkex.feederGateway
-          ? new FeederGatewayClient(
-              config.starkex.feederGateway,
-              fetchClient,
-              logger
-            )
-          : undefined
-        feederGatewayCollector = feederGatewayClient
-          ? new FeederGatewayCollector(
-              feederGatewayClient,
-              l2TransactionRepository,
-              stateUpdateRepository,
-              logger
-            )
-          : undefined
 
         const perpetualCairoOutputCollector = new PerpetualCairoOutputCollector(
           ethereumClient,
@@ -303,7 +303,7 @@ export class Application {
           perpetualValidiumUpdater,
           withdrawalAllowedCollector,
           feederGatewayCollector,
-          l2TransactionDownloader,
+          liveL2TransactionDownloader,
           logger
         )
       } else {
@@ -682,7 +682,7 @@ export class Application {
       if (config.enableSync) {
         transactionStatusService.start()
         await syncScheduler.start()
-        await l2TransactionDownloader?.start()
+        await liveL2TransactionDownloader?.start()
         await blockDownloader.start()
       }
 

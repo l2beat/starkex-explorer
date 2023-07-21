@@ -30,6 +30,7 @@ export function getApexGoerliConfig(env: Env): StarkexConfig {
       },
       auth: clientAuth,
     },
+    enableL2Transactions: true,
     feederGateway: {
       getUrl: (batchId: number) => {
         return `${env.string('APEX_FG_URL')}?batchId=${batchId}`

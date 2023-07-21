@@ -27,6 +27,7 @@ export function getMyriaGoerliConfig(env: Env): StarkexConfig {
         userKey: env.string('MYRIA_AG_USER_KEY'),
       },
     },
+    enableL2Transactions: false,
     contracts: {
       perpetual: EthereumAddress('0xF82C423a30E317f34f9b0997627F2F9c5d239Ad9'),
     },

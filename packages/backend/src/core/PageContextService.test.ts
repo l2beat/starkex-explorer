@@ -45,7 +45,7 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'perpetual',
-        showL2Transactions: false,
+        showL2Transactions: perpetualConfig.starkex.enableL2Transactions,
         chainId: 1,
         instanceName: perpetualConfig.starkex.instanceName,
         collateralAsset: fakeCollateralAsset,
@@ -70,7 +70,7 @@ describe(PageContextService.name, () => {
       expect(context).toEqual({
         user: undefined,
         tradingMode: 'spot',
-        showL2Transactions: false,
+        showL2Transactions: spotConfig.starkex.enableL2Transactions,
         chainId: 5,
         instanceName: spotConfig.starkex.instanceName,
       })

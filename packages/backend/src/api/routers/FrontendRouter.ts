@@ -4,7 +4,6 @@ import Router from '@koa/router'
 import * as z from 'zod'
 
 import { Config } from '../../config'
-import { shouldShowL2Transactions } from '../../utils/shouldShowL2Transactions'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'
@@ -367,7 +366,7 @@ export function createFrontendRouter(
     )
   )
 
-  if (shouldShowL2Transactions(config)) {
+  if (config.starkex.enableL2Transactions) {
     router.get(
       '/l2-transactions',
       withTypedContext(

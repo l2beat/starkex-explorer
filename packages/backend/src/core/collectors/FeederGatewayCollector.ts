@@ -9,10 +9,13 @@ export class FeederGatewayCollector {
     private readonly feederGatewayClient: FeederGatewayClient,
     private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly stateUpdateRepository: StateUpdateRepository,
-    private readonly logger: Logger
+    private readonly logger: Logger,
+    private readonly l2TransactionsEnabled: boolean
   ) {}
 
   async collect() {
+    if (!this.l2TransactionsEnabled) return
+
     const latestStateUpdate = await this.stateUpdateRepository.findLast()
     if (!latestStateUpdate) return
 
