@@ -216,9 +216,10 @@ export class UserController {
         starkKey
       )
 
-    const totalL2Transactions = sumUpTransactionCount(
-      preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-    ) + sumUpTransactionCount(liveL2TransactionStatistics)
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
+      ) + sumUpTransactionCount(liveL2TransactionStatistics)
 
     const content = renderUserPage({
       context,
@@ -322,21 +323,25 @@ export class UserController {
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const [l2Transactions, preprocessedUserL2TransactionsStatistics, liveL2TransactionStatistics] =
-      await Promise.all([
-        this.l2TransactionRepository.getUserSpecificPaginated(
-          starkKey,
-          pagination
-        ),
-        this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
-          starkKey
-        ),
-        this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
-      ])
+    const [
+      l2Transactions,
+      preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
+    ] = await Promise.all([
+      this.l2TransactionRepository.getUserSpecificPaginated(
+        starkKey,
+        pagination
+      ),
+      this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
+        starkKey
+      ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
+    ])
 
-    const totalL2Transactions = sumUpTransactionCount(
-      preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-    ) + sumUpTransactionCount(liveL2TransactionStatistics)
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
+      ) + sumUpTransactionCount(liveL2TransactionStatistics)
 
     const content = renderUserL2TransactionsPage({
       context,

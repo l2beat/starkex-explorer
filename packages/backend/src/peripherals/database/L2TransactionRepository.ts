@@ -276,6 +276,7 @@ export class L2TransactionRepository extends BaseRepository {
     const countGroupedByType = (await knex('l2_transactions')
       .select('type')
       .whereNull('state_update_id')
+      //eslint-disable-next-line @typescript-eslint/no-misused-promises
       .andWhere((qB) =>
         qB
           .where({ stark_key_a: starkKey.toString() })
@@ -290,6 +291,7 @@ export class L2TransactionRepository extends BaseRepository {
     const [replaced] = await knex('l2_transactions')
       .whereNull('state_update_id')
       .andWhere({ state: 'replaced' })
+      //eslint-disable-next-line @typescript-eslint/no-misused-promises
       .andWhere((qB) =>
         qB
           .where({ stark_key_a: starkKey.toString() })

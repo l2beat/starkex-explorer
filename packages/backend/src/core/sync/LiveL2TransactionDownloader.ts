@@ -1,6 +1,6 @@
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
-import { Logger } from '@l2beat/backend-tools'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
