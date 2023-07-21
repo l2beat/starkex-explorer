@@ -4,7 +4,6 @@ import Router from '@koa/router'
 import { z } from 'zod'
 
 import { Config } from '../../config'
-import { shouldShowL2Transactions } from '../../utils/shouldShowL2Transactions'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { L2TransactionController } from '../controllers/L2TransactionController'
@@ -68,7 +67,7 @@ export function addPerpetualTradingRoutes(
     )
   )
 
-  if (shouldShowL2Transactions(config)) {
+  if (config.starkex.enableL2Transactions) {
     router.get(
       '/l2-transactions/:transactionId{/:multiIndex}?',
       withTypedContext(

@@ -2,6 +2,7 @@ import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
+import { it } from 'mocha'
 
 import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import {
@@ -41,7 +42,8 @@ describe(FeederGatewayCollector.name, () => {
         mockFeederGatewayClient,
         mockL2TransactionRepository,
         mockStateUpdateRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        true
       )
 
       await feederGatewayCollector.collect()
@@ -142,7 +144,8 @@ describe(FeederGatewayCollector.name, () => {
         mockFeederGatewayClient,
         mockL2TransactionRepository,
         mockStateUpdateRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        true
       )
 
       await feederGatewayCollector.collect()
@@ -237,7 +240,8 @@ describe(FeederGatewayCollector.name, () => {
           findById: mockFn().resolvesTo({} as StateUpdateRecord),
           findLast: mockFn().resolvesTo(fakeStateUpdateRecord(10)),
         }),
-        Logger.SILENT
+        Logger.SILENT,
+        true
       )
 
       await feederGatewayCollector.collect()
@@ -259,7 +263,8 @@ describe(FeederGatewayCollector.name, () => {
         mockObject<FeederGatewayClient>(),
         mockedL2TransactionRepository,
         mockedStateUpdateRepository,
-        Logger.SILENT
+        Logger.SILENT,
+        true
       )
 
       await feederGatewayCollector.collect()
@@ -268,6 +273,27 @@ describe(FeederGatewayCollector.name, () => {
         mockedL2TransactionRepository.findLatestStateUpdateId
       ).not.toHaveBeenCalled()
       expect(mockedL2TransactionRepository.add).not.toHaveBeenCalled()
+    })
+
+    it('should not do anything if l2 transactions are disabled', async () => {
+      const mockedL2TransactionRepository = mockObject<L2TransactionRepository>(
+        {
+          findLatestStateUpdateId: mockFn(),
+        }
+      )
+      const feederGatewayCollector = new FeederGatewayCollector(
+        mockObject<FeederGatewayClient>(),
+        mockedL2TransactionRepository,
+        mockObject<StateUpdateRepository>(),
+        Logger.SILENT,
+        false
+      )
+
+      await feederGatewayCollector.collect()
+
+      expect(
+        mockedL2TransactionRepository.findLatestStateUpdateId
+      ).not.toHaveBeenCalled()
     })
   })
 
@@ -283,7 +309,8 @@ describe(FeederGatewayCollector.name, () => {
         findById: mockFn().resolvesTo(undefined),
         findLast: mockFn().resolvesTo(fakeStateUpdateRecord(10)),
       }),
-      Logger.SILENT
+      Logger.SILENT,
+      true
     )
 
     await expect(feederGatewayCollector.collect()).toBeRejectedWith(
@@ -300,7 +327,8 @@ describe(FeederGatewayCollector.name, () => {
       mockObject<FeederGatewayClient>(),
       mockedL2TransactionRepository,
       mockObject<StateUpdateRepository>(),
-      Logger.SILENT
+      Logger.SILENT,
+      mockObject<boolean>()
     )
 
     it('should discard transactions after given block number', async () => {
