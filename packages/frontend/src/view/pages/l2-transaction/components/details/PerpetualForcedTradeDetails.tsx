@@ -1,13 +1,13 @@
 import { getCollateralAssetIdFromHash } from '@explorer/shared'
 import React from 'react'
 
-import { Card } from '../../../../components/Card'
 import { InlineEllipsis } from '../../../../components/InlineEllipsis'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualForcedTradeDetails(
   props: PerpetualTransactionDetailsProps<'ForcedTrade'>
@@ -27,7 +27,7 @@ export function PerpetualForcedTradeDetails(
     props.collateralAsset
   )
   return (
-    <Card className="flex flex-col gap-6">
+    <TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -71,6 +71,6 @@ export function PerpetualForcedTradeDetails(
           amount: props.data.collateralAmount,
         }}
       />
-    </Card>
+    </TransactionDetailsCard>
   )
 }

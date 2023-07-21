@@ -4,16 +4,16 @@ import React from 'react'
 import { assetToInfo } from '../../../../../utils/assets'
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { AssetWithLogo } from '../../../../components/AssetWithLogo'
-import { Card } from '../../../../components/Card'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualFundingTickDetails(
   props: PerpetualTransactionDetailsProps<'FundingTick'>
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -32,7 +32,7 @@ export function PerpetualFundingTickDetails(
           })}
         </div>
       </TransactionField>
-    </Card>
+    </TransactionDetailsCard>
   )
 }
 

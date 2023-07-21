@@ -1,17 +1,17 @@
 import React from 'react'
 
 import { AssetAmountCard } from '../../../../components/AssetAmountCard'
-import { Card } from '../../../../components/Card'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualForcedWithdrawalDetails(
   props: PerpetualTransactionDetailsProps<'ForcedWithdrawal'>
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -28,6 +28,6 @@ export function PerpetualForcedWithdrawalDetails(
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}
       />
-    </Card>
+    </TransactionDetailsCard>
   )
 }

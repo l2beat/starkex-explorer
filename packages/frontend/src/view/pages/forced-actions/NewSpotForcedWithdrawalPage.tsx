@@ -4,7 +4,7 @@ import React from 'react'
 import { assetToInfo } from '../../../utils/assets'
 import { formatAmount } from '../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../components/AssetWithLogo'
-import { Button, LinkButton } from '../../components/Button'
+import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { Link } from '../../components/Link'
 import { OrderedList } from '../../components/OrderedList'
@@ -106,13 +106,14 @@ function NewSpotForcedWithdrawalPage(props: Props) {
               </div>
               <div className="flex flex-col gap-2">
                 <Button className="w-full">Prepare for withdrawal</Button>
-                <LinkButton
+                <Button
+                  as="a"
                   className="w-full"
                   variant="outlined"
                   href={`/users/${props.starkKey.toString()}`}
                 >
                   Back to assets
-                </LinkButton>
+                </Button>
               </div>
             </form>
           </Card>

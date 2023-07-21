@@ -2,18 +2,18 @@ import React from 'react'
 
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { AssetAmountCard } from '../../../../components/AssetAmountCard'
-import { Card } from '../../../../components/Card'
 import { EtherscanLink } from '../../../../components/EtherscanLink'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualWithdrawalToAddressDetails(
   props: PerpetualTransactionDetailsProps<'WithdrawalToAddress'>
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -44,6 +44,6 @@ export function PerpetualWithdrawalToAddressDetails(
       <TransactionField label="Nonce">
         {props.data.nonce.toString()}
       </TransactionField>
-    </Card>
+    </TransactionDetailsCard>
   )
 }

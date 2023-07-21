@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { Card } from '../../../../components/Card'
 import {
   TransactionField,
   TransactionYesOrNoField,
@@ -8,12 +7,13 @@ import {
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualDeleverageDetails(
   props: PerpetualTransactionDetailsProps<'Deleverage'>
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -39,6 +39,6 @@ export function PerpetualDeleverageDetails(
           amount: props.data.collateralAmount,
         }}
       />
-    </Card>
+    </TransactionDetailsCard>
   )
 }

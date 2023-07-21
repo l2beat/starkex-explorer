@@ -8,7 +8,7 @@ import {
   formatWithDecimals,
 } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
-import { LinkButton } from '../../../components/Button'
+import { Button } from '../../../components/Button'
 import { Table } from '../../../components/table/Table'
 
 interface UserAssetsTableProps {
@@ -66,13 +66,14 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               )}
             </span>,
             props.isMine && (
-              <LinkButton
+              <Button
+                as="a"
                 className="w-32"
                 href={forcedActionLink(entry)}
                 disabled={isDisabled}
               >
                 {entry.action}
-              </LinkButton>
+              </Button>
             ),
           ],
         }

@@ -92,6 +92,27 @@ export function addPerpetualTradingRoutes(
     )
 
     router.get(
+      '/raw-l2-transactions/:transactionId{/:multiIndex}?',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            transactionId: stringAsInt(),
+            multiIndex: z.optional(stringAsInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const result = await l2TransactionController.getRawL2TransactionPage(
+            givenUser,
+            ctx.params.transactionId,
+            ctx.params.multiIndex
+          )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+
+    router.get(
       '/l2-transactions/:transactionId/alternatives/:altIndex{/:multiIndex}?',
       withTypedContext(
         z.object({
@@ -110,6 +131,29 @@ export function addPerpetualTradingRoutes(
               ctx.params.multiIndex,
               ctx.params.altIndex
             )
+          applyControllerResult(ctx, result)
+        }
+      )
+    )
+
+    router.get(
+      '/raw-l2-transactions/:transactionId/alternatives/:altIndex{/:multiIndex}?',
+      withTypedContext(
+        z.object({
+          params: z.object({
+            transactionId: stringAsInt(),
+            altIndex: z.optional(stringAsInt()),
+            multiIndex: z.optional(stringAsInt()),
+          }),
+        }),
+        async (ctx) => {
+          const givenUser = getGivenUser(ctx)
+          const result = await l2TransactionController.getRawL2TransactionPage(
+            givenUser,
+            ctx.params.transactionId,
+            ctx.params.multiIndex,
+            ctx.params.altIndex
+          )
           applyControllerResult(ctx, result)
         }
       )

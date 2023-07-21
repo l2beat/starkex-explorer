@@ -16,7 +16,7 @@ import { PerpetualMultiTransactionDetails } from './PerpetualMultiTransactionDet
 import { PerpetualOraclePricesTickDetails } from './PerpetualOraclePricesTickDetails'
 import { PerpetualTradeDetails } from './PerpetualTradeDetails'
 import { PerpetualTransferDetails } from './PerpetualTransferDetails'
-import { PerpetualWithdrawalToAddressDetails } from './PerpetualWithdrawalToAddress'
+import { PerpetualWithdrawalToAddressDetails } from './PerpetualWithdrawalToAddressDetails'
 
 interface PerpetualTransactionDetailsProps {
   stateUpdateId: number | undefined
@@ -33,6 +33,7 @@ export function PerpetualTransactionDetails(
     case 'Deposit':
       return (
         <PerpetualDepositDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -41,6 +42,7 @@ export function PerpetualTransactionDetails(
     case 'WithdrawalToAddress':
       return (
         <PerpetualWithdrawalToAddressDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -49,6 +51,7 @@ export function PerpetualTransactionDetails(
     case 'ConditionalTransfer':
       return (
         <PerpetualConditionalTransferDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -57,6 +60,7 @@ export function PerpetualTransactionDetails(
     case 'Transfer':
       return (
         <PerpetualTransferDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -65,6 +69,7 @@ export function PerpetualTransactionDetails(
     case 'ForcedWithdrawal':
       return (
         <PerpetualForcedWithdrawalDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -73,6 +78,7 @@ export function PerpetualTransactionDetails(
     case 'Trade':
       return (
         <PerpetualTradeDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -81,6 +87,7 @@ export function PerpetualTransactionDetails(
     case 'ForcedTrade':
       return (
         <PerpetualForcedTradeDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -89,6 +96,7 @@ export function PerpetualTransactionDetails(
     case 'Deleverage':
       return (
         <PerpetualDeleverageDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -97,6 +105,7 @@ export function PerpetualTransactionDetails(
     case 'Liquidate':
       return (
         <PerpetualLiquidateDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -105,6 +114,7 @@ export function PerpetualTransactionDetails(
     case 'FundingTick':
       return (
         <PerpetualFundingTickDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
@@ -113,6 +123,7 @@ export function PerpetualTransactionDetails(
     case 'OraclePricesTick':
       return (
         <PerpetualOraclePricesTickDetails
+          transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
