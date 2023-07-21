@@ -245,13 +245,16 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           trx,
           lastProcessedStateUpdate.stateUpdateId
         )
-        await this.preprocessedStateUpdateRepository.deleteByStateUpdateId(
-          lastProcessedStateUpdate.stateUpdateId,
-          trx
-        )
         await this.userL2TransactionsPreprocessor.rollbackOneStateUpdate(
           trx,
           lastProcessedStateUpdate.stateUpdateId
+        )
+
+        // This needs to be called after all other preprocessors because it
+        // has others have reference to this table.
+        await this.preprocessedStateUpdateRepository.deleteByStateUpdateId(
+          lastProcessedStateUpdate.stateUpdateId,
+          trx
         )
         // END TRANSACTION
       }
