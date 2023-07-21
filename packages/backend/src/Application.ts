@@ -224,9 +224,9 @@ export class Application {
       | PerpetualRollupUpdater
     let stateTransitionCollector: IStateTransitionCollector
 
-    const feederGatewayClient = config.starkex.enableL2Transactions
+    const feederGatewayClient = config.starkex.l2Transactions.enabled
       ? new FeederGatewayClient(
-          config.starkex.feederGateway,
+          config.starkex.l2Transactions.feederGateway,
           fetchClient,
           logger
         )
@@ -238,14 +238,15 @@ export class Application {
           l2TransactionRepository,
           stateUpdateRepository,
           logger,
-          config.starkex.enableL2Transactions
+          config.starkex.l2Transactions.enabled
         )
       : undefined
 
     const liveL2TransactionClient =
-      config.starkex.enableL2Transactions && config.starkex.l2TransactionApi
+      config.starkex.l2Transactions.enabled &&
+      config.starkex.l2Transactions.liveApi
         ? new LiveL2TransactionClient(
-            config.starkex.l2TransactionApi,
+            config.starkex.l2Transactions.liveApi,
             fetchClient
           )
         : undefined
@@ -564,7 +565,8 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository,
       l2TransactionRepository,
-      preprocessedStateDetailsRepository
+      preprocessedStateDetailsRepository,
+      config.starkex.l2Transactions.excludeTypes
     )
 
     const userController = new UserController(
@@ -580,6 +582,7 @@ export class Application {
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
       preprocessedUserL2TransactionsStatisticsRepository,
+      config.starkex.l2Transactions.excludeTypes,
       config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
@@ -589,7 +592,8 @@ export class Application {
       userTransactionRepository,
       l2TransactionRepository,
       preprocessedAssetHistoryRepository,
-      preprocessedStateDetailsRepository
+      preprocessedStateDetailsRepository,
+      config.starkex.l2Transactions.excludeTypes
     )
     const transactionController = new TransactionController(
       pageContextService,

@@ -67,7 +67,7 @@ export function addPerpetualTradingRoutes(
     )
   )
 
-  if (config.starkex.enableL2Transactions) {
+  if (config.starkex.l2Transactions.enabled) {
     router.get(
       '/l2-transactions/:transactionId{/:multiIndex}?',
       withTypedContext(

@@ -25,7 +25,7 @@ export class PageContextService {
         instanceName: this.config.starkex.instanceName,
         chainId: this.config.starkex.blockchain.chainId,
         collateralAsset: this.config.starkex.collateralAsset,
-        showL2Transactions: this.config.starkex.enableL2Transactions,
+        showL2Transactions: this.config.starkex.l2Transactions.enabled,
       }
     }
 
@@ -34,7 +34,7 @@ export class PageContextService {
       tradingMode: this.config.starkex.tradingMode,
       chainId: this.config.starkex.blockchain.chainId,
       instanceName: this.config.starkex.instanceName,
-      showL2Transactions: this.config.starkex.enableL2Transactions,
+      showL2Transactions: this.config.starkex.l2Transactions.enabled,
     }
   }
 

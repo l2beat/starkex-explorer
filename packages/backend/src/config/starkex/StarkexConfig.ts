@@ -1,4 +1,9 @@
-import { CollateralAsset, InstanceName, TradingMode } from '@explorer/shared'
+import {
+  CollateralAsset,
+  InstanceName,
+  PerpetualL2TransactionData,
+  TradingMode,
+} from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 export type StarkexConfig<T extends TradingMode = TradingMode> =
@@ -8,12 +13,13 @@ export type StarkexConfig<T extends TradingMode = TradingMode> =
     ? SpotValidiumConfig
     : PerpetualRollupConfig | PerpetualValidiumConfig | SpotValidiumConfig
 
-type BaseConfig<T extends TradingMode, D extends 'rollup' | 'validium'> = {
+interface BaseConfig<T extends TradingMode, D extends 'rollup' | 'validium'> {
   instanceName: InstanceName
   dataAvailabilityMode: D
   tradingMode: T
   blockchain: BlockchainConfig
-} & L2TransactionsConfig
+  l2Transactions: L2TransactionsConfig
+}
 
 export type PerpetualRollupConfig = BaseConfig<'perpetual', 'rollup'> & {
   contracts: {
@@ -49,17 +55,25 @@ export interface BlockchainConfig {
   maxBlockNumber: number
 }
 
-export type L2TransactionsConfig =
+export type L2TransactionTypesToExclude = Exclude<
+  PerpetualL2TransactionData['type'],
+  'MultiTransaction'
+>[]
+
+export type L2TransactionsConfig = {
+  excludeTypes?: L2TransactionTypesToExclude
+} & (
   | {
-      enableL2Transactions: true
+      enabled: true
       feederGateway: GatewayConfig
-      l2TransactionApi: LiveL2TransactionApiConfig | undefined
+      liveApi: LiveL2TransactionApiConfig | undefined
     }
   | {
-      enableL2Transactions: false
+      enabled: false
       feederGateway?: GatewayConfig
-      l2TransactionApi?: LiveL2TransactionApiConfig
+      liveApi?: LiveL2TransactionApiConfig
     }
+)
 
 export type ClientAuth =
   | {
