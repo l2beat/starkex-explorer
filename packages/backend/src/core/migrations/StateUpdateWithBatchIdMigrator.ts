@@ -1,15 +1,14 @@
+import { Logger } from '@l2beat/backend-tools'
+
 import { BlockRange } from '../../model'
-import { SoftwareMigrationRepository } from '../../peripherals/database/SoftwareMigrationRepository'
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
-import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
-import { Logger } from '../../tools/Logger'
 import { IStateTransitionCollector } from '../IStateTransitionCollector'
 
 export class StateUpdateWithBatchIdMigrator {
   constructor(
-    private softwareMigrationRepository: SoftwareMigrationRepository,
+    private kvStore: KeyValueStore,
     private stateUpdateRepository: StateUpdateRepository,
-    private syncStatusRepository: SyncStatusRepository,
     private transitionCollector: IStateTransitionCollector,
     private logger: Logger
   ) {
@@ -18,16 +17,21 @@ export class StateUpdateWithBatchIdMigrator {
 
   async migrate(): Promise<void> {
     const migrationNumber =
-      await this.softwareMigrationRepository.getMigrationNumber()
+      (await this.kvStore.findByKey('softwareMigrationNumber')) ?? 0
     if (migrationNumber >= 5) {
       return
     }
     await this.migrateStateUpdates()
-    await this.softwareMigrationRepository.setMigrationNumber(5)
+    await this.kvStore.addOrUpdate({
+      key: 'softwareMigrationNumber',
+      value: 5,
+    })
   }
 
   private async migrateStateUpdates() {
-    const lastSyncedBlock = await this.syncStatusRepository.getLastSynced()
+    const lastSyncedBlock = await this.kvStore.findByKey(
+      'lastBlockNumberSynced'
+    )
     if (lastSyncedBlock === undefined) {
       return
     }

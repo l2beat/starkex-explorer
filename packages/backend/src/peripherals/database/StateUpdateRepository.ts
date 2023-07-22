@@ -1,10 +1,10 @@
 import { OraclePrice, State } from '@explorer/encoding'
 import { AssetId, Hash256, PedersenHash, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { PriceRow, StateUpdateRow } from 'knex/types/tables'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { Logger } from '../../tools/Logger'
 import {
   PositionRecord,
   toPositionRow,

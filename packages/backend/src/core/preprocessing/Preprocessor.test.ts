@@ -1,17 +1,19 @@
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
-import { expect, mockObject } from 'earl'
+import { Logger } from '@l2beat/backend-tools'
+import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
 
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PreprocessedStateUpdateRepository } from '../../peripherals/database/PreprocessedStateUpdateRepository'
 import {
   StateUpdateRecord,
   StateUpdateRepository,
 } from '../../peripherals/database/StateUpdateRepository'
-import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
-import { Logger } from '../../tools/Logger'
 import { PerpetualHistoryPreprocessor } from './PerpetualHistoryPreprocessor'
 import { Preprocessor, SyncDirection } from './Preprocessor'
 import { StateDetailsPreprocessor } from './StateDetailsPreprocessor'
+import { UserL2TransactionsStatisticsPreprocessor } from './UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './UserStatisticsPreprocessor'
 
 const generateFakeStateUpdate = (
@@ -29,12 +31,15 @@ describe(Preprocessor.name, () => {
   describe(Preprocessor.prototype.sync.name, () => {
     it('correctly moves forward and backward', async () => {
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         mockObject<PreprocessedStateUpdateRepository>(),
-        mockObject<SyncStatusRepository>(),
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
 
@@ -64,42 +69,164 @@ describe(Preprocessor.name, () => {
     })
   })
 
+  describe(Preprocessor.prototype.catchUp.name, () => {
+    it('catches up', async () => {
+      const mockKnexTransaction = mockObject<Knex.Transaction>()
+      const lastPreprocessedStateUpdateId = 10
+      const mockUserStatisticsPreprocessor =
+        mockObject<UserStatisticsPreprocessor>({
+          catchUp: mockFn().resolvesTo(undefined),
+        })
+      const mockUserL2TransactionsPreprocessor =
+        mockObject<UserL2TransactionsStatisticsPreprocessor>({
+          catchUp: mockFn().resolvesTo(undefined),
+        })
+      const mockStateDetailsPreprocessor = mockObject<StateDetailsPreprocessor>(
+        {
+          catchUpL2Transactions: mockFn().resolvesTo(undefined),
+        }
+      )
+
+      const mockPreprocessedStateUpdateRepository =
+        mockObject<PreprocessedStateUpdateRepository>({
+          findLast: mockFn().resolvesTo({
+            stateUpdateId: lastPreprocessedStateUpdateId,
+          }),
+          runInTransaction: mockFn(async (fn) => fn(mockKnexTransaction)),
+        })
+
+      const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
+        mockPreprocessedStateUpdateRepository,
+        mockObject<StateUpdateRepository>(),
+        mockObject<PerpetualHistoryPreprocessor>(),
+        mockStateDetailsPreprocessor,
+        mockUserStatisticsPreprocessor,
+        mockUserL2TransactionsPreprocessor,
+        mockObject<L2TransactionRepository>(),
+        Logger.SILENT
+      )
+
+      await preprocessor.catchUp()
+
+      expect(
+        mockPreprocessedStateUpdateRepository.runInTransaction
+      ).toHaveBeenCalled()
+      expect(
+        mockPreprocessedStateUpdateRepository.findLast
+      ).toHaveBeenCalledWith(mockKnexTransaction)
+
+      expect(mockUserStatisticsPreprocessor.catchUp).toHaveBeenCalledWith(
+        mockKnexTransaction,
+        lastPreprocessedStateUpdateId
+      )
+      expect(
+        mockStateDetailsPreprocessor.catchUpL2Transactions
+      ).toHaveBeenCalledWith(mockKnexTransaction, lastPreprocessedStateUpdateId)
+      expect(mockUserStatisticsPreprocessor.catchUp).toHaveBeenCalledWith(
+        mockKnexTransaction,
+        lastPreprocessedStateUpdateId
+      )
+    })
+
+    it('does nothing when there is nothing to catch up', async () => {
+      const mockKnexTransaction = mockObject<Knex.Transaction>()
+      const mockPreprocessedStateUpdateRepository =
+        mockObject<PreprocessedStateUpdateRepository>({
+          findLast: mockFn().resolvesTo(undefined),
+          runInTransaction: mockFn(async (fn) => fn(mockKnexTransaction)),
+        })
+
+      const mockUserStatisticsPreprocessor =
+        mockObject<UserStatisticsPreprocessor>({
+          catchUp: mockFn(),
+        })
+      const mockUserL2TransactionsPreprocessor =
+        mockObject<UserL2TransactionsStatisticsPreprocessor>({
+          catchUp: mockFn(),
+        })
+      const mockStateDetailsPreprocessor = mockObject<StateDetailsPreprocessor>(
+        {
+          catchUpL2Transactions: mockFn(),
+        }
+      )
+
+      const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
+        mockPreprocessedStateUpdateRepository,
+        mockObject<StateUpdateRepository>(),
+        mockObject<PerpetualHistoryPreprocessor>(),
+        mockStateDetailsPreprocessor,
+        mockUserStatisticsPreprocessor,
+        mockUserL2TransactionsPreprocessor,
+        mockObject<L2TransactionRepository>(),
+        Logger.SILENT
+      )
+
+      await preprocessor.catchUp()
+
+      expect(
+        mockPreprocessedStateUpdateRepository.runInTransaction
+      ).toHaveBeenCalled()
+      expect(
+        mockPreprocessedStateUpdateRepository.findLast
+      ).toHaveBeenCalledWith(mockKnexTransaction)
+
+      expect(mockUserStatisticsPreprocessor.catchUp).not.toHaveBeenCalled()
+      expect(
+        mockStateDetailsPreprocessor.catchUpL2Transactions
+      ).not.toHaveBeenCalled()
+      expect(mockUserStatisticsPreprocessor.catchUp).not.toHaveBeenCalled()
+    })
+  })
+
   describe(Preprocessor.prototype.getLastSyncedStateUpdate.name, () => {
     it('handles sync status returning undefined', async () => {
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => undefined,
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        findByKey: async () => undefined,
       })
       const preprocessor = new Preprocessor(
+        mockKeyValueStore,
         mockObject<PreprocessedStateUpdateRepository>(),
-        syncStatusRepo,
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+
       expect(await preprocessor.getLastSyncedStateUpdate()).toEqual(undefined)
+      expect(mockKeyValueStore.findByKey).toHaveBeenOnlyCalledWith(
+        'lastBlockNumberSynced'
+      )
     })
 
     it('calls state update repository for correct block', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(3)
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.blockNumber,
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        findByKey: mockFn().resolvesTo(fakeStateUpdate.blockNumber),
       })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findLastUntilBlockNumber: async () => fakeStateUpdate,
       })
       const preprocessor = new Preprocessor(
+        mockKeyValueStore,
         mockObject<PreprocessedStateUpdateRepository>(),
-        syncStatusRepo,
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
       const lastStateUpdate = await preprocessor.getLastSyncedStateUpdate()
       expect(lastStateUpdate).toEqual(fakeStateUpdate)
+      expect(mockKeyValueStore.findByKey).toHaveBeenOnlyCalledWith(
+        'lastBlockNumberSynced'
+      )
       expect(stateUpdateRepo.findLastUntilBlockNumber).toHaveBeenOnlyCalledWith(
         fakeStateUpdate.blockNumber
       )
@@ -108,30 +235,29 @@ describe(Preprocessor.name, () => {
 
   describe(Preprocessor.prototype.calculateRequiredSyncDirection.name, () => {
     it('returns not-needed when everything is empty', async () => {
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => undefined,
-      })
       const preprocessedRepo = mockObject<PreprocessedStateUpdateRepository>({
         findLast: async () => undefined,
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate = mockFn().resolvesTo(undefined)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'stop'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
 
     it('returns backward when there are no state updates but preprocessing has entries', async () => {
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => undefined,
-      })
       const preprocessedRepo = mockObject<PreprocessedStateUpdateRepository>({
         findLast: async () => ({
           stateUpdateId: 3,
@@ -139,24 +265,28 @@ describe(Preprocessor.name, () => {
         }),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate = mockFn().resolvesTo(undefined)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
+
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'backward'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
 
     it('returns forward when there are state updates but preprocessing has no entries', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(3)
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.blockNumber,
-      })
+
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findLastUntilBlockNumber: async () => fakeStateUpdate,
       })
@@ -164,24 +294,27 @@ describe(Preprocessor.name, () => {
         findLast: async () => undefined,
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate = mockFn().resolvesTo(fakeStateUpdate)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
+
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'forward'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
 
     it('returns backward when state update id is before preprocessing', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(2)
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.blockNumber,
-      })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findLastUntilBlockNumber: async () => fakeStateUpdate,
       })
@@ -192,24 +325,27 @@ describe(Preprocessor.name, () => {
         }),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate = mockFn().resolvesTo(fakeStateUpdate)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
+
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'backward'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
 
     it("throws when the are more state updates but can't find preprocessed id", async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.blockNumber,
-      })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async () => undefined,
         findLastUntilBlockNumber: async () => fakeStateUpdate,
@@ -221,26 +357,29 @@ describe(Preprocessor.name, () => {
         }),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate = mockFn().resolvesTo(fakeStateUpdate)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
+
       await expect(
         preprocessor.calculateRequiredSyncDirection()
       ).toBeRejectedWith(
         'Missing expected state update during Preprocessor sync'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
 
     it('returns not-needed when last state update ids and transition hashes match', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.blockNumber,
-      })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async (id: number) => ({ [10]: fakeStateUpdate }[id]),
         findLastUntilBlockNumber: async () => fakeStateUpdate,
@@ -252,25 +391,28 @@ describe(Preprocessor.name, () => {
         }),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate = mockFn().resolvesTo(fakeStateUpdate)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
+
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'stop'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
 
     // This can happen when there was a reorg and then a few more state updates were added
     it('returns backward when last state update ids match but transition hash is mismatched', async () => {
       const fakeStateUpdate = generateFakeStateUpdate(10)
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate.blockNumber,
-      })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async (id: number) => ({ [10]: fakeStateUpdate }[id]),
         findLastUntilBlockNumber: async () => fakeStateUpdate,
@@ -282,26 +424,29 @@ describe(Preprocessor.name, () => {
         }),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate = mockFn().resolvesTo(fakeStateUpdate)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
+
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'backward'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
 
     // This can happen when there was a reorg and then a few more state updates were added
     it('returns backward when state is ahead of preprocessing but current transition hash is mismatched', async () => {
       const fakeStateUpdate5 = generateFakeStateUpdate(5)
       const fakeStateUpdate10 = generateFakeStateUpdate(10)
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate10.blockNumber,
-      })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async (id: number) => ({ [5]: fakeStateUpdate5 }[id]),
         findLastUntilBlockNumber: async () => fakeStateUpdate10,
@@ -313,25 +458,30 @@ describe(Preprocessor.name, () => {
         }),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate =
+        mockFn().resolvesTo(fakeStateUpdate10)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
+
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'backward'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
 
     it('returns forward when state is ahead and current transition hash matches', async () => {
       const fakeStateUpdate5 = generateFakeStateUpdate(5)
       const fakeStateUpdate10 = generateFakeStateUpdate(10)
-      const syncStatusRepo = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => fakeStateUpdate10.blockNumber,
-      })
+
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async (id: number) => ({ [5]: fakeStateUpdate5 }[id]),
         findLastUntilBlockNumber: async () => fakeStateUpdate10,
@@ -343,22 +493,30 @@ describe(Preprocessor.name, () => {
         }),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        syncStatusRepo,
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+      const mockGetLastSyncedStateUpdate =
+        mockFn().resolvesTo(fakeStateUpdate10)
+      preprocessor.getLastSyncedStateUpdate = mockGetLastSyncedStateUpdate
+
       expect(await preprocessor.calculateRequiredSyncDirection()).toEqual(
         'forward'
       )
+      expect(mockGetLastSyncedStateUpdate).toHaveBeenCalled()
     })
   })
 
   describe(Preprocessor.prototype.preprocessNextStateUpdate.name, () => {
     it('correctly updates preprocessedStateUpdateRepository in SQL transaction', async () => {
+      const preprocessL2TransactionTo = 200
       const fakeStateUpdate1 = generateFakeStateUpdate(1)
       const fakeStateUpdate2 = generateFakeStateUpdate(2)
       const mockKnexTransaction = mockObject<Knex.Transaction>()
@@ -369,11 +527,16 @@ describe(Preprocessor.name, () => {
       const mockStateDetailsPreprocessor = mockObject<StateDetailsPreprocessor>(
         {
           preprocessNextStateUpdate: async () => undefined,
+          catchUpL2Transactions: mockFn(async () => {}),
         }
       )
       const mockUserStatisticsPreprocessor =
         mockObject<UserStatisticsPreprocessor>({
           preprocessNextStateUpdate: async () => undefined,
+        })
+      const mockUserL2TransactionsPreprocessor =
+        mockObject<UserL2TransactionsStatisticsPreprocessor>({
+          catchUp: mockFn(async () => {}),
         })
       const stateUpdateRepo = mockObject<StateUpdateRepository>({
         findById: async (id: number) => ({ [2]: fakeStateUpdate2 }[id]),
@@ -387,14 +550,22 @@ describe(Preprocessor.name, () => {
         runInTransaction: async (fn) => fn(mockKnexTransaction),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        mockObject<SyncStatusRepository>(),
         stateUpdateRepo,
         mockPerpetualHistoryPreprocessor,
         mockStateDetailsPreprocessor,
         mockUserStatisticsPreprocessor,
+        mockUserL2TransactionsPreprocessor,
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
+
+      const mockedGetStateUpdateIdToCatchUpL2TransactionsTo =
+        mockFn().resolvesTo(preprocessL2TransactionTo)
+      preprocessor.getStateUpdateIdToCatchUpL2TransactionsTo =
+        mockedGetStateUpdateIdToCatchUpL2TransactionsTo
+
       await preprocessor.preprocessNextStateUpdate()
       expect(preprocessedRepo.add).toHaveBeenOnlyCalledWith(
         {
@@ -412,6 +583,15 @@ describe(Preprocessor.name, () => {
       expect(
         mockUserStatisticsPreprocessor.preprocessNextStateUpdate
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate2)
+      expect(
+        mockedGetStateUpdateIdToCatchUpL2TransactionsTo
+      ).toHaveBeenCalledWith(mockKnexTransaction, fakeStateUpdate2.id)
+      expect(
+        mockStateDetailsPreprocessor.catchUpL2Transactions
+      ).toHaveBeenOnlyCalledWith(mockKnexTransaction, preprocessL2TransactionTo)
+      expect(
+        mockUserL2TransactionsPreprocessor.catchUp
+      ).toHaveBeenOnlyCalledWith(mockKnexTransaction, preprocessL2TransactionTo)
     })
 
     it('throws when next state update is missing', async () => {
@@ -429,12 +609,14 @@ describe(Preprocessor.name, () => {
         runInTransaction: async (fn) => fn(mockKnexTransaction),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        mockObject<SyncStatusRepository>(),
         stateUpdateRepo,
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
       await expect(preprocessor.preprocessNextStateUpdate()).toBeRejectedWith(
@@ -468,13 +650,19 @@ describe(Preprocessor.name, () => {
         runInTransaction: async (fn) => fn(mockKnexTransaction),
         deleteByStateUpdateId: async () => 1,
       })
+      const mockUserL2TransactionsPreprocessor =
+        mockObject<UserL2TransactionsStatisticsPreprocessor>({
+          rollbackOneStateUpdate: mockFn().resolvesTo(undefined),
+        })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        mockObject<SyncStatusRepository>(),
         mockObject<StateUpdateRepository>(),
         mockPerpetualHistoryPreprocessor,
         mockStateDetailsPreprocessor,
         mockUserStatisticsPreprocessor,
+        mockUserL2TransactionsPreprocessor,
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
       await preprocessor.rollbackOneStateUpdate()
@@ -491,6 +679,9 @@ describe(Preprocessor.name, () => {
       expect(
         mockUserStatisticsPreprocessor.rollbackOneStateUpdate
       ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate.id)
+      expect(
+        mockUserL2TransactionsPreprocessor.rollbackOneStateUpdate
+      ).toHaveBeenOnlyCalledWith(mockKnexTransaction, fakeStateUpdate.id)
     })
 
     it('throws when there are no preprocessings to roll back', async () => {
@@ -500,12 +691,14 @@ describe(Preprocessor.name, () => {
         runInTransaction: async (fn) => fn(mockKnexTransaction),
       })
       const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
         preprocessedRepo,
-        mockObject<SyncStatusRepository>(),
         mockObject<StateUpdateRepository>(),
         mockObject<PerpetualHistoryPreprocessor>(),
         mockObject<StateDetailsPreprocessor>(),
         mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockObject<L2TransactionRepository>(),
         Logger.SILENT
       )
       await expect(preprocessor.rollbackOneStateUpdate()).toBeRejectedWith(
@@ -513,4 +706,57 @@ describe(Preprocessor.name, () => {
       )
     })
   })
+
+  describe(
+    Preprocessor.prototype.getStateUpdateIdToCatchUpL2TransactionsTo.name,
+    () => {
+      const trx = mockObject<Knex.Transaction>()
+      const lastL2TransactionStateUpdateId = 100
+      const mockedL2TransactionRepository = mockObject<L2TransactionRepository>(
+        {
+          findLatestStateUpdateId: mockFn().resolvesTo(
+            lastL2TransactionStateUpdateId
+          ),
+        }
+      )
+
+      const preprocessor = new Preprocessor(
+        mockObject<KeyValueStore>(),
+        mockObject<PreprocessedStateUpdateRepository>(),
+        mockObject<StateUpdateRepository>(),
+        mockObject<PerpetualHistoryPreprocessor>(),
+        mockObject<StateDetailsPreprocessor>(),
+        mockObject<UserStatisticsPreprocessor>(),
+        mockObject<UserL2TransactionsStatisticsPreprocessor>(),
+        mockedL2TransactionRepository,
+        Logger.SILENT
+      )
+
+      it('returns the latest l2 transaction state update id if it is smaller than processed state update id', async () => {
+        const preprocessTo =
+          await preprocessor.getStateUpdateIdToCatchUpL2TransactionsTo(
+            trx,
+            lastL2TransactionStateUpdateId + 1
+          )
+
+        expect(
+          mockedL2TransactionRepository.findLatestStateUpdateId
+        ).toHaveBeenCalledWith(trx)
+        expect(preprocessTo).toEqual(lastL2TransactionStateUpdateId)
+      })
+
+      it('returns the processed state update id if it is smaller than latest l2 transaction state update id', async () => {
+        const preprocessTo =
+          await preprocessor.getStateUpdateIdToCatchUpL2TransactionsTo(
+            trx,
+            lastL2TransactionStateUpdateId - 1
+          )
+
+        expect(
+          mockedL2TransactionRepository.findLatestStateUpdateId
+        ).toHaveBeenCalledWith(trx)
+        expect(preprocessTo).toEqual(lastL2TransactionStateUpdateId - 1)
+      })
+    }
+  )
 })

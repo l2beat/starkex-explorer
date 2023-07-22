@@ -5,22 +5,20 @@ import {
   decodeWithdrawal,
 } from '@explorer/shared'
 import { AssetHash, Hash256, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { BlockRange } from '../../model'
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { Database } from '../../peripherals/database/shared/Database'
-import { SoftwareMigrationRepository } from '../../peripherals/database/SoftwareMigrationRepository'
-import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { Logger } from '../../tools/Logger'
 import { UserTransactionCollector } from '../collectors/UserTransactionCollector'
 
 export class UserTransactionMigrator {
   constructor(
     private database: Database,
-    private softwareMigrationRepository: SoftwareMigrationRepository,
-    private syncStatusRepository: SyncStatusRepository,
+    private kvStore: KeyValueStore,
     private userTransactionRepository: UserTransactionRepository,
     private sentTransactionRepository: SentTransactionRepository,
     private userTransactionCollector: UserTransactionCollector,
@@ -33,17 +31,22 @@ export class UserTransactionMigrator {
 
   async migrate(): Promise<void> {
     const migrationNumber =
-      await this.softwareMigrationRepository.getMigrationNumber()
+      (await this.kvStore.findByKey('softwareMigrationNumber')) ?? 0
 
     if (migrationNumber >= 1) {
       return
     }
     await this.migrateUserTransactions()
-    await this.softwareMigrationRepository.setMigrationNumber(1)
+    await this.kvStore.addOrUpdate({
+      key: 'softwareMigrationNumber',
+      value: 1,
+    })
   }
 
   private async migrateUserTransactions() {
-    const lastSyncedBlock = await this.syncStatusRepository.getLastSynced()
+    const lastSyncedBlock = await this.kvStore.findByKey(
+      'lastBlockNumberSynced'
+    )
     if (lastSyncedBlock === undefined) {
       return
     }

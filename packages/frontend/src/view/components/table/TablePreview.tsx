@@ -1,3 +1,4 @@
+import isNumber from 'lodash/isNumber'
 import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../utils/formatting/formatAmount'
@@ -11,7 +12,7 @@ interface TablePreviewProps {
   entryShortNamePlural: string
   entryLongNamePlural: string
   visible: number
-  total: number
+  total: number | 'processing'
   children: ReactNode
 }
 
@@ -21,6 +22,7 @@ export function TablePreview(props: TablePreviewProps) {
       <SectionHeading
         title={props.title}
         description={
+          props.total !== 'processing' &&
           props.total > 0 && (
             <>
               You're viewing {formatInt(props.visible)} out of{' '}
@@ -33,10 +35,12 @@ export function TablePreview(props: TablePreviewProps) {
       {props.children}
       {props.visible === 0 && (
         <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
-          There are no {props.entryLongNamePlural} to view.
+          {props.total === 'processing'
+            ? `${props.entryLongNamePlural} are being processed...`
+            : `There are no ${props.entryLongNamePlural} to view.`}
         </div>
       )}
-      {props.total > props.visible && (
+      {isNumber(props.total) && props.total > props.visible && (
         <div className="mt-6 flex items-center justify-center">
           <LinkButton variant="outlined" href={props.path}>
             View all {props.entryLongNamePlural}

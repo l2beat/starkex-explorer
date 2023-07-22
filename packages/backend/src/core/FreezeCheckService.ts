@@ -1,18 +1,16 @@
 import { EthereumAddress, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { ethers } from 'ethers'
 
 import { KeyValueStore } from '../peripherals/database/KeyValueStore'
-import { SyncStatusRepository } from '../peripherals/database/SyncStatusRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 
 export class FreezeCheckService {
   constructor(
     private readonly perpatualContractAddress: EthereumAddress,
     private readonly ethereumClient: EthereumClient,
     private readonly keyValueStore: KeyValueStore,
-    private readonly syncStatusRepository: SyncStatusRepository,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly logger: Logger
   ) {
@@ -20,13 +18,17 @@ export class FreezeCheckService {
   }
 
   async updateFreezeStatus() {
-    const lastSyncedBlockNumber =
-      await this.syncStatusRepository.getLastSynced()
+    const lastSyncedBlockNumber = await this.keyValueStore.findByKey(
+      'lastBlockNumberSynced'
+    )
     if (!lastSyncedBlockNumber) {
       this.logger.error(
         'Ignoring freeze-check - no last synced block number found'
       )
-      await this.keyValueStore.setFreezeStatus('not-frozen')
+      await this.keyValueStore.addOrUpdate({
+        key: 'freezeStatus',
+        value: 'not-frozen',
+      })
       return
     }
 
@@ -38,14 +40,20 @@ export class FreezeCheckService {
 
     if (isFrozen) {
       this.logger.info('StarkEx is frozen!')
-      await this.keyValueStore.setFreezeStatus('frozen')
+      await this.keyValueStore.addOrUpdate({
+        key: 'freezeStatus',
+        value: 'frozen',
+      })
       return
     }
 
     const oldestNotIncludedForcedAction =
       await this.findOldestNotIncludedForcedAction()
     if (!oldestNotIncludedForcedAction) {
-      await this.keyValueStore.setFreezeStatus('not-frozen')
+      await this.keyValueStore.addOrUpdate({
+        key: 'freezeStatus',
+        value: 'not-frozen',
+      })
       return
     }
 
@@ -54,13 +62,19 @@ export class FreezeCheckService {
       BigInt(freezeGracePeriod)
 
     if (latestNonFreezableTimestamp > curBlockTimestamp) {
-      await this.keyValueStore.setFreezeStatus('not-frozen')
+      await this.keyValueStore.addOrUpdate({
+        key: 'freezeStatus',
+        value: 'not-frozen',
+      })
       return // We're still in the grace period
     }
 
     // TODO: check if we're truly synced (lastSyncedBlockNumber is not further than an hour(?) behind)
     this.logger.info('StarkEx is freezable!')
-    await this.keyValueStore.setFreezeStatus('freezable')
+    await this.keyValueStore.addOrUpdate({
+      key: 'freezeStatus',
+      value: 'freezable',
+    })
   }
 
   public async findOldestNotIncludedForcedAction() {

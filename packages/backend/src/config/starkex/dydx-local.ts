@@ -1,9 +1,9 @@
 import { AssetHash, AssetId, EthereumAddress } from '@explorer/types'
+import { Env } from '@l2beat/backend-tools'
 
-import { getEnv } from '../getEnv'
 import { StarkexConfig } from './StarkexConfig'
 
-export function getDydxLocalConfig(): StarkexConfig {
+export function getDydxLocalConfig(env: Env): StarkexConfig {
   return {
     instanceName: 'dYdX',
     dataAvailabilityMode: 'rollup',
@@ -12,9 +12,9 @@ export function getDydxLocalConfig(): StarkexConfig {
       chainId: 1337,
       jsonRpcUrl: 'http://127.0.0.1:8545',
       safeBlockDistance: 5,
-      syncBatchSize: getEnv.integer('SYNC_BATCH_SIZE', 6_000),
+      syncBatchSize: env.integer('SYNC_BATCH_SIZE', 6_000),
       minBlockNumber: 0,
-      maxBlockNumber: getEnv.integer('MAX_BLOCK_NUMBER', Infinity),
+      maxBlockNumber: env.integer('MAX_BLOCK_NUMBER', Infinity),
     },
     contracts: {
       perpetual: EthereumAddress('0x27fac828D6E6862901ea8471fF22552D84e155D0'),

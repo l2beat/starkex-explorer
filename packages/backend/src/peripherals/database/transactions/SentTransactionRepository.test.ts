@@ -1,8 +1,8 @@
 import { AssetHash, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
 
 import { setupDatabaseTestSuite } from '../../../test/database'
-import { Logger } from '../../../tools/Logger'
 import { ForcedWithdrawalData, WithdrawData } from './SentTransaction'
 import { SentTransactionRepository } from './SentTransactionRepository'
 

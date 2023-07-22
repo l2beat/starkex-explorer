@@ -128,6 +128,8 @@ const routes: Route[] = [
         totalStateUpdates: 5123,
         forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
+        l2Transactions: [],
+        totalL2Transactions: 0,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
       })
@@ -138,16 +140,16 @@ const routes: Route[] = [
     description:
       'The home page for project that shared feeder gateway with us.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
+      const context = getPerpetualPageContext(ctx, {
+        showL2Transactions: true,
+      })
 
       ctx.body = renderHomePage({
         context,
         stateUpdates: repeat(6, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        l2Transactions: {
-          data: repeat(6, randomPerpetualL2TransactionEntry),
-          total: 5123,
-        },
+        l2Transactions: repeat(6, randomPerpetualL2TransactionEntry),
+        totalL2Transactions: 5123,
         tutorials: [],
         forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
@@ -168,6 +170,8 @@ const routes: Route[] = [
         totalStateUpdates: 5123,
         forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
+        l2Transactions: [],
+        totalL2Transactions: 0,
         offers: repeat(6, randomHomeOfferEntry),
         totalOffers: 7,
       })
@@ -292,6 +296,8 @@ const routes: Route[] = [
             Number(ethereumTimestamp) - Math.random() * 12 * 60 * 60 * 1000
           )
         ),
+        l2Transactions: [],
+        totalL2Transactions: 0,
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
         priceChanges: repeat(15, randomStateUpdatePriceEntry),
         totalBalanceChanges: 231,
@@ -306,7 +312,9 @@ const routes: Route[] = [
     description: 'State update page with l2 transacitons.',
     render: (ctx) => {
       const ethereumTimestamp = randomTimestamp()
-      const context = getPerpetualPageContext(ctx)
+      const context = getPerpetualPageContext(ctx, {
+        showL2Transactions: true,
+      })
       ctx.body = renderStateUpdatePage({
         context,
         id: randomId(),
@@ -327,10 +335,8 @@ const routes: Route[] = [
         balanceChanges: repeat(10, randomStateUpdateBalanceChangeEntry),
         priceChanges: repeat(15, randomStateUpdatePriceEntry),
         totalBalanceChanges: 231,
-        l2Transactions: {
-          data: repeat(5, randomPerpetualL2TransactionEntry),
-          total: 1000,
-        },
+        l2Transactions: repeat(5, randomPerpetualL2TransactionEntry),
+        totalL2Transactions: 1000,
         transactions: repeat(5, randomStateUpdateTransactionEntry),
         totalTransactions: 5,
       })
@@ -400,7 +406,9 @@ const routes: Route[] = [
     path: '/users/recover',
     description: 'Stark key recovery page, the stark key is not known.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderUserRecoverPage({
         context,
       })
@@ -411,7 +419,9 @@ const routes: Route[] = [
     description:
       'Stark key register page, the stark key is known but not registered.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
 
       ctx.body = renderUserRegisterPage({
         context: {
@@ -430,7 +440,9 @@ const routes: Route[] = [
     description:
       'My user page, the stark key is known, but it’s not registered.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const starkKey = context.user.starkKey ?? StarkKey.fake()
 
       ctx.body = renderUserPage({
@@ -451,6 +463,8 @@ const routes: Route[] = [
         totalBalanceChanges: 3367,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
         offers: repeat(6, randomUserOfferEntry),
         totalOffers: 6,
       })
@@ -492,7 +506,9 @@ const routes: Route[] = [
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const starkKey = context.user.starkKey ?? StarkKey.fake()
 
       ctx.body = renderUserPage({
@@ -514,6 +530,8 @@ const routes: Route[] = [
         totalBalanceChanges: 3367,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
         offers: repeat(6, randomUserOfferEntry),
         totalOffers: 6,
       })
@@ -540,6 +558,8 @@ const routes: Route[] = [
         totalBalanceChanges: 3367,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
         offers: repeat(6, randomUserOfferEntry),
         totalOffers: 6,
       })
@@ -551,7 +571,9 @@ const routes: Route[] = [
     description:
       'Someone else’s user page for project that feeder gateway with us.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
+      const context = getPerpetualPageContext(ctx, {
+        showL2Transactions: true,
+      })
 
       ctx.body = renderUserPage({
         context,
@@ -566,10 +588,8 @@ const routes: Route[] = [
         totalBalanceChanges: 3367,
         transactions: repeat(10, randomUserTransactionEntry),
         totalTransactions: 48,
-        l2Transactions: {
-          data: repeat(6, randomPerpetualUserL2TransactionEntry),
-          total: 5123,
-        },
+        l2Transactions: repeat(6, randomPerpetualUserL2TransactionEntry),
+        totalL2Transactions: 5123,
         offers: repeat(6, randomUserOfferEntry),
         totalOffers: 6,
       })
@@ -989,7 +1009,9 @@ const routes: Route[] = [
     path: '/forced/new/spot/withdraw',
     description: 'Form to create a new spot forced withdrawal.',
     render: (ctx) => {
-      const context = getSpotPageContext(ctx, true)
+      const context = getSpotPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderNewSpotForcedWithdrawPage({
         context,
         starkKey: StarkKey.fake(),
@@ -1007,7 +1029,9 @@ const routes: Route[] = [
     path: '/forced/new/perpetual/withdraw',
     description: 'Form to create a new perpetual forced withdrawal.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
         starkKey: StarkKey.fake(),
@@ -1025,7 +1049,9 @@ const routes: Route[] = [
     path: '/forced/new/perpetual/buy',
     description: 'Form to create a new perpetual forced buy.',
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
         starkKey: StarkKey.fake(),
@@ -1044,7 +1070,9 @@ const routes: Route[] = [
     description: 'Form to create a new perpetual forced sell.',
     breakAfter: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       ctx.body = renderNewPerpetualForcedActionPage({
         context,
         starkKey: StarkKey.fake(),
@@ -1274,7 +1302,9 @@ const routes: Route[] = [
       'Offer view of a created perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const offer = randomOfferDetails()
       ctx.body = renderOfferAndForcedTradePage({
         context,
@@ -1295,7 +1325,9 @@ const routes: Route[] = [
     isOfferPage: true,
     render: (ctx) => {
       const offer = randomOfferDetails()
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const taker = {
         ethereumAddress: context.user.address,
         starkKey: context.user.starkKey,
@@ -1332,7 +1364,9 @@ const routes: Route[] = [
       'Offer view of an accepted perpetual forced trade. As viewed by the creator.',
     isOfferPage: true,
     render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, true)
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
       const maker = userParty(context.user)
       const taker = randomParty()
       const offer = randomOfferDetails()
@@ -1651,20 +1685,31 @@ function getFakeUser() {
 
 function getPerpetualPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser: true
+  options?: {
+    fallbackToFakeUser?: true
+    showL2Transactions?: boolean
+  }
 ): PageContextWithUser<'perpetual'>
 function getPerpetualPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser?: false
+  options?: {
+    fallbackToFakeUser?: false
+    showL2Transactions?: boolean
+  }
 ): PageContext<'perpetual'>
 function getPerpetualPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser?: boolean
+  options?: {
+    fallbackToFakeUser?: boolean
+    showL2Transactions?: boolean
+  }
 ): PageContextWithUser<'perpetual'> | PageContext<'perpetual'> {
-  const user = getUser(ctx) ?? (fallbackToFakeUser ? getFakeUser() : undefined)
+  const user =
+    getUser(ctx) ?? (options?.fallbackToFakeUser ? getFakeUser() : undefined)
 
   return {
     user,
+    showL2Transactions: options?.showL2Transactions ?? false,
     instanceName: 'dYdX',
     chainId: 1,
     tradingMode: 'perpetual',
@@ -1675,20 +1720,31 @@ function getPerpetualPageContext(
 
 function getSpotPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser: true
+  options?: {
+    fallbackToFakeUser?: true
+    showL2Transactions?: boolean
+  }
 ): PageContextWithUser<'spot'>
 function getSpotPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser?: false
+  options?: {
+    fallbackToFakeUser?: false
+    showL2Transactions?: boolean
+  }
 ): PageContext<'spot'>
 function getSpotPageContext(
   ctx: Koa.Context,
-  fallbackToFakeUser?: boolean
+  options?: {
+    fallbackToFakeUser?: boolean
+    showL2Transactions?: boolean
+  }
 ): PageContextWithUser<'spot'> | PageContext<'spot'> {
-  const user = getUser(ctx) ?? (fallbackToFakeUser ? getFakeUser() : undefined)
+  const user =
+    getUser(ctx) ?? (options?.fallbackToFakeUser ? getFakeUser() : undefined)
 
   return {
     user,
+    showL2Transactions: options?.showL2Transactions ?? false,
     instanceName: 'Myria',
     chainId: 1,
     tradingMode: 'spot',

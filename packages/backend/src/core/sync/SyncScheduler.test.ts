@@ -1,10 +1,10 @@
 import { AssetId, Hash256 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import waitForExpect from 'wait-for-expect'
 
 import { BlockRange } from '../../model'
-import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
-import { Logger } from '../../tools/Logger'
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { FreezeCheckService } from '../FreezeCheckService'
 import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
@@ -20,8 +20,8 @@ describe(SyncScheduler.name, () => {
 
   describe(SyncScheduler.prototype.start.name, () => {
     it('starts from scratch', async () => {
-      const syncStatusRepository = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => undefined,
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        findByKey: async () => undefined,
       })
       const blockDownloader = mockObject<BlockDownloader>({
         getKnownBlocks: async () => [],
@@ -38,7 +38,7 @@ describe(SyncScheduler.name, () => {
         updateFreezeStatus: async () => {},
       })
       const syncScheduler = new SyncScheduler(
-        syncStatusRepository,
+        mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
@@ -58,8 +58,8 @@ describe(SyncScheduler.name, () => {
     })
 
     it('starts from the middle', async () => {
-      const syncStatusRepository = mockObject<SyncStatusRepository>({
-        getLastSynced: async () => 2_000_000,
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        findByKey: mockFn().resolvesTo(2_000_000),
       })
       const blockDownloader = mockObject<BlockDownloader>({
         getKnownBlocks: async () => [block(2_000_100), block(2_000_101)],
@@ -76,7 +76,7 @@ describe(SyncScheduler.name, () => {
         updateFreezeStatus: async () => {},
       })
       const syncScheduler = new SyncScheduler(
-        syncStatusRepository,
+        mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
@@ -105,8 +105,8 @@ describe(SyncScheduler.name, () => {
 
   describe(SyncScheduler.prototype.dispatch.name, () => {
     it('handles a successful sync', async () => {
-      const syncStatusRepository = mockObject<SyncStatusRepository>({
-        setLastSynced: async () => {},
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        addOrUpdate: mockFn().resolvesTo('lastBlockNumberSynced'),
       })
       const blockDownloader = mockObject<BlockDownloader>()
       const dataSyncService = mockObject<PerpetualRollupSyncService>({
@@ -120,7 +120,7 @@ describe(SyncScheduler.name, () => {
         updateFreezeStatus: async () => {},
       })
       const syncScheduler = new SyncScheduler(
-        syncStatusRepository,
+        mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
@@ -140,17 +140,18 @@ describe(SyncScheduler.name, () => {
         expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
           new BlockRange([block(1_000_001), block(1_000_002)])
         )
-        expect(syncStatusRepository.setLastSynced).toHaveBeenOnlyCalledWith(
-          1_000_002
-        )
+        expect(mockKeyValueStore.addOrUpdate).toHaveBeenOnlyCalledWith({
+          key: 'lastBlockNumberSynced',
+          value: 1_000_002,
+        })
         expect(preprocessor.sync).toHaveBeenCalled()
         expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })
     })
 
     it('handles a failing sync', async () => {
-      const syncStatusRepository = mockObject<SyncStatusRepository>({
-        setLastSynced: async () => {},
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        addOrUpdate: mockFn().resolvesTo('lastBlockNumberSynced'),
       })
       const blockDownloader = mockObject<BlockDownloader>()
       const dataSyncService = mockObject<PerpetualRollupSyncService>({
@@ -164,7 +165,7 @@ describe(SyncScheduler.name, () => {
         updateFreezeStatus: async () => {},
       })
       const syncScheduler = new SyncScheduler(
-        syncStatusRepository,
+        mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
@@ -183,9 +184,7 @@ describe(SyncScheduler.name, () => {
         expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
           new BlockRange([block(1_000_001), block(1_000_002)])
         )
-        expect(syncStatusRepository.setLastSynced).not.toHaveBeenCalledWith(
-          1_000_002
-        )
+        expect(mockKeyValueStore.addOrUpdate).not.toHaveBeenCalled()
       })
 
       // allow the jobQueue to finish
@@ -193,8 +192,8 @@ describe(SyncScheduler.name, () => {
     })
 
     it('handles a successful discardAfter', async () => {
-      const syncStatusRepository = mockObject<SyncStatusRepository>({
-        setLastSynced: async () => {},
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        addOrUpdate: mockFn().resolvesTo('lastBlockNumberSynced'),
       })
       const blockDownloader = mockObject<BlockDownloader>()
       const dataSyncService = mockObject<PerpetualRollupSyncService>({
@@ -208,7 +207,7 @@ describe(SyncScheduler.name, () => {
         updateFreezeStatus: async () => {},
       })
       const syncScheduler = new SyncScheduler(
-        syncStatusRepository,
+        mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
@@ -236,15 +235,15 @@ describe(SyncScheduler.name, () => {
           new BlockRange([block(1_000_000), block(1_000_001)])
         )
 
-        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledTimes(2)
-        expect(syncStatusRepository.setLastSynced).toHaveBeenNthCalledWith(
-          1,
-          999_999
-        )
-        expect(syncStatusRepository.setLastSynced).toHaveBeenNthCalledWith(
-          2,
-          1_000_001
-        )
+        expect(mockKeyValueStore.addOrUpdate).toHaveBeenCalledTimes(2)
+        expect(mockKeyValueStore.addOrUpdate).toHaveBeenNthCalledWith(1, {
+          key: 'lastBlockNumberSynced',
+          value: 999_999,
+        })
+        expect(mockKeyValueStore.addOrUpdate).toHaveBeenNthCalledWith(2, {
+          key: 'lastBlockNumberSynced',
+          value: 1_000_001,
+        })
 
         expect(preprocessor.sync).toHaveBeenCalled()
         expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalled()
@@ -252,8 +251,8 @@ describe(SyncScheduler.name, () => {
     })
 
     it('handles a failing discardAfter', async () => {
-      const syncStatusRepository = mockObject<SyncStatusRepository>({
-        setLastSynced: async () => {},
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        addOrUpdate: mockFn().resolvesTo('lastBlockNumberSynced'),
       })
       const blockDownloader = mockObject<BlockDownloader>()
       const dataSyncService = mockObject<PerpetualRollupSyncService>({
@@ -267,7 +266,7 @@ describe(SyncScheduler.name, () => {
         updateFreezeStatus: async () => {},
       })
       const syncScheduler = new SyncScheduler(
-        syncStatusRepository,
+        mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
@@ -287,9 +286,10 @@ describe(SyncScheduler.name, () => {
       })
 
       await waitForExpect(() => {
-        expect(syncStatusRepository.setLastSynced).toHaveBeenOnlyCalledWith(
-          999_999
-        )
+        expect(mockKeyValueStore.addOrUpdate).toHaveBeenOnlyCalledWith({
+          key: 'lastBlockNumberSynced',
+          value: 999_999,
+        })
         expect(dataSyncService.discardAfter).toHaveBeenOnlyCalledWith(999_999)
         expect(preprocessor.sync).toHaveBeenCalled()
         expect(freezeCheckService.updateFreezeStatus).not.toHaveBeenCalled()
@@ -307,8 +307,8 @@ describe(SyncScheduler.name, () => {
         discardAfter: async () => {},
         sync: async () => {},
       })
-      const syncStatusRepository = mockObject<SyncStatusRepository>({
-        setLastSynced: async () => {},
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        addOrUpdate: mockFn().resolvesTo('lastBlockNumberSynced'),
       })
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
@@ -317,7 +317,7 @@ describe(SyncScheduler.name, () => {
         updateFreezeStatus: async () => {},
       })
       const syncScheduler = new SyncScheduler(
-        syncStatusRepository,
+        mockKeyValueStore,
         mockObject<BlockDownloader>(),
         dataSyncService,
         preprocessor,
@@ -333,7 +333,7 @@ describe(SyncScheduler.name, () => {
       await waitForExpect(() => {
         expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(1)
         expect(dataSyncService.sync).toHaveBeenCalledTimes(1)
-        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledTimes(1)
+        expect(mockKeyValueStore.addOrUpdate).toHaveBeenCalledTimes(1)
         expect(preprocessor.sync).toHaveBeenCalledTimes(1)
         expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })
@@ -345,7 +345,7 @@ describe(SyncScheduler.name, () => {
       await waitForExpect(() => {
         expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(1)
         expect(dataSyncService.sync).toHaveBeenCalledTimes(1)
-        expect(syncStatusRepository.setLastSynced).toHaveBeenCalledTimes(1)
+        expect(mockKeyValueStore.addOrUpdate).toHaveBeenCalledTimes(1)
         expect(preprocessor.sync).toHaveBeenCalledTimes(1)
         expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })

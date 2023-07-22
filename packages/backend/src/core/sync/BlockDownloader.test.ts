@@ -1,4 +1,5 @@
 import { Hash256 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { providers } from 'ethers'
 
@@ -7,7 +8,6 @@ import {
   BlockRepository,
 } from '../../peripherals/database/BlockRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { Logger } from '../../tools/Logger'
 import { BlockDownloader } from './BlockDownloader'
 
 describe(BlockDownloader.name, () => {

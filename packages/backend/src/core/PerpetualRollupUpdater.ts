@@ -6,13 +6,13 @@ import {
   PositionLeaf,
 } from '@explorer/state'
 import { Hash256, PedersenHash } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { PageRepository } from '../peripherals/database/PageRepository'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 import { StateUpdater } from './StateUpdater'
 
 export const EMPTY_STATE_HASH = PedersenHash(

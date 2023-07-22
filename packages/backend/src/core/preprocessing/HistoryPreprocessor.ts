@@ -1,4 +1,5 @@
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
 import {
@@ -6,7 +7,6 @@ import {
   PreprocessedAssetHistoryRepository,
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
-import { Logger } from '../../tools/Logger'
 
 export abstract class HistoryPreprocessor<T extends AssetHash | AssetId> {
   constructor(

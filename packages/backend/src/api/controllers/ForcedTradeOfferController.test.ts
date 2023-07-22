@@ -54,6 +54,7 @@ describe(ForcedTradeOfferController.name, () => {
   const pageContext: PageContext = {
     user: undefined,
     tradingMode: 'perpetual',
+    showL2Transactions: true,
     chainId: 1,
     instanceName: 'dYdX',
     collateralAsset: fakeCollateralAsset,

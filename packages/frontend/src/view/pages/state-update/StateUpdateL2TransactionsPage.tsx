@@ -16,7 +16,7 @@ export interface StateUpdateL2TransactionsPageProps {
   l2Transactions: PerpetualL2TransactionEntry[]
   limit: number
   offset: number
-  total: number
+  total: number | 'processing'
 }
 
 export function renderStateUpdateL2TransactionsPage(

@@ -1,11 +1,11 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 
 import { BlockRange } from '../model'
 import { StateTransitionRecord } from '../peripherals/database/StateTransitionRepository'
 import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { decodedFakePages, fakePages } from '../test/fakes'
-import { Logger } from '../tools/Logger'
 import type { PageCollector } from './collectors/PageCollector'
 import type { PageMappingCollector } from './collectors/PageMappingCollector'
 import { PerpetualRollupStateTransitionCollector } from './collectors/PerpetualRollupStateTransitionCollector'

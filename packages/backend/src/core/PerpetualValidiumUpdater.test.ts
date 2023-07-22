@@ -15,13 +15,13 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 
 import type { MerkleTreeRepository } from '../peripherals/database/MerkleTreeRepository'
 import { StateUpdateRepository } from '../peripherals/database/StateUpdateRepository'
 import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
-import { Logger } from '../tools/Logger'
 import {
   EMPTY_STATE_HASH,
   PerpetualValidiumUpdater,

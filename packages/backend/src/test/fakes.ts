@@ -26,6 +26,7 @@ import {
   ForcedTransactionRecord,
   Updates,
 } from '../peripherals/database/ForcedTransactionRepository'
+import { PreprocessedL2TransactionsStatistics } from '../peripherals/database/PreprocessedL2TransactionsStatistics'
 import { StateUpdateRecord } from '../peripherals/database/StateUpdateRepository'
 import { SentTransactionData } from '../peripherals/database/transactions/SentTransaction'
 import { SentTransactionRecord } from '../peripherals/database/transactions/SentTransactionRepository'
@@ -379,4 +380,25 @@ export const fakeCollateralAsset: CollateralAsset = {
     '0x02893294412a4c8f915f75892b395ebbf6859ec246ec365c3b1f56f47c3a0a5d'
   ),
   price: 1_000_000n,
+}
+
+export const fakePreprocessedL2TransactionsStatistics = (
+  obj?: PreprocessedL2TransactionsStatistics
+): PreprocessedL2TransactionsStatistics => {
+  return {
+    depositCount: 12,
+    withdrawalToAddressCount: 55,
+    forcedWithdrawalCount: 32,
+    tradeCount: 11,
+    forcedTradeCount: 52,
+    transferCount: 24,
+    conditionalTransferCount: 65,
+    liquidateCount: 19,
+    deleverageCount: 10,
+    fundingTickCount: 1,
+    oraclePricesTickCount: 99,
+    multiTransactionCount: 5,
+    replacedTransactionsCount: 2,
+    ...obj,
+  }
 }

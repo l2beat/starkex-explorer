@@ -8,6 +8,7 @@ import {
 
 import { Config } from '../config'
 import { KeyValueStore } from '../peripherals/database/KeyValueStore'
+import { shouldShowL2Transactions } from '../utils/shouldShowL2Transactions'
 import { UserService } from './UserService'
 
 export class PageContextService {
@@ -20,7 +21,7 @@ export class PageContextService {
   async getPageContext(givenUser: Partial<UserDetails>): Promise<PageContext> {
     const [user, freezeStatus] = await Promise.all([
       this.userService.getUserDetails(givenUser),
-      this.keyValueStore.getFreezeStatus(),
+      this.keyValueStore.findByKeyWithDefault('freezeStatus', 'not-frozen'),
     ])
 
     if (this.config.starkex.tradingMode === 'perpetual') {
@@ -30,6 +31,7 @@ export class PageContextService {
         instanceName: this.config.starkex.instanceName,
         chainId: this.config.starkex.blockchain.chainId,
         collateralAsset: this.config.starkex.collateralAsset,
+        showL2Transactions: shouldShowL2Transactions(this.config),
         freezeStatus,
       }
     }
@@ -39,6 +41,7 @@ export class PageContextService {
       tradingMode: this.config.starkex.tradingMode,
       chainId: this.config.starkex.blockchain.chainId,
       instanceName: this.config.starkex.instanceName,
+      showL2Transactions: shouldShowL2Transactions(this.config),
       freezeStatus,
     }
   }

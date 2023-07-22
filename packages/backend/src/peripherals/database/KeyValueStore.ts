@@ -1,18 +1,34 @@
-import {
-  FreezeStatus,
-  FreezeStatuses,
-} from '@explorer/shared/build/FreezeStatus'
+import { stringAsBoolean, stringAsInt } from '@explorer/shared'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { KeyValueRow } from 'knex/types/tables'
+import { z } from 'zod'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-export interface KeyValueRecord {
-  key: string
-  value: string
-}
+export type KeyValueRecord = z.infer<typeof KeyValueRecord>
+export const KeyValueRecord = z.union([
+  z.object({ key: z.literal('softwareMigrationNumber'), value: stringAsInt() }),
+  z.object({ key: z.literal('lastBlockNumberSynced'), value: stringAsInt() }),
+  z.object({
+    key: z.literal('freezeStatus'),
+    value: z.union([
+      z.literal('not-frozen'),
+      z.literal('freezable'),
+      z.literal('frozen'),
+    ]),
+  }),
+  z.object({
+    key: z.literal('userStatisticsPreprocessorCaughtUp'),
+    value: stringAsBoolean(),
+  }),
+])
+
+type ValueForKey<K extends KeyValueRecord['key']> = Extract<
+  KeyValueRecord,
+  { key?: K }
+>['value']
 
 export class KeyValueStore extends BaseRepository {
   constructor(database: Database, logger: Logger) {
@@ -29,25 +45,41 @@ export class KeyValueStore extends BaseRepository {
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async findByKey(
-    key: string,
+  async findByKeyWithDefault<K extends KeyValueRecord['key']>(
+    key: K,
+    defaultValue: ValueForKey<K>,
     trx?: Knex.Transaction
-  ): Promise<string | undefined> {
-    const knex = await this.knex(trx)
-    const row = await knex('key_values').select('value').where({ key }).first()
-    return row?.value
+  ): Promise<ValueForKey<K>> {
+    const value = await this.findByKey(key, trx)
+    return value === undefined ? defaultValue : value
   }
 
-  async addOrUpdate(record: KeyValueRecord, trx?: Knex.Transaction) {
+  async findByKey<K extends KeyValueRecord['key']>(
+    key: K,
+    trx?: Knex.Transaction
+  ): Promise<ValueForKey<K> | undefined> {
+    const knex = await this.knex(trx)
+    const row = await knex('key_values').where({ key }).first()
+    return row ? (toRecord(row).value as ValueForKey<K>) : undefined
+  }
+
+  async addOrUpdate<K extends KeyValueRecord>(
+    record: K,
+    trx?: Knex.Transaction
+  ): Promise<K['key']> {
     const primaryKey: keyof KeyValueRow = 'key'
     const knex = await this.knex(trx)
-    await knex('key_values').insert(record).onConflict([primaryKey]).merge()
+    await knex('key_values')
+      .insert(toRow(record))
+      .onConflict([primaryKey])
+      .merge()
     return record.key
   }
 
   async getAll(): Promise<KeyValueRecord[]> {
     const knex = await this.knex()
-    return knex('key_values').select('*')
+    const rows = await knex('key_values').select('*')
+    return rows.map(toRecord)
   }
 
   async deleteAll() {
@@ -55,23 +87,19 @@ export class KeyValueStore extends BaseRepository {
     return knex('key_values').delete()
   }
 
-  async deleteByKey(key: string) {
+  async deleteByKey(key: KeyValueRecord['key']) {
     const knex = await this.knex()
     return knex('key_values').where({ key }).delete()
   }
+}
 
-  async getFreezeStatus(): Promise<FreezeStatus> {
-    const value = await this.findByKey('freezeStatus')
-    if (!value) {
-      return 'not-frozen'
-    }
-    if (!FreezeStatuses.includes(value as FreezeStatus)) {
-      throw new Error(`Invalid freeze status: ${value}`)
-    }
-    return value as FreezeStatus
-  }
+function toRecord(row: KeyValueRow): KeyValueRecord {
+  return KeyValueRecord.parse(row)
+}
 
-  async setFreezeStatus(status: FreezeStatus) {
-    await this.addOrUpdate({ key: 'freezeStatus', value: status })
+function toRow(record: KeyValueRecord): KeyValueRow {
+  return {
+    key: record.key,
+    value: record.value.toString(),
   }
 }

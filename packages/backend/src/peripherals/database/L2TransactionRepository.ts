@@ -3,15 +3,20 @@ import {
   PerpetualL2TransactionData,
 } from '@explorer/shared'
 import { StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
+import uniq from 'lodash/uniq'
 
 import { PaginationOptions } from '../../model/PaginationOptions'
-import { Logger } from '../../tools/Logger'
 import {
-  decodeTransactionData,
+  decodeL2TransactionData,
   encodeL2TransactionData,
 } from './PerpetualL2Transaction'
+import {
+  PreprocessedL2TransactionsStatistics,
+  PreprocessedUserL2TransactionsStatistics,
+} from './PreprocessedL2TransactionsStatistics'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
@@ -48,15 +53,25 @@ export class L2TransactionRepository extends BaseRepository {
     super(database, logger)
     /* eslint-disable @typescript-eslint/unbound-method */
     this.add = this.wrapAdd(this.add)
-    this.countAllDistinctTransactionIds = this.wrapAny(
-      this.countAllDistinctTransactionIds
-    )
-    this.countAllUserSpecific = this.wrapAny(this.countAllUserSpecific)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
+    this.getStarkKeysByStateUpdateId = this.wrapGet(
+      this.getStarkKeysByStateUpdateId
+    )
+    this.getStatisticsByStateUpdateId = this.wrapAny(
+      this.getStatisticsByStateUpdateId
+    )
+    this.getStatisticsByStateUpdateIdAndStarkKey = this.wrapAny(
+      this.getStatisticsByStateUpdateIdAndStarkKey
+    )
     this.getPaginatedWithoutMulti = this.wrapGet(this.getPaginatedWithoutMulti)
+    this.getPaginatedWithoutMultiByStateUpdateId = this.wrapGet(
+      this.getPaginatedWithoutMultiByStateUpdateId
+    )
     this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
     this.findById = this.wrapFind(this.findById)
-    this.findByTransactionId = this.wrapFind(this.findByTransactionId)
+    this.findAggregatedByTransactionId = this.wrapFind(
+      this.findAggregatedByTransactionId
+    )
     this.findLatestStateUpdateId = this.wrapFind(this.findLatestStateUpdateId)
     this.deleteAfterBlock = this.wrapDelete(this.deleteAfterBlock)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -165,38 +180,6 @@ export class L2TransactionRepository extends BaseRepository {
     return parentId
   }
 
-  async countAllDistinctTransactionIds() {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions').countDistinct(
-      'transaction_id'
-    )
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
-  }
-
-  async countAllDistinctTransactionIdsByStateUpdateId(stateUpdateId: number) {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions')
-      .where({ state_update_id: stateUpdateId })
-      .countDistinct('transaction_id')
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
-  }
-
-  async countAllUserSpecific(starkKey: StarkKey) {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions')
-      .where({
-        stark_key_a: starkKey.toString(),
-      })
-      .orWhere({
-        stark_key_b: starkKey.toString(),
-      })
-      .count()
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
-  }
-
   async countByTransactionId(transactionId: number): Promise<number> {
     const knex = await this.knex()
     const [result] = await knex('l2_transactions')
@@ -206,6 +189,96 @@ export class L2TransactionRepository extends BaseRepository {
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return Number(result!.count)
+  }
+
+  async getStarkKeysByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ) {
+    const knex = await this.knex(trx)
+    const starkKeyARows = (await knex('l2_transactions')
+      .distinct('stark_key_a')
+      .whereNotNull('stark_key_a')
+      .andWhere({ state_update_id: stateUpdateId })) as {
+      stark_key_a: string
+    }[]
+
+    const starkKeyBRows = (await knex('l2_transactions')
+      .distinct('stark_key_b')
+      .whereNotNull('stark_key_b')
+      .andWhere({ state_update_id: stateUpdateId })) as {
+      stark_key_b: string
+    }[]
+
+    const uniqStarkKeys = uniq([
+      ...starkKeyARows.map((row) => row.stark_key_a),
+      ...starkKeyBRows.map((row) => row.stark_key_b),
+    ])
+
+    return uniqStarkKeys.map((starkKey) => StarkKey(starkKey))
+  }
+
+  async getStatisticsByStateUpdateId(
+    stateUpdateId: number,
+    trx?: Knex.Transaction
+  ): Promise<PreprocessedL2TransactionsStatistics> {
+    const knex = await this.knex(trx)
+
+    const countGroupedByType = (await knex('l2_transactions')
+      .select('type')
+      .where({ state_update_id: stateUpdateId })
+      .count()
+      .groupBy('type')) as {
+      type: PerpetualL2TransactionData['type']
+      count: number
+    }[]
+
+    const [replaced] = await knex('l2_transactions')
+      .where({ state_update_id: stateUpdateId })
+      .andWhere({ state: 'replaced' })
+      .count()
+
+    return toPreprocessedL2TransactionsStatistics(
+      countGroupedByType,
+      Number(replaced?.count ?? 0)
+    )
+  }
+
+  async getStatisticsByStateUpdateIdAndStarkKey(
+    stateUpdateId: number,
+    starkKey: StarkKey,
+    trx?: Knex.Transaction
+  ): Promise<PreprocessedUserL2TransactionsStatistics> {
+    const knex = await this.knex(trx)
+    const countGroupedByType = (await knex('l2_transactions')
+      .select('type')
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      .where((qB) =>
+        qB
+          .where({ stark_key_a: starkKey.toString() })
+          .orWhere({ stark_key_b: starkKey.toString() })
+      )
+      .andWhere({ state_update_id: stateUpdateId })
+      .count()
+      .groupBy('type')) as {
+      type: Exclude<PerpetualL2TransactionData['type'], 'MultiTransaction'>
+      count: number
+    }[]
+
+    const [replaced] = await knex('l2_transactions')
+      .where({ state: 'replaced' })
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      .andWhere((qB) =>
+        qB
+          .where({ stark_key_a: starkKey.toString() })
+          .orWhere({ stark_key_b: starkKey.toString() })
+      )
+      .andWhere({ state_update_id: stateUpdateId })
+      .count()
+    return toPreprocessedUserL2TransactionsStatistics(
+      countGroupedByType,
+      Number(replaced?.count ?? 0)
+    )
   }
 
   async getPaginatedWithoutMulti({ offset, limit }: PaginationOptions) {
@@ -255,14 +328,19 @@ export class L2TransactionRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
-  async findById(id: number): Promise<Record | undefined> {
-    const knex = await this.knex()
+  async findById(
+    id: number,
+    trx?: Knex.Transaction
+  ): Promise<Record | undefined> {
+    const knex = await this.knex(trx)
     const row = await knex('l2_transactions').where({ id }).first()
 
     return row ? toRecord(row) : undefined
   }
 
-  async findByTransactionId(id: number): Promise<AggregatedRecord | undefined> {
+  async findAggregatedByTransactionId(
+    id: number
+  ): Promise<AggregatedRecord | undefined> {
     const knex = await this.knex()
     const originalTransaction = await knex('l2_transactions')
       .where({ transaction_id: id, parent_id: null })
@@ -284,8 +362,10 @@ export class L2TransactionRepository extends BaseRepository {
     return toAggregatedRecord(originalTransaction, alternativeTransactions)
   }
 
-  async findLatestStateUpdateId(): Promise<number | undefined> {
-    const knex = await this.knex()
+  async findLatestStateUpdateId(
+    trx?: Knex.Transaction
+  ): Promise<number | undefined> {
+    const knex = await this.knex(trx)
     const results = await knex('l2_transactions')
       .select('state_update_id')
       .orderBy('state_update_id', 'desc')
@@ -317,7 +397,7 @@ function toRecord(row: L2TransactionRow): Record {
     state: row.state ? row.state : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
-    data: decodeTransactionData(row.data),
+    data: decodeL2TransactionData(row.data),
   }
 }
 
@@ -330,9 +410,106 @@ function toAggregatedRecord(
     transactionId: transaction.transaction_id,
     stateUpdateId: transaction.state_update_id,
     blockNumber: transaction.block_number,
-    originalTransaction: decodeTransactionData(transaction.data),
+    originalTransaction: decodeL2TransactionData(transaction.data),
     alternativeTransactions: alternatives.map((alternative) =>
-      decodeTransactionData(alternative.data)
+      decodeL2TransactionData(alternative.data)
     ),
+  }
+}
+
+function toPreprocessedUserL2TransactionsStatistics(
+  countGroupedByType: {
+    type: Exclude<PerpetualL2TransactionData['type'], 'MultiTransaction'>
+    count: number
+  }[],
+  replacedCount: number
+): PreprocessedUserL2TransactionsStatistics {
+  return {
+    depositCount: Number(
+      countGroupedByType.find((x) => x.type === 'Deposit')?.count ?? 0
+    ),
+    withdrawalToAddressCount: Number(
+      countGroupedByType.find((x) => x.type === 'WithdrawalToAddress')?.count ??
+        0
+    ),
+    forcedWithdrawalCount: Number(
+      countGroupedByType.find((x) => x.type === 'ForcedWithdrawal')?.count ?? 0
+    ),
+    tradeCount: Number(
+      countGroupedByType.find((x) => x.type === 'Trade')?.count ?? 0
+    ),
+    forcedTradeCount: Number(
+      countGroupedByType.find((x) => x.type === 'ForcedTrade')?.count ?? 0
+    ),
+    transferCount: Number(
+      countGroupedByType.find((x) => x.type === 'Transfer')?.count ?? 0
+    ),
+    conditionalTransferCount: Number(
+      countGroupedByType.find((x) => x.type === 'ConditionalTransfer')?.count ??
+        0
+    ),
+    liquidateCount: Number(
+      countGroupedByType.find((x) => x.type === 'Liquidate')?.count ?? 0
+    ),
+    deleverageCount: Number(
+      countGroupedByType.find((x) => x.type === 'Deleverage')?.count ?? 0
+    ),
+    fundingTickCount: Number(
+      countGroupedByType.find((x) => x.type === 'FundingTick')?.count ?? 0
+    ),
+    oraclePricesTickCount: Number(
+      countGroupedByType.find((x) => x.type === 'OraclePricesTick')?.count ?? 0
+    ),
+    replacedTransactionsCount: replacedCount,
+  }
+}
+
+function toPreprocessedL2TransactionsStatistics(
+  countGroupedByType: {
+    type: PerpetualL2TransactionData['type']
+    count: number
+  }[],
+  replacedCount: number
+): PreprocessedL2TransactionsStatistics {
+  return {
+    depositCount: Number(
+      countGroupedByType.find((x) => x.type === 'Deposit')?.count ?? 0
+    ),
+    withdrawalToAddressCount: Number(
+      countGroupedByType.find((x) => x.type === 'WithdrawalToAddress')?.count ??
+        0
+    ),
+    forcedWithdrawalCount: Number(
+      countGroupedByType.find((x) => x.type === 'ForcedWithdrawal')?.count ?? 0
+    ),
+    tradeCount: Number(
+      countGroupedByType.find((x) => x.type === 'Trade')?.count ?? 0
+    ),
+    forcedTradeCount: Number(
+      countGroupedByType.find((x) => x.type === 'ForcedTrade')?.count ?? 0
+    ),
+    transferCount: Number(
+      countGroupedByType.find((x) => x.type === 'Transfer')?.count ?? 0
+    ),
+    conditionalTransferCount: Number(
+      countGroupedByType.find((x) => x.type === 'ConditionalTransfer')?.count ??
+        0
+    ),
+    liquidateCount: Number(
+      countGroupedByType.find((x) => x.type === 'Liquidate')?.count ?? 0
+    ),
+    deleverageCount: Number(
+      countGroupedByType.find((x) => x.type === 'Deleverage')?.count ?? 0
+    ),
+    fundingTickCount: Number(
+      countGroupedByType.find((x) => x.type === 'FundingTick')?.count ?? 0
+    ),
+    oraclePricesTickCount: Number(
+      countGroupedByType.find((x) => x.type === 'OraclePricesTick')?.count ?? 0
+    ),
+    multiTransactionCount: Number(
+      countGroupedByType.find((x) => x.type === 'MultiTransaction')?.count ?? 0
+    ),
+    replacedTransactionsCount: replacedCount,
   }
 }

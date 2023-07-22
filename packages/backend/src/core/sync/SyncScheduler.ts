@@ -1,9 +1,9 @@
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { BlockRange } from '../../model'
-import { SyncStatusRepository } from '../../peripherals/database/SyncStatusRepository'
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { JobQueue } from '../../tools/JobQueue'
-import { Logger } from '../../tools/Logger'
 import { FreezeCheckService } from '../FreezeCheckService'
 import { IDataSyncService } from '../IDataSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
@@ -27,7 +27,7 @@ export class SyncScheduler {
   private maxBlockNumber: number
 
   constructor(
-    private readonly syncStatusRepository: SyncStatusRepository,
+    private readonly kvStore: KeyValueStore,
     private readonly blockDownloader: BlockDownloader,
     private readonly dataSyncService: IDataSyncService,
     private readonly preprocessor:
@@ -45,7 +45,8 @@ export class SyncScheduler {
 
   async start() {
     const lastSynced =
-      (await this.syncStatusRepository.getLastSynced()) ?? this.earliestBlock
+      (await this.kvStore.findByKey('lastBlockNumberSynced')) ??
+      this.earliestBlock
 
     await this.dataSyncService.discardAfter(lastSynced)
 
@@ -106,7 +107,10 @@ export class SyncScheduler {
     try {
       await this.dataSyncService.discardAfter(blocks.start - 1)
       await this.dataSyncService.sync(blocks)
-      await this.syncStatusRepository.setLastSynced(blocks.end - 1)
+      await this.kvStore.addOrUpdate({
+        key: 'lastBlockNumberSynced',
+        value: blocks.end - 1,
+      })
       await this.preprocessor.sync()
       await this.freezeCheckService.updateFreezeStatus()
       this.dispatch({ type: 'syncSucceeded' })
@@ -118,7 +122,10 @@ export class SyncScheduler {
 
   private async handleDiscardAfter(blockNumber: number) {
     try {
-      await this.syncStatusRepository.setLastSynced(blockNumber)
+      await this.kvStore.addOrUpdate({
+        key: 'lastBlockNumberSynced',
+        value: blockNumber,
+      })
       await this.preprocessor.sync()
       await this.dataSyncService.discardAfter(blockNumber)
       await this.freezeCheckService.updateFreezeStatus()

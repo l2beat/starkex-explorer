@@ -17,6 +17,7 @@ interface PerpetualPageContext {
   chainId: number
   tradingMode: 'perpetual'
   collateralAsset: CollateralAsset
+  showL2Transactions: boolean
   freezeStatus: FreezeStatus
 }
 
@@ -25,6 +26,7 @@ interface SpotPageContext {
   instanceName: InstanceName
   chainId: number
   tradingMode: 'spot'
+  showL2Transactions: boolean
   freezeStatus: FreezeStatus
 }
 

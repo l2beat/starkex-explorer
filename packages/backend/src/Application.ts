@@ -1,5 +1,6 @@
 import { PositionLeaf, VaultLeaf } from '@explorer/state'
 import { AssetHash, AssetId } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 
 import { ApiServer } from './api/ApiServer'
 import { EscapeHatchController } from './api/controllers/EscapeHatchController'
@@ -52,6 +53,7 @@ import { PerpetualHistoryPreprocessor } from './core/preprocessing/PerpetualHist
 import { Preprocessor } from './core/preprocessing/Preprocessor'
 import { SpotHistoryPreprocessor } from './core/preprocessing/SpotHistoryPreprocessor'
 import { StateDetailsPreprocessor } from './core/preprocessing/StateDetailsPreprocessor'
+import { UserL2TransactionsStatisticsPreprocessor } from './core/preprocessing/UserL2TransactionsPreprocessor'
 import { UserStatisticsPreprocessor } from './core/preprocessing/UserStatisticsPreprocessor'
 import { SpotValidiumSyncService } from './core/SpotValidiumSyncService'
 import { SpotValidiumUpdater } from './core/SpotValidiumUpdater'
@@ -72,12 +74,11 @@ import { PositionRepository } from './peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from './peripherals/database/PreprocessedAssetHistoryRepository'
 import { PreprocessedStateDetailsRepository } from './peripherals/database/PreprocessedStateDetailsRepository'
 import { PreprocessedStateUpdateRepository } from './peripherals/database/PreprocessedStateUpdateRepository'
+import { PreprocessedUserL2TransactionsStatisticsRepository } from './peripherals/database/PreprocessedUserL2TransactionsStatisticsRepository'
 import { PreprocessedUserStatisticsRepository } from './peripherals/database/PreprocessedUserStatisticsRepository'
 import { Database } from './peripherals/database/shared/Database'
-import { SoftwareMigrationRepository } from './peripherals/database/SoftwareMigrationRepository'
 import { StateTransitionRepository } from './peripherals/database/StateTransitionRepository'
 import { StateUpdateRepository } from './peripherals/database/StateUpdateRepository'
-import { SyncStatusRepository } from './peripherals/database/SyncStatusRepository'
 import { SentTransactionRepository } from './peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from './peripherals/database/transactions/UserTransactionRepository'
 import { UserRegistrationEventRepository } from './peripherals/database/UserRegistrationEventRepository'
@@ -90,8 +91,6 @@ import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityG
 import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
 import { handleServerError, reportError } from './tools/ErrorReporter'
-import { Logger } from './tools/Logger'
-import { shouldShowL2Transactions } from './utils/shouldShowL2Transactions'
 
 export class Application {
   start: () => Promise<void>
@@ -115,11 +114,6 @@ export class Application {
         : undefined
 
     const kvStore = new KeyValueStore(database, logger)
-    const syncStatusRepository = new SyncStatusRepository(kvStore, logger)
-    const softwareMigrationRepository = new SoftwareMigrationRepository(
-      kvStore,
-      logger
-    )
 
     const verifierEventRepository = new VerifierEventRepository(
       database,
@@ -395,8 +389,7 @@ export class Application {
 
     const userTransactionMigrator = new UserTransactionMigrator(
       database,
-      softwareMigrationRepository,
-      syncStatusRepository,
+      kvStore,
       userTransactionRepository,
       sentTransactionRepository,
       userTransactionCollector,
@@ -406,8 +399,7 @@ export class Application {
     )
 
     const withdrawableAssetMigrator = new WithdrawableAssetMigrator(
-      softwareMigrationRepository,
-      syncStatusRepository,
+      kvStore,
       withdrawableAssetRepository,
       withdrawalAllowedCollector,
       userTransactionCollector,
@@ -415,9 +407,8 @@ export class Application {
     )
 
     const stateUpdateWithBatchIdMigrator = new StateUpdateWithBatchIdMigrator(
-      softwareMigrationRepository,
+      kvStore,
       stateUpdateRepository,
-      syncStatusRepository,
       stateTransitionCollector,
       logger
     )
@@ -430,6 +421,16 @@ export class Application {
 
     const preprocessedUserStatisticsRepository =
       new PreprocessedUserStatisticsRepository(database, logger)
+
+    const preprocessedUserL2TransactionsStatisticsRepository =
+      new PreprocessedUserL2TransactionsStatisticsRepository(database, logger)
+
+    const userL2TransactionsPreprocessor =
+      new UserL2TransactionsStatisticsPreprocessor(
+        preprocessedUserL2TransactionsStatisticsRepository,
+        l2TransactionRepository,
+        logger
+      )
 
     let preprocessor: Preprocessor<AssetHash> | Preprocessor<AssetId>
     const isPreprocessorEnabled = config.enablePreprocessing
@@ -460,25 +461,27 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
+        l2TransactionRepository,
         logger
       )
 
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
         preprocessedUserStatisticsRepository,
         preprocessedAssetHistoryRepository,
-        preprocessedStateUpdateRepository,
         stateUpdateRepository,
         kvStore,
         logger
       )
 
       preprocessor = new Preprocessor(
+        kvStore,
         preprocessedStateUpdateRepository,
-        syncStatusRepository,
         stateUpdateRepository,
         perpetualHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        userL2TransactionsPreprocessor,
+        l2TransactionRepository,
         logger,
         isPreprocessorEnabled
       )
@@ -496,25 +499,27 @@ export class Application {
         preprocessedStateDetailsRepository,
         preprocessedAssetHistoryRepository,
         userTransactionRepository,
+        l2TransactionRepository,
         logger
       )
 
       const userStatisticsPreprocessor = new UserStatisticsPreprocessor(
         preprocessedUserStatisticsRepository,
         preprocessedAssetHistoryRepository,
-        preprocessedStateUpdateRepository,
         stateUpdateRepository,
         kvStore,
         logger
       )
 
       preprocessor = new Preprocessor(
+        kvStore,
         preprocessedStateUpdateRepository,
-        syncStatusRepository,
         stateUpdateRepository,
         spotHistoryPreprocessor,
         stateDetailsPreprocessor,
         userStatisticsPreprocessor,
+        userL2TransactionsPreprocessor,
+        l2TransactionRepository,
         logger,
         isPreprocessorEnabled
       )
@@ -524,13 +529,12 @@ export class Application {
       config.starkex.contracts.perpetual,
       ethereumClient,
       kvStore,
-      syncStatusRepository,
       userTransactionRepository,
       logger
     )
 
     const syncScheduler = new SyncScheduler(
-      syncStatusRepository,
+      kvStore,
       blockDownloader,
       syncService,
       preprocessor,
@@ -544,7 +548,6 @@ export class Application {
 
     // #endregion core
     // #region api
-    const showL2Transactions = shouldShowL2Transactions(config)
     const homeController = new HomeController(
       pageContextService,
       assetDetailsService,
@@ -552,8 +555,7 @@ export class Application {
       userTransactionRepository,
       forcedTradeOfferRepository,
       l2TransactionRepository,
-      preprocessedStateDetailsRepository,
-      showL2Transactions
+      preprocessedStateDetailsRepository
     )
 
     const userController = new UserController(
@@ -568,8 +570,8 @@ export class Application {
       forcedTradeOfferViewService,
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
-      config.starkex.contracts.perpetual,
-      showL2Transactions
+      preprocessedUserL2TransactionsStatisticsRepository,
+      config.starkex.contracts.perpetual
     )
     const stateUpdateController = new StateUpdateController(
       pageContextService,
@@ -578,7 +580,7 @@ export class Application {
       userTransactionRepository,
       l2TransactionRepository,
       preprocessedAssetHistoryRepository,
-      showL2Transactions
+      preprocessedStateDetailsRepository
     )
     const transactionController = new TransactionController(
       pageContextService,
@@ -665,8 +667,8 @@ export class Application {
 
     this.start = async () => {
       logger.for(this).info('Starting')
-
       await apiServer.listen()
+
       if (config.freshStart) await database.rollbackAll()
       await database.migrateToLatest()
       await preprocessor.catchUp()

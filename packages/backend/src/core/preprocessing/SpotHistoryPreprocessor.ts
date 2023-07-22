@@ -1,4 +1,5 @@
 import { AssetHash, StarkKey } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 
 import {
@@ -7,7 +8,6 @@ import {
 } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { StateUpdateRecord } from '../../peripherals/database/StateUpdateRepository'
 import { VaultRepository } from '../../peripherals/database/VaultRepository'
-import { Logger } from '../../tools/Logger'
 import { HistoryPreprocessor } from './HistoryPreprocessor'
 
 export class SpotHistoryPreprocessor extends HistoryPreprocessor<AssetHash> {

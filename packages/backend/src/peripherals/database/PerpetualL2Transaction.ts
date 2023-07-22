@@ -48,7 +48,7 @@ export function encodeL2TransactionData(
   return encodeL2Transaction(values)
 }
 
-export function decodeTransactionData(
+export function decodeL2TransactionData(
   values: ToJSON<PerpetualL2TransactionData>
 ): PerpetualL2TransactionData {
   if (values.type === 'MultiTransaction') {

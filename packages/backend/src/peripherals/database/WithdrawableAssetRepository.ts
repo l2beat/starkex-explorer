@@ -1,7 +1,7 @@
 import { AssetHash, Hash256, StarkKey, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { WithdrawableAssetRow } from 'knex/types/tables'
 
-import { Logger } from '../../tools/Logger'
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 import { WithdrawalPerformedData } from './transactions/UserTransaction'
