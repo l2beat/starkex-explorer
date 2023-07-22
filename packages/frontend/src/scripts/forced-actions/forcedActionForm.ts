@@ -1,3 +1,4 @@
+import { initFinalizeEscapeForm } from './escape/finalizeEscapeForm'
 import { initFreezeRequestForm } from './escape/freezeRequestForm'
 import { initVerifyEscapeForm } from './escape/verifyEscapeForm'
 import { initPerpetualForcedActionForm } from './perpetual/perpetualForcedActionForm'
@@ -8,4 +9,5 @@ export function initForcedActionForms() {
   initSpotForcedWithdrawalForm()
   initFreezeRequestForm()
   initVerifyEscapeForm()
+  initFinalizeEscapeForm()
 }

@@ -18,6 +18,7 @@ import {
   UserDetails,
 } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import uniqBy from 'lodash/uniqBy'
 
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
@@ -210,6 +211,56 @@ export class UserController {
         starkKey
       )
 
+    const escapableAssets =
+      context.freezeStatus === 'frozen' && context.tradingMode === 'perpetual'
+        ? uniqBy(
+            await this.userTransactionRepository.getByStarkKey(starkKey, [
+              'EscapeVerified',
+            ]),
+            (t) => t.data.positionId
+          ).map((t) => ({
+            ownerStarkKey: t.data.starkKey,
+            positionOrVaultId: t.data.positionId,
+            withdrawalAmount: t.data.withdrawalAmount,
+          }))
+        : []
+
+    // let escapableAssets: {
+    //   positionOrVaultId: bigint,
+    //   withdrawalAmount: bigint,
+    //   sharedStateHash: Hash256,
+    //   assetHash: AssetHash
+    // }[] = []
+    // if (context.freezeStatus === 'frozen') {
+    //   const escapeVerifiedTransactions = await this.userTransactionRepository.getByStarkKey(
+    //     starkKey,
+    //     ['EscapeVerified']
+    //   )
+    //   const uniqueTransactions = uniqBy(escapeVerifiedTransactions, 't.data.positionId')
+    //   for (const t of uniqueTransactions) {
+    //     let assetHash: AssetHash
+    //     if (context.tradingMode === 'spot') {
+    //       const asset = (await this.preprocessedAssetHistoryRepository.getCurrentByPositionOrVaultId(
+    //         t.data.positionId
+    //       ))[0]
+    //       if (!asset) {
+    //         throw new Error('Asset for escape transaction not found')
+    //       }
+    //       assetHash = asset.assetHashOrId as AssetHash
+    //     }
+    //     else {
+    //       assetHash = context.collateralAsset.assetHash
+    //     }
+
+    //     escapableAssets.push({
+    //       positionOrVaultId: t.data.positionId,
+    //       withdrawalAmount: t.data.withdrawalAmount,
+    //       sharedStateHash: t.data.sharedStateHash,
+    //       assetHash
+    //     })
+    //   }
+    // }
+
     const content = renderUserPage({
       context,
       starkKey,
@@ -220,6 +271,18 @@ export class UserController {
             total: l2TransactionsCount,
           }
         : undefined,
+      escapableAssets:
+        collateralAsset !== undefined
+          ? escapableAssets.map((asset) => ({
+              asset: {
+                hashOrId: collateralAsset.assetId,
+                details: collateralAssetDetails(collateralAsset),
+              },
+              ownerStarkKey: asset.ownerStarkKey,
+              positionOrVaultId: asset.positionOrVaultId,
+              amount: asset.withdrawalAmount,
+            }))
+          : [],
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId:
@@ -228,21 +291,7 @@ export class UserController {
               : asset.assetHash,
           details:
             context.tradingMode === 'perpetual'
-              ? // TODO: this is a hack to get the regular withdrawals working for perpetuals
-                // This should be revised mandatory in phase 2!
-                ERC20Details.parse({
-                  assetHash: context.collateralAsset.assetHash,
-                  assetTypeHash: context.collateralAsset.assetHash,
-                  type: 'ERC20',
-                  quantum: AssetId.decimals(
-                    context.collateralAsset.assetId
-                  ).toString(),
-                  contractError: [],
-                  address: EthereumAddress.ZERO,
-                  name: AssetId.symbol(context.collateralAsset.assetId),
-                  symbol: AssetId.symbol(context.collateralAsset.assetId),
-                  decimals: 2,
-                })
+              ? collateralAssetDetails(context.collateralAsset)
               : assetDetailsMap?.getByAssetHash(asset.assetHash),
         },
         amount: asset.withdrawableBalance,
@@ -518,3 +567,16 @@ function buildUserTransactions(
 
   return [...sentEntries, ...userEntries]
 }
+
+const collateralAssetDetails = (collateralAsset: CollateralAsset) =>
+  ERC20Details.parse({
+    assetHash: collateralAsset.assetHash,
+    assetTypeHash: collateralAsset.assetHash,
+    type: 'ERC20',
+    quantum: AssetId.decimals(collateralAsset.assetId).toString(),
+    contractError: [],
+    address: EthereumAddress.ZERO,
+    name: AssetId.symbol(collateralAsset.assetId),
+    symbol: AssetId.symbol(collateralAsset.assetId),
+    decimals: 2,
+  })

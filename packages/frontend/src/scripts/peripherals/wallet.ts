@@ -3,6 +3,7 @@ import {
   AcceptedData,
   CollateralAsset,
   CreateOfferData,
+  encodeFinalizeEscapeRequest,
   encodeFinalizeExitRequest,
   encodeFreezeRequest,
   encodePerpetualForcedTradeRequest,
@@ -252,6 +253,31 @@ export const Wallet = {
         {
           from: account.toString(),
           to: escapeVerifierAddress.toString(),
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendFinalizeEscapeTransaction(
+    account: EthereumAddress,
+    ownerStarkKey: StarkKey,
+    positionOrVaultId: bigint,
+    amount: bigint,
+    exchangeAddress: EthereumAddress
+  ) {
+    const data = encodeFinalizeEscapeRequest({
+      starkKey: ownerStarkKey,
+      positionOrVaultId,
+      quantizedAmount: amount,
+    })
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account.toString(),
+          to: exchangeAddress.toString(),
           data,
         },
       ],
