@@ -89,6 +89,17 @@ export class WithdrawableAssetRepository extends BaseRepository {
     return result ? toWithdrawalBalanceChangeRecord(result) : undefined
   }
 
+  async getByStarkKeyFromBlockNumber(
+    starkKey: StarkKey,
+    blockNumber: number
+  ): Promise<WithdrawableAssetRecord[]> {
+    const knex = await this.knex()
+    const results = await knex('withdrawable_assets')
+      .where('stark_key', starkKey.toString())
+      .andWhere('block_number', '>=', blockNumber)
+    return results.map(toWithdrawalBalanceChangeRecord)
+  }
+
   async deleteAfter(blockNumber: number): Promise<number> {
     const knex = await this.knex()
     return await knex('withdrawable_assets')
