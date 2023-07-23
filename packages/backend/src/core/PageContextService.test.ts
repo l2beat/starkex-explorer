@@ -57,6 +57,7 @@ describe(PageContextService.name, () => {
         freezeStatus: 'not-frozen',
       })
       expect(mockedUserService.getUserDetails).toHaveBeenCalledWith(givenUser)
+      expect(mockedKvStore.findByKeyWithDefault).toHaveBeenCalled()
     })
 
     it('should return the correct context for spot', async () => {

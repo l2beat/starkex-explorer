@@ -7,7 +7,7 @@ import {
   StarkKey,
   Timestamp,
 } from '@explorer/types'
-import { expect, mockObject } from 'earl'
+import { expect, mockFn, mockObject } from 'earl'
 import { BigNumber, providers } from 'ethers'
 import range from 'lodash/range'
 
@@ -28,6 +28,7 @@ import {
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { fakeCollateralAsset } from '../../test/fakes'
 import {
+  LogEscapeVerified,
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
   LogFullWithdrawalRequest,
@@ -429,6 +430,81 @@ describe(UserTransactionCollector.name, () => {
         starkKey,
         vaultId,
       },
+    })
+  })
+
+  it(`can process ${LogEscapeVerified.name}`, async () => {
+    const blockRange = new BlockRange([], 100, 200)
+    const starkKey = StarkKey.fake('123')
+    const withdrawalAmount = 123n
+    const sharedStateHash = Hash256.fake('abcfed')
+    const positionId = 88n
+    const transactionHash = Hash256.fake('abc')
+    const starkExAddress = EthereumAddress.fake('def')
+    const escapeVerifierAddress = EthereumAddress.fake('fed')
+
+    const ethereumClient = mockObject<EthereumClient>({
+      getLogsInRange: mockFn(async (range, parameters) => {
+        expect(range).toEqual(blockRange)
+        expect(
+          [
+            starkExAddress.toString(),
+            escapeVerifierAddress.toString(),
+          ].includes(parameters.address as string)
+        ).toBeTruthy()
+
+        const log = LogEscapeVerified.encodeLog([
+          BigNumber.from(starkKey.toString()),
+          BigNumber.from(withdrawalAmount),
+          BigNumber.from(sharedStateHash),
+          BigNumber.from(positionId),
+        ])
+        const fullLog = {
+          ...log,
+          blockNumber: 151,
+          transactionHash: transactionHash.toString(),
+        }
+        return [fullLog as providers.Log]
+      }),
+      async getBlockTimestamp(blockNumber) {
+        expect(blockNumber).toEqual(151)
+        return 1234
+      },
+    })
+
+    let added: UserTransactionAddRecord | undefined
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
+      async add(record) {
+        added = record
+        return 1
+      },
+    })
+
+    const collector = new UserTransactionCollector(
+      ethereumClient,
+      userTransactionRepository,
+      mockObject<WithdrawableAssetRepository>(),
+      starkExAddress,
+      escapeVerifierAddress
+    )
+
+    await collector.collect(blockRange)
+
+    expect(added).toEqual({
+      blockNumber: 151,
+      transactionHash,
+      timestamp: Timestamp(1234000),
+      data: {
+        type: 'EscapeVerified',
+        starkKey,
+        positionId,
+        sharedStateHash,
+        withdrawalAmount,
+      },
+    })
+    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith(blockRange, {
+      address: escapeVerifierAddress.toString(),
+      topics: [[LogEscapeVerified.topic]],
     })
   })
 

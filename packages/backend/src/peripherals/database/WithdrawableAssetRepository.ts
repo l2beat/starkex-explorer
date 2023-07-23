@@ -36,6 +36,9 @@ export class WithdrawableAssetRepository extends BaseRepository {
     this.getAssetBalancesByStarkKey = this.wrapGet(
       this.getAssetBalancesByStarkKey
     )
+    this.getByStarkKeyFromBlockNumber = this.wrapGet(
+      this.getByStarkKeyFromBlockNumber
+    )
     this.findById = this.wrapFind(this.findById)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
     this.deleteAll = this.wrapDelete(this.deleteAll)

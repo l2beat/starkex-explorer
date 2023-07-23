@@ -27,6 +27,15 @@ describe(KeyValueStore.name, () => {
     expect(value).toEqual(119812)
   })
 
+  it("doesn't return default when value exists", async () => {
+    await kvStore.addOrUpdate({ key: 'softwareMigrationNumber', value: 3 })
+    const value = await kvStore.findByKeyWithDefault(
+      'softwareMigrationNumber',
+      119812
+    )
+    expect(value).toEqual(3)
+  })
+
   it('reads and removes all values', async () => {
     await Promise.all([
       kvStore.addOrUpdate({ key: 'softwareMigrationNumber', value: 2 }),
