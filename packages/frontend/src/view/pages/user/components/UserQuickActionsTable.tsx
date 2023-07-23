@@ -93,7 +93,7 @@ function EscapableAssets(
                 </InlineEllipsis>
               </strong>
             </p>
-            {props.isMine && props.context.user && asset.asset.details && (
+            {props.isMine && props.context.user && (
               <FinalizeEscapeForm
                 user={props.context.user}
                 ownerStarkKey={props.starkKey}

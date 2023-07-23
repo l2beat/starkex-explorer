@@ -76,9 +76,6 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
       {context.freezeStatus === 'frozen' && (
         <div className="flex items-center justify-center gap-2 bg-red-500 px-6 py-0.5 text-white">
           <span>This exchange is FROZEN and no longer operates normally. </span>
-          <a href="/frozen" className="underline">
-            Read more
-          </a>
         </div>
       )}
     </div>

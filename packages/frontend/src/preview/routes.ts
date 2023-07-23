@@ -81,6 +81,7 @@ import {
   userParty,
 } from './data/transactions'
 import {
+  randomEscapableEntry,
   randomUserAssetEntry,
   randomUserBalanceChangeEntry,
   randomUserOfferEntry,
@@ -472,43 +473,6 @@ const routes: Route[] = [
     },
   },
   {
-    path: '/users/me/unregistered/exchange-frozen',
-    description:
-      'My user page, exchange frozen, the stark key is known, but it’s not registered.',
-    render: (ctx) => {
-      const context = getPerpetualPageContext(ctx, {
-        fallbackToFakeUser: true,
-      })
-      context.freezeStatus = 'frozen'
-      const starkKey = context.user.starkKey ?? StarkKey.fake()
-
-      ctx.body = renderUserPage({
-        context: {
-          ...context,
-          user: {
-            ...context.user,
-            starkKey,
-          },
-        },
-        starkKey: starkKey,
-        exchangeAddress: EthereumAddress.fake(),
-        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
-        finalizableOffers: [],
-        assets: repeat(7, randomUserAssetEntry),
-        totalAssets: 7,
-        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
-        totalBalanceChanges: 3367,
-        transactions: repeat(10, randomUserTransactionEntry),
-        totalTransactions: 48,
-        offers: repeat(6, randomUserOfferEntry),
-        totalOffers: 6,
-        escapableAssets: [],
-        l2Transactions: [],
-        totalL2Transactions: 0,
-      })
-    },
-  },
-  {
     path: '/users/me/registered',
     description: 'My user page, the stark key is known and registered.',
     render: (ctx) => {
@@ -598,37 +562,6 @@ const routes: Route[] = [
         totalTransactions: 48,
         l2Transactions: repeat(6, randomPerpetualUserL2TransactionEntry),
         totalL2Transactions: 5123,
-        offers: repeat(6, randomUserOfferEntry),
-        totalOffers: 6,
-        escapableAssets: [],
-      })
-    },
-  },
-
-  {
-    path: '/users/:starkKey/exchange-frozen',
-    link: '/users/someone/exchange-frozen',
-    description:
-      'Someone else’s user page when exchange is in frozen state, so escape functionality is available.',
-    render: (ctx) => {
-      const context = getPerpetualPageContext(ctx)
-      context.freezeStatus = 'frozen'
-
-      ctx.body = renderUserPage({
-        context,
-        starkKey: StarkKey.fake(),
-        ethereumAddress: EthereumAddress.fake(),
-        exchangeAddress: EthereumAddress.fake(),
-        withdrawableAssets: repeat(3, randomWithdrawableAssetEntry),
-        finalizableOffers: repeat(2, randomUserOfferEntry),
-        assets: repeat(7, randomUserAssetEntry),
-        totalAssets: 7,
-        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
-        totalBalanceChanges: 3367,
-        transactions: repeat(10, randomUserTransactionEntry),
-        l2Transactions: repeat(6, randomPerpetualL2TransactionEntry),
-        totalL2Transactions: 6,
-        totalTransactions: 5123,
         offers: repeat(6, randomUserOfferEntry),
         totalOffers: 6,
         escapableAssets: [],
@@ -1094,6 +1027,28 @@ const routes: Route[] = [
       })
     },
   },
+  // #endregion
+  // #region Freeze and escape
+  {
+    path: '/home/freezable',
+    description: 'The home page when exchange can be frozen',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      context.freezeStatus = 'freezable'
+
+      ctx.body = renderHomePage({
+        context,
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        totalStateUpdates: 5123,
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        totalForcedTransactions: 68,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, randomHomeOfferEntry),
+        totalOffers: 7,
+      })
+    },
+  },
   {
     path: '/freeze',
     description: 'Request to freeze the exchange.',
@@ -1113,8 +1068,70 @@ const routes: Route[] = [
     },
   },
   {
+    path: '/home/frozen',
+    description: 'The home page when exchange is frozen',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      context.freezeStatus = 'frozen'
+
+      ctx.body = renderHomePage({
+        context,
+        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        totalStateUpdates: 5123,
+        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        totalForcedTransactions: 68,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, randomHomeOfferEntry),
+        totalOffers: 7,
+      })
+    },
+  },
+  {
+    path: '/users/me/exchange-frozen',
+    description: 'My user page with ESCAPE button, the exchange is frozen.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+      const starkKey = context.user.starkKey ?? StarkKey.fake()
+
+      ctx.body = renderUserPage({
+        context: {
+          ...context,
+          user: {
+            ...context.user,
+            starkKey,
+          },
+        },
+        starkKey: starkKey,
+        ethereumAddress: context.user.address,
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: [],
+        finalizableOffers: [],
+        assets: [
+          randomUserAssetEntry('WITHDRAW', { hashOrId: AssetId('USDC-6') }),
+          ...repeat(7, () => randomUserAssetEntry('CLOSE')),
+        ],
+        totalAssets: 8,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+        escapableAssets: [],
+      })
+    },
+  },
+  {
     path: '/escape/:positionOrVaultId',
-    description: 'Initiate withdrawal via Escape Hatch',
+    link: '/escape/12345',
+    description:
+      'Initiate withdrawal via Escape Hatch of position or vault 12345',
     render: (ctx) => {
       const context = getPerpetualPageContext(ctx, {
         fallbackToFakeUser: true,
@@ -1129,6 +1146,44 @@ const routes: Route[] = [
         serializedState: [],
       })
     },
+  },
+  {
+    path: '/users/me/finalizable-escape',
+    description: 'My user page, the stark key is known and registered.',
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx, {
+        fallbackToFakeUser: true,
+      })
+      context.freezeStatus = 'frozen'
+      const starkKey = context.user.starkKey ?? StarkKey.fake()
+
+      ctx.body = renderUserPage({
+        context: {
+          ...context,
+          user: {
+            ...context.user,
+            starkKey,
+          },
+        },
+        starkKey: starkKey,
+        ethereumAddress: context.user.address,
+        exchangeAddress: EthereumAddress.fake(),
+        withdrawableAssets: [],
+        finalizableOffers: [],
+        assets: [],
+        totalAssets: 0,
+        balanceChanges: repeat(10, randomUserBalanceChangeEntry),
+        totalBalanceChanges: 3367,
+        transactions: repeat(10, randomUserTransactionEntry),
+        totalTransactions: 48,
+        l2Transactions: [],
+        totalL2Transactions: 0,
+        offers: repeat(6, randomUserOfferEntry),
+        totalOffers: 6,
+        escapableAssets: [randomEscapableEntry()],
+      })
+    },
+    breakAfter: true,
   },
   // #endregion
   // #region Offers and transactions
