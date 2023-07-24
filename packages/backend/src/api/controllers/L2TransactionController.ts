@@ -104,12 +104,17 @@ export class L2TransactionController {
     }
 
     transaction = this.convertPricesToUSDCents(transaction)
-    const { id, blockNumber, ...transactionToShow } = transaction
+
     return {
       type: 'success',
       content: renderRawL2TransactionPage({
         context,
-        transaction: transactionToShow,
+        transaction: {
+          transactionId: transaction.transactionId,
+          stateUpdateId: transaction.stateUpdateId,
+          originalTransaction: transaction.originalTransaction,
+          alternativeTransactions: transaction.alternativeTransactions,
+        },
       }),
     }
   }
