@@ -12,6 +12,9 @@ describe(PageContextService.name, () => {
       tradingMode: 'perpetual',
       instanceName: 'dYdX',
       collateralAsset: fakeCollateralAsset,
+      l2Transactions: {
+        enabled: true,
+      },
       blockchain: {
         chainId: 1,
       },
@@ -21,6 +24,9 @@ describe(PageContextService.name, () => {
     starkex: {
       tradingMode: 'spot',
       instanceName: 'Myria',
+      l2Transactions: {
+        enabled: true,
+      },
       blockchain: {
         chainId: 5,
       },
