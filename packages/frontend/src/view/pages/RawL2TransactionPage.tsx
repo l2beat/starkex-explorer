@@ -32,7 +32,7 @@ export function RawL2TransactionPage(props: RawL2TransactionPageProps) {
       )} l2 transaction`}
       path="/raw-l2-transactions/:transactionId"
     >
-      <ContentWrapper className="flex flex-col">
+      <ContentWrapper className="flex !max-w-6xl flex-col">
         <div className="flex gap-3">
           <PageTitle>{`Raw data of transaction #${props.transaction.transactionId}`}</PageTitle>
           <span className="h-min rounded-full bg-fuchsia-400 py-2 px-2.5 text-sm font-bold text-black">
@@ -47,7 +47,9 @@ export function RawL2TransactionPage(props: RawL2TransactionPageProps) {
           </div>
         )}
         <Card>
-          <span>{toJsonWithoutBigInts(transactionData, 2)}</span>
+          <pre className="whitespace-pre-wrap">
+            {toJsonWithoutBigInts(transactionData, 2)}
+          </pre>
         </Card>
       </ContentWrapper>
     </Page>
