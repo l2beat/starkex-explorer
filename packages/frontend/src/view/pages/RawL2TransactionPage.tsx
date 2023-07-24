@@ -23,7 +23,7 @@ export function renderRawL2TransactionPage(props: RawL2TransactionPageProps) {
 
 export function RawL2TransactionPage(props: RawL2TransactionPageProps) {
   const isReplaced = props.transaction.alternativeTransactions.length > 0
-  const { transactionId, stateUpdateId, ...transactionData } = props.transaction
+
   return (
     <Page
       context={props.context}
@@ -48,7 +48,7 @@ export function RawL2TransactionPage(props: RawL2TransactionPageProps) {
         )}
         <Card>
           <pre className="whitespace-pre-wrap">
-            {toJsonWithoutBigInts(transactionData, 2)}
+            {toJsonWithoutBigInts(props.transaction, 2)}
           </pre>
         </Card>
       </ContentWrapper>

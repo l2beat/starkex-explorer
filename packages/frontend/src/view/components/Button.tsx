@@ -3,8 +3,10 @@ import React, { ComponentPropsWithoutRef, ElementType } from 'react'
 
 type ButtonProps<T extends ElementType> = {
   variant?: ButtonVariant
+  className?: string
   as?: T
 } & ComponentPropsWithoutRef<T> &
+  // eslint-disable-next-line @typescript-eslint/ban-types
   (T extends 'a' ? { disabled?: boolean } : {})
 
 type ButtonVariant = 'contained' | 'outlined'
