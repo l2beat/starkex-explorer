@@ -16,6 +16,7 @@ export function getProductionConfig(env: Env): Config {
       connectionString: env.string('DATABASE_URL'),
       ssl: { rejectUnauthorized: false },
     },
+    basicAuth: env.optionalString('BASIC_AUTH'),
     enableSync: true,
     enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
     freshStart: false,
