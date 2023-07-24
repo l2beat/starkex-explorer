@@ -634,6 +634,7 @@ export class Application {
       ],
       forceHttps: config.forceHttps,
       handleServerError,
+      basicAuth: config.basicAuth,
     })
 
     // #endregion api
