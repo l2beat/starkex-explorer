@@ -13,6 +13,7 @@ export function getLocalConfig(env: Env): Config {
     },
     port: env.integer('PORT', 3000),
     databaseConnection: env.string('LOCAL_DB_URL'),
+    basicAuth: env.optionalString('BASIC_AUTH'),
     enableSync: true,
     enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
     freshStart: env.boolean('FRESH_START', false),
