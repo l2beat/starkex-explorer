@@ -12,7 +12,7 @@ import {
 } from '@explorer/types'
 import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
-import { uniq } from 'lodash'
+import uniq from 'lodash/uniq'
 import { beforeEach, it } from 'mocha'
 
 import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
