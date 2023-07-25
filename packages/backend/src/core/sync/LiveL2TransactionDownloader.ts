@@ -90,7 +90,13 @@ export class LiveL2TransactionDownloader {
       return
     }
 
-    await this.downloadAndAddTransactions(lastSyncedThirdPartyId + 1)
+    try {
+      await this.downloadAndAddTransactions(lastSyncedThirdPartyId + 1)
+    } catch (error) {
+      // Ignoring the error - we don't want to kill the server
+      this.logger.error(error)
+      this.isRunning = false
+    }
   }
 
   private async downloadAndAddTransactions(thirdPartyId: number) {
@@ -112,9 +118,7 @@ export class LiveL2TransactionDownloader {
       transactions[transactions.length - 1]?.thirdPartyId !==
       lastSyncedThirdPartyId
     ) {
-      this.logger.error('ThirdPartyId should come in sequentional order')
-      this.isRunning = false
-      return
+      throw new Error('ThirdPartyId should come in sequentional order')
     }
 
     await this.l2TransactionRepository.runInTransactionWithLockedTable(
