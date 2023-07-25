@@ -60,7 +60,6 @@ export class L2TransactionRepository extends BaseRepository {
     this.addMultiTransaction = this.wrapAdd(this.addMultiTransaction)
     this.addSingleTransaction = this.wrapAdd(this.addSingleTransaction)
     this.addTransaction = this.wrapAdd(this.addTransaction)
-    this.countByTransactionId = this.wrapAny(this.countByTransactionId)
     this.getStarkKeysByStateUpdateId = this.wrapGet(
       this.getStarkKeysByStateUpdateId
     )
@@ -76,6 +75,7 @@ export class L2TransactionRepository extends BaseRepository {
     )
     this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
     this.findById = this.wrapFind(this.findById)
+    this.findByTransactionId = this.wrapFind(this.findByTransactionId)
     this.findAggregatedByTransactionId = this.wrapFind(
       this.findAggregatedByTransactionId
     )
@@ -104,6 +104,26 @@ export class L2TransactionRepository extends BaseRepository {
     trx?: Knex.Transaction
   ): Promise<number> {
     const knex = await this.knex(trx)
+
+    const existing = await this.findByTransactionId(record.transactionId, trx)
+
+    if (record.state === 'alternative' && !existing) {
+      throw new Error('L2 Transaction does not exist when adding alternative')
+    }
+
+    if (record.state === 'alternative' && existing?.state !== 'replaced') {
+      throw new Error(
+        'L2 Transaction should be "replaced" when adding alternative'
+      )
+    }
+
+    if (record.state !== 'alternative') {
+      if (existing) {
+        throw new Error(
+          'L2 Transaction already exists when adding from Feeder Gatway'
+        )
+      }
+    }
 
     return await this.addTransaction({ ...record, state: record.state }, knex)
   }
@@ -253,17 +273,6 @@ export class L2TransactionRepository extends BaseRepository {
       )
     }
     return parentId
-  }
-
-  async countByTransactionId(transactionId: number): Promise<number> {
-    const knex = await this.knex()
-    const [result] = await knex('l2_transactions')
-      // We filter out the child transactions because they should not be counted as separate transactions
-      .where({ transaction_id: transactionId, parent_id: null })
-      .count()
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return Number(result!.count)
   }
 
   async getStarkKeysByStateUpdateId(
@@ -484,6 +493,18 @@ export class L2TransactionRepository extends BaseRepository {
   ): Promise<Record | undefined> {
     const knex = await this.knex(trx)
     const row = await knex('l2_transactions').where({ id }).first()
+
+    return row ? toRecord(row) : undefined
+  }
+
+  async findByTransactionId(
+    transactionId: number,
+    trx?: Knex.Transaction
+  ): Promise<Record | undefined> {
+    const knex = await this.knex(trx)
+    const row = await knex('l2_transactions')
+      .where({ transaction_id: transactionId })
+      .first()
 
     return row ? toRecord(row) : undefined
   }
