@@ -140,7 +140,7 @@ export class UserController {
       forcedTradeOffers,
       forcedTradeOffersCount,
       finalizableOffers,
-      withdrawableAssets,
+      starkKeyWithdrawableAssets,
       userStatistics,
     ] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
@@ -185,6 +185,16 @@ export class UserController {
         message: `User with starkKey ${starkKey.toString()} not found`,
       }
     }
+    const ethAddressWithdrawableAssets = givenUser.address
+      ? await this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
+          StarkKey.fromEthereumAddress(givenUser.address)
+        )
+      : []
+
+    const withdrawableAssets = [
+      ...starkKeyWithdrawableAssets,
+      ...ethAddressWithdrawableAssets,
+    ]
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
