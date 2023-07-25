@@ -28,7 +28,7 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private l2TransactionRepository: L2TransactionRepository,
     private logger: Logger,
     private l2TransactionsEnabled: boolean,
-    private isEnabled: boolean = true
+    private isEnabled: boolean
   ) {
     this.logger = this.logger.for(this)
   }

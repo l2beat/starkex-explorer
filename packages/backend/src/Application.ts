@@ -502,6 +502,7 @@ export class Application {
         userL2TransactionsPreprocessor,
         l2TransactionRepository,
         logger,
+        config.starkex.l2Transactions.enabled,
         isPreprocessorEnabled
       )
     } else {
@@ -540,6 +541,7 @@ export class Application {
         userL2TransactionsPreprocessor,
         l2TransactionRepository,
         logger,
+        config.starkex.l2Transactions.enabled,
         isPreprocessorEnabled
       )
     }
