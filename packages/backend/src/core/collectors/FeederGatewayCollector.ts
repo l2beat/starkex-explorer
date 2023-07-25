@@ -22,41 +22,41 @@ export class FeederGatewayCollector {
     const latestSyncedTransactionStateUpdateId =
       await this.l2TransactionRepository.findLatestStateUpdateId()
 
-    for (
-      let stateUpdateId = latestSyncedTransactionStateUpdateId
-        ? latestSyncedTransactionStateUpdateId + 1
-        : 1;
-      stateUpdateId <= latestStateUpdate.id;
-      stateUpdateId++
-    ) {
-      const stateUpdate = await this.stateUpdateRepository.findById(
-        stateUpdateId
-      )
+    await this.l2TransactionRepository.runInTransactionWithLockedTable(
+      async (trx) => {
+        for (
+          let stateUpdateId = latestSyncedTransactionStateUpdateId
+            ? latestSyncedTransactionStateUpdateId + 1
+            : 1;
+          stateUpdateId <= latestStateUpdate.id;
+          stateUpdateId++
+        ) {
+          const stateUpdate = await this.stateUpdateRepository.findById(
+            stateUpdateId
+          )
 
-      // We throw an error if the state update is not found.
-      // It's a critical error and we should stop the sync process, becasue
-      // latestStateUpdate was found, but the state update before it was not.
-      if (!stateUpdate) {
-        throw new Error(`State update ${stateUpdateId} not found`)
-      }
+          // We throw an error if the state update is not found.
+          // It's a critical error and we should stop the sync process, becasue
+          // latestStateUpdate was found, but the state update before it was not.
+          if (!stateUpdate) {
+            throw new Error(`State update ${stateUpdateId} not found`)
+          }
 
-      this.logger.info(`Collecting transactions from Feeder Gateway`, {
-        stateUpdateId: stateUpdate.id,
-      })
+          this.logger.info(`Collecting transactions from Feeder Gateway`, {
+            stateUpdateId: stateUpdate.id,
+          })
 
-      const data = await this.feederGatewayClient.getPerpetualBatchInfo(
-        stateUpdate.batchId
-      )
+          const data = await this.feederGatewayClient.getPerpetualBatchInfo(
+            stateUpdate.batchId
+          )
 
-      // We stop collecting transactions if there is no batch data.
-      // It will not stop the sync process, but it will stop the transaction collection.
-      // We will try to collect unsynced transactions on the next state update sync.
-      if (!data) {
-        return
-      }
+          // We stop collecting transactions if there is no batch data.
+          // It will not stop the sync process, but it will stop the transaction collection.
+          // We will try to collect unsynced transactions on the next state update sync.
+          if (!data) {
+            return
+          }
 
-      await this.l2TransactionRepository.runInTransactionWithLockedTable(
-        async (trx) => {
           const transactionIds = data.transactionsInfo.map(
             (tx) => tx.originalTransactionId
           )
@@ -90,8 +90,8 @@ export class FeederGatewayCollector {
             }
           }
         }
-      )
-    }
+      }
+    )
   }
 
   async discardAfter(blockNumber: number) {

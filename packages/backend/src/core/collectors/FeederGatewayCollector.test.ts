@@ -54,7 +54,7 @@ describe(FeederGatewayCollector.name, () => {
       ).toHaveBeenCalledTimes(1)
       expect(
         mockL2TransactionRepository.runInTransactionWithLockedTable
-      ).toHaveBeenCalledTimes(5)
+      ).toHaveBeenCalledTimes(1)
       for (const i of [1, 2, 3, 4, 5]) {
         expect(mockStateUpdateRepository.findById).toHaveBeenNthCalledWith(i, i)
         const stateUpdate = fakeStateUpdateRecord(i)
@@ -157,7 +157,7 @@ describe(FeederGatewayCollector.name, () => {
 
       expect(
         mockL2TransactionRepository.runInTransactionWithLockedTable
-      ).toHaveBeenCalledTimes(4)
+      ).toHaveBeenCalledTimes(1)
 
       for (const i of [7, 8, 9, 10]) {
         expect(mockStateUpdateRepository.findById).toHaveBeenNthCalledWith(
@@ -225,10 +225,16 @@ describe(FeederGatewayCollector.name, () => {
     })
 
     it('should stop collecting transactions if there is no batch data', async () => {
+      const knexTransaction = mockObject<Knex.Transaction>()
       const mockedL2TransactionRepository = mockObject<L2TransactionRepository>(
         {
           findLatestStateUpdateId: mockFn().resolvesTo(undefined),
           add: mockFn(),
+          runInTransactionWithLockedTable: mockFn(
+            async (fun: (trx: Knex.Transaction) => Promise<void>) => {
+              await fun(knexTransaction)
+            }
+          ),
         }
       )
       const feederGatewayCollector = new FeederGatewayCollector(
@@ -245,7 +251,9 @@ describe(FeederGatewayCollector.name, () => {
       )
 
       await feederGatewayCollector.collect()
-
+      expect(
+        mockedL2TransactionRepository.runInTransactionWithLockedTable
+      ).toHaveBeenCalledTimes(1)
       expect(mockedL2TransactionRepository.add).not.toHaveBeenCalled()
     })
 
@@ -298,9 +306,15 @@ describe(FeederGatewayCollector.name, () => {
   })
 
   it('should throw error if there is no state update in db for given stateUpdateId', async () => {
+    const knexTransaction = mockObject<Knex.Transaction>()
     const mockedL2TransactionRepository = mockObject<L2TransactionRepository>({
       findLatestStateUpdateId: mockFn().resolvesTo(5),
       add: mockFn(),
+      runInTransactionWithLockedTable: mockFn(
+        async (fun: (trx: Knex.Transaction) => Promise<void>) => {
+          await fun(knexTransaction)
+        }
+      ),
     })
     const feederGatewayCollector = new FeederGatewayCollector(
       mockObject<FeederGatewayClient>(),
@@ -316,6 +330,9 @@ describe(FeederGatewayCollector.name, () => {
     await expect(feederGatewayCollector.collect()).toBeRejectedWith(
       `State update 6 not found`
     )
+    expect(
+      mockedL2TransactionRepository.runInTransactionWithLockedTable
+    ).toHaveBeenCalledTimes(1)
     expect(mockedL2TransactionRepository.add).not.toHaveBeenCalled()
   })
 
