@@ -602,6 +602,19 @@ export class L2TransactionRepository extends BaseRepository {
     const knex = await this.knex(trx)
     await knex.raw('LOCK TABLE l2_transactions IN ROW EXCLUSIVE MODE;')
   }
+
+  async starkKeyExists(
+    starkKey: StarkKey,
+    trx?: Knex.Transaction
+  ): Promise<boolean> {
+    const knex = await this.knex(trx)
+    const row = await knex('l2_transactions')
+      .where('stark_key_a', starkKey.toString())
+      .orWhere('stark_key_b', starkKey.toString())
+      .first()
+
+    return row !== undefined
+  }
 }
 
 function toRecord(row: L2TransactionRow): Record {

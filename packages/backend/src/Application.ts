@@ -617,6 +617,7 @@ export class Application {
         : vaultRepository,
       userRegistrationEventRepository,
       preprocessedAssetHistoryRepository,
+      l2TransactionRepository,
       config.starkex.tradingMode
     )
 

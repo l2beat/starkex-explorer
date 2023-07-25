@@ -90,6 +90,12 @@ function UserPage(props: UserPageProps) {
           visible={props.assets.length}
           total={props.totalAssets}
         >
+          {props.context.showL2Transactions && (
+            <div className="flex h-6 text-md text-zinc-500">
+              ⓘ Guaranteed state of balances (proven on Ethereum), updated every
+              few hours:
+            </div>
+          )}
           <UserAssetsTable
             tradingMode={props.context.tradingMode}
             starkKey={props.starkKey}

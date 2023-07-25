@@ -295,4 +295,18 @@ describe(L2TransactionRepository.name, () => {
       expect(transaction?.stateUpdateId).toBeNullish()
     })
   })
+
+  describe(L2TransactionRepository.prototype.starkKeyExists.name, () => {
+    it("returns false if user doesn't exist", async () => {
+      expect(await repository.starkKeyExists(StarkKey.fake())).toEqual(false)
+    })
+
+    it('returns true if user exists', async () => {
+      await repository.addFeederGatewayTransaction(genericDepositTransaction)
+
+      expect(
+        await repository.starkKeyExists(genericDepositTransaction.data.starkKey)
+      ).toEqual(true)
+    })
+  })
 })
