@@ -31,8 +31,12 @@ describe(LiveL2TransactionDownloader.name, () => {
   describe(LiveL2TransactionDownloader.prototype.start.name, () => {
     it('should initialize, start and sync', async () => {
       const thirdPartyId = 1200005
-      const firstTxs = range(100).map(() => fakeL2Transaction())
-      const secondTxs = range(99).map(() => fakeL2Transaction())
+      const firstTxs = range(100).map((i) =>
+        fakeL2Transaction({ thirdPartyId: thirdPartyId + i + 1 })
+      )
+      const secondTxs = range(99).map((i) =>
+        fakeL2Transaction({ thirdPartyId: thirdPartyId + i + 100 })
+      )
 
       const mockKnexTransaction = mockObject<Knex.Transaction>({})
       const mockClock = mockObject<Clock>({
@@ -97,7 +101,7 @@ describe(LiveL2TransactionDownloader.name, () => {
           1,
           {
             key: 'lastSyncedThirdPartyId',
-            value: thirdPartyId + firstTxs.length + 1,
+            value: thirdPartyId + firstTxs.length,
           },
           mockKnexTransaction
         )
@@ -105,7 +109,7 @@ describe(LiveL2TransactionDownloader.name, () => {
 
       expect(
         mockLiveL2TransactionClient.getPerpetualLiveTransactions
-      ).toHaveBeenNthCalledWith(2, thirdPartyId + firstTxs.length + 1, 100)
+      ).toHaveBeenNthCalledWith(2, thirdPartyId + firstTxs.length, 100)
       await waitForExpect(() => {
         secondTxs.forEach((tx, i) => {
           expect(
@@ -123,7 +127,7 @@ describe(LiveL2TransactionDownloader.name, () => {
             2,
             {
               key: 'lastSyncedThirdPartyId',
-              value: thirdPartyId + firstTxs.length + secondTxs.length + 1,
+              value: thirdPartyId + firstTxs.length + secondTxs.length - 1,
             },
             mockKnexTransaction
           )

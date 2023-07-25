@@ -107,7 +107,16 @@ export class LiveL2TransactionDownloader {
       return
     }
 
-    const lastSyncedThirdPartyId = thirdPartyId + transactions.length
+    const lastSyncedThirdPartyId = thirdPartyId + transactions.length - 1
+    if (
+      transactions[transactions.length - 1]?.thirdPartyId !==
+      lastSyncedThirdPartyId
+    ) {
+      this.logger.error('ThirdPartyId should come in sequentional order')
+      this.isRunning = false
+      return
+    }
+
     await this.l2TransactionRepository.runInTransactionWithLockedTable(
       async (trx) => {
         await this.addTransactions(transactions, trx)
@@ -116,7 +125,7 @@ export class LiveL2TransactionDownloader {
       }
     )
 
-    if (transactions.length === this.PAGE_SIZE) {
+    if (transactions.length >= this.PAGE_SIZE) {
       await this.downloadAndAddTransactions(lastSyncedThirdPartyId)
     } else {
       this.isRunning = false
