@@ -89,17 +89,11 @@ export class LiveL2TransactionDownloader {
       this.isRunning = false
       return
     }
-    await this.l2TransactionRepository.runInTransactionWithLockedTable(
-      async (trx) => {
-        await this.downloadAndAddTransactions(lastSyncedThirdPartyId + 1, trx)
-      }
-    )
+
+    await this.downloadAndAddTransactions(lastSyncedThirdPartyId + 1)
   }
 
-  private async downloadAndAddTransactions(
-    thirdPartyId: number,
-    trx: Knex.Transaction
-  ) {
+  private async downloadAndAddTransactions(thirdPartyId: number) {
     this.logger.info(`Downloading live transactions from ${thirdPartyId}`)
 
     const transactions =
@@ -113,13 +107,17 @@ export class LiveL2TransactionDownloader {
       return
     }
 
-    await this.addTransactions(transactions, trx)
-
     const lastSyncedThirdPartyId = thirdPartyId + transactions.length
-    await this.updateLastSyncedThirdPartyId(lastSyncedThirdPartyId, trx)
+    await this.l2TransactionRepository.runInTransactionWithLockedTable(
+      async (trx) => {
+        await this.addTransactions(transactions, trx)
+
+        await this.updateLastSyncedThirdPartyId(lastSyncedThirdPartyId, trx)
+      }
+    )
 
     if (transactions.length === this.PAGE_SIZE) {
-      await this.downloadAndAddTransactions(lastSyncedThirdPartyId, trx)
+      await this.downloadAndAddTransactions(lastSyncedThirdPartyId)
     } else {
       this.isRunning = false
     }
