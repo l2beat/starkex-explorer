@@ -53,7 +53,13 @@ export class L2TransactionRepository extends BaseRepository {
   constructor(database: Database, logger: Logger) {
     super(database, logger)
     /* eslint-disable @typescript-eslint/unbound-method */
-    this.add = this.wrapAdd(this.add)
+    this.addFeederGatewayTransaction = this.wrapAdd(
+      this.addFeederGatewayTransaction
+    )
+    this.addLiveTransaction = this.wrapAdd(this.addLiveTransaction)
+    this.addMultiTransaction = this.wrapAdd(this.addMultiTransaction)
+    this.addSingleTransaction = this.wrapAdd(this.addSingleTransaction)
+    this.addTransaction = this.wrapAdd(this.addTransaction)
     this.countByTransactionId = this.wrapAny(this.countByTransactionId)
     this.getStarkKeysByStateUpdateId = this.wrapGet(
       this.getStarkKeysByStateUpdateId
@@ -87,12 +93,25 @@ export class L2TransactionRepository extends BaseRepository {
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
-  async add(
+  async addFeederGatewayTransaction(
     record: {
       transactionId: number
       data: PerpetualL2TransactionData
-      stateUpdateId?: number
-      blockNumber?: number
+      stateUpdateId: number
+      blockNumber: number
+      state: 'replaced' | 'alternative' | undefined
+    },
+    trx?: Knex.Transaction
+  ): Promise<number> {
+    const knex = await this.knex(trx)
+
+    return await this.addTransaction({ ...record, state: record.state }, knex)
+  }
+
+  async addLiveTransaction(
+    record: {
+      transactionId: number
+      data: PerpetualL2TransactionData
     },
     trx?: Knex.Transaction
   ): Promise<number> {
@@ -101,36 +120,64 @@ export class L2TransactionRepository extends BaseRepository {
     const existingRecord = await this.findOldestByTransactionId(
       record.transactionId
     )
-    const isLive = record.stateUpdateId === undefined
 
     const isAlternative = !!existingRecord
 
-    /*
-      If live transactions are somehow behind the transactions from feeder gateway, we should not add them
-      Although we should add them if transaction in database is not included as it is alternative to the one in database
-    */
-    if (
-      isLive &&
-      existingRecord?.transactionId === record.transactionId &&
-      existingRecord.stateUpdateId !== undefined
-    ) {
-      return 0
+    if (existingRecord) {
+      /*
+        If live transactions are somehow behind the transactions from feeder gateway, we should not add them
+        Although we should add them if transaction in database is not included as it is alternative to the one in database
+      */
+      if (
+        existingRecord.transactionId === record.transactionId &&
+        existingRecord.stateUpdateId !== undefined
+      ) {
+        return 0
+      }
+
+      if (existingRecord.state === undefined) {
+        await knex('l2_transactions')
+          .update({ state: 'replaced' })
+          .where({ transaction_id: record.transactionId })
+      }
     }
 
-    if (existingRecord && existingRecord.state === undefined) {
-      await knex('l2_transactions')
-        .update({ state: 'replaced' })
-        .where({ transaction_id: record.transactionId })
-    }
+    return await this.addTransaction(
+      {
+        ...record,
+        state: isAlternative ? 'alternative' : undefined,
+      },
+      knex
+    )
+  }
 
+  private async addTransaction(
+    record: {
+      transactionId: number
+      data: PerpetualL2TransactionData
+      parentId?: number
+      stateUpdateId?: number
+      blockNumber?: number
+      state: 'replaced' | 'alternative' | undefined
+    },
+    knex: Knex
+  ) {
     if (record.data.type === 'MultiTransaction') {
       return await this.addMultiTransaction(
-        { ...record, data: record.data, isAlternative },
+        {
+          ...record,
+          data: record.data,
+          state: record.state,
+        },
         knex
       )
     } else {
       return await this.addSingleTransaction(
-        { ...record, data: record.data, isAlternative },
+        {
+          ...record,
+          data: record.data,
+          state: record.state,
+        },
         knex
       )
     }
@@ -139,11 +186,11 @@ export class L2TransactionRepository extends BaseRepository {
   private async addSingleTransaction(
     record: {
       transactionId: number
-      isAlternative: boolean
       data: Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
       parentId?: number
       stateUpdateId?: number
       blockNumber?: number
+      state: 'replaced' | 'alternative' | undefined
     },
     knex: Knex
   ) {
@@ -155,7 +202,7 @@ export class L2TransactionRepository extends BaseRepository {
         state_update_id: record.stateUpdateId,
         block_number: record.blockNumber,
         parent_id: record.parentId,
-        state: record.isAlternative ? 'alternative' : null,
+        state: record.state ?? null,
         stark_key_a: starkKeyA?.toString(),
         stark_key_b: starkKeyB?.toString(),
         type: record.data.type,
@@ -169,10 +216,10 @@ export class L2TransactionRepository extends BaseRepository {
   private async addMultiTransaction(
     record: {
       transactionId: number
-      isAlternative: boolean
       data: PerpetualL2MultiTransactionData
       stateUpdateId?: number
       blockNumber?: number
+      state: 'replaced' | 'alternative' | undefined
     },
     knex: Knex
   ) {
@@ -184,7 +231,7 @@ export class L2TransactionRepository extends BaseRepository {
         state_update_id: record.stateUpdateId,
         block_number: record.blockNumber,
         type: record.data.type,
-        state: record.isAlternative ? 'alternative' : null,
+        state: record.state ?? null,
         data,
       })
       .returning('id')
@@ -198,9 +245,9 @@ export class L2TransactionRepository extends BaseRepository {
           transactionId: record.transactionId,
           stateUpdateId: record.stateUpdateId,
           blockNumber: record.blockNumber,
-          isAlternative: record.isAlternative,
           data: transaction,
           parentId,
+          state: record.state,
         },
         knex
       )
@@ -378,6 +425,7 @@ export class L2TransactionRepository extends BaseRepository {
       .whereNotIn('type', excludeL2TransactionTypes)
       // We filter out the multi transactions because we show the child transactions instead
       .andWhereNot({ type: 'MultiTransaction' })
+      .orderBy('state_update_id', 'desc')
       .orderBy('id', 'desc')
       .offset(offset)
       .limit(limit)
@@ -404,6 +452,7 @@ export class L2TransactionRepository extends BaseRepository {
             stark_key_b: starkKey.toString(),
           })
       )
+      .orderBy('state_update_id', 'desc')
       .orderBy('id', 'desc')
       .limit(limit)
       .offset(offset)
@@ -421,6 +470,7 @@ export class L2TransactionRepository extends BaseRepository {
       .andWhere({ state_update_id: stateUpdateId })
       // We filter out the multi transactions because we show the child transactions instead
       .andWhereNot({ type: 'MultiTransaction' })
+      .orderBy('state_update_id', 'desc')
       .orderBy('id', 'desc')
       .offset(offset)
       .limit(limit)

@@ -128,13 +128,12 @@ export class LiveL2TransactionDownloader {
     trx: Knex.Transaction
   ) {
     for (const transaction of transactions) {
-      await this.l2TransactionRepository.add(
-        {
-          transactionId: transaction.transactionId,
-          data: transaction.transaction,
-        },
-        trx
-      )
+      const record = {
+        transactionId: transaction.transactionId,
+        data: transaction.transaction,
+      }
+
+      await this.l2TransactionRepository.addLiveTransaction(record, trx)
     }
   }
 

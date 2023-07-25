@@ -19,22 +19,27 @@ import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { setupDatabaseTestSuite } from '../../test/database'
 import { L2TransactionRepository } from './L2TransactionRepository'
 
-const genericMultiTransaction = (
+const genericLiveMultiTransaction = (
   transactions: PerpetualL2TransactionData[]
 ) => ({
-  stateUpdateId: 1,
   transactionId: 1234,
-  blockNumber: 12345,
   data: {
     type: 'MultiTransaction',
     transactions,
   } as PerpetualL2MultiTransactionData,
 })
 
-const genericDepositTransaction = {
+const genericMultiTransaction = (
+  transactions: PerpetualL2TransactionData[]
+) => ({
+  ...genericLiveMultiTransaction(transactions),
   stateUpdateId: 1,
-  transactionId: 1234,
   blockNumber: 12345,
+  state: undefined,
+})
+
+const genericLiveDepositTransaction = {
+  transactionId: 1234,
   data: {
     type: 'Deposit',
     starkKey: StarkKey.fake(),
@@ -43,10 +48,15 @@ const genericDepositTransaction = {
   },
 } as const
 
-const genericWithdrawalToAddressTransaction = {
+const genericDepositTransaction = {
+  ...genericLiveDepositTransaction,
   stateUpdateId: 1,
-  transactionId: 1234,
   blockNumber: 12345,
+  state: undefined,
+} as const
+
+const genericLiveWithdrawalToAddressTransaction = {
+  transactionId: 1234,
   data: {
     positionId: 1234n,
     starkKey: StarkKey.fake('2'),
@@ -62,6 +72,13 @@ const genericWithdrawalToAddressTransaction = {
   },
 } as const
 
+const genericWithdrawalToAddressTransaction = {
+  ...genericLiveWithdrawalToAddressTransaction,
+  stateUpdateId: 1,
+  blockNumber: 12345,
+  state: undefined,
+} as const
+
 describe(L2TransactionRepository.name, () => {
   const { database } = setupDatabaseTestSuite()
 
@@ -69,40 +86,138 @@ describe(L2TransactionRepository.name, () => {
 
   afterEach(() => repository.deleteAll())
 
-  describe(`${L2TransactionRepository.prototype.add.name} and ${L2TransactionRepository.prototype.findById.name}`, () => {
-    it('can add a transaction', async () => {
-      const id = await repository.add(genericDepositTransaction)
+  describe(
+    L2TransactionRepository.prototype.addFeederGatewayTransaction.name,
+    () => {
+      it('can add a transaction', async () => {
+        const id = await repository.addFeederGatewayTransaction(
+          genericDepositTransaction
+        )
 
-      const transaction = await repository.findById(id)
+        const transaction = await repository.findById(id)
 
-      expect(transaction).toEqual({
-        id,
-        stateUpdateId: genericDepositTransaction.stateUpdateId,
-        transactionId: genericDepositTransaction.transactionId,
-        blockNumber: genericDepositTransaction.blockNumber,
-        starkKeyA: genericDepositTransaction.data.starkKey,
-        starkKeyB: undefined,
-        data: genericDepositTransaction.data,
-        state: undefined,
-        parentId: undefined,
+        expect(transaction).toEqual({
+          id,
+          stateUpdateId: genericDepositTransaction.stateUpdateId,
+          transactionId: genericDepositTransaction.transactionId,
+          blockNumber: genericDepositTransaction.blockNumber,
+          starkKeyA: genericDepositTransaction.data.starkKey,
+          starkKeyB: undefined,
+          data: genericDepositTransaction.data,
+          state: undefined,
+          parentId: undefined,
+        })
       })
-    })
 
-    it('can add an alternative transaction', async () => {
-      const record = genericDepositTransaction
+      it('can add a transaction as replaced', async () => {
+        const id = await repository.addFeederGatewayTransaction({
+          ...genericDepositTransaction,
+          state: 'replaced',
+        })
+
+        const transaction = await repository.findById(id)
+
+        expect(transaction).toEqual({
+          id,
+          stateUpdateId: genericDepositTransaction.stateUpdateId,
+          transactionId: genericDepositTransaction.transactionId,
+          blockNumber: genericDepositTransaction.blockNumber,
+          starkKeyA: genericDepositTransaction.data.starkKey,
+          starkKeyB: undefined,
+          data: genericDepositTransaction.data,
+          state: 'replaced',
+          parentId: undefined,
+        })
+      })
+
+      it('can add a transaction as alternative', async () => {
+        const id = await repository.addFeederGatewayTransaction({
+          ...genericDepositTransaction,
+          state: 'alternative',
+        })
+
+        const transaction = await repository.findById(id)
+
+        expect(transaction).toEqual({
+          id,
+          stateUpdateId: genericDepositTransaction.stateUpdateId,
+          transactionId: genericDepositTransaction.transactionId,
+          blockNumber: genericDepositTransaction.blockNumber,
+          starkKeyA: genericDepositTransaction.data.starkKey,
+          starkKeyB: undefined,
+          data: genericDepositTransaction.data,
+          state: 'alternative',
+          parentId: undefined,
+        })
+      })
+
+      it('can add a multi transaction', async () => {
+        const record = genericMultiTransaction([
+          { ...genericDepositTransaction.data, starkKey: StarkKey.fake('1') },
+          {
+            ...genericWithdrawalToAddressTransaction.data,
+            starkKey: StarkKey.fake('2'),
+          },
+        ])
+
+        const id = await repository.addFeederGatewayTransaction(record)
+
+        const multiTransaction = await repository.findById(id)
+        const firstTransactionOfMulti = await repository.findById(id + 1)
+        const secondTransactionOfMulti = await repository.findById(id + 2)
+        expect(multiTransaction).toEqual({
+          id: id,
+          stateUpdateId: record.stateUpdateId,
+          transactionId: record.transactionId,
+          blockNumber: record.blockNumber,
+          state: undefined,
+          parentId: undefined,
+          starkKeyA: undefined,
+          starkKeyB: undefined,
+          data: record.data,
+        })
+        expect(firstTransactionOfMulti).toEqual({
+          id: id + 1,
+          stateUpdateId: record.stateUpdateId,
+          transactionId: record.transactionId,
+          blockNumber: record.blockNumber,
+          state: undefined,
+          parentId: id,
+          starkKeyA: StarkKey.fake('1'),
+          starkKeyB: undefined,
+          data: record.data.transactions[0]!,
+        })
+        expect(secondTransactionOfMulti).toEqual({
+          id: id + 2,
+          stateUpdateId: record.stateUpdateId,
+          transactionId: record.transactionId,
+          blockNumber: record.blockNumber,
+          state: undefined,
+          parentId: id,
+          starkKeyA: StarkKey.fake('2'),
+          starkKeyB: undefined,
+          data: record.data.transactions[1]!,
+        })
+      })
+    }
+  )
+
+  describe(L2TransactionRepository.prototype.addLiveTransaction.name, () => {
+    it('can add transaction as alternative if transaction with the same transaction id already exists', async () => {
+      const record = genericLiveDepositTransaction
       const alternativeRecord = {
-        ...genericDepositTransaction,
-        data: { ...genericDepositTransaction.data, positionId: 12345n },
+        ...genericLiveDepositTransaction,
+        data: { ...genericLiveDepositTransaction.data, positionId: 12345n },
       } as const
-      const id = await repository.add(record)
+      const id = await repository.addLiveTransaction(record)
 
       const transaction = await repository.findById(id)
 
       expect(transaction).toEqual({
         id,
-        stateUpdateId: record.stateUpdateId,
+        stateUpdateId: undefined,
         transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
+        blockNumber: undefined,
         starkKeyA: record.data.starkKey,
         starkKeyB: undefined,
         data: record.data,
@@ -110,16 +225,16 @@ describe(L2TransactionRepository.name, () => {
         parentId: undefined,
       })
 
-      const altId = await repository.add(alternativeRecord)
+      const altId = await repository.addLiveTransaction(alternativeRecord)
 
       const transactionAfterAlternative = await repository.findById(id)
       const altTransaction = await repository.findById(altId)
 
       expect(transactionAfterAlternative).toEqual({
         id,
-        stateUpdateId: record.stateUpdateId,
+        stateUpdateId: undefined,
         transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
+        blockNumber: undefined,
         starkKeyA: record.data.starkKey,
         starkKeyB: undefined,
         data: record.data,
@@ -129,9 +244,9 @@ describe(L2TransactionRepository.name, () => {
 
       expect(altTransaction).toEqual({
         id: altId,
-        stateUpdateId: alternativeRecord.stateUpdateId,
+        stateUpdateId: undefined,
         transactionId: alternativeRecord.transactionId,
-        blockNumber: alternativeRecord.blockNumber,
+        blockNumber: undefined,
         starkKeyA: alternativeRecord.data.starkKey,
         starkKeyB: undefined,
         data: alternativeRecord.data,
@@ -140,154 +255,16 @@ describe(L2TransactionRepository.name, () => {
       })
     })
 
-    it('can add a multi transaction', async () => {
-      const record = genericMultiTransaction([
-        { ...genericDepositTransaction.data, starkKey: StarkKey.fake('1') },
-        {
-          ...genericWithdrawalToAddressTransaction.data,
-          starkKey: StarkKey.fake('2'),
-        },
-      ])
+    it('does not add transaction if transaction with the same transaction id already exists and is included', async () => {
+      await repository.addFeederGatewayTransaction(genericDepositTransaction)
 
-      const id = await repository.add(record)
-
-      const multiTransaction = await repository.findById(id)
-      const firstTransactionOfMulti = await repository.findById(id + 1)
-      const secondTransactionOfMulti = await repository.findById(id + 2)
-      expect(multiTransaction).toEqual({
-        id: id,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        state: undefined,
-        parentId: undefined,
-        starkKeyA: undefined,
-        starkKeyB: undefined,
-        data: record.data,
-      })
-      expect(firstTransactionOfMulti).toEqual({
-        id: id + 1,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        state: undefined,
-        parentId: id,
-        starkKeyA: StarkKey.fake('1'),
-        starkKeyB: undefined,
-        data: record.data.transactions[0]!,
-      })
-      expect(secondTransactionOfMulti).toEqual({
-        id: id + 2,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        state: undefined,
-        parentId: id,
-        starkKeyA: StarkKey.fake('2'),
-        starkKeyB: undefined,
-        data: record.data.transactions[1]!,
-      })
-    })
-
-    it('can add a multi transaction as an alternative transaction', async () => {
-      const record = genericMultiTransaction([
-        { ...genericDepositTransaction.data, starkKey: StarkKey.fake('1') },
-        {
-          ...genericWithdrawalToAddressTransaction.data,
-          starkKey: StarkKey.fake('2'),
-        },
-      ])
-
-      const alternativeRecord = genericMultiTransaction([
-        { ...genericDepositTransaction.data, starkKey: StarkKey.fake('3') },
-        {
-          ...genericWithdrawalToAddressTransaction.data,
-          starkKey: StarkKey.fake('4'),
-        },
-      ])
-
-      const id = await repository.add(record)
-      const altId = await repository.add(alternativeRecord)
-
-      const multiAfterAlternative = await repository.findById(id)
-      const firstTransactionOfMultiAfterAlternative = await repository.findById(
-        id + 1
+      const id = await repository.addLiveTransaction(
+        genericLiveDepositTransaction
       )
-      const secondTransactionOfMultiAfterAlternative =
-        await repository.findById(id + 2)
 
-      expect(multiAfterAlternative).toEqual({
-        id: id,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        starkKeyA: undefined,
-        starkKeyB: undefined,
-        data: record.data,
-        state: 'replaced',
-        parentId: undefined,
-      })
-      expect(firstTransactionOfMultiAfterAlternative).toEqual({
-        id: id + 1,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        starkKeyA: StarkKey.fake('1'),
-        starkKeyB: undefined,
-        data: record.data.transactions[0]!,
-        state: 'replaced',
-        parentId: id,
-      })
-      expect(secondTransactionOfMultiAfterAlternative).toEqual({
-        id: id + 2,
-        stateUpdateId: record.stateUpdateId,
-        transactionId: record.transactionId,
-        blockNumber: record.blockNumber,
-        starkKeyA: StarkKey.fake('2'),
-        starkKeyB: undefined,
-        data: record.data.transactions[1]!,
-        state: 'replaced',
-        parentId: id,
-      })
-
-      const multiAltTransaction = await repository.findById(altId)
-      const firstTransactionOfMultiAlt = await repository.findById(altId + 1)
-      const secondTransactionOfMultiAlt = await repository.findById(altId + 2)
-
-      expect(multiAltTransaction).toEqual({
-        id: altId,
-        stateUpdateId: alternativeRecord.stateUpdateId,
-        transactionId: alternativeRecord.transactionId,
-        blockNumber: alternativeRecord.blockNumber,
-        starkKeyA: undefined,
-        starkKeyB: undefined,
-        data: alternativeRecord.data,
-        state: 'alternative',
-        parentId: undefined,
-      })
-
-      expect(firstTransactionOfMultiAlt).toEqual({
-        id: altId + 1,
-        stateUpdateId: alternativeRecord.stateUpdateId,
-        transactionId: alternativeRecord.transactionId,
-        blockNumber: alternativeRecord.blockNumber,
-        starkKeyA: StarkKey.fake('3'),
-        starkKeyB: undefined,
-        data: alternativeRecord.data.transactions[0]!,
-        state: 'alternative',
-        parentId: altId,
-      })
-      expect(secondTransactionOfMultiAlt).toEqual({
-        id: altId + 2,
-        stateUpdateId: alternativeRecord.stateUpdateId,
-        transactionId: alternativeRecord.transactionId,
-        blockNumber: alternativeRecord.blockNumber,
-        starkKeyA: StarkKey.fake('4'),
-        starkKeyB: undefined,
-        data: alternativeRecord.data.transactions[1]!,
-        state: 'alternative',
-        parentId: altId,
-      })
+      const transaction = await repository.findById(id)
+      expect(id).toEqual(0)
+      expect(transaction?.stateUpdateId).toBeNullish()
     })
   })
 
@@ -299,8 +276,8 @@ describe(L2TransactionRepository.name, () => {
         stateUpdateId: 2,
         blockNumber: 123456,
       }
-      await repository.add(record)
-      await repository.add(record2)
+      await repository.addFeederGatewayTransaction(record)
+      await repository.addFeederGatewayTransaction(record2)
 
       const count = await repository.countByTransactionId(record.transactionId)
 
@@ -308,13 +285,13 @@ describe(L2TransactionRepository.name, () => {
     })
 
     it('considers multi transactions as a single transaction', async () => {
-      await repository.add(
+      await repository.addFeederGatewayTransaction(
         genericMultiTransaction([
           genericDepositTransaction.data,
           genericWithdrawalToAddressTransaction.data,
         ])
       )
-      await repository.add(genericDepositTransaction)
+      await repository.addFeederGatewayTransaction(genericDepositTransaction)
 
       const count = await repository.countByTransactionId(1234)
       expect(count).toEqual(2)
@@ -333,7 +310,7 @@ describe(L2TransactionRepository.name, () => {
       it('returns correct object for transaction', async () => {
         const record = genericDepositTransaction
 
-        const id = await repository.add(record)
+        const id = await repository.addFeederGatewayTransaction(record)
 
         const transaction = await repository.findAggregatedByTransactionId(
           record.transactionId
@@ -355,7 +332,7 @@ describe(L2TransactionRepository.name, () => {
           genericWithdrawalToAddressTransaction.data,
         ])
 
-        const id = await repository.add(record)
+        const id = await repository.addFeederGatewayTransaction(record)
 
         const transaction = await repository.findAggregatedByTransactionId(
           record.transactionId
@@ -372,32 +349,40 @@ describe(L2TransactionRepository.name, () => {
       })
 
       it('returns correct object for transaction with alts', async () => {
-        const record = genericDepositTransaction
+        const record = {
+          ...genericDepositTransaction,
+          state: 'replaced',
+        } as const
         const alt1 = {
           ...record,
+          state: 'alternative',
           data: {
             ...record.data,
             amount: 2500n,
           },
         } as const
 
-        const alt2 = genericMultiTransaction([
-          genericDepositTransaction.data,
-          genericWithdrawalToAddressTransaction.data,
-        ])
+        const alt2 = {
+          ...genericMultiTransaction([
+            genericDepositTransaction.data,
+            genericWithdrawalToAddressTransaction.data,
+          ]),
+          state: 'alternative',
+        } as const
 
         const alt3 = {
           ...record,
+          state: 'alternative',
           data: {
             ...record.data,
             amount: 1000n,
           },
         } as const
 
-        const id = await repository.add(record)
-        await repository.add(alt1)
-        await repository.add(alt2)
-        await repository.add(alt3)
+        const id = await repository.addFeederGatewayTransaction(record)
+        await repository.addFeederGatewayTransaction(alt1)
+        await repository.addFeederGatewayTransaction(alt2)
+        await repository.addFeederGatewayTransaction(alt3)
 
         const transaction = await repository.findAggregatedByTransactionId(
           record.transactionId
@@ -422,7 +407,7 @@ describe(L2TransactionRepository.name, () => {
         const ids = []
         for (let i = 0; i < 10; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1234 + i,
             })
@@ -440,7 +425,7 @@ describe(L2TransactionRepository.name, () => {
         const ids = []
         for (let i = 0; i < 10; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1234 + i,
             })
@@ -458,7 +443,7 @@ describe(L2TransactionRepository.name, () => {
 
         for (let i = 0; i < 10; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1234 + i,
             })
@@ -468,7 +453,9 @@ describe(L2TransactionRepository.name, () => {
           genericDepositTransaction.data,
           genericWithdrawalToAddressTransaction.data,
         ])
-        const multiId = await repository.add(multiTransaction)
+        const multiId = await repository.addFeederGatewayTransaction(
+          multiTransaction
+        )
         multiTransaction.data.transactions.forEach((_, index) =>
           ids.push(multiId + index + 1)
         )
@@ -487,7 +474,7 @@ describe(L2TransactionRepository.name, () => {
 
         for (let i = 0; i < 10; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1234 + i,
             })
@@ -497,7 +484,9 @@ describe(L2TransactionRepository.name, () => {
           genericDepositTransaction.data,
           genericWithdrawalToAddressTransaction.data,
         ])
-        const multiId = await repository.add(multiTransaction)
+        const multiId = await repository.addFeederGatewayTransaction(
+          multiTransaction
+        )
         multiTransaction.data.transactions.forEach((_, index) =>
           ids.push(multiId + index + 1)
         )
@@ -527,7 +516,7 @@ describe(L2TransactionRepository.name, () => {
       beforeEach(async () => {
         for (let i = 0; i < 5; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1239 + i,
               stateUpdateId: 2,
@@ -540,7 +529,7 @@ describe(L2TransactionRepository.name, () => {
         }
         for (let i = 0; i < 5; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               transactionId: 1244 + i,
               stateUpdateId: 3,
               blockNumber: 12345,
@@ -567,12 +556,13 @@ describe(L2TransactionRepository.name, () => {
                 receiverPositionId: 331764625462788454n,
                 expirationTimestamp: Timestamp(460858),
               },
+              state: undefined,
             })
           )
         }
         for (let i = 0; i < 5; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               transactionId: 1234 + i,
               stateUpdateId: 1,
               blockNumber: 12345,
@@ -588,6 +578,7 @@ describe(L2TransactionRepository.name, () => {
                   timestamp: Timestamp(1657926000),
                 },
               },
+              state: undefined,
             })
           )
         }
@@ -652,7 +643,7 @@ describe(L2TransactionRepository.name, () => {
         const ids = []
         for (let i = 0; i < 20; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1234 + i,
               stateUpdateId: i < 10 ? 1 : 2,
@@ -672,7 +663,7 @@ describe(L2TransactionRepository.name, () => {
         const ids = []
         for (let i = 0; i < 20; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1234 + i,
               stateUpdateId: i < 10 ? 1 : 2,
@@ -692,7 +683,7 @@ describe(L2TransactionRepository.name, () => {
 
         for (let i = 0; i < 20; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1234 + i,
               stateUpdateId: i < 10 ? 1 : 2,
@@ -706,7 +697,9 @@ describe(L2TransactionRepository.name, () => {
           ]),
           transactionId: 1254,
         }
-        const multiId = await repository.add(multiTransaction)
+        const multiId = await repository.addFeederGatewayTransaction(
+          multiTransaction
+        )
         multiTransaction.data.transactions.forEach((_, index) =>
           ids.push(multiId + index + 1)
         )
@@ -730,7 +723,7 @@ describe(L2TransactionRepository.name, () => {
 
         for (let i = 0; i < 20; i++) {
           ids.push(
-            await repository.add({
+            await repository.addFeederGatewayTransaction({
               ...genericDepositTransaction,
               transactionId: 1234 + i,
               stateUpdateId: i < 10 ? 1 : 2,
@@ -744,7 +737,9 @@ describe(L2TransactionRepository.name, () => {
           ]),
           transactionId: 1254,
         }
-        const multiId = await repository.add(multiTransaction)
+        const multiId = await repository.addFeederGatewayTransaction(
+          multiTransaction
+        )
         multiTransaction.data.transactions.forEach((_, index) =>
           ids.push(multiId + index + 1)
         )
@@ -786,8 +781,8 @@ describe(L2TransactionRepository.name, () => {
           blockNumber: 123456,
         }
         const record = genericDepositTransaction
-        await repository.add(record)
-        await repository.add(latestStateUpdateRecord)
+        await repository.addFeederGatewayTransaction(record)
+        await repository.addFeederGatewayTransaction(latestStateUpdateRecord)
 
         const latestStateUpdateId = await repository.findLatestStateUpdateId()
 
@@ -808,8 +803,10 @@ describe(L2TransactionRepository.name, () => {
       })
 
       it('returns the oldest transaction', async () => {
-        const id = await repository.add(genericDepositTransaction)
-        await repository.add({
+        const id = await repository.addFeederGatewayTransaction(
+          genericDepositTransaction
+        )
+        await repository.addFeederGatewayTransaction({
           ...genericDepositTransaction,
           data: { ...genericDepositTransaction.data, amount: 1000n },
         })
@@ -825,9 +822,8 @@ describe(L2TransactionRepository.name, () => {
 
   describe(L2TransactionRepository.prototype.findLatestIncluded.name, () => {
     it('returns undefined if there are no included transactions', async () => {
-      await repository.add({
-        ...genericDepositTransaction,
-        stateUpdateId: undefined,
+      await repository.addLiveTransaction({
+        ...genericLiveDepositTransaction,
       })
 
       const transaction = await repository.findLatestIncluded()
@@ -836,10 +832,11 @@ describe(L2TransactionRepository.name, () => {
     })
 
     it('returns the latest included transaction', async () => {
-      const id = await repository.add(genericWithdrawalToAddressTransaction)
-      await repository.add({
-        ...genericDepositTransaction,
-        stateUpdateId: undefined,
+      const id = await repository.addFeederGatewayTransaction(
+        genericWithdrawalToAddressTransaction
+      )
+      await repository.addLiveTransaction({
+        ...genericLiveDepositTransaction,
       })
 
       const transaction = await repository.findLatestIncluded()
@@ -870,27 +867,24 @@ describe(L2TransactionRepository.name, () => {
     })
 
     it('returns correct statistics', async () => {
-      await repository.add(genericDepositTransaction)
-      await repository.add({
-        ...genericDepositTransaction,
+      await repository.addLiveTransaction(genericLiveDepositTransaction)
+      await repository.addLiveTransaction({
+        ...genericLiveDepositTransaction,
         transactionId: 1222,
-        stateUpdateId: undefined,
       })
-      await repository.add({
-        ...genericMultiTransaction([genericDepositTransaction.data]),
+      await repository.addLiveTransaction({
+        ...genericLiveMultiTransaction([genericDepositTransaction.data]),
         transactionId: 1223,
-        stateUpdateId: undefined,
       })
-      await repository.add({
-        ...genericDepositTransaction,
+      await repository.addLiveTransaction({
+        ...genericLiveDepositTransaction,
         transactionId: 1222,
-        stateUpdateId: undefined,
       })
 
       const statistics = await repository.getLiveStatistics()
 
       expect(statistics).toEqual({
-        depositCount: 3,
+        depositCount: 4,
         withdrawalToAddressCount: 0,
         forcedWithdrawalCount: 0,
         tradeCount: 0,
@@ -911,7 +905,7 @@ describe(L2TransactionRepository.name, () => {
     L2TransactionRepository.prototype.getLiveStatisticsByStarkKey.name,
     () => {
       it('returns zeros if there are no transactions', async () => {
-        await repository.add(genericDepositTransaction)
+        await repository.addFeederGatewayTransaction(genericDepositTransaction)
         const statistics = await repository.getLiveStatisticsByStarkKey(
           StarkKey.fake()
         )
@@ -933,30 +927,26 @@ describe(L2TransactionRepository.name, () => {
       })
 
       it('returns correct statistics', async () => {
-        await repository.add(genericDepositTransaction)
-        await repository.add({
-          ...genericDepositTransaction,
+        await repository.addLiveTransaction(genericLiveDepositTransaction)
+        await repository.addLiveTransaction({
+          ...genericLiveDepositTransaction,
           transactionId: 1292,
-          stateUpdateId: undefined,
           data: {
             ...genericDepositTransaction.data,
             starkKey: StarkKey.fake(),
           },
         })
-        await repository.add({
-          ...genericDepositTransaction,
+        await repository.addLiveTransaction({
+          ...genericLiveDepositTransaction,
           transactionId: 1222,
-          stateUpdateId: undefined,
         })
-        await repository.add({
+        await repository.addLiveTransaction({
           ...genericMultiTransaction([genericDepositTransaction.data]),
           transactionId: 1223,
-          stateUpdateId: undefined,
         })
-        await repository.add({
-          ...genericDepositTransaction,
+        await repository.addLiveTransaction({
+          ...genericLiveDepositTransaction,
           transactionId: 1222,
-          stateUpdateId: undefined,
         })
 
         const statistics = await repository.getLiveStatisticsByStarkKey(
@@ -985,7 +975,10 @@ describe(L2TransactionRepository.name, () => {
     L2TransactionRepository.prototype.getStatisticsByStateUpdateId.name,
     () => {
       it('returns zeros if there are no transactions', async () => {
-        await repository.add({ ...genericDepositTransaction, stateUpdateId: 1 })
+        await repository.addFeederGatewayTransaction({
+          ...genericDepositTransaction,
+          stateUpdateId: 1,
+        })
         const statistics = await repository.getStatisticsByStateUpdateId(2)
 
         expect(statistics).toEqual({
@@ -1006,21 +999,28 @@ describe(L2TransactionRepository.name, () => {
       })
 
       it('returns correct statistics', async () => {
-        await repository.add({
+        await repository.addFeederGatewayTransaction({
           ...genericDepositTransaction,
           transactionId: 1199,
           stateUpdateId: 1,
         })
-        await repository.add({ ...genericDepositTransaction, stateUpdateId: 2 })
-        await repository.add({ ...genericDepositTransaction, stateUpdateId: 2 })
-        await repository.add({
+        await repository.addFeederGatewayTransaction({
+          ...genericDepositTransaction,
+          stateUpdateId: 2,
+        })
+        await repository.addFeederGatewayTransaction({
+          ...genericDepositTransaction,
+          stateUpdateId: 2,
+        })
+        await repository.addFeederGatewayTransaction({
           ...genericMultiTransaction([genericDepositTransaction.data]),
           stateUpdateId: 2,
         })
-        await repository.add({
+        await repository.addFeederGatewayTransaction({
           ...genericDepositTransaction,
           transactionId: 2000,
           stateUpdateId: 2,
+          state: 'replaced',
         })
 
         const statistics = await repository.getStatisticsByStateUpdateId(2)
@@ -1049,7 +1049,10 @@ describe(L2TransactionRepository.name, () => {
       .name,
     () => {
       it('returns 0 if there are no transactions', async () => {
-        await repository.add({ ...genericDepositTransaction, stateUpdateId: 1 })
+        await repository.addFeederGatewayTransaction({
+          ...genericDepositTransaction,
+          stateUpdateId: 1,
+        })
         const statistics =
           await repository.getStatisticsByStateUpdateIdAndStarkKey(
             2,
@@ -1073,7 +1076,7 @@ describe(L2TransactionRepository.name, () => {
       })
 
       it('returns correct statistics', async () => {
-        await repository.add({
+        await repository.addFeederGatewayTransaction({
           ...genericDepositTransaction,
           transactionId: 1199,
           stateUpdateId: 1,
@@ -1082,16 +1085,23 @@ describe(L2TransactionRepository.name, () => {
             starkKey: StarkKey.fake(),
           },
         })
-        await repository.add({ ...genericDepositTransaction, stateUpdateId: 2 })
-        await repository.add({ ...genericDepositTransaction, stateUpdateId: 2 })
-        await repository.add({
+        await repository.addFeederGatewayTransaction({
+          ...genericDepositTransaction,
+          stateUpdateId: 2,
+        })
+        await repository.addFeederGatewayTransaction({
+          ...genericDepositTransaction,
+          stateUpdateId: 2,
+        })
+        await repository.addFeederGatewayTransaction({
           ...genericMultiTransaction([genericDepositTransaction.data]),
           stateUpdateId: 2,
         })
-        await repository.add({
+        await repository.addFeederGatewayTransaction({
           ...genericDepositTransaction,
           transactionId: 2000,
           stateUpdateId: 2,
+          state: 'replaced',
         })
 
         const statistics =
@@ -1132,8 +1142,10 @@ describe(L2TransactionRepository.name, () => {
         transactionId: 12345,
         blockNumber: 123456,
       }
-      const id = await repository.add(record)
-      const deletedId = await repository.add(recordToBeDeleted)
+      const id = await repository.addFeederGatewayTransaction(record)
+      const deletedId = await repository.addFeederGatewayTransaction(
+        recordToBeDeleted
+      )
 
       await repository.deleteAfterBlock(record.blockNumber)
 
@@ -1167,8 +1179,10 @@ describe(L2TransactionRepository.name, () => {
         },
       } as const
       it('deletes transactions by transaction ids', async () => {
-        const id = await repository.add(record)
-        const deletedId = await repository.add(recordToBeDeleted)
+        const id = await repository.addFeederGatewayTransaction(record)
+        const deletedId = await repository.addFeederGatewayTransaction(
+          recordToBeDeleted
+        )
 
         await repository.deleteAfterBlock(record.blockNumber)
 

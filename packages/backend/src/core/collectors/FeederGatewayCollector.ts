@@ -65,12 +65,17 @@ export class FeederGatewayCollector {
             trx
           )
           for (const transactionInfo of data.transactionsInfo) {
-            await this.l2TransactionRepository.add(
+            const isReplaced =
+              !!transactionInfo.alternativeTransactions &&
+              transactionInfo.alternativeTransactions.length > 0
+
+            await this.l2TransactionRepository.addFeederGatewayTransaction(
               {
                 stateUpdateId: stateUpdate.id,
                 blockNumber: stateUpdate.blockNumber,
                 transactionId: transactionInfo.originalTransactionId,
                 data: transactionInfo.originalTransaction,
+                state: isReplaced ? 'replaced' : undefined,
               },
               trx
             )
@@ -78,12 +83,13 @@ export class FeederGatewayCollector {
               continue
             }
             for (const alternativeTransaction of transactionInfo.alternativeTransactions) {
-              await this.l2TransactionRepository.add(
+              await this.l2TransactionRepository.addFeederGatewayTransaction(
                 {
                   stateUpdateId: stateUpdate.id,
                   blockNumber: stateUpdate.blockNumber,
                   transactionId: transactionInfo.originalTransactionId,
                   data: alternativeTransaction,
+                  state: 'alternative',
                 },
                 trx
               )

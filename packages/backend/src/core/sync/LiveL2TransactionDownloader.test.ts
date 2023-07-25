@@ -48,7 +48,7 @@ describe(LiveL2TransactionDownloader.name, () => {
           .resolvesToOnce(secondTxs),
       })
       const mockL2TransactionRepository = mockObject<L2TransactionRepository>({
-        add: mockFn().resolvesTo(1),
+        addLiveTransaction: mockFn().resolvesTo(1),
         runInTransactionWithLockedTable: mockFn(
           async (fun: (trx: Knex.Transaction) => Promise<void>) => {
             await fun(mockKnexTransaction)
@@ -81,7 +81,9 @@ describe(LiveL2TransactionDownloader.name, () => {
 
       await waitForExpect(() => {
         firstTxs.forEach((tx, i) => {
-          expect(mockL2TransactionRepository.add).toHaveBeenNthCalledWith(
+          expect(
+            mockL2TransactionRepository.addLiveTransaction
+          ).toHaveBeenNthCalledWith(
             i + 1,
             {
               transactionId: tx.transactionId,
@@ -106,7 +108,9 @@ describe(LiveL2TransactionDownloader.name, () => {
       ).toHaveBeenNthCalledWith(2, thirdPartyId + firstTxs.length + 1, 100)
       await waitForExpect(() => {
         secondTxs.forEach((tx, i) => {
-          expect(mockL2TransactionRepository.add).toHaveBeenNthCalledWith(
+          expect(
+            mockL2TransactionRepository.addLiveTransaction
+          ).toHaveBeenNthCalledWith(
             firstTxs.length + i + 1,
             {
               data: tx.transaction,
