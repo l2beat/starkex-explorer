@@ -8,6 +8,7 @@ import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
 import uniq from 'lodash/uniq'
 
+import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { PaginationOptions } from '../../model/PaginationOptions'
 import {
   decodeL2TransactionData,
@@ -368,11 +369,15 @@ export class L2TransactionRepository extends BaseRepository {
     )
   }
 
-  async getPaginatedWithoutMulti({ offset, limit }: PaginationOptions) {
+  async getPaginatedWithoutMulti(
+    { offset, limit }: PaginationOptions,
+    excludeL2TransactionTypes: L2TransactionTypesToExclude = []
+  ) {
     const knex = await this.knex()
     const rows = await knex('l2_transactions')
+      .whereNotIn('type', excludeL2TransactionTypes)
       // We filter out the multi transactions because we show the child transactions instead
-      .whereNot({ type: 'MultiTransaction' })
+      .andWhereNot({ type: 'MultiTransaction' })
       .orderBy('id', 'desc')
       .offset(offset)
       .limit(limit)
@@ -382,17 +387,23 @@ export class L2TransactionRepository extends BaseRepository {
 
   async getUserSpecificPaginated(
     starkKey: StarkKey,
-    { offset, limit }: PaginationOptions
+    { offset, limit }: PaginationOptions,
+    excludeL2TransactionTypes: L2TransactionTypesToExclude = []
   ) {
     const knex = await this.knex()
     // We do not need to filter multi transactions because they are not user specific
     const rows = await knex('l2_transactions')
-      .where({
-        stark_key_a: starkKey.toString(),
-      })
-      .orWhere({
-        stark_key_b: starkKey.toString(),
-      })
+      .whereNotIn('type', excludeL2TransactionTypes)
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      .andWhere((qB) =>
+        qB
+          .where({
+            stark_key_a: starkKey.toString(),
+          })
+          .orWhere({
+            stark_key_b: starkKey.toString(),
+          })
+      )
       .orderBy('id', 'desc')
       .limit(limit)
       .offset(offset)
@@ -401,11 +412,13 @@ export class L2TransactionRepository extends BaseRepository {
 
   async getPaginatedWithoutMultiByStateUpdateId(
     stateUpdateId: number,
-    { offset, limit }: PaginationOptions
+    { offset, limit }: PaginationOptions,
+    excludeL2TransactionTypes: L2TransactionTypesToExclude = []
   ) {
     const knex = await this.knex()
     const rows = await knex('l2_transactions')
-      .where({ state_update_id: stateUpdateId })
+      .whereNotIn('type', excludeL2TransactionTypes)
+      .andWhere({ state_update_id: stateUpdateId })
       // We filter out the multi transactions because we show the child transactions instead
       .andWhereNot({ type: 'MultiTransaction' })
       .orderBy('id', 'desc')

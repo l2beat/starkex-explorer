@@ -12,8 +12,10 @@ import {
 } from '@explorer/types'
 import { Logger } from '@l2beat/backend-tools'
 import { expect } from 'earl'
+import uniq from 'lodash/uniq'
 import { beforeEach, it } from 'mocha'
 
+import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { setupDatabaseTestSuite } from '../../test/database'
 import { L2TransactionRepository } from './L2TransactionRepository'
 
@@ -478,6 +480,41 @@ describe(L2TransactionRepository.name, () => {
 
         expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(0, 5))
       })
+
+      it('filters out transactions with excluded types', async () => {
+        const ids = []
+        const excludedTypes = ['Deposit'] as L2TransactionTypesToExclude
+
+        for (let i = 0; i < 10; i++) {
+          ids.push(
+            await repository.add({
+              ...genericDepositTransaction,
+              transactionId: 1234 + i,
+            })
+          )
+        }
+        const multiTransaction = genericMultiTransaction([
+          genericDepositTransaction.data,
+          genericWithdrawalToAddressTransaction.data,
+        ])
+        const multiId = await repository.add(multiTransaction)
+        multiTransaction.data.transactions.forEach((_, index) =>
+          ids.push(multiId + index + 1)
+        )
+
+        const records = await repository.getPaginatedWithoutMulti(
+          {
+            limit: 100,
+            offset: 0,
+          },
+          excludedTypes
+        )
+
+        expect(records.map((x) => x.id)).toEqual(ids.reverse().slice(0, 1))
+        expect(uniq(records.map((t) => t.data.type))).not.toEqualUnsorted(
+          excludedTypes
+        )
+      })
     }
   )
 
@@ -561,21 +598,48 @@ describe(L2TransactionRepository.name, () => {
       })
 
       it('respects the limit parameter', async () => {
-        const records = await repository.getUserSpecificPaginated(starkKey, {
-          limit: 6,
-          offset: 0,
-        })
+        const records = await repository.getUserSpecificPaginated(
+          starkKey,
+
+          {
+            limit: 6,
+            offset: 0,
+          }
+        )
 
         expect(records.map((x) => x.id)).toEqual(ids.slice(4, 10).reverse())
       })
 
       it('respects the offset parameter', async () => {
-        const records = await repository.getUserSpecificPaginated(starkKey, {
-          limit: 6,
-          offset: 2,
-        })
+        const records = await repository.getUserSpecificPaginated(
+          starkKey,
+
+          {
+            limit: 6,
+            offset: 2,
+          }
+        )
 
         expect(records.map((x) => x.id)).toEqual(ids.slice(2, 8).reverse())
+      })
+
+      it('filters out transactions with excluded types', async () => {
+        const excludedTypes = ['Transfer'] as L2TransactionTypesToExclude
+
+        const records = await repository.getUserSpecificPaginated(
+          starkKey,
+
+          {
+            limit: 100,
+            offset: 0,
+          },
+          excludedTypes
+        )
+
+        expect(records.map((x) => x.id)).toEqual(ids.slice(0, 5).reverse())
+        expect(uniq(records.map((t) => t.data.type))).not.toEqualUnsorted(
+          excludedTypes
+        )
       })
     }
   )
@@ -658,6 +722,49 @@ describe(L2TransactionRepository.name, () => {
           ...ids.slice(0, 2),
           ...ids.slice(12, 15),
         ])
+      })
+
+      it('filters out transactions with excluded types', async () => {
+        const ids = []
+        const excludedTypes = ['Deposit'] as L2TransactionTypesToExclude
+
+        for (let i = 0; i < 20; i++) {
+          ids.push(
+            await repository.add({
+              ...genericDepositTransaction,
+              transactionId: 1234 + i,
+              stateUpdateId: i < 10 ? 1 : 2,
+            })
+          )
+        }
+        const multiTransaction = {
+          ...genericMultiTransaction([
+            genericDepositTransaction.data,
+            genericWithdrawalToAddressTransaction.data,
+          ]),
+          transactionId: 1254,
+        }
+        const multiId = await repository.add(multiTransaction)
+        multiTransaction.data.transactions.forEach((_, index) =>
+          ids.push(multiId + index + 1)
+        )
+
+        const records =
+          await repository.getPaginatedWithoutMultiByStateUpdateId(
+            1,
+
+            {
+              limit: 100,
+              offset: 0,
+            },
+            excludedTypes
+          )
+
+        ids.reverse()
+        expect(records.map((x) => x.id)).toEqual(ids.slice(0, 1))
+        expect(uniq(records.map((t) => t.data.type))).not.toEqualUnsorted(
+          excludedTypes
+        )
       })
     }
   )

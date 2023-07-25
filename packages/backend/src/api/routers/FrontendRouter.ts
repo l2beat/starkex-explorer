@@ -366,7 +366,7 @@ export function createFrontendRouter(
     )
   )
 
-  if (config.starkex.enableL2Transactions) {
+  if (config.starkex.l2Transactions.enabled) {
     router.get(
       '/l2-transactions',
       withTypedContext(
