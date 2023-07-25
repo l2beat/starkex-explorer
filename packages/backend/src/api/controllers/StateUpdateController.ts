@@ -7,6 +7,7 @@ import {
 import { UserDetails } from '@explorer/shared'
 import { AssetHash } from '@explorer/types'
 
+import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { PageContextService } from '../../core/PageContextService'
@@ -40,7 +41,10 @@ export class StateUpdateController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
     private readonly preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
-    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository
+    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
+    private readonly excludeL2TransactionTypes:
+      | L2TransactionTypesToExclude
+      | undefined
   ) {}
 
   async getStateUpdatePage(
@@ -82,7 +86,8 @@ export class StateUpdateController {
         {
           offset: 0,
           limit: 6,
-        }
+        },
+        this.excludeL2TransactionTypes
       ),
       this.preprocessedStateDetailsRepository.findByStateUpdateId(
         stateUpdateId
@@ -132,7 +137,8 @@ export class StateUpdateController {
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       totalL2Transactions: preprocessedStateDetails?.l2TransactionsStatistics
         ? sumUpTransactionCount(
-            preprocessedStateDetails.l2TransactionsStatistics
+            preprocessedStateDetails.l2TransactionsStatistics,
+            this.excludeL2TransactionTypes
           )
         : 'processing',
       transactions,
@@ -152,7 +158,8 @@ export class StateUpdateController {
     const [l2Transactions, preprocessedStateDetails] = await Promise.all([
       this.l2TransactionRepository.getPaginatedWithoutMultiByStateUpdateId(
         stateUpdateId,
-        pagination
+        pagination,
+        this.excludeL2TransactionTypes
       ),
       this.preprocessedStateDetailsRepository.findByStateUpdateId(
         stateUpdateId
@@ -166,7 +173,8 @@ export class StateUpdateController {
       ...pagination,
       total: preprocessedStateDetails?.l2TransactionsStatistics
         ? sumUpTransactionCount(
-            preprocessedStateDetails.l2TransactionsStatistics
+            preprocessedStateDetails.l2TransactionsStatistics,
+            this.excludeL2TransactionTypes
           )
         : 'processing',
     })

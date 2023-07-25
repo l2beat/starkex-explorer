@@ -8,7 +8,7 @@ export function getLocalConfig(env: Env): Config {
     name: 'StarkexExplorer/Local',
     logger: {
       logLevel: env.string('LOG_LEVEL', 'INFO') as LoggerOptions['logLevel'],
-      format: 'pretty',
+      format: env.string('LOG_FORMAT', 'pretty') as LoggerOptions['format'],
       colors: true,
     },
     port: env.integer('PORT', 3000),

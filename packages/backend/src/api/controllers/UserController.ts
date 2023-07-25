@@ -19,6 +19,7 @@ import {
 } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
+import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
@@ -63,6 +64,9 @@ export class UserController {
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
     private readonly preprocessedUserL2TransactionsStatisticsRepository: PreprocessedUserL2TransactionsStatisticsRepository,
+    private readonly excludeL2TransactionTypes:
+      | L2TransactionTypesToExclude
+      | undefined,
     private readonly exchangeAddress: EthereumAddress
   ) {}
 
@@ -129,6 +133,7 @@ export class UserController {
       history,
       l2Transactions,
       preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
@@ -150,11 +155,13 @@ export class UserController {
       ),
       this.l2TransactionRepository.getUserSpecificPaginated(
         starkKey,
-        paginationOpts
+        paginationOpts,
+        this.excludeL2TransactionTypes
       ),
       this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
         starkKey
       ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
@@ -224,14 +231,22 @@ export class UserController {
         starkKey
       )
 
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionStatistics,
+        this.excludeL2TransactionTypes
+      )
+
     const content = renderUserPage({
       context,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions: sumUpTransactionCount(
-        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-      ),
+      totalL2Transactions,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId:
@@ -328,24 +343,37 @@ export class UserController {
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const [l2Transactions, preprocessedUserL2TransactionsStatistics] =
-      await Promise.all([
-        this.l2TransactionRepository.getUserSpecificPaginated(
-          starkKey,
-          pagination
-        ),
-        this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
-          starkKey
-        ),
-      ])
+    const [
+      l2Transactions,
+      preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
+    ] = await Promise.all([
+      this.l2TransactionRepository.getUserSpecificPaginated(
+        starkKey,
+        pagination,
+        this.excludeL2TransactionTypes
+      ),
+      this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
+        starkKey
+      ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
+    ])
+
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionStatistics,
+        this.excludeL2TransactionTypes
+      )
 
     const content = renderUserL2TransactionsPage({
       context,
       starkKey,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      total: sumUpTransactionCount(
-        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-      ),
+      total: totalL2Transactions,
       ...pagination,
     })
     return { type: 'success', content }

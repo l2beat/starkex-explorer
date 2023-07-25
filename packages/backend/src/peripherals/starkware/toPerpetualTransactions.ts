@@ -19,7 +19,7 @@ import {
   SignatureResponse,
   SignedOraclePrice,
 } from './schema/PerpetualBatchInfoResponse'
-import { PerpetualL2TransactionResponse } from './schema/PerpetualL2TransactionResponse'
+import { PerpetualLiveL2TransactionResponse } from './schema/PerpetualLiveL2TransactionResponse'
 export interface PerpetualL2Transaction {
   thirdPartyId: number
   transactionId: number
@@ -27,7 +27,7 @@ export interface PerpetualL2Transaction {
 }
 
 export function toPerpetualL2Transactions(
-  response: PerpetualL2TransactionResponse
+  response: PerpetualLiveL2TransactionResponse
 ): PerpetualL2Transaction[] {
   return response.txs.map((tx) => {
     return {

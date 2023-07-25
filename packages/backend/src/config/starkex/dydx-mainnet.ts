@@ -16,6 +16,7 @@ export function getDydxMainnetConfig(env: Env): StarkexConfig {
       minBlockNumber: 11813207,
       maxBlockNumber: env.integer('MAX_BLOCK_NUMBER', Infinity),
     },
+    l2Transactions: { enabled: false },
     contracts: {
       perpetual: EthereumAddress('0xD54f502e184B6B739d7D27a6410a67dc462D69c8'),
       registry: EthereumAddress('0xEfbCcE4659db72eC6897F46783303708cf9ACef8'),
