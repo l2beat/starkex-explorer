@@ -1,6 +1,7 @@
 import { getAddress } from '@ethersproject/address'
 
 import { fakeHexString } from './fake'
+import { StarkKey } from './StarkKey'
 
 export interface EthereumAddress extends String {
   _EthereumAddressBrand: string
@@ -25,6 +26,10 @@ EthereumAddress.inOrder = function (
   b: EthereumAddress
 ): [EthereumAddress, EthereumAddress] {
   return EthereumAddress.isBefore(a, b) ? [a, b] : [b, a]
+}
+
+EthereumAddress.asStarkKey = function asStarkKey(address: EthereumAddress) {
+  return StarkKey('0' + address.toString().slice(2).padStart(63, '0'))
 }
 
 EthereumAddress.fake = function fake(start?: string) {
