@@ -1,6 +1,7 @@
 import { expect } from 'earl'
 
 import { EthereumAddress } from './EthereumAddress'
+import { StarkKey } from './StarkKey'
 
 describe('EthereumAddress', () => {
   it('accepts lowercase addresses', () => {
@@ -60,5 +61,19 @@ describe('EthereumAddress', () => {
     expect(EthereumAddress.ZERO).toEqual(
       ('0x' + '0'.repeat(40)) as unknown as EthereumAddress
     )
+  })
+
+  describe('asStarkKey', () => {
+    it('prepends zeros to the address', () => {
+      const address = EthereumAddress(
+        '0xabcdabcd12345678abcdabcd12345678abcdabcd'
+      )
+
+      expect(EthereumAddress.asStarkKey(address)).toEqual(
+        StarkKey(
+          '0x000000000000000000000000abcdabcd12345678abcdabcd12345678abcdabcd'
+        )
+      )
+    })
   })
 })

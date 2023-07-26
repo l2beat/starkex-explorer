@@ -189,7 +189,7 @@ export class UserController {
     const ethAddressWithdrawableAssets =
       starkKey === givenUser.starkKey && givenUser.address
         ? await this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
-            StarkKey.fromEthereumAddress(givenUser.address)
+            EthereumAddress.asStarkKey(givenUser.address)
           )
         : []
 
