@@ -13,7 +13,7 @@ export const getAssetsTableProps = (starkKey: StarkKey) => ({
   title: (
     <span className="mt-2">
       Assets{' '}
-      <div className="text-md text-zinc-500">
+      <div className="mt-3 text-md text-zinc-500">
         Guaranteed state of balances (proven on Ethereum), updated every few
         hours:
       </div>
