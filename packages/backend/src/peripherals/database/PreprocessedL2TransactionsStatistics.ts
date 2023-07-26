@@ -1,5 +1,8 @@
 import { PerpetualL2TransactionData } from '@explorer/shared'
 
+import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
+import { uncapitalize } from '../../utils/uncapitalize'
+
 type PreprocessedL2TransactionsStatisticsKeys = `${Uncapitalize<
   PerpetualL2TransactionData['type']
 >}Count`
@@ -20,7 +23,8 @@ export function sumUpTransactionCount(
   statistics:
     | PreprocessedL2TransactionsStatistics
     | PreprocessedUserL2TransactionsStatistics
-    | undefined
+    | undefined,
+  excludeL2TransactionTypes: L2TransactionTypesToExclude = []
 ) {
   if (!statistics) return 0
 
@@ -30,12 +34,16 @@ export function sumUpTransactionCount(
     ? statistics.multiTransactionCount
     : 0
 
-  const replacedAndMultiTransactionCount =
+  let initialValue =
     multiTransactionCount + statistics.replacedTransactionsCount
+
+  for (const type of excludeL2TransactionTypes) {
+    initialValue += statistics[`${uncapitalize(type)}Count`]
+  }
 
   return Object.values(statistics).reduce(
     (sum, value) => sum + value,
-    -replacedAndMultiTransactionCount
+    -initialValue
   )
 }
 

@@ -27,7 +27,8 @@ export class Preprocessor<T extends AssetHash | AssetId> {
     private userL2TransactionsPreprocessor: UserL2TransactionsStatisticsPreprocessor,
     private l2TransactionRepository: L2TransactionRepository,
     private logger: Logger,
-    private isEnabled: boolean = true
+    private l2TransactionsEnabled: boolean,
+    private isEnabled: boolean
   ) {
     this.logger = this.logger.for(this)
   }
@@ -130,14 +131,17 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           trx,
           lastProcessedStateUpdate.stateUpdateId
         )
-        await this.stateDetailsPreprocessor.catchUpL2Transactions(
-          trx,
-          lastProcessedStateUpdate.stateUpdateId
-        )
-        await this.userL2TransactionsPreprocessor.catchUp(
-          trx,
-          lastProcessedStateUpdate.stateUpdateId
-        )
+
+        if (this.l2TransactionsEnabled) {
+          await this.stateDetailsPreprocessor.catchUpL2Transactions(
+            trx,
+            lastProcessedStateUpdate.stateUpdateId
+          )
+          await this.userL2TransactionsPreprocessor.catchUp(
+            trx,
+            lastProcessedStateUpdate.stateUpdateId
+          )
+        }
       }
     )
   }
@@ -187,24 +191,25 @@ export class Preprocessor<T extends AssetHash | AssetId> {
           nextStateUpdate
         )
 
-        // We cannot assume that Feeder and Availability Gateway are in sync
-        // with the state updates. We need to catch up with L2 transactions
-        // after each state update to make sure it is preprocessed as far as possible.
-        const preprocessL2TransactionTo =
-          await this.getStateUpdateIdToCatchUpL2TransactionsTo(
+        if (this.l2TransactionsEnabled) {
+          // We cannot assume that Feeder and Availability Gateway are in sync
+          // with the state updates. We need to catch up with L2 transactions
+          // after each state update to make sure it is preprocessed as far as possible.
+          const preprocessL2TransactionTo =
+            await this.getStateUpdateIdToCatchUpL2TransactionsTo(
+              trx,
+              nextStateUpdate.id
+            )
+
+          await this.stateDetailsPreprocessor.catchUpL2Transactions(
             trx,
-            nextStateUpdate.id
+            preprocessL2TransactionTo
           )
-
-        await this.stateDetailsPreprocessor.catchUpL2Transactions(
-          trx,
-          preprocessL2TransactionTo
-        )
-        await this.userL2TransactionsPreprocessor.catchUp(
-          trx,
-          preprocessL2TransactionTo
-        )
-
+          await this.userL2TransactionsPreprocessor.catchUp(
+            trx,
+            preprocessL2TransactionTo
+          )
+        }
         // END TRANSACTION
       }
     )

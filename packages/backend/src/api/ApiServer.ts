@@ -1,6 +1,7 @@
 import Router from '@koa/router'
 import { Logger } from '@l2beat/backend-tools'
 import Koa, { Context, Middleware } from 'koa'
+import auth from 'koa-basic-auth'
 
 import { createApiLogger } from './ApiLogger'
 import { forceHerokuHttps } from './middleware/forceHttps'
@@ -10,6 +11,7 @@ interface Options {
   middleware?: Middleware[]
   forceHttps: boolean
   handleServerError?: (error: Error, ctx: Context) => void
+  basicAuth?: string
 }
 
 export class ApiServer {
@@ -28,6 +30,18 @@ export class ApiServer {
 
     for (const middleware of options.middleware ?? []) {
       this.app.use(middleware)
+    }
+
+    if (options.basicAuth) {
+      this.logger.info('Website is using basic auth.')
+      const [name, ...rest] = options.basicAuth.split(':')
+      const pass = rest.join(':')
+      if (!name || !pass) {
+        throw new Error(
+          'Wrong structure of BASIC_AUTH env variable. Use user:pass.'
+        )
+      }
+      this.app.use(auth({ name, pass }))
     }
 
     const router = new Router()

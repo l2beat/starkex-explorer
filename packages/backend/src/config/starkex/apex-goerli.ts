@@ -30,19 +30,28 @@ export function getApexGoerliConfig(env: Env): StarkexConfig {
       },
       auth: clientAuth,
     },
-    feederGateway: {
-      getUrl: (batchId: number) => {
-        return `${env.string('APEX_FG_URL')}?batchId=${batchId}`
+    l2Transactions: {
+      enabled: true,
+      excludeTypes: ['OraclePricesTick'],
+      feederGateway: {
+        getUrl: (batchId: number) => {
+          return `${env.string('APEX_FG_URL')}?batchId=${batchId}`
+        },
+        auth: clientAuth,
       },
-      auth: clientAuth,
-    },
-    l2TransactionApi: {
-      getUrl: (startId, expectCount) => {
-        return `${env.string(
-          'APEX_TRANSACTION_API_URL'
-        )}?startApexId=${startId}&expectCount=${expectCount}`
+      liveApi: {
+        getTransactionsUrl: (startId, expectCount) => {
+          return `${env.string(
+            'APEX_TRANSACTION_API_URL'
+          )}?startApexId=${startId}&expectCount=${expectCount}`
+        },
+        getThirdPartyIdByTransactionIdUrl: (transactionId: number) => {
+          return `${env.string(
+            'APEX_THIRD_PARTY_ID_API_URL'
+          )}?txId=${transactionId}`
+        },
+        auth: clientAuth,
       },
-      auth: clientAuth,
     },
     collateralAsset: {
       assetId: AssetId('SLF-6'),

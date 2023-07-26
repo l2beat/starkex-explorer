@@ -13,5 +13,6 @@ export interface Config<T extends TradingMode = TradingMode> {
   enablePreprocessing: boolean
   freshStart: boolean
   forceHttps: boolean
+  basicAuth?: string
   starkex: StarkexConfig<T>
 }

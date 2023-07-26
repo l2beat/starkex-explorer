@@ -8,11 +8,12 @@ export function getLocalConfig(env: Env): Config {
     name: 'StarkexExplorer/Local',
     logger: {
       logLevel: env.string('LOG_LEVEL', 'INFO') as LoggerOptions['logLevel'],
-      format: 'pretty',
+      format: env.string('LOG_FORMAT', 'pretty') as LoggerOptions['format'],
       colors: true,
     },
     port: env.integer('PORT', 3000),
     databaseConnection: env.string('LOCAL_DB_URL'),
+    basicAuth: env.optionalString('BASIC_AUTH'),
     enableSync: true,
     enablePreprocessing: env.boolean('ENABLE_PREPROCESSING', true),
     freshStart: env.boolean('FRESH_START', false),
