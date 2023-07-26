@@ -10,7 +10,6 @@ import {
   AggregatedPerpetualL2TransactionEntry,
   l2TransactionTypeToText,
 } from './l2-transaction/common'
-import { ReplacedTransactionBanner } from './l2-transaction/components/ReplacedTransactionBanner'
 
 interface RawL2TransactionPageProps {
   context: PageContext<'perpetual'>
@@ -22,8 +21,6 @@ export function renderRawL2TransactionPage(props: RawL2TransactionPageProps) {
 }
 
 export function RawL2TransactionPage(props: RawL2TransactionPageProps) {
-  const isReplaced = props.transaction.alternativeTransactions.length > 0
-
   return (
     <Page
       context={props.context}
@@ -39,13 +36,6 @@ export function RawL2TransactionPage(props: RawL2TransactionPageProps) {
             L2 TRANSACTION
           </span>
         </div>
-        {isReplaced && (
-          <div className="mb-6 flex flex-col gap-1">
-            {props.transaction.alternativeTransactions.length > 0 && (
-              <ReplacedTransactionBanner />
-            )}
-          </div>
-        )}
         <Card>
           <pre className="whitespace-pre-wrap">
             {toJsonWithoutBigInts(props.transaction, 2)}
