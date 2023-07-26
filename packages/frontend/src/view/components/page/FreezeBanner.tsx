@@ -21,5 +21,5 @@ export function FreezeBanner({ freezeStatus }: { freezeStatus: FreezeStatus }) {
       </div>
     )
   }
-  return <></>
+  return null
 }
