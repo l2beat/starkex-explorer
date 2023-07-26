@@ -1,8 +1,8 @@
 import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
-import { omit } from 'lodash'
 import React from 'react'
 
+import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -14,6 +14,7 @@ import {
   TransactionsTable,
 } from '../../components/tables/TransactionsTable'
 import { Tabs } from '../../components/Tabs'
+import { TooltipWrapper } from '../../components/Tooltip'
 import { reactToHtml } from '../../reactToHtml'
 import { PerpetualL2TransactionEntry } from '../l2-transaction/common'
 import {
@@ -63,20 +64,20 @@ function UserPage(props: UserPageProps) {
   const common = getUserPageProps(props.starkKey)
   const isMine = props.context.user?.starkKey === props.starkKey
 
-  const assetsTableProps = omit(getAssetsTableProps(props.starkKey), 'title')
-  const l2TransactionTableProps = omit(
-    getL2TransactionTableProps(props.starkKey),
-    'title'
-  )
-  const balanceChangesProps = omit(
-    getBalanceChangeTableProps(props.starkKey),
-    'title'
-  )
-  const transactionTableProps = omit(
-    getTransactionTableProps(props.starkKey),
-    'title'
-  )
-  const offerTableProps = omit(getOfferTableProps(props.starkKey), 'title')
+  const { title: assetsTableTitle, ...assetsTablePropsWithoutTitle } =
+    getAssetsTableProps(props.starkKey)
+  const {
+    title: l2TransactionTableTitle,
+    ...l2TransactionsTablePropsWithoutTitle
+  } = getL2TransactionTableProps(props.starkKey)
+  const {
+    title: balanceChangesTableTitle,
+    ...balanceChangesTablePropsWithoutTitle
+  } = getBalanceChangeTableProps(props.starkKey)
+  const { title: transactionTableTitle, ...transactionTablePropsWithoutTitle } =
+    getTransactionTableProps(props.starkKey)
+  const { title: offerTableTitle, ...offerTablePropsWithoutTitle } =
+    getOfferTableProps(props.starkKey)
 
   return (
     <Page
@@ -107,11 +108,18 @@ function UserPage(props: UserPageProps) {
           items={[
             {
               id: 'assets',
-              name: 'Assets',
-              shortName: 'Assets',
+              name: assetsTableTitle,
+              accessoryRight: (
+                <TooltipWrapper
+                  content="Guaranteed state of balances (proven on Ethereum), updated every few
+                hours"
+                >
+                  <InfoIcon />
+                </TooltipWrapper>
+              ),
               content: (
                 <TablePreview
-                  {...assetsTableProps}
+                  {...assetsTablePropsWithoutTitle}
                   visible={props.assets.length}
                   total={props.totalAssets}
                 >
@@ -128,11 +136,16 @@ function UserPage(props: UserPageProps) {
               ? [
                   {
                     id: 'l2-transactions',
-                    name: 'L2 Transactions',
+                    name: l2TransactionTableTitle,
+                    accessoryRight: (
+                      <TooltipWrapper content="Only included transactions are reflected in asset balances">
+                        <InfoIcon />
+                      </TooltipWrapper>
+                    ),
                     shortName: 'L2 Txs',
                     content: (
                       <TablePreview
-                        {...l2TransactionTableProps}
+                        {...l2TransactionsTablePropsWithoutTitle}
                         visible={props.l2Transactions.length}
                         total={props.totalL2Transactions}
                       >
@@ -147,11 +160,10 @@ function UserPage(props: UserPageProps) {
               : []),
             {
               id: 'balance-changes',
-              name: 'Balance Changes',
-              shortName: 'Balance Changes',
+              name: balanceChangesTableTitle,
               content: (
                 <TablePreview
-                  {...balanceChangesProps}
+                  {...balanceChangesTablePropsWithoutTitle}
                   visible={props.balanceChanges.length}
                   total={props.totalBalanceChanges}
                 >
@@ -164,11 +176,10 @@ function UserPage(props: UserPageProps) {
             },
             {
               id: 'transactions',
-              name: 'Transactions',
-              shortName: 'Txs',
+              name: transactionTableTitle,
               content: (
                 <TablePreview
-                  {...transactionTableProps}
+                  {...transactionTablePropsWithoutTitle}
                   visible={props.transactions.length}
                   total={props.totalTransactions}
                 >
@@ -180,11 +191,10 @@ function UserPage(props: UserPageProps) {
               ? [
                   {
                     id: 'offers',
-                    name: 'Offers',
-                    shortName: 'Offers',
+                    name: offerTableTitle,
                     content: (
                       <TablePreview
-                        {...offerTableProps}
+                        {...offerTablePropsWithoutTitle}
                         visible={props.offers.length}
                         total={props.totalOffers}
                       >
