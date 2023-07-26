@@ -15,7 +15,7 @@ interface Tab {
 export function Tabs({ items }: TabsProps) {
   return (
     <div className="Tabs">
-      <div className="relative mb-6 border-b border-zinc-800">
+      <div className="relative mb-4 border-b border-zinc-800">
         <div className="TabsItemsContainer grid auto-cols-fr grid-flow-col md:flex md:gap-x-2">
           {items.map((tab) => (
             <a
