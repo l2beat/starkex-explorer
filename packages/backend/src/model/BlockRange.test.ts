@@ -115,7 +115,11 @@ describe(BlockRange.name, () => {
         blocks.push({ number: i, hash: Hash256.fake(i.toString()) })
       }
 
-      new BlockRange(blocks)
+      const blockRange = new BlockRange(blocks)
+
+      expect(blockRange.length).toEqual(1_000_000)
+      expect(blockRange.start).toEqual(0)
+      expect(blockRange.end).toEqual(1_000_000)
     })
   })
 
