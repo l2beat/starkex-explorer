@@ -42,7 +42,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
           {user && (
             <a
               href={`/users/${user.starkKey?.toString() ?? 'recover'}`}
-              className="relative flex h-10 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle hover:border-brand"
+              className="relative flex h-10 items-center justify-center gap-2 rounded-md border border-transparent px-4 align-middle transition-colors hover:border-brand"
             >
               <JazzIcon
                 className="hidden lg:block"
