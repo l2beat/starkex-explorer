@@ -86,6 +86,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: undefined,
       }
 
       const result = await repository.update(stateUpdateUpdateData)
@@ -147,6 +148,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: undefined,
       }
 
       await repository.add({ stateUpdate, positions: [], prices: [] })
@@ -246,6 +248,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: undefined,
       }
       await repository.add({ stateUpdate, positions: [], prices: [] })
 
@@ -304,6 +307,7 @@ describe(StateUpdateRepository.name, () => {
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
+          perpetualState: undefined,
         }
         const stateUpdate2 = {
           id: 30_002_000,
@@ -312,6 +316,7 @@ describe(StateUpdateRepository.name, () => {
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
+          perpetualState: undefined,
         }
         await repository.add({
           stateUpdate: stateUpdate1,
@@ -351,6 +356,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: undefined,
       }
       const stateUpdate2 = {
         id: 30_002_000,
@@ -359,6 +365,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: undefined,
       }
       await repository.add({
         stateUpdate: stateUpdate1,

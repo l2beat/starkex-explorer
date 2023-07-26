@@ -1,6 +1,7 @@
-import { ForcedAction, OraclePrice } from '@explorer/encoding'
+import { ForcedAction, OraclePrice, State } from '@explorer/encoding'
 import {
   IMerkleStorage,
+  MerkleProof,
   MerkleTree,
   PositionLeaf,
   VaultLeaf,
@@ -18,7 +19,9 @@ import { UserTransactionRepository } from '../peripherals/database/transactions/
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { BlockNumber } from '../peripherals/ethereum/types'
 
-export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
+export class StateUpdater<
+  T extends PositionLeaf | VaultLeaf = PositionLeaf | VaultLeaf
+> {
   constructor(
     protected readonly stateUpdateRepository: StateUpdateRepository,
     protected readonly merkleStorage: IMerkleStorage<T>,
@@ -38,7 +41,8 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     expectedPositionRoot: PedersenHash,
     forcedActions: ForcedAction[],
     oraclePrices: OraclePrice[],
-    newLeaves: { index: bigint; value: T }[]
+    newLeaves: { index: bigint; value: T }[],
+    perpetualState?: State
   ) {
     if (!this.stateTree) {
       throw new Error('State tree not initialized')
@@ -61,6 +65,7 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
       stateTransitionHash,
       rootHash,
       timestamp,
+      perpetualState,
     }
     await Promise.all([
       this.stateUpdateRepository.add({
@@ -195,7 +200,9 @@ export class StateUpdater<T extends PositionLeaf | VaultLeaf> {
     return { oldHash: this.emptyStateHash, id: 0 }
   }
 
-  async generateMerkleProof(positionOrVaultId: bigint) {
+  async generateMerkleProof(
+    positionOrVaultId: bigint
+  ): Promise<MerkleProof<T>> {
     if (!this.stateTree) {
       throw new Error('State tree not initialized')
     }

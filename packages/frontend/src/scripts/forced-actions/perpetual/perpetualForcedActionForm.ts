@@ -23,14 +23,6 @@ export function initPerpetualForcedActionForm() {
     submitButton,
     amountErrorView,
   } = getFormElements()
-  console.log({
-    form,
-    amountInput,
-    priceInput,
-    totalInput,
-    submitButton,
-    amountErrorView,
-  })
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const propsJson = JSON.parse(form.dataset.props ?? '{}')

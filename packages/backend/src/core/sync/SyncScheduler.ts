@@ -4,6 +4,7 @@ import { Logger } from '@l2beat/backend-tools'
 import { BlockRange } from '../../model'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { JobQueue } from '../../tools/JobQueue'
+import { FreezeCheckService } from '../FreezeCheckService'
 import { IDataSyncService } from '../IDataSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
 import { BlockDownloader } from './BlockDownloader'
@@ -32,6 +33,7 @@ export class SyncScheduler {
     private readonly preprocessor:
       | Preprocessor<AssetHash>
       | Preprocessor<AssetId>,
+    private readonly freezeCheckService: FreezeCheckService,
     private readonly logger: Logger,
     opts: SyncSchedulerOptions
   ) {
@@ -49,6 +51,7 @@ export class SyncScheduler {
     await this.dataSyncService.discardAfter(lastSynced)
 
     await this.preprocessor.sync()
+    await this.freezeCheckService.updateFreezeStatus()
 
     const knownBlocks = await this.blockDownloader.getKnownBlocks(lastSynced)
     this.dispatch({ type: 'initialized', lastSynced, knownBlocks })
@@ -113,6 +116,7 @@ export class SyncScheduler {
         value: blocks.end - 1,
       })
       await this.preprocessor.sync()
+      await this.freezeCheckService.updateFreezeStatus()
       this.dispatch({ type: 'syncSucceeded' })
     } catch (err) {
       this.dispatch({ type: 'syncFailed', blocks })
@@ -128,6 +132,7 @@ export class SyncScheduler {
       })
       await this.preprocessor.sync()
       await this.dataSyncService.discardAfter(blockNumber)
+      await this.freezeCheckService.updateFreezeStatus()
       this.dispatch({ type: 'discardAfterSucceeded', blockNumber })
     } catch (err) {
       this.dispatch({ type: 'discardAfterFailed' })

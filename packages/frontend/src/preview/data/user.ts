@@ -1,4 +1,4 @@
-import { Hash256 } from '@explorer/types'
+import { AssetId, Hash256, StarkKey } from '@explorer/types'
 
 import {
   OfferEntry,
@@ -6,7 +6,10 @@ import {
   UserAssetEntry,
   UserBalanceChangeEntry,
 } from '../../view'
-import { WithdrawableAssetEntry } from '../../view/pages/user/components/UserQuickActionsTable'
+import {
+  EscapableAssetEntry,
+  WithdrawableAssetEntry,
+} from '../../view/pages/user/components/UserQuickActionsTable'
 import { Bucket } from './Bucket'
 import { amountBucket, assetBucket, changeBucket } from './buckets'
 import { randomId, randomTimestamp } from './utils'
@@ -65,12 +68,15 @@ export function randomUserTransactionEntry(): TransactionEntry {
 }
 
 const actionBucket = new Bucket(['WITHDRAW', 'CLOSE'] as const)
-export function randomUserAssetEntry(): UserAssetEntry {
+export function randomUserAssetEntry(
+  action?: 'WITHDRAW' | 'CLOSE',
+  asset?: { hashOrId: AssetId }
+): UserAssetEntry {
   return {
-    asset: assetBucket.pick(),
+    asset: asset ?? assetBucket.pick(),
     balance: amountBucket.pick(),
     value: amountBucket.pick(),
-    action: actionBucket.pick(),
+    action: action ?? actionBucket.pick(),
     vaultOrPositionId: randomId(),
   }
 }
@@ -99,6 +105,15 @@ export function randomUserOfferEntry(): OfferEntry {
 export function randomWithdrawableAssetEntry(): WithdrawableAssetEntry {
   return {
     asset: assetBucket.pick(),
+    amount: amountBucket.pick(),
+  }
+}
+
+export function randomEscapableEntry(): EscapableAssetEntry {
+  return {
+    asset: { hashOrId: AssetId('USDC-6') },
+    ownerStarkKey: StarkKey.fake(),
+    positionOrVaultId: 12345n,
     amount: amountBucket.pick(),
   }
 }

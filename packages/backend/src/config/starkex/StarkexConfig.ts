@@ -24,6 +24,7 @@ interface BaseConfig<T extends TradingMode, D extends 'rollup' | 'validium'> {
 export type PerpetualRollupConfig = BaseConfig<'perpetual', 'rollup'> & {
   contracts: {
     perpetual: EthereumAddress
+    escapeVerifier: EthereumAddress
     registry: EthereumAddress
     proxy: EthereumAddress
     verifiers: EthereumAddress[]
@@ -35,6 +36,7 @@ export type PerpetualValidiumConfig = BaseConfig<'perpetual', 'validium'> & {
   availabilityGateway: GatewayConfig
   contracts: {
     perpetual: EthereumAddress
+    escapeVerifier: EthereumAddress
   }
   collateralAsset: CollateralAsset
 }
@@ -43,6 +45,7 @@ export type SpotValidiumConfig = BaseConfig<'spot', 'validium'> & {
   availabilityGateway: GatewayConfig
   contracts: {
     perpetual: EthereumAddress
+    escapeVerifier: EthereumAddress
   }
 }
 
