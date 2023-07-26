@@ -7,13 +7,13 @@ import {
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
-import { TransactionDetailsCard } from './TransactionDetailsCard'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualLiquidateDetails(
   props: PerpetualTransactionDetailsProps<'Liquidate'>
 ) {
   return (
-    <TransactionDetailsCard transactionId={props.transactionId}>
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -42,6 +42,6 @@ export function PerpetualLiquidateDetails(
           amount: props.data.actualCollateral,
         }}
       />
-    </TransactionDetailsCard>
+    </L2TransactionDetailsCard>
   )
 }

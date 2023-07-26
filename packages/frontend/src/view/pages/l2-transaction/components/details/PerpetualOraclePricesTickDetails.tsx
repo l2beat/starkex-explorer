@@ -5,13 +5,13 @@ import { AssetPriceCard } from '../../../../components/AssetPriceCard'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
-import { TransactionDetailsCard } from './TransactionDetailsCard'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualOraclePricesTickDetails(
   props: PerpetualTransactionDetailsProps<'OraclePricesTick'>
 ) {
   return (
-    <TransactionDetailsCard transactionId={props.transactionId}>
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -31,6 +31,6 @@ export function PerpetualOraclePricesTickDetails(
           })}
         </div>
       </TransactionField>
-    </TransactionDetailsCard>
+    </L2TransactionDetailsCard>
   )
 }

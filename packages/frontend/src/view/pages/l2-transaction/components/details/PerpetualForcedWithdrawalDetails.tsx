@@ -5,13 +5,13 @@ import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
-import { TransactionDetailsCard } from './TransactionDetailsCard'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualForcedWithdrawalDetails(
   props: PerpetualTransactionDetailsProps<'ForcedWithdrawal'>
 ) {
   return (
-    <TransactionDetailsCard transactionId={props.transactionId}>
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -28,6 +28,6 @@ export function PerpetualForcedWithdrawalDetails(
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}
       />
-    </TransactionDetailsCard>
+    </L2TransactionDetailsCard>
   )
 }

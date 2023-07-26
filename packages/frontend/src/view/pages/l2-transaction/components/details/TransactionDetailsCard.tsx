@@ -1,26 +1,27 @@
 import React from 'react'
 
-import { Button } from '../../../../components/Button'
+import { RawIcon } from '../../../../assets/icons/RawIcon'
 import { Card } from '../../../../components/Card'
+import { Link } from '../../../../components/Link'
 
-interface TransactionDetailsCardProps {
+interface L2TransactionDetailsCardProps {
   children: React.ReactNode
   transactionId: number
 }
 
-export function TransactionDetailsCard({
+export function L2TransactionDetailsCard({
   children,
   transactionId,
-}: TransactionDetailsCardProps) {
+}: L2TransactionDetailsCardProps) {
   return (
     <Card className="relative flex flex-col gap-6">
-      <Button
-        as="a"
-        className="absolute top-4 right-4"
+      <Link
+        className="absolute top-6 right-6 items-center !gap-1 text-md font-semibold"
         href={`/raw-l2-transactions/${transactionId}`}
+        accessoryLeft={<RawIcon />}
       >
-        RAW
-      </Button>
+        Raw data
+      </Link>
       {children}
     </Card>
   )

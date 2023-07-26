@@ -7,7 +7,7 @@ import { TransactionField } from '../../../transaction/components/TransactionFie
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
-import { TransactionDetailsCard } from './TransactionDetailsCard'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualTradeDetails(
   props: PerpetualTransactionDetailsProps<'Trade'>
@@ -23,7 +23,7 @@ export function PerpetualTradeDetails(
     props.collateralAsset
   )
   return (
-    <TransactionDetailsCard transactionId={props.transactionId}>
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -67,6 +67,6 @@ export function PerpetualTradeDetails(
           amount: props.data.actualCollateral,
         }}
       />
-    </TransactionDetailsCard>
+    </L2TransactionDetailsCard>
   )
 }
