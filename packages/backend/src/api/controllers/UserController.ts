@@ -179,7 +179,6 @@ export class UserController {
       this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
 
-
     const ethAddressWithdrawableAssets =
       starkKey === givenUser.starkKey && givenUser.address
         ? await this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
