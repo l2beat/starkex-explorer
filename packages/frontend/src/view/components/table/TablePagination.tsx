@@ -12,6 +12,8 @@ interface TablePaginationProps {
   perPage: number
 }
 
+const MAX_PAGE_TO_SHOW_AS_LAST = 500
+
 export function TablePagination(props: TablePaginationProps) {
   const { previous, next, display } = getPages(
     props.current,
@@ -106,6 +108,10 @@ function getDisplay(pages: Set<number>) {
     const next = sorted[i + 1]
     if (next !== undefined && next - page > 1) {
       display.push(null)
+      // Hide the last page if it's over MAX_PAGE_TO_SHOW_AS_LAST
+      if (i === pages.size - 2 && next > MAX_PAGE_TO_SHOW_AS_LAST) {
+        break
+      }
     }
   }
   return display

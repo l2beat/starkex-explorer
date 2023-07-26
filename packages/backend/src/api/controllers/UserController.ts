@@ -22,6 +22,7 @@ import {
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 import uniqBy from 'lodash/uniqBy'
 
+import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
@@ -66,6 +67,9 @@ export class UserController {
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly preprocessedUserStatisticsRepository: PreprocessedUserStatisticsRepository,
     private readonly preprocessedUserL2TransactionsStatisticsRepository: PreprocessedUserL2TransactionsStatisticsRepository,
+    private readonly excludeL2TransactionTypes:
+      | L2TransactionTypesToExclude
+      | undefined,
     private readonly exchangeAddress: EthereumAddress
   ) {}
 
@@ -132,13 +136,14 @@ export class UserController {
       history,
       l2Transactions,
       preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
       sentTransactions,
       userTransactions,
       userTransactionsCount,
       forcedTradeOffers,
       forcedTradeOffersCount,
       finalizableOffers,
-      withdrawableAssets,
+      starkKeyWithdrawableAssets,
       userStatistics,
     ] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
@@ -153,11 +158,13 @@ export class UserController {
       ),
       this.l2TransactionRepository.getUserSpecificPaginated(
         starkKey,
-        paginationOpts
+        paginationOpts,
+        this.excludeL2TransactionTypes
       ),
       this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
         starkKey
       ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
@@ -175,12 +182,17 @@ export class UserController {
       this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
 
-    if (!userStatistics) {
-      return {
-        type: 'not found',
-        message: `User with starkKey ${starkKey.toString()} not found`,
-      }
-    }
+    const ethAddressWithdrawableAssets =
+      starkKey === givenUser.starkKey && givenUser.address
+        ? await this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
+            EthereumAddress.asStarkKey(givenUser.address)
+          )
+        : []
+
+    const withdrawableAssets = [
+      ...starkKeyWithdrawableAssets,
+      ...ethAddressWithdrawableAssets,
+    ]
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
@@ -223,14 +235,22 @@ export class UserController {
       collateralAsset
     )
 
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionStatistics,
+        this.excludeL2TransactionTypes
+      )
+
     const content = renderUserPage({
       context,
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions: sumUpTransactionCount(
-        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-      ),
+      totalL2Transactions,
       escapableAssets: escapableAssets.finalizable,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
@@ -250,9 +270,10 @@ export class UserController {
         this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
       assets: escapableAssets.allCount > 0 ? [] : assetEntries, // When frozen and escaped, don't show assets
-      totalAssets: escapableAssets.allCount > 0 ? 0 : userStatistics.assetCount,
+      totalAssets:
+        escapableAssets.allCount > 0 ? 0 : userStatistics?.assetCount ?? 0,
       balanceChanges: balanceChangesEntries,
-      totalBalanceChanges: Number(userStatistics.balanceChangeCount), // TODO: don't cast
+      totalBalanceChanges: userStatistics?.balanceChangeCount ?? 0,
       transactions,
       totalTransactions,
       offers,
@@ -314,24 +335,37 @@ export class UserController {
     pagination: PaginationOptions
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const [l2Transactions, preprocessedUserL2TransactionsStatistics] =
-      await Promise.all([
-        this.l2TransactionRepository.getUserSpecificPaginated(
-          starkKey,
-          pagination
-        ),
-        this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
-          starkKey
-        ),
-      ])
+    const [
+      l2Transactions,
+      preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
+    ] = await Promise.all([
+      this.l2TransactionRepository.getUserSpecificPaginated(
+        starkKey,
+        pagination,
+        this.excludeL2TransactionTypes
+      ),
+      this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
+        starkKey
+      ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
+    ])
+
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionStatistics,
+        this.excludeL2TransactionTypes
+      )
 
     const content = renderUserL2TransactionsPage({
       context,
       starkKey,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      total: sumUpTransactionCount(
-        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-      ),
+      total: totalL2Transactions,
       ...pagination,
     })
     return { type: 'success', content }

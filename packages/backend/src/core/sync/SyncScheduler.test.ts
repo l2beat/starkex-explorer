@@ -7,6 +7,7 @@ import { BlockRange } from '../../model'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
 import { FreezeCheckService } from '../FreezeCheckService'
 import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
+import { PerpetualValidiumSyncService } from '../PerpetualValidiumSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
 import { BlockDownloader } from './BlockDownloader'
 import { SyncScheduler } from './SyncScheduler'
@@ -105,11 +106,12 @@ describe(SyncScheduler.name, () => {
 
   describe(SyncScheduler.prototype.dispatch.name, () => {
     it('handles a successful sync', async () => {
+      const isTip = true
       const mockKeyValueStore = mockObject<KeyValueStore>({
         addOrUpdate: mockFn().resolvesTo('lastBlockNumberSynced'),
       })
       const blockDownloader = mockObject<BlockDownloader>()
-      const dataSyncService = mockObject<PerpetualRollupSyncService>({
+      const dataSyncService = mockObject<PerpetualValidiumSyncService>({
         sync: async () => {},
         discardAfter: async () => {},
       })
@@ -128,6 +130,8 @@ describe(SyncScheduler.name, () => {
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
+      const mockIsTipFn = mockFn().returns(isTip)
+      syncScheduler.isTip = mockIsTipFn
 
       syncScheduler.dispatch({
         type: 'initialized',
@@ -136,9 +140,11 @@ describe(SyncScheduler.name, () => {
       })
 
       await waitForExpect(() => {
+        expect(mockIsTipFn).toHaveBeenOnlyCalledWith(1_000_003)
         expect(dataSyncService.discardAfter).toHaveBeenOnlyCalledWith(1_000_000)
         expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
-          new BlockRange([block(1_000_001), block(1_000_002)])
+          new BlockRange([block(1_000_001), block(1_000_002)]),
+          isTip
         )
         expect(mockKeyValueStore.addOrUpdate).toHaveBeenOnlyCalledWith({
           key: 'lastBlockNumberSynced',
@@ -150,11 +156,12 @@ describe(SyncScheduler.name, () => {
     })
 
     it('handles a failing sync', async () => {
+      const isTip = false
       const mockKeyValueStore = mockObject<KeyValueStore>({
         addOrUpdate: mockFn().resolvesTo('lastBlockNumberSynced'),
       })
       const blockDownloader = mockObject<BlockDownloader>()
-      const dataSyncService = mockObject<PerpetualRollupSyncService>({
+      const dataSyncService = mockObject<PerpetualValidiumSyncService>({
         sync: mockFn().rejectsWith(new Error('oops')),
         discardAfter: async () => {},
       })
@@ -173,6 +180,8 @@ describe(SyncScheduler.name, () => {
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
+      const mockIsTipFn = mockFn().returns(isTip)
+      syncScheduler.isTip = mockIsTipFn
 
       syncScheduler.dispatch({
         type: 'initialized',
@@ -181,8 +190,10 @@ describe(SyncScheduler.name, () => {
       })
 
       await waitForExpect(() => {
+        expect(mockIsTipFn).toHaveBeenOnlyCalledWith(1_000_003)
         expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
-          new BlockRange([block(1_000_001), block(1_000_002)])
+          new BlockRange([block(1_000_001), block(1_000_002)]),
+          isTip
         )
         expect(mockKeyValueStore.addOrUpdate).not.toHaveBeenCalled()
       })
@@ -192,11 +203,12 @@ describe(SyncScheduler.name, () => {
     })
 
     it('handles a successful discardAfter', async () => {
+      const isTip = true
       const mockKeyValueStore = mockObject<KeyValueStore>({
         addOrUpdate: mockFn().resolvesTo('lastBlockNumberSynced'),
       })
       const blockDownloader = mockObject<BlockDownloader>()
-      const dataSyncService = mockObject<PerpetualRollupSyncService>({
+      const dataSyncService = mockObject<PerpetualValidiumSyncService>({
         sync: async () => {},
         discardAfter: async () => {},
       })
@@ -215,6 +227,8 @@ describe(SyncScheduler.name, () => {
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
+      const mockIsTipFn = mockFn().returns(isTip)
+      syncScheduler.isTip = mockIsTipFn
 
       syncScheduler.dispatch({
         type: 'initialized',
@@ -231,8 +245,10 @@ describe(SyncScheduler.name, () => {
         expect(dataSyncService.discardAfter).toHaveBeenNthCalledWith(1, 999_999)
         expect(dataSyncService.discardAfter).toHaveBeenNthCalledWith(2, 999_999)
 
+        expect(mockIsTipFn).toHaveBeenOnlyCalledWith(1_000_002)
         expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
-          new BlockRange([block(1_000_000), block(1_000_001)])
+          new BlockRange([block(1_000_000), block(1_000_001)]),
+          isTip
         )
 
         expect(mockKeyValueStore.addOrUpdate).toHaveBeenCalledTimes(2)
@@ -301,9 +317,11 @@ describe(SyncScheduler.name, () => {
   })
 
   describe(SyncScheduler.prototype.handleSync.name, () => {
+    const maxBlockNumber = 10
+
     it('triggers data sync only if block range is inside the limit', async () => {
-      const maxBlockNumber = 10
-      const dataSyncService = mockObject<PerpetualRollupSyncService>({
+      const isTip = true
+      const dataSyncService = mockObject<PerpetualValidiumSyncService>({
         discardAfter: async () => {},
         sync: async () => {},
       })
@@ -325,30 +343,100 @@ describe(SyncScheduler.name, () => {
         Logger.SILENT,
         { earliestBlock: 1, maxBlockNumber }
       )
+      const mockIsTipFn = mockFn().returns(isTip)
+      syncScheduler.isTip = mockIsTipFn
 
-      await syncScheduler.handleSync(
-        new BlockRange([block(maxBlockNumber - 2), block(maxBlockNumber - 1)])
-      )
+      const blocks = new BlockRange([
+        block(maxBlockNumber - 2),
+        block(maxBlockNumber - 1),
+      ])
+
+      await syncScheduler.handleSync(blocks)
 
       await waitForExpect(() => {
+        expect(mockIsTipFn).toHaveBeenOnlyCalledWith(blocks.end)
         expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(1)
-        expect(dataSyncService.sync).toHaveBeenCalledTimes(1)
+        expect(dataSyncService.sync).toHaveBeenOnlyCalledWith(
+          expect.a(BlockRange),
+          isTip
+        )
         expect(mockKeyValueStore.addOrUpdate).toHaveBeenCalledTimes(1)
         expect(preprocessor.sync).toHaveBeenCalledTimes(1)
         expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })
+    })
 
-      await syncScheduler.handleSync(
-        new BlockRange([block(maxBlockNumber), block(maxBlockNumber + 1)])
+    it('skips data sync if block range is outside the limit', async () => {
+      const dataSyncService = mockObject<PerpetualValidiumSyncService>({
+        discardAfter: mockFn(),
+        sync: mockFn(),
+      })
+      const mockKeyValueStore = mockObject<KeyValueStore>({
+        addOrUpdate: mockFn(),
+      })
+      const preprocessor = mockObject<Preprocessor<AssetId>>({
+        sync: mockFn(),
+      })
+
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
+
+      const syncScheduler = new SyncScheduler(
+        mockKeyValueStore,
+        mockObject<BlockDownloader>(),
+        dataSyncService,
+        preprocessor,
+        freezeCheckService,
+        Logger.SILENT,
+        { earliestBlock: 1, maxBlockNumber }
       )
+      const mockIsTipFn = mockFn().returns(false)
+      syncScheduler.isTip = mockIsTipFn
+
+      const blocks = new BlockRange([
+        block(maxBlockNumber),
+        block(maxBlockNumber + 1),
+      ])
+
+      await syncScheduler.handleSync(blocks)
 
       await waitForExpect(() => {
-        expect(dataSyncService.discardAfter).toHaveBeenCalledTimes(1)
-        expect(dataSyncService.sync).toHaveBeenCalledTimes(1)
-        expect(mockKeyValueStore.addOrUpdate).toHaveBeenCalledTimes(1)
-        expect(preprocessor.sync).toHaveBeenCalledTimes(1)
-        expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
+        expect(mockIsTipFn).not.toHaveBeenCalled()
+        expect(dataSyncService.discardAfter).not.toHaveBeenCalled()
+        expect(dataSyncService.sync).not.toHaveBeenCalled()
+        expect(mockKeyValueStore.addOrUpdate).not.toHaveBeenCalled()
+        expect(preprocessor.sync).not.toHaveBeenCalledTimes(1)
+        expect(freezeCheckService.updateFreezeStatus).not.toHaveBeenCalled()
       })
+    })
+  })
+
+  describe(SyncScheduler.prototype.isTip.name, () => {
+    const syncScheduler = new SyncScheduler(
+      mockObject<KeyValueStore>(),
+      mockObject<BlockDownloader>(),
+      mockObject<PerpetualValidiumSyncService>(),
+      mockObject<Preprocessor<AssetId>>(),
+      mockObject<FreezeCheckService>(),
+      Logger.SILENT,
+      { earliestBlock: 1, maxBlockNumber: 10 }
+    )
+
+    beforeEach(() => {
+      syncScheduler.dispatch({
+        type: 'initialized',
+        lastSynced: 1_000_000,
+        knownBlocks: [block(1_000_001), block(1_000_002)],
+      })
+    })
+
+    it('returns false if the block range is not the tip', () => {
+      expect(syncScheduler.isTip(1_000_001)).toEqual(false)
+    })
+
+    it('returns true if the block range is the tip', () => {
+      expect(syncScheduler.isTip(1_000_003)).toEqual(true)
     })
   })
 })

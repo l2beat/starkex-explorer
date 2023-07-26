@@ -4,7 +4,6 @@ import Router from '@koa/router'
 import * as z from 'zod'
 
 import { Config } from '../../config'
-import { shouldShowL2Transactions } from '../../utils/shouldShowL2Transactions'
 import { EscapeHatchController } from '../controllers/EscapeHatchController'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
@@ -397,7 +396,35 @@ export function createFrontendRouter(
     )
   )
 
-  if (shouldShowL2Transactions(config)) {
+  router.get('/freeze', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await escapeActionController.getFreezeRequestActionPage(
+      givenUser
+    )
+    applyControllerResult(ctx, result)
+  })
+
+  router.get(
+    '/escape/:positionOrVaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionOrVaultId: stringAsBigInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+
+        const result = await escapeActionController.getEscapeHatchActionPage(
+          givenUser,
+          ctx.params.positionOrVaultId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  if (config.starkex.l2Transactions.enabled) {
     router.get(
       '/l2-transactions',
       withTypedContext(

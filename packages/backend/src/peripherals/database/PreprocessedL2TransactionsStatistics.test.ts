@@ -48,4 +48,26 @@ describe(sumUpTransactionCount.name, () => {
 
     expect(result).toEqual(66)
   })
+
+  it('sums up all the values for PreprocessedUserL2TransactionsStatistics with excluded types', () => {
+    const result = sumUpTransactionCount(
+      {
+        depositCount: 1,
+        withdrawalToAddressCount: 2,
+        forcedWithdrawalCount: 3,
+        tradeCount: 4,
+        forcedTradeCount: 5,
+        transferCount: 6,
+        conditionalTransferCount: 7,
+        liquidateCount: 8,
+        deleverageCount: 9,
+        fundingTickCount: 10,
+        oraclePricesTickCount: 11,
+        replacedTransactionsCount: 13,
+      },
+      ['Deposit', 'WithdrawalToAddress', 'ForcedWithdrawal']
+    )
+
+    expect(result).toEqual(66 - 1 - 2 - 3)
+  })
 })

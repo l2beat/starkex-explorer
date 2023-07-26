@@ -1,27 +1,27 @@
-import { CollateralAsset, InstanceName, TradingMode } from '@explorer/shared'
+import {
+  CollateralAsset,
+  InstanceName,
+  PerpetualL2TransactionData,
+  TradingMode,
+} from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
-type CheckTradingMode<T extends { tradingMode: TradingMode }> = Exclude<
-  T['tradingMode'],
-  TradingMode
-> extends never
-  ? T
-  : never
-
 export type StarkexConfig<T extends TradingMode = TradingMode> =
-  CheckTradingMode<
-    T extends 'perpetual'
-      ? PerpetualRollupConfig | PerpetualValidiumConfig
-      : T extends 'spot'
-      ? SpotValidiumConfig
-      : PerpetualRollupConfig | PerpetualValidiumConfig | SpotValidiumConfig
-  >
+  T extends 'perpetual'
+    ? PerpetualRollupConfig | PerpetualValidiumConfig
+    : T extends 'spot'
+    ? SpotValidiumConfig
+    : PerpetualRollupConfig | PerpetualValidiumConfig | SpotValidiumConfig
 
-export interface PerpetualRollupConfig {
+interface BaseConfig<T extends TradingMode, D extends 'rollup' | 'validium'> {
   instanceName: InstanceName
-  dataAvailabilityMode: 'rollup'
-  tradingMode: 'perpetual'
+  dataAvailabilityMode: D
+  tradingMode: T
   blockchain: BlockchainConfig
+  l2Transactions: L2TransactionsConfig
+}
+
+export type PerpetualRollupConfig = BaseConfig<'perpetual', 'rollup'> & {
   contracts: {
     perpetual: EthereumAddress
     escapeVerifier: EthereumAddress
@@ -32,14 +32,8 @@ export interface PerpetualRollupConfig {
   collateralAsset: CollateralAsset
 }
 
-export interface PerpetualValidiumConfig {
-  instanceName: InstanceName
-  dataAvailabilityMode: 'validium'
-  tradingMode: 'perpetual'
-  blockchain: BlockchainConfig
+export type PerpetualValidiumConfig = BaseConfig<'perpetual', 'validium'> & {
   availabilityGateway: GatewayConfig
-  feederGateway: GatewayConfig | undefined
-  l2TransactionApi: L2TransactionApiConfig | undefined
   contracts: {
     perpetual: EthereumAddress
     escapeVerifier: EthereumAddress
@@ -47,11 +41,7 @@ export interface PerpetualValidiumConfig {
   collateralAsset: CollateralAsset
 }
 
-export interface SpotValidiumConfig {
-  instanceName: InstanceName
-  dataAvailabilityMode: 'validium'
-  tradingMode: 'spot'
-  blockchain: BlockchainConfig
+export type SpotValidiumConfig = BaseConfig<'spot', 'validium'> & {
   availabilityGateway: GatewayConfig
   contracts: {
     perpetual: EthereumAddress
@@ -67,6 +57,26 @@ export interface BlockchainConfig {
   minBlockNumber: number
   maxBlockNumber: number
 }
+
+export type L2TransactionTypesToExclude = Exclude<
+  PerpetualL2TransactionData['type'],
+  'MultiTransaction'
+>[]
+
+export type L2TransactionsConfig = {
+  excludeTypes?: L2TransactionTypesToExclude
+} & (
+  | {
+      enabled: true
+      feederGateway: GatewayConfig
+      liveApi: LiveL2TransactionApiConfig | undefined
+    }
+  | {
+      enabled: false
+      feederGateway?: GatewayConfig
+      liveApi?: LiveL2TransactionApiConfig
+    }
+)
 
 export type ClientAuth =
   | {
@@ -85,7 +95,8 @@ export interface GatewayConfig {
   auth: ClientAuth
 }
 
-export interface L2TransactionApiConfig {
-  getUrl: (startApexId: number, expectCount: number) => string
+export interface LiveL2TransactionApiConfig {
+  getTransactionsUrl: (startApexId: number, expectCount: number) => string
+  getThirdPartyIdByTransactionIdUrl: (transactionId: number) => string
   auth: ClientAuth
 }

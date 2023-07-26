@@ -16,6 +16,7 @@ export function getDydxLocalConfig(env: Env): StarkexConfig {
       minBlockNumber: 0,
       maxBlockNumber: env.integer('MAX_BLOCK_NUMBER', Infinity),
     },
+    l2Transactions: { enabled: false },
     contracts: {
       perpetual: EthereumAddress('0x27fac828D6E6862901ea8471fF22552D84e155D0'),
       escapeVerifier: EthereumAddress.ZERO,

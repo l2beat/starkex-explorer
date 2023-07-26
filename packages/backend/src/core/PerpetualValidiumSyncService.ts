@@ -14,6 +14,7 @@ import {
   PerpetualValidiumUpdater,
   ValidiumStateTransition,
 } from './PerpetualValidiumUpdater'
+import { LiveL2TransactionDownloader } from './sync/LiveL2TransactionDownloader'
 
 export class PerpetualValidiumSyncService implements IDataSyncService {
   constructor(
@@ -25,12 +26,15 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
     private readonly perpetualValidiumUpdater: PerpetualValidiumUpdater,
     private readonly withdrawalAllowedCollector: WithdrawalAllowedCollector,
     private readonly feederGatewayCollector: FeederGatewayCollector | undefined,
+    private readonly L2TransactionDownloader:
+      | LiveL2TransactionDownloader
+      | undefined,
     private readonly logger: Logger
   ) {
     this.logger = logger.for(this)
   }
 
-  async sync(blockRange: BlockRange) {
+  async sync(blockRange: BlockRange, isTip: boolean) {
     const userRegistrations = await this.userRegistrationCollector.collect(
       blockRange
     )
@@ -50,6 +54,10 @@ export class PerpetualValidiumSyncService implements IDataSyncService {
 
     await this.processStateTransitions(stateTransitions)
     await this.feederGatewayCollector?.collect()
+
+    if (isTip) {
+      await this.L2TransactionDownloader?.enableSync()
+    }
   }
 
   async processStateTransitions(stateTransitions: ValidiumStateTransition[]) {

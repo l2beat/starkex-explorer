@@ -6,6 +6,7 @@ import {
 } from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
 
+import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsService } from '../../core/AssetDetailsService'
 import { ForcedTradeOfferViewService } from '../../core/ForcedTradeOfferViewService'
 import { PageContextService } from '../../core/PageContextService'
@@ -35,7 +36,10 @@ export class HomeController {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly forcedTradeOfferRepository: ForcedTradeOfferRepository,
     private readonly l2TransactionRepository: L2TransactionRepository,
-    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository
+    private readonly preprocessedStateDetailsRepository: PreprocessedStateDetailsRepository,
+    private readonly excludeL2TransactionTypes:
+      | L2TransactionTypesToExclude
+      | undefined
   ) {}
 
   async getHomePage(
@@ -46,6 +50,7 @@ export class HomeController {
     const [
       l2Transactions,
       lastStateDetailsWithL2TransactionsStatistics,
+      liveL2TransactionsStatistics,
       stateUpdates,
       stateUpdatesCount,
       forcedUserTransactions,
@@ -53,8 +58,12 @@ export class HomeController {
       availableOffers,
       availableOffersCount,
     ] = await Promise.all([
-      this.l2TransactionRepository.getPaginatedWithoutMulti(paginationOpts),
+      this.l2TransactionRepository.getPaginatedWithoutMulti(
+        paginationOpts,
+        this.excludeL2TransactionTypes
+      ),
       this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
+      this.l2TransactionRepository.getLiveStatistics(),
       this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
       this.preprocessedStateDetailsRepository.countAll(),
       this.userTransactionRepository.getPaginated({
@@ -83,13 +92,21 @@ export class HomeController {
       forcedTransactionCount: update.forcedTransactionCount,
     }))
 
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        lastStateDetailsWithL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      )
+
     const content = renderHomePage({
       context,
       tutorials: [], // explicitly no tutorials
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions: sumUpTransactionCount(
-        lastStateDetailsWithL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-      ),
+      totalL2Transactions,
       stateUpdates: stateUpdateEntries,
       totalStateUpdates: stateUpdatesCount,
       forcedTransactions: forcedTransactionEntries,
@@ -110,18 +127,33 @@ export class HomeController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
 
-    const [l2Transactions, lastStateDetailsWithL2TransactionsStatistics] =
-      await Promise.all([
-        this.l2TransactionRepository.getPaginatedWithoutMulti(pagination),
-        this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
-      ])
+    const [
+      l2Transactions,
+      lastStateDetailsWithL2TransactionsStatistics,
+      liveL2TransactionsStatistics,
+    ] = await Promise.all([
+      this.l2TransactionRepository.getPaginatedWithoutMulti(
+        pagination,
+        this.excludeL2TransactionTypes
+      ),
+      this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
+      this.l2TransactionRepository.getLiveStatistics(),
+    ])
+
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        lastStateDetailsWithL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      )
 
     const content = renderHomeL2TransactionsPage({
       context,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      total: sumUpTransactionCount(
-        lastStateDetailsWithL2TransactionsStatistics?.cumulativeL2TransactionsStatistics
-      ),
+      total: totalL2Transactions,
       ...pagination,
     })
     return { type: 'success', content }
