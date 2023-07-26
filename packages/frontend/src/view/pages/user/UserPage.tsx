@@ -2,6 +2,7 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -90,12 +91,6 @@ function UserPage(props: UserPageProps) {
           visible={props.assets.length}
           total={props.totalAssets}
         >
-          {props.context.showL2Transactions && (
-            <div className="flex h-6 text-md text-zinc-500">
-              ⓘ Guaranteed state of balances (proven on Ethereum), updated every
-              few hours:
-            </div>
-          )}
           <UserAssetsTable
             tradingMode={props.context.tradingMode}
             starkKey={props.starkKey}
