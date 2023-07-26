@@ -32,7 +32,7 @@ export function TableRow(props: TableRowProps) {
               (numeric || monospace) && 'font-mono',
               numeric && 'text-right',
               props.link &&
-                'cursor-pointer group-hover:bg-gray-800 group-hover:bg-opacity-40',
+                'cursor-pointer transition-colors group-hover:bg-gray-800 group-hover:bg-opacity-40',
               !props.link && className
             )}
           >
