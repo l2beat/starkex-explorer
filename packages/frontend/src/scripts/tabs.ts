@@ -55,8 +55,6 @@ function configureTabsNavigation(tabNavigation: HTMLElement) {
     moveUnderline(tabWithContent!.tab)
   }
 
-  onTabClick(selectedId)
-
   tabs.forEach((tab) => {
     tab.addEventListener('click', (e) => {
       e.preventDefault()
@@ -66,6 +64,9 @@ function configureTabsNavigation(tabNavigation: HTMLElement) {
   })
 
   window.addEventListener('resize', onResize)
+  window.addEventListener('load', () => {
+    onTabClick(selectedId)
+  })
 }
 
 function getElements(tabNavigation: HTMLElement) {
