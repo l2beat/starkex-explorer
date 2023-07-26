@@ -4,7 +4,7 @@ interface TabWithContent {
   tab: HTMLAnchorElement
   content: HTMLElement
 }
-
+// eslint-disable @typescript-eslint/no-non-null-assertion
 export function configureTabs() {
   const { $$ } = makeQuery(document.body)
   const tabs = $$('.Tabs')
