@@ -40,8 +40,9 @@ export function TablePagination(props: TablePaginationProps) {
           <li
             key={i}
             className={cx(
-              'flex h-6 min-w-[24px] items-center justify-center px-0.5',
-              page === props.current && 'rounded bg-brand'
+              'flex h-6 min-w-[24px] items-center justify-center rounded px-0.5',
+              page === props.current && 'bg-brand',
+              page === null && 'select-none'
             )}
           >
             {page ? (
