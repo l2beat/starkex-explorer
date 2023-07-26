@@ -6,6 +6,7 @@ import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
 import { ProjectLogo } from '../../assets/logos/ProjectLogo'
 import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
+import { FreezeBanner } from './FreezeBanner'
 
 interface NavbarProps {
   readonly context: PageContext
@@ -63,21 +64,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
           )}
         </div>
       </div>
-      {context.freezeStatus === 'freezable' && (
-        <div className="flex items-center justify-center gap-2 bg-brand px-6 py-0.5 text-white">
-          <span>
-            This exchange can be frozen due to inactivity of the operator.
-          </span>
-          <a href="/freeze" className="underline">
-            Read more
-          </a>
-        </div>
-      )}
-      {context.freezeStatus === 'frozen' && (
-        <div className="flex items-center justify-center gap-2 bg-red-500 px-6 py-0.5 text-white">
-          <span>This exchange is FROZEN and no longer operates normally. </span>
-        </div>
-      )}
+      <FreezeBanner freezeStatus={context.freezeStatus} />
     </div>
   )
 }

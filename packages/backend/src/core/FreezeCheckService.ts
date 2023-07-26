@@ -8,7 +8,7 @@ import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 
 export class FreezeCheckService {
   constructor(
-    private readonly perpatualContractAddress: EthereumAddress,
+    private readonly perpetualContractAddress: EthereumAddress,
     private readonly ethereumClient: EthereumClient,
     private readonly keyValueStore: KeyValueStore,
     private readonly userTransactionRepository: UserTransactionRepository,
@@ -32,7 +32,7 @@ export class FreezeCheckService {
       return
     }
 
-    const [isFrozen, freezeGracePeriod, curBlockTimestamp] = await Promise.all([
+    const [isFrozen, freezeGracePeriod, tipBlockTimestamp] = await Promise.all([
       this.callIsFrozen(),
       this.fetchFreezeGracePeriod(),
       this.ethereumClient.getBlockTimestamp('latest'),
@@ -61,7 +61,7 @@ export class FreezeCheckService {
       Timestamp.toSeconds(oldestNotIncludedForcedAction.timestamp) +
       BigInt(freezeGracePeriod)
 
-    if (latestNonFreezableTimestamp > curBlockTimestamp) {
+    if (latestNonFreezableTimestamp > tipBlockTimestamp) {
       await this.keyValueStore.addOrUpdate({
         key: 'freezeStatus',
         value: 'not-frozen',
@@ -87,7 +87,7 @@ export class FreezeCheckService {
 
   private async callIsFrozen(): Promise<boolean> {
     const [isFrozen, err] = await this.ethereumClient.call<boolean>(
-      this.perpatualContractAddress,
+      this.perpetualContractAddress,
       'isFrozen',
       'function isFrozen() public view returns (bool)'
     )
@@ -104,7 +104,7 @@ export class FreezeCheckService {
   private async fetchFreezeGracePeriod(): Promise<number> {
     const [freezeGracePeriod, err] =
       await this.ethereumClient.call<ethers.BigNumber>(
-        this.perpatualContractAddress,
+        this.perpetualContractAddress,
         'FREEZE_GRACE_PERIOD',
         'function FREEZE_GRACE_PERIOD() view returns (uint256)'
       )

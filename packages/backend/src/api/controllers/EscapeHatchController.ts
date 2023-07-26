@@ -1,4 +1,4 @@
-import { encodeState } from '@explorer/encoding'
+import { encodeStateAsInt256Array } from '@explorer/encoding/build/encoding/encodeState'
 import {
   renderEscapeHatchActionPage,
   renderFreezeRequestActionPage,
@@ -47,10 +47,9 @@ export class EscapeHatchController {
     const oldestNotIncludedForcedAction =
       await this.freezeCheckService.findOldestNotIncludedForcedAction()
     if (!oldestNotIncludedForcedAction) {
-      return {
-        type: 'not found',
-        message: 'Freeze is no longer possible',
-      }
+      throw new Error(
+        'Exchange is freezable but all forced actions are included!'
+      )
     }
 
     if (oldestNotIncludedForcedAction.data.type !== 'ForcedWithdrawal') {
@@ -107,13 +106,9 @@ export class EscapeHatchController {
     if (!latestStateUpdate.perpetualState) {
       throw new Error('No perpetual state recorded to perform escape')
     }
-    const encodedState = encodeState(latestStateUpdate.perpetualState)
-    const serializedState: bigint[] = []
-    for (let i = 0; i < encodedState.length / 2 / 32; i++) {
-      serializedState.push(
-        BigInt('0x' + encodedState.slice(64 * i, 64 * (i + 1)))
-      )
-    }
+    const serializedState = encodeStateAsInt256Array(
+      latestStateUpdate.perpetualState
+    )
 
     const content = renderEscapeHatchActionPage({
       context,

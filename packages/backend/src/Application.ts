@@ -642,7 +642,7 @@ export class Application {
       l2TransactionRepository
     )
 
-    const escapeActionController = new EscapeHatchController(
+    const escapeHatchController = new EscapeHatchController(
       pageContextService,
       freezeCheckService,
       stateUpdater,
@@ -678,7 +678,7 @@ export class Application {
           merkleProofController,
           searchController,
           l2TransactionController,
-          escapeActionController,
+          escapeHatchController,
           config
         ),
         createTransactionRouter(

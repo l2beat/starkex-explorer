@@ -1,5 +1,4 @@
 import {
-  EscapableAssetEntry,
   renderUserAssetsPage,
   renderUserBalanceChangesPage,
   renderUserL2TransactionsPage,
@@ -12,15 +11,8 @@ import {
   UserAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
-import {
-  CollateralAsset,
-  ERC20Details,
-  PageContext,
-  TradingMode,
-  UserDetails,
-} from '@explorer/shared'
+import { CollateralAsset, TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
-import uniqBy from 'lodash/uniqBy'
 
 import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
 import { AssetDetailsMap } from '../../core/AssetDetailsMap'
@@ -49,6 +41,8 @@ import { UserRegistrationEventRepository } from '../../peripherals/database/User
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { getAssetValueUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
+import { getCollateralAssetDetails } from './getCollateralAssetDetails'
+import { getEscapableAssets } from './getEscapableAssets'
 import { l2TransactionToEntry } from './l2TransactionToEntry'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
@@ -229,7 +223,9 @@ export class UserController {
         starkKey
       )
 
-    const escapableAssets = await this.getEscapableAssets(
+    const escapableAssets = await getEscapableAssets(
+      this.userTransactionRepository,
+      this.withdrawableAssetRepository,
       context,
       starkKey,
       collateralAsset
@@ -260,7 +256,7 @@ export class UserController {
               : asset.assetHash,
           details:
             context.tradingMode === 'perpetual'
-              ? collateralAssetDetails(context.collateralAsset)
+              ? getCollateralAssetDetails(context.collateralAsset)
               : assetDetailsMap?.getByAssetHash(asset.assetHash),
         },
         amount: asset.withdrawableBalance,
@@ -489,76 +485,6 @@ export class UserController {
     })
     return { type: 'success', content }
   }
-
-  async getEscapableAssets(
-    context: PageContext,
-    starkKey: StarkKey,
-    collateralAsset?: CollateralAsset
-  ): Promise<{
-    finalizable: EscapableAssetEntry[]
-    allCount: number
-  }> {
-    if (
-      context.freezeStatus !== 'frozen' ||
-      context.tradingMode !== 'perpetual' ||
-      collateralAsset === undefined
-    ) {
-      return { finalizable: [], allCount: 0 }
-    }
-    const allEscapeVerifiedTransactions =
-      await this.userTransactionRepository.getByStarkKey(starkKey, [
-        'EscapeVerified',
-      ])
-
-    if (allEscapeVerifiedTransactions.length === 0) {
-      return { finalizable: [], allCount: 0 }
-    }
-
-    const uniqueEscapeVerifiedTransactions = uniqBy(
-      allEscapeVerifiedTransactions,
-      (t) => t.data.positionId
-    )
-    const oldestBlockNumber = Math.min(
-      ...uniqueEscapeVerifiedTransactions.map((t) => t.blockNumber)
-    )
-    const withdrawalEventsFromBlockNumber =
-      await this.withdrawableAssetRepository.getByStarkKeyFromBlockNumber(
-        starkKey,
-        oldestBlockNumber
-      )
-    // For each transaction in uniqueEscapeVerifiedTransactions check if there is a corresponding withdrawal event
-    // in withdrawalEventsFromBlockNumber where asset and amount match.
-    // If found, remove the transaction from the uniqueEscapeVerifiedTransactions.
-    // This is the only way to find out if an escape has been finalized.
-    // Since the exchange is frozen, there can be no new other withdrawal events.
-    const notFinalizedEscapableTransactions =
-      uniqueEscapeVerifiedTransactions.filter((t) => {
-        const correspondingWithdrawalEvent =
-          withdrawalEventsFromBlockNumber.find((w) => {
-            return (
-              w.data.type === 'WithdrawalAllowed' &&
-              w.assetHash === collateralAsset.assetHash &&
-              w.data.quantizedAmount === t.data.withdrawalAmount
-            )
-          })
-        return correspondingWithdrawalEvent === undefined
-      })
-
-    const finalizable = notFinalizedEscapableTransactions.map((t) => ({
-      asset: {
-        hashOrId: collateralAsset.assetId,
-        details: collateralAssetDetails(collateralAsset),
-      },
-      ownerStarkKey: t.data.starkKey,
-      positionOrVaultId: t.data.positionId,
-      amount: t.data.withdrawalAmount,
-    }))
-
-    return {
-      finalizable,
-      allCount: allEscapeVerifiedTransactions.length,
-    }
-  }
 }
 
 function toUserAssetEntry(
@@ -625,16 +551,3 @@ function buildUserTransactions(
 
   return [...sentEntries, ...userEntries]
 }
-
-const collateralAssetDetails = (collateralAsset: CollateralAsset) =>
-  ERC20Details.parse({
-    assetHash: collateralAsset.assetHash,
-    assetTypeHash: collateralAsset.assetHash,
-    type: 'ERC20',
-    quantum: AssetId.decimals(collateralAsset.assetId).toString(),
-    contractError: [],
-    address: EthereumAddress.ZERO,
-    name: AssetId.symbol(collateralAsset.assetId),
-    symbol: AssetId.symbol(collateralAsset.assetId),
-    decimals: 2,
-  })

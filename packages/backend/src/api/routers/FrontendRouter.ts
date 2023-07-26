@@ -29,7 +29,7 @@ export function createFrontendRouter(
   merkleProofController: MerkleProofController,
   searchController: SearchController,
   l2TransactionController: L2TransactionController,
-  escapeActionController: EscapeHatchController,
+  escapeHatchController: EscapeHatchController,
   config: Config
 ) {
   const router = new Router()
@@ -370,7 +370,7 @@ export function createFrontendRouter(
 
   router.get('/freeze', async (ctx) => {
     const givenUser = getGivenUser(ctx)
-    const result = await escapeActionController.getFreezeRequestActionPage(
+    const result = await escapeHatchController.getFreezeRequestActionPage(
       givenUser
     )
     applyControllerResult(ctx, result)
@@ -387,7 +387,7 @@ export function createFrontendRouter(
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
 
-        const result = await escapeActionController.getEscapeHatchActionPage(
+        const result = await escapeHatchController.getEscapeHatchActionPage(
           givenUser,
           ctx.params.positionOrVaultId
         )
@@ -398,7 +398,7 @@ export function createFrontendRouter(
 
   router.get('/freeze', async (ctx) => {
     const givenUser = getGivenUser(ctx)
-    const result = await escapeActionController.getFreezeRequestActionPage(
+    const result = await escapeHatchController.getFreezeRequestActionPage(
       givenUser
     )
     applyControllerResult(ctx, result)
@@ -415,7 +415,7 @@ export function createFrontendRouter(
       async (ctx) => {
         const givenUser = getGivenUser(ctx)
 
-        const result = await escapeActionController.getEscapeHatchActionPage(
+        const result = await escapeHatchController.getEscapeHatchActionPage(
           givenUser,
           ctx.params.positionOrVaultId
         )

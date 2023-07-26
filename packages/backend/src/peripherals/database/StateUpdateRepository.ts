@@ -253,7 +253,7 @@ function toStateUpdateRecord(row: StateUpdateRow): StateUpdateRecord {
     timestamp: Timestamp(row.timestamp),
     perpetualState:
       row.perpetual_state !== null
-        ? decodeState(row.perpetual_state)
+        ? stateFromJson(row.perpetual_state)
         : undefined,
   }
 }
@@ -268,7 +268,7 @@ function toStateUpdateRow(record: StateUpdateRecord): StateUpdateRow {
     timestamp: BigInt(Number(record.timestamp)),
     perpetual_state:
       record.perpetualState !== undefined
-        ? encodeState(record.perpetualState)
+        ? stateToJson(record.perpetualState)
         : null,
   }
 }
@@ -303,7 +303,7 @@ function toStateUpdatePriceRecord(
   }
 }
 
-function encodeState(state: State): ToJSON<State> {
+function stateToJson(state: State): ToJSON<State> {
   return {
     positionRoot: state.positionRoot.toString(),
     positionHeight: state.positionHeight,
@@ -322,7 +322,7 @@ function encodeState(state: State): ToJSON<State> {
   }
 }
 
-function decodeState(values: ToJSON<State>): State {
+function stateFromJson(values: ToJSON<State>): State {
   return {
     positionRoot: PedersenHash(values.positionRoot),
     positionHeight: values.positionHeight,
