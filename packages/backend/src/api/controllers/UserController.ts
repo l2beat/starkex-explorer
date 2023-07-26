@@ -275,7 +275,7 @@ export class UserController {
       assets: assetEntries,
       totalAssets: userStatistics?.assetCount ?? 0,
       balanceChanges: balanceChangesEntries,
-      totalBalanceChanges: Number(userStatistics?.balanceChangeCount) || 0, // TODO: don't cast
+      totalBalanceChanges: userStatistics?.balanceChangeCount ?? 0,
       transactions,
       totalTransactions,
       offers,
