@@ -2,7 +2,6 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
