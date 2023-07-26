@@ -1,6 +1,7 @@
 import { assertUnreachable, TradingMode } from '@explorer/shared'
 import { EthereumAddress, PedersenHash, StarkKey } from '@explorer/types'
 
+import { L2TransactionRepository } from '../../peripherals/database/L2TransactionRepository'
 import { PositionRepository } from '../../peripherals/database/PositionRepository'
 import { PreprocessedAssetHistoryRepository } from '../../peripherals/database/PreprocessedAssetHistoryRepository'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
@@ -14,6 +15,7 @@ export class SearchController {
     private positionOrVaultRepository: PositionRepository | VaultRepository,
     private userRegistrationEventRepository: UserRegistrationEventRepository,
     private preprocessedAssetHistoryRepository: PreprocessedAssetHistoryRepository,
+    private l2TransactionRepository: L2TransactionRepository,
     private tradingMode: TradingMode
   ) {}
 
@@ -68,7 +70,10 @@ export class SearchController {
     const assetHistoryExistsForStarkKey =
       await this.preprocessedAssetHistoryRepository.starkKeyExists(starkKey)
 
-    if (!assetHistoryExistsForStarkKey) {
+    const l2TransactionsExistForStarkKey =
+      await this.l2TransactionRepository.starkKeyExists(starkKey)
+
+    if (!assetHistoryExistsForStarkKey && !l2TransactionsExistForStarkKey) {
       return {
         type: 'not found',
         message: `No user with Stark key ${starkKey.toString()} was found`,

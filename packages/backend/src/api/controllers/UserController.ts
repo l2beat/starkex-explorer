@@ -179,13 +179,6 @@ export class UserController {
       this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
 
-    if (!userStatistics) {
-      return {
-        type: 'not found',
-        message: `User with starkKey ${starkKey.toString()} not found`,
-      }
-    }
-
     const ethAddressWithdrawableAssets =
       starkKey === givenUser.starkKey && givenUser.address
         ? await this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
@@ -281,9 +274,9 @@ export class UserController {
         this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
       assets: assetEntries,
-      totalAssets: userStatistics.assetCount,
+      totalAssets: userStatistics?.assetCount ?? 0,
       balanceChanges: balanceChangesEntries,
-      totalBalanceChanges: Number(userStatistics.balanceChangeCount), // TODO: don't cast
+      totalBalanceChanges: userStatistics?.balanceChangeCount ?? 0,
       transactions,
       totalTransactions,
       offers,
