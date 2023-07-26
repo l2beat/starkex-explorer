@@ -8,7 +8,8 @@ interface Tab {
   id: string
   name: string
   content: ReactNode
-  icon?: ReactNode
+  accessoryLeft?: ReactNode
+  accessoryRight?: ReactNode
   shortName?: string
 }
 
@@ -24,11 +25,16 @@ export function Tabs({ items }: TabsProps) {
               id={tab.id}
               href={`#${tab.id}`}
             >
-              {tab.icon && <span className="mr-1.5">{tab.icon}</span>}
+              {tab.accessoryLeft && (
+                <span className="mr-2">{tab.accessoryLeft}</span>
+              )}
               <span className="text-base hidden md:inline">{tab.name}</span>
               <span className="inline text-xs md:hidden">
                 {tab.shortName ?? tab.name}
               </span>
+              {tab.accessoryRight && (
+                <span className="ml-2">{tab.accessoryRight}</span>
+              )}
               <span className="absolute bottom-0 left-0 block h-1 w-full rounded-t-sm bg-brand opacity-0 transition-all duration-300 group-hover:opacity-80" />
             </a>
           ))}
