@@ -1,5 +1,5 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
-import { providers } from 'ethers'
+import { providers, utils } from 'ethers'
 
 import { BlockRange } from '../../model'
 import { HackFilter, HackJsonRpcProvider } from './HackJsonRpcProvider'
@@ -42,8 +42,8 @@ export class EthereumClient {
     )
   }
 
-  async getBlockTimestamp(blockNumber: number): Promise<number> {
-    const block = await this.getBlock(blockNumber)
+  async getBlockTimestamp(blockTagOrHash: BlockTag | Hash256): Promise<number> {
+    const block = await this.getBlock(blockTagOrHash)
     return block.timestamp
   }
 
@@ -162,7 +162,7 @@ export class EthereumClient {
     return await this.provider.getTransactionReceipt(transactionHash.toString())
   }
 
-  async call(address: EthereumAddress, data: string): Promise<string> {
+  async rawCall(address: EthereumAddress, data: string): Promise<string> {
     return await this.provider.call({ to: address.toString(), data })
   }
 
@@ -172,4 +172,35 @@ export class EthereumClient {
       this.provider.off('block', handler)
     }
   }
+
+  async call<T>(
+    address: EthereumAddress,
+    name: string,
+    abi: string,
+    args: unknown[] = []
+  ): Promise<[T | undefined, Error | undefined]> {
+    const coder = new utils.Interface([abi])
+    const encoded = coder.encodeFunctionData(name, args)
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const result = await this.rawCall(address, encoded)
+      try {
+        const decodedName = coder.decodeFunctionResult(name, result)
+        return [decodedName[0] as T, undefined]
+      } catch (e) {
+        return [undefined, e as Error]
+      }
+    } catch (e) {
+      if (!isRevert(e)) {
+        throw e
+      } else {
+        return [undefined, e as Error]
+      }
+    }
+  }
+}
+
+function isRevert(e: unknown) {
+  return e instanceof Error && e.message.includes('revert')
 }

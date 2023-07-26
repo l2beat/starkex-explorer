@@ -8,15 +8,24 @@ import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { Button, LinkButton } from '../../../components/Button'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { OfferEntry } from '../../../components/tables/OffersTable'
+import { FinalizeEscapeForm } from './FinalizeEscapeForm'
 import { RegularWithdrawalForm } from './RegularWithdrawalForm'
 
 interface UserQuickActionsTableProps {
   readonly context: PageContext
+  readonly escapableAssets: readonly EscapableAssetEntry[]
   readonly withdrawableAssets: readonly WithdrawableAssetEntry[]
   readonly finalizableOffers: readonly FinalizableOfferEntry[]
   readonly starkKey: StarkKey
   readonly exchangeAddress: EthereumAddress
   readonly isMine?: boolean
+}
+
+export interface EscapableAssetEntry {
+  readonly asset: Asset
+  readonly ownerStarkKey: StarkKey
+  readonly positionOrVaultId: bigint
+  readonly amount: bigint
 }
 
 export interface WithdrawableAssetEntry {
@@ -26,9 +35,12 @@ export interface WithdrawableAssetEntry {
 
 export type FinalizableOfferEntry = Omit<OfferEntry, 'status' | 'role'>
 
+export const FINALIZE_ESCAPE_FORM_ID = 'finalize-escape-form-id'
+
 export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   if (
     props.withdrawableAssets.length === 0 &&
+    props.escapableAssets.length === 0 &&
     !(
       props.context.tradingMode === 'perpetual' &&
       props.isMine &&
@@ -41,6 +53,7 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   return (
     <section className="flex w-full flex-col gap-6 rounded-lg border border-solid border-brand bg-gray-800 p-6">
       {props.withdrawableAssets.length > 0 && <WithdrawableAssets {...props} />}
+      {props.escapableAssets.length > 0 && <EscapableAssets {...props} />}
       {props.context.tradingMode === 'perpetual' &&
         props.isMine &&
         props.finalizableOffers.length > 0 && (
@@ -50,6 +63,49 @@ export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
           />
         )}
     </section>
+  )
+}
+
+function EscapableAssets(
+  props: Pick<
+    UserQuickActionsTableProps,
+    'escapableAssets' | 'isMine' | 'context' | 'starkKey' | 'exchangeAddress'
+  >
+) {
+  return (
+    <div>
+      <p className="text-sm font-semibold text-zinc-500">Pending escapes</p>
+      {props.escapableAssets.map((asset) => {
+        const assetInfo = assetToInfo(asset.asset)
+        return (
+          <div className="mt-4 flex items-center gap-2" key={assetInfo.symbol}>
+            <AssetWithLogo
+              assetInfo={assetInfo}
+              type="symbol"
+              className="w-48"
+            />
+            <p className="flex-1 text-zinc-500">
+              Finalize the escape of{' '}
+              <strong className="text-white">
+                {formatAmount(asset.asset, asset.amount)}{' '}
+                <InlineEllipsis className="max-w-[80px]">
+                  {assetInfo.symbol}
+                </InlineEllipsis>
+              </strong>
+            </p>
+            {props.isMine && props.context.user && (
+              <FinalizeEscapeForm
+                user={props.context.user}
+                ownerStarkKey={props.starkKey}
+                exchangeAddress={props.exchangeAddress}
+                positionOrVaultId={asset.positionOrVaultId}
+                amount={asset.amount}
+              />
+            )}
+          </div>
+        )
+      })}
+    </div>
   )
 }
 

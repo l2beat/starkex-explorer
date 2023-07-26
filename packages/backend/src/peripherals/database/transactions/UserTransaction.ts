@@ -1,5 +1,11 @@
 import { assertUnreachable } from '@explorer/shared'
-import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+} from '@explorer/types'
 
 import { ToJSON } from './ToJSON'
 
@@ -15,6 +21,7 @@ export type UserTransactionData =
   | ForcedTradeData
   | ForcedWithdrawalData
   | FullWithdrawalData
+  | EscapeVerifiedData
   | WithdrawalPerformedData
 
 export type WithdrawalPerformedData =
@@ -51,6 +58,14 @@ export interface ForcedTradeData {
   syntheticAssetId: AssetId
   isABuyingSynthetic: boolean
   nonce: bigint
+}
+
+export interface EscapeVerifiedData {
+  type: 'EscapeVerified'
+  starkKey: StarkKey
+  withdrawalAmount: bigint
+  sharedStateHash: Hash256
+  positionId: bigint
 }
 
 export interface WithdrawData {
@@ -92,6 +107,8 @@ export function encodeUserTransactionData(
       return encodeFullWithdrawal(values)
     case 'ForcedTrade':
       return encodeForcedTrade(values)
+    case 'EscapeVerified':
+      return encodeEscapeVerified(values)
     case 'Withdraw':
       return encodeWithdraw(values)
     case 'WithdrawWithTokenId':
@@ -113,6 +130,8 @@ export function decodeUserTransactionData(
       return decodeFullWithdrawal(values)
     case 'ForcedTrade':
       return decodeForcedTrade(values)
+    case 'EscapeVerified':
+      return decodeEscapeVerified(values)
     case 'Withdraw':
       return decodeWithdraw(values)
     case 'WithdrawWithTokenId':
@@ -171,6 +190,34 @@ function decodeFullWithdrawal(
     ...values,
     starkKey: StarkKey(values.starkKey),
     vaultId: BigInt(values.vaultId),
+  }
+}
+
+function encodeEscapeVerified(
+  values: EscapeVerifiedData
+): Encoded<EscapeVerifiedData> {
+  return {
+    starkKeyA: values.starkKey,
+    vaultOrPositionIdA: values.positionId,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      positionId: values.positionId.toString(),
+      withdrawalAmount: values.withdrawalAmount.toString(),
+      sharedStateHash: values.sharedStateHash.toString(),
+    },
+  }
+}
+
+function decodeEscapeVerified(
+  values: ToJSON<EscapeVerifiedData>
+): EscapeVerifiedData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    positionId: BigInt(values.positionId),
+    withdrawalAmount: BigInt(values.withdrawalAmount),
+    sharedStateHash: Hash256(values.sharedStateHash),
   }
 }
 

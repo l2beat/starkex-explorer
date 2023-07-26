@@ -948,4 +948,41 @@ describe(UserTransactionRepository.name, () => {
       })
     }
   )
+
+  describe(
+    UserTransactionRepository.prototype.findOldestNotIncluded.name,
+    () => {
+      it('returns a forced withdrawal', async () => {
+        const transactionHash = Hash256.fake()
+        await repository.add({
+          transactionHash,
+          blockNumber: 123,
+          timestamp: Timestamp(123000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        const transactionHash2 = Hash256.fake()
+        const id2 = await repository.add({
+          transactionHash: transactionHash2,
+          blockNumber: 124,
+          timestamp: Timestamp(124000),
+          data: fakeForcedWithdrawal(),
+        })
+
+        await repository.addManyIncluded([
+          {
+            transactionHash: transactionHash,
+            blockNumber: 123,
+            timestamp: Timestamp(123000),
+            stateUpdateId: 1,
+          },
+        ])
+
+        const record = await repository.findOldestNotIncluded([
+          'ForcedWithdrawal',
+        ])
+        expect(record?.id).toEqual(id2)
+      })
+    }
+  )
 })

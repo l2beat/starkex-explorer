@@ -183,6 +183,9 @@ export class TransactionController {
         })
         return { type: 'success', content }
       }
+      case 'EscapeVerified': {
+        return { type: 'not found', message: 'NOT IMPLEMENTED' }
+      }
       case 'Withdraw':
       case 'WithdrawWithTokenId':
       case 'MintWithdraw': {
