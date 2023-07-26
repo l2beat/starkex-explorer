@@ -1,6 +1,5 @@
 import { type BigNumber } from '@ethersproject/bignumber'
 
-import { EthereumAddress } from './EthereumAddress'
 import { fakeHexString } from './fake'
 
 export interface StarkKey extends String {
@@ -24,12 +23,6 @@ StarkKey.from = function from(value: BigNumber | bigint) {
     value = value.toBigInt()
   }
   return StarkKey('0x' + value.toString(16).padStart(64, '0'))
-}
-
-StarkKey.fromEthereumAddress = function fromEthereumAddress(
-  address: EthereumAddress
-) {
-  return StarkKey('0' + address.toString().slice(2).padStart(63, '0'))
 }
 
 StarkKey.fake = function fake(start?: string) {

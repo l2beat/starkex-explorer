@@ -185,11 +185,13 @@ export class UserController {
         message: `User with starkKey ${starkKey.toString()} not found`,
       }
     }
-    const ethAddressWithdrawableAssets = givenUser.address
-      ? await this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
-          StarkKey.fromEthereumAddress(givenUser.address)
-        )
-      : []
+
+    const ethAddressWithdrawableAssets =
+      starkKey === givenUser.starkKey && givenUser.address
+        ? await this.withdrawableAssetRepository.getAssetBalancesByStarkKey(
+            EthereumAddress.asStarkKey(givenUser.address)
+          )
+        : []
 
     const withdrawableAssets = [
       ...starkKeyWithdrawableAssets,
