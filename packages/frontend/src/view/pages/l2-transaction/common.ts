@@ -9,6 +9,7 @@ import { StatusType } from '../../components/StatusBadge'
 export interface PerpetualTransactionDetailsProps<
   T extends PerpetualL2TransactionData['type']
 > {
+  transactionId: number
   stateUpdateId: number | undefined
   data: Extract<PerpetualL2TransactionData, { type: T }>
   collateralAsset: CollateralAsset

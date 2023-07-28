@@ -2,7 +2,7 @@ import isNumber from 'lodash/isNumber'
 import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../utils/formatting/formatAmount'
-import { LinkButton } from '../Button'
+import { Button } from '../Button'
 import { Link } from '../Link'
 import { SectionHeading } from '../SectionHeading'
 
@@ -42,9 +42,9 @@ export function TablePreview(props: TablePreviewProps) {
       )}
       {isNumber(props.total) && props.total > props.visible && (
         <div className="mt-6 flex items-center justify-center">
-          <LinkButton variant="outlined" href={props.path}>
+          <Button as="a" variant="outlined" href={props.path}>
             View all {props.entryLongNamePlural}
-          </LinkButton>
+          </Button>
         </div>
       )}
     </section>

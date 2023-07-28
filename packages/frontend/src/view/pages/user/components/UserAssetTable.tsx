@@ -8,7 +8,7 @@ import {
   formatWithDecimals,
 } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
-import { LinkButton } from '../../../components/Button'
+import { Button } from '../../../components/Button'
 import { Table } from '../../../components/table/Table'
 
 interface UserAssetsTableProps {
@@ -33,11 +33,12 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
 
   const escapeHatchElem = (entry: UserAssetEntry) =>
     entry.action === 'WITHDRAW' ? (
-      <LinkButton
+      <Button
+        as="a"
         href={getEscapeHatchLink(entry.vaultOrPositionId, isUserRegistered)}
       >
         ESCAPE
-      </LinkButton>
+      </Button>
     ) : (
       <span className="text-zinc-500">use collateral escape</span>
     )
@@ -75,7 +76,8 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
             </span>,
             props.isMine &&
               (!props.isFrozen ? (
-                <LinkButton
+                <Button
+                  as="a"
                   className="w-32"
                   href={getForcedActionLink(
                     props.tradingMode,
@@ -85,7 +87,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
                   disabled={isDisabled}
                 >
                   {entry.action}
-                </LinkButton>
+                </Button>
               ) : (
                 escapeHatchElem(entry)
               )),
