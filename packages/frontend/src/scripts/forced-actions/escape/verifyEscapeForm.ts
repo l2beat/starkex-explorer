@@ -30,7 +30,6 @@ async function submitVerifyEscape(
   props: VerifyEscapeFormProps,
   user: UserDetails
 ) {
-  // const hash = await Wallet.sendVerifyEscapeTransaction(
   await Wallet.sendVerifyEscapeTransaction(
     user.address,
     props.serializedMerkleProof,
@@ -40,6 +39,7 @@ async function submitVerifyEscape(
   )
 
   // TODO: should we save via the API to our DB?
-  // await Api.submitSpotForcedWithdrawal(hash) <- wrong function
-  window.location.href = '/'
+  window.location.href = user.starkKey
+    ? `/users/${user.starkKey.toString()}`
+    : '/home'
 }

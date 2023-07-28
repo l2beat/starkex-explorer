@@ -1,4 +1,5 @@
 import {
+  renderInitializeEscapePage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
   renderRegularWithdrawalPage,
@@ -184,7 +185,32 @@ export class TransactionController {
         return { type: 'success', content }
       }
       case 'EscapeVerified': {
-        return { type: 'not found', message: 'NOT IMPLEMENTED' }
+        //TODO: Check if we need different for Spot and Perpetual
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found' }
+        }
+        const txUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            userTransaction.data.starkKey
+          )
+        const transactionHistory = new TransactionHistory({
+          userTransaction: userTransaction,
+        })
+
+        const content = renderInitializeEscapePage({
+          context,
+          transactionHash: userTransaction.transactionHash,
+          recipient: {
+            starkKey: userTransaction.data.starkKey,
+            ethereumAddress: txUser?.ethAddress,
+          },
+          asset: { hashOrId: context.collateralAsset.assetId },
+          amount: userTransaction.data.withdrawalAmount,
+          positionId: userTransaction.data.positionId.toString(),
+          history: transactionHistory.getInitalizeEscapeTransactionHistory(),
+          stateUpdateId: userTransaction.included?.stateUpdateId,
+        })
+        return { type: 'success', content }
       }
       case 'Withdraw':
       case 'WithdrawWithTokenId':

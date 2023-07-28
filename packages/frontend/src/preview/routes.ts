@@ -43,6 +43,7 @@ import { renderEscapeHatchActionPage } from '../view/pages/forced-actions/Escape
 import { renderFreezeRequestActionPage } from '../view/pages/forced-actions/FreezeRequestActionPage'
 import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
 import { renderStateUpdateL2TransactionsPage } from '../view/pages/state-update/StateUpdateL2TransactionsPage'
+import { renderInitializeEscapePage } from '../view/pages/transaction/InitializeEscapePage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import { fakeCollateralAsset } from './data/collateralAsset'
@@ -1357,6 +1358,46 @@ const routes: Route[] = [
         positionId: randomId(),
         history: [
           { timestamp: randomTimestamp(), status: 'INCLUDED' },
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
+    path: '/transactions/initialize-escape/sent',
+    description: 'Transaction view of a sent initialize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
+    path: '/transactions/initialize-escape/mined',
+    description: 'Transaction view of a mined initialize escape transaction.',
+    isTransactionPage: true,
+    breakAfter: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        positionId: randomId(),
+        history: [
           { timestamp: randomTimestamp(), status: 'MINED' },
           { timestamp: randomTimestamp(), status: 'SENT' },
         ],

@@ -119,7 +119,7 @@ function getStatus(transaction: TransactionEntry): {
         return { type: 'END', text: 'MINED (2/2)' }
       default:
         throw new Error(
-          'INITIATE_ESCAPE transaction cannot be ${transaction.status}'
+          `INITIATE_ESCAPE transaction cannot be ${transaction.status}`
         )
     }
   }
