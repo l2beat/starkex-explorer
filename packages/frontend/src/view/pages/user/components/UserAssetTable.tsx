@@ -29,23 +29,12 @@ export interface UserAssetEntry {
 }
 
 export function UserAssetsTable(props: UserAssetsTableProps) {
-  const forcedActionLink = (entry: UserAssetEntry) =>
-    props.ethereumAddress
-      ? props.tradingMode === 'perpetual'
-        ? `/forced/new/${
-            entry.vaultOrPositionId
-          }/${entry.asset.hashOrId.toString()}`
-        : `/forced/new/${entry.vaultOrPositionId}`
-      : '/users/register'
+  const isUserRegistered = !!props.ethereumAddress
 
   const escapeHatchElem = (entry: UserAssetEntry) =>
     entry.action === 'WITHDRAW' ? (
       <LinkButton
-        href={
-          props.ethereumAddress
-            ? `/escape/${entry.vaultOrPositionId}`
-            : '/users/register'
-        }
+        href={getEscapeHatchLink(entry.vaultOrPositionId, isUserRegistered)}
       >
         ESCAPE
       </LinkButton>
@@ -88,7 +77,11 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
               (!props.isFrozen ? (
                 <LinkButton
                   className="w-32"
-                  href={forcedActionLink(entry)}
+                  href={getForcedActionLink(
+                    props.tradingMode,
+                    entry,
+                    isUserRegistered
+                  )}
                   disabled={isDisabled}
                 >
                   {entry.action}
@@ -103,7 +96,28 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
   )
 }
 
-export function getEscapeHatchLink(
+function getEscapeHatchLink(
   vaultOrPositionId: string,
-  ethereumAddress: EthereumAddress
-) {}
+  isUserRegistered: boolean
+) {
+  if (!isUserRegistered) {
+    return '/users/register'
+  }
+  return `/escape/${vaultOrPositionId}`
+}
+
+function getForcedActionLink(
+  tradingMode: TradingMode,
+  entry: UserAssetEntry,
+  isUserRegistered: boolean
+) {
+  if (!isUserRegistered) {
+    return '/users/register'
+  }
+
+  return tradingMode === 'perpetual'
+    ? `/forced/new/${
+        entry.vaultOrPositionId
+      }/${entry.asset.hashOrId.toString()}`
+    : `/forced/new/${entry.vaultOrPositionId}`
+}
