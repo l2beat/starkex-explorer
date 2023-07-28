@@ -1,5 +1,5 @@
 import { TradingMode } from '@explorer/shared'
-import { StarkKey } from '@explorer/types'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
@@ -14,6 +14,7 @@ import { Table } from '../../../components/table/Table'
 interface UserAssetsTableProps {
   assets: UserAssetEntry[]
   starkKey: StarkKey
+  ethereumAddress: EthereumAddress | undefined
   tradingMode: TradingMode
   isMine?: boolean
   isFrozen?: boolean
@@ -29,15 +30,23 @@ export interface UserAssetEntry {
 
 export function UserAssetsTable(props: UserAssetsTableProps) {
   const forcedActionLink = (entry: UserAssetEntry) =>
-    props.tradingMode === 'perpetual'
-      ? `/forced/new/${
-          entry.vaultOrPositionId
-        }/${entry.asset.hashOrId.toString()}`
-      : `/forced/new/${entry.vaultOrPositionId}`
+    props.ethereumAddress
+      ? props.tradingMode === 'perpetual'
+        ? `/forced/new/${
+            entry.vaultOrPositionId
+          }/${entry.asset.hashOrId.toString()}`
+        : `/forced/new/${entry.vaultOrPositionId}`
+      : '/users/register'
 
   const escapeHatchElem = (entry: UserAssetEntry) =>
     entry.action === 'WITHDRAW' ? (
-      <LinkButton href={`/escape/${entry.vaultOrPositionId}`}>
+      <LinkButton
+        href={
+          props.ethereumAddress
+            ? `/escape/${entry.vaultOrPositionId}`
+            : '/users/register'
+        }
+      >
         ESCAPE
       </LinkButton>
     ) : (
@@ -93,3 +102,8 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
     />
   )
 }
+
+export function getEscapeHatchLink(
+  vaultOrPositionId: string,
+  ethereumAddress: EthereumAddress
+) {}

@@ -582,6 +582,7 @@ const routes: Route[] = [
       ctx.body = renderUserAssetsPage({
         context,
         starkKey: StarkKey.fake(),
+        ethereumAddress: undefined,
         assets: repeat(visible, randomUserAssetEntry),
         limit,
         offset,
