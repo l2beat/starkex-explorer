@@ -15,7 +15,7 @@ export function SearchBar({ tradingMode, className }: SearchBarProps) {
       method="GET"
       action="/search"
       className={cx(
-        'group flex h-10 w-full rounded-lg border border-gray-600 bg-transparent drop-shadow-lg focus-within:!border-brand hover:border-zinc-500',
+        'group flex h-10 w-full rounded-lg border border-gray-600 bg-transparent drop-shadow-lg transition-colors focus-within:!border-brand hover:border-zinc-500',
         className
       )}
     >
@@ -25,6 +25,8 @@ export function SearchBar({ tradingMode, className }: SearchBarProps) {
         placeholder={`ETH address, Stark key, @state-update-id or #${
           tradingMode === 'perpetual' ? 'position-id' : 'vault-id'
         }`}
+        // do not show 1Password on this input
+        data-1p-ignore
         name="query"
       />
       <button className="flex w-12 items-center justify-center rounded-r-lg bg-transparent ">

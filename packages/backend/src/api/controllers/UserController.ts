@@ -11,12 +11,7 @@ import {
   UserAssetEntry,
 } from '@explorer/frontend'
 import { UserBalanceChangeEntry } from '@explorer/frontend/src/view/pages/user/components/UserBalanceChangesTable'
-import {
-  CollateralAsset,
-  ERC20Details,
-  TradingMode,
-  UserDetails,
-} from '@explorer/shared'
+import { CollateralAsset, TradingMode, UserDetails } from '@explorer/shared'
 import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
 
 import { L2TransactionTypesToExclude } from '../../config/starkex/StarkexConfig'
@@ -46,6 +41,8 @@ import { UserRegistrationEventRepository } from '../../peripherals/database/User
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { getAssetValueUSDCents } from '../../utils/assets'
 import { ControllerResult } from './ControllerResult'
+import { getCollateralAssetDetails } from './getCollateralAssetDetails'
+import { getEscapableAssets } from './getEscapableAssets'
 import { l2TransactionToEntry } from './l2TransactionToEntry'
 import { sentTransactionToEntry } from './sentTransactionToEntry'
 import { userTransactionToEntry } from './userTransactionToEntry'
@@ -78,6 +75,18 @@ export class UserController {
 
     if (!context) {
       return { type: 'redirect', url: '/users/recover' }
+    }
+
+    const registeredUser =
+      await this.userRegistrationEventRepository.findByStarkKey(
+        context.user.starkKey
+      )
+
+    if (registeredUser) {
+      return {
+        type: 'redirect',
+        url: `/users/${context.user.starkKey.toString()}`,
+      }
     }
 
     const content = renderUserRegisterPage({
@@ -226,6 +235,14 @@ export class UserController {
         starkKey
       )
 
+    const escapableAssets = await getEscapableAssets(
+      this.userTransactionRepository,
+      this.withdrawableAssetRepository,
+      context,
+      starkKey,
+      collateralAsset
+    )
+
     const totalL2Transactions =
       sumUpTransactionCount(
         preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
@@ -242,6 +259,7 @@ export class UserController {
       ethereumAddress: registeredUser?.ethAddress,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
       totalL2Transactions,
+      escapableAssets: escapableAssets.finalizable,
       withdrawableAssets: withdrawableAssets.map((asset) => ({
         asset: {
           hashOrId:
@@ -250,21 +268,7 @@ export class UserController {
               : asset.assetHash,
           details:
             context.tradingMode === 'perpetual'
-              ? // TODO: this is a hack to get the regular withdrawals working for perpetuals
-                // This should be revised mandatory in phase 2!
-                ERC20Details.parse({
-                  assetHash: context.collateralAsset.assetHash,
-                  assetTypeHash: context.collateralAsset.assetHash,
-                  type: 'ERC20',
-                  quantum: AssetId.decimals(
-                    context.collateralAsset.assetId
-                  ).toString(),
-                  contractError: [],
-                  address: EthereumAddress.ZERO,
-                  name: AssetId.symbol(context.collateralAsset.assetId),
-                  symbol: AssetId.symbol(context.collateralAsset.assetId),
-                  decimals: 2,
-                })
+              ? getCollateralAssetDetails(context.collateralAsset)
               : assetDetailsMap?.getByAssetHash(asset.assetHash),
         },
         amount: asset.withdrawableBalance,
@@ -273,8 +277,9 @@ export class UserController {
       finalizableOffers: finalizableOffers.map((offer) =>
         this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
-      assets: assetEntries,
-      totalAssets: userStatistics?.assetCount ?? 0,
+      assets: escapableAssets.allCount > 0 ? [] : assetEntries, // When frozen and escaped, don't show assets
+      totalAssets:
+        escapableAssets.allCount > 0 ? 0 : userStatistics?.assetCount ?? 0,
       balanceChanges: balanceChangesEntries,
       totalBalanceChanges: userStatistics?.balanceChangeCount ?? 0,
       transactions,
@@ -293,7 +298,8 @@ export class UserController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
-    const [userAssets, userStatistics] = await Promise.all([
+    const [registeredUser, userAssets, userStatistics] = await Promise.all([
+      this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         pagination,
@@ -308,7 +314,6 @@ export class UserController {
         message: `User with starkKey ${starkKey.toString()} not found`,
       }
     }
-
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
     })
@@ -325,6 +330,7 @@ export class UserController {
     const content = renderUserAssetsPage({
       context,
       starkKey,
+      ethereumAddress: registeredUser?.ethAddress,
       assets,
       ...pagination,
       total: userStatistics.assetCount,

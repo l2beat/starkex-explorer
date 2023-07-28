@@ -22,7 +22,12 @@ export interface TransactionEntry {
   asset?: Asset
   amount?: bigint
   status: 'SENT' | 'MINED' | 'INCLUDED' | 'REVERTED'
-  type: 'FORCED_WITHDRAW' | 'FORCED_BUY' | 'FORCED_SELL' | 'WITHDRAW'
+  type:
+    | 'FORCED_WITHDRAW'
+    | 'FORCED_BUY'
+    | 'FORCED_SELL'
+    | 'WITHDRAW'
+    | 'INITIATE_ESCAPE'
 }
 
 export function TransactionsTable(props: TransactionsTableProps) {
@@ -106,6 +111,18 @@ function getStatus(transaction: TransactionEntry): {
         throw new Error('WITHDRAW transaction cannot be INCLUDED')
     }
   }
+  if (transaction.type === 'INITIATE_ESCAPE') {
+    switch (transaction.status) {
+      case 'SENT':
+        return { type: 'BEGIN', text: 'SENT (1/2)' }
+      case 'MINED':
+        return { type: 'END', text: 'MINED (2/2)' }
+      default:
+        throw new Error(
+          'INITIATE_ESCAPE transaction cannot be ${transaction.status}'
+        )
+    }
+  }
   // FORCED_BUY and FORCED_SELL
   switch (transaction.status) {
     case 'SENT':
@@ -127,6 +144,8 @@ function toTypeText(type: TransactionEntry['type']): string {
       return 'F. buy'
     case 'FORCED_SELL':
       return 'F. sell'
+    case 'INITIATE_ESCAPE':
+      return 'Init. escape'
     case 'WITHDRAW':
       return 'Withdraw'
   }

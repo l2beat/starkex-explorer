@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { Card } from '../../../../components/Card'
 import {
   TransactionField,
   TransactionYesOrNoField,
@@ -8,12 +7,13 @@ import {
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualLiquidateDetails(
   props: PerpetualTransactionDetailsProps<'Liquidate'>
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -42,6 +42,6 @@ export function PerpetualLiquidateDetails(
           amount: props.data.actualCollateral,
         }}
       />
-    </Card>
+    </L2TransactionDetailsCard>
   )
 }

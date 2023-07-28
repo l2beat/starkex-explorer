@@ -1,9 +1,16 @@
-import { AssetHash, AssetId, EthereumAddress, StarkKey } from '@explorer/types'
+import {
+  AssetHash,
+  AssetId,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+} from '@explorer/types'
 import { expect } from 'earl'
 
 import {
   decodeUserTransactionData,
   encodeUserTransactionData,
+  EscapeVerifiedData,
   ForcedTradeData,
   ForcedWithdrawalData,
   FullWithdrawalData,
@@ -157,6 +164,33 @@ describe(encodeUserTransactionData.name, () => {
         assetId: data.assetId.toString(),
         nonQuantizedAmount: data.nonQuantizedAmount.toString(),
         quantizedAmount: data.quantizedAmount.toString(),
+      },
+    })
+    expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
+
+    const decoded = decodeUserTransactionData(encoded.data)
+    expect(decoded).toEqual(data)
+  })
+
+  it('can encode a EscapeVerified', () => {
+    const data: EscapeVerifiedData = {
+      type: 'EscapeVerified',
+      starkKey: StarkKey.fake(),
+      withdrawalAmount: 1234n,
+      sharedStateHash: Hash256.fake(),
+      positionId: 5678n,
+    }
+    const encoded = encodeUserTransactionData(data)
+
+    expect(encoded).toEqual({
+      starkKeyA: data.starkKey,
+      vaultOrPositionIdA: data.positionId,
+      data: {
+        type: 'EscapeVerified',
+        starkKey: data.starkKey.toString(),
+        positionId: '5678',
+        withdrawalAmount: data.withdrawalAmount.toString(),
+        sharedStateHash: data.sharedStateHash.toString(),
       },
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)

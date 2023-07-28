@@ -19,3 +19,12 @@ export function encodeState(state: State) {
 
   return writer.getBytes()
 }
+
+export function encodeStateAsInt256Array(state: State) {
+  const hexString = encodeState(state)
+  const result: bigint[] = []
+  for (let i = 0; i < hexString.length / 2 / 32; i++) {
+    result.push(BigInt('0x' + hexString.slice(64 * i, 64 * (i + 1))))
+  }
+  return result
+}

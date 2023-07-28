@@ -70,6 +70,7 @@ export class UserTransactionRepository extends BaseRepository {
       this.getCountOfIncludedByStateUpdateId
     )
     this.findById = this.wrapFind(this.findById)
+    this.findOldestNotIncluded = this.wrapFind(this.findOldestNotIncluded)
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
     this.deleteAll = this.wrapDelete(this.deleteAll)
@@ -244,6 +245,21 @@ export class UserTransactionRepository extends BaseRepository {
       query = query.whereIn('type', types)
     }
     return toRecords<T>(await query)
+  }
+
+  async findOldestNotIncluded<T extends UserTransactionData['type']>(
+    types?: T[]
+  ): Promise<UserTransactionRecord<T> | undefined> {
+    const knex = await this.knex()
+    let query = queryWithIncluded(knex)
+      .where('included_forced_requests.transaction_hash', null)
+      .orderBy('timestamp', 'asc')
+      .first()
+    if (types) {
+      query = query.whereIn('type', types)
+    }
+    const result = await query
+    return result ? toRecord(result) : undefined
   }
 
   async countAll(types?: UserTransactionData['type'][]): Promise<number> {

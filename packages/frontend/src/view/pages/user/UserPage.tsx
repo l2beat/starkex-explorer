@@ -33,6 +33,7 @@ import {
 } from './components/UserBalanceChangesTable'
 import { UserProfile } from './components/UserProfile'
 import {
+  EscapableAssetEntry,
   FinalizableOfferEntry,
   UserQuickActionsTable,
   WithdrawableAssetEntry,
@@ -43,6 +44,7 @@ interface UserPageProps {
   starkKey: StarkKey
   ethereumAddress?: EthereumAddress
   exchangeAddress: EthereumAddress
+  escapableAssets: EscapableAssetEntry[]
   withdrawableAssets: WithdrawableAssetEntry[]
   finalizableOffers: FinalizableOfferEntry[]
   assets: UserAssetEntry[]
@@ -96,6 +98,7 @@ function UserPage(props: UserPageProps) {
               ethereumAddress={props.ethereumAddress}
             />
             <UserQuickActionsTable
+              escapableAssets={props.escapableAssets}
               withdrawableAssets={props.withdrawableAssets}
               finalizableOffers={props.finalizableOffers}
               isMine={isMine}
