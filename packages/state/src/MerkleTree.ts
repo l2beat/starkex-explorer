@@ -7,6 +7,19 @@ import {
   NodeOrLeaf,
 } from './MerkleNode'
 import { MerkleValue } from './MerkleValue'
+import { PositionLeaf } from './PositionLeaf'
+
+export interface MerkleProof<T extends MerkleValue> {
+  root: PedersenHash
+  path: {
+    left: PedersenHash
+    right: PedersenHash
+  }[]
+  leafPrefixLength: number
+  leafIndex: bigint
+  perpetualAssetCount: number
+  leaf: T
+}
 
 export class MerkleTree<T extends MerkleValue> {
   private maxIndex = 0n
@@ -74,11 +87,7 @@ export class MerkleTree<T extends MerkleValue> {
   }
 
   // For reference see: https://github.com/starkware-libs/starkex-contracts/blob/master/scalable-dex/contracts/src/components/PedersenMerkleVerifier.sol
-  async getMerkleProofForLeaf(index: bigint): Promise<{
-    root: PedersenHash
-    path: { left: PedersenHash; right: PedersenHash }[]
-    leaf: T
-  }> {
+  async getMerkleProofForLeaf(index: bigint): Promise<MerkleProof<T>> {
     if (index < 0n || index > this.maxIndex) {
       throw new TypeError('Index out of bounds')
     }
@@ -89,7 +98,7 @@ export class MerkleTree<T extends MerkleValue> {
     let height = this.height
     let center = 2n ** (height - 1n)
     while (node instanceof MerkleNode) {
-      path.push({
+      path.unshift({
         left: await node.leftHash(),
         right: await node.rightHash(),
       })
@@ -103,10 +112,26 @@ export class MerkleTree<T extends MerkleValue> {
       }
       height -= 1n
     }
+
+    // This is a special solution in Perpetual StarkEx, where the leaf values
+    // and intermediate hashes are prefixed to the merkle proof (in practice
+    // making the tree higher)
+    let leafPrefixLength = 0
+    let perpetualAssetCount = 0
+    if (node instanceof PositionLeaf) {
+      const prefix = await node.calculateMerkleProofPrefix()
+      path.unshift(...prefix.nodes)
+      leafPrefixLength = prefix.nodes.length
+      perpetualAssetCount = node.assets.length
+    }
+
     return {
       root: await this.hash(),
       path,
+      leafPrefixLength,
       leaf: node,
+      leafIndex: index,
+      perpetualAssetCount,
     }
   }
 

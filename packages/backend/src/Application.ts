@@ -3,6 +3,7 @@ import { AssetHash, AssetId } from '@explorer/types'
 import { Logger } from '@l2beat/backend-tools'
 
 import { ApiServer } from './api/ApiServer'
+import { EscapeHatchController } from './api/controllers/EscapeHatchController'
 import { ForcedActionController } from './api/controllers/ForcedActionController'
 import { ForcedTradeOfferController } from './api/controllers/ForcedTradeOfferController'
 import { HomeController } from './api/controllers/HomeController'
@@ -37,6 +38,7 @@ import {
 import { VerifierCollector } from './core/collectors/VerifierCollector'
 import { WithdrawalAllowedCollector } from './core/collectors/WithdrawalAllowedCollector'
 import { ForcedTradeOfferViewService } from './core/ForcedTradeOfferViewService'
+import { FreezeCheckService } from './core/FreezeCheckService'
 import { IDataSyncService } from './core/IDataSyncService'
 import { IStateTransitionCollector } from './core/IStateTransitionCollector'
 import { StateUpdateWithBatchIdMigrator } from './core/migrations/StateUpdateWithBatchIdMigrator'
@@ -137,7 +139,11 @@ export class Application {
       logger
     )
     const userService = new UserService(userRegistrationEventRepository)
-    const pageContextService = new PageContextService(config, userService)
+    const pageContextService = new PageContextService(
+      config,
+      userService,
+      kvStore
+    )
     const forcedTradeOfferRepository = new ForcedTradeOfferRepository(
       database,
       logger
@@ -196,6 +202,7 @@ export class Application {
       userTransactionRepository,
       withdrawableAssetRepository,
       config.starkex.contracts.perpetual,
+      config.starkex.contracts.escapeVerifier,
       collateralAsset
     )
 
@@ -546,11 +553,20 @@ export class Application {
       )
     }
 
+    const freezeCheckService = new FreezeCheckService(
+      config.starkex.contracts.perpetual,
+      ethereumClient,
+      kvStore,
+      userTransactionRepository,
+      logger
+    )
+
     const syncScheduler = new SyncScheduler(
       kvStore,
       blockDownloader,
       syncService,
       preprocessor,
+      freezeCheckService,
       logger,
       {
         earliestBlock: config.starkex.blockchain.minBlockNumber,
@@ -626,6 +642,15 @@ export class Application {
       l2TransactionRepository
     )
 
+    const escapeHatchController = new EscapeHatchController(
+      pageContextService,
+      freezeCheckService,
+      stateUpdater,
+      stateUpdateRepository,
+      config.starkex.contracts.perpetual,
+      config.starkex.contracts.escapeVerifier
+    )
+
     const userTransactionController = new TransactionSubmitController(
       ethereumClient,
       sentTransactionRepository,
@@ -653,6 +678,7 @@ export class Application {
           merkleProofController,
           searchController,
           l2TransactionController,
+          escapeHatchController,
           config
         ),
         createTransactionRouter(

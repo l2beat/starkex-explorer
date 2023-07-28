@@ -3,10 +3,13 @@ import {
   AcceptedData,
   CollateralAsset,
   CreateOfferData,
+  encodeFinalizeEscapeRequest,
   encodeFinalizeExitRequest,
+  encodeFreezeRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
+  encodeVerifyEscapeRequest,
   encodeWithdrawal,
   encodeWithdrawalWithTokenId,
   FinalizeOfferData,
@@ -209,6 +212,80 @@ export const Wallet = {
   },
 
   // #endregion
+
+  // #region Escape
+  async sendFreezeRequestTransaction(
+    account: EthereumAddress,
+    ownerKey: StarkKey,
+    positionOrVaultId: bigint,
+    quantizedAmount: bigint,
+    exchangeAddress: EthereumAddress
+  ) {
+    const data = encodeFreezeRequest({
+      ownerKey,
+      positionOrVaultId,
+      quantizedAmount,
+    })
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        { from: account.toString(), to: exchangeAddress.toString(), data },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendVerifyEscapeTransaction(
+    account: EthereumAddress,
+    serializedMerkleProof: bigint[],
+    assetCount: number,
+    serializedState: bigint[],
+    escapeVerifierAddress: EthereumAddress
+  ) {
+    const data = encodeVerifyEscapeRequest({
+      serializedMerkleProof,
+      assetCount,
+      serializedState,
+    })
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account.toString(),
+          to: escapeVerifierAddress.toString(),
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+
+  async sendFinalizeEscapeTransaction(
+    account: EthereumAddress,
+    ownerStarkKey: StarkKey,
+    positionOrVaultId: bigint,
+    amount: bigint,
+    exchangeAddress: EthereumAddress
+  ) {
+    const data = encodeFinalizeEscapeRequest({
+      starkKey: ownerStarkKey,
+      positionOrVaultId,
+      quantizedAmount: amount,
+    })
+    const result = await getProvider().request({
+      method: 'eth_sendTransaction',
+      params: [
+        {
+          from: account.toString(),
+          to: exchangeAddress.toString(),
+          data,
+        },
+      ],
+    })
+    return Hash256(result as string)
+  },
+  // #endregion
+
   // #region Withdrawals
 
   async sendOldWithdrawalTransaction(

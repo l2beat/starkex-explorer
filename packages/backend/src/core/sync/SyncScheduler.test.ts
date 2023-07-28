@@ -5,6 +5,7 @@ import waitForExpect from 'wait-for-expect'
 
 import { BlockRange } from '../../model'
 import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
+import { FreezeCheckService } from '../FreezeCheckService'
 import { PerpetualRollupSyncService } from '../PerpetualRollupSyncService'
 import { PerpetualValidiumSyncService } from '../PerpetualValidiumSyncService'
 import { Preprocessor } from '../preprocessing/Preprocessor'
@@ -34,11 +35,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -49,7 +54,8 @@ describe(SyncScheduler.name, () => {
       expect(blockDownloader.getKnownBlocks).toHaveBeenOnlyCalledWith(1_000_000)
       expect(blockDownloader.onNewBlock).toHaveBeenCalledTimes(1)
       expect(blockDownloader.onReorg).toHaveBeenCalledTimes(1)
-      expect(preprocessor.sync).toHaveBeenCalled()
+      expect(preprocessor.sync).toHaveBeenCalledTimes(1)
+      expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
     })
 
     it('starts from the middle', async () => {
@@ -67,11 +73,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -89,7 +99,8 @@ describe(SyncScheduler.name, () => {
         lastSynced: 2_000_000,
         knownBlocks: [block(2_000_100), block(2_000_101)],
       })
-      expect(preprocessor.sync).toHaveBeenCalled()
+      expect(preprocessor.sync).toHaveBeenCalledTimes(1)
+      expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -107,11 +118,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -136,6 +151,7 @@ describe(SyncScheduler.name, () => {
           value: 1_000_002,
         })
         expect(preprocessor.sync).toHaveBeenCalled()
+        expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })
     })
 
@@ -152,11 +168,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -195,11 +215,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -238,6 +262,7 @@ describe(SyncScheduler.name, () => {
         })
 
         expect(preprocessor.sync).toHaveBeenCalled()
+        expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalled()
       })
     })
 
@@ -253,11 +278,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         mockKeyValueStore,
         blockDownloader,
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1_000_000 }
       )
@@ -279,6 +308,7 @@ describe(SyncScheduler.name, () => {
         })
         expect(dataSyncService.discardAfter).toHaveBeenOnlyCalledWith(999_999)
         expect(preprocessor.sync).toHaveBeenCalled()
+        expect(freezeCheckService.updateFreezeStatus).not.toHaveBeenCalled()
       })
 
       // allow the jobQueue to finish
@@ -301,11 +331,15 @@ describe(SyncScheduler.name, () => {
       const preprocessor = mockObject<Preprocessor<AssetId>>({
         sync: async () => {},
       })
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
       const syncScheduler = new SyncScheduler(
         mockKeyValueStore,
         mockObject<BlockDownloader>(),
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1, maxBlockNumber }
       )
@@ -327,7 +361,8 @@ describe(SyncScheduler.name, () => {
           isTip
         )
         expect(mockKeyValueStore.addOrUpdate).toHaveBeenCalledTimes(1)
-        expect(preprocessor.sync).toHaveBeenCalled()
+        expect(preprocessor.sync).toHaveBeenCalledTimes(1)
+        expect(freezeCheckService.updateFreezeStatus).toHaveBeenCalledTimes(1)
       })
     })
 
@@ -343,11 +378,16 @@ describe(SyncScheduler.name, () => {
         sync: mockFn(),
       })
 
+      const freezeCheckService = mockObject<FreezeCheckService>({
+        updateFreezeStatus: async () => {},
+      })
+
       const syncScheduler = new SyncScheduler(
         mockKeyValueStore,
         mockObject<BlockDownloader>(),
         dataSyncService,
         preprocessor,
+        freezeCheckService,
         Logger.SILENT,
         { earliestBlock: 1, maxBlockNumber }
       )
@@ -366,7 +406,8 @@ describe(SyncScheduler.name, () => {
         expect(dataSyncService.discardAfter).not.toHaveBeenCalled()
         expect(dataSyncService.sync).not.toHaveBeenCalled()
         expect(mockKeyValueStore.addOrUpdate).not.toHaveBeenCalled()
-        expect(preprocessor.sync).not.toHaveBeenCalled()
+        expect(preprocessor.sync).not.toHaveBeenCalledTimes(1)
+        expect(freezeCheckService.updateFreezeStatus).not.toHaveBeenCalled()
       })
     })
   })
@@ -377,6 +418,7 @@ describe(SyncScheduler.name, () => {
       mockObject<BlockDownloader>(),
       mockObject<PerpetualValidiumSyncService>(),
       mockObject<Preprocessor<AssetId>>(),
+      mockObject<FreezeCheckService>(),
       Logger.SILENT,
       { earliestBlock: 1, maxBlockNumber: 10 }
     )

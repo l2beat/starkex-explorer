@@ -4,6 +4,7 @@ import Router from '@koa/router'
 import * as z from 'zod'
 
 import { Config } from '../../config'
+import { EscapeHatchController } from '../controllers/EscapeHatchController'
 import { ForcedActionController } from '../controllers/ForcedActionController'
 import { ForcedTradeOfferController } from '../controllers/ForcedTradeOfferController'
 import { HomeController } from '../controllers/HomeController'
@@ -28,6 +29,7 @@ export function createFrontendRouter(
   merkleProofController: MerkleProofController,
   searchController: SearchController,
   l2TransactionController: L2TransactionController,
+  escapeHatchController: EscapeHatchController,
   config: Config
 ) {
   const router = new Router()
@@ -358,6 +360,62 @@ export function createFrontendRouter(
         const givenUser = getGivenUser(ctx)
 
         const result = await merkleProofController.getMerkleProofPage(
+          givenUser,
+          ctx.params.positionOrVaultId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get('/freeze', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await escapeHatchController.getFreezeRequestActionPage(
+      givenUser
+    )
+    applyControllerResult(ctx, result)
+  })
+
+  router.get(
+    '/escape/:positionOrVaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionOrVaultId: stringAsBigInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+
+        const result = await escapeHatchController.getEscapeHatchActionPage(
+          givenUser,
+          ctx.params.positionOrVaultId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.get('/freeze', async (ctx) => {
+    const givenUser = getGivenUser(ctx)
+    const result = await escapeHatchController.getFreezeRequestActionPage(
+      givenUser
+    )
+    applyControllerResult(ctx, result)
+  })
+
+  router.get(
+    '/escape/:positionOrVaultId',
+    withTypedContext(
+      z.object({
+        params: z.object({
+          positionOrVaultId: stringAsBigInt(),
+        }),
+      }),
+      async (ctx) => {
+        const givenUser = getGivenUser(ctx)
+
+        const result = await escapeHatchController.getEscapeHatchActionPage(
           givenUser,
           ctx.params.positionOrVaultId
         )

@@ -23,6 +23,9 @@ export function getApexMainnetConfig(env: Env): StarkexConfig {
     },
     contracts: {
       perpetual: EthereumAddress('0xA1D5443F2FB80A5A55ac804C948B45ce4C52DCbb'),
+      escapeVerifier: EthereumAddress(
+        '0xaadFdB9CAc145c65f2284fBe24600d07fb37F7BD'
+      ),
     },
     availabilityGateway: {
       getUrl: (batchId: number) => {

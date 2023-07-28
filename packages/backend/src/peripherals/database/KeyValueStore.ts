@@ -13,6 +13,14 @@ export const KeyValueRecord = z.union([
   z.object({ key: z.literal('lastBlockNumberSynced'), value: stringAsInt() }),
   z.object({ key: z.literal('lastSyncedThirdPartyId'), value: stringAsInt() }),
   z.object({
+    key: z.literal('freezeStatus'),
+    value: z.union([
+      z.literal('not-frozen'),
+      z.literal('freezable'),
+      z.literal('frozen'),
+    ]),
+  }),
+  z.object({
     key: z.literal('userStatisticsPreprocessorCaughtUp'),
     value: stringAsBoolean(),
   }),
@@ -36,6 +44,15 @@ export class KeyValueStore extends BaseRepository {
     this.deleteByKey = this.wrapDelete(this.deleteByKey)
 
     /* eslint-enable @typescript-eslint/unbound-method */
+  }
+
+  async findByKeyWithDefault<K extends KeyValueRecord['key']>(
+    key: K,
+    defaultValue: ValueForKey<K>,
+    trx?: Knex.Transaction
+  ): Promise<ValueForKey<K>> {
+    const value = await this.findByKey(key, trx)
+    return value === undefined ? defaultValue : value
   }
 
   async findByKey<K extends KeyValueRecord['key']>(

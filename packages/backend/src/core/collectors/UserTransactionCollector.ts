@@ -23,6 +23,7 @@ import { UserTransactionRepository } from '../../peripherals/database/transactio
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import {
+  LogEscapeVerified,
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
   LogFullWithdrawalRequest,
@@ -46,6 +47,7 @@ export class UserTransactionCollector {
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
     private readonly perpetualAddress: EthereumAddress,
+    private readonly escapeVerifierAddress: EthereumAddress,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -71,6 +73,16 @@ export class UserTransactionCollector {
       ],
     })
 
+    const escapeVerifierLogs = await this.ethereumClient.getLogsInRange(
+      blockRange,
+      {
+        address: this.escapeVerifierAddress.toString(),
+        topics: [[LogEscapeVerified.topic]],
+      }
+    )
+
+    logs.push(...escapeVerifierLogs)
+
     // we need to batch because of UserTransactionMigrator that collects all logs at once
     const batches = toBatches(logs, 20)
 
@@ -90,6 +102,7 @@ export class UserTransactionCollector {
       LogForcedWithdrawalRequest.safeParseLog(log) ??
       LogFullWithdrawalRequest.safeParseLog(log) ??
       LogForcedTradeRequest.safeParseLog(log) ??
+      LogEscapeVerified.safeParseLog(log) ??
       LogWithdrawalPerformed.safeParseLog(log) ??
       LogWithdrawalWithTokenIdPerformed.safeParseLog(log) ??
       LogMintWithdrawalPerformed.parseLog(log)
@@ -155,6 +168,20 @@ export class UserTransactionCollector {
             syntheticAssetId: decodeAssetId(event.args.syntheticAssetId),
             isABuyingSynthetic: event.args.isABuyingSynthetic,
             nonce: event.args.nonce.toBigInt(),
+          },
+        })
+      case 'LogEscapeVerified':
+        if (options?.skipUserTransactionRepository) {
+          return
+        }
+        return this.userTransactionRepository.add({
+          ...base,
+          data: {
+            type: 'EscapeVerified',
+            starkKey: StarkKey.from(event.args.starkKey),
+            withdrawalAmount: event.args.withdrawalAmount.toBigInt(),
+            positionId: event.args.positionId.toBigInt(),
+            sharedStateHash: Hash256(event.args.sharedStateHash.toString()),
           },
         })
       case 'LogWithdrawalPerformed':
