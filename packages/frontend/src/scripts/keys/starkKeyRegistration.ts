@@ -36,6 +36,6 @@ export function initStarkKeyRegistration() {
       EthereumAddress(exchangeAddress)
     )
 
-    window.location.reload()
+    window.location.href = `/users/${starkKey.toString()}`
   })
 }

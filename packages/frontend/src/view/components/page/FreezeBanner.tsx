@@ -4,7 +4,7 @@ import React from 'react'
 export function FreezeBanner({ freezeStatus }: { freezeStatus: FreezeStatus }) {
   if (freezeStatus === 'freezable') {
     return (
-      <div className="flex items-center justify-center gap-2 bg-brand px-6 py-0.5 text-white">
+      <div className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-brand px-6 py-0.5 text-white">
         <span>
           This exchange can be frozen due to inactivity of the operator.
         </span>
@@ -16,7 +16,7 @@ export function FreezeBanner({ freezeStatus }: { freezeStatus: FreezeStatus }) {
   }
   if (freezeStatus === 'frozen') {
     return (
-      <div className="flex items-center justify-center gap-2 bg-red-500 px-6 py-0.5 text-white">
+      <div className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-red-500 px-6 py-0.5 text-white">
         <span>This exchange is FROZEN and no longer operates normally. </span>
       </div>
     )

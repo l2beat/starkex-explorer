@@ -77,6 +77,18 @@ export class UserController {
       return { type: 'redirect', url: '/users/recover' }
     }
 
+    const registeredUser =
+      await this.userRegistrationEventRepository.findByStarkKey(
+        context.user.starkKey
+      )
+
+    if (registeredUser) {
+      return {
+        type: 'redirect',
+        url: `/users/${context.user.starkKey.toString()}`,
+      }
+    }
+
     const content = renderUserRegisterPage({
       context,
       exchangeAddress: this.exchangeAddress,
@@ -286,7 +298,8 @@ export class UserController {
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
     const collateralAsset = this.pageContextService.getCollateralAsset(context)
-    const [userAssets, userStatistics] = await Promise.all([
+    const [registeredUser, userAssets, userStatistics] = await Promise.all([
+      this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
         starkKey,
         pagination,
@@ -301,7 +314,6 @@ export class UserController {
         message: `User with starkKey ${starkKey.toString()} not found`,
       }
     }
-
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userAssets: userAssets,
     })
@@ -318,6 +330,7 @@ export class UserController {
     const content = renderUserAssetsPage({
       context,
       starkKey,
+      ethereumAddress: registeredUser?.ethAddress,
       assets,
       ...pagination,
       total: userStatistics.assetCount,

@@ -5,7 +5,7 @@ import React from 'react'
 import { Asset, assetToInfo } from '../../../../utils/assets'
 import { formatAmount } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
-import { Button, LinkButton } from '../../../components/Button'
+import { Button } from '../../../components/Button'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { OfferEntry } from '../../../components/tables/OffersTable'
 import { FinalizeEscapeForm } from './FinalizeEscapeForm'
@@ -196,12 +196,13 @@ function OffersToFinalize(
                 </InlineEllipsis>
               </strong>
             </p>
-            <LinkButton
+            <Button
+              as="a"
               href={`/offers/${offer.id}`}
               className="ml-auto w-32 !px-0"
             >
               Go to offer
-            </LinkButton>
+            </Button>
           </div>
         )
       })}

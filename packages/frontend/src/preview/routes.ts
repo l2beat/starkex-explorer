@@ -25,6 +25,7 @@ import {
   renderNewSpotForcedWithdrawPage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
+  renderRawL2TransactionPage,
   renderRegularWithdrawalPage,
   renderSpotForcedWithdrawalPage,
   renderStateUpdateBalanceChangesPage,
@@ -583,6 +584,7 @@ const routes: Route[] = [
       ctx.body = renderUserAssetsPage({
         context,
         starkKey: StarkKey.fake(),
+        ethereumAddress: undefined,
         assets: repeat(visible, randomUserAssetEntry),
         limit,
         offset,
@@ -941,6 +943,17 @@ const routes: Route[] = [
           randomPerpetualL2MultiTransaction()
         ),
         altIndex: randomInt(0, 10),
+      })
+    },
+  },
+  {
+    path: '/raw-l2-transactions/:transactionId',
+    link: '/raw-l2-transactions/random',
+    description: 'Raw L2 transaction details page.',
+    render: (ctx) => {
+      ctx.body = renderRawL2TransactionPage({
+        context: getPerpetualPageContext(ctx),
+        transaction: randomAggregatedPerpetualL2TransactionEntry(),
       })
     },
     breakAfter: true,
