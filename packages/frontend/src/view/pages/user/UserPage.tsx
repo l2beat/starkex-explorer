@@ -3,6 +3,7 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { InfoIcon } from '../../assets/icons/InfoIcon'
+import { CountBadge } from '../../components/CountBadge'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -51,7 +52,7 @@ interface UserPageProps {
   transactions: TransactionEntry[]
   totalTransactions: number
   l2Transactions: PerpetualL2TransactionEntry[]
-  totalL2Transactions: number | 'processing'
+  totalL2Transactions: number
   offers?: OfferEntry[]
   totalOffers: number
 }
@@ -110,12 +111,15 @@ function UserPage(props: UserPageProps) {
               id: 'assets',
               name: assetsTableTitle,
               accessoryRight: (
-                <TooltipWrapper
-                  content="Guaranteed state of balances (proven on Ethereum), updated every few
+                <div className="flex items-center justify-center gap-2">
+                  <CountBadge count={props.totalAssets} />
+                  <TooltipWrapper
+                    content="Guaranteed state of balances (proven on Ethereum), updated every few
                 hours"
-                >
-                  <InfoIcon />
-                </TooltipWrapper>
+                  >
+                    <InfoIcon />
+                  </TooltipWrapper>
+                </div>
               ),
               content: (
                 <TablePreview
@@ -138,9 +142,12 @@ function UserPage(props: UserPageProps) {
                     id: 'l2-transactions',
                     name: l2TransactionTableTitle,
                     accessoryRight: (
-                      <TooltipWrapper content="Only included transactions are reflected in asset balances">
-                        <InfoIcon />
-                      </TooltipWrapper>
+                      <div className="flex items-center justify-center gap-2">
+                        <CountBadge count={props.totalL2Transactions} />
+                        <TooltipWrapper content="Only included transactions are reflected in asset balances">
+                          <InfoIcon />
+                        </TooltipWrapper>
+                      </div>
                     ),
                     shortName: 'L2 Txs',
                     content: (
@@ -161,6 +168,7 @@ function UserPage(props: UserPageProps) {
             {
               id: 'balance-changes',
               name: balanceChangesTableTitle,
+              accessoryRight: <CountBadge count={props.totalBalanceChanges} />,
               content: (
                 <TablePreview
                   {...balanceChangesTablePropsWithoutTitle}
@@ -177,6 +185,7 @@ function UserPage(props: UserPageProps) {
             {
               id: 'transactions',
               name: transactionTableTitle,
+              accessoryRight: <CountBadge count={props.totalTransactions} />,
               content: (
                 <TablePreview
                   {...transactionTablePropsWithoutTitle}
@@ -192,6 +201,7 @@ function UserPage(props: UserPageProps) {
                   {
                     id: 'offers',
                     name: offerTableTitle,
+                    accessoryRight: <CountBadge count={props.totalOffers} />,
                     content: (
                       <TablePreview
                         {...offerTablePropsWithoutTitle}
