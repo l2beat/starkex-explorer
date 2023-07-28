@@ -64,7 +64,6 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
           )}
         </div>
       </div>
-      <FreezeBanner freezeStatus={context.freezeStatus} />
     </div>
   )
 }
