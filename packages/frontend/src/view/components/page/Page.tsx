@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react'
 
 import { Tooltip } from '../Tooltip'
 import { Footer } from './Footer'
+import { FreezeBanner } from './FreezeBanner'
 import { Head } from './Head'
 import { Navbar } from './Navbar'
 
@@ -43,6 +44,7 @@ export function Page(props: Props) {
       />
       <body className="flex h-full flex-col">
         <Navbar searchBar={!props.withoutSearch} context={props.context} />
+        <FreezeBanner freezeStatus={props.context.freezeStatus} />
         {props.children}
         <Footer />
         <Tooltip />
