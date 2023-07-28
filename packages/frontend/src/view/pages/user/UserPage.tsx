@@ -132,9 +132,11 @@ function UserPage(props: UserPageProps) {
                 >
                   <UserAssetsTable
                     tradingMode={props.context.tradingMode}
+                    ethereumAddress={props.ethereumAddress}
                     starkKey={props.starkKey}
                     assets={props.assets}
                     isMine={isMine}
+                    isFrozen={props.context.freezeStatus === 'frozen'}
                   />
                 </TablePreview>
               ),
