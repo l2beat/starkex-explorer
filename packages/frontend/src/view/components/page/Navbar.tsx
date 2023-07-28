@@ -6,7 +6,6 @@ import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
 import { ProjectLogo } from '../../assets/logos/ProjectLogo'
 import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
-import { FreezeBanner } from './FreezeBanner'
 
 interface NavbarProps {
   readonly context: PageContext
