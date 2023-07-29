@@ -344,5 +344,6 @@ export const EXAMPLE_PERPETUAL_TRANSACTIONS = {
       tx: transaction,
       tx_id: 4000 + index,
     }),
+    time_created: 1681458071 + index,
   })),
 }
