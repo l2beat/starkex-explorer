@@ -125,6 +125,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
             </div>
           </div>
           <TransactionOverview
+            chainId={props.context.chainId}
             stateUpdateId={props.stateUpdateId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}

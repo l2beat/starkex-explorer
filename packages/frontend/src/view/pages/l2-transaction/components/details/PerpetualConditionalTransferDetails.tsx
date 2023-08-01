@@ -11,7 +11,9 @@ import { CurrentStatusField } from '../CurrentStatusField'
 import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualConditionalTransferDetails(
-  props: PerpetualTransactionDetailsProps<'ConditionalTransfer'>
+  props: PerpetualTransactionDetailsProps<'ConditionalTransfer'> & {
+    chainId: number
+  }
 ) {
   return (
     <L2TransactionDetailsCard transactionId={props.transactionId}>
@@ -50,6 +52,7 @@ export function PerpetualConditionalTransferDetails(
       />
       <TransactionField label="Fact registry address">
         <EtherscanLink
+          chainId={props.chainId}
           type="address"
           address={props.data.factRegistryAddress.toString()}
         >

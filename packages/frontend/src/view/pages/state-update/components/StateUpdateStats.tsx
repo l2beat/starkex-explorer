@@ -1,3 +1,4 @@
+import { PageContext } from '@explorer/shared'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
@@ -23,6 +24,7 @@ export interface StateUpdateStatsProps {
   ethereumTimestamp: Timestamp
   starkExTimestamp: Timestamp
   rawDataAvailable?: boolean
+  context: PageContext
 }
 
 export function StateUpdateStats(props: StateUpdateStatsProps) {
@@ -41,7 +43,11 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
       <div className="mb-6 flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
         <div className="flex justify-between gap-6">
           <ValueItem label="Ethereum block number">
-            <EtherscanLink type="block" blockNumber={props.blockNumber}>
+            <EtherscanLink
+              chainId={props.context.chainId}
+              type="block"
+              blockNumber={props.blockNumber}
+            >
               {formatInt(props.blockNumber)}
             </EtherscanLink>
           </ValueItem>
