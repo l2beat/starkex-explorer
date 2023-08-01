@@ -28,6 +28,7 @@ export interface TransactionEntry {
     | 'FORCED_SELL'
     | 'WITHDRAW'
     | 'INITIATE_ESCAPE'
+    | 'FREEZE_REQUEST'
 }
 
 export function TransactionsTable(props: TransactionsTableProps) {
@@ -123,6 +124,20 @@ function getStatus(transaction: TransactionEntry): {
         )
     }
   }
+  if (transaction.type === 'FREEZE_REQUEST') {
+    switch (transaction.status) {
+      case 'SENT':
+        return { type: 'BEGIN', text: 'SENT (1/2)' }
+      case 'MINED':
+        return { type: 'MIDDLE', text: 'MINED (2/2)' }
+      case 'REVERTED':
+        return { type: 'ERROR', text: 'REVERTED' }
+      default:
+        throw new Error(
+          `FREEZE_REQUEST transaction cannot be ${transaction.status}`
+        )
+    }
+  }
   // FORCED_BUY and FORCED_SELL
   switch (transaction.status) {
     case 'SENT':
@@ -148,5 +163,7 @@ function toTypeText(type: TransactionEntry['type']): string {
       return 'Init. escape'
     case 'WITHDRAW':
       return 'Withdraw'
+    case 'FREEZE_REQUEST':
+      return 'Freeze req.'
   }
 }

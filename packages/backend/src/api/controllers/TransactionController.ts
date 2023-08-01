@@ -1,4 +1,5 @@
 import {
+  renderFreezeRequestDetailsPage,
   renderInitializeEscapePage,
   renderOfferAndForcedTradePage,
   renderPerpetualForcedWithdrawalPage,
@@ -88,8 +89,8 @@ export class TransactionController {
             userTransaction.data.starkKey
           )
         const transactionHistory = new TransactionHistory({
-          sentTransaction: sentTransaction,
-          userTransaction: userTransaction,
+          sentTransaction,
+          userTransaction,
         })
 
         const content = renderPerpetualForcedWithdrawalPage({
@@ -430,6 +431,27 @@ export class TransactionController {
         })
         return { type: 'success', content }
       }
+
+      case 'FreezeRequest':
+        const transactionHistory = new TransactionHistory({
+          sentTransaction,
+        })
+        const registeredUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKey
+          )
+
+        const content = renderFreezeRequestDetailsPage({
+          context,
+          transactionHash: sentTransaction.transactionHash,
+          ignored: {
+            starkKey: sentTransaction.data.starkKey,
+            ethereumAddress: registeredUser?.ethAddress,
+          },
+          history: transactionHistory.getRegularTransactionHistory(),
+        })
+
+        return { type: 'success', content }
 
       default:
         assertUnreachable(sentTransaction.data)

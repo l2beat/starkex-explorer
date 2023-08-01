@@ -15,6 +15,7 @@ export type SentTransactionData =
   | WithdrawData
   | WithdrawWithTokenIdData
   | EscapeVerifiedData
+  | FreezeRequestData
 
 export type SentTransactionJSON = ToJSON<SentTransactionData>
 
@@ -63,6 +64,13 @@ export interface EscapeVerifiedData {
   positionOrVaultId: bigint
 }
 
+export interface FreezeRequestData {
+  type: 'FreezeRequest'
+  starkKey: StarkKey
+  positionOrVaultId: bigint
+  quantizedAmount: bigint
+}
+
 export function encodeSentTransactionData(
   values: SentTransactionData
 ): Encoded<SentTransactionData> {
@@ -77,6 +85,8 @@ export function encodeSentTransactionData(
       return encodeWithdrawWithTokenId(values)
     case 'EscapeVerified':
       return encodeEscapeVerified(values)
+    case 'FreezeRequest':
+      return encodeFreezeRequest(values)
     default:
       assertUnreachable(values)
   }
@@ -96,6 +106,8 @@ export function decodeSentTransactionData(
       return decodeWithdrawWithTokenId(values)
     case 'EscapeVerified':
       return decodeEscapeVerified(values)
+    case 'FreezeRequest':
+      return decodeFreezeRequest(values)
     default:
       assertUnreachable(values)
   }
@@ -233,5 +245,31 @@ function decodeEscapeVerified(
     ...values,
     starkKey: StarkKey(values.starkKey),
     positionOrVaultId: BigInt(values.positionOrVaultId),
+  }
+}
+
+function encodeFreezeRequest(
+  values: FreezeRequestData
+): Encoded<FreezeRequestData> {
+  return {
+    starkKey: values.starkKey,
+    vaultOrPositionId: values.positionOrVaultId,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      positionOrVaultId: values.positionOrVaultId.toString(),
+      quantizedAmount: values.quantizedAmount.toString(),
+    },
+  }
+}
+
+function decodeFreezeRequest(
+  values: ToJSON<FreezeRequestData>
+): FreezeRequestData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    positionOrVaultId: BigInt(values.positionOrVaultId),
+    quantizedAmount: BigInt(values.quantizedAmount),
   }
 }

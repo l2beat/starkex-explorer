@@ -210,5 +210,25 @@ export function createTransactionRouter(
     )
   )
 
+  router.post(
+    '/escape/freeze-request',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result = await transactionSubmitController.submitFreezeRequest(
+          ctx.request.body.hash
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
   return router
 }

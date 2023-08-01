@@ -19,6 +19,8 @@ export function extractSentTxEntryType(
       return 'WITHDRAW'
     case 'EscapeVerified':
       return 'INITIATE_ESCAPE'
+    case 'FreezeRequest':
+      return 'FREEZE_REQUEST'
     default:
       assertUnreachable(data)
   }
@@ -34,8 +36,8 @@ export function extractSentTxAmount(
       return data.syntheticAmount
     case 'Withdraw':
     case 'WithdrawWithTokenId':
-      return undefined
     case 'EscapeVerified':
+    case 'FreezeRequest':
       return undefined
     default:
       assertUnreachable(data)
@@ -74,6 +76,8 @@ export function extractSentTxAsset(
     case 'EscapeVerified': {
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     }
+    case 'FreezeRequest':
+      return undefined
     default:
       assertUnreachable(data)
   }
@@ -84,11 +88,6 @@ export function sentTransactionToEntry(
   collateralAsset?: CollateralAsset,
   assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry {
-  if (sentTransaction.mined !== undefined && !sentTransaction.mined.reverted) {
-    throw new Error(
-      'Sent non-reverted transactions will be in userTransactions'
-    )
-  }
   const transactionHistory = new TransactionHistory({ sentTransaction })
   return {
     timestamp: sentTransaction.sentTimestamp,

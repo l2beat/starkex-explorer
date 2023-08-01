@@ -78,6 +78,14 @@ export const Api = {
     })
   },
 
+  async submitFreezeRequest(hash: Hash256) {
+    await fetch('/escape/freeze-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
   async createOffer(offer: CreateOfferData, signature: string) {
     const res = await fetch('/forced/offers', {
       method: 'POST',

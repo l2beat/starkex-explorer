@@ -1,5 +1,6 @@
 import {
   CollateralAsset,
+  decodeFreezeRequest,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
@@ -235,6 +236,40 @@ export class TransactionSubmitController {
         type: 'EscapeVerified',
         starkKey,
         positionOrVaultId,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitFreezeRequest(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const tx = await this.getTransaction(transactionHash)
+    if (!tx) {
+      return {
+        type: 'bad request',
+        message: `Transaction ${transactionHash.toString()} not found`,
+      }
+    }
+
+    const data = decodeFreezeRequest(tx.data)
+    if (
+      !tx.to ||
+      EthereumAddress(tx.to) !== this.contracts.perpetual ||
+      !data
+    ) {
+      return { type: 'bad request', message: `Invalid transaction` }
+    }
+
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'FreezeRequest',
+        starkKey: data.starkKey,
+        positionOrVaultId: data.positionOrVaultId,
+        quantizedAmount: data.quantizedAmount,
       },
     })
     return { type: 'created', content: { id: transactionHash } }
