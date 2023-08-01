@@ -17,6 +17,8 @@ export function extractSentTxEntryType(
     case 'Withdraw':
     case 'WithdrawWithTokenId':
       return 'WITHDRAW'
+    case 'EscapeVerified':
+      return 'INITIATE_ESCAPE'
     default:
       assertUnreachable(data)
   }
@@ -32,6 +34,8 @@ export function extractSentTxAmount(
       return data.syntheticAmount
     case 'Withdraw':
     case 'WithdrawWithTokenId':
+      return undefined
+    case 'EscapeVerified':
       return undefined
     default:
       assertUnreachable(data)
@@ -66,6 +70,9 @@ export function extractSentTxAsset(
         hashOrId: assetDetails.assetHash,
         details: assetDetails,
       }
+    }
+    case 'EscapeVerified': {
+      return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     }
     default:
       assertUnreachable(data)

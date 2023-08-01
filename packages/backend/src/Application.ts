@@ -655,7 +655,7 @@ export class Application {
       ethereumClient,
       sentTransactionRepository,
       forcedTradeOfferRepository,
-      config.starkex.contracts.perpetual,
+      config.starkex.contracts,
       collateralAsset
     )
     const forcedActionsController = new ForcedActionController(

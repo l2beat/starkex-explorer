@@ -6,7 +6,13 @@ import {
   decodeWithdrawalWithTokenId,
   PerpetualForcedTradeRequest,
 } from '@explorer/shared'
-import { AssetHash, EthereumAddress, Hash256, Timestamp } from '@explorer/types'
+import {
+  AssetHash,
+  EthereumAddress,
+  Hash256,
+  StarkKey,
+  Timestamp,
+} from '@explorer/types'
 
 import {
   ForcedTradeOfferRecord,
@@ -22,7 +28,10 @@ export class TransactionSubmitController {
     private ethereumClient: EthereumClient,
     private sentTransactionRepository: SentTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
-    private perpetualAddress: EthereumAddress,
+    private contracts: {
+      perpetual: EthereumAddress
+      escapeVerifier: EthereumAddress
+    },
     private collateralAsset: CollateralAsset | undefined,
     private retryTransactions = true
   ) {}
@@ -37,7 +46,11 @@ export class TransactionSubmitController {
       }
     }
     const data = decodePerpetualForcedWithdrawalRequest(tx.data)
-    if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
+    if (
+      !tx.to ||
+      EthereumAddress(tx.to) !== this.contracts.perpetual ||
+      !data
+    ) {
       return { type: 'bad request', message: `Invalid transaction` }
     }
     await this.sentTransactionRepository.add({
@@ -64,7 +77,11 @@ export class TransactionSubmitController {
       }
     }
     const data = decodeWithdrawal(tx.data)
-    if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
+    if (
+      !tx.to ||
+      EthereumAddress(tx.to) !== this.contracts.perpetual ||
+      !data
+    ) {
       return { type: 'bad request', message: `Invalid transaction` }
     }
     await this.sentTransactionRepository.add({
@@ -91,7 +108,11 @@ export class TransactionSubmitController {
       }
     }
     const data = decodeWithdrawalWithTokenId(tx.data)
-    if (!tx.to || EthereumAddress(tx.to) !== this.perpetualAddress || !data) {
+    if (
+      !tx.to ||
+      EthereumAddress(tx.to) !== this.contracts.perpetual ||
+      !data
+    ) {
       return { type: 'bad request', message: `Invalid transaction` }
     }
     await this.sentTransactionRepository.add({
@@ -157,7 +178,7 @@ export class TransactionSubmitController {
     )
     if (
       !tx.to ||
-      EthereumAddress(tx.to) !== this.perpetualAddress ||
+      EthereumAddress(tx.to) !== this.contracts.perpetual ||
       !data ||
       !tradeMatchesOffer(offer, data)
     ) {
@@ -184,6 +205,36 @@ export class TransactionSubmitController {
         signatureB: data.signature,
         premiumCost: data.premiumCost,
         offerId,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitVerifyEscape(
+    transactionHash: Hash256,
+    starkKey: StarkKey,
+    positionOrVaultId: bigint
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const tx = await this.getTransaction(transactionHash)
+    if (!tx) {
+      return {
+        type: 'bad request',
+        message: `Transaction ${transactionHash.toString()} not found`,
+      }
+    }
+
+    if (!tx.to || EthereumAddress(tx.to) !== this.contracts.escapeVerifier) {
+      return { type: 'bad request', message: `Invalid transaction` }
+    }
+
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'EscapeVerified',
+        starkKey,
+        positionOrVaultId,
       },
     })
     return { type: 'created', content: { id: transactionHash } }

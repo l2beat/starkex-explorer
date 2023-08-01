@@ -1,7 +1,7 @@
 import { Interface } from '@ethersproject/abi'
 
 const coder = new Interface([
-  'function verifyEscape(uint256[],uint256,uint256[])',
+  'function verifyEscape(uint256[] merkleProof, uint256 nAssets, uint256[] sharedState)',
 ])
 
 export interface VerifyEscapeRequest {

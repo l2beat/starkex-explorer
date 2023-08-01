@@ -4,7 +4,7 @@ import {
   stringAsBigInt,
   toJsonWithoutBigInts,
 } from '@explorer/shared'
-import { EthereumAddress } from '@explorer/types'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 import { z } from 'zod'
 
@@ -19,6 +19,7 @@ export const VERIFY_ESCAPE_REQUEST_FORM_ID = 'verify-escape-request-form'
 
 interface Props {
   context: PageContextWithUser
+  starkKey: StarkKey
   escapeVerifierAddress: EthereumAddress
   positionOrVaultId: bigint
   serializedMerkleProof: bigint[]
@@ -32,6 +33,7 @@ export const VerifyEscapeFormProps = z.object({
   positionOrVaultId: stringAsBigInt(),
   serializedMerkleProof: z.array(stringAsBigInt()),
   assetCount: z.number(),
+  starkKey: stringAs(StarkKey),
   serializedState: z.array(stringAsBigInt()),
 })
 

@@ -6,7 +6,7 @@ import {
   serializeCreateOfferBody,
   serializeFinalizeOfferBody,
 } from '@explorer/shared'
-import { Hash256 } from '@explorer/types'
+import { Hash256, StarkKey } from '@explorer/types'
 
 export const Api = {
   async getDydxTvl() {
@@ -28,6 +28,18 @@ export const Api = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitVerifyEscape(
+    hash: Hash256,
+    starkKey: StarkKey,
+    positionOrVaultId: string
+  ) {
+    await fetch('/escape/initialize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash, starkKey, positionOrVaultId }),
     })
   },
 

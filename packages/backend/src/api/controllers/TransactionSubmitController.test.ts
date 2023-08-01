@@ -1,6 +1,7 @@
 import {
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
+  encodeVerifyEscapeRequest,
   encodeWithdrawal,
 } from '@explorer/shared'
 import {
@@ -13,6 +14,7 @@ import {
 } from '@explorer/types'
 import { expect, mockObject } from 'earl'
 import { providers } from 'ethers'
+import { it } from 'mocha'
 
 import { ForcedTradeOfferRepository } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
@@ -34,7 +36,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake(),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset,
         false
       )
@@ -65,7 +70,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake('a'),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -89,7 +97,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake('a'),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -125,7 +136,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         repository,
         mockObject<ForcedTradeOfferRepository>(),
-        perpetualAddress,
+        {
+          perpetual: perpetualAddress,
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -137,6 +151,7 @@ describe(TransactionSubmitController.name, () => {
       })
     })
   })
+
   describe(TransactionSubmitController.prototype.submitForcedTrade.name, () => {
     it('handles nonexistent offer', async () => {
       const controller = new TransactionSubmitController(
@@ -145,7 +160,10 @@ describe(TransactionSubmitController.name, () => {
         mockObject<ForcedTradeOfferRepository>({
           findById: async () => undefined,
         }),
-        EthereumAddress.fake(),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -164,7 +182,10 @@ describe(TransactionSubmitController.name, () => {
         mockObject<EthereumClient>(),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake(),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -183,7 +204,10 @@ describe(TransactionSubmitController.name, () => {
         mockObject<EthereumClient>(),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake(),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -204,7 +228,10 @@ describe(TransactionSubmitController.name, () => {
         mockObject<EthereumClient>(),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake(),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -225,7 +252,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake(),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset,
         false
       )
@@ -268,7 +298,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        EthereumAddress.fake('a'),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -304,7 +337,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>({ findById: async () => offer }),
-        perpetualAddress,
+        {
+          perpetual: perpetualAddress,
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -349,7 +385,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         sentTransactionRepository,
         forcedTradeOfferRepository,
-        perpetualAddress,
+        {
+          perpetual: perpetualAddress,
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -370,7 +409,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake(),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset,
         false
       )
@@ -399,7 +441,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake('a'),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -423,7 +468,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         mockObject<SentTransactionRepository>(),
         mockObject<ForcedTradeOfferRepository>(),
-        EthereumAddress.fake('a'),
+        {
+          perpetual: EthereumAddress.fake(),
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -457,7 +505,10 @@ describe(TransactionSubmitController.name, () => {
         }),
         repository,
         mockObject<ForcedTradeOfferRepository>(),
-        perpetualAddress,
+        {
+          perpetual: perpetualAddress,
+          escapeVerifier: EthereumAddress.fake(),
+        },
         fakeCollateralAsset
       )
 
@@ -469,4 +520,114 @@ describe(TransactionSubmitController.name, () => {
       })
     })
   })
+
+  describe.only(
+    TransactionSubmitController.prototype.submitVerifyEscape.name,
+    () => {
+      it('handles nonexistent transaction', async () => {
+        const controller = new TransactionSubmitController(
+          mockObject<EthereumClient>({
+            getTransaction: async () => undefined,
+          }),
+          mockObject<SentTransactionRepository>(),
+          mockObject<ForcedTradeOfferRepository>(),
+          {
+            perpetual: EthereumAddress.fake(),
+            escapeVerifier: EthereumAddress.fake(),
+          },
+          fakeCollateralAsset,
+          false
+        )
+
+        const hash = Hash256.fake()
+        const result = await controller.submitVerifyEscape(
+          hash,
+          StarkKey.fake(),
+          123n
+        )
+
+        expect(result).toEqual({
+          type: 'bad request',
+          message: `Transaction ${hash.toString()} not found`,
+        })
+      })
+
+      it('handles transaction to a wrong address', async () => {
+        const data = encodeVerifyEscapeRequest({
+          serializedMerkleProof: [],
+          serializedState: [],
+          assetCount: 1,
+        })
+        const controller = new TransactionSubmitController(
+          mockObject<EthereumClient>({
+            getTransaction: async () =>
+              ({
+                to: EthereumAddress.fake('b').toString(),
+                data,
+              } as providers.TransactionResponse),
+          }),
+          mockObject<SentTransactionRepository>(),
+          mockObject<ForcedTradeOfferRepository>(),
+          {
+            perpetual: EthereumAddress.fake(),
+            escapeVerifier: EthereumAddress.fake(),
+          },
+          fakeCollateralAsset
+        )
+
+        const hash = Hash256.fake()
+        const result = await controller.submitVerifyEscape(
+          hash,
+          StarkKey.fake(),
+          123n
+        )
+
+        expect(result).toEqual({
+          type: 'bad request',
+          message: `Invalid transaction`,
+        })
+      })
+
+      it('handles transaction with correct data and address', async () => {
+        const data = encodeVerifyEscapeRequest({
+          serializedMerkleProof: [],
+          serializedState: [],
+          assetCount: 1,
+        })
+        const escapeVerifierAddress = EthereumAddress.fake()
+        const hash = Hash256.fake()
+
+        const repository = mockObject<SentTransactionRepository>({
+          add: async () => hash,
+        })
+        const controller = new TransactionSubmitController(
+          mockObject<EthereumClient>({
+            getTransaction: async () =>
+              ({
+                to: escapeVerifierAddress.toString(),
+                data,
+              } as providers.TransactionResponse),
+          }),
+          repository,
+          mockObject<ForcedTradeOfferRepository>(),
+          {
+            perpetual: EthereumAddress.fake(),
+            escapeVerifier: escapeVerifierAddress,
+          },
+          fakeCollateralAsset
+        )
+
+        const result = await controller.submitVerifyEscape(
+          hash,
+          StarkKey.fake(),
+          123n
+        )
+
+        expect(result).toEqual({
+          type: 'created',
+          content: { id: hash },
+        })
+      })
+    }
+  )
 })

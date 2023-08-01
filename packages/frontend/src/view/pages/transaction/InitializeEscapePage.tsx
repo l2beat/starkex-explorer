@@ -21,9 +21,11 @@ interface InitializeEscapePageProps {
     starkKey: StarkKey
     ethereumAddress: EthereumAddress | undefined
   }
-  asset: Asset
-  amount: bigint
-  positionId: string
+  dataFromL1?: {
+    asset: Asset
+    amount: bigint
+  }
+  positionOrVaultId: string
   history: {
     timestamp: Timestamp | undefined
     status: 'SENT' | 'MINED'
@@ -59,10 +61,14 @@ function InitializeEscapePage(props: InitializeEscapePageProps) {
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
-            value={{
-              asset: props.asset,
-              amount: props.amount,
-            }}
+            value={
+              props.dataFromL1
+                ? {
+                    asset: props.dataFromL1.asset,
+                    amount: props.dataFromL1.amount,
+                  }
+                : undefined
+            }
             stateUpdateId={props.stateUpdateId}
           />
         </div>
@@ -71,7 +77,7 @@ function InitializeEscapePage(props: InitializeEscapePageProps) {
           tradingMode="perpetual"
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}
-          vaultOrPositionId={props.positionId}
+          vaultOrPositionId={props.positionOrVaultId}
         />
         <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>

@@ -194,7 +194,8 @@ export class TransactionController {
             userTransaction.data.starkKey
           )
         const transactionHistory = new TransactionHistory({
-          userTransaction: userTransaction,
+          userTransaction,
+          sentTransaction,
         })
 
         const content = renderInitializeEscapePage({
@@ -204,9 +205,11 @@ export class TransactionController {
             starkKey: userTransaction.data.starkKey,
             ethereumAddress: txUser?.ethAddress,
           },
-          asset: { hashOrId: context.collateralAsset.assetId },
-          amount: userTransaction.data.withdrawalAmount,
-          positionId: userTransaction.data.positionId.toString(),
+          dataFromL1: {
+            asset: { hashOrId: context.collateralAsset.assetId },
+            amount: userTransaction.data.withdrawalAmount,
+          },
+          positionOrVaultId: userTransaction.data.positionId.toString(),
           history: transactionHistory.getInitalizeEscapeTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
@@ -399,6 +402,32 @@ export class TransactionController {
           history: transactionHistory.getRegularTransactionHistory(),
         })
 
+        return { type: 'success', content }
+      }
+
+      case 'EscapeVerified': {
+        //TODO: Check if we need different for Spot and Perpetual
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found' }
+        }
+        const txUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKey
+          )
+        const transactionHistory = new TransactionHistory({
+          sentTransaction,
+        })
+
+        const content = renderInitializeEscapePage({
+          context,
+          transactionHash: sentTransaction.transactionHash,
+          recipient: {
+            starkKey: sentTransaction.data.starkKey,
+            ethereumAddress: txUser?.ethAddress,
+          },
+          positionOrVaultId: sentTransaction.data.positionOrVaultId.toString(),
+          history: transactionHistory.getInitalizeEscapeTransactionHistory(),
+        })
         return { type: 'success', content }
       }
 

@@ -61,10 +61,12 @@ export class TransactionHistory {
       })
     }
 
-    history.push({
-      timestamp: this.sentTransaction?.sentTimestamp,
-      status: 'SENT',
-    })
+    if (this.sentTransaction || this.userTransaction) {
+      history.push({
+        timestamp: this.sentTransaction?.sentTimestamp,
+        status: 'SENT',
+      })
+    }
     return history
   }
 

@@ -1,4 +1,4 @@
-import { PedersenHash } from '@explorer/types'
+import { PedersenHash, StarkKey } from '@explorer/types'
 
 import {
   IMerkleStorage,
@@ -8,6 +8,7 @@ import {
 } from './MerkleNode'
 import { MerkleValue } from './MerkleValue'
 import { PositionLeaf } from './PositionLeaf'
+import { VaultLeaf } from './VaultLeaf'
 
 export interface MerkleProof<T extends MerkleValue> {
   root: PedersenHash
@@ -19,6 +20,7 @@ export interface MerkleProof<T extends MerkleValue> {
   leafIndex: bigint
   perpetualAssetCount: number
   leaf: T
+  starkKey: StarkKey
 }
 
 export class MerkleTree<T extends MerkleValue> {
@@ -118,11 +120,19 @@ export class MerkleTree<T extends MerkleValue> {
     // making the tree higher)
     let leafPrefixLength = 0
     let perpetualAssetCount = 0
+    let starkKey: StarkKey
     if (node instanceof PositionLeaf) {
       const prefix = await node.calculateMerkleProofPrefix()
       path.unshift(...prefix.nodes)
       leafPrefixLength = prefix.nodes.length
       perpetualAssetCount = node.assets.length
+      starkKey = node.starkKey
+    }
+    else if (node instanceof VaultLeaf) {
+      starkKey = node.starkKey
+    }
+    else {
+      throw new Error('Unknown leaf type, this should never happen')
     }
 
     return {
@@ -132,6 +142,7 @@ export class MerkleTree<T extends MerkleValue> {
       leaf: node,
       leafIndex: index,
       perpetualAssetCount,
+      starkKey
     }
   }
 

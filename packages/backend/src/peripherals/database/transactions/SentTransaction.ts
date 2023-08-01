@@ -14,6 +14,7 @@ export type SentTransactionData =
   | ForcedWithdrawalData
   | WithdrawData
   | WithdrawWithTokenIdData
+  | EscapeVerifiedData
 
 export type SentTransactionJSON = ToJSON<SentTransactionData>
 
@@ -56,6 +57,12 @@ export interface WithdrawWithTokenIdData {
   tokenId: bigint
 }
 
+export interface EscapeVerifiedData {
+  type: 'EscapeVerified'
+  starkKey: StarkKey
+  positionOrVaultId: bigint
+}
+
 export function encodeSentTransactionData(
   values: SentTransactionData
 ): Encoded<SentTransactionData> {
@@ -68,6 +75,8 @@ export function encodeSentTransactionData(
       return encodeWithdraw(values)
     case 'WithdrawWithTokenId':
       return encodeWithdrawWithTokenId(values)
+    case 'EscapeVerified':
+      return encodeEscapeVerified(values)
     default:
       assertUnreachable(values)
   }
@@ -85,6 +94,8 @@ export function decodeSentTransactionData(
       return decodeWithdraw(values)
     case 'WithdrawWithTokenId':
       return decodeWithdrawWithTokenId(values)
+    case 'EscapeVerified':
+      return decodeEscapeVerified(values)
     default:
       assertUnreachable(values)
   }
@@ -197,5 +208,30 @@ function decodeWithdrawWithTokenId(
     assetType: AssetHash(values.assetType),
     starkKey: StarkKey(values.starkKey),
     tokenId: BigInt(values.tokenId),
+  }
+}
+
+function encodeEscapeVerified(
+  values: EscapeVerifiedData
+): Encoded<EscapeVerifiedData> {
+  const { starkKey, ...rest } = values
+  return {
+    starkKey: values.starkKey,
+    vaultOrPositionId: values.positionOrVaultId,
+    data: {
+      ...rest,
+      starkKey: values.starkKey.toString(),
+      positionOrVaultId: values.positionOrVaultId.toString(),
+    },
+  }
+}
+
+function decodeEscapeVerified(
+  values: ToJSON<EscapeVerifiedData>
+): EscapeVerifiedData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    positionOrVaultId: BigInt(values.positionOrVaultId),
   }
 }

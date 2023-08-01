@@ -4,6 +4,7 @@ import {
   VERIFY_ESCAPE_REQUEST_FORM_ID,
   VerifyEscapeFormProps,
 } from '../../../view'
+import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 import { makeQuery } from '../../utils/query'
 
@@ -30,7 +31,7 @@ async function submitVerifyEscape(
   props: VerifyEscapeFormProps,
   user: UserDetails
 ) {
-  await Wallet.sendVerifyEscapeTransaction(
+  const hash = await Wallet.sendVerifyEscapeTransaction(
     user.address,
     props.serializedMerkleProof,
     props.assetCount,
@@ -38,8 +39,10 @@ async function submitVerifyEscape(
     props.escapeVerifierAddress
   )
 
-  // TODO: should we save via the API to our DB?
-  window.location.href = user.starkKey
-    ? `/users/${user.starkKey.toString()}`
-    : '/home'
+  await Api.submitVerifyEscape(
+    hash,
+    props.starkKey,
+    props.positionOrVaultId.toString()
+  )
+  window.location.href = `/transactions/${hash}`
 }

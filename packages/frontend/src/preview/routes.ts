@@ -1153,6 +1153,7 @@ const routes: Route[] = [
       context.freezeStatus = 'frozen'
       ctx.body = renderEscapeHatchActionPage({
         context,
+        starkKey: StarkKey.fake(),
         escapeVerifierAddress: EthereumAddress.fake(),
         positionOrVaultId: 12345n,
         serializedMerkleProof: [],
@@ -1388,9 +1389,7 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId('USDC-6') },
-        amount: amountBucket.pick(),
-        positionId: randomId(),
+        positionOrVaultId: randomId(),
         history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
         stateUpdateId: 1234,
       })
@@ -1407,9 +1406,11 @@ const routes: Route[] = [
         context,
         transactionHash: Hash256.fake(),
         recipient: randomRecipient(),
-        asset: { hashOrId: AssetId('USDC-6') },
-        amount: amountBucket.pick(),
-        positionId: randomId(),
+        dataFromL1: {
+          asset: { hashOrId: AssetId('USDC-6') },
+          amount: amountBucket.pick(),
+        },
+        positionOrVaultId: randomId(),
         history: [
           { timestamp: randomTimestamp(), status: 'MINED' },
           { timestamp: randomTimestamp(), status: 'SENT' },
