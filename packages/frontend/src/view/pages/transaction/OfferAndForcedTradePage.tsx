@@ -165,6 +165,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
         <TransactionUserDetails
           title="Creator details"
           tradingMode="perpetual"
+          chainId={props.context.chainId}
           starkKey={props.maker.starkKey}
           ethereumAddress={props.maker.ethereumAddress}
           vaultOrPositionId={props.maker.positionId}
@@ -173,6 +174,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
           <TransactionUserDetails
             title={`${props.type === 'BUY' ? 'Seller' : 'Buyer'} details`}
             tradingMode="perpetual"
+            chainId={props.context.chainId}
             starkKey={props.taker.starkKey}
             ethereumAddress={props.taker.ethereumAddress}
             vaultOrPositionId={props.taker.positionId}
