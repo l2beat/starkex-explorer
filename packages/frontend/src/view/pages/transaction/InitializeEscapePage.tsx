@@ -6,7 +6,6 @@ import { Asset } from '../../../utils/assets'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
-import { FORCED_TRANSACTION_SENT } from './common'
 import {
   TransactionHistoryEntry,
   TransactionHistoryTable,
@@ -89,7 +88,7 @@ function toHistoryEntry(
         timestamp: entry.timestamp,
         statusText: 'SENT (1/2)',
         statusType: 'BEGIN',
-        description: FORCED_TRANSACTION_SENT,
+        description: 'Initialize escape sent, waiting for it to be mined',
       }
     case 'MINED':
       return {
@@ -97,7 +96,7 @@ function toHistoryEntry(
         statusText: 'MINED (2/2)',
         statusType: 'MIDDLE',
         description:
-          'Forced transaction mined, you can finalize the escape now',
+          'Initialize escape mined, you can finalize the escape now on your user page',
       }
     default:
       assertUnreachable(entry.status)
