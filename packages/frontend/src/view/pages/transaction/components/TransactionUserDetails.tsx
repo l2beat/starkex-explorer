@@ -14,6 +14,7 @@ interface TransactionUserDetailsProps {
   ethereumAddress: EthereumAddress | undefined
   starkKey: StarkKey
   vaultOrPositionId?: string
+  chainId: number
 }
 
 export function TransactionUserDetails(props: TransactionUserDetailsProps) {
@@ -38,6 +39,7 @@ export function TransactionUserDetails(props: TransactionUserDetailsProps) {
         <TransactionField label="Ethereum address">
           {props.ethereumAddress ? (
             <EtherscanLink
+              chainId={props.chainId}
               type="address"
               address={props.ethereumAddress.toString()}
             >

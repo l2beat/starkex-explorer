@@ -30,7 +30,7 @@
     "@explorer/state": "*",
     "@explorer/types": "*",
     "@koa/router": "^10.1.1",
-    "@l2beat/backend-tools": "^0.2.1-canary.20230720T091646",
+    "@l2beat/backend-tools": "^0.3.0-canary.20230802T090238",
     "@types/koa": "^2.13.4",
     "@types/koa-bodyparser": "^4.3.7",
     "@types/koa-static": "^4.0.2",

@@ -93,7 +93,11 @@ import { AvailabilityGatewayClient } from './peripherals/starkware/AvailabilityG
 import { FeederGatewayClient } from './peripherals/starkware/FeederGatewayClient'
 import { FetchClient } from './peripherals/starkware/FetchClient'
 import { LiveL2TransactionClient } from './peripherals/starkware/LiveL2TransactionClient'
-import { handleServerError, reportError } from './tools/ErrorReporter'
+import {
+  handleServerError,
+  reportCriticalError,
+  reportError,
+} from './tools/ErrorReporter'
 
 export class Application {
   start: () => Promise<void>
@@ -104,6 +108,7 @@ export class Application {
     const logger = new Logger({
       ...config.logger,
       reportError,
+      reportCriticalError,
     })
 
     const clock = new Clock()
