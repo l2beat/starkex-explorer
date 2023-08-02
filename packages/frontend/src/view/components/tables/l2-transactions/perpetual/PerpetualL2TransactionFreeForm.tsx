@@ -1,4 +1,7 @@
-import { CollateralAsset, getCollateralAssetIdFromHash } from '@explorer/shared'
+import {
+  CollateralAsset,
+  validateCollateralAssetIdByHash,
+} from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
 import { Asset, assetToInfo } from '../../../../../utils/assets'
@@ -71,7 +74,7 @@ export function PerpetualL2TransactionFreeForm({
       }
       const syntheticBuyer = data.isABuyingSynthetic ? partyA : partyB
       const syntheticSeller = data.isABuyingSynthetic ? partyB : partyA
-      const collateralAssetId = getCollateralAssetIdFromHash(
+      const collateralAssetId = validateCollateralAssetIdByHash(
         data.collateralAssetId,
         collateralAsset
       )
@@ -126,7 +129,7 @@ export function PerpetualL2TransactionFreeForm({
         </>
       )
     case 'Liquidate': {
-      const collateralAssetId = getCollateralAssetIdFromHash(
+      const collateralAssetId = validateCollateralAssetIdByHash(
         data.liquidatorOrder.collateralAssetId,
         collateralAsset
       )

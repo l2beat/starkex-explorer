@@ -3,7 +3,7 @@ import {
   renderEscapeHatchActionPage,
   renderFreezeRequestActionPage,
 } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import { UserDetails, assertUnreachable } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 import { FreezeCheckService } from '../../core/FreezeCheckService'
@@ -52,22 +52,47 @@ export class EscapeHatchController {
       )
     }
 
-    if (oldestNotIncludedForcedAction.data.type !== 'ForcedWithdrawal') {
-      return {
-        type: 'not found',
-        message: 'Functionality not yet supported',
-      }
-    }
-
-    const data = oldestNotIncludedForcedAction.data
-    const content = renderFreezeRequestActionPage({
+    let content: string
+    const base = {
       context,
       transactionHash: oldestNotIncludedForcedAction.transactionHash,
-      starkKey: data.starkKey,
-      positionOrVaultId: data.positionId,
-      quantizedAmount: data.quantizedAmount,
       starkExAddress: this.starkExAddress,
-    })
+    }
+    const data = oldestNotIncludedForcedAction.data
+    switch (data.type) {
+      case 'ForcedWithdrawal':
+        content = renderFreezeRequestActionPage({
+          ...base,
+          type: data.type,
+          starkKey: data.starkKey,
+          positionOrVaultId: data.positionId,
+          quantizedAmount: data.quantizedAmount,
+        })
+        break
+      case 'ForcedTrade':
+        if (context.tradingMode !== 'perpetual') {
+          throw new Error('Forced trade is only supported in perpetual mode')
+        }
+        content = renderFreezeRequestActionPage({
+          ...base,
+          collateralAsset: context.collateralAsset,
+          type: data.type,
+          starkKeyA: data.starkKeyA,
+          starkKeyB: data.starkKeyB,
+          vaultIdA: data.positionIdA,
+          vaultIdB: data.positionIdB,
+          collateralAssetId: data.collateralAssetId,
+          syntheticAssetId: data.syntheticAssetId,
+          amountCollateral: data.collateralAmount,
+          amountSynthetic: data.syntheticAmount,
+          aIsBuyingSynthetic: data.isABuyingSynthetic,
+          nonce: data.nonce,
+        })
+      case 'FullWithdrawal':
+        throw new Error('NIY')
+      default:
+        assertUnreachable(data)
+    }
 
     return { type: 'success', content }
   }

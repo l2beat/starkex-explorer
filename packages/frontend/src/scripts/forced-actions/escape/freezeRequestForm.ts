@@ -31,13 +31,7 @@ async function submitFreezeRequest(
   user: UserDetails
 ) {
   // const hash = await Wallet.sendFreezeRequestTransaction(
-  await Wallet.sendFreezeRequestTransaction(
-    user.address,
-    props.starkKey,
-    props.positionOrVaultId,
-    props.quantizedAmount,
-    props.starkExAddress
-  )
+  await Wallet.sendFreezeRequestTransaction(user.address, props)
 
   // TODO: should we save via the API to our DB?
   // await Api.submitSpotForcedWithdrawal(hash) <- wrong function

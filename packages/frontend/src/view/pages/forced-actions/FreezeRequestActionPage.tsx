@@ -1,10 +1,11 @@
 import {
+  CollateralAsset,
   PageContextWithUser,
   stringAs,
   stringAsBigInt,
   toJsonWithoutBigInts,
 } from '@explorer/shared'
-import { EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import { AssetId, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import React from 'react'
 import { z } from 'zod'
 
@@ -15,24 +16,38 @@ import { reactToHtml } from '../../reactToHtml'
 
 export const FREEZE_REQUEST_FORM_ID = 'freeze-request-form'
 
-interface Props {
+type Props = {
   context: PageContextWithUser
   transactionHash: Hash256
-  starkExAddress: EthereumAddress
-  starkKey: StarkKey
-  positionOrVaultId: bigint
-  quantizedAmount: bigint
-}
+} & FreezeRequestActionFormProps
 
 export type FreezeRequestActionFormProps = z.infer<
   typeof FreezeRequestActionFormProps
 >
-export const FreezeRequestActionFormProps = z.object({
-  starkExAddress: stringAs(EthereumAddress),
-  starkKey: stringAs(StarkKey),
-  positionOrVaultId: stringAsBigInt(),
-  quantizedAmount: stringAsBigInt(),
-})
+export const FreezeRequestActionFormProps = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('ForcedWithdrawal'),
+    starkExAddress: stringAs(EthereumAddress),
+    starkKey: stringAs(StarkKey),
+    positionOrVaultId: stringAsBigInt(),
+    quantizedAmount: stringAsBigInt(),
+  }),
+  z.object({
+    type: z.literal('ForcedTrade'),
+    starkExAddress: stringAs(EthereumAddress),
+    collateralAsset: CollateralAsset,
+    starkKeyA: stringAs(StarkKey),
+    starkKeyB: stringAs(StarkKey),
+    vaultIdA: stringAsBigInt(),
+    vaultIdB: stringAsBigInt(),
+    collateralAssetId: stringAs(AssetId),
+    syntheticAssetId: stringAs(AssetId),
+    amountCollateral: stringAsBigInt(),
+    amountSynthetic: stringAsBigInt(),
+    aIsBuyingSynthetic: z.boolean(),
+    nonce: stringAsBigInt(),
+  }),
+])
 
 export function serializeFreezeRequestActionFormProps(
   props: FreezeRequestActionFormProps

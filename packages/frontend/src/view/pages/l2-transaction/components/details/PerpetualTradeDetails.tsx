@@ -1,4 +1,4 @@
-import { getCollateralAssetIdFromHash } from '@explorer/shared'
+import { validateCollateralAssetIdByHash } from '@explorer/shared'
 import React from 'react'
 
 import { InlineEllipsis } from '../../../../components/InlineEllipsis'
@@ -18,7 +18,7 @@ export function PerpetualTradeDetails(
   const syntheticSeller = props.data.partyAOrder.isBuyingSynthetic
     ? props.data.partyBOrder
     : props.data.partyAOrder
-  const collateralAssetId = getCollateralAssetIdFromHash(
+  const collateralAssetId = validateCollateralAssetIdByHash(
     props.data.partyAOrder.collateralAssetId,
     props.collateralAsset
   )

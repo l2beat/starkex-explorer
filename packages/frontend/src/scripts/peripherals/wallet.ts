@@ -1,11 +1,13 @@
 import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
+  assertUnreachable,
   CollateralAsset,
   CreateOfferData,
   encodeFinalizeEscapeRequest,
   encodeFinalizeExitRequest,
-  encodeFreezeRequest,
+  encodeForcedTradeFreezeRequest,
+  encodeForcedWithdrawalFreezeRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
@@ -19,6 +21,7 @@ import {
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 
+import { FreezeRequestActionFormProps } from '../../view'
 import { Registration } from '../keys/keys'
 
 function getProvider() {
@@ -216,20 +219,32 @@ export const Wallet = {
   // #region Escape
   async sendFreezeRequestTransaction(
     account: EthereumAddress,
-    ownerKey: StarkKey,
-    positionOrVaultId: bigint,
-    quantizedAmount: bigint,
-    exchangeAddress: EthereumAddress
+    props: FreezeRequestActionFormProps
   ) {
-    const data = encodeFreezeRequest({
-      ownerKey,
-      positionOrVaultId,
-      quantizedAmount,
-    })
+    let data: string
+    switch (props.type) {
+      case 'ForcedWithdrawal': {
+        const { type: _, starkExAddress, ...toEncode } = props
+        data = encodeForcedWithdrawalFreezeRequest(toEncode)
+        break
+      }
+      case 'ForcedTrade': {
+        const { type: _, starkExAddress, collateralAsset, ...toEncode } = props
+        data = encodeForcedTradeFreezeRequest(toEncode, collateralAsset)
+        break
+      }
+      default:
+        assertUnreachable(props)
+    }
+
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [
-        { from: account.toString(), to: exchangeAddress.toString(), data },
+        {
+          from: account.toString(),
+          to: props.starkExAddress.toString(),
+          data,
+        },
       ],
     })
     return Hash256(result as string)

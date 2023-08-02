@@ -2,7 +2,7 @@ import { decodeAssetId } from '@explorer/encoding'
 import {
   assertUnreachable,
   CollateralAsset,
-  getCollateralAssetIdFromHash,
+  validateCollateralAssetIdByHash,
 } from '@explorer/shared'
 import {
   AssetHash,
@@ -160,7 +160,7 @@ export class UserTransactionCollector {
             positionIdA: event.args.positionIdA.toBigInt(),
             positionIdB: event.args.positionIdB.toBigInt(),
             collateralAmount: event.args.collateralAmount.toBigInt(),
-            collateralAssetId: getCollateralAssetIdFromHash(
+            collateralAssetId: validateCollateralAssetIdByHash(
               event.args.collateralAssetId.toHexString(),
               this.collateralAsset
             ),

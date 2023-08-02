@@ -1073,6 +1073,7 @@ const routes: Route[] = [
       ctx.body = renderFreezeRequestActionPage({
         context,
         transactionHash: Hash256.fake(),
+        type: 'ForcedWithdrawal',
         starkExAddress: EthereumAddress.fake(),
         starkKey: StarkKey.fake(),
         positionOrVaultId: 12345n,
