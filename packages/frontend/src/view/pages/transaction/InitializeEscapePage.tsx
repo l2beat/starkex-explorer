@@ -57,6 +57,7 @@ function InitializeEscapePage(props: InitializeEscapePageProps) {
             transactionHash={props.transactionHash}
           />
           <TransactionOverview
+            chainId={props.context.chainId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
@@ -74,6 +75,7 @@ function InitializeEscapePage(props: InitializeEscapePageProps) {
         </div>
         <TransactionUserDetails
           title="Recipient details"
+          chainId={props.context.chainId}
           tradingMode="perpetual"
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}

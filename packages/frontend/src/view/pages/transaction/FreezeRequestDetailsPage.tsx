@@ -52,6 +52,7 @@ function FreezeRequestDetailsPage(props: FreezeRequestDetailsPageProps) {
             transactionHash={props.transactionHash}
           />
           <TransactionOverview
+            chainId={props.context.chainId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
@@ -59,6 +60,7 @@ function FreezeRequestDetailsPage(props: FreezeRequestDetailsPageProps) {
           />
         </div>
         <TransactionUserDetails
+          chainId={props.context.chainId}
           title="Ignored user details"
           tradingMode="perpetual"
           starkKey={props.ignored.starkKey}

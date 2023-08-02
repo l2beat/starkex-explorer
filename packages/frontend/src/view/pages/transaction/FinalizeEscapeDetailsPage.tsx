@@ -56,6 +56,7 @@ function FinalizeEscapeDetailsPage(props: FinalizeEscapeDetailsPageProps) {
             transactionHash={props.transactionHash}
           />
           <TransactionOverview
+            chainId={props.context.chainId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
@@ -65,6 +66,7 @@ function FinalizeEscapeDetailsPage(props: FinalizeEscapeDetailsPageProps) {
         </div>
         <TransactionUserDetails
           title="Recipient details"
+          chainId={props.context.chainId}
           tradingMode="perpetual"
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}
