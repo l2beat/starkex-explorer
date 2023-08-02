@@ -62,6 +62,7 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
             transactionHash={props.transactionHash}
           />
           <TransactionOverview
+            chainId={props.context.chainId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
@@ -72,6 +73,7 @@ function SpotForcedWithdrawalPage(props: SpotForcedWithdrawalPageProps) {
         <TransactionUserDetails
           title="Recipient details"
           tradingMode="spot"
+          chainId={props.context.chainId}
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}
           vaultOrPositionId={props.vaultId}

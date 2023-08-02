@@ -82,6 +82,7 @@ export function PerpetualL2TransactionDetailsPage(
           data={props.transaction.originalTransaction}
           stateUpdateId={props.transaction.stateUpdateId}
           collateralAsset={props.context.collateralAsset}
+          chainId={props.context.chainId}
           altIndex={props.altIndex}
         />
         {isReplaced && (

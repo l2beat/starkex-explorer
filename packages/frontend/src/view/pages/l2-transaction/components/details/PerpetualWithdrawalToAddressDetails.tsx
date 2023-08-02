@@ -10,7 +10,9 @@ import { CurrentStatusField } from '../CurrentStatusField'
 import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualWithdrawalToAddressDetails(
-  props: PerpetualTransactionDetailsProps<'WithdrawalToAddress'>
+  props: PerpetualTransactionDetailsProps<'WithdrawalToAddress'> & {
+    chainId: number
+  }
 ) {
   return (
     <L2TransactionDetailsCard transactionId={props.transactionId}>
@@ -27,6 +29,7 @@ export function PerpetualWithdrawalToAddressDetails(
       </TransactionField>
       <TransactionField label="Ethereum address">
         <EtherscanLink
+          chainId={props.chainId}
           type="address"
           address={props.data.ethereumAddress.toString()}
         >

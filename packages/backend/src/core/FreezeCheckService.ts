@@ -39,7 +39,7 @@ export class FreezeCheckService {
     ])
 
     if (isFrozen) {
-      this.logger.info('StarkEx is frozen!')
+      this.logger.critical('StarkEx is frozen!')
       await this.keyValueStore.addOrUpdate({
         key: 'freezeStatus',
         value: 'frozen',
@@ -70,7 +70,7 @@ export class FreezeCheckService {
     }
 
     // TODO: check if we're truly synced (lastSyncedBlockNumber is not further than an hour(?) behind)
-    this.logger.info('StarkEx is freezable!')
+    this.logger.critical('StarkEx is freezable!')
     await this.keyValueStore.addOrUpdate({
       key: 'freezeStatus',
       value: 'freezable',
