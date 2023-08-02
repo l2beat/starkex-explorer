@@ -29,7 +29,7 @@ import {
 } from '../../test/fakes'
 import { TransactionSubmitController } from './TransactionSubmitController'
 
-describe.only(TransactionSubmitController.name, () => {
+describe(TransactionSubmitController.name, () => {
   describe(TransactionSubmitController.prototype.submitForcedExit.name, () => {
     it('handles nonexistent transaction', async () => {
       const controller = new TransactionSubmitController(

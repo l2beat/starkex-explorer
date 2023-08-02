@@ -260,6 +260,7 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async validate<T extends (data: string) => any>(
     transactionHash: Hash256,
     to: EthereumAddress,
@@ -273,11 +274,13 @@ export class TransactionSubmitController {
       }
     }
 
-    const data = await validateFn(tx.data)
+    //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const data: Awaited<ReturnType<T>> = await validateFn(tx.data)
     if (!tx.to || EthereumAddress(tx.to) !== to || !data) {
       return { type: 'bad request', message: `Invalid transaction` }
     }
 
+    //eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return data
   }
 
