@@ -187,6 +187,26 @@ export function createTransactionRouter(
   )
 
   router.post(
+    '/escape/freeze-request',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result = await transactionSubmitController.submitFreezeRequest(
+          ctx.request.body.hash
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
     '/escape/initialize',
     bodyParser(),
     withTypedContext(
@@ -200,7 +220,7 @@ export function createTransactionRouter(
         }),
       }),
       async (ctx) => {
-        const result = await transactionSubmitController.submitVerifyEscape(
+        const result = await transactionSubmitController.submitEscapeVerified(
           ctx.request.body.hash,
           ctx.request.body.starkKey,
           ctx.request.body.positionOrVaultId
@@ -211,7 +231,7 @@ export function createTransactionRouter(
   )
 
   router.post(
-    '/escape/freeze-request',
+    '/escape/finalize',
     bodyParser(),
     withTypedContext(
       z.object({
@@ -222,7 +242,7 @@ export function createTransactionRouter(
         }),
       }),
       async (ctx) => {
-        const result = await transactionSubmitController.submitFreezeRequest(
+        const result = await transactionSubmitController.submitFinalizeEscape(
           ctx.request.body.hash
         )
         applyControllerResult(ctx, result)

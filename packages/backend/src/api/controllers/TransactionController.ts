@@ -1,4 +1,5 @@
 import {
+  renderFinalizeEscapeDetailsPage,
   renderFreezeRequestDetailsPage,
   renderInitializeEscapePage,
   renderOfferAndForcedTradePage,
@@ -429,10 +430,11 @@ export class TransactionController {
           positionOrVaultId: sentTransaction.data.positionOrVaultId.toString(),
           history: transactionHistory.getInitalizeEscapeTransactionHistory(),
         })
+
         return { type: 'success', content }
       }
 
-      case 'FreezeRequest':
+      case 'FreezeRequest': {
         const transactionHistory = new TransactionHistory({
           sentTransaction,
         })
@@ -452,6 +454,35 @@ export class TransactionController {
         })
 
         return { type: 'success', content }
+      }
+
+      case 'FinalizeEscape': {
+        //TODO: Check if we need different for Spot and Perpetual
+        if (context.tradingMode !== 'perpetual') {
+          return { type: 'not found' }
+        }
+        const transactionHistory = new TransactionHistory({
+          sentTransaction,
+        })
+        const registeredUser =
+          await this.userRegistrationEventRepository.findByStarkKey(
+            sentTransaction.data.starkKey
+          )
+
+        const content = renderFinalizeEscapeDetailsPage({
+          context,
+          transactionHash: sentTransaction.transactionHash,
+          recipient: {
+            starkKey: sentTransaction.data.starkKey,
+            ethereumAddress: registeredUser?.ethAddress,
+          },
+          asset: { hashOrId: context.collateralAsset.assetId },
+          amount: sentTransaction.data.quantizedAmount,
+          positionOrVaultId: sentTransaction.data.positionOrVaultId.toString(),
+          history: transactionHistory.getInitalizeEscapeTransactionHistory(),
+        })
+        return { type: 'success', content }
+      }
 
       default:
         assertUnreachable(sentTransaction.data)

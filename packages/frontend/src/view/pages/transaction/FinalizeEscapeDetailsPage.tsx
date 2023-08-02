@@ -1,7 +1,8 @@
-import { PageContext } from '@explorer/shared'
+import { assertUnreachable, PageContext } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 import React from 'react'
 
+import { Asset } from '../../../utils/assets'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { reactToHtml } from '../../reactToHtml'
@@ -13,26 +14,29 @@ import { TransactionOverview } from './components/TransactionOverview'
 import { TransactionPageTitle } from './components/TransactionPageTitle'
 import { TransactionUserDetails } from './components/TransactionUserDetails'
 
-interface FreezeRequestDetailsPageProps {
+interface FinalizeEscapeDetailsPageProps {
   context: PageContext
   transactionHash: Hash256
-  ignored: {
+  recipient: {
     starkKey: StarkKey
     ethereumAddress: EthereumAddress | undefined
   }
+  asset: Asset
+  amount: bigint
+  positionOrVaultId: string
   history: {
     timestamp: Timestamp | undefined
     status: 'SENT' | 'MINED' | 'REVERTED'
   }[]
 }
 
-export function renderFreezeRequestDetailsPage(
-  props: FreezeRequestDetailsPageProps
+export function renderFinalizeEscapeDetailsPage(
+  props: FinalizeEscapeDetailsPageProps
 ) {
-  return reactToHtml(<FreezeRequestDetailsPage {...props} />)
+  return reactToHtml(<FinalizeEscapeDetailsPage {...props} />)
 }
 
-function FreezeRequestDetailsPage(props: FreezeRequestDetailsPageProps) {
+function FinalizeEscapeDetailsPage(props: FinalizeEscapeDetailsPageProps) {
   const historyEntries = props.history.map((entry) => toHistoryEntry(entry))
   const lastEntry = historyEntries[0]
   if (!lastEntry) {
@@ -43,12 +47,12 @@ function FreezeRequestDetailsPage(props: FreezeRequestDetailsPageProps) {
     <Page
       context={props.context}
       path={`/transactions/${props.transactionHash.toString()}`}
-      description={`Details of the ${props.transactionHash.toString()} freeze request transaction`}
+      description={`Details of the ${props.transactionHash.toString()} finalize escape transaction`}
     >
       <ContentWrapper className="flex flex-col gap-12">
         <div>
           <TransactionPageTitle
-            title="Freeze request"
+            title="Finalize escape"
             transactionHash={props.transactionHash}
           />
           <TransactionOverview
@@ -56,13 +60,15 @@ function FreezeRequestDetailsPage(props: FreezeRequestDetailsPageProps) {
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
             transactionHash={props.transactionHash}
+            value={{ asset: props.asset, amount: props.amount }}
           />
         </div>
         <TransactionUserDetails
-          title="Ignored user details"
+          title="Recipient details"
           tradingMode="perpetual"
-          starkKey={props.ignored.starkKey}
-          ethereumAddress={props.ignored.ethereumAddress}
+          starkKey={props.recipient.starkKey}
+          ethereumAddress={props.recipient.ethereumAddress}
+          vaultOrPositionId={props.positionOrVaultId}
         />
         <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
@@ -71,7 +77,7 @@ function FreezeRequestDetailsPage(props: FreezeRequestDetailsPageProps) {
 }
 
 function toHistoryEntry(
-  entry: FreezeRequestDetailsPageProps['history'][number]
+  entry: FinalizeEscapeDetailsPageProps['history'][number]
 ): TransactionHistoryEntry {
   switch (entry.status) {
     case 'SENT':
@@ -79,21 +85,24 @@ function toHistoryEntry(
         timestamp: entry.timestamp,
         statusText: 'SENT (1/2)',
         statusType: 'BEGIN',
-        description: 'Freeze request sent',
+        description: 'Finalize escape sent, waiting for it to be mined',
       }
     case 'MINED':
       return {
         timestamp: entry.timestamp,
         statusText: 'MINED (2/2)',
         statusType: 'MIDDLE',
-        description: 'Freeze request mined, the exchange is now frozen',
+        description:
+          'Finalize escape mined, you can withdraw all your money on your user page',
       }
     case 'REVERTED':
       return {
         timestamp: entry.timestamp,
         statusText: 'REVERTED',
         statusType: 'ERROR',
-        description: 'Freeze request reverted',
+        description: 'Finalize escape reverted',
       }
+    default:
+      assertUnreachable(entry.status)
   }
 }

@@ -1,5 +1,6 @@
 import {
   CollateralAsset,
+  decodeFinalizeEscapeRequest,
   decodeFreezeRequest,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
@@ -211,7 +212,41 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  async submitVerifyEscape(
+  async submitFreezeRequest(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const tx = await this.getTransaction(transactionHash)
+    if (!tx) {
+      return {
+        type: 'bad request',
+        message: `Transaction ${transactionHash.toString()} not found`,
+      }
+    }
+
+    const data = decodeFreezeRequest(tx.data)
+    if (
+      !tx.to ||
+      EthereumAddress(tx.to) !== this.contracts.perpetual ||
+      !data
+    ) {
+      return { type: 'bad request', message: `Invalid transaction` }
+    }
+
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'FreezeRequest',
+        starkKey: data.starkKey,
+        positionOrVaultId: data.positionOrVaultId,
+        quantizedAmount: data.quantizedAmount,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitEscapeVerified(
     transactionHash: Hash256,
     starkKey: StarkKey,
     positionOrVaultId: bigint
@@ -241,7 +276,7 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  async submitFreezeRequest(
+  async submitFinalizeEscape(
     transactionHash: Hash256
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
@@ -253,7 +288,7 @@ export class TransactionSubmitController {
       }
     }
 
-    const data = decodeFreezeRequest(tx.data)
+    const data = decodeFinalizeEscapeRequest(tx.data)
     if (
       !tx.to ||
       EthereumAddress(tx.to) !== this.contracts.perpetual ||
@@ -266,7 +301,7 @@ export class TransactionSubmitController {
       transactionHash,
       timestamp,
       data: {
-        type: 'FreezeRequest',
+        type: 'FinalizeEscape',
         starkKey: data.starkKey,
         positionOrVaultId: data.positionOrVaultId,
         quantizedAmount: data.quantizedAmount,

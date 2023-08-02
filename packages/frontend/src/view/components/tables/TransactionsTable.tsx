@@ -29,6 +29,7 @@ export interface TransactionEntry {
     | 'WITHDRAW'
     | 'INITIATE_ESCAPE'
     | 'FREEZE_REQUEST'
+    | 'FINALIZE_ESCAPE'
 }
 
 export function TransactionsTable(props: TransactionsTableProps) {
@@ -100,7 +101,11 @@ function getStatus(transaction: TransactionEntry): {
         return { type: 'ERROR', text: 'REVERTED' }
     }
   }
-  if (transaction.type === 'WITHDRAW') {
+  if (
+    transaction.type === 'WITHDRAW' ||
+    transaction.type === 'FINALIZE_ESCAPE' ||
+    transaction.type === 'FREEZE_REQUEST'
+  ) {
     switch (transaction.status) {
       case 'SENT':
         return { type: 'BEGIN', text: 'SENT (1/2)' }
@@ -109,7 +114,9 @@ function getStatus(transaction: TransactionEntry): {
       case 'REVERTED':
         return { type: 'ERROR', text: 'REVERTED' }
       case 'INCLUDED':
-        throw new Error('WITHDRAW transaction cannot be INCLUDED')
+        throw new Error(
+          `${transaction.status} transaction cannot be ${transaction.status}`
+        )
     }
   }
   if (transaction.type === 'INITIATE_ESCAPE') {
@@ -124,20 +131,7 @@ function getStatus(transaction: TransactionEntry): {
         )
     }
   }
-  if (transaction.type === 'FREEZE_REQUEST') {
-    switch (transaction.status) {
-      case 'SENT':
-        return { type: 'BEGIN', text: 'SENT (1/2)' }
-      case 'MINED':
-        return { type: 'MIDDLE', text: 'MINED (2/2)' }
-      case 'REVERTED':
-        return { type: 'ERROR', text: 'REVERTED' }
-      default:
-        throw new Error(
-          `FREEZE_REQUEST transaction cannot be ${transaction.status}`
-        )
-    }
-  }
+
   // FORCED_BUY and FORCED_SELL
   switch (transaction.status) {
     case 'SENT':
@@ -165,5 +159,7 @@ function toTypeText(type: TransactionEntry['type']): string {
       return 'Withdraw'
     case 'FREEZE_REQUEST':
       return 'Freeze req.'
+    case 'FINALIZE_ESCAPE':
+      return 'Finalize escape'
   }
 }

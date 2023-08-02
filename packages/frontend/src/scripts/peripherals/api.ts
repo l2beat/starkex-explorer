@@ -31,18 +31,6 @@ export const Api = {
     })
   },
 
-  async submitVerifyEscape(
-    hash: Hash256,
-    starkKey: StarkKey,
-    positionOrVaultId: string
-  ) {
-    await fetch('/escape/initialize', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hash, starkKey, positionOrVaultId }),
-    })
-  },
-
   async submitPerpetualForcedTrade(offerId: number, hash: Hash256) {
     await fetch('/forced/trades', {
       method: 'POST',
@@ -80,6 +68,26 @@ export const Api = {
 
   async submitFreezeRequest(hash: Hash256) {
     await fetch('/escape/freeze-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitVerifyEscape(
+    hash: Hash256,
+    starkKey: StarkKey,
+    positionOrVaultId: string
+  ) {
+    await fetch('/escape/initialize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash, starkKey, positionOrVaultId }),
+    })
+  },
+
+  async submitFinalizeEscape(hash: Hash256) {
+    await fetch('/escape/finalize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hash }),

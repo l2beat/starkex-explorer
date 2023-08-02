@@ -2,6 +2,7 @@ import { UserDetails } from '@explorer/shared'
 
 import { FINALIZE_ESCAPE_FORM_ID } from '../../../view'
 import { FinalizeEscapeFormProps } from '../../../view/pages/user/components/FinalizeEscapeForm'
+import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 import { makeQuery } from '../../utils/query'
 
@@ -28,8 +29,7 @@ async function submitFinalizeEscape(
   props: FinalizeEscapeFormProps,
   user: UserDetails
 ) {
-  // // const hash = await Wallet.sendVerifyEscapeTransaction(
-  await Wallet.sendFinalizeEscapeTransaction(
+  const hash = await Wallet.sendFinalizeEscapeTransaction(
     user.address,
     props.ownerStarkKey,
     props.positionOrVaultId,
@@ -37,7 +37,6 @@ async function submitFinalizeEscape(
     props.exchangeAddress
   )
 
-  // // TODO: should we save via the API to our DB?
-  // // await Api.submitSpotForcedWithdrawal(hash) <- wrong function
-  window.location.href = '/'
+  await Api.submitFinalizeEscape(hash)
+  window.location.href = `/transactions/${hash}`
 }
