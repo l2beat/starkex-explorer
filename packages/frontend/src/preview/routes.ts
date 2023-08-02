@@ -1333,6 +1333,26 @@ const routes: Route[] = [
         ],
       })
     },
+  },
+  {
+    path: '/transactions/finalize-escape/reverted',
+    description: 'Transaction view of a mined finalize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFinalizeEscapeDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
     breakAfter: true,
   },
 
