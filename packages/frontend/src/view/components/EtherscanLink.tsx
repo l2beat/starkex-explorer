@@ -4,6 +4,7 @@ import React from 'react'
 import { Link } from './Link'
 
 type EtherscanLinkProps = {
+  chainId: number
   children: React.ReactNode
 } & (
   | {
@@ -21,12 +22,20 @@ type EtherscanLinkProps = {
 )
 
 export function EtherscanLink(props: EtherscanLinkProps) {
+  const link = getLink(props.chainId)
   const value = getValue(props)
-  return (
-    <Link href={`https://etherscan.io/${props.type}/${value}`}>
-      {props.children}
-    </Link>
-  )
+  return <Link href={`${link}/${props.type}/${value}`}>{props.children}</Link>
+}
+
+function getLink(chainId: number): `https://${string}` {
+  switch (chainId) {
+    case 1:
+      return 'https://etherscan.io'
+    case 5:
+      return 'https://goerli.etherscan.io'
+    default:
+      throw new Error(`Unsupported chain id: ${chainId}`)
+  }
 }
 
 function getValue(props: EtherscanLinkProps) {

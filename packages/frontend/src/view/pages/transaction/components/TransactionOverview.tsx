@@ -29,6 +29,7 @@ interface TransactionOverviewProps {
     receivedAmount: bigint
   }
   stateUpdateId?: number
+  chainId: number
 }
 
 export function TransactionOverview(props: TransactionOverviewProps) {
@@ -60,7 +61,11 @@ export function TransactionOverview(props: TransactionOverviewProps) {
       </div>
       {props.transactionHash && (
         <TransactionField label="Transaction hash">
-          <EtherscanLink txHash={props.transactionHash.toString()} type="tx">
+          <EtherscanLink
+            chainId={props.chainId}
+            txHash={props.transactionHash.toString()}
+            type="tx"
+          >
             {props.transactionHash.toString()}
           </EtherscanLink>
         </TransactionField>

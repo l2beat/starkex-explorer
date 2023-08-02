@@ -24,6 +24,7 @@ interface PerpetualTransactionDetailsProps {
   collateralAsset: CollateralAsset
   transactionId: number
   altIndex: number | undefined
+  chainId: number
 }
 
 export function PerpetualTransactionDetails(
@@ -46,6 +47,7 @@ export function PerpetualTransactionDetails(
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
+          chainId={props.chainId}
         />
       )
     case 'ConditionalTransfer':
@@ -55,6 +57,7 @@ export function PerpetualTransactionDetails(
           stateUpdateId={props.stateUpdateId}
           collateralAsset={props.collateralAsset}
           data={props.data}
+          chainId={props.chainId}
         />
       )
     case 'Transfer':
