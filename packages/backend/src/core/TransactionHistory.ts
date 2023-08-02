@@ -50,7 +50,7 @@ export class TransactionHistory {
     }
   }
 
-  getInitalizeEscapeTransactionHistory() {
+  getNonRevertableTransactionHistory() {
     const history: TransactionHistoryItem<'SENT' | 'MINED'>[] = []
     if (this.sentTransaction?.mined || this.userTransaction) {
       history.push({

@@ -40,5 +40,5 @@ async function submitFreezeRequest(
   )
 
   await Api.submitFreezeRequest(hash)
-  window.location.href = `/transactions/${hash}`
+  window.location.href = `/transactions/${hash.toString()}`
 }

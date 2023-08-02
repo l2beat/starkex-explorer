@@ -72,6 +72,7 @@ export class AssetDetailsService {
   ): AssetHash | undefined {
     switch (userTransaction.data.type) {
       case 'Withdraw':
+      case 'FinalizeEscape':
         return userTransaction.data.assetType
       case 'WithdrawWithTokenId':
       case 'MintWithdraw':

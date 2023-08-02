@@ -221,6 +221,8 @@ export class Application {
     const withdrawalAllowedCollector = new WithdrawalAllowedCollector(
       ethereumClient,
       withdrawableAssetRepository,
+      userTransactionRepository,
+      kvStore,
       config.starkex.contracts.perpetual
     )
 

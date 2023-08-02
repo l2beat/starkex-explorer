@@ -23,7 +23,7 @@ interface FinalizeEscapeDetailsPageProps {
   }
   asset: Asset
   amount: bigint
-  positionOrVaultId: string
+  positionOrVaultId?: string
   history: {
     timestamp: Timestamp | undefined
     status: 'SENT' | 'MINED' | 'REVERTED'

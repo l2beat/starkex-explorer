@@ -44,5 +44,5 @@ async function submitVerifyEscape(
     props.starkKey,
     props.positionOrVaultId.toString()
   )
-  window.location.href = `/transactions/${hash}`
+  window.location.href = `/transactions/${hash.toString()}`
 }

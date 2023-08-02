@@ -11,6 +11,7 @@ function extractUserTxAmount(
 ): bigint | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
+    case 'FinalizeEscape':
       return data.quantizedAmount
     case 'ForcedTrade':
       return data.syntheticAmount
@@ -34,13 +35,13 @@ function extractUserTxAsset(
 ): Asset | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
+    case 'FinalizeEscape':
+    case 'EscapeVerified':
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
     case 'FullWithdrawal':
       return undefined //TODO: Fix this
-    case 'EscapeVerified':
-      return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     case 'Withdraw':
       return {
         hashOrId: collateralAsset ? collateralAsset.assetId : data.assetType,
@@ -72,6 +73,8 @@ function extractUserTxEntryType(
     case 'WithdrawWithTokenId':
     case 'MintWithdraw':
       return 'WITHDRAW'
+    case 'FinalizeEscape':
+      return 'FINALIZE_ESCAPE'
     default:
       assertUnreachable(data)
   }

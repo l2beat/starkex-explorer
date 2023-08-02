@@ -38,5 +38,5 @@ async function submitFinalizeEscape(
   )
 
   await Api.submitFinalizeEscape(hash)
-  window.location.href = `/transactions/${hash}`
+  window.location.href = `/transactions/${hash.toString()}`
 }
