@@ -30,3 +30,17 @@ export interface ControllerBadRequestResult {
   type: 'bad request'
   message?: string
 }
+
+export function isControllerResult(data: unknown): data is ControllerResult {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'type' in data &&
+    typeof data.type === 'string' &&
+    (data.type === 'success' ||
+      data.type === 'not found' ||
+      data.type === 'redirect' ||
+      data.type === 'created' ||
+      data.type === 'bad request')
+  )
+}

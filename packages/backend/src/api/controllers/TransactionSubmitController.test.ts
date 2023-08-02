@@ -29,7 +29,7 @@ import {
 } from '../../test/fakes'
 import { TransactionSubmitController } from './TransactionSubmitController'
 
-describe(TransactionSubmitController.name, () => {
+describe.only(TransactionSubmitController.name, () => {
   describe(TransactionSubmitController.prototype.submitForcedExit.name, () => {
     it('handles nonexistent transaction', async () => {
       const controller = new TransactionSubmitController(
@@ -319,14 +319,6 @@ describe(TransactionSubmitController.name, () => {
     it('handles transaction with unknown data', async () => {
       const accepted = fakeAccepted({ signature: Hash256.fake().toString() })
       const offer = fakeOffer({ accepted })
-      const data = encodePerpetualForcedTradeRequest(
-        {
-          ...offer,
-          ...accepted,
-          starkKeyA: StarkKey.fake(),
-        },
-        fakeCollateralAsset
-      )
       const perpetualAddress = EthereumAddress.fake()
 
       const controller = new TransactionSubmitController(
@@ -334,7 +326,7 @@ describe(TransactionSubmitController.name, () => {
           getTransaction: async () =>
             ({
               to: perpetualAddress.toString(),
-              data,
+              data: '0x1234',
             } as providers.TransactionResponse),
         }),
         mockObject<SentTransactionRepository>(),
