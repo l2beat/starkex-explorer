@@ -4,9 +4,7 @@ import { expect, mockFn, mockObject } from 'earl'
 import { ethers } from 'ethers'
 
 import { KeyValueStore } from '../peripherals/database/KeyValueStore'
-import {
-  UserTransactionRepository,
-} from '../peripherals/database/transactions/UserTransactionRepository'
+import { UserTransactionRepository } from '../peripherals/database/transactions/UserTransactionRepository'
 import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
 import { FreezeCheckService } from './FreezeCheckService'
 
