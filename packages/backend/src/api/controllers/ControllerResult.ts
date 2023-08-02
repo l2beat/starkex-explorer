@@ -31,7 +31,8 @@ export interface ControllerBadRequestResult {
   message?: string
 }
 
-export function isControllerResult(data: unknown): data is ControllerResult {
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
+export function isControllerResult(data: any): data is ControllerResult {
   return (
     typeof data === 'object' &&
     data !== null &&
@@ -44,3 +45,4 @@ export function isControllerResult(data: unknown): data is ControllerResult {
       data.type === 'bad request')
   )
 }
+/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access */
