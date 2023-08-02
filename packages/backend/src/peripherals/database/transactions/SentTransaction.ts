@@ -238,12 +238,11 @@ function decodeWithdrawWithTokenId(
 function encodeEscapeVerified(
   values: EscapeVerifiedData
 ): Encoded<EscapeVerifiedData> {
-  const { starkKey, ...rest } = values
   return {
     starkKey: values.starkKey,
     vaultOrPositionId: values.positionOrVaultId,
     data: {
-      ...rest,
+      type: 'EscapeVerified',
       starkKey: values.starkKey.toString(),
       positionOrVaultId: values.positionOrVaultId.toString(),
     },

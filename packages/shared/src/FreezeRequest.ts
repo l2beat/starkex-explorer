@@ -19,13 +19,17 @@ export function encodeFreezeRequest(data: FreezeRequest) {
   ])
 }
 
-export function decodeFreezeRequest(data: string): FreezeRequest {
-  const decoded = coder.decodeFunctionData('freezeRequest', data)
-  /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
-  return {
-    starkKey: StarkKey.from(decoded.starkKey),
-    positionOrVaultId: BigInt(decoded.vaultId),
-    quantizedAmount: BigInt(decoded.quantizedAmount),
+export function decodeFreezeRequest(data: string): FreezeRequest | undefined {
+  try {
+    const decoded = coder.decodeFunctionData('freezeRequest', data)
+    /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
+    return {
+      starkKey: StarkKey.from(decoded.starkKey),
+      positionOrVaultId: BigInt(decoded.vaultId),
+      quantizedAmount: BigInt(decoded.quantizedAmount),
+    }
+    /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
+  } catch {
+    return
   }
-  /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
 }

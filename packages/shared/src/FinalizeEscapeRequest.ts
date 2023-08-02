@@ -21,13 +21,17 @@ export function encodeFinalizeEscapeRequest(data: FinalizeEscapeRequest) {
 
 export function decodeFinalizeEscapeRequest(
   data: string
-): FinalizeEscapeRequest {
-  const decoded = coder.decodeFunctionData('escape', data)
-  /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
-  return {
-    starkKey: StarkKey.from(decoded.starkKey),
-    positionOrVaultId: BigInt(decoded.vaultId),
-    quantizedAmount: BigInt(decoded.quantizedAmount),
+): FinalizeEscapeRequest | undefined {
+  try {
+    const decoded = coder.decodeFunctionData('escape', data)
+    /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
+    return {
+      starkKey: StarkKey.from(decoded.starkKey),
+      positionOrVaultId: BigInt(decoded.vaultId),
+      quantizedAmount: BigInt(decoded.quantizedAmount),
+    }
+    /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
+  } catch {
+    return
   }
-  /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
 }

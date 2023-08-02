@@ -74,7 +74,7 @@ export class WithdrawalAllowedCollector {
     }
 
     switch (event.name) {
-      case 'LogWithdrawalAllowed':
+      case 'LogWithdrawalAllowed': {
         const freezeStatus = await this.keyValueStore.findByKey('freezeStatus')
 
         const data = {
@@ -101,6 +101,7 @@ export class WithdrawalAllowedCollector {
             ...data,
           },
         })
+      }
       case 'LogMintableWithdrawalAllowed':
         return this.withdrawableAssetRepository.add({
           ...base,
