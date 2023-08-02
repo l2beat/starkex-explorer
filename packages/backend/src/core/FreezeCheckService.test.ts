@@ -1,14 +1,14 @@
+import { EthereumAddress, Timestamp } from '@explorer/types'
+import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { ethers } from 'ethers'
-import { FreezeCheckService } from './FreezeCheckService'
-import { EthereumAddress, Timestamp } from '@explorer/types'
-import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
+
 import { KeyValueStore } from '../peripherals/database/KeyValueStore'
 import {
-  UserTransactionRecord,
   UserTransactionRepository,
 } from '../peripherals/database/transactions/UserTransactionRepository'
-import { Logger } from '@l2beat/backend-tools'
+import { EthereumClient } from '../peripherals/ethereum/EthereumClient'
+import { FreezeCheckService } from './FreezeCheckService'
 
 describe(FreezeCheckService.name, () => {
   describe(FreezeCheckService.prototype.updateFreezeStatus.name, () => {
