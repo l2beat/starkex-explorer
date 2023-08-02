@@ -127,11 +127,9 @@ export class MerkleTree<T extends MerkleValue> {
       leafPrefixLength = prefix.nodes.length
       perpetualAssetCount = node.assets.length
       starkKey = node.starkKey
-    }
-    else if (node instanceof VaultLeaf) {
+    } else if (node instanceof VaultLeaf) {
       starkKey = node.starkKey
-    }
-    else {
+    } else {
       throw new Error('Unknown leaf type, this should never happen')
     }
 
@@ -142,7 +140,7 @@ export class MerkleTree<T extends MerkleValue> {
       leaf: node,
       leafIndex: index,
       perpetualAssetCount,
-      starkKey
+      starkKey,
     }
   }
 
