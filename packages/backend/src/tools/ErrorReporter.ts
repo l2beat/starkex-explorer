@@ -16,6 +16,12 @@ export function reportError(...args: any[]): void {
   rollbar?.error(...args)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function reportCriticalError(...args: any[]): void {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+  rollbar?.critical(...args)
+}
+
 export function handleServerError(error: Error, ctx: Context) {
   reportError(error, ctx)
 }
