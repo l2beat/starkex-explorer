@@ -584,6 +584,37 @@ describe(TransactionSubmitController.name, () => {
         })
       })
 
+      it('handles transaction with unknown data', async () => {
+        const controller = new TransactionSubmitController(
+          mockObject<EthereumClient>({
+            getTransaction: async () =>
+              ({
+                to: EthereumAddress.fake('a').toString(),
+                data: '0x1234',
+              } as providers.TransactionResponse),
+          }),
+          mockObject<SentTransactionRepository>(),
+          mockObject<ForcedTradeOfferRepository>(),
+          {
+            perpetual: EthereumAddress.fake(),
+            escapeVerifier: EthereumAddress.fake('a'),
+          },
+          fakeCollateralAsset
+        )
+
+        const hash = Hash256.fake()
+        const result = await controller.submitEscapeVerified(
+          hash,
+          StarkKey.fake(),
+          123n
+        )
+
+        expect(result).toEqual({
+          type: 'bad request',
+          message: `Invalid transaction`,
+        })
+      })
+
       it('handles transaction with correct data and address', async () => {
         const data = encodeVerifyEscapeRequest({
           serializedMerkleProof: [],
@@ -686,6 +717,33 @@ describe(TransactionSubmitController.name, () => {
         })
       })
 
+      it('handles transaction with unknown data', async () => {
+        const controller = new TransactionSubmitController(
+          mockObject<EthereumClient>({
+            getTransaction: async () =>
+              ({
+                to: EthereumAddress.fake('a').toString(),
+                data: '0x1234',
+              } as providers.TransactionResponse),
+          }),
+          mockObject<SentTransactionRepository>(),
+          mockObject<ForcedTradeOfferRepository>(),
+          {
+            perpetual: EthereumAddress.fake('a'),
+            escapeVerifier: EthereumAddress.fake(),
+          },
+          fakeCollateralAsset
+        )
+
+        const hash = Hash256.fake()
+        const result = await controller.submitFreezeRequest(hash)
+
+        expect(result).toEqual({
+          type: 'bad request',
+          message: `Invalid transaction`,
+        })
+      })
+
       it('handles transaction with correct data and address', async () => {
         const data = encodeFreezeRequest({
           starkKey: StarkKey.fake(),
@@ -770,6 +828,33 @@ describe(TransactionSubmitController.name, () => {
           mockObject<ForcedTradeOfferRepository>(),
           {
             perpetual: EthereumAddress.fake(),
+            escapeVerifier: EthereumAddress.fake(),
+          },
+          fakeCollateralAsset
+        )
+
+        const hash = Hash256.fake()
+        const result = await controller.submitFinalizeEscape(hash)
+
+        expect(result).toEqual({
+          type: 'bad request',
+          message: `Invalid transaction`,
+        })
+      })
+
+      it('handles transaction with unknown data', async () => {
+        const controller = new TransactionSubmitController(
+          mockObject<EthereumClient>({
+            getTransaction: async () =>
+              ({
+                to: EthereumAddress.fake('a').toString(),
+                data: '0x1234',
+              } as providers.TransactionResponse),
+          }),
+          mockObject<SentTransactionRepository>(),
+          mockObject<ForcedTradeOfferRepository>(),
+          {
+            perpetual: EthereumAddress.fake('a'),
             escapeVerifier: EthereumAddress.fake(),
           },
           fakeCollateralAsset

@@ -7,6 +7,7 @@ import {
   decodeWithdrawal,
   decodeWithdrawalWithTokenId,
   PerpetualForcedTradeRequest,
+  validateVerifyEscapeRequest,
 } from '@explorer/shared'
 import {
   AssetHash,
@@ -260,7 +261,13 @@ export class TransactionSubmitController {
       }
     }
 
-    if (!tx.to || EthereumAddress(tx.to) !== this.contracts.escapeVerifier) {
+    const isDataValid = validateVerifyEscapeRequest(tx.data)
+
+    if (
+      !tx.to ||
+      EthereumAddress(tx.to) !== this.contracts.escapeVerifier ||
+      !isDataValid
+    ) {
       return { type: 'bad request', message: `Invalid transaction` }
     }
 
