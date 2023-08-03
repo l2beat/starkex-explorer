@@ -24,30 +24,34 @@ type Props = {
 export type FreezeRequestActionFormProps = z.infer<
   typeof FreezeRequestActionFormProps
 >
-export const FreezeRequestActionFormProps = z.discriminatedUnion('type', [
+
+export const FreezeRequestActionFormProps = z.intersection(
   z.object({
-    type: z.literal('ForcedWithdrawal'),
     starkExAddress: stringAs(EthereumAddress),
-    starkKey: stringAs(StarkKey),
-    positionOrVaultId: stringAsBigInt(),
-    quantizedAmount: stringAsBigInt(),
   }),
-  z.object({
-    type: z.literal('ForcedTrade'),
-    starkExAddress: stringAs(EthereumAddress),
-    collateralAsset: CollateralAsset,
-    starkKeyA: stringAs(StarkKey),
-    starkKeyB: stringAs(StarkKey),
-    vaultIdA: stringAsBigInt(),
-    vaultIdB: stringAsBigInt(),
-    collateralAssetId: stringAs(AssetId),
-    syntheticAssetId: stringAs(AssetId),
-    amountCollateral: stringAsBigInt(),
-    amountSynthetic: stringAsBigInt(),
-    aIsBuyingSynthetic: z.boolean(),
-    nonce: stringAsBigInt(),
-  }),
-])
+  z.discriminatedUnion('type', [
+    z.object({
+      type: z.literal('ForcedWithdrawal'),
+      starkKey: stringAs(StarkKey),
+      positionOrVaultId: stringAsBigInt(),
+      quantizedAmount: stringAsBigInt(),
+    }),
+    z.object({
+      type: z.literal('ForcedTrade'),
+      collateralAsset: CollateralAsset,
+      starkKeyA: stringAs(StarkKey),
+      starkKeyB: stringAs(StarkKey),
+      vaultIdA: stringAsBigInt(),
+      vaultIdB: stringAsBigInt(),
+      collateralAssetId: stringAs(AssetId),
+      syntheticAssetId: stringAs(AssetId),
+      amountCollateral: stringAsBigInt(),
+      amountSynthetic: stringAsBigInt(),
+      aIsBuyingSynthetic: z.boolean(),
+      nonce: stringAsBigInt(),
+    }),
+  ])
+)
 
 export function serializeFreezeRequestActionFormProps(
   props: FreezeRequestActionFormProps
