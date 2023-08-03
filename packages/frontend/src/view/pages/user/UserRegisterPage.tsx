@@ -2,9 +2,9 @@ import { PageContextWithUserAndStarkKey } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 import React from 'react'
 
-import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
+import { InfoBanner } from '../../components/InfoBanner'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
@@ -56,12 +56,7 @@ function UserRegisterPage(props: UserRegisterPageProps) {
               Register
             </Button>
           </div>
-          <div className="mt-3 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
-            <InfoIcon />
-            <p className="ml-2 text-sm font-medium text-white">
-              Register your Stark key
-            </p>
-          </div>
+          <InfoBanner className="mt-3">Register your Stark key</InfoBanner>
           <p className="mt-6 text-sm font-semibold text-zinc-500">Stark key</p>
           <InlineEllipsis className="mt-1 max-w-[70%] font-semibold text-white">
             {props.context.user.starkKey.toString()}

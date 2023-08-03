@@ -2,8 +2,8 @@ import { UserDetails } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { InfoIcon } from '../../../assets/icons/InfoIcon'
 import { Button } from '../../../components/Button'
+import { InfoBanner } from '../../../components/InfoBanner'
 
 interface UserProfileProps {
   user: Partial<UserDetails> | undefined
@@ -41,13 +41,10 @@ export function UserProfile({
             )}
           </div>
           {isMine && (
-            <div className="mt-5 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
-              <InfoIcon />
-              <p className="ml-2 text-sm text-white">
-                Your stark key is not linked to your ethereum address. You don't
-                need this unless you want to perform forced actions.
-              </p>
-            </div>
+            <InfoBanner className="mt-5">
+              Your stark key is not linked to your ethereum address. You don't
+              need this unless you want to perform forced actions.
+            </InfoBanner>
           )}
         </>
       )}

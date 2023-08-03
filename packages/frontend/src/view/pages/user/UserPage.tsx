@@ -2,8 +2,8 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { CountBadge } from '../../components/CountBadge'
+import { InfoBanner } from '../../components/InfoBanner'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -15,7 +15,6 @@ import {
   TransactionsTable,
 } from '../../components/tables/TransactionsTable'
 import { Tabs } from '../../components/Tabs'
-import { TooltipWrapper } from '../../components/Tooltip'
 import { reactToHtml } from '../../reactToHtml'
 import { PerpetualL2TransactionEntry } from '../l2-transaction/common'
 import {
@@ -116,29 +115,29 @@ function UserPage(props: UserPageProps) {
               accessoryRight: (
                 <div className="flex items-center justify-center gap-2">
                   <CountBadge count={props.totalAssets} />
-                  <TooltipWrapper
-                    content="Guaranteed state of balances (proven on Ethereum), updated every few
-                hours"
-                  >
-                    <InfoIcon />
-                  </TooltipWrapper>
                 </div>
               ),
               content: (
-                <TablePreview
-                  {...assetsTablePropsWithoutTitle}
-                  visible={props.assets.length}
-                  total={props.totalAssets}
-                >
-                  <UserAssetsTable
-                    tradingMode={props.context.tradingMode}
-                    ethereumAddress={props.ethereumAddress}
-                    starkKey={props.starkKey}
-                    assets={props.assets}
-                    isMine={isMine}
-                    isFrozen={props.context.freezeStatus === 'frozen'}
-                  />
-                </TablePreview>
+                <>
+                  <InfoBanner className="mb-3">
+                    Guaranteed state of balance (proven on Ethereum), updated
+                    every few hours
+                  </InfoBanner>
+                  <TablePreview
+                    {...assetsTablePropsWithoutTitle}
+                    visible={props.assets.length}
+                    total={props.totalAssets}
+                  >
+                    <UserAssetsTable
+                      tradingMode={props.context.tradingMode}
+                      ethereumAddress={props.ethereumAddress}
+                      starkKey={props.starkKey}
+                      assets={props.assets}
+                      isMine={isMine}
+                      isFrozen={props.context.freezeStatus === 'frozen'}
+                    />
+                  </TablePreview>
+                </>
               ),
             },
             ...(props.context.showL2Transactions
@@ -149,23 +148,25 @@ function UserPage(props: UserPageProps) {
                     accessoryRight: (
                       <div className="flex items-center justify-center gap-2">
                         <CountBadge count={props.totalL2Transactions} />
-                        <TooltipWrapper content="Only included transactions are reflected in asset balances">
-                          <InfoIcon />
-                        </TooltipWrapper>
                       </div>
                     ),
-                    shortName: 'L2 Txs',
                     content: (
-                      <TablePreview
-                        {...l2TransactionsTablePropsWithoutTitle}
-                        visible={props.l2Transactions.length}
-                        total={props.totalL2Transactions}
-                      >
-                        <L2TransactionsTable
-                          transactions={props.l2Transactions}
-                          context={props.context}
-                        />
-                      </TablePreview>
+                      <>
+                        <InfoBanner className="mb-3">
+                          Only included transactions are reflected in asset
+                          balances
+                        </InfoBanner>
+                        <TablePreview
+                          {...l2TransactionsTablePropsWithoutTitle}
+                          visible={props.l2Transactions.length}
+                          total={props.totalL2Transactions}
+                        >
+                          <L2TransactionsTable
+                            transactions={props.l2Transactions}
+                            context={props.context}
+                          />
+                        </TablePreview>
+                      </>
                     ),
                   },
                 ]
