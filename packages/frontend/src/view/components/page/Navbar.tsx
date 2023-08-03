@@ -34,7 +34,8 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
           {searchBar && (
             <SearchBar
               tradingMode={tradingMode}
-              className="hidden w-auto min-w-[515px] lg:flex"
+              expandable
+              className="hidden lg:flex"
             />
           )}
           {!user && <Button id="connect-with-metamask">Connect wallet</Button>}
