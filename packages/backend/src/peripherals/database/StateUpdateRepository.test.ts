@@ -11,7 +11,12 @@ import range from 'lodash/range'
 import { it } from 'mocha'
 
 import { setupDatabaseTestSuite } from '../../test/database'
-import { fakeInt, fakeTimestamp, fakeWithdrawal } from '../../test/fakes'
+import {
+  decodedFakePerpetualState,
+  fakeInt,
+  fakeTimestamp,
+  fakeWithdrawal,
+} from '../../test/fakes'
 import { ForcedTransactionRepository } from './ForcedTransactionRepository'
 import {
   StateUpdateRecord,
@@ -64,6 +69,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
+        perpetualState: decodedFakePerpetualState,
       }
       await repository.add({
         stateUpdate,
@@ -86,7 +92,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
-        perpetualState: undefined,
+        perpetualState: decodedFakePerpetualState,
       }
 
       const result = await repository.update(stateUpdateUpdateData)
@@ -148,7 +154,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
-        perpetualState: undefined,
+        perpetualState: decodedFakePerpetualState,
       }
 
       await repository.add({ stateUpdate, positions: [], prices: [] })
@@ -248,7 +254,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
-        perpetualState: undefined,
+        perpetualState: decodedFakePerpetualState,
       }
       await repository.add({ stateUpdate, positions: [], prices: [] })
 
@@ -307,7 +313,7 @@ describe(StateUpdateRepository.name, () => {
           rootHash: PedersenHash.fake(),
           stateTransitionHash: Hash256.fake(),
           timestamp: Timestamp(0),
-          perpetualState: undefined,
+          perpetualState: decodedFakePerpetualState,
         }
         const stateUpdate2 = {
           id: 30_002_000,
@@ -356,7 +362,7 @@ describe(StateUpdateRepository.name, () => {
         rootHash: PedersenHash.fake(),
         stateTransitionHash: Hash256.fake(),
         timestamp: Timestamp(0),
-        perpetualState: undefined,
+        perpetualState: decodedFakePerpetualState,
       }
       const stateUpdate2 = {
         id: 30_002_000,
