@@ -45,7 +45,7 @@ export function renderStateUpdatePage(props: StateUpdatePageProps) {
 function StateUpdatePage(props: StateUpdatePageProps) {
   return (
     <Page
-      path={`/state-update/${props.id}`}
+      path={`/state-updates/${props.id}`}
       description="Show state update details, including balance changes, transactions and prices"
       context={props.context}
     >

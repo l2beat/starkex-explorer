@@ -43,7 +43,11 @@ export function Page(props: Props) {
         stylesheets={props.stylesheets ?? ['/styles/main.css']}
       />
       <body className="flex h-full flex-col">
-        <Navbar searchBar={!props.withoutSearch} context={props.context} />
+        <Navbar
+          searchBar={!props.withoutSearch}
+          context={props.context}
+          path={props.path}
+        />
         <FreezeBanner freezeStatus={props.context.freezeStatus} />
         {props.children}
         <Footer />

@@ -6,18 +6,21 @@ import { L2BeatMinimalLogo } from '../../assets/logos/L2BeatMinimalLogo'
 import { ProjectLogo } from '../../assets/logos/ProjectLogo'
 import { Button } from '../Button'
 import { SearchBar } from '../SearchBar'
+import { NavLink, NavLinkTitle } from './NavLink'
 
 interface NavbarProps {
   readonly context: PageContext
   readonly searchBar: boolean
+  readonly path: string
 }
 
-export function Navbar({ searchBar = true, context }: NavbarProps) {
+export function Navbar({ searchBar = true, context, path }: NavbarProps) {
   const { user, instanceName, tradingMode, chainId } = context
   const isMainnet = chainId === 1
+  const navItems = getNavLinks(context.showL2Transactions)
   return (
     <div>
-      <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
+      <div className="relative flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
         <a
           className="flex items-center justify-center gap-2 divide-x sm:gap-4"
           href="/"
@@ -30,6 +33,23 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
             {instanceName.toUpperCase()} {isMainnet ? '' : 'TESTNET'} EXPLORER
           </span>
         </a>
+        <div className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 transform items-center xl:flex">
+          {navItems.map((item) => {
+            const isSelected =
+              path.startsWith(item.href) ||
+              (item.activeOn
+                ? item.activeOn.some((link) => path.startsWith(link))
+                : false)
+            return (
+              <NavLink
+                key={item.title}
+                href={item.href}
+                title={item.title}
+                isSelected={isSelected}
+              />
+            )
+          })}
+        </div>
         <div className="flex flex-wrap gap-y-2 gap-x-4">
           {searchBar && (
             <SearchBar
@@ -66,4 +86,24 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
       </div>
     </div>
   )
+}
+
+function getNavLinks(showL2Transactions: boolean) {
+  const navItems: { href: string; title: NavLinkTitle; activeOn?: string[] }[] =
+    [{ href: '/home', title: 'Home' }]
+
+  if (showL2Transactions) {
+    navItems.push({ href: '/l2-transactions', title: 'Live transactions' })
+  }
+
+  navItems.push(
+    { href: '/state-updates', title: 'State updates' },
+    {
+      href: '/forced-transactions',
+      title: 'Forced transactions',
+      activeOn: ['/transactions'],
+    },
+    { href: '/offers', title: 'Offers' }
+  )
+  return navItems
 }

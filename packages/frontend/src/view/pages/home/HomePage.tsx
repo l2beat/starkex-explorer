@@ -52,7 +52,7 @@ function HomePage(props: HomePageProps) {
 
   return (
     <Page
-      path="/"
+      path="/home"
       description="This explorer allows you to view everything happening on dYdX from the perspective of the Ethereum blockchain. Browse positions, forced transaction and submit your own forced trades and withdrawals."
       context={props.context}
       withoutSearch
