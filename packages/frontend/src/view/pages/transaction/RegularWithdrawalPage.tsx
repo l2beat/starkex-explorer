@@ -54,6 +54,7 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
             transactionHash={props.transactionHash}
           />
           <TransactionOverview
+            chainId={props.context.chainId}
             statusText={lastEntry.statusText}
             statusType={lastEntry.statusType}
             statusDescription={lastEntry.description}
@@ -67,6 +68,7 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
         </div>
         <TransactionUserDetails
           title="Recipient details"
+          chainId={props.context.chainId}
           starkKey={props.recipient.starkKey}
           ethereumAddress={props.recipient.ethereumAddress}
         />
