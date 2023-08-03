@@ -27,6 +27,7 @@ function HomeStateUpdatesPage(props: HomeStateUpdatesPageProps) {
   return (
     <Page
       path={STATE_UPDATE_TABLE_PROPS.path}
+      activeNavItem="State updates"
       description="Latest state updates"
       context={props.context}
     >

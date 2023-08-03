@@ -11,10 +11,14 @@ import { NavLink, NavLinkTitle } from './NavLink'
 interface NavbarProps {
   readonly context: PageContext
   readonly searchBar: boolean
-  readonly path: string
+  readonly activeNavItem: NavLinkTitle | undefined
 }
 
-export function Navbar({ searchBar = true, context, path }: NavbarProps) {
+export function Navbar({
+  searchBar = true,
+  context,
+  activeNavItem,
+}: NavbarProps) {
   const { user, instanceName, tradingMode, chainId } = context
   const isMainnet = chainId === 1
   const navItems = getNavLinks(context.showL2Transactions)
@@ -35,11 +39,8 @@ export function Navbar({ searchBar = true, context, path }: NavbarProps) {
         </a>
         <div className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 transform items-center xl:flex">
           {navItems.map((item) => {
-            const isSelected =
-              path.startsWith(item.href) ||
-              (item.activeOn
-                ? item.activeOn.some((link) => path.startsWith(link))
-                : false)
+            const isSelected = item.title === activeNavItem
+
             return (
               <NavLink
                 key={item.title}
@@ -89,8 +90,9 @@ export function Navbar({ searchBar = true, context, path }: NavbarProps) {
 }
 
 function getNavLinks(showL2Transactions: boolean) {
-  const navItems: { href: string; title: NavLinkTitle; activeOn?: string[] }[] =
-    [{ href: '/home', title: 'Home' }]
+  const navItems: { href: string; title: NavLinkTitle }[] = [
+    { href: '/', title: 'Home' },
+  ]
 
   if (showL2Transactions) {
     navItems.push({ href: '/l2-transactions', title: 'Live transactions' })
@@ -101,7 +103,6 @@ function getNavLinks(showL2Transactions: boolean) {
     {
       href: '/forced-transactions',
       title: 'Forced transactions',
-      activeOn: ['/transactions'],
     },
     { href: '/offers', title: 'Offers' }
   )

@@ -27,6 +27,7 @@ function HomeTransactionsPage(props: HomeTransactionsPageProps) {
   return (
     <Page
       path={FORCED_TRANSACTION_TABLE_PROPS.path}
+      activeNavItem="Forced transactions"
       description="All forced transactions"
       context={props.context}
     >

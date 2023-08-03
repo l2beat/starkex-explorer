@@ -44,6 +44,7 @@ function RegularWithdrawalPage(props: RegularWithdrawalPageProps) {
   return (
     <Page
       context={props.context}
+      activeNavItem="Forced transactions"
       path={`/transactions/${props.transactionHash.toString()}`}
       description={`Details of the ${props.transactionHash.toString()} withdrawal transaction`}
     >

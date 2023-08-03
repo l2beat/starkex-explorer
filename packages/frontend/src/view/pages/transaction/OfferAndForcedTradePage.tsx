@@ -87,6 +87,7 @@ function OfferAndForcedTradePage(props: OfferAndForcedTradePageProps) {
   return (
     <Page
       context={props.context}
+      activeNavItem={common.activeNavItem}
       path={common.path}
       description={common.description}
     >
@@ -262,13 +263,15 @@ function getCommon(transactionHash?: Hash256, offerId?: string) {
     return {
       path: `/transactions/${transactionHash.toString()}`,
       description: `Details of the ${transactionHash.toString()} forced trade transaction`,
-    }
+      activeNavItem: 'Forced transactions',
+    } as const
   }
   if (offerId) {
     return {
       path: `/offers/${offerId}`,
       description: `Details of the ${offerId} forced trade offer`,
-    }
+      activeNavItem: 'Offers',
+    } as const
   }
   throw new Error('No transaction hash or offer id')
 }

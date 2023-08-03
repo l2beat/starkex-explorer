@@ -40,6 +40,7 @@ export function PerpetualL2TransactionDetailsPage(
   return (
     <Page
       context={props.context}
+      activeNavItem="Live transactions"
       description={`Details of ${l2TransactionTypeToText(
         props.transaction.originalTransaction.type
       )} l2 transaction`}

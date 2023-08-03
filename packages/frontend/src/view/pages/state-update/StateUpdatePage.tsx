@@ -46,6 +46,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
   return (
     <Page
       path={`/state-updates/${props.id}`}
+      activeNavItem="State updates"
       description="Show state update details, including balance changes, transactions and prices"
       context={props.context}
     >

@@ -24,6 +24,7 @@ function HomeOffersPage(props: HomeOffersPageProps) {
   return (
     <Page
       path={OFFER_TABLE_PROPS.path}
+      activeNavItem="Offers"
       description="All available trade offers"
       context={props.context}
     >

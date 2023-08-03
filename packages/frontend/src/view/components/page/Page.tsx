@@ -6,9 +6,11 @@ import { Footer } from './Footer'
 import { FreezeBanner } from './FreezeBanner'
 import { Head } from './Head'
 import { Navbar } from './Navbar'
+import { NavLinkTitle } from './NavLink'
 
 interface Props {
   context: PageContext | PageContextWithUser
+  activeNavItem?: NavLinkTitle
   withoutSearch?: boolean
   description: string
   image?: string
@@ -46,7 +48,7 @@ export function Page(props: Props) {
         <Navbar
           searchBar={!props.withoutSearch}
           context={props.context}
-          path={props.path}
+          activeNavItem={props.activeNavItem}
         />
         <FreezeBanner freezeStatus={props.context.freezeStatus} />
         {props.children}
