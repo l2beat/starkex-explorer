@@ -3,7 +3,7 @@ import {
   renderEscapeHatchActionPage,
   renderFreezeRequestActionPage,
 } from '@explorer/frontend'
-import { assertUnreachable,UserDetails } from '@explorer/shared'
+import { assertUnreachable, UserDetails } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 import { FreezeCheckService } from '../../core/FreezeCheckService'
