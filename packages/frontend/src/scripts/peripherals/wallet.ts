@@ -20,6 +20,7 @@ import {
   toSignableCreateOffer,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import omit from 'lodash/omit'
 
 import { FreezeRequestActionFormProps } from '../../view'
 import { Registration } from '../keys/keys'
@@ -224,13 +225,18 @@ export const Wallet = {
     let data: string
     switch (props.type) {
       case 'ForcedWithdrawal': {
-        const { type: _, starkExAddress, ...toEncode } = props
+        const toEncode = omit(props, 'type', 'starkExAddress')
         data = encodeForcedWithdrawalFreezeRequest(toEncode)
         break
       }
       case 'ForcedTrade': {
-        const { type: _, starkExAddress, collateralAsset, ...toEncode } = props
-        data = encodeForcedTradeFreezeRequest(toEncode, collateralAsset)
+        const toEncode = omit(
+          props,
+          'type',
+          'starkExAddress',
+          'collateralAsset'
+        )
+        data = encodeForcedTradeFreezeRequest(toEncode, props.collateralAsset)
         break
       }
       default:

@@ -3,7 +3,7 @@ import {
   renderEscapeHatchActionPage,
   renderFreezeRequestActionPage,
 } from '@explorer/frontend'
-import { UserDetails, assertUnreachable } from '@explorer/shared'
+import { assertUnreachable,UserDetails } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 import { FreezeCheckService } from '../../core/FreezeCheckService'
@@ -60,7 +60,7 @@ export class EscapeHatchController {
     }
     const data = oldestNotIncludedForcedAction.data
     switch (data.type) {
-      case 'ForcedWithdrawal':
+      case 'ForcedWithdrawal': {
         content = renderFreezeRequestActionPage({
           ...base,
           type: data.type,
@@ -69,7 +69,8 @@ export class EscapeHatchController {
           quantizedAmount: data.quantizedAmount,
         })
         break
-      case 'ForcedTrade':
+      }
+      case 'ForcedTrade': {
         if (context.tradingMode !== 'perpetual') {
           throw new Error('Forced trade is only supported in perpetual mode')
         }
@@ -88,6 +89,8 @@ export class EscapeHatchController {
           aIsBuyingSynthetic: data.isABuyingSynthetic,
           nonce: data.nonce,
         })
+        break
+      }
       case 'FullWithdrawal':
         throw new Error('NIY')
       default:
