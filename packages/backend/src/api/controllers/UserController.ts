@@ -220,7 +220,6 @@ export class UserController {
     const balanceChangesEntries = history.map((h) =>
       toUserBalanceChangeEntries(h, assetDetailsMap)
     )
-    console.log(sentTransactions)
     const transactions = buildUserTransactions(
       sentTransactions,
       userTransactions,
