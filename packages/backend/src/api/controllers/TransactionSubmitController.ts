@@ -24,7 +24,11 @@ import {
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { sleep } from '../../tools/sleep'
-import { ControllerResult, isControllerResult } from './ControllerResult'
+import { ControllerResult } from './ControllerResult'
+
+type DecodeResult<T> =
+  | { isSuccess: true; data: T }
+  | { isSuccess: false; controllerResult: ControllerResult }
 
 export class TransactionSubmitController {
   constructor(
@@ -41,13 +45,13 @@ export class TransactionSubmitController {
 
   async submitForcedExit(transactionHash: Hash256): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
-    const validatedData = await this.validate(
+    const fetched = await this.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodePerpetualForcedWithdrawalRequest
     )
-    if (isControllerResult(validatedData)) {
-      return validatedData
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
     }
 
     await this.sentTransactionRepository.add({
@@ -55,10 +59,10 @@ export class TransactionSubmitController {
       timestamp,
       data: {
         type: 'ForcedWithdrawal',
-        quantizedAmount: validatedData.quantizedAmount,
-        positionId: validatedData.positionId,
-        starkKey: validatedData.starkKey,
-        premiumCost: validatedData.premiumCost,
+        quantizedAmount: fetched.data.quantizedAmount,
+        positionId: fetched.data.positionId,
+        starkKey: fetched.data.starkKey,
+        premiumCost: fetched.data.premiumCost,
       },
     })
     return { type: 'created', content: { id: transactionHash } }
@@ -67,13 +71,13 @@ export class TransactionSubmitController {
   async submitWithdrawal(transactionHash: Hash256): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
 
-    const validatedData = await this.validate(
+    const fetched = await this.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodeWithdrawal
     )
-    if (isControllerResult(validatedData)) {
-      return validatedData
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
     }
 
     await this.sentTransactionRepository.add({
@@ -81,8 +85,8 @@ export class TransactionSubmitController {
       timestamp,
       data: {
         type: 'Withdraw',
-        starkKey: validatedData.starkKey,
-        assetType: AssetHash(validatedData.assetTypeHash.toString()),
+        starkKey: fetched.data.starkKey,
+        assetType: AssetHash(fetched.data.assetTypeHash.toString()),
       },
     })
     return { type: 'created', content: { id: transactionHash } }
@@ -93,13 +97,13 @@ export class TransactionSubmitController {
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
 
-    const validatedData = await this.validate(
+    const fetched = await this.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodeWithdrawalWithTokenId
     )
-    if (isControllerResult(validatedData)) {
-      return validatedData
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
     }
 
     await this.sentTransactionRepository.add({
@@ -107,9 +111,9 @@ export class TransactionSubmitController {
       timestamp,
       data: {
         type: 'WithdrawWithTokenId',
-        starkKey: validatedData.starkKey,
-        assetType: validatedData.assetTypeHash,
-        tokenId: validatedData.tokenId,
+        starkKey: fetched.data.starkKey,
+        assetType: fetched.data.assetTypeHash,
+        tokenId: fetched.data.tokenId,
       },
     })
     return { type: 'created', content: { id: transactionHash } }
@@ -138,7 +142,7 @@ export class TransactionSubmitController {
       }
     }
 
-    const validatedData = await this.validate(
+    const fetched = await this.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       (data: string) => {
@@ -148,10 +152,10 @@ export class TransactionSubmitController {
         return decodePerpetualForcedTradeRequest(data, this.collateralAsset)
       }
     )
-    if (isControllerResult(validatedData)) {
-      return validatedData
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
     }
-    if (!tradeMatchesOffer(offer, validatedData)) {
+    if (!tradeMatchesOffer(offer, fetched.data)) {
       return { type: 'bad request', message: `Trade does not match offer` }
     }
 
@@ -162,19 +166,19 @@ export class TransactionSubmitController {
       timestamp,
       data: {
         type: 'ForcedTrade',
-        starkKeyA: validatedData.starkKeyA,
-        starkKeyB: validatedData.starkKeyB,
-        positionIdA: validatedData.positionIdA,
-        positionIdB: validatedData.positionIdB,
-        collateralAmount: validatedData.collateralAmount,
+        starkKeyA: fetched.data.starkKeyA,
+        starkKeyB: fetched.data.starkKeyB,
+        positionIdA: fetched.data.positionIdA,
+        positionIdB: fetched.data.positionIdB,
+        collateralAmount: fetched.data.collateralAmount,
         collateralAssetId: this.collateralAsset.assetId,
-        syntheticAmount: validatedData.syntheticAmount,
-        syntheticAssetId: validatedData.syntheticAssetId,
-        isABuyingSynthetic: validatedData.isABuyingSynthetic,
-        submissionExpirationTime: validatedData.submissionExpirationTime,
-        nonce: validatedData.nonce,
-        signatureB: validatedData.signature,
-        premiumCost: validatedData.premiumCost,
+        syntheticAmount: fetched.data.syntheticAmount,
+        syntheticAssetId: fetched.data.syntheticAssetId,
+        isABuyingSynthetic: fetched.data.isABuyingSynthetic,
+        submissionExpirationTime: fetched.data.submissionExpirationTime,
+        nonce: fetched.data.nonce,
+        signatureB: fetched.data.signature,
+        premiumCost: fetched.data.premiumCost,
         offerId,
       },
     })
@@ -185,13 +189,13 @@ export class TransactionSubmitController {
     transactionHash: Hash256
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
-    const validatedData = await this.validate(
+    const fetched = await this.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodeFreezeRequest
     )
-    if (isControllerResult(validatedData)) {
-      return validatedData
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
     }
 
     await this.sentTransactionRepository.add({
@@ -199,9 +203,9 @@ export class TransactionSubmitController {
       timestamp,
       data: {
         type: 'FreezeRequest',
-        starkKey: validatedData.starkKey,
-        positionOrVaultId: validatedData.positionOrVaultId,
-        quantizedAmount: validatedData.quantizedAmount,
+        starkKey: fetched.data.starkKey,
+        positionOrVaultId: fetched.data.positionOrVaultId,
+        quantizedAmount: fetched.data.quantizedAmount,
       },
     })
     return { type: 'created', content: { id: transactionHash } }
@@ -213,13 +217,13 @@ export class TransactionSubmitController {
     positionOrVaultId: bigint
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
-    const validatedData = await this.validate(
+    const fetched = await this.fetchTxAndDecode(
       transactionHash,
       this.contracts.escapeVerifier,
       validateVerifyEscapeRequest
     )
-    if (isControllerResult(validatedData)) {
-      return validatedData
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
     }
 
     await this.sentTransactionRepository.add({
@@ -238,50 +242,55 @@ export class TransactionSubmitController {
     transactionHash: Hash256
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
-    const validatedData = await this.validate(
+    const fetched = await this.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodeFinalizeEscapeRequest
     )
 
-    if (isControllerResult(validatedData)) {
-      return validatedData
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
     }
     await this.sentTransactionRepository.add({
       transactionHash,
       timestamp,
       data: {
         type: 'FinalizeEscape',
-        starkKey: validatedData.starkKey,
-        positionOrVaultId: validatedData.positionOrVaultId,
-        quantizedAmount: validatedData.quantizedAmount,
+        starkKey: fetched.data.starkKey,
+        positionOrVaultId: fetched.data.positionOrVaultId,
+        quantizedAmount: fetched.data.quantizedAmount,
       },
     })
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async validate<T extends (data: string) => any>(
+  private async fetchTxAndDecode<T>(
     transactionHash: Hash256,
     to: EthereumAddress,
-    validateFn: T
-  ): Promise<NonNullable<Awaited<ReturnType<T>>> | ControllerResult> {
+    validateFn: (data: string) => T | undefined
+  ): Promise<DecodeResult<T>> {
     const tx = await this.getTransaction(transactionHash)
     if (!tx) {
       return {
-        type: 'bad request',
-        message: `Transaction ${transactionHash.toString()} not found`,
+        isSuccess: false,
+        controllerResult: {
+          type: 'bad request',
+          message: `Transaction ${transactionHash.toString()} not found`,
+        },
+      }
+    }
+    const data = validateFn(tx.data)
+    if (!tx.to || EthereumAddress(tx.to) !== to || !data) {
+      return {
+        isSuccess: false,
+        controllerResult: {
+          type: 'bad request',
+          message: `Invalid transaction`,
+        },
       }
     }
 
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const data: Awaited<ReturnType<T>> = await validateFn(tx.data)
-    if (!tx.to || EthereumAddress(tx.to) !== to || !data) {
-      return { type: 'bad request', message: `Invalid transaction` }
-    }
-
-    //eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return data
+    return { isSuccess: true, data }
   }
 
   private async getTransaction(hash: Hash256) {
