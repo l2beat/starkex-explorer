@@ -399,6 +399,7 @@ describe(MerkleTree.name, () => {
         root: PedersenHash(
           '00c9c74a31d9247f04cc9dbef31686d072fec342810c56d53855fa81e7af4bfd'
         ),
+        starkKey: StarkKey.fake('beef'),
       })
     })
 
@@ -457,6 +458,7 @@ describe(MerkleTree.name, () => {
         root: PedersenHash(
           '014f10fe0dfad76a60a8279bb67645b25db72b2af9125303a637468ddc48b953'
         ),
+        starkKey: StarkKey.fake('beef'),
       })
     })
   })

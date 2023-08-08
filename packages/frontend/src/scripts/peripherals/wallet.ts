@@ -216,13 +216,13 @@ export const Wallet = {
   // #region Escape
   async sendFreezeRequestTransaction(
     account: EthereumAddress,
-    ownerKey: StarkKey,
+    starkKey: StarkKey,
     positionOrVaultId: bigint,
     quantizedAmount: bigint,
     exchangeAddress: EthereumAddress
   ) {
     const data = encodeFreezeRequest({
-      ownerKey,
+      starkKey,
       positionOrVaultId,
       quantizedAmount,
     })

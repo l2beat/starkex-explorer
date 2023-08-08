@@ -112,6 +112,7 @@ export class EscapeHatchController {
 
     const content = renderEscapeHatchActionPage({
       context,
+      starkKey: merkleProof.starkKey,
       escapeVerifierAddress: this.escapeVerifierAddress,
       positionOrVaultId,
       serializedMerkleProof,

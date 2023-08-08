@@ -144,6 +144,7 @@ describe(encodeUserTransactionData.name, () => {
     const decoded = decodeUserTransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
+
   it('can encode a MintWithdraw', () => {
     const data: MintWithdrawData = {
       type: 'MintWithdraw',

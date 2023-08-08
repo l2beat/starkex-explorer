@@ -9,6 +9,8 @@ import {
 import { providers } from 'ethers'
 
 import { BlockRange } from '../../model/BlockRange'
+import { KeyValueStore } from '../../peripherals/database/KeyValueStore'
+import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import {
@@ -21,6 +23,8 @@ export class WithdrawalAllowedCollector {
   constructor(
     private readonly ethereumClient: EthereumClient,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
+    private readonly userTransactionRepository: UserTransactionRepository,
+    private readonly keyValueStore: KeyValueStore,
     private readonly perpetualAddress: EthereumAddress
   ) {}
 
@@ -70,17 +74,34 @@ export class WithdrawalAllowedCollector {
     }
 
     switch (event.name) {
-      case 'LogWithdrawalAllowed':
+      case 'LogWithdrawalAllowed': {
+        const freezeStatus = await this.keyValueStore.findByKey('freezeStatus')
+
+        const data = {
+          starkKey: StarkKey.from(event.args.starkKey),
+          assetType: AssetHash.from(event.args.assetType),
+          nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
+          quantizedAmount: event.args.quantizedAmount.toBigInt(),
+        }
+
+        if (freezeStatus === 'frozen') {
+          await this.userTransactionRepository.add({
+            ...base,
+            data: {
+              type: 'FinalizeEscape',
+              ...data,
+            },
+          })
+        }
+
         return this.withdrawableAssetRepository.add({
           ...base,
           data: {
             type: 'WithdrawalAllowed',
-            starkKey: StarkKey.from(event.args.starkKey),
-            assetType: AssetHash.from(event.args.assetType),
-            nonQuantizedAmount: event.args.nonQuantizedAmount.toBigInt(),
-            quantizedAmount: event.args.quantizedAmount.toBigInt(),
+            ...data,
           },
         })
+      }
       case 'LogMintableWithdrawalAllowed':
         return this.withdrawableAssetRepository.add({
           ...base,

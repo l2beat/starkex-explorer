@@ -68,6 +68,7 @@ describe(serializeMerkleProofForEscape.name, () => {
       root: PedersenHash(
         '00c9c74a31d9247f04cc9dbef31686d072fec342810c56d53855fa81e7af4bfd'
       ),
+      starkKey: StarkKey.fake('beef'),
     }
 
     expect(serializeMerkleProofForEscape(perpetualMerkleProof)).toEqual([

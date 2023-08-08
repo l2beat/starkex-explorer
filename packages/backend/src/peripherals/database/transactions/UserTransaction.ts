@@ -21,8 +21,9 @@ export type UserTransactionData =
   | ForcedTradeData
   | ForcedWithdrawalData
   | FullWithdrawalData
-  | EscapeVerifiedData
   | WithdrawalPerformedData
+  | EscapeVerifiedData
+  | FinalizeEscapeData
 
 export type WithdrawalPerformedData =
   | WithdrawData
@@ -97,6 +98,14 @@ export interface MintWithdrawData {
   assetId: AssetHash
 }
 
+export interface FinalizeEscapeData {
+  type: 'FinalizeEscape'
+  starkKey: StarkKey
+  assetType: AssetHash
+  nonQuantizedAmount: bigint
+  quantizedAmount: bigint
+}
+
 export function encodeUserTransactionData(
   values: UserTransactionData
 ): Encoded<UserTransactionData> {
@@ -115,6 +124,8 @@ export function encodeUserTransactionData(
       return encodeWithdrawWithTokenId(values)
     case 'MintWithdraw':
       return encodeMintWithdraw(values)
+    case 'FinalizeEscape':
+      return encodeFinalizeEscape(values)
     default:
       assertUnreachable(values)
   }
@@ -138,6 +149,8 @@ export function decodeUserTransactionData(
       return decodeWithdrawWithTokenId(values)
     case 'MintWithdraw':
       return decodeMintWithdraw(values)
+    case 'FinalizeEscape':
+      return decodeFinalizeEscape(values)
     default:
       assertUnreachable(values)
   }
@@ -339,6 +352,33 @@ function decodeMintWithdraw(
     starkKey: StarkKey(values.starkKey),
     assetType: AssetHash(values.assetType),
     assetId: AssetHash(values.assetId),
+    nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
+    quantizedAmount: BigInt(values.quantizedAmount),
+  }
+}
+
+function encodeFinalizeEscape(
+  values: FinalizeEscapeData
+): Encoded<FinalizeEscapeData> {
+  return {
+    starkKeyA: values.starkKey,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      assetType: values.assetType.toString(),
+      nonQuantizedAmount: values.nonQuantizedAmount.toString(),
+      quantizedAmount: values.quantizedAmount.toString(),
+    },
+  }
+}
+
+function decodeFinalizeEscape(
+  values: ToJSON<FinalizeEscapeData>
+): FinalizeEscapeData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    assetType: AssetHash(values.assetType),
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
   }
