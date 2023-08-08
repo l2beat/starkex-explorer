@@ -610,6 +610,7 @@ export class Application {
       withdrawableAssetRepository,
       preprocessedUserStatisticsRepository,
       preprocessedUserL2TransactionsStatisticsRepository,
+      vaultRepository,
       config.starkex.l2Transactions.excludeTypes,
       config.starkex.contracts.perpetual
     )

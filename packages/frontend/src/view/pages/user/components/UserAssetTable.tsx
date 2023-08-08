@@ -25,23 +25,28 @@ export interface UserAssetEntry {
   balance: bigint
   value: bigint
   vaultOrPositionId: string
-  action: 'WITHDRAW' | 'CLOSE'
+  action:
+    | 'WITHDRAW'
+    | 'CLOSE'
+    | 'NO-ACTION'
+    | 'ESCAPE'
+    | 'USE-COLLATERAL-ESCAPE'
 }
 
 export function UserAssetsTable(props: UserAssetsTableProps) {
   const isUserRegistered = !!props.ethereumAddress
 
   const escapeHatchElem = (entry: UserAssetEntry) =>
-    entry.action === 'WITHDRAW' ? (
+    entry.action === 'ESCAPE' ? (
       <Button
         as="a"
         href={getEscapeHatchLink(entry.vaultOrPositionId, isUserRegistered)}
       >
         ESCAPE
       </Button>
-    ) : (
+    ) : entry.action === 'USE-COLLATERAL-ESCAPE' ? (
       <span className="text-zinc-500">use collateral escape</span>
-    )
+    ) : null
 
   return (
     <Table

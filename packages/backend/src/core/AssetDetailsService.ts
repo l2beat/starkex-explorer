@@ -20,6 +20,7 @@ export class AssetDetailsService {
     sentTransactions?: SentTransactionRecord[]
     userTransactions?: UserTransactionRecord[]
     withdrawableAssets?: { assetHash: AssetHash; withdrawableBalance: bigint }[]
+    escapableAssetHashes?: AssetHash[]
   }): Promise<AssetDetailsMap | undefined> {
     if (this.tradingMode !== 'spot') {
       return undefined
@@ -35,6 +36,7 @@ export class AssetDetailsService {
         this.getUserTransactionAssetHash(tx)
       ) ?? []),
       ...(records.withdrawableAssets?.map((a) => a.assetHash) ?? []),
+      ...(records.escapableAssetHashes ?? []),
     ].filter((hash): hash is AssetHash => AssetHash.check(hash))
 
     const assetTypeAndTokenIds: { assetType: AssetHash; tokenId: bigint }[] =
