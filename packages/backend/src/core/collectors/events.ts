@@ -277,5 +277,5 @@ export const LogEscapeVerified = EthereumEvent<
 )`
 )
 
-export const LogFrozen = EthereumEvent<'LogFrozen', {}>('event LogFrozen()')
+export const LogFrozen = EthereumEvent<'LogFrozen', never>('event LogFrozen()')
 // #endregion escape hatches
