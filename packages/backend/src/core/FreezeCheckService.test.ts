@@ -31,7 +31,8 @@ describe(FreezeCheckService.name, () => {
         value: 'not-frozen',
       })
     })
-    it('sets to frozen when isFrozen() returns true', async () => {
+
+    it('sets to frozen when freezeRequestExists returns true', async () => {
       const kvStoreMock = mockObject<KeyValueStore>({
         findByKey: mockFn().resolvesTo(1),
         addOrUpdate: mockFn().resolvesTo(undefined),
@@ -39,12 +40,6 @@ describe(FreezeCheckService.name, () => {
       const ethereumClientMock = mockObject<EthereumClient>({
         getBlockTimestamp: mockFn().resolvesTo(123000000),
         call: mockFn()
-          .given(
-            EthereumAddress.fake('fade'),
-            'isFrozen',
-            'function isFrozen() public view returns (bool)'
-          )
-          .resolvesToOnce([true, undefined])
           .given(
             EthereumAddress.fake('fade'),
             'FREEZE_GRACE_PERIOD',
@@ -57,6 +52,7 @@ describe(FreezeCheckService.name, () => {
           findOldestNotIncluded: mockFn().resolvesTo({
             timestamp: Timestamp.fromSeconds(123000000),
           }),
+          freezeRequestExists: mockFn().resolvesTo(true),
         })
 
       const service = new FreezeCheckService(
@@ -73,6 +69,7 @@ describe(FreezeCheckService.name, () => {
         key: 'freezeStatus',
         value: 'frozen',
       })
+      expect(ethereumClientMock.call).toHaveBeenExhausted()
     })
 
     it('sets to not-frozen when no not-included transactions', async () => {
@@ -85,12 +82,6 @@ describe(FreezeCheckService.name, () => {
         call: mockFn()
           .given(
             EthereumAddress.fake('fade'),
-            'isFrozen',
-            'function isFrozen() public view returns (bool)'
-          )
-          .resolvesToOnce([false, undefined])
-          .given(
-            EthereumAddress.fake('fade'),
             'FREEZE_GRACE_PERIOD',
             'function FREEZE_GRACE_PERIOD() view returns (uint256)'
           )
@@ -99,6 +90,7 @@ describe(FreezeCheckService.name, () => {
       const userTransactionRepositoryMock =
         mockObject<UserTransactionRepository>({
           findOldestNotIncluded: mockFn().resolvesTo(undefined),
+          freezeRequestExists: mockFn().resolvesTo(false),
         })
 
       const service = new FreezeCheckService(
@@ -115,6 +107,7 @@ describe(FreezeCheckService.name, () => {
         key: 'freezeStatus',
         value: 'not-frozen',
       })
+      expect(ethereumClientMock.call).toHaveBeenExhausted()
     })
 
     it("sets not-frozen when grace period hasn't passed", async () => {
@@ -127,12 +120,6 @@ describe(FreezeCheckService.name, () => {
         call: mockFn()
           .given(
             EthereumAddress.fake('fade'),
-            'isFrozen',
-            'function isFrozen() public view returns (bool)'
-          )
-          .resolvesToOnce([false, undefined])
-          .given(
-            EthereumAddress.fake('fade'),
             'FREEZE_GRACE_PERIOD',
             'function FREEZE_GRACE_PERIOD() view returns (uint256)'
           )
@@ -143,6 +130,7 @@ describe(FreezeCheckService.name, () => {
           findOldestNotIncluded: mockFn().resolvesTo({
             timestamp: Timestamp.fromSeconds(1000),
           }),
+          freezeRequestExists: mockFn().resolvesTo(false),
         })
 
       const service = new FreezeCheckService(
@@ -159,6 +147,7 @@ describe(FreezeCheckService.name, () => {
         key: 'freezeStatus',
         value: 'not-frozen',
       })
+      expect(ethereumClientMock.call).toHaveBeenExhausted()
     })
 
     it('sets freezable when grace period has passed', async () => {
@@ -171,12 +160,6 @@ describe(FreezeCheckService.name, () => {
         call: mockFn()
           .given(
             EthereumAddress.fake('fade'),
-            'isFrozen',
-            'function isFrozen() public view returns (bool)'
-          )
-          .resolvesToOnce([false, undefined])
-          .given(
-            EthereumAddress.fake('fade'),
             'FREEZE_GRACE_PERIOD',
             'function FREEZE_GRACE_PERIOD() view returns (uint256)'
           )
@@ -187,6 +170,7 @@ describe(FreezeCheckService.name, () => {
           findOldestNotIncluded: mockFn().resolvesTo({
             timestamp: Timestamp.fromSeconds(1000),
           }),
+          freezeRequestExists: mockFn().resolvesTo(false),
         })
 
       const service = new FreezeCheckService(
@@ -203,6 +187,7 @@ describe(FreezeCheckService.name, () => {
         key: 'freezeStatus',
         value: 'freezable',
       })
+      expect(ethereumClientMock.call).toHaveBeenExhausted()
     })
   })
 })

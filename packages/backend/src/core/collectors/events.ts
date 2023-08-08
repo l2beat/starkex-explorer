@@ -46,23 +46,6 @@ export const LogFullWithdrawalRequest = EthereumEvent<
   uint256 vaultId
 )`)
 
-export const LogEscapeVerified = EthereumEvent<
-  'LogEscapeVerified',
-  {
-    starkKey: BigNumber
-    withdrawalAmount: BigNumber
-    sharedStateHash: BigNumber
-    positionId: BigNumber
-  }
->(
-  `event LogEscapeVerified(
-    uint256 starkKey,
-    int256 withdrawalAmount,
-    bytes32 sharedStateHash,
-    uint256 positionId
-)`
-)
-
 export const LogMemoryPagesHashes = EthereumEvent<
   'LogMemoryPagesHashes',
   { factHash: string; pagesHashes: string[] }
@@ -275,3 +258,24 @@ export const LogMintWithdrawalPerformed = EthereumEvent<
 )`)
 
 // #endregion withdrawable_assets
+
+// #region escape hatches
+export const LogEscapeVerified = EthereumEvent<
+  'LogEscapeVerified',
+  {
+    starkKey: BigNumber
+    withdrawalAmount: BigNumber
+    sharedStateHash: BigNumber
+    positionId: BigNumber
+  }
+>(
+  `event LogEscapeVerified(
+    uint256 starkKey,
+    int256 withdrawalAmount,
+    bytes32 sharedStateHash,
+    uint256 positionId
+)`
+)
+
+export const LogFrozen = EthereumEvent<'LogFrozen', {}>('event LogFrozen()')
+// #endregion escape hatches

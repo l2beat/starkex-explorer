@@ -74,7 +74,7 @@ export class UserTransactionRepository extends BaseRepository {
     this.findByTransactionHash = this.wrapFind(this.findByTransactionHash)
     this.deleteAfter = this.wrapDelete(this.deleteAfter)
     this.deleteAll = this.wrapDelete(this.deleteAll)
-
+    this.freezeRequestExists = this.wrapAny(this.freezeRequestExists)
     /* eslint-enable @typescript-eslint/unbound-method */
   }
 
@@ -114,6 +114,14 @@ export class UserTransactionRepository extends BaseRepository {
       }))
     )
     return records.map((x) => x.transactionHash)
+  }
+
+  async freezeRequestExists(): Promise<boolean> {
+    const knex = await this.knex()
+    const result = await knex('user_transactions')
+      .where({ type: 'FreezeRequest' })
+      .first()
+    return !!result
   }
 
   async getByStarkKey<T extends UserTransactionData['type']>(

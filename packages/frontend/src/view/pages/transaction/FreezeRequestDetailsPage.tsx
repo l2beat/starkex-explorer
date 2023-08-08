@@ -16,7 +16,7 @@ import { TransactionUserDetails } from './components/TransactionUserDetails'
 interface FreezeRequestDetailsPageProps {
   context: PageContext
   transactionHash: Hash256
-  ignored: {
+  ignored?: {
     starkKey: StarkKey
     ethereumAddress: EthereumAddress | undefined
   }
@@ -59,13 +59,15 @@ function FreezeRequestDetailsPage(props: FreezeRequestDetailsPageProps) {
             transactionHash={props.transactionHash}
           />
         </div>
-        <TransactionUserDetails
-          chainId={props.context.chainId}
-          title="Ignored user details"
-          tradingMode="perpetual"
-          starkKey={props.ignored.starkKey}
-          ethereumAddress={props.ignored.ethereumAddress}
-        />
+        {props.ignored && (
+          <TransactionUserDetails
+            chainId={props.context.chainId}
+            title="Ignored user details"
+            tradingMode="perpetual"
+            starkKey={props.ignored.starkKey}
+            ethereumAddress={props.ignored.ethereumAddress}
+          />
+        )}
         <TransactionHistoryTable entries={historyEntries} />
       </ContentWrapper>
     </Page>
