@@ -4,10 +4,10 @@ import { expect } from 'earl'
 import {
   decodeSentTransactionData,
   encodeSentTransactionData,
-  EscapeVerifiedData,
   ForcedTradeData,
   ForcedWithdrawalData,
   FreezeRequestData,
+  VerifyEscapeData,
   WithdrawData,
 } from './SentTransaction'
 
@@ -84,8 +84,8 @@ describe(encodeSentTransactionData.name, () => {
   })
 
   it('can encode and decode a VerifyEscape', () => {
-    const data: EscapeVerifiedData = {
-      type: 'EscapeVerified',
+    const data: VerifyEscapeData = {
+      type: 'VerifyEscape',
       starkKey: StarkKey.fake(),
       positionOrVaultId: 1234n,
     }

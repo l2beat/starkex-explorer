@@ -516,7 +516,7 @@ describe(TransactionSubmitController.name, () => {
   })
 
   describe(
-    TransactionSubmitController.prototype.submitEscapeVerified.name,
+    TransactionSubmitController.prototype.submitVerifyEscape.name,
     () => {
       it('handles nonexistent transaction', async () => {
         const controller = new TransactionSubmitController(
@@ -534,7 +534,7 @@ describe(TransactionSubmitController.name, () => {
         )
 
         const hash = Hash256.fake()
-        const result = await controller.submitEscapeVerified(
+        const result = await controller.submitVerifyEscape(
           hash,
           StarkKey.fake(),
           123n
@@ -564,7 +564,7 @@ describe(TransactionSubmitController.name, () => {
         )
 
         const hash = Hash256.fake()
-        const result = await controller.submitEscapeVerified(
+        const result = await controller.submitVerifyEscape(
           hash,
           StarkKey.fake(),
           123n
@@ -595,7 +595,7 @@ describe(TransactionSubmitController.name, () => {
         )
 
         const hash = Hash256.fake()
-        const result = await controller.submitEscapeVerified(
+        const result = await controller.submitVerifyEscape(
           hash,
           StarkKey.fake(),
           123n
@@ -636,7 +636,7 @@ describe(TransactionSubmitController.name, () => {
           fakeCollateralAsset
         )
 
-        const result = await controller.submitEscapeVerified(
+        const result = await controller.submitVerifyEscape(
           hash,
           StarkKey.fake(),
           123n

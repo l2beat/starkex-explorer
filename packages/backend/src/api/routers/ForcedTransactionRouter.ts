@@ -220,7 +220,7 @@ export function createTransactionRouter(
         }),
       }),
       async (ctx) => {
-        const result = await transactionSubmitController.submitEscapeVerified(
+        const result = await transactionSubmitController.submitVerifyEscape(
           ctx.request.body.hash,
           ctx.request.body.starkKey,
           ctx.request.body.positionOrVaultId

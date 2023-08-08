@@ -17,7 +17,7 @@ function extractUserTxAmount(
       return data.syntheticAmount
     case 'FullWithdrawal':
       return undefined
-    case 'EscapeVerified':
+    case 'VerifyEscape':
       return data.withdrawalAmount
     case 'Withdraw':
     case 'WithdrawWithTokenId':
@@ -36,7 +36,7 @@ function extractUserTxAsset(
   switch (data.type) {
     case 'ForcedWithdrawal':
     case 'FinalizeEscape':
-    case 'EscapeVerified':
+    case 'VerifyEscape':
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
@@ -67,7 +67,7 @@ function extractUserTxEntryType(
     case 'ForcedWithdrawal':
     case 'FullWithdrawal':
       return 'FORCED_WITHDRAW'
-    case 'EscapeVerified':
+    case 'VerifyEscape':
       return 'INITIATE_ESCAPE'
     case 'Withdraw':
     case 'WithdrawWithTokenId':
