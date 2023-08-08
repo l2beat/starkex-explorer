@@ -25,7 +25,7 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
   'ForcedWithdrawal',
   'ForcedTrade',
   'FullWithdrawal',
-  'EscapeVerified',
+  'VerifyEscape',
   'FinalizeEscape',
 ]
 //TODO: Do we want FreezeRequest here?

@@ -177,7 +177,7 @@ export class UserTransactionCollector {
         return this.userTransactionRepository.add({
           ...base,
           data: {
-            type: 'EscapeVerified',
+            type: 'VerifyEscape',
             starkKey: StarkKey.from(event.args.starkKey),
             withdrawalAmount: event.args.withdrawalAmount.toBigInt(),
             positionId: event.args.positionId.toBigInt(),

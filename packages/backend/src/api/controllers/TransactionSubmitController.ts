@@ -211,7 +211,7 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  async submitEscapeVerified(
+  async submitVerifyEscape(
     transactionHash: Hash256,
     starkKey: StarkKey,
     positionOrVaultId: bigint
@@ -230,7 +230,7 @@ export class TransactionSubmitController {
       transactionHash,
       timestamp,
       data: {
-        type: 'EscapeVerified',
+        type: 'VerifyEscape',
         starkKey,
         positionOrVaultId,
       },

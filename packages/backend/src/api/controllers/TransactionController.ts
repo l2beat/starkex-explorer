@@ -229,7 +229,7 @@ export class TransactionController {
         return { type: 'success', content }
       }
 
-      case 'EscapeVerified': {
+      case 'VerifyEscape': {
         //TODO: Check if we need different for Spot and Perpetual
         if (context.tradingMode !== 'perpetual') {
           return { type: 'not found' }
@@ -441,7 +441,7 @@ export class TransactionController {
         return { type: 'success', content }
       }
 
-      case 'EscapeVerified': {
+      case 'VerifyEscape': {
         //TODO: Check if we need different for Spot and Perpetual
         if (context.tradingMode !== 'perpetual') {
           return { type: 'not found' }

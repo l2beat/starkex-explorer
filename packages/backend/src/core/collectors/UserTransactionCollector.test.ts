@@ -495,7 +495,7 @@ describe(UserTransactionCollector.name, () => {
       transactionHash,
       timestamp: Timestamp(1234000),
       data: {
-        type: 'EscapeVerified',
+        type: 'VerifyEscape',
         starkKey,
         positionId,
         sharedStateHash,

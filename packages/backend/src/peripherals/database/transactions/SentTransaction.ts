@@ -15,7 +15,7 @@ export type SentTransactionData =
   | WithdrawData
   | WithdrawWithTokenIdData
   | FreezeRequestData
-  | EscapeVerifiedData
+  | VerifyEscapeData
   | FinalizeEscapeData
 
 export type SentTransactionJSON = ToJSON<SentTransactionData>
@@ -66,8 +66,8 @@ export interface FreezeRequestData {
   quantizedAmount: bigint
 }
 
-export interface EscapeVerifiedData {
-  type: 'EscapeVerified'
+export interface VerifyEscapeData {
+  type: 'VerifyEscape'
   starkKey: StarkKey
   positionOrVaultId: bigint
 }
@@ -93,8 +93,8 @@ export function encodeSentTransactionData(
       return encodeWithdrawWithTokenId(values)
     case 'FreezeRequest':
       return encodeFreezeRequest(values)
-    case 'EscapeVerified':
-      return encodeEscapeVerified(values)
+    case 'VerifyEscape':
+      return encodeVerifyEscape(values)
     case 'FinalizeEscape':
       return encodeFinalizeEscape(values)
     default:
@@ -116,8 +116,8 @@ export function decodeSentTransactionData(
       return decodeWithdrawWithTokenId(values)
     case 'FreezeRequest':
       return decodeFreezeRequest(values)
-    case 'EscapeVerified':
-      return decodeEscapeVerified(values)
+    case 'VerifyEscape':
+      return decodeVerifyEscape(values)
     case 'FinalizeEscape':
       return decodeFinalizeEscape(values)
     default:
@@ -235,23 +235,23 @@ function decodeWithdrawWithTokenId(
   }
 }
 
-function encodeEscapeVerified(
-  values: EscapeVerifiedData
-): Encoded<EscapeVerifiedData> {
+function encodeVerifyEscape(
+  values: VerifyEscapeData
+): Encoded<VerifyEscapeData> {
   return {
     starkKey: values.starkKey,
     vaultOrPositionId: values.positionOrVaultId,
     data: {
-      type: 'EscapeVerified',
+      type: 'VerifyEscape',
       starkKey: values.starkKey.toString(),
       positionOrVaultId: values.positionOrVaultId.toString(),
     },
   }
 }
 
-function decodeEscapeVerified(
-  values: ToJSON<EscapeVerifiedData>
-): EscapeVerifiedData {
+function decodeVerifyEscape(
+  values: ToJSON<VerifyEscapeData>
+): VerifyEscapeData {
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),

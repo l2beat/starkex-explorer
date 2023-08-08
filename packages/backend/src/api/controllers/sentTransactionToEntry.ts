@@ -17,7 +17,7 @@ export function extractSentTxEntryType(
     case 'Withdraw':
     case 'WithdrawWithTokenId':
       return 'WITHDRAW'
-    case 'EscapeVerified':
+    case 'VerifyEscape':
       return 'INITIATE_ESCAPE'
     case 'FreezeRequest':
       return 'FREEZE_REQUEST'
@@ -39,7 +39,7 @@ export function extractSentTxAmount(
       return data.syntheticAmount
     case 'Withdraw':
     case 'WithdrawWithTokenId':
-    case 'EscapeVerified':
+    case 'VerifyEscape':
     case 'FreezeRequest':
       return undefined
     default:
@@ -77,7 +77,7 @@ export function extractSentTxAsset(
         details: assetDetails,
       }
     }
-    case 'EscapeVerified': {
+    case 'VerifyEscape': {
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     }
     case 'FreezeRequest':

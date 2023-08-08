@@ -22,7 +22,7 @@ export type UserTransactionData =
   | ForcedWithdrawalData
   | FullWithdrawalData
   | WithdrawalPerformedData
-  | EscapeVerifiedData
+  | VerifyEscapeData
   | FinalizeEscapeData
 
 export type WithdrawalPerformedData =
@@ -61,8 +61,8 @@ export interface ForcedTradeData {
   nonce: bigint
 }
 
-export interface EscapeVerifiedData {
-  type: 'EscapeVerified'
+export interface VerifyEscapeData {
+  type: 'VerifyEscape'
   starkKey: StarkKey
   withdrawalAmount: bigint
   sharedStateHash: Hash256
@@ -116,8 +116,8 @@ export function encodeUserTransactionData(
       return encodeFullWithdrawal(values)
     case 'ForcedTrade':
       return encodeForcedTrade(values)
-    case 'EscapeVerified':
-      return encodeEscapeVerified(values)
+    case 'VerifyEscape':
+      return encodeVerifyEscape(values)
     case 'Withdraw':
       return encodeWithdraw(values)
     case 'WithdrawWithTokenId':
@@ -141,8 +141,8 @@ export function decodeUserTransactionData(
       return decodeFullWithdrawal(values)
     case 'ForcedTrade':
       return decodeForcedTrade(values)
-    case 'EscapeVerified':
-      return decodeEscapeVerified(values)
+    case 'VerifyEscape':
+      return decodeVerifyEscape(values)
     case 'Withdraw':
       return decodeWithdraw(values)
     case 'WithdrawWithTokenId':
@@ -206,9 +206,9 @@ function decodeFullWithdrawal(
   }
 }
 
-function encodeEscapeVerified(
-  values: EscapeVerifiedData
-): Encoded<EscapeVerifiedData> {
+function encodeVerifyEscape(
+  values: VerifyEscapeData
+): Encoded<VerifyEscapeData> {
   return {
     starkKeyA: values.starkKey,
     vaultOrPositionIdA: values.positionId,
@@ -222,9 +222,9 @@ function encodeEscapeVerified(
   }
 }
 
-function decodeEscapeVerified(
-  values: ToJSON<EscapeVerifiedData>
-): EscapeVerifiedData {
+function decodeVerifyEscape(
+  values: ToJSON<VerifyEscapeData>
+): VerifyEscapeData {
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
