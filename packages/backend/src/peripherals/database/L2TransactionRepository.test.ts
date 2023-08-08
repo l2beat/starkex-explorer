@@ -14,6 +14,7 @@ const genericLiveMultiTransaction = (
   transactions: PerpetualL2TransactionData[]
 ) => ({
   transactionId: 1234,
+  timestamp: Timestamp(4321),
   data: {
     type: 'MultiTransaction',
     transactions,
@@ -31,6 +32,7 @@ const genericMultiTransaction = (
 
 const genericLiveDepositTransaction = {
   transactionId: 1234,
+  timestamp: Timestamp(4321),
   data: {
     type: 'Deposit',
     starkKey: StarkKey.fake(),
@@ -48,6 +50,7 @@ const genericDepositTransaction = {
 
 const genericLiveWithdrawalToAddressTransaction = {
   transactionId: 1234,
+  timestamp: Timestamp(1234),
   data: {
     positionId: 1234n,
     starkKey: StarkKey.fake('2'),
@@ -95,6 +98,7 @@ describe(L2TransactionRepository.name, () => {
           starkKeyA: genericDepositTransaction.data.starkKey,
           starkKeyB: undefined,
           data: genericDepositTransaction.data,
+          timestamp: genericDepositTransaction.timestamp,
           state: undefined,
           parentId: undefined,
         })
@@ -116,6 +120,7 @@ describe(L2TransactionRepository.name, () => {
           starkKeyA: genericDepositTransaction.data.starkKey,
           starkKeyB: undefined,
           data: genericDepositTransaction.data,
+          timestamp: genericDepositTransaction.timestamp,
           state: 'replaced',
           parentId: undefined,
         })
@@ -142,6 +147,7 @@ describe(L2TransactionRepository.name, () => {
           starkKeyA: genericDepositTransaction.data.starkKey,
           starkKeyB: undefined,
           data: genericDepositTransaction.data,
+          timestamp: genericDepositTransaction.timestamp,
           state: 'alternative',
           parentId: undefined,
         })
@@ -167,6 +173,7 @@ describe(L2TransactionRepository.name, () => {
           transactionId: record.transactionId,
           blockNumber: record.blockNumber,
           state: undefined,
+          timestamp: record.timestamp,
           parentId: undefined,
           starkKeyA: undefined,
           starkKeyB: undefined,
@@ -178,6 +185,7 @@ describe(L2TransactionRepository.name, () => {
           transactionId: record.transactionId,
           blockNumber: record.blockNumber,
           state: undefined,
+          timestamp: record.timestamp,
           parentId: id,
           starkKeyA: StarkKey.fake('1'),
           starkKeyB: undefined,
@@ -189,6 +197,7 @@ describe(L2TransactionRepository.name, () => {
           transactionId: record.transactionId,
           blockNumber: record.blockNumber,
           state: undefined,
+          timestamp: record.timestamp,
           parentId: id,
           starkKeyA: StarkKey.fake('2'),
           starkKeyB: undefined,
@@ -249,6 +258,7 @@ describe(L2TransactionRepository.name, () => {
         starkKeyA: record.data.starkKey,
         starkKeyB: undefined,
         data: record.data,
+        timestamp: record.timestamp,
         state: undefined,
         parentId: undefined,
       })
@@ -265,6 +275,7 @@ describe(L2TransactionRepository.name, () => {
         blockNumber: undefined,
         starkKeyA: record.data.starkKey,
         starkKeyB: undefined,
+        timestamp: record.timestamp,
         data: record.data,
         state: 'replaced',
         parentId: undefined,
@@ -278,21 +289,27 @@ describe(L2TransactionRepository.name, () => {
         starkKeyA: alternativeRecord.data.starkKey,
         starkKeyB: undefined,
         data: alternativeRecord.data,
+        timestamp: alternativeRecord.timestamp,
         state: 'alternative',
         parentId: undefined,
       })
     })
 
-    it('does not add transaction if transaction with the same transaction id already exists and is included', async () => {
-      await repository.addFeederGatewayTransaction(genericDepositTransaction)
-
-      const id = await repository.addLiveTransaction(
-        genericLiveDepositTransaction
+    it('updates transaction timestamp if transaction with the same transaction id already exists and is included', async () => {
+      const liveTxTimestamp = Timestamp(100000)
+      const id = await repository.addFeederGatewayTransaction(
+        genericDepositTransaction
       )
 
+      await repository.addLiveTransaction({
+        ...genericLiveDepositTransaction,
+        timestamp: liveTxTimestamp,
+      })
+
       const transaction = await repository.findById(id)
-      expect(id).toEqual(0)
-      expect(transaction?.stateUpdateId).toBeNullish()
+
+      expect(id).not.toEqual(0)
+      expect(transaction?.timestamp).toEqual(liveTxTimestamp)
     })
   })
 

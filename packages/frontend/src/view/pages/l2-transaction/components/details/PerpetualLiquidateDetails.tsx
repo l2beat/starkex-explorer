@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import {
   TransactionField,
   TransactionYesOrNoField,
@@ -42,6 +43,9 @@ export function PerpetualLiquidateDetails(
           amount: props.data.actualCollateral,
         }}
       />
+      <TransactionField label="Timestamp (UTC)">
+        {props.timestamp ? formatTimestamp(props.timestamp) : '-'}
+      </TransactionField>
     </L2TransactionDetailsCard>
   )
 }
