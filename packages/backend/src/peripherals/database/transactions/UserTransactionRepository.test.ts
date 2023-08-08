@@ -985,4 +985,21 @@ describe(UserTransactionRepository.name, () => {
       })
     }
   )
+
+  describe(UserTransactionRepository.prototype.freezeRequestExists.name, () => {
+    it('returns false if no freeze request in db', async () => {
+      expect(await repository.freezeRequestExists()).toEqual(false)
+    })
+
+    it('returns true if freeze request in db', async () => {
+      await repository.add({
+        transactionHash: Hash256.fake(),
+        blockNumber: 123,
+        timestamp: Timestamp(123000),
+        data: { type: 'FreezeRequest' },
+      })
+
+      expect(await repository.freezeRequestExists()).toEqual(true)
+    })
+  })
 })

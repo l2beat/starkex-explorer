@@ -81,6 +81,7 @@ export class AssetDetailsService {
       case 'ForcedWithdrawal':
       case 'FullWithdrawal':
       case 'VerifyEscape':
+      case 'FreezeRequest':
         return undefined
       default:
         assertUnreachable(userTransaction.data)

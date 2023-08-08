@@ -24,6 +24,7 @@ export type UserTransactionData =
   | WithdrawalPerformedData
   | VerifyEscapeData
   | FinalizeEscapeData
+  | FreezeRequestData
 
 export type WithdrawalPerformedData =
   | WithdrawData
@@ -106,6 +107,10 @@ export interface FinalizeEscapeData {
   quantizedAmount: bigint
 }
 
+export interface FreezeRequestData {
+  type: 'FreezeRequest'
+}
+
 export function encodeUserTransactionData(
   values: UserTransactionData
 ): Encoded<UserTransactionData> {
@@ -126,6 +131,8 @@ export function encodeUserTransactionData(
       return encodeMintWithdraw(values)
     case 'FinalizeEscape':
       return encodeFinalizeEscape(values)
+    case 'FreezeRequest':
+      return encodeFreezeRequest(values)
     default:
       assertUnreachable(values)
   }
@@ -151,6 +158,8 @@ export function decodeUserTransactionData(
       return decodeMintWithdraw(values)
     case 'FinalizeEscape':
       return decodeFinalizeEscape(values)
+    case 'FreezeRequest':
+      return decodeFreezeRequest(values)
     default:
       assertUnreachable(values)
   }
@@ -382,4 +391,20 @@ function decodeFinalizeEscape(
     nonQuantizedAmount: BigInt(values.nonQuantizedAmount),
     quantizedAmount: BigInt(values.quantizedAmount),
   }
+}
+
+function encodeFreezeRequest(
+  values: FreezeRequestData
+): Encoded<FreezeRequestData> {
+  return {
+    // This is a hack to make the database happy.
+    starkKeyA: StarkKey.ZERO,
+    data: values,
+  }
+}
+
+function decodeFreezeRequest(
+  values: ToJSON<FreezeRequestData>
+): FreezeRequestData {
+  return values
 }

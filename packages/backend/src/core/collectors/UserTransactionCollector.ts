@@ -22,10 +22,12 @@ import {
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
+import { FreezeCheckService } from '../FreezeCheckService'
 import {
   LogEscapeVerified,
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
+  LogFrozen,
   LogFullWithdrawalRequest,
   LogMintWithdrawalPerformed,
   LogWithdrawalPerformed,
@@ -46,8 +48,11 @@ export class UserTransactionCollector {
     private readonly ethereumClient: EthereumClient,
     private readonly userTransactionRepository: UserTransactionRepository,
     private readonly withdrawableAssetRepository: WithdrawableAssetRepository,
-    private readonly perpetualAddress: EthereumAddress,
-    private readonly escapeVerifierAddress: EthereumAddress,
+    private readonly contracts: {
+      perpetualAddress: EthereumAddress
+      escapeVerifierAddress: EthereumAddress
+    },
+    private readonly freezeCheckService: FreezeCheckService,
     private readonly collateralAsset?: CollateralAsset
   ) {}
 
@@ -57,7 +62,7 @@ export class UserTransactionCollector {
     options?: UserTransactionCollectorOptions
   ) {
     const logs = await this.ethereumClient.getLogsInRange(blockRange, {
-      address: this.perpetualAddress.toString(),
+      address: this.contracts.perpetualAddress.toString(),
       topics: [
         [
           // Forced Actions:
@@ -69,6 +74,9 @@ export class UserTransactionCollector {
           LogWithdrawalPerformed.topic,
           LogWithdrawalWithTokenIdPerformed.topic,
           LogMintWithdrawalPerformed.topic,
+
+          // Escape hatches:
+          LogFrozen.topic,
         ],
       ],
     })
@@ -76,7 +84,7 @@ export class UserTransactionCollector {
     const escapeVerifierLogs = await this.ethereumClient.getLogsInRange(
       blockRange,
       {
-        address: this.escapeVerifierAddress.toString(),
+        address: this.contracts.escapeVerifierAddress.toString(),
         topics: [[LogEscapeVerified.topic]],
       }
     )
@@ -103,6 +111,7 @@ export class UserTransactionCollector {
       LogFullWithdrawalRequest.safeParseLog(log) ??
       LogForcedTradeRequest.safeParseLog(log) ??
       LogEscapeVerified.safeParseLog(log) ??
+      LogFrozen.safeParseLog(log) ??
       LogWithdrawalPerformed.safeParseLog(log) ??
       LogWithdrawalWithTokenIdPerformed.safeParseLog(log) ??
       LogMintWithdrawalPerformed.parseLog(log)
@@ -170,20 +179,6 @@ export class UserTransactionCollector {
             nonce: event.args.nonce.toBigInt(),
           },
         })
-      case 'LogEscapeVerified':
-        if (options?.skipUserTransactionRepository) {
-          return
-        }
-        return this.userTransactionRepository.add({
-          ...base,
-          data: {
-            type: 'VerifyEscape',
-            starkKey: StarkKey.from(event.args.starkKey),
-            withdrawalAmount: event.args.withdrawalAmount.toBigInt(),
-            positionId: event.args.positionId.toBigInt(),
-            sharedStateHash: Hash256(event.args.sharedStateHash.toString()),
-          },
-        })
       case 'LogWithdrawalPerformed':
         record = {
           ...base,
@@ -243,6 +238,31 @@ export class UserTransactionCollector {
           await this.userTransactionRepository.add(record)
         }
         return
+      case 'LogEscapeVerified':
+        if (options?.skipUserTransactionRepository) {
+          return
+        }
+        return this.userTransactionRepository.add({
+          ...base,
+          data: {
+            type: 'VerifyEscape',
+            starkKey: StarkKey.from(event.args.starkKey),
+            withdrawalAmount: event.args.withdrawalAmount.toBigInt(),
+            positionId: event.args.positionId.toBigInt(),
+            sharedStateHash: Hash256(event.args.sharedStateHash.toString()),
+          },
+        })
+      case 'LogFrozen':
+        await this.freezeCheckService.setFreezeStatus('frozen')
+        if (options?.skipUserTransactionRepository) {
+          return
+        }
+        return this.userTransactionRepository.add({
+          ...base,
+          data: {
+            type: 'FreezeRequest',
+          },
+        })
       default:
         assertUnreachable(event)
     }

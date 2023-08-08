@@ -15,14 +15,15 @@ function extractUserTxAmount(
       return data.quantizedAmount
     case 'ForcedTrade':
       return data.syntheticAmount
-    case 'FullWithdrawal':
-      return undefined
     case 'VerifyEscape':
       return data.withdrawalAmount
     case 'Withdraw':
     case 'WithdrawWithTokenId':
     case 'MintWithdraw':
       return data.quantizedAmount
+    case 'FullWithdrawal':
+    case 'FreezeRequest':
+      return undefined
     default:
       assertUnreachable(data)
   }
@@ -40,8 +41,6 @@ function extractUserTxAsset(
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
-    case 'FullWithdrawal':
-      return undefined //TODO: Fix this
     case 'Withdraw':
       return {
         hashOrId: collateralAsset ? collateralAsset.assetId : data.assetType,
@@ -53,6 +52,9 @@ function extractUserTxAsset(
         hashOrId: data.assetId,
         details: assetDetailsMap?.getByAssetHash(data.assetId),
       }
+    case 'FullWithdrawal':
+    case 'FreezeRequest':
+      return undefined //TODO: Fix this (FULL WITHDRAWAL)
     default:
       assertUnreachable(data)
   }
@@ -75,6 +77,8 @@ function extractUserTxEntryType(
       return 'WITHDRAW'
     case 'FinalizeEscape':
       return 'FINALIZE_ESCAPE'
+    case 'FreezeRequest':
+      return 'FREEZE_REQUEST'
     default:
       assertUnreachable(data)
   }
