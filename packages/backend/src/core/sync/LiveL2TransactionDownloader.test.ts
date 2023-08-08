@@ -1,4 +1,4 @@
-import { StarkKey } from '@explorer/types'
+import { StarkKey, Timestamp } from '@explorer/types'
 import { Logger } from '@l2beat/backend-tools'
 import { expect, mockFn, mockObject } from 'earl'
 import { Knex } from 'knex'
@@ -18,6 +18,7 @@ const fakeL2Transaction = (
 ): PerpetualL2Transaction => ({
   thirdPartyId: 1024,
   transactionId: 2048,
+  timestamp: Timestamp(4096),
   transaction: {
     type: 'Deposit',
     positionId: 4096n,
@@ -91,6 +92,7 @@ describe(LiveL2TransactionDownloader.name, () => {
             i + 1,
             {
               transactionId: tx.transactionId,
+              timestamp: tx.timestamp,
               data: tx.transaction,
             },
             mockKnexTransaction
@@ -118,6 +120,7 @@ describe(LiveL2TransactionDownloader.name, () => {
             firstTxs.length + i + 1,
             {
               data: tx.transaction,
+              timestamp: tx.timestamp,
               transactionId: tx.transactionId,
             },
             mockKnexTransaction

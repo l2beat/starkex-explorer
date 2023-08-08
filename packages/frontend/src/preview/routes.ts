@@ -695,9 +695,10 @@ const routes: Route[] = [
         context,
         transaction: {
           ...randomAggregatedPerpetualL2TransactionEntry(),
-          alternativeTransactions: repeat(randomInt(1, 10), () =>
-            perpetualL2TransactionsBucket.pick()
-          ),
+          alternativeTransactions: repeat(randomInt(1, 10), () => ({
+            timestamp: randomTimestamp(),
+            ...perpetualL2TransactionsBucket.pick(),
+          })),
         },
       })
     },
@@ -926,9 +927,10 @@ const routes: Route[] = [
           ...randomAggregatedPerpetualL2TransactionEntry(
             randomPerpetualL2MultiTransaction()
           ),
-          alternativeTransactions: repeat(randomInt(1, 10), () =>
-            perpetualL2TransactionsBucket.pick()
-          ),
+          alternativeTransactions: repeat(randomInt(1, 10), () => ({
+            ...perpetualL2TransactionsBucket.pick(),
+            timestamp: randomTimestamp(),
+          })),
         },
       })
     },
