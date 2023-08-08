@@ -104,7 +104,8 @@ function getStatus(transaction: TransactionEntry): {
   if (
     transaction.type === 'WITHDRAW' ||
     transaction.type === 'FINALIZE_ESCAPE' ||
-    transaction.type === 'FREEZE_REQUEST'
+    transaction.type === 'FREEZE_REQUEST' ||
+    transaction.type === 'INITIATE_ESCAPE'
   ) {
     switch (transaction.status) {
       case 'SENT':
@@ -115,19 +116,7 @@ function getStatus(transaction: TransactionEntry): {
         return { type: 'ERROR', text: 'REVERTED' }
       case 'INCLUDED':
         throw new Error(
-          `${transaction.status} transaction cannot be ${transaction.status}`
-        )
-    }
-  }
-  if (transaction.type === 'INITIATE_ESCAPE') {
-    switch (transaction.status) {
-      case 'SENT':
-        return { type: 'BEGIN', text: 'SENT (1/2)' }
-      case 'MINED':
-        return { type: 'END', text: 'MINED (2/2)' }
-      default:
-        throw new Error(
-          `INITIATE_ESCAPE transaction cannot be ${transaction.status}`
+          `${transaction.type} transaction cannot be ${transaction.status}`
         )
     }
   }

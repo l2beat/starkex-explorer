@@ -28,7 +28,7 @@ interface InitializeEscapePageProps {
   positionOrVaultId: string
   history: {
     timestamp: Timestamp | undefined
-    status: 'SENT' | 'MINED'
+    status: 'SENT' | 'MINED' | 'REVERTED'
   }[]
   stateUpdateId?: number
 }
@@ -105,6 +105,13 @@ function toHistoryEntry(
         statusType: 'MIDDLE',
         description:
           'Initialize escape mined, you can finalize the escape now on your user page',
+      }
+    case 'REVERTED':
+      return {
+        timestamp: entry.timestamp,
+        statusText: 'REVERTED',
+        statusType: 'ERROR',
+        description: 'Initialize escape reverted',
       }
     default:
       assertUnreachable(entry.status)

@@ -255,7 +255,7 @@ export class TransactionController {
             amount: userTransaction.data.withdrawalAmount,
           },
           positionOrVaultId: userTransaction.data.positionId.toString(),
-          history: transactionHistory.getNonRevertableTransactionHistory(),
+          history: transactionHistory.getRegularTransactionHistory(),
           stateUpdateId: userTransaction.included?.stateUpdateId,
         })
         return { type: 'success', content }
@@ -288,7 +288,7 @@ export class TransactionController {
             sentTransaction?.data.type === 'FinalizeEscape'
               ? sentTransaction.data.positionOrVaultId.toString()
               : undefined,
-          history: transactionHistory.getNonRevertableTransactionHistory(),
+          history: transactionHistory.getRegularTransactionHistory(),
         })
         return { type: 'success', content }
       }
@@ -462,7 +462,7 @@ export class TransactionController {
             ethereumAddress: txUser?.ethAddress,
           },
           positionOrVaultId: sentTransaction.data.positionOrVaultId.toString(),
-          history: transactionHistory.getNonRevertableTransactionHistory(),
+          history: transactionHistory.getRegularTransactionHistory(),
         })
 
         return { type: 'success', content }
@@ -513,7 +513,7 @@ export class TransactionController {
           asset: { hashOrId: context.collateralAsset.assetId },
           amount: sentTransaction.data.quantizedAmount,
           positionOrVaultId: sentTransaction.data.positionOrVaultId.toString(),
-          history: transactionHistory.getNonRevertableTransactionHistory(),
+          history: transactionHistory.getRegularTransactionHistory(),
         })
         return { type: 'success', content }
       }

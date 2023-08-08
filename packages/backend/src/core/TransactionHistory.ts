@@ -50,26 +50,6 @@ export class TransactionHistory {
     }
   }
 
-  getNonRevertableTransactionHistory() {
-    const history: TransactionHistoryItem<'SENT' | 'MINED'>[] = []
-    if (this.sentTransaction?.mined || this.userTransaction) {
-      history.push({
-        status: 'MINED',
-        timestamp:
-          this.sentTransaction?.mined?.timestamp ??
-          this.userTransaction?.timestamp,
-      })
-    }
-
-    if (this.sentTransaction || this.userTransaction) {
-      history.push({
-        timestamp: this.sentTransaction?.sentTimestamp,
-        status: 'SENT',
-      })
-    }
-    return history
-  }
-
   getRegularTransactionHistory() {
     const history: TransactionHistoryItem<'SENT' | 'REVERTED' | 'MINED'>[] = []
 
