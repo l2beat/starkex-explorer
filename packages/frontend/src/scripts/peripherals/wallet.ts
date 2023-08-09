@@ -8,6 +8,7 @@ import {
   encodeFinalizeExitRequest,
   encodeForcedTradeFreezeRequest,
   encodeForcedWithdrawalFreezeRequest,
+  encodeFullWithdrawalFreezeRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
@@ -222,26 +223,29 @@ export const Wallet = {
     account: EthereumAddress,
     props: FreezeRequestActionFormProps
   ) {
-    let data: string
-    switch (props.type) {
-      case 'ForcedWithdrawal': {
-        const toEncode = omit(props, 'type', 'starkExAddress')
-        data = encodeForcedWithdrawalFreezeRequest(toEncode)
-        break
+    const getEncodedData = () => {
+      switch (props.type) {
+        case 'ForcedWithdrawal': {
+          const toEncode = omit(props, 'type', 'starkExAddress')
+          return encodeForcedWithdrawalFreezeRequest(toEncode)
+        }
+        case 'ForcedTrade': {
+          const toEncode = omit(
+            props,
+            'type',
+            'starkExAddress',
+            'collateralAsset'
+          )
+          return encodeForcedTradeFreezeRequest(toEncode, props.collateralAsset)
+        }
+        case 'FullWithdrawal':
+          const toEncode = omit(props, 'type', 'starkExAddress')
+          return encodeFullWithdrawalFreezeRequest(toEncode)
+        default:
+          assertUnreachable(props)
       }
-      case 'ForcedTrade': {
-        const toEncode = omit(
-          props,
-          'type',
-          'starkExAddress',
-          'collateralAsset'
-        )
-        data = encodeForcedTradeFreezeRequest(toEncode, props.collateralAsset)
-        break
-      }
-      default:
-        assertUnreachable(props)
     }
+    const data = getEncodedData()
 
     const result = await getProvider().request({
       method: 'eth_sendTransaction',

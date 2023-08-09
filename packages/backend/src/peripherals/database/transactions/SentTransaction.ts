@@ -14,7 +14,9 @@ export type SentTransactionData =
   | ForcedWithdrawalData
   | WithdrawData
   | WithdrawWithTokenIdData
-  | FreezeRequestData
+  | ForcedWithdrawalFreezeRequestData
+  | ForcedTradeFreezeRequestData
+  | FullWithdrawalFreezeRequestData
   | VerifyEscapeData
   | FinalizeEscapeData
 
@@ -59,11 +61,31 @@ export interface WithdrawWithTokenIdData {
   tokenId: bigint
 }
 
-export interface FreezeRequestData {
-  type: 'FreezeRequest'
+export interface ForcedWithdrawalFreezeRequestData {
+  type: 'ForcedWithdrawalFreezeRequest'
   starkKey: StarkKey
-  positionOrVaultId: bigint
+  positionId: bigint
   quantizedAmount: bigint
+}
+
+export interface ForcedTradeFreezeRequestData {
+  type: 'ForcedTradeFreezeRequest'
+  starkKeyA: StarkKey
+  starkKeyB: StarkKey
+  positionIdA: bigint
+  positionIdB: bigint
+  collateralAssetId: AssetId
+  syntheticAssetId: AssetId
+  collateralAmount: bigint
+  syntheticAmount: bigint
+  isABuyingSynthetic: boolean
+  nonce: bigint
+}
+
+export interface FullWithdrawalFreezeRequestData {
+  type: 'FullWithdrawalFreezeRequest'
+  starkKey: StarkKey
+  vaultId: bigint
 }
 
 export interface VerifyEscapeData {
@@ -91,8 +113,12 @@ export function encodeSentTransactionData(
       return encodeWithdraw(values)
     case 'WithdrawWithTokenId':
       return encodeWithdrawWithTokenId(values)
-    case 'FreezeRequest':
-      return encodeFreezeRequest(values)
+    case 'ForcedWithdrawalFreezeRequest':
+      return encodeForcedWithdrawalFreezeRequest(values)
+    case 'ForcedTradeFreezeRequest':
+      return encodeForcedTradeFreezeRequest(values)
+    case 'FullWithdrawalFreezeRequest':
+      return encodeFullWithdrawalFreezeRequest(values)
     case 'VerifyEscape':
       return encodeVerifyEscape(values)
     case 'FinalizeEscape':
@@ -114,8 +140,12 @@ export function decodeSentTransactionData(
       return decodeWithdraw(values)
     case 'WithdrawWithTokenId':
       return decodeWithdrawWithTokenId(values)
-    case 'FreezeRequest':
-      return decodeFreezeRequest(values)
+    case 'ForcedWithdrawalFreezeRequest':
+      return decodeForcedWithdrawalFreezeRequest(values)
+    case 'ForcedTradeFreezeRequest':
+      return decodeForcedTradeFreezeRequest(values)
+    case 'FullWithdrawalFreezeRequest':
+      return decodeFullWithdrawalFreezeRequest(values)
     case 'VerifyEscape':
       return decodeVerifyEscape(values)
     case 'FinalizeEscape':
@@ -259,29 +289,91 @@ function decodeVerifyEscape(
   }
 }
 
-function encodeFreezeRequest(
-  values: FreezeRequestData
-): Encoded<FreezeRequestData> {
+function encodeForcedWithdrawalFreezeRequest(
+  values: ForcedWithdrawalFreezeRequestData
+): Encoded<ForcedWithdrawalFreezeRequestData> {
   return {
     starkKey: values.starkKey,
-    vaultOrPositionId: values.positionOrVaultId,
+    vaultOrPositionId: values.positionId,
     data: {
       ...values,
       starkKey: values.starkKey.toString(),
-      positionOrVaultId: values.positionOrVaultId.toString(),
+      positionId: values.positionId.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
     },
   }
 }
 
-function decodeFreezeRequest(
-  values: ToJSON<FreezeRequestData>
-): FreezeRequestData {
+function decodeForcedWithdrawalFreezeRequest(
+  values: ToJSON<ForcedWithdrawalFreezeRequestData>
+): ForcedWithdrawalFreezeRequestData {
   return {
     ...values,
     starkKey: StarkKey(values.starkKey),
-    positionOrVaultId: BigInt(values.positionOrVaultId),
+    positionId: BigInt(values.positionId),
     quantizedAmount: BigInt(values.quantizedAmount),
+  }
+}
+
+function encodeForcedTradeFreezeRequest(
+  values: ForcedTradeFreezeRequestData
+): Encoded<ForcedTradeFreezeRequestData> {
+  return {
+    starkKey: values.starkKeyA,
+    vaultOrPositionId: values.positionIdA,
+    data: {
+      ...values,
+      starkKeyA: values.starkKeyA.toString(),
+      starkKeyB: values.starkKeyB.toString(),
+      positionIdA: values.positionIdA.toString(),
+      positionIdB: values.positionIdB.toString(),
+      collateralAmount: values.collateralAmount.toString(),
+      collateralAssetId: values.collateralAssetId.toString(),
+      syntheticAmount: values.syntheticAmount.toString(),
+      syntheticAssetId: values.syntheticAssetId.toString(),
+      nonce: values.nonce.toString(),
+    },
+  }
+}
+
+function decodeForcedTradeFreezeRequest(
+  values: ToJSON<ForcedTradeFreezeRequestData>
+): ForcedTradeFreezeRequestData {
+  return {
+    ...values,
+    starkKeyA: StarkKey(values.starkKeyA),
+    starkKeyB: StarkKey(values.starkKeyB),
+    positionIdA: BigInt(values.positionIdA),
+    positionIdB: BigInt(values.positionIdB),
+    collateralAmount: BigInt(values.collateralAmount),
+    collateralAssetId: AssetId(values.collateralAssetId),
+    syntheticAmount: BigInt(values.syntheticAmount),
+    syntheticAssetId: AssetId(values.syntheticAssetId),
+    nonce: BigInt(values.nonce),
+  }
+}
+
+function encodeFullWithdrawalFreezeRequest(
+  values: FullWithdrawalFreezeRequestData
+): Encoded<FullWithdrawalFreezeRequestData> {
+  return {
+    starkKey: values.starkKey,
+    vaultOrPositionId: values.vaultId,
+    data: {
+      ...values,
+      starkKey: values.starkKey.toString(),
+      vaultId: values.vaultId.toString(),
+    },
+  }
+}
+
+function decodeFullWithdrawalFreezeRequest(
+  values: ToJSON<FullWithdrawalFreezeRequestData>
+): FullWithdrawalFreezeRequestData {
+  return {
+    ...values,
+    starkKey: StarkKey(values.starkKey),
+    vaultId: BigInt(values.vaultId),
   }
 }
 

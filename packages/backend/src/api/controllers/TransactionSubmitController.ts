@@ -1,7 +1,8 @@
 import {
   CollateralAsset,
   decodeFinalizeEscapeRequest,
-  decodeFreezeRequest,
+  decodeForcedWithdrawalFreezeRequest,
+  decodeFullWithdrawalFreezeRequest,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
@@ -185,14 +186,14 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  async submitFreezeRequest(
+  async submitForcedWithdrawalFreezeRequest(
     transactionHash: Hash256
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
     const fetched = await this.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
-      decodeFreezeRequest
+      decodeForcedWithdrawalFreezeRequest
     )
     if (!fetched.isSuccess) {
       return fetched.controllerResult
@@ -202,10 +203,63 @@ export class TransactionSubmitController {
       transactionHash,
       timestamp,
       data: {
-        type: 'FreezeRequest',
+        type: 'ForcedWithdrawalFreezeRequest',
         starkKey: fetched.data.starkKey,
-        positionOrVaultId: fetched.data.positionOrVaultId,
+        positionId: fetched.data.positionId,
         quantizedAmount: fetched.data.quantizedAmount,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitForcedTradeFreezeRequest(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const fetched = await this.fetchTxAndDecode(
+      transactionHash,
+      this.contracts.perpetual,
+      (data: string) => {
+        if (!this.collateralAsset) {
+          throw new Error('No collateral asset')
+        }
+        return decodePerpetualForcedTradeRequest(data, this.collateralAsset)
+      }
+    )
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
+    }
+
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'ForcedTradeFreezeRequest',
+        ...fetched.data,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitFullWithdrawalFreezeRequest(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const fetched = await this.fetchTxAndDecode(
+      transactionHash,
+      this.contracts.perpetual,
+      decodeFullWithdrawalFreezeRequest
+    )
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
+    }
+
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'FullWithdrawalFreezeRequest',
+        ...fetched.data,
       },
     })
     return { type: 'created', content: { id: transactionHash } }

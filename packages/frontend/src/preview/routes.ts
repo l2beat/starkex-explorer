@@ -1081,7 +1081,7 @@ const routes: Route[] = [
         type: 'ForcedWithdrawal',
         starkExAddress: EthereumAddress.fake(),
         starkKey: StarkKey.fake(),
-        positionOrVaultId: 12345n,
+        positionId: 12345n,
         quantizedAmount: 1000000000000000n,
       })
     },

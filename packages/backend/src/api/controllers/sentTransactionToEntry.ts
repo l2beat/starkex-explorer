@@ -19,7 +19,9 @@ export function extractSentTxEntryType(
       return 'WITHDRAW'
     case 'VerifyEscape':
       return 'INITIATE_ESCAPE'
-    case 'FreezeRequest':
+    case 'ForcedWithdrawalFreezeRequest':
+    case 'ForcedTradeFreezeRequest':
+    case 'FullWithdrawalFreezeRequest':
       return 'FREEZE_REQUEST'
     case 'FinalizeEscape':
       return 'FINALIZE_ESCAPE'
@@ -40,7 +42,9 @@ export function extractSentTxAmount(
     case 'Withdraw':
     case 'WithdrawWithTokenId':
     case 'VerifyEscape':
-    case 'FreezeRequest':
+    case 'ForcedWithdrawalFreezeRequest':
+    case 'ForcedTradeFreezeRequest':
+    case 'FullWithdrawalFreezeRequest':
       return undefined
     default:
       assertUnreachable(data)
@@ -80,7 +84,9 @@ export function extractSentTxAsset(
     case 'VerifyEscape': {
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     }
-    case 'FreezeRequest':
+    case 'ForcedWithdrawalFreezeRequest':
+    case 'ForcedTradeFreezeRequest':
+    case 'FullWithdrawalFreezeRequest':
       return undefined
     default:
       assertUnreachable(data)

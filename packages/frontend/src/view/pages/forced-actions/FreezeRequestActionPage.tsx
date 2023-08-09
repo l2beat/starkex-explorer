@@ -33,7 +33,7 @@ export const FreezeRequestActionFormProps = z.intersection(
     z.object({
       type: z.literal('ForcedWithdrawal'),
       starkKey: stringAs(StarkKey),
-      positionOrVaultId: stringAsBigInt(),
+      positionId: stringAsBigInt(),
       quantizedAmount: stringAsBigInt(),
     }),
     z.object({
@@ -41,14 +41,19 @@ export const FreezeRequestActionFormProps = z.intersection(
       collateralAsset: CollateralAsset,
       starkKeyA: stringAs(StarkKey),
       starkKeyB: stringAs(StarkKey),
-      vaultIdA: stringAsBigInt(),
-      vaultIdB: stringAsBigInt(),
+      positionIdA: stringAsBigInt(),
+      positionIdB: stringAsBigInt(),
       collateralAssetId: stringAs(AssetId),
       syntheticAssetId: stringAs(AssetId),
-      amountCollateral: stringAsBigInt(),
-      amountSynthetic: stringAsBigInt(),
-      aIsBuyingSynthetic: z.boolean(),
+      collateralAmount: stringAsBigInt(),
+      syntheticAmount: stringAsBigInt(),
+      isABuyingSynthetic: z.boolean(),
       nonce: stringAsBigInt(),
+    }),
+    z.object({
+      type: z.literal('FullWithdrawal'),
+      starkKey: stringAs(StarkKey),
+      vaultId: stringAsBigInt(),
     }),
   ])
 )
