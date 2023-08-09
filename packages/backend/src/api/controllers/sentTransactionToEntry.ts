@@ -64,8 +64,8 @@ export function extractSentTxAsset(
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
     case 'FinalizeSpotEscape':
       return {
-        hashOrId: data.assetId,
-        details: assetDetailsMap?.getByAssetHash(data.assetId),
+        hashOrId: data.assetHash,
+        details: assetDetailsMap?.getByAssetHash(data.assetHash),
       }
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }

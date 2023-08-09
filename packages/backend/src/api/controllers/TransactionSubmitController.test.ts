@@ -806,7 +806,7 @@ describe(TransactionSubmitController.name, () => {
           starkKey: StarkKey.fake(),
           vaultId: 1234n,
           quantizedAmount: 5000n,
-          assetId: AssetHash.fake(),
+          assetHash: AssetHash.fake(),
         }
         const perpetualAddress = EthereumAddress.fake()
         const hash = Hash256.fake()
@@ -850,7 +850,7 @@ describe(TransactionSubmitController.name, () => {
             starkKey: decodedData.starkKey,
             vaultId: decodedData.vaultId,
             quantizedAmount: decodedData.quantizedAmount,
-            assetId: decodedData.assetId,
+            assetHash: decodedData.assetHash,
           },
         })
       })

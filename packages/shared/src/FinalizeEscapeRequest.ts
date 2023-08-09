@@ -47,7 +47,7 @@ export function decodeFinalizePerpetualEscapeRequest(
 export interface FinalizeSpotEscapeRequest {
   starkKey: StarkKey
   vaultId: bigint
-  assetId: AssetHash
+  assetHash: AssetHash
   quantizedAmount: bigint
 }
 
@@ -57,7 +57,7 @@ export function encodeFinalizeSpotEscapeRequest(
   return finalizeSpotEscapeRequestCoder.encodeFunctionData('escape', [
     data.starkKey.toString(),
     data.vaultId,
-    data.assetId,
+    data.assetHash,
     data.quantizedAmount,
   ])
 }
@@ -75,7 +75,7 @@ export function decodeFinalizeSpotEscapeRequest(
     return {
       starkKey: StarkKey.from(decoded.starkKey),
       vaultId: BigInt(decoded.vaultId),
-      assetId: AssetHash.from(decoded.assetId),
+      assetHash: AssetHash.from(decoded.assetId),
       quantizedAmount: BigInt(decoded.quantizedAmount),
     }
   } catch {

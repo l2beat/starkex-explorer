@@ -328,7 +328,7 @@ export class TransactionSubmitController {
         starkKey: fetched.data.starkKey,
         vaultId: fetched.data.vaultId,
         quantizedAmount: fetched.data.quantizedAmount,
-        assetId: fetched.data.assetId,
+        assetHash: fetched.data.assetHash,
       },
     })
     return { type: 'created', content: { id: transactionHash } }

@@ -318,7 +318,7 @@ export const Wallet = {
           return encodeFinalizeSpotEscapeRequest({
             starkKey: rest.starkKey,
             vaultId: rest.vaultId,
-            assetId: rest.assetId,
+            assetHash: rest.assetId,
             quantizedAmount: rest.quantizedAmount,
           })
         }

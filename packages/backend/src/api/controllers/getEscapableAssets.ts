@@ -64,7 +64,7 @@ export async function getSpotEscapables(
 
   const [verified, finalized] = await Promise.all([
     sentTransactionRepository.getByStarkKey(starkKey, ['VerifyEscape']),
-    sentTransactionRepository.getByStarkKey(starkKey, ['FinalizeEscape']),
+    sentTransactionRepository.getByStarkKey(starkKey, ['FinalizeSpotEscape']),
   ])
 
   for (const tx of verified) {
@@ -85,7 +85,7 @@ export async function getSpotEscapables(
   // So we again rely on data in our sentTransactionsRepository:
   for (const tx of finalized) {
     if (tx.mined && !tx.mined.reverted) {
-      const entry = result[tx.data.positionOrVaultId.toString()]
+      const entry = result[tx.data.vaultId.toString()]
       if (entry !== undefined) {
         entry.amount = 0n
       }

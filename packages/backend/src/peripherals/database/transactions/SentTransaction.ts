@@ -107,7 +107,7 @@ export interface FinalizeSpotEscapeData {
   starkKey: StarkKey
   vaultId: bigint
   quantizedAmount: bigint
-  assetId: AssetHash
+  assetHash: AssetHash
 }
 
 export function encodeSentTransactionData(
@@ -427,7 +427,7 @@ function encodeFinalizeSpotEscape(
       starkKey: values.starkKey.toString(),
       vaultId: values.vaultId.toString(),
       quantizedAmount: values.quantizedAmount.toString(),
-      assetId: values.assetId.toString(),
+      assetHash: values.assetHash.toString(),
     },
   }
 }
@@ -440,6 +440,6 @@ function decodeFinalizeSpotEscape(
     starkKey: StarkKey(values.starkKey),
     vaultId: BigInt(values.vaultId),
     quantizedAmount: BigInt(values.quantizedAmount),
-    assetId: AssetHash(values.assetId),
+    assetHash: AssetHash(values.assetHash),
   }
 }

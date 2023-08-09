@@ -84,23 +84,25 @@ const fakeSentVerifyEscape: SentTransactionRecord<'VerifyEscape'> = {
   },
 }
 
-const fakeSentFinalizeEscape: SentTransactionRecord<'FinalizeEscape'> = {
-  mined: {
-    blockNumber: 899000,
-    timestamp: Timestamp(463000),
-    reverted: false,
-  },
-  starkKey: fakeStarkKey,
-  sentTimestamp: Timestamp(455000),
-  transactionHash: Hash256.fake('beaf'),
-  vaultOrPositionId: 1234n,
-  data: {
-    type: 'FinalizeEscape',
+const fakeSentSpotFinalizeEscape: SentTransactionRecord<'FinalizeSpotEscape'> =
+  {
+    mined: {
+      blockNumber: 899000,
+      timestamp: Timestamp(463000),
+      reverted: false,
+    },
     starkKey: fakeStarkKey,
-    positionOrVaultId: 1234n,
-    quantizedAmount: 5000n,
-  },
-}
+    sentTimestamp: Timestamp(455000),
+    transactionHash: Hash256.fake('beaf'),
+    vaultOrPositionId: 1234n,
+    data: {
+      type: 'FinalizeSpotEscape',
+      starkKey: fakeStarkKey,
+      vaultId: 1234n,
+      quantizedAmount: 5000n,
+      assetHash: fakeCollateralAsset.assetHash,
+    },
+  }
 describe('getEscapableAssets', () => {
   describe(getPerpetualEscapables.name, () => {
     it('returns empty result when there are no verified escapes', async () => {
@@ -181,7 +183,7 @@ describe('getEscapableAssets', () => {
               mined: undefined,
             },
           ])
-          .given(fakeStarkKey, ['FinalizeEscape'])
+          .given(fakeStarkKey, ['FinalizeSpotEscape'])
           .resolvesToOnce([]),
       })
 
@@ -206,7 +208,7 @@ describe('getEscapableAssets', () => {
               },
             },
           ])
-          .given(fakeStarkKey, ['FinalizeEscape'])
+          .given(fakeStarkKey, ['FinalizeSpotEscape'])
           .resolvesToOnce([]),
       })
 
@@ -223,7 +225,7 @@ describe('getEscapableAssets', () => {
         getByStarkKey: mockFn()
           .given(fakeStarkKey, ['VerifyEscape'])
           .resolvesToOnce([fakeSentVerifyEscape])
-          .given(fakeStarkKey, ['FinalizeEscape'])
+          .given(fakeStarkKey, ['FinalizeSpotEscape'])
           .resolvesToOnce([]),
       })
       const vaultRepository = mockObject<VaultRepository>({
@@ -254,8 +256,8 @@ describe('getEscapableAssets', () => {
         getByStarkKey: mockFn()
           .given(fakeStarkKey, ['VerifyEscape'])
           .resolvesToOnce([fakeSentVerifyEscape])
-          .given(fakeStarkKey, ['FinalizeEscape'])
-          .resolvesToOnce([fakeSentFinalizeEscape]),
+          .given(fakeStarkKey, ['FinalizeSpotEscape'])
+          .resolvesToOnce([fakeSentSpotFinalizeEscape]),
       })
       const vaultRepository = mockObject<VaultRepository>({
         findById: mockFn()
@@ -285,12 +287,12 @@ describe('getEscapableAssets', () => {
         getByStarkKey: mockFn()
           .given(fakeStarkKey, ['VerifyEscape'])
           .resolvesToOnce([fakeSentVerifyEscape])
-          .given(fakeStarkKey, ['FinalizeEscape'])
+          .given(fakeStarkKey, ['FinalizeSpotEscape'])
           .resolvesToOnce([
             {
-              ...fakeSentFinalizeEscape,
+              ...fakeSentSpotFinalizeEscape,
               mined: {
-                ...fakeSentFinalizeEscape.mined,
+                ...fakeSentSpotFinalizeEscape.mined,
                 reverted: true,
               },
             },
