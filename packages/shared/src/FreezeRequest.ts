@@ -108,7 +108,7 @@ export function decodeForcedTradeFreezeRequest(
       syntheticAssetId: decodeAssetId(decoded.syntheticAssetId),
       collateralAmount: BigInt(decoded.amountCollateral),
       syntheticAmount: BigInt(decoded.amountSynthetic),
-      isABuyingSynthetic: decoded.aIsBuyingSynthetic,
+      isABuyingSynthetic: Boolean(decoded.aIsBuyingSynthetic),
       nonce: BigInt(decoded.nonce),
     }
     /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */

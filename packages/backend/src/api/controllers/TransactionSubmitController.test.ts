@@ -28,7 +28,7 @@ import {
 } from '../../test/fakes'
 import { TransactionSubmitController } from './TransactionSubmitController'
 
-describe.only(TransactionSubmitController.name, () => {
+describe(TransactionSubmitController.name, () => {
   describe(TransactionSubmitController.prototype.submitForcedExit.name, () => {
     it('handles transaction with correct data and address', async () => {
       const decodedData = {

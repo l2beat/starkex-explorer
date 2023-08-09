@@ -238,9 +238,10 @@ export const Wallet = {
           )
           return encodeForcedTradeFreezeRequest(toEncode, props.collateralAsset)
         }
-        case 'FullWithdrawal':
+        case 'FullWithdrawal': {
           const toEncode = omit(props, 'type', 'starkExAddress')
           return encodeFullWithdrawalFreezeRequest(toEncode)
+        }
         default:
           assertUnreachable(props)
       }

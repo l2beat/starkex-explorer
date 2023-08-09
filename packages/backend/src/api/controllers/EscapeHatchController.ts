@@ -4,9 +4,9 @@ import {
   renderFreezeRequestActionPage,
 } from '@explorer/frontend'
 import {
+  assertUnreachable,
   PageContextWithUser,
   UserDetails,
-  assertUnreachable,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
