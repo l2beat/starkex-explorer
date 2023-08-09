@@ -27,12 +27,11 @@ export async function getPerpetualEscapables(
   // (look at transactions sent from the explorer)
   // because there is no way to match FinalizeEscape with
   // VerifyEscape due to lack of positionId in VerifyEscape event.
-  const verified = await userTransactionRepository.getByStarkKey(starkKey, [
-    'VerifyEscape',
+  const [verified, finalized] = await Promise.all([
+    userTransactionRepository.getByStarkKey(starkKey, ['VerifyEscape']),
+    userTransactionRepository.getByStarkKey(starkKey, ['FinalizeEscape']),
   ])
-  const finalized = await userTransactionRepository.getByStarkKey(starkKey, [
-    'FinalizeEscape',
-  ])
+
   const result: EscapableMap = {}
 
   if (verified[0] !== undefined) {
@@ -63,9 +62,11 @@ export async function getSpotEscapables(
   // (we look into our SentTransactionsRepository):
   const result: EscapableMap = {}
 
-  const verified = await sentTransactionRepository.getByStarkKey(starkKey, [
-    'VerifyEscape',
+  const [verified, finalized] = await Promise.all([
+    sentTransactionRepository.getByStarkKey(starkKey, ['VerifyEscape']),
+    sentTransactionRepository.getByStarkKey(starkKey, ['FinalizeEscape']),
   ])
+
   for (const tx of verified) {
     if (tx.mined && !tx.mined.reverted) {
       const vault = await vaultRepository.findById(tx.data.positionOrVaultId)
@@ -82,9 +83,6 @@ export async function getSpotEscapables(
   // when escape is finalized. There is only a WithdrawalAllowed event
   // which doesn't contain vaultId so we can't match it to VerifyEscapes.
   // So we again rely on data in our sentTransactionsRepository:
-  const finalized = await sentTransactionRepository.getByStarkKey(starkKey, [
-    'FinalizeEscape',
-  ])
   for (const tx of finalized) {
     if (tx.mined && !tx.mined.reverted) {
       const entry = result[tx.data.positionOrVaultId.toString()]

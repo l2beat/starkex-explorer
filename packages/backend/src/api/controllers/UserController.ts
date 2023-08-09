@@ -552,19 +552,19 @@ function toUserAssetEntry(
   assetDetailsMap?: AssetDetailsMap
 ): UserAssetEntry {
   const escapableEntry = escapableMap[asset.positionOrVaultId.toString()]
-  let action: UserAssetEntry['action'] = 'NO-ACTION'
+  let action: UserAssetEntry['action'] = 'NO_ACTION'
 
   if (tradingMode === 'spot' || asset.assetHashOrId === collateralAssetId) {
     if (freezeStatus !== 'frozen') {
       action = 'WITHDRAW'
     } else {
-      action = escapableEntry === undefined ? 'ESCAPE' : 'NO-ACTION'
+      action = escapableEntry === undefined ? 'ESCAPE' : 'NO_ACTION'
     }
   } else {
     if (freezeStatus !== 'frozen') {
       action = 'CLOSE'
     } else {
-      action = 'USE-COLLATERAL-ESCAPE'
+      action = 'USE_COLLATERAL_ESCAPE'
     }
   }
 

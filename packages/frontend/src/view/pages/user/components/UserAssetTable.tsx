@@ -28,9 +28,9 @@ export interface UserAssetEntry {
   action:
     | 'WITHDRAW'
     | 'CLOSE'
-    | 'NO-ACTION'
+    | 'NO_ACTION'
     | 'ESCAPE'
-    | 'USE-COLLATERAL-ESCAPE'
+    | 'USE_COLLATERAL_ESCAPE'
 }
 
 export function UserAssetsTable(props: UserAssetsTableProps) {
@@ -44,7 +44,7 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
       >
         ESCAPE
       </Button>
-    ) : entry.action === 'USE-COLLATERAL-ESCAPE' ? (
+    ) : entry.action === 'USE_COLLATERAL_ESCAPE' ? (
       <span className="text-zinc-500">use collateral escape</span>
     ) : null
 

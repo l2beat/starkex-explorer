@@ -29,7 +29,6 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
   'FinalizeEscape',
   'FreezeRequest',
 ]
-//TODO: Do we want FreezeRequest here?
 
 export class HomeController {
   constructor(
