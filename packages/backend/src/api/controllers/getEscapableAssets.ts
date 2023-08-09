@@ -1,79 +1,131 @@
-import { EscapableAssetEntry } from '@explorer/frontend'
-import { CollateralAsset, PageContext } from '@explorer/shared'
-import { StarkKey } from '@explorer/types'
-import uniqBy from 'lodash/uniqBy'
+import {
+  assertUnreachable,
+  CollateralAsset,
+  PageContext,
+} from '@explorer/shared'
+import { AssetHash, StarkKey } from '@explorer/types'
 
+import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
 import { UserTransactionRepository } from '../../peripherals/database/transactions/UserTransactionRepository'
-import { WithdrawableAssetRepository } from '../../peripherals/database/WithdrawableAssetRepository'
-import { getCollateralAssetDetails } from './getCollateralAssetDetails'
+import { VaultRepository } from '../../peripherals/database/VaultRepository'
+
+export type EscapableMap = Record<
+  string, // positionOrVaultId as string
+  { assetHash: AssetHash; amount: bigint }
+>
+
+export async function getPerpetualEscapables(
+  userTransactionRepository: UserTransactionRepository,
+  starkKey: StarkKey,
+  collateralAsset: CollateralAsset
+): Promise<EscapableMap> {
+  // We rely on the fact that all StarkEx perpetual deployments
+  // use single position for a single user, so we can just check
+  // if VerifyEscape and FinalizeEscape events came.
+  // If we ever need to support multiple positions per user
+  // we would need to use the same solution as for spot
+  // (look at transactions sent from the explorer)
+  // because there is no way to match FinalizeEscape with
+  // VerifyEscape due to lack of positionId in VerifyEscape event.
+  const [verified, finalized] = await Promise.all([
+    userTransactionRepository.getByStarkKey(starkKey, ['VerifyEscape']),
+    userTransactionRepository.getByStarkKey(starkKey, ['FinalizeEscape']),
+  ])
+
+  const result: EscapableMap = {}
+
+  if (verified[0] !== undefined) {
+    const positionId = verified[0].data.positionId
+    result[positionId.toString()] =
+      finalized.length === 0
+        ? {
+            assetHash: collateralAsset.assetHash,
+            amount: verified[0].data.withdrawalAmount,
+          }
+        : {
+            assetHash: collateralAsset.assetHash,
+            amount: 0n,
+          }
+  }
+
+  return result
+}
+
+export async function getSpotEscapables(
+  sentTransactionRepository: SentTransactionRepository,
+  vaultRepository: VaultRepository,
+  starkKey: StarkKey
+): Promise<EscapableMap> {
+  // Unfortunatelly there's no event emitted on Spot StarkEx
+  // when user verifies an escape. Because of that we only
+  // support escapes that were initiated from our explorer
+  // (we look into our SentTransactionsRepository):
+  const result: EscapableMap = {}
+
+  const [verified, finalized] = await Promise.all([
+    sentTransactionRepository.getByStarkKey(starkKey, ['VerifyEscape']),
+    sentTransactionRepository.getByStarkKey(starkKey, ['FinalizeEscape']),
+  ])
+
+  for (const tx of verified) {
+    if (tx.mined && !tx.mined.reverted) {
+      const vault = await vaultRepository.findById(tx.data.positionOrVaultId)
+      if (vault !== undefined && vault.balance > 0n) {
+        result[vault.vaultId.toString()] = {
+          assetHash: vault.assetHash,
+          amount: vault.balance,
+        }
+      }
+    }
+  }
+
+  // Unfortunatelly there is no proper event on Spot StarkEx
+  // when escape is finalized. There is only a WithdrawalAllowed event
+  // which doesn't contain vaultId so we can't match it to VerifyEscapes.
+  // So we again rely on data in our sentTransactionsRepository:
+  for (const tx of finalized) {
+    if (tx.mined && !tx.mined.reverted) {
+      const entry = result[tx.data.positionOrVaultId.toString()]
+      if (entry !== undefined) {
+        entry.amount = 0n
+      }
+    }
+  }
+
+  return result
+}
 
 export async function getEscapableAssets(
   userTransactionRepository: UserTransactionRepository,
-  withdrawableAssetRepository: WithdrawableAssetRepository,
+  sentTransactionRepository: SentTransactionRepository,
+  vaultRepository: VaultRepository,
   context: PageContext,
   starkKey: StarkKey,
   collateralAsset?: CollateralAsset
-): Promise<{
-  finalizable: EscapableAssetEntry[]
-  allCount: number
-}> {
-  if (
-    context.freezeStatus !== 'frozen' ||
-    context.tradingMode !== 'perpetual' ||
-    collateralAsset === undefined
-  ) {
-    return { finalizable: [], allCount: 0 }
+): Promise<EscapableMap> {
+  if (context.freezeStatus !== 'frozen') {
+    return {}
   }
-  const allEscapeVerifiedTransactions =
-    await userTransactionRepository.getByStarkKey(starkKey, ['VerifyEscape'])
-
-  if (allEscapeVerifiedTransactions.length === 0) {
-    return { finalizable: [], allCount: 0 }
-  }
-
-  const uniqueEscapeVerifiedTransactions = uniqBy(
-    allEscapeVerifiedTransactions,
-    (t) => t.data.positionId
-  )
-  const oldestBlockNumber = Math.min(
-    ...uniqueEscapeVerifiedTransactions.map((t) => t.blockNumber)
-  )
-  const withdrawalEventsFromBlockNumber =
-    await withdrawableAssetRepository.getByStarkKeyFromBlockNumber(
-      starkKey,
-      oldestBlockNumber
-    )
-  // For each transaction in uniqueEscapeVerifiedTransactions check if there is a corresponding withdrawal event
-  // in withdrawalEventsFromBlockNumber where asset and amount match.
-  // If found, remove the transaction from the uniqueEscapeVerifiedTransactions.
-  // This is the only way to find out if an escape has been finalized.
-  // Since the exchange is frozen, there can be no new other withdrawal events.
-  const notFinalizedEscapableTransactions =
-    uniqueEscapeVerifiedTransactions.filter((t) => {
-      const correspondingWithdrawalEvent = withdrawalEventsFromBlockNumber.find(
-        (w) => {
-          return (
-            w.data.type === 'WithdrawalAllowed' &&
-            w.assetHash === collateralAsset.assetHash &&
-            w.data.quantizedAmount === t.data.withdrawalAmount
-          )
-        }
+  const tradingMode = context.tradingMode
+  switch (tradingMode) {
+    case 'perpetual':
+      if (!collateralAsset) {
+        throw new Error(
+          'Missing collateral data for perpetual StarkEx escape calulcations'
+        )
+      }
+      return await getPerpetualEscapables(
+        userTransactionRepository,
+        starkKey,
+        collateralAsset
       )
-      return correspondingWithdrawalEvent === undefined
-    })
-
-  const finalizable = notFinalizedEscapableTransactions.map((t) => ({
-    asset: {
-      hashOrId: collateralAsset.assetId,
-      details: getCollateralAssetDetails(collateralAsset),
-    },
-    ownerStarkKey: t.data.starkKey,
-    positionOrVaultId: t.data.positionId,
-    amount: t.data.withdrawalAmount,
-  }))
-
-  return {
-    finalizable,
-    allCount: allEscapeVerifiedTransactions.length,
+    case 'spot':
+      return await getSpotEscapables(
+        sentTransactionRepository,
+        vaultRepository,
+        starkKey
+      )
+    default:
+      assertUnreachable(tradingMode)
   }
 }

@@ -23,7 +23,6 @@ interface UserQuickActionsTableProps {
 
 export interface EscapableAssetEntry {
   readonly asset: Asset
-  readonly ownerStarkKey: StarkKey
   readonly positionOrVaultId: bigint
   readonly amount: bigint
 }

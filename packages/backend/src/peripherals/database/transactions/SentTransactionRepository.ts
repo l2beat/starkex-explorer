@@ -10,11 +10,13 @@ import {
   SentTransactionData,
 } from './SentTransaction'
 
-export interface SentTransactionRecord {
+export interface SentTransactionRecord<
+  T extends SentTransactionData['type'] = SentTransactionData['type']
+> {
   transactionHash: Hash256
   starkKey: StarkKey
   vaultOrPositionId: bigint | undefined
-  data: SentTransactionData
+  data: Extract<SentTransactionData, { type: T }>
   sentTimestamp: Timestamp
   mined?: {
     timestamp: Timestamp
@@ -87,12 +89,20 @@ export class SentTransactionRepository extends BaseRepository {
     return rows.map((x) => Hash256(x.transaction_hash))
   }
 
-  async getByStarkKey(starkKey: StarkKey): Promise<SentTransactionRecord[]> {
+  async getByStarkKey<T extends SentTransactionData['type']>(
+    starkKey: StarkKey,
+    types?: T[]
+  ): Promise<SentTransactionRecord<T>[]> {
     const knex = await this.knex()
-    const rows = await knex('sent_transactions')
+    let query = knex('sent_transactions')
+    if (types) {
+      query = query.whereIn('type', types)
+    }
+    query = query
       .where('stark_key', starkKey.toString())
       .orderBy('sent_timestamp', 'desc')
-    return rows.map(toRecord)
+    const rows = await query
+    return rows.map((r) => toRecord(r))
   }
 
   async getByPositionId(positionId: bigint): Promise<SentTransactionRecord[]> {
@@ -165,7 +175,9 @@ export class SentTransactionRepository extends BaseRepository {
   }
 }
 
-function toRecord(row: SentTransactionRow): SentTransactionRecord {
+function toRecord<T extends SentTransactionData['type']>(
+  row: SentTransactionRow
+): SentTransactionRecord<T> {
   let mined: SentTransactionRecord['mined']
   if (row.mined_timestamp !== null && row.mined_block_number !== null) {
     mined = {
@@ -184,5 +196,5 @@ function toRecord(row: SentTransactionRow): SentTransactionRecord {
     data: decodeSentTransactionData(row.data),
     sentTimestamp: Timestamp(row.sent_timestamp),
     mined,
-  }
+  } as unknown as SentTransactionRecord<T>
 }
