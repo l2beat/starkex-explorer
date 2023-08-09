@@ -8,7 +8,7 @@ import {
   decodeWithdrawal,
   decodeWithdrawalWithTokenId,
   PerpetualForcedTradeRequest,
-  validateVerifyEscapeRequest,
+  validateVerifyPerpetualEscapeRequest,
 } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 
@@ -262,7 +262,7 @@ export class TransactionSubmitController {
     const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.escapeVerifier,
-      validateVerifyEscapeRequest
+      validateVerifyPerpetualEscapeRequest
     )
     if (!fetched.isSuccess) {
       return fetched.controllerResult

@@ -12,7 +12,8 @@ import {
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
-  encodeVerifyEscapeRequest,
+  encodeVerifyPerpetualEscapeRequest,
+  encodeVerifySpotEscapeRequest,
   encodeWithdrawal,
   encodeWithdrawalWithTokenId,
   FinalizeOfferData,
@@ -23,7 +24,7 @@ import {
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
 import omit from 'lodash/omit'
 
-import { FreezeRequestActionFormProps } from '../../view'
+import { FreezeRequestActionFormProps, VerifyEscapeFormProps } from '../../view'
 import { Registration } from '../keys/keys'
 
 function getProvider() {
@@ -263,16 +264,27 @@ export const Wallet = {
 
   async sendVerifyEscapeTransaction(
     account: EthereumAddress,
-    serializedMerkleProof: bigint[],
-    assetCount: number,
-    serializedState: bigint[],
-    escapeVerifierAddress: EthereumAddress
+    props: VerifyEscapeFormProps
   ) {
-    const data = encodeVerifyEscapeRequest({
-      serializedMerkleProof,
-      assetCount,
-      serializedState,
-    })
+    const { escapeVerifierAddress, ...rest } = props
+    const getEncodedData = () => {
+      switch (rest.tradingMode) {
+        case 'perpetual': {
+          return encodeVerifyPerpetualEscapeRequest({
+            serializedMerkleProof: rest.serializedMerkleProof,
+            assetCount: rest.assetCount,
+            serializedState: rest.serializedState,
+          })
+        }
+        case 'spot': {
+          return encodeVerifySpotEscapeRequest({
+            serializedEscapeProof: rest.serializedEscapeProof,
+          })
+        }
+      }
+    }
+    const data = getEncodedData()
+
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [

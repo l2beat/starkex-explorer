@@ -17,25 +17,30 @@ import { ForcedActionCard } from './components/ForcedActionCard'
 
 export const VERIFY_ESCAPE_REQUEST_FORM_ID = 'verify-escape-request-form'
 
-interface Props {
+type Props = {
   context: PageContextWithUser
-  starkKey: StarkKey
-  escapeVerifierAddress: EthereumAddress
-  positionOrVaultId: bigint
-  serializedMerkleProof: bigint[]
-  assetCount: number
-  serializedState: bigint[]
-}
+} & VerifyEscapeFormProps
 
 export type VerifyEscapeFormProps = z.infer<typeof VerifyEscapeFormProps>
-export const VerifyEscapeFormProps = z.object({
-  escapeVerifierAddress: stringAs(EthereumAddress),
-  positionOrVaultId: stringAsBigInt(),
-  serializedMerkleProof: z.array(stringAsBigInt()),
-  assetCount: z.number(),
-  starkKey: stringAs(StarkKey),
-  serializedState: z.array(stringAsBigInt()),
-})
+export const VerifyEscapeFormProps = z.intersection(
+  z.object({
+    escapeVerifierAddress: stringAs(EthereumAddress),
+    positionOrVaultId: stringAsBigInt(),
+    starkKey: stringAs(StarkKey),
+  }),
+  z.discriminatedUnion('tradingMode', [
+    z.object({
+      tradingMode: z.literal('spot'),
+      serializedEscapeProof: z.array(stringAsBigInt()),
+    }),
+    z.object({
+      tradingMode: z.literal('perpetual'),
+      serializedMerkleProof: z.array(stringAsBigInt()),
+      assetCount: z.number(),
+      serializedState: z.array(stringAsBigInt()),
+    }),
+  ])
+)
 
 export function serializeVerifyEscapeFormProps(props: VerifyEscapeFormProps) {
   return toJsonWithoutBigInts(props)

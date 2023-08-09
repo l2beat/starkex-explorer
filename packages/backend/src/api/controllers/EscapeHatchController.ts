@@ -4,9 +4,9 @@ import {
   renderFreezeRequestActionPage,
 } from '@explorer/frontend'
 import {
-  assertUnreachable,
   PageContextWithUser,
   UserDetails,
+  assertUnreachable,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
@@ -157,16 +157,32 @@ export class EscapeHatchController {
     const serializedState = encodeStateAsInt256Array(
       latestStateUpdate.perpetualState
     )
-
-    const content = renderEscapeHatchActionPage({
-      context,
-      starkKey: merkleProof.starkKey,
-      escapeVerifierAddress: this.escapeVerifierAddress,
-      positionOrVaultId,
-      serializedMerkleProof,
-      assetCount: merkleProof.perpetualAssetCount,
-      serializedState,
-    })
+    let content: string
+    switch (context.tradingMode) {
+      case 'perpetual':
+        content = renderEscapeHatchActionPage({
+          context,
+          tradingMode: context.tradingMode,
+          starkKey: merkleProof.starkKey,
+          escapeVerifierAddress: this.escapeVerifierAddress,
+          positionOrVaultId,
+          serializedMerkleProof,
+          assetCount: merkleProof.perpetualAssetCount,
+          serializedState,
+        })
+        break
+      case 'spot':
+        content = renderEscapeHatchActionPage({
+          context,
+          tradingMode: context.tradingMode,
+          starkKey: merkleProof.starkKey,
+          escapeVerifierAddress: this.escapeVerifierAddress,
+          positionOrVaultId,
+          // REVIEW: IS THIS CORRECT?
+          serializedEscapeProof: serializedMerkleProof,
+        })
+        break
+    }
 
     return { type: 'success', content }
   }

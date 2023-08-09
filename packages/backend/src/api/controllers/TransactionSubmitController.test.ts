@@ -4,7 +4,7 @@ import {
   decodeFullWithdrawalFreezeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
-  validateVerifyEscapeRequest,
+  validateVerifyPerpetualEscapeRequest,
 } from '@explorer/shared'
 import {
   AssetHash,
@@ -397,7 +397,7 @@ describe(TransactionSubmitController.name, () => {
         expect(transactionValidator.fetchTxAndDecode).toHaveBeenOnlyCalledWith(
           hash,
           escapeVerifierAddress,
-          validateVerifyEscapeRequest
+          validateVerifyPerpetualEscapeRequest
         )
         expect(repository.add).toHaveBeenOnlyCalledWith({
           transactionHash: hash,
