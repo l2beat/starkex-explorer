@@ -1,4 +1,4 @@
-import { AssetId, Hash256, StarkKey } from '@explorer/types'
+import { AssetId, Hash256 } from '@explorer/types'
 
 import {
   OfferEntry,
@@ -112,7 +112,6 @@ export function randomWithdrawableAssetEntry(): WithdrawableAssetEntry {
 export function randomEscapableEntry(): EscapableAssetEntry {
   return {
     asset: { hashOrId: AssetId('USDC-6') },
-    ownerStarkKey: StarkKey.fake(),
     positionOrVaultId: 12345n,
     amount: amountBucket.pick(),
   }
