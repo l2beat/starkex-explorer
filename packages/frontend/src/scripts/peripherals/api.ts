@@ -66,8 +66,24 @@ export const Api = {
     })
   },
 
-  async submitFreezeRequest(hash: Hash256) {
-    await fetch('/escape/freeze-request', {
+  async submitForcedWithdrawalFreezeRequest(hash: Hash256) {
+    await fetch('/escape/forced-withdrawal-freeze-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitForcedTradeFreezeRequest(hash: Hash256) {
+    await fetch('/escape/forced-trade-freeze-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitFullWithdrawalFreezeRequest(hash: Hash256) {
+    await fetch('/escape/full-withdrawal-freeze-request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hash }),

@@ -1,4 +1,4 @@
-import { getCollateralAssetIdFromHash } from '@explorer/shared'
+import { validateCollateralAssetIdByHash } from '@explorer/shared'
 import React from 'react'
 
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
@@ -23,7 +23,7 @@ export function PerpetualForcedTradeDetails(
   }
   const syntheticBuyer = props.data.isABuyingSynthetic ? partyA : partyB
   const syntheticSeller = props.data.isABuyingSynthetic ? partyB : partyA
-  const collateralAssetId = getCollateralAssetIdFromHash(
+  const collateralAssetId = validateCollateralAssetIdByHash(
     props.data.collateralAssetId,
     props.collateralAsset
   )

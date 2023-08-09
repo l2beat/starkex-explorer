@@ -298,23 +298,21 @@ export class TransactionController {
           sentTransaction,
         })
 
-        const txUser =
-          sentTransaction?.data.type === 'FreezeRequest'
-            ? await this.userRegistrationEventRepository.findByStarkKey(
-                sentTransaction.data.starkKey
-              )
-            : undefined
+        const txUser = sentTransaction
+          ? await this.userRegistrationEventRepository.findByStarkKey(
+              sentTransaction.starkKey
+            )
+          : undefined
 
         const content = renderFreezeRequestDetailsPage({
           context,
           transactionHash: userTransaction.transactionHash,
-          ignored:
-            sentTransaction?.data.type === 'FreezeRequest'
-              ? {
-                  starkKey: sentTransaction.data.starkKey,
-                  ethereumAddress: txUser?.ethAddress,
-                }
-              : undefined,
+          ignored: sentTransaction
+            ? {
+                starkKey: sentTransaction.starkKey,
+                ethereumAddress: txUser?.ethAddress,
+              }
+            : undefined,
           history: transactionHistory.getRegularTransactionHistory(),
         })
         return { type: 'success', content }
@@ -496,20 +494,22 @@ export class TransactionController {
         return { type: 'success', content }
       }
 
-      case 'FreezeRequest': {
+      case 'ForcedWithdrawalFreezeRequest':
+      case 'ForcedTradeFreezeRequest':
+      case 'FullWithdrawalFreezeRequest': {
         const transactionHistory = new TransactionHistory({
           sentTransaction,
         })
         const registeredUser =
           await this.userRegistrationEventRepository.findByStarkKey(
-            sentTransaction.data.starkKey
+            sentTransaction.starkKey
           )
 
         const content = renderFreezeRequestDetailsPage({
           context,
           transactionHash: sentTransaction.transactionHash,
           ignored: {
-            starkKey: sentTransaction.data.starkKey,
+            starkKey: sentTransaction.starkKey,
             ethereumAddress: registeredUser?.ethAddress,
           },
           history: transactionHistory.getRegularTransactionHistory(),

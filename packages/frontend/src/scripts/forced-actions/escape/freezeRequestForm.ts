@@ -1,4 +1,5 @@
 import { UserDetails } from '@explorer/shared'
+import { Hash256 } from '@explorer/types'
 
 import {
   FREEZE_REQUEST_FORM_ID,
@@ -31,14 +32,22 @@ async function submitFreezeRequest(
   props: FreezeRequestActionFormProps,
   user: UserDetails
 ) {
-  const hash = await Wallet.sendFreezeRequestTransaction(
-    user.address,
-    props.starkKey,
-    props.positionOrVaultId,
-    props.quantizedAmount,
-    props.starkExAddress
-  )
+  const hash = await Wallet.sendFreezeRequestTransaction(user.address, props)
 
-  await Api.submitFreezeRequest(hash)
+  await sendToDb(props.type, hash)
   window.location.href = `/transactions/${hash.toString()}`
+}
+
+async function sendToDb(
+  txType: FreezeRequestActionFormProps['type'],
+  txHash: Hash256
+) {
+  switch (txType) {
+    case 'ForcedTrade':
+      return await Api.submitForcedTradeFreezeRequest(txHash)
+    case 'ForcedWithdrawal':
+      return await Api.submitForcedWithdrawalFreezeRequest(txHash)
+    case 'FullWithdrawal':
+      return await Api.submitFullWithdrawalFreezeRequest(txHash)
+  }
 }

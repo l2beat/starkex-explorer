@@ -63,6 +63,7 @@ import { Clock } from './core/sync/Clock'
 import { LiveL2TransactionDownloader } from './core/sync/LiveL2TransactionDownloader'
 import { SyncScheduler } from './core/sync/SyncScheduler'
 import { TransactionStatusService } from './core/TransactionStatusService'
+import { TransactionValidator } from './core/TransactionValidator'
 import { UserService } from './core/UserService'
 import { AssetRepository } from './peripherals/database/AssetRepository'
 import { BlockRepository } from './peripherals/database/BlockRepository'
@@ -661,8 +662,10 @@ export class Application {
       config.starkex.contracts.escapeVerifier
     )
 
+    const transactionValidator = new TransactionValidator(ethereumClient)
+
     const userTransactionController = new TransactionSubmitController(
-      ethereumClient,
+      transactionValidator,
       sentTransactionRepository,
       forcedTradeOfferRepository,
       config.starkex.contracts,

@@ -1,7 +1,8 @@
 import {
   CollateralAsset,
   decodeFinalizeEscapeRequest,
-  decodeFreezeRequest,
+  decodeForcedWithdrawalFreezeRequest,
+  decodeFullWithdrawalFreezeRequest,
   decodePerpetualForcedTradeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
@@ -9,49 +10,37 @@ import {
   PerpetualForcedTradeRequest,
   validateVerifyEscapeRequest,
 } from '@explorer/shared'
-import {
-  AssetHash,
-  EthereumAddress,
-  Hash256,
-  StarkKey,
-  Timestamp,
-} from '@explorer/types'
+import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 
+import { TransactionValidator } from '../../core/TransactionValidator'
 import {
   ForcedTradeOfferRecord,
   ForcedTradeOfferRepository,
 } from '../../peripherals/database/ForcedTradeOfferRepository'
 import { SentTransactionRepository } from '../../peripherals/database/transactions/SentTransactionRepository'
-import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
-import { sleep } from '../../tools/sleep'
 import { ControllerResult } from './ControllerResult'
-
-type DecodeResult<T> =
-  | { isSuccess: true; data: T }
-  | { isSuccess: false; controllerResult: ControllerResult }
 
 export class TransactionSubmitController {
   constructor(
-    private ethereumClient: EthereumClient,
+    private transactionValidator: TransactionValidator,
     private sentTransactionRepository: SentTransactionRepository,
     private offersRepository: ForcedTradeOfferRepository,
     private contracts: {
       perpetual: EthereumAddress
       escapeVerifier: EthereumAddress
     },
-    private collateralAsset: CollateralAsset | undefined,
-    private retryTransactions = true
+    private collateralAsset: CollateralAsset | undefined
   ) {}
 
   async submitForcedExit(transactionHash: Hash256): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
-    const fetched = await this.fetchTxAndDecode(
+    const decoded = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodePerpetualForcedWithdrawalRequest
     )
-    if (!fetched.isSuccess) {
-      return fetched.controllerResult
+    if (!decoded.isSuccess) {
+      return decoded.controllerResult
     }
 
     await this.sentTransactionRepository.add({
@@ -59,10 +48,10 @@ export class TransactionSubmitController {
       timestamp,
       data: {
         type: 'ForcedWithdrawal',
-        quantizedAmount: fetched.data.quantizedAmount,
-        positionId: fetched.data.positionId,
-        starkKey: fetched.data.starkKey,
-        premiumCost: fetched.data.premiumCost,
+        quantizedAmount: decoded.data.quantizedAmount,
+        positionId: decoded.data.positionId,
+        starkKey: decoded.data.starkKey,
+        premiumCost: decoded.data.premiumCost,
       },
     })
     return { type: 'created', content: { id: transactionHash } }
@@ -71,7 +60,7 @@ export class TransactionSubmitController {
   async submitWithdrawal(transactionHash: Hash256): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
 
-    const fetched = await this.fetchTxAndDecode(
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodeWithdrawal
@@ -86,7 +75,7 @@ export class TransactionSubmitController {
       data: {
         type: 'Withdraw',
         starkKey: fetched.data.starkKey,
-        assetType: AssetHash(fetched.data.assetTypeHash.toString()),
+        assetType: fetched.data.assetTypeHash,
       },
     })
     return { type: 'created', content: { id: transactionHash } }
@@ -97,7 +86,7 @@ export class TransactionSubmitController {
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
 
-    const fetched = await this.fetchTxAndDecode(
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodeWithdrawalWithTokenId
@@ -142,7 +131,7 @@ export class TransactionSubmitController {
       }
     }
 
-    const fetched = await this.fetchTxAndDecode(
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       (data: string) => {
@@ -185,14 +174,14 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  async submitFreezeRequest(
+  async submitForcedWithdrawalFreezeRequest(
     transactionHash: Hash256
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
-    const fetched = await this.fetchTxAndDecode(
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
-      decodeFreezeRequest
+      decodeForcedWithdrawalFreezeRequest
     )
     if (!fetched.isSuccess) {
       return fetched.controllerResult
@@ -202,10 +191,63 @@ export class TransactionSubmitController {
       transactionHash,
       timestamp,
       data: {
-        type: 'FreezeRequest',
+        type: 'ForcedWithdrawalFreezeRequest',
         starkKey: fetched.data.starkKey,
-        positionOrVaultId: fetched.data.positionOrVaultId,
+        positionId: fetched.data.positionId,
         quantizedAmount: fetched.data.quantizedAmount,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitForcedTradeFreezeRequest(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
+      transactionHash,
+      this.contracts.perpetual,
+      (data: string) => {
+        if (!this.collateralAsset) {
+          throw new Error('No collateral asset')
+        }
+        return decodePerpetualForcedTradeRequest(data, this.collateralAsset)
+      }
+    )
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
+    }
+
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'ForcedTradeFreezeRequest',
+        ...fetched.data,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitFullWithdrawalFreezeRequest(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
+      transactionHash,
+      this.contracts.perpetual,
+      decodeFullWithdrawalFreezeRequest
+    )
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
+    }
+
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'FullWithdrawalFreezeRequest',
+        ...fetched.data,
       },
     })
     return { type: 'created', content: { id: transactionHash } }
@@ -217,7 +259,7 @@ export class TransactionSubmitController {
     positionOrVaultId: bigint
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
-    const fetched = await this.fetchTxAndDecode(
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.escapeVerifier,
       validateVerifyEscapeRequest
@@ -242,7 +284,7 @@ export class TransactionSubmitController {
     transactionHash: Hash256
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
-    const fetched = await this.fetchTxAndDecode(
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
       decodeFinalizeEscapeRequest
@@ -262,50 +304,6 @@ export class TransactionSubmitController {
       },
     })
     return { type: 'created', content: { id: transactionHash } }
-  }
-
-  private async fetchTxAndDecode<T>(
-    transactionHash: Hash256,
-    to: EthereumAddress,
-    validateFn: (data: string) => T | undefined
-  ): Promise<DecodeResult<T>> {
-    const tx = await this.getTransaction(transactionHash)
-    if (!tx) {
-      return {
-        isSuccess: false,
-        controllerResult: {
-          type: 'bad request',
-          message: `Transaction ${transactionHash.toString()} not found`,
-        },
-      }
-    }
-    const data = validateFn(tx.data)
-    if (!tx.to || EthereumAddress(tx.to) !== to || !data) {
-      return {
-        isSuccess: false,
-        controllerResult: {
-          type: 'bad request',
-          message: `Invalid transaction`,
-        },
-      }
-    }
-
-    return { isSuccess: true, data }
-  }
-
-  private async getTransaction(hash: Hash256) {
-    if (!this.retryTransactions) {
-      return this.ethereumClient.getTransaction(hash)
-    }
-    for (const ms of [0, 1000, 4000]) {
-      if (ms) {
-        await sleep(ms)
-      }
-      const tx = await this.ethereumClient.getTransaction(hash)
-      if (tx) {
-        return tx
-      }
-    }
   }
 }
 

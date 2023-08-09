@@ -187,7 +187,7 @@ export function createTransactionRouter(
   )
 
   router.post(
-    '/escape/freeze-request',
+    '/escape/forced-withdrawal-freeze-request',
     bodyParser(),
     withTypedContext(
       z.object({
@@ -198,9 +198,52 @@ export function createTransactionRouter(
         }),
       }),
       async (ctx) => {
-        const result = await transactionSubmitController.submitFreezeRequest(
-          ctx.request.body.hash
-        )
+        const result =
+          await transactionSubmitController.submitForcedWithdrawalFreezeRequest(
+            ctx.request.body.hash
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/escape/forced-trade-freeze-request',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result =
+          await transactionSubmitController.submitForcedTradeFreezeRequest(
+            ctx.request.body.hash
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/escape/full-withdrawal-freeze-request',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result =
+          await transactionSubmitController.submitFullWithdrawalFreezeRequest(
+            ctx.request.body.hash
+          )
         applyControllerResult(ctx, result)
       }
     )
