@@ -1301,6 +1301,30 @@ const routes: Route[] = [
     },
   },
   {
+    path: '/transactions/initialize-escape/reverted',
+    description:
+      'Transaction view of a reverted initialize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        dataFromL1: {
+          asset: { hashOrId: AssetId('USDC-6') },
+          amount: amountBucket.pick(),
+        },
+        positionOrVaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
     path: '/transactions/finalize-escape/sent',
     description: 'Transaction view of a sent finalize escape transaction.',
     isTransactionPage: true,
