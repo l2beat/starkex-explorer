@@ -1078,9 +1078,10 @@ const routes: Route[] = [
       ctx.body = renderFreezeRequestActionPage({
         context,
         transactionHash: Hash256.fake(),
+        type: 'ForcedWithdrawal',
         starkExAddress: EthereumAddress.fake(),
         starkKey: StarkKey.fake(),
-        positionOrVaultId: 12345n,
+        positionId: 12345n,
         quantizedAmount: 1000000000000000n,
       })
     },
@@ -1293,6 +1294,30 @@ const routes: Route[] = [
         positionOrVaultId: randomId(),
         history: [
           { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
+    path: '/transactions/initialize-escape/reverted',
+    description:
+      'Transaction view of a reverted initialize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        dataFromL1: {
+          asset: { hashOrId: AssetId('USDC-6') },
+          amount: amountBucket.pick(),
+        },
+        positionOrVaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
           { timestamp: randomTimestamp(), status: 'SENT' },
         ],
         stateUpdateId: 1234,

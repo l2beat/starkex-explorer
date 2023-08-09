@@ -3,7 +3,7 @@ import { decodeAssetId, encodeAssetId } from '@explorer/encoding'
 import { AssetId, StarkKey, Timestamp } from '@explorer/types'
 
 import { CollateralAsset } from './CollateralAsset'
-import { getCollateralAssetIdFromHash } from './utils'
+import { validateCollateralAssetIdByHash } from './utils'
 
 const coder = new Interface([
   `function forcedTradeRequest(
@@ -52,7 +52,7 @@ export function decodePerpetualForcedTradeRequest(
       starkKeyB: StarkKey.from(decoded.starkKeyB),
       positionIdA: BigInt(decoded.positionIdA),
       positionIdB: BigInt(decoded.positionIdB),
-      collateralAssetId: getCollateralAssetIdFromHash(
+      collateralAssetId: validateCollateralAssetIdByHash(
         decoded.collateralAssetId.toHexString(),
         collateralAsset
       ),

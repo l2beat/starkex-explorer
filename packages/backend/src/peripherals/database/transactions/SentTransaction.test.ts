@@ -6,7 +6,7 @@ import {
   encodeSentTransactionData,
   ForcedTradeData,
   ForcedWithdrawalData,
-  FreezeRequestData,
+  ForcedWithdrawalFreezeRequestData,
   VerifyEscapeData,
   WithdrawData,
 } from './SentTransaction'
@@ -103,11 +103,11 @@ describe(encodeSentTransactionData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode and decode a FreezeRequest', () => {
-    const data: FreezeRequestData = {
-      type: 'FreezeRequest',
+  it('can encode and decode a ForcedWithdrawalFreezeRequest', () => {
+    const data: ForcedWithdrawalFreezeRequestData = {
+      type: 'ForcedWithdrawalFreezeRequest',
       starkKey: StarkKey.fake(),
-      positionOrVaultId: 1234n,
+      positionId: 1234n,
       quantizedAmount: 5000n,
     }
 
@@ -115,7 +115,7 @@ describe(encodeSentTransactionData.name, () => {
 
     expect(encoded).toEqual({
       starkKey: data.starkKey,
-      vaultOrPositionId: data.positionOrVaultId,
+      vaultOrPositionId: data.positionId,
       data: expect.anything(),
     })
     expect(JSON.parse(JSON.stringify(encoded.data))).toEqual(encoded.data)
