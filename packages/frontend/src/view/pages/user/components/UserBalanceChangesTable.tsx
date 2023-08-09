@@ -8,7 +8,7 @@ import { AssetWithLogo } from '../../../components/AssetWithLogo'
 import { ChangeText } from '../../../components/ChangeText'
 import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
-import { TimeCell } from '../../../components/TimeCell'
+import { TimeAgeCell } from '../../../components/TimeAgeCell'
 
 interface UserBalanceChangesTableProps {
   balanceChanges: UserBalanceChangeEntry[]
@@ -28,7 +28,7 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
   return (
     <Table
       columns={[
-        { header: 'Time (UTC)' },
+        { header: 'Age' },
         { header: 'Update' },
         { header: 'Asset' },
         { header: 'Change', numeric: true },
@@ -39,7 +39,7 @@ export function UserBalanceChangesTable(props: UserBalanceChangesTableProps) {
         return {
           link: `/state-updates/${entry.stateUpdateId}`,
           cells: [
-            <TimeCell timestamp={entry.timestamp} />,
+            <TimeAgeCell timestamp={entry.timestamp} />,
             <Link>#{entry.stateUpdateId}</Link>,
             <AssetWithLogo type="small" assetInfo={assetToInfo(entry.asset)} />,
             <ChangeText className="text-sm font-medium">

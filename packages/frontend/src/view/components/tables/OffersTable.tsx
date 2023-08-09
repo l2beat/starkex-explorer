@@ -14,7 +14,7 @@ import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
 import { Table } from '../table/Table'
 import { Column } from '../table/types'
-import { TimeCell } from '../TimeCell'
+import { TimeAgeCell } from '../TimeAgeCell'
 
 interface OffersTableProps {
   context: PageContext<'perpetual'>
@@ -45,7 +45,7 @@ export interface OfferEntry {
 
 export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
-    { header: 'Time (UTC)' },
+    { header: 'Age' },
     { header: 'Id' },
     { header: 'Trade', align: 'center' },
     ...(props.showStatus ? [{ header: 'Status' }] : []),
@@ -58,7 +58,7 @@ export function OffersTable(props: OffersTableProps) {
       columns={columns}
       rows={props.offers.map((offer) => {
         const cells: ReactNode[] = [
-          <TimeCell timestamp={offer.timestamp} />,
+          <TimeAgeCell timestamp={offer.timestamp} />,
           <Link>#{offer.id}</Link>,
           <TradeColumn
             offer={offer}

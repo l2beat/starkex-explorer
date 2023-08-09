@@ -9,7 +9,7 @@ import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
 import { Table } from '../table/Table'
 import { Column } from '../table/types'
-import { TimeCell } from '../TimeCell'
+import { TimeAgeCell } from '../TimeAgeCell'
 
 interface TransactionsTableProps {
   transactions: TransactionEntry[]
@@ -35,7 +35,7 @@ export interface TransactionEntry {
 export function TransactionsTable(props: TransactionsTableProps) {
   const columns: Column[] = []
   if (!props.hideTime) {
-    columns.push({ header: 'Time (UTC)' })
+    columns.push({ header: 'Age' })
   }
   columns.push(
     { header: 'Tx Hash' },
@@ -53,7 +53,7 @@ export function TransactionsTable(props: TransactionsTableProps) {
 
         const cells: ReactNode[] = []
         if (!props.hideTime) {
-          cells.push(<TimeCell timestamp={transaction.timestamp} />)
+          cells.push(<TimeAgeCell timestamp={transaction.timestamp} />)
         }
         cells.push(
           <Link>
