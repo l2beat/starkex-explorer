@@ -3,13 +3,18 @@ import {
   renderEscapeHatchActionPage,
   renderFreezeRequestActionPage,
 } from '@explorer/frontend'
-import { assertUnreachable, UserDetails } from '@explorer/shared'
+import {
+  PageContextWithUser,
+  UserDetails,
+  assertUnreachable,
+} from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 import { FreezeCheckService } from '../../core/FreezeCheckService'
 import { PageContextService } from '../../core/PageContextService'
 import { StateUpdater } from '../../core/StateUpdater'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
 import { serializeMerkleProofForEscape } from './serializeMerkleProofForEscape'
 
@@ -52,52 +57,67 @@ export class EscapeHatchController {
       )
     }
 
-    let content: string
+    const content = this.getFreezeRequestActionPageContent(
+      context,
+      oldestNotIncludedForcedAction
+    )
+
+    return { type: 'success', content }
+  }
+
+  private getFreezeRequestActionPageContent(
+    context: PageContextWithUser,
+    transaction: UserTransactionRecord<
+      'ForcedTrade' | 'ForcedWithdrawal' | 'FullWithdrawal'
+    >
+  ) {
     const base = {
       context,
-      transactionHash: oldestNotIncludedForcedAction.transactionHash,
+      transactionHash: transaction.transactionHash,
       starkExAddress: this.starkExAddress,
     }
-    const data = oldestNotIncludedForcedAction.data
+    const data = transaction.data
+
     switch (data.type) {
       case 'ForcedWithdrawal': {
-        content = renderFreezeRequestActionPage({
+        return renderFreezeRequestActionPage({
           ...base,
           type: data.type,
           starkKey: data.starkKey,
-          positionOrVaultId: data.positionId,
+          positionId: data.positionId,
           quantizedAmount: data.quantizedAmount,
         })
-        break
       }
       case 'ForcedTrade': {
         if (context.tradingMode !== 'perpetual') {
           throw new Error('Forced trade is only supported in perpetual mode')
         }
-        content = renderFreezeRequestActionPage({
+        return renderFreezeRequestActionPage({
           ...base,
           collateralAsset: context.collateralAsset,
           type: data.type,
           starkKeyA: data.starkKeyA,
           starkKeyB: data.starkKeyB,
-          vaultIdA: data.positionIdA,
-          vaultIdB: data.positionIdB,
+          positionIdA: data.positionIdA,
+          positionIdB: data.positionIdB,
           collateralAssetId: data.collateralAssetId,
           syntheticAssetId: data.syntheticAssetId,
-          amountCollateral: data.collateralAmount,
-          amountSynthetic: data.syntheticAmount,
-          aIsBuyingSynthetic: data.isABuyingSynthetic,
+          collateralAmount: data.collateralAmount,
+          syntheticAmount: data.syntheticAmount,
+          isABuyingSynthetic: data.isABuyingSynthetic,
           nonce: data.nonce,
         })
-        break
       }
       case 'FullWithdrawal':
-        throw new Error('NIY')
+        return renderFreezeRequestActionPage({
+          ...base,
+          type: data.type,
+          starkKey: data.starkKey,
+          vaultId: data.vaultId,
+        })
       default:
         assertUnreachable(data)
     }
-
-    return { type: 'success', content }
   }
 
   async getEscapeHatchActionPage(
