@@ -284,10 +284,9 @@ export class TransactionController {
           },
           asset: { hashOrId: context.collateralAsset.assetId },
           amount: userTransaction.data.quantizedAmount,
-          positionOrVaultId:
-            sentTransaction?.data.type === 'FinalizeEscape'
-              ? sentTransaction.data.positionOrVaultId.toString()
-              : undefined,
+          positionOrVaultId: sentTransaction?.vaultOrPositionId
+            ? sentTransaction.vaultOrPositionId.toString()
+            : undefined,
           history: transactionHistory.getRegularTransactionHistory(),
         })
         return { type: 'success', content }
@@ -518,7 +517,8 @@ export class TransactionController {
         return { type: 'success', content }
       }
 
-      case 'FinalizeEscape': {
+      case 'FinalizePerpetualEscape':
+      case 'FinalizeSpotEscape': {
         //TODO: Check if we need different for Spot and Perpetual
         if (context.tradingMode !== 'perpetual') {
           return { type: 'not found' }
@@ -540,7 +540,7 @@ export class TransactionController {
           },
           asset: { hashOrId: context.collateralAsset.assetId },
           amount: sentTransaction.data.quantizedAmount,
-          positionOrVaultId: sentTransaction.data.positionOrVaultId.toString(),
+          positionOrVaultId: sentTransaction.vaultOrPositionId?.toString(),
           history: transactionHistory.getRegularTransactionHistory(),
         })
         return { type: 'success', content }

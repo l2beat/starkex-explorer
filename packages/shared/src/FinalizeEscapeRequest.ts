@@ -1,36 +1,83 @@
 import { Interface } from '@ethersproject/abi'
-import { StarkKey } from '@explorer/types'
+import { AssetHash, StarkKey } from '@explorer/types'
 
-const coder = new Interface([
+const finalizePerpetualEscapeRequestCoder = new Interface([
   'function escape(uint256 starkKey, uint256 vaultId, uint256 quantizedAmount)',
 ])
+const finalizeSpotEscapeRequestCoder = new Interface([
+  'function escape(uint256 starkKey, uint256 vaultId, uint256 assetId, uint256 quantizedAmount)',
+])
 
-export interface FinalizeEscapeRequest {
+export interface FinalizePerpetualEscapeRequest {
   starkKey: StarkKey
-  positionOrVaultId: bigint
+  positionId: bigint
   quantizedAmount: bigint
 }
 
-export function encodeFinalizeEscapeRequest(data: FinalizeEscapeRequest) {
-  return coder.encodeFunctionData('escape', [
+export function encodeFinalizePerpetualEscapeRequest(
+  data: FinalizePerpetualEscapeRequest
+) {
+  return finalizePerpetualEscapeRequestCoder.encodeFunctionData('escape', [
     data.starkKey.toString(),
-    data.positionOrVaultId,
+    data.positionId,
     data.quantizedAmount,
   ])
 }
 
-export function decodeFinalizeEscapeRequest(
+export function decodeFinalizePerpetualEscapeRequest(
   data: string
-): FinalizeEscapeRequest | undefined {
+): FinalizePerpetualEscapeRequest | undefined {
   try {
-    const decoded = coder.decodeFunctionData('escape', data)
+    const decoded = finalizePerpetualEscapeRequestCoder.decodeFunctionData(
+      'escape',
+      data
+    )
     /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
     return {
       starkKey: StarkKey.from(decoded.starkKey),
-      positionOrVaultId: BigInt(decoded.vaultId),
+      positionId: BigInt(decoded.vaultId),
       quantizedAmount: BigInt(decoded.quantizedAmount),
     }
     /* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
+  } catch {
+    return
+  }
+}
+
+export interface FinalizeSpotEscapeRequest {
+  starkKey: StarkKey
+  vaultId: bigint
+  assetId: AssetHash
+  quantizedAmount: bigint
+}
+
+export function encodeFinalizeSpotEscapeRequest(
+  data: FinalizeSpotEscapeRequest
+) {
+  return finalizeSpotEscapeRequestCoder.encodeFunctionData('escape', [
+    data.starkKey.toString(),
+    data.vaultId,
+    data.assetId,
+    data.quantizedAmount,
+  ])
+}
+
+export function decodeFinalizeSpotEscapeRequest(
+  data: string
+): FinalizeSpotEscapeRequest | undefined {
+  try {
+    const decoded = finalizeSpotEscapeRequestCoder.decodeFunctionData(
+      'escape',
+      data
+    )
+
+    /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call  */
+    return {
+      starkKey: StarkKey.from(decoded.starkKey),
+      vaultId: BigInt(decoded.vaultId),
+      assetId: AssetHash.from(decoded.assetId),
+      quantizedAmount: BigInt(decoded.quantizedAmount),
+    }
   } catch {
     return
   }

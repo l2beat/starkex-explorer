@@ -274,7 +274,7 @@ export function createTransactionRouter(
   )
 
   router.post(
-    '/escape/finalize',
+    '/escape/perpetual-finalize',
     bodyParser(),
     withTypedContext(
       z.object({
@@ -285,9 +285,31 @@ export function createTransactionRouter(
         }),
       }),
       async (ctx) => {
-        const result = await transactionSubmitController.submitFinalizeEscape(
-          ctx.request.body.hash
-        )
+        const result =
+          await transactionSubmitController.submitFinalizePerpetualEscape(
+            ctx.request.body.hash
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/escape/perpetual-finalize',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result =
+          await transactionSubmitController.submitFinalizeSpotEscape(
+            ctx.request.body.hash
+          )
         applyControllerResult(ctx, result)
       }
     )

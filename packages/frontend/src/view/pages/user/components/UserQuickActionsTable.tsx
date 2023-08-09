@@ -35,8 +35,6 @@ export interface WithdrawableAssetEntry {
 
 export type FinalizableOfferEntry = Omit<OfferEntry, 'status' | 'role'>
 
-export const FINALIZE_ESCAPE_FORM_ID = 'finalize-escape-form-id'
-
 export function UserQuickActionsTable(props: UserQuickActionsTableProps) {
   if (
     props.withdrawableAssets.length === 0 &&
@@ -93,15 +91,32 @@ function EscapableAssets(
                 </InlineEllipsis>
               </strong>
             </p>
-            {props.isMine && props.context.user && (
-              <FinalizeEscapeForm
-                user={props.context.user}
-                ownerStarkKey={props.starkKey}
-                exchangeAddress={props.exchangeAddress}
-                positionOrVaultId={asset.positionOrVaultId}
-                amount={asset.amount}
-              />
-            )}
+            {props.isMine &&
+              props.context.user &&
+              props.context.tradingMode === 'perpetual' && (
+                <FinalizeEscapeForm
+                  tradingMode={props.context.tradingMode}
+                  user={props.context.user}
+                  starkKey={props.starkKey}
+                  exchangeAddress={props.exchangeAddress}
+                  positionId={asset.positionOrVaultId}
+                  quantizedAmount={asset.amount}
+                />
+              )}
+            {props.isMine &&
+              props.context.user &&
+              props.context.tradingMode === 'spot' &&
+              asset.asset.details?.assetHash && (
+                <FinalizeEscapeForm
+                  tradingMode={props.context.tradingMode}
+                  user={props.context.user}
+                  starkKey={props.starkKey}
+                  exchangeAddress={props.exchangeAddress}
+                  vaultId={asset.positionOrVaultId}
+                  quantizedAmount={asset.amount}
+                  assetId={asset.asset.details.assetHash}
+                />
+              )}
           </div>
         )
       })}

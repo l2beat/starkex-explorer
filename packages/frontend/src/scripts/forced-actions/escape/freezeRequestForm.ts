@@ -34,20 +34,20 @@ async function submitFreezeRequest(
 ) {
   const hash = await Wallet.sendFreezeRequestTransaction(user.address, props)
 
-  await sendToDb(props.type, hash)
+  await submitTransaction(props.type, hash)
   window.location.href = `/transactions/${hash.toString()}`
 }
 
-async function sendToDb(
+async function submitTransaction(
   txType: FreezeRequestActionFormProps['type'],
   txHash: Hash256
 ) {
   switch (txType) {
     case 'ForcedTrade':
-      return await Api.submitForcedTradeFreezeRequest(txHash)
+      return Api.submitForcedTradeFreezeRequest(txHash)
     case 'ForcedWithdrawal':
-      return await Api.submitForcedWithdrawalFreezeRequest(txHash)
+      return Api.submitForcedWithdrawalFreezeRequest(txHash)
     case 'FullWithdrawal':
-      return await Api.submitFullWithdrawalFreezeRequest(txHash)
+      return Api.submitFullWithdrawalFreezeRequest(txHash)
   }
 }
