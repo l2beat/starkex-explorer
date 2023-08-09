@@ -4,9 +4,9 @@ import {
   renderFreezeRequestActionPage,
 } from '@explorer/frontend'
 import {
+  assertUnreachable,
   PageContextWithUser,
   UserDetails,
-  assertUnreachable,
 } from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
@@ -178,7 +178,6 @@ export class EscapeHatchController {
           starkKey: merkleProof.starkKey,
           escapeVerifierAddress: this.escapeVerifierAddress,
           positionOrVaultId,
-          // REVIEW: IS THIS CORRECT?
           serializedEscapeProof: serializedMerkleProof,
         })
         break

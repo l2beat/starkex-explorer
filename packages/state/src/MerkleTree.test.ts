@@ -427,8 +427,24 @@ describe(MerkleTree.name, () => {
       expect(proof).toEqual({
         leaf: vaultLeafB,
         leafIndex: 7n,
-        leafPrefixLength: 0,
+        leafPrefixLength: 2,
         path: [
+          {
+            left: PedersenHash(
+              '0beef00000000000000000000000000000000000000000000000000000000000'
+            ),
+            right: PedersenHash(
+              '0def000000000000000000000000000000000000000000000000000000000000'
+            ),
+          },
+          {
+            left: PedersenHash(
+              '06c1352a97b9c878ee2897c8180a82cc034bcbca4fe169e36c5f8b180f32535a'
+            ),
+            right: PedersenHash(
+              '000000000000000000000000000000000000000000000000000000000006f540'
+            ),
+          },
           {
             left: PedersenHash(
               '028109b4e56fad0455aa4b316045c93937b1e7e4e0fc663db375b9e67c80c620'
