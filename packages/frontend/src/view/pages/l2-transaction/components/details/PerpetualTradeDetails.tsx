@@ -1,13 +1,14 @@
-import { getCollateralAssetIdFromHash } from '@explorer/shared'
+import { validateCollateralAssetIdByHash } from '@explorer/shared'
 import React from 'react'
 
-import { Card } from '../../../../components/Card'
+import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { InlineEllipsis } from '../../../../components/InlineEllipsis'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { AssetTradeCard } from '../AssetTradeCard'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualTradeDetails(
   props: PerpetualTransactionDetailsProps<'Trade'>
@@ -18,12 +19,12 @@ export function PerpetualTradeDetails(
   const syntheticSeller = props.data.partyAOrder.isBuyingSynthetic
     ? props.data.partyBOrder
     : props.data.partyAOrder
-  const collateralAssetId = getCollateralAssetIdFromHash(
+  const collateralAssetId = validateCollateralAssetIdByHash(
     props.data.partyAOrder.collateralAssetId,
     props.collateralAsset
   )
   return (
-    <Card className="flex flex-col gap-6">
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -67,6 +68,9 @@ export function PerpetualTradeDetails(
           amount: props.data.actualCollateral,
         }}
       />
-    </Card>
+      <TransactionField label="Timestamp (UTC)">
+        {props.timestamp ? formatTimestamp(props.timestamp) : '-'}
+      </TransactionField>
+    </L2TransactionDetailsCard>
   )
 }

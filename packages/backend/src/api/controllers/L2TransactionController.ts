@@ -1,4 +1,7 @@
-import { renderPerpetualL2TransactionDetailsPage } from '@explorer/frontend'
+import {
+  renderPerpetualL2TransactionDetailsPage,
+  renderRawL2TransactionPage,
+} from '@explorer/frontend'
 import { UserDetails } from '@explorer/shared'
 
 import { PageContextService } from '../../core/PageContextService'
@@ -64,11 +67,63 @@ export class L2TransactionController {
     }
   }
 
-  extractTransactionByMultiAndAltIndex(
+  async getRawL2TransactionPage(
+    givenUser: Partial<UserDetails>,
+    transactionId: number,
+    multiIndex?: number,
+    altIndex?: number
+  ): Promise<ControllerResult> {
+    const context = await this.pageContextService.getPageContext(givenUser)
+
+    if (context.tradingMode != 'perpetual') {
+      return { type: 'not found' }
+    }
+    const aggregatedL2Transaction =
+      await this.l2TransactionRepository.findAggregatedByTransactionId(
+        transactionId
+      )
+
+    if (!aggregatedL2Transaction) {
+      return {
+        type: 'not found',
+        message: `L2 transaction #${transactionId} was not found`,
+      }
+    }
+    let transaction: AggregatedL2TransactionRecord | undefined
+    transaction = this.extractTransactionByMultiAndAltIndex(
+      aggregatedL2Transaction,
+      multiIndex,
+      altIndex
+    )
+
+    if (!transaction) {
+      return {
+        type: 'not found',
+        message: `L2 transaction #${transactionId} with given parameters was not found`,
+      }
+    }
+
+    transaction = this.convertPricesToUSDCents(transaction)
+
+    return {
+      type: 'success',
+      content: renderRawL2TransactionPage({
+        context,
+        transaction: {
+          transactionId: transaction.transactionId,
+          stateUpdateId: transaction.stateUpdateId,
+          originalTransaction: transaction.originalTransaction,
+          alternativeTransactions: transaction.alternativeTransactions,
+        },
+      }),
+    }
+  }
+
+  private extractTransactionByMultiAndAltIndex(
     aggregatedL2Transaction: AggregatedL2TransactionRecord,
     multiIndex: number | undefined,
     altIndex: number | undefined
-  ) {
+  ): AggregatedL2TransactionRecord | undefined {
     if (multiIndex !== undefined && altIndex !== undefined) {
       const altTransaction =
         aggregatedL2Transaction.alternativeTransactions[altIndex]
@@ -86,7 +141,10 @@ export class L2TransactionController {
 
       return {
         ...aggregatedL2Transaction,
-        originalTransaction: multiTransaction,
+        originalTransaction: {
+          timestamp: altTransaction.timestamp,
+          ...multiTransaction,
+        },
         alternativeTransactions: [],
       }
     }
@@ -106,7 +164,10 @@ export class L2TransactionController {
 
       return {
         ...aggregatedL2Transaction,
-        originalTransaction: multiTransaction,
+        originalTransaction: {
+          timestamp: aggregatedL2Transaction.originalTransaction.timestamp,
+          ...multiTransaction,
+        },
         alternativeTransactions: [],
       }
     }

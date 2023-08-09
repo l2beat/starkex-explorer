@@ -1,7 +1,7 @@
 import { StarkKey } from '@explorer/types'
 import React from 'react'
 
-import { Button, LinkButton } from '../../../components/Button'
+import { Button } from '../../../components/Button'
 import { NewForcedActionFormAsset } from '../NewForcedActionFormProps'
 import { ForcedActionCard } from './ForcedActionCard'
 import { AmountInput } from './form/AmountInput'
@@ -36,13 +36,14 @@ export function NewPerpetualForcedWithdrawalFormContent(
         <Button className="w-full" id={FormId.SubmitButton}>
           Prepare for withdrawal
         </Button>
-        <LinkButton
+        <Button
+          as="a"
           className="w-full"
           variant="outlined"
           href={`/users/${props.starkKey.toString()}`}
         >
           Back to assets
-        </LinkButton>
+        </Button>
       </div>
     </>
   )

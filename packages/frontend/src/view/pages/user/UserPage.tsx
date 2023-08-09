@@ -96,6 +96,7 @@ function UserPage(props: UserPageProps) {
           <UserAssetsTable
             tradingMode={props.context.tradingMode}
             starkKey={props.starkKey}
+            ethereumAddress={props.ethereumAddress}
             assets={props.assets}
             isMine={isMine}
             isFrozen={props.context.freezeStatus === 'frozen'}

@@ -2,16 +2,16 @@ import React from 'react'
 
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { AssetPriceCard } from '../../../../components/AssetPriceCard'
-import { Card } from '../../../../components/Card'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualOraclePricesTickDetails(
   props: PerpetualTransactionDetailsProps<'OraclePricesTick'>
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -31,6 +31,9 @@ export function PerpetualOraclePricesTickDetails(
           })}
         </div>
       </TransactionField>
-    </Card>
+      <TransactionField label="Timestamp (UTC)">
+        {props.timestamp ? formatTimestamp(props.timestamp) : '-'}
+      </TransactionField>
+    </L2TransactionDetailsCard>
   )
 }

@@ -1,7 +1,7 @@
 import { Interface } from '@ethersproject/abi'
 
 const coder = new Interface([
-  'function verifyEscape(uint256[],uint256,uint256[])',
+  'function verifyEscape(uint256[] merkleProof, uint256 nAssets, uint256[] sharedState)',
 ])
 
 export interface VerifyEscapeRequest {
@@ -16,4 +16,13 @@ export function encodeVerifyEscapeRequest(data: VerifyEscapeRequest) {
     data.assetCount,
     data.serializedState,
   ])
+}
+
+export function validateVerifyEscapeRequest(data: string) {
+  try {
+    coder.decodeFunctionData('verifyEscape', data)
+    return true
+  } catch {
+    return false
+  }
 }

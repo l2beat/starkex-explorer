@@ -1,11 +1,14 @@
 import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
+  assertUnreachable,
   CollateralAsset,
   CreateOfferData,
   encodeFinalizeEscapeRequest,
   encodeFinalizeExitRequest,
-  encodeFreezeRequest,
+  encodeForcedTradeFreezeRequest,
+  encodeForcedWithdrawalFreezeRequest,
+  encodeFullWithdrawalFreezeRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
@@ -18,7 +21,9 @@ import {
   toSignableCreateOffer,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import omit from 'lodash/omit'
 
+import { FreezeRequestActionFormProps } from '../../view'
 import { Registration } from '../keys/keys'
 
 function getProvider() {
@@ -216,20 +221,41 @@ export const Wallet = {
   // #region Escape
   async sendFreezeRequestTransaction(
     account: EthereumAddress,
-    ownerKey: StarkKey,
-    positionOrVaultId: bigint,
-    quantizedAmount: bigint,
-    exchangeAddress: EthereumAddress
+    props: FreezeRequestActionFormProps
   ) {
-    const data = encodeFreezeRequest({
-      ownerKey,
-      positionOrVaultId,
-      quantizedAmount,
-    })
+    const getEncodedData = () => {
+      switch (props.type) {
+        case 'ForcedWithdrawal': {
+          const toEncode = omit(props, 'type', 'starkExAddress')
+          return encodeForcedWithdrawalFreezeRequest(toEncode)
+        }
+        case 'ForcedTrade': {
+          const toEncode = omit(
+            props,
+            'type',
+            'starkExAddress',
+            'collateralAsset'
+          )
+          return encodeForcedTradeFreezeRequest(toEncode, props.collateralAsset)
+        }
+        case 'FullWithdrawal': {
+          const toEncode = omit(props, 'type', 'starkExAddress')
+          return encodeFullWithdrawalFreezeRequest(toEncode)
+        }
+        default:
+          assertUnreachable(props)
+      }
+    }
+    const data = getEncodedData()
+
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [
-        { from: account.toString(), to: exchangeAddress.toString(), data },
+        {
+          from: account.toString(),
+          to: props.starkExAddress.toString(),
+          data,
+        },
       ],
     })
     return Hash256(result as string)

@@ -1,3 +1,4 @@
+import { FreezeStatus } from '@explorer/shared'
 import { EthereumAddress, Timestamp } from '@explorer/types'
 import { Logger } from '@l2beat/backend-tools'
 import { ethers } from 'ethers'
@@ -25,35 +26,26 @@ export class FreezeCheckService {
       this.logger.error(
         'Ignoring freeze-check - no last synced block number found'
       )
-      await this.keyValueStore.addOrUpdate({
-        key: 'freezeStatus',
-        value: 'not-frozen',
-      })
+      await this.setFreezeStatus('not-frozen')
       return
     }
 
     const [isFrozen, freezeGracePeriod, tipBlockTimestamp] = await Promise.all([
-      this.callIsFrozen(),
+      this.userTransactionRepository.freezeRequestExists(),
       this.fetchFreezeGracePeriod(),
       this.ethereumClient.getBlockTimestamp('latest'),
     ])
 
     if (isFrozen) {
-      this.logger.info('StarkEx is frozen!')
-      await this.keyValueStore.addOrUpdate({
-        key: 'freezeStatus',
-        value: 'frozen',
-      })
+      this.logger.critical('StarkEx is frozen!')
+      await this.setFreezeStatus('frozen')
       return
     }
 
     const oldestNotIncludedForcedAction =
       await this.findOldestNotIncludedForcedAction()
     if (!oldestNotIncludedForcedAction) {
-      await this.keyValueStore.addOrUpdate({
-        key: 'freezeStatus',
-        value: 'not-frozen',
-      })
+      await this.setFreezeStatus('not-frozen')
       return
     }
 
@@ -62,18 +54,19 @@ export class FreezeCheckService {
       BigInt(freezeGracePeriod)
 
     if (latestNonFreezableTimestamp > tipBlockTimestamp) {
-      await this.keyValueStore.addOrUpdate({
-        key: 'freezeStatus',
-        value: 'not-frozen',
-      })
+      await this.setFreezeStatus('not-frozen')
       return // We're still in the grace period
     }
 
     // TODO: check if we're truly synced (lastSyncedBlockNumber is not further than an hour(?) behind)
-    this.logger.info('StarkEx is freezable!')
+    this.logger.critical('StarkEx is freezable!')
+    await this.setFreezeStatus('freezable')
+  }
+
+  async setFreezeStatus(status: FreezeStatus) {
     await this.keyValueStore.addOrUpdate({
       key: 'freezeStatus',
-      value: 'freezable',
+      value: status,
     })
   }
 
@@ -83,22 +76,6 @@ export class FreezeCheckService {
       'ForcedWithdrawal',
       'FullWithdrawal',
     ])
-  }
-
-  private async callIsFrozen(): Promise<boolean> {
-    const [isFrozen, err] = await this.ethereumClient.call<boolean>(
-      this.perpetualContractAddress,
-      'isFrozen',
-      'function isFrozen() public view returns (bool)'
-    )
-    if (err) {
-      this.logger.error('Failed calling isFrozen():', err)
-      throw err
-    }
-    if (isFrozen === undefined) {
-      throw new Error(`Failed calling isFrozen(): received undefined`)
-    }
-    return isFrozen
   }
 
   private async fetchFreezeGracePeriod(): Promise<number> {

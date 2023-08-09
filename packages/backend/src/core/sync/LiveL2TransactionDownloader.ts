@@ -144,6 +144,7 @@ export class LiveL2TransactionDownloader {
       const record = {
         transactionId: transaction.transactionId,
         data: transaction.transaction,
+        timestamp: transaction.timestamp,
       }
 
       await this.l2TransactionRepository.addLiveTransaction(record, trx)

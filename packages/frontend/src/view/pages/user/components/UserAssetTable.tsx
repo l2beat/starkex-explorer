@@ -1,5 +1,5 @@
 import { TradingMode } from '@explorer/shared'
-import { StarkKey } from '@explorer/types'
+import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { Asset, assetToInfo } from '../../../../utils/assets'
@@ -8,12 +8,13 @@ import {
   formatWithDecimals,
 } from '../../../../utils/formatting/formatAmount'
 import { AssetWithLogo } from '../../../components/AssetWithLogo'
-import { LinkButton } from '../../../components/Button'
+import { Button } from '../../../components/Button'
 import { Table } from '../../../components/table/Table'
 
 interface UserAssetsTableProps {
   assets: UserAssetEntry[]
   starkKey: StarkKey
+  ethereumAddress: EthereumAddress | undefined
   tradingMode: TradingMode
   isMine?: boolean
   isFrozen?: boolean
@@ -24,25 +25,28 @@ export interface UserAssetEntry {
   balance: bigint
   value: bigint
   vaultOrPositionId: string
-  action: 'WITHDRAW' | 'CLOSE'
+  action:
+    | 'WITHDRAW'
+    | 'CLOSE'
+    | 'NO_ACTION'
+    | 'ESCAPE'
+    | 'USE_COLLATERAL_ESCAPE'
 }
 
 export function UserAssetsTable(props: UserAssetsTableProps) {
-  const forcedActionLink = (entry: UserAssetEntry) =>
-    props.tradingMode === 'perpetual'
-      ? `/forced/new/${
-          entry.vaultOrPositionId
-        }/${entry.asset.hashOrId.toString()}`
-      : `/forced/new/${entry.vaultOrPositionId}`
+  const isUserRegistered = !!props.ethereumAddress
 
   const escapeHatchElem = (entry: UserAssetEntry) =>
-    entry.action === 'WITHDRAW' ? (
-      <LinkButton href={`/escape/${entry.vaultOrPositionId}`}>
+    entry.action === 'ESCAPE' ? (
+      <Button
+        as="a"
+        href={getEscapeHatchLink(entry.vaultOrPositionId, isUserRegistered)}
+      >
         ESCAPE
-      </LinkButton>
-    ) : (
+      </Button>
+    ) : entry.action === 'USE_COLLATERAL_ESCAPE' ? (
       <span className="text-zinc-500">use collateral escape</span>
-    )
+    ) : null
 
   return (
     <Table
@@ -77,13 +81,18 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
             </span>,
             props.isMine &&
               (!props.isFrozen ? (
-                <LinkButton
+                <Button
+                  as="a"
                   className="w-32"
-                  href={forcedActionLink(entry)}
+                  href={getForcedActionLink(
+                    props.tradingMode,
+                    entry,
+                    isUserRegistered
+                  )}
                   disabled={isDisabled}
                 >
                   {entry.action}
-                </LinkButton>
+                </Button>
               ) : (
                 escapeHatchElem(entry)
               )),
@@ -92,4 +101,30 @@ export function UserAssetsTable(props: UserAssetsTableProps) {
       })}
     />
   )
+}
+
+function getEscapeHatchLink(
+  vaultOrPositionId: string,
+  isUserRegistered: boolean
+) {
+  if (!isUserRegistered) {
+    return '/users/register'
+  }
+  return `/escape/${vaultOrPositionId}`
+}
+
+function getForcedActionLink(
+  tradingMode: TradingMode,
+  entry: UserAssetEntry,
+  isUserRegistered: boolean
+) {
+  if (!isUserRegistered) {
+    return '/users/register'
+  }
+
+  return tradingMode === 'perpetual'
+    ? `/forced/new/${
+        entry.vaultOrPositionId
+      }/${entry.asset.hashOrId.toString()}`
+    : `/forced/new/${entry.vaultOrPositionId}`
 }

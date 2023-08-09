@@ -4,9 +4,10 @@ import {
   CreateOfferBody,
   FinalizeOfferBody,
   stringAs,
+  stringAsBigInt,
   stringAsInt,
 } from '@explorer/shared'
-import { Hash256 } from '@explorer/types'
+import { Hash256, StarkKey } from '@explorer/types'
 import Router from '@koa/router'
 import bodyParser from 'koa-bodyparser'
 import { z } from 'zod'
@@ -179,6 +180,113 @@ export function createTransactionRouter(
         const result = await transactionSubmitController.submitForcedTrade(
           ctx.request.body.hash,
           ctx.request.body.offerId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/escape/forced-withdrawal-freeze-request',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result =
+          await transactionSubmitController.submitForcedWithdrawalFreezeRequest(
+            ctx.request.body.hash
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/escape/forced-trade-freeze-request',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result =
+          await transactionSubmitController.submitForcedTradeFreezeRequest(
+            ctx.request.body.hash
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/escape/full-withdrawal-freeze-request',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result =
+          await transactionSubmitController.submitFullWithdrawalFreezeRequest(
+            ctx.request.body.hash
+          )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/escape/initialize',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+            starkKey: stringAs(StarkKey),
+            positionOrVaultId: stringAsBigInt(),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result = await transactionSubmitController.submitVerifyEscape(
+          ctx.request.body.hash,
+          ctx.request.body.starkKey,
+          ctx.request.body.positionOrVaultId
+        )
+        applyControllerResult(ctx, result)
+      }
+    )
+  )
+
+  router.post(
+    '/escape/finalize',
+    bodyParser(),
+    withTypedContext(
+      z.object({
+        request: z.object({
+          body: z.object({
+            hash: stringAs(Hash256),
+          }),
+        }),
+      }),
+      async (ctx) => {
+        const result = await transactionSubmitController.submitFinalizeEscape(
+          ctx.request.body.hash
         )
         applyControllerResult(ctx, result)
       }

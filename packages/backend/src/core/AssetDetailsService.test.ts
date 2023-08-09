@@ -195,7 +195,7 @@ describe(AssetDetailsService.name, () => {
       })
       it('should return undefined for EscapeVerified', () => {
         const result = assetDetailsService.getUserTransactionAssetHash(
-          userTransaction({ type: 'EscapeVerified' } as UserTransactionData)
+          userTransaction({ type: 'VerifyEscape' } as UserTransactionData)
         )
         expect(result).toEqual(undefined)
       })

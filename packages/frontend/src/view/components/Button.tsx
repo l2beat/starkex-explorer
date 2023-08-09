@@ -1,15 +1,17 @@
 import cx from 'classnames'
-import React from 'react'
+import React, { ComponentPropsWithoutRef, ElementType } from 'react'
 
-import { Link } from './Link'
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  readonly variant?: ButtonVariant
-}
+type ButtonProps<T extends ElementType> = {
+  variant?: ButtonVariant
+  className?: string
+  as?: T
+} & ComponentPropsWithoutRef<T> &
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  (T extends 'a' ? { disabled?: boolean } : {})
 
 type ButtonVariant = 'contained' | 'outlined'
 const mainClassNames =
-  'py-2.5 text-sm font-semibold disabled:cursor-not-allowed px-8 rounded transition-colors'
+  'py-2.5 text-sm text-center font-semibold disabled:cursor-not-allowed px-8 rounded transition-colors'
 const classNameMap: Record<ButtonVariant, string> = {
   contained:
     'bg-brand hover:bg-brand-darker disabled:bg-white disabled:bg-opacity-20',
@@ -17,52 +19,20 @@ const classNameMap: Record<ButtonVariant, string> = {
     'bg-transparent border border-brand hover:bg-brand hover:bg-opacity-20',
 }
 
-export function Button({
+export function Button<T extends ElementType = 'button'>({
   variant = 'contained',
   className,
   children,
-  disabled,
+  as,
   ...rest
-}: ButtonProps) {
+}: ButtonProps<T>) {
+  const Comp = as ?? 'button'
   return (
-    <button
+    <Comp
       className={cx(mainClassNames, classNameMap[variant], className)}
-      disabled={disabled}
       {...rest}
     >
       {children}
-    </button>
-  )
-}
-
-interface LinkButtonProps extends React.HTMLProps<HTMLAnchorElement> {
-  readonly variant?: ButtonVariant
-  readonly href: string
-}
-
-export function LinkButton({
-  variant = 'contained',
-  className,
-  children,
-  href,
-  disabled,
-  ...rest
-}: LinkButtonProps) {
-  return (
-    <Link
-      href={disabled ? undefined : href}
-      disabled={disabled}
-      className={cx(
-        'flex items-center justify-center !text-white !no-underline',
-        mainClassNames,
-        disabled
-          ? 'cursor-not-allowed bg-white bg-opacity-20'
-          : classNameMap[variant],
-        className
-      )}
-      {...rest}
-    >
-      {children}
-    </Link>
+    </Comp>
   )
 }

@@ -2,19 +2,21 @@ import React from 'react'
 
 import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { AssetAmountCard } from '../../../../components/AssetAmountCard'
-import { Card } from '../../../../components/Card'
 import { EtherscanLink } from '../../../../components/EtherscanLink'
 import { InlineEllipsis } from '../../../../components/InlineEllipsis'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualConditionalTransferDetails(
-  props: PerpetualTransactionDetailsProps<'ConditionalTransfer'>
+  props: PerpetualTransactionDetailsProps<'ConditionalTransfer'> & {
+    chainId: number
+  }
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -50,6 +52,7 @@ export function PerpetualConditionalTransferDetails(
       />
       <TransactionField label="Fact registry address">
         <EtherscanLink
+          chainId={props.chainId}
           type="address"
           address={props.data.factRegistryAddress.toString()}
         >
@@ -65,6 +68,9 @@ export function PerpetualConditionalTransferDetails(
       <TransactionField label="Nonce">
         {props.data.nonce.toString()}
       </TransactionField>
-    </Card>
+      <TransactionField label="Timestamp (UTC)">
+        {props.timestamp ? formatTimestamp(props.timestamp) : '-'}
+      </TransactionField>
+    </L2TransactionDetailsCard>
   )
 }

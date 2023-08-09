@@ -1,6 +1,6 @@
 import { EthereumAddress, Hash256 } from '@explorer/types'
 import { expect, mockFn, mockObject } from 'earl'
-import { providers } from 'ethers'
+import { ethers, providers } from 'ethers'
 import range from 'lodash/range'
 
 import { BlockRange } from '../../model'
@@ -237,6 +237,66 @@ describe(EthereumClient.name, () => {
         fromBlock: 1,
         toBlock: 1,
       })
+    })
+  })
+
+  describe(EthereumClient.prototype.call.name, () => {
+    const address = EthereumAddress.fake()
+    const abi =
+      'function add(uint256 a, uint256 b) public view returns (uint256)'
+    const name = 'add'
+    const args = [100, 200]
+
+    it('calls rawCall with correct arguments', async () => {
+      const provider = mockObject<HackJsonRpcProvider>({
+        call: mockFn().resolvesTo(
+          '0x000000000000000000000000000000000000000000000000000000000000012c'
+        ),
+      })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
+
+      const result = await ethereumClient.call(address, name, abi, args)
+
+      expect(result).toEqual([ethers.BigNumber.from(300), undefined])
+      expect(provider.call).toHaveBeenOnlyCalledWith({
+        to: address.toString(),
+        data: '0x771602f7000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000000c8',
+      })
+    })
+
+    it('returns undefined and error if call fails with a revert', async () => {
+      const provider = mockObject<HackJsonRpcProvider>({
+        call: mockFn().rejectsWith(new Error('Transaction reverted')),
+      })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
+
+      const result = await ethereumClient.call(address, name, abi, args)
+
+      expect(result).toEqual([undefined, new Error('Transaction reverted')])
+    })
+
+    it('throws error in case of non-revert provider call error', async () => {
+      const error = new Error('Some error')
+      const provider = mockObject<HackJsonRpcProvider>({
+        call: mockFn().rejectsWith(error),
+      })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
+
+      await expect(
+        ethereumClient.call(address, name, abi, args)
+      ).toBeRejectedWith('Some error')
+    })
+
+    it('returns undefined and error if decoding response fails', async () => {
+      const provider = mockObject<HackJsonRpcProvider>({
+        call: mockFn().resolvesTo('errorString?!'),
+      })
+      const ethereumClient = new EthereumClient(provider, SAFE_BLOCK_DISTANCE)
+
+      const result = await ethereumClient.call(address, name, abi, args)
+
+      expect(result[0]).toEqual(undefined)
+      expect(result[1]).toBeA(Error)
     })
   })
 })

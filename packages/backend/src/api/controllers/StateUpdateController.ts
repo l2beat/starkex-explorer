@@ -31,7 +31,7 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
   'ForcedWithdrawal',
   'ForcedTrade',
   'FullWithdrawal',
-  // 'EscapeVerified' - not needed. When frozen, there are no state updates.
+  // 'VerifyEscape' - not needed. When frozen, there are no state updates.
 ]
 
 export class StateUpdateController {

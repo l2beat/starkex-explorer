@@ -3,14 +3,17 @@ import {
   CollateralAsset,
   PerpetualL2TransactionData,
 } from '@explorer/shared'
+import { Timestamp } from '@explorer/types'
 
 import { StatusType } from '../../components/StatusBadge'
 
 export interface PerpetualTransactionDetailsProps<
   T extends PerpetualL2TransactionData['type']
 > {
+  transactionId: number
   stateUpdateId: number | undefined
   data: Extract<PerpetualL2TransactionData, { type: T }>
+  timestamp: Timestamp | undefined
   collateralAsset: CollateralAsset
 }
 
@@ -20,6 +23,7 @@ export interface PerpetualL2TransactionEntry<
   transactionId: number
   data: Extract<PerpetualL2TransactionData, { type: T }>
   stateUpdateId: number | undefined
+  timestamp: Timestamp | undefined
   isPartOfMulti: boolean
   state?: 'alternative' | 'replaced'
 }
@@ -27,8 +31,12 @@ export interface PerpetualL2TransactionEntry<
 export interface AggregatedPerpetualL2TransactionEntry {
   transactionId: number
   stateUpdateId: number | undefined
-  originalTransaction: PerpetualL2TransactionData
-  alternativeTransactions: PerpetualL2TransactionData[]
+  originalTransaction: PerpetualL2TransactionData & {
+    timestamp: Timestamp | undefined
+  }
+  alternativeTransactions: (PerpetualL2TransactionData & {
+    timestamp: Timestamp | undefined
+  })[]
 }
 
 export function l2TransactionTypeToText(

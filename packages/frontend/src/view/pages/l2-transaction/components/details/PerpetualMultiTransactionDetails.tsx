@@ -1,4 +1,5 @@
 import { CollateralAsset, PerpetualL2TransactionData } from '@explorer/shared'
+import { Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { Card } from '../../../../components/Card'
@@ -10,6 +11,7 @@ export interface PerpetualMultiTransactionDetailsProps {
   transactionId: number
   stateUpdateId: number | undefined
   data: Extract<PerpetualL2TransactionData, { type: 'MultiTransaction' }>
+  timestamp?: Timestamp | undefined
   collateralAsset: CollateralAsset
   altIndex: number | undefined
 }

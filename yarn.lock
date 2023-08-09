@@ -408,10 +408,10 @@
     methods "^1.1.2"
     path-to-regexp "^6.1.0"
 
-"@l2beat/backend-tools@^0.2.1-canary.20230720T091646":
-  version "0.2.1-canary.20230720T091646"
-  resolved "https://registry.yarnpkg.com/@l2beat/backend-tools/-/backend-tools-0.2.1-canary.20230720T091646.tgz#9c58110197d7cb8b8891c0fad75316be915a037c"
-  integrity sha512-N54YVZdSRDxFMAjEdogoliUSIimlRy84W56P4kjhtjhJQCwjdEAYeVKsnosbzz/oez4xZGy4oZm+HxcbEJ8ZXw==
+"@l2beat/backend-tools@^0.3.0-canary.20230802T090238":
+  version "0.3.0-canary.20230802T090238"
+  resolved "https://registry.yarnpkg.com/@l2beat/backend-tools/-/backend-tools-0.3.0-canary.20230802T090238.tgz#b670bca27ad1e1619de67a53c4ee5f018fb26902"
+  integrity sha512-7EkMQcHJJVLsrn0aiTI7WqnVn7MzoNtvzDijXDQMAy+jQczOTSz/kWiVpyFvSg+SdFcGTPeKWtIu16tpEkvg+g==
   dependencies:
     chalk "^4.1.2"
     dotenv "^16.3.1"

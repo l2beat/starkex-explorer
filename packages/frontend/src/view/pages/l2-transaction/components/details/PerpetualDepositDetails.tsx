@@ -1,17 +1,18 @@
 import React from 'react'
 
+import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { AssetAmountCard } from '../../../../components/AssetAmountCard'
-import { Card } from '../../../../components/Card'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
 import { PerpetualTransactionDetailsProps } from '../../common'
 import { CurrentStatusField } from '../CurrentStatusField'
+import { L2TransactionDetailsCard } from './TransactionDetailsCard'
 
 export function PerpetualDepositDetails(
   props: PerpetualTransactionDetailsProps<'Deposit'>
 ) {
   return (
-    <Card className="flex flex-col gap-6">
+    <L2TransactionDetailsCard transactionId={props.transactionId}>
       <TransactionField label="Current status">
         <CurrentStatusField stateUpdateId={props.stateUpdateId} />
       </TransactionField>
@@ -29,6 +30,9 @@ export function PerpetualDepositDetails(
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}
       />
-    </Card>
+      <TransactionField label="Timestamp (UTC)">
+        {props.timestamp ? formatTimestamp(props.timestamp) : '-'}
+      </TransactionField>
+    </L2TransactionDetailsCard>
   )
 }

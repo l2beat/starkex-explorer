@@ -3,7 +3,7 @@ import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
 import { InfoIcon } from '../../../assets/icons/InfoIcon'
-import { LinkButton } from '../../../components/Button'
+import { Button } from '../../../components/Button'
 
 interface UserProfileProps {
   user: Partial<UserDetails> | undefined
@@ -34,7 +34,11 @@ export function UserProfile({
             <p className="font-semibold">
               {user?.address && isMine ? user.address.toString() : 'Unknown'}
             </p>
-            {isMine && <LinkButton href="/users/register">Register</LinkButton>}
+            {isMine && (
+              <Button as="a" href="/users/register">
+                Register
+              </Button>
+            )}
           </div>
           {isMine && (
             <div className="mt-5 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
