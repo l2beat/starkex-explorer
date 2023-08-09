@@ -250,8 +250,6 @@ describe(TransactionSubmitController.name, () => {
       expect(transactionValidator.fetchTxAndDecode).toHaveBeenOnlyCalledWith(
         hash,
         perpetualAddress,
-        // REVIEW: It would be really nice to pass exact function but since we are checking for
-        //         collateral asset existence its probably not possible
         expect.a(Function)
       )
       expect(sentTransactionRepository.add).toHaveBeenOnlyCalledWith({
