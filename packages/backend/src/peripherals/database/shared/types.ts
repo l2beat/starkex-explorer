@@ -300,6 +300,7 @@ declare module 'knex/types/tables' {
     stark_key_b: string | null
     data: PerpetualL2TransactionDataJson
     type: string
+    timestamp: bigint | null
   }
 
   interface Tables {

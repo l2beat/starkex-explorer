@@ -36,7 +36,6 @@ export function PerpetualL2TransactionDetailsPage(
   const isMultiOrAlt =
     props.altIndex !== undefined || props.multiIndex !== undefined
   const isReplaced = props.transaction.alternativeTransactions.length > 0
-
   return (
     <Page
       context={props.context}

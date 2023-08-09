@@ -25,7 +25,7 @@ export async function getEscapableAssets(
     return { finalizable: [], allCount: 0 }
   }
   const allEscapeVerifiedTransactions =
-    await userTransactionRepository.getByStarkKey(starkKey, ['EscapeVerified'])
+    await userTransactionRepository.getByStarkKey(starkKey, ['VerifyEscape'])
 
   if (allEscapeVerifiedTransactions.length === 0) {
     return { finalizable: [], allCount: 0 }

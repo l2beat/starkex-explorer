@@ -15,6 +15,8 @@ import Koa from 'koa'
 
 import {
   renderErrorPage,
+  renderFinalizeEscapeDetailsPage,
+  renderFreezeRequestDetailsPage,
   renderHomeL2TransactionsPage,
   renderHomeOffersPage,
   renderHomePage,
@@ -44,6 +46,7 @@ import { renderEscapeHatchActionPage } from '../view/pages/forced-actions/Escape
 import { renderFreezeRequestActionPage } from '../view/pages/forced-actions/FreezeRequestActionPage'
 import { renderPerpetualL2TransactionDetailsPage } from '../view/pages/l2-transaction/PerpetualL2TransactionDetailsPage'
 import { renderStateUpdateL2TransactionsPage } from '../view/pages/state-update/StateUpdateL2TransactionsPage'
+import { renderInitializeEscapePage } from '../view/pages/transaction/InitializeEscapePage'
 import { renderUserL2TransactionsPage } from '../view/pages/user/UserL2TransactionsPage'
 import { amountBucket, assetBucket } from './data/buckets'
 import { fakeCollateralAsset } from './data/collateralAsset'
@@ -692,9 +695,10 @@ const routes: Route[] = [
         context,
         transaction: {
           ...randomAggregatedPerpetualL2TransactionEntry(),
-          alternativeTransactions: repeat(randomInt(1, 10), () =>
-            perpetualL2TransactionsBucket.pick()
-          ),
+          alternativeTransactions: repeat(randomInt(1, 10), () => ({
+            timestamp: randomTimestamp(),
+            ...perpetualL2TransactionsBucket.pick(),
+          })),
         },
       })
     },
@@ -923,9 +927,10 @@ const routes: Route[] = [
           ...randomAggregatedPerpetualL2TransactionEntry(
             randomPerpetualL2MultiTransaction()
           ),
-          alternativeTransactions: repeat(randomInt(1, 10), () =>
-            perpetualL2TransactionsBucket.pick()
-          ),
+          alternativeTransactions: repeat(randomInt(1, 10), () => ({
+            ...perpetualL2TransactionsBucket.pick(),
+            timestamp: randomTimestamp(),
+          })),
         },
       })
     },
@@ -1153,6 +1158,7 @@ const routes: Route[] = [
       context.freezeStatus = 'frozen'
       ctx.body = renderEscapeHatchActionPage({
         context,
+        starkKey: StarkKey.fake(),
         escapeVerifierAddress: EthereumAddress.fake(),
         positionOrVaultId: 12345n,
         serializedMerkleProof: [],
@@ -1197,8 +1203,162 @@ const routes: Route[] = [
         escapableAssets: [randomEscapableEntry()],
       })
     },
+  },
+  {
+    path: '/transactions/freeze-request/sent',
+    description: 'Transaction view of a sent freeze request transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFreezeRequestDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+        ignored: {
+          starkKey: StarkKey.fake(),
+          ethereumAddress: EthereumAddress.fake(),
+        },
+      })
+    },
+  },
+  {
+    path: '/transactions/freeze-request/mined',
+    description: 'Transaction view of a mined freeze request transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFreezeRequestDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        ignored: {
+          starkKey: StarkKey.fake(),
+          ethereumAddress: EthereumAddress.fake(),
+        },
+      })
+    },
+  },
+  {
+    path: '/transactions/freeze-request/reverted',
+    description: 'Transaction view of a reverted freeze request transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFreezeRequestDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        ignored: {
+          starkKey: StarkKey.fake(),
+          ethereumAddress: EthereumAddress.fake(),
+        },
+      })
+    },
+  },
+  {
+    path: '/transactions/initialize-escape/sent',
+    description: 'Transaction view of a sent initialize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
+    path: '/transactions/initialize-escape/mined',
+    description: 'Transaction view of a mined initialize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderInitializeEscapePage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        dataFromL1: {
+          asset: { hashOrId: AssetId('USDC-6') },
+          amount: amountBucket.pick(),
+        },
+        positionOrVaultId: randomId(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+        stateUpdateId: 1234,
+      })
+    },
+  },
+  {
+    path: '/transactions/finalize-escape/sent',
+    description: 'Transaction view of a sent finalize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFinalizeEscapeDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        history: [{ timestamp: randomTimestamp(), status: 'SENT' }],
+      })
+    },
+  },
+  {
+    path: '/transactions/finalize-escape/mined',
+    description: 'Transaction view of a mined finalize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFinalizeEscapeDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'MINED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
+  },
+  {
+    path: '/transactions/finalize-escape/reverted',
+    description: 'Transaction view of a mined finalize escape transaction.',
+    isTransactionPage: true,
+    render: (ctx) => {
+      const context = getPerpetualPageContext(ctx)
+      ctx.body = renderFinalizeEscapeDetailsPage({
+        context,
+        transactionHash: Hash256.fake(),
+        recipient: randomRecipient(),
+        positionOrVaultId: randomId(),
+        asset: { hashOrId: AssetId('USDC-6') },
+        amount: amountBucket.pick(),
+        history: [
+          { timestamp: randomTimestamp(), status: 'REVERTED' },
+          { timestamp: randomTimestamp(), status: 'SENT' },
+        ],
+      })
+    },
     breakAfter: true,
   },
+
   // #endregion
   // #region Offers and transactions
   {

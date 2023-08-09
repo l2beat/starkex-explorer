@@ -220,7 +220,6 @@ export class UserController {
     const balanceChangesEntries = history.map((h) =>
       toUserBalanceChangeEntries(h, assetDetailsMap)
     )
-
     const transactions = buildUserTransactions(
       sentTransactions,
       userTransactions,
@@ -553,9 +552,9 @@ function buildUserTransactions(
   collateralAsset?: CollateralAsset,
   assetDetailsMap?: AssetDetailsMap
 ): TransactionEntry[] {
+  const userTransactionHashes = userTransactions.map((t) => t.transactionHash)
   const sentEntries = sentTransactions
-    // Mined non-reverted transactions will be inside userTransactions
-    .filter((t) => t.mined === undefined || t.mined.reverted)
+    .filter((t) => !userTransactionHashes.includes(t.transactionHash))
     .map((t) => sentTransactionToEntry(t, collateralAsset, assetDetailsMap))
 
   const userEntries = userTransactions.map((t) =>

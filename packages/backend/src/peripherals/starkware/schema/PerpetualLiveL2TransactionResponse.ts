@@ -13,7 +13,7 @@ const PerpetualLiveL2TransactionResponseTransaction = z.object({
     .transform((s) =>
       PerpetualLiveL2TransactionResponseTransactionInfo.parse(JSON.parse(s))
     ),
-  time_created: z.number().optional(), // Temporarily optional, only on goerli API
+  time_created: z.number(),
 })
 
 export type PerpetualLiveL2TransactionResponse = z.infer<

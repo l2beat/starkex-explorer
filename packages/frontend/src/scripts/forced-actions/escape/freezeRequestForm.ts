@@ -4,6 +4,7 @@ import {
   FREEZE_REQUEST_FORM_ID,
   FreezeRequestActionFormProps,
 } from '../../../view'
+import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 import { makeQuery } from '../../utils/query'
 
@@ -30,10 +31,8 @@ async function submitFreezeRequest(
   props: FreezeRequestActionFormProps,
   user: UserDetails
 ) {
-  // const hash = await Wallet.sendFreezeRequestTransaction(
-  await Wallet.sendFreezeRequestTransaction(user.address, props)
+  const hash = await Wallet.sendFreezeRequestTransaction(user.address, props)
 
-  // TODO: should we save via the API to our DB?
-  // await Api.submitSpotForcedWithdrawal(hash) <- wrong function
-  window.location.href = '/'
+  await Api.submitFreezeRequest(hash)
+  window.location.href = `/transactions/${hash.toString()}`
 }

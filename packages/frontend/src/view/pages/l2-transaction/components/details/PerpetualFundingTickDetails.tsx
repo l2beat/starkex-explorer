@@ -32,6 +32,9 @@ export function PerpetualFundingTickDetails(
           })}
         </div>
       </TransactionField>
+      <TransactionField label="Timestamp (UTC)">
+        {props.timestamp ? formatTimestamp(props.timestamp) : '-'}
+      </TransactionField>
     </L2TransactionDetailsCard>
   )
 }

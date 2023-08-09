@@ -27,10 +27,12 @@ import {
 } from '../../peripherals/database/WithdrawableAssetRepository'
 import { EthereumClient } from '../../peripherals/ethereum/EthereumClient'
 import { fakeCollateralAsset } from '../../test/fakes'
+import { FreezeCheckService } from '../FreezeCheckService'
 import {
   LogEscapeVerified,
   LogForcedTradeRequest,
   LogForcedWithdrawalRequest,
+  LogFrozen,
   LogFullWithdrawalRequest,
   LogMintWithdrawalPerformed,
   LogWithdrawalPerformed,
@@ -59,6 +61,7 @@ describe(UserTransactionCollector.name, () => {
             escapeVerifierAddress.toString(),
           ].includes(parameters.address as string)
         ).toBeTruthy()
+        if (parameters.address === escapeVerifierAddress.toString()) return []
 
         const log = LogWithdrawalPerformed.encodeLog([
           starkKey.toString(),
@@ -101,8 +104,8 @@ describe(UserTransactionCollector.name, () => {
       ethereumClient,
       userTransactionRepository,
       withdrawableAssetRepository,
-      perpetualAddress,
-      escapeVerifierAddress
+      { perpetualAddress, escapeVerifierAddress },
+      mockObject<FreezeCheckService>()
     )
 
     await collector.collect(blockRange)
@@ -146,6 +149,7 @@ describe(UserTransactionCollector.name, () => {
             escapeVerifierAddress.toString(),
           ].includes(parameters.address as string)
         ).toBeTruthy()
+        if (parameters.address === escapeVerifierAddress.toString()) return []
 
         const log = LogWithdrawalWithTokenIdPerformed.encodeLog([
           BigNumber.from(starkKey),
@@ -190,8 +194,8 @@ describe(UserTransactionCollector.name, () => {
       ethereumClient,
       userTransactionRepository,
       withdrawableAssetRepository,
-      perpetualAddress,
-      escapeVerifierAddress
+      { perpetualAddress, escapeVerifierAddress },
+      mockObject<FreezeCheckService>()
     )
 
     await collector.collect(blockRange)
@@ -236,6 +240,8 @@ describe(UserTransactionCollector.name, () => {
           ].includes(parameters.address as string)
         ).toBeTruthy()
 
+        if (parameters.address === escapeVerifierAddress.toString()) return []
+
         const log = LogMintWithdrawalPerformed.encodeLog([
           BigNumber.from(starkKey),
           BigNumber.from(assetType),
@@ -277,8 +283,8 @@ describe(UserTransactionCollector.name, () => {
       ethereumClient,
       userTransactionRepository,
       withdrawableAssetRepository,
-      perpetualAddress,
-      escapeVerifierAddress
+      { perpetualAddress, escapeVerifierAddress },
+      mockObject<FreezeCheckService>()
     )
 
     await collector.collect(blockRange)
@@ -319,6 +325,8 @@ describe(UserTransactionCollector.name, () => {
           ].includes(parameters.address as string)
         ).toBeTruthy()
 
+        if (parameters.address === escapeVerifierAddress.toString()) return []
+
         const log = LogForcedWithdrawalRequest.encodeLog([
           BigNumber.from(starkKey.toString()),
           BigNumber.from(positionId),
@@ -349,8 +357,8 @@ describe(UserTransactionCollector.name, () => {
       ethereumClient,
       userTransactionRepository,
       mockObject<WithdrawableAssetRepository>(),
-      perpetualAddress,
-      escapeVerifierAddress
+      { perpetualAddress, escapeVerifierAddress },
+      mockObject<FreezeCheckService>()
     )
 
     await collector.collect(blockRange)
@@ -373,7 +381,7 @@ describe(UserTransactionCollector.name, () => {
     const starkKey = StarkKey.fake('123')
     const vaultId = 123n
     const transactionHash = Hash256.fake('abc')
-    const starkExAddress = EthereumAddress.fake('def')
+    const perpetualAddress = EthereumAddress.fake('def')
     const escapeVerifierAddress = EthereumAddress.fake('fed')
 
     const ethereumClient = mockObject<EthereumClient>({
@@ -381,10 +389,11 @@ describe(UserTransactionCollector.name, () => {
         expect(range).toEqual(blockRange)
         expect(
           [
-            starkExAddress.toString(),
+            perpetualAddress.toString(),
             escapeVerifierAddress.toString(),
           ].includes(parameters.address as string)
         ).toBeTruthy()
+        if (parameters.address === escapeVerifierAddress.toString()) return []
 
         const log = LogFullWithdrawalRequest.encodeLog([
           BigNumber.from(starkKey.toString()),
@@ -415,8 +424,8 @@ describe(UserTransactionCollector.name, () => {
       ethereumClient,
       userTransactionRepository,
       mockObject<WithdrawableAssetRepository>(),
-      starkExAddress,
-      escapeVerifierAddress
+      { perpetualAddress, escapeVerifierAddress },
+      mockObject<FreezeCheckService>()
     )
 
     await collector.collect(blockRange)
@@ -430,81 +439,6 @@ describe(UserTransactionCollector.name, () => {
         starkKey,
         vaultId,
       },
-    })
-  })
-
-  it(`can process ${LogEscapeVerified.name}`, async () => {
-    const blockRange = new BlockRange([], 100, 200)
-    const starkKey = StarkKey.fake('123')
-    const withdrawalAmount = 123n
-    const sharedStateHash = Hash256.fake('abcfed')
-    const positionId = 88n
-    const transactionHash = Hash256.fake('abc')
-    const starkExAddress = EthereumAddress.fake('def')
-    const escapeVerifierAddress = EthereumAddress.fake('fed')
-
-    const ethereumClient = mockObject<EthereumClient>({
-      getLogsInRange: mockFn(async (range, parameters) => {
-        expect(range).toEqual(blockRange)
-        expect(
-          [
-            starkExAddress.toString(),
-            escapeVerifierAddress.toString(),
-          ].includes(parameters.address as string)
-        ).toBeTruthy()
-
-        const log = LogEscapeVerified.encodeLog([
-          BigNumber.from(starkKey.toString()),
-          BigNumber.from(withdrawalAmount),
-          BigNumber.from(sharedStateHash),
-          BigNumber.from(positionId),
-        ])
-        const fullLog = {
-          ...log,
-          blockNumber: 151,
-          transactionHash: transactionHash.toString(),
-        }
-        return [fullLog as providers.Log]
-      }),
-      async getBlockTimestamp(blockNumber) {
-        expect(blockNumber).toEqual(151)
-        return 1234
-      },
-    })
-
-    let added: UserTransactionAddRecord | undefined
-    const userTransactionRepository = mockObject<UserTransactionRepository>({
-      async add(record) {
-        added = record
-        return 1
-      },
-    })
-
-    const collector = new UserTransactionCollector(
-      ethereumClient,
-      userTransactionRepository,
-      mockObject<WithdrawableAssetRepository>(),
-      starkExAddress,
-      escapeVerifierAddress
-    )
-
-    await collector.collect(blockRange)
-
-    expect(added).toEqual({
-      blockNumber: 151,
-      transactionHash,
-      timestamp: Timestamp(1234000),
-      data: {
-        type: 'EscapeVerified',
-        starkKey,
-        positionId,
-        sharedStateHash,
-        withdrawalAmount,
-      },
-    })
-    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith(blockRange, {
-      address: escapeVerifierAddress.toString(),
-      topics: [[LogEscapeVerified.topic]],
     })
   })
 
@@ -535,6 +469,7 @@ describe(UserTransactionCollector.name, () => {
             escapeVerifierAddress.toString(),
           ].includes(parameters.address as string)
         ).toBeTruthy()
+        if (parameters.address === escapeVerifierAddress.toString()) return []
 
         const log = LogForcedTradeRequest.encodeLog([
           BigNumber.from(starkKeyA.toString()),
@@ -573,8 +508,8 @@ describe(UserTransactionCollector.name, () => {
       ethereumClient,
       userTransactionRepository,
       mockObject<WithdrawableAssetRepository>(),
-      perpetualAddress,
-      escapeVerifierAddress,
+      { perpetualAddress, escapeVerifierAddress },
+      mockObject<FreezeCheckService>(),
       fakeCollateralAsset
     )
 
@@ -598,6 +533,147 @@ describe(UserTransactionCollector.name, () => {
         nonce,
       },
     })
+  })
+
+  it(`can process ${LogEscapeVerified.name}`, async () => {
+    const blockRange = new BlockRange([], 100, 200)
+    const starkKey = StarkKey.fake('123')
+    const withdrawalAmount = 123n
+    const sharedStateHash = Hash256.fake('abcfed')
+    const positionId = 88n
+    const transactionHash = Hash256.fake('abc')
+    const perpetualAddress = EthereumAddress.fake('def')
+    const escapeVerifierAddress = EthereumAddress.fake('fed')
+
+    const ethereumClient = mockObject<EthereumClient>({
+      getLogsInRange: mockFn(async (range, parameters) => {
+        expect(range).toEqual(blockRange)
+        expect(
+          [
+            perpetualAddress.toString(),
+            escapeVerifierAddress.toString(),
+          ].includes(parameters.address as string)
+        ).toBeTruthy()
+        if (parameters.address === perpetualAddress.toString()) return []
+
+        const log = LogEscapeVerified.encodeLog([
+          BigNumber.from(starkKey.toString()),
+          BigNumber.from(withdrawalAmount),
+          BigNumber.from(sharedStateHash),
+          BigNumber.from(positionId),
+        ])
+        const fullLog = {
+          ...log,
+          blockNumber: 151,
+          transactionHash: transactionHash.toString(),
+        }
+        return [fullLog as providers.Log]
+      }),
+      async getBlockTimestamp(blockNumber) {
+        expect(blockNumber).toEqual(151)
+        return 1234
+      },
+    })
+
+    let added: UserTransactionAddRecord | undefined
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
+      async add(record) {
+        added = record
+        return 1
+      },
+    })
+
+    const collector = new UserTransactionCollector(
+      ethereumClient,
+      userTransactionRepository,
+      mockObject<WithdrawableAssetRepository>(),
+      { perpetualAddress, escapeVerifierAddress },
+      mockObject<FreezeCheckService>()
+    )
+
+    await collector.collect(blockRange)
+
+    expect(added).toEqual({
+      blockNumber: 151,
+      transactionHash,
+      timestamp: Timestamp(1234000),
+      data: {
+        type: 'VerifyEscape',
+        starkKey,
+        positionId,
+        sharedStateHash,
+        withdrawalAmount,
+      },
+    })
+    expect(ethereumClient.getLogsInRange).toHaveBeenCalledWith(blockRange, {
+      address: escapeVerifierAddress.toString(),
+      topics: [[LogEscapeVerified.topic]],
+    })
+  })
+
+  it(`can process ${LogFrozen.name}`, async () => {
+    const blockRange = new BlockRange([], 100, 200)
+    const transactionHash = Hash256.fake('abc')
+    const perpetualAddress = EthereumAddress.fake('def')
+    const escapeVerifierAddress = EthereumAddress.fake('fed')
+
+    const ethereumClient = mockObject<EthereumClient>({
+      getLogsInRange: mockFn(async (range, parameters) => {
+        expect(range).toEqual(blockRange)
+        expect(
+          [
+            perpetualAddress.toString(),
+            escapeVerifierAddress.toString(),
+          ].includes(parameters.address as string)
+        ).toBeTruthy()
+        if (parameters.address === escapeVerifierAddress.toString()) return []
+
+        const log = LogFrozen.encodeLog([])
+        const fullLog = {
+          ...log,
+          blockNumber: 151,
+          transactionHash: transactionHash.toString(),
+        }
+        return [fullLog as providers.Log]
+      }),
+      async getBlockTimestamp(blockNumber) {
+        expect(blockNumber).toEqual(151)
+        return 1234
+      },
+    })
+
+    let added: UserTransactionAddRecord | undefined
+    const userTransactionRepository = mockObject<UserTransactionRepository>({
+      async add(record) {
+        added = record
+        return 1
+      },
+    })
+    const freezeCheckService = mockObject<FreezeCheckService>({
+      setFreezeStatus: mockFn().resolvesTo('frozen'),
+    })
+
+    const collector = new UserTransactionCollector(
+      ethereumClient,
+      userTransactionRepository,
+      mockObject<WithdrawableAssetRepository>(),
+      { perpetualAddress, escapeVerifierAddress },
+      freezeCheckService
+    )
+
+    await collector.collect(blockRange)
+
+    expect(added).toEqual({
+      blockNumber: 151,
+      transactionHash,
+      timestamp: Timestamp(1234000),
+      data: {
+        type: 'FreezeRequest',
+      },
+    })
+    expect(freezeCheckService.setFreezeStatus).toHaveBeenOnlyCalledWith(
+      'frozen'
+    )
   })
 
   it('can process multiple events', async () => {
@@ -635,8 +711,11 @@ describe(UserTransactionCollector.name, () => {
       ethereumClient,
       userTransactionRepository,
       mockObject<WithdrawableAssetRepository>(),
-      EthereumAddress.fake(),
-      EthereumAddress.fake()
+      {
+        perpetualAddress: EthereumAddress.fake(),
+        escapeVerifierAddress: EthereumAddress.fake(),
+      },
+      mockObject<FreezeCheckService>()
     )
 
     await collector.collect(new BlockRange([], 100, 200))

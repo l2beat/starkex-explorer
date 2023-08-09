@@ -24,6 +24,7 @@ export interface PerpetualL2Transaction {
   thirdPartyId: number
   transactionId: number
   transaction: PerpetualL2TransactionData
+  timestamp: Timestamp
 }
 
 export function toPerpetualL2Transactions(
@@ -34,6 +35,7 @@ export function toPerpetualL2Transactions(
       thirdPartyId: tx.apex_id,
       transactionId: tx.tx_info.tx_id,
       transaction: toPerpetualL2TransactionData(tx.tx_info.tx),
+      timestamp: Timestamp.fromSeconds(tx.time_created),
     }
   })
 }

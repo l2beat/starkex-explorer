@@ -72,6 +72,7 @@ export class AssetDetailsService {
   ): AssetHash | undefined {
     switch (userTransaction.data.type) {
       case 'Withdraw':
+      case 'FinalizeEscape':
         return userTransaction.data.assetType
       case 'WithdrawWithTokenId':
       case 'MintWithdraw':
@@ -79,7 +80,8 @@ export class AssetDetailsService {
       case 'ForcedTrade':
       case 'ForcedWithdrawal':
       case 'FullWithdrawal':
-      case 'EscapeVerified':
+      case 'VerifyEscape':
+      case 'FreezeRequest':
         return undefined
       default:
         assertUnreachable(userTransaction.data)

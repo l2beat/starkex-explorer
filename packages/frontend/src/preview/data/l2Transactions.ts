@@ -129,6 +129,7 @@ export function randomPerpetualL2TransactionEntry(
   return {
     transactionId: randomInt(0, 100000),
     stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
+    timestamp: randomTimestamp(),
     data: data ? data : perpetualL2TransactionsBucket.pick(),
     state:
       randomInt(0, 10) > 8
@@ -144,6 +145,7 @@ export function randomPerpetualUserL2TransactionEntry(
   return {
     transactionId: randomInt(0, 100000),
     stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
+    timestamp: randomTimestamp(),
     data: data ? data : perpetualUserL2TransactionsBucket.pick(),
     state:
       randomInt(0, 10) > 8
@@ -159,7 +161,10 @@ export function randomAggregatedPerpetualL2TransactionEntry(
   return {
     transactionId: randomInt(0, 100000),
     stateUpdateId: randomInt(0, 10) > 7 ? undefined : randomInt(0, 100000),
-    originalTransaction: data ? data : perpetualL2TransactionsBucket.pick(),
+    originalTransaction: {
+      ...(data ? data : perpetualL2TransactionsBucket.pick()),
+      timestamp: randomTimestamp(),
+    },
     alternativeTransactions: [],
   }
 }

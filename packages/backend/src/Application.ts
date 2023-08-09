@@ -197,6 +197,14 @@ export class Application {
     const statusService = new StatusService({
       blockDownloader,
     })
+    const freezeCheckService = new FreezeCheckService(
+      config.starkex.contracts.perpetual,
+      ethereumClient,
+      kvStore,
+      userTransactionRepository,
+      logger
+    )
+
     const userRegistrationCollector = new UserRegistrationCollector(
       ethereumClient,
       userRegistrationEventRepository,
@@ -206,8 +214,11 @@ export class Application {
       ethereumClient,
       userTransactionRepository,
       withdrawableAssetRepository,
-      config.starkex.contracts.perpetual,
-      config.starkex.contracts.escapeVerifier,
+      {
+        perpetualAddress: config.starkex.contracts.perpetual,
+        escapeVerifierAddress: config.starkex.contracts.escapeVerifier,
+      },
+      freezeCheckService,
       collateralAsset
     )
 
@@ -226,6 +237,8 @@ export class Application {
     const withdrawalAllowedCollector = new WithdrawalAllowedCollector(
       ethereumClient,
       withdrawableAssetRepository,
+      userTransactionRepository,
+      kvStore,
       config.starkex.contracts.perpetual
     )
 
@@ -558,14 +571,6 @@ export class Application {
       )
     }
 
-    const freezeCheckService = new FreezeCheckService(
-      config.starkex.contracts.perpetual,
-      ethereumClient,
-      kvStore,
-      userTransactionRepository,
-      logger
-    )
-
     const syncScheduler = new SyncScheduler(
       kvStore,
       blockDownloader,
@@ -660,7 +665,7 @@ export class Application {
       ethereumClient,
       sentTransactionRepository,
       forcedTradeOfferRepository,
-      config.starkex.contracts.perpetual,
+      config.starkex.contracts,
       collateralAsset
     )
     const forcedActionsController = new ForcedActionController(

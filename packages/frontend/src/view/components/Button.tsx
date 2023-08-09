@@ -11,7 +11,7 @@ type ButtonProps<T extends ElementType> = {
 
 type ButtonVariant = 'contained' | 'outlined'
 const mainClassNames =
-  'py-2.5 text-sm font-semibold disabled:cursor-not-allowed px-8 rounded transition-colors'
+  'py-2.5 text-sm text-center font-semibold disabled:cursor-not-allowed px-8 rounded transition-colors'
 const classNameMap: Record<ButtonVariant, string> = {
   contained:
     'bg-brand hover:bg-brand-darker disabled:bg-white disabled:bg-opacity-20',
