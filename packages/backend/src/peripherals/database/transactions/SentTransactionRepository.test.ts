@@ -115,6 +115,52 @@ describe(SentTransactionRepository.name, () => {
         },
       ])
     })
+
+    it('returns transactions by stark key when type is provided', async () => {
+      const starkKey = StarkKey.fake('aaa')
+
+      const withdrawal = fakeWithdraw({ starkKey })
+      await repository.add({
+        transactionHash: Hash256.fake('111'),
+        timestamp: Timestamp(100),
+        data: withdrawal,
+      })
+
+      const forcedWithdrawal = fakeForcedWithdrawal({ starkKey })
+      const hash2 = await repository.add({
+        transactionHash: Hash256.fake('222'),
+        timestamp: Timestamp(200),
+        data: forcedWithdrawal,
+      })
+      await repository.updateMined(hash2, {
+        timestamp: Timestamp(2001),
+        blockNumber: 1,
+        reverted: false,
+      })
+
+      await repository.add({
+        transactionHash: Hash256.fake('333'),
+        timestamp: Timestamp(300),
+        data: fakeForcedWithdrawal(),
+      })
+
+      expect(
+        await repository.getByStarkKey(starkKey, ['ForcedWithdrawal'])
+      ).toEqual([
+        {
+          sentTimestamp: Timestamp(200),
+          transactionHash: hash2,
+          starkKey: forcedWithdrawal.starkKey,
+          vaultOrPositionId: forcedWithdrawal.positionId,
+          data: forcedWithdrawal,
+          mined: {
+            timestamp: Timestamp(2001),
+            blockNumber: 1,
+            reverted: false,
+          },
+        },
+      ])
+    })
   })
 
   describe(SentTransactionRepository.prototype.getByPositionId.name, () => {

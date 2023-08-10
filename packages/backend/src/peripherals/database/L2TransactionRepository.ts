@@ -2,7 +2,7 @@ import {
   PerpetualL2MultiTransactionData,
   PerpetualL2TransactionData,
 } from '@explorer/shared'
-import { StarkKey } from '@explorer/types'
+import { StarkKey, Timestamp } from '@explorer/types'
 import { Logger } from '@l2beat/backend-tools'
 import { Knex } from 'knex'
 import { L2TransactionRow } from 'knex/types/tables'
@@ -21,7 +21,7 @@ import {
 import { BaseRepository } from './shared/BaseRepository'
 import { Database } from './shared/Database'
 
-interface Record<
+export interface L2TransactionRecord<
   T extends PerpetualL2TransactionData['type'] = PerpetualL2TransactionData['type']
 > {
   id: number
@@ -33,20 +33,20 @@ interface Record<
   starkKeyA: StarkKey | undefined
   starkKeyB: StarkKey | undefined
   data: Extract<PerpetualL2TransactionData, { type: T }>
+  timestamp: Timestamp | undefined
 }
 
-interface AggregatedRecord {
+export interface AggregatedL2TransactionRecord {
   id: number
   transactionId: number
   stateUpdateId: number | undefined
   blockNumber: number | undefined
-  originalTransaction: PerpetualL2TransactionData
-  alternativeTransactions: PerpetualL2TransactionData[]
-}
-
-export type {
-  AggregatedRecord as AggregatedL2TransactionRecord,
-  Record as L2TransactionRecord,
+  originalTransaction: PerpetualL2TransactionData & {
+    timestamp: Timestamp | undefined
+  }
+  alternativeTransactions: (PerpetualL2TransactionData & {
+    timestamp: Timestamp | undefined
+  })[]
 }
 
 export class L2TransactionRepository extends BaseRepository {
@@ -74,6 +74,9 @@ export class L2TransactionRepository extends BaseRepository {
       this.getPaginatedWithoutMultiByStateUpdateId
     )
     this.getUserSpecificPaginated = this.wrapGet(this.getUserSpecificPaginated)
+    this.getTimestampsGroupedByTransactionId = this.wrapAny(
+      this.getTimestampsGroupedByTransactionId
+    )
     this.findById = this.wrapFind(this.findById)
     this.findByTransactionId = this.wrapFind(this.findByTransactionId)
     this.findAggregatedByTransactionId = this.wrapFind(
@@ -99,6 +102,7 @@ export class L2TransactionRepository extends BaseRepository {
       data: PerpetualL2TransactionData
       stateUpdateId: number
       blockNumber: number
+      timestamp: Timestamp | undefined
       state: 'replaced' | 'alternative' | undefined
     },
     trx?: Knex.Transaction
@@ -132,6 +136,7 @@ export class L2TransactionRepository extends BaseRepository {
     record: {
       transactionId: number
       data: PerpetualL2TransactionData
+      timestamp: Timestamp | undefined
     },
     trx?: Knex.Transaction
   ): Promise<number> {
@@ -152,7 +157,9 @@ export class L2TransactionRepository extends BaseRepository {
         existingRecord.transactionId === record.transactionId &&
         existingRecord.stateUpdateId !== undefined
       ) {
-        return 0
+        return await knex('l2_transactions')
+          .update({ timestamp: record.timestamp?.valueOf() })
+          .where({ id: existingRecord.id })
       }
 
       if (existingRecord.state === undefined) {
@@ -175,6 +182,7 @@ export class L2TransactionRepository extends BaseRepository {
     record: {
       transactionId: number
       data: PerpetualL2TransactionData
+      timestamp: Timestamp | undefined
       parentId?: number
       stateUpdateId?: number
       blockNumber?: number
@@ -207,6 +215,7 @@ export class L2TransactionRepository extends BaseRepository {
     record: {
       transactionId: number
       data: Exclude<PerpetualL2TransactionData, PerpetualL2MultiTransactionData>
+      timestamp: Timestamp | undefined
       parentId?: number
       stateUpdateId?: number
       blockNumber?: number
@@ -225,6 +234,7 @@ export class L2TransactionRepository extends BaseRepository {
         state: record.state ?? null,
         stark_key_a: starkKeyA?.toString(),
         stark_key_b: starkKeyB?.toString(),
+        timestamp: record.timestamp?.valueOf(),
         type: record.data.type,
         data,
       })
@@ -237,6 +247,7 @@ export class L2TransactionRepository extends BaseRepository {
     record: {
       transactionId: number
       data: PerpetualL2MultiTransactionData
+      timestamp: Timestamp | undefined
       stateUpdateId?: number
       blockNumber?: number
       state: 'replaced' | 'alternative' | undefined
@@ -250,6 +261,7 @@ export class L2TransactionRepository extends BaseRepository {
         transaction_id: record.transactionId,
         state_update_id: record.stateUpdateId,
         block_number: record.blockNumber,
+        timestamp: record.timestamp?.valueOf(),
         type: record.data.type,
         state: record.state ?? null,
         data,
@@ -265,6 +277,7 @@ export class L2TransactionRepository extends BaseRepository {
           transactionId: record.transactionId,
           stateUpdateId: record.stateUpdateId,
           blockNumber: record.blockNumber,
+          timestamp: record.timestamp,
           data: transaction,
           parentId,
           state: record.state,
@@ -487,10 +500,35 @@ export class L2TransactionRepository extends BaseRepository {
     return rows.map(toRecord)
   }
 
+  async getTimestampsGroupedByTransactionId(
+    transactionIds: number[],
+    trx?: Knex.Transaction
+  ): Promise<Record<number, Timestamp[]>> {
+    const knex = await this.knex(trx)
+
+    const rows = await knex('l2_transactions')
+      .select('transaction_id', 'timestamp')
+      .whereIn('transaction_id', transactionIds)
+      .orderBy('timestamp', 'asc')
+
+    const timestampsGroupedByTransactionId = rows.reduce<
+      Record<number, Timestamp[]>
+    >((res, cur) => {
+      if (!cur.timestamp) return res
+      if (!res[cur.transaction_id]) {
+        res[cur.transaction_id] = []
+      }
+      res[cur.transaction_id]?.push(Timestamp(cur.timestamp))
+      return res
+    }, {})
+
+    return timestampsGroupedByTransactionId
+  }
+
   async findById(
     id: number,
     trx?: Knex.Transaction
-  ): Promise<Record | undefined> {
+  ): Promise<L2TransactionRecord | undefined> {
     const knex = await this.knex(trx)
     const row = await knex('l2_transactions').where({ id }).first()
 
@@ -500,7 +538,7 @@ export class L2TransactionRepository extends BaseRepository {
   async findByTransactionId(
     transactionId: number,
     trx?: Knex.Transaction
-  ): Promise<Record | undefined> {
+  ): Promise<L2TransactionRecord | undefined> {
     const knex = await this.knex(trx)
     const row = await knex('l2_transactions')
       .where({ transaction_id: transactionId })
@@ -511,7 +549,7 @@ export class L2TransactionRepository extends BaseRepository {
 
   async findAggregatedByTransactionId(
     id: number
-  ): Promise<AggregatedRecord | undefined> {
+  ): Promise<AggregatedL2TransactionRecord | undefined> {
     const knex = await this.knex()
     const originalTransaction = await knex('l2_transactions')
       .where({ transaction_id: id, parent_id: null })
@@ -533,7 +571,9 @@ export class L2TransactionRepository extends BaseRepository {
     return toAggregatedRecord(originalTransaction, alternativeTransactions)
   }
 
-  async findOldestByTransactionId(id: number): Promise<Record | undefined> {
+  async findOldestByTransactionId(
+    id: number
+  ): Promise<L2TransactionRecord | undefined> {
     const knex = await this.knex()
     const row = await knex('l2_transactions')
       .where({ transaction_id: id })
@@ -556,7 +596,7 @@ export class L2TransactionRepository extends BaseRepository {
     return results?.state_update_id ? results.state_update_id : undefined
   }
 
-  async findLatestIncluded(): Promise<Record | undefined> {
+  async findLatestIncluded(): Promise<L2TransactionRecord | undefined> {
     const knex = await this.knex()
     const row = await knex('l2_transactions')
       .whereNotNull('state_update_id')
@@ -579,6 +619,7 @@ export class L2TransactionRepository extends BaseRepository {
     trx?: Knex.Transaction
   ) {
     const knex = await this.knex(trx)
+
     return knex('l2_transactions')
       .whereIn('transaction_id', transactionIds)
       .delete()
@@ -617,7 +658,7 @@ export class L2TransactionRepository extends BaseRepository {
   }
 }
 
-function toRecord(row: L2TransactionRow): Record {
+function toRecord(row: L2TransactionRow): L2TransactionRecord {
   return {
     id: row.id,
     transactionId: row.transaction_id,
@@ -627,6 +668,7 @@ function toRecord(row: L2TransactionRow): Record {
     state: row.state ? row.state : undefined,
     starkKeyA: row.stark_key_a ? StarkKey(row.stark_key_a) : undefined,
     starkKeyB: row.stark_key_b ? StarkKey(row.stark_key_b) : undefined,
+    timestamp: row.timestamp ? Timestamp(row.timestamp) : undefined,
     data: decodeL2TransactionData(row.data),
   }
 }
@@ -634,7 +676,7 @@ function toRecord(row: L2TransactionRow): Record {
 function toAggregatedRecord(
   transaction: L2TransactionRow,
   alternatives: L2TransactionRow[]
-): AggregatedRecord {
+): AggregatedL2TransactionRecord {
   return {
     id: transaction.id,
     transactionId: transaction.transaction_id,
@@ -644,10 +686,18 @@ function toAggregatedRecord(
     blockNumber: transaction.block_number
       ? transaction.block_number
       : undefined,
-    originalTransaction: decodeL2TransactionData(transaction.data),
-    alternativeTransactions: alternatives.map((alternative) =>
-      decodeL2TransactionData(alternative.data)
-    ),
+    originalTransaction: {
+      timestamp: transaction.timestamp
+        ? Timestamp(transaction.timestamp)
+        : undefined,
+      ...decodeL2TransactionData(transaction.data),
+    },
+    alternativeTransactions: alternatives.map((alternative) => ({
+      timestamp: alternative.timestamp
+        ? Timestamp(alternative.timestamp)
+        : undefined,
+      ...decodeL2TransactionData(alternative.data),
+    })),
   }
 }
 

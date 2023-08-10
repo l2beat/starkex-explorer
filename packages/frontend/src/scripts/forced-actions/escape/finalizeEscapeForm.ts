@@ -1,7 +1,11 @@
 import { UserDetails } from '@explorer/shared'
+import { Hash256 } from '@explorer/types'
 
-import { FINALIZE_ESCAPE_FORM_ID } from '../../../view'
-import { FinalizeEscapeFormProps } from '../../../view/pages/user/components/FinalizeEscapeForm'
+import {
+  FINALIZE_ESCAPE_FORM_ID,
+  FinalizeEscapeFormProps,
+} from '../../../view/pages/user/components/FinalizeEscapeForm'
+import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 import { makeQuery } from '../../utils/query'
 
@@ -28,16 +32,20 @@ async function submitFinalizeEscape(
   props: FinalizeEscapeFormProps,
   user: UserDetails
 ) {
-  // // const hash = await Wallet.sendVerifyEscapeTransaction(
-  await Wallet.sendFinalizeEscapeTransaction(
-    user.address,
-    props.ownerStarkKey,
-    props.positionOrVaultId,
-    props.amount,
-    props.exchangeAddress
-  )
+  const hash = await Wallet.sendFinalizeEscapeTransaction(user.address, props)
 
-  // // TODO: should we save via the API to our DB?
-  // // await Api.submitSpotForcedWithdrawal(hash) <- wrong function
-  window.location.href = '/'
+  await submitTransaction(props.tradingMode, hash)
+  window.location.href = `/transactions/${hash.toString()}`
+}
+
+async function submitTransaction(
+  tradingMode: FinalizeEscapeFormProps['tradingMode'],
+  hash: Hash256
+) {
+  switch (tradingMode) {
+    case 'perpetual':
+      return Api.submitPerpetualFinalizeEscape(hash)
+    case 'spot':
+      return Api.submitSpotFinalizeEscape(hash)
+  }
 }

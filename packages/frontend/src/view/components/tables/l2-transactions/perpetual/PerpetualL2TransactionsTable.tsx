@@ -13,6 +13,7 @@ import { Link } from '../../../Link'
 import { StatusBadge } from '../../../StatusBadge'
 import { Table } from '../../../table/Table'
 import { Column } from '../../../table/types'
+import { TimeAgeCell } from '../../../TimeAgeCell'
 import { TooltipWrapper } from '../../../Tooltip'
 import { PerpetualL2TransactionFreeForm } from './PerpetualL2TransactionFreeForm'
 
@@ -25,6 +26,7 @@ export function PerpetualL2TransactionsTable(
   props: PerpetualL2TransactionsTableProps
 ) {
   const columns: Column[] = [
+    { header: 'Age' },
     { header: 'Type' },
     { header: `Transaction id` },
     { header: 'Status' },
@@ -38,6 +40,11 @@ export function PerpetualL2TransactionsTable(
           transaction.stateUpdateId
         )
         const cells: ReactNode[] = [
+          transaction.timestamp ? (
+            <TimeAgeCell timestamp={transaction.timestamp} />
+          ) : (
+            '-'
+          ),
           <TypeCell
             transaction={transaction}
             collateralAsset={props.collateralAsset}

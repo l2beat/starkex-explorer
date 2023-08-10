@@ -10,11 +10,11 @@ import { expect } from 'earl'
 import {
   decodeUserTransactionData,
   encodeUserTransactionData,
-  EscapeVerifiedData,
   ForcedTradeData,
   ForcedWithdrawalData,
   FullWithdrawalData,
   MintWithdrawData,
+  VerifyEscapeData,
   WithdrawData,
   WithdrawWithTokenIdData,
 } from './UserTransaction'
@@ -144,6 +144,7 @@ describe(encodeUserTransactionData.name, () => {
     const decoded = decodeUserTransactionData(encoded.data)
     expect(decoded).toEqual(data)
   })
+
   it('can encode a MintWithdraw', () => {
     const data: MintWithdrawData = {
       type: 'MintWithdraw',
@@ -172,9 +173,9 @@ describe(encodeUserTransactionData.name, () => {
     expect(decoded).toEqual(data)
   })
 
-  it('can encode a EscapeVerified', () => {
-    const data: EscapeVerifiedData = {
-      type: 'EscapeVerified',
+  it('can encode a VerifyEscape', () => {
+    const data: VerifyEscapeData = {
+      type: 'VerifyEscape',
       starkKey: StarkKey.fake(),
       withdrawalAmount: 1234n,
       sharedStateHash: Hash256.fake(),
@@ -186,7 +187,7 @@ describe(encodeUserTransactionData.name, () => {
       starkKeyA: data.starkKey,
       vaultOrPositionIdA: data.positionId,
       data: {
-        type: 'EscapeVerified',
+        type: 'VerifyEscape',
         starkKey: data.starkKey.toString(),
         positionId: '5678',
         withdrawalAmount: data.withdrawalAmount.toString(),

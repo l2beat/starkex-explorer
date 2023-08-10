@@ -1,9 +1,11 @@
 import { UserDetails } from '@explorer/shared'
+import { Hash256 } from '@explorer/types'
 
 import {
   FREEZE_REQUEST_FORM_ID,
   FreezeRequestActionFormProps,
 } from '../../../view'
+import { Api } from '../../peripherals/api'
 import { Wallet } from '../../peripherals/wallet'
 import { makeQuery } from '../../utils/query'
 
@@ -30,16 +32,22 @@ async function submitFreezeRequest(
   props: FreezeRequestActionFormProps,
   user: UserDetails
 ) {
-  // const hash = await Wallet.sendFreezeRequestTransaction(
-  await Wallet.sendFreezeRequestTransaction(
-    user.address,
-    props.starkKey,
-    props.positionOrVaultId,
-    props.quantizedAmount,
-    props.starkExAddress
-  )
+  const hash = await Wallet.sendFreezeRequestTransaction(user.address, props)
 
-  // TODO: should we save via the API to our DB?
-  // await Api.submitSpotForcedWithdrawal(hash) <- wrong function
-  window.location.href = '/'
+  await submitTransaction(props.type, hash)
+  window.location.href = `/transactions/${hash.toString()}`
+}
+
+async function submitTransaction(
+  txType: FreezeRequestActionFormProps['type'],
+  txHash: Hash256
+) {
+  switch (txType) {
+    case 'ForcedTrade':
+      return Api.submitForcedTradeFreezeRequest(txHash)
+    case 'ForcedWithdrawal':
+      return Api.submitForcedWithdrawalFreezeRequest(txHash)
+    case 'FullWithdrawal':
+      return Api.submitFullWithdrawalFreezeRequest(txHash)
+  }
 }

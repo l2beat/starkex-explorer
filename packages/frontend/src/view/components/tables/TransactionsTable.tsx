@@ -9,7 +9,7 @@ import { Link } from '../Link'
 import { StatusBadge, StatusType } from '../StatusBadge'
 import { Table } from '../table/Table'
 import { Column } from '../table/types'
-import { TimeCell } from '../TimeCell'
+import { TimeAgeCell } from '../TimeAgeCell'
 
 interface TransactionsTableProps {
   transactions: TransactionEntry[]
@@ -28,12 +28,14 @@ export interface TransactionEntry {
     | 'FORCED_SELL'
     | 'WITHDRAW'
     | 'INITIATE_ESCAPE'
+    | 'FREEZE_REQUEST'
+    | 'FINALIZE_ESCAPE'
 }
 
 export function TransactionsTable(props: TransactionsTableProps) {
   const columns: Column[] = []
   if (!props.hideTime) {
-    columns.push({ header: 'Time (UTC)' })
+    columns.push({ header: 'Age' })
   }
   columns.push(
     { header: 'Tx Hash' },
@@ -51,7 +53,7 @@ export function TransactionsTable(props: TransactionsTableProps) {
 
         const cells: ReactNode[] = []
         if (!props.hideTime) {
-          cells.push(<TimeCell timestamp={transaction.timestamp} />)
+          cells.push(<TimeAgeCell timestamp={transaction.timestamp} />)
         }
         cells.push(
           <Link>
@@ -99,7 +101,12 @@ function getStatus(transaction: TransactionEntry): {
         return { type: 'ERROR', text: 'REVERTED' }
     }
   }
-  if (transaction.type === 'WITHDRAW') {
+  if (
+    transaction.type === 'WITHDRAW' ||
+    transaction.type === 'FINALIZE_ESCAPE' ||
+    transaction.type === 'FREEZE_REQUEST' ||
+    transaction.type === 'INITIATE_ESCAPE'
+  ) {
     switch (transaction.status) {
       case 'SENT':
         return { type: 'BEGIN', text: 'SENT (1/2)' }
@@ -108,21 +115,12 @@ function getStatus(transaction: TransactionEntry): {
       case 'REVERTED':
         return { type: 'ERROR', text: 'REVERTED' }
       case 'INCLUDED':
-        throw new Error('WITHDRAW transaction cannot be INCLUDED')
-    }
-  }
-  if (transaction.type === 'INITIATE_ESCAPE') {
-    switch (transaction.status) {
-      case 'SENT':
-        return { type: 'BEGIN', text: 'SENT (1/2)' }
-      case 'MINED':
-        return { type: 'END', text: 'MINED (2/2)' }
-      default:
         throw new Error(
-          'INITIATE_ESCAPE transaction cannot be ${transaction.status}'
+          `${transaction.type} transaction cannot be ${transaction.status}`
         )
     }
   }
+
   // FORCED_BUY and FORCED_SELL
   switch (transaction.status) {
     case 'SENT':
@@ -148,5 +146,9 @@ function toTypeText(type: TransactionEntry['type']): string {
       return 'Init. escape'
     case 'WITHDRAW':
       return 'Withdraw'
+    case 'FREEZE_REQUEST':
+      return 'Freeze req.'
+    case 'FINALIZE_ESCAPE':
+      return 'Finalize escape'
   }
 }

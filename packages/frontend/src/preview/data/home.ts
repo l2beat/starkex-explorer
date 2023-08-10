@@ -23,16 +23,27 @@ const transactionTypeBucket = new Bucket([
   'FORCED_BUY',
   'FORCED_SELL',
   'FORCED_WITHDRAW',
+  'INITIATE_ESCAPE',
+  'FREEZE_REQUEST',
+  'FINALIZE_ESCAPE',
 ] as const)
 
 export function randomHomeForcedTransactionEntry(): TransactionEntry {
+  const type = transactionTypeBucket.pick()
+  const status =
+    type === 'INITIATE_ESCAPE' ||
+    type === 'FREEZE_REQUEST' ||
+    type === 'FINALIZE_ESCAPE'
+      ? transactionStatusBucket.pickExcept('INCLUDED')
+      : transactionStatusBucket.pick()
+
   return {
     timestamp: randomTimestamp(),
     hash: Hash256.fake(),
     asset: assetBucket.pick(),
     amount: amountBucket.pick(),
-    status: transactionStatusBucket.pick(),
-    type: transactionTypeBucket.pick(),
+    status,
+    type,
   }
 }
 

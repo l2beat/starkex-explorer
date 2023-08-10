@@ -1,15 +1,20 @@
 import { Interface } from '@ethersproject/abi'
 import {
   AcceptedData,
+  assertUnreachable,
   CollateralAsset,
   CreateOfferData,
-  encodeFinalizeEscapeRequest,
   encodeFinalizeExitRequest,
-  encodeFreezeRequest,
+  encodeFinalizePerpetualEscapeRequest,
+  encodeFinalizeSpotEscapeRequest,
+  encodeForcedTradeFreezeRequest,
+  encodeForcedWithdrawalFreezeRequest,
+  encodeFullWithdrawalFreezeRequest,
   encodePerpetualForcedTradeRequest,
   encodePerpetualForcedWithdrawalRequest,
   encodeSpotForcedWithdrawalRequest,
-  encodeVerifyEscapeRequest,
+  encodeVerifyPerpetualEscapeRequest,
+  encodeVerifySpotEscapeRequest,
   encodeWithdrawal,
   encodeWithdrawalWithTokenId,
   FinalizeOfferData,
@@ -18,7 +23,10 @@ import {
   toSignableCreateOffer,
 } from '@explorer/shared'
 import { AssetHash, EthereumAddress, Hash256, StarkKey } from '@explorer/types'
+import omit from 'lodash/omit'
 
+import { FreezeRequestActionFormProps, VerifyEscapeFormProps } from '../../view'
+import { FinalizeEscapeFormProps } from '../../view/pages/user/components/FinalizeEscapeForm'
 import { Registration } from '../keys/keys'
 
 function getProvider() {
@@ -216,20 +224,41 @@ export const Wallet = {
   // #region Escape
   async sendFreezeRequestTransaction(
     account: EthereumAddress,
-    ownerKey: StarkKey,
-    positionOrVaultId: bigint,
-    quantizedAmount: bigint,
-    exchangeAddress: EthereumAddress
+    props: FreezeRequestActionFormProps
   ) {
-    const data = encodeFreezeRequest({
-      ownerKey,
-      positionOrVaultId,
-      quantizedAmount,
-    })
+    const getEncodedData = () => {
+      switch (props.type) {
+        case 'ForcedWithdrawal': {
+          const toEncode = omit(props, 'type', 'starkExAddress')
+          return encodeForcedWithdrawalFreezeRequest(toEncode)
+        }
+        case 'ForcedTrade': {
+          const toEncode = omit(
+            props,
+            'type',
+            'starkExAddress',
+            'collateralAsset'
+          )
+          return encodeForcedTradeFreezeRequest(toEncode, props.collateralAsset)
+        }
+        case 'FullWithdrawal': {
+          const toEncode = omit(props, 'type', 'starkExAddress')
+          return encodeFullWithdrawalFreezeRequest(toEncode)
+        }
+        default:
+          assertUnreachable(props)
+      }
+    }
+    const data = getEncodedData()
+
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [
-        { from: account.toString(), to: exchangeAddress.toString(), data },
+        {
+          from: account.toString(),
+          to: props.starkExAddress.toString(),
+          data,
+        },
       ],
     })
     return Hash256(result as string)
@@ -237,16 +266,27 @@ export const Wallet = {
 
   async sendVerifyEscapeTransaction(
     account: EthereumAddress,
-    serializedMerkleProof: bigint[],
-    assetCount: number,
-    serializedState: bigint[],
-    escapeVerifierAddress: EthereumAddress
+    props: VerifyEscapeFormProps
   ) {
-    const data = encodeVerifyEscapeRequest({
-      serializedMerkleProof,
-      assetCount,
-      serializedState,
-    })
+    const { escapeVerifierAddress, ...rest } = props
+    const getEncodedData = () => {
+      switch (rest.tradingMode) {
+        case 'perpetual': {
+          return encodeVerifyPerpetualEscapeRequest({
+            serializedMerkleProof: rest.serializedMerkleProof,
+            assetCount: rest.assetCount,
+            serializedState: rest.serializedState,
+          })
+        }
+        case 'spot': {
+          return encodeVerifySpotEscapeRequest({
+            serializedEscapeProof: rest.serializedEscapeProof,
+          })
+        }
+      }
+    }
+    const data = getEncodedData()
+
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [
@@ -262,16 +302,30 @@ export const Wallet = {
 
   async sendFinalizeEscapeTransaction(
     account: EthereumAddress,
-    ownerStarkKey: StarkKey,
-    positionOrVaultId: bigint,
-    amount: bigint,
-    exchangeAddress: EthereumAddress
+    props: FinalizeEscapeFormProps
   ) {
-    const data = encodeFinalizeEscapeRequest({
-      starkKey: ownerStarkKey,
-      positionOrVaultId,
-      quantizedAmount: amount,
-    })
+    const { exchangeAddress, ...rest } = props
+    const getEncodedData = () => {
+      switch (rest.tradingMode) {
+        case 'perpetual': {
+          return encodeFinalizePerpetualEscapeRequest({
+            starkKey: rest.starkKey,
+            positionId: rest.positionId,
+            quantizedAmount: rest.quantizedAmount,
+          })
+        }
+        case 'spot': {
+          return encodeFinalizeSpotEscapeRequest({
+            starkKey: rest.starkKey,
+            vaultId: rest.vaultId,
+            assetHash: rest.assetId,
+            quantizedAmount: rest.quantizedAmount,
+          })
+        }
+      }
+    }
+    const data = getEncodedData()
+
     const result = await getProvider().request({
       method: 'eth_sendTransaction',
       params: [

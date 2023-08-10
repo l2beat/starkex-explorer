@@ -25,7 +25,9 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
   'ForcedWithdrawal',
   'ForcedTrade',
   'FullWithdrawal',
-  'EscapeVerified',
+  'VerifyEscape',
+  'FinalizeEscape',
+  'FreezeRequest',
 ]
 
 export class HomeController {

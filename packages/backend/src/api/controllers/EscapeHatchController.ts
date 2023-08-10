@@ -3,13 +3,18 @@ import {
   renderEscapeHatchActionPage,
   renderFreezeRequestActionPage,
 } from '@explorer/frontend'
-import { UserDetails } from '@explorer/shared'
+import {
+  assertUnreachable,
+  PageContextWithUser,
+  UserDetails,
+} from '@explorer/shared'
 import { EthereumAddress } from '@explorer/types'
 
 import { FreezeCheckService } from '../../core/FreezeCheckService'
 import { PageContextService } from '../../core/PageContextService'
 import { StateUpdater } from '../../core/StateUpdater'
 import { StateUpdateRepository } from '../../peripherals/database/StateUpdateRepository'
+import { UserTransactionRecord } from '../../peripherals/database/transactions/UserTransactionRepository'
 import { ControllerResult } from './ControllerResult'
 import { serializeMerkleProofForEscape } from './serializeMerkleProofForEscape'
 
@@ -52,24 +57,67 @@ export class EscapeHatchController {
       )
     }
 
-    if (oldestNotIncludedForcedAction.data.type !== 'ForcedWithdrawal') {
-      return {
-        type: 'not found',
-        message: 'Functionality not yet supported',
-      }
-    }
-
-    const data = oldestNotIncludedForcedAction.data
-    const content = renderFreezeRequestActionPage({
+    const content = this.getFreezeRequestActionPageContent(
       context,
-      transactionHash: oldestNotIncludedForcedAction.transactionHash,
-      starkKey: data.starkKey,
-      positionOrVaultId: data.positionId,
-      quantizedAmount: data.quantizedAmount,
-      starkExAddress: this.starkExAddress,
-    })
+      oldestNotIncludedForcedAction
+    )
 
     return { type: 'success', content }
+  }
+
+  private getFreezeRequestActionPageContent(
+    context: PageContextWithUser,
+    transaction: UserTransactionRecord<
+      'ForcedTrade' | 'ForcedWithdrawal' | 'FullWithdrawal'
+    >
+  ) {
+    const base = {
+      context,
+      transactionHash: transaction.transactionHash,
+      starkExAddress: this.starkExAddress,
+    }
+    const data = transaction.data
+
+    switch (data.type) {
+      case 'ForcedWithdrawal': {
+        return renderFreezeRequestActionPage({
+          ...base,
+          type: data.type,
+          starkKey: data.starkKey,
+          positionId: data.positionId,
+          quantizedAmount: data.quantizedAmount,
+        })
+      }
+      case 'ForcedTrade': {
+        if (context.tradingMode !== 'perpetual') {
+          throw new Error('Forced trade is only supported in perpetual mode')
+        }
+        return renderFreezeRequestActionPage({
+          ...base,
+          collateralAsset: context.collateralAsset,
+          type: data.type,
+          starkKeyA: data.starkKeyA,
+          starkKeyB: data.starkKeyB,
+          positionIdA: data.positionIdA,
+          positionIdB: data.positionIdB,
+          collateralAssetId: data.collateralAssetId,
+          syntheticAssetId: data.syntheticAssetId,
+          collateralAmount: data.collateralAmount,
+          syntheticAmount: data.syntheticAmount,
+          isABuyingSynthetic: data.isABuyingSynthetic,
+          nonce: data.nonce,
+        })
+      }
+      case 'FullWithdrawal':
+        return renderFreezeRequestActionPage({
+          ...base,
+          type: data.type,
+          starkKey: data.starkKey,
+          vaultId: data.vaultId,
+        })
+      default:
+        assertUnreachable(data)
+    }
   }
 
   async getEscapeHatchActionPage(
@@ -109,15 +157,31 @@ export class EscapeHatchController {
     const serializedState = encodeStateAsInt256Array(
       latestStateUpdate.perpetualState
     )
-
-    const content = renderEscapeHatchActionPage({
-      context,
-      escapeVerifierAddress: this.escapeVerifierAddress,
-      positionOrVaultId,
-      serializedMerkleProof,
-      assetCount: merkleProof.perpetualAssetCount,
-      serializedState,
-    })
+    let content: string
+    switch (context.tradingMode) {
+      case 'perpetual':
+        content = renderEscapeHatchActionPage({
+          context,
+          tradingMode: context.tradingMode,
+          starkKey: merkleProof.starkKey,
+          escapeVerifierAddress: this.escapeVerifierAddress,
+          positionOrVaultId,
+          serializedMerkleProof,
+          assetCount: merkleProof.perpetualAssetCount,
+          serializedState,
+        })
+        break
+      case 'spot':
+        content = renderEscapeHatchActionPage({
+          context,
+          tradingMode: context.tradingMode,
+          starkKey: merkleProof.starkKey,
+          escapeVerifierAddress: this.escapeVerifierAddress,
+          positionOrVaultId,
+          serializedEscapeProof: serializedMerkleProof,
+        })
+        break
+    }
 
     return { type: 'success', content }
   }

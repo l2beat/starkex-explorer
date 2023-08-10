@@ -123,7 +123,7 @@ export class L2TransactionController {
     aggregatedL2Transaction: AggregatedL2TransactionRecord,
     multiIndex: number | undefined,
     altIndex: number | undefined
-  ) {
+  ): AggregatedL2TransactionRecord | undefined {
     if (multiIndex !== undefined && altIndex !== undefined) {
       const altTransaction =
         aggregatedL2Transaction.alternativeTransactions[altIndex]
@@ -141,7 +141,10 @@ export class L2TransactionController {
 
       return {
         ...aggregatedL2Transaction,
-        originalTransaction: multiTransaction,
+        originalTransaction: {
+          timestamp: altTransaction.timestamp,
+          ...multiTransaction,
+        },
         alternativeTransactions: [],
       }
     }
@@ -161,7 +164,10 @@ export class L2TransactionController {
 
       return {
         ...aggregatedL2Transaction,
-        originalTransaction: multiTransaction,
+        originalTransaction: {
+          timestamp: aggregatedL2Transaction.originalTransaction.timestamp,
+          ...multiTransaction,
+        },
         alternativeTransactions: [],
       }
     }

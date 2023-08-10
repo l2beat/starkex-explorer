@@ -5,7 +5,7 @@ import { formatInt } from '../../../../utils/formatting/formatAmount'
 import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { Link } from '../../../components/Link'
 import { Table } from '../../../components/table/Table'
-import { TimeCell } from '../../../components/TimeCell'
+import { TimeAgeCell } from '../../../components/TimeAgeCell'
 
 export interface HomeStateUpdateEntry {
   timestamp: Timestamp
@@ -23,7 +23,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
   return (
     <Table
       columns={[
-        { header: 'Time (UTC)' },
+        { header: 'Age' },
         { header: 'Id' },
         { header: 'Tx Hash' },
         { header: 'Updates', numeric: true },
@@ -41,7 +41,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
         return {
           link: `/state-updates/${stateUpdate.id}`,
           cells: [
-            <TimeCell timestamp={stateUpdate.timestamp} />,
+            <TimeAgeCell timestamp={stateUpdate.timestamp} />,
             <Link>#{stateUpdate.id}</Link>,
             <InlineEllipsis className="max-w-[80px] sm:max-w-[160px]">
               {stateUpdate.hash.toString()}

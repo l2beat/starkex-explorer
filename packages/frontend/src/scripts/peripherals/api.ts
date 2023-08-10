@@ -6,7 +6,7 @@ import {
   serializeCreateOfferBody,
   serializeFinalizeOfferBody,
 } from '@explorer/shared'
-import { Hash256 } from '@explorer/types'
+import { Hash256, StarkKey } from '@explorer/types'
 
 export const Api = {
   async getDydxTvl() {
@@ -60,6 +60,58 @@ export const Api = {
 
   async submitWithdrawalWithTokenId(hash: Hash256) {
     await fetch('/withdrawal-with-token-id', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitForcedWithdrawalFreezeRequest(hash: Hash256) {
+    await fetch('/escape/forced-withdrawal-freeze-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitForcedTradeFreezeRequest(hash: Hash256) {
+    await fetch('/escape/forced-trade-freeze-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitFullWithdrawalFreezeRequest(hash: Hash256) {
+    await fetch('/escape/full-withdrawal-freeze-request', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitVerifyEscape(
+    hash: Hash256,
+    starkKey: StarkKey,
+    positionOrVaultId: string
+  ) {
+    await fetch('/escape/initialize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash, starkKey, positionOrVaultId }),
+    })
+  },
+
+  async submitPerpetualFinalizeEscape(hash: Hash256) {
+    await fetch('/escape/perpetual-finalize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitSpotFinalizeEscape(hash: Hash256) {
+    await fetch('/escape/spot-finalize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hash }),

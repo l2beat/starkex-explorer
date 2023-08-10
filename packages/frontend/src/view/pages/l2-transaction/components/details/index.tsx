@@ -3,6 +3,7 @@ import {
   CollateralAsset,
   PerpetualL2TransactionData,
 } from '@explorer/shared'
+import { Timestamp } from '@explorer/types'
 import React from 'react'
 
 import { PerpetualConditionalTransferDetails } from './PerpetualConditionalTransferDetails'
@@ -20,7 +21,7 @@ import { PerpetualWithdrawalToAddressDetails } from './PerpetualWithdrawalToAddr
 
 interface PerpetualTransactionDetailsProps {
   stateUpdateId: number | undefined
-  data: PerpetualL2TransactionData
+  data: PerpetualL2TransactionData & { timestamp: Timestamp | undefined }
   collateralAsset: CollateralAsset
   transactionId: number
   altIndex: number | undefined
@@ -36,6 +37,7 @@ export function PerpetualTransactionDetails(
         <PerpetualDepositDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -45,6 +47,7 @@ export function PerpetualTransactionDetails(
         <PerpetualWithdrawalToAddressDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
           chainId={props.chainId}
@@ -55,6 +58,7 @@ export function PerpetualTransactionDetails(
         <PerpetualConditionalTransferDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
           chainId={props.chainId}
@@ -65,6 +69,7 @@ export function PerpetualTransactionDetails(
         <PerpetualTransferDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -74,6 +79,7 @@ export function PerpetualTransactionDetails(
         <PerpetualForcedWithdrawalDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -83,6 +89,7 @@ export function PerpetualTransactionDetails(
         <PerpetualTradeDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -92,6 +99,7 @@ export function PerpetualTransactionDetails(
         <PerpetualForcedTradeDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -101,6 +109,7 @@ export function PerpetualTransactionDetails(
         <PerpetualDeleverageDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -110,6 +119,7 @@ export function PerpetualTransactionDetails(
         <PerpetualLiquidateDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -119,6 +129,7 @@ export function PerpetualTransactionDetails(
         <PerpetualFundingTickDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -128,6 +139,7 @@ export function PerpetualTransactionDetails(
         <PerpetualOraclePricesTickDetails
           transactionId={props.transactionId}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           collateralAsset={props.collateralAsset}
           data={props.data}
         />
@@ -138,6 +150,7 @@ export function PerpetualTransactionDetails(
           data={props.data}
           collateralAsset={props.collateralAsset}
           stateUpdateId={props.stateUpdateId}
+          timestamp={props.data.timestamp}
           transactionId={props.transactionId}
           altIndex={props.altIndex}
         />

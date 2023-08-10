@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { AssetAmountCard } from '../../../../components/AssetAmountCard'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
@@ -28,6 +29,9 @@ export function PerpetualForcedWithdrawalDetails(
         asset={{ hashOrId: props.collateralAsset.assetId }}
         amount={props.data.amount}
       />
+      <TransactionField label="Timestamp (UTC)">
+        {props.timestamp ? formatTimestamp(props.timestamp) : '-'}
+      </TransactionField>
     </L2TransactionDetailsCard>
   )
 }

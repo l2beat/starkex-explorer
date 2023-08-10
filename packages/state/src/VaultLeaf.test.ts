@@ -32,6 +32,34 @@ describe(VaultLeaf.name, () => {
     )
   })
 
+  it('generates a correct merkle proof prefix', async () => {
+    const vaultLeaf = new VaultLeaf(StarkKey.fake('beef'), 12345n, tokenA)
+    const hash = await vaultLeaf.calculateMerkleProofPrefix()
+    expect(hash).toEqual({
+      nodes: [
+        {
+          left: PedersenHash(
+            '0beef00000000000000000000000000000000000000000000000000000000000'
+          ),
+          right: PedersenHash(
+            '00d5b742d29ab21fdb06ac5c7c460550131c0b30cbc4c911985174c0ea4a92ec'
+          ),
+        },
+        {
+          left: PedersenHash(
+            '023d412f1f9c1a4a45fb25d3dc489132d493465d1e93c7c5f068e2b51e84360f'
+          ),
+          right: PedersenHash(
+            '0000000000000000000000000000000000000000000000000000000000003039'
+          ),
+        },
+      ],
+      finalHash: PedersenHash(
+        '0726343459570e12da59aa8ac0270bdce02f185e5bb2dce9110824f6bdbb8e83'
+      ),
+    })
+  })
+
   it('can be stringified to json and back', async () => {
     const vaultLeaf = new VaultLeaf(
       StarkKey('1'.padStart(64, '0')),

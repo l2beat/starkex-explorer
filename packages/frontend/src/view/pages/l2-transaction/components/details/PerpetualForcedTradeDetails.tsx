@@ -1,6 +1,7 @@
-import { getCollateralAssetIdFromHash } from '@explorer/shared'
+import { validateCollateralAssetIdByHash } from '@explorer/shared'
 import React from 'react'
 
+import { formatTimestamp } from '../../../../../utils/formatting/formatTimestamp'
 import { InlineEllipsis } from '../../../../components/InlineEllipsis'
 import { Link } from '../../../../components/Link'
 import { TransactionField } from '../../../transaction/components/TransactionField'
@@ -22,7 +23,7 @@ export function PerpetualForcedTradeDetails(
   }
   const syntheticBuyer = props.data.isABuyingSynthetic ? partyA : partyB
   const syntheticSeller = props.data.isABuyingSynthetic ? partyB : partyA
-  const collateralAssetId = getCollateralAssetIdFromHash(
+  const collateralAssetId = validateCollateralAssetIdByHash(
     props.data.collateralAssetId,
     props.collateralAsset
   )
@@ -71,6 +72,9 @@ export function PerpetualForcedTradeDetails(
           amount: props.data.collateralAmount,
         }}
       />
+      <TransactionField label="Timestamp (UTC)">
+        {props.timestamp ? formatTimestamp(props.timestamp) : '-'}
+      </TransactionField>
     </L2TransactionDetailsCard>
   )
 }
