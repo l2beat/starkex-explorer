@@ -30,14 +30,18 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
             {instanceName.toUpperCase()} {isMainnet ? '' : 'TESTNET'} EXPLORER
           </span>
         </a>
-        <div className="flex flex-wrap gap-y-2 gap-x-4">
+        <div className="flex gap-y-2 gap-x-4">
           {searchBar && (
             <SearchBar
               tradingMode={tradingMode}
               className="hidden w-auto min-w-[515px] lg:flex"
             />
           )}
-          {!user && <Button id="connect-with-metamask">Connect wallet</Button>}
+          {!user && (
+            <Button id="connect-with-metamask" className="whitespace-pre">
+              Connect wallet
+            </Button>
+          )}
           {user && (
             <a
               href={`/users/${user.starkKey?.toString() ?? 'recover'}`}
@@ -53,7 +57,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
                 address={user.address}
                 size={18}
               />
-              <span className="font-mono">
+              <span className="font-mono whitespace-pre">
                 {user.address.slice(0, 6)}&hellip;
                 <span className="hidden sm:inline">
                   {user.address.slice(-4)}
