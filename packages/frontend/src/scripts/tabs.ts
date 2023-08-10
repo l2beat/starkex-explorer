@@ -6,7 +6,7 @@ interface TabWithContent {
 }
 const ARROWS_THRESHOLD = 2
 
-// eslint-disable @typescript-eslint/no-non-null-assertion
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 export function configureTabs() {
   const { $$ } = makeQuery(document.body)
   const tabs = $$('.Tabs')
@@ -131,11 +131,6 @@ function getElements(tabNavigation: HTMLElement) {
 
   tabs.forEach((tab) => {
     const content = $<HTMLElement>(`#${tab.id}.TabsContent`)
-
-    if (!content)
-      throw new Error(
-        `No content found for tab with id ${tab.id} in tab navigation`
-      )
 
     tabsWithContent[tab.id] = {
       tab,
