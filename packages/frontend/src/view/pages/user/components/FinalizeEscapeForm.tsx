@@ -4,7 +4,7 @@ import {
   toJsonWithoutBigInts,
   UserDetails,
 } from '@explorer/shared'
-import { EthereumAddress, StarkKey } from '@explorer/types'
+import { AssetHash, EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 import { z } from 'zod'
 
@@ -13,12 +13,26 @@ import { Button } from '../../../components/Button'
 export const FINALIZE_ESCAPE_FORM_ID = 'finalize-escape-form-id'
 
 export type FinalizeEscapeFormProps = z.infer<typeof FinalizeEscapeFormProps>
-export const FinalizeEscapeFormProps = z.object({
-  exchangeAddress: stringAs(EthereumAddress),
-  ownerStarkKey: stringAs(StarkKey),
-  positionOrVaultId: stringAsBigInt(),
-  amount: stringAsBigInt(),
-})
+export const FinalizeEscapeFormProps = z.intersection(
+  z.object({
+    exchangeAddress: stringAs(EthereumAddress),
+  }),
+  z.discriminatedUnion('tradingMode', [
+    z.object({
+      tradingMode: z.literal('spot'),
+      starkKey: stringAs(StarkKey),
+      vaultId: stringAsBigInt(),
+      quantizedAmount: stringAsBigInt(),
+      assetId: stringAs(AssetHash),
+    }),
+    z.object({
+      tradingMode: z.literal('perpetual'),
+      starkKey: stringAs(StarkKey),
+      positionId: stringAsBigInt(),
+      quantizedAmount: stringAsBigInt(),
+    }),
+  ])
+)
 
 export type Props = {
   user: UserDetails

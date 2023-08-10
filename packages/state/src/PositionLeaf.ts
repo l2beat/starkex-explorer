@@ -2,7 +2,7 @@ import { pedersen } from '@explorer/crypto'
 import { encodeAssetId } from '@explorer/encoding'
 import { AssetId, json, PedersenHash, StarkKey } from '@explorer/types'
 
-import { MerkleValue } from './MerkleValue'
+import { MerkleProofPrefix, MerkleValue } from './MerkleValue'
 import { packBytes } from './packBytes'
 
 const MIN_INT_64 = -(2n ** 63n)
@@ -11,14 +11,6 @@ export interface PositionAsset {
   readonly assetId: AssetId
   readonly balance: bigint
   readonly fundingIndex: bigint
-}
-
-export interface MerkleProofPrefix {
-  nodes: {
-    left: PedersenHash
-    right: PedersenHash
-  }[]
-  finalHash: PedersenHash
 }
 
 export class PositionLeaf extends MerkleValue {

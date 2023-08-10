@@ -1159,6 +1159,7 @@ const routes: Route[] = [
       ctx.body = renderEscapeHatchActionPage({
         context,
         starkKey: StarkKey.fake(),
+        tradingMode: 'perpetual',
         escapeVerifierAddress: EthereumAddress.fake(),
         positionOrVaultId: 12345n,
         serializedMerkleProof: [],

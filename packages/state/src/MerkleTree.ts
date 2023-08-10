@@ -115,23 +115,20 @@ export class MerkleTree<T extends MerkleValue> {
       height -= 1n
     }
 
+    if (!(node instanceof PositionLeaf) && !(node instanceof VaultLeaf)) {
+      throw new Error('Unknown leaf type, this should never happen')
+    }
+
     // This is a special solution in Perpetual StarkEx, where the leaf values
     // and intermediate hashes are prefixed to the merkle proof (in practice
     // making the tree higher)
-    let leafPrefixLength = 0
-    let perpetualAssetCount = 0
-    let starkKey: StarkKey
-    if (node instanceof PositionLeaf) {
-      const prefix = await node.calculateMerkleProofPrefix()
-      path.unshift(...prefix.nodes)
-      leafPrefixLength = prefix.nodes.length
-      perpetualAssetCount = node.assets.length
-      starkKey = node.starkKey
-    } else if (node instanceof VaultLeaf) {
-      starkKey = node.starkKey
-    } else {
-      throw new Error('Unknown leaf type, this should never happen')
-    }
+    const prefix = await node.calculateMerkleProofPrefix()
+    path.unshift(...prefix.nodes)
+
+    const starkKey = node.starkKey
+    const leafPrefixLength = prefix.nodes.length
+    const perpetualAssetCount =
+      node instanceof PositionLeaf ? node.assets.length : 0
 
     return {
       root: await this.hash(),

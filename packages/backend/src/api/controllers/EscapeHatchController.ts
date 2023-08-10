@@ -157,16 +157,31 @@ export class EscapeHatchController {
     const serializedState = encodeStateAsInt256Array(
       latestStateUpdate.perpetualState
     )
-
-    const content = renderEscapeHatchActionPage({
-      context,
-      starkKey: merkleProof.starkKey,
-      escapeVerifierAddress: this.escapeVerifierAddress,
-      positionOrVaultId,
-      serializedMerkleProof,
-      assetCount: merkleProof.perpetualAssetCount,
-      serializedState,
-    })
+    let content: string
+    switch (context.tradingMode) {
+      case 'perpetual':
+        content = renderEscapeHatchActionPage({
+          context,
+          tradingMode: context.tradingMode,
+          starkKey: merkleProof.starkKey,
+          escapeVerifierAddress: this.escapeVerifierAddress,
+          positionOrVaultId,
+          serializedMerkleProof,
+          assetCount: merkleProof.perpetualAssetCount,
+          serializedState,
+        })
+        break
+      case 'spot':
+        content = renderEscapeHatchActionPage({
+          context,
+          tradingMode: context.tradingMode,
+          starkKey: merkleProof.starkKey,
+          escapeVerifierAddress: this.escapeVerifierAddress,
+          positionOrVaultId,
+          serializedEscapeProof: serializedMerkleProof,
+        })
+        break
+    }
 
     return { type: 'success', content }
   }

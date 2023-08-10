@@ -1,10 +1,11 @@
 import {
-  decodeFinalizeEscapeRequest,
+  decodeFinalizePerpetualEscapeRequest,
+  decodeFinalizeSpotEscapeRequest,
   decodeForcedWithdrawalFreezeRequest,
   decodeFullWithdrawalFreezeRequest,
   decodePerpetualForcedWithdrawalRequest,
   decodeWithdrawal,
-  validateVerifyEscapeRequest,
+  validateVerifyPerpetualEscapeRequest,
 } from '@explorer/shared'
 import {
   AssetHash,
@@ -397,7 +398,7 @@ describe(TransactionSubmitController.name, () => {
         expect(transactionValidator.fetchTxAndDecode).toHaveBeenOnlyCalledWith(
           hash,
           escapeVerifierAddress,
-          validateVerifyEscapeRequest
+          validateVerifyPerpetualEscapeRequest
         )
         expect(repository.add).toHaveBeenOnlyCalledWith({
           transactionHash: hash,
@@ -712,12 +713,12 @@ describe(TransactionSubmitController.name, () => {
   )
 
   describe(
-    TransactionSubmitController.prototype.submitFinalizeEscape.name,
+    TransactionSubmitController.prototype.submitFinalizePerpetualEscape.name,
     () => {
       it('handles transaction with correct data and address', async () => {
         const decodedData = {
           starkKey: StarkKey.fake(),
-          positionOrVaultId: 1234n,
+          positionId: 1234n,
           quantizedAmount: 5000n,
         }
         const perpetualAddress = EthereumAddress.fake()
@@ -743,7 +744,7 @@ describe(TransactionSubmitController.name, () => {
           fakeCollateralAsset
         )
 
-        const result = await controller.submitFinalizeEscape(hash)
+        const result = await controller.submitFinalizePerpetualEscape(hash)
 
         expect(result).toEqual({
           type: 'created',
@@ -752,15 +753,15 @@ describe(TransactionSubmitController.name, () => {
         expect(transactionValidator.fetchTxAndDecode).toHaveBeenOnlyCalledWith(
           hash,
           perpetualAddress,
-          decodeFinalizeEscapeRequest
+          decodeFinalizePerpetualEscapeRequest
         )
         expect(repository.add).toHaveBeenOnlyCalledWith({
           transactionHash: hash,
           timestamp: expect.a(BigInt),
           data: {
-            type: 'FinalizeEscape',
+            type: 'FinalizePerpetualEscape',
             starkKey: decodedData.starkKey,
-            positionOrVaultId: decodedData.positionOrVaultId,
+            positionId: decodedData.positionId,
             quantizedAmount: decodedData.quantizedAmount,
           },
         })
@@ -788,7 +789,95 @@ describe(TransactionSubmitController.name, () => {
           fakeCollateralAsset
         )
 
-        const result = await controller.submitFinalizeEscape(Hash256.fake())
+        const result = await controller.submitFinalizePerpetualEscape(
+          Hash256.fake()
+        )
+
+        expect(result).toEqual(controllerResult)
+      })
+    }
+  )
+
+  describe(
+    TransactionSubmitController.prototype.submitFinalizeSpotEscape.name,
+    () => {
+      it('handles transaction with correct data and address', async () => {
+        const decodedData = {
+          starkKey: StarkKey.fake(),
+          vaultId: 1234n,
+          quantizedAmount: 5000n,
+          assetHash: AssetHash.fake(),
+        }
+        const perpetualAddress = EthereumAddress.fake()
+        const hash = Hash256.fake()
+
+        const transactionValidator = mockObject<TransactionValidator>({
+          fetchTxAndDecode: mockFn().resolvesTo({
+            isSuccess: true,
+            data: decodedData,
+          }),
+        })
+        const repository = mockObject<SentTransactionRepository>({
+          add: async () => hash,
+        })
+        const controller = new TransactionSubmitController(
+          transactionValidator,
+          repository,
+          mockObject<ForcedTradeOfferRepository>(),
+          {
+            perpetual: perpetualAddress,
+            escapeVerifier: EthereumAddress.fake(),
+          },
+          fakeCollateralAsset
+        )
+
+        const result = await controller.submitFinalizeSpotEscape(hash)
+
+        expect(result).toEqual({
+          type: 'created',
+          content: { id: hash },
+        })
+        expect(transactionValidator.fetchTxAndDecode).toHaveBeenOnlyCalledWith(
+          hash,
+          perpetualAddress,
+          decodeFinalizeSpotEscapeRequest
+        )
+        expect(repository.add).toHaveBeenOnlyCalledWith({
+          transactionHash: hash,
+          timestamp: expect.a(BigInt),
+          data: {
+            type: 'FinalizeSpotEscape',
+            starkKey: decodedData.starkKey,
+            vaultId: decodedData.vaultId,
+            quantizedAmount: decodedData.quantizedAmount,
+            assetHash: decodedData.assetHash,
+          },
+        })
+      })
+
+      it('handles transaction with incorrect data', async () => {
+        const controllerResult = {
+          type: 'bad request',
+          message: 'Invalid transaction',
+        } as const
+        const transactionValidator = mockObject<TransactionValidator>({
+          fetchTxAndDecode: mockFn().resolvesTo({
+            isSuccess: false,
+            controllerResult,
+          }),
+        })
+        const controller = new TransactionSubmitController(
+          transactionValidator,
+          mockObject<SentTransactionRepository>(),
+          mockObject<ForcedTradeOfferRepository>(),
+          {
+            perpetual: EthereumAddress.fake(),
+            escapeVerifier: EthereumAddress.fake(),
+          },
+          fakeCollateralAsset
+        )
+
+        const result = await controller.submitFinalizeSpotEscape(Hash256.fake())
 
         expect(result).toEqual(controllerResult)
       })

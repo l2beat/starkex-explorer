@@ -1,6 +1,7 @@
 import {
   CollateralAsset,
-  decodeFinalizeEscapeRequest,
+  decodeFinalizePerpetualEscapeRequest,
+  decodeFinalizeSpotEscapeRequest,
   decodeForcedWithdrawalFreezeRequest,
   decodeFullWithdrawalFreezeRequest,
   decodePerpetualForcedTradeRequest,
@@ -8,7 +9,7 @@ import {
   decodeWithdrawal,
   decodeWithdrawalWithTokenId,
   PerpetualForcedTradeRequest,
-  validateVerifyEscapeRequest,
+  validateVerifyPerpetualEscapeRequest,
 } from '@explorer/shared'
 import { EthereumAddress, Hash256, StarkKey, Timestamp } from '@explorer/types'
 
@@ -262,7 +263,7 @@ export class TransactionSubmitController {
     const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.escapeVerifier,
-      validateVerifyEscapeRequest
+      validateVerifyPerpetualEscapeRequest
     )
     if (!fetched.isSuccess) {
       return fetched.controllerResult
@@ -280,14 +281,14 @@ export class TransactionSubmitController {
     return { type: 'created', content: { id: transactionHash } }
   }
 
-  async submitFinalizeEscape(
+  async submitFinalizePerpetualEscape(
     transactionHash: Hash256
   ): Promise<ControllerResult> {
     const timestamp = Timestamp.now()
     const fetched = await this.transactionValidator.fetchTxAndDecode(
       transactionHash,
       this.contracts.perpetual,
-      decodeFinalizeEscapeRequest
+      decodeFinalizePerpetualEscapeRequest
     )
 
     if (!fetched.isSuccess) {
@@ -297,10 +298,37 @@ export class TransactionSubmitController {
       transactionHash,
       timestamp,
       data: {
-        type: 'FinalizeEscape',
+        type: 'FinalizePerpetualEscape',
         starkKey: fetched.data.starkKey,
-        positionOrVaultId: fetched.data.positionOrVaultId,
+        positionId: fetched.data.positionId,
         quantizedAmount: fetched.data.quantizedAmount,
+      },
+    })
+    return { type: 'created', content: { id: transactionHash } }
+  }
+
+  async submitFinalizeSpotEscape(
+    transactionHash: Hash256
+  ): Promise<ControllerResult> {
+    const timestamp = Timestamp.now()
+    const fetched = await this.transactionValidator.fetchTxAndDecode(
+      transactionHash,
+      this.contracts.perpetual,
+      decodeFinalizeSpotEscapeRequest
+    )
+
+    if (!fetched.isSuccess) {
+      return fetched.controllerResult
+    }
+    await this.sentTransactionRepository.add({
+      transactionHash,
+      timestamp,
+      data: {
+        type: 'FinalizeSpotEscape',
+        starkKey: fetched.data.starkKey,
+        vaultId: fetched.data.vaultId,
+        quantizedAmount: fetched.data.quantizedAmount,
+        assetHash: fetched.data.assetHash,
       },
     })
     return { type: 'created', content: { id: transactionHash } }

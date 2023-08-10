@@ -31,13 +31,7 @@ async function submitVerifyEscape(
   props: VerifyEscapeFormProps,
   user: UserDetails
 ) {
-  const hash = await Wallet.sendVerifyEscapeTransaction(
-    user.address,
-    props.serializedMerkleProof,
-    props.assetCount,
-    props.serializedState,
-    props.escapeVerifierAddress
-  )
+  const hash = await Wallet.sendVerifyEscapeTransaction(user.address, props)
 
   await Api.submitVerifyEscape(
     hash,

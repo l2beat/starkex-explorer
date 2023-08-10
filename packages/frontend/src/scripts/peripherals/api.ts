@@ -102,8 +102,16 @@ export const Api = {
     })
   },
 
-  async submitFinalizeEscape(hash: Hash256) {
-    await fetch('/escape/finalize', {
+  async submitPerpetualFinalizeEscape(hash: Hash256) {
+    await fetch('/escape/perpetual-finalize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash }),
+    })
+  },
+
+  async submitSpotFinalizeEscape(hash: Hash256) {
+    await fetch('/escape/spot-finalize', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ hash }),

@@ -23,7 +23,8 @@ export function extractSentTxEntryType(
     case 'ForcedTradeFreezeRequest':
     case 'FullWithdrawalFreezeRequest':
       return 'FREEZE_REQUEST'
-    case 'FinalizeEscape':
+    case 'FinalizePerpetualEscape':
+    case 'FinalizeSpotEscape':
       return 'FINALIZE_ESCAPE'
     default:
       assertUnreachable(data)
@@ -35,7 +36,8 @@ export function extractSentTxAmount(
 ): bigint | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
-    case 'FinalizeEscape':
+    case 'FinalizePerpetualEscape':
+    case 'FinalizeSpotEscape':
       return data.quantizedAmount
     case 'ForcedTrade':
       return data.syntheticAmount
@@ -58,8 +60,13 @@ export function extractSentTxAsset(
 ): Asset | undefined {
   switch (data.type) {
     case 'ForcedWithdrawal':
-    case 'FinalizeEscape':
+    case 'FinalizePerpetualEscape':
       return collateralAsset ? { hashOrId: collateralAsset.assetId } : undefined
+    case 'FinalizeSpotEscape':
+      return {
+        hashOrId: data.assetHash,
+        details: assetDetailsMap?.getByAssetHash(data.assetHash),
+      }
     case 'ForcedTrade':
       return { hashOrId: data.syntheticAssetId }
     case 'Withdraw':
