@@ -4,8 +4,10 @@ import React, { ReactNode } from 'react'
 
 import { formatInt } from '../../../../utils/formatting/formatAmount'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
-import { ChevronDownIcon } from '../../../assets/icons/ChevronDownIcon'
-import { ChevronUpIcon } from '../../../assets/icons/ChevronUpIcon'
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from '../../../assets/icons/ChevronIcon'
 import { Button } from '../../../components/Button'
 import { EtherscanLink } from '../../../components/EtherscanLink'
 import { Link } from '../../../components/Link'

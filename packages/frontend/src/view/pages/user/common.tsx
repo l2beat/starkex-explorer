@@ -30,11 +30,11 @@ export const getBalanceChangeTableProps = (starkKey: StarkKey) => ({
 })
 
 export const getTransactionTableProps = (starkKey: StarkKey) => ({
-  title: 'Ethereum transactions',
+  title: 'L1 transactions',
   entryShortNamePlural: 'transactions',
-  entryLongNamePlural: 'ethereum transactions',
+  entryLongNamePlural: 'l1 transactions',
   path: `/users/${starkKey.toString()}/transactions`,
-  description: `Ethereum transactions of user ${starkKey.toString()}`,
+  description: `L1 transactions of user ${starkKey.toString()}`,
 })
 
 export const getOfferTableProps = (starkKey: StarkKey) => ({
