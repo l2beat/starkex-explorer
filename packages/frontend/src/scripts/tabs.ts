@@ -28,10 +28,6 @@ function configureTabsNavigation(tabNavigation: HTMLElement) {
     arrowRight,
   } = elements
 
-  let selectedId =
-    tabs.find((tab) => tab.href.endsWith(window.location.hash))?.id ??
-    tabs[0]!.id
-
   const highlightTab = (tab: HTMLAnchorElement) => {
     tabsWithContent[selectedId]!.tab.classList.remove(
       'bg-brand',
@@ -96,6 +92,12 @@ function configureTabsNavigation(tabNavigation: HTMLElement) {
     moveUnderline(tabWithContent!.tab)
     showArrows()
   }
+
+  let selectedId =
+    tabs.find((tab) => tab.href.endsWith(window.location.hash))?.id ??
+    tabs[0]!.id
+
+  onTabClick(selectedId)
 
   tabs.forEach((tab) => {
     tab.addEventListener('click', (e) => {
