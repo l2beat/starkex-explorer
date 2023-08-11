@@ -38,9 +38,17 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
             />
           )}
           {!user && (
-            <Button id="connect-with-metamask" className="whitespace-pre">
-              Connect wallet
-            </Button>
+            <>
+              <Button id="connect-with-metamask" className="lg:hidden">
+                Connect
+              </Button>
+              <Button
+                id="connect-with-metamask"
+                className="hidden whitespace-nowrap lg:block"
+              >
+                Connect wallet
+              </Button>
+            </>
           )}
           {user && (
             <a
