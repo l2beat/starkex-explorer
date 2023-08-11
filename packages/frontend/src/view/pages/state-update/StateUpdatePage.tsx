@@ -30,12 +30,9 @@ import {
 interface StateUpdatePageProps extends StateUpdateStatsProps {
   context: PageContext
   balanceChanges: StateUpdateBalanceChangeEntry[]
-  totalBalanceChanges: number
   priceChanges?: PriceEntry[]
   transactions: TransactionEntry[]
   l2Transactions: PerpetualL2TransactionEntry[]
-  totalL2Transactions: number | 'processing'
-  totalTransactions: number
 }
 
 export function renderStateUpdatePage(props: StateUpdatePageProps) {
@@ -55,7 +52,6 @@ function StateUpdatePage(props: StateUpdatePageProps) {
           <TablePreview
             {...getL2TransactionTableProps(props.id)}
             visible={props.l2Transactions.length}
-            total={props.totalL2Transactions}
           >
             <L2TransactionsTable
               transactions={props.l2Transactions}
@@ -66,7 +62,6 @@ function StateUpdatePage(props: StateUpdatePageProps) {
         <TablePreview
           {...getBalanceChangeTableProps(props.id)}
           visible={props.balanceChanges.length}
-          total={props.totalBalanceChanges}
         >
           <StateUpdateBalanceChangesTable
             tradingMode={props.context.tradingMode}
@@ -76,7 +71,6 @@ function StateUpdatePage(props: StateUpdatePageProps) {
         <TablePreview
           {...getTransactionTableProps(props.id)}
           visible={props.transactions.length}
-          total={props.totalTransactions}
         >
           <TransactionsTable hideAge transactions={props.transactions} />
         </TablePreview>

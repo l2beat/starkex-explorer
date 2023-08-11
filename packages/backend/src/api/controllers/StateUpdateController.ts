@@ -58,29 +58,20 @@ export class StateUpdateController {
     const [
       stateUpdate,
       balanceChanges,
-      totalBalanceChanges,
       prices,
       forcedUserTransactions,
-      totalForcedUserTransactions,
       l2Transactions,
-      preprocessedStateDetails,
     ] = await Promise.all([
       this.stateUpdateRepository.findById(stateUpdateId),
       this.preprocessedAssetHistoryRepository.getByStateUpdateIdPaginated(
         stateUpdateId,
         { offset: 0, limit: 10 }
       ),
-      this.preprocessedAssetHistoryRepository.getCountByStateUpdateId(
-        stateUpdateId
-      ),
       this.stateUpdateRepository.getPricesByStateUpdateId(stateUpdateId),
       this.userTransactionRepository.getByStateUpdateId(
         stateUpdateId,
         FORCED_TRANSACTION_TYPES,
         { offset: 0, limit: 6 }
-      ),
-      this.userTransactionRepository.getCountOfIncludedByStateUpdateId(
-        stateUpdateId
       ),
       this.l2TransactionRepository.getPaginatedWithoutMultiByStateUpdateId(
         stateUpdateId,
@@ -89,9 +80,6 @@ export class StateUpdateController {
           limit: 6,
         },
         this.excludeL2TransactionTypes
-      ),
-      this.preprocessedStateDetailsRepository.findByStateUpdateId(
-        stateUpdateId
       ),
     ])
 
@@ -133,17 +121,9 @@ export class StateUpdateController {
       // TODO - what is this?
       starkExTimestamp: stateUpdate.timestamp,
       balanceChanges: balanceChangeEntries,
-      totalBalanceChanges,
       priceChanges: priceEntries,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions: preprocessedStateDetails?.l2TransactionsStatistics
-        ? sumUpTransactionCount(
-            preprocessedStateDetails.l2TransactionsStatistics,
-            this.excludeL2TransactionTypes
-          )
-        : 'processing',
       transactions,
-      totalTransactions: totalForcedUserTransactions,
     })
 
     return { type: 'success', content }

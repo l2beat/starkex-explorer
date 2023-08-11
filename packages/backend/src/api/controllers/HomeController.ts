@@ -58,7 +58,7 @@ export class HomeController {
       forcedUserTransactions,
       forcedUserTransactionsCount,
       availableOffers,
-      availableOffersCount,
+      offersCount,
     ] = await Promise.all([
       this.l2TransactionRepository.getPaginatedWithoutMulti(
         { offset: 0, limit: 8 },
@@ -81,7 +81,7 @@ export class HomeController {
         offset: 0,
         limit: 4,
       }),
-      this.forcedTradeOfferRepository.countAvailable(),
+      this.forcedTradeOfferRepository.countAll(),
     ])
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
@@ -111,21 +111,23 @@ export class HomeController {
         this.excludeL2TransactionTypes
       )
 
+    const statistics = {
+      stateUpdateCount: stateUpdatesCount,
+      l2TransactionCount: totalL2Transactions,
+      forcedTransactionCount: forcedUserTransactionsCount,
+      offerCount: offersCount,
+    }
+
     const content = renderHomePage({
       context,
       tutorials: [], // explicitly no tutorials
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
-      totalL2Transactions,
+      statistics,
       stateUpdates: stateUpdateEntries,
-      totalStateUpdates: stateUpdatesCount,
       forcedTransactions: forcedTransactionEntries,
-      totalForcedTransactions: forcedUserTransactionsCount,
-      // We use forcedTradeOfferToEntry here because we only need status from the offer,
-      // as we do not show other statuses on this page
       offers: availableOffers.map((offer) =>
         this.forcedTradeOfferViewService.toOfferEntry(offer)
       ),
-      totalOffers: availableOffersCount,
     })
     return { type: 'success', content }
   }

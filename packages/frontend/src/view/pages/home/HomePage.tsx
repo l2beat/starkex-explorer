@@ -24,6 +24,7 @@ import {
   HomeStateUpdateEntry,
   HomeStateUpdatesTable,
 } from './components/HomeStateUpdatesTable'
+import { HomeStatistics, StatisticsEntry } from './components/HomeStatistics'
 import {
   DEFAULT_TUTORIALS,
   HomeTutorialEntry,
@@ -32,16 +33,12 @@ import {
 
 interface HomePageProps {
   context: PageContext
-  // TODO: statistics
   tutorials?: HomeTutorialEntry[]
   stateUpdates: HomeStateUpdateEntry[]
-  totalStateUpdates: number
   l2Transactions: PerpetualL2TransactionEntry[]
-  totalL2Transactions: number
   forcedTransactions: TransactionEntry[]
-  totalForcedTransactions: number
+  statistics: StatisticsEntry
   offers?: OfferEntry[]
-  totalOffers: number
 }
 
 export function renderHomePage(props: HomePageProps) {
@@ -66,12 +63,23 @@ function HomePage(props: HomePageProps) {
               tradingMode={props.context.tradingMode}
             />
           </div>
-          <div className="grid grid-cols-1 space-x-0 space-y-8 xl:grid-cols-2 xl:space-x-8 xl:space-y-0">
+          <div className="grid gap-x-0 gap-y-8 xl:grid-cols-3 xl:gap-x-8">
+            <HomeStatistics
+              className={
+                tutorials.length > 0 ? 'xl:col-span-2' : 'xl:col-span-3'
+              }
+              statistics={props.statistics}
+              showL2Transactions={props.context.showL2Transactions}
+            />
+            {tutorials.length > 0 && (
+              <HomeTutorials tutorials={tutorials} className="hidden xl:flex" />
+            )}
+          </div>
+          <div className="grid grid-cols-1 gap-x-0 gap-y-8 xl:grid-cols-2 xl:gap-x-8 xl:gap-y-0">
             <Card>
               <TablePreview
                 {...STATE_UPDATE_TABLE_PROPS}
                 visible={props.stateUpdates.length}
-                total={props.totalStateUpdates}
               >
                 <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
               </TablePreview>
@@ -81,7 +89,6 @@ function HomePage(props: HomePageProps) {
                 <TablePreview
                   {...L2_TRANSACTIONS_TABLE_PROPS}
                   visible={props.l2Transactions.length}
-                  total={props.totalL2Transactions}
                 >
                   <L2TransactionsTable
                     transactions={props.l2Transactions}
@@ -93,7 +100,6 @@ function HomePage(props: HomePageProps) {
               <TablePreview
                 {...FORCED_TRANSACTION_TABLE_PROPS}
                 visible={props.forcedTransactions.length}
-                total={props.totalForcedTransactions}
               >
                 <TransactionsTable
                   transactions={props.forcedTransactions}
@@ -104,15 +110,16 @@ function HomePage(props: HomePageProps) {
                 <TablePreview
                   {...OFFER_TABLE_PROPS}
                   visible={props.offers.length}
-                  total={props.totalOffers}
                 >
                   <OffersTable offers={props.offers} context={props.context} />
                 </TablePreview>
               )}
             </Card>
           </div>
+          {tutorials.length > 0 && (
+            <HomeTutorials tutorials={tutorials} className="hidden xl:flex" />
+          )}
         </div>
-        {tutorials.length > 0 && <HomeTutorials tutorials={tutorials} />}
       </ContentWrapper>
     </Page>
   )

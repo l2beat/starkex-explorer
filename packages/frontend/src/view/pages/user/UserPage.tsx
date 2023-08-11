@@ -44,15 +44,10 @@ interface UserPageProps {
   withdrawableAssets: WithdrawableAssetEntry[]
   finalizableOffers: FinalizableOfferEntry[]
   assets: UserAssetEntry[]
-  totalAssets: number
   balanceChanges: UserBalanceChangeEntry[]
-  totalBalanceChanges: number
   transactions: TransactionEntry[]
-  totalTransactions: number
   l2Transactions: PerpetualL2TransactionEntry[]
-  totalL2Transactions: number | 'processing'
   offers?: OfferEntry[]
-  totalOffers: number
 }
 
 export function renderUserPage(props: UserPageProps) {
@@ -91,7 +86,6 @@ function UserPage(props: UserPageProps) {
         <TablePreview
           {...getAssetsTableProps(props.starkKey)}
           visible={props.assets.length}
-          total={props.totalAssets}
         >
           <UserAssetsTable
             tradingMode={props.context.tradingMode}
@@ -106,7 +100,6 @@ function UserPage(props: UserPageProps) {
           <TablePreview
             {...getL2TransactionTableProps(props.starkKey)}
             visible={props.l2Transactions.length}
-            total={props.totalL2Transactions}
           >
             <L2TransactionsTable
               transactions={props.l2Transactions}
@@ -117,7 +110,6 @@ function UserPage(props: UserPageProps) {
         <TablePreview
           {...getBalanceChangeTableProps(props.starkKey)}
           visible={props.balanceChanges.length}
-          total={props.totalBalanceChanges}
         >
           <UserBalanceChangesTable
             tradingMode={props.context.tradingMode}
@@ -127,7 +119,6 @@ function UserPage(props: UserPageProps) {
         <TablePreview
           {...getTransactionTableProps(props.starkKey)}
           visible={props.transactions.length}
-          total={props.totalTransactions}
         >
           <TransactionsTable transactions={props.transactions} />
         </TablePreview>
@@ -135,7 +126,6 @@ function UserPage(props: UserPageProps) {
           <TablePreview
             {...getOfferTableProps(props.starkKey)}
             visible={props.offers.length}
-            total={props.totalOffers}
           >
             <OffersTable
               offers={props.offers}
