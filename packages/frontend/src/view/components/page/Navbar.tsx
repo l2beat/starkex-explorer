@@ -17,7 +17,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
   const isMainnet = chainId === 1
   return (
     <div>
-      <div className="flex h-16 flex-wrap items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
+      <nav className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-y-2 border-b border-zinc-800 px-6 py-2.5">
         <a
           className="flex items-center justify-center gap-2 divide-x sm:gap-4"
           href="/"
@@ -39,12 +39,12 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
           )}
           {!user && (
             <>
-              <Button id="connect-with-metamask" className="lg:hidden">
+              <Button id="connect-with-metamask" className="sm:hidden">
                 Connect
               </Button>
               <Button
                 id="connect-with-metamask"
-                className="hidden whitespace-nowrap lg:block"
+                className="hidden whitespace-nowrap sm:block"
               >
                 Connect wallet
               </Button>
@@ -74,7 +74,7 @@ export function Navbar({ searchBar = true, context }: NavbarProps) {
             </a>
           )}
         </div>
-      </div>
+      </nav>
     </div>
   )
 }
