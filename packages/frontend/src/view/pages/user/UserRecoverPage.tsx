@@ -1,10 +1,10 @@
 import { PageContextWithUser } from '@explorer/shared'
 import React from 'react'
 
-import { InfoIcon } from '../../assets/icons/InfoIcon'
 import { WarningIcon } from '../../assets/icons/WarningIcon'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
+import { InfoBanner } from '../../components/InfoBanner'
 import { InlineEllipsis } from '../../components/InlineEllipsis'
 import { Link } from '../../components/Link'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
@@ -69,12 +69,7 @@ function UserRecoverPage(props: UserRegisterPageProps) {
               Recover
             </Button>
           </div>
-          <div className="mt-3 flex items-center justify-center rounded bg-blue-400 bg-opacity-20 py-2">
-            <InfoIcon />
-            <p className="ml-2 text-sm font-medium text-white">
-              Recover your Stark key
-            </p>
-          </div>
+          <InfoBanner className="mt-3">Recover your Stark key</InfoBanner>
           <p className="mt-6 text-sm font-semibold text-zinc-500">
             Ethereum address
           </p>
