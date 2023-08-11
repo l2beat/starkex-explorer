@@ -151,11 +151,16 @@ export class UserController {
       userAssets,
       history,
       l2Transactions,
+      preprocessedUserL2TransactionsStatistics,
+      liveL2TransactionStatistics,
       sentTransactions,
       userTransactions,
+      userTransactionsCount,
       forcedTradeOffers,
+      forcedTradeOffersCount,
       finalizableOffers,
       starkKeyWithdrawableAssets,
+      userStatistics,
     ] = await Promise.all([
       this.userRegistrationEventRepository.findByStarkKey(starkKey),
       this.preprocessedAssetHistoryRepository.getCurrentByStarkKeyPaginated(
@@ -172,18 +177,25 @@ export class UserController {
         paginationOpts,
         this.excludeL2TransactionTypes
       ),
+      this.preprocessedUserL2TransactionsStatisticsRepository.findLatestByStarkKey(
+        starkKey
+      ),
+      this.l2TransactionRepository.getLiveStatisticsByStarkKey(starkKey),
       this.sentTransactionRepository.getByStarkKey(starkKey),
       this.userTransactionRepository.getByStarkKey(
         starkKey,
         undefined,
         paginationOpts
       ),
+      this.userTransactionRepository.getCountByStarkKey(starkKey),
       this.forcedTradeOfferRepository.getByMakerOrTakerStarkKey(
         starkKey,
         paginationOpts
       ),
+      this.forcedTradeOfferRepository.countByMakerOrTakerStarkKey(starkKey),
       this.forcedTradeOfferRepository.getFinalizableByStarkKey(starkKey),
       this.withdrawableAssetRepository.getAssetBalancesByStarkKey(starkKey),
+      this.preprocessedUserStatisticsRepository.findCurrentByStarkKey(starkKey),
     ])
 
     const ethAddressWithdrawableAssets =
@@ -241,10 +253,21 @@ export class UserController {
       assetDetailsMap
     )
 
+    const totalTransactions = userTransactionsCount
     const offers =
       await this.forcedTradeOfferViewService.toEntriesWithFullHistory(
         forcedTradeOffers,
         starkKey
+      )
+
+    const totalL2Transactions =
+      sumUpTransactionCount(
+        preprocessedUserL2TransactionsStatistics?.cumulativeL2TransactionsStatistics,
+        this.excludeL2TransactionTypes
+      ) +
+      sumUpTransactionCount(
+        liveL2TransactionStatistics,
+        this.excludeL2TransactionTypes
       )
 
     // If escape process has started on perpetuals, hide all assets
@@ -258,6 +281,7 @@ export class UserController {
       starkKey,
       ethereumAddress: registeredUser?.ethAddress,
       l2Transactions: l2Transactions.map(l2TransactionToEntry),
+      totalL2Transactions,
       escapableAssets: toEscapableBalanceEntries(
         escapableMap,
         context,
@@ -276,9 +300,13 @@ export class UserController {
         this.forcedTradeOfferViewService.toFinalizableOfferEntry(offer)
       ),
       assets: hideAllAssets ? [] : assetEntries, // When frozen and escaped, don't show assets
+      totalAssets: hideAllAssets ? 0 : userStatistics?.assetCount ?? 0,
       balanceChanges: balanceChangesEntries,
+      totalBalanceChanges: userStatistics?.balanceChangeCount ?? 0,
       transactions,
+      totalTransactions,
       offers,
+      totalOffers: forcedTradeOffersCount,
     })
 
     return { type: 'success', content }
