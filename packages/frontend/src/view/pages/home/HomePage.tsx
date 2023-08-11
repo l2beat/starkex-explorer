@@ -84,35 +84,44 @@ function HomePage(props: HomePageProps) {
                 <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
               </TablePreview>
             </Card>
-            <Card className="flex h-min flex-col gap-10">
+            <Card className="flex h-min flex-col gap-10 bg-transparent !p-0 xl:bg-gray-800 xl:!p-6">
               {props.context.showL2Transactions && (
+                <Card className="xl:p-0">
+                  <TablePreview
+                    {...L2_TRANSACTIONS_TABLE_PROPS}
+                    visible={props.l2Transactions.length}
+                  >
+                    <L2TransactionsTable
+                      transactions={props.l2Transactions}
+                      context={props.context}
+                      showDetails={false}
+                    />
+                  </TablePreview>
+                </Card>
+              )}
+              <Card className="xl:p-0">
                 <TablePreview
-                  {...L2_TRANSACTIONS_TABLE_PROPS}
-                  visible={props.l2Transactions.length}
+                  {...FORCED_TRANSACTION_TABLE_PROPS}
+                  visible={props.forcedTransactions.length}
                 >
-                  <L2TransactionsTable
-                    transactions={props.l2Transactions}
-                    context={props.context}
-                    showDetails={false}
+                  <TransactionsTable
+                    transactions={props.forcedTransactions}
+                    hideAmount
                   />
                 </TablePreview>
-              )}
-              <TablePreview
-                {...FORCED_TRANSACTION_TABLE_PROPS}
-                visible={props.forcedTransactions.length}
-              >
-                <TransactionsTable
-                  transactions={props.forcedTransactions}
-                  hideAmount
-                />
-              </TablePreview>
+              </Card>
               {props.offers && props.context.tradingMode === 'perpetual' && (
-                <TablePreview
-                  {...OFFER_TABLE_PROPS}
-                  visible={props.offers.length}
-                >
-                  <OffersTable offers={props.offers} context={props.context} />
-                </TablePreview>
+                <Card className="xl:p-0">
+                  <TablePreview
+                    {...OFFER_TABLE_PROPS}
+                    visible={props.offers.length}
+                  >
+                    <OffersTable
+                      offers={props.offers}
+                      context={props.context}
+                    />
+                  </TablePreview>
+                </Card>
               )}
             </Card>
           </div>
