@@ -7,7 +7,7 @@ interface TabWithContent {
 const ARROWS_THRESHOLD = 2
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-export function configureTabs() {
+export function initTabs() {
   const { $$ } = makeQuery(document.body)
   const tabs = $$('.Tabs')
 

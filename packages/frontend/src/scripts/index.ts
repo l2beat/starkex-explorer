@@ -7,17 +7,23 @@ import { initMetamask } from './metamask'
 import { initPagination } from './pagination'
 import { initRegularWithdrawalForm } from './regularWithdrawal'
 import { initStateUpdateStats } from './stateUpdateStats'
-import { configureTabs } from './tabs'
+import { initTabs } from './tabs'
 import { initTooltips } from './tooltips'
 
-initMetamask()
-initForcedActionForms()
-initImageFallback()
-initPagination()
+// #region UI elements
+initTabs()
+initTooltips()
 initStateUpdateStats()
+initPagination()
+// #endregion
+// #region Forms
 initStarkKeyRecovery()
+initStarkKeyRegistration()
+initForcedActionForms()
 initForcedTradeOfferForms()
 initRegularWithdrawalForm()
-initStarkKeyRegistration()
-initTooltips()
-configureTabs()
+// #endregion
+// #region Misc
+initImageFallback()
+initMetamask()
+// #endregion
