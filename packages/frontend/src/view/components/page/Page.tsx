@@ -45,6 +45,7 @@ export function Page(props: Props) {
       <body className="flex h-full flex-col">
         <Navbar searchBar={!props.withoutSearch} context={props.context} />
         <FreezeBanner freezeStatus={props.context.freezeStatus} />
+        <GradientBackground />
         {props.children}
         <Footer />
         <Tooltip />
@@ -53,6 +54,14 @@ export function Page(props: Props) {
         ))}
       </body>
     </html>
+  )
+}
+
+function GradientBackground() {
+  return (
+    <div className="relative">
+      <div className="absolute top-0 -z-50 h-96 w-full bg-gradient-to-b from-[#262646] via-transparent "></div>
+    </div>
   )
 }
 
