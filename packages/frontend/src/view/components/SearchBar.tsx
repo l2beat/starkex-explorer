@@ -15,7 +15,7 @@ export function SearchBar({ tradingMode, className }: SearchBarProps) {
       method="GET"
       action="/search"
       className={cx(
-        'group flex h-10 w-full rounded-lg border border-gray-600 bg-transparent drop-shadow-lg transition-colors focus-within:!border-brand hover:border-zinc-500',
+        'group flex h-10 w-full rounded-lg border border-gray-600 bg-black drop-shadow-lg transition-colors focus-within:!border-brand hover:border-zinc-500',
         className
       )}
     >

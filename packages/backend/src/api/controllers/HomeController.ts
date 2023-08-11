@@ -48,7 +48,7 @@ export class HomeController {
     givenUser: Partial<UserDetails>
   ): Promise<ControllerResult> {
     const context = await this.pageContextService.getPageContext(givenUser)
-    const paginationOpts = { offset: 0, limit: 6 }
+
     const [
       l2Transactions,
       lastStateDetailsWithL2TransactionsStatistics,
@@ -61,19 +61,26 @@ export class HomeController {
       availableOffersCount,
     ] = await Promise.all([
       this.l2TransactionRepository.getPaginatedWithoutMulti(
-        paginationOpts,
+        { offset: 0, limit: 8 },
         this.excludeL2TransactionTypes
       ),
       this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
       this.l2TransactionRepository.getLiveStatistics(),
-      this.preprocessedStateDetailsRepository.getPaginated(paginationOpts),
+      this.preprocessedStateDetailsRepository.getPaginated({
+        offset: 0,
+        limit: 25,
+      }),
       this.preprocessedStateDetailsRepository.countAll(),
       this.userTransactionRepository.getPaginated({
-        ...paginationOpts,
+        offset: 0,
+        limit: 4,
         types: FORCED_TRANSACTION_TYPES,
       }),
       this.userTransactionRepository.countAll(FORCED_TRANSACTION_TYPES),
-      this.forcedTradeOfferRepository.getAvailablePaginated(paginationOpts),
+      this.forcedTradeOfferRepository.getAvailablePaginated({
+        offset: 0,
+        limit: 4,
+      }),
       this.forcedTradeOfferRepository.countAvailable(),
     ])
 

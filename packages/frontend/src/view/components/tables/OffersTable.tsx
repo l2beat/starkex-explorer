@@ -19,8 +19,8 @@ import { TimeAgeCell } from '../TimeAgeCell'
 interface OffersTableProps {
   context: PageContext<'perpetual'>
   offers: OfferEntry[]
-  showStatus?: boolean
   showRole?: boolean
+  showTradeDetails?: boolean
 }
 
 export interface OfferEntry {
@@ -45,36 +45,41 @@ export interface OfferEntry {
 
 export function OffersTable(props: OffersTableProps) {
   const columns: Column[] = [
-    { header: 'Age' },
     { header: 'Id' },
-    { header: 'Trade', align: 'center' },
-    ...(props.showStatus ? [{ header: 'Status' }] : []),
+    ...(props.showTradeDetails
+      ? [{ header: 'Trade', align: 'center' as const }]
+      : []),
     ...(props.showRole ? [{ header: 'Role' }] : []),
     { header: 'Type' },
+    { header: 'Status' },
+    { header: 'Age' },
   ]
-
+  if (props.showTradeDetails) {
+    props.offers
+  }
   return (
     <Table
       columns={columns}
       rows={props.offers.map((offer) => {
         const cells: ReactNode[] = [
-          <TimeAgeCell timestamp={offer.timestamp} />,
           <Link>#{offer.id}</Link>,
-          <TradeColumn
-            offer={offer}
-            collateralAsset={props.context.collateralAsset}
-          />,
-          ...(props.showStatus
+          ...(props.showTradeDetails
             ? [
-                <StatusBadge type={toStatusType(offer.status)}>
-                  {toStatusText(offer.status)}
-                </StatusBadge>,
+                <TradeColumn
+                  offer={offer}
+                  collateralAsset={props.context.collateralAsset}
+                />,
               ]
             : []),
+
           ...(props.showRole
             ? [<span className="capitalize">{offer.role?.toLowerCase()}</span>]
             : []),
           <span className="capitalize">{offer.type.toLowerCase()}</span>,
+          <StatusBadge type={toStatusType(offer.status)}>
+            {toStatusText(offer.status)}
+          </StatusBadge>,
+          <TimeAgeCell timestamp={offer.timestamp} />,
         ]
 
         return {
@@ -118,16 +123,14 @@ function TradeColumn({ offer, collateralAsset }: Props) {
         <AssetWithLogo
           type="small"
           assetInfo={assetToInfo(trade.offeredAsset)}
-          symbolClassName="max-w-[60px]"
         />
       </div>
-      <ArrowRightIcon className="mx-1 flex-1" />
+      <ArrowRightIcon className="mx-1 flex-shrink-0" />
       <div className="flex items-center gap-2">
         {formatAmount(trade.receivedAsset, trade.receivedAmount)}
         <AssetWithLogo
           type="small"
           assetInfo={assetToInfo(trade.receivedAsset)}
-          symbolClassName="max-w-[60px]"
         />
       </div>
     </div>

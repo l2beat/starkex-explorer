@@ -13,7 +13,8 @@ import { TimeAgeCell } from '../TimeAgeCell'
 
 interface TransactionsTableProps {
   transactions: TransactionEntry[]
-  hideTime?: boolean
+  hideAge?: boolean
+  hideAmount?: boolean
 }
 
 export interface TransactionEntry {
@@ -33,17 +34,13 @@ export interface TransactionEntry {
 }
 
 export function TransactionsTable(props: TransactionsTableProps) {
-  const columns: Column[] = []
-  if (!props.hideTime) {
-    columns.push({ header: 'Age' })
-  }
-  columns.push(
+  const columns: Column[] = [
     { header: 'Tx Hash' },
-    { header: 'Asset' },
-    { header: 'Amount', numeric: true },
+    ...(!props.hideAmount ? [{ header: 'Amount' }] : []),
+    { header: 'Type' },
     { header: 'Status' },
-    { header: 'Type' }
-  )
+    ...(!props.hideAge ? [{ header: 'Age' }] : []),
+  ]
 
   return (
     <Table
@@ -51,30 +48,35 @@ export function TransactionsTable(props: TransactionsTableProps) {
       rows={props.transactions.map((transaction) => {
         const status = getStatus(transaction)
 
-        const cells: ReactNode[] = []
-        if (!props.hideTime) {
-          cells.push(<TimeAgeCell timestamp={transaction.timestamp} />)
-        }
-        cells.push(
+        const cells: ReactNode[] = [
           <Link>
             <InlineEllipsis className="max-w-[80px]">
               {transaction.hash.toString()}
             </InlineEllipsis>
           </Link>,
-          transaction.asset ? (
-            <AssetWithLogo
-              type="small"
-              assetInfo={assetToInfo(transaction.asset)}
-            />
-          ) : (
-            '-'
-          ),
-          transaction.asset && transaction.amount !== undefined
-            ? formatAmount(transaction.asset, transaction.amount)
-            : '-',
+          ...(!props.hideAmount
+            ? [
+                <div className="flex items-center gap-0.5">
+                  {transaction.asset && transaction.amount !== undefined
+                    ? formatAmount(transaction.asset, transaction.amount)
+                    : '-'}
+                  {transaction.asset ? (
+                    <AssetWithLogo
+                      type="small"
+                      assetInfo={assetToInfo(transaction.asset)}
+                    />
+                  ) : (
+                    '-'
+                  )}
+                </div>,
+              ]
+            : []),
+          toTypeText(transaction.type),
           <StatusBadge type={status.type}>{status.text}</StatusBadge>,
-          toTypeText(transaction.type)
-        )
+          ...(!props.hideAge
+            ? [<TimeAgeCell timestamp={transaction.timestamp} />]
+            : []),
+        ]
 
         return {
           link: `/transactions/${transaction.hash.toString()}`,

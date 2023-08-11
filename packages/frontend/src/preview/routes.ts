@@ -129,13 +129,13 @@ const routes: Route[] = [
 
       ctx.body = renderHomePage({
         context,
-        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        stateUpdates: repeat(16, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         l2Transactions: [],
         totalL2Transactions: 0,
-        offers: repeat(6, randomHomeOfferEntry),
+        offers: repeat(3, randomHomeOfferEntry),
         totalOffers: 7,
       })
     },
@@ -151,14 +151,14 @@ const routes: Route[] = [
 
       ctx.body = renderHomePage({
         context,
-        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        stateUpdates: repeat(25, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        l2Transactions: repeat(6, randomPerpetualL2TransactionEntry),
+        l2Transactions: repeat(8, randomPerpetualL2TransactionEntry),
         totalL2Transactions: 5123,
         tutorials: [],
-        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
-        offers: repeat(6, randomHomeOfferEntry),
+        offers: repeat(3, randomHomeOfferEntry),
         totalOffers: 7,
       })
     },
@@ -171,13 +171,13 @@ const routes: Route[] = [
       ctx.body = renderHomePage({
         context,
         tutorials: [],
-        stateUpdates: repeat(6, randomHomeStateUpdateEntry),
+        stateUpdates: repeat(16, randomHomeStateUpdateEntry),
         totalStateUpdates: 5123,
-        forcedTransactions: repeat(6, randomHomeForcedTransactionEntry),
+        forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
         totalForcedTransactions: 68,
         l2Transactions: [],
         totalL2Transactions: 0,
-        offers: repeat(6, randomHomeOfferEntry),
+        offers: repeat(3, randomHomeOfferEntry),
         totalOffers: 7,
       })
     },

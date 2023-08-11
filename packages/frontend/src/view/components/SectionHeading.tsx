@@ -19,7 +19,9 @@ export function SectionHeading(props: SectionHeadingProps) {
       <h2 className={cx('text-xl font-semibold', props.children && 'flex-1')}>
         {props.title}
       </h2>
-      <p className="text-sm font-medium text-zinc-500">{props.description}</p>
+      <p className="text-right text-sm font-medium text-zinc-500">
+        {props.description}
+      </p>
       {props.children}
     </div>
   )

@@ -34,7 +34,7 @@ export function TablePreview(props: TablePreviewProps) {
       />
       {props.children}
       {props.visible === 0 && (
-        <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
+        <div className="group-[.Card]:bg-gray-900 flex h-20 items-center justify-center rounded bg-transparent text-center text-md text-zinc-500">
           {props.total === 'processing'
             ? `${props.entryLongNamePlural} are being processed...`
             : `There are no ${props.entryLongNamePlural} to view.`}

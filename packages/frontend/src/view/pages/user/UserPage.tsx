@@ -138,10 +138,10 @@ function UserPage(props: UserPageProps) {
             total={props.totalOffers}
           >
             <OffersTable
-              showStatus
-              showRole
               offers={props.offers}
               context={props.context}
+              showRole
+              showTradeDetails
             />
           </TablePreview>
         )}

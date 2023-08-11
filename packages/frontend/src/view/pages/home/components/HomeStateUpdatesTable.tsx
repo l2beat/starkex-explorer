@@ -23,9 +23,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
   return (
     <Table
       columns={[
-        { header: 'Age' },
         { header: 'Id' },
-        { header: 'Tx Hash' },
         { header: 'Updates', numeric: true },
         {
           header: (
@@ -36,22 +34,24 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
           ),
           numeric: true,
         },
+        { header: 'Tx Hash' },
+        { header: 'Age' },
       ]}
       rows={props.stateUpdates.map((stateUpdate) => {
         return {
           link: `/state-updates/${stateUpdate.id}`,
           cells: [
-            <TimeAgeCell timestamp={stateUpdate.timestamp} />,
             <Link>#{stateUpdate.id}</Link>,
-            <InlineEllipsis className="max-w-[80px] sm:max-w-[160px]">
-              {stateUpdate.hash.toString()}
-            </InlineEllipsis>,
             stateUpdate.updateCount > 0
               ? formatInt(stateUpdate.updateCount)
               : '-',
             stateUpdate.forcedTransactionCount > 0
               ? formatInt(stateUpdate.forcedTransactionCount)
               : '-',
+            <InlineEllipsis className="max-w-[80px]">
+              {stateUpdate.hash.toString()}
+            </InlineEllipsis>,
+            <TimeAgeCell timestamp={stateUpdate.timestamp} />,
           ],
         }
       })}

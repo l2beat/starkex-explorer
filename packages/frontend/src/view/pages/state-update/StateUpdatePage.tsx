@@ -78,7 +78,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
           visible={props.transactions.length}
           total={props.totalTransactions}
         >
-          <TransactionsTable hideTime transactions={props.transactions} />
+          <TransactionsTable hideAge transactions={props.transactions} />
         </TablePreview>
         {props.priceChanges && (
           <section>

@@ -20,16 +20,17 @@ import { PerpetualL2TransactionFreeForm } from './PerpetualL2TransactionFreeForm
 export interface PerpetualL2TransactionsTableProps {
   transactions: PerpetualL2TransactionEntry[]
   collateralAsset: CollateralAsset
+  showDetails: boolean
 }
 
 export function PerpetualL2TransactionsTable(
   props: PerpetualL2TransactionsTableProps
 ) {
   const columns: Column[] = [
-    { header: 'Age' },
+    { header: `ID` },
     { header: 'Type' },
-    { header: `Transaction id` },
     { header: 'Status' },
+    { header: 'Age' },
   ]
 
   return (
@@ -40,19 +41,20 @@ export function PerpetualL2TransactionsTable(
           transaction.stateUpdateId
         )
         const cells: ReactNode[] = [
+          <Link>#{transaction.transactionId}</Link>,
+          <TypeCell
+            transaction={transaction}
+            collateralAsset={props.collateralAsset}
+            showDetails={props.showDetails}
+          />,
+          <StatusBadge type={statusBadgeValues.type}>
+            {statusBadgeValues.text}
+          </StatusBadge>,
           transaction.timestamp ? (
             <TimeAgeCell timestamp={transaction.timestamp} />
           ) : (
             '-'
           ),
-          <TypeCell
-            transaction={transaction}
-            collateralAsset={props.collateralAsset}
-          />,
-          <Link>#{transaction.transactionId}</Link>,
-          <StatusBadge type={statusBadgeValues.type}>
-            {statusBadgeValues.text}
-          </StatusBadge>,
         ]
 
         return {
@@ -67,8 +69,13 @@ export function PerpetualL2TransactionsTable(
 interface TypeCellProps {
   transaction: PerpetualL2TransactionEntry
   collateralAsset: CollateralAsset
+  showDetails: boolean
 }
-function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
+function TypeCell({
+  transaction,
+  collateralAsset,
+  showDetails,
+}: TypeCellProps) {
   return (
     <span className="flex items-center gap-3">
       {l2TransactionTypeToText(transaction.data.type)}
@@ -95,10 +102,12 @@ function TypeCell({ transaction, collateralAsset }: TypeCellProps) {
           )}
         </div>
       )}
-      <PerpetualL2TransactionFreeForm
-        data={transaction.data}
-        collateralAsset={collateralAsset}
-      />
+      {showDetails && (
+        <PerpetualL2TransactionFreeForm
+          data={transaction.data}
+          collateralAsset={collateralAsset}
+        />
+      )}
     </span>
   )
 }

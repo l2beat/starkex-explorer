@@ -1,7 +1,8 @@
 import { PageContext } from '@explorer/shared'
-import cx from 'classnames'
 import React from 'react'
 
+import { Card } from '../../components/Card'
+import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { SearchBar } from '../../components/SearchBar'
 import { TablePreview } from '../../components/table/TablePreview'
@@ -57,57 +58,62 @@ function HomePage(props: HomePageProps) {
       context={props.context}
       withoutSearch
     >
-      <main
-        className={cx(
-          'mx-auto flex w-full max-w-[1024px] flex-1 flex-col gap-8 py-12 px-4 sm:px-8',
-          tutorials.length > 0 &&
-            'xl:grid xl:max-w-[1236px] xl:grid-cols-[minmax(760px,_1fr)_380px]'
-        )}
-      >
+      <ContentWrapper className="!max-w-[1340px]">
         <div className="flex flex-col gap-8">
-          <SearchBar tradingMode={props.context.tradingMode} />
-          {props.context.showL2Transactions && (
-            <TablePreview
-              {...L2_TRANSACTIONS_TABLE_PROPS}
-              visible={props.l2Transactions.length}
-              total={props.totalL2Transactions}
-            >
-              <L2TransactionsTable
-                transactions={props.l2Transactions}
-                context={props.context}
-              />
-            </TablePreview>
-          )}
-          <TablePreview
-            {...STATE_UPDATE_TABLE_PROPS}
-            visible={props.stateUpdates.length}
-            total={props.totalStateUpdates}
-          >
-            <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
-          </TablePreview>
-          <TablePreview
-            {...FORCED_TRANSACTION_TABLE_PROPS}
-            visible={props.forcedTransactions.length}
-            total={props.totalForcedTransactions}
-          >
-            <TransactionsTable transactions={props.forcedTransactions} />
-          </TablePreview>
-          {props.offers && props.context.tradingMode === 'perpetual' && (
-            <TablePreview
-              {...OFFER_TABLE_PROPS}
-              visible={props.offers.length}
-              total={props.totalOffers}
-            >
-              <OffersTable
-                showStatus
-                offers={props.offers}
-                context={props.context}
-              />
-            </TablePreview>
-          )}
+          <div className="flex h-24 items-center justify-center rounded-none bg-gradient-to-b from-brand to-indigo-900 lg:mx-0 lg:rounded-lg">
+            <SearchBar
+              className="!w-3/4"
+              tradingMode={props.context.tradingMode}
+            />
+          </div>
+          <div className="grid grid-cols-1 space-x-0 space-y-8 xl:grid-cols-2 xl:space-x-8 xl:space-y-0">
+            <Card>
+              <TablePreview
+                {...STATE_UPDATE_TABLE_PROPS}
+                visible={props.stateUpdates.length}
+                total={props.totalStateUpdates}
+              >
+                <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
+              </TablePreview>
+            </Card>
+            <Card className="flex h-min flex-col gap-10">
+              {props.context.showL2Transactions && (
+                <TablePreview
+                  {...L2_TRANSACTIONS_TABLE_PROPS}
+                  visible={props.l2Transactions.length}
+                  total={props.totalL2Transactions}
+                >
+                  <L2TransactionsTable
+                    transactions={props.l2Transactions}
+                    context={props.context}
+                    showDetails={false}
+                  />
+                </TablePreview>
+              )}
+              <TablePreview
+                {...FORCED_TRANSACTION_TABLE_PROPS}
+                visible={props.forcedTransactions.length}
+                total={props.totalForcedTransactions}
+              >
+                <TransactionsTable
+                  transactions={props.forcedTransactions}
+                  hideAmount
+                />
+              </TablePreview>
+              {props.offers && props.context.tradingMode === 'perpetual' && (
+                <TablePreview
+                  {...OFFER_TABLE_PROPS}
+                  visible={props.offers.length}
+                  total={props.totalOffers}
+                >
+                  <OffersTable offers={props.offers} context={props.context} />
+                </TablePreview>
+              )}
+            </Card>
+          </div>
         </div>
         {tutorials.length > 0 && <HomeTutorials tutorials={tutorials} />}
-      </main>
+      </ContentWrapper>
     </Page>
   )
 }
