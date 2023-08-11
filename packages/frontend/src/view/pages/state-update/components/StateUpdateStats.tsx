@@ -2,7 +2,6 @@ import { PageContext } from '@explorer/shared'
 import { Hash256, PedersenHash, Timestamp } from '@explorer/types'
 import React, { ReactNode } from 'react'
 
-import { formatInt } from '../../../../utils/formatting/formatAmount'
 import { formatTimestamp } from '../../../../utils/formatting/formatTimestamp'
 import {
   ChevronDownIcon,
@@ -10,19 +9,19 @@ import {
 } from '../../../assets/icons/ChevronIcon'
 import { Button } from '../../../components/Button'
 import { EtherscanLink } from '../../../components/EtherscanLink'
+import { InlineEllipsis } from '../../../components/InlineEllipsis'
 import { Link } from '../../../components/Link'
 import { PageTitle } from '../../../components/PageTitle'
 
 export interface StateUpdateStatsProps {
   id: string
+  transactionHash: Hash256
   hashes: {
-    factHash: Hash256
     positionTreeRoot?: PedersenHash
     onChainVaultTreeRoot?: PedersenHash
     offChainVaultTreeRoot?: PedersenHash
     orderRoot?: PedersenHash
   }
-  blockNumber: number
   ethereumTimestamp: Timestamp
   starkExTimestamp: Timestamp
   rawDataAvailable?: boolean
@@ -43,14 +42,16 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
     <section data-component="StateUpdateStats">
       <PageTitle>State Update #{props.id}</PageTitle>
       <div className="mb-6 flex flex-col gap-6 rounded-lg bg-gray-800 p-6">
-        <div className="flex justify-between gap-6">
-          <ValueItem label="Ethereum block number">
+        <div className="flex flex-col justify-between gap-6 sm:flex-row">
+          <ValueItem label="Transaction hash">
             <EtherscanLink
               chainId={props.context.chainId}
-              type="block"
-              blockNumber={props.blockNumber}
+              type="tx"
+              txHash={props.transactionHash.toString()}
             >
-              {formatInt(props.blockNumber)}
+              <InlineEllipsis className="max-w-[250px] lg:max-w-md">
+                {props.transactionHash.toString()}
+              </InlineEllipsis>
             </EtherscanLink>
           </ValueItem>
           <ValueItem label="Ethereum block timestamp">
@@ -67,9 +68,6 @@ export function StateUpdateStats(props: StateUpdateStatsProps) {
         </div>
         <div className="hidden" data-component="StateUpdateStats-Advanced">
           <div className="flex flex-col gap-4 rounded bg-slate-800 p-6">
-            <ValueItem label="Fact hash">
-              {props.hashes.factHash.toString()}
-            </ValueItem>
             {props.hashes.positionTreeRoot && (
               <ValueItem label="Position tree root">
                 0x{props.hashes.positionTreeRoot.toString()}

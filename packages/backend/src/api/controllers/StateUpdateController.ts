@@ -108,15 +108,14 @@ export class StateUpdateController {
     const content = renderStateUpdatePage({
       context,
       id: stateUpdateId.toString(),
+      transactionHash: stateUpdate.stateTransitionHash,
       hashes: {
-        factHash: stateUpdate.stateTransitionHash,
         positionTreeRoot: stateUpdate.rootHash,
         // TODO - extract this data:
         onChainVaultTreeRoot: undefined,
         offChainVaultTreeRoot: undefined,
         orderRoot: undefined,
       },
-      blockNumber: stateUpdate.blockNumber,
       ethereumTimestamp: stateUpdate.timestamp,
       // TODO - what is this?
       starkExTimestamp: stateUpdate.timestamp,

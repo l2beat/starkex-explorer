@@ -292,14 +292,13 @@ const routes: Route[] = [
       ctx.body = renderStateUpdatePage({
         context,
         id: randomId(),
+        transactionHash: Hash256.fake(),
         hashes: {
-          factHash: Hash256.fake(),
           positionTreeRoot: PedersenHash.fake(),
           onChainVaultTreeRoot: PedersenHash.fake(),
           offChainVaultTreeRoot: PedersenHash.fake(),
           orderRoot: PedersenHash.fake(),
         },
-        blockNumber: randomInt(14_000_000, 17_000_000),
         ethereumTimestamp,
         starkExTimestamp: Timestamp(
           Math.floor(
@@ -325,14 +324,13 @@ const routes: Route[] = [
       ctx.body = renderStateUpdatePage({
         context,
         id: randomId(),
+        transactionHash: Hash256.fake(),
         hashes: {
-          factHash: Hash256.fake(),
           positionTreeRoot: PedersenHash.fake(),
           onChainVaultTreeRoot: PedersenHash.fake(),
           offChainVaultTreeRoot: PedersenHash.fake(),
           orderRoot: PedersenHash.fake(),
         },
-        blockNumber: randomInt(14_000_000, 17_000_000),
         ethereumTimestamp,
         starkExTimestamp: Timestamp(
           Math.floor(
