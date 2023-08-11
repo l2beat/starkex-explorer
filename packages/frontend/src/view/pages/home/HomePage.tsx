@@ -57,7 +57,7 @@ function HomePage(props: HomePageProps) {
     >
       <ContentWrapper className="!max-w-[1340px]">
         <div className="flex flex-col gap-8">
-          <div className="flex h-24 items-center justify-center rounded-none bg-gradient-to-b from-brand to-indigo-900 lg:mx-0 lg:rounded-lg">
+          <div className="-mx-8 flex h-24 items-center justify-center rounded-none bg-gradient-to-b from-brand to-indigo-900 lg:mx-0 lg:rounded-lg">
             <SearchBar
               className="!w-3/4"
               tradingMode={props.context.tradingMode}
@@ -117,7 +117,7 @@ function HomePage(props: HomePageProps) {
             </Card>
           </div>
           {tutorials.length > 0 && (
-            <HomeTutorials tutorials={tutorials} className="hidden xl:flex" />
+            <HomeTutorials tutorials={tutorials} className="xl:hidden" />
           )}
         </div>
       </ContentWrapper>
