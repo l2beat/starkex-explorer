@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React from 'react'
 
+import { formatInt } from '../../../../utils/formatting/formatAmount'
 import { Card } from '../../../components/Card'
 import { SectionHeading } from '../../../components/SectionHeading'
 
@@ -80,7 +81,7 @@ function StatisticsItem({
       )}
     >
       <div className="text-gray-400 text-lg font-medium">{title}</div>
-      <div className="text-bold text-[50px] text-brand">{value}</div>
+      <div className="text-bold text-[50px] text-brand">{formatInt(value)}</div>
     </div>
   )
 }
