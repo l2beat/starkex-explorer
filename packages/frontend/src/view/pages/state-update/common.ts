@@ -7,7 +7,7 @@ export const getBalanceChangeTableProps = (id: string) => ({
 })
 
 export const getTransactionTableProps = (id: string) => ({
-  title: 'Included forced transactions',
+  title: 'Forced transactions',
   entryShortNamePlural: 'transactions',
   entryLongNamePlural: 'forced transactions',
   path: `/state-updates/${id}/transactions`,

@@ -7,7 +7,7 @@ import { Link } from '../Link'
 import { SectionHeading } from '../SectionHeading'
 
 interface TablePreviewProps {
-  title: ReactNode
+  title?: ReactNode
   path: string
   entryShortNamePlural: string
   entryLongNamePlural: string
@@ -19,19 +19,21 @@ interface TablePreviewProps {
 export function TablePreview(props: TablePreviewProps) {
   return (
     <section>
-      <SectionHeading
-        title={props.title}
-        description={
-          props.total !== 'processing' &&
-          props.total > 0 && (
-            <>
-              You're viewing {formatInt(props.visible)} out of{' '}
-              <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
-              {props.entryShortNamePlural}
-            </>
-          )
-        }
-      />
+      {props.title && (
+        <SectionHeading
+          title={props.title}
+          description={
+            props.total !== 'processing' &&
+            props.total > 0 && (
+              <>
+                You're viewing {formatInt(props.visible)} out of{' '}
+                <Link href={props.path}>{formatInt(props.total)}</Link>{' '}
+                {props.entryShortNamePlural}
+              </>
+            )
+          }
+        />
+      )}
       {props.children}
       {props.visible === 0 && (
         <div className="flex h-10 items-center justify-center text-center text-md text-zinc-500">
@@ -40,6 +42,7 @@ export function TablePreview(props: TablePreviewProps) {
             : `There are no ${props.entryLongNamePlural} to view.`}
         </div>
       )}
+
       {isNumber(props.total) && props.total > props.visible && (
         <div className="mt-6 flex items-center justify-center">
           <Button as="a" variant="outlined" href={props.path}>

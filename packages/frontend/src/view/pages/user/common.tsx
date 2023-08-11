@@ -1,8 +1,4 @@
 import { StarkKey } from '@explorer/types'
-import React from 'react'
-
-import { InfoIcon } from '../../assets/icons/InfoIcon'
-import { TooltipWrapper } from '../../components/Tooltip'
 
 export const getUserPageProps = (starkKey: StarkKey) => ({
   path: `/users/${starkKey.toString()}`,
@@ -10,15 +6,7 @@ export const getUserPageProps = (starkKey: StarkKey) => ({
 })
 
 export const getAssetsTableProps = (starkKey: StarkKey) => ({
-  title: (
-    <span className="mt-2">
-      Assets{' '}
-      <div className="mt-3 text-md text-zinc-500">
-        Guaranteed state of balances (proven on Ethereum), updated every few
-        hours:
-      </div>
-    </span>
-  ),
+  title: 'Assets',
   entryShortNamePlural: 'assets',
   entryLongNamePlural: 'assets',
   path: `/users/${starkKey.toString()}/assets`,
@@ -26,14 +14,7 @@ export const getAssetsTableProps = (starkKey: StarkKey) => ({
 })
 
 export const getL2TransactionTableProps = (starkKey: StarkKey) => ({
-  title: (
-    <span className="flex items-center gap-2">
-      Live Transactions{' '}
-      <TooltipWrapper content="Only included transactions are reflected in asset balances">
-        <InfoIcon />
-      </TooltipWrapper>
-    </span>
-  ),
+  title: 'Live Transactions',
   entryShortNamePlural: 'transactions',
   entryLongNamePlural: 'transactions',
   path: `/users/${starkKey.toString()}/l2-transactions`,
@@ -49,11 +30,11 @@ export const getBalanceChangeTableProps = (starkKey: StarkKey) => ({
 })
 
 export const getTransactionTableProps = (starkKey: StarkKey) => ({
-  title: 'Ethereum transactions',
+  title: 'L1 transactions',
   entryShortNamePlural: 'transactions',
-  entryLongNamePlural: 'ethereum transactions',
+  entryLongNamePlural: 'l1 transactions',
   path: `/users/${starkKey.toString()}/transactions`,
-  description: `Ethereum transactions of user ${starkKey.toString()}`,
+  description: `L1 transactions of user ${starkKey.toString()}`,
 })
 
 export const getOfferTableProps = (starkKey: StarkKey) => ({

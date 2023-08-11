@@ -2,6 +2,8 @@ import { PageContext } from '@explorer/shared'
 import { EthereumAddress, StarkKey } from '@explorer/types'
 import React from 'react'
 
+import { CountBadge } from '../../components/CountBadge'
+import { InfoBanner } from '../../components/InfoBanner'
 import { ContentWrapper } from '../../components/page/ContentWrapper'
 import { Page } from '../../components/page/Page'
 import { PageTitle } from '../../components/PageTitle'
@@ -12,6 +14,7 @@ import {
   TransactionEntry,
   TransactionsTable,
 } from '../../components/tables/TransactionsTable'
+import { Tabs } from '../../components/Tabs'
 import { reactToHtml } from '../../reactToHtml'
 import { PerpetualL2TransactionEntry } from '../l2-transaction/common'
 import {
@@ -50,7 +53,7 @@ interface UserPageProps {
   transactions: TransactionEntry[]
   totalTransactions: number
   l2Transactions: PerpetualL2TransactionEntry[]
-  totalL2Transactions: number | 'processing'
+  totalL2Transactions: number
   offers?: OfferEntry[]
   totalOffers: number
 }
@@ -62,6 +65,22 @@ export function renderUserPage(props: UserPageProps) {
 function UserPage(props: UserPageProps) {
   const common = getUserPageProps(props.starkKey)
   const isMine = props.context.user?.starkKey === props.starkKey
+
+  const { title: assetsTableTitle, ...assetsTablePropsWithoutTitle } =
+    getAssetsTableProps(props.starkKey)
+  const {
+    title: l2TransactionTableTitle,
+    ...l2TransactionsTablePropsWithoutTitle
+  } = getL2TransactionTableProps(props.starkKey)
+  const {
+    title: balanceChangesTableTitle,
+    ...balanceChangesTablePropsWithoutTitle
+  } = getBalanceChangeTableProps(props.starkKey)
+  const { title: transactionTableTitle, ...transactionTablePropsWithoutTitle } =
+    getTransactionTableProps(props.starkKey)
+  const { title: offerTableTitle, ...offerTablePropsWithoutTitle } =
+    getOfferTableProps(props.starkKey)
+
   return (
     <Page
       path={common.path}
@@ -88,63 +107,126 @@ function UserPage(props: UserPageProps) {
             />
           </div>
         </section>
-        <TablePreview
-          {...getAssetsTableProps(props.starkKey)}
-          visible={props.assets.length}
-          total={props.totalAssets}
-        >
-          <UserAssetsTable
-            tradingMode={props.context.tradingMode}
-            starkKey={props.starkKey}
-            ethereumAddress={props.ethereumAddress}
-            assets={props.assets}
-            isMine={isMine}
-            isFrozen={props.context.freezeStatus === 'frozen'}
-          />
-        </TablePreview>
-        {props.context.showL2Transactions && (
-          <TablePreview
-            {...getL2TransactionTableProps(props.starkKey)}
-            visible={props.l2Transactions.length}
-            total={props.totalL2Transactions}
-          >
-            <L2TransactionsTable
-              transactions={props.l2Transactions}
-              context={props.context}
-            />
-          </TablePreview>
-        )}
-        <TablePreview
-          {...getBalanceChangeTableProps(props.starkKey)}
-          visible={props.balanceChanges.length}
-          total={props.totalBalanceChanges}
-        >
-          <UserBalanceChangesTable
-            tradingMode={props.context.tradingMode}
-            balanceChanges={props.balanceChanges}
-          />
-        </TablePreview>
-        <TablePreview
-          {...getTransactionTableProps(props.starkKey)}
-          visible={props.transactions.length}
-          total={props.totalTransactions}
-        >
-          <TransactionsTable transactions={props.transactions} />
-        </TablePreview>
-        {props.offers && props.context.tradingMode === 'perpetual' && (
-          <TablePreview
-            {...getOfferTableProps(props.starkKey)}
-            visible={props.offers.length}
-            total={props.totalOffers}
-          >
-            <OffersTable
-              showStatus
-              showRole
-              offers={props.offers}
-              context={props.context}
-            />
-          </TablePreview>
-        )}
+        <Tabs
+          items={[
+            {
+              id: 'assets',
+              name: assetsTableTitle,
+              accessoryRight: (
+                <div className="flex items-center justify-center gap-2">
+                  <CountBadge count={props.totalAssets} />
+                </div>
+              ),
+              content: (
+                <>
+                  <InfoBanner className="mb-3">
+                    Guaranteed state of balance (proven on Ethereum), updated
+                    every few hours
+                  </InfoBanner>
+                  <TablePreview
+                    {...assetsTablePropsWithoutTitle}
+                    visible={props.assets.length}
+                    total={props.totalAssets}
+                  >
+                    <UserAssetsTable
+                      tradingMode={props.context.tradingMode}
+                      ethereumAddress={props.ethereumAddress}
+                      starkKey={props.starkKey}
+                      assets={props.assets}
+                      isMine={isMine}
+                      isFrozen={props.context.freezeStatus === 'frozen'}
+                    />
+                  </TablePreview>
+                </>
+              ),
+            },
+            ...(props.context.showL2Transactions
+              ? [
+                  {
+                    id: 'l2-transactions',
+                    name: l2TransactionTableTitle,
+                    accessoryRight: (
+                      <div className="flex items-center justify-center gap-2">
+                        <CountBadge count={props.totalL2Transactions} />
+                      </div>
+                    ),
+                    content: (
+                      <>
+                        <InfoBanner className="mb-3">
+                          Only included transactions are reflected in asset
+                          balances
+                        </InfoBanner>
+                        <TablePreview
+                          {...l2TransactionsTablePropsWithoutTitle}
+                          visible={props.l2Transactions.length}
+                          total={props.totalL2Transactions}
+                        >
+                          <L2TransactionsTable
+                            transactions={props.l2Transactions}
+                            context={props.context}
+                          />
+                        </TablePreview>
+                      </>
+                    ),
+                  },
+                ]
+              : []),
+            {
+              id: 'balance-changes',
+              name: balanceChangesTableTitle,
+              accessoryRight: <CountBadge count={props.totalBalanceChanges} />,
+              content: (
+                <TablePreview
+                  {...balanceChangesTablePropsWithoutTitle}
+                  visible={props.balanceChanges.length}
+                  total={props.totalBalanceChanges}
+                >
+                  <UserBalanceChangesTable
+                    tradingMode={props.context.tradingMode}
+                    balanceChanges={props.balanceChanges}
+                  />
+                </TablePreview>
+              ),
+            },
+            {
+              id: 'transactions',
+              name: transactionTableTitle,
+              accessoryRight: <CountBadge count={props.totalTransactions} />,
+              content: (
+                <TablePreview
+                  {...transactionTablePropsWithoutTitle}
+                  visible={props.transactions.length}
+                  total={props.totalTransactions}
+                >
+                  <TransactionsTable transactions={props.transactions} />
+                </TablePreview>
+              ),
+            },
+            ...(props.offers && props.context.tradingMode === 'perpetual'
+              ? [
+                  {
+                    id: 'offers',
+                    name: offerTableTitle,
+                    accessoryRight: <CountBadge count={props.totalOffers} />,
+                    content: (
+                      <TablePreview
+                        {...offerTablePropsWithoutTitle}
+                        visible={props.offers.length}
+                        total={props.totalOffers}
+                      >
+                        <OffersTable
+                          showStatus
+                          showRole
+                          offers={props.offers}
+                          context={props.context}
+                        />
+                      </TablePreview>
+                    ),
+                  },
+                ]
+              : []),
+          ]}
+        />
       </ContentWrapper>
     </Page>
   )
