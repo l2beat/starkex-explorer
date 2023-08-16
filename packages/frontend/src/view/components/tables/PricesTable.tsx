@@ -20,30 +20,55 @@ export function PricesTable(props: PricesTableProps) {
   const tableCount = props.prices.length == 1 ? 1 : 2
 
   return (
-    <div className={classNames('flex', tableCount === 2 && 'gap-12')}>
-      {range(tableCount).map((index) => {
-        return (
-          <Table
-            key={index}
-            columns={[{ header: 'Asset' }, { header: 'Price', numeric: true }]}
-            rows={props.prices
-              .filter((_, txIndex) => txIndex % tableCount === index)
-              .map((transaction) => {
-                return {
-                  cells: [
-                    <AssetWithLogo
-                      type="small"
-                      assetInfo={assetToInfo(transaction.asset)}
-                    />,
-                    formatWithDecimals(transaction.priceInCents, 2, {
-                      prefix: '$',
-                    }),
-                  ],
-                }
-              })}
-          />
-        )
-      })}
+    <div>
+      <div
+        className={classNames('hidden lg:flex', tableCount === 2 && 'gap-12')}
+      >
+        {range(tableCount).map((index) => {
+          return (
+            <Table
+              key={index}
+              columns={[
+                { header: 'Asset' },
+                { header: 'Price', numeric: true },
+              ]}
+              rows={props.prices
+                .filter((_, txIndex) => txIndex % tableCount === index)
+                .map((transaction) => {
+                  return {
+                    cells: [
+                      <AssetWithLogo
+                        type="small"
+                        assetInfo={assetToInfo(transaction.asset)}
+                      />,
+                      formatWithDecimals(transaction.priceInCents, 2, {
+                        prefix: '$',
+                      }),
+                    ],
+                  }
+                })}
+            />
+          )
+        })}
+      </div>
+      <div className="block lg:hidden">
+        <Table
+          columns={[{ header: 'Asset' }, { header: 'Price', numeric: true }]}
+          rows={props.prices.map((transaction) => {
+            return {
+              cells: [
+                <AssetWithLogo
+                  type="small"
+                  assetInfo={assetToInfo(transaction.asset)}
+                />,
+                formatWithDecimals(transaction.priceInCents, 2, {
+                  prefix: '$',
+                }),
+              ],
+            }
+          })}
+        />
+      </div>
     </div>
   )
 }
