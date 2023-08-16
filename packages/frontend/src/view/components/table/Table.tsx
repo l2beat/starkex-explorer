@@ -15,10 +15,9 @@ export function Table(props: TableProps) {
   const { alignLastColumnRight = true } = props
   return (
     <div
-      className={cx(
-        '-mx-4 w-[calc(100%+32px)] overflow-x-auto sm:mx-0 sm:w-full',
-        { 'rounded-lg bg-gray-800 pb-4': props.fullBackground }
-      )}
+      className={cx('overflow-x-auto sm:w-full', {
+        'rounded-lg bg-gray-800 pb-4': props.fullBackground,
+      })}
     >
       <table
         cellPadding="0"
