@@ -2,7 +2,7 @@ import React from 'react'
 
 export function BreakpointIndicator() {
   return (
-    <div className="fixed right-0 top-0 mr-8 mt-20 flex h-8 w-8 items-center justify-center rounded-full bg-brand stroke-white text-sm opacity-80">
+    <div className="fixed bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-tl-lg bg-brand stroke-white text-sm opacity-80">
       <div className="block  sm:hidden md:hidden lg:hidden xl:hidden 2xl:hidden">
         xs
       </div>
