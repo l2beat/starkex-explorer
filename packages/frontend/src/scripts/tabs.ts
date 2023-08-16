@@ -7,7 +7,7 @@ interface TabWithContent {
 const ARROWS_THRESHOLD = 2
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-export function configureTabs() {
+export function initTabs() {
   const { $$ } = makeQuery(document.body)
   const tabs = $$('.Tabs')
 
@@ -27,10 +27,6 @@ function configureTabsNavigation(tabNavigation: HTMLElement) {
     arrowLeft,
     arrowRight,
   } = elements
-
-  let selectedId =
-    tabs.find((tab) => tab.href.endsWith(window.location.hash))?.id ??
-    tabs[0]!.id
 
   const highlightTab = (tab: HTMLAnchorElement) => {
     tabsWithContent[selectedId]!.tab.classList.remove(
@@ -96,6 +92,12 @@ function configureTabsNavigation(tabNavigation: HTMLElement) {
     moveUnderline(tabWithContent!.tab)
     showArrows()
   }
+
+  let selectedId =
+    tabs.find((tab) => tab.href.endsWith(window.location.hash))?.id ??
+    tabs[0]!.id
+
+  onTabClick(selectedId)
 
   tabs.forEach((tab) => {
     tab.addEventListener('click', (e) => {
