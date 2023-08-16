@@ -2,6 +2,7 @@ import { PageContext, PageContextWithUser } from '@explorer/shared'
 import React, { ReactNode } from 'react'
 
 import { Tooltip } from '../Tooltip'
+import { BreakpointIndicator } from './BreakpointIndicator'
 import { Footer } from './Footer'
 import { FreezeBanner } from './FreezeBanner'
 import { Head } from './Head'
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export function Page(props: Props) {
+  const isPreview = process.env.PREVIEW === 'true'
   return (
     <html
       lang="en"
@@ -43,6 +45,7 @@ export function Page(props: Props) {
         stylesheets={props.stylesheets ?? ['/styles/main.css']}
       />
       <body className="flex h-full flex-col">
+        {isPreview && <BreakpointIndicator />}
         <Navbar searchBar={!props.withoutSearch} context={props.context} />
         <FreezeBanner freezeStatus={props.context.freezeStatus} />
         <GradientBackground />

@@ -17,9 +17,7 @@
     "build": "NODE_ENV=production gulp build",
     "clean": "rm -rf build",
     "test": "mocha",
-    "dev": "gulp watch",
-    "dev:myria": "STARKEX_INSTANCE=myria-goerli gulp watch",
-    "dev:gammax": "STARKEX_INSTANCE=gammax-goerli gulp watch"
+    "dev": "PREVIEW=true gulp watch"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.6.3",
