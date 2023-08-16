@@ -23,7 +23,7 @@ interface Props {
 }
 
 export function Page(props: Props) {
-  const isPreview = process.env.PREVIEW === 'true'
+  const isPreview = process.env.DEPLOYMENT_ENV === 'preview'
   return (
     <html
       lang="en"

@@ -17,7 +17,7 @@
     "build": "NODE_ENV=production gulp build",
     "clean": "rm -rf build",
     "test": "mocha",
-    "dev": "PREVIEW=true gulp watch"
+    "dev": "DEPLOYMENT_ENV=preview gulp watch"
   },
   "dependencies": {
     "@ethersproject/abi": "^5.6.3",
