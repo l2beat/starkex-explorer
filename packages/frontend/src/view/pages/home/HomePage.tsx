@@ -81,7 +81,10 @@ function HomePage(props: HomePageProps) {
                 {...STATE_UPDATE_TABLE_PROPS}
                 visible={props.stateUpdates.length}
               >
-                <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
+                <HomeStateUpdatesTable
+                  stateUpdates={props.stateUpdates}
+                  shortenOnMobile
+                />
               </TablePreview>
             </Card>
             <Card className="flex h-min flex-col gap-[33px] bg-transparent !p-0 xl:bg-gray-800 xl:!p-6">

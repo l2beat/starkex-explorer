@@ -9,6 +9,7 @@ interface TableProps {
   rows: Row[]
   fullBackground?: boolean
   alignLastColumnRight?: boolean
+  shortenOnMobile?: boolean
 }
 
 export function Table(props: TableProps) {
@@ -51,6 +52,7 @@ export function Table(props: TableProps) {
               link={link}
               columns={props.columns}
               fullBackground={props.fullBackground}
+              shortenOnMobile={props.shortenOnMobile}
               i={i}
               key={i}
             />

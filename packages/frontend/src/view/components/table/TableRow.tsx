@@ -7,15 +7,18 @@ interface TableRowProps extends Row {
   i: number
   columns: Column[]
   fullBackground?: boolean
+  shortenOnMobile?: boolean
 }
 
 export function TableRow(props: TableRowProps) {
   return (
     <tr
       className={cx(
+        'whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium ',
         props.fullBackground ? 'h-16' : 'h-10',
-        'whitespace-nowrap border-b border-b-zinc-800 border-opacity-50 text-sm font-medium',
-        props.link && 'cursor-pointer hover:bg-gray-900 hover:bg-opacity-40'
+        props.link && 'cursor-pointer hover:bg-gray-900 hover:bg-opacity-40',
+        props.shortenOnMobile &&
+          '[&:nth-child(n+11)]:hidden xl:[&:nth-child(n+11)]:table-row'
       )}
     >
       {props.cells.map((cell, col) => {

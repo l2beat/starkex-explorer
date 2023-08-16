@@ -17,11 +17,13 @@ export interface HomeStateUpdateEntry {
 
 interface HomeStateUpdatesTableProps {
   stateUpdates: HomeStateUpdateEntry[]
+  shortenOnMobile?: boolean
 }
 
 export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
   return (
     <Table
+      shortenOnMobile={props.shortenOnMobile}
       columns={[
         { header: 'Id' },
         { header: 'Updates', numeric: true },
