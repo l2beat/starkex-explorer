@@ -36,7 +36,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
           ),
           numeric: true,
         },
-        { header: 'Tx Hash' },
+        { header: 'Tx Hash', className: '@container/tx-hash' },
         { header: 'Age' },
       ]}
       rows={props.stateUpdates.map((stateUpdate) => {
@@ -50,7 +50,7 @@ export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
             stateUpdate.forcedTransactionCount > 0
               ? formatInt(stateUpdate.forcedTransactionCount)
               : '-',
-            <InlineEllipsis className="max-w-[80px]">
+            <InlineEllipsis className="max-w-[80px] @[150px]/tx-hash:max-w-[150px]">
               {stateUpdate.hash.toString()}
             </InlineEllipsis>,
             <TimeAgeCell timestamp={stateUpdate.timestamp} />,
