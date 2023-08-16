@@ -84,7 +84,7 @@ function HomePage(props: HomePageProps) {
                 <HomeStateUpdatesTable stateUpdates={props.stateUpdates} />
               </TablePreview>
             </Card>
-            <Card className="flex h-min flex-col gap-10 bg-transparent !p-0 xl:bg-gray-800 xl:!p-6">
+            <Card className="flex h-min flex-col gap-[33px] bg-transparent !p-0 xl:bg-gray-800 xl:!p-6">
               {props.context.showL2Transactions && (
                 <Card className="xl:p-0">
                   <TablePreview

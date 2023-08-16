@@ -129,7 +129,7 @@ const routes: Route[] = [
 
       ctx.body = renderHomePage({
         context,
-        stateUpdates: repeat(16, randomHomeStateUpdateEntry),
+        stateUpdates: repeat(10, randomHomeStateUpdateEntry),
         forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
         l2Transactions: [],
         statistics: {
@@ -153,7 +153,7 @@ const routes: Route[] = [
 
       ctx.body = renderHomePage({
         context,
-        stateUpdates: repeat(25, randomHomeStateUpdateEntry),
+        stateUpdates: repeat(22, randomHomeStateUpdateEntry),
         l2Transactions: repeat(8, randomPerpetualL2TransactionEntry),
         forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
         statistics: {
@@ -162,7 +162,7 @@ const routes: Route[] = [
           forcedTransactionCount: 68,
           offerCount: 6,
         },
-        offers: repeat(3, randomHomeOfferEntry),
+        offers: repeat(4, randomHomeOfferEntry),
       })
     },
   },
@@ -174,7 +174,7 @@ const routes: Route[] = [
       ctx.body = renderHomePage({
         context,
         tutorials: [],
-        stateUpdates: repeat(16, randomHomeStateUpdateEntry),
+        stateUpdates: repeat(10, randomHomeStateUpdateEntry),
         forcedTransactions: repeat(4, randomHomeForcedTransactionEntry),
         l2Transactions: [],
         statistics: {

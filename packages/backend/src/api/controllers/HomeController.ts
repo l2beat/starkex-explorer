@@ -53,7 +53,6 @@ export class HomeController {
       l2Transactions,
       lastStateDetailsWithL2TransactionsStatistics,
       liveL2TransactionsStatistics,
-      stateUpdates,
       stateUpdatesCount,
       forcedUserTransactions,
       forcedUserTransactionsCount,
@@ -66,10 +65,7 @@ export class HomeController {
       ),
       this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
       this.l2TransactionRepository.getLiveStatistics(),
-      this.preprocessedStateDetailsRepository.getPaginated({
-        offset: 0,
-        limit: 25,
-      }),
+
       this.preprocessedStateDetailsRepository.countAll(),
       this.userTransactionRepository.getPaginated({
         offset: 0,
@@ -83,6 +79,20 @@ export class HomeController {
       }),
       this.forcedTradeOfferRepository.countAll(),
     ])
+    const stateUpdatesLimit = this.calculateStateUpdateLimit(
+      {
+        l2Transactions: l2Transactions.length,
+        forcedTransactions: forcedUserTransactions.length,
+        offers: availableOffers.length,
+      },
+      context.showL2Transactions
+    )
+
+    const stateUpdates =
+      await this.preprocessedStateDetailsRepository.getPaginated({
+        offset: 0,
+        limit: stateUpdatesLimit,
+      })
 
     const assetDetailsMap = await this.assetDetailsService.getAssetDetailsMap({
       userTransactions: forcedUserTransactions,
@@ -230,5 +240,27 @@ export class HomeController {
     })
 
     return { type: 'success', content }
+  }
+
+  private calculateStateUpdateLimit(
+    counts: {
+      l2Transactions: number
+      forcedTransactions: number
+      offers: number
+    },
+    showL2Transactions: boolean
+  ) {
+    const spaceBetweenTablesInRows = 3
+    const emptyTableRows = 3
+    const stateUpdateLimit =
+      (counts.forcedTransactions || emptyTableRows) +
+      spaceBetweenTablesInRows +
+      (counts.offers || emptyTableRows)
+
+    return showL2Transactions
+      ? stateUpdateLimit +
+          (counts.l2Transactions || spaceBetweenTablesInRows) +
+          spaceBetweenTablesInRows
+      : stateUpdateLimit
   }
 }

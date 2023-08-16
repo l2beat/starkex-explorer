@@ -22,7 +22,6 @@ interface HomeStateUpdatesTableProps {
 export function HomeStateUpdatesTable(props: HomeStateUpdatesTableProps) {
   return (
     <Table
-      hideAfter={19}
       columns={[
         { header: 'Id' },
         { header: 'Updates', numeric: true },
