@@ -29,6 +29,8 @@ const FORCED_TRANSACTION_TYPES: UserTransactionData['type'][] = [
   'FinalizeEscape',
   'FreezeRequest',
 ]
+const SPACE_BETWEEN_TABLES_IN_ROWS = 3
+const EMPTY_TABLE_HEIGHT_IN_ROWS = 2
 
 export class HomeController {
   constructor(
@@ -65,7 +67,6 @@ export class HomeController {
       ),
       this.preprocessedStateDetailsRepository.findLastWithL2TransactionsStatistics(),
       this.l2TransactionRepository.getLiveStatistics(),
-
       this.preprocessedStateDetailsRepository.countAll(),
       this.userTransactionRepository.getPaginated({
         offset: 0,
@@ -243,24 +244,25 @@ export class HomeController {
   }
 
   private calculateStateUpdateLimit(
-    counts: {
+    recordCounts: {
       l2Transactions: number
       forcedTransactions: number
       offers: number
     },
     showL2Transactions: boolean
   ) {
-    const spaceBetweenTablesInRows = 3
-    const emptyTableRows = 3
+    const counts = {
+      l2Transactions: recordCounts.l2Transactions || EMPTY_TABLE_HEIGHT_IN_ROWS,
+      forcedTransactions:
+        recordCounts.forcedTransactions || EMPTY_TABLE_HEIGHT_IN_ROWS,
+      offers: recordCounts.offers || EMPTY_TABLE_HEIGHT_IN_ROWS,
+    }
+
     const stateUpdateLimit =
-      (counts.forcedTransactions || emptyTableRows) +
-      spaceBetweenTablesInRows +
-      (counts.offers || emptyTableRows)
+      counts.forcedTransactions + SPACE_BETWEEN_TABLES_IN_ROWS + counts.offers
 
     return showL2Transactions
-      ? stateUpdateLimit +
-          (counts.l2Transactions || spaceBetweenTablesInRows) +
-          spaceBetweenTablesInRows
+      ? stateUpdateLimit + counts.l2Transactions + SPACE_BETWEEN_TABLES_IN_ROWS
       : stateUpdateLimit
   }
 }
