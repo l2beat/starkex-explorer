@@ -76,5 +76,5 @@ module.exports = {
       'brand-darker': '#4F4CD7',
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/container-queries')],
 }

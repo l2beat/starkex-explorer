@@ -545,6 +545,11 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
+"@tailwindcss/container-queries@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/container-queries/-/container-queries-0.1.1.tgz#9a759ce2cb8736a4c6a0cb93aeb740573a731974"
+  integrity sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==
+
 "@trufflesuite/bigint-buffer@1.1.9":
   version "1.1.9"
   resolved "https://registry.yarnpkg.com/@trufflesuite/bigint-buffer/-/bigint-buffer-1.1.9.tgz#e2604d76e1e4747b74376d68f1312f9944d0d75d"
