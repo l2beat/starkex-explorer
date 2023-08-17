@@ -75,6 +75,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
                     ),
                     content: (
                       <TablePreview
+                        viewAllPosition="bottom"
                         {...l2TransactionsTablePropsWithoutTitle}
                         visible={props.l2Transactions.length}
                       >
@@ -93,6 +94,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
               accessoryRight: <CountBadge count={props.totalBalanceChanges} />,
               content: (
                 <TablePreview
+                  viewAllPosition="bottom"
                   {...balanceChangesTablePropsWithoutTitle}
                   visible={props.balanceChanges.length}
                 >
@@ -109,6 +111,7 @@ function StateUpdatePage(props: StateUpdatePageProps) {
               accessoryRight: <CountBadge count={props.totalTransactions} />,
               content: (
                 <TablePreview
+                  viewAllPosition="bottom"
                   {...transactionTablePropsWithoutTitle}
                   visible={props.transactions.length}
                 >

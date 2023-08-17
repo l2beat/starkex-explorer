@@ -120,8 +120,9 @@ function UserPage(props: UserPageProps) {
                     every few hours
                   </InfoBanner>
                   <TablePreview
-                    {...assetsTablePropsWithoutTitle}
+                    viewAllPosition="bottom"
                     visible={props.assets.length}
+                    {...assetsTablePropsWithoutTitle}
                   >
                     <UserAssetsTable
                       tradingMode={props.context.tradingMode}
@@ -150,8 +151,9 @@ function UserPage(props: UserPageProps) {
                           balances
                         </InfoBanner>
                         <TablePreview
-                          {...l2TransactionsTablePropsWithoutTitle}
+                          viewAllPosition="bottom"
                           visible={props.l2Transactions.length}
+                          {...l2TransactionsTablePropsWithoutTitle}
                         >
                           <L2TransactionsTable
                             transactions={props.l2Transactions}
@@ -169,8 +171,9 @@ function UserPage(props: UserPageProps) {
               accessoryRight: <CountBadge count={props.totalBalanceChanges} />,
               content: (
                 <TablePreview
-                  {...balanceChangesTablePropsWithoutTitle}
+                  viewAllPosition="bottom"
                   visible={props.balanceChanges.length}
+                  {...balanceChangesTablePropsWithoutTitle}
                 >
                   <UserBalanceChangesTable
                     tradingMode={props.context.tradingMode}
@@ -185,8 +188,9 @@ function UserPage(props: UserPageProps) {
               accessoryRight: <CountBadge count={props.totalTransactions} />,
               content: (
                 <TablePreview
-                  {...transactionTablePropsWithoutTitle}
+                  viewAllPosition="bottom"
                   visible={props.transactions.length}
+                  {...transactionTablePropsWithoutTitle}
                 >
                   <TransactionsTable transactions={props.transactions} />
                 </TablePreview>
@@ -200,8 +204,9 @@ function UserPage(props: UserPageProps) {
                     accessoryRight: <CountBadge count={props.totalOffers} />,
                     content: (
                       <TablePreview
-                        {...offerTablePropsWithoutTitle}
+                        viewAllPosition="bottom"
                         visible={props.offers.length}
+                        {...offerTablePropsWithoutTitle}
                       >
                         <OffersTable
                           showRole
