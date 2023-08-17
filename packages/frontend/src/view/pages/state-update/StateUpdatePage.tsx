@@ -65,6 +65,23 @@ function StateUpdatePage(props: StateUpdatePageProps) {
         <StateUpdateStats {...props} />
         <Tabs
           items={[
+            {
+              id: 'balance-changes',
+              name: balanceChangesTableTitle,
+              accessoryRight: <CountBadge count={props.totalBalanceChanges} />,
+              content: (
+                <TablePreview
+                  viewAllPosition="bottom"
+                  {...balanceChangesTablePropsWithoutTitle}
+                  visible={props.balanceChanges.length}
+                >
+                  <StateUpdateBalanceChangesTable
+                    tradingMode={props.context.tradingMode}
+                    balanceChanges={props.balanceChanges}
+                  />
+                </TablePreview>
+              ),
+            },
             ...(props.context.showL2Transactions
               ? [
                   {
@@ -88,23 +105,6 @@ function StateUpdatePage(props: StateUpdatePageProps) {
                   },
                 ]
               : []),
-            {
-              id: 'balance-changes',
-              name: balanceChangesTableTitle,
-              accessoryRight: <CountBadge count={props.totalBalanceChanges} />,
-              content: (
-                <TablePreview
-                  viewAllPosition="bottom"
-                  {...balanceChangesTablePropsWithoutTitle}
-                  visible={props.balanceChanges.length}
-                >
-                  <StateUpdateBalanceChangesTable
-                    tradingMode={props.context.tradingMode}
-                    balanceChanges={props.balanceChanges}
-                  />
-                </TablePreview>
-              ),
-            },
             {
               id: 'transactions',
               name: transactionTableTitle,
